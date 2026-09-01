@@ -3,6 +3,7 @@ import { usePosStore } from '../../store/posStore';
 import { PaymentMethod } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
 import { sound } from '@jamanvaar/ui';
+import { PosDiscountModal } from '../cart/PosDiscountModal';
 import {
   X,
   Banknote,
@@ -17,7 +18,9 @@ import {
   ArrowRight,
   Check,
   Sparkles,
-  Split
+  Split,
+  Tag,
+  Percent
 } from 'lucide-react';
 
 type PaymentChannel = 'CASH' | 'UPI' | 'CARD' | 'WALLET' | 'HOUSE_ACCOUNT';
@@ -75,7 +78,10 @@ export const PosPaymentModal: React.FC = () => {
     cart,
     selectedTable,
     selectedCustomer,
-    completePayment
+    completePayment,
+    isDiscountModalOpen,
+    setIsDiscountModalOpen,
+    removeDiscount
   } = usePosStore();
 
   const totalPayable = Number(cart?.totalPayable) || 0;
@@ -112,28 +118,25 @@ export const PosPaymentModal: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Initialize on modal open
+  // Initialize or synchronize on modal open & payable change
   useEffect(() => {
     if (isPaymentOpen) {
       const payable = Number(cart?.totalPayable) || 0;
-      setIsSplitMode(false);
-      setActiveChannel('CASH');
-      setSplitPrimaryChannel('CASH');
-      setSplitSecondaryChannel('UPI');
-      setAllocations({
-        CASH: payable,
-        UPI: 0,
-        CARD: 0,
-        WALLET: 0,
-        HOUSE_ACCOUNT: 0
-      });
-      setCashReceivedInput(payable > 0 ? payable.toString() : '');
-      setUpiConfirmed(false);
-      setCardConfirmed(false);
-      setErrorMessage('');
-      setIsProcessing(false);
+      if (!isSplitMode) {
+        setAllocations({
+          CASH: 0,
+          UPI: 0,
+          CARD: 0,
+          WALLET: 0,
+          HOUSE_ACCOUNT: 0,
+          [activeChannel]: payable
+        });
+        if (activeChannel === 'CASH') {
+          setCashReceivedInput(payable > 0 ? payable.toString() : '');
+        }
+      }
     }
-  }, [isPaymentOpen, cart?.totalPayable]);
+  }, [isPaymentOpen, cart?.totalPayable, isSplitMode, activeChannel]);
 
   // Derived Calculations
   const totalAllocated = useMemo(() => {
@@ -391,11 +394,18 @@ export const PosPaymentModal: React.FC = () => {
               <h2 className="text-2xl sm:text-3xl font-black text-[#0B253A] font-mono leading-tight">
                 {formatINR(totalPayable)}
               </h2>
-              {cart.discountAmount > 0 && (
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-lg border border-emerald-300">
-                  Discount: -{formatINR(cart.discountAmount)} {cart.discountReason ? `(${cart.discountReason})` : ''}
-                </span>
-              )}
+              <button
+                type="button"
+                onClick={() => setIsDiscountModalOpen(true)}
+                className={`px-2.5 py-1 rounded-xl border text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                  cart.discountAmount > 0
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-2xs'
+                    : 'bg-[#FFF4ED] border-[#FDBA74] text-[#E66817] hover:bg-[#FFE8D6]'
+                }`}
+              >
+                <Tag className="w-3.5 h-3.5" />
+                <span>{cart.discountAmount > 0 ? `Discount: -${formatINR(cart.discountAmount)}` : '+ Apply Discount'}</span>
+              </button>
             </div>
             <div className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
               <span>{selectedTable ? `Table #${selectedTable.tableNumber}` : 'Counter Takeaway'}</span>
@@ -854,12 +864,61 @@ export const PosPaymentModal: React.FC = () => {
                 )}
               </div>
 
-              {/* Bill Total Line */}
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-500">Bill Total:</span>
-                <span className="font-mono font-black text-base text-[#0B253A]">
-                  {formatINR(totalPayable)}
-                </span>
+              {/* Financial Breakdown with Subtotal & Discount */}
+              <div className="space-y-1.5 text-xs text-slate-600 font-medium">
+                <div className="flex justify-between">
+                  <span>Gross Subtotal:</span>
+                  <span className="font-mono font-bold text-[#0B253A]">{formatINR(cart.subtotal)}</span>
+                </div>
+
+                {cart.discountAmount > 0 ? (
+                  <div className="flex justify-between items-center text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1.5 rounded-xl border border-emerald-200">
+                    <div className="flex items-center gap-1 truncate max-w-[170px]">
+                      <Tag className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span className="truncate">Discount {cart.discountReason ? `(${cart.discountReason})` : ''}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono font-black">-{formatINR(cart.discountAmount)}</span>
+                      <button
+                        type="button"
+                        onClick={() => setIsDiscountModalOpen(true)}
+                        className="text-emerald-800 hover:underline text-[10px] font-bold cursor-pointer"
+                        title="Edit discount"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeDiscount()}
+                        className="w-4 h-4 rounded-full bg-emerald-200/80 hover:bg-rose-100 hover:text-rose-700 text-emerald-800 flex items-center justify-center text-[10px] cursor-pointer"
+                        title="Remove discount"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsDiscountModalOpen(true)}
+                    className="w-full py-2 px-3 rounded-xl border border-dashed border-[#FDBA74] bg-[#FFF8F3] hover:bg-[#FFF2E8] text-[#E66817] text-xs font-extrabold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Tag className="w-3.5 h-3.5" />
+                    <span>+ Add Order Discount / Coupon</span>
+                  </button>
+                )}
+
+                <div className="flex justify-between text-[11px] text-slate-500">
+                  <span>GST (CGST 2.5% + SGST 2.5%):</span>
+                  <span className="font-mono">{formatINR(cart.taxAmount)}</span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs pt-1.5 border-t border-slate-200">
+                  <span className="font-bold text-slate-700">Total Payable:</span>
+                  <span className="font-mono font-black text-lg text-[#0B253A]">
+                    {formatINR(totalPayable)}
+                  </span>
+                </div>
               </div>
 
               {/* Active Tender Breakdown Lines */}
@@ -963,6 +1022,11 @@ export const PosPaymentModal: React.FC = () => {
           </div>
         </div>
 
+        {/* Nested Discount Modal for on-the-fly discounts during checkout */}
+        <PosDiscountModal
+          isOpen={isDiscountModalOpen}
+          onClose={() => setIsDiscountModalOpen(false)}
+        />
       </div>
     </div>
   );
