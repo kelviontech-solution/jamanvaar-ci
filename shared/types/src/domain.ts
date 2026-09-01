@@ -1,0 +1,1285 @@
+import {
+  DietaryType,
+  KioskStatus,
+  KOTStatus,
+  KOTType,
+  ManagerOverrideAction,
+  OrderStatus,
+  OrderType,
+  PaymentMethod,
+  PaymentStatus,
+  ServiceRequestStatus,
+  ServiceRequestType,
+  ShiftStatus,
+  SpiceLevel,
+  SyncEventStatus,
+  SyncEventType,
+  TableStatus
+} from './enums';
+
+export interface InstantBillConfig {
+  enabled: boolean;
+  paymentMethod: PaymentMethod;
+  autoPrint: boolean;
+  askConfirmation: boolean;
+  defaultOrderType: OrderType;
+  sendKotBeforeBill: boolean;
+  allowedRoles?: string[];
+}
+
+export interface Restaurant {
+  id: string;
+  name: string;
+  legalName?: string;
+  tagline?: string;
+  logoUrl?: string;
+  currency: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  gstin?: string;
+  fssaiNumber?: string;
+  msmeNumber?: string;
+  website?: string;
+  footerText?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  ownerName?: string;
+  managerName?: string;
+  instantBillConfig?: InstantBillConfig;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Outlet {
+  id: string;
+  restaurantId: string;
+  name: string;
+  code: string;
+  address: string;
+  city: string;
+  state: string;
+  phone: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface KioskDevice {
+  id: string;
+  outletId: string;
+  kioskCode: string;
+  name: string;
+  locationDescription?: string;
+  status: KioskStatus;
+  orderTypesAllowed: OrderType[];
+  allowCashAtCounter: boolean;
+  defaultLanguage: string;
+  idleTimeoutSeconds: number;
+  ipAddress?: string;
+  macAddress?: string;
+  appVersion: string;
+  lastHeartbeat?: string;
+  lastSyncAt?: string;
+  isLocked: boolean;
+  lockReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface KioskSession {
+  sessionId: string;
+  kioskId: string;
+  outletId: string;
+  orderType?: OrderType;
+  tableId?: string;
+  guestCount?: number;
+  customerPhone?: string;
+  customerName?: string;
+  startedAt: string;
+  lastActiveAt: string;
+  status: 'ACTIVE' | 'ORDER_PLACED' | 'EXPIRED' | 'CANCELLED';
+  metadata?: Record<string, any>;
+}
+
+export interface User {
+  id: string;
+  restaurantId: string;
+  username: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  roleId: string;
+  isActive: boolean;
+  lastLoginAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  description: string;
+  permissions: string[];
+  isSystemRole?: boolean;
+}
+
+export interface Category {
+  id: string;
+  outletId?: string;
+  name: string;
+  slug: string;
+  description?: string;
+  imageUrl?: string;
+  iconName?: string;
+  sortOrder: number;
+  isActive: boolean;
+  itemCount?: number;
+  translations?: Record<string, { name: string; description?: string }>;
+}
+
+export interface ModifierOption {
+  id: string;
+  groupId: string;
+  name: string;
+  priceDelta: number; // e.g. +₹30 for extra cheese
+  isDefault?: boolean;
+  isAvailable: boolean;
+  sortOrder: number;
+  dietaryType?: DietaryType;
+  translations?: Record<string, { name: string }>;
+}
+
+export interface ModifierGroup {
+  id: string;
+  name: string;
+  description?: string;
+  minSelections: number; // 0 for optional, 1+ for required
+  maxSelections: number;
+  isRequired: boolean;
+  options: ModifierOption[];
+  sortOrder: number;
+}
+
+export interface MenuItem {
+  id: string;
+  categoryId: string;
+  outletId?: string;
+  sku: string;
+  name: string;
+  description: string;
+  price: number;
+  basePrice?: number;
+  takeawayPrice?: number;
+  dineInPrice?: number;
+  imageUrl?: string;
+  dietaryType: DietaryType;
+  spiceLevel: SpiceLevel;
+  isPopular: boolean;
+  isNew: boolean;
+  isFeatured: boolean;
+  isAvailable: boolean;
+  soldOutReason?: string;
+  stockQuantity?: number;
+  lowStockThreshold?: number;
+  prepTimeMinutes: number;
+  calories?: number;
+  servingSize?: string;
+  allergens: string[];
+  modifierGroupIds: string[];
+  modifierGroups?: ModifierGroup[];
+  taxGroupId?: string;
+  sortOrder: number;
+  kitchenStation?: string;
+  isDigitalMenuVisible?: boolean;
+  isQrOrderingEnabled?: boolean;
+  isKioskEnabled?: boolean;
+  imagePrompt?: string;
+  imageSource?: string;
+  imageSourceUrl?: string;
+  imageLicense?: string;
+  imageApproved?: boolean;
+  translations?: Record<string, { name: string; description?: string }>;
+}
+
+export interface ComboItemSlot {
+  id: string;
+  comboId: string;
+  slotName: string; // e.g., 'Main Course', 'Beverage', 'Side'
+  allowedCategoryIds?: string[];
+  allowedItemIds?: string[];
+  defaultItemId?: string;
+  isRequired: boolean;
+  priceDelta: number;
+}
+
+export interface Combo {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl?: string;
+  comboPrice: number;
+  originalPrice?: number;
+  slots: ComboItemSlot[];
+  isActive: boolean;
+  dietaryType: DietaryType;
+  sortOrder: number;
+}
+
+export interface TaxGroup {
+  id: string;
+  name: string;
+  cgstPercent: number; // e.g. 2.5
+  sgstPercent: number; // e.g. 2.5
+  igstPercent: number; // e.g. 5.0
+  isInclusive: boolean; // default true for restaurants
+  isActive: boolean;
+}
+
+export interface Offer {
+  id: string;
+  title: string;
+  description: string;
+  discountType: 'PERCENTAGE' | 'FLAT' | 'BOGO';
+  discountValue: number;
+  minOrderValue: number;
+  maxDiscountAmount?: number;
+  bannerImageUrl?: string;
+  isActive: boolean;
+  startDate?: string;
+  endDate?: string;
+  channel: 'ALL' | 'KIOSK_ONLY' | 'POS_ONLY';
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  description: string;
+  discountType: 'PERCENTAGE' | 'FLAT';
+  discountValue: number;
+  minOrderValue: number;
+  maxDiscountAmount?: number;
+  usageLimit?: number;
+  usageCount: number;
+  perCustomerLimit?: number;
+  validFrom: string;
+  validUntil: string;
+  isActive: boolean;
+}
+
+export interface DiningTable {
+  id: string;
+  outletId: string;
+  tableNumber: string;
+  capacity: number;
+  currentGuests?: number;
+  zone: string; // e.g., 'Main Hall', 'AC Section', 'Balcony'
+  floor: number;
+  qrCodeUrl?: string;
+  qrShortCode?: string;
+  qrStatus?: 'ACTIVE' | 'INACTIVE' | 'DISABLED';
+  lastOrderId?: string;
+  lastOrderTime?: string;
+  totalOrdersToday?: number;
+  totalRevenueToday?: number;
+  status: TableStatus;
+  currentOrderId?: string;
+  isActive: boolean;
+}
+
+export interface SelectedModifier {
+  groupId: string;
+  groupName: string;
+  optionId: string;
+  optionName: string;
+  priceDelta: number;
+}
+
+export interface CartItem {
+  cartItemId: string;
+  menuItemId: string;
+  item: MenuItem;
+  quantity: number;
+  unitPrice: number;
+  selectedModifiers: SelectedModifier[];
+  specialInstructions?: string;
+  itemTotal: number;
+}
+
+export interface Cart {
+  items: CartItem[];
+  subtotal: number;
+  discountAmount: number;
+  appliedCoupon?: Coupon;
+  cgstAmount: number;
+  sgstAmount: number;
+  taxAmount: number;
+  serviceChargeAmount: number;
+  tipAmount: number;
+  roundOffAmount: number;
+  totalPayable: number;
+}
+
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  menuItemId: string;
+  name: string;
+  sku: string;
+  quantity: number;
+  unitPrice: number;
+  modifiers: SelectedModifier[];
+  specialInstructions?: string;
+  totalPrice: number;
+  kitchenStatus?: 'PENDING' | 'PREPARING' | 'READY' | 'SERVED';
+}
+
+export type BusinessDayStatus = 'OPEN' | 'CLOSING' | 'CLOSED' | 'REOPENED';
+
+export interface BusinessDaySnapshot {
+  grossSalesSnapshot: number;
+  discountSnapshot: number;
+  taxSnapshot: number;
+  netSalesSnapshot: number;
+  paymentSnapshot: {
+    cash: number;
+    upi: number;
+    card: number;
+    split: number;
+    other: number;
+  };
+  orderCountSnapshot: number;
+  completedOrderCountSnapshot: number;
+  cancelledOrderCountSnapshot: number;
+  refundedOrderCountSnapshot: number;
+  cashDrawerSnapshot: {
+    openingCash: number;
+    cashSales: number;
+    cashIn: number;
+    cashOut: number;
+    expectedCash: number;
+    actualCash: number;
+    variance: number;
+    varianceReason?: string;
+  };
+  topItemsSnapshot: Array<{
+    name: string;
+    quantity: number;
+    revenue: number;
+  }>;
+}
+
+export interface BusinessDay {
+  id: string;
+  businessDate: string;
+  displayDate: string;
+  openedAt: string;
+  closedAt?: string;
+  openedBy: string;
+  closedBy?: string;
+  status: BusinessDayStatus;
+  openingCash: number;
+  closingCash?: number;
+  expectedCash?: number;
+  cashVariance?: number;
+  varianceReason?: string;
+  cashIn?: number;
+  cashOut?: number;
+  grossSales: number;
+  discounts: number;
+  netSales: number;
+  tax: number;
+  totalCollected: number;
+  cashSales: number;
+  upiSales: number;
+  cardSales: number;
+  otherPayments: number;
+  orderCount: number;
+  completedOrderCount: number;
+  cancelledOrderCount: number;
+  refundedOrderCount: number;
+  dineInCount: number;
+  takeawayCount: number;
+  deliveryCount: number;
+  tokenCount: number;
+  terminalId?: string;
+  reopenedAt?: string;
+  reopenedBy?: string;
+  reopenReason?: string;
+  snapshot?: BusinessDaySnapshot;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  tokenNumber: string;
+  businessDayId?: string;
+  shiftId?: string;
+  restaurantId: string;
+  outletId: string;
+  kioskId: string;
+  sessionId: string;
+  idempotencyKey: string;
+  orderType: OrderType;
+  tableId?: string;
+  tableNumber?: string;
+  guestCount?: number;
+  customerPhone?: string;
+  customerName?: string;
+  cashierName?: string;
+  captainName?: string;
+  items: OrderItem[];
+  subtotal: number;
+  discountAmount: number;
+  couponCode?: string;
+  cgstAmount: number;
+  sgstAmount: number;
+  taxAmount: number;
+  serviceChargeAmount: number;
+  tipAmount: number;
+  roundOffAmount: number;
+  totalAmount: number;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  paymentTransactionId?: string;
+  orderStatus: OrderStatus;
+  estimatedWaitMinutes: number;
+  tenderedAmount?: number;
+  changeAmount?: number;
+  createdAt: string;
+  updatedAt: string;
+  pickupCounter?: string;
+  source_type?: 'KIOSK' | 'POS' | 'CAPTAIN' | 'QR_TABLE' | 'ONLINE' | 'OTHER';
+  customerNotes?: string;
+  kitchenRouting?: {
+    stationBreakdown: Record<string, number>;
+    summaryText: string;
+  };
+  acknowledgementStage?:
+    | 'ORDER_CREATED_LOCALLY'
+    | 'ORDER_ACCEPTED_BY_CLOUD'
+    | 'ORDER_RECEIVED_BY_POS'
+    | 'ORDER_SENT_TO_KDS'
+    | 'ORDER_PREPARING'
+    | 'ORDER_READY'
+    | 'ORDER_COMPLETED';
+  timeline?: Array<{
+    status: string;
+    title: string;
+    timestamp: string;
+    note?: string;
+    actor?: string;
+  }>;
+  syncStatus?: 'SAVED_LOCALLY' | 'SYNCING' | 'SYNCED' | 'FAILED';
+  eBillStatus?: ReceiptDeliveryStatus;
+  eBillMethod?: ReceiptDeliveryMethod;
+  eBillRecipient?: string;
+  isSynced: boolean;
+  eBillDispatched?: boolean;
+}
+
+export interface QrOrderingSettings {
+  isQrOrderingActive: boolean;
+  allowCustomerOrdering: boolean;
+  allowCustomerModifications: boolean;
+  allowSpecialInstructions: boolean;
+  allowRepeatOrdering: boolean;
+  requireWaiterApproval: boolean;
+  autoSendToKitchen: boolean;
+  showOrderStatusTimeline: boolean;
+  allowCustomerCancellation: boolean;
+  minOrderValue: number;
+  maxOrderValue: number;
+  tableQrTemplate: 'ELEGANT' | 'MODERN' | 'MINIMAL' | 'PREMIUM' | 'SIGNATURE';
+  enableNotificationSound: boolean;
+  welcomeMessage?: string;
+}
+
+export type VoiceStyle = 'STANDARD' | 'SHORT' | 'DISABLED';
+export type VoiceLanguage = 'en' | 'hi' | 'gu';
+
+export interface VoiceConfig {
+  enabled: boolean;
+  style: VoiceStyle;
+  language: VoiceLanguage;
+  volume: number; // 0 to 1
+  rate: number; // 0.5 to 2
+  pitch: number; // 0.5 to 2
+  confirmationVoiceEnabled: boolean;
+  readyVoiceEnabled: boolean;
+  quietMode: boolean;
+}
+
+export interface PaymentTransaction {
+  id: string;
+  orderId: string;
+  idempotencyKey: string;
+  amount: number;
+  method: PaymentMethod;
+  status: PaymentStatus;
+  provider: 'UPI_GATEWAY' | 'CARD_POS' | 'CASH_DESK' | 'MOCK_TEST';
+  gatewayTransactionId?: string;
+  qrPayload?: string;
+  errorMessage?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Receipt {
+  id: string;
+  orderId: string;
+  receiptNumber: string;
+  contentFormatted: string;
+  isPrinted: boolean;
+  printedAt?: string;
+  digitalUrl?: string;
+}
+
+export interface ServiceRequest {
+  id: string;
+  kioskId: string;
+  tableNumber?: string;
+  sessionId?: string;
+  type: ServiceRequestType;
+  notes?: string;
+  status: ServiceRequestStatus;
+  createdAt: string;
+  resolvedAt?: string;
+}
+
+export interface DeviceHealth {
+  kioskId: string;
+  status: KioskStatus;
+  isOnline: boolean;
+  cpuUsagePercent: number;
+  ramUsagePercent: number;
+  storageFreeGb: number;
+  appVersion: string;
+  isPrinterOnline: boolean;
+  isPaymentTerminalOnline: boolean;
+  isTouchscreenResponsive: boolean;
+  lastHeartbeat: string;
+  pendingSyncEventsCount: number;
+}
+
+export interface DeviceRecord {
+  id: string;
+  name: string;
+  type: 'POS' | 'KDS' | 'CAPTAIN' | 'KIOSK';
+  platform?: string;
+  status: 'ONLINE' | 'OFFLINE';
+  lastSync?: string;
+  isPrimary?: boolean;
+}
+
+export interface SyncEvent {
+  id: string;
+  kioskId: string;
+  eventType: SyncEventType;
+  payload: any;
+  status: SyncEventStatus;
+  retryCount: number;
+  lastAttemptAt?: string;
+  errorMessage?: string;
+  createdAt: string;
+}
+
+export interface AuditLog {
+  id: string;
+  userId?: string;
+  username?: string;
+  kioskId?: string;
+  action: string;
+  category: string; // 'MENU', 'PRICING', 'ORDER', 'DEVICE', 'AUTH', 'SETTINGS', 'STAFF_OVERRIDE'
+  details: string;
+  ipAddress?: string;
+  timestamp: string;
+}
+
+export interface CustomerFeedback {
+  id: string;
+  orderId?: string;
+  kioskId: string;
+  rating: number; // 1 to 5 stars
+  tags: string[]; // 'Food Quality', 'Speed', 'Cleanliness', 'Packaging'
+  comments?: string;
+  createdAt: string;
+}
+
+export interface CustomerAccount {
+  phone: string;
+  name?: string;
+  email?: string;
+  address?: string;
+  dob?: string; // YYYY-MM-DD Birthday
+  anniversary?: string; // YYYY-MM-DD Anniversary
+  notes?: string;
+  tags?: string[]; // 'VIP' | 'REGULAR' | 'CORPORATE' | 'FAMILY' | 'VEGAN' | 'JAIN'
+  loyaltyPoints: number; // e.g. 150 pts = ₹150 redeemable
+  favoriteItemIds: string[];
+  recentOrderIds: string[];
+  totalVisits?: number;
+  totalSpend?: number;
+  createdAt?: string;
+  lastVisitAt?: string;
+}
+
+export type PlanTier = 'CORE' | 'PRO';
+
+export interface PlanEntitlements {
+  posTerminal: boolean;
+  offlineBilling: boolean;
+  dineInTakeawayDeliveryToken: boolean;
+  menuManagement: boolean;
+  foodCustomization: boolean;
+  discountsAndGst: boolean;
+  multiPaymentTenders: boolean;
+  tableManagement: boolean;
+  customerManagement: boolean;
+  kotKdsRouting: boolean;
+  receiptPrinting: boolean;
+  shiftAndCashDrawer: boolean;
+  salesAndGstReports: boolean;
+  inventoryManagement: boolean;
+  posAssistant: boolean;
+  restaurantAdmin: boolean;
+  captainApp: boolean;
+  advancedCaptainReports: boolean;
+  advancedServiceWorkflow: boolean;
+}
+
+export interface LicenseInfo {
+  planName: string;
+  tier: PlanTier;
+  price: number;
+  billingPeriod?: string;
+  licenseKey: string;
+  allowedDevicesCount: number;
+  activeDevicesCount: number;
+  status: 'ACTIVE' | 'TRIAL' | 'EXPIRED' | 'SUSPENDED';
+  activatedAt?: string;
+  validUntil: string;
+  restaurantId: string;
+  restaurantName?: string;
+  branchName?: string;
+  terminalId?: string;
+  entitlements: PlanEntitlements;
+}
+
+export interface ComboDeal {
+  id: string;
+  name: string;
+  description: string;
+  basePrice: number;
+  originalPrice: number;
+  savingsAmount: number;
+  mainItemIds: string[];
+  sideItemIds: string[];
+  drinkItemIds: string[];
+  dessertItemIds: string[];
+  imageUrl?: string;
+  isAvailable: boolean;
+  featured?: boolean;
+}
+
+export interface RecommendationRule {
+  id: string;
+  triggerItemId?: string;
+  triggerCategoryId?: string;
+  recommendedItemIds: string[];
+  explanation: string; // e.g. "Customers often pair Butter Naan with Paneer Lababdar"
+  discountDelta?: number;
+  isActive: boolean;
+}
+
+export interface ChatMessage {
+  id: string;
+  sender: 'USER' | 'ASSISTANT';
+  text: string;
+  timestamp: string;
+  suggestions?: string[];
+  actionItems?: MenuItem[];
+  actionCombos?: ComboDeal[];
+  actionLink?: string;
+  requiresConfirmation?: boolean;
+  pendingActionPayload?: {
+    action: string;
+    targetId?: string;
+    details?: string;
+  };
+}
+
+export type NetworkState = 'ONLINE' | 'OFFLINE' | 'CONNECTING' | 'SYNCING' | 'DEGRADED';
+
+export type ReceiptDeliveryMethod = 'PRINT' | 'WHATSAPP' | 'SMS' | 'EMAIL' | 'QR' | 'SKIP';
+export type ReceiptDeliveryStatus = 'NOT_REQUESTED' | 'REQUESTED' | 'QUEUED' | 'SENDING' | 'SENT' | 'FAILED';
+export type ReceiptPaperSize = '58mm' | '80mm';
+
+export interface ReceiptConfig {
+  restaurantName: string;
+  address: string;
+  phone: string;
+  gstin: string;
+  fssaiNumber: string;
+  footerMessage: string;
+  thankYouMessage: string;
+  paperSize: ReceiptPaperSize;
+  showCustomerPhone: boolean;
+  showTaxBreakup: boolean;
+  showTokenBig: boolean;
+  enableWhatsApp: boolean;
+  enableSms: boolean;
+  enableEmail: boolean;
+  enableQrReceipt: boolean;
+}
+
+export interface ReceiptRecord {
+  id: string;
+  orderId: string;
+  orderNumber: string;
+  tokenNumber: string;
+  deliveryMethod: ReceiptDeliveryMethod;
+  deliveryStatus: ReceiptDeliveryStatus;
+  recipient: string; // phone / email (masked for privacy)
+  paperSize?: ReceiptPaperSize;
+  content: string;
+  createdAt: string;
+  sentAt?: string;
+  errorMessage?: string;
+}
+
+export type PrinterInterfaceType = 'USB' | 'SERIAL' | 'NETWORK_LAN' | 'WINDOWS_DRIVER' | 'VIRTUAL_EMULATOR';
+export type PrinterHardwareStatus = 'READY' | 'OFFLINE' | 'PAPER_OUT' | 'ERROR' | 'BUSY' | 'UNKNOWN';
+export type PrinterRole = 'RECEIPT' | 'KITCHEN' | 'BAR' | 'TANDOOR' | 'DESSERT' | 'REPORT' | 'GENERAL';
+
+export interface PrinterDevice {
+  id: string;
+  name: string;
+  role?: PrinterRole;
+  driverName?: string;
+  interfaceType: PrinterInterfaceType;
+  port?: string;
+  ipAddress?: string;
+  paperSize: ReceiptPaperSize;
+  status: PrinterHardwareStatus;
+  isDefault: boolean;
+  isKioskBuiltIn: boolean;
+  modelName: string;
+  manufacturer?: string;
+  assignedTerminalId?: string;
+  lastTestAt?: string;
+  lastPrintAt?: string;
+  lastError?: string;
+}
+
+export type PrintJobStatus = 'QUEUED' | 'PENDING' | 'PRINTING' | 'PRINTED' | 'SUCCESS' | 'FAILED' | 'RETRYING';
+export type PrintJobType = 'RECEIPT_80MM' | 'RECEIPT_58MM' | 'KOT_TICKET' | 'TEST_PAGE' | 'SHIFT_REPORT';
+
+export interface PrintJob {
+  id: string;
+  type?: PrintJobType;
+  orderId?: string;
+  orderNumber?: string;
+  tokenNumber?: string;
+  kotId?: string;
+  kotNumber?: string;
+  receiptId?: string;
+  printerId: string;
+  printerName?: string;
+  targetStation?: string;
+  status: PrintJobStatus;
+  attempts: number;
+  maxAttempts: number;
+  rawEscPos?: string;
+  rawPayload?: string;
+  formattedText?: string;
+  paperSize: ReceiptPaperSize;
+  createdAt: string;
+  printedAt?: string;
+  completedAt?: string;
+  lastAttemptAt?: string;
+  lastError?: string;
+  errorMessage?: string;
+  isReprint?: boolean;
+}
+
+export interface GeneratedReport {
+  id: string;
+  title: string;
+  reportType: 'DAILY_SALES' | 'ITEM_SALES' | 'CATEGORY_SALES' | 'PAYMENT_MIX' | 'KIOSK_PERFORMANCE' | 'TAX_GST';
+  dateFrom: string;
+  dateTo: string;
+  generatedAt: string;
+  summaryMetrics: {
+    totalRevenue: number;
+    totalOrders: number;
+    avgOrderValue: number;
+    totalDiscount: number;
+    totalTax: number;
+  };
+  rows: Array<{
+    label: string;
+    metric1: string | number;
+    metric2?: string | number;
+    metric3?: string | number;
+    metric4?: string | number;
+  }>;
+}
+
+export interface SplitPaymentPortion {
+  id: string;
+  method: PaymentMethod;
+  amount: number;
+  reference?: string;
+  status: PaymentStatus;
+}
+
+export interface ShiftRecord {
+  id: string;
+  posId: string;
+  cashierId: string;
+  cashierName: string;
+  openedAt: string;
+  closedAt?: string;
+  status: ShiftStatus;
+  openingCash: number;
+  closingCash?: number;
+  expectedCash: number;
+  actualCash?: number;
+  cashVariance?: number;
+  totalCashSales: number;
+  totalUpiSales: number;
+  totalCardSales: number;
+  totalSales: number;
+  totalDiscounts: number;
+  totalOrders: number;
+  notes?: string;
+}
+
+export interface CashMovement {
+  id: string;
+  shiftId: string;
+  type: 'CASH_IN' | 'CASH_OUT';
+  amount: number;
+  reason: string;
+  cashierName: string;
+  authorizedBy?: string;
+  timestamp: string;
+}
+
+export interface KOTItem {
+  id: string;
+  menuItemId: string;
+  name: string;
+  quantity: number;
+  modifiers: SelectedModifier[];
+  specialInstructions?: string;
+  kitchenStation: string;
+  status: KOTStatus;
+  isDelta?: boolean;
+}
+
+export interface KOTRecord {
+  id: string;
+  kotNumber: string; // e.g. KOT-01
+  orderId: string;
+  orderNumber: string;
+  tokenNumber: string;
+  tableNumber?: string;
+  orderType: OrderType;
+  station: string; // 'Main Kitchen', 'Tandoor', 'Bar', 'Dessert'
+  type: KOTType;
+  items: KOTItem[];
+  serverName?: string;
+  cashierName: string;
+  createdAt: string;
+  printed: boolean;
+  status: KOTStatus;
+}
+
+export type KOT = KOTRecord;
+
+export interface HeldOrder {
+  id: string;
+  label: string;
+  orderType: OrderType;
+  tableNumber?: string;
+  customerName?: string;
+  customerPhone?: string;
+  cart: Cart;
+  totalAmount: number;
+  itemCount: number;
+  heldAt: string;
+  cashierName: string;
+  notes?: string;
+}
+
+export interface ManagerOverrideRequest {
+  id: string;
+  action: ManagerOverrideAction;
+  reason: string;
+  requestedBy: string;
+  approvedBy?: string;
+  approved: boolean;
+  details?: Record<string, any>;
+  timestamp: string;
+}
+
+export interface Reservation {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  guestCount: number;
+  tableNumber?: string;
+  tableId?: string;
+  reservationTime: string;
+  status: 'CONFIRMED' | 'SEATED' | 'CANCELLED' | 'NO_SHOW';
+  specialRequests?: string;
+  depositAmount?: number;
+  createdAt: string;
+}
+
+export interface WaitlistEntry {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  guestCount: number;
+  queuePosition: number;
+  estimatedWaitMinutes: number;
+  status: 'WAITING' | 'SEATED' | 'CANCELLED' | 'CALLED';
+  notes?: string;
+  createdAt: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  outletId?: string;
+  name: string;
+  sku: string;
+  category: string;
+  unit: string; // 'kg', 'ltr', 'pcs', 'grams', 'boxes'
+  currentStock: number;
+  minStockLevel: number;
+  reorderLevel: number;
+  costPerUnit: number;
+  supplierName?: string;
+  status: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+  lastRestockedAt?: string;
+  updatedAt: string;
+}
+
+export interface StockMovement {
+  id: string;
+  itemId: string;
+  itemName: string;
+  type: 'PURCHASE' | 'RESTOCK' | 'SALE' | 'WASTE' | 'SPOILAGE' | 'ADJUSTMENT';
+  quantityDelta: number;
+  unit: string;
+  costImpact?: number;
+  orderId?: string;
+  reason: string;
+  performedBy: string;
+  timestamp: string;
+}
+
+export interface RecipeIngredient {
+  inventoryItemId: string;
+  inventoryItemName: string;
+  quantityPerPortion: number;
+  unit: string;
+}
+
+export interface Recipe {
+  id: string;
+  menuItemId: string;
+  menuItemName: string;
+  ingredients: RecipeIngredient[];
+  preparationNotes?: string;
+  isActive: boolean;
+}
+
+export interface DraftCartSession {
+  id: string;
+  terminalId: string;
+  orderType: OrderType;
+  selectedTableId?: string;
+  selectedTableNumber?: string;
+  guestCount: number;
+  customerPhone?: string;
+  customerName?: string;
+  cart: Cart;
+  billDiscountPercent: number;
+  billDiscountFlat: number;
+  notes?: string;
+  updatedAt: string;
+}
+
+export interface CaptainPermissions {
+  CAN_REQUEST_BILL: boolean;
+  CAN_VIEW_BILL: boolean;
+  CAN_PRINT_BILL: boolean;
+  CAN_ACCEPT_CASH: boolean;
+  CAN_ACCEPT_UPI: boolean;
+  CAN_ACCEPT_CARD: boolean;
+  CAN_SETTLE_ORDER: boolean;
+  CAN_APPLY_DISCOUNT: boolean;
+  CAN_VOID_ITEM: boolean;
+  CAN_TRANSFER_TABLE: boolean;
+  CAN_MERGE_TABLE: boolean;
+}
+
+export interface CaptainProfile {
+  id: string;
+  employeeId: string;
+  name: string;
+  pin: string;
+  role: 'CAPTAIN' | 'HEAD_WAITER' | 'FLOOR_MANAGER';
+  assignedTableIds: string[];
+  assignedTableNumbers: string[];
+  activeShiftId?: string;
+  shiftStartTime?: string;
+  permissions: CaptainPermissions;
+}
+
+export interface FoodReadyItem {
+  id: string;
+  kotId: string;
+  kotNumber: string;
+  orderId: string;
+  orderNumber: string;
+  tableNumber: string;
+  itemId: string;
+  dishName: string;
+  quantity: number;
+  modifiers: string[];
+  specialInstructions?: string;
+  station: string;
+  readyAt: string;
+  elapsedSeconds: number;
+  isServed: boolean;
+  servedAt?: string;
+  servedBy?: string;
+}
+
+export type NotificationType =
+  | 'BUSINESS_DAY_CLOSED'
+  | 'BUSINESS_DAY_STARTED'
+  | 'NEW_ORDER_CREATED'
+  | 'KOT_CREATED'
+  | 'KOT_READY'
+  | 'FOOD_READY'
+  | 'BILL_REQUESTED'
+  | 'BILL_SETTLED'
+  | 'PAYMENT_COMPLETED'
+  | 'TABLE_OPENED'
+  | 'TABLE_CLEARED'
+  | 'LOW_STOCK'
+  | 'SHIFT_OPENED'
+  | 'SHIFT_CLOSED'
+  | 'MANAGER_ALERT';
+
+export type NotificationRole = 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'ALL';
+
+export interface AppNotification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  timestamp: string;
+  isRead: boolean;
+  priority?: 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
+  targetRoles?: NotificationRole[];
+  tableNumber?: string;
+  meta?: Record<string, any>;
+}
+
+export interface BusinessDayPreCloseCheck {
+  day: BusinessDay;
+  activeOrdersCount: number;
+  unpaidOrdersCount: number;
+  pendingKotCount: number;
+  unclosedShiftsCount: number;
+  expectedCash: number;
+  isReadyToClose: boolean;
+  warnings: string[];
+}
+
+export interface CaptainNotification {
+  id: string;
+  type: 'FOOD_READY' | 'KOT_DELAYED' | 'BILL_READY' | 'TABLE_ASSIGNED' | 'TABLE_TRANSFER' | 'MANAGER_MESSAGE' | 'SYNC_ISSUE';
+  title: string;
+  message: string;
+  tableNumber?: string;
+  timestamp: string;
+  isRead: boolean;
+}
+
+export interface EodReportBranding {
+  restaurantName: string;
+  legalName?: string;
+  tagline?: string;
+  logoUrl?: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  phone: string;
+  email: string;
+  gstin: string;
+  fssaiNumber: string;
+  msmeNumber?: string;
+  website?: string;
+  footerText?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  ownerName?: string;
+  managerName?: string;
+}
+
+export interface EodReport {
+  id: string; // EOD-YYYYMMDD-001
+  businessDate: string; // YYYY-MM-DD
+  displayDate: string; // e.g. 30 August 2026
+  shiftId: string;
+  shiftName: string;
+  cashierId: string;
+  cashierName: string;
+  terminalId: string;
+  openingFloat: number;
+  closingFloat: number;
+  shiftDuration: string; // e.g. "09:00 AM → 11:58 PM"
+  ordersSettled: number;
+  customersServed: number;
+  tablesServed: number;
+
+  // Daily Summary (Gross / Net / AOV)
+  grossRevenue: number;
+  netRevenue: number;
+  avgBillValue: number;
+
+  // Sales Breakdown by Department / Category
+  salesBreakdown: {
+    foodSales: number;
+    beverageSales: number;
+    dessertSales: number;
+    otherSales: number;
+    grossSales: number;
+  };
+
+  // Discounts & Refunds
+  discountsAndRefunds: {
+    manualDiscount: number;
+    loyaltyDiscount: number;
+    couponDiscount: number;
+    refundsAmount: number;
+    netDiscount: number;
+  };
+
+  // GST Tax Summary
+  gstSummary: {
+    taxableValue: number;
+    cgstAmount: number; // 2.5%
+    sgstAmount: number; // 2.5%
+    totalTax: number; // 5%
+    roundOff: number;
+    finalCollection: number;
+  };
+
+  // Payment Settlement
+  paymentSettlement: {
+    cash: { count: number; amount: number };
+    upi: { count: number; amount: number };
+    card: { count: number; amount: number };
+    wallet: { count: number; amount: number };
+    houseAccount: { count: number; amount: number };
+    splitPayment: { count: number; amount: number };
+    totalCollection: number;
+  };
+
+  // Split Payment Summary Breakdown
+  splitSummary: {
+    cashUpiCount: number;
+    cashCardCount: number;
+    upiCardCount: number;
+    otherSplitCount: number;
+    totalSplitBills: number;
+  };
+
+  // Cash Drawer Reconciliation
+  cashDrawer: {
+    openingFloat: number;
+    cashSales: number;
+    cashRefund: number;
+    cashPaidOut: number;
+    expectedDrawer: number;
+    actualDrawer: number;
+    difference: number;
+    isBalanced: boolean;
+  };
+
+  // Order Type Distribution
+  orderTypeSummary: {
+    dineIn: number;
+    takeaway: number;
+    delivery: number;
+    token: number;
+  };
+
+  // Top Selling Items (Rank, Dish, Qty, Revenue)
+  topSellingItems: Array<{
+    rank: number;
+    name: string;
+    quantity: number;
+    revenue: number;
+  }>;
+
+  // Top Categories (Category Name, Revenue)
+  topCategories: Array<{
+    name: string;
+    revenue: number;
+  }>;
+
+  // Best Performing Captain
+  captainPerformance: Array<{
+    name: string;
+    orders: number;
+    sales: number;
+  }>;
+
+  // Cashier Performance
+  cashierPerformance: Array<{
+    name: string;
+    bills: number;
+    collection: number;
+  }>;
+
+  // Table Utilization
+  tableUtilization: {
+    topTables: Array<{
+      tableNumber: string;
+      revenue: number;
+    }>;
+    avgDiningTimeMinutes: number;
+  };
+
+  // Inventory Low Stock Alert
+  lowStockInventory: Array<{
+    name: string;
+    currentStock: number;
+    unit: string;
+  }>;
+
+  // Manager Notes & Signatures
+  managerNotes: string;
+  generatedAt: string; // ISO
+  generatedAtFormatted: string; // 30 Aug 2026 11:58 PM
+  generatedBy: string;
+  status: 'DRAFT' | 'LOCKED' | 'SYNCED';
+  branding: EodReportBranding;
+}
+

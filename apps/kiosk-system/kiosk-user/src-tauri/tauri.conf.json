@@ -1,0 +1,53 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-cli/schema.json",
+  "productName": "JAMANVAAR Kiosk",
+  "version": "1.0.0",
+  "identifier": "com.jamanvaar.kiosk",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5174",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+        "width": 1080,
+        "height": 1920,
+        "resizable": false,
+        "fullscreen": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/64x64.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "publisher": "JAMANVAAR by Kelviontech Systems",
+    "copyright": "Copyright © 2026 Kelviontech Systems. All rights reserved.",
+    "category": "Business",
+    "shortDescription": "JAMANVAAR Self-Ordering Touch Kiosk",
+    "longDescription": "JAMANVAAR Interactive Customer Self-Ordering Terminal",
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "installMode": "currentUser",
+        "languages": ["English"],
+        "displayLanguageSelector": false
+      }
+    }
+  }
+}

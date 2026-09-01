@@ -1,0 +1,82 @@
+// JAMANVAAR POS — Tauri Main Entry Point
+// Production Windows Desktop Application
+// Machine 1: Hosts JAMANVAAR POS + Local Core SSE Server
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+use std::net::UdpSocket;
+use std::thread;
+use std::time::Duration;
+
+/// Broadcast JAMANVAAR_CORE beacon on LAN so Kiosk machines can auto-discover
+fn start_lan_beacon(local_core_port: u16) {
+    thread::spawn(move || {
+        let socket = match UdpSocket::bind("0.0.0.0:0") {
+            Ok(s) => s,
+            Err(_) => return,
+        };
+        let _ = socket.set_broadcast(true);
+
+        // Get local IP from OS
+        let local_ip = get_local_ip().unwrap_or_else(|| "127.0.0.1".to_string());
+
+        let beacon_msg = format!(
+            "JAMANVAAR_CORE|{}|{}",
+            local_ip, local_core_port
+        );
+
+        loop {
+            let _ = socket.send_to(beacon_msg.as_bytes(), "255.255.255.255:45678");
+            thread::sleep(Duration::from_secs(3));
+        }
+    });
+}
+
+/// Get the machine's local network IP address
+fn get_local_ip() -> Option<String> {
+    // Connect to a public IP (doesn't actually send data) to determine local interface
+    let socket = UdpSocket::bind("0.0.0.0:0").ok()?;
+    socket.connect("8.8.8.8:80").ok()?;
+    let addr = socket.local_addr().ok()?;
+    Some(addr.ip().to_string())
+}
+
+/// Tauri command: get local core status info for frontend display
+#[tauri::command]
+fn get_local_core_info() -> serde_json::Value {
+    let local_ip = get_local_ip().unwrap_or_else(|| "127.0.0.1".to_string());
+    serde_json::json!({
+        "status": "RUNNING",
+        "ip": local_ip,
+        "port": 5178,
+        "version": "1.0.0"
+    })
+}
+
+/// Tauri command: get this machine's LAN IP for display in settings
+#[tauri::command]
+fn get_machine_ip() -> String {
+    get_local_ip().unwrap_or_else(|| "127.0.0.1".to_string())
+}
+
+fn main() {
+    // Start LAN beacon so Kiosk machines can discover this POS machine
+    start_lan_beacon(5178);
+
+    tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
+        .invoke_handler(tauri::generate_handler![
+            get_local_core_info,
+            get_machine_ip
+        ])
+        .setup(|app| {
+            // Auto-launch the Local Core sidecar if present
+            use tauri_plugin_shell::ShellExt;
+            let shell = app.shell();
+            let _ = shell
+                .sidecar("JamanvaarLocalCore")
+                .and_then(|cmd| cmd.spawn().map_err(Into::into));
+            Ok(())
+        })
+        .run(tauri::generate_context!())
+        .expect("error while running JAMANVAAR POS desktop application");
+}

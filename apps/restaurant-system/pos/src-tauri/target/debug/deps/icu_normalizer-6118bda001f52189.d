@@ -1,0 +1,8 @@
+C:\Users\OM Sanjhira\OneDrive\Desktop\k2\apps\restaurant-system\pos\src-tauri\target\debug\deps\icu_normalizer-6118bda001f52189.d: C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\lib.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\properties.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\provider.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\uts46.rs
+
+C:\Users\OM Sanjhira\OneDrive\Desktop\k2\apps\restaurant-system\pos\src-tauri\target\debug\deps\libicu_normalizer-6118bda001f52189.rmeta: C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\lib.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\properties.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\provider.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\uts46.rs
+
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\lib.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\properties.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\provider.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\icu_normalizer-2.3.0\src\uts46.rs:

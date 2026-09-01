@@ -1,0 +1,60 @@
+{
+  "name": "jamanvaar-kiosk-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-grade JAMANVAAR Kiosk Platform (Admin & Customer Touch Applications)",
+  "workspaces": [
+    "apps/kiosk-system/*",
+    "apps/restaurant-system/*",
+    "shared/*"
+  ],
+  "scripts": {
+    "dev:sync": "node scripts/sync_server.cjs",
+    "dev:kiosk": "npm run dev --workspace=@jamanvaar/kiosk-user",
+    "dev:kiosk-admin": "npm run dev --workspace=@jamanvaar/kiosk-admin",
+    "dev:pos": "npm run dev --workspace=@jamanvaar/pos",
+    "dev:pos-admin": "npm run dev --workspace=@jamanvaar/pos-admin",
+    "dev:captain": "npm run dev --workspace=@jamanvaar/captain",
+    "dev:kds": "npm run dev --workspace=@jamanvaar/kds",
+    "dev": "concurrently \"npm run dev:sync\" \"npm run dev:kiosk-admin\" \"npm run dev:kiosk\" \"npm run dev:pos\" \"npm run dev:pos-admin\" \"npm run dev:captain\" \"npm run dev:kds\"",
+    "validate:menu": "node scripts/validate_menu_assets.mjs",
+    "validate:menu-assets": "node scripts/validate_menu_assets.mjs",
+    "prepare:images": "node scripts/prepare_brand_assets.mjs && node scripts/package_core_menu_images.mjs && node scripts/download_real_food_images.mjs && node scripts/prepare_menu_images.mjs && node scripts/build_canonical_menu_catalog.mjs",
+    "build:kiosk": "npm run build --workspace=@jamanvaar/kiosk-user",
+    "build:kiosk-admin": "npm run build --workspace=@jamanvaar/kiosk-admin",
+    "build:pos": "npm run build --workspace=@jamanvaar/pos",
+    "build:pos-admin": "npm run build --workspace=@jamanvaar/pos-admin",
+    "build:captain": "npm run build --workspace=@jamanvaar/captain",
+    "build:kds": "npm run build --workspace=@jamanvaar/kds",
+    "build": "npm run prepare:images && npm run validate:menu-assets && npm run build --workspace=@jamanvaar/kiosk-admin && npm run build --workspace=@jamanvaar/kiosk-user && npm run build --workspace=@jamanvaar/pos && npm run build --workspace=@jamanvaar/pos-admin && npm run build --workspace=@jamanvaar/captain && npm run build --workspace=@jamanvaar/kds",
+    "typecheck": "tsc -b",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
+    "postcss": "^8.5.1",
+    "sharp": "^0.35.4",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0",
+    "vitest": "^3.0.5"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.475.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.54.2",
+    "tailwind-merge": "^3.0.1",
+    "zod": "^3.24.1",
+    "zustand": "^5.0.3"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true
+  }
+}

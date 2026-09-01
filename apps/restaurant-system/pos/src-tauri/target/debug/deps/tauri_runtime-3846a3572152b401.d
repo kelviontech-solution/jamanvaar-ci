@@ -1,0 +1,9 @@
+C:\Users\OM Sanjhira\OneDrive\Desktop\k2\apps\restaurant-system\pos\src-tauri\target\debug\deps\tauri_runtime-3846a3572152b401.d: C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\lib.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\dpi.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\monitor.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\webview.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\window.rs
+
+C:\Users\OM Sanjhira\OneDrive\Desktop\k2\apps\restaurant-system\pos\src-tauri\target\debug\deps\libtauri_runtime-3846a3572152b401.rmeta: C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\lib.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\dpi.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\monitor.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\webview.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\window.rs
+
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\lib.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\dpi.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\monitor.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\webview.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-runtime-2.11.3\src\window.rs:

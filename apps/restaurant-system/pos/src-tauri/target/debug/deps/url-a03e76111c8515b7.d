@@ -1,0 +1,11 @@
+C:\Users\OM Sanjhira\OneDrive\Desktop\k2\apps\restaurant-system\pos\src-tauri\target\debug\deps\url-a03e76111c8515b7.d: C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\lib.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\host.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\origin.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\parser.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\path_segments.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\slicing.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\quirks.rs
+
+C:\Users\OM Sanjhira\OneDrive\Desktop\k2\apps\restaurant-system\pos\src-tauri\target\debug\deps\liburl-a03e76111c8515b7.rmeta: C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\lib.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\host.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\origin.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\parser.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\path_segments.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\slicing.rs C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\quirks.rs
+
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\lib.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\host.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\origin.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\parser.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\path_segments.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\slicing.rs:
+C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\url-2.5.8\src\quirks.rs:

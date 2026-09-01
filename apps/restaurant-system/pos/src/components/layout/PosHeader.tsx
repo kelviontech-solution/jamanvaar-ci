@@ -1,0 +1,668 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { usePosStore } from '../../store/posStore';
+import { BrandHeader, NotificationDrawerModal, sound } from '@jamanvaar/ui';
+import {
+  db,
+  ShiftRepository,
+  NotificationRepository,
+  BusinessDayRepository,
+  BusinessDayAccountingService,
+  BusinessDaySummary
+} from '@jamanvaar/database';
+import { PosCloseDayModal } from '../days/PosCloseDayModal';
+import { BusinessDayService } from '@jamanvaar/business';
+import { formatINR } from '@jamanvaar/utils';
+import {
+  Search,
+  Wifi,
+  WifiOff,
+  Server,
+  Printer,
+  ChefHat,
+  Lock,
+  LogOut,
+  HelpCircle,
+  Clock,
+  CircleDollarSign,
+  ChevronDown,
+  PlusCircle,
+  UtensilsCrossed,
+  ShoppingBag,
+  Bike,
+  Activity,
+  CheckCircle2,
+  AlertTriangle,
+  Bell,
+  Calendar,
+  Sparkles,
+  User,
+  ShieldCheck,
+  RotateCcw,
+  Check
+} from 'lucide-react';
+
+export const PosHeader: React.FC = () => {
+  const {
+    currentUser,
+    posTerminalId,
+    isOnline,
+    hardwareStatus,
+    toggleNetworkStatus,
+    lockTerminal,
+    logout,
+    setActiveTab,
+    setOrderType,
+    clearCart,
+    setIsGlobalSearchOpen,
+    setIsShortcutsOpen,
+    setIsShiftModalOpen,
+    setIsCashDrawerModalOpen,
+    setIsPrintQueueOpen,
+    setIsChatbotOpen,
+    isChatbotOpen
+  } = usePosStore();
+
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [newOrderDropdownOpen, setNewOrderDropdownOpen] = useState(false);
+  const [healthDropdownOpen, setHealthDropdownOpen] = useState(false);
+  const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
+  const [isBusinessDayPanelOpen, setIsBusinessDayPanelOpen] = useState(false);
+  const [isCloseDayModalOpen, setIsCloseDayModalOpen] = useState(false);
+
+  // Refs for click outside handling
+  const profileRef = useRef<HTMLDivElement>(null);
+  const businessDayRef = useRef<HTMLDivElement>(null);
+  const healthRef = useRef<HTMLDivElement>(null);
+  const newOrderRef = useRef<HTMLDivElement>(null);
+
+  // Subscribe to db mutations
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const unsub = db.subscribe(() => setTick((n) => n + 1));
+    return unsub;
+  }, []);
+
+  // Click Outside & Escape Key Listeners
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (profileRef.current && !profileRef.current.contains(target)) {
+        setProfileDropdownOpen(false);
+      }
+      if (businessDayRef.current && !businessDayRef.current.contains(target)) {
+        setIsBusinessDayPanelOpen(false);
+      }
+      if (healthRef.current && !healthRef.current.contains(target)) {
+        setHealthDropdownOpen(false);
+      }
+      if (newOrderRef.current && !newOrderRef.current.contains(target)) {
+        setNewOrderDropdownOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setProfileDropdownOpen(false);
+        setIsBusinessDayPanelOpen(false);
+        setHealthDropdownOpen(false);
+        setNewOrderDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Single authoritative business day summary
+  const activeDay = BusinessDayAccountingService.getActiveBusinessDay();
+  const daySummary: BusinessDaySummary = BusinessDayAccountingService.getBusinessDaySummary(activeDay.id);
+  const activeShift = ShiftRepository.getActiveShift();
+  const unreadNotifsCount = NotificationRepository.getUnreadCount('POS');
+  const failedJobsCount = db.printJobs.filter((j) => j.status === 'FAILED').length;
+  const isPrinterOffline = !hardwareStatus.printer || failedJobsCount > 0;
+  const allSystemsOk = hardwareStatus.localDb && !isPrinterOffline && isOnline;
+
+  // AI badge alerts
+  const delayedKotCount = (db.kots || []).filter((k) => {
+    if (k.status !== 'PENDING' && k.status !== 'PREPARING') return false;
+    const elapsed = (Date.now() - new Date(k.createdAt).getTime()) / 60000;
+    return elapsed > 15;
+  }).length;
+  const lowStockCount = (db.inventoryItems || []).filter(
+    (i) => i.currentStock <= i.reorderLevel
+  ).length;
+  const aiAlertCount = delayedKotCount + lowStockCount;
+
+  const handleStartNewOrder = (type: 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY') => {
+    setNewOrderDropdownOpen(false);
+    clearCart();
+    setOrderType(type);
+    if (type === 'DINE_IN') {
+      setActiveTab('TABLES');
+    } else {
+      setActiveTab('MENU');
+    }
+  };
+
+  const handleStartNewBusinessDay = () => {
+    BusinessDayRepository.openNewBusinessDay('Amit Dave (Lead Cashier)', 2000);
+    setIsBusinessDayPanelOpen(false);
+    clearCart();
+    setActiveTab('MENU');
+  };
+
+  return (
+    <header className="w-full h-14 bg-white border-b border-[#EBE6DD] px-2 sm:px-4 flex items-center justify-between text-[#0B253A] select-none shrink-0 z-30 shadow-2xs max-w-full overflow-visible">
+      {/* Left: Brand Header & New Order */}
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <BrandHeader
+          app="POS"
+          restaurantName={db.restaurant.name}
+          outletName={db.outlet.name}
+          terminalId={posTerminalId}
+          logoHeight={54}
+          badgeSize="sm"
+        />
+
+        {/* Quick Action: + NEW ORDER Dropdown */}
+        <div ref={newOrderRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setNewOrderDropdownOpen((prev) => !prev)}
+            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-extrabold text-xs flex items-center gap-1.5 shadow-sm shadow-[#E66817]/20 transition-all active:scale-95 cursor-pointer shrink-0"
+            title="Start fresh order"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">+ New Order</span>
+            <ChevronDown className="w-3 h-3 opacity-80" />
+          </button>
+
+          {newOrderDropdownOpen && (
+            <div className="absolute left-0 mt-2 w-52 bg-white border border-[#EBE6DD] rounded-2xl shadow-xl p-1.5 text-xs text-[#0B253A] z-50 animate-in fade-in zoom-in-95 duration-100">
+              <button
+                type="button"
+                onClick={() => handleStartNewOrder('DINE_IN')}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-[#0B253A] cursor-pointer"
+              >
+                <UtensilsCrossed className="w-4 h-4 text-[#E66817]" />
+                <span>Dine-In (Floor Table)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleStartNewOrder('TAKEAWAY')}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-[#0B253A] cursor-pointer"
+              >
+                <ShoppingBag className="w-4 h-4 text-emerald-600" />
+                <span>Quick Takeaway</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleStartNewOrder('DELIVERY')}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-[#0B253A] cursor-pointer"
+              >
+                <Bike className="w-4 h-4 text-blue-600" />
+                <span>Delivery Order</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Center: Global Search Everything Bar */}
+      <div className="flex-1 min-w-[100px] max-w-xs md:max-w-md mx-1.5 sm:mx-3">
+        <button
+          type="button"
+          onClick={() => setIsGlobalSearchOpen(true)}
+          className="w-full h-9 sm:h-10 bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] hover:border-[#E66817]/60 rounded-xl px-2.5 sm:px-3.5 flex items-center justify-between text-slate-500 text-xs sm:text-sm transition-all shadow-2xs group active:scale-[0.99] cursor-pointer"
+          title="Search dishes, SKU, tables, bills, customers"
+        >
+          <div className="flex items-center gap-2 truncate">
+            <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#E66817] transition-colors shrink-0" />
+            <span className="truncate text-xs font-medium">Search dishes, SKU, tables, bills, customers...</span>
+          </div>
+        </button>
+      </div>
+
+      {/* Right: Interactive Controls */}
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        {/* Printer Status */}
+        <button
+          type="button"
+          onClick={() => setIsPrintQueueOpen(true)}
+          className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0 ${
+            isPrinterOffline
+              ? 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100'
+              : 'bg-[#FAF7F2] hover:bg-[#F5F0E8] border-[#EBE6DD] text-[#0B253A]'
+          }`}
+          title="Thermal Print Queue & Spooler"
+        >
+          <Printer className={`w-3.5 h-3.5 ${isPrinterOffline ? 'text-rose-600 animate-pulse' : 'text-emerald-600'}`} />
+          <span className="hidden xl:inline text-[11px] font-bold">
+            {isPrinterOffline ? '⚠ Offline' : '🖨 Ready (80mm)'}
+          </span>
+          {failedJobsCount > 0 && (
+            <span className="bg-rose-500 text-white font-black text-[9px] px-1.5 py-0.2 rounded-full">
+              {failedJobsCount}
+            </span>
+          )}
+        </button>
+
+        {/* System Health Dropdown */}
+        <div ref={healthRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setHealthDropdownOpen((prev) => !prev)}
+            className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer ${
+              allSystemsOk
+                ? 'bg-emerald-50/80 border-emerald-200 text-emerald-800 hover:bg-emerald-100/80'
+                : 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100'
+            }`}
+            title="System & Hardware Health"
+          >
+            <span className={`w-2 h-2 rounded-full ${allSystemsOk ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+            <span className="hidden 2xl:inline text-[11px]">
+              {allSystemsOk ? 'System Ready' : 'Attention'}
+            </span>
+            <ChevronDown className="w-3 h-3 opacity-60" />
+          </button>
+
+          {healthDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-72 bg-white border border-[#EBE6DD] rounded-2xl shadow-xl p-3 text-xs text-[#0B253A] z-50 animate-in fade-in zoom-in-95 duration-100 space-y-2">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                <div className="flex items-center gap-1.5 font-bold text-xs">
+                  <Activity className="w-3.5 h-3.5 text-[#E66817]" />
+                  <span>Hardware & Network Health</span>
+                </div>
+                <span className="text-[10px] font-mono text-slate-400">Offline-First</span>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50">
+                  <div className="flex items-center gap-2">
+                    <Server className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Local Database</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">
+                    ACTIVE (0ms)
+                  </span>
+                </div>
+
+                <div
+                  onClick={() => {
+                    setHealthDropdownOpen(false);
+                    setIsPrintQueueOpen(true);
+                  }}
+                  className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Printer className={`w-3.5 h-3.5 ${isPrinterOffline ? 'text-rose-600' : 'text-emerald-600'}`} />
+                    <span>Thermal Printer</span>
+                  </div>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
+                    isPrinterOffline ? 'text-rose-700 bg-rose-100' : 'text-emerald-700 bg-emerald-100'
+                  }`}>
+                    {isPrinterOffline ? 'OFFLINE' : 'READY'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50">
+                  <div className="flex items-center gap-2">
+                    <ChefHat className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>KDS Kitchen Sync</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">
+                    SYNCED
+                  </span>
+                </div>
+
+                <div
+                  onClick={toggleNetworkStatus}
+                  className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    {isOnline ? <Wifi className="w-3.5 h-3.5 text-emerald-600" /> : <WifiOff className="w-3.5 h-3.5 text-amber-600" />}
+                    <span>LAN / Cloud Sync</span>
+                  </div>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
+                    isOnline ? 'text-emerald-700 bg-emerald-100' : 'text-amber-700 bg-amber-100'
+                  }`}>
+                    {isOnline ? 'ONLINE' : 'OFFLINE MODE'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ── 1. AUTHORITATIVE BUSINESS DAY CONTROL ── */}
+        <div ref={businessDayRef} className="relative hidden lg:block">
+          <button
+            type="button"
+            onClick={() => setIsBusinessDayPanelOpen((prev) => !prev)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-bold transition-colors cursor-pointer shadow-2xs ${
+              daySummary.status === 'OPEN'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100'
+                : 'bg-rose-50 border-rose-300 text-rose-800 hover:bg-rose-100'
+            }`}
+            title="Business Day Operating Status — Click to manage"
+          >
+            <span className={`w-2 h-2 rounded-full ${
+              daySummary.status === 'OPEN' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
+            }`} />
+            <span className="font-black">
+              {daySummary.status === 'OPEN' ? 'DAY OPEN' : 'DAY CLOSED'}
+            </span>
+            <span className="text-slate-400 font-bold">•</span>
+            <span className="font-mono text-xs">{daySummary.display_date}</span>
+            <ChevronDown className="w-3 h-3 opacity-60" />
+          </button>
+
+          {/* Business Day Popover */}
+          {isBusinessDayPanelOpen && (
+            <div className="absolute right-0 mt-2 w-80 bg-white border border-[#EBE6DD] rounded-2xl shadow-2xl p-4 text-xs text-[#0B253A] z-50 animate-in fade-in zoom-in-95 duration-100 space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <div>
+                  <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Accounting Business Day</p>
+                  <p className="font-black text-sm text-[#0B253A]">{daySummary.display_date}</p>
+                  <span className="text-[10px] font-mono text-slate-400">{daySummary.business_day_id}</span>
+                </div>
+                <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                  daySummary.status === 'OPEN'
+                    ? 'bg-emerald-100 text-emerald-800'
+                    : 'bg-rose-100 text-rose-800'
+                }`}>
+                  {daySummary.status === 'OPEN' ? '🟢 OPEN' : '🔴 CLOSED'}
+                </span>
+              </div>
+
+              {/* Day Metrics */}
+              <div className="space-y-1.5 text-xs">
+                <div className="flex justify-between p-2 bg-slate-50 rounded-xl">
+                  <span className="text-slate-500">Opened At:</span>
+                  <span className="font-bold">{daySummary.opened_at ? new Date(daySummary.opened_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '–'}</span>
+                </div>
+                <div className="flex justify-between p-2 bg-slate-50 rounded-xl">
+                  <span className="text-slate-500">Net Sales:</span>
+                  <span className="font-black text-emerald-700 font-mono">{formatINR(daySummary.net_sales)}</span>
+                </div>
+                <div className="flex justify-between p-2 bg-slate-50 rounded-xl">
+                  <span className="text-slate-500">Orders:</span>
+                  <span className="font-bold font-mono">{daySummary.completed_orders} completed / {daySummary.total_orders} total</span>
+                </div>
+                <div className="flex justify-between p-2 bg-slate-50 rounded-xl">
+                  <span className="text-slate-500">Active Tables:</span>
+                  <span className={`font-bold ${
+                    db.tables.filter((t) => t.status !== 'AVAILABLE').length > 0 ? 'text-amber-600' : 'text-emerald-600'
+                  }`}>
+                    {db.tables.filter((t) => t.status !== 'AVAILABLE').length} occupied
+                  </span>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="border-t border-[#EBE6DD] pt-2.5 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsBusinessDayPanelOpen(false);
+                    setActiveTab('DAYS');
+                  }}
+                  className="w-full py-2 rounded-xl bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] text-xs font-bold text-[#0B253A] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-[#E66817]" />
+                  <span>View Day History & Reports</span>
+                </button>
+
+                {daySummary.status === 'OPEN' ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsBusinessDayPanelOpen(false);
+                      setIsCloseDayModalOpen(true);
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Close Business Day (EOD)</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleStartNewBusinessDay}
+                    className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Start New Business Day</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ── 2. SEPARATE SHIFT PILL (Cashier Drawer) ── */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('SHIFTS')}
+          className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-colors shadow-2xs cursor-pointer shrink-0 ${
+            activeShift
+              ? 'bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] text-[#0B253A]'
+              : 'bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900'
+          }`}
+          title={activeShift ? "Active Shift Drawer (Click to view Shift & Cash)" : "Shift Closed (Click to open shift)"}
+        >
+          <Clock className={`w-3.5 h-3.5 ${activeShift ? 'text-[#E66817]' : 'text-amber-700'}`} />
+          <div className="flex items-center gap-1 text-[11px]">
+            {activeShift ? (
+              <>
+                <span className="text-emerald-700 font-black">● Shift #{activeShift.id.slice(-2) || '01'}:</span>
+                <span className="font-mono font-bold text-[#0B253A]">{formatINR(activeShift.totalSales ?? 0)}</span>
+              </>
+            ) : (
+              <span className="font-bold text-amber-900">Shift Closed</span>
+            )}
+          </div>
+        </button>
+
+        {/* Cash In / Out Trigger */}
+        <button
+          type="button"
+          onClick={() => setIsCashDrawerModalOpen(true)}
+          className="w-8 h-8 rounded-xl bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] text-amber-600 flex items-center justify-center transition-colors shadow-2xs cursor-pointer shrink-0"
+          title="Cash In / Out Float Adjustment"
+        >
+          <CircleDollarSign className="w-4 h-4" />
+        </button>
+
+        {/* Notification Bell */}
+        <button
+          type="button"
+          onClick={() => { sound.play('notification'); setIsNotifDrawerOpen(true); }}
+          className="relative w-8 h-8 rounded-xl bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer shrink-0"
+          title="Notifications & System Events"
+        >
+          <Bell className="w-4 h-4" />
+          {unreadNotifsCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-black flex items-center justify-center shadow-xs animate-pulse">
+              {unreadNotifsCount}
+            </span>
+          )}
+        </button>
+
+        {/* JAMAN AI Button */}
+        <button
+          type="button"
+          onClick={() => setIsChatbotOpen(true)}
+          className={`relative flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-black transition-all shadow-2xs cursor-pointer shrink-0 ${
+            isChatbotOpen
+              ? 'bg-[#0B253A] text-white border-[#0B253A]'
+              : aiAlertCount > 0
+              ? 'bg-[#FFF4ED] hover:bg-[#FFE8D6] border-[#FDBA74] text-[#E66817]'
+              : 'bg-white hover:bg-[#FFF4ED] border-[#EBE6DD] hover:border-[#FDBA74] text-[#0B253A] hover:text-[#E66817]'
+          }`}
+          title="JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)"
+          aria-label="Open JAMAN AI Assistant"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-[#E66817]" />
+          <span className="hidden md:inline tracking-tight">JAMAN AI</span>
+          {aiAlertCount > 0 && !isChatbotOpen && (
+            <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-rose-600 text-white text-[9px] font-black px-1 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
+              {aiAlertCount}
+            </span>
+          )}
+        </button>
+
+        {/* ── 3. CASHIER PROFILE MENU (AMIT DAVE ▼) ── */}
+        <div ref={profileRef} className="relative shrink-0">
+          <button
+            type="button"
+            onClick={() => setProfileDropdownOpen((prev) => !prev)}
+            className="flex items-center gap-1.5 bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] px-2 py-1 rounded-xl transition-colors shadow-2xs text-[#0B253A] cursor-pointer"
+            title="User Profile & Session Options"
+          >
+            <div className="w-6 h-6 rounded-lg bg-[#E66817] text-white flex items-center justify-center font-black text-xs">
+              {currentUser?.fullName?.charAt(0) || 'A'}
+            </div>
+            <div className="hidden xl:flex flex-col text-left">
+              <span className="text-xs font-bold leading-tight truncate max-w-[110px]">
+                {currentUser?.fullName || 'Amit Dave'}
+              </span>
+              <span className="text-[9px] text-slate-400 uppercase font-bold tracking-tight">
+                {currentUser?.roleId?.replace('role-', '').replace('-', ' ') || 'Lead Cashier'}
+              </span>
+            </div>
+            <ChevronDown className="w-3 h-3 text-slate-400" />
+          </button>
+
+          {/* Profile Dropdown Popover */}
+          {profileDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-64 bg-white border border-[#EBE6DD] rounded-2xl shadow-2xl p-2 text-xs text-[#0B253A] z-50 animate-in fade-in zoom-in-95 duration-100 space-y-1">
+              <div className="p-2.5 border-b border-[#EBE6DD] bg-[#FAF7F2] rounded-xl space-y-1">
+                <div className="flex items-center justify-between">
+                  <p className="font-black text-sm text-[#0B253A]">{currentUser?.fullName || 'Amit Dave'}</p>
+                  <span className="text-[10px] font-bold bg-[#E66817]/10 text-[#E66817] px-1.5 py-0.5 rounded">
+                    POS-01
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500">{currentUser?.email || 'amit.dave@jamanvaar.com'}</p>
+                <div className="flex items-center gap-1.5 text-[10px] text-emerald-700 font-bold pt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span>Online • Local Database Active</span>
+                </div>
+              </div>
+
+              {/* Current Shift Snapshot */}
+              <div className="p-2 bg-slate-50 rounded-xl space-y-1 text-[11px]">
+                <div className="flex justify-between font-bold">
+                  <span className="text-slate-500">Current Shift:</span>
+                  <span className="text-[#0B253A]">Shift #{activeShift?.id?.slice(-2) || '01'} (Active)</span>
+                </div>
+                <div className="flex justify-between font-bold">
+                  <span className="text-slate-500">Opening Float:</span>
+                  <span className="font-mono text-[#0B253A]">₹2,000</span>
+                </div>
+              </div>
+
+              <div className="pt-1 space-y-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    setActiveTab('SHIFTS');
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-slate-700 cursor-pointer"
+                >
+                  <Clock className="w-3.5 h-3.5 text-[#E66817]" />
+                  <span>Current Shift & Drawer</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    setIsNotifDrawerOpen(true);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-slate-700 cursor-pointer"
+                >
+                  <Bell className="w-3.5 h-3.5 text-blue-600" />
+                  <span>System Notifications</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    setIsPrintQueueOpen(true);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-slate-700 cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Thermal Printer & Queue</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    lockTerminal();
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-amber-700 cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Lock Screen (PIN)</span>
+                </button>
+              </div>
+
+              <div className="border-t border-[#EBE6DD] my-1" />
+
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileDropdownOpen(false);
+                  logout();
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-rose-50 text-rose-600 text-left transition-colors font-black cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                <span>Logout Cashier Session</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Global Notification Drawer Modal */}
+      <NotificationDrawerModal
+        isOpen={isNotifDrawerOpen}
+        onClose={() => setIsNotifDrawerOpen(false)}
+        role="POS"
+      />
+
+      {/* Close Business Day Modal */}
+      {isCloseDayModalOpen && (
+        <PosCloseDayModal
+          businessDay={activeDay}
+          isOpen={isCloseDayModalOpen}
+          onClose={() => setIsCloseDayModalOpen(false)}
+          onClosedSuccess={() => {
+            setIsCloseDayModalOpen(false);
+            setActiveTab('DAYS');
+          }}
+          onStartNewOrder={() => {
+            setIsCloseDayModalOpen(false);
+            clearCart();
+            setActiveTab('MENU');
+          }}
+          onViewEodReport={() => {
+            setIsCloseDayModalOpen(false);
+            setActiveTab('DAYS');
+          }}
+        />
+      )}
+    </header>
+  );
+};
