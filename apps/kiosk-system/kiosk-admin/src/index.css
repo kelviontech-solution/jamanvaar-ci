@@ -28,14 +28,14 @@
 
 /* OFFICIAL PRINTABLE PDF REPORT STYLES */
 @page {
-  size: A4 portrait;
-  margin: 10mm 12mm 10mm 12mm;
+  size: auto;
+  margin: 0 !important;
 }
 
 @media print {
   @page {
-    size: A4 portrait;
-    margin: 10mm 12mm 10mm 12mm;
+    size: auto;
+    margin: 0 !important;
   }
 
   /* Hide non-report UI elements during print */

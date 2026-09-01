@@ -95,10 +95,15 @@ body {
 /* ========================================================================= */
 /* PRINT MEDIA STYLES FOR OFFICIAL FINANCIAL & EOD STATEMENTS */
 /* ========================================================================= */
+@page {
+  size: auto;
+  margin: 0 !important;
+}
+
 @media print {
   @page {
-    size: A4 portrait;
-    margin: 8mm 12mm 12mm 12mm;
+    size: auto;
+    margin: 0 !important;
   }
 
   /* Un-constrain html, body, and root elements to enable full multi-page printing */
@@ -118,6 +123,8 @@ body {
     padding: 0 !important;
     margin: 0 !important;
     display: block !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* Hide screen chrome & controls */
@@ -147,7 +154,7 @@ body {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 auto !important;
-    padding: 0 !important;
+    padding: 10mm 15mm !important;
     border: none !important;
     box-shadow: none !important;
     background: #FFFFFF !important;
@@ -158,7 +165,7 @@ body {
     width: 78mm !important;
     max-width: 78mm !important;
     margin: 0 auto !important;
-    padding: 0 !important;
+    padding: 4mm !important;
     border: none !important;
     box-shadow: none !important;
     background: #FFFFFF !important;

@@ -263,11 +263,26 @@ export function printThermalReceipt(
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Receipt #${order.orderNumber}</title>
+        <title></title>
         <style>
           @page {
             size: ${paperWidth} auto;
-            margin: 0mm;
+            margin: 0 !important;
+          }
+          @media print {
+            @page {
+              size: ${paperWidth} auto;
+              margin: 0 !important;
+            }
+            html, body {
+              margin: 0 !important;
+              padding: 4px !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            header, footer, nav {
+              display: none !important;
+            }
           }
           * {
             box-sizing: border-box;
@@ -449,11 +464,26 @@ export function printThermalKotTicket(
     <!DOCTYPE html>
     <html>
       <head>
-        <title>KOT #${kot.kotNumber || kot.id}</title>
+        <title></title>
         <style>
           @page {
             size: ${paperWidth} auto;
-            margin: 0mm;
+            margin: 0 !important;
+          }
+          @media print {
+            @page {
+              size: ${paperWidth} auto;
+              margin: 0 !important;
+            }
+            html, body {
+              margin: 0 !important;
+              padding: 4px !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            header, footer, nav {
+              display: none !important;
+            }
           }
           * { box-sizing: border-box; margin: 0; padding: 0; }
           body {

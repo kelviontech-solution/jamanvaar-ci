@@ -61,3 +61,28 @@
 .kiosk-bottom-padding {
   padding-bottom: 7.5rem;
 }
+
+/* ZERO-MARGIN PRINT STYLES (Suppresses localhost headers/footers) */
+@page {
+  size: auto;
+  margin: 0 !important;
+}
+
+@media print {
+  @page {
+    size: auto;
+    margin: 0 !important;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  header, footer, nav, aside, .no-print {
+    display: none !important;
+  }
+}
