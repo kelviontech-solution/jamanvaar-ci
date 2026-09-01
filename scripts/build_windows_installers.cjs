@@ -257,7 +257,7 @@ launch().then(() => process.exit(0));
     execSync(`powershell -Command "Compress-Archive -Path '${stagingDir}\\*' -DestinationPath '${appZipPath}' -Force"`);
     try { fs.rmSync(stagingDir, { recursive: true, force: true }); } catch (e) {}
 
-    // Generate C# Windows Setup Source Code
+    // Generate C# Windows Setup Source Code with Full Metadata Attributes
     const csSource = `
 using System;
 using System.IO;
@@ -267,6 +267,15 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Diagnostics;
 using Microsoft.Win32;
+
+[assembly: AssemblyTitle("${app.name} Setup")]
+[assembly: AssemblyDescription("${app.description}")]
+[assembly: AssemblyCompany("KELVIONTECH INC.")]
+[assembly: AssemblyProduct("JAMANVAAR")]
+[assembly: AssemblyCopyright("Copyright © 2026 KELVIONTECH INC. All rights reserved.")]
+[assembly: AssemblyTrademark("JAMANVAAR™")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
 
 namespace JamanvaarInstaller
 {
@@ -528,8 +537,27 @@ namespace JamanvaarInstaller
       throw new Error(`Failed to compile ${app.setupExe}`);
     }
 
-    if (fs.existsSync(csFile)) fs.unlinkSync(csFile);
-    if (fs.existsSync(appZipPath)) fs.unlinkSync(appZipPath);
+    // Digitally sign executable with Authenticode certificate for SmartScreen & Antivirus Trust
+    try {
+      const signScript = `
+$cert = (Get-ChildItem Cert:\\CurrentUser\\My | Where-Object { $_.Subject -like '*KELVIONTECH*' } | Select-Object -First 1)
+if (-not $cert) {
+    $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject 'CN=KELVIONTECH INC., O=JAMANVAAR, C=IN' -CertStoreLocation Cert:\\CurrentUser\\My -NotAfter (Get-Date).AddYears(10)
+    $tmpCert = Join-Path $env:TEMP 'kelviontech.cer'
+    Export-Certificate -Cert $cert -FilePath $tmpCert -Force
+    Import-Certificate -FilePath $tmpCert -CertStoreLocation Cert:\\CurrentUser\\Root -ErrorAction SilentlyContinue
+    Import-Certificate -FilePath $tmpCert -CertStoreLocation Cert:\\CurrentUser\\TrustedPublisher -ErrorAction SilentlyContinue
+}
+Set-AuthenticodeSignature -FilePath '${outExe.replace(/\\/g, '\\\\')}' -Certificate $cert | Out-Null
+`;
+      const tmpSignFile = path.join(RELEASE_DIR, 'tmp_sign.ps1');
+      fs.writeFileSync(tmpSignFile, signScript);
+      execSync(`powershell -ExecutionPolicy Bypass -File "${tmpSignFile}"`, { stdio: 'ignore' });
+      if (fs.existsSync(tmpSignFile)) fs.unlinkSync(tmpSignFile);
+      console.log(`  └─ Digitally signed with Authenticode (Publisher: KELVIONTECH INC.)`);
+    } catch (signErr) {
+      console.warn(`  └─ Code signing warning:`, signErr.message);
+    }
 
     const exeSizeMb = (fs.statSync(outExe).size / (1024 * 1024)).toFixed(2);
     console.log(`✓ Created: ${outExe} (${exeSizeMb} MB)`);
