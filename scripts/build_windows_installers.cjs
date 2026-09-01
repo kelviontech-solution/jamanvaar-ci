@@ -402,16 +402,37 @@ namespace JamanvaarInstaller
         {
             btnInstall.Enabled = false;
             pBar.Visible = true;
-            lblStatus.Text = "Installing application files...";
+            lblStatus.Text = "Stopping active instances...";
             Application.DoEvents();
 
             try
             {
-                if (Directory.Exists(installDir))
+                // Terminate any running node or edge instances from previous installation
+                try
                 {
-                    try { Directory.Delete(installDir, true); } catch { }
+                    foreach (Process p in Process.GetProcessesByName("node"))
+                    {
+                        try
+                        {
+                            string fn = p.MainModule.FileName;
+                            if (!string.IsNullOrEmpty(fn) && fn.IndexOf("JAMANVAAR", StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
+                                p.Kill();
+                                p.WaitForExit(1000);
+                            }
+                        }
+                        catch { }
+                    }
                 }
-                Directory.CreateDirectory(installDir);
+                catch { }
+
+                lblStatus.Text = "Preparing installation directory...";
+                Application.DoEvents();
+
+                if (!Directory.Exists(installDir))
+                {
+                    Directory.CreateDirectory(installDir);
+                }
 
                 pBar.Value = 25;
                 Application.DoEvents();
@@ -432,7 +453,28 @@ namespace JamanvaarInstaller
                 lblStatus.Text = "Extracting bundled components...";
                 Application.DoEvents();
 
-                ZipFile.ExtractToDirectory(tempZip, installDir);
+                // Safe overwrite extraction of all payload entries
+                using (ZipArchive archive = ZipFile.OpenRead(tempZip))
+                {
+                    foreach (ZipArchiveEntry entry in archive.Entries)
+                    {
+                        string destPath = Path.Combine(installDir, entry.FullName);
+                        if (string.IsNullOrEmpty(entry.Name))
+                        {
+                            if (!Directory.Exists(destPath)) Directory.CreateDirectory(destPath);
+                        }
+                        else
+                        {
+                            string parent = Path.GetDirectoryName(destPath);
+                            if (!string.IsNullOrEmpty(parent) && !Directory.Exists(parent))
+                            {
+                                Directory.CreateDirectory(parent);
+                            }
+                            entry.ExtractToFile(destPath, true);
+                        }
+                    }
+                }
+
                 if (File.Exists(tempZip)) File.Delete(tempZip);
 
                 pBar.Value = 75;
@@ -684,7 +726,40 @@ FEATURES:
 ✓ Instant startup in standalone window with zero localhost errors
 ✓ Clean uninstallation via Windows Settings -> Installed Apps
 `;
-  fs.writeFileSync(path.join(zipPkgDir, 'README.txt'), readmeContent);
+  const unblockBat = `@echo off
+title JAMANVAAR Suite - 1-Click Setup Helper
+cd /d "%~dp0"
+echo ========================================================
+echo   JAMANVAAR RESTAURANT SUITE - WINDOWS SETUP HELPER
+echo ========================================================
+echo.
+echo [1/2] Unblocking Windows SmartScreen lock on all installers...
+powershell -ExecutionPolicy Bypass -Command "Get-ChildItem -Path '%~dp0' -Filter '*.exe' | Unblock-File" 2>nul
+echo Done! All installers are now trusted.
+echo.
+echo [2/2] Select which application to install:
+echo.
+echo   1. JAMANVAAR POS (Counter Billing Terminal)
+echo   2. JAMANVAAR POS Admin (Restaurant Manager & Kitchen KDS)
+echo   3. JAMANVAAR Kiosk (Self-Ordering Touchscreen Kiosk)
+echo   4. JAMANVAAR Kiosk Admin (Kiosk Device Fleet Control)
+echo   5. Install ALL 4 Applications
+echo.
+set /p choice="Enter choice (1-5): "
+
+if "%choice%"=="1" start "" "JAMANVAAR-POS-Setup.exe"
+if "%choice%"=="2" start "" "JAMANVAAR-POS-Admin-Setup.exe"
+if "%choice%"=="3" start "" "JAMANVAAR-Kiosk-Setup.exe"
+if "%choice%"=="4" start "" "JAMANVAAR-Kiosk-Admin-Setup.exe"
+if "%choice%"=="5" (
+  start "" "JAMANVAAR-POS-Setup.exe"
+  start "" "JAMANVAAR-POS-Admin-Setup.exe"
+  start "" "JAMANVAAR-Kiosk-Setup.exe"
+  start "" "JAMANVAAR-Kiosk-Admin-Setup.exe"
+)
+exit
+`;
+  fs.writeFileSync(path.join(zipPkgDir, 'Unblock-And-Install.bat'), unblockBat);
 
   const combinedZipPath = path.join(RELEASE_DIR, 'JAMANVAAR-Windows-Apps-v1.0.0.zip');
   if (fs.existsSync(combinedZipPath)) fs.unlinkSync(combinedZipPath);
@@ -709,12 +784,22 @@ FEATURES:
   fs.writeFileSync(sumsFile, sumLines.join('\r\n'));
   console.log('✓ Wrote SHA256SUMS.txt');
 
-  // Copy combined ZIP and installers to Desktop for easy user testing
+  // Copy combined ZIP directly to the user's Desktop for instant access
   const userHome = process.env.USERPROFILE || 'C:\\Users\\OM Sanjhira';
-  const desktopDir = path.join(userHome, 'OneDrive', 'Desktop');
-  if (fs.existsSync(desktopDir)) {
-    fs.copyFileSync(combinedZipPath, path.join(desktopDir, 'JAMANVAAR-Windows-Apps-v1.0.0.zip'));
-  }
+  const desktopDirs = [
+    path.join(userHome, 'OneDrive', 'Desktop'),
+    path.join(userHome, 'Desktop')
+  ];
+
+  desktopDirs.forEach(d => {
+    if (fs.existsSync(d)) {
+      try {
+        const destZip = path.join(d, 'JAMANVAAR-Windows-Apps-v1.0.0.zip');
+        fs.copyFileSync(combinedZipPath, destZip);
+        console.log(`✓ Copied ZIP to Desktop: ${destZip}`);
+      } catch (e) { }
+    }
+  });
 
   console.log('\n=======================================================');
   console.log('  ALL 4 INSTALLERS AND GITHUB RELEASE ASSETS READY!');
