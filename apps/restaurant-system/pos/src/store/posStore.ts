@@ -33,7 +33,7 @@ import {
 import { PosPrinterService } from '../services/printerService';
 import { PosRecoveryService } from '../services/recoveryService';
 import { lanMeshSync } from '@jamanvaar/sync';
-import { SessionPersistence, AuthStatus } from '@jamanvaar/business';
+import { SessionPersistence, AuthStatus, calculateCart } from '@jamanvaar/business';
 
 export type PosTab =
   | 'MENU'
@@ -61,6 +61,10 @@ const EMPTY_CART: Cart = {
   items: [],
   subtotal: 0,
   discountAmount: 0,
+  discountType: 'NONE',
+  discountValue: 0,
+  discountScope: 'BILL',
+  discountReason: '',
   cgstAmount: 0,
   sgstAmount: 0,
   taxAmount: 0,
@@ -103,11 +107,17 @@ interface PosState {
   cart: Cart;
   billDiscountPercent: number;
   billDiscountFlat: number;
+  discountScope: 'BILL' | 'ITEMS';
+  discountType: 'PERCENTAGE' | 'FIXED' | 'NONE';
+  discountValue: number;
+  discountReason: string;
+  discountCode: string;
   orderNotes: string;
   recoverableDraft: DraftCartSession | null;
 
   // Active Modals & Dialogs
   customizingItem: MenuItem | null;
+  isDiscountModalOpen: boolean;
   isPaymentOpen: boolean;
   isReceiptOpen: boolean;
   isPrintQueueOpen: boolean;
@@ -164,6 +174,16 @@ interface PosState {
   removeItemFromCart: (cartItemId: string) => void;
   applyBillDiscountPercent: (percent: number) => void;
   applyBillDiscountFlat: (amount: number) => void;
+  applyDiscount: (params: {
+    scope: 'BILL' | 'ITEMS';
+    type: 'PERCENTAGE' | 'FIXED';
+    value: number;
+    reason: string;
+    code?: string;
+    itemIds?: string[];
+  }) => void;
+  removeDiscount: () => void;
+  setIsDiscountModalOpen: (open: boolean) => void;
   clearCart: () => void;
 
   holdCurrentOrder: (label?: string) => boolean;
@@ -211,44 +231,23 @@ interface PosState {
   discardDraftSession: () => void;
 }
 
-// Robust Indian Restaurant Tax & Round-off Calculation
+// Robust Indian Restaurant Tax, Discount & Round-off Calculation
 function recomputeCart(
   items: CartItem[],
-  discountPercent: number,
-  discountFlat: number
+  discountType: 'PERCENTAGE' | 'FIXED' | 'COUPON' | 'NONE' = 'NONE',
+  discountValue: number = 0,
+  discountScope: 'BILL' | 'ITEMS' = 'BILL',
+  discountReason?: string,
+  discountCode?: string
 ): Cart {
-  const subtotal = items.reduce((acc, it) => acc + it.itemTotal, 0);
-
-  let calculatedDiscount = 0;
-  if (discountPercent > 0) {
-    calculatedDiscount = Number(((subtotal * discountPercent) / 100).toFixed(2));
-  } else if (discountFlat > 0) {
-    calculatedDiscount = Math.min(subtotal, discountFlat);
-  }
-
-  const taxableAmount = Math.max(0, subtotal - calculatedDiscount);
-
-  // Indian Restaurant GST standard (5% = 2.5% CGST + 2.5% SGST)
-  const cgstAmount = Number(((taxableAmount * 2.5) / 100).toFixed(2));
-  const sgstAmount = Number(((taxableAmount * 2.5) / 100).toFixed(2));
-  const taxAmount = Number((cgstAmount + sgstAmount).toFixed(2));
-
-  const unroundedTotal = taxableAmount + taxAmount;
-  const roundedTotal = Math.round(unroundedTotal);
-  const roundOffAmount = Number((roundedTotal - unroundedTotal).toFixed(2));
-
-  return {
+  return calculateCart({
     items,
-    subtotal,
-    discountAmount: calculatedDiscount,
-    cgstAmount,
-    sgstAmount,
-    taxAmount,
-    serviceChargeAmount: 0,
-    tipAmount: 0,
-    roundOffAmount,
-    totalPayable: roundedTotal
-  };
+    discountType,
+    discountValue,
+    discountScope,
+    discountReason,
+    discountCode
+  });
 }
 
 export const usePosStore = create<PosState>((set, get) => {
@@ -299,10 +298,16 @@ export const usePosStore = create<PosState>((set, get) => {
     cart: EMPTY_CART,
     billDiscountPercent: 0,
     billDiscountFlat: 0,
+    discountScope: 'BILL',
+    discountType: 'NONE',
+    discountValue: 0,
+    discountReason: '',
+    discountCode: '',
     orderNotes: '',
     recoverableDraft: initialDraft,
 
     customizingItem: null,
+    isDiscountModalOpen: false,
     isPaymentOpen: false,
     isReceiptOpen: false,
     isPrintQueueOpen: false,
@@ -547,8 +552,11 @@ export const usePosStore = create<PosState>((set, get) => {
 
       const updatedCart = recomputeCart(
         newItems,
-        state.billDiscountPercent,
-        state.billDiscountFlat
+        state.discountType,
+        state.discountValue,
+        state.discountScope,
+        state.discountReason,
+        state.discountCode
       );
 
       set({ cart: updatedCart });
@@ -587,8 +595,11 @@ export const usePosStore = create<PosState>((set, get) => {
 
       const updatedCart = recomputeCart(
         newItems,
-        state.billDiscountPercent,
-        state.billDiscountFlat
+        state.discountType,
+        state.discountValue,
+        state.discountScope,
+        state.discountReason,
+        state.discountCode
       );
 
       set({ cart: updatedCart });
@@ -629,8 +640,11 @@ export const usePosStore = create<PosState>((set, get) => {
 
       const updatedCart = recomputeCart(
         newItems,
-        state.billDiscountPercent,
-        state.billDiscountFlat
+        state.discountType,
+        state.discountValue,
+        state.discountScope,
+        state.discountReason,
+        state.discountCode
       );
 
       set({ cart: updatedCart });
@@ -660,8 +674,11 @@ export const usePosStore = create<PosState>((set, get) => {
 
       const updatedCart = recomputeCart(
         newItems,
-        state.billDiscountPercent,
-        state.billDiscountFlat
+        state.discountType,
+        state.discountValue,
+        state.discountScope,
+        state.discountReason,
+        state.discountCode
       );
 
       set({ cart: updatedCart });
@@ -682,8 +699,11 @@ export const usePosStore = create<PosState>((set, get) => {
       const newItems = state.cart.items.filter((ci) => ci.cartItemId !== cartItemId);
       const updatedCart = recomputeCart(
         newItems,
-        state.billDiscountPercent,
-        state.billDiscountFlat
+        state.discountType,
+        state.discountValue,
+        state.discountScope,
+        state.discountReason,
+        state.discountCode
       );
 
       set({ cart: updatedCart });
@@ -702,8 +722,12 @@ export const usePosStore = create<PosState>((set, get) => {
 
     applyBillDiscountPercent: (percent: number) => {
       const state = get();
-      const updatedCart = recomputeCart(state.cart.items, percent, 0);
+      const updatedCart = recomputeCart(state.cart.items, 'PERCENTAGE', percent, 'BILL', 'Bill Discount');
       set({
+        discountType: 'PERCENTAGE',
+        discountValue: percent,
+        discountScope: 'BILL',
+        discountReason: 'Bill Discount',
         billDiscountPercent: percent,
         billDiscountFlat: 0,
         cart: updatedCart
@@ -719,8 +743,12 @@ export const usePosStore = create<PosState>((set, get) => {
 
     applyBillDiscountFlat: (amount: number) => {
       const state = get();
-      const updatedCart = recomputeCart(state.cart.items, 0, amount);
+      const updatedCart = recomputeCart(state.cart.items, 'FIXED', amount, 'BILL', 'Flat Bill Discount');
       set({
+        discountType: 'FIXED',
+        discountValue: amount,
+        discountScope: 'BILL',
+        discountReason: 'Flat Bill Discount',
         billDiscountPercent: 0,
         billDiscountFlat: amount,
         cart: updatedCart
@@ -734,11 +762,109 @@ export const usePosStore = create<PosState>((set, get) => {
       });
     },
 
+    applyDiscount: (params: {
+      scope: 'BILL' | 'ITEMS';
+      type: 'PERCENTAGE' | 'FIXED';
+      value: number;
+      reason: string;
+      code?: string;
+      itemIds?: string[];
+    }) => {
+      const state = get();
+      let itemsToProcess = [...state.cart.items];
+
+      if (params.scope === 'ITEMS' && params.itemIds && params.itemIds.length > 0) {
+        itemsToProcess = itemsToProcess.map((it) => {
+          if (params.itemIds!.includes(it.cartItemId)) {
+            if (params.type === 'PERCENTAGE') {
+              return {
+                ...it,
+                itemDiscountPercent: params.value,
+                itemDiscountAmount: 0,
+                discountReason: params.reason
+              };
+            } else {
+              return {
+                ...it,
+                itemDiscountPercent: 0,
+                itemDiscountAmount: params.value,
+                discountReason: params.reason
+              };
+            }
+          }
+          return it;
+        });
+      }
+
+      const updatedCart = recomputeCart(
+        itemsToProcess,
+        params.type,
+        params.value,
+        params.scope,
+        params.reason,
+        params.code
+      );
+
+      set({
+        discountScope: params.scope,
+        discountType: params.type,
+        discountValue: params.value,
+        discountReason: params.reason,
+        discountCode: params.code || '',
+        billDiscountPercent: params.scope === 'BILL' && params.type === 'PERCENTAGE' ? params.value : 0,
+        billDiscountFlat: params.scope === 'BILL' && params.type === 'FIXED' ? params.value : 0,
+        cart: updatedCart
+      });
+
+      AuditRepository.log({
+        action: 'DISCOUNT_APPLIED',
+        category: 'FINANCIAL',
+        details: `Applied ${params.scope} discount (${params.type === 'PERCENTAGE' ? `${params.value}%` : `₹${params.value}`}) for "${params.reason}" (-₹${updatedCart.discountAmount})`,
+        username: state.currentUser?.fullName || 'Cashier'
+      });
+    },
+
+    removeDiscount: () => {
+      const state = get();
+      const cleanItems = state.cart.items.map((it) => ({
+        ...it,
+        itemDiscountPercent: 0,
+        itemDiscountAmount: 0,
+        discountReason: undefined
+      }));
+
+      const updatedCart = recomputeCart(cleanItems, 'NONE', 0, 'BILL', '', '');
+      set({
+        discountScope: 'BILL',
+        discountType: 'NONE',
+        discountValue: 0,
+        discountReason: '',
+        discountCode: '',
+        billDiscountPercent: 0,
+        billDiscountFlat: 0,
+        cart: updatedCart
+      });
+
+      AuditRepository.log({
+        action: 'DISCOUNT_REMOVED',
+        category: 'FINANCIAL',
+        details: 'Removed applied order discount',
+        username: state.currentUser?.fullName || 'Cashier'
+      });
+    },
+
+    setIsDiscountModalOpen: (open: boolean) => set({ isDiscountModalOpen: open }),
+
     clearCart: () => {
       set({
         cart: EMPTY_CART,
         billDiscountPercent: 0,
         billDiscountFlat: 0,
+        discountScope: 'BILL',
+        discountType: 'NONE',
+        discountValue: 0,
+        discountReason: '',
+        discountCode: '',
         orderNotes: ''
       });
       PosRecoveryService.clearDraft();
@@ -892,6 +1018,9 @@ export const usePosStore = create<PosState>((set, get) => {
           modifiers: ci.selectedModifiers,
           specialInstructions: ci.specialInstructions,
           totalPrice: ci.itemTotal,
+          itemDiscountPercent: ci.itemDiscountPercent,
+          itemDiscountAmount: ci.itemDiscountAmount,
+          discountReason: ci.discountReason,
           kitchenStatus: 'PREPARING' as const
         }));
 
@@ -905,6 +1034,13 @@ export const usePosStore = create<PosState>((set, get) => {
           items: orderItems,
           subtotal: state.cart.subtotal,
           discountAmount: state.cart.discountAmount,
+          discountType: state.discountType,
+          discountValue: state.discountValue,
+          discountScope: state.discountScope,
+          discountReason: state.discountReason,
+          discountCode: state.discountCode,
+          discountAppliedBy: state.currentUser?.fullName || 'Cashier',
+          discountAppliedAt: state.cart.discountAmount > 0 ? new Date().toISOString() : undefined,
           cgstAmount: state.cart.cgstAmount,
           sgstAmount: state.cart.sgstAmount,
           taxAmount: state.cart.taxAmount,
@@ -1036,7 +1172,14 @@ export const usePosStore = create<PosState>((set, get) => {
         };
       });
 
-      const updatedCart = recomputeCart(cartItems, 0, order.discountAmount || 0);
+      const updatedCart = recomputeCart(
+        cartItems,
+        order.discountType || (order.discountAmount ? 'FIXED' : 'NONE'),
+        order.discountAmount || 0,
+        order.discountScope || 'BILL',
+        order.discountReason,
+        order.discountCode
+      );
 
       set({
         selectedTable: table,
@@ -1120,7 +1263,7 @@ export const usePosStore = create<PosState>((set, get) => {
         };
       });
 
-      const updatedCart = recomputeCart(newCartItems, 0, 0);
+      const updatedCart = recomputeCart(newCartItems, 'NONE', 0, 'BILL');
 
       const table = order.tableId ? db.tables.find((t) => t.id === order.tableId) : null;
       const customer = order.customerPhone

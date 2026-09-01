@@ -391,11 +391,22 @@ export const PosPaymentModal: React.FC = () => {
               <h2 className="text-2xl sm:text-3xl font-black text-[#0B253A] font-mono leading-tight">
                 {formatINR(totalPayable)}
               </h2>
+              {cart.discountAmount > 0 && (
+                <span className="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-lg border border-emerald-300">
+                  Discount: -{formatINR(cart.discountAmount)} {cart.discountReason ? `(${cart.discountReason})` : ''}
+                </span>
+              )}
             </div>
             <div className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
               <span>{selectedTable ? `Table #${selectedTable.tableNumber}` : 'Counter Takeaway'}</span>
               <span>•</span>
               <span>{itemsCount} items</span>
+              {cart.discountAmount > 0 && (
+                <>
+                  <span>•</span>
+                  <span className="text-slate-400 line-through font-mono">Gross: {formatINR(cart.subtotal)}</span>
+                </>
+              )}
               {selectedCustomer && (
                 <>
                   <span>•</span>

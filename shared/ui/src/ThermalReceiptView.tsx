@@ -161,7 +161,14 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
 
           {(order.discountAmount || 0) > 0 && (
             <div className="flex justify-between text-emerald-700 font-semibold">
-              <span>Discount</span>
+              <span className="truncate max-w-[200px]">
+                Discount
+                {order.discountReason
+                  ? ` (${order.discountReason})`
+                  : order.couponCode
+                  ? ` (${order.couponCode})`
+                  : ''}
+              </span>
               <span>-₹{order.discountAmount}</span>
             </div>
           )}

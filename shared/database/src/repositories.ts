@@ -400,12 +400,18 @@ export class OrderRepository {
 
     // Reset daily token counter per business day
     const activeDayOrders = db.orders.filter((o) => o.businessDayId === businessDayId);
-    const highestToken = activeDayOrders.reduce((max, o) => {
-      const num = parseInt(o.tokenNumber, 10);
-      return !isNaN(num) && num > max ? num : max;
-    }, 100);
-
-    const tokenNumber = orderData.tokenNumber || generateTokenNumber(highestToken);
+    let tokenNumber = orderData.tokenNumber;
+    if (!tokenNumber) {
+      if (activeDayOrders.length === 0) {
+        tokenNumber = '101';
+      } else {
+        const highestToken = activeDayOrders.reduce((max, o) => {
+          const num = parseInt(o.tokenNumber, 10);
+          return !isNaN(num) && num > max ? num : max;
+        }, 100);
+        tokenNumber = (highestToken + 1).toString();
+      }
+    }
     const orderNumber = orderData.orderNumber || generateOrderNumber();
 
     const nowIso = new Date().toISOString();
@@ -445,6 +451,14 @@ export class OrderRepository {
       items: orderData.items || [],
       subtotal: orderData.subtotal || 0,
       discountAmount: orderData.discountAmount || 0,
+      discountType: orderData.discountType,
+      discountValue: orderData.discountValue,
+      discountScope: orderData.discountScope,
+      discountReason: orderData.discountReason,
+      discountCode: orderData.discountCode,
+      discountAppliedBy: orderData.discountAppliedBy,
+      discountAppliedAt: orderData.discountAppliedAt,
+      discountApprovalStatus: orderData.discountApprovalStatus,
       couponCode: orderData.couponCode,
       cgstAmount: orderData.cgstAmount || 0,
       sgstAmount: orderData.sgstAmount || 0,

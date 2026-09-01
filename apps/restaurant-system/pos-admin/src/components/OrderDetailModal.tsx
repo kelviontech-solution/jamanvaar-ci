@@ -150,8 +150,15 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               <span className="font-mono font-semibold">{formatINR(order.subtotal)}</span>
             </div>
             {order.discountAmount > 0 && (
-              <div className="flex justify-between text-rose-600 font-semibold">
-                <span>Discount</span>
+              <div className="flex justify-between text-emerald-700 font-semibold">
+                <span>
+                  Discount
+                  {order.discountReason
+                    ? ` (${order.discountReason})`
+                    : order.couponCode
+                    ? ` (${order.couponCode})`
+                    : ''}
+                </span>
                 <span className="font-mono">-{formatINR(order.discountAmount)}</span>
               </div>
             )}

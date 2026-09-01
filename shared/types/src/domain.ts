@@ -17,6 +17,22 @@ import {
   TableStatus
 } from './enums';
 
+export interface DiscountConfig {
+  enabled: boolean;
+  maxPercentage: number;
+  maxFixedAmount: number;
+  allowItemLevel: boolean;
+  allowBillLevel: boolean;
+  allowPercentage: boolean;
+  allowFixed: boolean;
+  requireReason: boolean;
+  requireManagerApproval: boolean;
+  managerApprovalThresholdPercent: number;
+  managerApprovalThresholdAmount: number;
+  allowedReasons: string[];
+  enableDiscountCodes: boolean;
+}
+
 export interface InstantBillConfig {
   enabled: boolean;
   paymentMethod: PaymentMethod;
@@ -50,6 +66,7 @@ export interface Restaurant {
   ownerName?: string;
   managerName?: string;
   instantBillConfig?: InstantBillConfig;
+  discountConfig?: DiscountConfig;
   createdAt: string;
   updatedAt: string;
 }
@@ -307,12 +324,20 @@ export interface CartItem {
   selectedModifiers: SelectedModifier[];
   specialInstructions?: string;
   itemTotal: number;
+  itemDiscountPercent?: number;
+  itemDiscountAmount?: number;
+  discountReason?: string;
 }
 
 export interface Cart {
   items: CartItem[];
   subtotal: number;
   discountAmount: number;
+  discountType?: 'PERCENTAGE' | 'FIXED' | 'COUPON' | 'NONE';
+  discountValue?: number;
+  discountScope?: 'BILL' | 'ITEMS';
+  discountReason?: string;
+  discountCode?: string;
   appliedCoupon?: Coupon;
   cgstAmount: number;
   sgstAmount: number;
@@ -334,6 +359,9 @@ export interface OrderItem {
   modifiers: SelectedModifier[];
   specialInstructions?: string;
   totalPrice: number;
+  itemDiscountPercent?: number;
+  itemDiscountAmount?: number;
+  discountReason?: string;
   kitchenStatus?: 'PENDING' | 'PREPARING' | 'READY' | 'SERVED';
 }
 
@@ -436,6 +464,14 @@ export interface Order {
   items: OrderItem[];
   subtotal: number;
   discountAmount: number;
+  discountType?: 'PERCENTAGE' | 'FIXED' | 'COUPON' | 'NONE';
+  discountValue?: number;
+  discountScope?: 'BILL' | 'ITEMS';
+  discountReason?: string;
+  discountCode?: string;
+  discountAppliedBy?: string;
+  discountAppliedAt?: string;
+  discountApprovalStatus?: 'AUTO' | 'APPROVED' | 'PENDING';
   couponCode?: string;
   cgstAmount: number;
   sgstAmount: number;
