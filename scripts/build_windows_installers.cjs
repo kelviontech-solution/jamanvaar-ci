@@ -158,11 +158,22 @@ async function buildAllInstallers() {
     }
     fs.mkdirSync(stagingDir, { recursive: true });
 
-    // Copy frontend
+    // 1. Copy active frontend
     const appDir = path.join(stagingDir, 'app');
     copyRecursiveSync(app.distDir, appDir);
 
-    // Copy server backend & database
+    // 2. Copy ALL 4 app dists so local_service.cjs can serve any route seamlessly
+    APPS.forEach(a => {
+      const targetDir = path.join(stagingDir, `${a.id.replace(/-/g, '_')}_app`);
+      copyRecursiveSync(a.distDir, targetDir);
+    });
+
+    // 3. Copy bundled portable Node.js runtime so ANY fresh PC runs with zero prerequisites
+    if (fs.existsSync(process.execPath)) {
+      fs.copyFileSync(process.execPath, path.join(stagingDir, 'node.exe'));
+    }
+
+    // 4. Copy server backend & database
     const serverDir = path.join(stagingDir, 'server');
     fs.mkdirSync(serverDir, { recursive: true });
     fs.copyFileSync(path.join(ROOT, 'scripts', 'local_service.cjs'), path.join(serverDir, 'local_service.cjs'));
@@ -170,11 +181,11 @@ async function buildAllInstallers() {
       fs.copyFileSync(path.join(ROOT, 'shared', 'database', 'src', 'live_db.json'), path.join(serverDir, 'live_db.json'));
     }
 
-    // Copy icon
+    // 5. Copy icon
     const iconDest = path.join(stagingDir, 'icon.ico');
     fs.copyFileSync(tempIco, iconDest);
 
-    // Create App Launcher Node Script
+    // 6. Create App Launcher Node Script
     const launcherScript = `const { spawn } = require('child_process');
 const http = require('http');
 const path = require('path');
@@ -182,6 +193,7 @@ const fs = require('fs');
 
 const ROOT = __dirname;
 const SERVER_SCRIPT = path.join(ROOT, 'server', 'local_service.cjs');
+const nodeExe = fs.existsSync(path.join(ROOT, 'node.exe')) ? path.join(ROOT, 'node.exe') : 'node';
 
 let edgeExe = 'C:\\\\Program Files (x86)\\\\Microsoft\\\\Edge\\\\Application\\\\msedge.exe';
 if (!fs.existsSync(edgeExe)) {
@@ -204,7 +216,7 @@ function isServerAlive() {
 async function launch() {
   const alive = await isServerAlive();
   if (!alive) {
-    const srv = spawn('node', [SERVER_SCRIPT], {
+    const srv = spawn(nodeExe, [SERVER_SCRIPT], {
       detached: true,
       stdio: 'ignore',
       cwd: path.dirname(SERVER_SCRIPT),
@@ -212,7 +224,7 @@ async function launch() {
     });
     srv.unref();
 
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) {
       await new Promise(r => setTimeout(r, 200));
       if (await isServerAlive()) break;
     }
@@ -248,8 +260,14 @@ launch().then(() => process.exit(0));
     fs.writeFileSync(path.join(stagingDir, 'launcher.cjs'), launcherScript);
 
     // Create Launcher batch & vbs
-    fs.writeFileSync(path.join(stagingDir, 'start.vbs'), `Set WshShell = CreateObject("WScript.Shell")\r\nWshShell.CurrentDirectory = CreateObject("Scripting.FileSystemObject").GetParentFolderName(WScript.ScriptFullName)\r\nWshShell.Run "node launcher.cjs", 0, False\r\n`);
-    fs.writeFileSync(path.join(stagingDir, 'start.bat'), `@echo off\r\ncd /d "%~dp0"\r\nstart "" /b node launcher.cjs\r\nexit\r\n`);
+    fs.writeFileSync(
+      path.join(stagingDir, 'start.vbs'),
+      `Set WshShell = CreateObject("WScript.Shell")\r\nSet fso = CreateObject("Scripting.FileSystemObject")\r\nappDir = fso.GetParentFolderName(WScript.ScriptFullName)\r\nnodeExe = appDir & "\\node.exe"\r\nIf Not fso.FileExists(nodeExe) Then nodeExe = "node"\r\nWshShell.CurrentDirectory = appDir\r\nWshShell.Run """" & nodeExe & """ launcher.cjs", 0, False\r\n`
+    );
+    fs.writeFileSync(
+      path.join(stagingDir, 'start.bat'),
+      `@echo off\r\ncd /d "%~dp0"\r\nif exist "%~dp0node.exe" (\r\n  start "" /b "%~dp0node.exe" "%~dp0launcher.cjs"\r\n) else (\r\n  start "" /b node launcher.cjs\r\n)\r\nexit\r\n`
+    );
 
     // Zip staging files for resource embedding
     const appZipPath = path.join(RELEASE_DIR, `${app.id}_payload.zip`);

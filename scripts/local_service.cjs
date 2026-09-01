@@ -615,11 +615,23 @@ const server = http.createServer((req, res) => {
   };
 
   const getDir = (folderName, altDist) => {
-    const p1 = path.join(__dirname, '..', folderName);
-    if (fs.existsSync(p1)) return p1;
-    const p2 = path.join(__dirname, '..', 'apps', altDist, 'dist');
-    if (fs.existsSync(p2)) return p2;
-    return p1;
+    const candidates = [
+      path.join(__dirname, '..', folderName),
+      path.join(__dirname, folderName),
+      path.join(__dirname, '..', 'app'),
+      path.join(__dirname, 'app'),
+      path.join(__dirname, '..', 'apps', altDist, 'dist'),
+      path.join(__dirname, '..', '..', 'apps', altDist, 'dist')
+    ];
+    for (const p of candidates) {
+      if (fs.existsSync(p) && fs.existsSync(path.join(p, 'index.html'))) {
+        return p;
+      }
+    }
+    for (const p of candidates) {
+      if (fs.existsSync(p)) return p;
+    }
+    return path.join(__dirname, '..', 'app');
   };
 
   const posDir = getDir('pos_app', 'restaurant-system/pos');
