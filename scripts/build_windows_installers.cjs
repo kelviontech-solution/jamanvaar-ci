@@ -266,6 +266,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Collections.Generic;
 using Microsoft.Win32;
 
 [assembly: AssemblyTitle("${app.name} Setup")]
@@ -424,14 +425,65 @@ namespace JamanvaarInstaller
                 string launcherVbs = Path.Combine(installDir, "start.vbs");
                 string wscriptExe = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "wscript.exe");
 
-                // Desktop shortcut
-                string desktopFolder = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                CreateShortcut(Path.Combine(desktopFolder, "${app.name}.lnk"), wscriptExe, "\\"" + launcherVbs + "\\"", installDir, "${app.name}", iconLocation);
+                // 1. Gather all active Desktop locations (Handles OneDrive desktop redirection, Public desktop, and local desktop)
+                List<string> desktopFolders = new List<string>();
+                try
+                {
+                    using (RegistryKey regKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders"))
+                    {
+                        if (regKey != null)
+                        {
+                            object dObj = regKey.GetValue("Desktop");
+                            if (dObj != null)
+                            {
+                                string rDesk = Environment.ExpandEnvironmentVariables(dObj.ToString());
+                                if (!string.IsNullOrEmpty(rDesk) && !desktopFolders.Contains(rDesk)) desktopFolders.Add(rDesk);
+                            }
+                        }
+                    }
+                }
+                catch { }
 
-                // Start Menu shortcut
-                string startMenuFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "JAMANVAAR");
-                Directory.CreateDirectory(startMenuFolder);
-                CreateShortcut(Path.Combine(startMenuFolder, "${app.name}.lnk"), wscriptExe, "\\"" + launcherVbs + "\\"", installDir, "${app.name}", iconLocation);
+                string sfDeskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                if (!string.IsNullOrEmpty(sfDeskDir) && !desktopFolders.Contains(sfDeskDir)) desktopFolders.Add(sfDeskDir);
+
+                string sfDesk = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                if (!string.IsNullOrEmpty(sfDesk) && !desktopFolders.Contains(sfDesk)) desktopFolders.Add(sfDesk);
+
+                string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string oneDriveDesk = Path.Combine(userProfile, "OneDrive", "Desktop");
+                if (Directory.Exists(oneDriveDesk) && !desktopFolders.Contains(oneDriveDesk)) desktopFolders.Add(oneDriveDesk);
+
+                string plainDesk = Path.Combine(userProfile, "Desktop");
+                if (Directory.Exists(plainDesk) && !desktopFolders.Contains(plainDesk)) desktopFolders.Add(plainDesk);
+
+                // Write Desktop Shortcut into every detected active Desktop folder
+                foreach (string df in desktopFolders)
+                {
+                    try
+                    {
+                        if (!Directory.Exists(df)) Directory.CreateDirectory(df);
+                        CreateShortcut(Path.Combine(df, "${app.name}.lnk"), wscriptExe, "\\"" + launcherVbs + "\\"", installDir, "${app.name}", iconLocation);
+                    }
+                    catch { }
+                }
+
+                // 2. Gather and write Start Menu shortcuts
+                List<string> startFolders = new List<string>();
+                string sfStart = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "JAMANVAAR");
+                startFolders.Add(sfStart);
+                string sfPrograms = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "JAMANVAAR");
+                if (!startFolders.Contains(sfPrograms)) startFolders.Add(sfPrograms);
+
+                foreach (string sf in startFolders)
+                {
+                    try
+                    {
+                        if (!Directory.Exists(sf)) Directory.CreateDirectory(sf);
+                        CreateShortcut(Path.Combine(sf, "${app.name}.lnk"), wscriptExe, "\\"" + launcherVbs + "\\"", installDir, "${app.name}", iconLocation);
+                    }
+                    catch { }
+                }
 
                 // Register Windows Uninstaller in Registry
                 RegisterUninstaller();
@@ -465,6 +517,12 @@ namespace JamanvaarInstaller
         {
             try
             {
+                string dir = Path.GetDirectoryName(linkPath);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
                 Type shellType = Type.GetTypeFromProgID("WScript.Shell");
                 dynamic shell = Activator.CreateInstance(shellType);
                 dynamic shortcut = shell.CreateShortcut(linkPath);
