@@ -1,0 +1,340 @@
+/* Shared page/modal/table primitives reused across every SaaS management page. */
+
+.page-error {
+  background: #fef2f2;
+  color: var(--jv-error);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  margin-bottom: 16px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.toolbar input[type='text'],
+.toolbar input[type='search'],
+.toolbar select {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: var(--jv-radius-md);
+  border: 1px solid var(--jv-border);
+  font-size: 13.5px;
+  background: #ffffff;
+  color: var(--jv-text);
+  box-shadow: var(--jv-shadow-xs);
+  transition: all 0.15s ease-in-out;
+}
+.toolbar input[type='text']:focus,
+.toolbar input[type='search']:focus,
+.toolbar select:focus {
+  outline: none;
+  border-color: var(--jv-accent);
+  box-shadow: 0 0 0 3px rgba(230, 104, 23, 0.15);
+}
+.toolbar .spacer {
+  flex: 1;
+}
+
+.data-table-container {
+  overflow-x: auto;
+  border-radius: var(--jv-radius-lg);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  text-align: left;
+}
+.data-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--jv-text-secondary);
+  font-weight: 700;
+  padding: 14px 20px;
+  background: var(--jv-bg);
+  border-bottom: 1px solid var(--jv-border);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--jv-border);
+  vertical-align: middle;
+  color: var(--jv-text);
+  transition: background 0.12s ease;
+}
+.data-table tbody tr:hover td {
+  background: var(--jv-surface-subtle);
+}
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+.table-link {
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--jv-primary);
+  transition: color 0.15s ease;
+}
+.table-link:hover {
+  color: var(--jv-accent);
+  text-decoration: underline;
+}
+.row-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 14px 20px;
+  font-size: 13px;
+  color: var(--jv-text-secondary);
+  border-top: 1px solid var(--jv-border);
+  background: var(--jv-surface-subtle);
+}
+
+.back-link {
+  display: inline-block;
+  font-size: 13px;
+  color: var(--jv-text-secondary);
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+.back-link:hover {
+  color: var(--jv-primary);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.detail-card {
+  padding: 20px 22px;
+}
+.detail-card-full {
+  grid-column: 1 / -1;
+}
+.detail-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.detail-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin: 0;
+  font-size: 13.5px;
+}
+.detail-list dt {
+  color: var(--jv-text-muted);
+}
+.detail-list dd {
+  margin: 0;
+}
+.simple-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13.5px;
+}
+.muted {
+  color: var(--jv-text-muted);
+  font-size: 13px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--jv-border);
+  margin-bottom: 20px;
+}
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--jv-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tab-btn.active {
+  color: var(--jv-primary);
+  border-bottom-color: var(--jv-accent);
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 37, 58, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
+.modal {
+  background: #fff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.4);
+}
+.modal.modal-wide {
+  max-width: 760px;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--jv-border);
+  position: sticky;
+  top: 0;
+  background: #fff;
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--jv-text-muted);
+}
+.modal-form {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.form-section-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--jv-text-muted);
+  margin-top: 4px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.form-note {
+  font-size: 12px;
+  color: var(--jv-text-muted);
+  margin: 0;
+}
+.form-error {
+  background: #fef2f2;
+  color: var(--jv-error);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+}
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.checkbox-row input {
+  width: 16px;
+  height: 16px;
+}
+
+.entitlement-matrix {
+  overflow-x: auto;
+}
+.entitlement-matrix table {
+  border-collapse: collapse;
+  font-size: 12.5px;
+  min-width: 100%;
+}
+.entitlement-matrix th,
+.entitlement-matrix td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--jv-border);
+  text-align: center;
+  white-space: nowrap;
+}
+.entitlement-matrix th:first-child,
+.entitlement-matrix td:first-child {
+  text-align: left;
+  position: sticky;
+  left: 0;
+  background: #fff;
+}
+.entitlement-matrix thead th {
+  color: var(--jv-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+}
+.check-yes {
+  color: var(--jv-success);
+  font-weight: 700;
+}
+.check-no {
+  color: var(--jv-border);
+}
+
+.activation-code-display {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 20px;
+  background: var(--jv-bg-muted);
+  border: 1px dashed var(--jv-border);
+  border-radius: 10px;
+  color: var(--jv-primary);
+}
+
+.kv-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 420px;
+}

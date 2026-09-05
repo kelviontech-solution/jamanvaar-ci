@@ -8,9 +8,9 @@ import {
   KOTRepository,
   OrderRepository,
   TableRepository
-} from '../shared/database/src';
+} from '../packages/database/src';
 import { KIOSK_DEFAULTS } from '../apps/kiosk-system/shared/src';
-import { RESTAURANT_DEFAULT_STATIONS } from '../shared/config/src';
+import { RESTAURANT_DEFAULT_STATIONS } from '../packages/config/src';
 
 describe('JAMANVAAR Unified Restaurant Suite Architecture & Single Local Core', () => {
   beforeEach(() => {

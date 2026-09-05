@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { PrinterService } from '../shared/api/src/printer';
-import { db } from '../shared/database/src/db';
-import { Order } from '../shared/types/src';
+import { PrinterService } from '../packages/api/src/printer';
+import { db } from '../packages/database/src/db';
+import { Order } from '../packages/types/src';
 
 const mockOrder: Order = {
   id: `ord-test-printer-${Date.now()}`,

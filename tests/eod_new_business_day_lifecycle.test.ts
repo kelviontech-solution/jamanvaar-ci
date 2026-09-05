@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   db,
   BusinessDayRepository,
@@ -13,6 +13,12 @@ import { lanMeshSync } from '@jamanvaar/sync';
 
 describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Comprehensive Matrix', () => {
   beforeEach(() => {
+    // Freeze "now" to the afternoon of the fixture's business day (2026-08-31, IST) so the
+    // 5:00 AM cutoff auto-close logic and seed-order dates are deterministic regardless of
+    // the real calendar date the suite happens to run on.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-31T08:30:00.000Z'));
+
     // Reset database to deterministic starting state for test
     db.businessDays = [
       {
@@ -70,6 +76,10 @@ describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Com
 
     db.notifications = [];
     db.kots = [];
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   // TEST 1: Normal EOD
@@ -170,6 +180,9 @@ describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Com
 
   // TEST 5: EOD with Refund Accounting
   it('TEST 5: should properly tally refunds in business day metrics and snapshot', () => {
+    BusinessDayRepository.recalculateMetrics('BD-20260831');
+    const before = BusinessDayRepository.getBusinessDayById('BD-20260831')!.refundedOrderCount;
+
     OrderRepository.createOrder({
       id: 'ord-ref-1',
       orderNumber: 'ORD-REF-1',
@@ -181,7 +194,7 @@ describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Com
 
     BusinessDayRepository.recalculateMetrics('BD-20260831');
     const day = BusinessDayRepository.getBusinessDayById('BD-20260831')!;
-    expect(day.refundedOrderCount).toBe(1);
+    expect(day.refundedOrderCount).toBe(before + 1);
   });
 
   // TEST 6: EOD with Cash Variance
@@ -216,6 +229,11 @@ describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Com
     BusinessDayService.closeBusinessDay({ businessDayId: 'BD-20260831', forceCloseWithExceptions: true });
     const activeDay = BusinessDayService.getActiveBusinessDay();
     expect(activeDay.id).toBe('BD-20260901');
+
+    // Isolate: the shared seed dataset carries its own rolling window of historical orders
+    // (dated relative to the real calendar day the suite runs on), which can incidentally
+    // land on this same business-day id. Strip those so the token sequence below is clean.
+    db.orders = db.orders.filter((o) => o.businessDayId !== activeDay.id);
 
     // Create fresh order on new day
     const newOrder = OrderRepository.createOrder({

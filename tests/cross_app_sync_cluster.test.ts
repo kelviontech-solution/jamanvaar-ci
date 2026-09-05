@@ -4,8 +4,8 @@ import {
   posAdminDb,
   kioskUserDb,
   kioskAdminDb
-} from '../shared/database/src';
-import { Order, MenuItem, KioskDevice } from '../shared/types/src';
+} from '../packages/database/src';
+import { Order, MenuItem, KioskDevice } from '../packages/types/src';
 
 describe('Cross-Application Cluster Sync (Kiosk ↔ Kiosk Admin & POS ↔ POS Admin)', () => {
   beforeEach(() => {

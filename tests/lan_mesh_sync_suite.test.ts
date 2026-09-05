@@ -2,15 +2,15 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   lanMeshSync,
   LanMeshSyncEngine
-} from '../shared/sync/src/lan_mesh_sync';
+} from '../packages/sync/src/lan_mesh_sync';
 import {
   db,
   captainDb,
   posDb,
   posAdminDb,
   kdsDb
-} from '../shared/database/src';
-import { Order, KOTRecord } from '../shared/types/src';
+} from '../packages/database/src';
+import { Order, KOTRecord } from '../packages/types/src';
 
 describe('JAMANVAAR POS Admin ↔ POS ↔ Captain App ↔ KDS Real-Time & Offline Sync', () => {
   beforeEach(() => {

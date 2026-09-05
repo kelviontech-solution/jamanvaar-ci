@@ -500,14 +500,37 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           </div>
 
           {filteredDaySummaries.length === 0 && (
-            <div className="text-center py-16 bg-white rounded-3xl border border-[#EBE6DD] space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 mx-auto flex items-center justify-center">
-                <Calendar className="w-6 h-6" />
+            <div className="text-center py-16 bg-white rounded-3xl border border-[#EBE6DD] shadow-2xs space-y-4 max-w-xl mx-auto my-6 p-6">
+              <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-[#E66817] mx-auto flex items-center justify-center border border-[#FDBA74]/40 shadow-xs">
+                <ShoppingBag className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-sm text-[#0B253A]">No Orders Found for this Period</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                No orders were recorded for the selected date range or search query.
-              </p>
+              <div className="space-y-1">
+                <h3 className="font-black text-base text-[#0B253A]">No Orders Found</h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  There are no customer orders matching the selected date period or search query.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilterPreset('TODAY');
+                    setDaysSearchQuery('');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-[#0B253A] hover:bg-[#1E3A4C] text-white text-xs font-bold transition-all shadow-xs"
+                >
+                  View Today's Orders
+                </button>
+                {daysSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setDaysSearchQuery('')}
+                    className="px-4 py-2 rounded-xl bg-white border border-[#EBE6DD] text-slate-700 hover:bg-[#FAF7F2] text-xs font-bold transition-all shadow-xs"
+                  >
+                    Clear Search
+                  </button>
+                )}
+              </div>
             </div>
           )}
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { db, OrderRepository } from '@jamanvaar/database';
-import { PosAssistantService } from '../shared/business/src/pos_assistant';
+import { PosAssistantService } from '../packages/business/src/pos_assistant';
 
 describe('JAMANVAAR POS Smart Assistant Engine Tests', () => {
   beforeEach(() => {

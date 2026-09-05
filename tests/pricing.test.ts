@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { calculateCart, calculateItemTotal, calculateItemUnitPrice } from '../shared/business/src/pricing';
-import { CartItem, MenuItem } from '../shared/types/src/domain';
+import { calculateCart, calculateItemTotal, calculateItemUnitPrice } from '../packages/business/src/pricing';
+import { CartItem, MenuItem } from '../packages/types/src/domain';
 
 const mockDish: MenuItem = {
   id: 'item-1',

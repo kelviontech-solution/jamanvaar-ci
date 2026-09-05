@@ -1,0 +1,50 @@
+import { Body, Controller, Get, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { PlatformUser } from '@prisma/client';
+import { RestaurantsService } from './restaurants.service';
+import { createRestaurantSchema } from './dto/create-restaurant.dto';
+import { updateRestaurantSchema } from './dto/update-restaurant.dto';
+import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
+import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
+import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
+
+@Controller('api/v1/restaurants')
+@UseGuards(PlatformAuthGuard)
+export class RestaurantsController {
+  constructor(private readonly restaurants: RestaurantsService) {}
+
+  @Post()
+  @UsePipes(new ZodValidationPipe(createRestaurantSchema))
+  create(@Body() body: ReturnType<typeof createRestaurantSchema.parse>, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.restaurants.createRestaurant(body, actor);
+  }
+
+  @Get()
+  list() {
+    return this.restaurants.listRestaurants();
+  }
+
+  @Get(':id')
+  detail(@Param('id') id: string) {
+    return this.restaurants.getRestaurantById(id);
+  }
+
+  @Patch(':id')
+  @UsePipes(new ZodValidationPipe(updateRestaurantSchema))
+  update(
+    @Param('id') id: string,
+    @Body() body: ReturnType<typeof updateRestaurantSchema.parse>,
+    @CurrentPlatformUser() actor: PlatformUser
+  ) {
+    return this.restaurants.update(id, body, actor);
+  }
+
+  @Patch(':id/suspend')
+  suspend(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.restaurants.setStatus(id, 'SUSPENDED', actor);
+  }
+
+  @Patch(':id/reactivate')
+  reactivate(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.restaurants.setStatus(id, 'ACTIVE', actor);
+  }
+}

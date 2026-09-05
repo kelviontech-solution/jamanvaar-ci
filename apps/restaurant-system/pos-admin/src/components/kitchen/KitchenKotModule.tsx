@@ -297,17 +297,19 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
 
       {/* KOT Cards Grid */}
       {filteredKots.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-[#EBE6DD] space-y-3">
-          <div className="w-12 h-12 bg-orange-50 text-[#E66817] rounded-2xl flex items-center justify-center mx-auto">
-            <ChefHat className="w-6 h-6" />
+        <div className="bg-white rounded-3xl p-12 text-center border border-[#EBE6DD] shadow-2xs space-y-3 max-w-lg mx-auto my-6">
+          <div className="w-14 h-14 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto border border-emerald-200/60 shadow-xs">
+            <ChefHat className="w-7 h-7" />
           </div>
-          <h3 className="font-black text-base text-[#0B253A]">No Kitchen Tickets Found</h3>
-          <p className="text-xs text-slate-500 max-w-md mx-auto">
-            There are no active KOT tickets matching the selected station or status. Click below to dispatch a ticket:
-          </p>
+          <div className="space-y-1">
+            <h3 className="font-black text-base text-[#0B253A]">Your Kitchen is Clear</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              No active KOT tickets are waiting right now for the selected station or status.
+            </p>
+          </div>
           <button
             onClick={handleCreateTestKot}
-            className="px-4 py-2 bg-[#0B253A] text-white text-xs font-bold rounded-xl shadow-xs"
+            className="px-4 py-2 bg-[#0B253A] hover:bg-[#1E3A4C] text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95"
           >
             + Dispatch Sample KOT
           </button>

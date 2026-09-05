@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { db, OrderRepository } from '@jamanvaar/database';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
@@ -6,9 +6,18 @@ import { ReportGeneratorService } from '@jamanvaar/business';
 
 describe('JAMANVAAR POS ➔ POS ADMIN Real-Time Order & Sales Reflection', () => {
   beforeEach(() => {
+    // Freeze "now" so the active business day (and its 'TODAY' report scope) can't shift
+    // mid-test from a real-clock 5:00 AM cutoff crossing or day-boundary drift in seed data.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-31T08:30:00.000Z'));
+
     db.resetToDefaultSeed();
     usePosStore.getState().clearCart();
     lanMeshSync.registerDevice('POS_ADMIN', 'ADMIN-01', 'Restaurant Admin HQ');
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('1. should immediately reflect an order created and settled on POS in POS Admin database and reports', async () => {

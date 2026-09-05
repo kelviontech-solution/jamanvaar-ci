@@ -1,0 +1,4 @@
+{
+  "main": "tooling/local-runtime/standalone_local_core.cjs",
+  "output": "tooling/local-runtime/sea-prep.blob"
+}

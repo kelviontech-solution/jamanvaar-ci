@@ -4,8 +4,8 @@ import {
   OrderRepository,
   ShiftRepository,
   AuditRepository
-} from '../shared/database/src';
-import { PaymentMethod, Order } from '../shared/types/src';
+} from '../packages/database/src';
+import { PaymentMethod, Order } from '../packages/types/src';
 
 interface PaymentAllocation {
   channel: 'CASH' | 'UPI' | 'CARD' | 'WALLET' | 'HOUSE_ACCOUNT';

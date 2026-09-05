@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ReportGeneratorService } from '../shared/business/src/report_generator';
+import { ReportGeneratorService } from '../packages/business/src/report_generator';
 
 describe('ReportGeneratorService', () => {
   it('should generate daily sales report with summary metrics', () => {

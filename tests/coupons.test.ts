@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { validateCoupon } from '../shared/business/src/coupons';
-import { Coupon } from '../shared/types/src/domain';
+import { validateCoupon } from '../packages/business/src/coupons';
+import { Coupon } from '../packages/types/src/domain';
 
 describe('Coupon Validation & Discount Logic', () => {
   const coupon: Coupon = {

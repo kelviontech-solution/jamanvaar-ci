@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { VoiceService } from '../shared/api/src/services/voice';
+import { VoiceService } from '../packages/api/src/services/voice';
 
 describe('VoiceService & Multilingual Audio Synthesis', () => {
   it('should generate accurate Hindi confirmation voice message', () => {

@@ -7,11 +7,11 @@ import {
   kdsDb,
   JamanvaarLocalCore,
   BusinessDayAccountingService
-} from '../shared/database/src';
+} from '../packages/database/src';
 import {
   RestaurantCommandPipeline,
   RestaurantCommand
-} from '../shared/sync/src/command_pipeline';
+} from '../packages/sync/src/command_pipeline';
 
 describe('JAMANVAAR — Unified Multi-App Restaurant Ecosystem Suite', () => {
   beforeEach(() => {

@@ -1,0 +1,297 @@
+// JAMANVAAR Cloud — Phase 1a schema.
+//
+// Row-Level Security note: Prisma cannot express RLS policies declaratively.
+// The initial migration is generated with `prisma migrate dev --create-only`
+// and then hand-edited (see prisma/migrations/*_init/migration.sql) to add
+// `ENABLE ROW LEVEL SECURITY` + `FORCE ROW LEVEL SECURITY` + policies on every
+// tenant-owned table. FORCE is required — Postgres exempts table owners from
+// RLS by default, and the app's DB role owns these tables, so without FORCE
+// the policies below would be silently decorative.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Platform (Super Admin) identity — structurally separate from tenant User.
+// No code path maps one to the other; a restaurant owner row can never
+// satisfy a platform login query because it isn't in this table at all.
+// ---------------------------------------------------------------------------
+
+enum PlatformUserStatus {
+  ACTIVE
+  DISABLED
+}
+
+model PlatformUser {
+  id           String             @id @default(uuid())
+  email        String             @unique
+  passwordHash String
+  fullName     String
+  status       PlatformUserStatus @default(ACTIVE)
+  lastLoginAt  DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  refreshTokens PlatformRefreshToken[]
+}
+
+model PlatformRefreshToken {
+  id             String    @id @default(uuid())
+  platformUserId String
+  platformUser   PlatformUser @relation(fields: [platformUserId], references: [id], onDelete: Cascade)
+  tokenHash      String    @unique
+  expiresAt      DateTime
+  revokedAt      DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([platformUserId])
+}
+
+// ---------------------------------------------------------------------------
+// Tenant hierarchy: Restaurant -> Branch -> User / Device.
+// These four plus Subscription and ActivationKey are RLS-protected.
+// ---------------------------------------------------------------------------
+
+enum RestaurantStatus {
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
+}
+
+model Restaurant {
+  id              String           @id @default(uuid())
+  name            String
+  legalName       String?
+  gstin           String?
+  fssaiNumber     String?
+  address         String?
+  city            String?
+  state           String?
+  country         String           @default("India")
+  timezone        String           @default("Asia/Kolkata")
+  currency        String           @default("INR")
+  defaultLanguage String           @default("en")
+  status          RestaurantStatus @default(ACTIVE)
+  deletedAt       DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  branches      Branch[]
+  users         User[]
+  devices       Device[]
+  subscriptions Subscription[]
+  activationKeys ActivationKey[]
+}
+
+enum BranchStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Branch {
+  id           String       @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  name         String
+  code         String
+  address      String?
+  timezone     String       @default("Asia/Kolkata")
+  status       BranchStatus @default(ACTIVE)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  users   User[]
+  devices Device[]
+
+  @@unique([restaurantId, code])
+  @@index([restaurantId])
+}
+
+enum TenantUserRole {
+  OWNER
+  MANAGER
+  STAFF
+}
+
+enum TenantUserStatus {
+  PENDING_ACTIVATION
+  ACTIVE
+  DISABLED
+}
+
+model User {
+  id           String            @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branchId     String?
+  branch       Branch?           @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  email        String
+  phone        String?
+  passwordHash String?           // null until a PENDING_ACTIVATION owner sets their own password
+  fullName     String
+  role         TenantUserRole    @default(STAFF)
+  status       TenantUserStatus  @default(PENDING_ACTIVATION)
+  invitedAt    DateTime?
+  activatedAt  DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@unique([restaurantId, email])
+  @@index([restaurantId])
+  @@index([branchId])
+}
+
+// ---------------------------------------------------------------------------
+// Plans are platform-global (no restaurantId, no RLS).
+// ---------------------------------------------------------------------------
+
+enum PlanTier {
+  CORE
+  PRO
+  ENTERPRISE
+}
+
+enum PlanStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Plan {
+  id           String     @id @default(uuid())
+  tier         PlanTier
+  name         String
+  description  String?
+  priceMonthly Int // paise, avoids float rounding
+  priceYearly  Int?
+  maxBranches  Int
+  maxDevices   Int
+  maxUsers     Int
+  entitlements Json
+  status       PlanStatus @default(ACTIVE)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  subscriptions Subscription[]
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  SUSPENDED
+  EXPIRED
+}
+
+model Subscription {
+  id           String             @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  planId       String
+  plan         Plan               @relation(fields: [planId], references: [id])
+  status       SubscriptionStatus @default(TRIAL)
+  startDate    DateTime           @default(now())
+  expiresAt    DateTime
+  trialEndsAt  DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  activationKeys ActivationKey[]
+
+  @@index([restaurantId])
+}
+
+enum ActivationKeyDeviceType {
+  POS
+  CAPTAIN
+  KDS
+  KIOSK
+  ANY
+}
+
+enum ActivationKeyStatus {
+  ACTIVE
+  REDEEMED
+  REVOKED
+  EXPIRED
+}
+
+model ActivationKey {
+  id                 String                  @id @default(uuid())
+  code               String                  @unique // opaque public identifier, not a password
+  restaurantId       String
+  restaurant         Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  subscriptionId     String?
+  subscription       Subscription?           @relation(fields: [subscriptionId], references: [id])
+  allowedDeviceType  ActivationKeyDeviceType  @default(ANY)
+  status             ActivationKeyStatus     @default(ACTIVE)
+  expiresAt          DateTime
+  redeemedAt         DateTime?
+  redeemedByDeviceId String?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  @@index([restaurantId])
+}
+
+enum DeviceType {
+  POS
+  CAPTAIN
+  KDS
+  KIOSK
+}
+
+enum DeviceStatus {
+  PENDING
+  ACTIVE
+  REVOKED
+}
+
+model Device {
+  id           String       @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branchId     String?
+  branch       Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  type         DeviceType
+  publicKey    String?      // populated once the keypair activation flow (later phase) ships
+  appVersion   String?
+  status       DeviceStatus @default(PENDING)
+  lastSeenAt   DateTime?
+  activatedAt  DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([restaurantId])
+  @@index([branchId])
+}
+
+// ---------------------------------------------------------------------------
+// Audit log — platform-readable, not RLS-scoped in this phase.
+// ---------------------------------------------------------------------------
+
+enum AuditActorType {
+  PLATFORM
+  TENANT
+  SYSTEM
+}
+
+model AuditLog {
+  id           String         @id @default(uuid())
+  actorType    AuditActorType
+  actorId      String?
+  restaurantId String?
+  action       String
+  category     String
+  details      Json?
+  createdAt    DateTime       @default(now())
+
+  @@index([restaurantId])
+  @@index([actorType, actorId])
+  @@index([createdAt])
+}

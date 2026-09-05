@@ -6,7 +6,7 @@ import {
   captainDb,
   kdsDb,
   JamanvaarLocalCore
-} from '../shared/database/src';
+} from '../packages/database/src';
 
 describe('Unified Local Core Architecture: Single Authoritative Database Client Unification', () => {
   it('should ensure all restaurant applications connect to the same Local Core database', () => {

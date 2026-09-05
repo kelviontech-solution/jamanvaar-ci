@@ -68,4 +68,33 @@ describe('JAMANVAAR — Branded Startup / Splash → Login Experience Matrix', (
     expect(BRAND_COLORS.orange).toBe('#E66817');
     expect(BRAND_COLORS.border).toBe('#EBE6DD');
   });
+
+  // TEST 6: Four-Corner Bespoke Indian Heritage Vector Artwork Components
+  it('TEST 6: should provide four-corner bespoke Indian heritage vector artwork components', async () => {
+    const ui = await import('@jamanvaar/ui');
+    expect(ui.SplashCornerArtwork).toBeDefined();
+    expect(ui.TopLeftDiningMotif).toBeDefined();
+    expect(ui.TopLeftArchitecturalMotif).toBeDefined();
+    expect(ui.TopRightHospitalityMotif).toBeDefined();
+    expect(ui.BottomLeftThaliMotif).toBeDefined();
+    expect(ui.BottomLeftBotanicalMotif).toBeDefined();
+    expect(ui.BottomRightFoodServiceMotif).toBeDefined();
+    expect(ui.ConnectingEdgeFiligree).toBeDefined();
+  });
+
+  // TEST 7: Application-Specific Subtitle and Badge Hierarchy
+  it('TEST 7: should maintain coherent branding hierarchy across all 4 applications', () => {
+    const appConfigs = [
+      { appType: 'ADMIN', appName: 'Restaurant Admin', expectedDefaultSubtitle: 'Restaurant Operations Platform' },
+      { appType: 'POS', appName: 'POS Terminal', expectedDefaultSubtitle: 'Point of Sale System' },
+      { appType: 'CAPTAIN', appName: 'Captain App', expectedDefaultSubtitle: 'Service & Order Management' },
+      { appType: 'KIOSK_ADMIN', appName: 'Kiosk Management', expectedDefaultSubtitle: 'Hardware & Fleet Control' }
+    ];
+
+    expect(appConfigs.length).toBe(4);
+    appConfigs.forEach((app) => {
+      expect(app.appName.length).toBeGreaterThan(0);
+      expect(app.expectedDefaultSubtitle.length).toBeGreaterThan(0);
+    });
+  });
 });

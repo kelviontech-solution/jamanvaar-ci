@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db } from '../shared/database/src/db';
-import { OrderRepository } from '../shared/database/src/repositories';
+import { db } from '../packages/database/src/db';
+import { OrderRepository } from '../packages/database/src/repositories';
 
 describe('LAN Sync Bridge & Multi-Machine Pairing Engine', () => {
   beforeEach(() => {

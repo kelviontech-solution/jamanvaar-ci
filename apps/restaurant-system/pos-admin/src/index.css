@@ -68,12 +68,100 @@ body {
   box-shadow: 0 8px 24px -4px rgba(11, 37, 58, 0.08), 0 2px 6px 0 rgba(11, 37, 58, 0.04);
 }
 
+/* Reusable Standard 5 Card Types */
+.card-metric-premium {
+  background: #FFFFFF;
+  border: 1px solid #E6DEC9;
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  box-shadow: 0 4px 16px -4px rgba(11, 37, 58, 0.05), 0 1px 3px 0 rgba(11, 37, 58, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-metric-premium:hover {
+  border-color: #D8CEB8;
+  box-shadow: 0 8px 24px -4px rgba(11, 37, 58, 0.08);
+  transform: translateY(-1px);
+}
+
+.card-status-premium {
+  background: #FFFFFF;
+  border: 1px solid #EBE6DD;
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 4px 0 rgba(11, 37, 58, 0.03);
+  transition: all 0.2s ease-in-out;
+}
+
+.card-status-premium:hover {
+  border-color: #DDD4C5;
+  box-shadow: 0 4px 12px -2px rgba(11, 37, 58, 0.06);
+}
+
+.card-summary-premium {
+  background: #FFFFFF;
+  border: 1px solid #EBE6DD;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(11, 37, 58, 0.02);
+  transition: all 0.15s ease-in-out;
+}
+
+.card-data-premium {
+  background: #FFFFFF;
+  border: 1px solid #EBE6DD;
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 8px -2px rgba(11, 37, 58, 0.04);
+  overflow: hidden;
+}
+
+.card-action-premium {
+  background: #FFFFFF;
+  border: 1px solid #EBE6DD;
+  border-radius: 1rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-action-premium:hover {
+  border-color: #E66817;
+  background: #FFFBF8;
+  box-shadow: 0 4px 16px -3px rgba(230, 104, 23, 0.12);
+  transform: translateY(-1px);
+}
+
+.dash-hero-card {
+  background: #FFFFFF;
+  border: 1px solid #E6DEC9;
+  box-shadow: 0 4px 20px -4px rgba(11, 37, 58, 0.06), 0 1px 4px 0 rgba(11, 37, 58, 0.03);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dash-hero-card:hover {
+  border-color: #D1C7AF;
+  box-shadow: 0 10px 28px -6px rgba(11, 37, 58, 0.1), 0 2px 8px 0 rgba(11, 37, 58, 0.04);
+  transform: translateY(-1px);
+}
+
+.dash-subtle-card {
+  background: #FFFFFF;
+  border: 1px solid #EBE6DD;
+  box-shadow: 0 1px 4px 0 rgba(11, 37, 58, 0.03);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dash-subtle-card:hover {
+  border-color: #D8D1C3;
+  box-shadow: 0 6px 16px -3px rgba(11, 37, 58, 0.06);
+}
+
 .btn-saffron-glow {
-  box-shadow: 0 4px 14px 0 rgba(230, 104, 23, 0.35);
+  box-shadow: 0 4px 14px 0 rgba(230, 104, 23, 0.28);
 }
 
 .btn-saffron-glow:hover {
-  box-shadow: 0 6px 20px 0 rgba(230, 104, 23, 0.5);
+  box-shadow: 0 6px 20px 0 rgba(230, 104, 23, 0.42);
 }
 
 .badge-dot {

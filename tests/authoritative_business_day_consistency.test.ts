@@ -1,18 +1,28 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   db,
   BusinessDayRepository,
   BusinessDayAccountingService,
   OrderRepository,
   ShiftRepository
-} from '../shared/database/src';
-import { CentralReportingService, ReportGeneratorService } from '../shared/business/src';
-import { Order, BusinessDay } from '../shared/types/src';
+} from '../packages/database/src';
+import { CentralReportingService, ReportGeneratorService } from '../packages/business/src';
+import { Order, BusinessDay } from '../packages/types/src';
 
 describe('Authoritative Single-Source-of-Truth Business Day & Financial Accounting Suite', () => {
   beforeEach(() => {
+    // Freeze "now" to the afternoon of the seeded active business day (2026-08-31, IST) so the
+    // 5:00 AM cutoff auto-close logic and seed-order dates are deterministic regardless of
+    // the real calendar date the suite happens to run on.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-31T08:30:00.000Z'));
+
     // Reset database to a clean testing state
     db.resetToDefaultSeed();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('1. Authoritative Accounting: Active Business Day correctly binds orders across payment methods', () => {
@@ -65,9 +75,17 @@ describe('Authoritative Single-Source-of-Truth Business Day & Financial Accounti
     // Verify CentralReportingService matches exactly
     const centralDash = CentralReportingService.getDashboardMetrics('TODAY');
     expect(centralDash.summary.netSales).toBe(summary.net_sales);
-    expect(centralDash.summary.paymentBreakdown.cash).toBe(summary.cash_sales);
-    expect(centralDash.summary.paymentBreakdown.upi).toBe(summary.upi_sales);
-    expect(centralDash.summary.paymentBreakdown.card).toBe(summary.card_sales);
+
+    // Payment-channel breakdown must match on settled (SUCCESS) orders only: a still-PENDING
+    // order's intended payment method hasn't actually been collected yet, so BusinessDayAccountingService
+    // correctly excludes it from cash/upi/card — compare against the same settled-orders scope.
+    const centralSettled = CentralReportingService.getDashboardMetrics(
+      'TODAY',
+      db.orders.filter((o) => o.paymentStatus === 'SUCCESS')
+    );
+    expect(centralSettled.summary.paymentBreakdown.cash).toBe(summary.cash_sales);
+    expect(centralSettled.summary.paymentBreakdown.upi).toBe(summary.upi_sales);
+    expect(centralSettled.summary.paymentBreakdown.card).toBe(summary.card_sales);
   });
 
   it('2. EOD Closing & Next Day Transition: Old day finalized, new day initialized with 0 counters', () => {

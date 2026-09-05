@@ -318,7 +318,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         
         {/* Total Customers */}
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">TOTAL GUESTS</span>
             <Users className="w-4 h-4 text-[#0B253A]" />
@@ -332,12 +332,12 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
         </div>
 
         {/* Total Lifetime Spend */}
-        <div className="bg-white p-4 rounded-2xl border border-emerald-200 bg-gradient-to-b from-emerald-50/40 to-white shadow-xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800">LIFETIME SPEND</span>
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">LIFETIME SPEND</span>
             <DollarSign className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-black text-emerald-950 font-mono">
+          <div className="text-2xl font-black text-emerald-800 font-mono">
             {formatINR(kpis.totalLifetimeSpend)}
           </div>
           <span className="text-[10px] text-emerald-700 font-bold block">
@@ -346,33 +346,32 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
         </div>
 
         {/* Active Loyalty Points Pool */}
-        <div className="bg-white p-4 rounded-2xl border border-amber-200 bg-gradient-to-b from-amber-50/40 to-white shadow-xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-wider text-amber-800">LOYALTY REWARDS</span>
-            <Award className="w-4 h-4 text-amber-600" />
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">LOYALTY REWARDS</span>
+            <Award className="w-4 h-4 text-[#E66817]" />
           </div>
-          <div className="text-2xl font-black text-amber-950 font-mono">
+          <div className="text-2xl font-black text-[#E66817] font-mono">
             ⭐ {kpis.totalPointsPool} Pts
           </div>
-          <span className="text-[10px] text-amber-700 font-bold block">
+          <span className="text-[10px] text-slate-600 font-bold block">
             ₹{kpis.totalPointsPool} Total Redeemable Value
           </span>
         </div>
 
         {/* VIP High Spenders */}
-        <div className="bg-white p-4 rounded-2xl border border-purple-200 bg-gradient-to-b from-purple-50/40 to-white shadow-xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-wider text-purple-800">VIP ELITE TIER</span>
-            <Star className="w-4 h-4 text-purple-600" />
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">VIP ELITE TIER</span>
+            <Star className="w-4 h-4 text-[#0B253A]" />
           </div>
-          <div className="text-2xl font-black text-purple-950 font-mono">
+          <div className="text-2xl font-black text-[#0B253A] font-mono">
             {kpis.vipCount} VIP Guests
           </div>
-          <span className="text-[10px] text-purple-700 font-bold block">
-            {kpis.totalCount > 0 ? Math.round((kpis.vipCount / kpis.totalCount) * 100) : 0}% of Guest Base
+          <span className="text-[10px] text-slate-500 font-bold block">
+            Highest dining frequency & ticket size
           </span>
         </div>
-
       </div>
 
       {/* 3. SEGMENT FILTER CHIPS */}

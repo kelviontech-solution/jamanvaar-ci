@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AdminChatbotEngine, CustomerChatbotEngine } from '../shared/business/src';
+import { AdminChatbotEngine, CustomerChatbotEngine } from '../packages/business/src';
 
 describe('CustomerChatbotEngine', () => {
   it('should answer vegetarian inquiries with real menu items', () => {

@@ -5,8 +5,8 @@ import {
   KOTRepository,
   TableRepository,
   AuditRepository
-} from '../shared/database/src';
-import { Order, MenuItem, DiningTable, KOT } from '../shared/types/src';
+} from '../packages/database/src';
+import { Order, MenuItem, DiningTable, KOT } from '../packages/types/src';
 
 describe('JAMANVAAR Captain Floor Service Application Workflows', () => {
   beforeEach(() => {

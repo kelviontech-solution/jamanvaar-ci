@@ -17,30 +17,31 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@jamanvaar/types": ["./shared/types/src"],
-      "@jamanvaar/types/*": ["./shared/types/src/*"],
-      "@jamanvaar/config": ["./shared/config/src"],
-      "@jamanvaar/config/*": ["./shared/config/src/*"],
-      "@jamanvaar/i18n": ["./shared/i18n/src"],
-      "@jamanvaar/i18n/*": ["./shared/i18n/src/*"],
-      "@jamanvaar/utils": ["./shared/utils/src"],
-      "@jamanvaar/utils/*": ["./shared/utils/src/*"],
-      "@jamanvaar/business": ["./shared/business/src"],
-      "@jamanvaar/business/*": ["./shared/business/src/*"],
-      "@jamanvaar/validation": ["./shared/validation/src"],
-      "@jamanvaar/validation/*": ["./shared/validation/src/*"],
-      "@jamanvaar/database": ["./shared/database/src"],
-      "@jamanvaar/database/*": ["./shared/database/src/*"],
-      "@jamanvaar/api": ["./shared/api/src"],
-      "@jamanvaar/api/*": ["./shared/api/src/*"],
-      "@jamanvaar/sync": ["./shared/sync/src"],
-      "@jamanvaar/sync/*": ["./shared/sync/src/*"],
-      "@jamanvaar/ui": ["./shared/ui/src"],
-      "@jamanvaar/ui/*": ["./shared/ui/src/*"],
-      "@jamanvaar/kiosk-shared": ["./apps/kiosk-system/shared/src"],
-      "@jamanvaar/kiosk-shared/*": ["./apps/kiosk-system/shared/src/*"],
-      "@jamanvaar/restaurant-shared": ["./apps/restaurant-system/shared/src"],
-      "@jamanvaar/restaurant-shared/*": ["./apps/restaurant-system/shared/src/*"]
+      "@jamanvaar/types": ["./packages/types/src"],
+      "@jamanvaar/types/*": ["./packages/types/src/*"],
+      "@jamanvaar/config": ["./packages/config/src"],
+      "@jamanvaar/config/*": ["./packages/config/src/*"],
+      "@jamanvaar/i18n": ["./packages/i18n/src"],
+      "@jamanvaar/i18n/*": ["./packages/i18n/src/*"],
+      "@jamanvaar/utils": ["./packages/utils/src"],
+      "@jamanvaar/utils/*": ["./packages/utils/src/*"],
+      "@jamanvaar/business": ["./packages/business/src"],
+      "@jamanvaar/business/*": ["./packages/business/src/*"],
+      "@jamanvaar/validation": ["./packages/validation/src"],
+      "@jamanvaar/validation/*": ["./packages/validation/src/*"],
+      "@jamanvaar/database": ["./packages/database/src"],
+      "@jamanvaar/database/*": ["./packages/database/src/*"],
+      "@jamanvaar/api": ["./packages/api/src"],
+      "@jamanvaar/api/*": ["./packages/api/src/*"],
+      "@jamanvaar/sync": ["./packages/sync/src"],
+      "@jamanvaar/sync/*": ["./packages/sync/src/*"],
+      "@jamanvaar/ui": ["./packages/ui/src"],
+      "@jamanvaar/ui/*": ["./packages/ui/src/*"]
     }
-  }
+  },
+  // cloud/api is a separate NestJS project with its own tsconfig (decorator
+  // metadata, commonjs modules) and its own independent typecheck script —
+  // it must not be swept into this project's default include, which has no
+  // "include" of its own and would otherwise pick up every .ts file in the repo.
+  "exclude": ["cloud/**", "node_modules"]
 }

@@ -65,10 +65,10 @@ cd kiosk
 npm install
 
 # Build all production frontends
-npm run build:all
+npm run build
 
 # Generate all 4 standalone Windows Setup.exe installers & GitHub Release ZIP
-node scripts/build_windows_installers.cjs
+node tooling/installers/build_windows_installers.cjs
 ```
 
 ---

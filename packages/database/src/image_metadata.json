@@ -1,0 +1,732 @@
+[
+  {
+    "imageFile": "/assets/menu/common/fallback-dish.svg",
+    "title": "JAMANVAAR Special",
+    "cuisineFolder": "common",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.186Z"
+  },
+  {
+    "imageFile": "/assets/menu/common/placeholder.svg",
+    "title": "Fresh Dish",
+    "cuisineFolder": "common",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/north-indian/paneer-tikka.svg",
+    "title": "Paneer Tikka Angara",
+    "cuisineFolder": "north-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/north-indian/hara-bhara-kebab.svg",
+    "title": "Hara Bhara Kebab",
+    "cuisineFolder": "north-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/north-indian/paneer-butter-masala.svg",
+    "title": "Paneer Butter Masala",
+    "cuisineFolder": "north-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/north-indian/dal-makhani.svg",
+    "title": "Dal Makhani Bukhara",
+    "cuisineFolder": "north-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/north-indian/kadai-paneer.svg",
+    "title": "Kadai Paneer Peshawari",
+    "cuisineFolder": "north-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/north-indian/butter-naan.svg",
+    "title": "Butter Garlic Naan",
+    "cuisineFolder": "north-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/north-indian/biryani.svg",
+    "title": "Hyderabadi Dum Veg Biryani",
+    "cuisineFolder": "north-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/north-indian/gulab-jamun.svg",
+    "title": "Gulab Jamun (2 Pcs)",
+    "cuisineFolder": "north-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/north-indian/rasmalai.svg",
+    "title": "Rasmalai Kesar Pista",
+    "cuisineFolder": "north-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/north-indian/chaas.svg",
+    "title": "Masala Chaas",
+    "cuisineFolder": "north-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/north-indian/lassi.svg",
+    "title": "Punjabi Sweet Lassi",
+    "cuisineFolder": "north-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/gujarati/thali.svg",
+    "title": "Royal Gujarati Grand Thali",
+    "cuisineFolder": "gujarati",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/gujarati/khaman.svg",
+    "title": "Surti Nylon Khaman",
+    "cuisineFolder": "gujarati",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/gujarati/khandvi.svg",
+    "title": "Khandvi Mustard Rolls",
+    "cuisineFolder": "gujarati",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/gujarati/undhiyu.svg",
+    "title": "Surti Undhiyu Special",
+    "cuisineFolder": "gujarati",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/gujarati/sev-tameta.svg",
+    "title": "Sev Tameta Nu Shaak",
+    "cuisineFolder": "gujarati",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/gujarati/rotla.svg",
+    "title": "Kathiyawadi Bajra Rotla",
+    "cuisineFolder": "gujarati",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/gujarati/shrikhand.svg",
+    "title": "Kesar Pista Shrikhand",
+    "cuisineFolder": "gujarati",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/gujarati/khichdi.svg",
+    "title": "Vaghareli Khichdi Kadhi",
+    "cuisineFolder": "gujarati",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/south-indian/masala-dosa.svg",
+    "title": "Crispy Butter Masala Dosa",
+    "cuisineFolder": "south-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/south-indian/mysore-dosa.svg",
+    "title": "Mysore Masala Dosa",
+    "cuisineFolder": "south-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/south-indian/idli.svg",
+    "title": "Ghee Podi Button Idli",
+    "cuisineFolder": "south-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/south-indian/medu-vada.svg",
+    "title": "Crispy Medu Vada",
+    "cuisineFolder": "south-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/south-indian/uttapam.svg",
+    "title": "Onion Tomato Uttapam",
+    "cuisineFolder": "south-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/south-indian/filter-coffee.svg",
+    "title": "Kumbakonam Filter Coffee",
+    "cuisineFolder": "south-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/south-indian/south-thali.svg",
+    "title": "South Indian Thali Meal",
+    "cuisineFolder": "south-indian",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/punjabi/pindi-chhole.svg",
+    "title": "Pindi Chhole Rawalpindi",
+    "cuisineFolder": "punjabi",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/punjabi/amritsari-kulcha.svg",
+    "title": "Amritsari Aloo Kulcha",
+    "cuisineFolder": "punjabi",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/punjabi/sarson-saag.svg",
+    "title": "Sarson Ka Saag & Makki Roti",
+    "cuisineFolder": "punjabi",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/mughlai/galouti-kebab.svg",
+    "title": "Veg Galouti Kebab",
+    "cuisineFolder": "mughlai",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/mughlai/navratan-korma.svg",
+    "title": "Navratan Korma Royal",
+    "cuisineFolder": "mughlai",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/mughlai/sheermal.svg",
+    "title": "Khamiri Roti & Sheermal",
+    "cuisineFolder": "mughlai",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/kathiyawadi/ringna-olo.svg",
+    "title": "Kathiyawadi Ringna No Olo",
+    "cuisineFolder": "kathiyawadi",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/kathiyawadi/lasaniya-bateta.svg",
+    "title": "Lasaniya Bateta Spicy",
+    "cuisineFolder": "kathiyawadi",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/kathiyawadi/dahi-tikhari.svg",
+    "title": "Dahi Tikhari Dip",
+    "cuisineFolder": "kathiyawadi",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/rajasthani/dal-baati.svg",
+    "title": "Dal Baati Churma Thali",
+    "cuisineFolder": "rajasthani",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/rajasthani/gatte-ki-sabzi.svg",
+    "title": "Shahi Gatte Ki Sabzi",
+    "cuisineFolder": "rajasthani",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/rajasthani/ker-sangri.svg",
+    "title": "Ker Sangri Royal Special",
+    "cuisineFolder": "rajasthani",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/chinese/hakka-noodles.svg",
+    "title": "Veg Hakka Noodles",
+    "cuisineFolder": "chinese",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/chinese/schezwan-rice.svg",
+    "title": "Schezwan Fried Rice",
+    "cuisineFolder": "chinese",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/chinese/chilli-paneer.svg",
+    "title": "Chilli Paneer Dry",
+    "cuisineFolder": "chinese",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/chinese/manchurian.svg",
+    "title": "Veg Manchurian Gravy",
+    "cuisineFolder": "chinese",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/chinese/momos.svg",
+    "title": "Steamed Veg Momos",
+    "cuisineFolder": "chinese",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/pizza/margherita.svg",
+    "title": "Margherita Basilico Pizza",
+    "cuisineFolder": "pizza",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/pizza/farmhouse.svg",
+    "title": "Farmhouse Veggie Supreme",
+    "cuisineFolder": "pizza",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/pizza/paneer-pizza.svg",
+    "title": "Paneer Tikka Pizza",
+    "cuisineFolder": "pizza",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/pizza/garlic-bread.svg",
+    "title": "Cheese Garlic Breadsticks",
+    "cuisineFolder": "pizza",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/pizza/alfredo-pasta.svg",
+    "title": "Creamy Alfredo Penne",
+    "cuisineFolder": "pizza",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/fast-food/burger.svg",
+    "title": "Veggie Supreme Burger",
+    "cuisineFolder": "fast-food",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/fast-food/wrap.svg",
+    "title": "Spicy Paneer Tikka Wrap",
+    "cuisineFolder": "fast-food",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/fast-food/peri-peri-fries.svg",
+    "title": "Peri Peri Crinkle Fries",
+    "cuisineFolder": "fast-food",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/fast-food/sandwich.svg",
+    "title": "Bombay Grilled Sandwich",
+    "cuisineFolder": "fast-food",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/cafe/cappuccino.svg",
+    "title": "Classic Cappuccino",
+    "cuisineFolder": "cafe",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/cafe/frappe.svg",
+    "title": "Caramel Brownie Frappe",
+    "cuisineFolder": "cafe",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/bakery/truffle-pastry.svg",
+    "title": "Dutch Chocolate Truffle",
+    "cuisineFolder": "bakery",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/bakery/choco-lava.svg",
+    "title": "Warm Choco Lava Cake",
+    "cuisineFolder": "bakery",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/chaat/pani-puri.svg",
+    "title": "Pani Puri Platter (6 Pcs)",
+    "cuisineFolder": "chaat",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/chaat/sev-puri.svg",
+    "title": "Dahi Sev Batata Puri",
+    "cuisineFolder": "chaat",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/chaat/pav-bhaji.svg",
+    "title": "Butter Pav Bhaji (2 Pav)",
+    "cuisineFolder": "chaat",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/snacks/samosa.svg",
+    "title": "Special Punjabi Samosa",
+    "cuisineFolder": "snacks",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/snacks/vada-pav.svg",
+    "title": "Mumbai Vada Pav",
+    "cuisineFolder": "snacks",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/biryani/dum-biryani.svg",
+    "title": "Paneer Dum Biryani Handi",
+    "cuisineFolder": "biryani",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/tandoor/malai-chaap.svg",
+    "title": "Malai Soya Chaap Tandoori",
+    "cuisineFolder": "tandoor",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/sweets/kaju-katli.svg",
+    "title": "Kaju Katli Special",
+    "cuisineFolder": "sweets",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/sweets/motichoor.svg",
+    "title": "Motichoor Laddoo Desi Ghee",
+    "cuisineFolder": "sweets",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/desserts/falooda.svg",
+    "title": "Royal Kesar Pista Falooda",
+    "cuisineFolder": "desserts",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/desserts/sizzler-brownie.svg",
+    "title": "Sizzling Brownie Sundae",
+    "cuisineFolder": "desserts",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/beverages/juice.svg",
+    "title": "Fresh Mosambi Juice",
+    "cuisineFolder": "beverages",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/beverages/mojito.svg",
+    "title": "Virgin Mint Mojito Cooler",
+    "cuisineFolder": "beverages",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/jain/jain-tikka.svg",
+    "title": "Jain Paneer Tikka Satvik",
+    "cuisineFolder": "jain",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  },
+  {
+    "imageFile": "/assets/menu/jain/raw-banana.svg",
+    "title": "Jain Raw Banana Cutlets",
+    "cuisineFolder": "jain",
+    "format": "SVG/Vector (Crisp Offline)",
+    "dimensions": "400x300",
+    "isOfflinePackaged": true,
+    "license": "JAMANVAAR Commercial Local Assets / CC0",
+    "downloadedAt": "2026-09-05T15:27:03.188Z"
+  }
+]

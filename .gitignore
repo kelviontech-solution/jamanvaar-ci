@@ -1,4 +1,8 @@
 node_modules/
+.env
+.env.*.local
+!.env.example
+*.tsbuildinfo
 dist/
 build/
 release/

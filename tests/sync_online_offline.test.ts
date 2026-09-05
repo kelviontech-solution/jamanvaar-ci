@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { SyncOutboxEngine } from '../shared/sync/src/outbox';
-import { NetworkStatusService } from '../shared/api/src/services/network';
-import { db } from '../shared/database/src/db';
-import { Order } from '../shared/types/src';
+import { SyncOutboxEngine } from '../packages/sync/src/outbox';
+import { NetworkStatusService } from '../packages/api/src/services/network';
+import { db } from '../packages/database/src/db';
+import { Order } from '../packages/types/src';
 
 describe('SyncOutboxEngine & Network Continuity', () => {
   it('should track network state transitions correctly', () => {

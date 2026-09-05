@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RecommendationEngine } from '../shared/business/src/recommendations';
+import { RecommendationEngine } from '../packages/business/src/recommendations';
 
 describe('RecommendationEngine', () => {
   it('should recommend Beverages and Desserts when Chicken Biryani is in cart', () => {

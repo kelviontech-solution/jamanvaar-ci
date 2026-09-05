@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { EBillService } from '../shared/api/src/services/ebill';
-import { Order, ReceiptConfig } from '../shared/types/src';
+import { EBillService } from '../packages/api/src/services/ebill';
+import { Order, ReceiptConfig } from '../packages/types/src';
 
 const mockReceiptConfig: ReceiptConfig = {
   restaurantName: 'JAMANVAAR Restaurant',

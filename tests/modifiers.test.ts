@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { validateModifiers } from '../shared/business/src/modifiers';
-import { ModifierGroup } from '../shared/types/src/domain';
+import { validateModifiers } from '../packages/business/src/modifiers';
+import { ModifierGroup } from '../packages/types/src/domain';
 
 describe('Modifier Selection Validation', () => {
   const groups: ModifierGroup[] = [

@@ -1,4 +1,0 @@
-{
-  "main": "scripts/standalone_local_core.cjs",
-  "output": "scripts/sea-prep.blob"
-}

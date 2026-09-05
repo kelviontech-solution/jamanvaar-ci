@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { OrderRepository } from '../shared/database/src/repositories';
-import { KdsMeshService } from '../shared/api/src/kds';
-import { db } from '../shared/database/src/db';
+import { OrderRepository } from '../packages/database/src/repositories';
+import { KdsMeshService } from '../packages/api/src/kds';
+import { db } from '../packages/database/src/db';
 
 describe('Order Lifecycle, Source Tagging & KDS Mesh Tracking', () => {
   it('should create order with source_type KIOSK and initial stage', () => {

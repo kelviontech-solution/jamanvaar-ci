@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap');
+
+:root {
+  /* JAMANVAAR master brand tokens */
+  --jv-primary: #0b253a;
+  --jv-primary-hover: #133e5e;
+  --jv-primary-soft: rgba(11, 37, 58, 0.05);
+
+  --jv-accent: #e66817;
+  --jv-accent-hover: #d45a0e;
+  --jv-accent-soft: #fff4ed;
+  --jv-accent-border: rgba(230, 104, 23, 0.25);
+
+  --jv-gold: #c5a059;
+  --jv-gold-soft: #faf4e8;
+  --jv-gold-border: #e6dec9;
+
+  --jv-teal: #00a99d;
+  --jv-teal-soft: #e6f7f5;
+
+  --jv-bg: #faf8f5;
+  --jv-bg-muted: #f4efe6;
+  --jv-surface: #ffffff;
+  --jv-surface-subtle: #fcfaf7;
+
+  --jv-border: #ebe6dd;
+  --jv-border-hover: #d8d1c3;
+
+  --jv-text: #0b253a;
+  --jv-text-secondary: #4a5568;
+  --jv-text-muted: #7a8b9e;
+  --jv-text-light: #94a3b8;
+
+  --jv-success: #16a34a;
+  --jv-success-soft: #ecfdf5;
+  --jv-warning: #d97706;
+  --jv-warning-soft: #fffbeb;
+  --jv-error: #dc2626;
+  --jv-error-soft: #fef2f2;
+  --jv-online: #22c55e;
+
+  /* Elevation and shadows */
+  --jv-shadow-xs: 0 1px 2px 0 rgba(11, 37, 58, 0.05);
+  --jv-shadow-sm: 0 1px 4px 0 rgba(11, 37, 58, 0.04);
+  --jv-shadow-card: 0 2px 10px -2px rgba(11, 37, 58, 0.04), 0 1px 3px 0 rgba(11, 37, 58, 0.02);
+  --jv-shadow-card-hover: 0 8px 24px -4px rgba(11, 37, 58, 0.08), 0 2px 6px 0 rgba(11, 37, 58, 0.04);
+  --jv-shadow-hero: 0 4px 20px -4px rgba(11, 37, 58, 0.06), 0 1px 4px 0 rgba(11, 37, 58, 0.03);
+  --jv-shadow-hero-hover: 0 10px 28px -6px rgba(11, 37, 58, 0.1), 0 2px 8px 0 rgba(11, 37, 58, 0.04);
+  --jv-shadow-saffron: 0 4px 14px 0 rgba(230, 104, 23, 0.28);
+  --jv-shadow-saffron-hover: 0 6px 20px 0 rgba(230, 104, 23, 0.42);
+
+  --jv-radius-sm: 6px;
+  --jv-radius-md: 10px;
+  --jv-radius-lg: 14px;
+  --jv-radius-xl: 18px;
+  --jv-radius-full: 9999px;
+
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--jv-bg);
+  color: var(--jv-text);
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--jv-bg-muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d9d2c5;
+  border-radius: var(--jv-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b8ada0;
+}
+
+.mono {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  color: var(--jv-primary);
+  text-decoration: none;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(1.1); }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

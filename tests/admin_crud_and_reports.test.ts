@@ -10,8 +10,8 @@ import {
   MenuRepository,
   OrderRepository,
   LicenseRepository
-} from '../shared/database/src';
-import { ReportGeneratorService, EntitlementService } from '../shared/business/src';
+} from '../packages/database/src';
+import { ReportGeneratorService, EntitlementService } from '../packages/business/src';
 
 describe('JAMANVAAR Restaurant Admin Center — Full CRUD, Persistence & Reporting Suite', () => {
   beforeEach(() => {
