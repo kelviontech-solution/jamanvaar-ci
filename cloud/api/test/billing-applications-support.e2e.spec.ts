@@ -162,6 +162,78 @@ describe('New SaaS Modules: Invoices, Applications, Support, and Platform Settin
       expect(res.body.activeSubscription).toBeDefined();
       expect(res.body.entitlements).toBeDefined();
     });
+
+    describe('Resend invite', () => {
+      let pendingOwnerId: string;
+      let pendingOwnerEmail: string;
+      let firstToken: string;
+      let resendTestRestaurantId: string;
+
+      beforeAll(async () => {
+        pendingOwnerEmail = `resend-invite-owner-${Date.now()}@test.example.com`;
+        const res = await authed('post', '/api/v1/restaurants').send({
+          name: `TEST Resend Invite Restaurant ${Date.now()}`,
+          ownerName: 'Resend Test Owner',
+          ownerEmail: pendingOwnerEmail
+        });
+        resendTestRestaurantId = res.body.restaurant.id;
+        pendingOwnerId = res.body.owner.id;
+        firstToken = res.body.activationToken;
+        // No SMTP configured in the test environment.
+        expect(res.body.emailSent).toBe(false);
+      });
+
+      afterAll(async () => {
+        await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: resendTestRestaurantId } }));
+      });
+
+      it('rejects with no reason', async () => {
+        const res = await authed('post', '/api/v1/support/resend-invite').send({ userId: pendingOwnerId });
+        expect(res.status).toBe(400);
+      });
+
+      it('regenerates the activation token, reports emailSent: false with no SMTP configured, and invalidates the old token', async () => {
+        const res = await authed('post', '/api/v1/support/resend-invite').send({
+          userId: pendingOwnerId,
+          reason: 'test: verifying resend-invite regenerates the token'
+        });
+        expect(res.status).toBe(201);
+        expect(res.body.emailSent).toBe(false);
+        expect(res.body.activationToken).toBeTypeOf('string');
+        expect(res.body.activationToken).not.toBe(firstToken);
+
+        // The old token must no longer work.
+        const oldTokenAttempt = await request(app.getHttpServer())
+          .post('/api/v1/tenant-auth/set-initial-password')
+          .send({
+            restaurantId: resendTestRestaurantId,
+            email: pendingOwnerEmail,
+            activationToken: firstToken,
+            newPassword: 'irrelevant-password-1'
+          });
+        expect(oldTokenAttempt.status).toBe(401);
+
+        // The new token does.
+        const newTokenAttempt = await request(app.getHttpServer())
+          .post('/api/v1/tenant-auth/set-initial-password')
+          .send({
+            restaurantId: resendTestRestaurantId,
+            email: pendingOwnerEmail,
+            activationToken: res.body.activationToken,
+            newPassword: 'irrelevant-password-1'
+          });
+        expect(newTokenAttempt.status).toBe(200);
+      });
+
+      it('rejects resending an invite for an already-active account', async () => {
+        const res = await authed('post', '/api/v1/support/resend-invite').send({
+          userId: pendingOwnerId,
+          reason: 'test: should be rejected, account is already active'
+        });
+        expect(res.status).toBe(400);
+        expect(res.body.message).toMatch(/already been activated/i);
+      });
+    });
   });
 
   describe('Platform Settings', () => {

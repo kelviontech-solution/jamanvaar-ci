@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { usePosStore } from '../../store/posStore';
-import { db, OrderRepository, BusinessDayRepository, QrOrderingRepository } from '@jamanvaar/database';
+import { db, OrderRepository, BusinessDayRepository, QrOrderingRepository, RiderRepository } from '@jamanvaar/database';
 import { Order, OrderStatus } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
 import {
@@ -50,8 +50,10 @@ export const PosOrdersView: React.FC = () => {
       if (o.businessDayId) {
         return o.businessDayId === activeDay.id;
       }
-      // Fallback for orders created on the same calendar date
-      const oDate = new Date(o.createdAt).toISOString().slice(0, 10);
+      // Fallback for orders created on the same business date — matches
+      // BusinessDayRepository's own 5:00 AM-cutoff canonical date instead of
+      // a raw UTC calendar-date string, which disagreed with it near midnight.
+      const oDate = BusinessDayRepository.getCanonicalBusinessDate(new Date(o.createdAt)).dateKey;
       return oDate === activeDay.businessDate;
     });
   }, [allOrders, scopeFilter, activeDay.id, activeDay.businessDate]);
@@ -408,6 +410,53 @@ export const PosOrdersView: React.FC = () => {
                   </span>
                 </div>
               </div>
+
+              {/* Delivery Dispatch — previously a DELIVERY order had an
+                  orderType and nothing else: no rider, no status tracking. */}
+              {selectedOrder.orderType === 'DELIVERY' && (
+                <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-blue-900 uppercase tracking-wide text-[11px]">Delivery Dispatch</span>
+                    <span className="font-bold text-blue-800">{selectedOrder.deliveryStatus || 'UNASSIGNED'}</span>
+                  </div>
+                  <select
+                    value={selectedOrder.riderId || ''}
+                    onChange={(e) => {
+                      if (!e.target.value) return;
+                      const updated = RiderRepository.assignRider(selectedOrder.id, e.target.value);
+                      if (updated) setSelectedOrder(updated);
+                    }}
+                    className="w-full bg-white border border-blue-200 rounded-lg px-2 py-1.5 text-xs font-bold cursor-pointer"
+                  >
+                    <option value="">Assign a rider…</option>
+                    {RiderRepository.getActiveRiders().map((r) => (
+                      <option key={r.id} value={r.id}>{r.name} ({r.vehicleType})</option>
+                    ))}
+                  </select>
+                  {selectedOrder.riderId && (
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={() => {
+                          const updated = RiderRepository.updateDeliveryStatus(selectedOrder.id, 'OUT_FOR_DELIVERY');
+                          if (updated) setSelectedOrder(updated);
+                        }}
+                        className="flex-1 px-2 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold cursor-pointer"
+                      >
+                        Out for Delivery
+                      </button>
+                      <button
+                        onClick={() => {
+                          const updated = RiderRepository.updateDeliveryStatus(selectedOrder.id, 'DELIVERED');
+                          if (updated) setSelectedOrder(updated);
+                        }}
+                        className="flex-1 px-2 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold cursor-pointer"
+                      >
+                        Delivered
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Special Instructions / Notes Banner */}
               {selectedOrder.customerNotes && (

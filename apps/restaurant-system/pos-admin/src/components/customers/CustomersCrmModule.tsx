@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { CustomerAccount, Order } from '@jamanvaar/types';
 import { db, CustomerRepository, AuditRepository } from '@jamanvaar/database';
+import { LoyaltyProgramModal } from './LoyaltyProgramModal';
+import { MarketingCampaignsModal } from './MarketingCampaignsModal';
 import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
 import {
   Users,
@@ -29,7 +31,8 @@ import {
   Filter,
   X,
   UserCheck,
-  AlertCircle
+  AlertCircle,
+  Megaphone
 } from 'lucide-react';
 
 interface CustomersCrmModuleProps {
@@ -39,6 +42,14 @@ interface CustomersCrmModuleProps {
   showToast: (msg: string) => void;
   onOpenCreateModal: () => void;
   onOpenEditModal: (cust: CustomerAccount) => void;
+  onRequestConfirm?: (dialog: {
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmText: string;
+    isDanger: boolean;
+    onConfirm: () => void;
+  }) => void;
 }
 
 export type CustomerSegment =
@@ -55,7 +66,8 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
   onCustomerUpdated,
   showToast,
   onOpenCreateModal,
-  onOpenEditModal
+  onOpenEditModal,
+  onRequestConfirm
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [segmentFilter, setSegmentFilter] = useState<CustomerSegment>('ALL');
@@ -65,6 +77,8 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
   // Customer 360 Detail Modal state
   const [detailCustomer, setDetailCustomer] = useState<CustomerAccount | null>(null);
   const [pointsAdjustInput, setPointsAdjustInput] = useState('50');
+  const [isLoyaltyModalOpen, setIsLoyaltyModalOpen] = useState(false);
+  const [isMarketingModalOpen, setIsMarketingModalOpen] = useState(false);
 
   // Derive rich computed stats per customer by merging accounts with database orders
   const richCustomers = useMemo(() => {
@@ -211,13 +225,39 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
     if (updated) setDetailCustomer(updated);
   };
 
+  const handleRedeemReward = (rewardId: string, rewardName: string, pointsCost: number) => {
+    if (!detailCustomer) return;
+    const result = CustomerRepository.redeemReward(detailCustomer.phone, rewardId);
+    if (!result.ok) {
+      showToast(result.reason || 'Could not redeem reward');
+      return;
+    }
+    showToast(`Redeemed "${rewardName}" for ${pointsCost} pts`);
+    onCustomerUpdated();
+    const updated = CustomerRepository.getByPhone(detailCustomer.phone);
+    if (updated) setDetailCustomer(updated);
+  };
+
   // Delete customer record
   const handleDeleteCustomer = (cust: CustomerAccount) => {
-    if (window.confirm(`Are you sure you want to delete customer record for ${cust.name || cust.phone}?`)) {
+    const doDelete = () => {
       CustomerRepository.deleteCustomer(cust.phone);
       onCustomerUpdated();
       if (detailCustomer?.phone === cust.phone) setDetailCustomer(null);
       showToast(`Customer ${cust.name} deleted.`);
+    };
+
+    if (onRequestConfirm) {
+      onRequestConfirm({
+        isOpen: true,
+        title: 'Delete Customer',
+        message: `Are you sure you want to delete customer record for ${cust.name || cust.phone}? This cannot be undone.`,
+        confirmText: 'Delete Customer',
+        isDanger: true,
+        onConfirm: doDelete
+      });
+    } else if (window.confirm(`Are you sure you want to delete customer record for ${cust.name || cust.phone}?`)) {
+      doDelete();
     }
   };
 
@@ -302,6 +342,22 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
             <span>Export CRM CSV ({filteredCustomers.length})</span>
+          </button>
+
+          <button
+            onClick={() => setIsLoyaltyModalOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-white border border-amber-200 hover:bg-amber-50 text-amber-800 text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
+          >
+            <Award className="w-4 h-4 text-amber-600" />
+            <span>Loyalty Program</span>
+          </button>
+
+          <button
+            onClick={() => setIsMarketingModalOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-white border border-blue-200 hover:bg-blue-50 text-blue-800 text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
+          >
+            <Megaphone className="w-4 h-4 text-blue-600" />
+            <span>Marketing Campaigns</span>
           </button>
 
           <button
@@ -581,6 +637,18 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                     {/* Loyalty Points with Quick Add */}
                     <td className="p-3.5" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-1.5">
+                        {(() => {
+                          const tier = CustomerRepository.getTierForAccount(cust);
+                          return tier ? (
+                            <span
+                              className="font-black px-1.5 py-0.5 rounded-lg text-[10px] border shrink-0"
+                              style={{ color: tier.colorHex, borderColor: tier.colorHex, background: `${tier.colorHex}14` }}
+                              title={`${tier.name} tier — ${tier.pointsMultiplier}x points`}
+                            >
+                              {tier.name}
+                            </span>
+                          ) : null;
+                        })()}
                         <span className="font-mono font-black text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-lg text-xs">
                           ⭐ {cust.loyaltyPoints || 0}
                         </span>
@@ -770,6 +838,42 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                 </div>
               </div>
 
+              {/* Rewards Catalog Redemption — replaces the flat "1 pt = ₹1"
+                  assumption above with real, named rewards. */}
+              {(() => {
+                const rewards = CustomerRepository.getRewards().filter((r) => r.isActive);
+                if (rewards.length === 0) return null;
+                return (
+                  <div className="space-y-2">
+                    <h4 className="font-black text-xs text-[#0B253A] uppercase tracking-wide">Redeem a Reward</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {rewards.map((reward) => {
+                        const canAfford = (detailCustomer.loyaltyPoints || 0) >= reward.pointsCost;
+                        return (
+                          <div key={reward.id} className="p-3 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="font-bold text-[#0B253A] truncate">{reward.name}</div>
+                              <div className="text-[10px] text-slate-500 truncate">{reward.description}</div>
+                            </div>
+                            <button
+                              onClick={() => handleRedeemReward(reward.id, reward.name, reward.pointsCost)}
+                              disabled={!canAfford}
+                              className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[10px] font-bold ${
+                                canAfford
+                                  ? 'bg-amber-600 hover:bg-amber-700 text-white cursor-pointer'
+                                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                              }`}
+                            >
+                              {reward.pointsCost} pts
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* Complete Order History for this Customer */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -887,6 +991,18 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
           </div>
         </div>
       )}
+
+      <LoyaltyProgramModal
+        isOpen={isLoyaltyModalOpen}
+        onClose={() => setIsLoyaltyModalOpen(false)}
+        showToast={showToast}
+      />
+
+      <MarketingCampaignsModal
+        isOpen={isMarketingModalOpen}
+        onClose={() => setIsMarketingModalOpen(false)}
+        showToast={showToast}
+      />
 
     </div>
   );

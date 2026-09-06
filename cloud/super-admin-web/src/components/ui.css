@@ -81,7 +81,7 @@
 }
 
 .btn-ghost {
-  background: #ffffff;
+  background: var(--jv-surface);
   border-color: var(--jv-border);
   color: var(--jv-text);
   box-shadow: var(--jv-shadow-xs);
@@ -93,7 +93,7 @@
 }
 
 .btn-danger {
-  background: #ffffff;
+  background: var(--jv-surface);
   border-color: #fecaca;
   color: var(--jv-error);
   box-shadow: var(--jv-shadow-xs);
@@ -125,16 +125,16 @@
 .card-hero {
   border-color: var(--jv-gold-border);
   box-shadow: var(--jv-shadow-hero);
-  background: linear-gradient(180deg, #ffffff 0%, #fcfbf9 100%);
+  background: linear-gradient(180deg, var(--jv-surface) 0%, var(--jv-surface-subtle) 100%);
 }
 .card-hero:hover {
-  border-color: #d1c7af;
+  border-color: var(--jv-gold);
   box-shadow: var(--jv-shadow-hero-hover);
   transform: translateY(-1px);
 }
 
 .card-subtle {
-  background: #ffffff;
+  background: var(--jv-surface);
   border-color: var(--jv-border);
   box-shadow: var(--jv-shadow-sm);
 }
@@ -160,7 +160,7 @@
   border-radius: var(--jv-radius-md);
   border: 1px solid var(--jv-border);
   font-size: 13.5px;
-  background: #ffffff;
+  background: var(--jv-surface);
   color: var(--jv-text);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -309,7 +309,7 @@
 }
 
 .skeleton-shimmer {
-  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background: linear-gradient(90deg, var(--jv-bg-muted) 25%, var(--jv-border) 50%, var(--jv-bg-muted) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite ease-in-out;
 }
@@ -327,7 +327,7 @@
   border-radius: var(--jv-radius-md);
   border: 1px solid var(--jv-border);
   font-size: 13.5px;
-  background: #ffffff;
+  background: var(--jv-surface);
   color: var(--jv-text);
   box-shadow: var(--jv-shadow-xs);
   transition: all 0.15s ease-in-out;
@@ -370,7 +370,7 @@
   padding: 0 14px;
   border-radius: var(--jv-radius-full);
   border: 1px solid var(--jv-border);
-  background: #ffffff;
+  background: var(--jv-surface);
   font-size: 12.5px;
   font-weight: 600;
   color: var(--jv-text-secondary);

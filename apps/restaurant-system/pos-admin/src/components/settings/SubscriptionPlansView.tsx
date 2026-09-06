@@ -68,6 +68,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   showToast,
   onUpdated
 }) => {
+  // The plan screen used to be one long scroll: cloud status, device logins,
+  // two full plan cards, an upgrade-pillars section, a comparison matrix, and
+  // offline certificate activation all stacked on a single page. Split into
+  // tabs so each visit lands on the thing the user actually came for.
+  const [activeSubTab, setActiveSubTab] = useState<'MY_PLAN' | 'COMPARE' | 'ACTIVATE_OFFLINE'>('MY_PLAN');
   const [dealerKeyInput, setDealerKeyInput] = useState('');
   const [licenseFeedback, setLicenseFeedback] = useState('');
   const [licenseError, setLicenseError] = useState('');
@@ -275,6 +280,30 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         </div>
       </div>
 
+      {/* Sub-tab bar */}
+      <div className="flex items-center gap-1.5 border-b border-slate-200/80 -mt-2">
+        {([
+          { id: 'MY_PLAN', label: 'My Plan' },
+          { id: 'COMPARE', label: 'Compare Plans' },
+          { id: 'ACTIVATE_OFFLINE', label: 'Activate Offline' }
+        ] as const).map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveSubTab(tab.id)}
+            className={`px-4 py-2.5 text-xs font-black tracking-tight rounded-t-xl transition-colors cursor-pointer border-b-2 -mb-px ${
+              activeSubTab === tab.id
+                ? 'text-[#E66817] border-[#E66817]'
+                : 'text-slate-500 border-transparent hover:text-[#0B253A] hover:border-slate-300'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeSubTab === 'MY_PLAN' && (
+      <>
       {/* CLOUD SUBSCRIPTION STATUS — additive, optional; everything below keeps working offline regardless */}
       <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-2xs space-y-3">
         {!cloudConnected ? (
@@ -406,7 +435,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
 
       {/* DEVICE & STAFF LOGINS — self-service credentials for Captain and other apps/terminals */}
       <CloudDeviceLoginsPanel />
+      </>
+      )}
 
+      {activeSubTab === 'COMPARE' && (
+      <>
       {/* TWO CARDS GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* CARD 1: JAMANVAAR CORE (₹5,000) - 5 Cols */}
@@ -817,7 +850,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           </table>
         </div>
       </div>
+      </>
+      )}
 
+      {activeSubTab === 'ACTIVATE_OFFLINE' && (
+      <>
       {/* SECTION 4: OFFLINE LICENSE CERTIFICATE ACTIVATION */}
       <div className="bg-white border border-[#EBE6DD] rounded-3xl p-6 shadow-2xs space-y-3">
         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
@@ -850,6 +887,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           </button>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 };

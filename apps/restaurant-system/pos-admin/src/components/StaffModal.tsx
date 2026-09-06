@@ -22,6 +22,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
   const [phone, setPhone] = useState('');
   const [roleId, setRoleId] = useState('CASHIER');
   const [isActive, setIsActive] = useState(true);
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     if (staffToEdit) {
@@ -51,7 +52,11 @@ export const StaffModal: React.FC<StaffModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !username) return;
+    setFormError('');
+    if (!fullName || !username) {
+      setFormError('Full name and username are required.');
+      return;
+    }
 
     if (staffToEdit) {
       StaffRepository.updateUser(staffToEdit.id, {
@@ -159,6 +164,12 @@ export const StaffModal: React.FC<StaffModalProps> = ({
             <span>Active Employee (Permitted to log in and operate)</span>
           </label>
         </div>
+
+        {formError && (
+          <p className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+            {formError}
+          </p>
+        )}
 
         <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
           <Button variant="outline" size="sm" type="button" onClick={onClose}>

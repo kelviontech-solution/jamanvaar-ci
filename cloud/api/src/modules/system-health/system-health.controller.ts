@@ -33,7 +33,9 @@ export class SystemHealthController {
       databaseLatencyMs,
       uptimeSeconds: Math.round((Date.now() - START_TIME) / 1000),
       timestamp: new Date().toISOString(),
-      nodeVersion: process.version
+      nodeVersion: process.version,
+      arch: process.arch,
+      platform: process.platform
     };
   }
 }

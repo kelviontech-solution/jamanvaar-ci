@@ -4,6 +4,7 @@ import { api, ApiError } from '../../api/client';
 import type { TenantUser } from '../../api/types';
 import {
   Badge,
+  BulkActionsBar,
   Button,
   Card,
   ConfirmModal,
@@ -14,7 +15,8 @@ import {
   SkeletonTable,
   statusTone
 } from '../../components/ui';
-import { Users, Send, CheckCircle2, UserCheck, ShieldAlert } from 'lucide-react';
+import { Users, Send, CheckCircle2, UserCheck, ShieldAlert, Download } from 'lucide-react';
+import { exportRowsToCsv } from '../../lib/csvExport';
 import '../../components/shared.css';
 
 type OwnerStatus = 'ALL' | 'ACTIVE' | 'DISABLED' | 'PENDING_ACTIVATION';
@@ -38,6 +40,10 @@ export function OwnersListPage() {
     action: 'activate' | 'suspend';
   } | null>(null);
   const [pendingAction, setPendingAction] = useState(false);
+
+  // Bulk selection
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkPending, setBulkPending] = useState(false);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -92,11 +98,16 @@ export function OwnersListPage() {
 
   async function handleResendInvite(ownerId: string, email: string) {
     try {
-      await api.post('/api/v1/support/resend-invite', {
+      const res = await api.post<{ emailSent: boolean; activationToken: string }>('/api/v1/support/resend-invite', {
         userId: ownerId,
         reason: 'Super Admin owner credentials invitation'
       });
-      showToast(`Invitation resent to ${email}`);
+      if (res.emailSent) {
+        showToast(`New invitation emailed to ${email}`);
+      } else {
+        navigator.clipboard?.writeText(res.activationToken).catch(() => {});
+        showToast(`Email could not be sent — new token copied to clipboard, relay it to ${email} manually`);
+      }
     } catch (err) {
       showToast(err instanceof ApiError ? err.message : 'Failed to resend invite');
     }
@@ -105,6 +116,50 @@ export function OwnersListPage() {
   const activeCount = useMemo(() => owners?.filter((o) => o.status === 'ACTIVE').length || 0, [owners]);
   const pendingCount = useMemo(() => owners?.filter((o) => o.status === 'PENDING_ACTIVATION').length || 0, [owners]);
   const disabledCount = useMemo(() => owners?.filter((o) => o.status === 'DISABLED').length || 0, [owners]);
+
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelectedIds((prev) =>
+      prev.size === filteredOwners.length ? new Set() : new Set(filteredOwners.map((o) => o.id))
+    );
+  }
+
+  async function handleBulkAction(actionPath: 'activate' | 'suspend') {
+    const ids = Array.from(selectedIds);
+    setBulkPending(true);
+    try {
+      const results = await Promise.allSettled(ids.map((id) => api.patch(`/api/v1/owners/${id}/${actionPath}`)));
+      const failed = results.filter((r) => r.status === 'rejected').length;
+      showToast(
+        failed === 0
+          ? `${ids.length} owner account(s) ${actionPath === 'activate' ? 'activated' : 'suspended'}`
+          : `${ids.length - failed} of ${ids.length} succeeded — ${failed} failed`
+      );
+      setSelectedIds(new Set());
+      load();
+    } finally {
+      setBulkPending(false);
+    }
+  }
+
+  function handleExportCsv() {
+    exportRowsToCsv(`jamanvaar_owners_${new Date().toISOString().slice(0, 10)}.csv`, filteredOwners, [
+      { header: 'Full Name', value: (o) => o.fullName },
+      { header: 'Email', value: (o) => o.email },
+      { header: 'Phone', value: (o) => o.phone || '' },
+      { header: 'Status', value: (o) => o.status },
+      { header: 'Restaurant', value: (o) => o.restaurant?.name || '' },
+      { header: 'Registered', value: (o) => new Date(o.createdAt).toISOString().slice(0, 10) }
+    ]);
+  }
 
   return (
     <div>
@@ -115,6 +170,10 @@ export function OwnersListPage() {
             Master tenant users with the OWNER role — strictly isolated from platform Super Admin privileges.
           </p>
         </div>
+        <Button variant="ghost" onClick={handleExportCsv} disabled={!owners || owners.length === 0}>
+          <Download className="w-4 h-4" />
+          <span>Export CSV</span>
+        </Button>
       </div>
 
       {error && (
@@ -171,6 +230,15 @@ export function OwnersListPage() {
 
       {loading && !owners && <SkeletonTable rows={6} cols={6} />}
 
+      <BulkActionsBar selectedCount={selectedIds.size} onClear={() => setSelectedIds(new Set())}>
+        <Button size="sm" variant="primary" disabled={bulkPending} onClick={() => handleBulkAction('activate')}>
+          Activate Selected
+        </Button>
+        <Button size="sm" variant="danger" disabled={bulkPending} onClick={() => handleBulkAction('suspend')}>
+          Suspend Selected
+        </Button>
+      </BulkActionsBar>
+
       {owners && (
         <Card>
           {filteredOwners.length === 0 ? (
@@ -195,6 +263,13 @@ export function OwnersListPage() {
               <table className="data-table">
                 <thead>
                   <tr>
+                    <th style={{ width: 32 }}>
+                      <input
+                        type="checkbox"
+                        checked={filteredOwners.length > 0 && selectedIds.size === filteredOwners.length}
+                        onChange={toggleSelectAll}
+                      />
+                    </th>
                     <th>Owner</th>
                     <th>Restaurant</th>
                     <th>Phone</th>
@@ -206,6 +281,9 @@ export function OwnersListPage() {
                 <tbody>
                   {filteredOwners.map((o) => (
                     <tr key={o.id}>
+                      <td>
+                        <input type="checkbox" checked={selectedIds.has(o.id)} onChange={() => toggleSelected(o.id)} />
+                      </td>
                       <td>
                         <button
                           type="button"

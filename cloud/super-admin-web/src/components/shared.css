@@ -24,7 +24,7 @@
   border-radius: var(--jv-radius-md);
   border: 1px solid var(--jv-border);
   font-size: 13.5px;
-  background: #ffffff;
+  background: var(--jv-surface);
   color: var(--jv-text);
   box-shadow: var(--jv-shadow-xs);
   transition: all 0.15s ease-in-out;
@@ -199,7 +199,7 @@
   z-index: 50;
 }
 .modal {
-  background: #fff;
+  background: var(--jv-surface);
   border-radius: 14px;
   width: 100%;
   max-width: 560px;
@@ -218,7 +218,7 @@
   border-bottom: 1px solid var(--jv-border);
   position: sticky;
   top: 0;
-  background: #fff;
+  background: var(--jv-surface);
 }
 .modal-header h2 {
   margin: 0;
@@ -306,7 +306,7 @@
   text-align: left;
   position: sticky;
   left: 0;
-  background: #fff;
+  background: var(--jv-surface);
 }
 .entitlement-matrix thead th {
   color: var(--jv-text-muted);

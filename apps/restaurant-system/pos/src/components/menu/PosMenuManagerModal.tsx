@@ -281,7 +281,8 @@ export const PosMenuManagerModal: React.FC<{
   const handleProceedToConflictReview = () => {
     if (!selectedTemplate) return;
     if (selectedDishKeys.size === 0) {
-      alert('Please select at least 1 dish to import.');
+      setErrorMsg('Please select at least 1 dish to import.');
+      setTimeout(() => setErrorMsg(''), 3500);
       return;
     }
 
@@ -419,7 +420,8 @@ export const PosMenuManagerModal: React.FC<{
   const handleDeleteCategory = (id: string, name: string) => {
     const itemsInCat = db.menuItems.filter((i) => i.categoryId === id).length;
     if (itemsInCat > 0) {
-      alert(`Cannot delete "${name}" because it contains ${itemsInCat} dishes. Reassign or delete the dishes first.`);
+      setErrorMsg(`Cannot delete "${name}" because it contains ${itemsInCat} dishes. Reassign or delete the dishes first.`);
+      setTimeout(() => setErrorMsg(''), 4000);
       return;
     }
 

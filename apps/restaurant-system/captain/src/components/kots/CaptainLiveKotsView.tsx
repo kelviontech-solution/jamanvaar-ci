@@ -108,14 +108,14 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xl font-black text-[#0B253A]">
-                          KOT #{kot.kotNumber?.slice(-3) || '104'}
+                          KOT #{kot.kotNumber?.slice(-3) || '—'}
                         </span>
                         <span className="bg-[#0B253A] text-white text-[10px] font-black px-2 py-0.5 rounded-md">
                           TABLE {kot.tableNumber}
                         </span>
                       </div>
                       <span className="text-xs text-slate-500 font-bold block mt-0.5">
-                        Order #{kot.orderNumber?.slice(-4) || '5033'}
+                        Order #{kot.orderNumber?.slice(-4) || '—'}
                       </span>
                     </div>
 

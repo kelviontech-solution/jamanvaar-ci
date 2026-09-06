@@ -5,6 +5,7 @@ import { OperationalSnapshot } from './OperationalSnapshot';
 import { HourlySalesChart } from './HourlySalesChart';
 import { TopDishesLeaderboard } from './TopDishesLeaderboard';
 import { NeedsAttentionSection } from './NeedsAttentionSection';
+import { OnboardingChecklistCard, OnboardingChecklistItem } from './OnboardingChecklistCard';
 import { TopItemStat } from '@jamanvaar/business';
 
 interface RestaurantDashboardProps {
@@ -54,6 +55,7 @@ interface RestaurantDashboardProps {
   setActiveTab: (tab: any) => void;
   setReportSubTab: (subTab: any) => void;
   setIsReconModalOpen: (open: boolean) => void;
+  onboardingItems: OnboardingChecklistItem[];
   onRefresh: () => void;
 }
 
@@ -72,6 +74,7 @@ export const RestaurantDashboard: React.FC<RestaurantDashboardProps> = ({
   setActiveTab,
   setReportSubTab,
   setIsReconModalOpen,
+  onboardingItems,
   onRefresh
 }) => {
   const { summary, dateRange } = dashPeriodReport;
@@ -85,6 +88,9 @@ export const RestaurantDashboard: React.FC<RestaurantDashboardProps> = ({
         onRefresh={onRefresh}
         dateRangeLabel={dateRange.label}
       />
+
+      {/* First-run checklist — real state, disappears once complete or dismissed */}
+      <OnboardingChecklistCard items={onboardingItems} />
 
       {/* 2. Primary Business Overview: The 4 Dominant Hero Cards */}
       <PrimaryMetricsGrid

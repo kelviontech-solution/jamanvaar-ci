@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrandHeader } from '@jamanvaar/ui';
+import { lanMeshSync, type MeshPeerInfo } from '@jamanvaar/sync';
 import { useCaptainStore } from '../../store/captainStore';
 import {
   MessageSquare,
@@ -23,9 +24,27 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
   onOpenNotifications,
   onOpenQuickMessage
 }) => {
-  const { currentCaptain, logout, notifications, syncStatus } = useCaptainStore();
+  const { currentCaptain, logout, notifications } = useCaptainStore();
   const [isSyncInfoOpen, setIsSyncInfoOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  // Real mesh state, not the static "always connected" placeholder this
+  // panel used to show — getConnectedPeers() drops a peer after 18s with no
+  // heartbeat, so this genuinely reflects a dropped POS/KDS connection.
+  const [meshOnline, setMeshOnline] = useState(lanMeshSync.getIsOnline());
+  const [peers, setPeers] = useState<MeshPeerInfo[]>(lanMeshSync.getConnectedPeers());
+  const [pendingSyncCount, setPendingSyncCount] = useState(lanMeshSync.getOutboxCount());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMeshOnline(lanMeshSync.getIsOnline());
+      setPeers(lanMeshSync.getConnectedPeers());
+      setPendingSyncCount(lanMeshSync.getOutboxCount());
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const posPeer = peers.find((p) => p.role === 'POS' || p.role === 'POS_ADMIN');
+  const kdsPeer = peers.find((p) => p.role === 'KDS');
 
   const unreadNotifs = notifications.filter((n) => !n.isRead).length;
 
@@ -91,27 +110,41 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50">
-                    <span className="font-semibold text-slate-600">Local Floor DB</span>
-                    <span className="font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md text-[10px]">
-                      ACTIVE (0ms)
+                    <span className="font-semibold text-slate-600">This Device</span>
+                    <span
+                      className={`font-black px-2 py-0.5 rounded-md text-[10px] ${
+                        meshOnline ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100'
+                      }`}
+                    >
+                      {meshOnline ? `ONLINE${pendingSyncCount > 0 ? ` (${pendingSyncCount} pending)` : ''}` : 'OFFLINE'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50">
                     <span className="font-semibold text-slate-600">POS Terminal Link</span>
-                    <span className="font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md text-[10px]">
-                      CONNECTED
+                    <span
+                      className={`font-black px-2 py-0.5 rounded-md text-[10px] ${
+                        posPeer ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100'
+                      }`}
+                    >
+                      {posPeer ? `CONNECTED (${posPeer.latencyMs}ms)` : 'NOT DETECTED'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50">
                     <span className="font-semibold text-slate-600">KDS Kitchen Mesh</span>
-                    <span className="font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md text-[10px]">
-                      LIVE
+                    <span
+                      className={`font-black px-2 py-0.5 rounded-md text-[10px] ${
+                        kdsPeer ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100'
+                      }`}
+                    >
+                      {kdsPeer ? `LIVE (${kdsPeer.latencyMs}ms)` : 'NOT DETECTED'}
                     </span>
                   </div>
                 </div>
 
                 <p className="text-[10px] text-slate-400 text-center font-medium pt-1">
-                  Changes sync instantly across all floor handhelds & counter POS.
+                  {posPeer || kdsPeer
+                    ? 'Changes sync instantly across all floor handhelds & counter POS.'
+                    : 'No POS/KDS terminal detected on this network yet — orders will queue locally until one is found.'}
                 </p>
               </div>
             )}
@@ -181,7 +214,9 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                   type="button"
                   onClick={() => {
                     setIsProfileOpen(false);
-                    logout();
+                    if (window.confirm('End your session and log out?')) {
+                      logout();
+                    }
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-rose-50 text-rose-600 text-left transition-colors font-bold cursor-pointer"
                 >

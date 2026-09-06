@@ -104,7 +104,7 @@ export function ChangePlanModal({
             </div>
             <p style={{ margin: '4px 0 0 0', fontSize: 13, color: '#7c2d12' }}>
               Moving from <strong>{currentPlan.name}</strong> to <strong>{chosenPlan.name}</strong>.
-              {chosenPlan.tier === 'PRO'
+              {chosenPlan.tier === 'PRO' || chosenPlan.tier === 'ENTERPRISE'
                 ? ' Captain app, QR table ordering, KDS, and multi-device sync will be immediately unlocked for this restaurant.'
                 : ' Advanced PRO features will be locked according to the CORE plan specification.'}
             </p>

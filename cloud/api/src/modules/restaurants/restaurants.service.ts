@@ -1,18 +1,23 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PlatformUser, RestaurantStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { generateOpaqueToken, hashOpaqueToken } from '../../common/security/token.util';
+import { EmailService } from '../notifications/email.service';
+import { ownerInviteEmail } from '../notifications/email-templates';
 
 const ACTIVATION_TOKEN_TTL_DAYS = 7;
 
 @Injectable()
 export class RestaurantsService {
+  private readonly logger = new Logger(RestaurantsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly email: EmailService
   ) {}
 
   /**
@@ -21,7 +26,7 @@ export class RestaurantsService {
    * transaction so a partial failure never leaves an unaudited restaurant.
    */
   async createRestaurant(dto: CreateRestaurantDto, actor: PlatformUser) {
-    return this.prisma.runAsPlatform(async (tx) => {
+    const result = await this.prisma.runAsPlatform(async (tx) => {
       const restaurant = await tx.restaurant.create({
         data: {
           name: dto.name,
@@ -103,6 +108,28 @@ export class RestaurantsService {
       // never ends up in the audit log — the operator must relay it to the owner now.
       return { restaurant, branch, owner, activationToken, activationTokenExpiresAt };
     });
+
+    // Sent after the transaction commits — a slow/unreachable SMTP server
+    // must never hold the DB transaction open or roll back a successful
+    // restaurant creation. If this fails or isn't configured, the operator
+    // still has the token above to relay manually (emailSent tells them so).
+    let emailSent = false;
+    if (!dto.skipInviteEmail) {
+      try {
+        const { subject, html } = ownerInviteEmail({
+          restaurantName: result.restaurant.name,
+          ownerName: result.owner.fullName,
+          email: result.owner.email,
+          activationToken: result.activationToken,
+          expiresAt: result.activationTokenExpiresAt
+        });
+        emailSent = await this.email.send(result.owner.email, subject, html);
+      } catch (err) {
+        this.logger.error(`Owner invite email failed to send to ${result.owner.email}`, err instanceof Error ? err.stack : err);
+      }
+    }
+
+    return { ...result, emailSent };
   }
 
   async listRestaurants() {

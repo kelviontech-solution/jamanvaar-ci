@@ -34,6 +34,7 @@ import { PosPrinterService } from '../services/printerService';
 import { PosRecoveryService } from '../services/recoveryService';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { SessionPersistence, AuthStatus, calculateCart } from '@jamanvaar/business';
+import { generateUUID } from '@jamanvaar/utils';
 
 export type PosTab =
   | 'MENU'
@@ -1494,8 +1495,9 @@ export const usePosStore = create<PosState>((set, get) => {
           lanMeshSync.broadcast('KOT_CREATED', kots);
         }
 
-        // 3. Settle order atomically
-        const transactionId = `IB-${Date.now().toString().slice(-6)}`;
+        // 3. Settle order atomically — a real random reference, not a
+        // clock-derived value, since this is persisted for reconciliation.
+        const transactionId = `IB-${generateUUID().replace(/-/g, '').slice(0, 10).toUpperCase()}`;
         const settled = OrderRepository.settleOrder(
           order.id,
           method,

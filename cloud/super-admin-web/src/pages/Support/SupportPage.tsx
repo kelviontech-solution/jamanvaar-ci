@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { SearchResult, RestaurantDiagnostics } from '../../api/types';
 import { Card, Button, Input, Modal, Badge, EmptyState } from '../../components/ui';
+import { useAuth } from '../../auth/AuthContext';
 import {
   Search,
   LifeBuoy,
@@ -16,12 +17,16 @@ import {
   Mail,
   HelpCircle,
   Clock,
-  Send
+  Send,
+  UserCog,
+  Copy
 } from 'lucide-react';
 import '../../components/shared.css';
 import './support.css';
 
 export function SupportPage() {
+  const { hasPermission } = useAuth();
+  const canImpersonate = hasPermission('SUPPORT_ADMIN');
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
@@ -33,12 +38,19 @@ export function SupportPage() {
 
   // Audited Action Modals
   const [actionModal, setActionModal] = useState<{
-    type: 'RESEND_INVITE' | 'REVOKE_DEVICE';
+    type: 'RESEND_INVITE' | 'REVOKE_DEVICE' | 'IMPERSONATE';
     targetId: string;
     targetName: string;
   } | null>(null);
   const [actionReason, setActionReason] = useState('');
   const [performingAction, setPerformingAction] = useState(false);
+  const [impersonationResult, setImpersonationResult] = useState<{
+    accessToken: string;
+    expiresAt: string;
+    restaurantName: string;
+    ownerEmail: string;
+    ownerName: string;
+  } | null>(null);
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -81,17 +93,35 @@ export function SupportPage() {
     setPerformingAction(true);
     try {
       if (actionModal.type === 'RESEND_INVITE') {
-        await api.post('/api/v1/support/resend-invite', {
+        const res = await api.post<{ emailSent: boolean; activationToken: string }>('/api/v1/support/resend-invite', {
           userId: actionModal.targetId,
           reason: actionReason.trim()
         });
-        setSuccessToast(`Invitation resent to ${actionModal.targetName}`);
+        if (res.emailSent) {
+          setSuccessToast(`New invitation emailed to ${actionModal.targetName}`);
+        } else {
+          navigator.clipboard?.writeText(res.activationToken).catch(() => {});
+          setSuccessToast(`Email could not be sent — new token copied to clipboard, relay it to ${actionModal.targetName} manually`);
+        }
       } else if (actionModal.type === 'REVOKE_DEVICE') {
         await api.post('/api/v1/support/revoke-device-session', {
           deviceId: actionModal.targetId,
           reason: actionReason.trim()
         });
         setSuccessToast(`Device ${actionModal.targetName} disconnected and session revoked`);
+      } else if (actionModal.type === 'IMPERSONATE') {
+        const res = await api.post<{
+          accessToken: string;
+          expiresAt: string;
+          restaurantName: string;
+          ownerEmail: string;
+          ownerName: string;
+        }>('/api/v1/support/impersonate', {
+          restaurantId: actionModal.targetId,
+          reason: actionReason.trim()
+        });
+        setImpersonationResult(res);
+        setSuccessToast(`Impersonation token issued for ${res.ownerName} (${res.restaurantName})`);
       }
 
       setActionModal(null);
@@ -149,12 +179,12 @@ export function SupportPage() {
                   key={r.id}
                   className="result-item-card"
                   style={{
-                    borderColor: selectedRestaurantId === r.id ? 'var(--accent-primary)' : undefined
+                    borderColor: selectedRestaurantId === r.id ? 'var(--jv-accent)' : undefined
                   }}
                   onClick={() => loadDiagnostics(r.id)}
                 >
                   <div style={{ fontWeight: 600 }}>{r.name}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-muted)' }}>
                     {r.city || 'India'} • {r.status}
                   </div>
                 </div>
@@ -170,7 +200,7 @@ export function SupportPage() {
                   onClick={() => loadDiagnostics(u.restaurantId)}
                 >
                   <div style={{ fontWeight: 600 }}>{u.fullName}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{u.email}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-muted)' }}>{u.email}</div>
                   <Badge tone={u.status === 'ACTIVE' ? 'success' : 'accent'}>{u.status}</Badge>
                 </div>
               ))}
@@ -185,7 +215,7 @@ export function SupportPage() {
                   onClick={() => loadDiagnostics(d.restaurantId)}
                 >
                   <div style={{ fontWeight: 600 }}>{d.type} Terminal</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>ID: {d.id.slice(0, 8)}…</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-muted)' }}>ID: {d.id.slice(0, 8)}…</div>
                   <Badge tone={d.status === 'ACTIVE' ? 'success' : 'neutral'}>{d.status}</Badge>
                 </div>
               ))}
@@ -257,17 +287,78 @@ export function SupportPage() {
                   {diagnostics.onlineDevicesCount} of {diagnostics.devices.length} Online
                 </span>
               </div>
+              {canImpersonate && (
+                <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--jv-border)' }}>
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      setActionModal({
+                        type: 'IMPERSONATE',
+                        targetId: diagnostics.restaurant.id,
+                        targetName: diagnostics.restaurant.name
+                      })
+                    }
+                    style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 8 }}
+                  >
+                    <UserCog className="w-4 h-4" />
+                    <span>Impersonate Owner Session</span>
+                  </Button>
+                </div>
+              )}
             </Card>
+
+            {impersonationResult && impersonationResult.restaurantName === diagnostics.restaurant.name && (
+              <Card style={{ border: '1px solid var(--jv-accent-border)', background: 'var(--jv-accent-soft)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                  <h3 style={{ margin: 0, fontSize: '0.95rem' }}>Impersonation Token — {impersonationResult.ownerName}</h3>
+                  <button
+                    onClick={() => setImpersonationResult(null)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: 'var(--jv-text-muted)' }}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <p style={{ fontSize: '0.78rem', color: 'var(--jv-text-secondary)', margin: '0 0 0.75rem' }}>
+                  A real, valid tenant access token for <strong>{impersonationResult.ownerEmail}</strong>, expiring at{' '}
+                  {new Date(impersonationResult.expiresAt).toLocaleTimeString('en-IN')}. This is an API-level debugging
+                  credential (use it as a Bearer token against tenant-scoped endpoints, e.g. via Postman or browser
+                  devtools) — it does not open a view of this restaurant's live local POS data, which never leaves that
+                  restaurant's own on-site device. This action has been recorded in the audit log.
+                </p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input
+                    readOnly
+                    value={impersonationResult.accessToken}
+                    style={{
+                      flex: 1,
+                      fontFamily: 'monospace',
+                      fontSize: '0.72rem',
+                      padding: '0.5rem',
+                      border: '1px solid var(--jv-border)',
+                      borderRadius: 6,
+                      background: 'var(--jv-surface)',
+                      color: 'var(--jv-text)'
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigator.clipboard?.writeText(impersonationResult.accessToken).catch(() => {})}
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+              </Card>
+            )}
 
             {/* Owner accounts */}
             <Card>
               <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem' }}>Owner Accounts</h3>
               {diagnostics.owners.map((o) => (
-                <div key={o.id} style={{ padding: '0.5rem 0', borderBottom: '1px solid var(--border-subtle)' }}>
+                <div key={o.id} style={{ padding: '0.5rem 0', borderBottom: '1px solid var(--jv-border)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontWeight: 600 }}>{o.fullName}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{o.email}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-muted)' }}>{o.email}</div>
                     </div>
                     <Badge tone={o.status === 'ACTIVE' ? 'success' : 'accent'}>{o.status}</Badge>
                   </div>
@@ -297,7 +388,7 @@ export function SupportPage() {
             <Card>
               <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem' }}>Connected Terminal Hardware</h3>
               {diagnostics.devices.length === 0 ? (
-                <div style={{ color: 'var(--text-muted)' }}>No devices registered yet.</div>
+                <div style={{ color: 'var(--jv-text-muted)' }}>No devices registered yet.</div>
               ) : (
                 <table className="data-table">
                   <thead>
@@ -314,9 +405,9 @@ export function SupportPage() {
                       <tr key={d.id}>
                         <td>
                           <strong>{d.type}</strong>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>ID: {d.id.slice(0, 8)}…</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-muted)' }}>ID: {d.id.slice(0, 8)}…</div>
                         </td>
-                        <td>{d.appVersion || <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Unknown</span>}</td>
+                        <td>{d.appVersion || <span style={{ color: 'var(--jv-text-muted)', fontStyle: 'italic' }}>Unknown</span>}</td>
                         <td>{d.lastSeenAt ? new Date(d.lastSeenAt).toLocaleTimeString() : 'Never'}</td>
                         <td>
                           <Badge tone={d.status === 'ACTIVE' ? 'success' : 'neutral'}>{d.status}</Badge>
@@ -348,7 +439,7 @@ export function SupportPage() {
             <Card>
               <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem' }}>Recent Diagnostic Audit Logs</h3>
               {diagnostics.recentAudits.length === 0 ? (
-                <div style={{ color: 'var(--text-muted)' }}>No audit entries logged for this tenant.</div>
+                <div style={{ color: 'var(--jv-text-muted)' }}>No audit entries logged for this tenant.</div>
               ) : (
                 <div style={{ fontSize: '0.8rem' }}>
                   {diagnostics.recentAudits.slice(0, 8).map((a) => (
@@ -358,13 +449,13 @@ export function SupportPage() {
                         display: 'flex',
                         justifyContent: 'space-between',
                         padding: '0.4rem 0',
-                        borderBottom: '1px solid var(--border-subtle)'
+                        borderBottom: '1px solid var(--jv-border)'
                       }}
                     >
                       <span>
                         <strong>{a.action}</strong> ({a.category})
                       </span>
-                      <span style={{ color: 'var(--text-muted)' }}>
+                      <span style={{ color: 'var(--jv-text-muted)' }}>
                         {new Date(a.createdAt).toLocaleString()}
                       </span>
                     </div>
@@ -379,7 +470,13 @@ export function SupportPage() {
       {/* ── Audited Operator Action Modal ── */}
       {actionModal && (
         <Modal
-          title={`Support Operator Action: ${actionModal.type === 'RESEND_INVITE' ? 'Resend Invitation' : 'Revoke Device Session'}`}
+          title={`Support Operator Action: ${
+            actionModal.type === 'RESEND_INVITE'
+              ? 'Resend Invitation'
+              : actionModal.type === 'REVOKE_DEVICE'
+              ? 'Revoke Device Session'
+              : 'Impersonate Owner Session'
+          }`}
           onClose={() => setActionModal(null)}
           footer={
             <>
@@ -397,8 +494,9 @@ export function SupportPage() {
               <div style={{ color: '#ef4444', fontWeight: 600, fontSize: '0.85rem' }}>
                 Audited Operator Procedure
               </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--jv-text-secondary)' }}>
                 Target: <strong>{actionModal.targetName}</strong>. A mandatory reason is required and will be appended to the immutable platform audit trail.
+                {actionModal.type === 'IMPERSONATE' && ' This mints a real, time-boxed (15 min) access token for this restaurant\'s owner account.'}
               </div>
             </div>
 

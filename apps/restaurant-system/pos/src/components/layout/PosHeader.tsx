@@ -52,6 +52,7 @@ export const PosHeader: React.FC = () => {
     logout,
     setActiveTab,
     setOrderType,
+    cart,
     clearCart,
     setIsGlobalSearchOpen,
     setIsShortcutsOpen,
@@ -64,7 +65,6 @@ export const PosHeader: React.FC = () => {
 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [newOrderDropdownOpen, setNewOrderDropdownOpen] = useState(false);
-  const [healthDropdownOpen, setHealthDropdownOpen] = useState(false);
   const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
   const [isBusinessDayPanelOpen, setIsBusinessDayPanelOpen] = useState(false);
   const [isCloseDayModalOpen, setIsCloseDayModalOpen] = useState(false);
@@ -72,7 +72,6 @@ export const PosHeader: React.FC = () => {
   // Refs for click outside handling
   const profileRef = useRef<HTMLDivElement>(null);
   const businessDayRef = useRef<HTMLDivElement>(null);
-  const healthRef = useRef<HTMLDivElement>(null);
   const newOrderRef = useRef<HTMLDivElement>(null);
 
   // Subscribe to db mutations
@@ -92,9 +91,6 @@ export const PosHeader: React.FC = () => {
       if (businessDayRef.current && !businessDayRef.current.contains(target)) {
         setIsBusinessDayPanelOpen(false);
       }
-      if (healthRef.current && !healthRef.current.contains(target)) {
-        setHealthDropdownOpen(false);
-      }
       if (newOrderRef.current && !newOrderRef.current.contains(target)) {
         setNewOrderDropdownOpen(false);
       }
@@ -104,7 +100,6 @@ export const PosHeader: React.FC = () => {
       if (event.key === 'Escape') {
         setProfileDropdownOpen(false);
         setIsBusinessDayPanelOpen(false);
-        setHealthDropdownOpen(false);
         setNewOrderDropdownOpen(false);
       }
     };
@@ -139,6 +134,12 @@ export const PosHeader: React.FC = () => {
 
   const handleStartNewOrder = (type: 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY') => {
     setNewOrderDropdownOpen(false);
+    // An in-progress cart used to be discarded with zero confirmation here,
+    // in direct contrast to the cart's own "Clear Cart" button, which
+    // correctly asks first.
+    if (cart.items.length > 0 && !window.confirm(`Discard the ${cart.items.length} item(s) in the current cart and start a new order?`)) {
+      return;
+    }
     clearCart();
     setOrderType(type);
     if (type === 'DINE_IN') {
@@ -149,6 +150,9 @@ export const PosHeader: React.FC = () => {
   };
 
   const handleStartNewBusinessDay = () => {
+    if (cart.items.length > 0 && !window.confirm(`Discard the ${cart.items.length} item(s) in the current cart and start a new business day?`)) {
+      return;
+    }
     BusinessDayRepository.openNewBusinessDay('Amit Dave (Lead Cashier)', 2000);
     setIsBusinessDayPanelOpen(false);
     clearCart();
@@ -229,116 +233,27 @@ export const PosHeader: React.FC = () => {
 
       {/* Right: Interactive Controls */}
       <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        {/* Printer Status */}
-        <button
-          type="button"
-          onClick={() => setIsPrintQueueOpen(true)}
-          className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0 ${
-            isPrinterOffline
-              ? 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100'
-              : 'bg-[#FAF7F2] hover:bg-[#F5F0E8] border-[#EBE6DD] text-[#0B253A]'
-          }`}
-          title="Thermal Print Queue & Spooler"
-        >
-          <Printer className={`w-3.5 h-3.5 ${isPrinterOffline ? 'text-rose-600 animate-pulse' : 'text-emerald-600'}`} />
-          <span className="hidden xl:inline text-[11px] font-bold">
-            {isPrinterOffline ? '⚠ Offline' : '🖨 Ready (80mm)'}
-          </span>
-          {failedJobsCount > 0 && (
-            <span className="bg-rose-500 text-white font-black text-[9px] px-1.5 py-0.2 rounded-full">
-              {failedJobsCount}
-            </span>
-          )}
-        </button>
-
-        {/* System Health Dropdown */}
-        <div ref={healthRef} className="relative">
+        {/* Printer alert — only rendered when something needs attention.
+            Healthy printer status now lives inside the profile menu's
+            System Health section instead of taking permanent header space. */}
+        {isPrinterOffline && (
           <button
             type="button"
-            onClick={() => setHealthDropdownOpen((prev) => !prev)}
-            className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer ${
-              allSystemsOk
-                ? 'bg-emerald-50/80 border-emerald-200 text-emerald-800 hover:bg-emerald-100/80'
-                : 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100'
-            }`}
-            title="System & Hardware Health"
+            onClick={() => setIsPrintQueueOpen(true)}
+            className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100"
+            title="Thermal Print Queue & Spooler — printer needs attention"
           >
-            <span className={`w-2 h-2 rounded-full ${allSystemsOk ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-            <span className="hidden 2xl:inline text-[11px]">
-              {allSystemsOk ? 'System Ready' : 'Attention'}
-            </span>
-            <ChevronDown className="w-3 h-3 opacity-60" />
+            <Printer className="w-3.5 h-3.5 text-rose-600 animate-pulse" />
+            <span className="hidden xl:inline text-[11px] font-bold">Printer Offline</span>
+            {failedJobsCount > 0 && (
+              <span className="bg-rose-500 text-white font-black text-[9px] px-1.5 py-0.2 rounded-full">
+                {failedJobsCount}
+              </span>
+            )}
           </button>
+        )}
 
-          {healthDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-72 bg-white border border-[#EBE6DD] rounded-2xl shadow-xl p-3 text-xs text-[#0B253A] z-50 animate-in fade-in zoom-in-95 duration-100 space-y-2">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                <div className="flex items-center gap-1.5 font-bold text-xs">
-                  <Activity className="w-3.5 h-3.5 text-[#E66817]" />
-                  <span>Hardware & Network Health</span>
-                </div>
-                <span className="text-[10px] font-mono text-slate-400">Offline-First</span>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50">
-                  <div className="flex items-center gap-2">
-                    <Server className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Local Database</span>
-                  </div>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">
-                    ACTIVE (0ms)
-                  </span>
-                </div>
-
-                <div
-                  onClick={() => {
-                    setHealthDropdownOpen(false);
-                    setIsPrintQueueOpen(true);
-                  }}
-                  className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <Printer className={`w-3.5 h-3.5 ${isPrinterOffline ? 'text-rose-600' : 'text-emerald-600'}`} />
-                    <span>Thermal Printer</span>
-                  </div>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
-                    isPrinterOffline ? 'text-rose-700 bg-rose-100' : 'text-emerald-700 bg-emerald-100'
-                  }`}>
-                    {isPrinterOffline ? 'OFFLINE' : 'READY'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50">
-                  <div className="flex items-center gap-2">
-                    <ChefHat className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>KDS Kitchen Sync</span>
-                  </div>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">
-                    SYNCED
-                  </span>
-                </div>
-
-                <div
-                  onClick={toggleNetworkStatus}
-                  className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    {isOnline ? <Wifi className="w-3.5 h-3.5 text-emerald-600" /> : <WifiOff className="w-3.5 h-3.5 text-amber-600" />}
-                    <span>LAN / Cloud Sync</span>
-                  </div>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
-                    isOnline ? 'text-emerald-700 bg-emerald-100' : 'text-amber-700 bg-amber-100'
-                  }`}>
-                    {isOnline ? 'ONLINE' : 'OFFLINE MODE'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* ── 1. AUTHORITATIVE BUSINESS DAY CONTROL ── */}
+        {/* ── AUTHORITATIVE BUSINESS DAY + SHIFT CONTROL (merged) ── */}
         <div ref={businessDayRef} className="relative hidden lg:block">
           <button
             type="button"
@@ -348,7 +263,7 @@ export const PosHeader: React.FC = () => {
                 ? 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100'
                 : 'bg-rose-50 border-rose-300 text-rose-800 hover:bg-rose-100'
             }`}
-            title="Business Day Operating Status — Click to manage"
+            title="Business Day & Shift Status — Click to manage"
           >
             <span className={`w-2 h-2 rounded-full ${
               daySummary.status === 'OPEN' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
@@ -357,11 +272,13 @@ export const PosHeader: React.FC = () => {
               {daySummary.status === 'OPEN' ? 'DAY OPEN' : 'DAY CLOSED'}
             </span>
             <span className="text-slate-400 font-bold">•</span>
-            <span className="font-mono text-xs">{daySummary.display_date}</span>
+            <span className="font-mono text-xs">
+              {activeShift ? formatINR(activeShift.totalSales ?? 0) : 'No Shift'}
+            </span>
             <ChevronDown className="w-3 h-3 opacity-60" />
           </button>
 
-          {/* Business Day Popover */}
+          {/* Business Day + Shift Popover */}
           {isBusinessDayPanelOpen && (
             <div className="absolute right-0 mt-2 w-80 bg-white border border-[#EBE6DD] rounded-2xl shadow-2xl p-4 text-xs text-[#0B253A] z-50 animate-in fade-in zoom-in-95 duration-100 space-y-3">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
@@ -417,6 +334,34 @@ export const PosHeader: React.FC = () => {
                   <span>View Day History & Reports</span>
                 </button>
 
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsBusinessDayPanelOpen(false);
+                    setActiveTab('SHIFTS');
+                  }}
+                  className={`w-full py-2 rounded-xl border text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                    activeShift
+                      ? 'bg-[#FAF7F2] hover:bg-[#F5F0E8] border-[#EBE6DD] text-[#0B253A]'
+                      : 'bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900'
+                  }`}
+                >
+                  <Clock className={`w-3.5 h-3.5 ${activeShift ? 'text-[#E66817]' : 'text-amber-700'}`} />
+                  <span>{activeShift ? `Shift #${activeShift.id.slice(-2) || '01'} — Open Drawer` : 'Shift Closed — Open New Shift'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsBusinessDayPanelOpen(false);
+                    setIsCashDrawerModalOpen(true);
+                  }}
+                  className="w-full py-2 rounded-xl bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] text-xs font-bold text-amber-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <CircleDollarSign className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Cash In / Out (Float Adjustment)</span>
+                </button>
+
                 {daySummary.status === 'OPEN' ? (
                   <button
                     type="button"
@@ -443,40 +388,6 @@ export const PosHeader: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* ── 2. SEPARATE SHIFT PILL (Cashier Drawer) ── */}
-        <button
-          type="button"
-          onClick={() => setActiveTab('SHIFTS')}
-          className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-colors shadow-2xs cursor-pointer shrink-0 ${
-            activeShift
-              ? 'bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] text-[#0B253A]'
-              : 'bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900'
-          }`}
-          title={activeShift ? "Active Shift Drawer (Click to view Shift & Cash)" : "Shift Closed (Click to open shift)"}
-        >
-          <Clock className={`w-3.5 h-3.5 ${activeShift ? 'text-[#E66817]' : 'text-amber-700'}`} />
-          <div className="flex items-center gap-1 text-[11px]">
-            {activeShift ? (
-              <>
-                <span className="text-emerald-700 font-black">● Shift #{activeShift.id.slice(-2) || '01'}:</span>
-                <span className="font-mono font-bold text-[#0B253A]">{formatINR(activeShift.totalSales ?? 0)}</span>
-              </>
-            ) : (
-              <span className="font-bold text-amber-900">Shift Closed</span>
-            )}
-          </div>
-        </button>
-
-        {/* Cash In / Out Trigger */}
-        <button
-          type="button"
-          onClick={() => setIsCashDrawerModalOpen(true)}
-          className="w-8 h-8 rounded-xl bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] text-amber-600 flex items-center justify-center transition-colors shadow-2xs cursor-pointer shrink-0"
-          title="Cash In / Out Float Adjustment"
-        >
-          <CircleDollarSign className="w-4 h-4" />
-        </button>
 
         {/* Notification Bell */}
         <button
@@ -516,16 +427,21 @@ export const PosHeader: React.FC = () => {
           )}
         </button>
 
-        {/* ── 3. CASHIER PROFILE MENU (AMIT DAVE ▼) ── */}
+        {/* ── CASHIER PROFILE MENU (AMIT DAVE ▼) ── */}
         <div ref={profileRef} className="relative shrink-0">
           <button
             type="button"
             onClick={() => setProfileDropdownOpen((prev) => !prev)}
             className="flex items-center gap-1.5 bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] px-2 py-1 rounded-xl transition-colors shadow-2xs text-[#0B253A] cursor-pointer"
-            title="User Profile & Session Options"
+            title={allSystemsOk ? 'User Profile & Session Options — All Systems OK' : 'User Profile & Session Options — Hardware needs attention'}
           >
-            <div className="w-6 h-6 rounded-lg bg-[#E66817] text-white flex items-center justify-center font-black text-xs">
+            <div className="relative w-6 h-6 rounded-lg bg-[#E66817] text-white flex items-center justify-center font-black text-xs">
               {currentUser?.fullName?.charAt(0) || 'A'}
+              <span
+                className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-white ${
+                  allSystemsOk ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'
+                }`}
+              />
             </div>
             <div className="hidden xl:flex flex-col text-left">
               <span className="text-xs font-bold leading-tight truncate max-w-[110px]">
@@ -564,6 +480,48 @@ export const PosHeader: React.FC = () => {
                 <div className="flex justify-between font-bold">
                   <span className="text-slate-500">Opening Float:</span>
                   <span className="font-mono text-[#0B253A]">₹2,000</span>
+                </div>
+              </div>
+
+              {/* System Health — moved here from the standalone header
+                  dropdown to cut a permanently-visible button that was
+                  almost always showing "System Ready" with nothing to act on. */}
+              <div className="p-2 bg-slate-50 rounded-xl space-y-1.5 text-[11px]">
+                <div className="flex items-center gap-1.5 font-bold text-slate-500 pb-0.5">
+                  <Activity className="w-3 h-3" />
+                  <span>System Health</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-slate-600"><Server className="w-3 h-3 text-emerald-600" />Local Database</span>
+                  <span className="font-bold text-emerald-700">ACTIVE</span>
+                </div>
+                <div
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    setIsPrintQueueOpen(true);
+                  }}
+                  className="flex items-center justify-between cursor-pointer"
+                >
+                  <span className="flex items-center gap-1.5 text-slate-600">
+                    <Printer className={`w-3 h-3 ${isPrinterOffline ? 'text-rose-600' : 'text-emerald-600'}`} />
+                    Thermal Printer
+                  </span>
+                  <span className={`font-bold ${isPrinterOffline ? 'text-rose-700' : 'text-emerald-700'}`}>
+                    {isPrinterOffline ? 'OFFLINE' : 'READY'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-slate-600"><ChefHat className="w-3 h-3 text-emerald-600" />KDS Kitchen Sync</span>
+                  <span className="font-bold text-emerald-700">SYNCED</span>
+                </div>
+                <div onClick={toggleNetworkStatus} className="flex items-center justify-between cursor-pointer">
+                  <span className="flex items-center gap-1.5 text-slate-600">
+                    {isOnline ? <Wifi className="w-3 h-3 text-emerald-600" /> : <WifiOff className="w-3 h-3 text-amber-600" />}
+                    LAN / Cloud Sync
+                  </span>
+                  <span className={`font-bold ${isOnline ? 'text-emerald-700' : 'text-amber-700'}`}>
+                    {isOnline ? 'ONLINE' : 'OFFLINE'}
+                  </span>
                 </div>
               </div>
 

@@ -7,7 +7,7 @@
 
 .app-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--jv-border);
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
@@ -17,7 +17,7 @@
 
 .app-card:hover {
   transform: translateY(-2px);
-  border-color: var(--accent-primary);
+  border-color: var(--jv-accent);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
@@ -33,7 +33,7 @@
   height: 44px;
   border-radius: 10px;
   background: rgba(220, 38, 38, 0.1);
-  color: var(--accent-primary);
+  color: var(--jv-accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,12 +52,12 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-muted);
+  color: var(--jv-text-muted);
 }
 
 .app-card-desc {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--jv-text-secondary);
   line-height: 1.5;
   margin-bottom: 1.25rem;
   flex-grow: 1;
@@ -70,7 +70,7 @@
   padding: 0.75rem 1rem;
   background: var(--bg-canvas);
   border-radius: 8px;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--jv-border);
   margin-bottom: 1.25rem;
 }
 
@@ -81,7 +81,7 @@
 
 .app-spec-label {
   font-size: 0.7rem;
-  color: var(--text-muted);
+  color: var(--jv-text-muted);
   text-transform: uppercase;
 }
 
@@ -102,9 +102,9 @@
   font-size: 0.75rem;
   padding: 0.2rem 0.6rem;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--jv-border);
   border-radius: 20px;
-  color: var(--text-secondary);
+  color: var(--jv-text-secondary);
 }
 
 .app-card-actions {
@@ -113,13 +113,13 @@
   align-items: center;
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--jv-border);
 }
 
 .release-history-box {
   margin-top: 1rem;
   font-size: 0.8rem;
-  border-top: 1px dashed var(--border-subtle);
+  border-top: 1px dashed var(--jv-border);
   padding-top: 0.75rem;
 }
 
@@ -127,5 +127,5 @@
   display: flex;
   justify-content: space-between;
   padding: 0.25rem 0;
-  color: var(--text-secondary);
+  color: var(--jv-text-secondary);
 }

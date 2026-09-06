@@ -23,6 +23,8 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
   const [isRefunding, setIsRefunding] = useState(false);
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
+  const [voidError, setVoidError] = useState('');
+  const [refundError, setRefundError] = useState('');
 
   if (!order) return null;
 
@@ -43,7 +45,11 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
   const handleVoid = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!voidReason) return;
+    setVoidError('');
+    if (!voidReason) {
+      setVoidError('A reason is required to void this order.');
+      return;
+    }
     OrderRepository.voidOrder(order.id, voidReason, 'Manager');
     setIsVoiding(false);
     setVoidReason('');
@@ -52,8 +58,12 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
   const handleRefund = (e: React.FormEvent) => {
     e.preventDefault();
+    setRefundError('');
     const amt = parseFloat(refundAmount) || order.totalAmount;
-    if (!amt || !refundReason) return;
+    if (!amt || !refundReason) {
+      setRefundError('A valid amount and reason are required to process this refund.');
+      return;
+    }
     OrderRepository.refundOrder(order.id, amt, refundReason, 'Manager');
     setIsRefunding(false);
     setRefundAmount('');
@@ -288,6 +298,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               placeholder="e.g. Customer cancelled before cooking / duplicate bill"
               className="w-full bg-white border border-rose-300 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none"
             />
+            {voidError && <p className="font-bold text-rose-700">{voidError}</p>}
             <div className="flex justify-end gap-2">
               <Button variant="outline" size="sm" type="button" onClick={() => setIsVoiding(false)}>
                 Cancel
@@ -321,6 +332,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 className="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none"
               />
             </div>
+            {refundError && <p className="font-bold text-amber-800">{refundError}</p>}
             <div className="flex justify-end gap-2">
               <Button variant="outline" size="sm" type="button" onClick={() => setIsRefunding(false)}>
                 Cancel

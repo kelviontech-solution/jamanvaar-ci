@@ -6,7 +6,8 @@ import {
   Bot,
   Bell,
   LogOut,
-  Radio
+  Radio,
+  Building2
 } from 'lucide-react';
 import { JAMANVAAR_LOGOS } from '@jamanvaar/ui';
 import { formatINR } from '@jamanvaar/utils';
@@ -14,6 +15,8 @@ import { formatINR } from '@jamanvaar/utils';
 export interface PosAdminHeaderProps {
   restaurantName: string;
   outletName: string;
+  isCloudConnected?: boolean;
+  onOpenBranchDirectory?: () => void;
   globalSearch: string;
   onOpenGlobalSearch: () => void;
   activeShift?: {
@@ -32,6 +35,8 @@ export interface PosAdminHeaderProps {
 export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
   restaurantName,
   outletName,
+  isCloudConnected,
+  onOpenBranchDirectory,
   globalSearch,
   onOpenGlobalSearch,
   activeShift,
@@ -78,12 +83,24 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
               ADMIN
             </span>
           </div>
-          <span
-            title={outletName || 'Ahmedabad Flagship Store'}
-            className="text-[10px] sm:text-[11px] font-medium text-slate-500 truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px] leading-tight mt-0.5"
-          >
-            {outletName || 'Ahmedabad Flagship Store'}
-          </span>
+          {isCloudConnected && onOpenBranchDirectory ? (
+            <button
+              type="button"
+              onClick={onOpenBranchDirectory}
+              title="View all branches for this restaurant"
+              className="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-slate-500 hover:text-[#E66817] truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px] leading-tight mt-0.5 cursor-pointer transition-colors"
+            >
+              <Building2 className="w-3 h-3 shrink-0" />
+              <span className="truncate">{outletName || 'Ahmedabad Flagship Store'}</span>
+            </button>
+          ) : (
+            <span
+              title={outletName || 'Ahmedabad Flagship Store'}
+              className="text-[10px] sm:text-[11px] font-medium text-slate-500 truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px] leading-tight mt-0.5"
+            >
+              {outletName || 'Ahmedabad Flagship Store'}
+            </span>
+          )}
         </div>
       </div>
 

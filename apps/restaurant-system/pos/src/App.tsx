@@ -18,6 +18,7 @@ import { PosDayHistoryView } from './components/days/PosDayHistoryView';
 import { PosSettingsView } from './components/settings/PosSettingsView';
 import { PosInventoryView } from './components/inventory/PosInventoryView';
 import { PosPaymentModal } from './components/payment/PosPaymentModal';
+import { PosHoldModal } from './components/cart/PosHoldModal';
 import { PosInstantBillConfirmationModal } from './components/payment/PosInstantBillConfirmationModal';
 import { PosThermalReceiptModal } from './components/receipt/PosThermalReceiptModal';
 import { PosPrintQueueModal } from './components/receipt/PosPrintQueueModal';
@@ -187,6 +188,8 @@ export const App: React.FC = () => {
 
       {/* Global Application Modals */}
       <PosPaymentModal />
+      {/* Mounted globally (not tab-scoped) so F8 works from any tab, not just Menu. */}
+      <PosHoldModal />
       <PosInstantBillConfirmationModal />
       <PosThermalReceiptModal />
       <PosPrintQueueModal />

@@ -80,9 +80,10 @@ export interface SubscriptionListItem extends Subscription {
   restaurant: { id: string; name: string; status: string };
 }
 
-interface RestaurantCore {
+export interface RestaurantCore {
   id: string;
   name: string;
+  legalName: string | null;
   city: string | null;
   state: string | null;
   status: 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED';
@@ -163,7 +164,6 @@ export interface Backup {
 
 /** GET /api/v1/restaurants/:id — carries the full related rows instead of _count. */
 export interface RestaurantDetail extends RestaurantCore {
-  legalName: string | null;
   gstin: string | null;
   fssaiNumber: string | null;
   address: string | null;
@@ -220,6 +220,8 @@ export interface SystemHealth {
   uptimeSeconds: number;
   timestamp: string;
   nodeVersion: string;
+  arch: string;
+  platform: string;
 }
 
 export interface Session {
@@ -371,5 +373,74 @@ export interface PlatformSetting {
   description: string | null;
   updatedBy: string | null;
   updatedAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// Platform Team & RBAC
+// ---------------------------------------------------------------------------
+
+export type PlatformRole =
+  | 'PLATFORM_OWNER'
+  | 'SUPER_ADMIN'
+  | 'PLATFORM_OPS'
+  | 'SUPPORT_ADMIN'
+  | 'FINANCE_ADMIN'
+  | 'READ_ONLY';
+
+export interface PlatformTeamUser {
+  id: string;
+  email: string;
+  fullName: string;
+  role: PlatformRole;
+  status: 'ACTIVE' | 'DISABLED' | 'PENDING_ACTIVATION';
+  invitedAt: string | null;
+  activatedAt: string | null;
+  lastLoginAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// Support Tickets
+// ---------------------------------------------------------------------------
+
+export type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
+export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+
+export interface TicketPersonRef {
+  id: string;
+  fullName: string;
+  email?: string;
+}
+
+export interface SupportTicket {
+  id: string;
+  restaurantId: string | null;
+  restaurant: { id: string; name: string } | null;
+  subject: string;
+  description: string;
+  status: TicketStatus;
+  priority: TicketPriority;
+  assignedToId: string | null;
+  assignedTo: TicketPersonRef | null;
+  createdById: string;
+  createdBy: TicketPersonRef;
+  slaDueAt: string;
+  resolvedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TicketComment {
+  id: string;
+  ticketId: string;
+  authorId: string;
+  author: { id: string; fullName: string };
+  body: string;
+  createdAt: string;
+}
+
+export interface SupportTicketDetail extends SupportTicket {
+  comments: TicketComment[];
 }
 

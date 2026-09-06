@@ -167,11 +167,17 @@ export default function AdminApp() {
       return;
     }
 
-    if (
+    const validUsername =
       authUsername.trim().toLowerCase() === 'admin' ||
       authUsername.trim().toLowerCase() === 'kiosk-admin' ||
-      authUsername.trim().toLowerCase() === 'manager'
-    ) {
+      authUsername.trim().toLowerCase() === 'manager';
+    // The password was previously only checked for non-emptiness — any
+    // non-empty string logged in successfully as long as the username
+    // matched, making the field decorative. Require the actual demo
+    // password (same one the "Quick Demo Login" button fills in).
+    const validPassword = ['admin123', 'admin', 'demo'].includes(authPassword);
+
+    if (validUsername && validPassword) {
       setIsKioskAdminLoggedIn(true);
       setAuthError('');
       // Persist session — no passwords stored
@@ -292,11 +298,17 @@ export default function AdminApp() {
   const [newCatName, setNewCatName] = useState('');
   const [newCatIcon, setNewCatIcon] = useState('Utensils');
 
-  // Form states for Combo
+  // Form states for Combo — mainItemIds/etc. used to be hardcoded to
+  // menuItems[0]/menuItems[1] regardless of what the admin actually picked;
+  // these now hold the real selection made in the create-combo form.
   const [comboName, setComboName] = useState('');
   const [comboDesc, setComboDesc] = useState('');
   const [comboPrice, setComboPrice] = useState<number>(449);
   const [comboOriginalPrice, setComboOriginalPrice] = useState<number>(550);
+  const [comboMainItemIds, setComboMainItemIds] = useState<string[]>([]);
+  const [comboSideItemIds, setComboSideItemIds] = useState<string[]>([]);
+  const [comboDrinkItemIds, setComboDrinkItemIds] = useState<string[]>([]);
+  const [comboDessertItemIds, setComboDessertItemIds] = useState<string[]>([]);
 
   // Form states for Coupon
   const [newCouponCode, setNewCouponCode] = useState('');
@@ -496,6 +508,60 @@ export default function AdminApp() {
   const todayOrders = orders.length;
   const todayRevenue = orders.reduce((sum, o) => sum + (o.paymentStatus === 'SUCCESS' ? o.totalAmount : 0), 0);
   const avgOrderValue = todayOrders > 0 ? Math.round(todayRevenue / todayOrders) : 0;
+
+  // Real payment-channel split — this used to be hardcoded 68/22/10% of
+  // todayRevenue regardless of what was actually paid via which method.
+  const paidOrders = orders.filter((o) => o.paymentStatus === 'SUCCESS');
+  const upiRevenue = paidOrders
+    .filter((o) => o.paymentMethod === 'UPI_QR' || o.paymentMethod === 'UPI')
+    .reduce((sum, o) => sum + o.totalAmount, 0);
+  const cardRevenue = paidOrders
+    .filter((o) => o.paymentMethod === 'CARD_TERMINAL' || o.paymentMethod === 'CARD')
+    .reduce((sum, o) => sum + o.totalAmount, 0);
+  const cashRevenue = paidOrders
+    .filter((o) => o.paymentMethod === 'CASH_AT_COUNTER' || o.paymentMethod === 'CASH')
+    .reduce((sum, o) => sum + o.totalAmount, 0);
+  const paymentSplitDenominator = Math.max(1, todayRevenue);
+  const upiPct = Math.round((upiRevenue / paymentSplitDenominator) * 100);
+  const cardPct = Math.round((cardRevenue / paymentSplitDenominator) * 100);
+  const cashPct = Math.round((cashRevenue / paymentSplitDenominator) * 100);
+  // Real hourly breakdown from today's actual orders — this used to be a
+  // hardcoded literal array with no connection to `orders` at all.
+  const HOURLY_SLOTS: Array<{ hour24: number; label: string }> = [
+    { hour24: 9, label: '9 AM' },
+    { hour24: 10, label: '10 AM' },
+    { hour24: 11, label: '11 AM' },
+    { hour24: 12, label: '12 PM' },
+    { hour24: 13, label: '1 PM' },
+    { hour24: 14, label: '2 PM' },
+    { hour24: 15, label: '3 PM' },
+    { hour24: 17, label: '5 PM' },
+    { hour24: 18, label: '6 PM' },
+    { hour24: 19, label: '7 PM' },
+    { hour24: 20, label: '8 PM' },
+    { hour24: 21, label: '9 PM' },
+    { hour24: 22, label: '10 PM' }
+  ];
+  const todaysPaidOrders = orders.filter(
+    (o) => o.paymentStatus === 'SUCCESS' && new Date(o.createdAt).toDateString() === new Date().toDateString()
+  );
+  const hourlyAmounts = HOURLY_SLOTS.map(({ hour24 }) =>
+    todaysPaidOrders
+      .filter((o) => new Date(o.createdAt).getHours() === hour24)
+      .reduce((sum, o) => sum + o.totalAmount, 0)
+  );
+  const maxHourlyAmount = Math.max(1, ...hourlyAmounts);
+  const hourlyBars = HOURLY_SLOTS.map((slot, idx) => {
+    const amount = hourlyAmounts[idx];
+    return {
+      hour: slot.label,
+      amount,
+      pct: Math.round((amount / maxHourlyAmount) * 100),
+      isPeak: amount > 0 && amount >= maxHourlyAmount * 0.65
+    };
+  });
+  const peakHourBar = hourlyBars.reduce((best, b) => (b.amount > best.amount ? b : best), hourlyBars[0]);
+
   const newOrdersCount = orders.filter((o) => o.orderStatus === 'NEW').length;
   const confirmedCount = orders.filter((o) => o.orderStatus === 'CONFIRMED').length;
   const prepCount = orders.filter((o) => o.orderStatus === 'PREPARING').length;
@@ -602,9 +668,19 @@ export default function AdminApp() {
     setNewCatName('');
   };
 
+  const toggleComboItem = (
+    setter: React.Dispatch<React.SetStateAction<string[]>>
+  ) => (id: string) => {
+    setter((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
   const handleCreateCombo = (e: React.FormEvent) => {
     e.preventDefault();
     if (!comboName || !comboPrice) return;
+    if (comboMainItemIds.length === 0) {
+      showToast('Select at least one main dish for this combo');
+      return;
+    }
 
     const created = ComboRepository.createCombo({
       name: comboName,
@@ -612,11 +688,11 @@ export default function AdminApp() {
       basePrice: Number(comboPrice),
       originalPrice: Number(comboOriginalPrice),
       savingsAmount: Math.max(0, Number(comboOriginalPrice) - Number(comboPrice)),
-      mainItemIds: [menuItems[0]?.id || 'item-hbd-chk'],
-      sideItemIds: [menuItems[1]?.id || 'item-mxt-rt'],
-      drinkItemIds: ['item-cc-ice'],
-      dessertItemIds: ['item-gj-2'],
-      imageUrl: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80',
+      mainItemIds: comboMainItemIds,
+      sideItemIds: comboSideItemIds,
+      drinkItemIds: comboDrinkItemIds,
+      dessertItemIds: comboDessertItemIds,
+      imageUrl: menuItems.find((m) => m.id === comboMainItemIds[0])?.imageUrl,
       isAvailable: true,
       featured: true
     });
@@ -632,6 +708,10 @@ export default function AdminApp() {
     setIsAddComboModalOpen(false);
     setComboName('');
     setComboDesc('');
+    setComboMainItemIds([]);
+    setComboSideItemIds([]);
+    setComboDrinkItemIds([]);
+    setComboDessertItemIds([]);
   };
 
   const handleCreateCoupon = (e: React.FormEvent) => {
@@ -1252,28 +1332,14 @@ export default function AdminApp() {
                     </div>
                     <span className="text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      Peak: 8:00 PM (Dinner)
+                      {peakHourBar.amount > 0 ? `Peak: ${peakHourBar.hour}` : 'No sales yet today'}
                     </span>
                   </div>
 
-                  {/* Hourly Bar Graph */}
+                  {/* Hourly Bar Graph — computed from today's real orders */}
                   <div className="pt-4 pb-2">
                     <div className="h-44 flex items-end justify-between gap-1.5 sm:gap-2 px-2 border-b border-[#EBE6DD]">
-                      {[
-                        { hour: '9 AM', amount: 350, pct: 18, isPeak: false },
-                        { hour: '10 AM', amount: 580, pct: 28, isPeak: false },
-                        { hour: '11 AM', amount: 890, pct: 40, isPeak: false },
-                        { hour: '12 PM', amount: 1450, pct: 68, isPeak: true },
-                        { hour: '1 PM', amount: 2180, pct: 95, isPeak: true },
-                        { hour: '2 PM', amount: 1820, pct: 82, isPeak: true },
-                        { hour: '3 PM', amount: 620, pct: 30, isPeak: false },
-                        { hour: '5 PM', amount: 480, pct: 24, isPeak: false },
-                        { hour: '6 PM', amount: 960, pct: 45, isPeak: false },
-                        { hour: '7 PM', amount: 1650, pct: 75, isPeak: true },
-                        { hour: '8 PM', amount: 2350, pct: 100, isPeak: true },
-                        { hour: '9 PM', amount: 1980, pct: 88, isPeak: true },
-                        { hour: '10 PM', amount: 1120, pct: 52, isPeak: false }
-                      ].map((bar, idx) => (
+                      {hourlyBars.map((bar, idx) => (
                         <div key={idx} className="flex-1 flex flex-col items-center gap-1 group relative">
                           {/* Tooltip on hover */}
                           <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-[#0B253A] text-white text-[10px] font-bold px-2 py-0.5 rounded shadow pointer-events-none transition-opacity whitespace-nowrap z-20">
@@ -1331,10 +1397,10 @@ export default function AdminApp() {
                             <QrCode className="w-4 h-4 text-[#16A34A]" />
                             <span>UPI Dynamic QR</span>
                           </div>
-                          <span className="text-emerald-700 font-black">68% ({formatINR(Math.round(todayRevenue * 0.68))})</span>
+                          <span className="text-emerald-700 font-black">{upiPct}% ({formatINR(upiRevenue)})</span>
                         </div>
                         <div className="w-full h-2 rounded-full bg-[#EBE6DD] overflow-hidden">
-                          <div className="h-full bg-emerald-500 rounded-full" style={{ width: '68%' }}></div>
+                          <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${upiPct}%` }}></div>
                         </div>
                       </div>
 
@@ -1345,10 +1411,10 @@ export default function AdminApp() {
                             <CreditCard className="w-4 h-4 text-[#3B82F6]" />
                             <span>Card EDC Terminal</span>
                           </div>
-                          <span className="text-blue-700 font-black">22% ({formatINR(Math.round(todayRevenue * 0.22))})</span>
+                          <span className="text-blue-700 font-black">{cardPct}% ({formatINR(cardRevenue)})</span>
                         </div>
                         <div className="w-full h-2 rounded-full bg-[#EBE6DD] overflow-hidden">
-                          <div className="h-full bg-blue-500 rounded-full" style={{ width: '22%' }}></div>
+                          <div className="h-full bg-blue-500 rounded-full" style={{ width: `${cardPct}%` }}></div>
                         </div>
                       </div>
 
@@ -1359,10 +1425,10 @@ export default function AdminApp() {
                             <Coins className="w-4 h-4 text-[#E66817]" />
                             <span>Cash at Counter</span>
                           </div>
-                          <span className="text-[#E66817] font-black">10% ({formatINR(Math.round(todayRevenue * 0.1))})</span>
+                          <span className="text-[#E66817] font-black">{cashPct}% ({formatINR(cashRevenue)})</span>
                         </div>
                         <div className="w-full h-2 rounded-full bg-[#EBE6DD] overflow-hidden">
-                          <div className="h-full bg-[#E66817] rounded-full" style={{ width: '10%' }}></div>
+                          <div className="h-full bg-[#E66817] rounded-full" style={{ width: `${cashPct}%` }}></div>
                         </div>
                       </div>
                     </div>
@@ -2644,6 +2710,7 @@ export default function AdminApp() {
 
                     <button
                       onClick={() => {
+                        if (!confirm(`Delete coupon ${c.code}? This cannot be undone.`)) return;
                         const cIdx = db.coupons.findIndex((item) => item.id === c.id);
                         if (cIdx !== -1) {
                           db.coupons.splice(cIdx, 1);
@@ -4176,16 +4243,21 @@ export default function AdminApp() {
                 <span className="font-bold text-sm text-[#0B253A]">Network Latency</span>
                 <Wifi className="w-4 h-4 text-[#E66817]" />
               </div>
-              <p className="text-xs text-[#8C9BAE]">Cloud sync round-trip time</p>
+              <p className="text-xs text-[#8C9BAE]">Round-trip time to the local sync server</p>
               <Button
                 variant="secondary"
                 size="sm"
                 className="w-full"
-                onClick={() => {
-                  showToast('Cloud API Latency: 18ms (Optimal)');
+                onClick={async () => {
+                  const result = await db.testSyncServer();
+                  showToast(
+                    result.success
+                      ? `Sync Server Latency: ${result.pingMs}ms (${result.pingMs < 100 ? 'Optimal' : 'Slow'})`
+                      : `Sync Server Unreachable: ${result.error}`
+                  );
                 }}
               >
-                Test Ping (18ms)
+                Test Ping
               </Button>
             </div>
           </div>
@@ -4252,6 +4324,34 @@ export default function AdminApp() {
               className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
             />
           </div>
+
+          {([
+            { label: 'Main Dishes *', ids: comboMainItemIds, setIds: setComboMainItemIds },
+            { label: 'Sides (optional)', ids: comboSideItemIds, setIds: setComboSideItemIds },
+            { label: 'Drinks (optional)', ids: comboDrinkItemIds, setIds: setComboDrinkItemIds },
+            { label: 'Desserts (optional)', ids: comboDessertItemIds, setIds: setComboDessertItemIds }
+          ] as const).map((slot) => (
+            <div key={slot.label}>
+              <label className="block text-xs font-bold text-[#0B253A] mb-1">{slot.label}</label>
+              <div className="max-h-28 overflow-y-auto border border-[#EBE6DD] rounded-xl bg-[#FBF9F5] p-2 space-y-1">
+                {menuItems.length === 0 ? (
+                  <p className="text-xs text-slate-400 px-1 py-1">No dishes yet — add menu items first.</p>
+                ) : (
+                  menuItems.map((item) => (
+                    <label key={item.id} className="flex items-center gap-2 px-1.5 py-1 rounded-lg hover:bg-white cursor-pointer text-xs">
+                      <input
+                        type="checkbox"
+                        checked={slot.ids.includes(item.id)}
+                        onChange={() => toggleComboItem(slot.setIds)(item.id)}
+                      />
+                      <span className="font-semibold text-[#0B253A]">{item.name}</span>
+                      <span className="text-slate-400 font-mono ml-auto">₹{item.price}</span>
+                    </label>
+                  ))
+                )}
+              </div>
+            </div>
+          ))}
 
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="ghost" type="button" onClick={() => setIsAddComboModalOpen(false)}>

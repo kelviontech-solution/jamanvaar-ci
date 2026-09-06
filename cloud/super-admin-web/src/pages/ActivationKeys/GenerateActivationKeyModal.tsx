@@ -20,6 +20,7 @@ export function GenerateActivationKeyModal({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [createdCode, setCreatedCode] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!fixedRestaurantId) {
@@ -63,6 +64,17 @@ export function GenerateActivationKeyModal({
             </p>
             <div className="activation-code-display">{createdCode}</div>
             <div className="modal-actions">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  navigator.clipboard.writeText(createdCode);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 1500);
+                }}
+              >
+                {copied ? 'Copied ✓' : 'Copy Code'}
+              </Button>
               <Button
                 variant="primary"
                 onClick={() => {

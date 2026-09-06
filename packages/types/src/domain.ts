@@ -136,6 +136,65 @@ export interface User {
   updatedAt: string;
 }
 
+/** A planned work shift for one staff member on one date — distinct from ShiftRecord, which is a cashier's cash-drawer/till session, not a work roster entry. */
+export interface StaffShiftSchedule {
+  id: string;
+  userId: string;
+  userName: string;
+  date: string; // YYYY-MM-DD
+  startTime: string; // HH:mm, 24h
+  endTime: string; // HH:mm, 24h
+  roleLabel?: string; // e.g. 'Cashier', 'Waiter', 'Kitchen' — free text, independent of the login roleId
+  notes?: string;
+  createdAt: string;
+}
+
+export type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'LATE' | 'ON_LEAVE';
+
+export interface AttendanceRecord {
+  id: string;
+  userId: string;
+  userName: string;
+  date: string; // YYYY-MM-DD
+  clockInAt?: string; // ISO timestamp
+  clockOutAt?: string; // ISO timestamp
+  status: AttendanceStatus;
+  notes?: string;
+}
+
+/**
+ * A saved audience filter for a marketing campaign — real conditions matched
+ * against actual CustomerAccount data, not a mock segment. All fields are
+ * optional and AND together; leaving a field unset means "don't filter on this".
+ */
+export interface CustomerSegmentFilter {
+  tags?: string[]; // customer must have at least one of these tags
+  minTierId?: string; // customer's computed LoyaltyTier must be at or above this tier's rank
+  minLifetimeSpend?: number;
+  inactiveForDays?: number; // customer's lastVisitAt is at least this many days ago (or never visited)
+  birthdayThisMonth?: boolean;
+}
+
+export type CampaignStatus = 'DRAFT' | 'ACTIVE' | 'COMPLETED';
+
+/**
+ * A WhatsApp outreach campaign. There is no WhatsApp Business API/bulk-send
+ * backend in this system — sending still opens one wa.me deep link per
+ * recipient, the same real constraint the previous single-customer button
+ * had. What this adds is a saved, reusable segment + message template and a
+ * tracked send queue, instead of re-picking one customer and one message
+ * every single time.
+ */
+export interface MarketingCampaign {
+  id: string;
+  name: string;
+  messageTemplate: string; // may include {{name}} merge tag
+  segmentFilter: CustomerSegmentFilter;
+  status: CampaignStatus;
+  sentToPhones: string[]; // recipients already sent to, to avoid re-sending on resume
+  createdAt: string;
+}
+
 export interface Role {
   id: string;
   name: string;
@@ -518,6 +577,26 @@ export interface Order {
   eBillRecipient?: string;
   isSynced: boolean;
   eBillDispatched?: boolean;
+  // Delivery dispatch — previously a DELIVERY order had an orderType and
+  // nothing else: no address, no rider, no way to track it out the door.
+  deliveryAddress?: string;
+  riderId?: string;
+  riderName?: string;
+  deliveryStatus?: DeliveryStatus;
+  dispatchedAt?: string;
+  deliveredAt?: string;
+}
+
+export type DeliveryStatus = 'UNASSIGNED' | 'ASSIGNED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'FAILED';
+
+export interface DeliveryRider {
+  id: string;
+  name: string;
+  phone: string;
+  vehicleType: 'BIKE' | 'SCOOTER' | 'BICYCLE' | 'CAR' | 'ON_FOOT';
+  vehicleNumber?: string;
+  isActive: boolean;
+  createdAt: string;
 }
 
 export interface QrOrderingSettings {
@@ -664,6 +743,30 @@ export interface CustomerAccount {
   totalSpend?: number;
   createdAt?: string;
   lastVisitAt?: string;
+}
+
+/**
+ * A spend-based tier that multiplies how fast a customer earns points —
+ * evolves the previous flat "1 point per ₹10, no tiers" ledger. Tiers are
+ * ordered by `minLifetimeSpend`; a customer's tier is whichever is the
+ * highest one their `CustomerAccount.totalSpend` clears.
+ */
+export interface LoyaltyTier {
+  id: string;
+  name: string;
+  minLifetimeSpend: number;
+  pointsMultiplier: number; // e.g. 1 = base rate, 1.5 = 50% faster earning
+  perks: string[];
+  colorHex: string;
+}
+
+/** A catalog entry a customer can redeem points against, instead of a flat 1pt = ₹1 assumption. */
+export interface LoyaltyReward {
+  id: string;
+  name: string;
+  description: string;
+  pointsCost: number;
+  isActive: boolean;
 }
 
 export type PlanTier = 'CORE' | 'PRO';
@@ -1014,6 +1117,14 @@ export interface InventoryItem {
   updatedAt: string;
 }
 
+export type WastageReasonCode =
+  | 'KITCHEN_PREP_TRIM'
+  | 'DROPPED_SPILLED'
+  | 'EXPIRED_SPOILED'
+  | 'QUALITY_REJECT'
+  | 'CUSTOMER_RETURN'
+  | 'OTHER';
+
 export interface StockMovement {
   id: string;
   itemId: string;
@@ -1024,6 +1135,11 @@ export interface StockMovement {
   costImpact?: number;
   orderId?: string;
   reason: string;
+  // Structured reason taxonomy + optional photo evidence — only ever set for
+  // WASTE/SPOILAGE movements logged through the dedicated wastage workflow,
+  // as opposed to the free-text reason every other movement type still uses.
+  wastageReasonCode?: WastageReasonCode;
+  photoUrl?: string;
   performedBy: string;
   timestamp: string;
 }

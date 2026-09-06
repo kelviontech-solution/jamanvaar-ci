@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Category, MenuItem } from '@jamanvaar/types';
-import { db, MenuRepository } from '@jamanvaar/database';
+import { Category, MenuItem, ComboDeal } from '@jamanvaar/types';
+import { db, MenuRepository, ComboRepository, AuditRepository } from '@jamanvaar/database';
 import {
   Plus,
   Search,
@@ -8,8 +8,11 @@ import {
   Copy,
   Edit2,
   Trash2,
-  Percent
+  Percent,
+  Sparkles,
+  Package
 } from 'lucide-react';
+import { ComboModal } from './ComboModal';
 
 interface MenuCategoriesModuleProps {
   categories: Category[];
@@ -42,6 +45,14 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
   const [menuSearch, setMenuSearch] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('ALL');
   const [dietaryFilter, setDietaryFilter] = useState<string>('ALL');
+
+  // Combos & Meal Deals — the data layer (ComboRepository) already existed
+  // and is consumed by Kiosk, but there was no Restaurant Admin screen to
+  // actually create or edit a combo; re-reads on every db.notify() the same
+  // way menuItems/categories do (App.tsx subscribes and re-renders this tree).
+  const combos = ComboRepository.getAllCombos();
+  const [isComboModalOpen, setIsComboModalOpen] = useState(false);
+  const [comboToEdit, setComboToEdit] = useState<ComboDeal | null>(null);
 
   const filteredMenuItems = useMemo(() => {
     return menuItems.filter((item) => {
@@ -99,6 +110,31 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
         MenuRepository.deleteMenuItem(dish.id);
         showToast(`Deleted dish: ${dish.name}`);
       }
+    }
+  };
+
+  const handleDeleteCombo = (combo: ComboDeal) => {
+    const doDelete = () => {
+      ComboRepository.deleteCombo(combo.id);
+      AuditRepository.log({
+        action: 'COMBO_DELETED',
+        category: 'MENU',
+        details: `Deleted combo "${combo.name}"`,
+        username: 'Manager'
+      });
+      showToast(`Deleted combo: ${combo.name}`);
+    };
+    if (onRequestConfirm) {
+      onRequestConfirm({
+        isOpen: true,
+        title: 'Delete Combo Deal',
+        message: `Are you sure you want to permanently remove "${combo.name}"?`,
+        confirmText: 'Delete Combo',
+        isDanger: true,
+        onConfirm: doDelete
+      });
+    } else if (window.confirm(`Delete combo "${combo.name}"?`)) {
+      doDelete();
     }
   };
 
@@ -352,6 +388,129 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
           ))}
         </div>
       )}
+
+      {/* Combos & Meal Deals */}
+      <div className="pt-2 border-t border-slate-100 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-black text-[#0B253A] tracking-tight">Combos & Meal Deals</h2>
+              <span className="bg-orange-50 text-[#E66817] font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-orange-200/70">
+                {combos.length} ACTIVE
+              </span>
+            </div>
+            <p className="text-xs text-[#4A5568] mt-0.5">Bundle dishes into a fixed-price deal with an automatic savings badge.</p>
+          </div>
+          <button
+            onClick={() => {
+              setComboToEdit(null);
+              setIsComboModalOpen(true);
+            }}
+            className="px-3.5 py-2 rounded-xl bg-[#0B253A] hover:bg-[#1E3A4C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create Combo</span>
+          </button>
+        </div>
+
+        {combos.length === 0 ? (
+          <div className="bg-white rounded-3xl p-10 text-center border border-[#EBE6DD] shadow-2xs space-y-3 max-w-lg mx-auto">
+            <div className="w-12 h-12 bg-orange-50 text-[#E66817] rounded-2xl flex items-center justify-center mx-auto">
+              <Package className="w-6 h-6" />
+            </div>
+            <h3 className="font-black text-sm text-[#0B253A]">No Combos Yet</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              Bundle popular dishes into a discounted combo to increase average order value on Kiosk and QR ordering.
+            </p>
+            <button
+              onClick={() => {
+                setComboToEdit(null);
+                setIsComboModalOpen(true);
+              }}
+              className="px-4 py-2 bg-[#0B253A] text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
+            >
+              + Create First Combo
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {combos.map((combo) => (
+              <div
+                key={combo.id}
+                className="bg-white rounded-2xl border border-[#EBE6DD] p-4 shadow-2xs flex flex-col justify-between space-y-3"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="font-extrabold text-sm text-[#0B253A]">{combo.name}</h4>
+                    {combo.featured && (
+                      <span className="shrink-0 flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
+                        <Sparkles className="w-2.5 h-2.5" /> Featured
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2">{combo.description}</p>
+                  <div className="flex items-baseline gap-2 mt-2">
+                    <span className="font-mono font-black text-lg text-emerald-800">₹{combo.basePrice}</span>
+                    {combo.originalPrice > combo.basePrice && (
+                      <span className="text-xs text-slate-400 line-through">₹{combo.originalPrice}</span>
+                    )}
+                  </div>
+                  <div className="text-[11px] text-slate-500 mt-1">
+                    {combo.mainItemIds.length} main{combo.mainItemIds.length === 1 ? '' : 's'}
+                    {combo.sideItemIds.length > 0 && ` • ${combo.sideItemIds.length} side(s)`}
+                    {combo.drinkItemIds.length > 0 && ` • ${combo.drinkItemIds.length} drink(s)`}
+                    {combo.dessertItemIds.length > 0 && ` • ${combo.dessertItemIds.length} dessert(s)`}
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <button
+                    onClick={() => {
+                      ComboRepository.toggleAvailability(combo.id);
+                      showToast(`${combo.name} is now ${combo.isAvailable ? 'paused' : 'active'}`);
+                    }}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                      combo.isAvailable
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/80 hover:bg-emerald-100'
+                        : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
+                    }`}
+                  >
+                    {combo.isAvailable ? '● Active' : '○ Paused'}
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => {
+                        setComboToEdit(combo);
+                        setIsComboModalOpen(true);
+                      }}
+                      title="Edit Combo"
+                      className="p-1.5 hover:bg-[#FFF4ED] rounded-lg text-slate-400 hover:text-[#E66817] transition-colors cursor-pointer"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCombo(combo)}
+                      title="Delete Combo"
+                      className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <ComboModal
+        isOpen={isComboModalOpen}
+        onClose={() => setIsComboModalOpen(false)}
+        comboToEdit={comboToEdit}
+        menuItems={menuItems}
+        onSaved={() => showToast(comboToEdit ? `Updated combo: ${comboToEdit.name}` : 'Combo created')}
+      />
     </div>
   );
 };

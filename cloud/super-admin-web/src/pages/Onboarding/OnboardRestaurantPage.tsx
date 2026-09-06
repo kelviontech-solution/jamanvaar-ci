@@ -37,6 +37,38 @@ import {
 import '../../components/shared.css';
 import './onboarding.css';
 
+/**
+ * Replaces the old 'Jaman@' + 4-digit-random pattern (36 characters of real
+ * entropy shared by every restaurant, distinguished only by a guessable
+ * 4-digit suffix) with a genuinely random password drawn from the Web Crypto
+ * API — still readable/typeable for an operator relaying it by phone.
+ */
+function generateSecurePassword(): string {
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // no I/O — avoid confusion with 1/0
+  const lower = 'abcdefghijkmnopqrstuvwxyz'; // no l
+  const digits = '23456789'; // no 0/1
+  const symbols = '!@#$%';
+  const all = upper + lower + digits + symbols;
+
+  const randomFrom = (charset: string) => {
+    const bytes = new Uint32Array(1);
+    crypto.getRandomValues(bytes);
+    return charset[bytes[0] % charset.length];
+  };
+
+  // Guarantee at least one of each class, then fill the rest randomly.
+  const required = [randomFrom(upper), randomFrom(lower), randomFrom(digits), randomFrom(symbols)];
+  const rest = Array.from({ length: 8 }, () => randomFrom(all));
+  const chars = [...required, ...rest];
+
+  // Fisher-Yates shuffle so the required chars aren't always in the same 4 positions.
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = Math.floor((crypto.getRandomValues(new Uint32Array(1))[0] / (0xffffffff + 1)) * (i + 1));
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  return chars.join('');
+}
+
 type Step = 'details' | 'owner' | 'plan' | 'modules' | 'activation' | 'review' | 'done';
 
 const STEPS: Array<{ key: Step; label: string }> = [
@@ -112,7 +144,7 @@ const EMPTY_OWNER: OwnerForm = {
   ownerEmail: '',
   ownerPhone: '',
   passwordMode: 'set_now',
-  initialPassword: 'Jaman@' + Math.floor(1000 + Math.random() * 9000)
+  initialPassword: generateSecurePassword()
 };
 
 const EMPTY_PLAN: PlanForm = {
@@ -146,10 +178,12 @@ export function OnboardRestaurantPage() {
 
   // Execution state & outputs
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
-  // Real credential, not "check your email" — no email-sending system exists
-  // anywhere in cloud/api, so that claim was never true. This is the only way
-  // the owner can actually self-activate via pos-admin's invitation-token flow.
+  // Shown to the operator regardless of email outcome — this is the only way
+  // the owner can self-activate via pos-admin's invitation-token flow, and
+  // when passwordMode is 'invite' it's also what gets emailed to them
+  // (inviteEmailSent says whether that actually went out).
   const [ownerActivationToken, setOwnerActivationToken] = useState<string | null>(null);
+  const [inviteEmailSent, setInviteEmailSent] = useState(false);
   const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
   const [provisionedKeys, setProvisionedKeys] = useState<ProvisionedKey[]>([]);
   const [copyToast, setCopyToast] = useState<string | null>(null);
@@ -207,7 +241,7 @@ export function OnboardRestaurantPage() {
   function handleRegeneratePassword() {
     setOwner((prev) => ({
       ...prev,
-      initialPassword: 'Jaman@' + Math.floor(1000 + Math.random() * 9000)
+      initialPassword: generateSecurePassword()
     }));
   }
 
@@ -238,6 +272,7 @@ export function OnboardRestaurantPage() {
           restaurant: { id: string };
           owner: { id: string; email: string };
           activationToken: string;
+          emailSent: boolean;
         }>(
           '/api/v1/restaurants',
           {
@@ -251,12 +286,17 @@ export function OnboardRestaurantPage() {
             country: details.country,
             ownerName: owner.ownerName,
             ownerEmail: owner.ownerEmail,
-            ownerPhone: owner.ownerPhone || undefined
+            ownerPhone: owner.ownerPhone || undefined,
+            // "set now" mode consumes this exact token in the very next call
+            // below — an invite email built around it would already be dead
+            // by the time the owner read it, so don't send one in that case.
+            skipInviteEmail: owner.passwordMode === 'set_now'
           }
         );
         rId = res.restaurant.id;
         setRestaurantId(rId);
         setOwnerActivationToken(res.activationToken);
+        setInviteEmailSent(res.emailSent);
 
         // If Super Admin provided an initial password, set it now to activate the owner account!
         if (owner.passwordMode === 'set_now' && owner.initialPassword.trim()) {
@@ -1215,7 +1255,10 @@ export function OnboardRestaurantPage() {
                 {owner.passwordMode === 'invite' && (
                   <div className="credential-item" style={{ gridColumn: '1 / -1' }}>
                     <span className="credential-label">
-                      Invitation Token — send this to the owner yourself; there is no automatic email
+                      Invitation Token —{' '}
+                      {inviteEmailSent
+                        ? `emailed to ${owner.ownerEmail} — also shown here as a backup`
+                        : 'could not be emailed (SMTP not configured or delivery failed) — relay it to the owner yourself'}
                     </span>
                     <div className="credential-value" style={{ color: '#e66817', fontFamily: 'monospace', fontSize: 11, wordBreak: 'break-all' }}>
                       <span>{ownerActivationToken ?? 'Unavailable — password activation step failed, see warning above'}</span>

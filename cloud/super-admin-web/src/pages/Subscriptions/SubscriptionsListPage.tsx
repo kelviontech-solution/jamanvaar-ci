@@ -4,6 +4,7 @@ import { api, ApiError } from '../../api/client';
 import type { SubscriptionListItem } from '../../api/types';
 import {
   Badge,
+  BulkActionsBar,
   Button,
   Card,
   ConfirmModal,
@@ -39,10 +40,14 @@ export function SubscriptionsListPage() {
   } | null>(null);
   const [actionPending, setActionPending] = useState(false);
 
+  // Bulk selection
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkPending, setBulkPending] = useState(false);
+
   // Search & Filters
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<SubStatusFilter>('ALL');
-  const [tierFilter, setTierFilter] = useState<'ALL' | 'CORE' | 'PRO'>('ALL');
+  const [tierFilter, setTierFilter] = useState<'ALL' | 'CORE' | 'PRO' | 'ENTERPRISE'>('ALL');
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -85,6 +90,41 @@ export function SubscriptionsListPage() {
       return true;
     });
   }, [subs, statusFilter, tierFilter, search]);
+
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelectedIds((prev) =>
+      prev.size === filteredSubs.length ? new Set() : new Set(filteredSubs.map((s) => s.id))
+    );
+  }
+
+  async function handleBulkAction(actionPath: 'suspend' | 'reactivate') {
+    const ids = Array.from(selectedIds);
+    setBulkPending(true);
+    try {
+      const results = await Promise.allSettled(
+        ids.map((id) => api.patch(`/api/v1/subscriptions/${id}/${actionPath}`))
+      );
+      const failed = results.filter((r) => r.status === 'rejected').length;
+      showToast(
+        failed === 0
+          ? `${ids.length} subscription(s) ${actionPath === 'reactivate' ? 'reactivated' : 'suspended'}`
+          : `${ids.length - failed} of ${ids.length} succeeded — ${failed} failed`
+      );
+      setSelectedIds(new Set());
+      load();
+    } finally {
+      setBulkPending(false);
+    }
+  }
 
   async function handleExecuteConfirm() {
     if (!confirmTarget) return;
@@ -155,12 +195,13 @@ export function SubscriptionsListPage() {
 
         <select
           value={tierFilter}
-          onChange={(e) => setTierFilter(e.target.value as 'ALL' | 'CORE' | 'PRO')}
+          onChange={(e) => setTierFilter(e.target.value as 'ALL' | 'CORE' | 'PRO' | 'ENTERPRISE')}
           style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: '#fff' }}
         >
           <option value="ALL">All Tiers</option>
           <option value="CORE">CORE (₹5,000)</option>
           <option value="PRO">PRO (₹7,000)</option>
+          <option value="ENTERPRISE">ENTERPRISE</option>
         </select>
 
         {(search || statusFilter !== 'ALL' || tierFilter !== 'ALL') && (
@@ -184,6 +225,15 @@ export function SubscriptionsListPage() {
       </div>
 
       {loading && !subs && <SkeletonTable rows={6} cols={6} />}
+
+      <BulkActionsBar selectedCount={selectedIds.size} onClear={() => setSelectedIds(new Set())}>
+        <Button size="sm" variant="danger" disabled={bulkPending} onClick={() => handleBulkAction('suspend')}>
+          Suspend Selected
+        </Button>
+        <Button size="sm" variant="primary" disabled={bulkPending} onClick={() => handleBulkAction('reactivate')}>
+          Reactivate Selected
+        </Button>
+      </BulkActionsBar>
 
       {subs && (
         <Card>
@@ -213,6 +263,13 @@ export function SubscriptionsListPage() {
               <table className="data-table">
                 <thead>
                   <tr>
+                    <th style={{ width: 32 }}>
+                      <input
+                        type="checkbox"
+                        checked={filteredSubs.length > 0 && selectedIds.size === filteredSubs.length}
+                        onChange={toggleSelectAll}
+                      />
+                    </th>
                     <th>Restaurant</th>
                     <th>Plan &amp; Tier</th>
                     <th>Fee (₹)</th>
@@ -224,10 +281,13 @@ export function SubscriptionsListPage() {
                 </thead>
                 <tbody>
                   {filteredSubs.map((s) => {
-                    const isPro = s.plan.tier === 'PRO';
+                    const isPremiumTier = s.plan.tier === 'PRO' || s.plan.tier === 'ENTERPRISE';
                     const isExpired = new Date(s.expiresAt).getTime() < Date.now();
                     return (
                       <tr key={s.id}>
+                        <td>
+                          <input type="checkbox" checked={selectedIds.has(s.id)} onChange={() => toggleSelected(s.id)} />
+                        </td>
                         <td>
                           <Link to={`/restaurants/${s.restaurant.id}`} className="table-link" style={{ fontWeight: 700 }}>
                             {s.restaurant.name}
@@ -236,7 +296,7 @@ export function SubscriptionsListPage() {
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <span style={{ fontWeight: 600 }}>{s.plan.name}</span>
-                            <Badge tone={isPro ? 'gold' : 'neutral'}>{s.plan.tier}</Badge>
+                            <Badge tone={isPremiumTier ? 'gold' : 'neutral'}>{s.plan.tier}</Badge>
                           </div>
                         </td>
                         <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>

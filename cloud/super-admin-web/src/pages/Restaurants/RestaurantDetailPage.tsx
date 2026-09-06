@@ -437,11 +437,16 @@ export function RestaurantDetailPage() {
                         variant="ghost"
                         onClick={async () => {
                           try {
-                            await api.post('/api/v1/support/resend-invite', {
-                              userId: u.id,
-                              reason: 'Super Admin manual invitation dispatch'
-                            });
-                            showToast(`Invitation resent to ${u.email}!`);
+                            const res = await api.post<{ emailSent: boolean; activationToken: string }>(
+                              '/api/v1/support/resend-invite',
+                              { userId: u.id, reason: 'Super Admin manual invitation dispatch' }
+                            );
+                            if (res.emailSent) {
+                              showToast(`New invitation emailed to ${u.email}`);
+                            } else {
+                              navigator.clipboard?.writeText(res.activationToken).catch(() => {});
+                              showToast(`Email could not be sent — new token copied to clipboard, relay it to ${u.email} manually`);
+                            }
                           } catch (err) {
                             showToast(err instanceof ApiError ? err.message : 'Failed to resend invite');
                           }

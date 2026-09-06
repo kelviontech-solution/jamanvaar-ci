@@ -17,6 +17,12 @@ import {
   KioskDevice,
   KOTRecord,
   LicenseInfo,
+  LoyaltyTier,
+  LoyaltyReward,
+  StaffShiftSchedule,
+  AttendanceRecord,
+  MarketingCampaign,
+  DeliveryRider,
   ManagerOverrideRequest,
   MenuItem,
   ModifierGroup,
@@ -602,6 +608,37 @@ export class JamanvaarDatabase {
     }
   ];
 
+  // Loyalty program — previously a single flat loyaltyPoints number on
+  // CustomerAccount with no tiers, no automated earn rate, and no way to
+  // spend points on anything specific.
+  public loyaltyTiers: LoyaltyTier[] = [
+    { id: 'tier-bronze', name: 'Bronze', minLifetimeSpend: 0, pointsMultiplier: 1, perks: ['Earn 1 point per ₹10 spent'], colorHex: '#B08D57' },
+    { id: 'tier-silver', name: 'Silver', minLifetimeSpend: 5000, pointsMultiplier: 1.25, perks: ['25% faster points', 'Birthday month bonus'], colorHex: '#94A3B8' },
+    { id: 'tier-gold', name: 'Gold', minLifetimeSpend: 15000, pointsMultiplier: 1.5, perks: ['50% faster points', 'Priority table booking'], colorHex: '#D4A017' },
+    { id: 'tier-platinum', name: 'Platinum', minLifetimeSpend: 40000, pointsMultiplier: 2, perks: ['2x points', 'Complimentary dessert every visit'], colorHex: '#7C3AED' }
+  ];
+
+  public loyaltyRewards: LoyaltyReward[] = [
+    { id: 'reward-dessert', name: 'Free Dessert', description: 'Any dessert on the menu, on the house', pointsCost: 100, isActive: true },
+    { id: 'reward-100off', name: '₹100 Off Bill', description: 'Flat ₹100 off the total bill', pointsCost: 150, isActive: true },
+    { id: 'reward-starter', name: 'Free Starter', description: 'Any starter under ₹250', pointsCost: 200, isActive: true },
+    { id: 'reward-meal', name: 'Free Meal for Two', description: 'A full meal for two guests', pointsCost: 800, isActive: true }
+  ];
+
+  // Staff scheduling & attendance — previously nonexistent; StaffRepository
+  // only ever managed login accounts, not who's rostered to work when or
+  // whether they actually showed up.
+  public staffSchedules: StaffShiftSchedule[] = [];
+  public attendanceRecords: AttendanceRecord[] = [];
+
+  // Marketing campaigns — previously only a per-customer, one-at-a-time
+  // WhatsApp deep-link button with no saved segment or reusable message.
+  public marketingCampaigns: MarketingCampaign[] = [];
+
+  // Delivery riders — a DELIVERY order previously had an orderType and
+  // nothing else: no roster, no assignment, no dispatch tracking.
+  public deliveryRiders: DeliveryRider[] = [];
+
   public inventoryItems: InventoryItem[] = [
     {
       id: 'inv-paneer',
@@ -1033,6 +1070,12 @@ export class JamanvaarDatabase {
           menuItems: this.menuItems,
           modifierGroups: this.modifierGroups,
           combos: this.combos,
+          loyaltyTiers: this.loyaltyTiers,
+          loyaltyRewards: this.loyaltyRewards,
+          staffSchedules: this.staffSchedules,
+          attendanceRecords: this.attendanceRecords,
+          marketingCampaigns: this.marketingCampaigns,
+          deliveryRiders: this.deliveryRiders,
           receiptConfig: this.receiptConfig,
           receiptRecords: this.receiptRecords,
           printJobs: this.printJobs,
@@ -1263,6 +1306,12 @@ export class JamanvaarDatabase {
       localStorage.setItem(`${p}categories`, JSON.stringify(this.categories));
       localStorage.setItem(`${p}modifier_groups`, JSON.stringify(this.modifierGroups));
       localStorage.setItem(`${p}combos`, JSON.stringify(this.combos));
+      localStorage.setItem(`${p}loyalty_tiers`, JSON.stringify(this.loyaltyTiers));
+      localStorage.setItem(`${p}loyalty_rewards`, JSON.stringify(this.loyaltyRewards));
+      localStorage.setItem(`${p}staff_schedules`, JSON.stringify(this.staffSchedules));
+      localStorage.setItem(`${p}attendance_records`, JSON.stringify(this.attendanceRecords));
+      localStorage.setItem(`${p}marketing_campaigns`, JSON.stringify(this.marketingCampaigns));
+      localStorage.setItem(`${p}delivery_riders`, JSON.stringify(this.deliveryRiders));
       localStorage.setItem(`${p}receipt_config`, JSON.stringify(this.receiptConfig));
       localStorage.setItem(`${p}receipt_records`, JSON.stringify(this.receiptRecords));
       localStorage.setItem(`${p}print_jobs`, JSON.stringify(this.printJobs));
@@ -1368,6 +1417,24 @@ export class JamanvaarDatabase {
 
       const storedCombos = localStorage.getItem(`${p}combos`);
       if (storedCombos) this.combos = JSON.parse(storedCombos);
+
+      const storedLoyaltyTiers = localStorage.getItem(`${p}loyalty_tiers`);
+      if (storedLoyaltyTiers) this.loyaltyTiers = JSON.parse(storedLoyaltyTiers);
+
+      const storedLoyaltyRewards = localStorage.getItem(`${p}loyalty_rewards`);
+      if (storedLoyaltyRewards) this.loyaltyRewards = JSON.parse(storedLoyaltyRewards);
+
+      const storedStaffSchedules = localStorage.getItem(`${p}staff_schedules`);
+      if (storedStaffSchedules) this.staffSchedules = JSON.parse(storedStaffSchedules);
+
+      const storedAttendanceRecords = localStorage.getItem(`${p}attendance_records`);
+      if (storedAttendanceRecords) this.attendanceRecords = JSON.parse(storedAttendanceRecords);
+
+      const storedMarketingCampaigns = localStorage.getItem(`${p}marketing_campaigns`);
+      if (storedMarketingCampaigns) this.marketingCampaigns = JSON.parse(storedMarketingCampaigns);
+
+      const storedDeliveryRiders = localStorage.getItem(`${p}delivery_riders`);
+      if (storedDeliveryRiders) this.deliveryRiders = JSON.parse(storedDeliveryRiders);
 
       const storedReceiptConfig = localStorage.getItem(`${p}receipt_config`);
       if (storedReceiptConfig) this.receiptConfig = JSON.parse(storedReceiptConfig);

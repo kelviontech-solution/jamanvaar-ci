@@ -25,6 +25,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
   const [reorderLevel, setReorderLevel] = useState('5');
   const [costPerUnit, setCostPerUnit] = useState('100');
   const [supplierName, setSupplierName] = useState('');
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     if (itemToEdit) {
@@ -52,7 +53,11 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !costPerUnit) return;
+    setFormError('');
+    if (!name || !costPerUnit) {
+      setFormError('Item name and cost per unit are required.');
+      return;
+    }
 
     if (itemToEdit) {
       InventoryRepository.updateItem(itemToEdit.id, {
@@ -195,6 +200,12 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
             className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
           />
         </div>
+
+        {formError && (
+          <p className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+            {formError}
+          </p>
+        )}
 
         <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
           <Button variant="outline" size="sm" type="button" onClick={onClose}>

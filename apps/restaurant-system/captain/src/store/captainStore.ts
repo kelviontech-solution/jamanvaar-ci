@@ -298,12 +298,14 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     }
   ],
 
+  // A fresh shift starts at zero — these used to seed non-zero demo values
+  // that made a brand-new shift look like it already had activity.
   shiftStats: {
-    tablesServed: 8,
-    ordersTaken: 12,
-    kotsSent: 15,
-    foodServed: 24,
-    billsRequested: 6
+    tablesServed: 0,
+    ordersTaken: 0,
+    kotsSent: 0,
+    foodServed: 0,
+    billsRequested: 0
   },
 
   categories: captainDb.categories,

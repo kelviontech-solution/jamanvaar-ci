@@ -4,6 +4,7 @@ import { api, ApiError } from '../../api/client';
 import type { ActivationKey } from '../../api/types';
 import {
   Badge,
+  BulkActionsBar,
   Button,
   Card,
   ConfirmModal,
@@ -13,7 +14,8 @@ import {
   SkeletonTable,
   statusTone
 } from '../../components/ui';
-import { KeyRound, Plus } from 'lucide-react';
+import { KeyRound, Plus, Copy, Download } from 'lucide-react';
+import { exportRowsToCsv } from '../../lib/csvExport';
 import '../../components/shared.css';
 import { GenerateActivationKeyModal } from './GenerateActivationKeyModal';
 
@@ -34,6 +36,10 @@ export function ActivationKeysListPage() {
   // Confirm Modal state
   const [confirmTarget, setConfirmTarget] = useState<ActivationKey | null>(null);
   const [actionPending, setActionPending] = useState(false);
+
+  // Bulk selection
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkPending, setBulkPending] = useState(false);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -99,6 +105,59 @@ export function ActivationKeysListPage() {
 
   const revokedCount = useMemo(() => keys?.filter((k) => k.status === 'REVOKED').length || 0, [keys]);
 
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelectedIds((prev) =>
+      prev.size === filteredKeys.length ? new Set() : new Set(filteredKeys.map((k) => k.id))
+    );
+  }
+
+  async function handleBulkRevoke() {
+    // Only currently-active, non-expired keys can actually be revoked —
+    // silently skip the rest rather than erroring on them.
+    const ids = Array.from(selectedIds).filter((id) => {
+      const k = keys?.find((key) => key.id === id);
+      return k && k.status === 'ACTIVE' && new Date(k.expiresAt).getTime() > Date.now();
+    });
+    if (ids.length === 0) {
+      showToast('None of the selected keys are revocable (already revoked or expired)');
+      return;
+    }
+    if (!window.confirm(`Revoke ${ids.length} activation key(s)? This permanently invalidates them.`)) return;
+    setBulkPending(true);
+    try {
+      const results = await Promise.allSettled(ids.map((id) => api.patch(`/api/v1/activation-keys/${id}/revoke`)));
+      const failed = results.filter((r) => r.status === 'rejected').length;
+      showToast(
+        failed === 0
+          ? `${ids.length} activation key(s) revoked`
+          : `${ids.length - failed} of ${ids.length} succeeded — ${failed} failed`
+      );
+      setSelectedIds(new Set());
+      load();
+    } finally {
+      setBulkPending(false);
+    }
+  }
+
+  function handleExportCsv() {
+    exportRowsToCsv(`jamanvaar_activation_keys_${new Date().toISOString().slice(0, 10)}.csv`, filteredKeys, [
+      { header: 'Code', value: (k) => k.code },
+      { header: 'Restaurant', value: (k) => k.restaurant?.name || '' },
+      { header: 'Allowed Device Type', value: (k) => k.allowedDeviceType },
+      { header: 'Status', value: (k) => k.status },
+      { header: 'Expires', value: (k) => new Date(k.expiresAt).toISOString().slice(0, 10) }
+    ]);
+  }
+
   return (
     <div>
       <div className="page-header">
@@ -108,10 +167,16 @@ export function ActivationKeysListPage() {
             One-time hardware provisioning tokens for POS, Captain, KDS, and Kiosk terminal authentication.
           </p>
         </div>
-        <Button variant="accent" onClick={() => setShowGenerate(true)}>
-          <Plus className="w-4 h-4" />
-          <span>Generate Key</span>
-        </Button>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <Button variant="ghost" onClick={handleExportCsv} disabled={!keys || keys.length === 0}>
+            <Download className="w-4 h-4" />
+            <span>Export CSV</span>
+          </Button>
+          <Button variant="accent" onClick={() => setShowGenerate(true)}>
+            <Plus className="w-4 h-4" />
+            <span>Generate Key</span>
+          </Button>
+        </div>
       </div>
 
       {error && (
@@ -180,6 +245,12 @@ export function ActivationKeysListPage() {
 
       {loading && !keys && <SkeletonTable rows={5} cols={6} />}
 
+      <BulkActionsBar selectedCount={selectedIds.size} onClear={() => setSelectedIds(new Set())}>
+        <Button size="sm" variant="danger" disabled={bulkPending} onClick={handleBulkRevoke}>
+          Revoke Selected
+        </Button>
+      </BulkActionsBar>
+
       {keys && (
         <Card>
           {filteredKeys.length === 0 ? (
@@ -208,6 +279,13 @@ export function ActivationKeysListPage() {
               <table className="data-table">
                 <thead>
                   <tr>
+                    <th style={{ width: 32 }}>
+                      <input
+                        type="checkbox"
+                        checked={filteredKeys.length > 0 && selectedIds.size === filteredKeys.length}
+                        onChange={toggleSelectAll}
+                      />
+                    </th>
                     <th>Activation Code</th>
                     <th>Restaurant</th>
                     <th>Allowed Terminal</th>
@@ -222,6 +300,9 @@ export function ActivationKeysListPage() {
                     const isRevoked = k.status === 'REVOKED';
                     return (
                       <tr key={k.id}>
+                        <td>
+                          <input type="checkbox" checked={selectedIds.has(k.id)} onChange={() => toggleSelected(k.id)} />
+                        </td>
                         <td>
                           <span className="mono" style={{ fontWeight: 800, color: '#0B253A', fontSize: 14, letterSpacing: '0.02em' }}>
                             {k.code}
@@ -249,11 +330,25 @@ export function ActivationKeysListPage() {
                         </td>
                         <td>{new Date(k.expiresAt).toLocaleDateString('en-IN')}</td>
                         <td>
-                          {k.status === 'ACTIVE' && !isExpired && (
-                            <Button size="sm" variant="danger" onClick={() => setConfirmTarget(k)}>
-                              Revoke
+                          <div style={{ display: 'flex', gap: 6 }}>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              icon={<Copy className="w-3.5 h-3.5" />}
+                              onClick={() => {
+                                navigator.clipboard.writeText(k.code);
+                                showToast(`Copied code "${k.code}" to clipboard`);
+                              }}
+                              title="Copy code"
+                            >
+                              Copy
                             </Button>
-                          )}
+                            {k.status === 'ACTIVE' && !isExpired && (
+                              <Button size="sm" variant="danger" onClick={() => setConfirmTarget(k)}>
+                                Revoke
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );

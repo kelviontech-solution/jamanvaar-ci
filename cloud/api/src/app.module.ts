@@ -15,6 +15,8 @@ import { ActivationKeysModule } from './modules/activation-keys/activation-keys.
 import { DevicesModule } from './modules/devices/devices.module';
 import { BranchesModule } from './modules/branches/branches.module';
 import { OwnersModule } from './modules/owners/owners.module';
+import { PlatformUsersModule } from './modules/platform-users/platform-users.module';
+import { SupportTicketsModule } from './modules/support-tickets/support-tickets.module';
 import { SystemHealthModule } from './modules/system-health/system-health.module';
 import { SessionsModule } from './modules/sessions/sessions.module';
 import { BillingModule } from './modules/billing/billing.module';
@@ -24,6 +26,7 @@ import { PlatformSettingsModule } from './modules/platform-settings/platform-set
 import { LicensingModule } from './modules/licensing/licensing.module';
 import { BackupsModule } from './modules/backups/backups.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { validateEnv } from './config/env.validation';
 
 @Module({
@@ -36,6 +39,7 @@ import { validateEnv } from './config/env.validation';
       }
     ]),
     PrismaModule,
+    NotificationsModule,
     AuditModule,
     AuditQueryModule,
     PlatformAuthModule,
@@ -48,6 +52,8 @@ import { validateEnv } from './config/env.validation';
     DevicesModule,
     BranchesModule,
     OwnersModule,
+    PlatformUsersModule,
+    SupportTicketsModule,
     SystemHealthModule,
     SessionsModule,
     BillingModule,

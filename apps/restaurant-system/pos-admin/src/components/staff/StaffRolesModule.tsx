@@ -1,6 +1,6 @@
-import React from 'react';
-import { User } from '@jamanvaar/types';
-import { StaffRepository } from '@jamanvaar/database';
+import React, { useState } from 'react';
+import { User, StaffShiftSchedule, AttendanceStatus, DeliveryRider } from '@jamanvaar/types';
+import { StaffRepository, StaffScheduleRepository, RiderRepository } from '@jamanvaar/database';
 import {
   Plus,
   Shield,
@@ -9,8 +9,15 @@ import {
   UserCheck,
   Phone,
   Mail,
-  Key
+  Key,
+  Calendar,
+  Clock,
+  LogIn,
+  LogOut,
+  Bike
 } from 'lucide-react';
+import { ScheduleShiftModal } from './ScheduleShiftModal';
+import { RiderModal } from './RiderModal';
 
 interface StaffRolesModuleProps {
   users: User[];
@@ -32,6 +39,61 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
   showToast,
   onRequestConfirm
 }) => {
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const [selectedDate, setSelectedDate] = useState(todayKey);
+  const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
+  const [shiftToEdit, setShiftToEdit] = useState<StaffShiftSchedule | null>(null);
+  const [isRiderModalOpen, setIsRiderModalOpen] = useState(false);
+  const [riderToEdit, setRiderToEdit] = useState<DeliveryRider | null>(null);
+  const [, setTick] = useState(0);
+  const refresh = () => setTick((t) => t + 1);
+
+  const schedulesForDay = StaffScheduleRepository.getSchedules().filter((s) => s.date === selectedDate);
+  const attendanceForDay = StaffScheduleRepository.getAttendanceForDate(selectedDate);
+  const riders = RiderRepository.getAllRiders();
+
+  const handleDeleteRider = (rider: DeliveryRider) => {
+    if (!window.confirm(`Remove rider "${rider.name}" from the roster?`)) return;
+    RiderRepository.deleteRider(rider.id);
+    refresh();
+    showToast(`Removed rider: ${rider.name}`);
+  };
+
+  const toggleRiderActive = (rider: DeliveryRider) => {
+    RiderRepository.updateRider(rider.id, { isActive: !rider.isActive });
+    refresh();
+  };
+
+  const attendanceStatusFor = (userId: string): AttendanceStatus | null => {
+    const rec = attendanceForDay.find((a) => a.userId === userId);
+    return rec?.status || null;
+  };
+
+  const handleDeleteShift = (shift: StaffShiftSchedule) => {
+    if (!window.confirm(`Remove ${shift.userName}'s shift on ${shift.date}?`)) return;
+    StaffScheduleRepository.deleteSchedule(shift.id);
+    refresh();
+    showToast('Shift removed');
+  };
+
+  const handleClockIn = (usr: User) => {
+    StaffScheduleRepository.clockIn(usr.id, usr.fullName);
+    refresh();
+    showToast(`${usr.fullName} clocked in`);
+  };
+
+  const handleClockOut = (usr: User) => {
+    StaffScheduleRepository.clockOut(usr.id, usr.fullName);
+    refresh();
+    showToast(`${usr.fullName} clocked out`);
+  };
+
+  const handleMarkAttendance = (usr: User, status: AttendanceStatus) => {
+    StaffScheduleRepository.markAttendance(usr.id, usr.fullName, selectedDate, status);
+    refresh();
+    showToast(`${usr.fullName} marked ${status.replace('_', ' ').toLowerCase()}`);
+  };
+
   const handleDeleteStaff = (usr: User) => {
     if (onRequestConfirm) {
       onRequestConfirm({
@@ -156,6 +218,195 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
           </div>
         ))}
       </div>
+
+      {/* Schedule & Attendance — previously nonexistent: StaffRepository only
+          managed login accounts, with no concept of a work roster or whether
+          someone actually showed up. */}
+      <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-2xs">
+        <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-[#E66817]" />
+            <span className="font-extrabold text-sm text-[#0B253A]">Schedule & Attendance</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+            />
+            <button
+              onClick={() => { setShiftToEdit(null); setIsShiftModalOpen(true); }}
+              className="px-3 py-1.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Schedule Shift</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="p-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Shifts scheduled for the selected day */}
+          <div className="space-y-2">
+            <h4 className="text-[11px] font-black uppercase text-slate-400 tracking-wider">
+              Shifts on {new Date(selectedDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
+            </h4>
+            {schedulesForDay.length === 0 ? (
+              <div className="p-4 bg-[#FAF7F2] rounded-xl text-center text-xs text-slate-400">
+                No shifts scheduled for this day.
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                {schedulesForDay.map((shift) => (
+                  <div key={shift.id} className="p-2.5 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Clock className="w-3.5 h-3.5 text-[#E66817] shrink-0" />
+                      <div className="min-w-0">
+                        <div className="font-bold text-xs text-[#0B253A] truncate">{shift.userName}</div>
+                        <div className="text-[10px] text-slate-500 font-mono">
+                          {shift.startTime}–{shift.endTime}{shift.roleLabel ? ` · ${shift.roleLabel}` : ''}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => { setShiftToEdit(shift); setIsShiftModalOpen(true); }}
+                        className="p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-[#E66817] cursor-pointer"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteShift(shift)}
+                        className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-600 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Attendance for the selected day */}
+          <div className="space-y-2">
+            <h4 className="text-[11px] font-black uppercase text-slate-400 tracking-wider">Attendance</h4>
+            <div className="space-y-1.5">
+              {users.map((usr) => {
+                const status = attendanceStatusFor(usr.id);
+                const attRecord = attendanceForDay.find((a) => a.userId === usr.id);
+                return (
+                  <div key={usr.id} className="p-2.5 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="font-bold text-xs text-[#0B253A] truncate">{usr.fullName}</div>
+                      <div className="text-[10px] text-slate-500">
+                        {attRecord?.clockInAt
+                          ? `In ${new Date(attRecord.clockInAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}${attRecord.clockOutAt ? ` · Out ${new Date(attRecord.clockOutAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` : ''}`
+                          : 'Not clocked in'}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {selectedDate === todayKey && (
+                        <>
+                          <button
+                            onClick={() => handleClockIn(usr)}
+                            title="Clock In"
+                            className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 cursor-pointer"
+                          >
+                            <LogIn className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleClockOut(usr)}
+                            title="Clock Out"
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 cursor-pointer"
+                          >
+                            <LogOut className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      )}
+                      <select
+                        value={status || ''}
+                        onChange={(e) => handleMarkAttendance(usr, e.target.value as AttendanceStatus)}
+                        className="bg-white border border-[#EBE6DD] rounded-lg px-1.5 py-1 text-[10px] font-bold cursor-pointer"
+                      >
+                        <option value="" disabled>Mark…</option>
+                        <option value="PRESENT">Present</option>
+                        <option value="LATE">Late</option>
+                        <option value="ABSENT">Absent</option>
+                        <option value="ON_LEAVE">On Leave</option>
+                      </select>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Delivery Riders — previously a DELIVERY order had an orderType and
+          nothing else: no roster, no assignment, no dispatch tracking. */}
+      <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-2xs">
+        <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Bike className="w-4 h-4 text-[#E66817]" />
+            <span className="font-extrabold text-sm text-[#0B253A]">Delivery Riders ({riders.length})</span>
+          </div>
+          <button
+            onClick={() => { setRiderToEdit(null); setIsRiderModalOpen(true); }}
+            className="px-3 py-1.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Rider</span>
+          </button>
+        </div>
+        {riders.length === 0 ? (
+          <div className="py-10 text-center px-4">
+            <p className="text-xs text-slate-400">No riders on the roster yet. Add one to assign deliveries to a real person instead of leaving delivery orders untracked.</p>
+          </div>
+        ) : (
+          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {riders.map((rider) => (
+              <div key={rider.id} className="p-3 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="font-bold text-xs text-[#0B253A] truncate">{rider.name}</div>
+                  <div className="text-[10px] text-slate-500">{rider.phone} · {rider.vehicleType.replace('_', ' ')}{rider.vehicleNumber ? ` · ${rider.vehicleNumber}` : ''}</div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => toggleRiderActive(rider)}
+                    className={`px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer ${rider.isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}
+                  >
+                    {rider.isActive ? 'Active' : 'Inactive'}
+                  </button>
+                  <button onClick={() => { setRiderToEdit(rider); setIsRiderModalOpen(true); }} className="p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-[#E66817] cursor-pointer">
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button onClick={() => handleDeleteRider(rider)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-600 cursor-pointer">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <ScheduleShiftModal
+        isOpen={isShiftModalOpen}
+        onClose={() => setIsShiftModalOpen(false)}
+        users={users}
+        shiftToEdit={shiftToEdit}
+        defaultDate={selectedDate}
+        onSaved={() => { refresh(); showToast(shiftToEdit ? 'Shift updated' : 'Shift scheduled'); }}
+      />
+
+      <RiderModal
+        isOpen={isRiderModalOpen}
+        onClose={() => setIsRiderModalOpen(false)}
+        riderToEdit={riderToEdit}
+        onSaved={() => { refresh(); showToast(riderToEdit ? 'Rider updated' : 'Rider added'); }}
+      />
     </div>
   );
 };

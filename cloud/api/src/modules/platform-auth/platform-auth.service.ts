@@ -19,7 +19,7 @@ export interface LoginResult {
   accessToken: string;
   refreshToken: string;
   refreshTokenExpiresAt: Date;
-  user: Pick<PlatformUser, 'id' | 'email' | 'fullName' | 'status'>;
+  user: Pick<PlatformUser, 'id' | 'email' | 'fullName' | 'status' | 'role'>;
 }
 
 function hashRefreshToken(token: string): string {
@@ -105,7 +105,7 @@ export class PlatformAuthService {
       accessToken,
       refreshToken,
       refreshTokenExpiresAt: expiresAt,
-      user: { id: user.id, email: user.email, fullName: user.fullName, status: user.status }
+      user: { id: user.id, email: user.email, fullName: user.fullName, status: user.status, role: user.role }
     };
   }
 
@@ -138,7 +138,7 @@ export class PlatformAuthService {
       accessToken,
       refreshToken: newRefreshToken,
       refreshTokenExpiresAt: expiresAt,
-      user: { id: user.id, email: user.email, fullName: user.fullName, status: user.status }
+      user: { id: user.id, email: user.email, fullName: user.fullName, status: user.status, role: user.role }
     };
   }
 
@@ -158,7 +158,10 @@ export class PlatformAuthService {
   }
 
   async changePassword(user: PlatformUser, currentPassword: string, newPassword: string): Promise<void> {
-    const currentOk = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!user.passwordHash) {
+      throw new BadRequestException('Account has no password set yet — complete activation first');
+    }
+    const currentOk = await bcrypt.compare(currentPassword, user.passwordHash!);
     if (!currentOk) {
       throw new BadRequestException('Current password is incorrect');
     }

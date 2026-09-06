@@ -21,8 +21,22 @@ interface CaptainActiveOrdersViewProps {
 export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = ({
   onOpenTableWorkspace
 }) => {
-  const { tables, requestBill } = useCaptainStore();
+  const { tables, kots, requestBill } = useCaptainStore();
   const [search, setSearch] = useState('');
+
+  // Real per-table kitchen status, derived from this table's actual KOTs —
+  // this used to be a single hardcoded "Order Active in Kitchen" string for
+  // every table regardless of what was actually happening in the kitchen.
+  function getServiceStatus(tableNumber: string): { label: string; tone: 'ready' | 'preparing' | 'served' | 'none' } {
+    const tableKots = kots.filter((k) => k.tableNumber === tableNumber);
+    if (tableKots.length === 0) return { label: 'No Active KOT', tone: 'none' };
+    if (tableKots.some((k) => k.status === 'READY')) return { label: 'Food Ready — Serve Now', tone: 'ready' };
+    if (tableKots.some((k) => k.status === 'PREPARING' || (k.status as string) === 'PENDING' || (k.status as string) === 'ACCEPTED' || (k.status as string) === 'COOKING')) {
+      return { label: 'Preparing in Kitchen', tone: 'preparing' };
+    }
+    if (tableKots.every((k) => k.status === 'SERVED')) return { label: 'All Items Served', tone: 'served' };
+    return { label: 'Order Active in Kitchen', tone: 'preparing' };
+  }
 
   // Active occupied tables with orders
   const activeDiningTables = tables.filter((t) => {
@@ -70,6 +84,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-16 md:pb-6">
           {activeDiningTables.map((table) => {
             const isBillReq = table.status === 'BILL_REQUESTED';
+            const serviceStatus = getServiceStatus(table.tableNumber);
 
             return (
               <div
@@ -101,7 +116,17 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
                   <div className="mt-4 p-3 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5 text-xs font-semibold text-slate-600">
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500">Service Status:</span>
-                      <span className="font-bold text-[#0B253A]">Order Active in Kitchen</span>
+                      <span
+                        className={`font-bold ${
+                          serviceStatus.tone === 'ready'
+                            ? 'text-emerald-700'
+                            : serviceStatus.tone === 'none'
+                            ? 'text-slate-400'
+                            : 'text-[#0B253A]'
+                        }`}
+                      >
+                        {serviceStatus.label}
+                      </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500">Seated Guests:</span>

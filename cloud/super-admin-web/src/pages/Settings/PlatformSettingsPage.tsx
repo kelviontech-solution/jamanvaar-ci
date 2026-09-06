@@ -133,7 +133,7 @@ export function PlatformSettingsPage() {
           {/* Platform Branding */}
           <Card>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
-              <Building2 className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
+              <Building2 className="w-5 h-5" style={{ color: 'var(--jv-accent)' }} />
               <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Platform Branding</h3>
             </div>
             <form onSubmit={handleSaveBranding} className="modal-form">
@@ -167,7 +167,7 @@ export function PlatformSettingsPage() {
           {/* Onboarding Defaults */}
           <Card>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
-              <Sliders className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
+              <Sliders className="w-5 h-5" style={{ color: 'var(--jv-accent)' }} />
               <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Onboarding Default Quotas</h3>
             </div>
             <form onSubmit={handleSaveDefaults} className="modal-form">
@@ -212,7 +212,7 @@ export function PlatformSettingsPage() {
           {/* Maintenance & Operational Status */}
           <Card>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
-              <Wrench className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
+              <Wrench className="w-5 h-5" style={{ color: 'var(--jv-accent)' }} />
               <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Maintenance & Alerts</h3>
             </div>
             <form onSubmit={handleSaveMaintenance} className="modal-form">
@@ -227,7 +227,7 @@ export function PlatformSettingsPage() {
                   <label htmlFor="maintenanceToggle" style={{ margin: 0, fontWeight: 600, cursor: 'pointer' }}>
                     Platform Maintenance Mode
                   </label>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-secondary)' }}>
                     When active, tenant admins see a maintenance notice; offline local POS terminals continue operating uninterrupted.
                   </div>
                 </div>

@@ -2,10 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { AuditLogPage } from '../../api/types';
 import { Badge, Button, Card, EmptyState, Modal, SearchBar, SkeletonTable } from '../../components/ui';
-import { FileText, Eye } from 'lucide-react';
+import { FileText, Eye, Download } from 'lucide-react';
+import { exportRowsToCsv } from '../../lib/csvExport';
 import '../../components/shared.css';
 
 const LIMIT = 25;
+const EXPORT_PAGE_SIZE = 100;
 
 export function AuditLogsPage() {
   const [data, setData] = useState<AuditLogPage | null>(null);
@@ -28,6 +30,8 @@ export function AuditLogsPage() {
     createdAt: string;
     metadata?: any;
   } | null>(null);
+
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     api
@@ -56,6 +60,41 @@ export function AuditLogsPage() {
 
   const totalPages = data ? Math.max(1, Math.ceil(data.total / LIMIT)) : 1;
 
+  async function handleExportCsv() {
+    setExporting(true);
+    try {
+      const params = new URLSearchParams({ limit: String(EXPORT_PAGE_SIZE) });
+      if (category) params.set('category', category);
+      if (actorType) params.set('actorType', actorType);
+      if (action.trim()) params.set('action', action.trim());
+
+      const allRows: AuditLogPage['rows'] = [];
+      let fetchPage = 1;
+      let total = Infinity;
+      while (allRows.length < total && fetchPage <= 200) {
+        params.set('page', String(fetchPage));
+        const res = await api.get<AuditLogPage>(`/api/v1/audit-logs?${params.toString()}`);
+        allRows.push(...res.rows);
+        total = res.total;
+        if (res.rows.length === 0) break;
+        fetchPage += 1;
+      }
+
+      exportRowsToCsv(`jamanvaar_audit_logs_${new Date().toISOString().slice(0, 10)}.csv`, allRows, [
+        { header: 'Action', value: (r) => r.action },
+        { header: 'Category', value: (r) => r.category },
+        { header: 'Actor Type', value: (r) => r.actorType },
+        { header: 'Actor ID', value: (r) => r.actorId || '' },
+        { header: 'Restaurant ID', value: (r) => r.restaurantId || '' },
+        { header: 'Timestamp', value: (r) => new Date(r.createdAt).toISOString() }
+      ]);
+    } catch {
+      setError('Failed to export audit logs');
+    } finally {
+      setExporting(false);
+    }
+  }
+
   return (
     <div>
       <div className="page-header">
@@ -65,6 +104,10 @@ export function AuditLogsPage() {
             Immutable, cryptographically anchored operational event trail — tracking every platform action across all tenants.
           </p>
         </div>
+        <Button variant="ghost" onClick={handleExportCsv} disabled={exporting || !data || data.total === 0}>
+          <Download className="w-4 h-4" />
+          <span>{exporting ? 'Exporting…' : 'Export CSV'}</span>
+        </Button>
       </div>
 
       <div className="toolbar" style={{ marginTop: 12 }}>

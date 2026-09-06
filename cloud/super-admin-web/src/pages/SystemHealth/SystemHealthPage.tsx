@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { SystemHealth } from '../../api/types';
 import { Badge, Button, Card, SkeletonCard } from '../../components/ui';
-import { RefreshCw, Server, Database, Cpu, Wifi, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { RefreshCw, Server, Database, CheckCircle2, AlertTriangle } from 'lucide-react';
 import '../../components/shared.css';
 
 export function SystemHealthPage() {
@@ -93,7 +93,9 @@ export function SystemHealthPage() {
               {health?.database === 'UP' ? 'All Platform Core Services Operational' : 'Infrastructure Degraded'}
             </h3>
             <p style={{ margin: '2px 0 0 0', fontSize: 13, color: '#475569' }}>
-              Cloud API NestJS runtime and PostgreSQL connection pool are operating within nominal latency thresholds.
+              {health?.database === 'UP'
+                ? 'Cloud API NestJS runtime and PostgreSQL connection pool are operating within nominal latency thresholds.'
+                : 'The database ping failed on the last check — the API process itself is still responding, but requests that touch the database will fail.'}
             </p>
           </div>
         </div>
@@ -107,7 +109,6 @@ export function SystemHealthPage() {
 
       {loading && !health ? (
         <div className="detail-grid">
-          <SkeletonCard rows={3} />
           <SkeletonCard rows={3} />
           <SkeletonCard rows={3} />
         </div>
@@ -132,7 +133,7 @@ export function SystemHealthPage() {
               <dt>Node.js Engine</dt>
               <dd className="mono">{health.nodeVersion}</dd>
               <dt>Process Architecture</dt>
-              <dd className="mono">x64 (Windows Core)</dd>
+              <dd className="mono">{health.arch} ({health.platform})</dd>
             </dl>
           </Card>
 
@@ -140,43 +141,28 @@ export function SystemHealthPage() {
           <Card className="detail-card">
             <div className="detail-card-title">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Database className="w-4 h-4 text-emerald-600" />
+                <Database className={`w-4 h-4 ${health.database === 'UP' ? 'text-emerald-600' : 'text-rose-600'}`} />
                 <span>PostgreSQL Primary Cluster</span>
               </div>
               <Badge tone={health.database === 'UP' ? 'success' : 'error'}>{health.database}</Badge>
             </div>
             <dl className="detail-list">
               <dt>Connection Pool</dt>
-              <dd style={{ fontWeight: 700, color: '#16a34a' }}>ACTIVE &amp; HEALTHY</dd>
+              <dd style={{ fontWeight: 700, color: health.database === 'UP' ? '#16a34a' : '#dc2626' }}>
+                {health.database === 'UP' ? 'ACTIVE & HEALTHY' : 'UNREACHABLE'}
+              </dd>
               <dt>Ping Latency</dt>
               <dd style={{ fontFamily: 'monospace', fontWeight: 800, color: '#0B253A', fontSize: 15 }}>
                 {health.databaseLatencyMs !== null ? `${health.databaseLatencyMs} ms` : '—'}
               </dd>
               <dt>Database Schema</dt>
               <dd className="mono">public (Prisma ORM)</dd>
-              <dt>Query Health</dt>
-              <dd><Badge tone="success">100% SUCCESSFUL</Badge></dd>
-            </dl>
-          </Card>
-
-          {/* Offline Sync Infrastructure */}
-          <Card className="detail-card">
-            <div className="detail-card-title">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Wifi className="w-4 h-4 text-saffron" />
-                <span>Local Edge Sync Protocol</span>
-              </div>
-              <Badge tone="accent">ACTIVE</Badge>
-            </div>
-            <dl className="detail-list">
-              <dt>Offline-First Mode</dt>
-              <dd style={{ fontWeight: 700, color: '#16a34a' }}>AVAILABLE</dd>
-              <dt>Local DB Protocol</dt>
-              <dd>Local SQLite + PGLite Sync</dd>
-              <dt>Mesh Ordering</dt>
-              <dd>Captain → POS Local Dispatch</dd>
-              <dt>Network Resilience</dt>
-              <dd><Badge tone="success">Auto-Reconcile</Badge></dd>
+              <dt>Last Check</dt>
+              <dd>
+                <Badge tone={health.database === 'UP' ? 'success' : 'error'}>
+                  {health.database === 'UP' ? 'SELECT 1 SUCCEEDED' : 'SELECT 1 FAILED'}
+                </Badge>
+              </dd>
             </dl>
           </Card>
         </div>

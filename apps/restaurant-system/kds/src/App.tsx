@@ -9,6 +9,7 @@ import {
   JAMANVAARStartup
 } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
+import { sound } from '@jamanvaar/ui';
 import {
   ChefHat,
   Flame,
@@ -89,6 +90,10 @@ export const App: React.FC = () => {
         if (hasNew) {
           kdsDb.notify();
           setKots([...kdsDb.kots]);
+          // A new ticket landing on a kitchen wall display needs an audible
+          // cue — cooks aren't watching the screen continuously. Fires once
+          // per batch of genuinely-new KOTs, not per render.
+          sound.play('kot');
         }
       });
 
@@ -561,7 +566,7 @@ export const App: React.FC = () => {
                         <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold mt-1">
                           <span>{kot.tableNumber ? `Table ${kot.tableNumber}` : 'Takeaway'}</span>
                           <span>•</span>
-                          <span className="uppercase text-[10px] bg-slate-100 px-1.5 py-0.2 rounded font-black text-slate-600">
+                          <span className="uppercase text-xs bg-slate-100 px-1.5 py-0.2 rounded font-black text-slate-700">
                             {kot.orderType}
                           </span>
                         </div>
@@ -601,11 +606,14 @@ export const App: React.FC = () => {
                                 {it.name}
                               </span>
 
-                              {/* Modifiers */}
+                              {/* Modifiers — deliberately NOT small: this is often
+                                  allergy/spice/prep-critical information read from
+                                  a few feet away in a busy kitchen, so it gets the
+                                  same weight/contrast as the dish name above it. */}
                               {it.modifiers && it.modifiers.length > 0 && (
-                                <div className="text-[11px] font-medium text-slate-600 pt-0.5 space-y-0.5">
+                                <div className="text-sm font-bold text-slate-800 pt-0.5 space-y-0.5">
                                   {it.modifiers.map((m: any, mIdx: number) => (
-                                    <span key={mIdx} className="block text-slate-700">
+                                    <span key={mIdx} className="block">
                                       • {m.optionName || m}
                                     </span>
                                   ))}
@@ -614,7 +622,7 @@ export const App: React.FC = () => {
 
                               {/* Special Kitchen Notes */}
                               {it.specialInstructions && (
-                                <div className="mt-1 px-2 py-0.5 rounded-lg bg-amber-100/80 text-amber-900 text-[10px] font-bold inline-flex items-center gap-1 border border-amber-300/60">
+                                <div className="mt-1 px-2 py-0.5 rounded-lg bg-amber-100/80 text-amber-900 text-xs font-bold inline-flex items-center gap-1 border border-amber-300/60">
                                   <AlertCircle className="w-3 h-3 text-amber-700 shrink-0" />
                                   <span>{it.specialInstructions}</span>
                                 </div>
@@ -628,7 +636,7 @@ export const App: React.FC = () => {
 
                   {/* Card Footer & Large Touch Action Button (48px height) */}
                   <div className="p-4 sm:p-5 bg-[#FAF7F2] border-t border-[#EBE6DD] space-y-3">
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 font-bold">
+                    <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
                       <span>Captain: <strong className="text-[#0B253A]">{kot.cashierName || 'Rahul'}</strong></span>
                       <span className="font-mono text-slate-400">#{kot.id.slice(-5)}</span>
                     </div>

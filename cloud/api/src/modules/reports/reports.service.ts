@@ -27,17 +27,17 @@ export class ReportsService {
       this.prisma.subscription.count({ where: { status: 'ACTIVE' } }),
       this.prisma.invoice.findMany({
         where: { status: { not: 'VOID' } },
-        select: { total: true, status: true }
+        select: { totalAmount: true, status: true }
       })
     ]);
 
     // Financial reconciliation
     const collectedPaise = invoices
       .filter((inv) => inv.status === 'PAID')
-      .reduce((sum, inv) => sum + inv.total, 0);
+      .reduce((sum, inv) => sum + inv.totalAmount, 0);
     const outstandingPaise = invoices
-      .filter((inv) => inv.status === 'PENDING' || inv.status === 'OVERDUE')
-      .reduce((sum, inv) => sum + inv.total, 0);
+      .filter((inv) => inv.status === 'ISSUED' || inv.status === 'PAST_DUE' || inv.status === 'DRAFT')
+      .reduce((sum, inv) => sum + inv.totalAmount, 0);
 
     // MRR calculation based on active subscriptions
     const activeSubsWithPlan = await this.prisma.subscription.findMany({
@@ -83,8 +83,8 @@ export class ReportsService {
     const coreInvoices = invoices.filter((i) => i.plan?.tier === 'CORE');
     const proInvoices = invoices.filter((i) => i.plan?.tier === 'PRO');
 
-    const coreRevenue = coreInvoices.reduce((sum, i) => sum + i.total, 0);
-    const proRevenue = proInvoices.reduce((sum, i) => sum + i.total, 0);
+    const coreRevenue = coreInvoices.reduce((sum, i) => sum + i.totalAmount, 0);
+    const proRevenue = proInvoices.reduce((sum, i) => sum + i.totalAmount, 0);
 
     return {
       byPlan: [
@@ -95,10 +95,10 @@ export class ReportsService {
         id: i.id,
         invoiceNumber: i.invoiceNumber,
         restaurantName: i.restaurant.name,
-        planName: i.plan.name,
-        total: Math.round(i.total / 100),
+        planName: i.plan?.name ?? 'Custom Plan',
+        total: Math.round(i.totalAmount / 100),
         status: i.status,
-        issuedAt: i.issuedAt
+        issuedAt: i.createdAt.toISOString()
       }))
     };
   }
@@ -133,7 +133,7 @@ export class ReportsService {
         branchCount: r.branches.length,
         deviceCount: r.devices.length,
         activePlan: r.subscriptions[0]?.plan.name ?? 'No Plan',
-        createdAt: r.createdAt
+        createdAt: r.createdAt.toISOString()
       }))
     };
   }
@@ -161,7 +161,7 @@ export class ReportsService {
         type: d.type,
         appVersion: d.appVersion,
         status: d.status,
-        lastSeenAt: d.lastSeenAt,
+        lastSeenAt: d.lastSeenAt ? d.lastSeenAt.toISOString() : null,
         syncStatus: d.syncStatus
       }))
     };
@@ -187,8 +187,8 @@ export class ReportsService {
         planName: s.plan.name,
         tier: s.plan.tier,
         status: s.status,
-        startDate: s.startDate,
-        expiresAt: s.expiresAt
+        startDate: s.startDate.toISOString(),
+        expiresAt: s.expiresAt.toISOString()
       }))
     };
   }
@@ -198,17 +198,16 @@ export class ReportsService {
       const invoices = await this.prisma.invoice.findMany({
         include: { restaurant: true, plan: true }
       });
-      const headers = ['Invoice Number', 'Restaurant', 'Plan', 'Subtotal (INR)', 'CGST (INR)', 'SGST (INR)', 'Total (INR)', 'Status', 'Issued At'];
+      const headers = ['Invoice Number', 'Restaurant', 'Plan', 'Subtotal (INR)', 'Tax Amount (INR)', 'Total (INR)', 'Status', 'Issued At'];
       const rows = invoices.map((i) => [
         i.invoiceNumber,
         `"${i.restaurant.name.replace(/"/g, '""')}"`,
-        `"${i.plan.name}"`,
-        (i.subtotal / 100).toFixed(2),
-        (i.cgst / 100).toFixed(2),
-        (i.sgst / 100).toFixed(2),
-        (i.total / 100).toFixed(2),
+        `"${i.plan?.name ?? 'Custom Plan'}"`,
+        (i.amount / 100).toFixed(2),
+        (i.taxAmount / 100).toFixed(2),
+        (i.totalAmount / 100).toFixed(2),
         i.status,
-        i.issuedAt.toISOString()
+        i.createdAt.toISOString()
       ]);
       return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     }

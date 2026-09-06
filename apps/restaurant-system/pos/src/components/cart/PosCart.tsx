@@ -3,7 +3,6 @@ import { usePosStore } from '../../store/posStore';
 import { OrderType } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
 import { JAMANVAAR_LOGOS, sound } from '@jamanvaar/ui';
-import { PosHoldModal } from './PosHoldModal';
 import { PosOrderNotesModal } from './PosOrderNotesModal';
 import { PosDiscountModal } from './PosDiscountModal';
 import { PosCustomerSearchDrawer } from '../customers/PosCustomerSearchDrawer';
@@ -50,8 +49,6 @@ export const PosCart: React.FC = () => {
     holdCurrentOrder,
     sendKOT,
     setIsPaymentOpen,
-    isHoldOrdersOpen,
-    setIsHoldOrdersOpen,
     setActiveTab,
     addItemToCart,
     requestManagerOverride,
@@ -118,8 +115,8 @@ export const PosCart: React.FC = () => {
         {/* Order Identifier & Clear Button */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <span className="font-extrabold text-xs text-[#0B2B39]">
-              ORDER #{Date.now().toString().slice(-4)}
+            <span className="font-extrabold text-xs text-[#0B2B39] uppercase tracking-wide">
+              New Order — Unsaved
             </span>
             <span className="text-[10px] text-slate-400 font-medium">
               • {currentUser?.fullName || 'Cashier'}
@@ -581,8 +578,8 @@ export const PosCart: React.FC = () => {
         )}
       </div>
 
-      {/* Modals & Drawers */}
-      {isHoldOrdersOpen && <PosHoldModal />}
+      {/* Modals & Drawers — PosHoldModal now mounts globally in App.tsx so its
+          F8 shortcut works from every tab, not just this one. */}
       <PosDiscountModal isOpen={isDiscountModalOpen} onClose={() => setIsDiscountModalOpen(false)} />
       <PosOrderNotesModal isOpen={notesModalOpen} onClose={() => setNotesModalOpen(false)} />
       <PosCustomerSearchDrawer

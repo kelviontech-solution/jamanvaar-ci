@@ -36,6 +36,7 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
         email: superAdminEmail,
         passwordHash: await bcrypt.hash(superAdminPassword, 10),
         fullName: 'JAMANVAAR Super Admin',
+        role: 'PLATFORM_OWNER',
         status: 'ACTIVE'
       }
     });

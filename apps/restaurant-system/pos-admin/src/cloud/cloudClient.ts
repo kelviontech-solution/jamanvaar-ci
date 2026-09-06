@@ -251,6 +251,28 @@ export async function fetchCloudBackups(): Promise<CloudBackupSummary[]> {
   return request<CloudBackupSummary[]>('/api/v1/tenant/me/backups');
 }
 
+export interface CloudBranch {
+  id: string;
+  name: string;
+  code: string;
+  address: string | null;
+  timezone: string;
+  status: 'ACTIVE' | 'INACTIVE';
+  createdAt: string;
+  _count: { devices: number; users: number };
+}
+
+/**
+ * Sibling branches under this same restaurant — read-only here (creating or
+ * deactivating a branch stays a Super Admin action). This app is local-first
+ * and tied to one physical outlet's own database, so this is a directory of
+ * other outlets, not a way to view their live operational data.
+ */
+export async function fetchCloudBranches(): Promise<CloudBranch[]> {
+  if (!isCloudLoggedIn()) return [];
+  return request<CloudBranch[]>('/api/v1/tenant/branches');
+}
+
 /**
  * Tries the network first; on ANY failure (offline, not logged in, server
  * down) falls back to the last cached response instead of throwing — this

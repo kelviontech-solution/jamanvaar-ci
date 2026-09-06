@@ -4,6 +4,7 @@ import { api, ApiError } from '../../api/client';
 import type { Device } from '../../api/types';
 import {
   Badge,
+  BulkActionsBar,
   Button,
   Card,
   ConfirmModal,
@@ -13,7 +14,8 @@ import {
   SkeletonTable,
   statusTone
 } from '../../components/ui';
-import { Laptop2 } from 'lucide-react';
+import { Laptop2, Download } from 'lucide-react';
+import { exportRowsToCsv } from '../../lib/csvExport';
 import '../../components/shared.css';
 
 type DeviceStatusFilter = 'ALL' | 'ACTIVE' | 'REVOKED';
@@ -32,6 +34,10 @@ export function DevicesListPage() {
   // Confirm Modal state
   const [confirmTarget, setConfirmTarget] = useState<Device | null>(null);
   const [actionPending, setActionPending] = useState(false);
+
+  // Bulk selection
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkPending, setBulkPending] = useState(false);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -89,6 +95,54 @@ export function DevicesListPage() {
   const activeCount = useMemo(() => devices?.filter((d) => d.status === 'ACTIVE').length || 0, [devices]);
   const revokedCount = useMemo(() => devices?.filter((d) => d.status === 'REVOKED').length || 0, [devices]);
 
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelectedIds((prev) =>
+      prev.size === filteredDevices.length ? new Set() : new Set(filteredDevices.map((d) => d.id))
+    );
+  }
+
+  async function handleBulkRevoke() {
+    const ids = Array.from(selectedIds);
+    if (!window.confirm(`Revoke ${ids.length} device(s)? They will be immediately unauthenticated and disconnected from cloud sync.`)) {
+      return;
+    }
+    setBulkPending(true);
+    try {
+      const results = await Promise.allSettled(ids.map((id) => api.patch(`/api/v1/devices/${id}/revoke`)));
+      const failed = results.filter((r) => r.status === 'rejected').length;
+      showToast(
+        failed === 0
+          ? `${ids.length} device(s) revoked`
+          : `${ids.length - failed} of ${ids.length} succeeded — ${failed} failed`
+      );
+      setSelectedIds(new Set());
+      load();
+    } finally {
+      setBulkPending(false);
+    }
+  }
+
+  function handleExportCsv() {
+    exportRowsToCsv(`jamanvaar_devices_${new Date().toISOString().slice(0, 10)}.csv`, filteredDevices, [
+      { header: 'Device ID', value: (d) => d.id },
+      { header: 'Type', value: (d) => d.type },
+      { header: 'Restaurant', value: (d) => d.restaurant?.name || '' },
+      { header: 'Branch', value: (d) => d.branch?.name || '' },
+      { header: 'Status', value: (d) => d.status },
+      { header: 'App Version', value: (d) => d.appVersion || '' },
+      { header: 'Last Seen', value: (d) => (d.lastSeenAt ? new Date(d.lastSeenAt).toISOString() : 'Never') }
+    ]);
+  }
+
   return (
     <div>
       <div className="page-header">
@@ -98,6 +152,10 @@ export function DevicesListPage() {
             POS, Captain, KDS, and Kiosk terminals registered in restaurant fleets — authenticated through verified cryptographic keypairs.
           </p>
         </div>
+        <Button variant="ghost" onClick={handleExportCsv} disabled={!devices || devices.length === 0}>
+          <Download className="w-4 h-4" />
+          <span>Export CSV</span>
+        </Button>
       </div>
 
       {error && (
@@ -166,6 +224,12 @@ export function DevicesListPage() {
 
       {loading && !devices && <SkeletonTable rows={5} cols={7} />}
 
+      <BulkActionsBar selectedCount={selectedIds.size} onClear={() => setSelectedIds(new Set())}>
+        <Button size="sm" variant="danger" disabled={bulkPending} onClick={handleBulkRevoke}>
+          Revoke Selected
+        </Button>
+      </BulkActionsBar>
+
       {devices && (
         <Card>
           {filteredDevices.length === 0 ? (
@@ -194,6 +258,13 @@ export function DevicesListPage() {
               <table className="data-table">
                 <thead>
                   <tr>
+                    <th style={{ width: 32 }}>
+                      <input
+                        type="checkbox"
+                        checked={filteredDevices.length > 0 && selectedIds.size === filteredDevices.length}
+                        onChange={toggleSelectAll}
+                      />
+                    </th>
                     <th>Terminal Type</th>
                     <th>Restaurant</th>
                     <th>Branch</th>
@@ -206,6 +277,9 @@ export function DevicesListPage() {
                 <tbody>
                   {filteredDevices.map((d) => (
                     <tr key={d.id}>
+                      <td>
+                        <input type="checkbox" checked={selectedIds.has(d.id)} onChange={() => toggleSelected(d.id)} />
+                      </td>
                       <td>
                         <span className="badge badge-accent" style={{ fontWeight: 800 }}>{d.type}</span>
                         <div className="muted mono" style={{ fontSize: 10, marginTop: 2 }}>{d.id.slice(0, 10)}…</div>

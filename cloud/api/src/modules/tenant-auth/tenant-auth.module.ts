@@ -9,6 +9,6 @@ import { AuditModule } from '../audit/audit.module';
   imports: [JwtModule.register({}), AuditModule],
   controllers: [TenantAuthController, TenantMeController],
   providers: [TenantAuthService, TenantAuthGuard],
-  exports: [TenantAuthGuard, JwtModule]
+  exports: [TenantAuthGuard, TenantAuthService, JwtModule]
 })
 export class TenantAuthModule {}

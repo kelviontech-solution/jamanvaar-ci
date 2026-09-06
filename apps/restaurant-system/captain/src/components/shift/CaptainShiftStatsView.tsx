@@ -150,7 +150,11 @@ export const CaptainShiftStatsView: React.FC = () => {
 
         <button
           type="button"
-          onClick={logout}
+          onClick={() => {
+            if (window.confirm('End your shift and sign out? Make sure any active tables have been handed over first.')) {
+              logout();
+            }
+          }}
           className="px-4 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs shadow-sm flex items-center gap-2 transition-all active:scale-95 cursor-pointer shrink-0"
         >
           <LogOut className="w-4 h-4" />

@@ -4,6 +4,7 @@ import { api, ApiError } from '../../api/client';
 import type { Branch } from '../../api/types';
 import {
   Badge,
+  BulkActionsBar,
   Button,
   Card,
   ConfirmModal,
@@ -37,6 +38,10 @@ export function BranchesListPage() {
     action: 'activate' | 'deactivate';
   } | null>(null);
   const [actionPending, setActionPending] = useState(false);
+
+  // Bulk selection
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkPending, setBulkPending] = useState(false);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -109,6 +114,39 @@ export function BranchesListPage() {
 
   const activeCount = useMemo(() => branches?.filter((b) => b.status === 'ACTIVE').length || 0, [branches]);
   const inactiveCount = useMemo(() => branches?.filter((b) => b.status !== 'ACTIVE').length || 0, [branches]);
+
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelectedIds((prev) =>
+      prev.size === filteredBranches.length ? new Set() : new Set(filteredBranches.map((b) => b.id))
+    );
+  }
+
+  async function handleBulkAction(actionPath: 'activate' | 'deactivate') {
+    const ids = Array.from(selectedIds);
+    setBulkPending(true);
+    try {
+      const results = await Promise.allSettled(ids.map((id) => api.patch(`/api/v1/branches/${id}/${actionPath}`)));
+      const failed = results.filter((r) => r.status === 'rejected').length;
+      showToast(
+        failed === 0
+          ? `${ids.length} branch(es) ${actionPath === 'activate' ? 'activated' : 'deactivated'}`
+          : `${ids.length - failed} of ${ids.length} succeeded — ${failed} failed`
+      );
+      setSelectedIds(new Set());
+      load();
+    } finally {
+      setBulkPending(false);
+    }
+  }
 
   return (
     <div>
@@ -190,6 +228,15 @@ export function BranchesListPage() {
 
       {loading && !branches && <SkeletonTable rows={5} cols={6} />}
 
+      <BulkActionsBar selectedCount={selectedIds.size} onClear={() => setSelectedIds(new Set())}>
+        <Button size="sm" variant="primary" disabled={bulkPending} onClick={() => handleBulkAction('activate')}>
+          Activate Selected
+        </Button>
+        <Button size="sm" variant="danger" disabled={bulkPending} onClick={() => handleBulkAction('deactivate')}>
+          Deactivate Selected
+        </Button>
+      </BulkActionsBar>
+
       {branches && (
         <Card>
           {filteredBranches.length === 0 ? (
@@ -214,6 +261,13 @@ export function BranchesListPage() {
               <table className="data-table">
                 <thead>
                   <tr>
+                    <th style={{ width: 32 }}>
+                      <input
+                        type="checkbox"
+                        checked={filteredBranches.length > 0 && selectedIds.size === filteredBranches.length}
+                        onChange={toggleSelectAll}
+                      />
+                    </th>
                     <th>Branch</th>
                     <th>Restaurant</th>
                     <th>Terminals</th>
@@ -225,6 +279,9 @@ export function BranchesListPage() {
                 <tbody>
                   {filteredBranches.map((b) => (
                     <tr key={b.id}>
+                      <td>
+                        <input type="checkbox" checked={selectedIds.has(b.id)} onChange={() => toggleSelected(b.id)} />
+                      </td>
                       <td>
                         <div style={{ fontWeight: 700, fontSize: 14 }}>{b.name}</div>
                         <span className="muted mono" style={{ fontSize: 11 }}>Code: {b.code}</span>

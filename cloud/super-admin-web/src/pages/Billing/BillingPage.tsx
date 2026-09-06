@@ -29,6 +29,7 @@ import {
   ShieldCheck,
   Building2
 } from 'lucide-react';
+import { exportRowsToCsv } from '../../lib/csvExport';
 import '../../components/shared.css';
 import '../Dashboard/dashboard.css';
 
@@ -44,6 +45,11 @@ export function BillingPage() {
   // Search and Filter
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<InvoiceFilterStatus>('ALL');
+  // The filter tabs used to always render inline next to search, making the
+  // toolbar row read as a wall of controls even when nothing was filtered.
+  // Collapsed behind this toggle by default; the active filter still shows
+  // as a removable chip so it's never hidden once applied.
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Issue Invoice Modal
   const [issueModalOpen, setIssueModalOpen] = useState(false);
@@ -68,6 +74,11 @@ export function BillingPage() {
   // View Invoice Modal
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
 
+  // Void / Refund — reachable actions that previously had a real backend
+  // endpoint (PATCH /invoices/:id/status) but no UI path to trigger them.
+  const [actionMenuInvoiceId, setActionMenuInvoiceId] = useState<string | null>(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3500);
@@ -91,6 +102,13 @@ export function BillingPage() {
   useEffect(() => {
     loadBillingData();
   }, []);
+
+  useEffect(() => {
+    if (!actionMenuInvoiceId) return;
+    const close = () => setActionMenuInvoiceId(null);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [actionMenuInvoiceId]);
 
   function openIssueModal() {
     api.get<RestaurantCore[]>('/api/v1/restaurants').then(setRestaurants).catch(() => {});
@@ -175,6 +193,24 @@ export function BillingPage() {
     }
   }
 
+  async function handleUpdateInvoiceStatus(invoice: Invoice, status: 'VOID' | 'REFUNDED') {
+    setActionMenuInvoiceId(null);
+    const verb = status === 'VOID' ? 'void' : 'mark as refunded';
+    if (!window.confirm(`Are you sure you want to ${verb} invoice ${invoice.invoiceNumber}? This cannot be undone.`)) {
+      return;
+    }
+    setUpdatingStatusId(invoice.id);
+    try {
+      await api.patch(`/api/v1/invoices/${invoice.id}/status`, { status });
+      showToast(`Invoice ${invoice.invoiceNumber} ${status === 'VOID' ? 'voided' : 'marked as refunded'}.`);
+      loadBillingData();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : `Failed to ${verb} invoice`);
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  }
+
   function getStatusTone(status: string): BadgeTone {
     switch (status) {
       case 'PAID':
@@ -205,6 +241,19 @@ export function BillingPage() {
     });
   }, [invoices, statusFilter, search]);
 
+  function handleExportCsv() {
+    exportRowsToCsv(`jamanvaar_invoices_${new Date().toISOString().slice(0, 10)}.csv`, filteredInvoices, [
+      { header: 'Invoice #', value: (i) => i.invoiceNumber },
+      { header: 'Restaurant', value: (i) => i.restaurant?.name || '' },
+      { header: 'Plan', value: (i) => i.plan?.name || 'Custom Fee' },
+      { header: 'Amount (₹)', value: (i) => (i.amount / 100).toFixed(2) },
+      { header: 'Tax (₹)', value: (i) => (i.taxAmount / 100).toFixed(2) },
+      { header: 'Total (₹)', value: (i) => (i.totalAmount / 100).toFixed(2) },
+      { header: 'Due Date', value: (i) => new Date(i.dueDate).toISOString().slice(0, 10) },
+      { header: 'Status', value: (i) => i.status }
+    ]);
+  }
+
   const issuedCount = useMemo(() => invoices.filter((i) => i.status === 'ISSUED').length, [invoices]);
   const paidCount = useMemo(() => invoices.filter((i) => i.status === 'PAID').length, [invoices]);
   const overdueCount = useMemo(() => invoices.filter((i) => i.status === 'PAST_DUE').length, [invoices]);
@@ -218,10 +267,16 @@ export function BillingPage() {
             Commercial SaaS receivables, statutory GST 18% tax invoices, and verified payment reconciliations.
           </p>
         </div>
-        <Button variant="accent" onClick={openIssueModal}>
-          <Plus className="w-4 h-4" />
-          <span>Issue Invoice</span>
-        </Button>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <Button variant="ghost" onClick={handleExportCsv} disabled={invoices.length === 0}>
+            <Download className="w-4 h-4" />
+            <span>Export CSV</span>
+          </Button>
+          <Button variant="accent" onClick={openIssueModal}>
+            <Plus className="w-4 h-4" />
+            <span>Issue Invoice</span>
+          </Button>
+        </div>
       </div>
 
       {error && <div className="page-error">{error}</div>}
@@ -269,7 +324,7 @@ export function BillingPage() {
       )}
 
       {/* Toolbar */}
-      <div className="toolbar" style={{ marginTop: 16 }}>
+      <div className="toolbar" style={{ marginTop: 16, flexWrap: 'wrap' }}>
         <SearchBar
           value={search}
           onChange={setSearch}
@@ -277,16 +332,31 @@ export function BillingPage() {
           width="320px"
         />
 
-        <FilterTabs<InvoiceFilterStatus>
-          value={statusFilter}
-          onChange={setStatusFilter}
-          options={[
-            { id: 'ALL', label: 'All Invoices', count: invoices.length },
-            { id: 'ISSUED', label: 'Pending', count: issuedCount },
-            { id: 'PAID', label: 'Paid', count: paidCount },
-            { id: 'PAST_DUE', label: 'Overdue', count: overdueCount }
-          ]}
-        />
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => setFiltersOpen((prev) => !prev)}
+          style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+        >
+          <Filter className="w-3.5 h-3.5" />
+          <span>Filters</span>
+          {statusFilter !== 'ALL' && (
+            <span className="badge badge-accent" style={{ fontSize: 10, padding: '1px 6px' }}>1</span>
+          )}
+        </button>
+
+        {/* Applied filter stays visible as a removable chip even while the
+            rest of the filter controls are collapsed. */}
+        {statusFilter !== 'ALL' && (
+          <span
+            className="badge badge-neutral"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}
+            onClick={() => setStatusFilter('ALL')}
+            title="Remove this filter"
+          >
+            Status: {statusFilter === 'ISSUED' ? 'Pending' : statusFilter === 'PAST_DUE' ? 'Overdue' : 'Paid'} ✕
+          </span>
+        )}
 
         {(search || statusFilter !== 'ALL') && (
           <button
@@ -295,6 +365,7 @@ export function BillingPage() {
             onClick={() => {
               setSearch('');
               setStatusFilter('ALL');
+              setFiltersOpen(false);
             }}
           >
             Clear filters
@@ -306,6 +377,21 @@ export function BillingPage() {
           {filteredInvoices.length} of {invoices.length} invoices
         </span>
       </div>
+
+      {filtersOpen && (
+        <div style={{ marginTop: 10, marginBottom: 6 }}>
+          <FilterTabs<InvoiceFilterStatus>
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[
+              { id: 'ALL', label: 'All Invoices', count: invoices.length },
+              { id: 'ISSUED', label: 'Pending', count: issuedCount },
+              { id: 'PAID', label: 'Paid', count: paidCount },
+              { id: 'PAST_DUE', label: 'Overdue', count: overdueCount }
+            ]}
+          />
+        </div>
+      )}
 
       {loading && invoices.length === 0 ? (
         <SkeletonTable rows={5} cols={7} />
@@ -381,8 +467,8 @@ export function BillingPage() {
                         <Badge tone={getStatusTone(inv.status)} pulse={inv.status === 'PAID'}>{inv.status}</Badge>
                       </td>
                       <td>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          {inv.status !== 'PAID' && inv.status !== 'VOID' && (
+                        <div style={{ display: 'flex', gap: 6, position: 'relative' }}>
+                          {inv.status !== 'PAID' && inv.status !== 'VOID' && inv.status !== 'REFUNDED' && (
                             <Button size="sm" variant="accent" onClick={() => openPaymentModal(inv)}>
                               Record Payment
                             </Button>
@@ -390,6 +476,57 @@ export function BillingPage() {
                           <Button size="sm" variant="ghost" onClick={() => setViewInvoice(inv)}>
                             View Tax Receipt
                           </Button>
+
+                          {inv.status !== 'VOID' && inv.status !== 'REFUNDED' && (
+                            <>
+                              <button
+                                type="button"
+                                className="btn btn-ghost btn-sm"
+                                title="More invoice actions"
+                                disabled={updatingStatusId === inv.id}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActionMenuInvoiceId(actionMenuInvoiceId === inv.id ? null : inv.id);
+                                }}
+                              >
+                                ⋮
+                              </button>
+                              {actionMenuInvoiceId === inv.id && (
+                                <div
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{
+                                    position: 'absolute',
+                                    right: 0,
+                                    top: '100%',
+                                    marginTop: 4,
+                                    background: 'var(--jv-surface)',
+                                    border: '1px solid var(--jv-border)',
+                                    borderRadius: 8,
+                                    boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                                    zIndex: 20,
+                                    minWidth: 160
+                                  }}
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateInvoiceStatus(inv, 'VOID')}
+                                    style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 12, fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-text-secondary)' }}
+                                  >
+                                    Void Invoice
+                                  </button>
+                                  {inv.status === 'PAID' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUpdateInvoiceStatus(inv, 'REFUNDED')}
+                                      style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 12, fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-error)', borderTop: '1px solid var(--jv-border)' }}
+                                    >
+                                      Mark as Refunded
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -647,7 +784,7 @@ export function BillingPage() {
                 {viewInvoice.payments.map((p) => (
                   <div key={p.id} style={{ fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between', color: 'var(--jv-text-secondary)' }}>
                     <span>
-                      {p.method} {p.referenceNumber ? `(${p.referenceNumber})` : ''} • {new Date(p.paidAt).toLocaleDateString('en-IN')}
+                      {p.method} {p.referenceNumber ? `(${p.referenceNumber})` : ''} • {new Date(p.createdAt).toLocaleDateString('en-IN')}
                     </span>
                     <strong style={{ fontFamily: 'monospace' }}>₹{(p.amount / 100).toFixed(2)}</strong>
                   </div>

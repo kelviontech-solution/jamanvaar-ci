@@ -41,6 +41,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
   const [notes, setNotes] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>(['REGULAR']);
   const [loyaltyPoints, setLoyaltyPoints] = useState('50');
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     if (customerToEdit) {
@@ -83,7 +84,11 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !phone) return;
+    setFormError('');
+    if (!name || !phone) {
+      setFormError('Name and phone number are required.');
+      return;
+    }
 
     const payload: Partial<CustomerAccount> = {
       name,
@@ -292,6 +297,12 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               </div>
             </div>
           </div>
+        )}
+
+        {formError && (
+          <p className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+            {formError}
+          </p>
         )}
 
         <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">

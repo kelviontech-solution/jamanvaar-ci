@@ -26,19 +26,43 @@ datasource db {
 enum PlatformUserStatus {
   ACTIVE
   DISABLED
+  PENDING_ACTIVATION
+}
+
+// Team/RBAC roles for platform staff — previously the API hardcoded every
+// user's role to 'SUPER_ADMIN' in its responses regardless of this table,
+// so hasPermission() on the frontend had nothing real to check.
+enum PlatformRole {
+  PLATFORM_OWNER
+  SUPER_ADMIN
+  PLATFORM_OPS
+  SUPPORT_ADMIN
+  FINANCE_ADMIN
+  READ_ONLY
 }
 
 model PlatformUser {
   id           String             @id @default(uuid())
   email        String             @unique
-  passwordHash String
+  passwordHash String?            // null until a PENDING_ACTIVATION teammate sets their own password
   fullName     String
+  role         PlatformRole       @default(SUPER_ADMIN)
   status       PlatformUserStatus @default(ACTIVE)
+  invitedAt    DateTime?
+  activatedAt  DateTime?
+  // One-time invitation credential for activate() — same shape as
+  // User.activationTokenHash (SEC-001): only the sha256 hash is stored, the
+  // plaintext token is returned once, at invite time.
+  activationTokenHash      String?
+  activationTokenExpiresAt DateTime?
   lastLoginAt  DateTime?
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
 
-  refreshTokens PlatformRefreshToken[]
+  refreshTokens    PlatformRefreshToken[]
+  assignedTickets  SupportTicket[]
+  createdTickets   SupportTicket[] @relation("SupportTicketCreatedBy")
+  ticketComments   TicketComment[]
 }
 
 model PlatformRefreshToken {
@@ -90,6 +114,7 @@ model Restaurant {
   invoices      Invoice[]
   payments      Payment[]
   backups       Backup[]
+  supportTickets SupportTicket[]
 }
 
 enum BranchStatus {
@@ -335,6 +360,63 @@ model AuditLog {
   @@index([restaurantId])
   @@index([actorType, actorId])
   @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Support Tickets — evolves the Support page from search+diagnostics into a
+// real lightweight ticketing view (status, assignee, SLA), instead of every
+// support interaction being a one-off audited action with no persistent
+// record of the underlying issue.
+// ---------------------------------------------------------------------------
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model SupportTicket {
+  id           String         @id @default(uuid())
+  restaurantId String? // null = platform-wide issue, not tied to one tenant
+  restaurant   Restaurant?    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  subject      String
+  description  String
+  status       TicketStatus   @default(OPEN)
+  priority     TicketPriority @default(MEDIUM)
+  assignedToId String?
+  assignedTo   PlatformUser?  @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdById  String
+  createdBy    PlatformUser   @relation("SupportTicketCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  slaDueAt     DateTime
+  resolvedAt   DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  comments TicketComment[]
+
+  @@index([restaurantId])
+  @@index([status])
+  @@index([assignedToId])
+}
+
+model TicketComment {
+  id        String        @id @default(uuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    PlatformUser  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime      @default(now())
+
+  @@index([ticketId])
 }
 
 // ---------------------------------------------------------------------------

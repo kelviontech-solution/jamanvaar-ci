@@ -21,6 +21,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   const [description, setDescription] = useState('');
   const [iconName, setIconName] = useState('UtensilsCrossed');
   const [isActive, setIsActive] = useState(true);
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     if (categoryToEdit) {
@@ -47,7 +48,11 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name) return;
+    setFormError('');
+    if (!name) {
+      setFormError('Category name is required.');
+      return;
+    }
 
     if (categoryToEdit) {
       MenuRepository.updateCategory(categoryToEdit.id, {
@@ -152,6 +157,12 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             <span>Active & Visible on Customer Kiosk / POS</span>
           </label>
         </div>
+
+        {formError && (
+          <p className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+            {formError}
+          </p>
+        )}
 
         <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
           <Button variant="outline" size="sm" type="button" onClick={onClose}>

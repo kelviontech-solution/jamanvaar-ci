@@ -119,7 +119,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
         {activeOrder ? (
           <div className="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-medium text-slate-500">
             <div className="flex items-center gap-1 font-mono font-bold text-[#0B253A]">
-              <span>#{activeOrder.orderNumber?.slice(-4) || '5033'}</span>
+              <span>#{activeOrder.orderNumber?.slice(-4) || '—'}</span>
               <span className="text-slate-300">•</span>
               <span className="text-slate-600 font-sans">{captainName}</span>
             </div>

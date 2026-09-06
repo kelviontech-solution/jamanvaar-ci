@@ -155,11 +155,11 @@ export function EntitlementsPage() {
                       return (
                         <th key={p.id} style={{ padding: '16px 20px', textAlign: 'center', minWidth: 180, borderLeft: '1px solid var(--jv-border)' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                            <Badge tone={p.tier === 'PRO' ? 'gold' : 'neutral'}>{p.tier}</Badge>
+                            <Badge tone={p.tier === 'PRO' || p.tier === 'ENTERPRISE' ? 'gold' : 'neutral'}>{p.tier}</Badge>
                             <Link to={`/plans/${p.id}`} style={{ fontWeight: 900, fontSize: 15, color: '#0B253A', textDecoration: 'none' }}>
                               {p.name}
                             </Link>
-                            <div style={{ fontSize: 18, fontWeight: 900, color: p.tier === 'PRO' ? '#ea580c' : '#0B253A', fontFamily: 'monospace' }}>
+                            <div style={{ fontSize: 18, fontWeight: 900, color: p.tier === 'PRO' || p.tier === 'ENTERPRISE' ? '#ea580c' : '#0B253A', fontFamily: 'monospace' }}>
                               ₹{(p.priceMonthly / 100).toLocaleString('en-IN')}
                               <span style={{ fontSize: 11, fontWeight: 600, color: '#64748b' }}>/mo</span>
                             </div>
@@ -242,7 +242,7 @@ export function EntitlementsPage() {
                                         padding: '10px 20px',
                                         textAlign: 'center',
                                         borderLeft: '1px solid var(--jv-border)',
-                                        background: isEnabled && p.tier === 'PRO' ? 'rgba(254, 243, 199, 0.1)' : undefined
+                                        background: isEnabled && (p.tier === 'PRO' || p.tier === 'ENTERPRISE') ? 'rgba(254, 243, 199, 0.1)' : undefined
                                       }}
                                     >
                                       {isEnabled ? (

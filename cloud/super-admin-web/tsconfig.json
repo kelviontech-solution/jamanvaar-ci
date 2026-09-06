@@ -4,5 +4,6 @@
     "noEmit": true,
     "noImplicitAny": false
   },
-  "include": ["src", "../../packages/**/*"]
+  "include": ["src", "../../packages/**/*"],
+  "exclude": []
 }

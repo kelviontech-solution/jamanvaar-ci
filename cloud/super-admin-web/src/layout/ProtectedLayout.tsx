@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Link, NavLink, Navigate, Outlet, useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { api } from '../api/client';
-import type { SystemHealth } from '../api/types';
+import type { SystemHealth, SearchResult } from '../api/types';
+import { applyTheme, getStoredTheme, type ThemePreference } from '../theme';
 // Deep relative import, not the '@jamanvaar/ui' barrel: that barrel also
 // re-exports components which import @jamanvaar/database, whose module-level
 // singleton immediately starts polling a LAN-only local device bridge
@@ -32,9 +33,13 @@ import {
   ExternalLink,
   Layers,
   LifeBuoy,
+  Ticket,
   Sliders,
   BarChart3,
-  Database
+  Database,
+  ChevronDown,
+  Sun,
+  Moon
 } from 'lucide-react';
 import './layout.css';
 
@@ -85,7 +90,9 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'Platform Operations',
     items: [
       { to: '/backups', label: 'Backups & Recovery', icon: Database },
+      { to: '/team', label: 'Platform Team', icon: ShieldCheck },
       { to: '/support', label: 'Support & Diagnostics', icon: LifeBuoy },
+      { to: '/tickets', label: 'Support Tickets', icon: Ticket },
       { to: '/audit-logs', label: 'Audit Logs', icon: FileText },
       { to: '/system-health', label: 'System Health', icon: HeartPulse },
       { to: '/settings/platform', label: 'Platform Settings', icon: Sliders }
@@ -100,8 +107,83 @@ const NAV_GROUPS: NavGroup[] = [
 export function ProtectedLayout() {
   const { user, status, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Cross-entity header search — this used to only ever build a
+  // /restaurants?search= URL, so an owner name, device ID, or activation
+  // code typed here silently found nothing even though the real
+  // /api/v1/support/search endpoint (used by the Support page) already
+  // indexes all four entity types. Wired here as a live typeahead instead.
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searching, setSearching] = useState(false);
+
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (q.length < 2) {
+      setSearchResults(null);
+      return;
+    }
+    setSearching(true);
+    const handle = setTimeout(() => {
+      api
+        .get<SearchResult>(`/api/v1/support/search?q=${encodeURIComponent(q)}`)
+        .then((res) => {
+          setSearchResults(res);
+          setSearchOpen(true);
+        })
+        .catch(() => setSearchResults(null))
+        .finally(() => setSearching(false));
+    }, 250);
+    return () => clearTimeout(handle);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+      if (e.key === 'Escape') {
+        setSearchOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
+  function goToSearchResult(path: string) {
+    setSearchOpen(false);
+    setSearchQuery('');
+    setSearchResults(null);
+    navigate(path);
+  }
+
+  // Sidebar groups are collapsible and remembered per browser — previously
+  // all 6 groups / 19 items were always fully expanded with no way to hide
+  // sections a given operator never touches.
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
+    try {
+      const raw = localStorage.getItem('jamanvaar_superadmin_collapsed_groups');
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
+  const toggleGroup = (label: string) => {
+    setCollapsedGroups((prev) => {
+      const next = { ...prev, [label]: !prev[label] };
+      try {
+        localStorage.setItem('jamanvaar_superadmin_collapsed_groups', JSON.stringify(next));
+      } catch {
+        // localStorage unavailable — collapse state just won't persist across reloads.
+      }
+      return next;
+    });
+  };
   // The "PLATFORM ONLINE" pill used to be static markup with no data behind
   // it. Polls the real health endpoint instead — a failed fetch (network
   // down, API unreachable) is itself meaningful and now shown as degraded
@@ -127,6 +209,59 @@ export function ProtectedLayout() {
       clearInterval(interval);
     };
   }, []);
+
+  // Real notification center — expiringSubscriptions and failed-backup counts
+  // were already computed server-side (DashboardSummary, backups fleet stats)
+  // but never surfaced anywhere; the header bell just linked to the audit log.
+  const [expiringSubscriptions, setExpiringSubscriptions] = useState(0);
+  const [failedBackups, setFailedBackups] = useState(0);
+  const [notifOpen, setNotifOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const check = () => {
+      Promise.all([
+        api.get<{ expiringSubscriptions: number }>('/api/v1/platform/dashboard'),
+        api.get<{ stats: { failed: number } }>('/api/v1/platform/backups')
+      ])
+        .then(([dash, backups]) => {
+          if (cancelled) return;
+          setExpiringSubscriptions(dash.expiringSubscriptions || 0);
+          setFailedBackups(backups.stats?.failed || 0);
+        })
+        .catch(() => {
+          /* notification counts are best-effort — a failed poll just leaves the last known count */
+        });
+    };
+    check();
+    const interval = setInterval(check, 60000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+
+  const notificationCount = (expiringSubscriptions > 0 ? 1 : 0) + (failedBackups > 0 ? 1 : 0);
+
+  // Dark/light theme toggle — resolves the *effective* theme (accounting for
+  // 'system') so the icon always shows what clicking it will switch to next,
+  // not just the raw stored preference.
+  const [themePref, setThemePref] = useState<ThemePreference>(() => getStoredTheme());
+  const [systemPrefersDark, setSystemPrefersDark] = useState(
+    () => window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e: MediaQueryListEvent) => setSystemPrefersDark(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  const effectiveIsDark = themePref === 'dark' || (themePref === 'system' && systemPrefersDark);
+  const toggleTheme = () => {
+    const next: ThemePreference = effectiveIsDark ? 'light' : 'dark';
+    setThemePref(next);
+    applyTheme(next);
+  };
 
   if (status === 'loading') {
     return (
@@ -182,30 +317,55 @@ export function ProtectedLayout() {
 
         {/* Navigation List */}
         <nav className="sidebar-nav">
-          {NAV_GROUPS.map((group) => (
-            <div className="sidebar-group" key={group.label}>
-              <div className="sidebar-group-label">{group.label}</div>
-              {group.items.map((item) => {
-                const IconComponent = item.icon;
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    end={item.end}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={({ isActive }) =>
-                      `sidebar-link ${isActive ? 'active' : ''}`
-                    }
-                  >
-                    <span className="sidebar-icon-wrap">
-                      <IconComponent className="sidebar-icon" />
-                    </span>
-                    <span className="sidebar-label">{item.label}</span>
-                  </NavLink>
-                );
-              })}
-            </div>
-          ))}
+          {NAV_GROUPS.map((group) => {
+            const groupHasActiveItem = group.items.some((item) =>
+              item.end
+                ? location.pathname === item.to
+                : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`)
+            );
+            // A group containing the active route is always shown expanded,
+            // even if the user had previously collapsed it — otherwise
+            // navigating there would hide the page you're currently on.
+            const isExpanded = groupHasActiveItem || !collapsedGroups[group.label];
+            return (
+              <div className="sidebar-group" key={group.label}>
+                <button
+                  type="button"
+                  className="sidebar-group-label sidebar-group-toggle"
+                  onClick={() => toggleGroup(group.label)}
+                  aria-expanded={isExpanded}
+                >
+                  <span>{group.label}</span>
+                  <ChevronDown
+                    className={`sidebar-group-chevron ${isExpanded ? 'expanded' : ''}`}
+                  />
+                </button>
+                {isExpanded && (
+                  <div className="sidebar-group-items">
+                    {group.items.map((item) => {
+                      const IconComponent = item.icon;
+                      return (
+                        <NavLink
+                          key={item.to}
+                          to={item.to}
+                          end={item.end}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={({ isActive }) =>
+                            `sidebar-link ${isActive ? 'active' : ''}`
+                          }
+                        >
+                          <span className="sidebar-icon-wrap">
+                            <IconComponent className="sidebar-icon" />
+                          </span>
+                          <span className="sidebar-label">{item.label}</span>
+                        </NavLink>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         {/* Sidebar Footer */}
@@ -243,19 +403,136 @@ export function ProtectedLayout() {
             </div>
           </div>
 
-          {/* Center Search Bar */}
-          <div className="header-search-container">
+          {/* Center Search Bar — cross-entity live results via /api/v1/support/search */}
+          <div className="header-search-container" style={{ position: 'relative' }}>
             <form onSubmit={handleSearchSubmit} className="header-search-form">
               <Search className="search-icon" />
               <input
+                ref={searchInputRef}
                 type="text"
-                placeholder="Search restaurants, owners, branches, keys…"
+                placeholder="Search restaurants, owners, devices, activation keys…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchResults && setSearchOpen(true)}
+                onBlur={() => setTimeout(() => setSearchOpen(false), 150)}
                 className="header-search-input"
               />
               <kbd className="search-kbd">Ctrl+K</kbd>
             </form>
+
+            {searchOpen && searchQuery.trim().length >= 2 && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 6px)',
+                  left: 0,
+                  right: 0,
+                  background: 'var(--jv-surface)',
+                  border: '1px solid var(--jv-border)',
+                  borderRadius: 10,
+                  boxShadow: '0 8px 28px rgba(0,0,0,0.14)',
+                  zIndex: 60,
+                  maxHeight: 420,
+                  overflowY: 'auto'
+                }}
+              >
+                {searching && (
+                  <div style={{ padding: '14px 16px', fontSize: 12, color: 'var(--jv-text-light)' }}>Searching…</div>
+                )}
+
+                {!searching && searchResults && (
+                  <>
+                    {searchResults.restaurants.length === 0 &&
+                      searchResults.owners.length === 0 &&
+                      searchResults.devices.length === 0 &&
+                      searchResults.activationKeys.length === 0 && (
+                        <div style={{ padding: '14px 16px', fontSize: 12, color: 'var(--jv-text-light)' }}>
+                          No matches for "{searchQuery.trim()}"
+                        </div>
+                      )}
+
+                    {searchResults.restaurants.length > 0 && (
+                      <div>
+                        <div style={{ padding: '8px 16px 4px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
+                          Restaurants
+                        </div>
+                        {searchResults.restaurants.map((r) => (
+                          <button
+                            key={r.id}
+                            type="button"
+                            onMouseDown={() => goToSearchResult(`/restaurants/${r.id}`)}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}
+                          >
+                            <Store className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span style={{ fontWeight: 700 }}>{r.name}</span>
+                            {r.city && <span style={{ color: 'var(--jv-text-light)', fontSize: 11 }}>· {r.city}</span>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {searchResults.owners.length > 0 && (
+                      <div>
+                        <div style={{ padding: '8px 16px 4px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
+                          Owners
+                        </div>
+                        {searchResults.owners.map((o) => (
+                          <button
+                            key={o.id}
+                            type="button"
+                            onMouseDown={() => goToSearchResult(o.restaurant ? `/restaurants/${o.restaurant.id}` : '/owners')}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}
+                          >
+                            <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span style={{ fontWeight: 700 }}>{o.fullName}</span>
+                            <span style={{ color: 'var(--jv-text-light)', fontSize: 11 }}>· {o.email}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {searchResults.devices.length > 0 && (
+                      <div>
+                        <div style={{ padding: '8px 16px 4px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
+                          Devices
+                        </div>
+                        {searchResults.devices.map((d) => (
+                          <button
+                            key={d.id}
+                            type="button"
+                            onMouseDown={() => goToSearchResult('/devices')}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}
+                          >
+                            <Laptop2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span style={{ fontWeight: 700 }}>{d.type}</span>
+                            <span style={{ color: 'var(--jv-text-light)', fontSize: 11 }}>· {d.restaurant?.name ?? d.id.slice(0, 10)}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {searchResults.activationKeys.length > 0 && (
+                      <div>
+                        <div style={{ padding: '8px 16px 4px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
+                          Activation Keys
+                        </div>
+                        {searchResults.activationKeys.map((k) => (
+                          <button
+                            key={k.id}
+                            type="button"
+                            onMouseDown={() => goToSearchResult('/activation-keys')}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}
+                          >
+                            <KeyRound className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span style={{ fontWeight: 700, fontFamily: 'monospace' }}>{k.code}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Header Right Actions */}
@@ -277,19 +554,113 @@ export function ProtectedLayout() {
               </span>
             </div>
 
-            {/* Recent platform activity — links to the real audit log, the
-                closest thing this console has to notifications today. The
-                permanent unread dot this used to show was decorative (no
-                click handler, no actual unread state behind it); removed
-                rather than left implying activity that was never computed. */}
-            <Link
-              to="/audit-logs"
+            {/* Real notification center — surfaces expiringSubscriptions and
+                failed-backup counts that were already computed server-side
+                but previously discarded; this used to be a permanent
+                decorative unread dot with no actual state behind it. */}
+            <div style={{ position: 'relative' }}>
+              <button
+                type="button"
+                className="header-icon-btn"
+                style={{ position: 'relative' }}
+                title="Notifications"
+                aria-label="Notifications"
+                onClick={() => setNotifOpen((prev) => !prev)}
+                onBlur={() => setTimeout(() => setNotifOpen(false), 150)}
+              >
+                <Bell className="w-4 h-4" />
+                {notificationCount > 0 && (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: -3,
+                      right: -3,
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      background: '#ef4444',
+                      border: '1.5px solid #fff'
+                    }}
+                  />
+                )}
+              </button>
+
+              {notifOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: 'calc(100% + 8px)',
+                    width: 300,
+                    background: 'var(--jv-surface)',
+                    border: '1px solid var(--jv-border)',
+                    borderRadius: 10,
+                    boxShadow: '0 8px 28px rgba(0,0,0,0.14)',
+                    zIndex: 60,
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div style={{ padding: '10px 14px', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)', borderBottom: '1px solid var(--jv-border)' }}>
+                    Notifications
+                  </div>
+                  {notificationCount === 0 ? (
+                    <div style={{ padding: '18px 14px', fontSize: 12, color: 'var(--jv-text-light)', textAlign: 'center' }}>
+                      Nothing needs your attention right now.
+                    </div>
+                  ) : (
+                    <>
+                      {expiringSubscriptions > 0 && (
+                        <Link
+                          to="/subscriptions"
+                          onMouseDown={() => setNotifOpen(false)}
+                          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderBottom: '1px solid var(--jv-border)', textDecoration: 'none' }}
+                        >
+                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', flexShrink: 0 }} />
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--jv-text)' }}>
+                              {expiringSubscriptions} subscription{expiringSubscriptions === 1 ? '' : 's'} expiring soon
+                            </div>
+                            <div style={{ fontSize: 11, color: 'var(--jv-text-light)' }}>Renew before they lapse</div>
+                          </div>
+                        </Link>
+                      )}
+                      {failedBackups > 0 && (
+                        <Link
+                          to="/backups"
+                          onMouseDown={() => setNotifOpen(false)}
+                          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', textDecoration: 'none' }}
+                        >
+                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444', flexShrink: 0 }} />
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--jv-text)' }}>
+                              {failedBackups} failed backup{failedBackups === 1 ? '' : 's'}
+                            </div>
+                            <div style={{ fontSize: 11, color: 'var(--jv-text-light)' }}>Review and retry the snapshot</div>
+                          </div>
+                        </Link>
+                      )}
+                    </>
+                  )}
+                  <Link
+                    to="/audit-logs"
+                    onMouseDown={() => setNotifOpen(false)}
+                    style={{ display: 'block', padding: '10px 14px', fontSize: 12, fontWeight: 700, color: 'var(--jv-text-secondary)', textAlign: 'center', borderTop: '1px solid var(--jv-border)', textDecoration: 'none' }}
+                  >
+                    View full activity log →
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <button
+              type="button"
               className="header-icon-btn"
-              title="Recent platform activity"
-              aria-label="Recent platform activity"
+              title={effectiveIsDark ? 'Switch to light theme' : 'Switch to dark theme'}
+              aria-label="Toggle dark mode"
+              onClick={toggleTheme}
             >
-              <Bell className="w-4 h-4" />
-            </Link>
+              {effectiveIsDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
 
             <div className="header-separator" aria-hidden="true" />
 
@@ -302,7 +673,18 @@ export function ProtectedLayout() {
               </Link>
               <div className="profile-info-block">
                 <div className="profile-name">{user?.fullName ?? 'Super Admin'}</div>
-                <div className="profile-role-tag">Super Admin</div>
+                <div className="profile-role-tag">
+                  {user?.role
+                    ? {
+                        PLATFORM_OWNER: 'Platform Owner',
+                        SUPER_ADMIN: 'Super Admin',
+                        PLATFORM_OPS: 'Platform Ops',
+                        SUPPORT_ADMIN: 'Support Admin',
+                        FINANCE_ADMIN: 'Finance Admin',
+                        READ_ONLY: 'Read-Only'
+                      }[user.role] ?? user.role
+                    : 'Super Admin'}
+                </div>
               </div>
 
               {/* Logout Button */}

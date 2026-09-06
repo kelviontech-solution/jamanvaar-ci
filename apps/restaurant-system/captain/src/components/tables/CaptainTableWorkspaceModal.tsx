@@ -51,8 +51,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
     clearCart,
     sendKOT,
     requestBill,
-    repeatPreviousOrder,
-    markItemServed
+    repeatPreviousOrder
   } = useCaptainStore();
 
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<'ORDER' | 'MENU'>('ORDER');
@@ -61,6 +60,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   const [searchQuery, setSearchQuery] = useState('');
   const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
   const [kotSuccessAlert, setKotSuccessAlert] = useState(false);
+  const [repeatOrderError, setRepeatOrderError] = useState('');
 
   // Filtered Menu Items
   const filteredMenuItems = useMemo(() => {
@@ -297,13 +297,32 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                   <div className="p-8 text-center rounded-3xl bg-[#FAF7F2] border border-dashed border-[#EBE6DD] space-y-3">
                     <UtensilsCrossed className="w-8 h-8 text-slate-400 mx-auto" />
                     <p className="text-xs font-bold text-slate-600">No dishes added to Table {table.tableNumber} yet.</p>
-                    <button
-                      type="button"
-                      onClick={() => setActiveWorkspaceTab('MENU')}
-                      className="px-4 py-2 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs transition-colors cursor-pointer"
-                    >
-                      + Open Menu & Add Dishes
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                      <button
+                        type="button"
+                        onClick={() => setActiveWorkspaceTab('MENU')}
+                        className="px-4 py-2 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs transition-colors cursor-pointer"
+                      >
+                        + Open Menu & Add Dishes
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const repeated = repeatPreviousOrder(table.tableNumber);
+                          if (!repeated) {
+                            setRepeatOrderError('No previous completed order found for this table.');
+                            setTimeout(() => setRepeatOrderError(''), 3000);
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-[#0B253A] border border-[#EBE6DD] font-black text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Repeat Previous Order</span>
+                      </button>
+                    </div>
+                    {repeatOrderError && (
+                      <p className="text-[11px] font-bold text-rose-600">{repeatOrderError}</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -364,6 +383,24 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                     <Receipt className="w-3.5 h-3.5" />
                     <span>Send Bill Request to Counter POS</span>
                   </button>
+
+                  {/* Only offered while nothing has been fired to the kitchen
+                      yet — clearCart() wipes the whole cart, so it would be
+                      unsafe to expose once items are already cooking. */}
+                  {firedCartItems.length === 0 && unFiredCartItems.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (window.confirm('Discard this unfired order and start over? Nothing has been sent to the kitchen yet.')) {
+                          clearCart();
+                        }
+                      }}
+                      className="w-full py-2 px-4 rounded-2xl bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Discard Order</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

@@ -19,6 +19,15 @@ import {
   KOTRecord,
   KOTType,
   LicenseInfo,
+  LoyaltyTier,
+  LoyaltyReward,
+  StaffShiftSchedule,
+  AttendanceRecord,
+  AttendanceStatus,
+  MarketingCampaign,
+  CustomerSegmentFilter,
+  DeliveryRider,
+  DeliveryStatus,
   PlanTier,
   PlanEntitlements,
   ManagerOverrideAction,
@@ -697,6 +706,13 @@ export class OrderRepository {
       }
     }
 
+    // Automated loyalty earn — previously nothing credited points or
+    // advanced totalSpend/totalVisits on an actual paid order; only a
+    // manual addPoints() call existed, never wired to checkout.
+    if (order.customerPhone) {
+      CustomerRepository.earnPointsForOrder(order.customerPhone, order.totalAmount);
+    }
+
     db.notify();
 
     // Directly post settled order to authoritative Local Service for cross-port sync
@@ -860,6 +876,75 @@ export class OrderRepository {
     }
 
     return false;
+  }
+}
+
+/**
+ * Delivery rider roster + dispatch tracking — previously a DELIVERY order
+ * had an orderType and nothing else: no address capture beyond whatever was
+ * typed as a note, no rider roster, no way to know if an order was ever
+ * actually handed to a rider or delivered.
+ */
+export class RiderRepository {
+  public static getAllRiders(): DeliveryRider[] {
+    return db.deliveryRiders;
+  }
+
+  public static getActiveRiders(): DeliveryRider[] {
+    return db.deliveryRiders.filter((r) => r.isActive);
+  }
+
+  public static createRider(data: Omit<DeliveryRider, 'id' | 'createdAt'>): DeliveryRider {
+    const rider: DeliveryRider = { id: `rider-${Date.now()}`, createdAt: new Date().toISOString(), ...data };
+    db.deliveryRiders.push(rider);
+    AuditRepository.log({ action: 'RIDER_CREATED', category: 'STAFF', details: `Added rider ${rider.name} (${rider.phone})`, username: 'Manager' });
+    db.notify();
+    return rider;
+  }
+
+  public static updateRider(id: string, updates: Partial<DeliveryRider>): DeliveryRider | null {
+    const idx = db.deliveryRiders.findIndex((r) => r.id === id);
+    if (idx === -1) return null;
+    db.deliveryRiders[idx] = { ...db.deliveryRiders[idx], ...updates };
+    db.notify();
+    return db.deliveryRiders[idx];
+  }
+
+  public static deleteRider(id: string): boolean {
+    const idx = db.deliveryRiders.findIndex((r) => r.id === id);
+    if (idx === -1) return false;
+    db.deliveryRiders.splice(idx, 1);
+    db.notify();
+    return true;
+  }
+
+  public static assignRider(orderId: string, riderId: string): Order | null {
+    const order = db.orders.find((o) => o.id === orderId);
+    const rider = db.deliveryRiders.find((r) => r.id === riderId);
+    if (!order || !rider) return null;
+
+    order.riderId = rider.id;
+    order.riderName = rider.name;
+    order.deliveryStatus = 'ASSIGNED';
+    order.updatedAt = new Date().toISOString();
+
+    AuditRepository.log({ action: 'DELIVERY_RIDER_ASSIGNED', category: 'ORDER', details: `Assigned ${rider.name} to order ${order.orderNumber}`, username: 'Manager' });
+    db.notify();
+    return order;
+  }
+
+  public static updateDeliveryStatus(orderId: string, status: DeliveryStatus): Order | null {
+    const order = db.orders.find((o) => o.id === orderId);
+    if (!order) return null;
+
+    order.deliveryStatus = status;
+    order.updatedAt = new Date().toISOString();
+    if (status === 'OUT_FOR_DELIVERY' && !order.dispatchedAt) order.dispatchedAt = new Date().toISOString();
+    if (status === 'DELIVERED') order.deliveredAt = new Date().toISOString();
+
+    AuditRepository.log({ action: 'DELIVERY_STATUS_UPDATED', category: 'ORDER', details: `Order ${order.orderNumber} marked ${status}`, username: 'Manager' });
+    db.notify();
+    return order;
   }
 }
 
@@ -1141,6 +1226,219 @@ export class CustomerRepository {
     }
     db.notify();
     return account.favoriteItemIds.includes(itemId);
+  }
+
+  // ── Loyalty Tiers ──────────────────────────────────────────────────────
+
+  public static getTiers(): LoyaltyTier[] {
+    return [...db.loyaltyTiers].sort((a, b) => a.minLifetimeSpend - b.minLifetimeSpend);
+  }
+
+  /** The highest tier whose spend threshold the account's lifetime spend clears. Bronze (0) always matches, so this never returns undefined when at least one tier exists. */
+  public static getTierForAccount(account: CustomerAccount): LoyaltyTier | undefined {
+    const spend = account.totalSpend || 0;
+    return this.getTiers()
+      .filter((t) => spend >= t.minLifetimeSpend)
+      .pop();
+  }
+
+  public static createTier(tier: Omit<LoyaltyTier, 'id'>): LoyaltyTier {
+    const newTier: LoyaltyTier = { id: `tier-${Date.now()}`, ...tier };
+    db.loyaltyTiers.push(newTier);
+    AuditRepository.log({ action: 'LOYALTY_TIER_CREATED', category: 'CUSTOMER', details: `Created loyalty tier "${newTier.name}"`, username: 'Manager' });
+    db.notify();
+    return newTier;
+  }
+
+  public static updateTier(id: string, updates: Partial<LoyaltyTier>): LoyaltyTier | null {
+    const idx = db.loyaltyTiers.findIndex((t) => t.id === id);
+    if (idx === -1) return null;
+    db.loyaltyTiers[idx] = { ...db.loyaltyTiers[idx], ...updates };
+    db.notify();
+    return db.loyaltyTiers[idx];
+  }
+
+  public static deleteTier(id: string): boolean {
+    const idx = db.loyaltyTiers.findIndex((t) => t.id === id);
+    if (idx === -1) return false;
+    db.loyaltyTiers.splice(idx, 1);
+    db.notify();
+    return true;
+  }
+
+  // ── Rewards Catalog ────────────────────────────────────────────────────
+
+  public static getRewards(): LoyaltyReward[] {
+    return db.loyaltyRewards;
+  }
+
+  public static createReward(reward: Omit<LoyaltyReward, 'id'>): LoyaltyReward {
+    const newReward: LoyaltyReward = { id: `reward-${Date.now()}`, ...reward };
+    db.loyaltyRewards.push(newReward);
+    AuditRepository.log({ action: 'LOYALTY_REWARD_CREATED', category: 'CUSTOMER', details: `Added reward "${newReward.name}" (${newReward.pointsCost} pts)`, username: 'Manager' });
+    db.notify();
+    return newReward;
+  }
+
+  public static updateReward(id: string, updates: Partial<LoyaltyReward>): LoyaltyReward | null {
+    const idx = db.loyaltyRewards.findIndex((r) => r.id === id);
+    if (idx === -1) return null;
+    db.loyaltyRewards[idx] = { ...db.loyaltyRewards[idx], ...updates };
+    db.notify();
+    return db.loyaltyRewards[idx];
+  }
+
+  public static deleteReward(id: string): boolean {
+    const idx = db.loyaltyRewards.findIndex((r) => r.id === id);
+    if (idx === -1) return false;
+    db.loyaltyRewards.splice(idx, 1);
+    db.notify();
+    return true;
+  }
+
+  /** Redeems a catalog reward against the customer's points balance — replaces the previous flat "any point = ₹1" assumption. */
+  public static redeemReward(phone: string, rewardId: string): { ok: boolean; reason?: string } {
+    const account = db.customerAccounts.find((a) => a.phone === phone);
+    if (!account) return { ok: false, reason: 'Customer not found' };
+    const reward = db.loyaltyRewards.find((r) => r.id === rewardId && r.isActive);
+    if (!reward) return { ok: false, reason: 'Reward not found or inactive' };
+    if (account.loyaltyPoints < reward.pointsCost) return { ok: false, reason: 'Not enough points' };
+
+    account.loyaltyPoints -= reward.pointsCost;
+    AuditRepository.log({
+      action: 'LOYALTY_REWARD_REDEEMED',
+      category: 'CUSTOMER',
+      details: `${account.name || phone} redeemed "${reward.name}" for ${reward.pointsCost} pts`,
+      username: 'Manager'
+    });
+    db.notify();
+    return { ok: true };
+  }
+
+  /**
+   * Automated earn rule, called on order settlement: base rate of 1 point
+   * per ₹10 spent, multiplied by the customer's current tier. Also advances
+   * totalSpend/totalVisits/lastVisitAt, which previously were seed-only
+   * fields nothing ever updated — a customer's tier could never actually
+   * change from real activity.
+   */
+  public static earnPointsForOrder(phone: string, orderTotal: number): number {
+    const account = this.getOrCreateAccount(phone);
+    const tierBefore = this.getTierForAccount(account);
+
+    account.totalSpend = (account.totalSpend || 0) + orderTotal;
+    account.totalVisits = (account.totalVisits || 0) + 1;
+    account.lastVisitAt = new Date().toISOString();
+
+    const tier = this.getTierForAccount(account) || tierBefore;
+    const basePoints = Math.floor(orderTotal / 10);
+    const earned = Math.floor(basePoints * (tier?.pointsMultiplier ?? 1));
+    account.loyaltyPoints += earned;
+
+    if (tierBefore && tier && tier.id !== tierBefore.id) {
+      AuditRepository.log({
+        action: 'LOYALTY_TIER_UPGRADED',
+        category: 'CUSTOMER',
+        details: `${account.name || phone} upgraded from ${tierBefore.name} to ${tier.name}`,
+        username: 'System'
+      });
+    }
+
+    db.notify();
+    return earned;
+  }
+}
+
+/**
+ * Marketing campaigns — evolves the previous one-at-a-time, un-saved
+ * WhatsApp deep-link button into a real segment + reusable message template
+ * + tracked send queue. There is still no WhatsApp Business API/SMS gateway
+ * anywhere in this system, so sending is still one wa.me link per recipient
+ * — that's a real external constraint, not something faked away here; what
+ * changes is that the audience and message are computed and saved once,
+ * and the queue tracks who's already been sent to.
+ */
+export class MarketingRepository {
+  public static getCampaigns(): MarketingCampaign[] {
+    return [...db.marketingCampaigns].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  public static createCampaign(data: { name: string; messageTemplate: string; segmentFilter: CustomerSegmentFilter }): MarketingCampaign {
+    const campaign: MarketingCampaign = {
+      id: `camp-${Date.now()}`,
+      name: data.name,
+      messageTemplate: data.messageTemplate,
+      segmentFilter: data.segmentFilter,
+      status: 'DRAFT',
+      sentToPhones: [],
+      createdAt: new Date().toISOString()
+    };
+    db.marketingCampaigns.unshift(campaign);
+    AuditRepository.log({ action: 'CAMPAIGN_CREATED', category: 'CUSTOMER', details: `Created campaign "${campaign.name}"`, username: 'Manager' });
+    db.notify();
+    return campaign;
+  }
+
+  public static updateCampaign(id: string, updates: Partial<MarketingCampaign>): MarketingCampaign | null {
+    const idx = db.marketingCampaigns.findIndex((c) => c.id === id);
+    if (idx === -1) return null;
+    db.marketingCampaigns[idx] = { ...db.marketingCampaigns[idx], ...updates };
+    db.notify();
+    return db.marketingCampaigns[idx];
+  }
+
+  public static deleteCampaign(id: string): boolean {
+    const idx = db.marketingCampaigns.findIndex((c) => c.id === id);
+    if (idx === -1) return false;
+    db.marketingCampaigns.splice(idx, 1);
+    db.notify();
+    return true;
+  }
+
+  /** Real segment matching against actual CustomerAccount data — every filter field is optional and ANDs together. */
+  public static getMatchingCustomers(filter: CustomerSegmentFilter): CustomerAccount[] {
+    const tiers = CustomerRepository.getTiers();
+    const minTierRank = filter.minTierId ? tiers.findIndex((t) => t.id === filter.minTierId) : -1;
+    const now = Date.now();
+    const thisMonth = new Date().getMonth();
+
+    return db.customerAccounts.filter((cust) => {
+      if (filter.tags && filter.tags.length > 0) {
+        if (!cust.tags || !filter.tags.some((t) => cust.tags!.includes(t))) return false;
+      }
+      if (filter.minLifetimeSpend !== undefined && (cust.totalSpend || 0) < filter.minLifetimeSpend) {
+        return false;
+      }
+      if (minTierRank >= 0) {
+        const custTier = CustomerRepository.getTierForAccount(cust);
+        const custRank = custTier ? tiers.findIndex((t) => t.id === custTier.id) : -1;
+        if (custRank < minTierRank) return false;
+      }
+      if (filter.inactiveForDays !== undefined) {
+        const lastVisit = cust.lastVisitAt ? new Date(cust.lastVisitAt).getTime() : 0;
+        const daysSince = lastVisit === 0 ? Infinity : (now - lastVisit) / (1000 * 60 * 60 * 24);
+        if (daysSince < filter.inactiveForDays) return false;
+      }
+      if (filter.birthdayThisMonth) {
+        if (!cust.dob || new Date(cust.dob).getMonth() !== thisMonth) return false;
+      }
+      return true;
+    });
+  }
+
+  /** Renders {{name}} in the message template for one recipient. */
+  public static renderMessage(template: string, customer: CustomerAccount): string {
+    return template.replace(/\{\{\s*name\s*\}\}/gi, customer.name || 'Valued Guest');
+  }
+
+  public static markSent(campaignId: string, phone: string): void {
+    const campaign = db.marketingCampaigns.find((c) => c.id === campaignId);
+    if (!campaign) return;
+    if (!campaign.sentToPhones.includes(phone)) {
+      campaign.sentToPhones.push(phone);
+    }
+    if (campaign.status === 'DRAFT') campaign.status = 'ACTIVE';
+    db.notify();
   }
 }
 
@@ -1927,6 +2225,8 @@ export class InventoryRepository {
       costImpact: data.costImpact,
       orderId: data.orderId,
       reason: data.reason,
+      wastageReasonCode: data.wastageReasonCode,
+      photoUrl: data.photoUrl,
       performedBy: data.performedBy,
       timestamp: new Date().toISOString()
     };
@@ -2106,6 +2406,106 @@ export class StaffRepository {
   }
 }
 
+/**
+ * Staff work rosters and daily attendance — previously nonexistent.
+ * StaffRepository only ever managed login accounts (username/role/PIN), not
+ * who is scheduled to work when, or whether they actually clocked in.
+ */
+export class StaffScheduleRepository {
+  public static getSchedules(): StaffShiftSchedule[] {
+    return [...db.staffSchedules].sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
+  }
+
+  public static getSchedulesForRange(startDate: string, endDate: string): StaffShiftSchedule[] {
+    return this.getSchedules().filter((s) => s.date >= startDate && s.date <= endDate);
+  }
+
+  public static createSchedule(data: Omit<StaffShiftSchedule, 'id' | 'createdAt'>): StaffShiftSchedule {
+    const shift: StaffShiftSchedule = { id: `sched-${Date.now()}`, createdAt: new Date().toISOString(), ...data };
+    db.staffSchedules.push(shift);
+    AuditRepository.log({
+      action: 'STAFF_SHIFT_SCHEDULED',
+      category: 'STAFF',
+      details: `Scheduled ${shift.userName} for ${shift.date} ${shift.startTime}-${shift.endTime}`,
+      username: 'Manager'
+    });
+    db.notify();
+    return shift;
+  }
+
+  public static updateSchedule(id: string, updates: Partial<StaffShiftSchedule>): StaffShiftSchedule | null {
+    const idx = db.staffSchedules.findIndex((s) => s.id === id);
+    if (idx === -1) return null;
+    db.staffSchedules[idx] = { ...db.staffSchedules[idx], ...updates };
+    db.notify();
+    return db.staffSchedules[idx];
+  }
+
+  public static deleteSchedule(id: string): boolean {
+    const idx = db.staffSchedules.findIndex((s) => s.id === id);
+    if (idx === -1) return false;
+    db.staffSchedules.splice(idx, 1);
+    db.notify();
+    return true;
+  }
+
+  // ── Attendance ─────────────────────────────────────────────────────────
+
+  public static getAttendanceForDate(date: string): AttendanceRecord[] {
+    return db.attendanceRecords.filter((a) => a.date === date);
+  }
+
+  public static getAttendanceForUser(userId: string, days = 30): AttendanceRecord[] {
+    return db.attendanceRecords
+      .filter((a) => a.userId === userId)
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, days);
+  }
+
+  private static findOrCreateToday(userId: string, userName: string): AttendanceRecord {
+    const today = new Date().toISOString().slice(0, 10);
+    let record = db.attendanceRecords.find((a) => a.userId === userId && a.date === today);
+    if (!record) {
+      record = { id: `att-${Date.now()}`, userId, userName, date: today, status: 'PRESENT' };
+      db.attendanceRecords.push(record);
+    }
+    return record;
+  }
+
+  public static clockIn(userId: string, userName: string): AttendanceRecord {
+    const record = this.findOrCreateToday(userId, userName);
+    record.clockInAt = new Date().toISOString();
+    record.status = 'PRESENT';
+    AuditRepository.log({ action: 'STAFF_CLOCK_IN', category: 'STAFF', details: `${userName} clocked in`, username: userName });
+    db.notify();
+    return record;
+  }
+
+  public static clockOut(userId: string, userName: string): AttendanceRecord | null {
+    const today = new Date().toISOString().slice(0, 10);
+    const record = db.attendanceRecords.find((a) => a.userId === userId && a.date === today);
+    if (!record) return null;
+    record.clockOutAt = new Date().toISOString();
+    AuditRepository.log({ action: 'STAFF_CLOCK_OUT', category: 'STAFF', details: `${userName} clocked out`, username: userName });
+    db.notify();
+    return record;
+  }
+
+  public static markAttendance(userId: string, userName: string, date: string, status: AttendanceStatus, notes?: string): AttendanceRecord {
+    let record = db.attendanceRecords.find((a) => a.userId === userId && a.date === date);
+    if (!record) {
+      record = { id: `att-${Date.now()}`, userId, userName, date, status };
+      db.attendanceRecords.push(record);
+    } else {
+      record.status = status;
+    }
+    if (notes !== undefined) record.notes = notes;
+    AuditRepository.log({ action: 'STAFF_ATTENDANCE_MARKED', category: 'STAFF', details: `${userName} marked ${status} on ${date}`, username: 'Manager' });
+    db.notify();
+    return record;
+  }
+}
+
 export class PrinterRepository {
   public static getAllPrinters(): PrinterDevice[] {
     return db.configuredPrinters;
@@ -2276,7 +2676,12 @@ export class BusinessDayRepository {
         return o.businessDayId === businessDayId;
       }
       if (day) {
-        const oDate = new Date(o.createdAt).toISOString().slice(0, 10);
+        // Match using the same local-time, 5:00 AM-cutoff canonical date the
+        // rest of this class uses — comparing raw UTC calendar dates here
+        // (the previous toISOString().slice(0,10)) silently misclassified
+        // any order created in the small hours local time, since UTC and a
+        // 5 AM cutoff disagree about which calendar day "now" is on.
+        const oDate = this.getCanonicalBusinessDate(new Date(o.createdAt)).dateKey;
         return oDate === day.businessDate;
       }
       return false;
@@ -2492,8 +2897,16 @@ export class BusinessDayRepository {
     let displayDateStr = '';
 
     if (!dateKey) {
-      // Find the most recently closed business day
-      const lastClosed = db.businessDays.find((d) => d.status === 'CLOSED');
+      // Find the most recently closed business day by businessDate — the
+      // array is not guaranteed to be in chronological order (older seed
+      // days can sit ahead of a day closed just now), so a plain .find()
+      // here previously grabbed whichever CLOSED day happened to appear
+      // first, silently reusing a stale historical date instead of
+      // yesterday's real close and corrupting which orders the new day's
+      // date-fallback matching (getOrdersForBusinessDay) picks up.
+      const lastClosed = [...db.businessDays]
+        .filter((d) => d.status === 'CLOSED' && d.businessDate)
+        .sort((a, b) => b.businessDate.localeCompare(a.businessDate))[0];
       if (lastClosed && lastClosed.businessDate) {
         const [y, m, d] = lastClosed.businessDate.split('-').map(Number);
         const nextDt = new Date(y, m - 1, d + 1, 8, 0, 0);

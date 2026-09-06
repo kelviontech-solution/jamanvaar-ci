@@ -34,4 +34,12 @@ export class SupportController {
   ) {
     return this.support.revokeDeviceSession(body.deviceId, body.reason, actor);
   }
+
+  @Post('impersonate')
+  impersonate(
+    @Body() body: { restaurantId: string; reason: string },
+    @CurrentPlatformUser() actor: PlatformUser
+  ) {
+    return this.support.impersonateOwner(body.restaurantId, body.reason, actor);
+  }
 }

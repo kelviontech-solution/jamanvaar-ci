@@ -23,6 +23,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
 }) => {
   const [menuItemId, setMenuItemId] = useState('');
   const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     if (recipeToEdit) {
@@ -86,9 +87,16 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!menuItemId || ingredients.length === 0) return;
+    setFormError('');
+    if (!menuItemId || ingredients.length === 0) {
+      setFormError('Select a dish and add at least one ingredient.');
+      return;
+    }
     const dish = menuItems.find((m) => m.id === menuItemId);
-    if (!dish) return;
+    if (!dish) {
+      setFormError('Selected dish could not be found — pick it again from the list.');
+      return;
+    }
 
     RecipeRepository.createRecipe({
       id: recipeToEdit?.id,
@@ -197,6 +205,12 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
               <span className="font-mono font-black text-[#0B253A] ml-2">₹{selectedDish.price}</span>
             </div>
           </div>
+        )}
+
+        {formError && (
+          <p className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+            {formError}
+          </p>
         )}
 
         <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">

@@ -1,0 +1,23 @@
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { User } from '@prisma/client';
+import { BranchesService } from './branches.service';
+import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
+import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.decorator';
+
+/**
+ * A restaurant's own authenticated session listing its own sibling branches
+ * — never another restaurant's. Read-only: branch creation/status changes
+ * stay a Super Admin action via BranchesController. Backs the multi-outlet
+ * switcher in Restaurant Admin, which previously had no way to see other
+ * branches under the same restaurant at all.
+ */
+@Controller('api/v1/tenant/branches')
+@UseGuards(TenantAuthGuard)
+export class TenantBranchesController {
+  constructor(private readonly branches: BranchesService) {}
+
+  @Get()
+  list(@CurrentTenantUser() user: User) {
+    return this.branches.list(user.restaurantId);
+  }
+}

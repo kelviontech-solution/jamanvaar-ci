@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { InventoryItem, Recipe } from '@jamanvaar/types';
-import { InventoryRepository, RecipeRepository } from '@jamanvaar/database';
+import { InventoryRepository, RecipeRepository, db } from '@jamanvaar/database';
 import { formatINR } from '@jamanvaar/utils';
 import {
   Package,
@@ -12,7 +12,8 @@ import {
   Trash2,
   AlertTriangle,
   Layers,
-  ArrowUpDown
+  ArrowUpDown,
+  Trash
 } from 'lucide-react';
 
 interface InventoryRecipesModuleProps {
@@ -22,6 +23,7 @@ interface InventoryRecipesModuleProps {
   onOpenInventoryModal: (item?: InventoryItem | null) => void;
   onOpenRecipeModal: (rec?: Recipe | null) => void;
   onOpenStockAdjustModal: (item: InventoryItem) => void;
+  onOpenWastageModal: (item: InventoryItem) => void;
   showToast: (msg: string) => void;
   onRequestConfirm?: (dialog: {
     isOpen: boolean;
@@ -40,9 +42,14 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
   onOpenInventoryModal,
   onOpenRecipeModal,
   onOpenStockAdjustModal,
+  onOpenWastageModal,
   showToast,
   onRequestConfirm
 }) => {
+  // Not memoized: db.stockMovements/inventoryItems are mutated in place, not
+  // reassigned, so a useMemo keyed on either reference would never invalidate.
+  // App.tsx already re-renders this whole tree on every db.notify().
+  const recentWastage = db.stockMovements.filter((m) => m.type === 'WASTE' || m.type === 'SPOILAGE').slice(0, 8);
   const [inventorySearch, setInventorySearch] = useState('');
   const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState<string>('ALL');
 
@@ -339,6 +346,13 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
                           Adjust Stock
                         </button>
                         <button
+                          onClick={() => onOpenWastageModal(stock)}
+                          title="Log Wastage"
+                          className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl transition-all active:scale-95 shadow-2xs cursor-pointer"
+                        >
+                          <Trash className="w-3.5 h-3.5" />
+                        </button>
+                        <button
                           onClick={() => onOpenInventoryModal(stock)}
                           className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                           title="Edit Item"
@@ -434,6 +448,55 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
                         </button>
                       </div>
                     </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Recent Wastage Log */}
+      <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-2xs">
+        <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Trash className="w-4 h-4 text-rose-600" />
+            <span className="font-extrabold text-sm text-[#0B253A]">Recent Wastage Log</span>
+          </div>
+          <span className="text-xs text-slate-400 font-semibold">Last {recentWastage.length} of {db.stockMovements.filter((m) => m.type === 'WASTE' || m.type === 'SPOILAGE').length} entries</span>
+        </div>
+        {recentWastage.length === 0 ? (
+          <div className="py-10 text-center px-4 space-y-1">
+            <p className="text-xs text-slate-400">No wastage logged yet. Use "Log Wastage" on an ingredient to record spoilage, prep trim, or breakage.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-slate-500 uppercase font-black text-[11px] tracking-wider">
+                <tr>
+                  <th className="p-4">Item</th>
+                  <th className="p-4">Reason</th>
+                  <th className="p-4">Qty</th>
+                  <th className="p-4">Cost Impact</th>
+                  <th className="p-4">Evidence</th>
+                  <th className="p-4">Logged</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                {recentWastage.map((m) => (
+                  <tr key={m.id} className="hover:bg-[#FDFBF7] transition-colors">
+                    <td className="p-4 font-bold text-[#0B253A]">{m.itemName}</td>
+                    <td className="p-4 text-slate-600">{m.reason}</td>
+                    <td className="p-4 font-mono text-rose-700">{m.quantityDelta} {m.unit}</td>
+                    <td className="p-4 font-mono font-bold text-rose-700">₹{(m.costImpact ?? 0).toFixed(2)}</td>
+                    <td className="p-4">
+                      {m.photoUrl ? (
+                        <img src={m.photoUrl} alt="Wastage evidence" className="w-10 h-10 object-cover rounded-lg border border-[#EBE6DD]" />
+                      ) : (
+                        <span className="text-slate-300">—</span>
+                      )}
+                    </td>
+                    <td className="p-4 text-slate-500">{new Date(m.timestamp).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</td>
                   </tr>
                 ))}
               </tbody>

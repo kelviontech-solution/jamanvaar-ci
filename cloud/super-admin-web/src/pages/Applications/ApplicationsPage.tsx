@@ -197,7 +197,7 @@ export function ApplicationsPage() {
                     </span>
                   ))}
                   {app.defaultPort && (
-                    <span className="platform-pill" style={{ color: 'var(--accent-primary)' }}>
+                    <span className="platform-pill" style={{ color: 'var(--jv-accent)' }}>
                       PORT {app.defaultPort}
                     </span>
                   )}
@@ -241,7 +241,7 @@ export function ApplicationsPage() {
                       Recent Releases ({app.recentReleases.length})
                     </div>
                     {app.recentReleases.length === 0 ? (
-                      <div style={{ color: 'var(--text-muted)' }}>No previous releases recorded.</div>
+                      <div style={{ color: 'var(--jv-text-muted)' }}>No previous releases recorded.</div>
                     ) : (
                       app.recentReleases.map((rel) => (
                         <div className="release-history-item" key={rel.id}>

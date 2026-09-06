@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
 import { Sparkles } from 'lucide-react';
 import './ui.css';
 
@@ -27,13 +27,19 @@ export function Button({
 export function Card({
   children,
   className = '',
-  variant = 'default'
+  variant = 'default',
+  style
 }: {
   children: ReactNode;
   className?: string;
   variant?: 'default' | 'luxury' | 'hero' | 'subtle';
+  style?: CSSProperties;
 }) {
-  return <div className={`card card-${variant} ${className}`}>{children}</div>;
+  return (
+    <div className={`card card-${variant} ${className}`} style={style}>
+      {children}
+    </div>
+  );
 }
 
 export type BadgeTone = 'success' | 'warning' | 'error' | 'neutral' | 'accent' | 'gold';
@@ -85,6 +91,31 @@ export function EmptyState({
       <h3>{title}</h3>
       <p>{description}</p>
       {action && <div className="empty-state-action">{action}</div>}
+    </div>
+  );
+}
+
+export function ErrorState({
+  message,
+  onRetry
+}: {
+  message: string;
+  onRetry?: () => void;
+}) {
+  return (
+    <div className="empty-state" style={{ borderColor: 'rgba(239, 68, 68, 0.2)', background: '#fffcfc' }}>
+      <div className="empty-state-icon-box" style={{ background: '#fef2f2', color: '#dc2626', fontWeight: 800 }}>
+        !
+      </div>
+      <h3 style={{ color: '#991b1b' }}>Unable to load data</h3>
+      <p style={{ color: '#7f1d1d' }}>{message}</p>
+      {onRetry && (
+        <div className="empty-state-action">
+          <Button variant="accent" size="sm" onClick={onRetry}>
+            Retry
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -274,15 +305,17 @@ export function SearchBar({
   value,
   onChange,
   placeholder = 'Search…',
-  width = '280px'
+  width = '280px',
+  className = ''
 }: {
   value: string;
   onChange: (val: string) => void;
   placeholder?: string;
   width?: string;
+  className?: string;
 }) {
   return (
-    <div className="ui-search-wrapper" style={{ width }}>
+    <div className={`ui-search-wrapper ${className}`} style={{ width }}>
       <input
         type="text"
         className="ui-search-input"
@@ -305,6 +338,49 @@ export function SearchBar({
 }
 
 /* ── Filter Tabs Component ── */
+/**
+ * Bulk-selection toolbar shown above a data table once at least one row is
+ * checked. Every list page that adopts this loops its own row-level PATCH
+ * endpoint over the selected IDs (there is no dedicated bulk API) and passes
+ * the resulting buttons in as children.
+ */
+export function BulkActionsBar({
+  selectedCount,
+  onClear,
+  children
+}: {
+  selectedCount: number;
+  onClear: () => void;
+  children: React.ReactNode;
+}) {
+  if (selectedCount === 0) return null;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '10px 16px',
+        background: '#0B253A',
+        color: '#fff',
+        borderRadius: 10,
+        marginBottom: 12
+      }}
+    >
+      <span style={{ fontSize: 13, fontWeight: 700 }}>{selectedCount} selected</span>
+      <div style={{ display: 'flex', gap: 8 }}>{children}</div>
+      <div style={{ flex: 1 }} />
+      <button
+        type="button"
+        onClick={onClear}
+        style={{ background: 'none', border: 'none', color: '#cbd5e1', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+      >
+        Clear selection
+      </button>
+    </div>
+  );
+}
+
 export function FilterTabs<T extends string>({
   options,
   value,

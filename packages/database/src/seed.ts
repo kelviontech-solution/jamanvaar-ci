@@ -742,6 +742,15 @@ export function generateSeedOrders(): import('@jamanvaar/types').Order[] {
 
   const orders: import('@jamanvaar/types').Order[] = [];
   const now = new Date();
+  // The restaurant's business day rolls over at 5:00 AM local time, not
+  // midnight (BusinessDayRepository.getCanonicalBusinessDate). Every "which
+  // calendar day is this seed order on" computation below must agree with
+  // that rule, or an order generated between midnight and 5 AM lands on a
+  // business day that hasn't opened yet from the app's own point of view.
+  const canonicalToday = new Date(now);
+  if (canonicalToday.getHours() < 5) {
+    canonicalToday.setDate(canonicalToday.getDate() - 1);
+  }
   let orderSeq = 9900;
   let tokenSeq = 100;
 
@@ -756,7 +765,7 @@ export function generateSeedOrders(): import('@jamanvaar/types').Order[] {
   ];
 
   dayConfigs.forEach(({ daysAgo, count }) => {
-    const baseDate = new Date(now);
+    const baseDate = new Date(canonicalToday);
     baseDate.setDate(baseDate.getDate() - daysAgo);
 
     for (let i = 0; i < count; i++) {
@@ -893,8 +902,9 @@ export function generateSeedOrders(): import('@jamanvaar/types').Order[] {
     }
   });
 
-  // Dedicated Real-time Seed QR Table Orders
-  const todayDayId = `BD-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+  // Dedicated Real-time Seed QR Table Orders — uses the same canonicalToday
+  // (5:00 AM cutoff) computed above, for the same reason.
+  const todayDayId = `BD-${canonicalToday.getFullYear()}${String(canonicalToday.getMonth() + 1).padStart(2, '0')}${String(canonicalToday.getDate()).padStart(2, '0')}`;
   const qrSeedConfigs = [
     {
       orderNumber: 'QR-1042',

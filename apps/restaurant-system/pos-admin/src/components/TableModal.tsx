@@ -22,6 +22,7 @@ export const TableModal: React.FC<TableModalProps> = ({
   const [floor, setFloor] = useState('1');
   const [status, setStatus] = useState<TableStatus>('AVAILABLE');
   const [isActive, setIsActive] = useState(true);
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     if (tableToEdit) {
@@ -43,7 +44,11 @@ export const TableModal: React.FC<TableModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!tableNumber) return;
+    setFormError('');
+    if (!tableNumber) {
+      setFormError('Table number is required.');
+      return;
+    }
 
     if (tableToEdit) {
       TableRepository.updateTable(tableToEdit.id, {
@@ -144,6 +149,12 @@ export const TableModal: React.FC<TableModalProps> = ({
             <option value="CLEANING">🟡 CLEANING / RESET</option>
           </select>
         </div>
+
+        {formError && (
+          <p className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+            {formError}
+          </p>
+        )}
 
         <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
           <Button variant="outline" size="sm" type="button" onClick={onClose}>

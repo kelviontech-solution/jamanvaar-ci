@@ -37,6 +37,7 @@ import {
   Activity,
   AlertCircle,
   Award,
+  CalendarClock,
   CheckCircle2,
   Coins,
   CreditCard,
@@ -49,6 +50,8 @@ import {
   Package,
   Printer,
   QrCode,
+  Lock,
+  ChevronDown,
   Settings,
   ShieldCheck,
   ShoppingBag,
@@ -67,6 +70,8 @@ import { QrOrderingModule } from './components/qr/QrOrderingModule';
 import { GuestQrOrderingPage } from './components/qr/GuestQrOrderingPage';
 import { MenuCategoriesModule } from './components/menu/MenuCategoriesModule';
 import { FloorTablesModule } from './components/tables/FloorTablesModule';
+import { ReservationsModule } from './components/reservations/ReservationsModule';
+import { BranchDirectoryModal } from './components/header/BranchDirectoryModal';
 import { InventoryRecipesModule } from './components/inventory/InventoryRecipesModule';
 import { CustomersCrmModule } from './components/customers/CustomersCrmModule';
 import { StaffRolesModule } from './components/staff/StaffRolesModule';
@@ -94,6 +99,7 @@ import { RecipeModal } from './components/RecipeModal';
 import { PrinterModal } from './components/PrinterModal';
 import { PrebuiltMenuModal } from './components/PrebuiltMenuModal';
 import { StockAdjustModal } from './components/StockAdjustModal';
+import { WastageLogModal } from './components/inventory/WastageLogModal';
 import { CashDropModal } from './components/CashDropModal';
 import { EodReportModal } from './components/EodReportModal';
 import { RestoreModal } from './components/RestoreModal';
@@ -107,6 +113,7 @@ export type PosAdminTab =
   | 'LIVE_KDS'
   | 'MENU'
   | 'TABLES'
+  | 'RESERVATIONS'
   | 'KITCHEN_KOT'
   | 'INVENTORY'
   | 'CUSTOMERS'
@@ -131,6 +138,29 @@ export default function PosAdminApp() {
 
   const [activeTab, setActiveTab] = useState<PosAdminTab>('DASHBOARD');
   const [dbTick, setDbTick] = useState(0);
+
+  // Sidebar sections are collapsible and remembered per install (localStorage)
+  // — previously all 19 nav items across 5 sections were always fully
+  // expanded with no way to hide sections a given owner never uses.
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>(() => {
+    try {
+      const raw = localStorage.getItem('jamanvaar_posadmin_collapsed_sections');
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
+  const toggleSection = (section: string) => {
+    setCollapsedSections((prev) => {
+      const next = { ...prev, [section]: !prev[section] };
+      try {
+        localStorage.setItem('jamanvaar_posadmin_collapsed_sections', JSON.stringify(next));
+      } catch {
+        // localStorage unavailable — collapse state just won't persist across reloads.
+      }
+      return next;
+    });
+  };
 
   // Authentication State — restored from persisted session
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(
@@ -288,6 +318,11 @@ export default function PosAdminApp() {
   const [isStockAdjustModalOpen, setIsStockAdjustModalOpen] = useState(false);
   const [stockAdjustItem, setStockAdjustItem] = useState<InventoryItem | null>(null);
 
+  const [isWastageModalOpen, setIsWastageModalOpen] = useState(false);
+  const [wastageItem, setWastageItem] = useState<InventoryItem | null>(null);
+
+  const [isBranchDirectoryOpen, setIsBranchDirectoryOpen] = useState(false);
+
   const [isCashDropModalOpen, setIsCashDropModalOpen] = useState(false);
   const [isEodModalOpen, setIsEodModalOpen] = useState(false);
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
@@ -354,6 +389,7 @@ export default function PosAdminApp() {
   const menuItems = db.menuItems;
   const tables = useMemo(() => [...db.tables], [dbTick]);
   const orders = useMemo(() => [...db.orders], [dbTick]);
+  const reservations = useMemo(() => [...db.reservations], [dbTick]);
   const kots = useMemo(() => [...db.kots], [dbTick]);
   const shifts = useMemo(() => [...db.shifts], [dbTick]);
   const users = db.users;
@@ -615,6 +651,8 @@ export default function PosAdminApp() {
         <PosAdminHeader
           restaurantName={db.restaurant.name}
           outletName={db.outlet.name}
+          isCloudConnected={cloudConnected}
+          onOpenBranchDirectory={() => setIsBranchDirectoryOpen(true)}
           globalSearch={globalSearch}
           onOpenGlobalSearch={() => setIsGlobalSearchOpen(true)}
           activeShift={activeShift}
@@ -640,6 +678,7 @@ export default function PosAdminApp() {
                     { id: 'ORDERS', label: 'Orders', icon: ShoppingBag },
                     { id: 'LIVE_KDS', label: 'Live Orders / KDS', icon: Flame },
                     { id: 'TABLES', label: 'Floor / Tables', icon: Grid },
+                    { id: 'RESERVATIONS', label: 'Reservations', icon: CalendarClock },
                     { id: 'KITCHEN_KOT', label: 'Kitchen / KOT', icon: Activity }
                   ]
                 },
@@ -674,11 +713,27 @@ export default function PosAdminApp() {
                     { id: 'BACKUP', label: 'Backup & Restore', icon: Database }
                   ]
                 }
-              ].map((grp) => (
+              ].map((grp) => {
+                const hasActiveTab = grp.items.some((it) => it.id === activeTab);
+                // A section holding the currently-open tab always shows,
+                // regardless of its remembered collapse state — you should
+                // never lose sight of where you are.
+                const isExpanded = hasActiveTab || !collapsedSections[grp.section];
+                return (
                 <div key={grp.section} className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 py-0.5 block font-mono">
-                    {grp.section}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(grp.section)}
+                    className="w-full flex items-center justify-between px-3 py-0.5 cursor-pointer group/section"
+                  >
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover/section:text-slate-600 font-mono">
+                      {grp.section}
+                    </span>
+                    <ChevronDown
+                      className={`w-3 h-3 text-slate-300 group-hover/section:text-slate-500 transition-transform ${isExpanded ? '' : '-rotate-90'}`}
+                    />
+                  </button>
+                  {isExpanded && (
                   <nav className="space-y-0.5">
                     {grp.items.map((nav) => {
                       const Icon = nav.icon;
@@ -694,13 +749,23 @@ export default function PosAdminApp() {
                         badgeColor = 'bg-amber-600 text-white shadow-2xs';
                       }
 
+                      // A locked module used to look like any other clickable
+                      // nav item with just a small "PRO" tag — a CORE-tier
+                      // owner could only tell it was locked after navigating
+                      // in. Now the whole row visibly dims and shows a lock
+                      // icon before the click, not after.
+                      const isLockedPro = nav.id === 'QR_ORDERING' && db.license?.tier !== 'PRO';
+
                       return (
                         <button
                           key={nav.id}
                           onClick={() => setActiveTab(nav.id as PosAdminTab)}
+                          title={isLockedPro ? 'PRO plan required — tap to see what unlocks' : undefined}
                           className={`relative w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-xs sm:text-[13px] transition-all duration-150 cursor-pointer ${
                             isSelected
                               ? 'bg-[#0B253A] text-white shadow-xs'
+                              : isLockedPro
+                              ? 'text-[#94A3B8] hover:bg-white/60'
                               : 'text-[#4A5568] hover:bg-white hover:text-[#0B253A]'
                           }`}
                         >
@@ -711,10 +776,10 @@ export default function PosAdminApp() {
                             />
                           )}
 
-                          <div className="flex items-center gap-2.5 min-w-0 pl-1">
+                          <div className={`flex items-center gap-2.5 min-w-0 pl-1 ${isLockedPro ? 'opacity-60' : ''}`}>
                             <Icon
                               className={`w-4 h-4 shrink-0 transition-colors ${
-                                isSelected ? 'text-[#E66817]' : 'text-slate-400 group-hover:text-[#0B253A]'
+                                isSelected ? 'text-[#E66817]' : isLockedPro ? 'text-slate-400' : 'text-slate-400 group-hover:text-[#0B253A]'
                               }`}
                             />
                             <span className="truncate">{nav.label}</span>
@@ -723,12 +788,13 @@ export default function PosAdminApp() {
                           <div className="flex items-center gap-1.5 shrink-0">
                             {nav.id === 'QR_ORDERING' && (
                               <span
-                                className={`px-1.5 py-0.5 text-[9px] font-black rounded-md uppercase ${
+                                className={`flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-black rounded-md uppercase ${
                                   db.license?.tier === 'PRO'
                                     ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                                     : 'bg-amber-100 text-amber-800 border border-amber-200'
                                 }`}
                               >
+                                {isLockedPro && <Lock className="w-2.5 h-2.5" />}
                                 PRO
                               </span>
                             )}
@@ -744,8 +810,10 @@ export default function PosAdminApp() {
                       );
                     })}
                   </nav>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </aside>
 
@@ -768,6 +836,13 @@ export default function PosAdminApp() {
                 setActiveTab={setActiveTab}
                 setReportSubTab={setReportSubTab}
                 setIsReconModalOpen={setIsReconModalOpen}
+                onboardingItems={[
+                  { id: 'menu', label: 'Add dishes to your menu', done: menuItems.length > 0, onGo: () => setActiveTab('MENU') },
+                  { id: 'tables', label: 'Set up your floor & tables', done: tables.length > 0, onGo: () => setActiveTab('TABLES') },
+                  { id: 'printer', label: 'Connect a receipt printer', done: configuredPrinters.length > 0, onGo: () => setActiveTab('HARDWARE') },
+                  { id: 'staff', label: 'Add your team members', done: users.length > 1, onGo: () => setActiveTab('STAFF') },
+                  { id: 'first_order', label: 'Take your first order', done: orders.length > 0, onGo: () => setActiveTab('TABLES') }
+                ]}
                 onRefresh={() => {
                   setDbTick((t) => t + 1);
                   showToast('Dashboard metrics refreshed');
@@ -841,6 +916,16 @@ export default function PosAdminApp() {
               />
             )}
 
+            {/* TAB 7B: TABLE RESERVATIONS */}
+            {activeTab === 'RESERVATIONS' && (
+              <ReservationsModule
+                reservations={reservations}
+                tables={tables}
+                showToast={showToast}
+                onRequestConfirm={setConfirmDialog}
+              />
+            )}
+
             {/* TAB 8: INVENTORY & RECIPES */}
             {activeTab === 'INVENTORY' && (
               <InventoryRecipesModule
@@ -858,6 +943,10 @@ export default function PosAdminApp() {
                 onOpenStockAdjustModal={(item) => {
                   setStockAdjustItem(item);
                   setIsStockAdjustModalOpen(true);
+                }}
+                onOpenWastageModal={(item) => {
+                  setWastageItem(item);
+                  setIsWastageModalOpen(true);
                 }}
                 showToast={showToast}
                 onRequestConfirm={setConfirmDialog}
@@ -879,6 +968,7 @@ export default function PosAdminApp() {
                   setCustomerToEdit(cust);
                   setIsCustomerModalOpen(true);
                 }}
+                onRequestConfirm={setConfirmDialog}
               />
             )}
 
@@ -1078,6 +1168,19 @@ export default function PosAdminApp() {
           onClose={() => setIsStockAdjustModalOpen(false)}
           item={stockAdjustItem}
           onSaved={() => showToast('Stock movement recorded!')}
+        />
+
+        <WastageLogModal
+          isOpen={isWastageModalOpen}
+          onClose={() => setIsWastageModalOpen(false)}
+          item={wastageItem}
+          onSaved={() => showToast('Wastage logged')}
+          onRequestConfirm={setConfirmDialog}
+        />
+
+        <BranchDirectoryModal
+          isOpen={isBranchDirectoryOpen}
+          onClose={() => setIsBranchDirectoryOpen(false)}
         />
 
         <CashDropModal

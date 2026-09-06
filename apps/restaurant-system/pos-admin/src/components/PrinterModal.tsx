@@ -21,6 +21,7 @@ export const PrinterModal: React.FC<PrinterModalProps> = ({
   const [port, setPort] = useState('USB001');
   const [paperSize, setPaperSize] = useState<PrinterDevice['paperSize']>('80mm');
   const [isDefault, setIsDefault] = useState(false);
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     if (printerToEdit) {
@@ -40,7 +41,11 @@ export const PrinterModal: React.FC<PrinterModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name) return;
+    setFormError('');
+    if (!name) {
+      setFormError('Printer name is required.');
+      return;
+    }
 
     if (printerToEdit) {
       PrinterRepository.updatePrinter(printerToEdit.id, {
@@ -152,6 +157,12 @@ export const PrinterModal: React.FC<PrinterModalProps> = ({
             <span>Set as Default Terminal Receipt Printer</span>
           </label>
         </div>
+
+        {formError && (
+          <p className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+            {formError}
+          </p>
+        )}
 
         <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
           <Button variant="outline" size="sm" type="button" onClick={onClose}>

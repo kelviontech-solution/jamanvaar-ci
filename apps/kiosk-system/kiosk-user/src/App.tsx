@@ -315,7 +315,7 @@ export default function KioskUserApp() {
 
   // Payment Countdown
   useEffect(() => {
-    if (step !== 'CHECKOUT_PAYMENT' || paymentStatus === 'SUCCESS') return;
+    if (step !== 'CHECKOUT_PAYMENT' || paymentStatus === 'SUCCESS' || paymentStatus === 'EXPIRED') return;
     const interval = setInterval(() => {
       setPaymentTimeLeft((prev) => {
         if (prev <= 1) {
@@ -917,6 +917,26 @@ export default function KioskUserApp() {
 
         {/* Right: Controls & Network Status */}
         <div className="flex items-center gap-2.5 sm:gap-3">
+          {/* Accessibility toggle — high-contrast + large-text mode already
+              existed in state/CSS but had no way to turn it on. */}
+          <button
+            onClick={() => {
+              const next = !(isHighContrast && isLargeText);
+              setIsHighContrast(next);
+              setIsLargeText(next);
+              showToast(next ? 'Accessibility mode on: larger text, higher contrast' : 'Accessibility mode off');
+            }}
+            title="Toggle larger text & higher contrast"
+            aria-pressed={isHighContrast && isLargeText}
+            className={`w-11 h-11 rounded-2xl border flex items-center justify-center transition-all active:scale-95 ${
+              isHighContrast && isLargeText
+                ? 'bg-[#0B253A] border-[#0B253A] text-white'
+                : 'bg-[#FBF9F5] border-[#EBE6DD] text-[#0B253A] hover:bg-[#F4EFE6]'
+            }`}
+          >
+            <Eye className="w-5 h-5" />
+          </button>
+
           {/* Subtle Non-Scary Network Indicator (Section 122 & 153) */}
           <button
             onClick={() => {
@@ -1669,6 +1689,27 @@ export default function KioskUserApp() {
           </div>
 
           <div className="bg-white rounded-3xl p-8 border border-[#EBE6DD] shadow-lg max-w-xl mx-auto w-full text-center space-y-6">
+            {paymentStatus === 'EXPIRED' ? (
+              <div className="py-8 space-y-4">
+                <Clock className="w-16 h-16 text-rose-500 mx-auto" />
+                <h3 className="text-xl font-black text-[#0B253A]">Payment Session Expired</h3>
+                <p className="text-sm text-[#4A5568]">
+                  This QR/payment session timed out. Nothing was charged — start again to get a fresh code.
+                </p>
+                <Button
+                  variant="accent"
+                  size="touch"
+                  className="w-full"
+                  onClick={() => {
+                    setPaymentStatus('CREATED');
+                    setPaymentTimeLeft(180);
+                  }}
+                >
+                  Try Again
+                </Button>
+              </div>
+            ) : (
+              <>
             {paymentMethod === 'UPI_QR' && (
               <div className="space-y-4">
                 <p className="text-sm font-semibold text-[#4A5568]">{t('scanQrToPay')}</p>
@@ -1715,6 +1756,8 @@ export default function KioskUserApp() {
                 {paymentMethod === 'CASH_AT_COUNTER' ? 'Confirm & Get Token' : 'Simulate Payment Success'}
               </Button>
             </div>
+              </>
+            )}
           </div>
         </div>
       )}

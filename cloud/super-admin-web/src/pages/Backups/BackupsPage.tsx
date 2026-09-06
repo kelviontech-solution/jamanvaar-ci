@@ -78,6 +78,12 @@ export function BackupsPage() {
   const [triggerError, setTriggerError] = useState<string | null>(null);
 
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3500);
+  };
 
   const load = () => {
     setLoading(true);
@@ -109,7 +115,7 @@ export function BackupsPage() {
       const res = await api.get<{ url: string }>(`/api/v1/restaurants/${restaurantId}/backups/${backupId}/download`);
       window.open(res.url, '_blank');
     } catch (e) {
-      alert(e instanceof ApiError ? e.message : 'Failed to generate download link');
+      showToast(e instanceof ApiError ? e.message : 'Failed to generate download link');
     } finally {
       setDownloadingId(null);
     }
@@ -142,6 +148,11 @@ export function BackupsPage() {
 
   return (
     <div className="backups-page-container">
+      {toast && (
+        <div style={{ padding: '10px 16px', background: '#0B253A', color: '#fff', borderRadius: 8, marginBottom: 16, fontSize: 13, fontWeight: 600 }}>
+          {toast}
+        </div>
+      )}
       <PageHeader
         title="Fleet Backups & Data Recovery"
         subtitle="Centralized tenant snapshot ledger, offline-first transaction sync backups, and emergency recovery downloads."
@@ -236,21 +247,21 @@ export function BackupsPage() {
           className="backups-search"
         />
         <FilterTabs
-          tabs={[
-            { key: 'ALL', label: 'All Snapshots', count: data?.backups.length },
+          options={[
+            { id: 'ALL', label: 'All Snapshots', count: data?.backups.length },
             {
-              key: 'COMPLETED',
+              id: 'COMPLETED',
               label: 'Completed',
               count: data?.backups.filter((b) => b.status === 'COMPLETED').length
             },
             {
-              key: 'FAILED',
+              id: 'FAILED',
               label: 'Failed',
               count: data?.backups.filter((b) => b.status === 'FAILED').length
             }
           ]}
-          activeTab={statusFilter}
-          onTabChange={(t) => setStatusFilter(t as typeof statusFilter)}
+          value={statusFilter}
+          onChange={setStatusFilter}
         />
       </div>
 

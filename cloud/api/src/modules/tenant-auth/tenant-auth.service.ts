@@ -24,6 +24,7 @@ export interface TenantAccessTokenPayload {
   sub: string; // User.id
   restaurantId: string;
   email: string;
+  impersonatedBy?: string; // PlatformUser.id — set only on a support-issued impersonation token
 }
 
 export interface TenantLoginResult {
@@ -66,6 +67,43 @@ export class TenantAuthService {
       audience: TENANT_JWT_AUDIENCE,
       expiresIn: this.config.get<string>('JWT_ACCESS_TTL') ?? '15m'
     });
+  }
+
+  /**
+   * Support-issued impersonation token — a real, valid tenant access token
+   * for the restaurant's OWNER, scoped to 15 minutes and stamped with
+   * `impersonatedBy` so it's distinguishable from an ordinary login if
+   * decoded later. No refresh token is issued: once it expires, the support
+   * agent must re-request (and re-justify) another one. Callers (the
+   * support/platform-side endpoint) are responsible for the audit log entry
+   * and the actor-role check — this method only knows how to mint the token
+   * once a caller has already decided it's authorized.
+   */
+  async impersonateOwner(restaurantId: string, impersonatingPlatformUserId: string): Promise<{ accessToken: string; expiresAt: Date; owner: TenantLoginResult['user'] }> {
+    const owner = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.user.findFirst({ where: { restaurantId, role: 'OWNER', status: TenantUserStatus.ACTIVE } })
+    );
+    if (!owner) throw new NotFoundException('No active owner account found for this restaurant');
+
+    const ttlSeconds = 15 * 60;
+    const payload: TenantAccessTokenPayload = {
+      sub: owner.id,
+      restaurantId: owner.restaurantId,
+      email: owner.email,
+      impersonatedBy: impersonatingPlatformUserId
+    };
+    const accessToken = this.jwt.sign(payload, {
+      secret: this.config.get<string>('JWT_ACCESS_SECRET'),
+      issuer: TENANT_JWT_ISSUER,
+      audience: TENANT_JWT_AUDIENCE,
+      expiresIn: ttlSeconds
+    });
+
+    return {
+      accessToken,
+      expiresAt: new Date(Date.now() + ttlSeconds * 1000),
+      owner: publicUser(owner)
+    };
   }
 
   private async issueRefreshToken(userId: string, restaurantId: string): Promise<{ token: string; expiresAt: Date }> {

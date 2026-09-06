@@ -33,6 +33,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   const [isFeatured, setIsFeatured] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [modifierGroupIds, setModifierGroupIds] = useState<string[]>([]);
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     if (itemToEdit) {
@@ -102,10 +103,17 @@ export const ItemModal: React.FC<ItemModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !price) return;
+    setFormError('');
+    if (!name || !price) {
+      setFormError('Dish name and price are required.');
+      return;
+    }
 
     const numPrice = Number(price);
-    if (isNaN(numPrice) || numPrice <= 0) return;
+    if (isNaN(numPrice) || numPrice <= 0) {
+      setFormError('Price must be a number greater than zero.');
+      return;
+    }
 
     if (itemToEdit) {
       MenuRepository.updateMenuItem(itemToEdit.id, {
@@ -423,6 +431,12 @@ export const ItemModal: React.FC<ItemModalProps> = ({
             <span>Show "Popular" Tag</span>
           </label>
         </div>
+
+        {formError && (
+          <p className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+            {formError}
+          </p>
+        )}
 
         {/* Actions */}
         <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">

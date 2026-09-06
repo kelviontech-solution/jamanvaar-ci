@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { PaymentMethod } from '@jamanvaar/types';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, generateUUID } from '@jamanvaar/utils';
 import { sound } from '@jamanvaar/ui';
 import { PosDiscountModal } from '../cart/PosDiscountModal';
 import {
@@ -147,6 +147,14 @@ export const PosPaymentModal: React.FC = () => {
   const isFullyAllocated = totalAllocated === totalPayable && totalPayable > 0;
   const isOverAllocated = totalAllocated > totalPayable;
   const isUnderAllocated = totalAllocated < totalPayable;
+
+  // "Mark UPI Paid"/"Mark Card Paid" used to be purely decorative — a
+  // cashier could hit Confirm & Settle without ever tapping them. Now any
+  // channel actually allocated money must be confirmed before settlement.
+  const upiPortion = Number(allocations.UPI) || 0;
+  const cardPortion = Number(allocations.CARD) || 0;
+  const isReadyToSettle =
+    isFullyAllocated && (upiPortion === 0 || upiConfirmed) && (cardPortion === 0 || cardConfirmed);
 
   // Cash change calculation
   const cashPortion = Number(allocations.CASH) || 0;
@@ -300,7 +308,7 @@ export const PosPaymentModal: React.FC = () => {
       if (e.key === 'Escape') {
         e.preventDefault();
         setIsPaymentOpen(false);
-      } else if (e.key === 'Enter' && !isInput && isFullyAllocated) {
+      } else if (e.key === 'Enter' && !isInput && isReadyToSettle) {
         e.preventDefault();
         handleSettle();
       } else if (!isInput) {
@@ -315,7 +323,7 @@ export const PosPaymentModal: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPaymentOpen, isFullyAllocated]);
+  }, [isPaymentOpen, isReadyToSettle]);
 
   // Settle and Confirm Payment
   const handleSettle = () => {
@@ -351,7 +359,10 @@ export const PosPaymentModal: React.FC = () => {
     setIsProcessing(true);
 
     try {
-      const txnRef = `TXN-${Date.now().toString().slice(-6)}`;
+      // A real random reference, not a clock-derived value — this is the
+      // persisted transaction reference used for reconciliation, not just
+      // display text, so it needs genuine uniqueness guarantees.
+      const txnRef = `TXN-${generateUUID().replace(/-/g, '').slice(0, 10).toUpperCase()}`;
       const res = completePayment(
         finalMethod,
         cashPortion > 0 ? cashReceived : undefined,
@@ -385,8 +396,8 @@ export const PosPaymentModal: React.FC = () => {
               <span className="text-[11px] font-black text-[#E66817] uppercase tracking-wider bg-[#FFF4ED] px-2 py-0.5 rounded border border-[#FDBA74]">
                 PAYMENT & SETTLEMENT
               </span>
-              <span className="text-xs text-slate-500 font-mono font-bold">
-                Order #{Date.now().toString().slice(-4)}
+              <span className="text-xs text-slate-500 font-mono font-bold uppercase">
+                New Order — Not Yet Saved
               </span>
             </div>
             <div className="flex items-baseline gap-3 mt-1">
@@ -998,9 +1009,9 @@ export const PosPaymentModal: React.FC = () => {
               <button
                 type="button"
                 onClick={handleSettle}
-                disabled={!isFullyAllocated || isProcessing}
+                disabled={!isReadyToSettle || isProcessing}
                 className={`w-full py-4 rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 ${
-                  isFullyAllocated && !isProcessing
+                  isReadyToSettle && !isProcessing
                     ? 'bg-gradient-to-r from-[#E66817] to-[#F27E2B] hover:from-[#EA580C] hover:to-[#E66817] text-white shadow-orange-500/25 cursor-pointer'
                     : 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300/60'
                 }`}
@@ -1016,7 +1027,11 @@ export const PosPaymentModal: React.FC = () => {
               </button>
 
               <span className="text-[10px] text-slate-400 text-center block">
-                Settles bill, queues 80mm thermal receipt, and updates active cashier shift ledger.
+                {isFullyAllocated && !isReadyToSettle
+                  ? `Confirm ${upiPortion > 0 && !upiConfirmed ? 'UPI' : ''}${
+                      upiPortion > 0 && !upiConfirmed && cardPortion > 0 && !cardConfirmed ? ' & ' : ''
+                    }${cardPortion > 0 && !cardConfirmed ? 'Card' : ''} payment above before settling.`
+                  : 'Settles bill, queues 80mm thermal receipt, and updates active cashier shift ledger.'}
               </span>
             </div>
           </div>

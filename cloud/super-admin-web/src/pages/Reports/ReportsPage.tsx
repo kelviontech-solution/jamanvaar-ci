@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api, ApiError } from '../../api/client';
+import { api, ApiError, API_BASE, getAccessToken } from '../../api/client';
 import {
   PageHeader,
   Card,
@@ -104,6 +104,12 @@ export function ReportsPage() {
   const [subData, setSubData] = useState<SubscriptionReportData | null>(null);
 
   const [exporting, setExporting] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3500);
+  };
 
   const loadData = () => {
     setLoading(true);
@@ -136,8 +142,9 @@ export function ReportsPage() {
   const handleExport = async (type: string) => {
     setExporting(true);
     try {
-      const res = await fetch(`http://localhost:4000/api/v1/platform/reports/export?type=${type}`, {
-        credentials: 'include'
+      const res = await fetch(`${API_BASE}/api/v1/platform/reports/export?type=${type}`, {
+        credentials: 'include',
+        headers: getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {}
       });
       if (!res.ok) throw new Error('Failed to export CSV');
       const blob = await res.blob();
@@ -150,7 +157,7 @@ export function ReportsPage() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (e) {
-      alert('Export failed. Please try again.');
+      showToast('Export failed. Please try again.');
     } finally {
       setExporting(false);
     }
@@ -158,6 +165,11 @@ export function ReportsPage() {
 
   return (
     <div className="reports-page-container">
+      {toast && (
+        <div style={{ padding: '10px 16px', background: '#0B253A', color: '#fff', borderRadius: 8, marginBottom: 16, fontSize: 13, fontWeight: 600 }}>
+          {toast}
+        </div>
+      )}
       <PageHeader
         title="Platform Reports & Analytics"
         subtitle="Comprehensive SaaS telemetry, financial reconciliation, restaurant cohort growth, and device fleet operations."
@@ -253,14 +265,14 @@ export function ReportsPage() {
       {/* Tabs Filter */}
       <div className="reports-tabs-bar">
         <FilterTabs
-          tabs={[
-            { key: 'revenue', label: 'Revenue Analytics' },
-            { key: 'restaurants', label: 'Restaurant Cohorts' },
-            { key: 'devices', label: 'Device Telemetry' },
-            { key: 'subscriptions', label: 'Plan Distribution' }
+          options={[
+            { id: 'revenue', label: 'Revenue Analytics' },
+            { id: 'restaurants', label: 'Restaurant Cohorts' },
+            { id: 'devices', label: 'Device Telemetry' },
+            { id: 'subscriptions', label: 'Plan Distribution' }
           ]}
-          activeTab={activeTab}
-          onTabChange={(t) => setActiveTab(t as ReportTab)}
+          value={activeTab}
+          onChange={setActiveTab}
         />
       </div>
 
