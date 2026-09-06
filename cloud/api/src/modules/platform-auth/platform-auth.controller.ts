@@ -48,7 +48,7 @@ export class PlatformAuthController {
   ) {
     const result = await this.authService.login(body.email, body.password);
     this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
-    return { accessToken: result.accessToken, user: result.user };
+    return { accessToken: result.accessToken, user: { ...result.user, role: 'SUPER_ADMIN' } };
   }
 
   @Post('refresh')
@@ -88,7 +88,7 @@ export class PlatformMeController {
 
   @Get('me')
   me(@CurrentPlatformUser() user: PlatformUser) {
-    return { id: user.id, email: user.email, fullName: user.fullName, status: user.status };
+    return { id: user.id, email: user.email, fullName: user.fullName, role: 'SUPER_ADMIN', status: user.status };
   }
 
   @Patch('me/password')

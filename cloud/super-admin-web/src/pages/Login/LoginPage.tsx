@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { ApiError } from '../../api/client';
 import { Button } from '../../components/ui';
-import { JAMANVAAR_LOGOS } from '@jamanvaar/ui';
-import { Lock, Mail, ShieldCheck } from 'lucide-react';
+// See ProtectedLayout.tsx for why this bypasses the '@jamanvaar/ui' barrel.
+import { JAMANVAAR_LOGOS } from '../../../../../packages/ui/src/assets';
 import './login.css';
 
 export function LoginPage() {
@@ -23,7 +23,13 @@ export function LoginPage() {
       await login(email, password);
       navigate('/', { replace: true });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.');
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else if (err instanceof Error && err.message.includes('fetch')) {
+        setError('Cloud API is unreachable at http://localhost:4000. Please ensure the backend is running.');
+      } else {
+        setError('Something went wrong. Please check your credentials and try again.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -80,3 +86,4 @@ export function LoginPage() {
     </div>
   );
 }
+

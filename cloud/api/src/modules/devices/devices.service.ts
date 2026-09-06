@@ -1,7 +1,14 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PlatformUser } from '@prisma/client';
+import { Device, PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+
+export interface HeartbeatDto {
+  lastSyncAt?: Date;
+  lastBackupAt?: Date;
+  syncStatus?: string;
+  appVersion?: string;
+}
 
 /**
  * No device ever gets fabricated here. Devices only ever appear once the
@@ -65,5 +72,27 @@ export class DevicesService {
 
       return updated;
     });
+  }
+
+  /**
+   * ENT-001-adjacent gap this closes: Device.lastSyncAt/lastBackupAt/syncStatus
+   * existed as schema columns with nothing populating them, because no device
+   * had any way to authenticate a write to its own row. DeviceAuthGuard is
+   * that path now — the device identifies itself via its own long-lived
+   * credential, never a caller-supplied device id.
+   */
+  async reportHeartbeat(device: Device, dto: HeartbeatDto) {
+    return this.prisma.runAsTenant(device.restaurantId, (tx) =>
+      tx.device.update({
+        where: { id: device.id },
+        data: {
+          lastSeenAt: new Date(),
+          ...(dto.lastSyncAt ? { lastSyncAt: dto.lastSyncAt } : {}),
+          ...(dto.lastBackupAt ? { lastBackupAt: dto.lastBackupAt } : {}),
+          ...(dto.syncStatus ? { syncStatus: dto.syncStatus } : {}),
+          ...(dto.appVersion ? { appVersion: dto.appVersion } : {})
+        }
+      })
+    );
   }
 }

@@ -13,3 +13,6 @@ Thumbs.db
 .jamanvaar/
 JAMANVAAR_DESKTOP_PACKAGE/
 *.zip
+tooling/local-runtime/.local_service_key
+packages/database/src/live_db.json.tmp
+packages/database/src/live_db.json.bak

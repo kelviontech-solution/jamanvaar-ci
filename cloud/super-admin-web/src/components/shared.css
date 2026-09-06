@@ -166,6 +166,8 @@
   gap: 4px;
   border-bottom: 1px solid var(--jv-border);
   margin-bottom: 20px;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 .tab-btn {
   background: none;
@@ -177,6 +179,8 @@
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .tab-btn.active {
   color: var(--jv-primary);
@@ -337,4 +341,61 @@
   flex-direction: column;
   gap: 14px;
   max-width: 420px;
+}
+
+.user-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.user-card {
+  padding: 18px;
+}
+.user-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--jv-bg-muted);
+  color: var(--jv-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.user-avatar-owner {
+  background: #fff4eb;
+  color: var(--jv-accent);
+}
+.user-card-name {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--jv-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-card-role {
+  font-size: 11px;
+  color: var(--jv-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+}
+.user-card-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--jv-text);
+  margin-top: 6px;
+}
+.user-card-detail.muted {
+  color: var(--jv-text-muted);
+  font-size: 11.5px;
 }

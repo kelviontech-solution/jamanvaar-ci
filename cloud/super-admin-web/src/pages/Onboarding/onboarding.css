@@ -1,0 +1,375 @@
+.onboard-wizard {
+  max-width: 920px;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+
+.onboard-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 24px;
+}
+
+.onboard-step-pill {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: var(--jv-bg-muted, #f4efe6);
+  color: var(--jv-text-secondary, #64748b);
+  border: 1px solid var(--jv-border, #ebe6dd);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.onboard-step-pill.active {
+  background: var(--jv-primary, #0b253a);
+  color: #fff;
+  border-color: var(--jv-primary, #0b253a);
+  box-shadow: 0 4px 12px rgba(11, 37, 58, 0.15);
+}
+
+.onboard-step-pill.complete:not(.active) {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #a7f3d0;
+}
+
+.onboard-card {
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--jv-border, #ebe6dd);
+  box-shadow: 0 4px 20px rgba(11, 37, 58, 0.04);
+}
+
+.form-section-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-subtext {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: -10px;
+  margin-bottom: 16px;
+}
+
+/* Plan Selection Cards */
+.plan-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.plan-select-card {
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  cursor: pointer;
+  background: #ffffff;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.plan-select-card:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(11, 37, 58, 0.06);
+}
+
+.plan-select-card.selected {
+  border-color: #e66817;
+  background: #fffcf9;
+  box-shadow: 0 8px 28px rgba(230, 104, 23, 0.12);
+}
+
+.plan-card-popular-badge {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  background: linear-gradient(135deg, #e66817 0%, #d45a0e 100%);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 6px rgba(230, 104, 23, 0.35);
+}
+
+.plan-card-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0b253a;
+  margin-bottom: 6px;
+}
+
+.plan-card-price {
+  font-size: 26px;
+  font-weight: 900;
+  color: #0f172a;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.plan-card-price span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.plan-card-desc {
+  font-size: 12px;
+  color: #475569;
+  margin-bottom: 16px;
+  min-height: 36px;
+}
+
+.plan-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 14px;
+  font-size: 12px;
+  color: #334155;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.plan-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Device Key Selection Checklist */
+.device-key-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.device-key-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.device-key-option:hover {
+  background: #f1f5f9;
+}
+
+.device-key-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #e66817;
+  cursor: pointer;
+}
+
+.device-key-option-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.device-key-option-desc {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Official Welcome Kit & Handover Styling */
+.welcome-kit-container {
+  background: #faf8f5;
+  border: 1px solid #eadfcf;
+  border-radius: 16px;
+  padding: 36px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(11, 37, 58, 0.08);
+}
+
+.welcome-kit-banner {
+  text-align: center;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #e2d7c5;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.welcome-kit-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: #0b253a;
+  letter-spacing: -0.02em;
+  margin-top: 8px;
+}
+
+.welcome-kit-subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #786c5e;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.credentials-box {
+  background: #ffffff;
+  border: 1px solid #e2d7c5;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(11, 37, 58, 0.04);
+}
+
+.credentials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.credential-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.credential-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.credential-value {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  font-family: 'IBM Plex Mono', monospace;
+  background: #f8fafc;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Device Keys Handover Cards */
+.device-keys-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.device-key-card {
+  background: #ffffff;
+  border: 1px solid #e2d7c5;
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(11, 37, 58, 0.04);
+}
+
+.device-key-type-tag {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #e66817;
+  color: #ffffff;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  margin-bottom: 12px;
+}
+
+.device-qr-wrapper {
+  background: #ffffff;
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.device-code-pill {
+  font-size: 13px;
+  font-weight: 800;
+  font-family: 'IBM Plex Mono', monospace;
+  color: #0b253a;
+  background: #f1f5f9;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px dashed #cbd5e1;
+  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+}
+
+/* Handover Actions Bar */
+.welcome-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+  .app-shell .sidebar,
+  .app-shell header,
+  .onboard-steps,
+  .welcome-actions-bar,
+  .page-header {
+    display: none !important;
+  }
+  .onboard-wizard {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  .welcome-kit-container {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+}

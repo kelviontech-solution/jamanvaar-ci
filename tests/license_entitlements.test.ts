@@ -51,7 +51,11 @@ describe('JAMANVAAR Restaurant Suite — Plan & License Entitlement Engine', () 
     expect(access.message).toContain('Captain App is available in JAMANVAAR PRO');
   });
 
-  it('should support instant offline dealer license activation', () => {
+  // NOTE: activatePlan() is the low-level, unverified primitive kept for test
+  // setup — production UI no longer calls it directly (ENT-001 fix). The real
+  // dealer/offline activation path is applyLicenseCertificate(), covered in
+  // tests/license_certificate.test.ts.
+  it('the underlying activatePlan primitive records a license key when given one', () => {
     LicenseRepository.activatePlan('PRO', 'JAMAN-DEALER-PRO-9921');
     const license = EntitlementService.getActiveLicense();
 

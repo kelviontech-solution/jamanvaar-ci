@@ -892,7 +892,8 @@ export class JamanvaarDatabase {
       restaurantAdmin: true,
       captainApp: true,
       advancedCaptainReports: true,
-      advancedServiceWorkflow: true
+      advancedServiceWorkflow: true,
+      qrTableOrdering: true
     }
   };
 

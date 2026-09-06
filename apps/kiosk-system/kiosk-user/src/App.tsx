@@ -176,6 +176,12 @@ export default function KioskUserApp() {
   const [upiQrData, setUpiQrData] = useState<string | null>(null);
   const [paymentTimeLeft, setPaymentTimeLeft] = useState<number>(180);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  // Data-integrity fix: this used to be regenerated fresh inside
+  // handleFinalizePayment on every call, so the IdempotencyManager.isDuplicate
+  // check there could never trip — a double-tapped "Pay" button created two
+  // orders. Generated once per checkout attempt (when payment starts) and
+  // reused by every retry of finalizing THAT SAME attempt.
+  const orderIdempotencyKeyRef = useRef<string | null>(null);
 
   // Confirmed Order & Auto-Print State
   const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
@@ -354,6 +360,7 @@ export default function KioskUserApp() {
       window.speechSynthesis.cancel();
     }
     setSessionId(generateUUID());
+    orderIdempotencyKeyRef.current = null;
     setStep('WELCOME');
     setCartItems([]);
     setSelectedTable(null);
@@ -582,6 +589,9 @@ export default function KioskUserApp() {
 
     const tempOrderId = `ord-${Date.now()}`;
     const idempKey = generateIdempotencyKey('pay');
+    // One order-creation idempotency key per checkout attempt, reused by
+    // every call to handleFinalizePayment for this attempt (see ref comment).
+    orderIdempotencyKeyRef.current = generateIdempotencyKey('kiosk_ord');
 
     try {
       const res = await PaymentService.startPayment({
@@ -604,7 +614,10 @@ export default function KioskUserApp() {
     resetIdleTimer();
     setIsProcessingPayment(true);
 
-    const idempotencyKey = generateIdempotencyKey('kiosk_ord');
+    // Fall back to a fresh key only if this was somehow reached without
+    // handleStartPayment having run first — the normal path always reuses
+    // the same key across retries so the duplicate check below is meaningful.
+    const idempotencyKey = orderIdempotencyKeyRef.current || generateIdempotencyKey('kiosk_ord');
 
     if (IdempotencyManager.isDuplicate(idempotencyKey)) {
       alert('Order already being processed.');

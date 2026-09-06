@@ -74,13 +74,24 @@ function formatActor(actorType: string): string {
 
 export function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true);
+    setError(null);
     api
       .get<DashboardSummary>('/api/v1/platform/dashboard')
-      .then(setSummary)
-      .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load dashboard'));
+      .then((data) => {
+        setSummary(data);
+        setError(null);
+      })
+      .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load dashboard'))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    load();
   }, []);
 
   return (
@@ -94,7 +105,7 @@ export function DashboardPage() {
           </p>
         </div>
         <div className="dashboard-header-actions">
-          <Link to="/restaurants" className="btn btn-accent btn-sm">
+          <Link to="/restaurants/onboard" className="btn btn-accent btn-sm">
             <Plus className="w-4 h-4" />
             <span>Onboard Restaurant</span>
           </Link>
@@ -104,10 +115,48 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {error && <div className="dashboard-error">{error}</div>}
+      {error && (
+        <div className="dashboard-error" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>{error}</span>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={load} style={{ color: 'inherit' }}>
+            Retry Loading
+          </button>
+        </div>
+      )}
+
+      {loading && !summary && (
+        <div className="dashboard-content" style={{ marginTop: 20 }}>
+          <div className="hero-metrics-grid">
+            <div className="card skeleton-card" style={{ padding: 24, minHeight: 140 }}>
+              <div className="skeleton-shimmer" style={{ width: '50%', height: 18, borderRadius: 4 }} />
+              <div className="skeleton-shimmer" style={{ width: '70%', height: 36, marginTop: 16, borderRadius: 6 }} />
+              <div className="skeleton-shimmer" style={{ width: '40%', height: 14, marginTop: 12, borderRadius: 4 }} />
+            </div>
+            <div className="card skeleton-card" style={{ padding: 24, minHeight: 140 }}>
+              <div className="skeleton-shimmer" style={{ width: '40%', height: 18, borderRadius: 4 }} />
+              <div className="skeleton-shimmer" style={{ width: '50%', height: 36, marginTop: 16, borderRadius: 6 }} />
+              <div className="skeleton-shimmer" style={{ width: '60%', height: 14, marginTop: 12, borderRadius: 4 }} />
+            </div>
+            <div className="card skeleton-card" style={{ padding: 24, minHeight: 140 }}>
+              <div className="skeleton-shimmer" style={{ width: '45%', height: 18, borderRadius: 4 }} />
+              <div className="skeleton-shimmer" style={{ width: '50%', height: 36, marginTop: 16, borderRadius: 6 }} />
+              <div className="skeleton-shimmer" style={{ width: '55%', height: 14, marginTop: 12, borderRadius: 4 }} />
+            </div>
+          </div>
+          <div className="health-grid" style={{ marginTop: 20 }}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="card skeleton-card" style={{ padding: 18, minHeight: 90 }}>
+                <div className="skeleton-shimmer" style={{ width: '30%', height: 24, borderRadius: 4 }} />
+                <div className="skeleton-shimmer" style={{ width: '60%', height: 14, marginTop: 8, borderRadius: 4 }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {summary && (
         <div className="dashboard-content">
+
           {/* ══════════════════════════════════════════════════════════
               TIER 1: PLATFORM OVERVIEW (HERO FINANCIAL & SCALE)
              ══════════════════════════════════════════════════════════ */}

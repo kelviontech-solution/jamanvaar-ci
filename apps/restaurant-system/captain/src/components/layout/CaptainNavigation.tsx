@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 
 interface CaptainNavigationProps {
-  activeTab: 'TABLES' | 'ORDERS' | 'FOOD_READY' | 'KOTS' | 'MESSAGES' | 'REQUESTS' | 'SHIFT';
-  onSelectTab: (tab: 'TABLES' | 'ORDERS' | 'FOOD_READY' | 'KOTS' | 'MESSAGES' | 'REQUESTS' | 'SHIFT') => void;
+  activeTab: 'TABLES' | 'ORDERS' | 'FOOD_READY' | 'KOTS' | 'MESSAGES' | 'REQUESTS' | 'SHIFT' | 'CUSTOMERS';
+  onSelectTab: (tab: 'TABLES' | 'ORDERS' | 'FOOD_READY' | 'KOTS' | 'MESSAGES' | 'REQUESTS' | 'SHIFT' | 'CUSTOMERS') => void;
   onOpenMoreDrawer: () => void;
 }
 

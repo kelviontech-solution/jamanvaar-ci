@@ -4,6 +4,9 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { generateOpaqueToken, hashOpaqueToken } from '../../common/security/token.util';
+
+const ACTIVATION_TOKEN_TTL_DAYS = 7;
 
 @Injectable()
 export class RestaurantsService {
@@ -24,6 +27,7 @@ export class RestaurantsService {
           name: dto.name,
           legalName: dto.legalName,
           gstin: dto.gstin,
+          fssaiNumber: dto.fssaiNumber,
           address: dto.address,
           city: dto.city,
           state: dto.state,
@@ -44,6 +48,14 @@ export class RestaurantsService {
         }
       });
 
+      // SEC-001 fix: a PENDING_ACTIVATION owner can no longer set their password with
+      // just restaurantId + email. A one-time invitation token is minted here, its hash
+      // stored on the User row, and the plaintext returned exactly once (never persisted,
+      // never logged) — the same pattern already used for ActivationKey.code and the
+      // seeded Super Admin password below.
+      const activationToken = generateOpaqueToken();
+      const activationTokenExpiresAt = new Date(Date.now() + ACTIVATION_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000);
+
       const owner = await tx.user.create({
         data: {
           restaurantId: restaurant.id,
@@ -53,11 +65,12 @@ export class RestaurantsService {
           fullName: dto.ownerName,
           role: 'OWNER',
           status: 'PENDING_ACTIVATION',
-          invitedAt: new Date()
+          invitedAt: new Date(),
+          activationTokenHash: hashOpaqueToken(activationToken),
+          activationTokenExpiresAt
         },
-        // passwordHash is always null at creation, but excluding it by
-        // shape (not just value) keeps the response safe even after a
-        // future phase lets an owner set one.
+        // passwordHash and activationTokenHash are always excluded by shape
+        // (not just value) so this response can never leak a credential.
         select: {
           id: true,
           restaurantId: true,
@@ -86,7 +99,9 @@ export class RestaurantsService {
         tx
       );
 
-      return { restaurant, branch, owner };
+      // Returned once, out-of-band from the audited detail payload above, so it
+      // never ends up in the audit log — the operator must relay it to the owner now.
+      return { restaurant, branch, owner, activationToken, activationTokenExpiresAt };
     });
   }
 
@@ -114,7 +129,7 @@ export class RestaurantsService {
         include: {
           branches: true,
           users: {
-            where: { role: 'OWNER' },
+            orderBy: { createdAt: 'asc' },
             select: {
               id: true,
               restaurantId: true,

@@ -182,6 +182,15 @@ interface PosState {
     code?: string;
     itemIds?: string[];
   }) => void;
+  /** Internal — applies a discount without the SEC-013 manager-approval gate. Only call directly from within applyDiscount's own override-approved callback. */
+  applyDiscountUnchecked: (params: {
+    scope: 'BILL' | 'ITEMS';
+    type: 'PERCENTAGE' | 'FIXED';
+    value: number;
+    reason: string;
+    code?: string;
+    itemIds?: string[];
+  }) => void;
   removeDiscount: () => void;
   setIsDiscountModalOpen: (open: boolean) => void;
   clearCart: () => void;
@@ -229,6 +238,23 @@ interface PosState {
   openCashDrawer: () => void;
   recoverDraftSession: () => void;
   discardDraftSession: () => void;
+}
+
+/**
+ * SEC-013 fix: the >25% / >₹500 manager-approval threshold used to be checked
+ * only inside PosDiscountModal.tsx — a UI component, not the store action that
+ * actually mutates the cart. Any other caller of `applyDiscount` (or the same
+ * function called directly via devtools, since this is a fully client-side
+ * app with no server round-trip) could skip that dialog entirely and apply an
+ * unlimited discount. Exported so the modal and the store enforce the exact
+ * same rule instead of two copies that could drift.
+ */
+export function isManagerOrAboveRole(user: { roleId?: string } | null | undefined): boolean {
+  return user?.roleId === 'role-manager' || user?.roleId === 'role-owner' || user?.roleId === 'role-super-admin';
+}
+
+export function isHighDiscount(type: 'PERCENTAGE' | 'FIXED', value: number): boolean {
+  return (type === 'PERCENTAGE' && value > 25) || (type === 'FIXED' && value > 500);
 }
 
 // Robust Indian Restaurant Tax, Discount & Round-off Calculation
@@ -763,6 +789,36 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     applyDiscount: (params: {
+      scope: 'BILL' | 'ITEMS';
+      type: 'PERCENTAGE' | 'FIXED';
+      value: number;
+      reason: string;
+      code?: string;
+      itemIds?: string[];
+    }) => {
+      const state = get();
+
+      // SEC-013 fix: enforced here, at the actual mutation boundary, not only
+      // in PosDiscountModal.tsx — a discount above the threshold can no longer
+      // be applied by any caller (UI, future code, or a direct store call)
+      // without a manager PIN, even if a caller skips the dialog that used to
+      // be the only place this was checked.
+      if (isHighDiscount(params.type, params.value) && !isManagerOrAboveRole(state.currentUser)) {
+        get().requestManagerOverride(
+          'HIGH_DISCOUNT',
+          `High Discount Approval (${params.type === 'PERCENTAGE' ? `${params.value}%` : `₹${params.value}`})`,
+          `Cashier ${state.currentUser?.fullName || ''} is applying ${params.type === 'PERCENTAGE' ? `${params.value}%` : `₹${params.value}`} discount for "${params.reason}".`,
+          (managerName) => {
+            get().applyDiscountUnchecked({ ...params, reason: `${params.reason} (Approved by ${managerName})` });
+          }
+        );
+        return;
+      }
+
+      get().applyDiscountUnchecked(params);
+    },
+
+    applyDiscountUnchecked: (params: {
       scope: 'BILL' | 'ITEMS';
       type: 'PERCENTAGE' | 'FIXED';
       value: number;

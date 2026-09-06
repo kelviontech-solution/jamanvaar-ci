@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { usePosStore } from '../../store/posStore';
+import { usePosStore, isManagerOrAboveRole, isHighDiscount } from '../../store/posStore';
 import { formatINR } from '@jamanvaar/utils';
 import { sound } from '@jamanvaar/ui';
 import { db } from '@jamanvaar/database';
@@ -179,11 +179,14 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
 
     const finalReason = reason === 'Other' ? (customReason.trim() || 'Other Discount') : reason;
 
-    // Check if Manager Approval is required for high discounts (> 25% or > ₹500)
-    const isManagerRole = currentUser?.roleId === 'role-manager' || currentUser?.roleId === 'role-owner' || currentUser?.roleId === 'role-super-admin';
-    const isHighDiscount = (discountType === 'PERCENTAGE' && numVal > 25) || (discountType === 'FIXED' && numVal > 500);
+    // Manager-approval threshold (SEC-013): same rule the store itself now enforces
+    // at the actual mutation boundary — checked here too only so the PIN prompt
+    // appears immediately, with correct modal-close/sound timing, instead of via
+    // a delayed round-trip through the store's own override redirect.
+    const isManagerRole = isManagerOrAboveRole(currentUser);
+    const needsApproval = isHighDiscount(discountType, numVal) && !isManagerRole;
 
-    if (isHighDiscount && !isManagerRole) {
+    if (needsApproval) {
       requestManagerOverride(
         'HIGH_DISCOUNT',
         `High Discount Approval (${discountType === 'PERCENTAGE' ? `${numVal}%` : `₹${numVal}`})`,

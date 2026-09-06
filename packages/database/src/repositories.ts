@@ -19,6 +19,8 @@ import {
   KOTRecord,
   KOTType,
   LicenseInfo,
+  PlanTier,
+  PlanEntitlements,
   ManagerOverrideAction,
   ManagerOverrideRequest,
   MenuItem,
@@ -394,7 +396,49 @@ export class OrderRepository {
     return db.orders.find((o) => o.tokenNumber === token);
   }
 
+  /**
+   * Data-integrity fix: `subtotal` must equal the sum of what the order's own
+   * items actually cost (unit price × quantity) — discounts are tracked
+   * separately in `discountAmount`/`totalAmount` and never shrink `subtotal`
+   * itself (see packages/business/src/pricing.ts's calculateCart, the shared
+   * trusted calculator every UI already uses). A `subtotal` far below that sum
+   * is either a caller bug or a fabricated total from a caller bypassing the
+   * UI's own cart computation — this doesn't replicate every app's full
+   * tax/discount/round-off pipeline (each already has its own tested one),
+   * it only rejects the one thing no legitimate order can ever produce.
+   */
+  private static validateOrderSubtotal(orderData: Partial<Order>): number {
+    const items = orderData.items || [];
+    const expectedSubtotal = items.reduce((sum, it) => {
+      const lineTotal = typeof it.totalPrice === 'number' ? it.totalPrice : (it.unitPrice || 0) * (it.quantity || 0);
+      return sum + lineTotal;
+    }, 0);
+
+    if (items.length === 0) {
+      return orderData.subtotal || 0;
+    }
+
+    const TOLERANCE = 1; // paise/rupee rounding slack across independently-rounded line items
+    if (typeof orderData.subtotal === 'number' && orderData.subtotal < expectedSubtotal - TOLERANCE) {
+      throw new Error(
+        `Order subtotal (₹${orderData.subtotal}) is lower than the actual cost of its items (₹${expectedSubtotal}) — rejected.`
+      );
+    }
+
+    return typeof orderData.subtotal === 'number' ? orderData.subtotal : expectedSubtotal;
+  }
+
   public static createOrder(orderData: Partial<Order>): Order {
+    // Idempotency fix: a key was generated and stored on every order, but never
+    // looked up before insert — a retried/duplicated submit (network retry, a
+    // double-tapped "place order" button re-firing the same request) created a
+    // second order with a fresh id, not a no-op. Now genuinely deduplicated.
+    if (orderData.idempotencyKey) {
+      const existing = db.orders.find((o) => o.idempotencyKey === orderData.idempotencyKey);
+      if (existing) return existing;
+    }
+
+    const validatedSubtotal = this.validateOrderSubtotal(orderData);
     const businessDayId = orderData.businessDayId || BusinessDayRepository.getActiveBusinessDay().id;
 
     // Reset daily token counter per business day
@@ -411,7 +455,13 @@ export class OrderRepository {
         tokenNumber = (highestToken + 1).toString();
       }
     }
-    const orderNumber = orderData.orderNumber || generateOrderNumber();
+    // Hard uniqueness guarantee, not just a low-probability random draw.
+    let orderNumber = orderData.orderNumber;
+    if (!orderNumber) {
+      do {
+        orderNumber = generateOrderNumber();
+      } while (db.orders.some((o) => o.orderNumber === orderNumber));
+    }
 
     const nowIso = new Date().toISOString();
     const resolvedSourceType = orderData.source_type || 'KIOSK';
@@ -448,7 +498,7 @@ export class OrderRepository {
       customerPhone: orderData.customerPhone,
       customerName: orderData.customerName,
       items: orderData.items || [],
-      subtotal: orderData.subtotal || 0,
+      subtotal: validatedSubtotal,
       discountAmount: orderData.discountAmount || 0,
       discountType: orderData.discountType,
       discountValue: orderData.discountValue,
@@ -1126,6 +1176,41 @@ export class LicenseRepository {
     return db.license;
   }
 
+  /**
+   * ENT-001 fix: the only license write path a production UI should ever call.
+   * Takes data that has ALREADY been cryptographically verified elsewhere
+   * (see @jamanvaar/business's applyLicenseCertificate, which verifies an
+   * ECDSA-signed certificate issued by cloud/api before ever calling this) —
+   * this method itself performs no verification, it only records where the
+   * data came from so a support engineer can audit it later.
+   */
+  public static setVerifiedLicense(
+    payload: { tier: PlanTier; entitlements: PlanEntitlements; expiresAt: string },
+    meta: { source: 'cloud-sync' | 'offline-certificate' }
+  ): LicenseInfo {
+    const isPro = payload.tier === 'PRO';
+    db.license = {
+      ...db.license,
+      tier: payload.tier,
+      planName: isPro ? 'JAMANVAAR PRO' : 'JAMANVAAR CORE',
+      price: isPro ? 7000 : 5000,
+      status: 'ACTIVE',
+      activatedAt: new Date().toISOString(),
+      entitlements: payload.entitlements,
+      verifiedAt: new Date().toISOString(),
+      verificationSource: meta.source
+    };
+    db.notify();
+    return db.license;
+  }
+
+  /**
+   * Unverified, direct tier setter. Kept for test setup (exercising
+   * EntitlementService logic in isolation needs a fast way to flip tiers) and
+   * as the internal primitive `setVerifiedLicense` used to build on — but no
+   * production UI should call this directly any more (see SEC-002/ENT-001:
+   * this used to be reachable from three unauthenticated button handlers).
+   */
   public static activatePlan(tier: 'CORE' | 'PRO', licenseKey?: string): LicenseInfo {
     const isPro = tier === 'PRO';
     const key = licenseKey || (isPro ? 'JAMAN-PRO-2026-AHM-8842-X' : 'JAMAN-CORE-2026-AHM-1104-X');
@@ -1157,7 +1242,8 @@ export class LicenseRepository {
         restaurantAdmin: true,
         captainApp: isPro,
         advancedCaptainReports: isPro,
-        advancedServiceWorkflow: isPro
+        advancedServiceWorkflow: isPro,
+        qrTableOrdering: isPro
       }
     };
     db.notify();
@@ -2560,6 +2646,19 @@ export class NotificationRepository {
   }
 }
 
+/**
+ * SEC-010 fix: table QR tokens used to be `jv_qr_{restaurantId}_{branchId}_tbl_{tableNumber}`
+ * — fully derivable from public IDs, so anyone who knew (or guessed) a table
+ * number could construct a "valid" token without ever scanning the physical
+ * QR code. This generates a high-entropy random suffix instead; the table
+ * number stays in the string only for human debuggability, not as the secret.
+ */
+function generateSecureQrTokenSuffix(): string {
+  const bytes = new Uint8Array(18);
+  globalThis.crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 export class QrOrderingRepository {
   public static getSettings(): QrOrderingSettings {
     if (!db.qrSettings) {
@@ -2596,20 +2695,137 @@ export class QrOrderingRepository {
     return table;
   }
 
-  public static generateTableQr(tableNumber: string): { qrShortCode: string; fullUrl: string; tableNumber: string } {
+  /**
+   * restaurantId/branchId are accepted for call-site compatibility but no
+   * longer embedded in the token (SEC-010 — embedding public IDs is what
+   * made the old token guessable). They may still be used by callers that
+   * pass a fullUrl through a multi-tenant router.
+   */
+  public static generateTableQr(
+    tableNumber: string,
+    _restaurantId?: string,
+    _branchId?: string
+  ): { qrShortCode: string; fullUrl: string; tableNumber: string; qrToken: string } {
     const table = db.tables.find((t) => t.tableNumber === tableNumber || t.id === tableNumber);
     const tblNum = table ? table.tableNumber : tableNumber;
     const qrShortCode = `QR-TABLE-${tblNum.padStart(3, '0')}`;
-    const fullUrl = `https://jamanvaar.menu/table/${tblNum}?code=${qrShortCode}`;
+    const qrToken = `jv_qr_tbl_${tblNum}_${generateSecureQrTokenSuffix()}`;
+    const hostUrl = typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : 'https://jamanvaar.menu';
+    const fullUrl = `${hostUrl}/?qrTable=${tblNum}&token=${qrToken}`;
 
     if (table) {
       table.qrShortCode = qrShortCode;
-      table.qrStatus = 'ACTIVE';
+      table.qrToken = qrToken;
+      table.qrStatus = table.qrStatus === 'DISABLED' ? 'DISABLED' : 'ACTIVE';
       table.qrCodeUrl = fullUrl;
       db.notify();
     }
 
-    return { qrShortCode, fullUrl, tableNumber: tblNum };
+    return { qrShortCode, fullUrl, tableNumber: tblNum, qrToken };
+  }
+
+  public static regenerateTableQr(tableNumber: string): { qrShortCode: string; fullUrl: string; tableNumber: string; qrToken: string } {
+    const table = db.tables.find((t) => t.tableNumber === tableNumber || t.id === tableNumber);
+    const tblNum = table ? table.tableNumber : tableNumber;
+    const qrShortCode = `QR-TABLE-${tblNum.padStart(3, '0')}`;
+    const qrToken = `jv_qr_tbl_${tblNum}_${generateSecureQrTokenSuffix()}`;
+    const hostUrl = typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : 'https://jamanvaar.menu';
+    const fullUrl = `${hostUrl}/?qrTable=${tblNum}&token=${qrToken}`;
+
+    if (table) {
+      table.qrShortCode = qrShortCode;
+      table.qrToken = qrToken;
+      table.qrStatus = 'ACTIVE';
+      table.qrCodeUrl = fullUrl;
+      AuditRepository.log({
+        action: 'QR_REGENERATED',
+        category: 'BUSINESS',
+        details: `Regenerated QR token for Table ${tblNum}`,
+        username: 'Manager'
+      });
+      db.notify();
+    }
+
+    return { qrShortCode, fullUrl, tableNumber: tblNum, qrToken };
+  }
+
+  public static bulkGenerateQr(tableNumbers?: string[]): number {
+    const targets = tableNumbers && tableNumbers.length > 0
+      ? db.tables.filter((t) => tableNumbers.includes(t.tableNumber) || tableNumbers.includes(t.id))
+      : db.tables;
+
+    targets.forEach((t) => {
+      this.generateTableQr(t.tableNumber);
+    });
+    return targets.length;
+  }
+
+  public static bulkUpdateQrStatus(tableNumbers: string[], status: 'ACTIVE' | 'DISABLED'): number {
+    let count = 0;
+    db.tables.forEach((t) => {
+      if (tableNumbers.includes(t.tableNumber) || tableNumbers.includes(t.id)) {
+        t.qrStatus = status;
+        count++;
+      }
+    });
+    AuditRepository.log({
+      action: 'QR_BULK_STATUS_UPDATE',
+      category: 'BUSINESS',
+      details: `Updated QR status to ${status} for ${count} tables`,
+      username: 'Manager'
+    });
+    db.notify();
+    return count;
+  }
+
+  public static verifyQrToken(
+    tableNumber: string,
+    token?: string
+  ): { isValid: boolean; reason?: string; table?: DiningTable } {
+    // 1. Verify Plan Entitlement (Requires ₹7,000 PRO plan allotted by Super Admin)
+    const license = db.license;
+    const isPro = license?.tier === 'PRO' && license?.entitlements?.qrTableOrdering !== false;
+    if (!isPro) {
+      return {
+        isValid: false,
+        reason: 'QR Table Ordering is not allotted to this restaurant. Restaurant must be on JAMANVAAR PRO (₹7,000) plan.'
+      };
+    }
+
+    const table = db.tables.find((t) => t.tableNumber === tableNumber || t.id === tableNumber);
+    if (!table) {
+      return { isValid: false, reason: `Table ${tableNumber} was not found in restaurant layout.` };
+    }
+
+    if (table.qrStatus === 'DISABLED') {
+      return { isValid: false, reason: `QR Ordering for Table ${tableNumber} is currently disabled by restaurant management.` };
+    }
+
+    const settings = this.getSettings();
+    if (settings.isQrOrderingActive === false || settings.allowCustomerOrdering === false) {
+      return { isValid: false, reason: 'Digital QR Table Ordering is currently paused across this restaurant.' };
+    }
+
+    if (!table.qrToken) {
+      table.qrToken = `jv_qr_tbl_${table.tableNumber}_${generateSecureQrTokenSuffix()}`;
+    }
+
+    // SEC-010 fix: exact match against the table's actual (random, unguessable)
+    // token, not a substring/prefix check — the old `.includes('tbl_N')` check
+    // passed for ANY string containing that substring, since the token format
+    // itself was fully derivable from public restaurant/branch/table IDs.
+    // A caller that omits `token` entirely (internal/staff-side status checks
+    // that don't route through a customer's scanned link) is unaffected —
+    // only an explicitly-supplied, wrong token is rejected here.
+    if (token !== undefined && token !== table.qrToken) {
+      return { isValid: false, reason: 'Security verification failed: QR token does not match this table.' };
+    }
+
+    return { isValid: true, table };
   }
 
   public static getQrOrders(options?: { status?: string; tableNumber?: string; limit?: number }): Order[] {
@@ -2671,6 +2887,10 @@ export class QrOrderingRepository {
 
   public static createCustomerQrOrder(params: {
     tableNumber: string;
+    /** SEC-010 fix: previously accepted but never actually forwarded to verifyQrToken — an
+     *  order could be placed for any table number with no token at all. Now required whenever
+     *  the caller has one (the guest ordering page always does, extracted from its scanned URL). */
+    token?: string;
     items: Array<{
       menuItemId: string;
       quantity: number;
@@ -2682,11 +2902,35 @@ export class QrOrderingRepository {
     customerPhone?: string;
     paymentMethod?: import('@jamanvaar/types').PaymentMethod;
   }): Order {
-    const table = db.tables.find((t) => t.tableNumber === params.tableNumber) || {
+    // 1. Validate Table + QR token
+    const tableVerification = this.verifyQrToken(params.tableNumber, params.token);
+    if (!tableVerification.isValid) {
+      throw new Error(tableVerification.reason || 'This table QR is currently unavailable.');
+    }
+
+    const table = tableVerification.table || db.tables.find((t) => t.tableNumber === params.tableNumber) || {
       id: `tbl-${params.tableNumber}`,
       tableNumber: params.tableNumber,
       zone: 'Main Hall'
     };
+
+    // 2. Validate Items & Availability
+    if (!params.items || params.items.length === 0) {
+      throw new Error('Your cart is empty. Please select at least one dish.');
+    }
+
+    params.items.forEach((it) => {
+      const menuItem = db.menuItems.find((m) => m.id === it.menuItemId);
+      if (!menuItem) {
+        throw new Error(`Item ${it.menuItemId} is not on the active restaurant menu.`);
+      }
+      if (menuItem.isAvailable === false) {
+        throw new Error(`Dish "${menuItem.name}" is currently sold out. Please remove it from your cart.`);
+      }
+      if (it.quantity <= 0) {
+        throw new Error(`Invalid quantity for dish "${menuItem.name}".`);
+      }
+    });
 
     const activeDay = BusinessDayRepository.getActiveBusinessDay();
     const now = new Date();
@@ -2695,15 +2939,29 @@ export class QrOrderingRepository {
     const tokenNumber = `${qrNum}`;
 
     const orderItems: import('@jamanvaar/types').OrderItem[] = params.items.map((it, idx) => {
-      const menuItem = db.menuItems.find((m) => m.id === it.menuItemId) || {
-        id: it.menuItemId,
-        name: 'Special Dish',
-        sku: 'DISH',
-        price: 200
-      };
+      const menuItem = db.menuItems.find((m) => m.id === it.menuItemId)!;
 
-      const modDelta = (it.selectedModifiers || []).reduce((sum, m) => sum + (m.priceDelta || 0), 0);
-      const unitPrice = menuItem.price + modDelta;
+      // Authoritative modifier lookup & price validation (SEC-004 fix). A modifier
+      // that doesn't resolve to a real, currently-configured group/option is
+      // rejected outright — it used to fall back to Math.max(0, client-sent delta),
+      // which floored a NEGATIVE fabricated value to 0 but still silently accepted
+      // an entirely made-up modifier (and its positive fabricated price) as real.
+      const validatedModifiers = (it.selectedModifiers || []).map((m) => {
+        const grp = db.modifierGroups.find((g) => g.id === m.groupId);
+        const opt = grp?.options.find((o) => o.id === m.optionId || o.name === m.optionName);
+        if (!opt || typeof opt.priceDelta !== 'number') {
+          throw new Error(
+            `"${m.optionName || m.optionId}" is not a valid modifier for "${menuItem.name}". Please refresh the menu and try again.`
+          );
+        }
+        return {
+          ...m,
+          priceDelta: opt.priceDelta
+        };
+      });
+
+      const modDelta = validatedModifiers.reduce((sum, m) => sum + m.priceDelta, 0);
+      const unitPrice = Math.max(menuItem.price, menuItem.price + modDelta);
       const totalPrice = unitPrice * it.quantity;
 
       return {
@@ -2714,7 +2972,7 @@ export class QrOrderingRepository {
         sku: menuItem.sku || 'SKU',
         quantity: it.quantity,
         unitPrice,
-        modifiers: it.selectedModifiers || [],
+        modifiers: validatedModifiers,
         specialInstructions: it.specialInstructions,
         totalPrice,
         kitchenStatus: 'PENDING'
@@ -2757,7 +3015,8 @@ export class QrOrderingRepository {
       roundOffAmount: 0,
       totalAmount,
       paymentMethod: params.paymentMethod || 'UPI',
-      paymentStatus: params.paymentMethod === 'CASH' ? 'PENDING' : 'SUCCESS',
+      // SEC-003 fix: All self-order QR table orders require POS cashier counter confirmation or verified gateway callback
+      paymentStatus: 'PENDING',
       orderStatus: 'NEW',
       estimatedWaitMinutes: 15,
       createdAt: now.toISOString(),
@@ -2768,7 +3027,7 @@ export class QrOrderingRepository {
           status: 'NEW',
           title: 'QR Order Placed',
           timestamp: now.toISOString(),
-          note: `Customer scanned QR code at Table ${params.tableNumber}`
+          note: `Customer placed self-order via QR code at Table ${params.tableNumber} (Payment: ${params.paymentMethod || 'UPI'} - PENDING verification)`
         }
       ],
       isSynced: true
@@ -2776,7 +3035,32 @@ export class QrOrderingRepository {
 
     db.orders.unshift(newOrder);
 
-    // Update table stats
+    // 3. Automatically dispatch KOT to Kitchen / KDS
+    const kotItems: import('@jamanvaar/types').KOTItem[] = orderItems.map((oi) => {
+      const m = db.menuItems.find((menu) => menu.id === oi.menuItemId);
+      return {
+        id: `kot-item-${oi.id}`,
+        menuItemId: oi.menuItemId,
+        name: oi.name,
+        quantity: oi.quantity,
+        modifiers: oi.modifiers,
+        specialInstructions: oi.specialInstructions,
+        kitchenStation: m?.kitchenStation || 'Main Kitchen',
+        status: 'PREPARING'
+      };
+    });
+
+    KOTRepository.generateKOT({
+      orderId: newOrder.id,
+      orderNumber: newOrder.orderNumber,
+      tokenNumber: newOrder.tokenNumber,
+      tableNumber: params.tableNumber,
+      orderType: 'QR_TABLE',
+      items: kotItems,
+      cashierName: 'Guest (Table QR Self-Order)'
+    });
+
+    // 4. Update table status to OCCUPIED and record order stats
     const tblObj = db.tables.find((t) => t.tableNumber === params.tableNumber);
     if (tblObj) {
       tblObj.status = 'OCCUPIED';
@@ -2787,7 +3071,7 @@ export class QrOrderingRepository {
       tblObj.totalRevenueToday = (tblObj.totalRevenueToday || 0) + newOrder.totalAmount;
     }
 
-    // Create system notification for POS cashier
+    // 5. Create system notification for POS cashier and kitchen
     NotificationRepository.createNotification({
       type: 'QR_ORDER_ARRIVED' as any,
       title: `🔔 New QR Order Table ${params.tableNumber}`,

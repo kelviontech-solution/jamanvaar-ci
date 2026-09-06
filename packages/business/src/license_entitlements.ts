@@ -35,7 +35,8 @@ export const PLAN_DEFINITIONS: Record<PlanTier, PlanDefinition> = {
       { name: 'Restaurant Admin Management Portal', included: true },
       { name: 'Captain App (Table-Side Ordering)', included: false, note: 'Available in PRO' },
       { name: 'Waiter & Captain Performance Analytics', included: false, note: 'Available in PRO' },
-      { name: 'Captain ↔ KDS Real-Time Course Sync', included: false, note: 'Available in PRO' }
+      { name: 'Captain ↔ KDS Real-Time Course Sync', included: false, note: 'Available in PRO' },
+      { name: 'QR Table Ordering & Digital Menu', included: false, note: 'Available in PRO (₹7,000)' }
     ]
   },
   PRO: {
@@ -43,8 +44,8 @@ export const PLAN_DEFINITIONS: Record<PlanTier, PlanDefinition> = {
     name: 'JAMANVAAR PRO',
     price: 7000,
     badge: 'RECOMMENDED',
-    tagline: 'POS + Restaurant Management + Captain App',
-    description: 'All Core features plus full wireless Captain App table-side ordering, course dispatch, and waiter tracking.',
+    tagline: 'POS + Restaurant Management + Captain App + QR Table Ordering',
+    description: 'All Core features plus wireless Captain App, waiter tracking, and Super Admin-allotted QR Table Ordering.',
     features: [
       { name: 'Everything in JAMANVAAR CORE', included: true },
       { name: 'Wireless Captain App for Waiters', included: true },
@@ -52,7 +53,8 @@ export const PLAN_DEFINITIONS: Record<PlanTier, PlanDefinition> = {
       { name: 'Instant Food Ready & KDS Notifications', included: true },
       { name: 'Waiter Performance & Tip Allocation', included: true },
       { name: 'Captain ↔ POS ↔ KDS Real-Time Mesh Sync', included: true },
-      { name: 'Advanced Operational Analytics & Flow Metrics', included: true }
+      { name: 'Advanced Operational Analytics & Flow Metrics', included: true },
+      { name: 'QR Table Ordering & Digital Menu (Allotted by Super Admin)', included: true }
     ]
   }
 };
@@ -86,6 +88,79 @@ export class EntitlementService {
     return {
       allowed: true,
       tier: 'PRO'
+    };
+  }
+
+  public static checkQrOrderingAccess(): {
+    allowed: boolean;
+    tier: PlanTier;
+    message?: string;
+  } {
+    const license = LicenseRepository.getLicense();
+    const isPro = license?.tier === 'PRO' && Boolean(license?.entitlements?.qrTableOrdering !== false);
+
+    if (!isPro) {
+      return {
+        allowed: false,
+        tier: license?.tier || 'CORE',
+        message: 'QR Table Ordering is exclusively available in the JAMANVAAR PRO (₹7,000) plan. Allotment must be provisioned by Platform Super Admin.'
+      };
+    }
+
+    return {
+      allowed: true,
+      tier: 'PRO'
+    };
+  }
+
+  public static checkAiAssistantAccess(): {
+    allowed: boolean;
+    tier: PlanTier;
+    message?: string;
+  } {
+    const license = LicenseRepository.getLicense();
+    const allowed = Boolean(license?.entitlements?.posAssistant);
+
+    return {
+      allowed,
+      tier: license?.tier || 'CORE',
+      message: allowed
+        ? undefined
+        : 'JAMAN AI Assistant is not enabled in your current plan. Upgrade to JAMANVAAR PRO (₹7,000) for complete conversational intelligence.'
+    };
+  }
+
+  public static checkAdvancedAnalyticsAccess(): {
+    allowed: boolean;
+    tier: PlanTier;
+    message?: string;
+  } {
+    const license = LicenseRepository.getLicense();
+    const isPro = license?.tier === 'PRO' && Boolean(license?.entitlements?.advancedCaptainReports);
+
+    return {
+      allowed: isPro,
+      tier: license?.tier || 'CORE',
+      message: isPro
+        ? undefined
+        : 'Advanced analytics, heatmaps, and staff attribution are exclusively available in JAMANVAAR PRO (₹7,000).'
+    };
+  }
+
+  public static checkAdvancedKdsAccess(): {
+    allowed: boolean;
+    tier: PlanTier;
+    message?: string;
+  } {
+    const license = LicenseRepository.getLicense();
+    const isPro = license?.tier === 'PRO';
+
+    return {
+      allowed: isPro,
+      tier: license?.tier || 'CORE',
+      message: isPro
+        ? undefined
+        : 'Multi-station routing and kitchen load monitoring are available in JAMANVAAR PRO (₹7,000).'
     };
   }
 

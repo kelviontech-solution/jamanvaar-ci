@@ -22,7 +22,13 @@ export function generateTokenNumber(lastTokenNumber?: number): string {
   return next.toString();
 }
 
+/**
+ * Widened from a 4-digit range (9,000 possible values, no uniqueness check at
+ * the old call site) to an 8-digit range — collisions are now astronomically
+ * unlikely even without a retry loop, though OrderRepository.createOrder
+ * additionally retries on collision as a hard guarantee, not just a low odds.
+ */
 export function generateOrderNumber(prefix: string = 'ORD'): string {
-  const randomNum = Math.floor(1000 + Math.random() * 9000);
+  const randomNum = Math.floor(10000000 + Math.random() * 90000000);
   return `${prefix}-${randomNum}`;
 }

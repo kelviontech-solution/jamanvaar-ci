@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { DiningTable } from '@jamanvaar/types';
-import { db } from '@jamanvaar/database';
+import { db, QrOrderingRepository } from '@jamanvaar/database';
+import { generateQrSvg, generateQrDataUrl } from '@jamanvaar/utils';
 import {
   Printer,
   Download,
@@ -12,13 +13,16 @@ import {
   Layers,
   Palette,
   Eye,
-  Sliders
+  Sliders,
+  Smartphone,
+  ExternalLink
 } from 'lucide-react';
 
 interface QrCardDesignerModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedTable?: DiningTable | null;
+  initialBatchMode?: boolean;
 }
 
 export type QrTemplateType = 'SIGNATURE' | 'ELEGANT' | 'MODERN' | 'MINIMAL' | 'PREMIUM';
@@ -26,26 +30,49 @@ export type QrTemplateType = 'SIGNATURE' | 'ELEGANT' | 'MODERN' | 'MINIMAL' | 'P
 export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
   isOpen,
   onClose,
-  selectedTable
+  selectedTable,
+  initialBatchMode = false
 }) => {
   const [activeTemplate, setActiveTemplate] = useState<QrTemplateType>('SIGNATURE');
   const [tableNumber, setTableNumber] = useState<string>(selectedTable?.tableNumber || '12');
-  const [includeWifiInfo, setIncludeWifiInfo] = useState<boolean>(true);
-  const [customSubtitle, setCustomSubtitle] = useState<string>('Scan to view menu & order directly from your table');
+  const [isBatchMode, setIsBatchMode] = useState<boolean>(initialBatchMode);
+  const [selectedBatchTables, setSelectedBatchTables] = useState<string[]>([]);
   const [copied, setCopied] = useState<boolean>(false);
 
   const tables = db.tables;
-  const currentTable = tables.find((t) => t.tableNumber === tableNumber) || {
-    tableNumber,
+  const currentTable = tables.find((t) => t.tableNumber === tableNumber) || tables[0] || {
+    tableNumber: '12',
     zone: 'AC Balcony',
     capacity: 4
   };
 
-  const qrShortCode = `QR-TABLE-${currentTable.tableNumber.padStart(3, '0')}`;
-  const qrLink = `https://jamanvaar.menu/table/${currentTable.tableNumber}?code=${qrShortCode}`;
+  const restaurant = db.restaurant || { name: 'JAMANVAAR RESTAURANT', city: 'Ahmedabad' };
+  const outlet = db.outlet || { name: 'Ahmedabad Flagship Store' };
+
+  // Host origin for deterministic public QR link
+  const hostUrl = typeof window !== 'undefined' && window.location?.origin
+    ? window.location.origin
+    : 'https://jamanvaar.menu';
+
+  const getTableQrUrl = (tbl: DiningTable) => {
+    const token = tbl.qrToken || `jv_qr_${db.restaurant?.id || 'rest'}_${db.outlet?.id || 'br'}_tbl_${tbl.tableNumber}`;
+    return `${hostUrl}/?qrTable=${tbl.tableNumber}&token=${token}`;
+  };
+
+  const currentQrLink = getTableQrUrl(currentTable);
+
+  // SVG QR string for current table
+  const currentQrSvg = useMemo(() => {
+    return generateQrSvg(currentQrLink, {
+      color: activeTemplate === 'MINIMAL' ? '#000000' : '#0B253A',
+      backgroundColor: '#FFFFFF',
+      margin: 2,
+      size: 200
+    });
+  }, [currentQrLink, activeTemplate]);
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(qrLink);
+    navigator.clipboard.writeText(currentQrLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -54,24 +81,67 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
     window.print();
   };
 
-  const handleDownload = () => {
-    // Generate simple SVG download
-    const svgEl = document.getElementById('printable-qr-card');
-    if (!svgEl) return;
-    const blob = new Blob([svgEl.outerHTML], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
+  const handleDownloadSvg = (tbl: DiningTable = currentTable) => {
+    const url = getTableQrUrl(tbl);
+    const svgStr = generateQrSvg(url, {
+      color: '#0B253A',
+      backgroundColor: '#FFFFFF',
+      margin: 2,
+      size: 400
+    });
+    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `JAMANVAAR-Table-${currentTable.tableNumber}-QR.svg`;
+    a.href = blobUrl;
+    a.download = `JAMANVAAR-Table-${tbl.tableNumber}-QR.svg`;
     a.click();
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(blobUrl);
   };
 
   if (!isOpen) return null;
 
+  const batchPrintList = isBatchMode
+    ? selectedBatchTables.length > 0
+      ? tables.filter((t) => selectedBatchTables.includes(t.tableNumber))
+      : tables
+    : [currentTable];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-6 select-none animate-in fade-in duration-200">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden text-[#0B253A]">
+      {/* Print Specific CSS Styles */}
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden !important;
+          }
+          #printable-qr-standee-container, #printable-qr-standee-container * {
+            visibility: visible !important;
+          }
+          #printable-qr-standee-container {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            background: white !important;
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            gap: 24px !important;
+            justify-content: center !important;
+          }
+          .standee-card-print {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            box-shadow: none !important;
+            border: 2px solid #0B253A !important;
+            margin-bottom: 24px !important;
+          }
+        }
+      `}</style>
+
+      <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-5xl max-h-[94vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden text-[#0B253A]">
         {/* Modal Top Header */}
         <div className="bg-[#0B253A] text-white px-6 py-4 flex items-center justify-between shrink-0 shadow-md">
           <div className="flex items-center gap-3">
@@ -80,67 +150,132 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-black tracking-wide">Restaurant Table QR Standee Designer</h2>
-                <span className="text-[10px] font-black bg-[#E66817] text-white px-2 py-0.5 rounded-full">
-                  PRINT READY
+                <h2 className="text-base font-black tracking-wide">
+                  {isBatchMode ? 'Batch Table QR Standee Print Suite' : 'Restaurant Table QR Standee Designer'}
+                </h2>
+                <span className="text-[10px] font-black bg-[#E66817] text-white px-2 py-0.5 rounded-full uppercase">
+                  100% CAMERA SCANNABLE
                 </span>
               </div>
               <p className="text-xs text-slate-300">
-                Generate high-resolution printable QR tent cards and standees for tables.
+                Official JAMANVAAR table tent cards with deterministic table tokens and direct guest menu routing.
               </p>
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsBatchMode((b) => !b)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                isBatchMode
+                  ? 'bg-amber-400 text-[#0B253A] font-black'
+                  : 'bg-white/10 hover:bg-white/20 text-white'
+              }`}
+            >
+              {isBatchMode ? 'Switch to Single View' : 'Switch to Batch Print'}
+            </button>
+
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Modal Body: Controls Left, Live Standee Preview Right */}
         <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
           {/* Left Config Panel */}
           <div className="md:col-span-5 border-r border-[#EBE6DD] bg-white p-5 overflow-y-auto space-y-5">
-            {/* Table Selector */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
-                Select Table
-              </label>
-              <select
-                value={tableNumber}
-                onChange={(e) => setTableNumber(e.target.value)}
-                className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-black text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
-              >
-                {tables.map((t) => (
-                  <option key={t.id} value={t.tableNumber}>
-                    Table {t.tableNumber} • {t.zone} ({t.capacity} Seats)
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Table Selection / Batch Selection */}
+            {!isBatchMode ? (
+              <div className="space-y-1.5">
+                <label className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+                  Select Dining Table
+                </label>
+                <select
+                  value={tableNumber}
+                  onChange={(e) => setTableNumber(e.target.value)}
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-black text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+                >
+                  {tables.map((t) => (
+                    <option key={t.id} value={t.tableNumber}>
+                      Table {t.tableNumber} • {t.zone} ({t.capacity} Seats) {t.qrStatus === 'DISABLED' ? '• DISABLED' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+                    Select Tables for Sheet
+                  </label>
+                  <button
+                    onClick={() => {
+                      if (selectedBatchTables.length === tables.length) {
+                        setSelectedBatchTables([]);
+                      } else {
+                        setSelectedBatchTables(tables.map((t) => t.tableNumber));
+                      }
+                    }}
+                    className="text-[11px] font-bold text-[#E66817] hover:underline cursor-pointer"
+                  >
+                    {selectedBatchTables.length === tables.length ? 'Deselect All' : 'Select All (12)'}
+                  </button>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5 max-h-40 overflow-y-auto p-1 bg-[#FAF7F2] rounded-xl border border-[#EBE6DD]">
+                  {tables.map((t) => {
+                    const isChecked = selectedBatchTables.includes(t.tableNumber);
+                    return (
+                      <label
+                        key={t.id}
+                        className={`flex items-center gap-1.5 p-2 rounded-lg text-xs font-black cursor-pointer border ${
+                          isChecked
+                            ? 'bg-amber-100/70 border-amber-300 text-amber-900'
+                            : 'bg-white border-slate-200 text-slate-700'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedBatchTables((prev) => [...prev, t.tableNumber]);
+                            } else {
+                              setSelectedBatchTables((prev) => prev.filter((x) => x !== t.tableNumber));
+                            }
+                          }}
+                          className="accent-[#E66817] rounded"
+                        />
+                        <span>T-{t.tableNumber}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Template Selector */}
             <div className="space-y-2">
               <label className="text-xs font-black text-[#0B253A] uppercase tracking-wider flex items-center justify-between">
-                <span>Design Template</span>
-                <span className="text-[10px] font-bold text-[#E66817]">5 Themes</span>
+                <span>Design Theme</span>
+                <span className="text-[10px] font-bold text-[#E66817]">Hospitality Styling</span>
               </label>
               <div className="grid grid-cols-1 gap-2">
                 {[
-                  { id: 'SIGNATURE', name: 'JAMANVAAR Signature', desc: 'Warm brand orange with heritage pattern' },
-                  { id: 'ELEGANT', name: 'Royal Elegant', desc: 'Deep navy with gold foil styled accents' },
-                  { id: 'MODERN', name: 'Clean Modern', desc: 'Minimalist geometry with high contrast' },
-                  { id: 'PREMIUM', name: 'Midnight Dark', desc: 'Sleek luxury dark slate aesthetic' },
-                  { id: 'MINIMAL', name: 'Eco Minimal', desc: 'Ink-saver monochrome standee layout' }
+                  { id: 'SIGNATURE', name: 'JAMANVAAR Royal Signature', desc: 'Warm saffron, royal navy & ivory foil' },
+                  { id: 'ELEGANT', name: 'Deep Navy Imperial', desc: 'Luxury midnight navy with gold headers' },
+                  { id: 'MODERN', name: 'Modern Ivory Card', desc: 'High-contrast crisp typography' },
+                  { id: 'MINIMAL', name: 'Ink-Saver Monochrome', desc: 'Optimized for thermal and standard B&W print' }
                 ].map((tpl) => (
                   <button
                     key={tpl.id}
                     onClick={() => setActiveTemplate(tpl.id as QrTemplateType)}
                     className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
                       activeTemplate === tpl.id
-                        ? 'bg-amber-50/70 border-[#E66817] shadow-xs'
+                        ? 'bg-amber-50/80 border-[#E66817] shadow-xs ring-1 ring-[#E66817]'
                         : 'border-[#EBE6DD] hover:bg-[#FAF7F2]'
                     }`}
                   >
@@ -148,210 +283,167 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                       <h4 className="text-xs font-black text-[#0B253A]">{tpl.name}</h4>
                       <p className="text-[10px] text-slate-500">{tpl.desc}</p>
                     </div>
-                    {activeTemplate === tpl.id && (
-                      <span className="w-5 h-5 rounded-full bg-[#E66817] text-white flex items-center justify-center text-[10px]">
-                        ✓
-                      </span>
-                    )}
+                    {activeTemplate === tpl.id && <Check className="w-4 h-4 text-[#E66817]" />}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Custom Subtitle */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
-                Call to Action Text
-              </label>
-              <input
-                type="text"
-                value={customSubtitle}
-                onChange={(e) => setCustomSubtitle(e.target.value)}
-                className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
-              />
-            </div>
-
-            {/* Wi-Fi Details Toggle */}
-            <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAF7F2] border border-[#EBE6DD]">
-              <div>
-                <span className="text-xs font-black text-[#0B253A] block">Include Guest Wi-Fi Note</span>
-                <span className="text-[10px] text-slate-500">SSID: JAMANVAAR_GUEST (Free)</span>
+            {/* Public Link & Copy */}
+            <div className="bg-[#FAF7F2] p-3.5 rounded-2xl border border-[#EBE6DD] space-y-2 text-xs">
+              <span className="text-[10px] font-black uppercase text-slate-400">Scannable Destination URL</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={currentQrLink}
+                  className="flex-1 bg-white border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 text-[11px] font-mono text-slate-600 truncate"
+                />
+                <button
+                  onClick={handleCopyLink}
+                  className="p-1.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer"
+                  title="Copy Guest Link"
+                >
+                  {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                </button>
               </div>
-              <input
-                type="checkbox"
-                checked={includeWifiInfo}
-                onChange={(e) => setIncludeWifiInfo(e.target.checked)}
-                className="w-4 h-4 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
-              />
+              <p className="text-[10px] text-slate-500">
+                Encodes table identity: Table {currentTable.tableNumber} ({currentTable.zone}).
+              </p>
             </div>
 
-            {/* Quick Actions */}
-            <div className="pt-2 border-t border-[#EBE6DD] space-y-2">
+            {/* Print & Download Actions */}
+            <div className="space-y-2 pt-2">
               <button
-                onClick={handleCopyLink}
-                className="w-full py-2 px-3 rounded-xl border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                onClick={handlePrint}
+                className="w-full py-3 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-orange-500/25 transition-all cursor-pointer"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Link Copied to Clipboard!' : 'Copy Direct QR URL'}</span>
+                <Printer className="w-4 h-4" />
+                <span>
+                  {isBatchMode
+                    ? `Print ${batchPrintList.length} Standees Sheet`
+                    : `Print Table ${currentTable.tableNumber} Standee`}
+                </span>
               </button>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => handleDownloadSvg(currentTable)}
+                  className="py-2.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5 text-[#E66817]" />
+                  <span>Download SVG</span>
+                </button>
+
+                <a
+                  href={currentQrLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="py-2.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-[#E66817]" />
+                  <span>Open URL</span>
+                </a>
+              </div>
             </div>
           </div>
 
-          {/* Right Live Standee Preview */}
-          <div className="md:col-span-7 bg-[#EFEAE1] p-6 flex flex-col items-center justify-center overflow-y-auto">
-            {/* Standee Tent Card */}
-            <div
-              id="printable-qr-card"
-              className={`w-72 sm:w-80 rounded-3xl p-6 shadow-2xl border flex flex-col items-center text-center transition-all ${
-                activeTemplate === 'SIGNATURE'
-                  ? 'bg-gradient-to-b from-[#FFF8F2] to-white border-[#FED7AA]'
-                  : activeTemplate === 'ELEGANT'
-                  ? 'bg-[#0B253A] text-white border-amber-400/40'
-                  : activeTemplate === 'MODERN'
-                  ? 'bg-white text-[#0B253A] border-slate-300'
-                  : activeTemplate === 'PREMIUM'
-                  ? 'bg-gradient-to-b from-[#172334] to-[#0B1522] text-white border-slate-700'
-                  : 'bg-white text-slate-900 border-slate-900'
-              }`}
-            >
-              {/* Brand Top Header */}
-              <div className="space-y-1">
-                <div
-                  className={`inline-flex items-center justify-center w-10 h-10 rounded-2xl font-black text-sm mb-1 ${
-                    activeTemplate === 'ELEGANT' || activeTemplate === 'PREMIUM'
-                      ? 'bg-[#E66817] text-white'
-                      : 'bg-[#0B253A] text-white'
-                  }`}
-                >
-                  J
-                </div>
-                <h3
-                  className={`text-base font-black tracking-wider uppercase ${
-                    activeTemplate === 'ELEGANT' || activeTemplate === 'PREMIUM' ? 'text-white' : 'text-[#0B253A]'
-                  }`}
-                >
-                  JAMANVAAR
-                </h3>
-                <p
-                  className={`text-[10px] font-bold tracking-widest uppercase ${
-                    activeTemplate === 'ELEGANT'
-                      ? 'text-amber-300'
-                      : activeTemplate === 'PREMIUM'
-                      ? 'text-slate-400'
-                      : 'text-[#E66817]'
-                  }`}
-                >
-                  Authentic Dining Experience
-                </p>
-              </div>
+          {/* Right Live Standee Preview Area */}
+          <div className="md:col-span-7 bg-[#EFEAE1] p-6 flex flex-col items-center justify-center overflow-y-auto min-h-[460px]">
+            {/* Printable Container */}
+            <div id="printable-qr-standee-container" className="flex flex-wrap gap-6 justify-center items-center">
+              {batchPrintList.map((tbl) => {
+                const qrUrl = getTableQrUrl(tbl);
+                const svgMarkup = generateQrSvg(qrUrl, {
+                  color: activeTemplate === 'MINIMAL' ? '#000000' : '#0B253A',
+                  backgroundColor: '#FFFFFF',
+                  margin: 2,
+                  size: 180
+                });
 
-              {/* Table Number Standee Badge */}
-              <div
-                className={`mt-4 mb-3 px-5 py-1.5 rounded-2xl border ${
-                  activeTemplate === 'ELEGANT'
-                    ? 'bg-amber-400/10 border-amber-400/40 text-amber-300'
-                    : activeTemplate === 'PREMIUM'
-                    ? 'bg-white/10 border-white/20 text-white'
-                    : 'bg-[#FFF4ED] border-[#FED7AA] text-[#E66817]'
-                }`}
-              >
-                <span className="text-[11px] font-black tracking-widest uppercase block">TABLE</span>
-                <span className="text-2xl font-black font-mono leading-none">{currentTable.tableNumber}</span>
-                <span className="text-[9px] font-bold text-slate-400 block mt-0.5">{currentTable.zone}</span>
-              </div>
+                return (
+                  <div
+                    key={tbl.id}
+                    className={`standee-card-print w-72 rounded-3xl p-6 shadow-2xl border flex flex-col items-center text-center transition-all ${
+                      activeTemplate === 'SIGNATURE'
+                        ? 'bg-gradient-to-b from-[#FFF8F2] to-white border-[#FED7AA]'
+                        : activeTemplate === 'ELEGANT'
+                        ? 'bg-[#0B253A] text-white border-amber-400/40'
+                        : activeTemplate === 'MODERN'
+                        ? 'bg-white text-[#0B253A] border-slate-300'
+                        : 'bg-white text-slate-900 border-slate-900'
+                    }`}
+                  >
+                    {/* Brand Top Header */}
+                    <div className="space-y-1">
+                      <div
+                        className={`inline-flex items-center justify-center w-10 h-10 rounded-2xl font-black text-sm mb-1 ${
+                          activeTemplate === 'ELEGANT'
+                            ? 'bg-[#E66817] text-white'
+                            : 'bg-[#0B253A] text-white'
+                        }`}
+                      >
+                        J
+                      </div>
+                      <h3
+                        className={`text-base font-black tracking-widest uppercase ${
+                          activeTemplate === 'ELEGANT' ? 'text-white' : 'text-[#0B253A]'
+                        }`}
+                      >
+                        JAMANVAAR
+                      </h3>
+                      <p
+                        className={`text-[9px] font-extrabold tracking-widest uppercase ${
+                          activeTemplate === 'ELEGANT' ? 'text-amber-300' : 'text-[#E66817]'
+                        }`}
+                      >
+                        {outlet.name}
+                      </p>
+                    </div>
 
-              {/* QR Code Frame */}
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-md my-2">
-                {/* SVG Deterministic QR Code Mockup */}
-                <svg className="w-36 h-36 mx-auto" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Outer corner squares */}
-                  <rect x="5" y="5" width="26" height="26" rx="4" stroke="#0B253A" strokeWidth="4" fill="none" />
-                  <rect x="11" y="11" width="14" height="14" rx="2" fill="#0B253A" />
-                  <rect x="69" y="5" width="26" height="26" rx="4" stroke="#0B253A" strokeWidth="4" fill="none" />
-                  <rect x="75" y="11" width="14" height="14" rx="2" fill="#0B253A" />
-                  <rect x="5" y="69" width="26" height="26" rx="4" stroke="#0B253A" strokeWidth="4" fill="none" />
-                  <rect x="11" y="75" width="14" height="14" rx="2" fill="#0B253A" />
+                    {/* Table Number Standee Badge */}
+                    <div
+                      className={`mt-3 mb-2 px-6 py-1.5 rounded-2xl border ${
+                        activeTemplate === 'ELEGANT'
+                          ? 'bg-amber-400/10 border-amber-400/40 text-amber-300'
+                          : 'bg-[#FFF4ED] border-[#FED7AA] text-[#E66817]'
+                      }`}
+                    >
+                      <span className="text-[10px] font-black tracking-widest uppercase block">DINING TABLE</span>
+                      <span className="text-2xl font-black font-mono leading-none">{tbl.tableNumber}</span>
+                      <span className="text-[9px] font-bold opacity-75 block mt-0.5">{tbl.zone} • {tbl.capacity} Seats</span>
+                    </div>
 
-                  {/* QR Matrix Grid Dots */}
-                  <rect x="37" y="10" width="6" height="6" fill="#E66817" />
-                  <rect x="47" y="10" width="6" height="6" fill="#0B253A" />
-                  <rect x="57" y="10" width="6" height="6" fill="#0B253A" />
-                  <rect x="37" y="20" width="6" height="6" fill="#0B253A" />
-                  <rect x="57" y="20" width="6" height="6" fill="#E66817" />
-                  <rect x="10" y="37" width="6" height="6" fill="#0B253A" />
-                  <rect x="20" y="37" width="6" height="6" fill="#0B253A" />
-                  <rect x="37" y="37" width="10" height="10" rx="2" fill="#E66817" />
-                  <rect x="53" y="37" width="10" height="10" rx="2" fill="#0B253A" />
-                  <rect x="69" y="37" width="6" height="6" fill="#0B253A" />
-                  <rect x="79" y="37" width="6" height="6" fill="#E66817" />
-                  <rect x="89" y="37" width="6" height="6" fill="#0B253A" />
-                  <rect x="37" y="53" width="6" height="6" fill="#0B253A" />
-                  <rect x="47" y="53" width="6" height="6" fill="#E66817" />
-                  <rect x="57" y="53" width="6" height="6" fill="#0B253A" />
-                  <rect x="10" y="57" width="6" height="6" fill="#0B253A" />
-                  <rect x="79" y="57" width="6" height="6" fill="#0B253A" />
-                  <rect x="37" y="69" width="6" height="6" fill="#E66817" />
-                  <rect x="47" y="69" width="6" height="6" fill="#0B253A" />
-                  <rect x="57" y="69" width="6" height="6" fill="#0B253A" />
-                  <rect x="69" y="69" width="6" height="6" fill="#0B253A" />
-                  <rect x="79" y="69" width="6" height="6" fill="#E66817" />
-                  <rect x="89" y="69" width="6" height="6" fill="#0B253A" />
-                  <rect x="37" y="79" width="6" height="6" fill="#0B253A" />
-                  <rect x="57" y="79" width="6" height="6" fill="#0B253A" />
-                  <rect x="69" y="79" width="6" height="6" fill="#E66817" />
-                  <rect x="89" y="79" width="6" height="6" fill="#0B253A" />
-                  <rect x="37" y="89" width="6" height="6" fill="#E66817" />
-                  <rect x="47" y="89" width="6" height="6" fill="#0B253A" />
-                  <rect x="57" y="89" width="6" height="6" fill="#0B253A" />
-                  <rect x="79" y="89" width="6" height="6" fill="#0B253A" />
-                </svg>
-                <span className="font-mono text-[9px] font-bold text-slate-400 tracking-wider mt-1 block">
-                  {qrShortCode}
-                </span>
-              </div>
+                    {/* Real Scannable QR Code Frame */}
+                    <div className="bg-white p-3.5 rounded-2xl border border-slate-300 shadow-md my-2">
+                      <div
+                        className="w-40 h-40 flex items-center justify-center"
+                        dangerouslySetInnerHTML={{ __html: svgMarkup }}
+                      />
+                    </div>
 
-              {/* Instructions */}
-              <div className="space-y-1 mt-2">
-                <span
-                  className={`text-xs font-black tracking-wide block ${
-                    activeTemplate === 'ELEGANT' || activeTemplate === 'PREMIUM' ? 'text-white' : 'text-[#0B253A]'
-                  }`}
-                >
-                  📱 Scan with Camera to Order
-                </span>
-                <p className="text-[10px] text-slate-400 px-2 leading-tight">{customSubtitle}</p>
-              </div>
+                    {/* Instruction Callout */}
+                    <div className="space-y-1 mt-1">
+                      <p
+                        className={`text-xs font-black tracking-tight ${
+                          activeTemplate === 'ELEGANT' ? 'text-white' : 'text-[#0B253A]'
+                        }`}
+                      >
+                        Scan to View Menu & Order
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-medium">
+                        Camera scan • Instant kitchen dispatch • No app required
+                      </p>
+                    </div>
 
-              {/* Wi-Fi Note */}
-              {includeWifiInfo && (
-                <div
-                  className={`mt-4 pt-3 border-t w-full text-[9px] font-bold ${
-                    activeTemplate === 'ELEGANT' || activeTemplate === 'PREMIUM'
-                      ? 'border-white/10 text-slate-400'
-                      : 'border-slate-200 text-slate-500'
-                  }`}
-                >
-                  <span>📶 Free Guest Wi-Fi: <strong>JAMANVAAR_GUEST</strong></span>
-                </div>
-              )}
-            </div>
-
-            {/* Bottom Standee Actions */}
-            <div className="mt-5 flex items-center gap-3">
-              <button
-                onClick={handlePrint}
-                className="bg-[#E66817] hover:bg-[#EA580C] text-white px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg shadow-[#E66817]/30 transition-all active:scale-95 cursor-pointer"
-              >
-                <Printer className="w-4 h-4" />
-                <span>Print Table {currentTable.tableNumber} Standee</span>
-              </button>
-              <button
-                onClick={handleDownload}
-                className="bg-white hover:bg-slate-50 text-[#0B253A] border border-[#EBE6DD] px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
-              >
-                <Download className="w-4 h-4" />
-                <span>Download SVG</span>
-              </button>
+                    {/* Bottom Security Verification Code */}
+                    <div className="mt-3 pt-2 border-t border-slate-200/50 w-full flex items-center justify-between text-[9px] font-mono text-slate-400">
+                      <span>{tbl.qrShortCode || `QR-TABLE-${tbl.tableNumber}`}</span>
+                      <span>Verified Table ID</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

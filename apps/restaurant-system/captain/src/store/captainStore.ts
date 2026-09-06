@@ -386,17 +386,27 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   },
 
   login: (pin: string) => {
-    if (pin === '1234' || pin === '0000') {
+    // SEC-006 fix: Authenticate against database users instead of hardcoded PIN bypass
+    const userPool = (captainDb.users || db.users || []) as (import('@jamanvaar/types').User & { pinCode?: string })[];
+    const matchedUser = userPool.find((u) => u.pinCode === pin && u.isActive);
+
+    if (matchedUser) {
+      const captainProfile: CaptainProfile = {
+        ...DEFAULT_CAPTAIN,
+        id: matchedUser.id,
+        name: matchedUser.fullName,
+        pin: matchedUser.pinCode || pin
+      };
       const startTime = new Date().toISOString();
       SessionPersistence.save('captain', {
-        userId: DEFAULT_CAPTAIN.id,
-        fullName: DEFAULT_CAPTAIN.name,
-        roleId: 'CAPTAIN',
-        restaurantId: 'restaurant-main',
+        userId: matchedUser.id,
+        fullName: matchedUser.fullName,
+        roleId: matchedUser.roleId || 'CAPTAIN',
+        restaurantId: matchedUser.restaurantId || 'restaurant-main',
         terminalId: 'CAPTAIN-01'
       });
       set({
-        currentCaptain: DEFAULT_CAPTAIN,
+        currentCaptain: captainProfile,
         authStatus: 'AUTHENTICATED',
         isLoggedIn: true,
         activeShiftStartTime: startTime
@@ -404,8 +414,8 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       AuditRepository.log({
         action: 'CAPTAIN_LOGIN',
         category: 'AUTH',
-        details: `Captain ${DEFAULT_CAPTAIN.name} logged in on Floor Handheld`,
-        username: DEFAULT_CAPTAIN.name
+        details: `Staff member ${matchedUser.fullName} logged in on Floor Handheld`,
+        username: matchedUser.fullName
       });
       return true;
     }

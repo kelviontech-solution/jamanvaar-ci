@@ -25,7 +25,8 @@ export const ENTITLEMENT_KEYS = [
   'restaurantAdmin',
   'captainApp',
   'advancedCaptainReports',
-  'advancedServiceWorkflow'
+  'advancedServiceWorkflow',
+  'qrTableOrdering'
 ] as const;
 
 export type EntitlementKey = (typeof ENTITLEMENT_KEYS)[number];

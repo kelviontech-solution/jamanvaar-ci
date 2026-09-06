@@ -1,6 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LicenseRepository } from '@jamanvaar/database';
-import { PlanTier } from '@jamanvaar/types';
+import { applyLicenseCertificate } from '@jamanvaar/business';
+import { PlanTier, CORE_PLAN_FEATURE_GROUPS, PRO_PLAN_FEATURE_GROUPS, countFeatures } from '@jamanvaar/types';
+import {
+  isCloudConnected,
+  isCloudLoggedIn,
+  redeemActivationCode,
+  cloudLogin,
+  cloudSetInitialPassword,
+  fetchEntitlements,
+  CloudApiError,
+  type CloudEntitlementsResponse
+} from '../../cloud/cloudClient';
+import { CloudDeviceLoginsPanel } from './CloudDeviceLoginsPanel';
 import {
   Check,
   CheckCircle2,
@@ -21,8 +33,31 @@ import {
   Smartphone,
   QrCode,
   Network,
-  Bot
+  Bot,
+  type LucideIcon
 } from 'lucide-react';
+
+// Feature groups themselves live in @jamanvaar/types/planFeatureCatalog (shared with cloud/api's
+// entitlement schema) — this package has no UI dependency, so icons are resolved locally by name.
+const FEATURE_GROUP_ICONS: Record<string, LucideIcon> = {
+  UtensilsCrossed,
+  Banknote,
+  LayoutGrid,
+  ChefHat,
+  Package,
+  BarChart3,
+  HardDrive,
+  Printer,
+  Users,
+  Settings,
+  Smartphone,
+  QrCode,
+  Network,
+  Bot
+};
+
+const CORE_FEATURE_COUNT = countFeatures(CORE_PLAN_FEATURE_GROUPS);
+const PRO_FEATURE_COUNT = countFeatures(PRO_PLAN_FEATURE_GROUPS);
 
 interface SubscriptionPlansViewProps {
   showToast: (msg: string) => void;
@@ -41,46 +76,151 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   const [showAllCoreFeatures, setShowAllCoreFeatures] = useState(false);
   const [showAllProFeatures, setShowAllProFeatures] = useState(false);
 
+  // Cloud connection (see @jamanvaar's cloud/cloudClient.ts) — purely additive to
+  // everything below; a restaurant that has never entered an activation code never
+  // triggers any of this, and the existing CORE/PRO cards + dealer-key activation
+  // keep working exactly as before as the offline path.
+  const [cloudConnected, setCloudConnected] = useState(isCloudConnected());
+  const [cloudLoggedIn, setCloudLoggedIn] = useState(isCloudLoggedIn());
+  const [cloudData, setCloudData] = useState<CloudEntitlementsResponse | null>(null);
+  const [cloudSyncedAt, setCloudSyncedAt] = useState<string | null>(null);
+  const [cloudStale, setCloudStale] = useState(false);
+  const [cloudBusy, setCloudBusy] = useState(false);
+  const [cloudError, setCloudError] = useState<string | null>(null);
+  const [cloudMode, setCloudMode] = useState<'connect' | 'login' | 'set-password'>(
+    isCloudConnected() ? 'login' : 'connect'
+  );
+  const [activationCodeInput, setActivationCodeInput] = useState('');
+  const [cloudEmail, setCloudEmail] = useState('');
+  const [cloudPassword, setCloudPassword] = useState('');
+  const [cloudNewPassword, setCloudNewPassword] = useState('');
+  const [cloudActivationToken, setCloudActivationToken] = useState('');
+
+  async function refreshCloudEntitlements() {
+    const result = await fetchEntitlements();
+    setCloudData(result.data);
+    setCloudSyncedAt(result.syncedAt);
+    setCloudStale(result.stale);
+
+    // Synchronize cloud subscription entitlements directly into authoritative local runtime
+    if (result.data?.planTier && result.data?.entitlements) {
+      const isPro = result.data.planTier === 'PRO';
+      const isEligible = result.data.subscriptionStatus === 'ACTIVE' || result.data.subscriptionStatus === 'TRIAL';
+      LicenseRepository.updateLicense({
+        tier: isPro ? 'PRO' : 'CORE',
+        planName: result.data.planName || (isPro ? 'JAMANVAAR PRO' : 'JAMANVAAR CORE'),
+        price: isPro ? 7000 : 5000,
+        status: isEligible ? 'ACTIVE' : 'SUSPENDED',
+        entitlements: {
+          ...result.data.entitlements,
+          qrTableOrdering: isPro && result.data.entitlements.qrTableOrdering !== false
+        }
+      });
+      if (onUpdated) onUpdated();
+    }
+  }
+
+  useEffect(() => {
+    if (cloudConnected && cloudLoggedIn) {
+      refreshCloudEntitlements();
+    }
+  }, [cloudConnected, cloudLoggedIn]);
+
+  async function handleConnectSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setCloudError(null);
+    setCloudBusy(true);
+    try {
+      await redeemActivationCode(activationCodeInput.trim());
+      setCloudConnected(true);
+      setCloudMode('login');
+      setActivationCodeInput('');
+    } catch (err) {
+      setCloudError(err instanceof CloudApiError ? err.message : 'Could not connect — check the code and try again.');
+    } finally {
+      setCloudBusy(false);
+    }
+  }
+
+  async function handleCloudLoginSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setCloudError(null);
+    setCloudBusy(true);
+    try {
+      await cloudLogin(cloudEmail, cloudPassword);
+      setCloudLoggedIn(true);
+      setCloudPassword('');
+    } catch (err) {
+      setCloudError(err instanceof CloudApiError ? err.message : 'Login failed — check your email and password.');
+    } finally {
+      setCloudBusy(false);
+    }
+  }
+
+  async function handleSetInitialPasswordSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setCloudError(null);
+    setCloudBusy(true);
+    try {
+      await cloudSetInitialPassword(cloudEmail, cloudActivationToken.trim(), cloudNewPassword);
+      await cloudLogin(cloudEmail, cloudNewPassword);
+      setCloudLoggedIn(true);
+      setCloudNewPassword('');
+      setCloudActivationToken('');
+      setCloudMode('login');
+    } catch (err) {
+      setCloudError(err instanceof CloudApiError ? err.message : 'Could not set password — it may already be set.');
+    } finally {
+      setCloudBusy(false);
+    }
+  }
+
   const currentLicense = LicenseRepository.getLicense();
   const currentTier: PlanTier = currentLicense.tier || 'CORE';
 
+  // ENT-001 / SEC-002 fix: neither button below can activate a plan by itself any
+  // more. A restaurant either (a) connects to JAMANVAAR Cloud above and gets its
+  // entitlements from the real, subscription-backed endpoint, or (b) pastes a
+  // signed license certificate issued by Super Admin (see handleApplyCertificate).
+  // There is no third path — clicking a plan card only explains how to activate it.
   const handleActivatePlan = (tier: PlanTier) => {
     setLicenseError('');
-    LicenseRepository.activatePlan(tier);
-    const msg = `Successfully activated ${tier === 'PRO' ? 'JAMANVAAR PRO (₹7,000)' : 'JAMANVAAR CORE (₹5,000)'}!`;
-    setLicenseFeedback(msg);
-    showToast(msg);
-    if (onUpdated) onUpdated();
-    setTimeout(() => setLicenseFeedback(''), 4000);
+    if (isCloudConnected()) {
+      setLicenseError('This restaurant is enrolled in JAMANVAAR Cloud Control Plane. Subscription plans and feature entitlements are authoritative and must be assigned by Super Admin.');
+      return;
+    }
+    setLicenseError(
+      `To activate ${tier === 'PRO' ? 'JAMANVAAR PRO' : 'JAMANVAAR CORE'}, connect to JAMANVAAR Cloud above, or paste a signed License Certificate from Super Admin below.`
+    );
   };
 
-  const handleActivateWithDealerKey = () => {
+  const handleApplyCertificate = async () => {
     setLicenseError('');
-    const key = dealerKeyInput.trim().toUpperCase();
-    if (!key) {
-      setLicenseError('Please enter a valid dealer activation license key');
+    const cert = dealerKeyInput.trim();
+    if (!cert) {
+      setLicenseError('Please paste a License Certificate issued by Super Admin');
+      return;
+    }
+    if (isCloudConnected()) {
+      setLicenseError('This restaurant is enrolled in JAMANVAAR Cloud Control Plane. Use official Cloud Activation Keys from Super Admin.');
       return;
     }
 
-    if (key.includes('PRO')) {
-      LicenseRepository.activatePlan('PRO', key);
-      const msg = `Valid Dealer Key: Activated JAMANVAAR PRO (${key})`;
-      setLicenseFeedback(msg);
-      showToast(msg);
-      setDealerKeyInput('');
-    } else if (key.includes('CORE')) {
-      LicenseRepository.activatePlan('CORE', key);
-      const msg = `Valid Dealer Key: Activated JAMANVAAR CORE (${key})`;
-      setLicenseFeedback(msg);
-      showToast(msg);
-      setDealerKeyInput('');
-    } else {
-      LicenseRepository.activatePlan('PRO', key);
-      const msg = `Custom Enterprise Key Applied: (${key})`;
-      setLicenseFeedback(msg);
-      showToast(msg);
-      setDealerKeyInput('');
+    const result = await applyLicenseCertificate(cert);
+    if (!result.ok) {
+      const reasons: Record<typeof result.reason, string> = {
+        malformed: 'That does not look like a License Certificate — paste it exactly as Super Admin provided it.',
+        'invalid-signature-or-expired': 'This License Certificate is invalid or has expired. Request a new one from Super Admin.',
+        'restaurant-mismatch': 'This License Certificate was issued for a different restaurant.'
+      };
+      setLicenseError(reasons[result.reason]);
+      return;
     }
+
+    const msg = `License Certificate applied: activated ${result.license.planName} (verified, signed by Super Admin).`;
+    setLicenseFeedback(msg);
+    showToast(msg);
+    setDealerKeyInput('');
     if (onUpdated) onUpdated();
     setTimeout(() => setLicenseFeedback(''), 4000);
   };
@@ -135,6 +275,138 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         </div>
       </div>
 
+      {/* CLOUD SUBSCRIPTION STATUS — additive, optional; everything below keeps working offline regardless */}
+      <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-2xs space-y-3">
+        {!cloudConnected ? (
+          <form onSubmit={handleConnectSubmit} className="space-y-2">
+            <div className="flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-[#E66817]" />
+              <h3 className="text-sm font-bold text-[#0B253A]">Connect to JAMANVAAR Cloud</h3>
+            </div>
+            <p className="text-[11px] text-slate-500">
+              Enter the activation code from Super Admin to see this restaurant's real, live subscription plan here.
+              Optional — everything below already works without it.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-2">
+              <input
+                type="text"
+                value={activationCodeInput}
+                onChange={(e) => setActivationCodeInput(e.target.value)}
+                placeholder="JMV-XXXX-XXXX-XXXX"
+                className="w-full sm:flex-1 bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl px-4 py-2.5 text-xs font-mono font-bold text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
+              />
+              <button
+                type="submit"
+                disabled={cloudBusy || !activationCodeInput.trim()}
+                className="w-full sm:w-auto px-6 py-2.5 bg-[#0B253A] hover:bg-[#1E3A4C] disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
+              >
+                {cloudBusy ? 'Connecting…' : 'Connect'}
+              </button>
+            </div>
+            {cloudError && <div className="form-error">{cloudError}</div>}
+          </form>
+        ) : !cloudLoggedIn ? (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <KeyRound className="w-4 h-4 text-[#E66817]" />
+                <h3 className="text-sm font-bold text-[#0B253A]">
+                  {cloudMode === 'set-password' ? 'Set your owner password' : 'Log in to JAMANVAAR Cloud'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCloudMode(cloudMode === 'login' ? 'set-password' : 'login')}
+                className="text-[10px] font-bold text-slate-500 hover:text-[#0B253A] underline cursor-pointer"
+              >
+                {cloudMode === 'set-password' ? 'Already have a password? Log in' : 'First time? Set your password'}
+              </button>
+            </div>
+            <form
+              onSubmit={cloudMode === 'set-password' ? handleSetInitialPasswordSubmit : handleCloudLoginSubmit}
+              className="form-grid"
+            >
+              <div className="field">
+                <label>Owner email</label>
+                <input type="email" value={cloudEmail} onChange={(e) => setCloudEmail(e.target.value)} required />
+              </div>
+              {cloudMode === 'set-password' ? (
+                <>
+                  <div className="field">
+                    <label>Invitation token</label>
+                    <input
+                      type="text"
+                      value={cloudActivationToken}
+                      onChange={(e) => setCloudActivationToken(e.target.value)}
+                      placeholder="From Super Admin — sent when this restaurant was created"
+                      required
+                    />
+                  </div>
+                  <div className="field">
+                    <label>New password</label>
+                    <input
+                      type="password"
+                      value={cloudNewPassword}
+                      onChange={(e) => setCloudNewPassword(e.target.value)}
+                      minLength={8}
+                      required
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="field">
+                  <label>Password</label>
+                  <input
+                    type="password"
+                    value={cloudPassword}
+                    onChange={(e) => setCloudPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
+              <div className="modal-actions" style={{ gridColumn: '1 / -1' }}>
+                <button
+                  type="submit"
+                  disabled={cloudBusy}
+                  className="w-full sm:w-auto px-6 py-2.5 bg-[#0B253A] hover:bg-[#1E3A4C] disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
+                >
+                  {cloudBusy ? 'Please wait…' : cloudMode === 'set-password' ? 'Set password & log in' : 'Log in'}
+                </button>
+              </div>
+            </form>
+            {cloudError && <div className="form-error">{cloudError}</div>}
+          </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span className="text-sm font-black text-[#0B253A]">
+                  Cloud-Synced Plan: {cloudData?.planName ?? '—'} {cloudData?.planTier ? `(${cloudData.planTier})` : ''}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                {cloudData?.subscriptionStatus
+                  ? `Subscription ${cloudData.subscriptionStatus}`
+                  : 'No active subscription on this restaurant yet'}
+                {cloudSyncedAt &&
+                  ` • ${cloudStale ? 'offline — last synced' : 'synced'} ${new Date(cloudSyncedAt).toLocaleString()}`}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={refreshCloudEntitlements}
+              className="text-[11px] font-bold text-slate-500 hover:text-[#0B253A] underline cursor-pointer shrink-0"
+            >
+              Refresh
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* DEVICE & STAFF LOGINS — self-service credentials for Captain and other apps/terminals */}
+      <CloudDeviceLoginsPanel />
+
       {/* TWO CARDS GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* CARD 1: JAMANVAAR CORE (₹5,000) - 5 Cols */}
@@ -172,7 +444,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             <div className="space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
-                  INCLUDED MODULES & CAPABILITIES (183 FEATURES):
+                  INCLUDED MODULES & CAPABILITIES ({CORE_FEATURE_COUNT} FEATURES):
                 </span>
                 <button
                   type="button"
@@ -183,261 +455,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 </button>
               </div>
 
-              {[
-                {
-                  id: 'pos_billing',
-                  title: '1. POS & Fast Billing',
-                  icon: UtensilsCrossed,
-                  features: [
-                    'Fast Counter Billing',
-                    'New Order Creation',
-                    'Dine-In Orders',
-                    'Takeaway Orders',
-                    'Delivery Orders',
-                    'Token Orders',
-                    'Item Search',
-                    'SKU Search',
-                    'Category-Based Menu',
-                    'Quick Add Items',
-                    'Item Quantity Control',
-                    'Item Customization',
-                    'Item Modifiers',
-                    'Special Instructions',
-                    'Order Notes',
-                    'Customer Attachment',
-                    'Repeat Previous Order',
-                    'Hold Order',
-                    'Recall Held Order',
-                    'Order Editing',
-                    'Discount Application',
-                    'Automatic Tax Calculation',
-                    'Bill Preview',
-                    'Bill Generation',
-                    'Bill Reopening',
-                    'Invoice Numbering',
-                    'Token Number Generation',
-                    'Fast Touch-Friendly POS Interface'
-                  ]
-                },
-                {
-                  id: 'payments_cash',
-                  title: '2. Payments & Cash Drawer',
-                  icon: Banknote,
-                  features: [
-                    'Cash Payment',
-                    'UPI Payment',
-                    'BharatQR Payment',
-                    'Card Payment',
-                    'Split Payment',
-                    'Multiple Payment Methods',
-                    'Payment Settlement',
-                    'Cash Tender Entry',
-                    'Automatic Change Calculation',
-                    'Cash Drawer Management',
-                    'Opening Cash / Float',
-                    'Closing Cash',
-                    'Cash Variance',
-                    'Cashier Shift Tracking',
-                    'Payment History',
-                    'Refund Management',
-                    'Payment Status Tracking',
-                    'Daily Cash Collection',
-                    'Payment Reconciliation'
-                  ]
-                },
-                {
-                  id: 'table_floor',
-                  title: '3. Table & Floor Management',
-                  icon: LayoutGrid,
-                  features: [
-                    'Visual Floor Plan',
-                    'Multiple Restaurant Sections',
-                    'Table Creation',
-                    'Table Numbering',
-                    'Table Capacity',
-                    'Available Table Status',
-                    'Occupied Table Status',
-                    'Reserved Table Status',
-                    'Table Order Management',
-                    'Guest Count',
-                    'Open Table',
-                    'Close Table',
-                    'Transfer Table',
-                    'Merge Tables',
-                    'Split Table',
-                    'Move Order Between Tables',
-                    'Table-Based Billing',
-                    'Table Occupancy Tracking',
-                    'Table Turnover Tracking',
-                    'Real-Time Table Status'
-                  ]
-                },
-                {
-                  id: 'kitchen_kot',
-                  title: '4. Kitchen / KOT / Basic KDS',
-                  icon: ChefHat,
-                  features: [
-                    'KOT Creation',
-                    'KOT Sending',
-                    'KOT Printing',
-                    'KOT Reprinting',
-                    'Kitchen Order Queue',
-                    'Kitchen Station Routing',
-                    'Kitchen Station Assignment',
-                    'Order Preparing Status',
-                    'Order Ready Status',
-                    'Order Completed Status',
-                    'Food Ready Notification',
-                    'KOT Cancellation',
-                    'KOT Modification',
-                    'Kitchen Notes',
-                    'Order Priority',
-                    'Kitchen Order Timing',
-                    'Basic KDS',
-                    'Pending KOT Tracking',
-                    'Kitchen Availability Status'
-                  ]
-                },
-                {
-                  id: 'menu_inventory',
-                  title: '5. Menu & Inventory',
-                  icon: Package,
-                  features: [
-                    'Menu Management',
-                    'Category Management',
-                    'Dish Management',
-                    'Dish Images',
-                    'Dish Descriptions',
-                    'Dish SKU',
-                    'Dish Pricing',
-                    'Veg / Jain / Non-Veg Classification',
-                    'Dish Availability',
-                    'Mark Dish Available',
-                    'Mark Dish Unavailable',
-                    'Kitchen Station Assignment',
-                    'Modifier Management',
-                    'Recipe Information',
-                    'Inventory Tracking',
-                    'Low Stock Status',
-                    'Item Availability Management',
-                    'Inventory Search',
-                    'Category Filtering',
-                    'Starter Menu Import',
-                    'Bulk Menu Management'
-                  ]
-                },
-                {
-                  id: 'reports_gst',
-                  title: '6. Reports & GST',
-                  icon: BarChart3,
-                  features: [
-                    'Daily Sales Report',
-                    'Order Report',
-                    'Payment Report',
-                    'Cash Report',
-                    'GST Report',
-                    'CGST / SGST Breakdown',
-                    'Discount Report',
-                    'Top Selling Dishes',
-                    'Dish Velocity',
-                    'Average Order Value',
-                    'Sales by Order Type',
-                    'Sales by Payment Method',
-                    'Cashier Performance',
-                    'Shift Performance',
-                    'Date-Based Reports',
-                    'Custom Date Reports',
-                    'Monthly Reports',
-                    'Yearly Reports',
-                    'Report Preview',
-                    'Print Reports',
-                    'PDF Reports',
-                    'CSV Export'
-                  ]
-                },
-                {
-                  id: 'offline_ops',
-                  title: '7. Offline-First Operations',
-                  icon: HardDrive,
-                  features: [
-                    'Local SQLite Database',
-                    'Offline Billing',
-                    'Offline Order Creation',
-                    'Offline Menu Access',
-                    'Offline Table Management',
-                    'Offline KOT Queue',
-                    'Offline Reports',
-                    'Local Print Queue',
-                    'Offline Payment Recording',
-                    'Automatic Sync When Online',
-                    'Sync Retry',
-                    'Local Data Persistence',
-                    'Connection Status',
-                    'Local Engine Status',
-                    'Offline-First POS Operation'
-                  ]
-                },
-                {
-                  id: 'printing_hw',
-                  title: '8. Printing & Hardware',
-                  icon: Printer,
-                  features: [
-                    '58mm Thermal Printer Support',
-                    '80mm Thermal Printer Support',
-                    'ESC/POS Printing',
-                    'Automatic Printer Detection',
-                    'Receipt Printing',
-                    'KOT Printing',
-                    'Report Printing',
-                    'Reprint Receipt',
-                    'Print Queue',
-                    'Printer Status',
-                    'Printer Test Print',
-                    'Auto-Print After Payment',
-                    'Auto-Print KOT',
-                    'Cash Drawer Trigger',
-                    'Printer Configuration'
-                  ]
-                },
-                {
-                  id: 'customer_mgmt',
-                  title: '9. Customer Management',
-                  icon: Users,
-                  features: [
-                    'Customer Database',
-                    'Customer Search',
-                    'Customer Phone Number',
-                    'Customer Order History',
-                    'Customer Visit History',
-                    'Customer Spending History',
-                    'Customer Notes',
-                    'Loyalty Points',
-                    'Repeat Customer Tracking',
-                    'Customer Information on Bills'
-                  ]
-                },
-                {
-                  id: 'restaurant_admin',
-                  title: '10. Restaurant Administration',
-                  icon: Settings,
-                  features: [
-                    'Restaurant Settings',
-                    'Branch Information',
-                    'Tax Configuration',
-                    'Bill Configuration',
-                    'Printer Configuration',
-                    'Kitchen Configuration',
-                    'Menu Configuration',
-                    'User Management',
-                    'Role Management',
-                    'Cashier Management',
-                    'Device Configuration',
-                    'License Management',
-                    'Subscription Management',
-                    'Audit Records'
-                  ]
-                }
-              ].map((group) => {
+              {CORE_PLAN_FEATURE_GROUPS.map((group) => {
                 const isExpanded = expandedCoreCategory === group.id || showAllCoreFeatures;
 
                 return (
@@ -545,7 +563,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             <div className="space-y-2">
               <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-xs font-black text-emerald-900 flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>✓ EVERYTHING IN CORE IS INCLUDED (183 Base Features)</span>
+                <span>✓ EVERYTHING IN CORE IS INCLUDED ({CORE_FEATURE_COUNT} Base Features)</span>
               </div>
 
               <div className="p-2.5 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 rounded-xl border border-amber-300 text-xs text-[#0B253A] flex items-center justify-between gap-2 font-black">
@@ -563,7 +581,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             <div className="space-y-2.5 text-xs">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-black uppercase text-[#E66817] tracking-wider block">
-                  ⭐ PRO CONNECTED MODULES (173 EXCLUSIVE CAPABILITIES):
+                  ⭐ PRO CONNECTED MODULES ({PRO_FEATURE_COUNT} EXCLUSIVE CAPABILITIES):
                 </span>
                 <button
                   type="button"
@@ -574,233 +592,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 </button>
               </div>
 
-              {[
-                {
-                  id: 'captain',
-                  title: '1. Wireless Captain / Waiter App',
-                  icon: Smartphone,
-                  isFlagship: true,
-                  features: [
-                    'Captain Login',
-                    'Waiter Login',
-                    'Staff Profile',
-                    'Assigned Tables',
-                    'My Tables',
-                    'Table Availability',
-                    'Table Occupancy',
-                    'Table-Side Ordering',
-                    'Browse Menu',
-                    'Search Dishes',
-                    'Add Items',
-                    'Modify Quantity',
-                    'Item Modifiers',
-                    'Special Instructions',
-                    'Customer Attachment',
-                    'Table Notes',
-                    'Send Order to POS',
-                    'Send Order to Kitchen',
-                    'Course-Based Ordering',
-                    'Course Dispatch',
-                    'Order Status Tracking',
-                    'Preparing Status',
-                    'Food Ready Status',
-                    'Food Ready Notification',
-                    'Bill Request',
-                    'View Bill',
-                    'Payment Request',
-                    'Reorder',
-                    'Repeat Previous Order',
-                    'Table Transfer',
-                    'Table Merge',
-                    'Table Split',
-                    'Captain Order Attribution',
-                    'Waiter Performance',
-                    'Orders Handled',
-                    'Captain Sales Tracking',
-                    'Offline Captain Mode',
-                    'Automatic POS Synchronization',
-                    'Real-Time Updates'
-                  ]
-                },
-                {
-                  id: 'qr_kiosk',
-                  title: '2. QR Table Ordering & Kiosk',
-                  icon: QrCode,
-                  features: [
-                    'Table QR Code',
-                    'Unique QR per Table',
-                    'Scan-to-Order',
-                    'Digital Menu',
-                    'Digital Categories',
-                    'Dish Images',
-                    'Dish Descriptions',
-                    'Dish Customization',
-                    'Modifiers',
-                    'Customer Cart',
-                    'Quantity Selection',
-                    'Special Instructions',
-                    'Table Identification',
-                    'Order Submission',
-                    'POS Order Reception',
-                    'Kitchen Order Routing',
-                    'Order Status',
-                    'QR Order Tracking',
-                    'Kiosk Integration',
-                    'Kiosk Touch Ordering',
-                    'Kiosk Menu',
-                    'Kiosk Cart',
-                    'Kiosk Order Confirmation',
-                    'Kiosk Token Generation',
-                    'Kiosk POS Synchronization',
-                    'Kiosk KDS Synchronization',
-                    'Kiosk Printer Integration',
-                    'Multiple Ordering Channels'
-                  ]
-                },
-                {
-                  id: 'sync',
-                  title: '3. Real-Time Multi-Machine Mesh Sync',
-                  icon: Network,
-                  features: [
-                    'POS ↔ Captain Sync',
-                    'POS ↔ KDS Sync',
-                    'POS ↔ Kiosk Sync',
-                    'Captain ↔ KDS Sync',
-                    'Kiosk ↔ KDS Sync',
-                    'Real-Time Order Sync',
-                    'Real-Time Table Sync',
-                    'Real-Time Menu Sync',
-                    'Real-Time Availability Sync',
-                    'Real-Time Order Status Sync',
-                    'Bill Status Synchronization',
-                    'Device Presence',
-                    'Online / Offline Device Status',
-                    'Automatic Reconnection',
-                    'Sync Retry',
-                    'Offline Queue',
-                    'Pending Sync Queue',
-                    'Conflict Handling',
-                    'Duplicate Prevention',
-                    'Event Synchronization',
-                    'Device Health Monitoring',
-                    'Multi-Machine Restaurant Network'
-                  ]
-                },
-                {
-                  id: 'kds',
-                  title: '4. Advanced Multi-Station KDS',
-                  icon: ChefHat,
-                  features: [
-                    'Multiple Kitchen Stations',
-                    'Main Kitchen',
-                    'Tandoor Station',
-                    'Curry Station',
-                    'Beverage Station',
-                    'Dessert Station',
-                    'Biryani Station',
-                    'Station-Based KOT Routing',
-                    'Automatic Order Routing',
-                    'Course Routing',
-                    'Kitchen Queue',
-                    'Priority Orders',
-                    'Preparing Orders',
-                    'Ready Orders',
-                    'Completed Orders',
-                    'Food Ready Notifications',
-                    'Delayed KOT Detection',
-                    'Order Preparation Timer',
-                    'Station Performance',
-                    'Kitchen Performance',
-                    'KOT Reprinting',
-                    'KOT Modification',
-                    'KOT Cancellation',
-                    'Real-Time KDS Updates',
-                    'Multi-Screen KDS',
-                    'Kitchen Load Visibility'
-                  ]
-                },
-                {
-                  id: 'ai',
-                  title: '5. JAMANVAAR AI Restaurant Assistant',
-                  icon: Bot,
-                  features: [
-                    "Today's Sales Questions",
-                    "Today's Order Questions",
-                    'Average Order Value Analysis',
-                    'Payment Analysis',
-                    'Cash Analysis',
-                    'Kitchen Analysis',
-                    'Delayed KOT Analysis',
-                    'Table Occupancy Analysis',
-                    'Menu Performance Analysis',
-                    'Top Selling Dish Analysis',
-                    'Slow Selling Dish Analysis',
-                    'Sales Trend Analysis',
-                    'Customer Analysis',
-                    'Restaurant Performance Questions',
-                    'Operational Insights',
-                    'Low Stock Insights',
-                    'Low Availability Insights',
-                    'Business Summary',
-                    'Daily Restaurant Summary',
-                    'Management Questions',
-                    'Natural Language Restaurant Queries',
-                    'Offline Local AI Intelligence',
-                    'Local Database-Based Answers'
-                  ]
-                },
-                {
-                  id: 'analytics',
-                  title: '6. Advanced Analytics + CRM + Live Monitoring',
-                  icon: BarChart3,
-                  features: [
-                    'Advanced Sales Analytics',
-                    'Hourly Sales Analysis',
-                    'Day-of-Week Analysis',
-                    'Sales Heatmaps',
-                    'Channel Performance',
-                    'POS vs Captain vs Kiosk',
-                    'Table Utilization',
-                    'Table Turnover',
-                    'Average Order Value',
-                    'Dish Velocity',
-                    'Category Performance',
-                    'Gross Sales',
-                    'Net Sales',
-                    'Discount Analysis',
-                    'GST Analysis',
-                    'Payment Mix',
-                    'Cash Performance',
-                    'UPI Performance',
-                    'Card Performance',
-                    'Customer Lifetime Value',
-                    'Repeat Customer Analysis',
-                    'Customer Visit Frequency',
-                    'Customer Spending Patterns',
-                    'Captain Sales Attribution',
-                    'Orders Handled by Captain',
-                    'Waiter Performance',
-                    'KOT Performance',
-                    'Kitchen Timing',
-                    'Delayed Order Detection',
-                    'Low Stock Alerts',
-                    'Low Availability Alerts',
-                    'Live POS Monitoring',
-                    'Live Captain Monitoring',
-                    'Live KDS Monitoring',
-                    'Live Kiosk Monitoring',
-                    'Printer Monitoring',
-                    'Device Monitoring',
-                    'Sync Monitoring',
-                    'Operational Alerts',
-                    'Historical Comparisons',
-                    'Daily vs Weekly Comparison',
-                    'Monthly Performance Analysis',
-                    'Restaurant Flow Metrics'
-                  ]
-                }
-              ].map((group) => {
-                const Icon = group.icon;
+              {PRO_PLAN_FEATURE_GROUPS.map((group) => {
+                const Icon = FEATURE_GROUP_ICONS[group.iconName];
                 const isExpanded = expandedProCategory === group.id || showAllProFeatures;
 
                 return (
@@ -1025,14 +818,16 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         </div>
       </div>
 
-      {/* SECTION 4: DEALER LICENSE KEY ACTIVATION PORTAL */}
+      {/* SECTION 4: OFFLINE LICENSE CERTIFICATE ACTIVATION */}
       <div className="bg-white border border-[#EBE6DD] rounded-3xl p-6 shadow-2xs space-y-3">
         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
           <KeyRound className="w-5 h-5 text-[#E66817]" />
           <div>
-            <h3 className="text-sm font-bold text-[#0B253A]">Dealer License Key Activation</h3>
+            <h3 className="text-sm font-bold text-[#0B253A]">Offline License Certificate</h3>
             <p className="text-[11px] text-slate-500">
-              POS Dealers can apply new license tokens or upgrade customer restaurant licenses offline.
+              For restaurants without a live cloud connection: ask Super Admin to generate a signed License
+              Certificate for this restaurant and paste it here. It is cryptographically verified — a
+              plan cannot be changed without one.
             </p>
           </div>
         </div>
@@ -1042,16 +837,16 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             type="text"
             value={dealerKeyInput}
             onChange={(e) => setDealerKeyInput(e.target.value)}
-            placeholder="Enter Dealer Activation Key (e.g. JAMAN-PRO-2026-AHM-XXXX)..."
+            placeholder="Paste the License Certificate from Super Admin..."
             className="w-full sm:flex-1 bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl px-4 py-2.5 text-xs font-mono font-bold text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
           />
 
           <button
-            onClick={handleActivateWithDealerKey}
+            onClick={handleApplyCertificate}
             disabled={!dealerKeyInput.trim()}
             className="w-full sm:w-auto px-6 py-2.5 bg-[#0B253A] hover:bg-[#1E3A4C] disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
           >
-            Validate & Apply Key
+            Verify & Apply Certificate
           </button>
         </div>
       </div>

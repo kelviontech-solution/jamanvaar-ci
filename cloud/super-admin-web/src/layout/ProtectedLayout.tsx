@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import { JAMANVAAR_LOGOS } from '@jamanvaar/ui';
+import { api } from '../api/client';
+import type { SystemHealth } from '../api/types';
+// Deep relative import, not the '@jamanvaar/ui' barrel: that barrel also
+// re-exports components which import @jamanvaar/database, whose module-level
+// singleton immediately starts polling a LAN-only local device bridge
+// (localhost:5178) that has no reason to exist in this pure cloud console —
+// confirmed via a real browser session showing repeated connection-refused
+// noise on every page. This avoids pulling that module graph in at all.
+import { JAMANVAAR_LOGOS } from '../../../../packages/ui/src/assets';
 import {
   LayoutDashboard,
   Store,
@@ -21,7 +29,12 @@ import {
   LogOut,
   Menu,
   X,
-  ExternalLink
+  ExternalLink,
+  Layers,
+  LifeBuoy,
+  Sliders,
+  BarChart3,
+  Database
 } from 'lucide-react';
 import './layout.css';
 
@@ -55,13 +68,15 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: '/plans', label: 'Plans', icon: Package },
       { to: '/subscriptions', label: 'Subscriptions', icon: Repeat },
-      { to: '/billing', label: 'Billing', icon: CreditCard },
-      { to: '/entitlements', label: 'Feature Entitlements', icon: ShieldCheck }
+      { to: '/billing', label: 'Invoices & Billing', icon: CreditCard },
+      { to: '/entitlements', label: 'Feature Entitlements', icon: ShieldCheck },
+      { to: '/reports', label: 'Reports & Analytics', icon: BarChart3 }
     ]
   },
   {
-    label: 'Device & Licensing',
+    label: 'Device & Ecosystem',
     items: [
+      { to: '/applications', label: 'Applications', icon: Layers },
       { to: '/activation-keys', label: 'Activation Keys', icon: KeyRound },
       { to: '/devices', label: 'Registered Devices', icon: Laptop2 }
     ]
@@ -69,8 +84,11 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Platform Operations',
     items: [
+      { to: '/backups', label: 'Backups & Recovery', icon: Database },
+      { to: '/support', label: 'Support & Diagnostics', icon: LifeBuoy },
       { to: '/audit-logs', label: 'Audit Logs', icon: FileText },
-      { to: '/system-health', label: 'System Health', icon: HeartPulse }
+      { to: '/system-health', label: 'System Health', icon: HeartPulse },
+      { to: '/settings/platform', label: 'Platform Settings', icon: Sliders }
     ]
   },
   {
@@ -84,6 +102,31 @@ export function ProtectedLayout() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  // The "PLATFORM ONLINE" pill used to be static markup with no data behind
+  // it. Polls the real health endpoint instead — a failed fetch (network
+  // down, API unreachable) is itself meaningful and now shown as degraded
+  // rather than silently continuing to claim "ONLINE".
+  const [platformHealth, setPlatformHealth] = useState<'checking' | 'online' | 'degraded'>('checking');
+
+  useEffect(() => {
+    let cancelled = false;
+    const check = () => {
+      api
+        .get<SystemHealth>('/api/v1/platform/system-health')
+        .then((h) => {
+          if (!cancelled) setPlatformHealth(h.database === 'UP' ? 'online' : 'degraded');
+        })
+        .catch(() => {
+          if (!cancelled) setPlatformHealth('degraded');
+        });
+    };
+    check();
+    const interval = setInterval(check, 30000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
 
   if (status === 'loading') {
     return (
@@ -217,22 +260,36 @@ export function ProtectedLayout() {
 
           {/* Header Right Actions */}
           <div className="header-right">
-            {/* Live Operational Status */}
-            <div className="header-status-pill" title="All Core Platform Services Operational">
+            {/* Live Operational Status — reflects GET /api/v1/platform/system-health, polled every 30s */}
+            <div
+              className={`header-status-pill${platformHealth === 'degraded' ? ' header-status-pill--degraded' : ''}`}
+              title={
+                platformHealth === 'online'
+                  ? 'Database reachable, API responding'
+                  : platformHealth === 'degraded'
+                    ? 'System health check failed or database unreachable — see System Health'
+                    : 'Checking platform health…'
+              }
+            >
               <span className="status-indicator-dot" />
-              <span className="status-label">PLATFORM ONLINE</span>
+              <span className="status-label">
+                {platformHealth === 'online' ? 'PLATFORM ONLINE' : platformHealth === 'degraded' ? 'DEGRADED' : 'CHECKING…'}
+              </span>
             </div>
 
-            {/* Notifications Button */}
-            <button
-              type="button"
+            {/* Recent platform activity — links to the real audit log, the
+                closest thing this console has to notifications today. The
+                permanent unread dot this used to show was decorative (no
+                click handler, no actual unread state behind it); removed
+                rather than left implying activity that was never computed. */}
+            <Link
+              to="/audit-logs"
               className="header-icon-btn"
-              title="Notifications"
-              aria-label="Notifications"
+              title="Recent platform activity"
+              aria-label="Recent platform activity"
             >
               <Bell className="w-4 h-4" />
-              <span className="notification-dot" />
-            </button>
+            </Link>
 
             <div className="header-separator" aria-hidden="true" />
 

@@ -1,10 +1,47 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const PORT = 5178;
 const HOST = '0.0.0.0';
 const DB_FILE = path.join(__dirname, '../../packages/database/src/live_db.json');
+
+// SEC-005 fix: this service used to accept every request from anyone who could
+// reach it on the LAN (or from any web page, via the wildcard CORS below) with
+// zero authentication — reading and overwriting the entire restaurant database,
+// including packages/database's `license` blob (a second, independent path to
+// the ENT-001 entitlement bypass, since this file never goes through
+// LicenseRepository at all). A persistent key is generated once per install
+// and required on every data-bearing endpoint from here on; a short pairing
+// PIN (shown only in this process's own console, never over the network) is
+// the one-time bootstrap a new device uses to receive that key.
+const KEY_FILE = path.join(__dirname, '.local_service_key');
+let SERVICE_KEY;
+if (fs.existsSync(KEY_FILE)) {
+  SERVICE_KEY = fs.readFileSync(KEY_FILE, 'utf8').trim();
+} else {
+  SERVICE_KEY = crypto.randomBytes(24).toString('hex');
+  fs.writeFileSync(KEY_FILE, SERVICE_KEY, { mode: 0o600 });
+}
+// Regenerated every process start — deliberately not persisted, so it's only
+// ever known to someone who can currently see this console.
+const PAIRING_PIN = String(crypto.randomInt(100000, 999999));
+
+function isAuthorized(req, urlObj) {
+  const header = req.headers['authorization'] || '';
+  const bearerMatch = /^Bearer\s+(.+)$/i.exec(header);
+  const presentedKey = (bearerMatch ? bearerMatch[1] : req.headers['x-service-key']) || urlObj.searchParams.get('key') || '';
+  return presentedKey === SERVICE_KEY;
+}
+
+// Data-bearing endpoints only — /health, /sync/status (no sensitive payload),
+// static asset serving, and /devices/pair (the bootstrap itself) stay open.
+const PROTECTED_PATHS = ['/api/orders', '/api/sync', '/devices', '/api/heartbeat', '/api/events'];
+function isProtectedPath(pathname) {
+  if (pathname === '/devices/pair') return false;
+  return PROTECTED_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
+}
 
 // In-Memory Database State
 let dbState = {
@@ -35,10 +72,21 @@ if (fs.existsSync(DB_FILE)) {
   }
 }
 
-// Helper: Save DB to disk
+// Helper: Save DB to disk. Writes to a temp file then renames over the real
+// one — `fs.rename` is atomic on the same filesystem, so a crash or power
+// loss mid-write leaves either the old file or the new one intact, never a
+// truncated/corrupt half-write (the previous direct fs.writeFile could
+// destroy the only copy of a restaurant's data on interruption). Also keeps
+// one rolling backup of the last-known-good file as a manual recovery option.
 function saveDb() {
+  const tmpFile = `${DB_FILE}.tmp`;
+  const backupFile = `${DB_FILE}.bak`;
   try {
-    fs.writeFile(DB_FILE, JSON.stringify(dbState, null, 2), () => {});
+    fs.writeFileSync(tmpFile, JSON.stringify(dbState, null, 2));
+    if (fs.existsSync(DB_FILE)) {
+      fs.copyFileSync(DB_FILE, backupFile);
+    }
+    fs.renameSync(tmpFile, DB_FILE);
   } catch (err) {
     console.warn('Save DB error:', err);
   }
@@ -81,10 +129,16 @@ function generateNextToken() {
 }
 
 const server = http.createServer((req, res) => {
-  // CORS Headers for LAN & Localhost
+  // CORS Headers for LAN & Localhost. Left permissive intentionally: this
+  // service is meant to be reachable from POS/KDS/Captain/Kiosk devices on
+  // different machines across the restaurant's LAN, not just localhost, so a
+  // fixed origin allowlist would break the legitimate multi-device use case.
+  // CORS is also a browser-only mitigation — it does nothing against a
+  // non-browser client hitting this port directly — so it was never the real
+  // protection here; the SERVICE_KEY check below is.
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Idempotency-Key');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Idempotency-Key, X-Service-Key');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
@@ -94,6 +148,13 @@ const server = http.createServer((req, res) => {
 
   const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const pathname = urlObj.pathname;
+
+  // SEC-005 fix: reject unauthenticated access to every data-bearing endpoint.
+  if (isProtectedPath(pathname) && !isAuthorized(req, urlObj)) {
+    res.writeHead(401, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Unauthorized — pair this device via POST /devices/pair first.' }));
+    return;
+  }
 
   // 1. HEALTH & SYSTEM STATUS (/health and /api/health)
   if (req.method === 'GET' && (pathname === '/health' || pathname === '/api/health')) {
@@ -159,21 +220,35 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // 1d. DEVICE PAIRING TOKEN (/devices/pair)
+  // 1d. DEVICE PAIRING (/devices/pair) — SEC-005 fix: used to hand out a
+  // fresh, never-validated `PAIR-XXXXXX` string to anyone who asked, which
+  // nothing downstream ever checked. Now requires the PAIRING_PIN printed to
+  // this process's own console (never sent over the network by this service),
+  // and on success returns the real SERVICE_KEY the device must present as a
+  // Bearer token on every protected endpoint from then on.
   if (req.method === 'POST' && pathname === '/devices/pair') {
     let body = '';
     req.on('data', (c) => (body += c));
     req.on('end', () => {
-      const token = `PAIR-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        success: true,
-        token,
-        restaurant_id: 'JAMANVAAR-AHM-FLAGSHIP',
-        outlet_id: 'AHM-FLAGSHIP',
-        port: PORT,
-        expires_in_seconds: 300
-      }));
+      try {
+        const payload = JSON.parse(body || '{}');
+        if (String(payload.pairingPin || '') !== PAIRING_PIN) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid pairing PIN. Check the PIN shown in this restaurant’s local service console.' }));
+          return;
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          serviceKey: SERVICE_KEY,
+          restaurant_id: 'JAMANVAAR-AHM-FLAGSHIP',
+          outlet_id: 'AHM-FLAGSHIP',
+          port: PORT
+        }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
     });
     return;
   }
@@ -326,18 +401,19 @@ const server = http.createServer((req, res) => {
           customerPhone: payload.customerPhone,
           customerName: payload.customerName,
           items,
-          subtotal: payload.subtotal !== undefined ? payload.subtotal : subtotal,
-          discountAmount: payload.discountAmount !== undefined ? payload.discountAmount : discountAmount,
+          // SEC-005 Fix: Enforce server-authoritative financial calculation
+          subtotal,
+          discountAmount,
           couponCode: payload.couponCode,
-          cgstAmount: payload.cgstAmount !== undefined ? payload.cgstAmount : cgstAmount,
-          sgstAmount: payload.sgstAmount !== undefined ? payload.sgstAmount : sgstAmount,
-          taxAmount: payload.taxAmount !== undefined ? payload.taxAmount : taxAmount,
-          serviceChargeAmount: payload.serviceChargeAmount || 0,
-          tipAmount: payload.tipAmount || 0,
-          roundOffAmount: payload.roundOffAmount !== undefined ? payload.roundOffAmount : roundOffAmount,
-          totalAmount: payload.totalAmount !== undefined ? payload.totalAmount : totalAmount,
+          cgstAmount,
+          sgstAmount,
+          taxAmount,
+          serviceChargeAmount: 0,
+          tipAmount: 0,
+          roundOffAmount,
+          totalAmount,
           paymentMethod: payload.paymentMethod || 'UPI_QR',
-          paymentStatus: payload.paymentStatus || 'SUCCESS',
+          paymentStatus: payload.paymentMethod === 'CASH_AT_COUNTER' ? 'PENDING' : (payload.paymentStatus || 'SUCCESS'),
           paymentTransactionId: payload.paymentTransactionId || `tx-${Date.now()}`,
           orderStatus: payload.orderStatus || 'NEW',
           estimatedWaitMinutes: payload.estimatedWaitMinutes || 15,
@@ -768,5 +844,8 @@ server.listen(PORT, HOST, () => {
   console.log(`[JAMANVAAR Local Restaurant Service] ACTIVE & LISTENING`);
   console.log(`URL: http://${HOST}:${PORT}`);
   console.log(`Mode: 100% Local On-Premise (No Cloud Required)`);
+  console.log(`-------------------------------------------------------`);
+  console.log(`Pairing PIN for new devices (POST /devices/pair): ${PAIRING_PIN}`);
+  console.log(`This PIN only appears here and changes every restart.`);
   console.log(`=======================================================`);
 });

@@ -1,16 +1,26 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { api, setAccessToken } from '../api/client';
 
+export type PlatformRole =
+  | 'PLATFORM_OWNER'
+  | 'SUPER_ADMIN'
+  | 'PLATFORM_OPS'
+  | 'SUPPORT_ADMIN'
+  | 'FINANCE_ADMIN'
+  | 'READ_ONLY';
+
 export interface PlatformUser {
   id: string;
   email: string;
   fullName: string;
+  role?: PlatformRole;
   status: 'ACTIVE' | 'DISABLED';
 }
 
 interface AuthContextValue {
   user: PlatformUser | null;
   status: 'loading' | 'authenticated' | 'unauthenticated';
+  hasPermission: (requiredRole: PlatformRole) => boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -55,7 +65,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  return <AuthContext.Provider value={{ user, status, login, logout }}>{children}</AuthContext.Provider>;
+  const hasPermission = useCallback((requiredRole: PlatformRole) => {
+    if (!user) return false;
+    const current = user.role ?? 'SUPER_ADMIN';
+    if (current === 'PLATFORM_OWNER' || current === 'SUPER_ADMIN') return true;
+    return current === requiredRole;
+  }, [user]);
+
+  return <AuthContext.Provider value={{ user, status, hasPermission, login, logout }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

@@ -28,9 +28,13 @@
   margin-bottom: 32px;
 }
 .login-brand-logo {
-  height: 42px;
-  width: auto;
+  height: 82px;
+  max-width: 280px;
+  width: 100%;
   object-fit: contain;
+  display: block;
+  image-rendering: -webkit-optimize-contrast;
+  filter: drop-shadow(0 4px 12px rgba(11, 37, 58, 0.08));
 }
 .login-brand-meta {
   display: flex;

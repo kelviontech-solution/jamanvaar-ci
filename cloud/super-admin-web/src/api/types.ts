@@ -17,7 +17,8 @@ export const ENTITLEMENT_KEYS = [
   'restaurantAdmin',
   'captainApp',
   'advancedCaptainReports',
-  'advancedServiceWorkflow'
+  'advancedServiceWorkflow',
+  'qrTableOrdering'
 ] as const;
 export type EntitlementKey = (typeof ENTITLEMENT_KEYS)[number];
 export type Entitlements = Record<EntitlementKey, boolean>;
@@ -41,7 +42,8 @@ export const ENTITLEMENT_LABELS: Record<EntitlementKey, string> = {
   restaurantAdmin: 'Restaurant Admin',
   captainApp: 'Captain App',
   advancedCaptainReports: 'Advanced Captain Reports',
-  advancedServiceWorkflow: 'Advanced Service Workflow'
+  advancedServiceWorkflow: 'Advanced Service Workflow',
+  qrTableOrdering: 'QR Table Ordering & Standees'
 };
 
 export interface Plan {
@@ -140,16 +142,30 @@ export interface Device {
   status: 'PENDING' | 'ACTIVE' | 'REVOKED';
   appVersion: string | null;
   lastSeenAt: string | null;
+  lastSyncAt: string | null;
+  lastBackupAt: string | null;
+  syncStatus: string | null;
   activatedAt: string | null;
   createdAt: string;
   restaurant?: { id: string; name: string };
   branch?: { id: string; name: string } | null;
 }
 
+export interface Backup {
+  id: string;
+  method: 'MANUAL' | 'AUTOMATIC';
+  status: 'COMPLETED' | 'FAILED';
+  sizeBytes: number;
+  createdAt: string;
+  errorMessage: string | null;
+  device: { id: string; type: string } | null;
+}
+
 /** GET /api/v1/restaurants/:id — carries the full related rows instead of _count. */
 export interface RestaurantDetail extends RestaurantCore {
   legalName: string | null;
   gstin: string | null;
+  fssaiNumber: string | null;
   address: string | null;
   country: string;
   timezone: string;
@@ -166,6 +182,7 @@ export interface CreateRestaurantInput {
   name: string;
   legalName?: string;
   gstin?: string;
+  fssaiNumber?: string;
   address?: string;
   city?: string;
   state?: string;
@@ -227,3 +244,132 @@ export interface DashboardSummary {
   planDistribution: Array<{ planId: string; planName: string; subscriptionCount: number }>;
   recentActivity: AuditLogRow[];
 }
+
+// ---------------------------------------------------------------------------
+// Billing & Invoices
+// ---------------------------------------------------------------------------
+
+export type InvoiceStatus = 'DRAFT' | 'ISSUED' | 'PAID' | 'PAST_DUE' | 'VOID' | 'REFUNDED';
+export type PaymentMethod = 'MANUAL' | 'BANK_TRANSFER' | 'UPI' | 'CARD' | 'CHEQUE' | 'GATEWAY';
+
+export interface Payment {
+  id: string;
+  invoiceId: string;
+  restaurantId: string;
+  amount: number;
+  method: PaymentMethod;
+  referenceNumber: string | null;
+  status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
+  notes: string | null;
+  recordedBy: string | null;
+  createdAt: string;
+}
+
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  restaurantId: string;
+  subscriptionId: string | null;
+  planId: string | null;
+  amount: number; // paise
+  taxAmount: number; // paise
+  totalAmount: number; // paise
+  currency: string;
+  status: InvoiceStatus;
+  billingPeriodStart: string;
+  billingPeriodEnd: string;
+  dueDate: string;
+  paidAt: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  restaurant?: { id: string; name: string; legalName?: string; city?: string; gstin?: string };
+  plan?: { id: string; name: string; tier: string };
+  payments?: Payment[];
+}
+
+export interface BillingSummary {
+  totalInvoices: number;
+  paidInvoices: number;
+  pendingInvoices: number;
+  pastDueInvoices: number;
+  totalCollected: number; // in rupees
+  pendingAmount: number; // in rupees
+}
+
+// ---------------------------------------------------------------------------
+// Applications & Releases
+// ---------------------------------------------------------------------------
+
+export interface AppRelease {
+  id: string;
+  appCode: string;
+  version: string;
+  channel: 'STABLE' | 'BETA';
+  minSupportedVersion: string | null;
+  supportedPlatforms: string[];
+  releaseNotes: string | null;
+  downloadUrl: string | null;
+  isMandatory: boolean;
+  releasedAt: string;
+  createdAt: string;
+}
+
+export interface ApplicationSummary {
+  code: string;
+  name: string;
+  category: string;
+  description: string;
+  defaultPort?: number;
+  currentVersion: string;
+  channel: 'STABLE' | 'BETA';
+  minSupportedVersion: string | null;
+  supportedPlatforms: string[];
+  downloadUrl: string | null;
+  releaseNotes: string | null;
+  releasedAt: string | null;
+  totalDevices: number;
+  activeDevices: number;
+  onlineDevices: number;
+  offlineDevices: number;
+  recentReleases: AppRelease[];
+}
+
+// ---------------------------------------------------------------------------
+// Support & Diagnostics
+// ---------------------------------------------------------------------------
+
+export interface SearchResult {
+  restaurants: RestaurantCore[];
+  owners: TenantUser[];
+  devices: Device[];
+  activationKeys: ActivationKey[];
+}
+
+export interface RestaurantDiagnostics {
+  restaurant: RestaurantCore & { legalName: string | null; gstin: string | null };
+  owners: TenantUser[];
+  branches: Branch[];
+  activeSubscription: Subscription | null;
+  subscriptionsHistory: Subscription[];
+  devices: Device[];
+  onlineDevicesCount: number;
+  activationKeys: ActivationKey[];
+  recentAudits: AuditLogRow[];
+  entitlements: Record<string, boolean> | null;
+}
+
+// ---------------------------------------------------------------------------
+// Platform Settings
+// ---------------------------------------------------------------------------
+
+export interface PlatformSetting {
+  id: string;
+  key: string;
+  value: any;
+  category: string;
+  description: string | null;
+  updatedBy: string | null;
+  updatedAt: string;
+}
+

@@ -177,7 +177,7 @@ describe('Authoritative Single-Source-of-Truth Business Day & Financial Accounti
     expect(activeDay.id).toBeDefined();
 
     // Closing a shift should NOT close the business day
-    ShiftRepository.closeShift(activeShift.id, 2000, 'Amit Dave');
+    ShiftRepository.closeShift(activeShift!.id, 2000, 'Amit Dave');
 
     const freshActiveDay = BusinessDayAccountingService.getActiveBusinessDay();
     expect(freshActiveDay.status).toBe('OPEN');

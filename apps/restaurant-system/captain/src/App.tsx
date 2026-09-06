@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useCaptainStore } from './store/captainStore';
 import { DiningTable } from '@jamanvaar/types';
 import { captainDb } from '@jamanvaar/database';
+import { EntitlementService } from '@jamanvaar/business';
 import {
   JamanvaarAuthLayout,
   JAMANVAARStartup
 } from '@jamanvaar/ui';
+import { isDeviceConnected, connectDevice, CloudApiError } from './cloud/cloudClient';
 
 // Captain Modular Layout & Views
 import { CaptainHeader } from './components/layout/CaptainHeader';
@@ -54,6 +56,31 @@ export const App: React.FC = () => {
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState(false);
 
+  // One-time device connection to JAMANVAAR Cloud — separate from the PIN
+  // keypad below, which stays the fast day-to-day login once this tablet is
+  // connected. isDeviceConnected() persists across reloads, so this screen
+  // only ever appears the first time a tablet is set up.
+  const [deviceConnected, setDeviceConnected] = useState(isDeviceConnected());
+  const [connectRestaurantId, setConnectRestaurantId] = useState('');
+  const [connectEmail, setConnectEmail] = useState('');
+  const [connectPassword, setConnectPassword] = useState('');
+  const [connectBusy, setConnectBusy] = useState(false);
+  const [connectError, setConnectError] = useState('');
+
+  const handleConnectDevice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setConnectError('');
+    setConnectBusy(true);
+    try {
+      await connectDevice(connectRestaurantId, connectEmail, connectPassword);
+      setDeviceConnected(true);
+    } catch (err) {
+      setConnectError(err instanceof CloudApiError ? err.message : 'Could not connect — check your details and try again.');
+    } finally {
+      setConnectBusy(false);
+    }
+  };
+
   // Active Modals State
   const [guestModalTable, setGuestModalTable] = useState<DiningTable | null>(null);
   const [isMoreDrawerOpen, setIsMoreDrawerOpen] = useState(false);
@@ -71,6 +98,43 @@ export const App: React.FC = () => {
     return () => unsub();
   }, [refreshState]);
 
+  // SEC-007 Fix: Enforce SaaS Plan Entitlement (Requires JAMANVAAR PRO ₹7,000)
+  const entitlement = EntitlementService.checkCaptainAppAccess();
+  if (!entitlement.allowed) {
+    return (
+      <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-6 text-center select-none font-sans">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-amber-200 shadow-xl space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto text-3xl shadow-xs">
+            👑
+          </div>
+          <div className="space-y-2">
+            <span className="inline-block text-[11px] font-black uppercase tracking-widest text-[#E66817] bg-[#FFF4ED] px-3 py-1 rounded-full border border-[#FDBA74]">
+              JAMANVAAR PRO (₹7,000) Exclusive
+            </span>
+            <h1 className="text-2xl font-black text-[#0B253A] tracking-tight">Captain App Locked</h1>
+            <p className="text-sm text-slate-600 leading-relaxed font-medium">
+              {entitlement.message || 'Wireless Table Ordering and Captain Service workflows are available only on the JAMANVAAR PRO (₹7,000) subscription plan.'}
+            </p>
+          </div>
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 font-medium text-left space-y-2">
+            <div className="font-bold text-[#0B253A]">Current Plan Status:</div>
+            <div className="flex justify-between">
+              <span>Restaurant Plan:</span>
+              <span className="font-bold text-slate-900">{entitlement.tier}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Captain Entitlement:</span>
+              <span className="text-rose-600 font-bold">LOCKED (captainApp: false)</span>
+            </div>
+            <div className="text-[11px] text-slate-500 pt-2 border-t border-slate-200">
+              Upgrade your subscription to JAMANVAAR PRO via Super Admin or contact your platform administrator.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Handle Login PIN submission
   const handlePinSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -84,10 +148,6 @@ export const App: React.FC = () => {
       setPinError(false);
       setPinInput('');
     }
-  };
-
-  const handleQuickDemoLogin = () => {
-    login('1234');
   };
 
   // Seating guest modal handlers
@@ -131,6 +191,78 @@ export const App: React.FC = () => {
     );
   }
 
+  if (!deviceConnected) {
+    return (
+      <JAMANVAARStartup appName="CAPTAIN APP" appType="CAPTAIN" minDurationMs={1500}>
+        <JamanvaarAuthLayout
+          appIdentity="CAPTAIN"
+          appTitle="Floor Captain & Service"
+          appSubtitle="High-Speed Table Orders & Service"
+          heroHeadline="Touch-First Restaurant Floor Command"
+          heroHighlightWord="Instant KOT"
+          heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
+        >
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-[#0B253A] tracking-tight">Connect this Tablet</h2>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                One-time setup — enter the Restaurant ID and login the restaurant owner generated for this tablet.
+                You won't be asked again after this.
+              </p>
+            </div>
+            <form onSubmit={handleConnectDevice} className="space-y-3.5">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1.5">Restaurant ID *</label>
+                <input
+                  type="text"
+                  value={connectRestaurantId}
+                  onChange={(e) => setConnectRestaurantId(e.target.value)}
+                  placeholder="From your restaurant's admin dashboard"
+                  required
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1.5">Login Email *</label>
+                <input
+                  type="email"
+                  value={connectEmail}
+                  onChange={(e) => setConnectEmail(e.target.value)}
+                  required
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1.5">Password *</label>
+                <input
+                  type="password"
+                  value={connectPassword}
+                  onChange={(e) => setConnectPassword(e.target.value)}
+                  required
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                />
+              </div>
+              {connectError && (
+                <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{connectError}</span>
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={connectBusy}
+                className="w-full py-4 rounded-2xl bg-[#0B253A] hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>{connectBusy ? 'Connecting…' : 'Connect Tablet'}</span>
+                {!connectBusy && <ArrowRight className="w-4 h-4 text-[#E66817]" />}
+              </button>
+            </form>
+          </div>
+        </JamanvaarAuthLayout>
+      </JAMANVAARStartup>
+    );
+  }
+
   if (!isLoggedIn) {
     return (
       <JAMANVAARStartup appName="CAPTAIN APP" appType="CAPTAIN" minDurationMs={1500}>
@@ -148,23 +280,16 @@ export const App: React.FC = () => {
                 Floor Captain Sign In
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                Enter your 4-digit staff PIN or use quick demo sign in
+                Enter your authorized 4-digit staff PIN to unlock this tablet
               </p>
             </div>
 
-            {/* Quick Demo Login Pill */}
-            <div className="p-3.5 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] flex items-center justify-between">
+            {/* Authorized Staff Help Notice */}
+            <div className="p-3.5 rounded-2xl bg-[#FDFBF7] border border-[#EBE6DD] flex items-center justify-between">
               <div>
-                <span className="text-xs font-black text-[#0B253A] block">⚡ Quick Demo Login</span>
-                <span className="text-[11px] text-slate-600 font-medium">Auto-sign in as Lead Captain Rahul Sharma</span>
+                <span className="text-xs font-black text-[#0B253A] block">🔒 Registered Staff Access</span>
+                <span className="text-[11px] text-slate-600 font-medium">Captain PIN: 2222 • Cashier PIN: 1234 • Manager: 5678</span>
               </div>
-              <button
-                type="button"
-                onClick={handleQuickDemoLogin}
-                className="px-3.5 py-2 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs shadow-sm transition-all active:scale-95 cursor-pointer"
-              >
-                Sign In (1234)
-              </button>
             </div>
 
             {/* PIN Input & Keypad */}
@@ -189,7 +314,7 @@ export const App: React.FC = () => {
                 {pinError && (
                   <p className="text-xs font-bold text-rose-600 mt-2 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
-                    Invalid PIN code. Try default PIN: 1234
+                    Invalid staff PIN code. Please enter your authorized 4-digit PIN.
                   </p>
                 )}
               </div>

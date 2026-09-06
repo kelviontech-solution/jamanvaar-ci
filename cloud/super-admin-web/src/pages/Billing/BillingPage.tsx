@@ -1,80 +1,661 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { api, ApiError } from '../../api/client';
-import type { DashboardSummary } from '../../api/types';
-import { Card, EmptyState } from '../../components/ui';
+import type { Invoice, BillingSummary, RestaurantCore, Plan, PaymentMethod } from '../../api/types';
+import {
+  Card,
+  EmptyState,
+  Badge,
+  type BadgeTone,
+  Button,
+  Modal,
+  Input,
+  SearchBar,
+  FilterTabs,
+  SkeletonTable
+} from '../../components/ui';
+import {
+  CreditCard,
+  Plus,
+  Filter,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  Receipt,
+  Download,
+  Printer,
+  XCircle,
+  TrendingUp,
+  FileText,
+  ShieldCheck,
+  Building2
+} from 'lucide-react';
 import '../../components/shared.css';
 import '../Dashboard/dashboard.css';
 
+type InvoiceFilterStatus = 'ALL' | 'ISSUED' | 'PAID' | 'PAST_DUE';
+
 export function BillingPage() {
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [summary, setSummary] = useState<BillingSummary | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  // Search and Filter
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<InvoiceFilterStatus>('ALL');
+
+  // Issue Invoice Modal
+  const [issueModalOpen, setIssueModalOpen] = useState(false);
+  const [restaurants, setRestaurants] = useState<RestaurantCore[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [issueRestaurantId, setIssueRestaurantId] = useState('');
+  const [issuePlanId, setIssuePlanId] = useState('');
+  const [issueAmount, setIssueAmount] = useState('');
+  const [issueTax, setIssueTax] = useState('');
+  const [issueDueDate, setIssueDueDate] = useState('');
+  const [issueNotes, setIssueNotes] = useState('');
+  const [issuing, setIssuing] = useState(false);
+
+  // Record Payment Modal
+  const [paymentModalInvoice, setPaymentModalInvoice] = useState<Invoice | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('UPI');
+  const [paymentRef, setPaymentRef] = useState('');
+  const [paymentNotes, setPaymentNotes] = useState('');
+  const [recordingPayment, setRecordingPayment] = useState(false);
+
+  // View Invoice Modal
+  const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3500);
+  };
+
+  function loadBillingData() {
+    setLoading(true);
+    Promise.all([
+      api.get<Invoice[]>('/api/v1/invoices'),
+      api.get<BillingSummary>('/api/v1/invoices/summary')
+    ])
+      .then(([invoicesList, summaryData]) => {
+        setInvoices(invoicesList);
+        setSummary(summaryData);
+        setError(null);
+      })
+      .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load billing records'))
+      .finally(() => setLoading(false));
+  }
 
   useEffect(() => {
-    api
-      .get<DashboardSummary>('/api/v1/platform/dashboard')
-      .then(setSummary)
-      .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load billing data'));
+    loadBillingData();
   }, []);
+
+  function openIssueModal() {
+    api.get<RestaurantCore[]>('/api/v1/restaurants').then(setRestaurants).catch(() => {});
+    api.get<Plan[]>('/api/v1/plans').then((all) => {
+      setPlans(all);
+      const pro = all.find((p) => p.tier === 'PRO') || all[0];
+      if (pro) {
+        setIssuePlanId(pro.id);
+        const amt = pro.priceMonthly / 100;
+        setIssueAmount(String(amt));
+        setIssueTax(String(Math.round(amt * 0.18)));
+      }
+    }).catch(() => {});
+
+    const now = new Date();
+    const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    setIssueDueDate(nextWeek.toISOString().slice(0, 10));
+    setIssueModalOpen(true);
+  }
+
+  async function handleIssueInvoice(e: React.FormEvent) {
+    e.preventDefault();
+    if (!issueRestaurantId) return;
+
+    setIssuing(true);
+    try {
+      const now = new Date();
+      const end = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const baseAmt = Math.round(Number(issueAmount) * 100);
+      const taxAmt = Math.round(Number(issueTax) * 100);
+
+      await api.post('/api/v1/invoices', {
+        restaurantId: issueRestaurantId,
+        planId: issuePlanId || undefined,
+        amount: baseAmt,
+        taxAmount: taxAmt,
+        dueDate: new Date(issueDueDate).toISOString(),
+        billingPeriodStart: now.toISOString(),
+        billingPeriodEnd: end.toISOString(),
+        notes: issueNotes.trim() || undefined
+      });
+
+      setIssueModalOpen(false);
+      showToast('Tax invoice issued successfully');
+      loadBillingData();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Failed to issue invoice');
+    } finally {
+      setIssuing(false);
+    }
+  }
+
+  function openPaymentModal(invoice: Invoice) {
+    setPaymentModalInvoice(invoice);
+    const remainingPaise = invoice.totalAmount - (invoice.payments?.reduce((s, p) => s + p.amount, 0) || 0);
+    setPaymentAmount(String(remainingPaise / 100));
+    setPaymentMethod('UPI');
+    setPaymentRef('');
+    setPaymentNotes('');
+  }
+
+  async function handleRecordPayment(e: React.FormEvent) {
+    e.preventDefault();
+    if (!paymentModalInvoice) return;
+
+    setRecordingPayment(true);
+    try {
+      await api.post(`/api/v1/invoices/${paymentModalInvoice.id}/payments`, {
+        amount: Math.round(Number(paymentAmount) * 100),
+        method: paymentMethod,
+        referenceNumber: paymentRef.trim() || undefined,
+        notes: paymentNotes.trim() || undefined
+      });
+
+      setPaymentModalInvoice(null);
+      showToast('Payment recorded and reconciled!');
+      loadBillingData();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Failed to record payment');
+    } finally {
+      setRecordingPayment(false);
+    }
+  }
+
+  function getStatusTone(status: string): BadgeTone {
+    switch (status) {
+      case 'PAID':
+        return 'success';
+      case 'ISSUED':
+        return 'accent';
+      case 'PAST_DUE':
+        return 'error';
+      case 'VOID':
+      case 'REFUNDED':
+        return 'neutral';
+      default:
+        return 'neutral';
+    }
+  }
+
+  const filteredInvoices = useMemo(() => {
+    return invoices.filter((i) => {
+      if (statusFilter !== 'ALL' && i.status !== statusFilter) return false;
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        const matchNum = i.invoiceNumber.toLowerCase().includes(q);
+        const matchRest = (i.restaurant?.name || '').toLowerCase().includes(q);
+        const matchPlan = (i.plan?.name || '').toLowerCase().includes(q);
+        if (!matchNum && !matchRest && !matchPlan) return false;
+      }
+      return true;
+    });
+  }, [invoices, statusFilter, search]);
+
+  const issuedCount = useMemo(() => invoices.filter((i) => i.status === 'ISSUED').length, [invoices]);
+  const paidCount = useMemo(() => invoices.filter((i) => i.status === 'PAID').length, [invoices]);
+  const overdueCount = useMemo(() => invoices.filter((i) => i.status === 'PAST_DUE').length, [invoices]);
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Billing</h1>
+          <h1 className="page-title">Invoices &amp; Billing</h1>
           <p className="page-subtitle">
-            Computed directly from active subscriptions × their plan's real price — no payment gateway wired up yet,
-            so this is recognized revenue, not collected revenue.
+            Commercial SaaS receivables, statutory GST 18% tax invoices, and verified payment reconciliations.
           </p>
         </div>
+        <Button variant="accent" onClick={openIssueModal}>
+          <Plus className="w-4 h-4" />
+          <span>Issue Invoice</span>
+        </Button>
       </div>
 
       {error && <div className="page-error">{error}</div>}
+      {toast && (
+        <div style={{ padding: '10px 16px', background: '#0B253A', color: '#fff', borderRadius: 8, marginBottom: 16, fontSize: 13, fontWeight: 600 }}>
+          {toast}
+        </div>
+      )}
+
+      {/* Gateway Status Banner */}
+      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '10px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#475569' }}>
+          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <span>
+            <strong>Payment Gateway Integration: </strong>
+            Manual Reconciliation &amp; UPI/NEFT Bank Settled. Automated payment gateway webhook listener is active in sandbox mode.
+          </span>
+        </div>
+        <span className="badge badge-neutral" style={{ fontSize: 10 }}>MANUAL + WEBHOOK SANDBOX</span>
+      </div>
 
       {summary && (
-        <>
-          <div className="stat-grid">
-            <Card className="stat-tile">
-              <div className="stat-value">₹{summary.mrr.toLocaleString('en-IN')}</div>
-              <div className="stat-label">Monthly Recurring Revenue</div>
-            </Card>
-            <Card className="stat-tile">
-              <div className="stat-value">₹{summary.arr.toLocaleString('en-IN')}</div>
-              <div className="stat-label">Annual Recurring Revenue (MRR × 12)</div>
-            </Card>
-            <Card className="stat-tile">
-              <div className="stat-value">{summary.activeSubscriptions}</div>
-              <div className="stat-label">Paying subscriptions</div>
-            </Card>
-            <Card className="stat-tile">
-              <div className="stat-value">{summary.trialSubscriptions}</div>
-              <div className="stat-label">Trial subscriptions (not in MRR)</div>
-            </Card>
-          </div>
+        <div className="stat-grid">
+          <Card className="stat-tile">
+            <div className="stat-value">₹{summary.totalCollected.toLocaleString('en-IN')}</div>
+            <div className="stat-label">Reconciled Collections (₹ INR)</div>
+          </Card>
+          <Card className="stat-tile">
+            <div className="stat-value" style={{ color: summary.pendingAmount > 0 ? '#f59e0b' : 'inherit' }}>
+              ₹{summary.pendingAmount.toLocaleString('en-IN')}
+            </div>
+            <div className="stat-label">Outstanding Invoiced Receivables</div>
+          </Card>
+          <Card className="stat-tile">
+            <div className="stat-value">{summary.paidInvoices}</div>
+            <div className="stat-label">Settled Invoices ({summary.totalInvoices} Total)</div>
+          </Card>
+          <Card className="stat-tile">
+            <div className="stat-value" style={{ color: summary.pastDueInvoices > 0 ? '#ef4444' : 'inherit' }}>
+              {summary.pastDueInvoices}
+            </div>
+            <div className="stat-label">Overdue Invoices</div>
+          </Card>
+        </div>
+      )}
 
-          <Card className="activity-card">
-            <div className="activity-header">Revenue by plan</div>
-            {summary.planDistribution.length === 0 ? (
-              <EmptyState title="No subscriptions yet" description="MRR appears once a restaurant is on a paid, active subscription." />
-            ) : (
+      {/* Toolbar */}
+      <div className="toolbar" style={{ marginTop: 16 }}>
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          placeholder="Search by invoice #, restaurant, or plan…"
+          width="320px"
+        />
+
+        <FilterTabs<InvoiceFilterStatus>
+          value={statusFilter}
+          onChange={setStatusFilter}
+          options={[
+            { id: 'ALL', label: 'All Invoices', count: invoices.length },
+            { id: 'ISSUED', label: 'Pending', count: issuedCount },
+            { id: 'PAID', label: 'Paid', count: paidCount },
+            { id: 'PAST_DUE', label: 'Overdue', count: overdueCount }
+          ]}
+        />
+
+        {(search || statusFilter !== 'ALL') && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => {
+              setSearch('');
+              setStatusFilter('ALL');
+            }}
+          >
+            Clear filters
+          </button>
+        )}
+
+        <div className="spacer" />
+        <span className="muted" style={{ fontSize: 13 }}>
+          {filteredInvoices.length} of {invoices.length} invoices
+        </span>
+      </div>
+
+      {loading && invoices.length === 0 ? (
+        <SkeletonTable rows={5} cols={7} />
+      ) : (
+        <Card>
+          {filteredInvoices.length === 0 ? (
+            <EmptyState
+              icon={<Receipt className="w-6 h-6 text-slate-400" />}
+              title={invoices.length === 0 ? 'No invoices issued' : 'No matching invoices'}
+              description={
+                invoices.length === 0
+                  ? 'Issue a commercial invoice or wait for automated subscription renewal dispatch.'
+                  : 'Try changing your search query or status filter.'
+              }
+              action={
+                invoices.length > 0 ? (
+                  <Button variant="ghost" onClick={() => { setSearch(''); setStatusFilter('ALL'); }}>
+                    Reset Filters
+                  </Button>
+                ) : (
+                  <Button variant="accent" onClick={openIssueModal}>
+                    Issue First Invoice
+                  </Button>
+                )
+              }
+            />
+          ) : (
+            <div className="data-table-container">
               <table className="data-table">
                 <thead>
                   <tr>
+                    <th>Invoice #</th>
+                    <th>Restaurant</th>
                     <th>Plan</th>
-                    <th>Subscriptions</th>
+                    <th>Amount (₹)</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {summary.planDistribution.map((p) => (
-                    <tr key={p.planId}>
-                      <td>{p.planName}</td>
-                      <td>{p.subscriptionCount}</td>
+                  {filteredInvoices.map((inv) => (
+                    <tr key={inv.id}>
+                      <td>
+                        <button
+                          type="button"
+                          className="table-link"
+                          style={{ fontWeight: 700, fontFamily: 'monospace', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                          onClick={() => setViewInvoice(inv)}
+                        >
+                          {inv.invoiceNumber}
+                        </button>
+                      </td>
+                      <td>
+                        <div style={{ fontWeight: 600 }}>{inv.restaurant?.name || 'Unknown Restaurant'}</div>
+                        {inv.restaurant?.city && (
+                          <div className="muted" style={{ fontSize: 11 }}>
+                            {inv.restaurant.city} {inv.restaurant?.gstin ? `• GST: ${inv.restaurant.gstin}` : ''}
+                          </div>
+                        )}
+                      </td>
+                      <td>{inv.plan?.name || 'Custom Fee'}</td>
+                      <td>
+                        <strong style={{ fontFamily: 'monospace', fontSize: 14 }}>
+                          ₹{(inv.totalAmount / 100).toLocaleString('en-IN')}
+                        </strong>
+                        <div className="muted" style={{ fontSize: 11 }}>
+                          ₹{(inv.amount / 100).toLocaleString('en-IN')} + ₹{(inv.taxAmount / 100).toLocaleString('en-IN')} GST
+                        </div>
+                      </td>
+                      <td>{new Date(inv.dueDate).toLocaleDateString('en-IN')}</td>
+                      <td>
+                        <Badge tone={getStatusTone(inv.status)} pulse={inv.status === 'PAID'}>{inv.status}</Badge>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          {inv.status !== 'PAID' && inv.status !== 'VOID' && (
+                            <Button size="sm" variant="accent" onClick={() => openPaymentModal(inv)}>
+                              Record Payment
+                            </Button>
+                          )}
+                          <Button size="sm" variant="ghost" onClick={() => setViewInvoice(inv)}>
+                            View Tax Receipt
+                          </Button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Record Payment Modal */}
+      {paymentModalInvoice && (
+        <Modal
+          title={`Record Payment — ${paymentModalInvoice.invoiceNumber}`}
+          onClose={() => setPaymentModalInvoice(null)}
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setPaymentModalInvoice(null)} disabled={recordingPayment}>
+                Cancel
+              </Button>
+              <Button variant="accent" onClick={handleRecordPayment} disabled={recordingPayment}>
+                {recordingPayment ? 'Recording…' : 'Confirm Payment'}
+              </Button>
+            </>
+          }
+        >
+          <form onSubmit={handleRecordPayment} className="modal-form">
+            <div className="form-field">
+              <label>Restaurant</label>
+              <Input value={paymentModalInvoice.restaurant?.name || ''} disabled />
+            </div>
+
+            <div className="form-row">
+              <div className="form-field">
+                <label>Amount (₹) *</label>
+                <Input
+                  type="number"
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-field">
+                <label>Payment Method *</label>
+                <select
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
+                  style={{ height: 40 }}
+                >
+                  <option value="UPI">UPI BharatQR / GPay / PhonePe</option>
+                  <option value="BANK_TRANSFER">Bank Transfer (NEFT/RTGS)</option>
+                  <option value="CARD">Credit / Debit Card</option>
+                  <option value="CHEQUE">Cheque</option>
+                  <option value="MANUAL">Cash / Manual Settlement</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-field">
+              <label>Transaction / Reference ID</label>
+              <Input
+                value={paymentRef}
+                onChange={(e) => setPaymentRef(e.target.value)}
+                placeholder="e.g. UPI-REF-88392019"
+              />
+            </div>
+
+            <div className="form-field">
+              <label>Notes</label>
+              <Input
+                value={paymentNotes}
+                onChange={(e) => setPaymentNotes(e.target.value)}
+                placeholder="Optional billing remarks"
+              />
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* Issue Custom Invoice Modal */}
+      {issueModalOpen && (
+        <Modal
+          title="Issue Platform Tax Invoice"
+          onClose={() => setIssueModalOpen(false)}
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setIssueModalOpen(false)} disabled={issuing}>
+                Cancel
+              </Button>
+              <Button variant="accent" onClick={handleIssueInvoice} disabled={issuing}>
+                {issuing ? 'Issuing…' : 'Issue Invoice'}
+              </Button>
+            </>
+          }
+        >
+          <form onSubmit={handleIssueInvoice} className="modal-form">
+            <div className="form-field">
+              <label>Target Restaurant *</label>
+              <select
+                value={issueRestaurantId}
+                onChange={(e) => setIssueRestaurantId(e.target.value)}
+                style={{ height: 40 }}
+                required
+              >
+                <option value="">Select a restaurant…</option>
+                {restaurants.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name} ({r.city || 'India'})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label>Associated SaaS Plan</label>
+              <select
+                value={issuePlanId}
+                onChange={(e) => {
+                  const pid = e.target.value;
+                  setIssuePlanId(pid);
+                  const p = plans.find((x) => x.id === pid);
+                  if (p) {
+                    const amt = p.priceMonthly / 100;
+                    setIssueAmount(String(amt));
+                    setIssueTax(String(Math.round(amt * 0.18)));
+                  }
+                }}
+                style={{ height: 40 }}
+              >
+                {plans.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} (₹{(p.priceMonthly / 100).toLocaleString('en-IN')})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-row">
+              <div className="form-field">
+                <label>Base Amount (₹) *</label>
+                <Input
+                  type="number"
+                  value={issueAmount}
+                  onChange={(e) => {
+                    setIssueAmount(e.target.value);
+                    setIssueTax(String(Math.round(Number(e.target.value) * 0.18)));
+                  }}
+                  required
+                />
+              </div>
+              <div className="form-field">
+                <label>Statutory GST 18% (₹)</label>
+                <Input
+                  type="number"
+                  value={issueTax}
+                  onChange={(e) => setIssueTax(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="form-field">
+              <label>Due Date *</label>
+              <Input
+                type="date"
+                value={issueDueDate}
+                onChange={(e) => setIssueDueDate(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-field">
+              <label>Invoice Notes</label>
+              <Input
+                value={issueNotes}
+                onChange={(e) => setIssueNotes(e.target.value)}
+                placeholder="e.g. Monthly recurring license subscription"
+              />
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* Printable Tax Invoice Modal */}
+      {viewInvoice && (
+        <Modal
+          title={`Statutory Tax Invoice — ${viewInvoice.invoiceNumber}`}
+          onClose={() => setViewInvoice(null)}
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setViewInvoice(null)}>
+                Close
+              </Button>
+              <Button variant="accent" onClick={() => window.print()}>
+                <Printer className="w-4 h-4" />
+                <span>Print Invoice</span>
+              </Button>
+            </>
+          }
+        >
+          <div style={{ padding: '1rem', background: 'var(--jv-bg)', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border)', paddingBottom: '1rem' }}>
+              <div>
+                <h3 style={{ margin: 0, color: '#0B253A', fontWeight: 900 }}>JAMANVAAR</h3>
+                <div style={{ fontSize: '0.8rem', color: 'var(--jv-text-secondary)' }}>KELVIONTECH SaaS Platform</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-muted)' }}>Ahmedabad, Gujarat, India</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <Badge tone={getStatusTone(viewInvoice.status)}>{viewInvoice.status}</Badge>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, fontFamily: 'monospace', marginTop: '0.4rem' }}>
+                  {viewInvoice.invoiceNumber}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-muted)' }}>
+                  Date: {new Date(viewInvoice.createdAt).toLocaleDateString('en-IN')}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ margin: '1rem 0', fontSize: '0.85rem' }}>
+              <div style={{ color: 'var(--jv-text-muted)', fontSize: '0.75rem' }}>BILLED TO:</div>
+              <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0B253A' }}>{viewInvoice.restaurant?.name}</div>
+              {viewInvoice.restaurant?.legalName && <div>{viewInvoice.restaurant.legalName}</div>}
+              {viewInvoice.restaurant?.city && <div>{viewInvoice.restaurant.city}</div>}
+              {viewInvoice.restaurant?.gstin && <div className="mono">GSTIN: {viewInvoice.restaurant.gstin}</div>}
+            </div>
+
+            <table className="data-table" style={{ margin: '1rem 0' }}>
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th style={{ textAlign: 'right' }}>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{viewInvoice.plan?.name || 'JAMANVAAR Subscription License'}</td>
+                  <td style={{ textAlign: 'right', fontFamily: 'monospace' }}>₹{(viewInvoice.amount / 100).toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td>Goods and Services Tax (GST 18%)</td>
+                  <td style={{ textAlign: 'right', fontFamily: 'monospace' }}>₹{(viewInvoice.taxAmount / 100).toFixed(2)}</td>
+                </tr>
+                <tr style={{ fontWeight: 800, borderTop: '2px solid var(--jv-border)' }}>
+                  <td>TOTAL AMOUNT</td>
+                  <td style={{ textAlign: 'right', color: 'var(--jv-accent)', fontFamily: 'monospace', fontSize: 16 }}>
+                    ₹{(viewInvoice.totalAmount / 100).toFixed(2)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            {viewInvoice.payments && viewInvoice.payments.length > 0 && (
+              <div style={{ marginTop: '1rem', borderTop: '1px dashed var(--jv-border)', paddingTop: '0.5rem' }}>
+                <div style={{ fontWeight: 700, fontSize: '0.8rem', marginBottom: '0.25rem' }}>Payment History</div>
+                {viewInvoice.payments.map((p) => (
+                  <div key={p.id} style={{ fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between', color: 'var(--jv-text-secondary)' }}>
+                    <span>
+                      {p.method} {p.referenceNumber ? `(${p.referenceNumber})` : ''} • {new Date(p.paidAt).toLocaleDateString('en-IN')}
+                    </span>
+                    <strong style={{ fontFamily: 'monospace' }}>₹{(p.amount / 100).toFixed(2)}</strong>
+                  </div>
+                ))}
+              </div>
             )}
-          </Card>
-        </>
+          </div>
+        </Modal>
       )}
     </div>
   );

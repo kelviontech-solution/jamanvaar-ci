@@ -1,0 +1,160 @@
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+  UsePipes
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Request, Response } from 'express';
+import { User } from '@prisma/client';
+import { TenantAuthService } from './tenant-auth.service';
+import {
+  createTenantStaffUserSchema,
+  setInitialPasswordSchema,
+  setTenantUserStatusSchema,
+  tenantChangePasswordSchema,
+  tenantLoginSchema
+} from './dto/login.dto';
+import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
+import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
+import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.decorator';
+
+const REFRESH_COOKIE = 'jamanvaar_tenant_refresh';
+
+@Controller('api/v1/tenant-auth')
+export class TenantAuthController {
+  constructor(
+    private readonly authService: TenantAuthService,
+    private readonly config: ConfigService
+  ) {}
+
+  private setRefreshCookie(res: Response, token: string, expiresAt: Date) {
+    res.cookie(REFRESH_COOKIE, token, {
+      httpOnly: true,
+      secure: this.config.get('NODE_ENV') === 'production',
+      sameSite: 'lax',
+      expires: expiresAt,
+      path: '/api/v1/tenant-auth'
+    });
+  }
+
+  @Post('set-initial-password')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(setInitialPasswordSchema))
+  async setInitialPassword(
+    @Body() body: { restaurantId: string; email: string; activationToken: string; newPassword: string }
+  ) {
+    await this.authService.setInitialPassword(body.restaurantId, body.email, body.activationToken, body.newPassword);
+    return { success: true };
+  }
+
+  @Post('login')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(tenantLoginSchema))
+  async login(
+    @Body() body: { restaurantId: string; email: string; password: string },
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const result = await this.authService.login(body.restaurantId, body.email, body.password);
+    this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
+    return { accessToken: result.accessToken, user: result.user };
+  }
+
+  @Post('refresh')
+  @HttpCode(200)
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies?.[REFRESH_COOKIE];
+    if (!refreshToken) {
+      throw new UnauthorizedException('Missing refresh token');
+    }
+    const result = await this.authService.refresh(refreshToken);
+    this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
+    return { accessToken: result.accessToken, user: result.user };
+  }
+
+  @Post('logout')
+  @HttpCode(200)
+  @UseGuards(TenantAuthGuard)
+  async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @CurrentTenantUser() user: User
+  ) {
+    const refreshToken = req.cookies?.[REFRESH_COOKIE];
+    if (refreshToken) {
+      await this.authService.logout(refreshToken, user.restaurantId, user.id);
+    }
+    res.clearCookie(REFRESH_COOKIE, { path: '/api/v1/tenant-auth' });
+    return { success: true };
+  }
+}
+
+/** GET /api/v1/tenant/me + entitlements — the tenant-side counterpart of PlatformMeController. */
+@Controller('api/v1/tenant')
+@UseGuards(TenantAuthGuard)
+export class TenantMeController {
+  constructor(private readonly authService: TenantAuthService) {}
+
+  @Get('me')
+  me(@CurrentTenantUser() user: User) {
+    return {
+      id: user.id,
+      restaurantId: user.restaurantId,
+      branchId: user.branchId,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role,
+      status: user.status
+    };
+  }
+
+  @Get('me/entitlements')
+  entitlements(@CurrentTenantUser() user: User) {
+    return this.authService.getEntitlements(user.restaurantId);
+  }
+
+  @Patch('me/password')
+  @UsePipes(new ZodValidationPipe(tenantChangePasswordSchema))
+  async changePassword(
+    @Body() body: ReturnType<typeof tenantChangePasswordSchema.parse>,
+    @CurrentTenantUser() user: User
+  ) {
+    await this.authService.changePassword(user, body.currentPassword, body.newPassword);
+    return { success: true };
+  }
+
+  /** Every login this restaurant has (owner + any self-service staff/device logins). */
+  @Get('me/users')
+  listUsers(@CurrentTenantUser() user: User) {
+    return this.authService.listUsers(user.restaurantId);
+  }
+
+  /** Owner-only: generate an id + password login for another app/device (Captain, etc.) — shown once. */
+  @Post('me/users')
+  @UsePipes(new ZodValidationPipe(createTenantStaffUserSchema))
+  createUser(
+    @Body() body: ReturnType<typeof createTenantStaffUserSchema.parse>,
+    @CurrentTenantUser() user: User
+  ) {
+    return this.authService.createStaffUser(user, body);
+  }
+
+  /** Owner-only: disable/re-enable a login this restaurant issued. */
+  @Patch('me/users/:id/status')
+  @UsePipes(new ZodValidationPipe(setTenantUserStatusSchema))
+  setUserStatus(
+    @Param('id') id: string,
+    @Body() body: ReturnType<typeof setTenantUserStatusSchema.parse>,
+    @CurrentTenantUser() user: User
+  ) {
+    return this.authService.setUserStatus(user, id, body.status);
+  }
+}

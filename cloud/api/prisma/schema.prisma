@@ -87,6 +87,9 @@ model Restaurant {
   devices       Device[]
   subscriptions Subscription[]
   activationKeys ActivationKey[]
+  invoices      Invoice[]
+  payments      Payment[]
+  backups       Backup[]
 }
 
 enum BranchStatus {
@@ -139,12 +142,38 @@ model User {
   status       TenantUserStatus  @default(PENDING_ACTIVATION)
   invitedAt    DateTime?
   activatedAt  DateTime?
+  // One-time invitation credential for setInitialPassword (SEC-001). Only the
+  // sha256 hash is stored — the plaintext token is returned once, at creation
+  // time, the same way ActivationKey.code is. Both must be cleared/consumed
+  // once a password is successfully set.
+  activationTokenHash      String?
+  activationTokenExpiresAt DateTime?
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
+
+  refreshTokens TenantRefreshToken[]
 
   @@unique([restaurantId, email])
   @@index([restaurantId])
   @@index([branchId])
+}
+
+// Tenant-user session tokens. Kept separate from PlatformRefreshToken (which is
+// FK'd only to PlatformUser) since tenant and platform identities are structurally
+// distinct. restaurantId is denormalized onto this row (not just reachable via
+// userId) so the same tenant_isolation RLS policy shape used elsewhere applies here.
+model TenantRefreshToken {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurantId String
+  tokenHash    String    @unique
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@index([restaurantId])
 }
 
 // ---------------------------------------------------------------------------
@@ -178,6 +207,7 @@ model Plan {
   updatedAt    DateTime   @updatedAt
 
   subscriptions Subscription[]
+  invoices      Invoice[]
 }
 
 enum SubscriptionStatus {
@@ -202,6 +232,7 @@ model Subscription {
   updatedAt    DateTime           @updatedAt
 
   activationKeys ActivationKey[]
+  invoices       Invoice[]
 
   @@index([restaurantId])
 }
@@ -244,6 +275,7 @@ enum DeviceType {
   CAPTAIN
   KDS
   KIOSK
+  POS_ADMIN
 }
 
 enum DeviceStatus {
@@ -263,9 +295,18 @@ model Device {
   appVersion   String?
   status       DeviceStatus @default(PENDING)
   lastSeenAt   DateTime?
+  lastSyncAt   DateTime?    // last time this device's local runtime successfully synced
+  lastBackupAt DateTime?    // last time this device reported a completed local backup
+  syncStatus   String?      // free-form status string reported by the device (e.g. "ok", "stale", "error: <reason>")
+  // sha256 hash of the opaque bearer credential issued once at activation-redeem
+  // time (DeviceAuthGuard). Never store the plaintext — same pattern as
+  // TenantRefreshToken.tokenHash and User.activationTokenHash.
+  deviceTokenHash String?  @unique
   activatedAt  DateTime?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+
+  backups Backup[]
 
   @@index([restaurantId])
   @@index([branchId])
@@ -295,3 +336,154 @@ model AuditLog {
   @@index([actorType, actorId])
   @@index([createdAt])
 }
+
+// ---------------------------------------------------------------------------
+// Billing & Invoices
+// ---------------------------------------------------------------------------
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  PAST_DUE
+  VOID
+  REFUNDED
+}
+
+enum PaymentMethod {
+  MANUAL
+  BANK_TRANSFER
+  UPI
+  CARD
+  CHEQUE
+  GATEWAY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model Invoice {
+  id                 String        @id @default(uuid())
+  invoiceNumber      String        @unique
+  restaurantId       String
+  restaurant         Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  subscriptionId     String?
+  subscription       Subscription? @relation(fields: [subscriptionId], references: [id])
+  planId             String?
+  plan               Plan?         @relation(fields: [planId], references: [id])
+  amount             Int           // in paise
+  taxAmount          Int           // in paise (GST 18%)
+  totalAmount        Int           // in paise
+  currency           String        @default("INR")
+  status             InvoiceStatus @default(ISSUED)
+  billingPeriodStart DateTime
+  billingPeriodEnd   DateTime
+  dueDate            DateTime
+  paidAt             DateTime?
+  notes              String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  payments Payment[]
+
+  @@index([restaurantId])
+  @@index([status])
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  invoiceId       String
+  invoice         Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  restaurantId    String
+  restaurant      Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  amount          Int           // in paise
+  method          PaymentMethod @default(BANK_TRANSFER)
+  referenceNumber String?
+  status          PaymentStatus @default(COMPLETED)
+  notes           String?
+  recordedBy      String?
+  createdAt       DateTime      @default(now())
+
+  @@index([invoiceId])
+  @@index([restaurantId])
+}
+
+// ---------------------------------------------------------------------------
+// Applications & Release Matrix
+// ---------------------------------------------------------------------------
+
+enum AppReleaseChannel {
+  STABLE
+  BETA
+}
+
+model AppRelease {
+  id                  String             @id @default(uuid())
+  appCode             String             // POS, RESTAURANT_ADMIN, CAPTAIN, KDS, KIOSK, KIOSK_ADMIN
+  version             String             // e.g. "2.4.0"
+  channel             AppReleaseChannel  @default(STABLE)
+  minSupportedVersion String?
+  supportedPlatforms  Json               // ["windows", "android", "web", "electron"]
+  releaseNotes        String?
+  downloadUrl         String?
+  isMandatory         Boolean            @default(false)
+  releasedAt          DateTime           @default(now())
+  createdAt           DateTime           @default(now())
+
+  @@unique([appCode, version])
+  @@index([appCode])
+}
+
+// ---------------------------------------------------------------------------
+// Platform Settings
+// ---------------------------------------------------------------------------
+
+model PlatformSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       Json
+  category    String   @default("GENERAL")
+  description String?
+  updatedBy   String?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Real off-device backups. A row here means the payload was actually
+// uploaded to object storage (see modules/backups/backup-storage.service.ts)
+// — never created speculatively, never faked when storage isn't configured.
+// ---------------------------------------------------------------------------
+
+enum BackupMethod {
+  MANUAL
+  AUTOMATIC
+}
+
+enum BackupStatus {
+  COMPLETED
+  FAILED
+}
+
+model Backup {
+  id             String       @id @default(uuid())
+  restaurantId   String
+  restaurant     Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  deviceId       String?
+  device         Device?      @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  method         BackupMethod @default(MANUAL)
+  status         BackupStatus @default(COMPLETED)
+  sizeBytes      Int
+  storageKey     String       // object key within the configured bucket
+  checksumSha256 String
+  errorMessage   String?
+  createdAt      DateTime     @default(now())
+
+  @@index([restaurantId])
+  @@index([deviceId])
+}
+

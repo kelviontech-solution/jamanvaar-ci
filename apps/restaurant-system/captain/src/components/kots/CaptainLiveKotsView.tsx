@@ -27,14 +27,14 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
     const isDelayed = elapsedMinutes > 15 && k.status !== 'SERVED' && k.status !== 'CANCELLED';
 
     if (filter === 'DELAYED' && !isDelayed) return false;
-    if (filter === 'PREPARING' && k.status !== 'PREPARING' && k.status !== 'COOKING') return false;
+    if (filter === 'PREPARING' && (k.status as string) !== 'PREPARING' && (k.status as string) !== 'COOKING') return false;
     if (filter === 'SERVED' && k.status !== 'SERVED') return false;
 
     if (search.trim()) {
       const q = search.toLowerCase();
       return (
         k.kotNumber.toLowerCase().includes(q) ||
-        k.tableNumber.toLowerCase().includes(q) ||
+        (k.tableNumber || '').toLowerCase().includes(q) ||
         k.items.some((it) => it.name.toLowerCase().includes(q))
       );
     }
@@ -154,7 +154,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
                 <div className="pt-2 border-t border-slate-100 flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => onOpenSendMessage(kot.tableNumber)}
+                    onClick={() => onOpenSendMessage(kot.tableNumber || '')}
                     className="flex-1 py-2.5 px-3 rounded-xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-[#E66817] font-black text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />

@@ -297,6 +297,7 @@ export interface DiningTable {
   floor: number;
   qrCodeUrl?: string;
   qrShortCode?: string;
+  qrToken?: string;
   qrStatus?: 'ACTIVE' | 'INACTIVE' | 'DISABLED';
   lastOrderId?: string;
   lastOrderTime?: string;
@@ -687,6 +688,7 @@ export interface PlanEntitlements {
   captainApp: boolean;
   advancedCaptainReports: boolean;
   advancedServiceWorkflow: boolean;
+  qrTableOrdering?: boolean;
 }
 
 export interface LicenseInfo {
@@ -705,6 +707,9 @@ export interface LicenseInfo {
   branchName?: string;
   terminalId?: string;
   entitlements: PlanEntitlements;
+  /** Set only when this license was written via a cryptographically verified path (ENT-001 fix) — absent for test/legacy-set data. */
+  verifiedAt?: string;
+  verificationSource?: 'cloud-sync' | 'offline-certificate';
 }
 
 export interface ComboDeal {

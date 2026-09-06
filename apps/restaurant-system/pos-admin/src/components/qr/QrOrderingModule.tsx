@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { db, QrOrderingRepository, BusinessDayRepository, MenuRepository } from '@jamanvaar/database';
 import { Order, DiningTable, MenuItem, QrOrderingSettings, OrderStatus } from '@jamanvaar/types';
+import { EntitlementService, PLAN_DEFINITIONS } from '@jamanvaar/business';
 import { formatINR } from '@jamanvaar/utils';
 import {
   QrCode,
@@ -26,14 +27,16 @@ import {
   ShieldCheck,
   Radio,
   Zap,
-  Sparkles,
   AlertCircle,
   Volume2,
   VolumeX,
   Sliders,
   DollarSign,
   Edit2,
-  Check
+  Check,
+  Lock,
+  Crown,
+  ShieldAlert
 } from 'lucide-react';
 import { CustomerQrExperienceModal } from './CustomerQrExperienceModal';
 import { QrCardDesignerModal } from './QrCardDesignerModal';
@@ -70,6 +73,10 @@ export const QrOrderingModule: React.FC = () => {
   // Settings local state
   const [qrSettings, setQrSettings] = useState<QrOrderingSettings>(() => QrOrderingRepository.getSettings());
   const [settingsSavedToast, setSettingsSavedToast] = useState<boolean>(false);
+
+  // Table selection & batch actions state
+  const [selectedTableNumbers, setSelectedTableNumbers] = useState<string[]>([]);
+  const [batchDesignerMode, setBatchDesignerMode] = useState<boolean>(false);
 
   // Subscribe to live DB updates
   useEffect(() => {
@@ -141,6 +148,264 @@ export const QrOrderingModule: React.FC = () => {
     setTimeout(() => setSettingsSavedToast(false), 2500);
   };
 
+  const handleToggleTableSelect = (tblNum: string) => {
+    setSelectedTableNumbers((prev) =>
+      prev.includes(tblNum) ? prev.filter((x) => x !== tblNum) : [...prev, tblNum]
+    );
+  };
+
+  const handleSelectAllTables = () => {
+    if (selectedTableNumbers.length === tables.length) {
+      setSelectedTableNumbers([]);
+    } else {
+      setSelectedTableNumbers(tables.map((t) => t.tableNumber));
+    }
+  };
+
+
+
+  const handleBulkUpdateStatus = (status: 'ACTIVE' | 'DISABLED') => {
+    if (selectedTableNumbers.length === 0) return;
+    QrOrderingRepository.bulkUpdateQrStatus(selectedTableNumbers, status);
+    setSelectedTableNumbers([]);
+    setTick((t) => t + 1);
+  };
+
+  const handleToggleSingleTableStatus = (table: DiningTable) => {
+    const nextStatus = table.qrStatus === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
+    QrOrderingRepository.bulkUpdateQrStatus([table.tableNumber], nextStatus);
+    setTick((t) => t + 1);
+  };
+
+  const handleOpenBatchDesigner = () => {
+    setBatchDesignerMode(true);
+    setDesignerTable(tables[0]);
+    setIsCardDesignerOpen(true);
+  };
+
+  // ENT-001 / SEC-002 fix: this module used to ship a one-click "Simulate Super
+  // Admin Allotment" button that called LicenseRepository.activatePlan() directly
+  // — any restaurant on CORE could unlock PRO-only QR ordering for free with no
+  // verification at all. Plan changes now only happen via Settings → Subscription
+  // Plan, either through a real cloud-connected session or a Super-Admin-signed
+  // License Certificate (see SubscriptionPlansView.tsx).
+
+  // Plan Entitlement Check (QR Table Ordering requires ₹7,000 PRO plan allotted by Super Admin)
+  const license = db.license;
+  const qrEntitlement = EntitlementService.checkQrOrderingAccess();
+  const isAllowed = qrEntitlement.allowed;
+
+  // Render Plan Locked Screen if restaurant is on 5K CORE plan
+  if (!isAllowed) {
+    return (
+      <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] overflow-y-auto select-none p-6">
+        <div className="max-w-4xl mx-auto w-full space-y-6">
+          {/* Top Status Strip */}
+          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
+                <Lock className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-black text-[#0B253A]">QR Table Ordering — Locked Module</h2>
+                  <span className="text-[10px] font-black bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
+                    Current: JAMANVAAR CORE (₹5,000/mo)
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Feature restricted to JAMANVAAR PRO (₹7,000/mo). Allotment is provisioned by Super Admin.
+                </p>
+              </div>
+            </div>
+
+            <span className="text-xs text-slate-500 font-medium">
+              Ask Super Admin to allot the PRO plan, or open Settings → Subscription Plan to activate a License Certificate.
+            </span>
+          </div>
+
+          {/* Hero Explanatory Card */}
+          <div className="bg-gradient-to-br from-[#0B253A] to-[#123959] text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-[#E66817]/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 space-y-4">
+              <div className="inline-flex items-center gap-2 bg-[#E66817]/20 border border-[#E66817]/40 text-amber-300 px-3 py-1 rounded-full text-xs font-black tracking-wide uppercase">
+                <ShieldAlert className="w-3.5 h-3.5" />
+                <span>Super Admin Allotment Required</span>
+              </div>
+
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
+                QR Table Ordering & Digital Menus are Available in JAMANVAAR PRO (₹7,000)
+              </h1>
+
+              <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
+                Your restaurant is currently active on the <strong className="text-white">JAMANVAAR CORE (₹5,000/month)</strong> plan,
+                which includes Counter POS, offline billing, KOT, and table management.
+                The full <strong>QR Table Ordering & Standee Suite</strong> is an exclusive feature of the <strong className="text-white">JAMANVAAR PRO (₹7,000/month)</strong> plan.
+              </p>
+
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 px-4 border border-white/10 flex items-center gap-3">
+                  <Crown className="w-5 h-5 text-amber-400" />
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Plan Entitlement</span>
+                    <span className="text-xs font-black text-white">PRO Plan (₹7,000 / month)</span>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 px-4 border border-white/10 flex items-center gap-3">
+                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Allotment Authority</span>
+                    <span className="text-xs font-black text-white">Platform Super Admin Only</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Plan Comparison Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* CORE Plan Card */}
+            <div className="bg-white border-2 border-slate-200 rounded-3xl p-6 space-y-4 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-black tracking-wider uppercase text-slate-400 block">Current Activated Plan</span>
+                  <h3 className="text-lg font-black text-[#0B253A]">JAMANVAAR CORE</h3>
+                </div>
+                <div className="text-right">
+                  <span className="text-lg font-black text-[#0B253A]">₹5,000</span>
+                  <span className="text-[10px] text-slate-400 block font-bold">per month</span>
+                </div>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Active License Key in this branch</span>
+              </div>
+
+              <ul className="space-y-2 text-xs text-slate-600 font-medium">
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Counter POS & Fast Billing</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>100% Offline-First SQLite Engine</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Kitchen KOT & Station Routing</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Table Management & Dine-In Floor Plan</span>
+                </li>
+                <li className="flex items-center gap-2 text-rose-600 font-bold">
+                  <span className="w-3.5 h-3.5 flex items-center justify-center font-black">✕</span>
+                  <span>QR Table Self-Ordering (Not in 5K Plan)</span>
+                </li>
+                <li className="flex items-center gap-2 text-rose-600 font-bold">
+                  <span className="w-3.5 h-3.5 flex items-center justify-center font-black">✕</span>
+                  <span>Captain App Table-side Dispatch (Not in 5K Plan)</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* PRO Plan Card */}
+            <div className="bg-gradient-to-b from-amber-50/50 to-white border-2 border-[#E66817] rounded-3xl p-6 space-y-4 shadow-md relative">
+              <div className="absolute -top-3 right-6 bg-[#E66817] text-white text-[10px] font-black px-3 py-0.5 rounded-full tracking-wider uppercase shadow-xs">
+                QR Entitled Plan
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-black tracking-wider uppercase text-[#E66817] block">Required Plan</span>
+                  <h3 className="text-lg font-black text-[#0B253A]">JAMANVAAR PRO</h3>
+                </div>
+                <div className="text-right">
+                  <span className="text-lg font-black text-[#E66817]">₹7,000</span>
+                  <span className="text-[10px] text-slate-400 block font-bold">per month</span>
+                </div>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-amber-100/60 border border-amber-300 text-xs font-bold text-[#0B253A] flex items-center gap-2">
+                <Crown className="w-4 h-4 text-[#E66817] shrink-0" />
+                <span>Includes full QR Table Ordering & Standees</span>
+              </div>
+
+              <ul className="space-y-2 text-xs text-slate-700 font-medium">
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Everything in JAMANVAAR CORE</span>
+                </li>
+                <li className="flex items-center gap-2 font-bold text-[#0B253A]">
+                  <Check className="w-3.5 h-3.5 text-[#E66817]" />
+                  <span>Public Mobile Guest Self-Ordering App</span>
+                </li>
+                <li className="flex items-center gap-2 font-bold text-[#0B253A]">
+                  <Check className="w-3.5 h-3.5 text-[#E66817]" />
+                  <span>Super Admin Deterministic Table Security Tokens</span>
+                </li>
+                <li className="flex items-center gap-2 font-bold text-[#0B253A]">
+                  <Check className="w-3.5 h-3.5 text-[#E66817]" />
+                  <span>Acrylic Tent Card Standee Designer & Printing</span>
+                </li>
+                <li className="flex items-center gap-2 font-bold text-[#0B253A]">
+                  <Check className="w-3.5 h-3.5 text-[#E66817]" />
+                  <span>Real-Time POS Queue & Automated KDS Dispatch</span>
+                </li>
+                <li className="flex items-center gap-2 font-bold text-[#0B253A]">
+                  <Check className="w-3.5 h-3.5 text-[#E66817]" />
+                  <span>Wireless Captain App for Waiters</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Super Admin Allotment Workflow Banner */}
+          <div className="bg-white border border-[#EBE6DD] rounded-3xl p-6 shadow-2xs space-y-4">
+            <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider flex items-center gap-2">
+              <Radio className="w-4 h-4 text-[#E66817]" />
+              <span>Super Admin Allotment & Provisioning Workflow</span>
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
+                <span className="w-6 h-6 rounded-full bg-[#0B253A] text-white text-xs font-black flex items-center justify-center">1</span>
+                <h4 className="text-xs font-black text-[#0B253A]">Plan Allotment</h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Super Admin allots the ₹7,000 PRO plan to this restaurant in the Super Admin Platform Control Center.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
+                <span className="w-6 h-6 rounded-full bg-[#E66817] text-white text-xs font-black flex items-center justify-center">2</span>
+                <h4 className="text-xs font-black text-[#0B253A]">QR Token Generation</h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Super Admin generates and provisions deterministic, tamper-proof QR table tokens. Restaurant Admin cannot forge or generate tokens.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
+                <span className="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-black flex items-center justify-center">3</span>
+                <h4 className="text-xs font-black text-[#0B253A]">Print & Fulfill</h4>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Restaurant Admin unlocks access to preview and print standees, view guest cart activity, and fulfill live orders.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-between border-t border-slate-100 flex-wrap gap-3">
+              <span className="text-xs text-slate-400 font-medium">
+                QR table ordering unlocks once this restaurant has an active PRO subscription — go to Settings → Subscription Plan.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] overflow-hidden select-none">
       {/* Top Section Navigation Header */}
@@ -158,6 +423,9 @@ export const QrOrderingModule: React.FC = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 QR Active
               </span>
+              <span className="text-[10px] font-black bg-[#FAF7F2] text-[#0B253A] border border-[#EBE6DD] px-2 py-0.5 rounded-full">
+                PRO Plan (₹7,000/mo) • Allotted by Super Admin
+              </span>
             </div>
             <p className="text-xs text-slate-500">
               Let guests scan table QR codes, explore the canonical digital menu, customize dishes, and order directly.
@@ -165,7 +433,7 @@ export const QrOrderingModule: React.FC = () => {
           </div>
         </div>
 
-        {/* Action Button: Simulator */}
+        {/* Action Button */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleOpenCustomerPreview('12')}
@@ -336,12 +604,12 @@ export const QrOrderingModule: React.FC = () => {
                   </div>
                 </div>
 
-                {/* KDS Dispatch Ready - Honest Demo Sync Label (Part 12 & Part 30) */}
-                <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-300 flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                {/* KDS Dispatch Ready - Real KOT Routing */}
+                <div className="p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-300 flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                   <div>
-                    <span className="text-[10px] text-amber-800 font-bold block uppercase">KDS Routing</span>
-                    <span className="text-xs font-black text-amber-950">● DEMO SYNC</span>
+                    <span className="text-[10px] text-emerald-800 font-bold block uppercase">KDS Routing</span>
+                    <span className="text-xs font-black text-emerald-950">● ONLINE & ROUTING</span>
                   </div>
                 </div>
 
@@ -525,29 +793,79 @@ export const QrOrderingModule: React.FC = () => {
         {/* TAB 2: TABLE QR MANAGEMENT                                   */}
         {/* ============================================================ */}
         {activeSubTab === 'TABLES' && (
-          <div className="space-y-6 max-w-7xl mx-auto">
+          <div className="space-y-4 max-w-7xl mx-auto">
             {/* Action Bar */}
             <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs">
               <div>
-                <h2 className="text-sm font-black text-[#0B253A]">Restaurant Table QR Management</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-black text-[#0B253A]">Restaurant Table QR Management</h2>
+                  <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                    {tables.filter((t) => t.qrStatus !== 'DISABLED').length} / {tables.length} Active
+                  </span>
+                </div>
                 <p className="text-xs text-slate-500">
-                  Every table has a unique deterministic identifier. Guests scanning the QR automatically route orders to that table.
+                  Every table has a unique deterministic identifier allotted by Super Admin. Select tables below for standee printing or operational status.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
-                  onClick={() => {
-                    setDesignerTable(tables[0]);
-                    setIsCardDesignerOpen(true);
-                  }}
+                  onClick={handleSelectAllTables}
+                  className="bg-[#FAF7F2] hover:bg-slate-100 text-[#0B253A] border border-[#EBE6DD] px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer"
+                >
+                  {selectedTableNumbers.length === tables.length ? 'Deselect All' : `Select All (${tables.length})`}
+                </button>
+
+                <button
+                  onClick={handleOpenBatchDesigner}
                   className="bg-[#0B253A] hover:bg-[#123959] text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5 text-[#E66817]" />
-                  <span>Batch Print All 12 Standees</span>
+                  <span>Batch Print All Standees</span>
                 </button>
               </div>
             </div>
+
+            {/* Bulk Action Strip when tables are selected */}
+            {selectedTableNumbers.length > 0 && (
+              <div className="bg-amber-50 border border-amber-300 p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 animate-in fade-in">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-lg bg-[#E66817] text-white text-xs font-black flex items-center justify-center">
+                    {selectedTableNumbers.length}
+                  </span>
+                  <span className="text-xs font-black text-[#0B253A]">
+                    {selectedTableNumbers.length} {selectedTableNumbers.length === 1 ? 'Table' : 'Tables'} Selected
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => handleBulkUpdateStatus('ACTIVE')}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black cursor-pointer shadow-xs"
+                  >
+                    Enable Selected
+                  </button>
+
+                  <button
+                    onClick={() => handleBulkUpdateStatus('DISABLED')}
+                    className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black cursor-pointer shadow-xs"
+                  >
+                    Disable Selected
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setBatchDesignerMode(true);
+                      setIsCardDesignerOpen(true);
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-black flex items-center gap-1 cursor-pointer shadow-sm"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>Print Selected Standees</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Tables Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -558,24 +876,41 @@ export const QrOrderingModule: React.FC = () => {
                   .filter((o) => o.tableNumber === table.tableNumber && o.orderStatus !== 'CANCELLED')
                   .reduce((s, o) => s + o.totalAmount, 0);
 
+                const isSelected = selectedTableNumbers.includes(table.tableNumber);
+                const isActive = table.qrStatus !== 'DISABLED';
+
                 return (
                   <div
                     key={table.id}
-                    className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs hover:shadow-md hover:border-[#E66817]/40 transition-all flex flex-col justify-between space-y-3 group"
+                    className={`bg-white border rounded-2xl p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-3 group ${
+                      isSelected ? 'border-[#E66817] ring-1 ring-[#E66817]' : 'border-[#EBE6DD]'
+                    }`}
                   >
                     <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-base font-black text-[#0B253A]">TABLE {table.tableNumber}</h3>
-                          <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-                            ● QR Active
-                          </span>
+                      <div className="flex items-start gap-2.5">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleToggleTableSelect(table.tableNumber)}
+                          className="mt-1 accent-[#E66817] rounded cursor-pointer"
+                        />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-base font-black text-[#0B253A]">TABLE {table.tableNumber}</h3>
+                            <span
+                              className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                                isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
+                              }`}
+                            >
+                              ● {isActive ? 'QR Active' : 'QR Disabled'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500">{table.zone} • {table.capacity} Seats</p>
                         </div>
-                        <p className="text-xs text-slate-500">{table.zone} • {table.capacity} Seats</p>
                       </div>
 
-                      <div className="w-10 h-10 rounded-xl bg-amber-50 border border-[#FED7AA] flex items-center justify-center text-[#E66817]">
-                        <QrCode className="w-5 h-5" />
+                      <div className="w-9 h-9 rounded-xl bg-amber-50 border border-[#FED7AA] flex items-center justify-center text-[#E66817] shrink-0">
+                        <QrCode className="w-4 h-4" />
                       </div>
                     </div>
 
@@ -596,14 +931,17 @@ export const QrOrderingModule: React.FC = () => {
                       <span>Last: {table.lastOrderTime || '12:45 PM'}</span>
                     </div>
 
-                    {/* Table Actions */}
+                    {/* Table Actions Row */}
                     <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100">
                       <button
-                        onClick={() => handleOpenDesigner(table)}
+                        onClick={() => {
+                          setBatchDesignerMode(false);
+                          handleOpenDesigner(table);
+                        }}
                         className="py-1.5 px-2.5 rounded-xl border border-slate-200 hover:bg-[#FAF7F2] text-xs font-black text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <Printer className="w-3.5 h-3.5 text-[#E66817]" />
-                        <span>View Standee</span>
+                        <span>Standee</span>
                       </button>
 
                       <button
@@ -612,6 +950,28 @@ export const QrOrderingModule: React.FC = () => {
                       >
                         <Smartphone className="w-3.5 h-3.5" />
                         <span>Test Scan</span>
+                      </button>
+                    </div>
+
+                    {/* Secondary Management Row */}
+                    <div className="grid grid-cols-2 gap-2 pt-1 text-[11px]">
+                      <div
+                        className="py-1 px-2 rounded-lg bg-slate-50 text-slate-600 font-mono text-[10px] border border-slate-200 flex items-center justify-between"
+                        title={table.qrToken || 'Token will be provisioned by Super Admin'}
+                      >
+                        <span className="truncate max-w-[85px] font-bold">{table.qrToken ? 'Token Allotted' : 'Pending Allotment'}</span>
+                        <span className="text-[9px] font-black text-emerald-800 bg-emerald-100 px-1 rounded">Super Admin</span>
+                      </div>
+
+                      <button
+                        onClick={() => handleToggleSingleTableStatus(table)}
+                        className={`py-1 px-2 rounded-lg font-bold border text-center cursor-pointer transition-colors ${
+                          isActive
+                            ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200'
+                            : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
+                        }`}
+                      >
+                        {isActive ? 'Disable QR' : 'Enable QR'}
                       </button>
                     </div>
                   </div>
@@ -726,14 +1086,30 @@ export const QrOrderingModule: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Configure Button */}
-                    <button
-                      onClick={() => handleOpenDishConfig(item)}
-                      className="w-full py-1.5 px-3 rounded-xl border border-slate-200 hover:bg-[#FAF7F2] text-xs font-black text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      <Edit2 className="w-3.5 h-3.5 text-[#E66817]" />
-                      <span>Configure Item</span>
-                    </button>
+                    {/* Action Buttons: Toggle Availability & Configure */}
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <button
+                        onClick={() => {
+                          MenuRepository.toggleItemAvailability(item.id);
+                          setTick((t) => t + 1);
+                        }}
+                        className={`py-1.5 px-2 rounded-xl text-xs font-black border text-center transition-colors cursor-pointer ${
+                          item.isAvailable !== false
+                            ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                            : 'bg-rose-50 hover:bg-rose-100 text-rose-800 border-rose-200'
+                        }`}
+                      >
+                        {item.isAvailable !== false ? '● In Stock' : '○ Sold Out'}
+                      </button>
+
+                      <button
+                        onClick={() => handleOpenDishConfig(item)}
+                        className="py-1.5 px-2 rounded-xl border border-slate-200 hover:bg-[#FAF7F2] text-xs font-black text-slate-700 flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                      >
+                        <Edit2 className="w-3 h-3 text-[#E66817]" />
+                        <span>Configure</span>
+                      </button>
+                    </div>
                   </div>
                 ))}
             </div>
@@ -1313,8 +1689,12 @@ export const QrOrderingModule: React.FC = () => {
 
       <QrCardDesignerModal
         isOpen={isCardDesignerOpen}
-        onClose={() => setIsCardDesignerOpen(false)}
+        onClose={() => {
+          setIsCardDesignerOpen(false);
+          setBatchDesignerMode(false);
+        }}
         selectedTable={designerTable}
+        initialBatchMode={batchDesignerMode}
       />
 
       <QrDishConfigModal

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, ReceiptRepository, PrintQueueRepository, LicenseRepository } from '@jamanvaar/database';
-import { PLAN_DEFINITIONS, EntitlementService } from '@jamanvaar/business';
+import { PLAN_DEFINITIONS, EntitlementService, applyLicenseCertificate } from '@jamanvaar/business';
 import { PlanTier, PrinterRole } from '@jamanvaar/types';
 import { PosPrinterService } from '../../services/printerService';
 import { formatINR } from '@jamanvaar/utils';
@@ -173,34 +173,36 @@ ESC/POS Command Engine Verified OK
     setTimeout(() => setSyncFeedback(''), 2500);
   };
 
-  const handleActivateTier = (tier: PlanTier) => {
-    setLicenseError('');
-    LicenseRepository.activatePlan(tier);
-    setLicenseFeedback(`Successfully activated ${tier === 'PRO' ? 'JAMANVAAR PRO (₹7,000)' : 'JAMANVAAR CORE (₹5,000)'}!`);
-    setTimeout(() => setLicenseFeedback(''), 4000);
+  // ENT-001 / SEC-002 fix: this used to call LicenseRepository.activatePlan(tier)
+  // directly — any terminal could self-upgrade to PRO with one click, with zero
+  // verification, bypassing whatever plan Super Admin actually assigned. Plan
+  // changes now require a Super-Admin-signed License Certificate (see
+  // handleApplyCertificate below); clicking a tier card only explains that.
+  const handleActivateTier = (_tier: PlanTier) => {
+    setLicenseError('Plan changes require a signed License Certificate from Super Admin — paste it below.');
   };
 
-  const handleActivateWithDealerKey = () => {
+  const handleApplyCertificate = async () => {
     setLicenseError('');
-    const key = dealerKeyInput.trim().toUpperCase();
-    if (!key) {
-      setLicenseError('Please enter a valid dealer activation license key');
+    const cert = dealerKeyInput.trim();
+    if (!cert) {
+      setLicenseError('Please paste a License Certificate issued by Super Admin');
       return;
     }
 
-    if (key.includes('PRO')) {
-      LicenseRepository.activatePlan('PRO', key);
-      setLicenseFeedback(`Valid Dealer Key: Activated JAMANVAAR PRO (${key})`);
-      setDealerKeyInput('');
-    } else if (key.includes('CORE')) {
-      LicenseRepository.activatePlan('CORE', key);
-      setLicenseFeedback(`Valid Dealer Key: Activated JAMANVAAR CORE (${key})`);
-      setDealerKeyInput('');
-    } else {
-      LicenseRepository.activatePlan('PRO', key);
-      setLicenseFeedback(`Custom Enterprise Key Applied: (${key})`);
-      setDealerKeyInput('');
+    const result = await applyLicenseCertificate(cert);
+    if (!result.ok) {
+      const reasons: Record<typeof result.reason, string> = {
+        malformed: 'That does not look like a License Certificate — paste it exactly as Super Admin provided it.',
+        'invalid-signature-or-expired': 'This License Certificate is invalid or has expired. Request a new one from Super Admin.',
+        'restaurant-mismatch': 'This License Certificate was issued for a different restaurant.'
+      };
+      setLicenseError(reasons[result.reason]);
+      return;
     }
+
+    setLicenseFeedback(`License Certificate applied: activated ${result.license.planName} (verified, signed by Super Admin).`);
+    setDealerKeyInput('');
     setTimeout(() => setLicenseFeedback(''), 4000);
   };
 
@@ -2004,14 +2006,15 @@ ESC/POS Command Engine Verified OK
               </div>
             </div>
 
-            {/* Dealer License Key Activation Portal */}
+            {/* Offline License Certificate Activation */}
             <div className="bg-white border border-[#EBE6DD] rounded-3xl p-6 shadow-2xs space-y-3">
               <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                 <KeyRound className="w-5 h-5 text-[#E66817]" />
                 <div>
-                  <h4 className="text-sm font-bold text-[#0B253A]">Dealer License Key Activation</h4>
+                  <h4 className="text-sm font-bold text-[#0B253A]">Offline License Certificate</h4>
                   <p className="text-[11px] text-slate-500">
-                    POS Dealers can apply new license tokens or upgrade customer restaurant licenses offline.
+                    Paste the signed License Certificate Super Admin generated for this restaurant. It is
+                    cryptographically verified — a plan cannot be changed without one.
                   </p>
                 </div>
               </div>
@@ -2021,16 +2024,16 @@ ESC/POS Command Engine Verified OK
                   type="text"
                   value={dealerKeyInput}
                   onChange={(e) => setDealerKeyInput(e.target.value)}
-                  placeholder="Enter Dealer Activation Key (e.g. JAMAN-PRO-2026-AHM-XXXX)..."
+                  placeholder="Paste the License Certificate from Super Admin..."
                   className="w-full sm:flex-1 bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl px-4 py-2.5 text-xs font-mono font-bold text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
                 />
 
                 <button
-                  onClick={handleActivateWithDealerKey}
+                  onClick={handleApplyCertificate}
                   disabled={!dealerKeyInput.trim()}
                   className="w-full sm:w-auto px-6 py-2.5 bg-[#0B253A] hover:bg-[#1E3A4C] disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
                 >
-                  Validate & Apply Key
+                  Verify & Apply Certificate
                 </button>
               </div>
             </div>

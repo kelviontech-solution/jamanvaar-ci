@@ -697,6 +697,20 @@ export const SEED_USERS: (User & { pinCode?: string })[] = [
     lastLoginAt: '2026-08-25T09:00:00.000Z',
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-08-25T09:00:00.000Z'
+  },
+  {
+    id: 'cap-1',
+    restaurantId: 'rest-jamanvaar-main',
+    username: 'captain1',
+    fullName: 'Rahul Sharma (Captain)',
+    email: 'captain1@jamanvaar.com',
+    phone: '+91 98765 00004',
+    roleId: 'role-captain',
+    pinCode: '2222',
+    isActive: true,
+    lastLoginAt: '2026-08-25T09:30:00.000Z',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-08-25T09:30:00.000Z'
   }
 ];
 
