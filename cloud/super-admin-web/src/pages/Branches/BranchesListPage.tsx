@@ -1,26 +1,43 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import type { Branch } from '../../api/types';
 import {
   Badge,
   BulkActionsBar,
   Button,
-  Card,
   ConfirmModal,
   EmptyState,
-  FilterTabs,
-  SearchBar,
-  SkeletonTable,
   statusTone
 } from '../../components/ui';
-import { Building2, Plus, Store } from 'lucide-react';
+import {
+  Building2,
+  Plus,
+  Store,
+  MapPin,
+  Laptop2,
+  Users,
+  ArrowRight,
+  Hash,
+  Search,
+  X,
+  MoreVertical,
+  ShieldAlert
+} from 'lucide-react';
+import '../../components/card-grid.css';
 import '../../components/shared.css';
 import { CreateBranchModal } from './CreateBranchModal';
+
+function getAvatarClass(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return `mgmt-avatar-c${Math.abs(hash) % 8}`;
+}
 
 type BranchStatusFilter = 'ALL' | 'ACTIVE' | 'INACTIVE';
 
 export function BranchesListPage() {
+  const navigate = useNavigate();
   const [branches, setBranches] = useState<Branch[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +59,18 @@ export function BranchesListPage() {
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkPending, setBulkPending] = useState(false);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+
+  // Close dropdown menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (!(e.target as HTMLElement).closest('.more-actions-menu-container')) {
+        setActiveMenuId(null);
+      }
+    }
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -91,7 +120,8 @@ export function BranchesListPage() {
         const matchName = b.name.toLowerCase().includes(q);
         const matchCode = b.code.toLowerCase().includes(q);
         const matchRest = (b.restaurant?.name || '').toLowerCase().includes(q);
-        if (!matchName && !matchCode && !matchRest) return false;
+        const matchAddr = (b.address || '').toLowerCase().includes(q);
+        if (!matchName && !matchCode && !matchRest && !matchAddr) return false;
       }
       return true;
     });
@@ -150,10 +180,15 @@ export function BranchesListPage() {
 
   return (
     <div>
-      <div className="page-header">
+      {/* Page Header */}
+      <div className="page-header" style={{ marginBottom: 20 }}>
         <div>
-          <h1 className="page-title">Branches</h1>
-          <p className="page-subtitle">Every operational branch across all restaurant tenants — managed independently with localized hardware limits.</p>
+          <h1 className="page-title" style={{ fontSize: 24, fontWeight: 800, color: '#0B253A', letterSpacing: '-0.02em' }}>
+            Branches
+          </h1>
+          <p className="page-subtitle" style={{ fontSize: 13.5, color: '#64748B', marginTop: 4 }}>
+            Every operational branch across all restaurant tenants — managed independently with localized hardware limits.
+          </p>
         </div>
         <Button variant="accent" onClick={() => setShowCreate(true)}>
           <Plus className="w-4 h-4" />
@@ -162,47 +197,90 @@ export function BranchesListPage() {
       </div>
 
       {error && (
-        <div className="page-error" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="page-error" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <span>{error}</span>
-          <Button variant="ghost" size="sm" onClick={load}>Retry</Button>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={load}>Retry</button>
         </div>
       )}
 
       {toast && (
-        <div style={{ padding: '10px 16px', background: '#0B253A', color: '#fff', borderRadius: 8, marginBottom: 16, fontSize: 13, fontWeight: 600 }}>
+        <div style={{ padding: '12px 18px', background: 'var(--jv-surface)', color: 'var(--jv-text)', border: '1px solid var(--jv-border)', borderRadius: 8, marginBottom: 16, fontSize: 13, fontWeight: 600 }}>
           {toast}
         </div>
       )}
 
       {/* Toolbar */}
-      <div className="toolbar" style={{ marginTop: 12 }}>
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          placeholder="Search by branch name, code, or restaurant…"
-          width="320px"
-        />
+      <div className="mgmt-toolbar">
+        {/* Search */}
+        <div style={{ position: 'relative', width: 300 }}>
+          <Search className="w-4 h-4 text-slate-400" style={{ position: 'absolute', left: 12, top: 11 }} />
+          <input
+            type="text"
+            className="input"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search name, code, restaurant…"
+            style={{ paddingLeft: 34, height: 38, fontSize: 13 }}
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              style={{ position: 'absolute', right: 10, top: 11, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-text-muted)' }}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
 
-        <FilterTabs<BranchStatusFilter>
-          value={statusFilter}
-          onChange={setStatusFilter}
-          options={[
-            { id: 'ALL', label: 'All Branches', count: branches?.length },
-            { id: 'ACTIVE', label: 'Active', count: activeCount },
-            { id: 'INACTIVE', label: 'Inactive', count: inactiveCount }
-          ]}
-        />
+        {/* Status filter chips */}
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {(
+            [
+              { id: 'ALL', label: 'All', count: branches?.length },
+              { id: 'ACTIVE', label: 'Active', count: activeCount },
+              { id: 'INACTIVE', label: 'Inactive', count: inactiveCount }
+            ] as const
+          ).map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setStatusFilter(t.id)}
+              className={`filter-chip-btn ${statusFilter === t.id ? 'active' : ''}`}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 20,
+                fontSize: 12.5,
+                fontWeight: statusFilter === t.id ? 700 : 500,
+                border: '1px solid var(--jv-border)',
+                background: statusFilter === t.id ? '#0b253a' : 'var(--jv-bg)',
+                color: statusFilter === t.id ? '#fff' : 'var(--jv-text-secondary)',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {t.label}
+              {typeof t.count === 'number' && (
+                <span style={{ fontSize: 11, padding: '1px 6px', borderRadius: 10, background: statusFilter === t.id ? 'rgba(255,255,255,0.25)' : 'var(--jv-border)', color: statusFilter === t.id ? '#fff' : 'var(--jv-text-secondary)' }}>
+                  {t.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
 
+        {/* Restaurant filter */}
         <select
           value={selectedRestaurantId}
           onChange={(e) => setSelectedRestaurantId(e.target.value)}
-          style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: '#fff' }}
+          style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: 'var(--jv-bg)', fontWeight: 500, color: 'var(--jv-text)' }}
         >
           <option value="ALL">All Restaurants ({uniqueRestaurants.length})</option>
           {uniqueRestaurants.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name}
-            </option>
+            <option key={r.id} value={r.id}>{r.name}</option>
           ))}
         </select>
 
@@ -210,23 +288,18 @@ export function BranchesListPage() {
           <button
             type="button"
             className="btn btn-ghost btn-sm"
-            onClick={() => {
-              setSearch('');
-              setStatusFilter('ALL');
-              setSelectedRestaurantId('ALL');
-            }}
+            style={{ fontSize: 12, color: 'var(--jv-accent)', fontWeight: 600 }}
+            onClick={() => { setSearch(''); setStatusFilter('ALL'); setSelectedRestaurantId('ALL'); }}
           >
             Clear filters
           </button>
         )}
 
         <div className="spacer" />
-        <span className="muted" style={{ fontSize: 13 }}>
-          {filteredBranches.length} of {branches?.length ?? 0} branches
+        <span className="muted" style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--jv-text-secondary)' }}>
+          {filteredBranches.length} of {branches?.length ?? 0}
         </span>
       </div>
-
-      {loading && !branches && <SkeletonTable rows={5} cols={6} />}
 
       <BulkActionsBar selectedCount={selectedIds.size} onClear={() => setSelectedIds(new Set())}>
         <Button size="sm" variant="primary" disabled={bulkPending} onClick={() => handleBulkAction('activate')}>
@@ -237,88 +310,192 @@ export function BranchesListPage() {
         </Button>
       </BulkActionsBar>
 
-      {branches && (
-        <Card>
-          {filteredBranches.length === 0 ? (
-            <EmptyState
-              icon={<Building2 className="w-6 h-6 text-slate-400" />}
-              title={branches.length === 0 ? 'No branches yet' : 'No matching branches found'}
-              description={
-                branches.length === 0
-                  ? 'Every restaurant gets a primary branch on creation, and additional branches can be added here.'
-                  : 'Try clearing your search query or restaurant filter to view other outlets.'
-              }
-              action={
-                branches.length > 0 ? (
-                  <Button variant="ghost" onClick={() => { setSearch(''); setStatusFilter('ALL'); setSelectedRestaurantId('ALL'); }}>
-                    Reset Filters
-                  </Button>
-                ) : undefined
-              }
-            />
-          ) : (
-            <div className="data-table-container">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th style={{ width: 32 }}>
-                      <input
-                        type="checkbox"
-                        checked={filteredBranches.length > 0 && selectedIds.size === filteredBranches.length}
-                        onChange={toggleSelectAll}
-                      />
-                    </th>
-                    <th>Branch</th>
-                    <th>Restaurant</th>
-                    <th>Terminals</th>
-                    <th>Staff Users</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredBranches.map((b) => (
-                    <tr key={b.id}>
-                      <td>
-                        <input type="checkbox" checked={selectedIds.has(b.id)} onChange={() => toggleSelected(b.id)} />
-                      </td>
-                      <td>
-                        <div style={{ fontWeight: 700, fontSize: 14 }}>{b.name}</div>
-                        <span className="muted mono" style={{ fontSize: 11 }}>Code: {b.code}</span>
-                      </td>
-                      <td>
-                        {b.restaurant ? (
-                          <Link to={`/restaurants/${b.restaurant.id}`} className="table-link" style={{ fontWeight: 600 }}>
-                            {b.restaurant.name}
-                          </Link>
-                        ) : (
-                          '—'
-                        )}
-                      </td>
-                      <td style={{ fontWeight: 600 }}>{b._count?.devices ?? 0}</td>
-                      <td style={{ fontWeight: 600 }}>{b._count?.users ?? 0}</td>
-                      <td>
-                        <Badge tone={statusTone(b.status)} pulse={b.status === 'ACTIVE'}>{b.status}</Badge>
-                      </td>
-                      <td>
-                        <Button
-                          size="sm"
-                          variant={b.status === 'ACTIVE' ? 'danger' : 'primary'}
-                          onClick={() => setConfirmTarget({
-                            branch: b,
-                            action: b.status === 'ACTIVE' ? 'deactivate' : 'activate'
-                          })}
-                        >
-                          {b.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
+      {/* Loading skeletons */}
+      {loading && !branches && (
+        <div className="mgmt-card-grid">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="mgmt-card-skeleton" />
+          ))}
+        </div>
+      )}
+
+      {/* Empty State */}
+      {branches && filteredBranches.length === 0 && (
+        <div style={{ background: 'var(--jv-surface-card)', border: '1px solid var(--jv-border)', borderRadius: 14, padding: 40 }}>
+          <EmptyState
+            icon={<Building2 className="w-6 h-6 text-slate-400" />}
+            title={branches.length === 0 ? 'No branches yet' : 'No matching branches found'}
+            description={
+              branches.length === 0
+                ? 'Every restaurant gets a primary branch on creation, and additional branches can be added here.'
+                : 'Try clearing your search query or restaurant filter to view other outlets.'
+            }
+            action={
+              branches.length > 0 ? (
+                <Button variant="ghost" onClick={() => { setSearch(''); setStatusFilter('ALL'); setSelectedRestaurantId('ALL'); }}>
+                  Reset Filters
+                </Button>
+              ) : undefined
+            }
+          />
+        </div>
+      )}
+
+      {/* Branch Cards Grid */}
+      {branches && filteredBranches.length > 0 && (
+        <div className="mgmt-card-grid">
+          {filteredBranches.map((b) => {
+            const isActive = b.status === 'ACTIVE';
+            const initials =
+              b.name
+                .split(' ')
+                .map((w) => w[0])
+                .filter(Boolean)
+                .slice(0, 2)
+                .join('')
+                .toUpperCase() || 'B';
+            const terminalCount = b._count?.devices ?? 0;
+            const staffCount = b._count?.users ?? 0;
+            const isMenuOpen = activeMenuId === b.id;
+            const avatarClass = getAvatarClass(b.name);
+
+            return (
+              <div
+                key={b.id}
+                className={`mgmt-card ${selectedIds.has(b.id) ? 'is-selected' : ''} ${!isActive ? 'is-suspended' : ''}`}
+                onClick={() => navigate(`/branches/${b.id}`)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/branches/${b.id}`)}
+              >
+                {/* ── TOP BAR: Checkbox / Code & Status / Actions ── */}
+                <div className="mgmt-card-header-bar" onClick={(e) => e.stopPropagation()}>
+                  <div className="mgmt-card-header-left">
+                    <input
+                      type="checkbox"
+                      className="mgmt-card-checkbox"
+                      checked={selectedIds.has(b.id)}
+                      onClick={() => toggleSelected(b.id)}
+                      onChange={() => {}}
+                      title="Select branch"
+                    />
+                    <span className="mgmt-card-id-pill" title="Branch code">
+                      <Hash className="w-2.5 h-2.5 inline" />
+                      {b.code}
+                    </span>
+                  </div>
+
+                  <div className="mgmt-card-header-right">
+                    <Badge tone={statusTone(b.status)} pulse={isActive}>
+                      {b.status}
+                    </Badge>
+
+                    <div className="more-actions-menu-container">
+                      <button
+                        type="button"
+                        className={`mgmt-card-corner-btn ${isMenuOpen ? 'is-active' : ''}`}
+                        title="More actions"
+                        onClick={(e) => { e.stopPropagation(); setActiveMenuId(isMenuOpen ? null : b.id); }}
+                      >
+                        <MoreVertical className="w-3.5 h-3.5" />
+                      </button>
+
+                      {isMenuOpen && (
+                        <div className="actions-dropdown-menu">
+                          <button type="button" className="actions-dropdown-item" onClick={() => { setActiveMenuId(null); navigate(`/branches/${b.id}`); }}>
+                            <Building2 className="w-3.5 h-3.5 text-slate-500" /><span>Branch Workspace</span>
+                          </button>
+                          {b.restaurant && (
+                            <button type="button" className="actions-dropdown-item" onClick={() => { setActiveMenuId(null); navigate(`/restaurants/${b.restaurant!.id}`); }}>
+                              <Store className="w-3.5 h-3.5 text-slate-500" /><span>Parent Restaurant</span>
+                            </button>
+                          )}
+                          <div className="actions-dropdown-divider" />
+                          <button
+                            type="button"
+                            className={`actions-dropdown-item ${isActive ? 'is-danger' : ''}`}
+                            onClick={() => {
+                              setActiveMenuId(null);
+                              setConfirmTarget({ branch: b, action: isActive ? 'deactivate' : 'activate' });
+                            }}
+                          >
+                            <ShieldAlert className="w-3.5 h-3.5" />
+                            <span>{isActive ? 'Deactivate Branch' : 'Activate Branch'}</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── IDENTITY ROW: Avatar + Names + Code ── */}
+                <div className="mgmt-card-identity">
+                  <div className={`mgmt-card-avatar ${avatarClass} ${!isActive ? 'is-suspended' : ''}`}>
+                    {initials}
+                  </div>
+                  <div className="mgmt-card-identity-text">
+                    <p className="mgmt-card-name" title={b.name}>{b.name}</p>
+                    {b.restaurant && (
+                      <p className="mgmt-card-subtitle" title={b.restaurant.name}>
+                        <Store style={{ display: 'inline', width: 11, height: 11, marginRight: 4, verticalAlign: 'middle' }} />
+                        {b.restaurant.name}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* ── STATS: Terminals + Staff ── */}
+                <div className="mgmt-card-stats">
+                  <div className="mgmt-card-stat">
+                    <span className="mgmt-card-stat-label">
+                      <Laptop2 className="w-3 h-3 text-slate-400" /> Terminals
+                    </span>
+                    <span className={`mgmt-card-stat-value ${terminalCount > 0 ? 'has-data' : ''}`}>
+                      {terminalCount}
+                    </span>
+                  </div>
+                  <div className="mgmt-card-stat">
+                    <span className="mgmt-card-stat-label">
+                      <Users className="w-3 h-3 text-slate-400" /> Staff
+                    </span>
+                    <span className={`mgmt-card-stat-value ${staffCount > 0 ? 'has-data' : ''}`}>
+                      {staffCount}
+                    </span>
+                  </div>
+                </div>
+
+                {/* ── INFO ROW: Address + Timezone ── */}
+                <div className="mgmt-card-info-row">
+                  {b.address && (
+                    <div className="mgmt-card-info-item">
+                      <MapPin className="w-3 h-3" />
+                      <span>{b.address}</span>
+                    </div>
+                  )}
+                  <div className="mgmt-card-info-item">
+                    <Laptop2 className="w-3 h-3" />
+                    <span>{b.timezone || 'Asia/Kolkata'}</span>
+                  </div>
+                </div>
+
+                {/* ── FOOTER: CTA + Meta ── */}
+                <div className="mgmt-card-footer" onClick={(e) => e.stopPropagation()}>
+                  <span className="mgmt-card-cta">
+                    <Building2 className="w-3.5 h-3.5" />
+                    Manage Branch
+                    <span className="mgmt-card-cta-arrow">
+                      <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </span>
+
+                  <span style={{ fontSize: 11, color: 'var(--jv-text-muted)', fontWeight: 500 }}>
+                    {b.code}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
 
       {showCreate && (
@@ -331,7 +508,6 @@ export function BranchesListPage() {
         />
       )}
 
-      {/* Confirm Dialog */}
       {confirmTarget && (
         <ConfirmModal
           isOpen={true}

@@ -1,51 +1,72 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
-import type { TenantUser, ActivationKey } from '../../api/types';
+import type { TenantUser } from '../../api/types';
 import {
   Badge,
   BulkActionsBar,
   Button,
-  Card,
   ConfirmModal,
   EmptyState,
-  FilterTabs,
-  Modal,
-  SearchBar,
-  SkeletonTable,
   statusTone
 } from '../../components/ui';
-import { Users, Send, CheckCircle2, UserCheck, ShieldAlert, Download, KeyRound, Copy } from 'lucide-react';
+import {
+  Users,
+  Send,
+  CheckCircle2,
+  ShieldAlert,
+  Download,
+  Mail,
+  Phone,
+  Store,
+  ArrowRight,
+  Search,
+  X,
+  Building2,
+  MoreVertical
+} from 'lucide-react';
 import { exportRowsToCsv } from '../../lib/csvExport';
+import '../../components/card-grid.css';
 import '../../components/shared.css';
+
+function getAvatarClass(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return `mgmt-avatar-c${Math.abs(hash) % 8}`;
+}
 
 type OwnerStatus = 'ALL' | 'ACTIVE' | 'DISABLED' | 'PENDING_ACTIVATION';
 
 export function OwnersListPage() {
+  const navigate = useNavigate();
   const [owners, setOwners] = useState<TenantUser[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  // Search and Filter
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<OwnerStatus>('ALL');
 
-  // Selected owner for detail modal
-  const [detailOwner, setDetailOwner] = useState<TenantUser | null>(null);
-  const [ownerKeys, setOwnerKeys] = useState<ActivationKey[] | null>(null);
-  const [loadingOwnerKeys, setLoadingOwnerKeys] = useState(false);
-
-  // Confirm Modal state
   const [confirmTarget, setConfirmTarget] = useState<{
     owner: TenantUser;
     action: 'activate' | 'suspend';
   } | null>(null);
   const [pendingAction, setPendingAction] = useState(false);
 
-  // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkPending, setBulkPending] = useState(false);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+
+  // Close dropdown menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (!(e.target as HTMLElement).closest('.more-actions-menu-container')) {
+        setActiveMenuId(null);
+      }
+    }
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -66,19 +87,6 @@ export function OwnersListPage() {
   }, []);
 
   useEffect(load, [load]);
-
-  useEffect(() => {
-    if (detailOwner?.restaurant?.id) {
-      setLoadingOwnerKeys(true);
-      api
-        .get<ActivationKey[]>(`/api/v1/activation-keys?restaurantId=${detailOwner.restaurant.id}`)
-        .then(setOwnerKeys)
-        .catch(() => setOwnerKeys([]))
-        .finally(() => setLoadingOwnerKeys(false));
-    } else {
-      setOwnerKeys(null);
-    }
-  }, [detailOwner]);
 
   const filteredOwners = useMemo(() => {
     if (!owners) return [];
@@ -178,10 +186,13 @@ export function OwnersListPage() {
 
   return (
     <div>
-      <div className="page-header">
+      {/* Page Header */}
+      <div className="page-header" style={{ marginBottom: 20 }}>
         <div>
-          <h1 className="page-title">Restaurant Owners</h1>
-          <p className="page-subtitle">
+          <h1 className="page-title" style={{ fontSize: 24, fontWeight: 800, color: '#0B253A', letterSpacing: '-0.02em' }}>
+            Restaurant Owners
+          </h1>
+          <p className="page-subtitle" style={{ fontSize: 13.5, color: '#64748B', marginTop: 4 }}>
             Master tenant users with the OWNER role — strictly isolated from platform Super Admin privileges.
           </p>
         </div>
@@ -192,58 +203,98 @@ export function OwnersListPage() {
       </div>
 
       {error && (
-        <div className="page-error" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="page-error" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <span>{error}</span>
-          <Button variant="ghost" size="sm" onClick={load}>Retry</Button>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={load}>Retry</button>
         </div>
       )}
 
       {toast && (
-        <div style={{ padding: '10px 16px', background: '#0B253A', color: '#fff', borderRadius: 8, marginBottom: 16, fontSize: 13, fontWeight: 600 }}>
+        <div style={{ padding: '12px 18px', background: 'var(--jv-surface)', color: 'var(--jv-text)', border: '1px solid var(--jv-border)', borderRadius: 8, marginBottom: 16, fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           {toast}
         </div>
       )}
 
       {/* Toolbar */}
-      <div className="toolbar" style={{ marginTop: 12 }}>
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          placeholder="Search by owner name, email, phone, or restaurant…"
-          width="340px"
-        />
+      <div className="mgmt-toolbar">
+        {/* Search */}
+        <div style={{ position: 'relative', width: 320 }}>
+          <Search className="w-4 h-4 text-slate-400" style={{ position: 'absolute', left: 12, top: 11 }} />
+          <input
+            type="text"
+            className="input"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search name, email, phone, restaurant…"
+            style={{ paddingLeft: 34, height: 38, fontSize: 13 }}
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              style={{ position: 'absolute', right: 10, top: 11, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-text-muted)' }}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
 
-        <FilterTabs<OwnerStatus>
-          value={statusFilter}
-          onChange={setStatusFilter}
-          options={[
-            { id: 'ALL', label: 'All Owners', count: owners?.length },
-            { id: 'ACTIVE', label: 'Active', count: activeCount },
-            { id: 'PENDING_ACTIVATION', label: 'Pending Invite', count: pendingCount },
-            { id: 'DISABLED', label: 'Suspended', count: disabledCount }
-          ]}
-        />
+        {/* Status filter chips */}
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {(
+            [
+              { id: 'ALL', label: 'All', count: owners?.length },
+              { id: 'ACTIVE', label: 'Active', count: activeCount },
+              { id: 'PENDING_ACTIVATION', label: 'Pending', count: pendingCount },
+              { id: 'DISABLED', label: 'Suspended', count: disabledCount }
+            ] as const
+          ).map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setStatusFilter(t.id)}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 20,
+                fontSize: 12.5,
+                fontWeight: statusFilter === t.id ? 700 : 500,
+                border: '1px solid var(--jv-border)',
+                background: statusFilter === t.id ? '#0b253a' : 'var(--jv-bg)',
+                color: statusFilter === t.id ? '#fff' : 'var(--jv-text-secondary)',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {t.label}
+              {typeof t.count === 'number' && (
+                <span style={{ fontSize: 11, padding: '1px 6px', borderRadius: 10, background: statusFilter === t.id ? 'rgba(255,255,255,0.25)' : 'var(--jv-border)', color: statusFilter === t.id ? '#fff' : 'var(--jv-text-secondary)' }}>
+                  {t.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
 
         {(search || statusFilter !== 'ALL') && (
           <button
             type="button"
             className="btn btn-ghost btn-sm"
-            onClick={() => {
-              setSearch('');
-              setStatusFilter('ALL');
-            }}
+            style={{ fontSize: 12, color: 'var(--jv-accent)', fontWeight: 600 }}
+            onClick={() => { setSearch(''); setStatusFilter('ALL'); }}
           >
             Clear filters
           </button>
         )}
 
         <div className="spacer" />
-        <span className="muted" style={{ fontSize: 13 }}>
-          {filteredOwners.length} of {owners?.length ?? 0} owners
+        <span className="muted" style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--jv-text-secondary)' }}>
+          {filteredOwners.length} of {owners?.length ?? 0}
         </span>
       </div>
-
-      {loading && !owners && <SkeletonTable rows={6} cols={6} />}
 
       <BulkActionsBar selectedCount={selectedIds.size} onClear={() => setSelectedIds(new Set())}>
         <Button size="sm" variant="primary" disabled={bulkPending} onClick={() => handleBulkAction('activate')}>
@@ -254,226 +305,182 @@ export function OwnersListPage() {
         </Button>
       </BulkActionsBar>
 
-      {owners && (
-        <Card>
-          {filteredOwners.length === 0 ? (
-            <EmptyState
-              icon={<Users className="w-6 h-6 text-slate-400" />}
-              title={owners.length === 0 ? 'No owners registered' : 'No matching owners found'}
-              description={
-                owners.length === 0
-                  ? 'Owners are automatically provisioned when you onboard a restaurant.'
-                  : 'Try clearing your search or switching status tabs to inspect other records.'
-              }
-              action={
-                owners.length > 0 ? (
-                  <Button variant="ghost" onClick={() => { setSearch(''); setStatusFilter('ALL'); }}>
-                    Reset Filters
-                  </Button>
-                ) : undefined
-              }
-            />
-          ) : (
-            <div className="data-table-container">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th style={{ width: 32 }}>
-                      <input
-                        type="checkbox"
-                        checked={filteredOwners.length > 0 && selectedIds.size === filteredOwners.length}
-                        onChange={toggleSelectAll}
-                      />
-                    </th>
-                    <th>Owner</th>
-                    <th>Restaurant</th>
-                    <th>Phone</th>
-                    <th>Status</th>
-                    <th>Registered</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredOwners.map((o) => (
-                    <tr key={o.id}>
-                      <td>
-                        <input type="checkbox" checked={selectedIds.has(o.id)} onChange={() => toggleSelected(o.id)} />
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="table-link"
-                          style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left', cursor: 'pointer' }}
-                          onClick={() => setDetailOwner(o)}
-                        >
-                          <strong style={{ fontSize: 14 }}>{o.fullName}</strong>
-                          <div className="muted mono" style={{ fontSize: 11 }}>{o.email}</div>
-                        </button>
-                      </td>
-                      <td>
-                        {o.restaurant ? (
-                          <Link to={`/restaurants/${o.restaurant.id}`} className="table-link" style={{ fontWeight: 600 }}>
-                            {o.restaurant.name}
-                          </Link>
-                        ) : (
-                          '—'
-                        )}
-                      </td>
-                      <td>{o.phone || '—'}</td>
-                      <td>
-                        <Badge tone={statusTone(o.status)} pulse={o.status === 'ACTIVE'}>{o.status}</Badge>
-                      </td>
-                      <td>{new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
-                      <td>
-                        <div className="row-actions">
-                          <Button size="sm" variant="ghost" onClick={() => setDetailOwner(o)}>
-                            Details
-                          </Button>
-                          {o.status === 'PENDING_ACTIVATION' ? (
-                            <Button size="sm" variant="accent" onClick={() => handleResendInvite(o.id, o.email)}>
-                              <Send className="w-3 h-3" />
-                              <span>Resend Invite</span>
-                            </Button>
-                          ) : (
-                            <Button
-                              size="sm"
-                              variant={o.status === 'DISABLED' ? 'primary' : 'danger'}
-                              onClick={() => setConfirmTarget({
-                                owner: o,
-                                action: o.status === 'DISABLED' ? 'activate' : 'suspend'
-                              })}
-                            >
-                              {o.status === 'DISABLED' ? 'Activate' : 'Suspend'}
-                            </Button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
+      {/* Loading skeletons */}
+      {loading && !owners && (
+        <div className="mgmt-card-grid">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="mgmt-card-skeleton" />
+          ))}
+        </div>
       )}
 
-      {/* Owner Detail Modal */}
-      {detailOwner && (
-        <Modal
-          title={`Owner Profile — ${detailOwner.fullName}`}
-          onClose={() => setDetailOwner(null)}
-          footer={
-            <Button variant="ghost" onClick={() => setDetailOwner(null)}>
-              Close
-            </Button>
-          }
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <dl className="detail-list">
-              <dt>Full Name</dt>
-              <dd style={{ fontWeight: 700 }}>{detailOwner.fullName}</dd>
-              <dt>Email Address</dt>
-              <dd className="mono">{detailOwner.email}</dd>
-              <dt>Contact Phone</dt>
-              <dd>{detailOwner.phone || '—'}</dd>
-              <dt>Account Status</dt>
-              <dd><Badge tone={statusTone(detailOwner.status)}>{detailOwner.status}</Badge></dd>
-              <dt>Associated Restaurant</dt>
-              <dd>
-                {detailOwner.restaurant ? (
-                  <Link to={`/restaurants/${detailOwner.restaurant.id}`} style={{ fontWeight: 700, color: 'var(--jv-accent)' }}>
-                    {detailOwner.restaurant.name} →
-                  </Link>
-                ) : 'None'}
-              </dd>
-              <dt>Created Timestamp</dt>
-              <dd>{new Date(detailOwner.createdAt).toLocaleString('en-IN')}</dd>
-            </dl>
+      {/* Empty State */}
+      {owners && filteredOwners.length === 0 && (
+        <div style={{ background: 'var(--jv-surface-card)', border: '1px solid var(--jv-border)', borderRadius: 14, padding: 40 }}>
+          <EmptyState
+            icon={<Users className="w-6 h-6 text-slate-400" />}
+            title={owners.length === 0 ? 'No owners registered' : 'No matching owners found'}
+            description={
+              owners.length === 0
+                ? 'Owners are automatically provisioned when you onboard a restaurant.'
+                : 'Try clearing your search or switching status tabs to inspect other records.'
+            }
+            action={
+              owners.length > 0 ? (
+                <Button variant="ghost" onClick={() => { setSearch(''); setStatusFilter('ALL'); }}>
+                  Reset Filters
+                </Button>
+              ) : undefined
+            }
+          />
+        </div>
+      )}
 
-            {detailOwner.restaurant && (
-              <div style={{ borderTop: '1px solid var(--jv-border)', paddingTop: 14, marginTop: 6 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <KeyRound className="w-4 h-4 text-orange-600" />
-                    <span style={{ fontSize: 13, fontWeight: 800, color: '#0B253A' }}>
-                      Hardware Activation Keys ({ownerKeys?.length ?? '…'})
+      {/* Owner Cards Grid */}
+      {owners && filteredOwners.length > 0 && (
+        <div className="mgmt-card-grid">
+          {filteredOwners.map((o) => {
+            const isActive = o.status === 'ACTIVE';
+            const isPending = o.status === 'PENDING_ACTIVATION';
+            const initials = o.fullName
+              .split(' ')
+              .map((w) => w[0])
+              .filter(Boolean)
+              .slice(0, 2)
+              .join('')
+              .toUpperCase() || 'O';
+            const isMenuOpen = activeMenuId === o.id;
+            const avatarClass = getAvatarClass(o.fullName);
+
+            return (
+              <div
+                key={o.id}
+                className={`mgmt-card ${selectedIds.has(o.id) ? 'is-selected' : ''} ${o.status === 'DISABLED' ? 'is-suspended' : ''}`}
+                onClick={() => navigate(`/owners/${o.id}`)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/owners/${o.id}`)}
+              >
+                {/* ── TOP BAR: Checkbox / Role & Status / Actions ── */}
+                <div className="mgmt-card-header-bar" onClick={(e) => e.stopPropagation()}>
+                  <div className="mgmt-card-header-left">
+                    <input
+                      type="checkbox"
+                      className="mgmt-card-checkbox"
+                      checked={selectedIds.has(o.id)}
+                      onClick={() => toggleSelected(o.id)}
+                      onChange={() => {}}
+                      title="Select owner"
+                    />
+                    <span className="mgmt-card-id-pill" title="Role">
+                      {o.role}
                     </span>
                   </div>
-                  <Link
-                    to={`/restaurants/${detailOwner.restaurant.id}`}
-                    style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-accent)' }}
-                  >
-                    Open Restaurant Details →
-                  </Link>
+
+                  <div className="mgmt-card-header-right">
+                    <Badge tone={statusTone(o.status)} pulse={isActive}>
+                      {o.status === 'PENDING_ACTIVATION' ? 'PENDING' : o.status}
+                    </Badge>
+
+                    <div className="more-actions-menu-container">
+                      <button
+                        type="button"
+                        className={`mgmt-card-corner-btn ${isMenuOpen ? 'is-active' : ''}`}
+                        title="More actions"
+                        onClick={(e) => { e.stopPropagation(); setActiveMenuId(isMenuOpen ? null : o.id); }}
+                      >
+                        <MoreVertical className="w-3.5 h-3.5" />
+                      </button>
+
+                      {isMenuOpen && (
+                        <div className="actions-dropdown-menu">
+                          <button type="button" className="actions-dropdown-item" onClick={() => { setActiveMenuId(null); navigate(`/owners/${o.id}`); }}>
+                            <Users className="w-3.5 h-3.5 text-slate-500" /><span>Owner Profile</span>
+                          </button>
+                          {o.restaurant && (
+                            <button type="button" className="actions-dropdown-item" onClick={() => { setActiveMenuId(null); navigate(`/restaurants/${o.restaurant!.id}`); }}>
+                              <Store className="w-3.5 h-3.5 text-slate-500" /><span>Assigned Restaurant</span>
+                            </button>
+                          )}
+                          {isPending && (
+                            <button type="button" className="actions-dropdown-item" onClick={() => { setActiveMenuId(null); handleResendInvite(o.id, o.email); }}>
+                              <Send className="w-3.5 h-3.5 text-slate-500" /><span>Resend Invite</span>
+                            </button>
+                          )}
+                          <div className="actions-dropdown-divider" />
+                          <button
+                            type="button"
+                            className={`actions-dropdown-item ${isActive ? 'is-danger' : ''}`}
+                            onClick={() => {
+                              setActiveMenuId(null);
+                              setConfirmTarget({ owner: o, action: isActive ? 'suspend' : 'activate' });
+                            }}
+                          >
+                            <ShieldAlert className="w-3.5 h-3.5" />
+                            <span>{isActive ? 'Suspend Owner' : 'Reactivate Owner'}</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                {loadingOwnerKeys ? (
-                  <div style={{ fontSize: 12, color: '#64748b' }}>Loading activation keys…</div>
-                ) : !ownerKeys || ownerKeys.length === 0 ? (
-                  <div style={{ fontSize: 12, color: '#64748b', fontStyle: 'italic' }}>
-                    No activation keys generated yet.
+                {/* ── IDENTITY ROW: Avatar + Names + Restaurant Tag ── */}
+                <div className="mgmt-card-identity">
+                  <div className={`mgmt-card-avatar ${avatarClass} ${o.status === 'DISABLED' ? 'is-suspended' : ''}`}>
+                    {initials}
                   </div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 180, overflowY: 'auto' }}>
-                    {ownerKeys.map((k) => (
-                      <div
-                        key={k.id}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          padding: '8px 12px',
-                          borderRadius: 8,
-                          background: k.status === 'ACTIVE' ? '#fffaf5' : '#f8fafc',
-                          border: k.status === 'ACTIVE' ? '1px solid #fed7aa' : '1px solid #e2e8f0'
-                        }}
-                      >
-                        <div>
-                          <span className="mono" style={{ fontSize: 13, fontWeight: 800, color: '#0B253A' }}>
-                            {k.code}
-                          </span>
-                          <span style={{ marginLeft: 8, fontSize: 11, color: '#64748b' }}>
-                            ({k.allowedDeviceType} Terminal)
-                          </span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <Badge tone={statusTone(k.status)} pulse={k.status === 'ACTIVE'}>{k.status}</Badge>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              navigator.clipboard.writeText(k.code);
-                              showToast(`Copied key "${k.code}" to clipboard!`);
-                            }}
-                            style={{ padding: '2px 8px', height: 'auto', fontSize: 11 }}
-                          >
-                            <Copy className="w-3 h-3 mr-1" />
-                            Copy
-                          </Button>
-                        </div>
+                  <div className="mgmt-card-identity-text">
+                    <p className="mgmt-card-name" title={o.fullName}>{o.fullName}</p>
+                    {o.restaurant && (
+                      <div className="mgmt-card-plan-wrap">
+                        <span className="mgmt-card-plan-badge" style={{ background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe' }}>
+                          <Store style={{ width: 10, height: 10, display: 'inline', marginRight: 3 }} />
+                          {o.restaurant.name}
+                        </span>
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
-            )}
+                </div>
 
-            <div style={{ borderTop: '1px solid var(--jv-border)', paddingTop: 14, marginTop: 6, display: 'flex', gap: 10 }}>
-              <Button
-                variant="accent"
-                onClick={() => {
-                  handleResendInvite(detailOwner.id, detailOwner.email);
-                }}
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>Resend Activation Credentials</span>
-              </Button>
-            </div>
-          </div>
-        </Modal>
+                {/* ── INFO ROW: Email + Phone + Joined Date ── */}
+                <div className="mgmt-card-info-row">
+                  <div className="mgmt-card-info-item">
+                    <Mail className="w-3 h-3" />
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', fontFamily: 'monospace', fontSize: 11 }}>{o.email}</span>
+                  </div>
+                  {o.phone && (
+                    <div className="mgmt-card-info-item">
+                      <Phone className="w-3 h-3" />
+                      <span>{o.phone}</span>
+                    </div>
+                  )}
+                  <div className="mgmt-card-info-item">
+                    <Building2 className="w-3 h-3" />
+                    <span>Joined {new Date(o.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}</span>
+                  </div>
+                </div>
+
+                {/* ── FOOTER: CTA + Status / Action ── */}
+                <div className="mgmt-card-footer" onClick={(e) => e.stopPropagation()}>
+                  <span className="mgmt-card-cta">
+                    <Users className="w-3.5 h-3.5" />
+                    Manage Owner
+                    <span className="mgmt-card-cta-arrow">
+                      <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </span>
+
+                  <span style={{ fontSize: 11, color: 'var(--jv-text-muted)', fontWeight: 500 }}>
+                    {new Date(o.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
 
-      {/* Confirm Modal */}
       {confirmTarget && (
         <ConfirmModal
           isOpen={true}

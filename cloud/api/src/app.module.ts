@@ -32,6 +32,7 @@ import { MasterCatalogModule } from './modules/master-catalog/master-catalog.mod
 import { SyncObservabilityModule } from './modules/sync-observability/sync-observability.module';
 import { OfflinePolicyModule } from './modules/offline-policy/offline-policy.module';
 import { SandboxesModule } from './modules/sandboxes/sandboxes.module';
+import { AiAssistantModule } from './modules/ai-assistant/ai-assistant.module';
 import { validateEnv } from './config/env.validation';
 
 @Module({
@@ -72,7 +73,8 @@ import { validateEnv } from './config/env.validation';
     MasterCatalogModule,
     SyncObservabilityModule,
     OfflinePolicyModule,
-    SandboxesModule
+    SandboxesModule,
+    AiAssistantModule
   ],
   providers: [
     {

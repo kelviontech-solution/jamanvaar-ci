@@ -476,10 +476,25 @@ export interface Payment {
   amount: number;
   method: PaymentMethod;
   referenceNumber: string | null;
+  receiptNumber?: string | null;
   status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
   notes: string | null;
   recordedBy: string | null;
   createdAt: string;
+}
+
+export interface TaxBreakup {
+  isIntraState: boolean;
+  cgstRate: number;
+  sgstRate: number;
+  igstRate: number;
+  cgstAmount: number;
+  sgstAmount: number;
+  igstAmount: number;
+  taxAmount: number;
+  totalAmount: number;
+  sacCode: string;
+  description: string;
 }
 
 export interface Invoice {
@@ -500,9 +515,24 @@ export interface Invoice {
   notes: string | null;
   createdAt: string;
   updatedAt: string;
-  restaurant?: { id: string; name: string; legalName?: string; city?: string; gstin?: string };
-  plan?: { id: string; name: string; tier: string };
+  restaurant?: {
+    id: string;
+    name: string;
+    legalName?: string;
+    city?: string;
+    state?: string;
+    address?: string;
+    gstin?: string;
+    fssaiNumber?: string;
+    users?: Array<{ fullName: string; email: string; phone?: string | null }>;
+  };
+  plan?: { id: string; name: string; tier: string; priceMonthly?: number };
+  subscription?: { id: string; status: string; expiresAt: string };
   payments?: Payment[];
+  taxBreakup?: TaxBreakup;
+  totalPaid?: number;
+  balanceDue?: number;
+  paymentStatus?: 'PAID' | 'PARTIALLY_PAID' | 'UNPAID';
 }
 
 export interface BillingSummary {
@@ -512,6 +542,107 @@ export interface BillingSummary {
   pastDueInvoices: number;
   totalCollected: number; // in rupees
   pendingAmount: number; // in rupees
+  collectionRatePercent?: number;
+}
+
+export interface ReceiptData {
+  receiptNumber: string;
+  paymentDate: string;
+  invoiceNumber: string;
+  invoiceId: string;
+  transactionId: string;
+  paymentMethod: string;
+  paymentStatus: string;
+  amountPaid: number;
+  amountPaidRupees: string;
+  totalInvoiceAmount: number;
+  totalPaid: number;
+  balanceDue: number;
+  currency: string;
+  planName: string;
+  planTier: string;
+  billingPeriodStart: string;
+  billingPeriodEnd: string;
+  receivedFrom: {
+    restaurantName: string;
+    legalName: string;
+    address: string | null;
+    city: string | null;
+    state: string | null;
+    gstin: string | null;
+    ownerName: string;
+    ownerEmail: string;
+  };
+  seller: {
+    companyName: string;
+    tagline: string;
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+    gstin: string;
+    pan: string;
+    sacCode: string;
+    supportEmail: string;
+  };
+  taxBreakup: TaxBreakup;
+}
+
+// ---------------------------------------------------------------------------
+// JAMAN AI Engine & Assistant Configuration
+// ---------------------------------------------------------------------------
+
+export interface AiCategory {
+  id: string;
+  label: string;
+  icon: string;
+  description: string;
+}
+
+export interface AiQuestionItem {
+  id: string;
+  category: string;
+  label: string;
+  icon: string;
+  intent: string;
+  minPlanTier: 'CORE' | 'PRO';
+  priorityScore: number;
+  isEnabled: boolean;
+  isCustom?: boolean;
+  targetDomain?: 'ORDERS' | 'PAYMENTS' | 'KITCHEN' | 'TABLES' | 'INVENTORY' | 'SHIFTS';
+  calculationType?: 'SUM' | 'COUNT' | 'AVG' | 'RATIO' | 'TOP_LIST';
+  filterField?: string;
+  filterValue?: string;
+  displayUnit?: 'CURRENCY' | 'NUMBER' | 'PERCENT' | 'MINUTES';
+}
+
+export interface AiGlobalSettings {
+  mode: 'OFFLINE_RULE_BASED' | 'HYBRID_LLM';
+  delayedKotMinutes: number;
+  lowStockThreshold: number;
+  cashDrawerVarianceThreshold: number;
+  proactiveAlertsEnabled: boolean;
+  corePlanTeaserEnabled: boolean;
+  dailyQueryLimitPro: number;
+  engineLatencyMs: number;
+}
+
+export interface AiTelemetry {
+  totalQueries: number;
+  todayQueries: number;
+  activeProTenants: number;
+  totalActiveTenants: number;
+  adoptionRatePercent: number;
+  topIntent: string;
+  topIntents: Array<{ intent: string; count: number }>;
+  latencyMs: number;
+}
+
+export interface AiAssistantConfigResponse {
+  categories: AiCategory[];
+  questions: AiQuestionItem[];
+  settings: AiGlobalSettings;
+  telemetry: AiTelemetry;
 }
 
 // ---------------------------------------------------------------------------

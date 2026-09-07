@@ -1,6 +1,7 @@
 import { db, ShiftRepository, PrintQueueRepository, BusinessDayRepository, BusinessDayAccountingService } from '@jamanvaar/database';
 import { Order, DiningTable } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
+import { DynamicQueryExecutor, DynamicQueryFormula } from './dynamic_query_executor';
 
 export type PosAssistantIntent =
   | 'TODAY_SALES'
@@ -42,6 +43,11 @@ export type PosAssistantIntent =
   | 'PRO_FEATURES'
   | 'CAPTAIN_FEATURES'
   | 'QR_FEATURES'
+  | 'DYNAMIC_QUERY'
+  | 'SWIGGY_ORDERS'
+  | 'ZOMATO_ORDERS'
+  | 'DINE_IN_REVENUE'
+  | 'TAKEAWAY_REVENUE'
   | 'HELP_UNKNOWN';
 
 export interface PosAssistantAction {
@@ -200,20 +206,69 @@ export class PosAssistantService {
   /**
    * Execute real deterministic query against local database
    */
-  public static executeQuery(queryOrIntent: string | PosAssistantIntent): PosAssistantResponse {
+  public static executeQuery(
+    queryOrIntent: string | PosAssistantIntent | { intent?: string; label?: string; formula?: DynamicQueryFormula }
+  ): PosAssistantResponse {
+    // 1. Direct Dynamic Formula Evaluation (e.g. from Super Admin templates)
+    if (typeof queryOrIntent === 'object' && queryOrIntent !== null && 'formula' in queryOrIntent && queryOrIntent.formula) {
+      return DynamicQueryExecutor.execute(queryOrIntent.label || 'Custom Metric', queryOrIntent.formula);
+    }
+
+    const rawKey = typeof queryOrIntent === 'string' ? queryOrIntent : (queryOrIntent?.intent || '');
+
+    // 2. Pre-configured Aggregator & Channel intents
+    if (rawKey === 'SWIGGY_ORDERS') {
+      return DynamicQueryExecutor.execute("Swiggy Delivery Orders Today", {
+        targetDomain: 'ORDERS',
+        calculationType: 'SUM',
+        filterField: 'channel',
+        filterValue: 'SWIGGY',
+        displayUnit: 'CURRENCY'
+      });
+    }
+    if (rawKey === 'ZOMATO_ORDERS') {
+      return DynamicQueryExecutor.execute("Zomato Delivery Orders Today", {
+        targetDomain: 'ORDERS',
+        calculationType: 'SUM',
+        filterField: 'channel',
+        filterValue: 'ZOMATO',
+        displayUnit: 'CURRENCY'
+      });
+    }
+    if (rawKey === 'DINE_IN_REVENUE') {
+      return DynamicQueryExecutor.execute("Dine-In Revenue Today", {
+        targetDomain: 'ORDERS',
+        calculationType: 'SUM',
+        filterField: 'channel',
+        filterValue: 'DINE_IN',
+        displayUnit: 'CURRENCY'
+      });
+    }
+    if (rawKey === 'TAKEAWAY_REVENUE') {
+      return DynamicQueryExecutor.execute("Takeaway / Parcel Revenue Today", {
+        targetDomain: 'ORDERS',
+        calculationType: 'SUM',
+        filterField: 'channel',
+        filterValue: 'TAKEAWAY',
+        displayUnit: 'CURRENCY'
+      });
+    }
+
     const intent =
-      typeof queryOrIntent === 'string' && queryOrIntent.startsWith('TODAY_') ||
-      queryOrIntent.startsWith('CASH_') ||
-      queryOrIntent.startsWith('UPI_') ||
-      queryOrIntent.startsWith('CARD_') ||
-      queryOrIntent.startsWith('TABLE_') ||
-      queryOrIntent.startsWith('PENDING_') ||
-      queryOrIntent.startsWith('DELAYED_') ||
-      queryOrIntent.startsWith('TOP_') ||
-      queryOrIntent.startsWith('LOW_') ||
-      queryOrIntent.startsWith('END_OF_DAY')
-        ? (queryOrIntent as PosAssistantIntent)
-        : this.resolveIntent(queryOrIntent as string);
+      typeof rawKey === 'string' && (
+        rawKey.startsWith('TODAY_') ||
+        rawKey.startsWith('CASH_') ||
+        rawKey.startsWith('UPI_') ||
+        rawKey.startsWith('CARD_') ||
+        rawKey.startsWith('TABLE_') ||
+        rawKey.startsWith('PENDING_') ||
+        rawKey.startsWith('DELAYED_') ||
+        rawKey.startsWith('TOP_') ||
+        rawKey.startsWith('LOW_') ||
+        rawKey.startsWith('END_OF_DAY')
+      )
+        ? (rawKey as PosAssistantIntent)
+        : this.resolveIntent(rawKey);
 
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const id = `asst-resp-${Date.now()}`;

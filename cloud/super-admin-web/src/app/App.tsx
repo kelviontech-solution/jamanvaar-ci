@@ -8,7 +8,9 @@ import { RestaurantsListPage } from '../pages/Restaurants/RestaurantsListPage';
 import { RestaurantDetailPage } from '../pages/Restaurants/RestaurantDetailPage';
 import { OnboardRestaurantPage } from '../pages/Onboarding/OnboardRestaurantPage';
 import { OwnersListPage } from '../pages/Owners/OwnersListPage';
+import { OwnerDetailPage } from '../pages/Owners/OwnerDetailPage';
 import { BranchesListPage } from '../pages/Branches/BranchesListPage';
+import { BranchDetailPage } from '../pages/Branches/BranchDetailPage';
 import { PlansListPage } from '../pages/Plans/PlansListPage';
 import { PlanDetailPage } from '../pages/Plans/PlanDetailPage';
 import { SubscriptionsListPage } from '../pages/Subscriptions/SubscriptionsListPage';
@@ -29,6 +31,7 @@ import { PlatformActivatePage } from '../pages/Activate/PlatformActivatePage';
 import { TicketsPage } from '../pages/Tickets/TicketsPage';
 import { DeviceDetailPage } from '../pages/Devices/DeviceDetailPage';
 import { MasterCatalogPage } from '../pages/Catalog/MasterCatalogPage';
+import { AiAssistantPage } from '../pages/AiAssistant/AiAssistantPage';
 import { SyncMonitorPage } from '../pages/SyncMonitor/SyncMonitorPage';
 import { OfflinePolicyPage } from '../pages/OfflinePolicy/OfflinePolicyPage';
 import { SandboxesPage } from '../pages/Sandboxes/SandboxesPage';
@@ -52,9 +55,12 @@ export function App() {
               <Route path="/restaurants/onboard" element={page('OnboardRestaurant', <OnboardRestaurantPage />)} />
               <Route path="/restaurants/:id" element={page('RestaurantDetail', <RestaurantDetailPage />)} />
               <Route path="/owners" element={page('OwnersList', <OwnersListPage />)} />
+              <Route path="/owners/:id" element={page('OwnerDetail', <OwnerDetailPage />)} />
               <Route path="/branches" element={page('BranchesList', <BranchesListPage />)} />
+              <Route path="/branches/:id" element={page('BranchDetail', <BranchDetailPage />)} />
               <Route path="/plans" element={page('PlansList', <PlansListPage />)} />
               <Route path="/plans/:id" element={page('PlanDetail', <PlanDetailPage />)} />
+              <Route path="/ai-assistant" element={page('AiAssistant', <AiAssistantPage />)} />
               <Route path="/catalog" element={page('MasterCatalog', <MasterCatalogPage />)} />
               <Route path="/subscriptions" element={page('SubscriptionsList', <SubscriptionsListPage />)} />
               <Route path="/billing" element={page('Billing', <BillingPage />)} />

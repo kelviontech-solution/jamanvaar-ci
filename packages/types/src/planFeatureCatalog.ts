@@ -540,7 +540,7 @@ export const CORE_DEFAULT_ENTITLEMENTS: PlanEntitlements = {
   shiftAndCashDrawer: true,
   salesAndGstReports: true,
   inventoryManagement: true,
-  posAssistant: true, // Basic Assistant in Core
+  posAssistant: false, // Pro Exclusive
   restaurantAdmin: true,
   captainApp: false,
   advancedCaptainReports: false,
@@ -575,7 +575,8 @@ export const PRO_EXCLUSIVE_KEYS: (keyof PlanEntitlements)[] = [
   'captainApp',
   'advancedCaptainReports',
   'advancedServiceWorkflow',
-  'qrTableOrdering'
+  'qrTableOrdering',
+  'posAssistant'
 ];
 
 export const CORE_KEYS: (keyof PlanEntitlements)[] = [
@@ -593,7 +594,6 @@ export const CORE_KEYS: (keyof PlanEntitlements)[] = [
   'shiftAndCashDrawer',
   'salesAndGstReports',
   'inventoryManagement',
-  'posAssistant',
   'restaurantAdmin'
 ];
 
@@ -609,7 +609,8 @@ export function resolveTierEntitlements(
       captainApp: false,
       advancedCaptainReports: false,
       advancedServiceWorkflow: false,
-      qrTableOrdering: false
+      qrTableOrdering: false,
+      posAssistant: false
     };
   }
 

@@ -1,6 +1,7 @@
 import { db, ShiftRepository } from '@jamanvaar/database';
 import { BusinessDayService } from './business_day_service';
 import { PosAssistantIntent } from './pos_assistant';
+import { DynamicQueryFormula } from './dynamic_query_executor';
 
 export type JamanAiCategory =
   | 'TODAY'
@@ -25,6 +26,8 @@ export interface JamanAiQuestion {
   apps: ('POS' | 'ADMIN' | 'ALL')[];
   isCriticalAlert?: boolean;
   priorityScore?: number;
+  minPlanTier?: 'CORE' | 'PRO';
+  formula?: DynamicQueryFormula;
 }
 
 export const JAMAN_AI_CATEGORIES: Array<{
@@ -231,6 +234,78 @@ export const JAMAN_AI_QUESTION_REGISTRY: JamanAiQuestion[] = [
     roles: ['ALL'],
     apps: ['ALL'],
     priorityScore: 65
+  },
+  {
+    id: 'orders_swiggy',
+    category: 'ORDERS',
+    label: "Swiggy Delivery Orders & Volume",
+    icon: 'smartphone',
+    intent: 'SWIGGY_ORDERS',
+    roles: ['ALL'],
+    apps: ['ALL'],
+    priorityScore: 80,
+    minPlanTier: 'PRO',
+    formula: {
+      targetDomain: 'ORDERS',
+      calculationType: 'SUM',
+      filterField: 'channel',
+      filterValue: 'SWIGGY',
+      displayUnit: 'CURRENCY'
+    }
+  },
+  {
+    id: 'orders_zomato',
+    category: 'ORDERS',
+    label: "Zomato Delivery Orders & Volume",
+    icon: 'smartphone',
+    intent: 'ZOMATO_ORDERS',
+    roles: ['ALL'],
+    apps: ['ALL'],
+    priorityScore: 78,
+    minPlanTier: 'PRO',
+    formula: {
+      targetDomain: 'ORDERS',
+      calculationType: 'SUM',
+      filterField: 'channel',
+      filterValue: 'ZOMATO',
+      displayUnit: 'CURRENCY'
+    }
+  },
+  {
+    id: 'orders_dinein_rev',
+    category: 'ORDERS',
+    label: "Dine-In Revenue Today",
+    icon: 'utensils',
+    intent: 'DINE_IN_REVENUE',
+    roles: ['ALL'],
+    apps: ['ALL'],
+    priorityScore: 75,
+    minPlanTier: 'PRO',
+    formula: {
+      targetDomain: 'ORDERS',
+      calculationType: 'SUM',
+      filterField: 'channel',
+      filterValue: 'DINE_IN',
+      displayUnit: 'CURRENCY'
+    }
+  },
+  {
+    id: 'orders_takeaway_rev',
+    category: 'ORDERS',
+    label: "Takeaway / Parcel Revenue Today",
+    icon: 'shopping-bag',
+    intent: 'TAKEAWAY_REVENUE',
+    roles: ['ALL'],
+    apps: ['ALL'],
+    priorityScore: 72,
+    minPlanTier: 'PRO',
+    formula: {
+      targetDomain: 'ORDERS',
+      calculationType: 'SUM',
+      filterField: 'channel',
+      filterValue: 'TAKEAWAY',
+      displayUnit: 'CURRENCY'
+    }
   },
 
   // ==========================================

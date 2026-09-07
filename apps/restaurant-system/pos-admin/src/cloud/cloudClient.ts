@@ -431,3 +431,167 @@ export async function fetchEntitlements(): Promise<{ data: CloudEntitlementsResp
     return cached ? { data: cached.data, syncedAt: cached.syncedAt, stale: true } : { data: null, syncedAt: null, stale: false };
   }
 }
+
+// ──────────────────────────────────────────────────────────────────────────
+// Tenant Billing & Invoices Operations
+// ──────────────────────────────────────────────────────────────────────────
+
+export interface TenantBillingSummary {
+  subscription: {
+    id: string;
+    status: string;
+    planName: string;
+    planTier: string;
+    priceMonthly: number;
+    expiresAt: string;
+    daysRemaining: number;
+  } | null;
+  unpaidInvoicesCount: number;
+  totalDue: number;
+  totalPaid: number;
+  invoicesCount: number;
+  latestInvoice: any;
+}
+
+export interface TenantInvoice {
+  id: string;
+  invoiceNumber: string;
+  amount: number; // paise
+  taxAmount: number;
+  totalAmount: number;
+  status: 'ISSUED' | 'PAID' | 'PAST_DUE' | 'VOID';
+  dueDate: string;
+  billingPeriodStart: string;
+  billingPeriodEnd: string;
+  paidAt: string | null;
+  plan?: { name: string; tier: string };
+  restaurant?: {
+    name: string;
+    legalName?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    gstin?: string;
+    fssaiNumber?: string;
+    users?: Array<{ fullName: string; email: string }>;
+  };
+  payments?: Array<{
+    id: string;
+    amount: number;
+    method: string;
+    referenceNumber?: string;
+    receiptNumber?: string;
+    createdAt: string;
+  }>;
+  taxBreakup?: {
+    isIntraState: boolean;
+    cgstRate: number;
+    sgstRate: number;
+    igstRate: number;
+    cgstAmount: number;
+    sgstAmount: number;
+    igstAmount: number;
+    taxAmount: number;
+    totalAmount: number;
+    sacCode: string;
+  };
+}
+
+export interface TenantReceipt {
+  receiptNumber: string;
+  paymentDate: string;
+  invoiceNumber: string;
+  invoiceId: string;
+  transactionId: string;
+  paymentMethod: string;
+  paymentStatus: string;
+  amountPaid: number;
+  amountPaidRupees: string;
+  totalInvoiceAmount: number;
+  totalPaid: number;
+  balanceDue: number;
+  planName: string;
+  planTier: string;
+  billingPeriodStart: string;
+  billingPeriodEnd: string;
+  receivedFrom: {
+    restaurantName: string;
+    legalName: string;
+    address: string | null;
+    city: string | null;
+    state: string | null;
+    gstin: string | null;
+    ownerName: string;
+    ownerEmail: string;
+  };
+  seller: {
+    companyName: string;
+    address: string;
+    gstin: string;
+    sacCode: string;
+  };
+}
+
+export async function fetchTenantBillingSummary(): Promise<TenantBillingSummary | null> {
+  if (!isCloudLoggedIn()) return null;
+  return request<TenantBillingSummary>('/api/v1/tenant/billing/summary');
+}
+
+export async function fetchTenantInvoices(): Promise<TenantInvoice[]> {
+  if (!isCloudLoggedIn()) return [];
+  return request<TenantInvoice[]>('/api/v1/tenant/billing/invoices');
+}
+
+export async function fetchTenantInvoiceDetail(invoiceId: string): Promise<TenantInvoice> {
+  return request<TenantInvoice>(`/api/v1/tenant/billing/invoices/${invoiceId}`);
+}
+
+export async function fetchTenantReceipt(invoiceId: string): Promise<TenantReceipt> {
+  return request<TenantReceipt>(`/api/v1/tenant/billing/invoices/${invoiceId}/receipt`);
+}
+
+export async function payTenantInvoice(
+  invoiceId: string,
+  payload: { amount?: number; method?: string; referenceNumber?: string; notes?: string }
+): Promise<any> {
+  return request(`/api/v1/tenant/billing/invoices/${invoiceId}/pay`, {
+    method: 'POST',
+    body: payload
+  });
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Tenant JAMAN AI Assistant & Intelligence Operations
+// ──────────────────────────────────────────────────────────────────────────
+
+export interface TenantAiConfig {
+  isEntitled: boolean;
+  tier: string;
+  planName: string;
+  upgradeRequired: boolean;
+  proUpgradePrice: number;
+  settings: {
+    delayedKotMinutes: number;
+    lowStockThreshold: number;
+    cashDrawerVarianceThreshold: number;
+    proactiveAlertsEnabled: boolean;
+    mode: string;
+  };
+  categories: any[];
+  questions: any[];
+}
+
+export async function fetchTenantAiConfig(): Promise<TenantAiConfig | null> {
+  if (!isCloudLoggedIn()) return null;
+  return request<TenantAiConfig>('/api/v1/tenant/ai-assistant/config');
+}
+
+export async function logTenantAiTelemetry(intent: string, queryText?: string): Promise<any> {
+  if (!isCloudLoggedIn()) return;
+  return request('/api/v1/tenant/ai-assistant/telemetry/log', {
+    method: 'POST',
+    body: { intent, queryText }
+  }).catch(() => {});
+}
+
+

@@ -28,3 +28,13 @@ export const updateInvoiceStatusSchema = z.object({
 });
 
 export type UpdateInvoiceStatusDto = z.infer<typeof updateInvoiceStatusSchema>;
+
+export const tenantPaymentSchema = z.object({
+  method: z.enum(['MANUAL', 'BANK_TRANSFER', 'UPI', 'CARD', 'CHEQUE', 'GATEWAY']).default('UPI'),
+  referenceNumber: z.string().optional(),
+  amount: z.number().int().positive().optional(),
+  notes: z.string().optional()
+});
+
+export type TenantPaymentDto = z.infer<typeof tenantPaymentSchema>;
+

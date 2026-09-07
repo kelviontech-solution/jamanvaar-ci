@@ -1536,7 +1536,7 @@ export class LicenseRepository {
         shiftAndCashDrawer: true,
         salesAndGstReports: true,
         inventoryManagement: true,
-        posAssistant: true,
+        posAssistant: isPro,
         restaurantAdmin: true,
         captainApp: isPro,
         advancedCaptainReports: isPro,

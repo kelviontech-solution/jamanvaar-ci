@@ -2,10 +2,11 @@ import React, { useEffect, useState, useMemo } from 'react';
 import {
   AuditRepository,
   db,
+  LicenseRepository,
   MenuRepository,
   NotificationRepository
 } from '@jamanvaar/database';
-import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError } from './cloud/cloudClient';
+import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError, logTenantAiTelemetry } from './cloud/cloudClient';
 import {
   Category,
   DiningTable,
@@ -58,7 +59,9 @@ import {
   TrendingUp,
   UtensilsCrossed,
   Users,
-  Zap
+  Zap,
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 
 // Reusable Feature Modules
@@ -395,9 +398,20 @@ export default function PosAdminApp() {
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [isProUpgradeModalOpen, setIsProUpgradeModalOpen] = useState(false);
   const [isReconModalOpen, setIsReconModalOpen] = useState(false);
   const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
   const [reportSubTab, setReportSubTab] = useState<string>('DAILY');
+
+  const handleOpenAssistant = () => {
+    const currentLicense = LicenseRepository.getLicense();
+    const isPro = currentLicense?.tier === 'PRO' || currentLicense?.entitlements?.posAssistant === true;
+    if (!isPro) {
+      setIsProUpgradeModalOpen(true);
+    } else {
+      setIsAssistantOpen(true);
+    }
+  };
 
   const unreadNotifsCount = NotificationRepository.getUnreadCount('POS_ADMIN');
 
@@ -686,7 +700,7 @@ export default function PosAdminApp() {
           activeShift={activeShift}
           onOpenEodModal={() => setIsEodModalOpen(true)}
           onOpenReconModal={() => setIsReconModalOpen(true)}
-          onOpenAssistant={() => setIsAssistantOpen(true)}
+          onOpenAssistant={handleOpenAssistant}
           onOpenNotifDrawer={() => setIsNotifDrawerOpen(true)}
           unreadNotifsCount={unreadNotifsCount}
           onAdminLogout={handleAdminLogout}
@@ -1317,7 +1331,7 @@ export default function PosAdminApp() {
         <NotificationToastContainer role="POS_ADMIN" />
 
         <JamanAiFloatingButton
-          onClick={() => setIsAssistantOpen(true)}
+          onClick={handleOpenAssistant}
           isOpen={isAssistantOpen}
           position="bottom-right"
           className="bottom-4! right-4! sm:bottom-6! sm:right-6!"
@@ -1333,7 +1347,118 @@ export default function PosAdminApp() {
               setActiveTab(action.targetTab as any);
             }
           }}
+          onQueryExecuted={(intent, queryText) => {
+            logTenantAiTelemetry(intent, queryText);
+          }}
         />
+
+        {/* PRO FEATURE LOCKED MODAL (₹7,000 Plan Gate) */}
+        {isProUpgradeModalOpen && (
+          <Modal
+            isOpen={isProUpgradeModalOpen}
+            onClose={() => setIsProUpgradeModalOpen(false)}
+            title="JAMAN AI Operations Assistant"
+            maxWidth="md"
+          >
+            <div className="space-y-4 py-2">
+              {/* Feature Hero Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#0B253A] to-[#163E5E] text-white shadow-md relative overflow-hidden">
+                <div className="absolute top-0 right-0 transform translate-x-3 -translate-y-3 w-28 h-28 bg-[#E66817]/20 rounded-full blur-2xl pointer-events-none" />
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-[#E66817] text-white">
+                    <Sparkles className="w-3 h-3" /> PRO Exclusive Feature
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-300">₹7,000 / month</span>
+                </div>
+                <h3 className="text-lg font-black text-white tracking-tight">
+                  Unlock Intelligent Restaurant Operations
+                </h3>
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                  JAMAN AI connects directly to your restaurant's local SQLite ledger to deliver instant operational answers, revenue projections, delayed kitchen alerts, and cash drawer auditing.
+                </p>
+              </div>
+
+              {/* Benefits Checklist */}
+              <div className="space-y-2">
+                <div className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                  What you get with PRO Plan
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EAE3D6] flex items-start gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-white border border-[#EBE6DD] flex items-center justify-center shrink-0 text-[#E66817]">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-[#0B253A]">JAMAN AI Engine</div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">Real-time revenue, delayed KOT & cash discrepancy detection.</div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EAE3D6] flex items-start gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-white border border-[#EBE6DD] flex items-center justify-center shrink-0 text-emerald-600">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-[#0B253A]">Captain Ordering App</div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">Handheld digital ordering for waitstaff & captains on any mobile.</div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EAE3D6] flex items-start gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-white border border-[#EBE6DD] flex items-center justify-center shrink-0 text-indigo-600">
+                      <QrCode className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-[#0B253A]">Table QR Ordering</div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">Instant guest scanning, digital menu browsing & self-ordering.</div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EAE3D6] flex items-start gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-white border border-[#EBE6DD] flex items-center justify-center shrink-0 text-amber-600">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-[#0B253A]">Super Admin Synced</div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">Centralized audit, cloud invoices & real-time telemetry control.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Current plan notice */}
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Currently on <strong>JAMANVAAR CORE (₹5,000/mo)</strong>. Upgrade to PRO to unlock.</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#EAE3D6]">
+                <button
+                  type="button"
+                  onClick={() => setIsProUpgradeModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-600 transition-all cursor-pointer"
+                >
+                  Maybe Later
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsProUpgradeModalOpen(false);
+                    setActiveTab('SETTINGS');
+                    setToastMessage('Navigate to Subscription Plans to upgrade to JAMANVAAR PRO.');
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-[#E66817] hover:bg-[#c9570f] text-white text-xs font-black shadow-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <span>Upgrade to PRO (₹7,000)</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </Modal>
+        )}
       </div>
     </JAMANVAARStartup>
   );

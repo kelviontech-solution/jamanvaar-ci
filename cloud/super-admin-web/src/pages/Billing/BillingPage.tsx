@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { api, ApiError } from '../../api/client';
-import type { Invoice, BillingSummary, RestaurantCore, Plan, PaymentMethod } from '../../api/types';
+import type { Invoice, BillingSummary, RestaurantCore, Plan, PaymentMethod, ReceiptData } from '../../api/types';
 import {
   Card,
   EmptyState,
@@ -27,13 +27,17 @@ import {
   TrendingUp,
   FileText,
   ShieldCheck,
-  Building2
+  Building2,
+  RefreshCw,
+  Eye,
+  Check
 } from 'lucide-react';
 import { exportRowsToCsv } from '../../lib/csvExport';
 import '../../components/shared.css';
 import '../Dashboard/dashboard.css';
+import './billing.css';
 
-type InvoiceFilterStatus = 'ALL' | 'ISSUED' | 'PAID' | 'PAST_DUE';
+type InvoiceFilterStatus = 'ALL' | 'ISSUED' | 'PAID' | 'PAST_DUE' | 'VOID';
 
 export function BillingPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -45,10 +49,6 @@ export function BillingPage() {
   // Search and Filter
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<InvoiceFilterStatus>('ALL');
-  // The filter tabs used to always render inline next to search, making the
-  // toolbar row read as a wall of controls even when nothing was filtered.
-  // Collapsed behind this toggle by default; the active filter still shows
-  // as a removable chip so it's never hidden once applied.
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Issue Invoice Modal
@@ -71,17 +71,23 @@ export function BillingPage() {
   const [paymentNotes, setPaymentNotes] = useState('');
   const [recordingPayment, setRecordingPayment] = useState(false);
 
-  // View Invoice Modal
+  // View Tax Invoice Modal
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
 
-  // Void / Refund — reachable actions that previously had a real backend
-  // endpoint (PATCH /invoices/:id/status) but no UI path to trigger them.
+  // View Payment Receipt Modal
+  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
+  const [loadingReceipt, setLoadingReceipt] = useState(false);
+
+  // Automated Renewals Check
+  const [runningRenewals, setRunningRenewals] = useState(false);
+
+  // Action Menu
   const [actionMenuInvoiceId, setActionMenuInvoiceId] = useState<string | null>(null);
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToast(msg);
-    setTimeout(() => setToast(null), 3500);
+    setTimeout(() => setToast(null), 4000);
   };
 
   function loadBillingData() {
@@ -152,7 +158,7 @@ export function BillingPage() {
       });
 
       setIssueModalOpen(false);
-      showToast('Tax invoice issued successfully');
+      showToast('Statutory tax invoice issued successfully');
       loadBillingData();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to issue invoice');
@@ -163,7 +169,8 @@ export function BillingPage() {
 
   function openPaymentModal(invoice: Invoice) {
     setPaymentModalInvoice(invoice);
-    const remainingPaise = invoice.totalAmount - (invoice.payments?.reduce((s, p) => s + p.amount, 0) || 0);
+    const paidPaise = invoice.payments?.reduce((s, p) => s + p.amount, 0) || 0;
+    const remainingPaise = Math.max(0, invoice.totalAmount - paidPaise);
     setPaymentAmount(String(remainingPaise / 100));
     setPaymentMethod('UPI');
     setPaymentRef('');
@@ -176,15 +183,19 @@ export function BillingPage() {
 
     setRecordingPayment(true);
     try {
-      await api.post(`/api/v1/invoices/${paymentModalInvoice.id}/payments`, {
-        amount: Math.round(Number(paymentAmount) * 100),
-        method: paymentMethod,
-        referenceNumber: paymentRef.trim() || undefined,
-        notes: paymentNotes.trim() || undefined
-      });
+      const res = await api.post<{ invoice: Invoice; payment: { id: string; receiptNumber?: string } }>(
+        `/api/v1/invoices/${paymentModalInvoice.id}/payments`,
+        {
+          amount: Math.round(Number(paymentAmount) * 100),
+          method: paymentMethod,
+          referenceNumber: paymentRef.trim() || undefined,
+          notes: paymentNotes.trim() || undefined
+        }
+      );
 
       setPaymentModalInvoice(null);
-      showToast('Payment recorded and reconciled!');
+      const rcpNum = res?.payment?.receiptNumber;
+      showToast(`Payment recorded! Official Receipt ${rcpNum || ''} issued.`);
       loadBillingData();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to record payment');
@@ -193,16 +204,46 @@ export function BillingPage() {
     }
   }
 
+  async function handleViewReceipt(invoiceId: string) {
+    setLoadingReceipt(true);
+    try {
+      const data = await api.get<ReceiptData>(`/api/v1/invoices/${invoiceId}/receipt`);
+      setReceiptData(data);
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : 'No completed payment receipt found for this invoice');
+    } finally {
+      setLoadingReceipt(false);
+    }
+  }
+
+  async function handleRunRenewalCheck() {
+    setRunningRenewals(true);
+    try {
+      const res = await api.post<{ scannedCount: number; invoicesGeneratedCount: number; generatedInvoiceNumbers: string[]; markedPastDueCount: number }>(
+        '/api/v1/invoices/check-renewals',
+        {}
+      );
+      showToast(
+        `Renewal scan complete: ${res.scannedCount} reviewed, ${res.invoicesGeneratedCount} renewal invoice(s) generated, ${res.markedPastDueCount} flagged past-due.`
+      );
+      loadBillingData();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Failed to execute renewal check');
+    } finally {
+      setRunningRenewals(false);
+    }
+  }
+
   async function handleUpdateInvoiceStatus(invoice: Invoice, status: 'VOID' | 'REFUNDED') {
     setActionMenuInvoiceId(null);
     const verb = status === 'VOID' ? 'void' : 'mark as refunded';
-    if (!window.confirm(`Are you sure you want to ${verb} invoice ${invoice.invoiceNumber}? This cannot be undone.`)) {
+    if (!window.confirm(`Are you sure you want to ${verb} invoice ${invoice.invoiceNumber}? This action cannot be undone.`)) {
       return;
     }
     setUpdatingStatusId(invoice.id);
     try {
       await api.patch(`/api/v1/invoices/${invoice.id}/status`, { status });
-      showToast(`Invoice ${invoice.invoiceNumber} ${status === 'VOID' ? 'voided' : 'marked as refunded'}.`);
+      showToast(`Invoice ${invoice.invoiceNumber} updated to ${status}.`);
       loadBillingData();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : `Failed to ${verb} invoice`);
@@ -249,25 +290,63 @@ export function BillingPage() {
       { header: 'Amount (₹)', value: (i) => (i.amount / 100).toFixed(2) },
       { header: 'Tax (₹)', value: (i) => (i.taxAmount / 100).toFixed(2) },
       { header: 'Total (₹)', value: (i) => (i.totalAmount / 100).toFixed(2) },
-      { header: 'Due Date', value: (i) => new Date(i.dueDate).toISOString().slice(0, 10) },
-      { header: 'Status', value: (i) => i.status }
+      { header: 'Due Date', value: (i) => i.dueDate.slice(0, 10) },
+      { header: 'Status', value: (i) => i.status },
+      { header: 'Paid At', value: (i) => (i.paidAt ? i.paidAt.slice(0, 10) : 'Unpaid') }
     ]);
   }
 
-  const issuedCount = useMemo(() => invoices.filter((i) => i.status === 'ISSUED').length, [invoices]);
-  const paidCount = useMemo(() => invoices.filter((i) => i.status === 'PAID').length, [invoices]);
-  const overdueCount = useMemo(() => invoices.filter((i) => i.status === 'PAST_DUE').length, [invoices]);
+  const issuedCount = invoices.filter((i) => i.status === 'ISSUED').length;
+  const paidCount = invoices.filter((i) => i.status === 'PAID').length;
+  const overdueCount = invoices.filter((i) => i.status === 'PAST_DUE').length;
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="billing-container">
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 24,
+            right: 24,
+            zIndex: 9999,
+            background: '#0f172a',
+            color: '#fff',
+            padding: '12px 20px',
+            borderRadius: 8,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            fontSize: 14,
+            fontWeight: 600
+          }}
+        >
+          <Check className="w-5 h-5 text-emerald-400" />
+          <span>{toast}</span>
+        </div>
+      )}
+
+      {/* Page Header */}
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1 className="page-title">Invoices &amp; Billing</h1>
-          <p className="page-subtitle">
+          <h1 className="page-title" style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#0f172a' }}>
+            Invoices & Billing
+          </h1>
+          <p className="page-subtitle" style={{ margin: '4px 0 0', color: '#64748b', fontSize: 14 }}>
             Commercial SaaS receivables, statutory GST 18% tax invoices, and verified payment reconciliations.
           </p>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <Button
+            variant="ghost"
+            onClick={handleRunRenewalCheck}
+            disabled={runningRenewals}
+            title="Scan subscriptions nearing renewal (7 days) and issue statutory invoices"
+          >
+            <RefreshCw className={`w-4 h-4 ${runningRenewals ? 'animate-spin' : ''}`} />
+            <span>{runningRenewals ? 'Scanning…' : 'Check Renewals'}</span>
+          </Button>
           <Button variant="ghost" onClick={handleExportCsv} disabled={invoices.length === 0}>
             <Download className="w-4 h-4" />
             <span>Export CSV</span>
@@ -279,102 +358,121 @@ export function BillingPage() {
         </div>
       </div>
 
-      {error && <div className="page-error">{error}</div>}
-      {toast && (
-        <div style={{ padding: '10px 16px', background: '#0B253A', color: '#fff', borderRadius: 8, marginBottom: 16, fontSize: 13, fontWeight: 600 }}>
-          {toast}
+      {/* Payment Gateway Status Banner */}
+      <div
+        style={{
+          background: '#f8fafc',
+          border: '1px solid #e2e8f0',
+          borderRadius: 8,
+          padding: '10px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: 13,
+          color: '#475569'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <span>
+            <strong>Payment Gateway Integration:</strong> Manual Reconciliation & UPI/NEFT Bank Settled. Automated renewal generator and webhook listener active.
+          </span>
+        </div>
+        <span className="badge badge-neutral" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          SANDBOX + PRODUCTION ENGINE
+        </span>
+      </div>
+
+      {error && (
+        <div className="banner banner-error" style={{ marginBottom: 12 }}>
+          {error}
         </div>
       )}
 
-      {/* Gateway Status Banner */}
-      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '10px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#475569' }}>
-          <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>
-            <strong>Payment Gateway Integration: </strong>
-            Manual Reconciliation &amp; UPI/NEFT Bank Settled. Automated payment gateway webhook listener is active in sandbox mode.
-          </span>
+      {/* Summary KPI Cards (Derived from real backend data) */}
+      {loading ? (
+        <div className="billing-metrics-grid">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="stat-tile">
+              <div style={{ height: 72 }} />
+            </Card>
+          ))}
         </div>
-        <span className="badge badge-neutral" style={{ fontSize: 10 }}>MANUAL + WEBHOOK SANDBOX</span>
-      </div>
-
-      {summary && (
-        <div className="stat-grid">
-          <Card className="stat-tile">
-            <div className="stat-tile-top">
-              <div className="stat-label">Reconciled Collections</div>
-              <div className="stat-tile-icon stat-tile-icon-green">
-                <Receipt className="w-5 h-5" />
-              </div>
-            </div>
-            <div>
-              <div className="stat-value">₹{summary.totalCollected.toLocaleString('en-IN')}</div>
-              <div className="stat-sub">
-                <span style={{ color: '#059669', fontWeight: 700 }}>● GST Compliant</span> • 100% Settled
-              </div>
-            </div>
-          </Card>
-
-          <Card className="stat-tile">
-            <div className="stat-tile-top">
-              <div className="stat-label">Invoiced Receivables</div>
-              <div className="stat-tile-icon stat-tile-icon-amber">
-                <CreditCard className="w-5 h-5" />
-              </div>
-            </div>
-            <div>
-              <div className="stat-value" style={{ color: summary.pendingAmount > 0 ? '#d97706' : 'inherit' }}>
-                ₹{summary.pendingAmount.toLocaleString('en-IN')}
-              </div>
-              <div className="stat-sub">
-                {summary.pendingAmount > 0 ? 'Awaiting Tenant Payment' : 'Zero Pending Dues'}
-              </div>
-            </div>
-          </Card>
-
-          <Card className="stat-tile">
-            <div className="stat-tile-top">
-              <div className="stat-label">Settled Invoices</div>
-              <div className="stat-tile-icon stat-tile-icon-blue">
+      ) : summary && (
+        <div className="billing-metrics-grid">
+          <div className="billing-metric-card">
+            <div className="billing-metric-header">
+              <span className="billing-metric-title">Reconciled Collections</span>
+              <div className="billing-metric-icon" style={{ background: '#ecfdf5', color: '#059669' }}>
                 <CheckCircle2 className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <div className="stat-value">
-                {summary.paidInvoices}{' '}
-                <span style={{ fontSize: 14, color: 'var(--jv-text-muted)', fontWeight: 600 }}>
-                  / {summary.totalInvoices} Total
-                </span>
+              <div className="billing-metric-value">
+                ₹{summary.totalCollected.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="stat-sub">
-                {summary.totalInvoices > 0
-                  ? `${Math.round((summary.paidInvoices / summary.totalInvoices) * 100)}% Collection Rate`
-                  : '0 Total Issued'}
+              <div className="billing-metric-subtext" style={{ color: '#059669' }}>
+                <Check className="w-3.5 h-3.5" />
+                <span>GST Compliant • 100% Settled</span>
               </div>
             </div>
-          </Card>
+          </div>
 
-          <Card className="stat-tile">
-            <div className="stat-tile-top">
-              <div className="stat-label">Overdue Invoices</div>
-              <div className="stat-tile-icon stat-tile-icon-orange">
+          <div className="billing-metric-card">
+            <div className="billing-metric-header">
+              <span className="billing-metric-title">Invoiced Receivables</span>
+              <div className="billing-metric-icon" style={{ background: '#fffbeb', color: '#d97706' }}>
+                <Clock className="w-5 h-5" />
+              </div>
+            </div>
+            <div>
+              <div className="billing-metric-value" style={{ color: summary.pendingAmount > 0 ? '#b45309' : '#0f172a' }}>
+                ₹{summary.pendingAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="billing-metric-subtext" style={{ color: '#64748b' }}>
+                <span>{summary.pendingInvoices} Awaiting Tenant Payment</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="billing-metric-card">
+            <div className="billing-metric-header">
+              <span className="billing-metric-title">Settled Invoices</span>
+              <div className="billing-metric-icon" style={{ background: '#eff6ff', color: '#2563eb' }}>
+                <TrendingUp className="w-5 h-5" />
+              </div>
+            </div>
+            <div>
+              <div className="billing-metric-value">
+                {summary.paidInvoices} <span style={{ fontSize: '1rem', color: '#64748b', fontWeight: 600 }}>/ {summary.totalInvoices} Total</span>
+              </div>
+              <div className="billing-metric-subtext" style={{ color: '#2563eb' }}>
+                <span>{summary.collectionRatePercent ?? (summary.totalInvoices > 0 ? Math.round((summary.paidInvoices / summary.totalInvoices) * 100) : 0)}% Collection Rate</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="billing-metric-card">
+            <div className="billing-metric-header">
+              <span className="billing-metric-title">Overdue Invoices</span>
+              <div className="billing-metric-icon" style={{ background: summary.pastDueInvoices > 0 ? '#fef2f2' : '#f8fafc', color: summary.pastDueInvoices > 0 ? '#dc2626' : '#94a3b8' }}>
                 <AlertTriangle className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <div className="stat-value" style={{ color: summary.pastDueInvoices > 0 ? '#dc2626' : 'inherit' }}>
+              <div className="billing-metric-value" style={{ color: summary.pastDueInvoices > 0 ? '#dc2626' : '#0f172a' }}>
                 {summary.pastDueInvoices}
               </div>
-              <div className="stat-sub">
-                {summary.pastDueInvoices > 0 ? 'Requires Follow-up' : 'All Accounts Current'}
+              <div className="billing-metric-subtext" style={{ color: summary.pastDueInvoices > 0 ? '#dc2626' : '#64748b' }}>
+                <span>{summary.pastDueInvoices > 0 ? 'Requires Account Action' : 'All Accounts Current'}</span>
               </div>
             </div>
-          </Card>
+          </div>
         </div>
       )}
 
-      {/* Toolbar */}
-      <div className="toolbar" style={{ marginTop: 16, flexWrap: 'wrap' }}>
+      {/* Search & Filter Toolbar */}
+      <div className="toolbar" style={{ marginTop: 8, flexWrap: 'wrap', gap: 12 }}>
         <SearchBar
           value={search}
           onChange={setSearch}
@@ -395,8 +493,6 @@ export function BillingPage() {
           )}
         </button>
 
-        {/* Applied filter stays visible as a removable chip even while the
-            rest of the filter controls are collapsed. */}
         {statusFilter !== 'ALL' && (
           <span
             className="badge badge-neutral"
@@ -404,7 +500,7 @@ export function BillingPage() {
             onClick={() => setStatusFilter('ALL')}
             title="Remove this filter"
           >
-            Status: {statusFilter === 'ISSUED' ? 'Pending' : statusFilter === 'PAST_DUE' ? 'Overdue' : 'Paid'} ✕
+            Status: {statusFilter} ✕
           </span>
         )}
 
@@ -429,7 +525,7 @@ export function BillingPage() {
       </div>
 
       {filtersOpen && (
-        <div style={{ marginTop: 10, marginBottom: 6 }}>
+        <div style={{ marginTop: 4, marginBottom: 8 }}>
           <FilterTabs<InvoiceFilterStatus>
             value={statusFilter}
             onChange={setStatusFilter}
@@ -437,102 +533,148 @@ export function BillingPage() {
               { id: 'ALL', label: 'All Invoices', count: invoices.length },
               { id: 'ISSUED', label: 'Pending', count: issuedCount },
               { id: 'PAID', label: 'Paid', count: paidCount },
-              { id: 'PAST_DUE', label: 'Overdue', count: overdueCount }
+              { id: 'PAST_DUE', label: 'Overdue', count: overdueCount },
+              { id: 'VOID', label: 'Void / Cancelled' }
             ]}
           />
         </div>
       )}
 
-      {loading && invoices.length === 0 ? (
-        <SkeletonTable rows={5} cols={7} />
-      ) : (
-        <Card>
-          {filteredInvoices.length === 0 ? (
-            <EmptyState
-              icon={<Receipt className="w-6 h-6 text-slate-400" />}
-              title={invoices.length === 0 ? 'No invoices issued' : 'No matching invoices'}
-              description={
-                invoices.length === 0
-                  ? 'Issue a commercial invoice or wait for automated subscription renewal dispatch.'
-                  : 'Try changing your search query or status filter.'
-              }
-              action={
-                invoices.length > 0 ? (
-                  <Button variant="ghost" onClick={() => { setSearch(''); setStatusFilter('ALL'); }}>
-                    Reset Filters
-                  </Button>
-                ) : (
-                  <Button variant="accent" onClick={openIssueModal}>
-                    Issue First Invoice
-                  </Button>
-                )
-              }
-            />
-          ) : (
-            <div className="data-table-container">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Invoice #</th>
-                    <th>Restaurant</th>
-                    <th>Plan</th>
-                    <th>Amount (₹)</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredInvoices.map((inv) => (
+      {/* Invoices List Table */}
+      <Card>
+        {loading ? (
+          <SkeletonTable rows={5} />
+        ) : filteredInvoices.length === 0 ? (
+          <EmptyState
+            icon={<Receipt className="w-6 h-6 text-slate-400" />}
+            title={invoices.length === 0 ? 'No invoices issued' : 'No matching invoices'}
+            description={
+              invoices.length === 0
+                ? 'Assign a subscription or click "Issue Invoice" to issue a statutory billing record.'
+                : 'Try changing your search query or status filter.'
+            }
+            action={
+              invoices.length > 0 ? (
+                <Button variant="ghost" onClick={() => { setSearch(''); setStatusFilter('ALL'); }}>
+                  Reset Filters
+                </Button>
+              ) : (
+                <Button variant="accent" onClick={openIssueModal}>
+                  Issue First Invoice
+                </Button>
+              )
+            }
+          />
+        ) : (
+          <div className="data-table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Invoice #</th>
+                  <th>Restaurant</th>
+                  <th>Plan</th>
+                  <th>Amount (₹)</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredInvoices.map((inv) => {
+                  const hasPayments = inv.payments && inv.payments.length > 0;
+                  const isPaid = inv.status === 'PAID';
+                  return (
                     <tr key={inv.id}>
                       <td>
                         <button
                           type="button"
                           className="table-link"
-                          style={{ fontWeight: 700, fontFamily: 'monospace', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                          style={{
+                            fontWeight: 700,
+                            fontFamily: 'monospace',
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                            color: '#2563eb'
+                          }}
                           onClick={() => setViewInvoice(inv)}
+                          title="View statutory GST invoice"
                         >
                           {inv.invoiceNumber}
                         </button>
                       </td>
                       <td>
-                        <div style={{ fontWeight: 600 }}>{inv.restaurant?.name || 'Unknown Restaurant'}</div>
-                        {inv.restaurant?.city && (
+                        <div style={{ fontWeight: 600, color: '#0f172a' }}>
+                          {inv.restaurant?.name || 'Unknown Restaurant'}
+                        </div>
+                        <div className="muted" style={{ fontSize: 11 }}>
+                          {inv.restaurant?.city || 'India'}
+                          {inv.restaurant?.gstin ? ` • GSTIN: ${inv.restaurant.gstin}` : ''}
+                        </div>
+                      </td>
+                      <td>
+                        <span style={{ fontWeight: 600, color: '#334155' }}>
+                          {inv.plan?.name || 'Custom Fee'}
+                        </span>
+                        {inv.plan?.tier && (
                           <div className="muted" style={{ fontSize: 11 }}>
-                            {inv.restaurant.city} {inv.restaurant?.gstin ? `• GST: ${inv.restaurant.gstin}` : ''}
+                            Tier: {inv.plan.tier}
                           </div>
                         )}
                       </td>
-                      <td>{inv.plan?.name || 'Custom Fee'}</td>
                       <td>
-                        <strong style={{ fontFamily: 'monospace', fontSize: 14 }}>
-                          ₹{(inv.totalAmount / 100).toLocaleString('en-IN')}
+                        <strong style={{ fontFamily: 'monospace', fontSize: 14, color: '#0f172a' }}>
+                          ₹{(inv.totalAmount / 100).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </strong>
                         <div className="muted" style={{ fontSize: 11 }}>
                           ₹{(inv.amount / 100).toLocaleString('en-IN')} + ₹{(inv.taxAmount / 100).toLocaleString('en-IN')} GST
                         </div>
                       </td>
-                      <td>{new Date(inv.dueDate).toLocaleDateString('en-IN')}</td>
                       <td>
-                        <Badge tone={getStatusTone(inv.status)} pulse={inv.status === 'PAID'}>{inv.status}</Badge>
+                        <div style={{ fontSize: 13, color: '#334155' }}>
+                          {new Date(inv.dueDate).toLocaleDateString('en-IN')}
+                        </div>
+                        {inv.status === 'ISSUED' && new Date(inv.dueDate) < new Date() && (
+                          <div style={{ fontSize: 10, color: '#dc2626', fontWeight: 600 }}>OVERDUE</div>
+                        )}
                       </td>
                       <td>
-                        <div style={{ display: 'flex', gap: 6, position: 'relative' }}>
-                          {inv.status !== 'PAID' && inv.status !== 'VOID' && inv.status !== 'REFUNDED' && (
+                        <Badge tone={getStatusTone(inv.status)} pulse={isPaid}>
+                          {inv.status}
+                        </Badge>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 6, position: 'relative', alignItems: 'center' }}>
+                          {!isPaid && inv.status !== 'VOID' && inv.status !== 'REFUNDED' && (
                             <Button size="sm" variant="accent" onClick={() => openPaymentModal(inv)}>
                               Record Payment
                             </Button>
                           )}
-                          <Button size="sm" variant="ghost" onClick={() => setViewInvoice(inv)}>
-                            View Tax Receipt
+                          <Button size="sm" variant="ghost" onClick={() => setViewInvoice(inv)} title="View Statutory GST Invoice">
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>Invoice</span>
                           </Button>
+                          {(isPaid || hasPayments) && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleViewReceipt(inv.id)}
+                              disabled={loadingReceipt}
+                              title="View Official Payment Receipt"
+                              style={{ color: '#059669', borderColor: '#a7f3d0' }}
+                            >
+                              <Receipt className="w-3.5 h-3.5" />
+                              <span>Receipt</span>
+                            </Button>
+                          )}
 
                           {inv.status !== 'VOID' && inv.status !== 'REFUNDED' && (
                             <>
                               <button
                                 type="button"
                                 className="btn btn-ghost btn-sm"
-                                title="More invoice actions"
+                                title="More actions"
                                 disabled={updatingStatusId === inv.id}
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -549,26 +691,49 @@ export function BillingPage() {
                                     right: 0,
                                     top: '100%',
                                     marginTop: 4,
-                                    background: 'var(--jv-surface)',
-                                    border: '1px solid var(--jv-border)',
+                                    background: '#ffffff',
+                                    border: '1px solid #cbd5e1',
                                     borderRadius: 8,
-                                    boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-                                    zIndex: 20,
+                                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                                    zIndex: 30,
                                     minWidth: 160
                                   }}
                                 >
                                   <button
                                     type="button"
                                     onClick={() => handleUpdateInvoiceStatus(inv, 'VOID')}
-                                    style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 12, fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-text-secondary)' }}
+                                    style={{
+                                      display: 'block',
+                                      width: '100%',
+                                      textAlign: 'left',
+                                      padding: '8px 12px',
+                                      fontSize: 12,
+                                      fontWeight: 600,
+                                      background: 'none',
+                                      border: 'none',
+                                      cursor: 'pointer',
+                                      color: '#475569'
+                                    }}
                                   >
                                     Void Invoice
                                   </button>
-                                  {inv.status === 'PAID' && (
+                                  {isPaid && (
                                     <button
                                       type="button"
                                       onClick={() => handleUpdateInvoiceStatus(inv, 'REFUNDED')}
-                                      style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 12, fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-error)', borderTop: '1px solid var(--jv-border)' }}
+                                      style={{
+                                        display: 'block',
+                                        width: '100%',
+                                        textAlign: 'left',
+                                        padding: '8px 12px',
+                                        fontSize: 12,
+                                        fontWeight: 600,
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        color: '#dc2626',
+                                        borderTop: '1px solid #f1f5f9'
+                                      }}
                                     >
                                       Mark as Refunded
                                     </button>
@@ -580,15 +745,404 @@ export function BillingPage() {
                         </div>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+
+      {/* ─────────────────────────────────────────────────────────────
+          MODAL 1: STATUTORY A4 GST TAX INVOICE PREVIEW
+          ───────────────────────────────────────────────────────────── */}
+      {viewInvoice && (
+        <Modal
+          title={`Statutory Tax Invoice — ${viewInvoice.invoiceNumber}`}
+          onClose={() => setViewInvoice(null)}
+          footer={
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {viewInvoice.status !== 'PAID' && (
+                  <Button
+                    variant="accent"
+                    onClick={() => {
+                      const inv = viewInvoice;
+                      setViewInvoice(null);
+                      openPaymentModal(inv);
+                    }}
+                  >
+                    Record Payment
+                  </Button>
+                )}
+                {(viewInvoice.status === 'PAID' || (viewInvoice.payments && viewInvoice.payments.length > 0)) && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      const id = viewInvoice.id;
+                      setViewInvoice(null);
+                      handleViewReceipt(id);
+                    }}
+                  >
+                    <Receipt className="w-4 h-4" />
+                    <span>View Receipt</span>
+                  </Button>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <Button variant="ghost" onClick={() => setViewInvoice(null)}>
+                  Close
+                </Button>
+                <Button variant="accent" onClick={() => window.print()}>
+                  <Printer className="w-4 h-4" />
+                  <span>Print Invoice (A4)</span>
+                </Button>
+              </div>
             </div>
-          )}
-        </Card>
+          }
+        >
+          <div className="doc-sheet print-surface">
+            {/* Header / Brand */}
+            <div className="doc-brand-header">
+              <div>
+                <div className="doc-brand-title">
+                  <Building2 className="w-7 h-7 text-amber-500" />
+                  <span>JAMANVAAR</span>
+                </div>
+                <div className="doc-brand-tagline">KELVIONTECH PRIVATE LIMITED</div>
+                <div className="doc-brand-meta">
+                  Plot 42, Science City Road, Sola, Ahmedabad, Gujarat 380060<br />
+                  <strong>GSTIN:</strong> 24AAACK7890F1ZT &nbsp;|&nbsp; <strong>PAN:</strong> AAACK7890F &nbsp;|&nbsp; <strong>SAC:</strong> 997331<br />
+                  <strong>Support:</strong> billing@kelviontech.com
+                </div>
+              </div>
+              <div className="doc-type-badge">
+                <div className="doc-type-title">TAX INVOICE</div>
+                <div style={{ marginTop: 6 }}>
+                  <Badge tone={getStatusTone(viewInvoice.status)}>{viewInvoice.status}</Badge>
+                </div>
+                <div style={{ fontSize: '1rem', fontWeight: 800, fontFamily: 'monospace', marginTop: 8, color: '#0f172a' }}>
+                  {viewInvoice.invoiceNumber}
+                </div>
+                <div style={{ fontSize: '0.8125rem', color: '#64748b', marginTop: 2 }}>
+                  <strong>Date:</strong> {new Date(viewInvoice.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </div>
+                <div style={{ fontSize: '0.8125rem', color: '#64748b' }}>
+                  <strong>Due:</strong> {new Date(viewInvoice.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </div>
+              </div>
+            </div>
+
+            {/* Parties Info Grid */}
+            <div className="doc-info-grid">
+              <div>
+                <div className="doc-section-title">BILLED TO (BUYER):</div>
+                <div className="doc-party-name">{viewInvoice.restaurant?.name}</div>
+                {viewInvoice.restaurant?.legalName && (
+                  <div className="doc-party-detail"><strong>Legal Name:</strong> {viewInvoice.restaurant.legalName}</div>
+                )}
+                {viewInvoice.restaurant?.address && (
+                  <div className="doc-party-detail">{viewInvoice.restaurant.address}</div>
+                )}
+                <div className="doc-party-detail">
+                  {viewInvoice.restaurant?.city || 'Ahmedabad'}, {viewInvoice.restaurant?.state || 'Gujarat'}
+                </div>
+                <div className="doc-party-detail" style={{ marginTop: 4 }}>
+                  <strong>GSTIN:</strong> {viewInvoice.restaurant?.gstin || 'Unregistered Commercial Buyer'}
+                </div>
+                {viewInvoice.restaurant?.fssaiNumber && (
+                  <div className="doc-party-detail"><strong>FSSAI:</strong> {viewInvoice.restaurant.fssaiNumber}</div>
+                )}
+              </div>
+
+              <div>
+                <div className="doc-section-title">SUBSCRIPTION & BILLING PERIOD:</div>
+                <div className="doc-party-name">{viewInvoice.plan?.name || 'JAMANVAAR SaaS Subscription'}</div>
+                <div className="doc-party-detail">
+                  <strong>Service:</strong> Cloud Restaurant POS & Multi-Outlet SaaS
+                </div>
+                <div className="doc-party-detail">
+                  <strong>Period:</strong> {new Date(viewInvoice.billingPeriodStart).toLocaleDateString('en-IN')} – {new Date(viewInvoice.billingPeriodEnd).toLocaleDateString('en-IN')}
+                </div>
+                <div className="doc-party-detail">
+                  <strong>Place of Supply:</strong> {viewInvoice.restaurant?.state || 'Gujarat'} (Code: 24)
+                </div>
+                <div className="doc-party-detail">
+                  <strong>Currency:</strong> Indian Rupee (INR)
+                </div>
+              </div>
+            </div>
+
+            {/* Line Items Table */}
+            <table className="doc-table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>SAC Code</th>
+                  <th className="num">Billing Period</th>
+                  <th className="num">Taxable Value (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>{viewInvoice.plan?.name || 'JAMANVAAR Subscription'}</strong>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 2 }}>
+                      Multi-outlet cloud license, menu syndication, device MDM, offline sync & analytics
+                    </div>
+                  </td>
+                  <td>997331</td>
+                  <td className="num" style={{ fontSize: '0.8125rem' }}>
+                    30 Days
+                  </td>
+                  <td className="num" style={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                    ₹{(viewInvoice.amount / 100).toFixed(2)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            {/* Tax & Total Summary */}
+            <div className="doc-summary-wrap">
+              <div className="doc-summary-box">
+                <div className="doc-summary-row">
+                  <span>Taxable Amount:</span>
+                  <span style={{ fontFamily: 'monospace' }}>₹{(viewInvoice.amount / 100).toFixed(2)}</span>
+                </div>
+
+                {/* GST Breakup: check if Gujarat intra-state or inter-state */}
+                {(!viewInvoice.restaurant?.state || viewInvoice.restaurant.state.toLowerCase() === 'gujarat') ? (
+                  <>
+                    <div className="doc-summary-row">
+                      <span>CGST (9%):</span>
+                      <span style={{ fontFamily: 'monospace' }}>₹{((viewInvoice.taxAmount / 2) / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="doc-summary-row">
+                      <span>SGST (9%):</span>
+                      <span style={{ fontFamily: 'monospace' }}>₹{((viewInvoice.taxAmount / 2) / 100).toFixed(2)}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="doc-summary-row">
+                    <span>IGST (18%):</span>
+                    <span style={{ fontFamily: 'monospace' }}>₹{(viewInvoice.taxAmount / 100).toFixed(2)}</span>
+                  </div>
+                )}
+
+                <div className="doc-summary-row total">
+                  <span>TOTAL AMOUNT:</span>
+                  <span style={{ fontFamily: 'monospace' }}>₹{(viewInvoice.totalAmount / 100).toFixed(2)}</span>
+                </div>
+
+                {viewInvoice.payments && viewInvoice.payments.length > 0 && (
+                  <>
+                    <div className="doc-summary-row settled" style={{ marginTop: 8 }}>
+                      <span>Amount Paid:</span>
+                      <span style={{ fontFamily: 'monospace' }}>
+                        ₹{(viewInvoice.payments.reduce((s, p) => s + p.amount, 0) / 100).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="doc-summary-row" style={{ fontWeight: 700 }}>
+                      <span>Balance Due:</span>
+                      <span style={{ fontFamily: 'monospace' }}>
+                        ₹{Math.max(0, (viewInvoice.totalAmount - viewInvoice.payments.reduce((s, p) => s + p.amount, 0)) / 100).toFixed(2)}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Bank Details & Payment Remittance */}
+            <div className="doc-bank-box">
+              <div style={{ fontWeight: 700, marginBottom: 4, color: '#0f172a' }}>
+                Bank Remittance & UPI Payment Instructions:
+              </div>
+              <div><strong>Beneficiary:</strong> KELVIONTECH PRIVATE LIMITED &nbsp;|&nbsp; <strong>Bank:</strong> HDFC Bank Ltd, Science City Branch</div>
+              <div><strong>A/C No:</strong> 50200084920194 &nbsp;|&nbsp; <strong>IFSC:</strong> HDFC0001248 &nbsp;|&nbsp; <strong>UPI ID:</strong> kelviontech@hdfcbank</div>
+            </div>
+
+            {/* Payment History if exists */}
+            {viewInvoice.payments && viewInvoice.payments.length > 0 && (
+              <div style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: 6, border: '1px solid #e2e8f0' }}>
+                <div style={{ fontWeight: 700, fontSize: '0.8125rem', marginBottom: 6, color: '#0f172a' }}>
+                  Recorded Transactions
+                </div>
+                {viewInvoice.payments.map((p) => (
+                  <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8125rem', color: '#475569', padding: '4px 0' }}>
+                    <span>
+                      {p.method} • Ref: {p.referenceNumber || 'N/A'} {p.receiptNumber ? `• Receipt: ${p.receiptNumber}` : ''} ({new Date(p.createdAt).toLocaleDateString('en-IN')})
+                    </span>
+                    <strong style={{ fontFamily: 'monospace', color: '#059669' }}>₹{(p.amount / 100).toFixed(2)}</strong>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="doc-footer">
+              This is a computer-generated statutory GST invoice issued by KELVIONTECH PRIVATE LIMITED for the JAMANVAAR SaaS Platform.<br />
+              Thank you for partnering with JAMANVAAR. For billing queries, contact <strong>billing@kelviontech.com</strong>.
+            </div>
+          </div>
+        </Modal>
       )}
 
-      {/* Record Payment Modal */}
+      {/* ─────────────────────────────────────────────────────────────
+          MODAL 2: OFFICIAL PAYMENT RECEIPT PREVIEW
+          ───────────────────────────────────────────────────────────── */}
+      {receiptData && (
+        <Modal
+          title={`Official Payment Receipt — ${receiptData.receiptNumber}`}
+          onClose={() => setReceiptData(null)}
+          footer={
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <Button variant="ghost" onClick={() => setReceiptData(null)}>
+                Close
+              </Button>
+              <Button variant="accent" onClick={() => window.print()}>
+                <Printer className="w-4 h-4" />
+                <span>Print Receipt (A4)</span>
+              </Button>
+            </div>
+          }
+        >
+          <div className="doc-sheet print-surface">
+            <div className="doc-brand-header">
+              <div>
+                <div className="doc-brand-title">
+                  <Building2 className="w-7 h-7 text-amber-500" />
+                  <span>JAMANVAAR</span>
+                </div>
+                <div className="doc-brand-tagline">KELVIONTECH PRIVATE LIMITED</div>
+                <div className="doc-brand-meta">
+                  Plot 42, Science City Road, Sola, Ahmedabad, Gujarat 380060<br />
+                  <strong>GSTIN:</strong> 24AAACK7890F1ZT &nbsp;|&nbsp; <strong>SAC:</strong> 997331
+                </div>
+              </div>
+              <div className="doc-type-badge">
+                <div className="doc-type-title" style={{ color: '#059669' }}>PAYMENT RECEIPT</div>
+                <div style={{ marginTop: 6 }}>
+                  <Badge tone="success">PAYMENT RECONCILED</Badge>
+                </div>
+                <div style={{ fontSize: '1.125rem', fontWeight: 800, fontFamily: 'monospace', marginTop: 8, color: '#0f172a' }}>
+                  {receiptData.receiptNumber}
+                </div>
+                <div style={{ fontSize: '0.8125rem', color: '#64748b', marginTop: 2 }}>
+                  <strong>Date:</strong> {new Date(receiptData.paymentDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </div>
+              </div>
+            </div>
+
+            <div className="doc-info-grid">
+              <div>
+                <div className="doc-section-title">RECEIVED FROM:</div>
+                <div className="doc-party-name">{receiptData.receivedFrom.restaurantName}</div>
+                {receiptData.receivedFrom.legalName && (
+                  <div className="doc-party-detail"><strong>Legal Entity:</strong> {receiptData.receivedFrom.legalName}</div>
+                )}
+                {receiptData.receivedFrom.address && (
+                  <div className="doc-party-detail">{receiptData.receivedFrom.address}</div>
+                )}
+                <div className="doc-party-detail">
+                  {receiptData.receivedFrom.city || 'Ahmedabad'}, {receiptData.receivedFrom.state || 'Gujarat'}
+                </div>
+                <div className="doc-party-detail" style={{ marginTop: 4 }}>
+                  <strong>GSTIN:</strong> {receiptData.receivedFrom.gstin || 'Unregistered'}
+                </div>
+                <div className="doc-party-detail">
+                  <strong>Contact:</strong> {receiptData.receivedFrom.ownerName} ({receiptData.receivedFrom.ownerEmail})
+                </div>
+              </div>
+
+              <div>
+                <div className="doc-section-title">PAYMENT RECONCILIATION:</div>
+                <div className="doc-party-name">{receiptData.planName} ({receiptData.planTier})</div>
+                <div className="doc-party-detail">
+                  <strong>Against Invoice:</strong> {receiptData.invoiceNumber}
+                </div>
+                <div className="doc-party-detail">
+                  <strong>Payment Method:</strong> {receiptData.paymentMethod}
+                </div>
+                <div className="doc-party-detail">
+                  <strong>Transaction / UTR:</strong> {receiptData.transactionId}
+                </div>
+                <div className="doc-party-detail">
+                  <strong>Billing Period:</strong> {new Date(receiptData.billingPeriodStart).toLocaleDateString('en-IN')} – {new Date(receiptData.billingPeriodEnd).toLocaleDateString('en-IN')}
+                </div>
+              </div>
+            </div>
+
+            <table className="doc-table">
+              <thead>
+                <tr>
+                  <th>Item / Fee Particulars</th>
+                  <th>Payment Mode</th>
+                  <th className="num">Reference / UTR</th>
+                  <th className="num">Amount Received</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Subscription License Settlement</strong>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                      Invoice #{receiptData.invoiceNumber} • {receiptData.planName}
+                    </div>
+                  </td>
+                  <td>{receiptData.paymentMethod}</td>
+                  <td className="num" style={{ fontFamily: 'monospace' }}>{receiptData.transactionId}</td>
+                  <td className="num" style={{ fontFamily: 'monospace', fontWeight: 700, color: '#059669', fontSize: 15 }}>
+                    ₹{receiptData.amountPaidRupees}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div className="doc-summary-wrap">
+              <div className="doc-summary-box">
+                <div className="doc-summary-row">
+                  <span>Total Invoice Value:</span>
+                  <span style={{ fontFamily: 'monospace' }}>₹{(receiptData.totalInvoiceAmount / 100).toFixed(2)}</span>
+                </div>
+                <div className="doc-summary-row settled">
+                  <span>Total Paid to Date:</span>
+                  <span style={{ fontFamily: 'monospace' }}>₹{(receiptData.totalPaid / 100).toFixed(2)}</span>
+                </div>
+                <div className="doc-summary-row total" style={{ color: '#059669' }}>
+                  <span>BALANCE OUTSTANDING:</span>
+                  <span style={{ fontFamily: 'monospace' }}>₹{(receiptData.balanceDue / 100).toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid #cbd5e1' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#059669', fontWeight: 700, fontSize: '0.9rem' }}>
+                  <ShieldCheck className="w-5 h-5" />
+                  <span>OFFICIALLY RECONCILED & SETTLED</span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 4 }}>
+                  Transaction logged into JAMANVAAR Central Accounting Ledger
+                </div>
+              </div>
+              <div style={{ textAlign: 'center', minWidth: 200 }}>
+                <div style={{ height: 36, borderBottom: '1px solid #94a3b8', marginBottom: 6 }} />
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155' }}>Authorized Accounts Officer</div>
+                <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>KELVIONTECH PRIVATE LIMITED</div>
+              </div>
+            </div>
+
+            <div className="doc-footer" style={{ marginTop: '2rem' }}>
+              This payment receipt confirms full or partial settlement of SaaS charges. Keep this document for statutory GST input credit records.
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          MODAL 3: RECORD PAYMENT
+          ───────────────────────────────────────────────────────────── */}
       {paymentModalInvoice && (
         <Modal
           title={`Record Payment — ${paymentModalInvoice.invoiceNumber}`}
@@ -599,15 +1153,19 @@ export function BillingPage() {
                 Cancel
               </Button>
               <Button variant="accent" onClick={handleRecordPayment} disabled={recordingPayment}>
-                {recordingPayment ? 'Recording…' : 'Confirm Payment'}
+                {recordingPayment ? 'Recording…' : 'Record & Issue Receipt'}
               </Button>
             </>
           }
         >
           <form onSubmit={handleRecordPayment} className="modal-form">
-            <div className="form-field">
-              <label>Restaurant</label>
-              <Input value={paymentModalInvoice.restaurant?.name || ''} disabled />
+            <div style={{ background: '#f8fafc', padding: 12, borderRadius: 8, marginBottom: 16, border: '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: 12, color: '#64748b' }}>Target Account</div>
+              <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 15 }}>{paymentModalInvoice.restaurant?.name}</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 13 }}>
+                <span>Invoice Total: <strong>₹{(paymentModalInvoice.totalAmount / 100).toFixed(2)}</strong></span>
+                <span>Already Paid: <strong>₹{((paymentModalInvoice.payments?.reduce((s, p) => s + p.amount, 0) || 0) / 100).toFixed(2)}</strong></span>
+              </div>
             </div>
 
             <div className="form-row">
@@ -615,6 +1173,7 @@ export function BillingPage() {
                 <label>Amount (₹) *</label>
                 <Input
                   type="number"
+                  step="0.01"
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
                   required
@@ -625,39 +1184,42 @@ export function BillingPage() {
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
-                  style={{ height: 40 }}
+                  style={{ height: 40, width: '100%', borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px' }}
+                  required
                 >
-                  <option value="UPI">UPI BharatQR / GPay / PhonePe</option>
-                  <option value="BANK_TRANSFER">Bank Transfer (NEFT/RTGS)</option>
-                  <option value="CARD">Credit / Debit Card</option>
-                  <option value="CHEQUE">Cheque</option>
-                  <option value="MANUAL">Cash / Manual Settlement</option>
+                  <option value="UPI">UPI (Google Pay / PhonePe / Paytm)</option>
+                  <option value="BANK_TRANSFER">Bank Transfer (NEFT / RTGS / IMPS)</option>
+                  <option value="CARD">Debit / Credit Card</option>
+                  <option value="CHEQUE">Bank Cheque / DD</option>
+                  <option value="MANUAL">Cash / Manual Settle</option>
                 </select>
               </div>
             </div>
 
             <div className="form-field">
-              <label>Transaction / Reference ID</label>
+              <label>Reference / UTR Number</label>
               <Input
                 value={paymentRef}
                 onChange={(e) => setPaymentRef(e.target.value)}
-                placeholder="e.g. UPI-REF-88392019"
+                placeholder="e.g. UPI-3498239048 or NEFT-HDFC98234"
               />
             </div>
 
             <div className="form-field">
-              <label>Notes</label>
+              <label>Notes / Accounting Remark</label>
               <Input
                 value={paymentNotes}
                 onChange={(e) => setPaymentNotes(e.target.value)}
-                placeholder="Optional billing remarks"
+                placeholder="e.g. Reconciled against HDFC bank statement"
               />
             </div>
           </form>
         </Modal>
       )}
 
-      {/* Issue Custom Invoice Modal */}
+      {/* ─────────────────────────────────────────────────────────────
+          MODAL 4: ISSUE CUSTOM INVOICE
+          ───────────────────────────────────────────────────────────── */}
       {issueModalOpen && (
         <Modal
           title="Issue Platform Tax Invoice"
@@ -679,7 +1241,7 @@ export function BillingPage() {
               <select
                 value={issueRestaurantId}
                 onChange={(e) => setIssueRestaurantId(e.target.value)}
-                style={{ height: 40 }}
+                style={{ height: 40, width: '100%', borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px' }}
                 required
               >
                 <option value="">Select a restaurant…</option>
@@ -705,7 +1267,7 @@ export function BillingPage() {
                     setIssueTax(String(Math.round(amt * 0.18)));
                   }
                 }}
-                style={{ height: 40 }}
+                style={{ height: 40, width: '100%', borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px' }}
               >
                 {plans.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -757,91 +1319,6 @@ export function BillingPage() {
               />
             </div>
           </form>
-        </Modal>
-      )}
-
-      {/* Printable Tax Invoice Modal */}
-      {viewInvoice && (
-        <Modal
-          title={`Statutory Tax Invoice — ${viewInvoice.invoiceNumber}`}
-          onClose={() => setViewInvoice(null)}
-          footer={
-            <>
-              <Button variant="ghost" onClick={() => setViewInvoice(null)}>
-                Close
-              </Button>
-              <Button variant="accent" onClick={() => window.print()}>
-                <Printer className="w-4 h-4" />
-                <span>Print Invoice</span>
-              </Button>
-            </>
-          }
-        >
-          <div style={{ padding: '1rem', background: 'var(--jv-bg)', borderRadius: '8px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border)', paddingBottom: '1rem' }}>
-              <div>
-                <h3 style={{ margin: 0, color: '#0B253A', fontWeight: 900 }}>JAMANVAAR</h3>
-                <div style={{ fontSize: '0.8rem', color: 'var(--jv-text-secondary)' }}>KELVIONTECH SaaS Platform</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-muted)' }}>Ahmedabad, Gujarat, India</div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <Badge tone={getStatusTone(viewInvoice.status)}>{viewInvoice.status}</Badge>
-                <div style={{ fontSize: '0.9rem', fontWeight: 700, fontFamily: 'monospace', marginTop: '0.4rem' }}>
-                  {viewInvoice.invoiceNumber}
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-muted)' }}>
-                  Date: {new Date(viewInvoice.createdAt).toLocaleDateString('en-IN')}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ margin: '1rem 0', fontSize: '0.85rem' }}>
-              <div style={{ color: 'var(--jv-text-muted)', fontSize: '0.75rem' }}>BILLED TO:</div>
-              <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0B253A' }}>{viewInvoice.restaurant?.name}</div>
-              {viewInvoice.restaurant?.legalName && <div>{viewInvoice.restaurant.legalName}</div>}
-              {viewInvoice.restaurant?.city && <div>{viewInvoice.restaurant.city}</div>}
-              {viewInvoice.restaurant?.gstin && <div className="mono">GSTIN: {viewInvoice.restaurant.gstin}</div>}
-            </div>
-
-            <table className="data-table" style={{ margin: '1rem 0' }}>
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th style={{ textAlign: 'right' }}>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{viewInvoice.plan?.name || 'JAMANVAAR Subscription License'}</td>
-                  <td style={{ textAlign: 'right', fontFamily: 'monospace' }}>₹{(viewInvoice.amount / 100).toFixed(2)}</td>
-                </tr>
-                <tr>
-                  <td>Goods and Services Tax (GST 18%)</td>
-                  <td style={{ textAlign: 'right', fontFamily: 'monospace' }}>₹{(viewInvoice.taxAmount / 100).toFixed(2)}</td>
-                </tr>
-                <tr style={{ fontWeight: 800, borderTop: '2px solid var(--jv-border)' }}>
-                  <td>TOTAL AMOUNT</td>
-                  <td style={{ textAlign: 'right', color: 'var(--jv-accent)', fontFamily: 'monospace', fontSize: 16 }}>
-                    ₹{(viewInvoice.totalAmount / 100).toFixed(2)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            {viewInvoice.payments && viewInvoice.payments.length > 0 && (
-              <div style={{ marginTop: '1rem', borderTop: '1px dashed var(--jv-border)', paddingTop: '0.5rem' }}>
-                <div style={{ fontWeight: 700, fontSize: '0.8rem', marginBottom: '0.25rem' }}>Payment History</div>
-                {viewInvoice.payments.map((p) => (
-                  <div key={p.id} style={{ fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between', color: 'var(--jv-text-secondary)' }}>
-                    <span>
-                      {p.method} {p.referenceNumber ? `(${p.referenceNumber})` : ''} • {new Date(p.createdAt).toLocaleDateString('en-IN')}
-                    </span>
-                    <strong style={{ fontFamily: 'monospace' }}>₹{(p.amount / 100).toFixed(2)}</strong>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </Modal>
       )}
     </div>

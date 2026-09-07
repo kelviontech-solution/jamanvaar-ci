@@ -32,6 +32,13 @@ import { CreateRestaurantModal } from './CreateRestaurantModal';
 import { EditRestaurantModal } from './EditRestaurantModal';
 import { exportRowsToCsv } from '../../lib/csvExport';
 import './restaurants.css';
+import '../../components/card-grid.css';
+
+function getAvatarClass(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return `mgmt-avatar-c${Math.abs(hash) % 8}`;
+}
 
 type StatusFilter = 'ALL' | 'ACTIVE' | 'SUSPENDED' | 'TRIAL' | 'NO_PLAN';
 type PlanFilter = 'ALL' | 'CORE' | 'PRO' | 'ENTERPRISE' | 'NO_PLAN';
@@ -463,9 +470,9 @@ export function RestaurantsListPage() {
 
       {/* Loading Skeletons */}
       {loading && !restaurants && (
-        <div className="restaurants-cards-list">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="restaurant-skeleton-card" />
+        <div className="mgmt-card-grid">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="mgmt-card-skeleton" />
           ))}
         </div>
       )}
@@ -504,9 +511,9 @@ export function RestaurantsListPage() {
         </Card>
       )}
 
-      {/* 3. Primary View: SaaS Rectangular Cards */}
+      {/* 3. Primary View: Square Grid Cards */}
       {restaurants && filteredRestaurants.length > 0 && viewMode === 'cards' && (
-        <div className="restaurants-cards-list">
+        <div className="mgmt-card-grid">
           {filteredRestaurants.map((r) => {
             const sub = r.subscriptions?.[0];
             const plan = sub?.plan;
@@ -521,252 +528,185 @@ export function RestaurantsListPage() {
                 .join('')
                 .toUpperCase() || 'R';
             const isMenuOpen = activeMenuId === r.id;
+            const tierClass =
+              plan?.tier === 'PRO' ? 'tier-pro' : plan?.tier === 'ENTERPRISE' ? 'tier-enterprise' : '';
+            const avatarClass = getAvatarClass(r.name);
+
+            // Clean plan display name to avoid "JAMANVAAR PRO · PRO"
+            const planLabel = plan
+              ? plan.name.toLowerCase().includes(plan.tier.toLowerCase())
+                ? plan.name
+                : `${plan.name} · ${plan.tier}`
+              : null;
 
             return (
               <div
                 key={r.id}
-                className={`restaurant-card-item ${selectedIds.has(r.id) ? 'is-selected' : ''}`}
+                className={`mgmt-card ${selectedIds.has(r.id) ? 'is-selected' : ''} ${isSuspended ? 'is-suspended' : ''}`}
                 onClick={() => navigate(`/restaurants/${r.id}`)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/restaurants/${r.id}`)}
               >
-                {/* Left Section: Identity */}
-                <div className="card-sec-identity">
-                  <input
-                    type="checkbox"
-                    className="card-select-checkbox"
-                    checked={selectedIds.has(r.id)}
-                    onClick={(e) => toggleSelected(r.id, e)}
-                    onChange={() => {}}
-                  />
-
-                  <div className={`restaurant-avatar-box ${isSuspended ? 'is-suspended' : ''}`}>
-                    {initials}
+                {/* ── TOP BAR: Checkbox / ID & Status / Actions ── */}
+                <div className="mgmt-card-header-bar" onClick={(e) => e.stopPropagation()}>
+                  <div className="mgmt-card-header-left">
+                    <input
+                      type="checkbox"
+                      className="mgmt-card-checkbox"
+                      checked={selectedIds.has(r.id)}
+                      onClick={(e) => toggleSelected(r.id, e)}
+                      onChange={() => {}}
+                      title="Select restaurant"
+                    />
+                    <span
+                      className="mgmt-card-id-pill"
+                      title="Click to copy ID"
+                      onClick={(e) => handleCopyId(e, r.id)}
+                    >
+                      {copiedId === r.id ? <Check className="w-3 h-3 text-emerald-600" /> : `#${r.id.slice(-6)}`}
+                    </span>
                   </div>
 
-                  <div className="identity-details">
-                    <div className="identity-name-row">
-                      <span className="restaurant-title">{r.name}</span>
+                  <div className="mgmt-card-header-right">
+                    <Badge tone={statusTone(r.status)} pulse={r.status === 'ACTIVE'}>
+                      {r.status}
+                    </Badge>
+                    {sub && sub.status !== 'ACTIVE' && sub.status !== r.status && (
+                      <Badge tone={statusTone(sub.status)}>
+                        Sub: {sub.status}
+                      </Badge>
+                    )}
+
+                    <div className="more-actions-menu-container">
                       <button
                         type="button"
-                        className="card-id-pill"
-                        title="Click to copy restaurant ID"
-                        onClick={(e) => handleCopyId(e, r.id)}
+                        className={`mgmt-card-corner-btn ${isMenuOpen ? 'is-active' : ''}`}
+                        title="More actions"
+                        onClick={(e) => { e.stopPropagation(); setActiveMenuId(isMenuOpen ? null : r.id); }}
                       >
-                        {copiedId === r.id ? (
-                          <>
-                            <Check className="w-3 h-3 text-emerald-600" />
-                            <span style={{ color: '#16A34A', fontWeight: 600 }}>Copied!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3" />
-                            <span>#{r.id.slice(0, 8)}</span>
-                          </>
-                        )}
+                        <MoreVertical className="w-3.5 h-3.5" />
                       </button>
-                    </div>
 
+                      {isMenuOpen && (
+                        <div className="actions-dropdown-menu">
+                          <button type="button" className="actions-dropdown-item" onClick={() => { setActiveMenuId(null); navigate(`/restaurants/${r.id}`); }}>
+                            <Store className="w-3.5 h-3.5 text-slate-500" /><span>Open Workspace</span>
+                          </button>
+                          <button type="button" className="actions-dropdown-item" onClick={() => { setActiveMenuId(null); setEditingRestaurant(r); }}>
+                            <Edit3 className="w-3.5 h-3.5 text-slate-500" /><span>Edit Restaurant</span>
+                          </button>
+                          <button type="button" className="actions-dropdown-item" onClick={() => { setActiveMenuId(null); navigate(`/restaurants/${r.id}?tab=subscription`); }}>
+                            <Repeat className="w-3.5 h-3.5 text-slate-500" /><span>Manage Subscription</span>
+                          </button>
+                          <button type="button" className="actions-dropdown-item" onClick={() => { setActiveMenuId(null); navigate(`/restaurants/${r.id}?tab=branches`); }}>
+                            <Building2 className="w-3.5 h-3.5 text-slate-500" /><span>Manage Branches</span>
+                          </button>
+                          <button type="button" className="actions-dropdown-item" onClick={() => { setActiveMenuId(null); navigate(`/restaurants/${r.id}?tab=devices`); }}>
+                            <KeyRound className="w-3.5 h-3.5 text-slate-500" /><span>Devices & Keys</span>
+                          </button>
+                          <button type="button" className="actions-dropdown-item" onClick={() => { setActiveMenuId(null); navigate(`/restaurants/${r.id}?tab=audit`); }}>
+                            <FileText className="w-3.5 h-3.5 text-slate-500" /><span>Audit Logs</span>
+                          </button>
+                          <div className="actions-dropdown-divider" />
+                          <button type="button" className={`actions-dropdown-item ${r.status === 'ACTIVE' ? 'is-danger' : ''}`} onClick={() => { setActiveMenuId(null); setConfirmingStatusRestaurant(r); }}>
+                            <ShieldAlert className="w-3.5 h-3.5" /><span>{r.status === 'ACTIVE' ? 'Suspend Restaurant' : 'Reactivate'}</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── IDENTITY ROW: Avatar + Names + Plan ── */}
+                <div className="mgmt-card-identity">
+                  <div className={`mgmt-card-avatar ${avatarClass} ${isSuspended ? 'is-suspended' : ''}`}>
+                    {initials}
+                  </div>
+                  <div className="mgmt-card-identity-text">
+                    <p className="mgmt-card-name" title={r.name}>{r.name}</p>
                     {r.legalName && r.legalName !== r.name && (
-                      <span className="restaurant-legal-name">{r.legalName}</span>
+                      <p className="mgmt-card-subtitle" title={r.legalName}>{r.legalName}</p>
                     )}
-
-                    <div className="identity-meta-row">
-                      <span className="identity-meta-item">
-                        <MapPin className="w-3 h-3 text-slate-400" />
-                        <span>{[r.city, r.state].filter(Boolean).join(', ') || 'Location Unset'}</span>
-                      </span>
-                      <span>•</span>
-                      <span className="identity-meta-item">
-                        <Calendar className="w-3 h-3 text-slate-400" />
-                        <span>
-                          Onboarded{' '}
-                          {new Date(r.createdAt).toLocaleDateString('en-IN', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                          })}
+                    <div className="mgmt-card-plan-wrap">
+                      {plan ? (
+                        <span className={`mgmt-card-plan-badge ${tierClass}`}>
+                          {planLabel}
                         </span>
-                      </span>
+                      ) : (
+                        <span className="mgmt-card-plan-badge no-plan">
+                          No Plan Assigned
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
 
-                {/* Middle Section: Business & Owner */}
-                <div className="card-sec-business">
-                  <div className="business-badges-row">
-                    {plan ? (
-                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: '#0B253A' }}>{plan.name}</span>
-                        <Badge tone={plan.tier === 'PRO' || plan.tier === 'ENTERPRISE' ? 'gold' : 'neutral'}>
-                          {plan.tier}
-                        </Badge>
-                      </div>
-                    ) : (
-                      <span className="muted" style={{ fontSize: 12.5, fontWeight: 500 }}>
-                        No Plan Assigned
-                      </span>
-                    )}
-
-                    {sub ? (
-                      <Badge tone={statusTone(sub.status)} pulse={sub.status === 'ACTIVE'}>
-                        {sub.status}
-                      </Badge>
-                    ) : (
-                      <Badge tone="neutral">UNLICENSED</Badge>
-                    )}
-
-                    <span className={`metric-pill ${r._count.branches > 0 ? 'has-data' : ''}`}>
-                      <Building2 className="w-3.5 h-3.5" />
-                      <span>
-                        {r._count.branches} {r._count.branches === 1 ? 'Branch' : 'Branches'}
-                      </span>
+                {/* ── STATS: Branches + Terminals ── */}
+                <div className="mgmt-card-stats">
+                  <div className="mgmt-card-stat">
+                    <span className="mgmt-card-stat-label">
+                      <Building2 className="w-3 h-3 text-slate-400" /> Branches
                     </span>
-
-                    <span className={`metric-pill ${r._count.devices > 0 ? 'has-data' : ''}`}>
-                      <Laptop2 className="w-3.5 h-3.5" />
-                      <span>
-                        {r._count.devices} {r._count.devices === 1 ? 'Terminal' : 'Terminals'}
-                      </span>
+                    <span className={`mgmt-card-stat-value ${r._count.branches > 0 ? 'has-data' : ''}`}>
+                      {r._count.branches}
                     </span>
                   </div>
-
-                  <div className="owner-contact-row">
-                    <span className="owner-contact-item">
-                      <User className="w-3.5 h-3.5 text-slate-400" />
-                      <span style={{ fontWeight: 600, color: 'var(--jv-text)' }}>
-                        {owner?.fullName || 'Master Owner Not Assigned'}
-                      </span>
+                  <div className="mgmt-card-stat">
+                    <span className="mgmt-card-stat-label">
+                      <Laptop2 className="w-3 h-3 text-slate-400" /> Terminals
                     </span>
-                    {owner?.email && (
-                      <>
-                        <span className="muted">•</span>
-                        <span className="owner-contact-item">
-                          <Mail className="w-3.5 h-3.5 text-slate-400" />
-                          <span style={{ color: 'var(--jv-text-secondary)' }}>{owner.email}</span>
-                        </span>
-                      </>
-                    )}
+                    <span className={`mgmt-card-stat-value ${r._count.devices > 0 ? 'has-data' : ''}`}>
+                      {r._count.devices}
+                    </span>
                   </div>
                 </div>
 
-                {/* Right Section: Actions */}
-                <div className="card-sec-actions" onClick={(e) => e.stopPropagation()}>
-                  <Badge tone={statusTone(r.status)}>{r.status}</Badge>
+                {/* ── INFO ROW: Location + Owner + Email ── */}
+                <div className="mgmt-card-info-row">
+                  {[r.city, r.state].filter(Boolean).length > 0 && (
+                    <div className="mgmt-card-info-item">
+                      <MapPin className="w-3 h-3" />
+                      <span>{[r.city, r.state].filter(Boolean).join(', ')}</span>
+                    </div>
+                  )}
+                  <div className="mgmt-card-info-item">
+                    <User className="w-3 h-3" />
+                    <span className="mgmt-card-info-value">
+                      {owner?.fullName || 'No Owner Assigned'}
+                    </span>
+                  </div>
+                  {owner?.email && (
+                    <div className="mgmt-card-info-item">
+                      <Mail className="w-3 h-3" />
+                      <span>{owner.email}</span>
+                    </div>
+                  )}
+                </div>
 
-                  <button
-                    type="button"
-                    className="btn-open-workspace"
+                {/* ── FOOTER: CTA + Created Date ── */}
+                <div className="mgmt-card-footer" onClick={(e) => e.stopPropagation()}>
+                  <span
+                    className="mgmt-card-cta"
                     onClick={() => navigate(`/restaurants/${r.id}`)}
                   >
-                    <span>Open Workspace</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                    <Store className="w-3.5 h-3.5" />
+                    Manage Restaurant
+                    <span className="mgmt-card-cta-arrow">
+                      <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </span>
 
-                  <div className="more-actions-menu-container">
-                    <button
-                      type="button"
-                      className="btn-more-actions"
-                      title="More actions"
-                      onClick={() => setActiveMenuId(isMenuOpen ? null : r.id)}
-                    >
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-
-                    {isMenuOpen && (
-                      <div className="actions-dropdown-menu">
-                        <button
-                          type="button"
-                          className="actions-dropdown-item"
-                          onClick={() => {
-                            setActiveMenuId(null);
-                            navigate(`/restaurants/${r.id}`);
-                          }}
-                        >
-                          <Store className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Open Workspace</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          className="actions-dropdown-item"
-                          onClick={() => {
-                            setActiveMenuId(null);
-                            setEditingRestaurant(r);
-                          }}
-                        >
-                          <Edit3 className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Edit Restaurant</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          className="actions-dropdown-item"
-                          onClick={() => {
-                            setActiveMenuId(null);
-                            navigate(`/restaurants/${r.id}?tab=subscription`);
-                          }}
-                        >
-                          <Repeat className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Manage Subscription</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          className="actions-dropdown-item"
-                          onClick={() => {
-                            setActiveMenuId(null);
-                            navigate(`/restaurants/${r.id}?tab=branches`);
-                          }}
-                        >
-                          <Building2 className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Manage Branches</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          className="actions-dropdown-item"
-                          onClick={() => {
-                            setActiveMenuId(null);
-                            navigate(`/restaurants/${r.id}?tab=devices`);
-                          }}
-                        >
-                          <KeyRound className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Devices & Activation Keys</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          className="actions-dropdown-item"
-                          onClick={() => {
-                            setActiveMenuId(null);
-                            navigate(`/restaurants/${r.id}?tab=audit`);
-                          }}
-                        >
-                          <FileText className="w-3.5 h-3.5 text-slate-500" />
-                          <span>View Audit Logs</span>
-                        </button>
-
-                        <div className="actions-dropdown-divider" />
-
-                        <button
-                          type="button"
-                          className={`actions-dropdown-item ${r.status === 'ACTIVE' ? 'is-danger' : ''}`}
-                          onClick={() => {
-                            setActiveMenuId(null);
-                            setConfirmingStatusRestaurant(r);
-                          }}
-                        >
-                          <ShieldAlert className="w-3.5 h-3.5" />
-                          <span>{r.status === 'ACTIVE' ? 'Suspend Restaurant' : 'Reactivate Restaurant'}</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <span style={{ fontSize: 11, color: 'var(--jv-text-muted)', fontWeight: 500 }}>
+                    {new Date(r.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
+                  </span>
                 </div>
               </div>
             );
           })}
         </div>
       )}
+
 
       {/* 4. Tabular View (Optional fallback) */}
       {restaurants && filteredRestaurants.length > 0 && viewMode === 'table' && (

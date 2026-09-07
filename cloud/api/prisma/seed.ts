@@ -57,7 +57,7 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     shiftAndCashDrawer: true,
     salesAndGstReports: true,
     inventoryManagement: true,
-    posAssistant: true,
+    posAssistant: false,
     restaurantAdmin: true,
     captainApp: false,
     advancedCaptainReports: false,

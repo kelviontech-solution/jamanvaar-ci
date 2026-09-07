@@ -10,7 +10,15 @@ import {
   cloudSetInitialPassword,
   fetchEntitlements,
   CloudApiError,
-  type CloudEntitlementsResponse
+  type CloudEntitlementsResponse,
+  fetchTenantBillingSummary,
+  fetchTenantInvoices,
+  fetchTenantInvoiceDetail,
+  fetchTenantReceipt,
+  payTenantInvoice,
+  type TenantBillingSummary,
+  type TenantInvoice,
+  type TenantReceipt
 } from '../../cloud/cloudClient';
 import { CloudDeviceLoginsPanel } from './CloudDeviceLoginsPanel';
 import {
@@ -34,6 +42,13 @@ import {
   QrCode,
   Network,
   Bot,
+  FileText,
+  Receipt,
+  CreditCard,
+  AlertTriangle,
+  Clock,
+  ShieldCheck,
+  Building2,
   type LucideIcon
 } from 'lucide-react';
 
@@ -72,7 +87,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   // two full plan cards, an upgrade-pillars section, a comparison matrix, and
   // offline certificate activation all stacked on a single page. Split into
   // tabs so each visit lands on the thing the user actually came for.
-  const [activeSubTab, setActiveSubTab] = useState<'MY_PLAN' | 'COMPARE' | 'ACTIVATE_OFFLINE'>('MY_PLAN');
+  const [activeSubTab, setActiveSubTab] = useState<'MY_PLAN' | 'BILLING_INVOICES' | 'COMPARE' | 'ACTIVATE_OFFLINE'>('MY_PLAN');
   const [dealerKeyInput, setDealerKeyInput] = useState('');
   const [licenseFeedback, setLicenseFeedback] = useState('');
   const [licenseError, setLicenseError] = useState('');
@@ -80,6 +95,17 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   const [expandedProCategory, setExpandedProCategory] = useState<string | null>('captain');
   const [showAllCoreFeatures, setShowAllCoreFeatures] = useState(false);
   const [showAllProFeatures, setShowAllProFeatures] = useState(false);
+
+  // Billing & Invoices Tab State
+  const [billingSummary, setBillingSummary] = useState<TenantBillingSummary | null>(null);
+  const [billingInvoices, setBillingInvoices] = useState<TenantInvoice[]>([]);
+  const [loadingBilling, setLoadingBilling] = useState(false);
+  const [tenantViewInvoice, setTenantViewInvoice] = useState<TenantInvoice | null>(null);
+  const [tenantReceiptData, setTenantReceiptData] = useState<TenantReceipt | null>(null);
+  const [payModalInvoice, setPayModalInvoice] = useState<TenantInvoice | null>(null);
+  const [payMethod, setPayMethod] = useState<'UPI' | 'BANK_TRANSFER' | 'CARD'>('UPI');
+  const [payReference, setPayReference] = useState('');
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   // Cloud connection (see @jamanvaar's cloud/cloudClient.ts) — purely additive to
   // everything below; a restaurant that has never entered an activation code never
@@ -100,6 +126,23 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   const [cloudPassword, setCloudPassword] = useState('');
   const [cloudNewPassword, setCloudNewPassword] = useState('');
   const [cloudActivationToken, setCloudActivationToken] = useState('');
+
+  async function loadTenantBilling() {
+    if (!cloudLoggedIn) return;
+    setLoadingBilling(true);
+    try {
+      const [sum, invs] = await Promise.all([
+        fetchTenantBillingSummary(),
+        fetchTenantInvoices()
+      ]);
+      setBillingSummary(sum);
+      setBillingInvoices(invs);
+    } catch (err) {
+      console.error('Failed to load tenant billing records', err);
+    } finally {
+      setLoadingBilling(false);
+    }
+  }
 
   async function refreshCloudEntitlements() {
     const result = await fetchEntitlements();
@@ -128,8 +171,38 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
   useEffect(() => {
     if (cloudConnected && cloudLoggedIn) {
       refreshCloudEntitlements();
+      if (activeSubTab === 'BILLING_INVOICES') {
+        loadTenantBilling();
+      }
     }
-  }, [cloudConnected, cloudLoggedIn]);
+  }, [cloudConnected, cloudLoggedIn, activeSubTab]);
+
+  async function handlePayInvoice(e: React.FormEvent) {
+    e.preventDefault();
+    if (!payModalInvoice) return;
+    setProcessingPayment(true);
+    try {
+      const res = await payTenantInvoice(payModalInvoice.id, {
+        amount: payModalInvoice.totalAmount,
+        method: payMethod,
+        referenceNumber: payReference.trim() || undefined
+      });
+      showToast('Payment successful! Subscription active and tax receipt issued.');
+      setPayModalInvoice(null);
+      await loadTenantBilling();
+      await refreshCloudEntitlements();
+      if (res?.payment?.receiptNumber) {
+        try {
+          const rcp = await fetchTenantReceipt(payModalInvoice.id);
+          setTenantReceiptData(rcp);
+        } catch {}
+      }
+    } catch (err: any) {
+      showToast(err?.message || 'Payment processing failed. Please try again.');
+    } finally {
+      setProcessingPayment(false);
+    }
+  }
 
   async function handleConnectSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -284,6 +357,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       <div className="flex items-center gap-1.5 border-b border-slate-200/80 -mt-2">
         {([
           { id: 'MY_PLAN', label: 'My Plan' },
+          { id: 'BILLING_INVOICES', label: 'Billing & Invoices' },
           { id: 'COMPARE', label: 'Compare Plans' },
           { id: 'ACTIVATE_OFFLINE', label: 'Activate Offline' }
         ] as const).map((tab) => (
@@ -851,6 +925,523 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         </div>
       </div>
       </>
+      )}
+
+      {activeSubTab === 'BILLING_INVOICES' && (
+        <div className="space-y-4">
+          {!cloudLoggedIn ? (
+            <div className="bg-white rounded-3xl p-8 border border-[#EBE6DD] shadow-2xs text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#E66817] flex items-center justify-center mx-auto">
+                <Receipt className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-black text-[#0B253A]">Cloud Subscription Login Required</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                To view statutory GST 18% invoices, download official payment receipts, and make subscription renewal payments, please sign in to your restaurant cloud account.
+              </p>
+              <button
+                type="button"
+                onClick={() => setActiveSubTab('MY_PLAN')}
+                className="px-5 py-2 bg-[#E66817] hover:bg-[#d45b10] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer"
+              >
+                Go to Cloud Account Login
+              </button>
+            </div>
+          ) : loadingBilling ? (
+            <div className="bg-white rounded-3xl p-12 border border-[#EBE6DD] shadow-2xs text-center text-xs text-slate-500 font-bold">
+              Loading subscription billing history and invoices…
+            </div>
+          ) : (
+            <>
+              {/* Top Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-2xs flex flex-col justify-between">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <span>Current Subscription</span>
+                    <Building2 className="w-4 h-4 text-[#E66817]" />
+                  </div>
+                  <div className="mt-3">
+                    <div className="text-lg font-black text-[#0B253A]">
+                      {billingSummary?.subscription?.planName || 'JAMANVAAR SaaS'}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                        billingSummary?.subscription?.status === 'ACTIVE'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : billingSummary?.subscription?.status === 'PAST_DUE'
+                          ? 'bg-red-50 text-red-700 border border-red-200'
+                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                      }`}>
+                        {billingSummary?.subscription?.status || 'ACTIVE'}
+                      </span>
+                      <span className="text-xs text-slate-500 font-mono font-bold">
+                        ₹{(billingSummary?.subscription?.priceMonthly || 7000).toLocaleString('en-IN')}/mo + GST
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-2xs flex flex-col justify-between">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <span>Renewal Countdown</span>
+                    <Clock className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div className="mt-3">
+                    <div className="text-lg font-black text-[#0B253A]">
+                      {billingSummary?.subscription?.daysRemaining !== undefined
+                        ? `Renews in ${billingSummary.subscription.daysRemaining} days`
+                        : 'Active Lifetime'}
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1">
+                      Next billing date:{' '}
+                      <strong>
+                        {billingSummary?.subscription?.expiresAt
+                          ? new Date(billingSummary.subscription.expiresAt).toLocaleDateString('en-IN')
+                          : 'N/A'}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-2xs flex flex-col justify-between">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <span>Account Balance</span>
+                    <CreditCard className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <div className="mt-3">
+                    <div className="text-lg font-black" style={{ color: (billingSummary?.totalDue || 0) > 0 ? '#dc2626' : '#059669' }}>
+                      {(billingSummary?.totalDue || 0) > 0 ? `₹${billingSummary?.totalDue.toLocaleString('en-IN')} Due` : 'All Settled (₹0.00)'}
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1">
+                      Total settled: <strong>₹{(billingSummary?.totalPaid || 0).toLocaleString('en-IN')}</strong> • {billingSummary?.unpaidInvoicesCount || 0} invoice(s) pending
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Invoices List Table */}
+              <div className="bg-white rounded-3xl p-6 border border-[#EBE6DD] shadow-2xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <h3 className="text-sm font-black text-[#0B253A]">Statutory Tax Invoices & Receipts</h3>
+                    <span className="text-[11px] text-slate-500">
+                      GST-compliant commercial tax invoices issued by KELVIONTECH PRIVATE LIMITED.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={loadTenantBilling}
+                    className="text-xs font-bold text-[#E66817] hover:underline cursor-pointer"
+                  >
+                    Refresh Records
+                  </button>
+                </div>
+
+                {billingInvoices.length === 0 ? (
+                  <div className="py-10 text-center text-slate-400 text-xs">
+                    No commercial invoices issued yet. When a new subscription cycle initiates, invoices will appear here automatically.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b border-[#EBE6DD] text-slate-400 font-bold text-[10px] uppercase">
+                          <th className="py-2.5 px-3">Invoice #</th>
+                          <th className="py-2.5 px-3">Plan / Description</th>
+                          <th className="py-2.5 px-3">Billing Period</th>
+                          <th className="py-2.5 px-3 text-right">Amount (₹)</th>
+                          <th className="py-2.5 px-3">Due Date</th>
+                          <th className="py-2.5 px-3 text-center">Status</th>
+                          <th className="py-2.5 px-3 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {billingInvoices.map((inv) => {
+                          const isPaid = inv.status === 'PAID';
+                          const hasPayments = inv.payments && inv.payments.length > 0;
+                          return (
+                            <tr key={inv.id} className="hover:bg-slate-50/80">
+                              <td className="py-3 px-3 font-mono font-bold text-[#0B253A]">
+                                {inv.invoiceNumber}
+                              </td>
+                              <td className="py-3 px-3 font-medium text-[#0B253A]">
+                                {inv.plan?.name || 'JAMANVAAR License'}
+                              </td>
+                              <td className="py-3 px-3 text-slate-500 text-[11px]">
+                                {new Date(inv.billingPeriodStart).toLocaleDateString('en-IN')} – {new Date(inv.billingPeriodEnd).toLocaleDateString('en-IN')}
+                              </td>
+                              <td className="py-3 px-3 text-right font-mono font-bold text-[#0B253A]">
+                                ₹{(inv.totalAmount / 100).toFixed(2)}
+                                <div className="text-[10px] text-slate-400 font-normal">
+                                  ₹{(inv.amount / 100).toFixed(2)} + GST
+                                </div>
+                              </td>
+                              <td className="py-3 px-3 text-slate-600 font-medium">
+                                {new Date(inv.dueDate).toLocaleDateString('en-IN')}
+                              </td>
+                              <td className="py-3 px-3 text-center">
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                                  isPaid
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : inv.status === 'PAST_DUE'
+                                    ? 'bg-red-50 text-red-700 border border-red-200'
+                                    : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                }`}>
+                                  {inv.status}
+                                </span>
+                              </td>
+                              <td className="py-3 px-3 text-right">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  {!isPaid && inv.status !== 'VOID' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setPayModalInvoice(inv);
+                                        setPayReference('');
+                                      }}
+                                      className="px-3 py-1 bg-[#E66817] hover:bg-[#d45b10] text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer shadow-2xs"
+                                    >
+                                      Pay Now
+                                    </button>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => setTenantViewInvoice(inv)}
+                                    className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded-lg transition-colors cursor-pointer"
+                                  >
+                                    Invoice
+                                  </button>
+                                  {(isPaid || hasPayments) && (
+                                    <button
+                                      type="button"
+                                      onClick={async () => {
+                                        try {
+                                          const rcp = await fetchTenantReceipt(inv.id);
+                                          setTenantReceiptData(rcp);
+                                        } catch (err: any) {
+                                          showToast(err?.message || 'Receipt not available yet');
+                                        }
+                                      }}
+                                      className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[11px] font-bold rounded-lg transition-colors cursor-pointer"
+                                    >
+                                      Receipt
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TENANT MODAL 1: PAY NOW (UPI / BANK TRANSFER SIMULATION)
+          ───────────────────────────────────────────────────────────── */}
+      {payModalInvoice && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-base font-black text-[#0B253A]">Pay Invoice</h3>
+                <span className="text-xs text-slate-400 font-mono">{payModalInvoice.invoiceNumber}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPayModalInvoice(null)}
+                className="text-slate-400 hover:text-slate-600 font-bold text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="bg-amber-50/60 border border-amber-200/80 rounded-2xl p-4 flex items-center justify-between">
+              <div>
+                <div className="text-[11px] font-bold text-slate-500">Total Payable Amount</div>
+                <div className="text-2xl font-black text-[#0B253A] font-mono mt-0.5">
+                  ₹{(payModalInvoice.totalAmount / 100).toFixed(2)}
+                </div>
+                <div className="text-[10px] text-slate-500">Includes 18% statutory GST</div>
+              </div>
+              <span className="text-[10px] font-bold bg-amber-100 text-[#E66817] px-2.5 py-1 rounded-full">
+                {payModalInvoice.plan?.name || 'SaaS Renewal'}
+              </span>
+            </div>
+
+            <form onSubmit={handlePayInvoice} className="space-y-3">
+              <div>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Payment Method</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['UPI', 'BANK_TRANSFER', 'CARD'] as const).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setPayMethod(m)}
+                      className={`py-2 px-2 text-center text-xs font-bold rounded-xl border transition-all cursor-pointer ${
+                        payMethod === m
+                          ? 'border-[#E66817] bg-amber-50/60 text-[#E66817]'
+                          : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                      }`}
+                    >
+                      {m === 'UPI' ? 'UPI / QR' : m === 'BANK_TRANSFER' ? 'Net Banking' : 'Card'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {payMethod === 'UPI' && (
+                <div className="bg-slate-50 rounded-2xl p-3 text-xs text-slate-600 space-y-1.5 border border-slate-200">
+                  <div className="font-bold text-[#0B253A]">Pay using UPI:</div>
+                  <div className="font-mono text-[11px] text-[#E66817] bg-white p-2 rounded-lg border border-slate-200 font-bold text-center">
+                    kelviontech@hdfcbank
+                  </div>
+                  <div className="text-[10px] text-slate-500 text-center">
+                    Scan via Google Pay, PhonePe, Paytm, or BHIM
+                  </div>
+                </div>
+              )}
+
+              {payMethod === 'BANK_TRANSFER' && (
+                <div className="bg-slate-50 rounded-2xl p-3 text-[11px] text-slate-600 space-y-1 border border-slate-200 font-mono">
+                  <div><strong>Beneficiary:</strong> KELVIONTECH PRIVATE LIMITED</div>
+                  <div><strong>Bank:</strong> HDFC Bank Ltd, Science City Branch</div>
+                  <div><strong>Account:</strong> 50200084920194</div>
+                  <div><strong>IFSC:</strong> HDFC0001248</div>
+                </div>
+              )}
+
+              <div>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                  Transaction / UTR Reference Number *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. UPI-928472938472 or NEFT-HDFC2349"
+                  value={payReference}
+                  onChange={(e) => setPayReference(e.target.value)}
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-xs font-mono text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setPayModalInvoice(null)}
+                  disabled={processingPayment}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={processingPayment}
+                  className="px-5 py-2 bg-[#E66817] hover:bg-[#d45b10] disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer shadow-xs"
+                >
+                  {processingPayment ? 'Processing Payment…' : 'Confirm & Renew Subscription'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TENANT MODAL 2: VIEW TAX INVOICE
+          ───────────────────────────────────────────────────────────── */}
+      {tenantViewInvoice && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl p-6 max-w-2xl w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-base font-black text-[#0B253A]">Statutory Tax Invoice</h3>
+                <span className="text-xs text-slate-400 font-mono">{tenantViewInvoice.invoiceNumber}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print (A4)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTenantViewInvoice(null)}
+                  className="text-slate-400 hover:text-slate-600 font-bold text-base cursor-pointer px-2"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Invoice Print Surface */}
+            <div className="p-4 border border-slate-200 rounded-2xl text-xs text-slate-700 space-y-4">
+              <div className="flex justify-between items-start border-b border-slate-200 pb-3">
+                <div>
+                  <div className="text-lg font-black text-[#0B253A]">JAMANVAAR</div>
+                  <div className="text-[11px] font-bold text-slate-500">KELVIONTECH PRIVATE LIMITED</div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">
+                    Plot 42, Science City Road, Ahmedabad, Gujarat 380060<br />
+                    GSTIN: 24AAACK7890F1ZT | SAC: 997331
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs font-bold text-[#E66817] uppercase">TAX INVOICE</div>
+                  <div className="font-mono font-bold text-sm text-[#0B253A] mt-1">{tenantViewInvoice.invoiceNumber}</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">
+                    Date: {new Date(tenantViewInvoice.dueDate).toLocaleDateString('en-IN')}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-xl">
+                <div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">BILLED TO:</div>
+                  <div className="font-bold text-[#0B253A] text-xs mt-0.5">{tenantViewInvoice.restaurant?.name}</div>
+                  <div className="text-[10px] text-slate-500">{tenantViewInvoice.restaurant?.city || 'India'}</div>
+                  {tenantViewInvoice.restaurant?.gstin && (
+                    <div className="text-[10px] font-mono text-slate-600 mt-0.5">
+                      GSTIN: {tenantViewInvoice.restaurant.gstin}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">BILLING PERIOD:</div>
+                  <div className="font-medium text-[#0B253A] text-xs mt-0.5">
+                    {new Date(tenantViewInvoice.billingPeriodStart).toLocaleDateString('en-IN')} – {new Date(tenantViewInvoice.billingPeriodEnd).toLocaleDateString('en-IN')}
+                  </div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">
+                    Plan: {tenantViewInvoice.plan?.name || 'JAMANVAAR SaaS'}
+                  </div>
+                </div>
+              </div>
+
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 text-slate-400 font-bold text-[10px] uppercase">
+                    <th className="py-2">Description</th>
+                    <th className="py-2">SAC</th>
+                    <th className="py-2 text-right">Taxable (₹)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  <tr>
+                    <td className="py-2 font-medium">{tenantViewInvoice.plan?.name || 'JAMANVAAR Subscription License'}</td>
+                    <td className="py-2 font-mono">997331</td>
+                    <td className="py-2 text-right font-mono font-bold">₹{(tenantViewInvoice.amount / 100).toFixed(2)}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div className="border-t border-slate-200 pt-3 space-y-1 text-right font-mono text-xs">
+                <div className="flex justify-between text-slate-500">
+                  <span>Taxable Value:</span>
+                  <span>₹{(tenantViewInvoice.amount / 100).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-slate-500">
+                  <span>Goods and Services Tax (GST 18%):</span>
+                  <span>₹{(tenantViewInvoice.taxAmount / 100).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-[#0B253A] font-black text-sm border-t border-slate-200 pt-1.5 mt-1">
+                  <span>Total Payable:</span>
+                  <span>₹{(tenantViewInvoice.totalAmount / 100).toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TENANT MODAL 3: VIEW OFFICIAL PAYMENT RECEIPT
+          ───────────────────────────────────────────────────────────── */}
+      {tenantReceiptData && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl p-6 max-w-2xl w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-base font-black text-[#0B253A]">Official Payment Receipt</h3>
+                <span className="text-xs text-emerald-600 font-mono font-bold">{tenantReceiptData.receiptNumber}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print Receipt</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTenantReceiptData(null)}
+                  className="text-slate-400 hover:text-slate-600 font-bold text-base cursor-pointer px-2"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 border border-slate-200 rounded-2xl text-xs text-slate-700 space-y-4">
+              <div className="flex justify-between items-start border-b border-slate-200 pb-3">
+                <div>
+                  <div className="text-lg font-black text-[#0B253A]">JAMANVAAR</div>
+                  <div className="text-[11px] font-bold text-slate-500">KELVIONTECH PRIVATE LIMITED</div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">
+                    GSTIN: 24AAACK7890F1ZT | SAC: 997331
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs font-bold text-emerald-600 uppercase">PAYMENT SETTLED</div>
+                  <div className="font-mono font-bold text-sm text-[#0B253A] mt-1">{tenantReceiptData.receiptNumber}</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">
+                    Date: {new Date(tenantReceiptData.paymentDate).toLocaleDateString('en-IN')}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 bg-emerald-50/50 border border-emerald-100 p-3 rounded-xl">
+                <div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">RECEIVED FROM:</div>
+                  <div className="font-bold text-[#0B253A] text-xs mt-0.5">{tenantReceiptData.receivedFrom.restaurantName}</div>
+                  <div className="text-[10px] text-slate-500">{tenantReceiptData.receivedFrom.city || 'India'}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">RECONCILIATION DETAILS:</div>
+                  <div className="font-medium text-[#0B253A] text-xs mt-0.5">
+                    Against Invoice: <span className="font-mono font-bold">{tenantReceiptData.invoiceNumber}</span>
+                  </div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">
+                    Method: {tenantReceiptData.paymentMethod} • Ref: {tenantReceiptData.transactionId}
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-200 pt-3 space-y-1 text-right font-mono text-xs">
+                <div className="flex justify-between text-slate-500">
+                  <span>Amount Settled:</span>
+                  <span className="text-emerald-700 font-bold text-sm">₹{tenantReceiptData.amountPaidRupees}</span>
+                </div>
+                <div className="flex justify-between text-slate-400 text-[11px]">
+                  <span>Balance Outstanding:</span>
+                  <span>₹0.00 (Fully Settled)</span>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-100 pt-2 text-[10px] text-slate-400 text-center">
+                This official receipt confirms statutory settlement of SaaS license charges. Generated electronically by KELVIONTECH.
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {activeSubTab === 'ACTIVATE_OFFLINE' && (

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   JAMAN_AI_CATEGORIES,
   JamanAiCategory,
@@ -33,7 +33,8 @@ import {
   Clock,
   Smartphone,
   ShieldCheck,
-  Wifi
+  Wifi,
+  Send
 } from "lucide-react";
 
 export interface JamanAiAssistantModalProps {
@@ -44,6 +45,7 @@ export interface JamanAiAssistantModalProps {
   /** Active POS tab for context-aware quick action defaults */
   posContext?: string;
   onPerformAction?: (action: PosAssistantAction) => void;
+  onQueryExecuted?: (intent: string, queryText?: string) => void;
 }
 
 /** Map from POS tab name to best AI category */
@@ -67,12 +69,14 @@ export const JamanAiAssistantModal: React.FC<JamanAiAssistantModalProps> = ({
   app,
   userRole = "CASHIER",
   posContext,
-  onPerformAction
+  onPerformAction,
+  onQueryExecuted
 }) => {
   const defaultCategory = (posContext ? CONTEXT_CATEGORY_MAP[posContext] : undefined) ?? "TODAY";
   const [activeCategory, setActiveCategory] = useState<JamanAiCategory>(defaultCategory);
   const [activeResponse, setActiveResponse] = useState<PosAssistantResponse | null>(null);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
+  const [naturalQuery, setNaturalQuery] = useState("");
   const [isVisible, setIsVisible] = useState(false);
 
   // Animate slide-in / slide-out
@@ -83,6 +87,7 @@ export const JamanAiAssistantModal: React.FC<JamanAiAssistantModalProps> = ({
       setActiveCategory(cat ?? "TODAY");
       setActiveResponse(null);
       setSelectedQuestionId(null);
+      setNaturalQuery("");
     } else {
       setIsVisible(false);
     }
@@ -112,9 +117,23 @@ export const JamanAiAssistantModal: React.FC<JamanAiAssistantModalProps> = ({
 
   const handleSelectQuestion = useCallback((q: JamanAiQuestion) => {
     setSelectedQuestionId(q.id);
-    const resp = PosAssistantService.executeQuery(q.intent as any);
+    const resp = PosAssistantService.executeQuery(
+      q.formula ? { intent: q.intent, label: q.label, formula: q.formula } : (q.intent as any)
+    );
     setActiveResponse(resp);
-  }, []);
+    onQueryExecuted?.(q.intent as string, q.label);
+  }, [onQueryExecuted]);
+
+  const handleExecuteNaturalQuery = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!naturalQuery.trim()) return;
+    const resolvedIntent = PosAssistantService.resolveIntent(naturalQuery.trim());
+    const resp = PosAssistantService.executeQuery(resolvedIntent);
+    setActiveResponse(resp);
+    setSelectedQuestionId(null);
+    onQueryExecuted?.(resolvedIntent, naturalQuery.trim());
+    setNaturalQuery("");
+  };
 
   const handleBackToQuestions = useCallback(() => {
     setActiveResponse(null);
@@ -411,6 +430,27 @@ export const JamanAiAssistantModal: React.FC<JamanAiAssistantModalProps> = ({
               </div>
             )}
           </div>
+        </div>
+
+        {/* NATURAL LANGUAGE QUERY INPUT BAR */}
+        <div className="shrink-0 bg-white border-t border-[#EBE6DD] p-3">
+          <form onSubmit={handleExecuteNaturalQuery} className="relative flex items-center">
+            <input
+              type="text"
+              value={naturalQuery}
+              onChange={(e) => setNaturalQuery(e.target.value)}
+              placeholder="Ask anything (e.g. 'sales today', 'slow tables')..."
+              className="w-full pl-3.5 pr-10 py-2.5 text-xs font-semibold bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-xl text-[#0B253A] placeholder:text-slate-400 focus:outline-none transition-all"
+            />
+            <button
+              type="submit"
+              disabled={!naturalQuery.trim()}
+              className="absolute right-1.5 p-1.5 rounded-lg bg-[#E66817] text-white disabled:opacity-30 disabled:hover:bg-[#E66817] hover:bg-[#c9570f] transition-all cursor-pointer disabled:cursor-not-allowed shadow-2xs"
+              title="Ask JAMAN AI"
+            >
+              <Send className="w-3.5 h-3.5" />
+            </button>
+          </form>
         </div>
 
         {/* FOOTER */}

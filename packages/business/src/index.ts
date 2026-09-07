@@ -1,4 +1,4 @@
-﻿export * from './pricing';
+export * from './pricing';
 export * from './modifiers';
 export * from './coupons';
 export * from './idempotency';
@@ -16,3 +16,4 @@ export * from './central_reporting_service';
 export * from './business_day_service';
 export * from './jaman_ai_registry';
 export * from './session_persistence';
+export * from './dynamic_query_executor';

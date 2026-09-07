@@ -506,6 +506,7 @@ model Payment {
   amount          Int           // in paise
   method          PaymentMethod @default(BANK_TRANSFER)
   referenceNumber String?
+  receiptNumber   String?       @unique
   status          PaymentStatus @default(COMPLETED)
   notes           String?
   recordedBy      String?

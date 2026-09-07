@@ -168,283 +168,11 @@
 }
 
 /* ==========================================================================
-   SaaS Rectangular Restaurant Cards System
+   Restaurant Square-Grid Card System
+   (The grid container / square tiles live in card-grid.css)
    ========================================================================== */
 
-.restaurants-cards-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-top: 4px;
-}
-
-.restaurant-card-item {
-  background: var(--jv-surface-card);
-  border: 1px solid var(--jv-border);
-  border-radius: 12px;
-  padding: 18px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-  position: relative;
-  box-shadow: var(--jv-shadow-card);
-}
-
-.restaurant-card-item:hover {
-  border-color: var(--jv-accent);
-  background: var(--jv-surface-hover);
-  transform: translateY(-2px);
-  box-shadow: var(--jv-shadow-card-hover);
-}
-
-.restaurant-card-item.is-selected {
-  border-color: var(--jv-accent);
-  background: var(--jv-accent-soft);
-}
-
-/* Left Section: Identity */
-.card-sec-identity {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex: 1 1 340px;
-  min-width: 0;
-}
-
-.card-select-checkbox {
-  cursor: pointer;
-  width: 16px;
-  height: 16px;
-  accent-color: var(--jv-accent);
-}
-
-.restaurant-avatar-box {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #0b253a 0%, #173f60 100%);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 18px;
-  flex-shrink: 0;
-  border: 1px solid rgba(230, 104, 23, 0.25);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
-}
-
-[data-theme='dark'] .restaurant-avatar-box {
-  background: linear-gradient(135deg, #18283a 0%, #223850 100%);
-  border-color: rgba(249, 115, 22, 0.35);
-}
-
-.restaurant-avatar-box.is-suspended {
-  background: var(--jv-bg-muted);
-  color: var(--jv-text-light);
-  border-color: var(--jv-border);
-}
-
-.identity-details {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.identity-name-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.restaurant-title {
-  font-size: 15.5px;
-  font-weight: 700;
-  color: var(--jv-text);
-  text-decoration: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: -0.01em;
-}
-
-.restaurant-title:hover {
-  color: var(--jv-accent);
-}
-
-.restaurant-legal-name {
-  font-size: 12px;
-  color: var(--jv-text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.identity-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 11.5px;
-  color: var(--jv-text-muted);
-  margin-top: 3px;
-  flex-wrap: wrap;
-}
-
-.identity-meta-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.card-id-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  background: var(--jv-bg-muted);
-  color: var(--jv-text-secondary);
-  border: 1px solid var(--jv-border);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 10.5px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.card-id-pill:hover {
-  background: var(--jv-surface-hover);
-  color: var(--jv-text);
-  border-color: var(--jv-border-hover);
-}
-
-/* Middle Section: Business & Owner */
-.card-sec-business {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1 1 360px;
-  min-width: 0;
-  padding: 0 20px;
-  border-left: 1px solid var(--jv-border);
-  border-right: 1px solid var(--jv-border);
-}
-
-.business-badges-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.metric-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 9px;
-  border-radius: 6px;
-  background: var(--jv-bg-muted);
-  border: 1px solid var(--jv-border);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--jv-text-secondary);
-}
-
-.metric-pill.has-data {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.28);
-  color: #10b981;
-}
-
-[data-theme='dark'] .metric-pill.has-data {
-  color: #34d399;
-}
-
-.owner-contact-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 12px;
-  color: var(--jv-text-secondary);
-  flex-wrap: wrap;
-}
-
-.owner-contact-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Right Section: Management Actions */
-.card-sec-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 0 0 auto;
-}
-
-.btn-open-workspace {
-  background: #0b253a;
-  color: #ffffff;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  border: 1px solid transparent;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-
-[data-theme='dark'] .btn-open-workspace {
-  background: #1a2f48;
-  color: #f8fafc;
-  border-color: #274567;
-}
-
-.btn-open-workspace:hover {
-  background: var(--jv-accent);
-  border-color: var(--jv-accent);
-  color: #ffffff;
-  box-shadow: 0 3px 12px rgba(230, 104, 23, 0.35);
-}
-
-[data-theme='dark'] .btn-open-workspace:hover {
-  background: #f97316;
-  border-color: #f97316;
-  color: #ffffff;
-}
-
-.btn-more-actions {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: var(--jv-surface);
-  border: 1px solid var(--jv-border);
-  color: var(--jv-text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-more-actions:hover {
-  background: var(--jv-surface-hover);
-  color: var(--jv-text);
-  border-color: var(--jv-border-hover);
-}
-
+/* Legacy table-view card uses a dropdown menu — preserve those styles */
 .more-actions-menu-container {
   position: relative;
 }
@@ -500,6 +228,71 @@
   height: 1px;
   background: var(--jv-border);
   margin: 4px 0;
+}
+
+/* Table-view "Open Workspace" button (used in table rows) */
+.btn-open-workspace {
+  background: #0b253a;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-open-workspace:hover {
+  background: var(--jv-accent);
+  border-color: var(--jv-accent);
+  color: #ffffff;
+  box-shadow: 0 3px 12px rgba(230, 104, 23, 0.35);
+}
+
+.btn-more-actions {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--jv-surface);
+  border: 1px solid var(--jv-border);
+  color: var(--jv-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-more-actions:hover {
+  background: var(--jv-surface-hover);
+  color: var(--jv-text);
+  border-color: var(--jv-border-hover);
+}
+
+/* Card ID pill (used in table view too) */
+.card-id-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--jv-bg-muted);
+  color: var(--jv-text-secondary);
+  border: 1px solid var(--jv-border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.card-id-pill:hover {
+  background: var(--jv-surface-hover);
+  color: var(--jv-text);
 }
 
 /* ── Specific Toolbar & Filter Styles ── */

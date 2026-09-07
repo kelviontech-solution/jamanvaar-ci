@@ -24,6 +24,16 @@ export class InvoicesController {
     return this.invoices.list(restaurantId, status);
   }
 
+  @Post('check-renewals')
+  checkRenewals() {
+    return this.invoices.checkAndGenerateRenewals();
+  }
+
+  @Get(':id/receipt')
+  getReceipt(@Param('id') id: string) {
+    return this.invoices.getReceiptForInvoice(id);
+  }
+
   @Get(':id')
   detail(@Param('id') id: string) {
     return this.invoices.getById(id);
@@ -45,7 +55,7 @@ export class InvoicesController {
     @Body() body: ReturnType<typeof recordPaymentSchema.parse>,
     @CurrentPlatformUser() actor: PlatformUser
   ) {
-    return this.invoices.recordPayment(id, body, actor);
+    return this.invoices.recordPayment(id, body, actor.id);
   }
 
   @Patch(':id/status')

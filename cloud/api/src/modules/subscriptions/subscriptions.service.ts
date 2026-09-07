@@ -3,12 +3,14 @@ import { PlatformUser, SubscriptionStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { AssignSubscriptionDto } from './dto/subscription.dto';
+import { InvoicesService } from '../billing/invoices.service';
 
 @Injectable()
 export class SubscriptionsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly invoices: InvoicesService
   ) {}
 
   list() {
@@ -57,6 +59,16 @@ export class SubscriptionsService {
         },
         include: { plan: true }
       });
+
+      // Automatically generate first invoice for this subscription if plan price > 0 or status is ACTIVE
+      await this.invoices.createInitialSubscriptionInvoice(
+        tx,
+        sub.restaurantId,
+        sub.id,
+        plan.id,
+        sub.expiresAt ?? new Date(Date.now() + 30 * 86400000),
+        new Date()
+      );
 
       await this.audit.log(
         {
