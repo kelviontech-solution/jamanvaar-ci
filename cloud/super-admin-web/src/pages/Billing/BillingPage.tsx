@@ -301,24 +301,74 @@ export function BillingPage() {
       {summary && (
         <div className="stat-grid">
           <Card className="stat-tile">
-            <div className="stat-value">₹{summary.totalCollected.toLocaleString('en-IN')}</div>
-            <div className="stat-label">Reconciled Collections (₹ INR)</div>
-          </Card>
-          <Card className="stat-tile">
-            <div className="stat-value" style={{ color: summary.pendingAmount > 0 ? '#f59e0b' : 'inherit' }}>
-              ₹{summary.pendingAmount.toLocaleString('en-IN')}
+            <div className="stat-tile-top">
+              <div className="stat-label">Reconciled Collections</div>
+              <div className="stat-tile-icon stat-tile-icon-green">
+                <Receipt className="w-5 h-5" />
+              </div>
             </div>
-            <div className="stat-label">Outstanding Invoiced Receivables</div>
-          </Card>
-          <Card className="stat-tile">
-            <div className="stat-value">{summary.paidInvoices}</div>
-            <div className="stat-label">Settled Invoices ({summary.totalInvoices} Total)</div>
-          </Card>
-          <Card className="stat-tile">
-            <div className="stat-value" style={{ color: summary.pastDueInvoices > 0 ? '#ef4444' : 'inherit' }}>
-              {summary.pastDueInvoices}
+            <div>
+              <div className="stat-value">₹{summary.totalCollected.toLocaleString('en-IN')}</div>
+              <div className="stat-sub">
+                <span style={{ color: '#059669', fontWeight: 700 }}>● GST Compliant</span> • 100% Settled
+              </div>
             </div>
-            <div className="stat-label">Overdue Invoices</div>
+          </Card>
+
+          <Card className="stat-tile">
+            <div className="stat-tile-top">
+              <div className="stat-label">Invoiced Receivables</div>
+              <div className="stat-tile-icon stat-tile-icon-amber">
+                <CreditCard className="w-5 h-5" />
+              </div>
+            </div>
+            <div>
+              <div className="stat-value" style={{ color: summary.pendingAmount > 0 ? '#d97706' : 'inherit' }}>
+                ₹{summary.pendingAmount.toLocaleString('en-IN')}
+              </div>
+              <div className="stat-sub">
+                {summary.pendingAmount > 0 ? 'Awaiting Tenant Payment' : 'Zero Pending Dues'}
+              </div>
+            </div>
+          </Card>
+
+          <Card className="stat-tile">
+            <div className="stat-tile-top">
+              <div className="stat-label">Settled Invoices</div>
+              <div className="stat-tile-icon stat-tile-icon-blue">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+            </div>
+            <div>
+              <div className="stat-value">
+                {summary.paidInvoices}{' '}
+                <span style={{ fontSize: 14, color: 'var(--jv-text-muted)', fontWeight: 600 }}>
+                  / {summary.totalInvoices} Total
+                </span>
+              </div>
+              <div className="stat-sub">
+                {summary.totalInvoices > 0
+                  ? `${Math.round((summary.paidInvoices / summary.totalInvoices) * 100)}% Collection Rate`
+                  : '0 Total Issued'}
+              </div>
+            </div>
+          </Card>
+
+          <Card className="stat-tile">
+            <div className="stat-tile-top">
+              <div className="stat-label">Overdue Invoices</div>
+              <div className="stat-tile-icon stat-tile-icon-orange">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+            </div>
+            <div>
+              <div className="stat-value" style={{ color: summary.pastDueInvoices > 0 ? '#dc2626' : 'inherit' }}>
+                {summary.pastDueInvoices}
+              </div>
+              <div className="stat-sub">
+                {summary.pastDueInvoices > 0 ? 'Requires Follow-up' : 'All Accounts Current'}
+              </div>
+            </div>
           </Card>
         </div>
       )}

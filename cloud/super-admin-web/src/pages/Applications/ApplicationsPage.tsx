@@ -15,7 +15,8 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
-  Tag
+  Tag,
+  ShieldCheck
 } from 'lucide-react';
 import '../../components/shared.css';
 import './applications.css';
@@ -137,20 +138,59 @@ export function ApplicationsPage() {
 
       <div className="stat-grid">
         <Card className="stat-tile">
-          <div className="stat-value">{apps.length}</div>
-          <div className="stat-label">Client Applications</div>
+          <div className="stat-tile-top">
+            <div className="stat-label">Client Applications</div>
+            <div className="stat-tile-icon stat-tile-icon-blue">
+              <Layers className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <div className="stat-value">{apps.length}</div>
+            <div className="stat-sub">POS, KDS, Captain, Kiosks & Admin</div>
+          </div>
         </Card>
+
         <Card className="stat-tile">
-          <div className="stat-value">{totalFleetDevices}</div>
-          <div className="stat-label">Registered Terminals</div>
+          <div className="stat-tile-top">
+            <div className="stat-label">Registered Terminals</div>
+            <div className="stat-tile-icon stat-tile-icon-purple">
+              <Laptop2 className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <div className="stat-value">{totalFleetDevices}</div>
+            <div className="stat-sub">Across All Onboarded Outlets</div>
+          </div>
         </Card>
+
         <Card className="stat-tile">
-          <div className="stat-value">{totalOnlineDevices}</div>
-          <div className="stat-label">Active / Online Terminals</div>
+          <div className="stat-tile-top">
+            <div className="stat-label">Active / Online Terminals</div>
+            <div className="stat-tile-icon stat-tile-icon-green">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <div className="stat-value" style={{ color: totalOnlineDevices > 0 ? '#059669' : 'inherit' }}>
+              {totalOnlineDevices}
+            </div>
+            <div className="stat-sub">
+              {totalOnlineDevices > 0 ? `${totalOnlineDevices} Synchronizing Live` : 'Standby / Local Mesh Mode'}
+            </div>
+          </div>
         </Card>
+
         <Card className="stat-tile">
-          <div className="stat-value">100%</div>
-          <div className="stat-label">Offline-First Operational Parity</div>
+          <div className="stat-tile-top">
+            <div className="stat-label">Operational Parity</div>
+            <div className="stat-tile-icon stat-tile-icon-amber">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <div className="stat-value" style={{ color: '#059669' }}>100%</div>
+            <div className="stat-sub">Zero Cloud Downtime Risk</div>
+          </div>
         </Card>
       </div>
 

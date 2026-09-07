@@ -716,8 +716,199 @@
 }
 
 /* ══════════════════════════════════════════════════════════
-   RESPONSIVE ADAPTATIONS
+   OPERATIONS TELEMETRY & LIVE PLATFORM HEALTH
    ══════════════════════════════════════════════════════════ */
+.telemetry-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.telemetry-tile {
+  padding: 18px;
+  background: #FFFFFF;
+  border: 1px solid var(--jv-border, #E2E8F0);
+  border-radius: var(--jv-radius-md, 10px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.18s ease;
+}
+
+.telemetry-tile:hover {
+  border-color: rgba(230, 104, 23, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(11, 37, 58, 0.05);
+}
+
+.telemetry-tile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.telemetry-tile-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--jv-text-secondary, #475569);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.telemetry-tile-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.telemetry-tile-metric {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0B253A;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.telemetry-tile-sub {
+  font-size: 11.5px;
+  color: #64748B;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ANALYTICS CHARTS & GRAPHS
+   ══════════════════════════════════════════════════════════ */
+.charts-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.chart-card {
+  padding: 22px;
+  background: #FFFFFF;
+  border: 1px solid var(--jv-border, #E2E8F0);
+  border-radius: var(--jv-radius-lg, 12px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.chart-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.chart-card-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.chart-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0B253A;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-card-subtitle {
+  font-size: 12px;
+  color: #64748B;
+}
+
+.mini-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 140px;
+  padding-top: 20px;
+  border-bottom: 1px solid #F1F5F9;
+  gap: 12px;
+}
+
+.chart-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.chart-bar-val {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0B253A;
+}
+
+.chart-bar-pillar {
+  width: 100%;
+  max-width: 38px;
+  border-radius: 6px 6px 0 0;
+  transition: all 0.3s ease;
+  min-height: 8px;
+}
+
+.chart-bar-pillar-orange {
+  background: linear-gradient(180deg, #E66817 0%, #F59E0B 100%);
+}
+
+.chart-bar-pillar-navy {
+  background: linear-gradient(180deg, #0B253A 0%, #2563EB 100%);
+}
+
+.chart-bar-wrap:hover .chart-bar-pillar {
+  filter: brightness(1.15);
+  transform: scaleY(1.03);
+}
+
+.chart-bar-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748B;
+}
+
+/* Invoices Receivables Card */
+.invoices-receivables-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #FFFDF9;
+  border: 1px solid var(--jv-gold-border, #E8DEC8);
+  border-radius: 10px;
+  gap: 14px;
+}
+
+.invoices-rec-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.invoices-rec-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.invoices-rec-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0B253A;
+}
+
+.invoices-rec-sub {
+  font-size: 11.5px;
+  color: #64748B;
+}
+
+/* Responsive updates */
 @media (max-width: 1200px) {
   .hero-metrics-grid {
     grid-template-columns: 1fr;
@@ -728,10 +919,19 @@
   .operations-split-grid {
     grid-template-columns: 1fr;
   }
+  .telemetry-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .charts-split-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
   .health-grid {
+    grid-template-columns: 1fr;
+  }
+  .telemetry-grid-4 {
     grid-template-columns: 1fr;
   }
   .infra-stats-row {
@@ -741,5 +941,9 @@
     flex-direction: column;
     align-items: stretch;
   }
+  .mini-bar-chart {
+    gap: 6px;
+  }
 }
+
 

@@ -27,6 +27,11 @@ import { LicensingModule } from './modules/licensing/licensing.module';
 import { BackupsModule } from './modules/backups/backups.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { DeviceCommandsModule } from './modules/device-commands/device-commands.module';
+import { MasterCatalogModule } from './modules/master-catalog/master-catalog.module';
+import { SyncObservabilityModule } from './modules/sync-observability/sync-observability.module';
+import { OfflinePolicyModule } from './modules/offline-policy/offline-policy.module';
+import { SandboxesModule } from './modules/sandboxes/sandboxes.module';
 import { validateEnv } from './config/env.validation';
 
 @Module({
@@ -62,7 +67,12 @@ import { validateEnv } from './config/env.validation';
     PlatformSettingsModule,
     LicensingModule,
     BackupsModule,
-    ReportsModule
+    ReportsModule,
+    DeviceCommandsModule,
+    MasterCatalogModule,
+    SyncObservabilityModule,
+    OfflinePolicyModule,
+    SandboxesModule
   ],
   providers: [
     {

@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { ReportsService } from './reports.service';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
@@ -21,6 +21,11 @@ export class ReportsController {
   @Get('restaurants')
   getRestaurants() {
     return this.reportsService.getRestaurants();
+  }
+
+  @Get('restaurants/:id')
+  getRestaurantReport(@Param('id') id: string) {
+    return this.reportsService.getRestaurantReport(id);
   }
 
   @Get('devices')

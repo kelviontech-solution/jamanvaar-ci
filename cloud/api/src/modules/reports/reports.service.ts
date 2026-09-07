@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -246,5 +246,88 @@ export class ReportsService {
       s.expiresAt.toISOString()
     ]);
     return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+  }
+
+  async getRestaurantReport(restaurantId: string) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const restaurant = await tx.restaurant.findUnique({
+        where: { id: restaurantId },
+        include: {
+          branches: true,
+          devices: true,
+          subscriptions: { include: { plan: true }, orderBy: { createdAt: 'desc' }, take: 1 },
+          invoices: { orderBy: { createdAt: 'desc' } }
+        }
+      });
+      if (!restaurant) throw new NotFoundException('Restaurant not found');
+
+      const branchesCount = restaurant.branches.length;
+      const devicesCount = restaurant.devices.length;
+      const activeDevices = restaurant.devices.filter((d) => d.status === 'ACTIVE').length;
+      const offlineDevices = devicesCount - activeDevices;
+
+      const deviceTypeBreakdown: Record<string, number> = {};
+      for (const d of restaurant.devices) {
+        deviceTypeBreakdown[d.type] = (deviceTypeBreakdown[d.type] || 0) + 1;
+      }
+
+      const totalInvoices = restaurant.invoices.length;
+      const totalBilledPaise = restaurant.invoices.reduce((sum, i) => sum + i.totalAmount, 0);
+      const collectedPaise = restaurant.invoices
+        .filter((i) => i.status === 'PAID')
+        .reduce((sum, i) => sum + i.totalAmount, 0);
+      const outstandingPaise = restaurant.invoices
+        .filter((i) => i.status === 'ISSUED' || i.status === 'PAST_DUE')
+        .reduce((sum, i) => sum + i.totalAmount, 0);
+
+      // Backups and sync telemetry
+      const backupsCount = await tx.backup.count({ where: { restaurantId } });
+      const lastBackup = await tx.backup.findFirst({
+        where: { restaurantId },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      const syncEventsCount = await tx.syncEventLog.count({ where: { restaurantId } });
+      const pendingConflictsCount = await tx.syncConflict.count({
+        where: { restaurantId, resolution: 'PENDING' }
+      });
+
+      const activeSub = restaurant.subscriptions[0];
+
+      return {
+        restaurant: {
+          id: restaurant.id,
+          name: restaurant.name,
+          city: restaurant.city,
+          state: restaurant.state,
+          status: restaurant.status
+        },
+        subscription: activeSub
+          ? {
+              planName: activeSub.plan.name,
+              tier: activeSub.plan.tier,
+              status: activeSub.status,
+              priceMonthly: Math.round(activeSub.plan.priceMonthly / 100),
+              expiresAt: activeSub.expiresAt.toISOString()
+            }
+          : null,
+        metrics: {
+          branchesCount,
+          devicesCount,
+          activeDevices,
+          offlineDevices,
+          deviceTypeBreakdown,
+          totalInvoices,
+          totalBilled: Math.round(totalBilledPaise / 100),
+          collectedRevenue: Math.round(collectedPaise / 100),
+          outstandingReceivables: Math.round(outstandingPaise / 100),
+          backupsCount,
+          lastBackupAt: lastBackup?.createdAt.toISOString() || null,
+          lastBackupStatus: lastBackup?.status || null,
+          syncEventsCount,
+          pendingConflictsCount
+        }
+      };
+    });
   }
 }

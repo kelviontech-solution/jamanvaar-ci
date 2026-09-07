@@ -106,11 +106,11 @@ export function GenerateActivationKeyModal({
               <div className="field">
                 <label>Allowed device type</label>
                 <select value={deviceType} onChange={(e) => setDeviceType(e.target.value as typeof deviceType)}>
-                  <option value="ANY">Any</option>
-                  <option value="POS">POS</option>
-                  <option value="CAPTAIN">Captain</option>
-                  <option value="KDS">KDS</option>
-                  <option value="KIOSK">Kiosk</option>
+                  <option value="ANY">Restaurant Admin Console (POS_ADMIN / Any Terminal)</option>
+                  <option value="POS">Main Billing Counter POS</option>
+                  <option value="CAPTAIN">Captain Waiter Tablet</option>
+                  <option value="KDS">Kitchen Order Display (KDS)</option>
+                  <option value="KIOSK">Self-Order Kiosk</option>
                 </select>
               </div>
               <div className="field">

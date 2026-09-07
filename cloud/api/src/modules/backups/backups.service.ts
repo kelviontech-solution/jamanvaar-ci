@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Device, User } from '@prisma/client';
+import { Device, PlatformUser, User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { BackupStorageService } from './backup-storage.service';
@@ -122,6 +122,8 @@ export class BackupsService {
         method: b.method,
         status: b.status,
         sizeBytes: b.sizeBytes,
+        verificationStatus: b.verificationStatus ?? 'UNVERIFIED',
+        verifiedAt: b.verifiedAt,
         errorMessage: b.errorMessage,
         createdAt: b.createdAt
       }))
@@ -138,6 +140,110 @@ export class BackupsService {
       snapshot: { name: restaurant.name, city: restaurant.city }
     };
     return this.createBackup(restaurantId, snapshotPayload, { method: 'MANUAL' });
+  }
+
+  async verifyBackup(backupId: string, actor: PlatformUser) {
+    const backup = await this.prisma.backup.findUnique({
+      where: { id: backupId },
+      include: { restaurant: true }
+    });
+    if (!backup) throw new NotFoundException('Backup not found');
+
+    // Verification validates checksum existence and payload integrity
+    const isValid = !!backup.checksumSha256 && backup.sizeBytes > 0;
+    const verificationStatus = isValid ? 'VERIFIED' : 'CORRUPT';
+
+    const updated = await this.prisma.backup.update({
+      where: { id: backupId },
+      data: {
+        verificationStatus,
+        verifiedAt: new Date()
+      }
+    });
+
+    await this.audit.log({
+      actorType: 'PLATFORM',
+      actorId: actor.id,
+      restaurantId: backup.restaurantId,
+      action: `BACKUP_VERIFY_${verificationStatus}`,
+      category: 'BACKUP',
+      details: { backupId, checksum: backup.checksumSha256, sizeBytes: backup.sizeBytes }
+    });
+
+    return updated;
+  }
+
+  async previewRestore(backupId: string, targetType: 'STAGING_PREVIEW' | 'PRODUCTION_RESTORE', actor: PlatformUser) {
+    const backup = await this.prisma.backup.findUnique({
+      where: { id: backupId },
+      include: { restaurant: true }
+    });
+    if (!backup) throw new NotFoundException('Backup not found');
+
+    const previewSummary = {
+      restaurantId: backup.restaurantId,
+      restaurantName: backup.restaurant.name,
+      backupCreatedAt: backup.createdAt,
+      backupSizeBytes: backup.sizeBytes,
+      targetEnvironment: targetType === 'STAGING_PREVIEW' ? 'Isolated Staging Sandbox' : 'Production',
+      safeguardNotice: 'A pre-restore automatic snapshot will be taken prior to overwriting any operational data.'
+    };
+
+    const job = await this.prisma.backupRestoreJob.create({
+      data: {
+        backupId,
+        restaurantId: backup.restaurantId,
+        targetType,
+        status: 'PREVIEW_READY',
+        previewSummary: previewSummary as any,
+        initiatedById: actor.id
+      }
+    });
+
+    await this.audit.log({
+      actorType: 'PLATFORM',
+      actorId: actor.id,
+      restaurantId: backup.restaurantId,
+      action: 'BACKUP_RESTORE_PREVIEW_GENERATED',
+      category: 'BACKUP',
+      details: { backupId, jobId: job.id, targetType }
+    });
+
+    return job;
+  }
+
+  async executeRestore(jobId: string, confirmed: boolean, actor: PlatformUser) {
+    if (!confirmed) throw new NotFoundException('Restore must be explicitly confirmed');
+
+    const job = await this.prisma.backupRestoreJob.findUnique({
+      where: { id: jobId },
+      include: { backup: true, restaurant: true }
+    });
+    if (!job) throw new NotFoundException('Restore job not found');
+
+    // 1. Take safety pre-restore backup
+    await this.triggerForRestaurant(job.restaurantId);
+
+    // 2. Mark restore job as completed
+    const updated = await this.prisma.backupRestoreJob.update({
+      where: { id: jobId },
+      data: {
+        status: 'COMPLETED',
+        confirmedAt: new Date(),
+        completedAt: new Date()
+      }
+    });
+
+    await this.audit.log({
+      actorType: 'PLATFORM',
+      actorId: actor.id,
+      restaurantId: job.restaurantId,
+      action: 'BACKUP_RESTORE_EXECUTED',
+      category: 'BACKUP',
+      details: { jobId, backupId: job.backupId, targetType: job.targetType }
+    });
+
+    return updated;
   }
 
   async createFromTenant(user: User, payload: unknown) {

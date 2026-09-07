@@ -4,6 +4,7 @@ import type { AuditLogPage } from '../../api/types';
 import { Badge, Button, Card, EmptyState, Modal, SearchBar, SkeletonTable } from '../../components/ui';
 import { FileText, Eye, Download } from 'lucide-react';
 import { exportRowsToCsv } from '../../lib/csvExport';
+import { formatAuditEvent } from '../../lib/auditFormatter';
 import '../../components/shared.css';
 
 const LIMIT = 25;
@@ -205,62 +206,75 @@ export function AuditLogsPage() {
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Action Event</th>
+                      <th style={{ minWidth: 320 }}>Event & Operational Activity</th>
                       <th>Category</th>
                       <th>Actor</th>
-                      <th>Restaurant ID</th>
+                      <th>Tenant Context</th>
                       <th>Timestamp</th>
-                      <th>Inspect</th>
+                      <th style={{ textAlign: 'right' }}>Inspect</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {data.rows.map((row) => (
-                      <tr key={row.id}>
-                        <td>
-                          <button
-                            type="button"
-                            className="table-link mono"
-                            style={{ fontWeight: 700, background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
-                            onClick={() => setSelectedLog(row)}
-                          >
-                            {row.action}
-                          </button>
-                        </td>
-                        <td>
-                          <span className="badge badge-neutral">{row.category}</span>
-                        </td>
-                        <td>
-                          <span
-                            className={`badge ${
-                              row.actorType === 'PLATFORM'
-                                ? 'badge-accent'
-                                : row.actorType === 'SYSTEM'
-                                ? 'badge-neutral'
-                                : 'badge-gold'
-                            }`}
-                          >
-                            {row.actorType}
-                          </span>
-                        </td>
-                        <td className="mono muted">{row.restaurantId ? row.restaurantId.slice(0, 10) + '…' : '—'}</td>
-                        <td>
-                          {new Date(row.createdAt).toLocaleDateString('en-IN', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                          })}
-                        </td>
-                        <td>
-                          <Button size="sm" variant="ghost" onClick={() => setSelectedLog(row)}>
-                            <Eye className="w-3 h-3" />
-                            <span>Details</span>
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
+                    {data.rows.map((row) => {
+                      const event = formatAuditEvent(row.action, row.category);
+                      return (
+                        <tr key={row.id}>
+                          <td>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                                <button
+                                  type="button"
+                                  className="table-link"
+                                  style={{ fontWeight: 700, fontSize: 13.5, background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+                                  onClick={() => setSelectedLog(row)}
+                                >
+                                  {event.title}
+                                </button>
+                                <span className="mono" style={{ fontSize: 10, color: 'var(--jv-text-secondary)', background: 'var(--jv-bg-muted)', padding: '1px 6px', borderRadius: 4, border: '1px solid var(--jv-border)' }}>
+                                  {row.action}
+                                </span>
+                              </div>
+                              <span style={{ fontSize: 12, color: 'var(--jv-text-secondary)', lineHeight: 1.35 }}>
+                                {event.description}
+                              </span>
+                            </div>
+                          </td>
+                          <td>
+                            <span className={`badge badge-${event.badgeTone}`}>{event.category}</span>
+                          </td>
+                          <td>
+                            <span
+                              className={`badge ${
+                                row.actorType === 'PLATFORM'
+                                  ? 'badge-accent'
+                                  : row.actorType === 'SYSTEM'
+                                  ? 'badge-neutral'
+                                  : 'badge-gold'
+                              }`}
+                            >
+                              {row.actorType}
+                            </span>
+                          </td>
+                          <td className="mono muted">{row.restaurantId ? row.restaurantId.slice(0, 10) + '…' : '—'}</td>
+                          <td style={{ fontSize: 12.5, whiteSpace: 'nowrap' }}>
+                            {new Date(row.createdAt).toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit'
+                            })}
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <Button size="sm" variant="ghost" onClick={() => setSelectedLog(row)}>
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>Details</span>
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

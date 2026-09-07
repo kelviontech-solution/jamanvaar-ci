@@ -183,14 +183,18 @@ export const JAMANVAARStartup: React.FC<JAMANVAARStartupProps> = ({
     return <>{children}</>;
   }
 
+  const isSuperAdmin = String(appType).toUpperCase() === 'SUPER_ADMIN';
+
   return (
-    <div
-      role="region"
-      aria-label="JAMANVAAR Startup"
-      className={`fixed inset-0 z-50 overflow-hidden select-none bg-[#FAF8F5] text-[#0B253A] flex items-center justify-center transition-all duration-500 ${
-        isFadingOut ? 'opacity-0 scale-[1.005] pointer-events-none' : 'opacity-100 scale-100'
-      }`}
-    >
+    <>
+      {children}
+      <div
+        role="region"
+        aria-label="JAMANVAAR Startup"
+        className={`fixed inset-0 z-50 overflow-hidden select-none bg-[#FAF8F5] text-[#0B253A] flex items-center justify-center transition-all duration-500 ${
+          isFadingOut ? 'opacity-0 scale-[1.005] pointer-events-none' : 'opacity-100 scale-100'
+        }`}
+      >
       {/* ── LAYER 1: Subtle Luxury Stationery Canvas & Watermark ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         {/* Soft Radial Warm Glow behind Logo */}
@@ -251,7 +255,7 @@ export const JAMANVAARStartup: React.FC<JAMANVAARStartupProps> = ({
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 text-emerald-800 bg-emerald-50/85 border border-emerald-200/70 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide shadow-2xs backdrop-blur-xs">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Local Engine Active</span>
+            <span>{isSuperAdmin ? 'Cloud Control Active' : 'Local Engine Active'}</span>
           </div>
         </div>
       </header>
@@ -259,7 +263,7 @@ export const JAMANVAARStartup: React.FC<JAMANVAARStartupProps> = ({
       <footer className="absolute bottom-0 inset-x-0 p-6 sm:p-8 md:px-12 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 font-mono tracking-wider pointer-events-auto z-20">
         <span className="flex items-center gap-2">
           <span className="w-1 h-1 rounded-full bg-slate-300" />
-          OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+          {isSuperAdmin ? 'ENTERPRISE MULTI-TENANT CLOUD CONTROL' : 'OFFLINE-FIRST INDIAN RESTAURANT SYSTEM'}
         </span>
         <span>v2.0 • POWERED BY KELVIONTECH</span>
       </footer>
@@ -339,12 +343,12 @@ export const JAMANVAARStartup: React.FC<JAMANVAARStartupProps> = ({
             <span className="text-slate-300">•</span>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50/90 border border-emerald-200/70 text-emerald-800 font-semibold shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Database Initialized
+              {isSuperAdmin ? 'Cloud Database Connected' : 'Database Initialized'}
             </span>
             <span className="text-slate-300">•</span>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50/80 border border-amber-200/70 text-amber-800 font-semibold shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-              Local-First Mode
+              {isSuperAdmin ? 'Multi-Tenant Active' : 'Local-First Mode'}
             </span>
           </div>
 
@@ -374,6 +378,7 @@ export const JAMANVAARStartup: React.FC<JAMANVAARStartupProps> = ({
         )}
       </main>
     </div>
+    </>
   );
 };
 

@@ -7,6 +7,7 @@ import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { generateOpaqueToken, hashOpaqueToken } from '../../common/security/token.util';
 import { EmailService } from '../notifications/email.service';
 import { ownerInviteEmail } from '../notifications/email-templates';
+import * as bcrypt from 'bcryptjs';
 
 const ACTIVATION_TOKEN_TTL_DAYS = 7;
 
@@ -61,6 +62,10 @@ export class RestaurantsService {
       const activationToken = generateOpaqueToken();
       const activationTokenExpiresAt = new Date(Date.now() + ACTIVATION_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000);
 
+      const passwordHash = dto.ownerPassword ? await bcrypt.hash(dto.ownerPassword, 10) : null;
+      const ownerStatus = dto.ownerPassword ? 'ACTIVE' : 'PENDING_ACTIVATION';
+      const activatedAt = dto.ownerPassword ? new Date() : null;
+
       const owner = await tx.user.create({
         data: {
           restaurantId: restaurant.id,
@@ -69,8 +74,10 @@ export class RestaurantsService {
           phone: dto.ownerPhone,
           fullName: dto.ownerName,
           role: 'OWNER',
-          status: 'PENDING_ACTIVATION',
+          passwordHash,
+          status: ownerStatus,
           invitedAt: new Date(),
+          activatedAt,
           activationTokenHash: hashOpaqueToken(activationToken),
           activationTokenExpiresAt
         },
@@ -139,6 +146,11 @@ export class RestaurantsService {
         orderBy: { createdAt: 'desc' },
         include: {
           _count: { select: { branches: true, devices: true } },
+          users: {
+            where: { role: 'OWNER' },
+            take: 1,
+            select: { id: true, fullName: true, email: true, phone: true }
+          },
           subscriptions: {
             orderBy: { createdAt: 'desc' },
             take: 1,

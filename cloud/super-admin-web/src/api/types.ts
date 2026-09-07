@@ -84,8 +84,11 @@ export interface RestaurantCore {
   id: string;
   name: string;
   legalName: string | null;
+  address?: string | null;
   city: string | null;
   state: string | null;
+  gstin?: string | null;
+  fssaiNumber?: string | null;
   status: 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED';
   createdAt: string;
 }
@@ -93,6 +96,7 @@ export interface RestaurantCore {
 /** GET /api/v1/restaurants — carries _count instead of the full related rows. */
 export interface RestaurantListItem extends RestaurantCore {
   _count: { branches: number; devices: number };
+  users?: Array<{ id: string; fullName: string; email: string; phone: string | null }>;
   subscriptions: Subscription[];
 }
 
@@ -139,8 +143,17 @@ export interface Device {
   id: string;
   restaurantId: string;
   branchId: string | null;
-  type: 'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK';
+  type: 'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'POS_ADMIN';
   status: 'PENDING' | 'ACTIVE' | 'REVOKED';
+  name?: string | null;
+  ipAddress?: string | null;
+  macAddress?: string | null;
+  osPlatform?: string | null;
+  isLocked?: boolean;
+  lockReason?: string | null;
+  lockedAt?: string | null;
+  pendingSyncCount?: number;
+  syncError?: string | null;
   appVersion: string | null;
   lastSeenAt: string | null;
   lastSyncAt: string | null;
@@ -152,14 +165,180 @@ export interface Device {
   branch?: { id: string; name: string } | null;
 }
 
+export type DeviceCommandType =
+  | 'LOCK'
+  | 'UNLOCK'
+  | 'FORCE_LOGOUT'
+  | 'REVOKE_SESSION'
+  | 'REVOKE_AUTH'
+  | 'REQUEST_SYNC'
+  | 'REQUEST_HEALTH'
+  | 'APP_UPDATE'
+  | 'RESTART_APP'
+  | 'CLEAR_CACHE'
+  | 'REQUEST_DIAGNOSTICS'
+  | 'DISABLE_DEVICE'
+  | 'ENABLE_DEVICE'
+  | 'WIPE_LOCAL_DATA';
+
+export type DeviceCommandStatus =
+  | 'PENDING'
+  | 'SENT'
+  | 'ACKNOWLEDGED'
+  | 'RUNNING'
+  | 'SUCCEEDED'
+  | 'FAILED'
+  | 'EXPIRED'
+  | 'CANCELLED';
+
+export interface DeviceCommand {
+  id: string;
+  deviceId: string;
+  restaurantId: string;
+  commandType: DeviceCommandType;
+  status: DeviceCommandStatus;
+  payload?: any;
+  result?: any;
+  errorMessage?: string | null;
+  issuedById?: string | null;
+  issuedAt: string;
+  acknowledgedAt?: string | null;
+  executedAt?: string | null;
+  expiresAt: string;
+}
+
 export interface Backup {
   id: string;
+  restaurantId?: string;
+  restaurantName?: string;
+  restaurantCity?: string | null;
   method: 'MANUAL' | 'AUTOMATIC';
   status: 'COMPLETED' | 'FAILED';
   sizeBytes: number;
+  verificationStatus?: 'UNVERIFIED' | 'VERIFIED' | 'CORRUPT';
+  verifiedAt?: string | null;
   createdAt: string;
   errorMessage: string | null;
   device: { id: string; type: string } | null;
+}
+
+export interface MasterMenuCategory {
+  id: string;
+  name: string;
+  slug: string;
+  icon?: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  _count?: { items: number };
+}
+
+export interface MasterMenuItem {
+  id: string;
+  categoryId: string;
+  category?: { id: string; name: string };
+  name: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  basePrice: number;
+  preparationTimeMinutes: number;
+  dietaryType: 'VEG' | 'NON_VEG' | 'VEGAN' | 'JAIN' | 'SWAMINARAYAN';
+  isAvailable: boolean;
+  allergens?: string[] | null;
+  tags?: string[] | null;
+  taxRate: number;
+  hsnCode?: string | null;
+  recipe?: any;
+  createdAt: string;
+  _count?: { syndications: number };
+}
+
+export interface SyncEventLog {
+  id: string;
+  restaurantId: string;
+  restaurant?: { id: string; name: string };
+  branchId?: string | null;
+  deviceId?: string | null;
+  device?: { id: string; type: string; name?: string } | null;
+  entityType: string;
+  action: string;
+  status: 'SUCCESS' | 'FAILED' | 'PENDING';
+  latencyMs: number;
+  payloadSize: number;
+  errorMessage?: string | null;
+  timestamp: string;
+}
+
+export interface SyncConflict {
+  id: string;
+  restaurantId: string;
+  restaurant?: { id: string; name: string };
+  branchId?: string | null;
+  deviceId?: string | null;
+  device?: { id: string; type: string; name?: string } | null;
+  entityType: string;
+  entityId: string;
+  localVersion: any;
+  cloudVersion: any;
+  reason: string;
+  resolution: 'PENDING' | 'CLOUD_WINS' | 'LOCAL_WINS' | 'MANUAL_MERGE';
+  resolvedAt?: string | null;
+  createdAt: string;
+}
+
+export interface PlatformTelemetry {
+  database: {
+    status: 'HEALTHY' | 'DEGRADED' | 'DOWN';
+    latencyMs: number;
+    activeConnections: number;
+    sizeMb: number;
+  };
+  process: {
+    uptimeSeconds: number;
+    rssMb: number;
+    heapUsedMb: number;
+    heapTotalMb: number;
+    nodeVersion: string;
+  };
+  timestamp: string;
+}
+
+export interface SyncMetrics {
+  events24h: number;
+  failures24h: number;
+  successRatePercent: number;
+  activeSyncingDevices: number;
+  pendingConflicts: number;
+}
+
+export interface OfflineExtension {
+  id: string;
+  restaurantId: string;
+  restaurant?: { id: string; name: string; city?: string | null };
+  branchId?: string | null;
+  deviceId?: string | null;
+  device?: { id: string; type: string; name?: string } | null;
+  extensionDays: number;
+  reason: string;
+  requestedBy: string;
+  status: 'ACTIVE' | 'REVOKED' | 'EXPIRED';
+  certificatePayload: string;
+  certificateSignature: string;
+  validFrom: string;
+  validUntil: string;
+  createdAt: string;
+}
+
+export interface RestaurantSandbox {
+  id: string;
+  sourceRestaurantId: string;
+  sourceRestaurant?: { id: string; name: string; city?: string | null };
+  name: string;
+  environmentKey: string;
+  status: 'ACTIVE' | 'CREATING' | 'EXPIRED' | 'DELETED';
+  config: any;
+  expiresAt: string;
+  createdAt: string;
 }
 
 /** GET /api/v1/restaurants/:id — carries the full related rows instead of _count. */
@@ -230,21 +409,57 @@ export interface Session {
   expiresAt: string;
 }
 
+export interface DashboardOperationsTelemetry {
+  platformHealth: {
+    apiStatus: 'UP';
+    databaseStatus: 'HEALTHY' | 'DOWN';
+    databaseLatencyMs: number;
+    activeConnections: number;
+    uptimeSeconds: number;
+  };
+  syncHealth: {
+    events24h: number;
+    failures24h: number;
+    successRatePercent: number;
+    pendingConflicts: number;
+  };
+  backupHealth: {
+    totalBackups: number;
+    completedBackups: number;
+    failedBackups: number;
+    lastBackupAt: string | null;
+  };
+  fleetHealth: {
+    connectivityPercent: number;
+    byType: Array<{ type: string; count: number }>;
+  };
+}
+
 export interface DashboardSummary {
   totalRestaurants: number;
   activeRestaurants: number;
   suspendedRestaurants: number;
+  trialRestaurants?: number;
   totalBranches: number;
   activeSubscriptions: number;
   trialSubscriptions: number;
   expiringSubscriptions: number;
   registeredDevices: number;
   onlineDevices: number;
+  offlineDevices?: number;
   newRestaurantsThisMonth: number;
   mrr: number;
   arr: number;
+  pendingInvoices?: number;
+  overdueInvoices?: number;
+  pendingInvoiceAmount?: number;
   planDistribution: Array<{ planId: string; planName: string; subscriptionCount: number }>;
   recentActivity: AuditLogRow[];
+  operations?: DashboardOperationsTelemetry;
+  trends?: {
+    growth: Array<{ month: string; count: number }>;
+    revenue: Array<{ month: string; revenue: number }>;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -442,5 +657,48 @@ export interface TicketComment {
 
 export interface SupportTicketDetail extends SupportTicket {
   comments: TicketComment[];
+}
+
+export interface CreateRestaurantInput {
+  name: string;
+  city?: string;
+  state?: string;
+  ownerName: string;
+  ownerEmail: string;
+  ownerPhone?: string;
+  ownerPassword?: string;
+}
+
+export interface RestaurantReport {
+  restaurant: {
+    id: string;
+    name: string;
+    city: string | null;
+    state: string | null;
+    status: string;
+  };
+  subscription: {
+    planName: string;
+    tier: string;
+    status: string;
+    priceMonthly: number;
+    expiresAt: string;
+  } | null;
+  metrics: {
+    branchesCount: number;
+    devicesCount: number;
+    activeDevices: number;
+    offlineDevices: number;
+    deviceTypeBreakdown: Record<string, number>;
+    totalInvoices: number;
+    totalBilled: number;
+    collectedRevenue: number;
+    outstandingReceivables: number;
+    backupsCount: number;
+    lastBackupAt: string | null;
+    lastBackupStatus: string | null;
+    syncEventsCount: number;
+    pendingConflictsCount: number;
+  };
 }
 

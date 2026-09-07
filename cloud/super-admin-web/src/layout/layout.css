@@ -47,30 +47,34 @@
 
 /* Brand Area */
 .sidebar-brand {
-  padding: 20px 20px 16px;
+  padding: 18px 20px 14px;
   border-bottom: 1px solid var(--jv-border);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  align-items: flex-start;
 }
 .brand-logo-link {
   display: flex;
   align-items: center;
   text-decoration: none;
+  width: 100%;
 }
 .brand-logo-img {
-  height: 56px;
+  width: 175px;
   max-width: 100%;
-  width: auto;
+  height: auto;
+  max-height: 96px;
   object-fit: contain;
   display: block;
   image-rendering: -webkit-optimize-contrast;
-  filter: drop-shadow(0 2px 6px rgba(11, 37, 58, 0.08)) drop-shadow(0 1px 2px rgba(230, 104, 23, 0.1));
+  filter: drop-shadow(0 2px 8px rgba(11, 37, 58, 0.08)) drop-shadow(0 1px 3px rgba(230, 104, 23, 0.12));
 }
 .brand-badge-row {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
 }
 .platform-tag {
   font-size: 10px;

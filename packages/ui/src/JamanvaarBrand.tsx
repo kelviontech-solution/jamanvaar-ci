@@ -3,7 +3,7 @@ import { JAMANVAAR_LOGOS } from './assets';
 import { LogoVariant, LogoSize } from './Logo';
 
 export type JamanvaarLogoSize = LogoSize | 'xs' | '2xl';
-export type AppIdentity = 'POS' | 'ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN';
+export type AppIdentity = 'POS' | 'ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'SUPER_ADMIN';
 
 export interface JamanvaarLogoProps {
   variant?: LogoVariant;
@@ -113,7 +113,8 @@ export const JamanvaarAppBadge: React.FC<JamanvaarAppBadgeProps> = ({
     CAPTAIN: 'CAPTAIN APP',
     KDS: 'KITCHEN DISPLAY (KDS)',
     KIOSK: 'CUSTOMER KIOSK',
-    KIOSK_ADMIN: 'KIOSK ADMIN'
+    KIOSK_ADMIN: 'KIOSK ADMIN',
+    SUPER_ADMIN: 'SUPER ADMIN'
   };
 
   const label = labelMap[app] || app;

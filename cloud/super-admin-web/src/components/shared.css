@@ -399,3 +399,165 @@
   color: var(--jv-text-muted);
   font-size: 11.5px;
 }
+
+/* ── Universal Metric / KPI Stat Grids (Fixes Billing & Applications Pages) ── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-tile {
+  padding: 20px 22px;
+  background: var(--jv-surface);
+  border: 1px solid var(--jv-border);
+  border-radius: var(--jv-radius-lg);
+  box-shadow: var(--jv-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-tile:hover {
+  border-color: var(--jv-border-hover);
+  box-shadow: var(--jv-shadow-card-hover);
+  transform: translateY(-1.5px);
+}
+
+.stat-tile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stat-tile-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--jv-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-tile-icon-blue { background: #eff6ff; color: #2563eb; }
+.stat-tile-icon-green { background: #ecfdf5; color: #059669; }
+.stat-tile-icon-orange { background: #fff7ed; color: #ea580c; }
+.stat-tile-icon-purple { background: #faf5ff; color: #7c3aed; }
+.stat-tile-icon-amber { background: #fffbeb; color: #d97706; }
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--jv-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.stat-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--jv-text-secondary);
+  line-height: 1.35;
+}
+
+.stat-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--jv-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Standard Form Primitives (Fixes Settings, Tickets & Modals) ── */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.form-field label,
+.modal-form label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--jv-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: block;
+}
+
+.form-field .field-hint {
+  font-size: 11px;
+  color: var(--jv-text-muted);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.input,
+.form-field input,
+.form-field select,
+.form-field textarea,
+.modal-form input:not([type='checkbox']):not([type='radio']),
+.modal-form select,
+.modal-form textarea {
+  width: 100%;
+  height: 40px;
+  padding: 8px 14px;
+  border-radius: var(--jv-radius-md);
+  border: 1px solid var(--jv-border);
+  font-size: 13.5px;
+  font-weight: 500;
+  background: var(--jv-surface);
+  color: var(--jv-text);
+  box-shadow: var(--jv-shadow-xs);
+  transition: all 0.15s ease-in-out;
+  box-sizing: border-box;
+}
+
+.input:focus,
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus,
+.modal-form input:focus,
+.modal-form select:focus,
+.modal-form textarea:focus {
+  outline: none;
+  border-color: var(--jv-accent);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(230, 104, 23, 0.15);
+}
+
+.form-field textarea,
+.modal-form textarea {
+  height: auto;
+  min-height: 84px;
+  resize: vertical;
+  line-height: 1.5;
+  padding: 10px 14px;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder,
+.modal-form input::placeholder,
+.modal-form textarea::placeholder {
+  color: var(--jv-text-light);
+  font-weight: 400;
+}
+

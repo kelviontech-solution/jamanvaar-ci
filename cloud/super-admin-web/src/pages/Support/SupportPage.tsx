@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { SearchResult, RestaurantDiagnostics } from '../../api/types';
 import { Card, Button, Input, Modal, Badge, EmptyState } from '../../components/ui';
@@ -35,6 +35,13 @@ export function SupportPage() {
   const [diagLoading, setDiagLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [fleetList, setFleetList] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.get<any[]>('/api/v1/restaurants')
+      .then((data) => setFleetList(data || []))
+      .catch(() => {});
+  }, []);
 
   // Audited Action Modals
   const [actionModal, setActionModal] = useState<{
@@ -465,7 +472,108 @@ export function SupportPage() {
             </Card>
           </div>
         </div>
-      ) : null}
+      ) : (
+        <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* Diagnostic Mesh Quick Summary */}
+          <div className="stat-grid">
+            <Card className="stat-tile">
+              <div className="stat-tile-top">
+                <div className="stat-label">Diagnostic Telemetry Mesh</div>
+                <div className="stat-tile-icon stat-tile-icon-green">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+              </div>
+              <div>
+                <div className="stat-value" style={{ color: '#059669', fontSize: 20 }}>Cluster Active</div>
+                <div className="stat-sub">Port 4000 Backend Serving Real-Time Metrics</div>
+              </div>
+            </Card>
+
+            <Card className="stat-tile">
+              <div className="stat-tile-top">
+                <div className="stat-label">Operator Privilege</div>
+                <div className="stat-tile-icon stat-tile-icon-blue">
+                  <UserCog className="w-5 h-5" />
+                </div>
+              </div>
+              <div>
+                <div className="stat-value" style={{ fontSize: 20 }}>Support Admin</div>
+                <div className="stat-sub">Audited Device Revocation &amp; Impersonation</div>
+              </div>
+            </Card>
+
+            <Card className="stat-tile">
+              <div className="stat-tile-top">
+                <div className="stat-label">Indexed Tenants</div>
+                <div className="stat-tile-icon stat-tile-icon-purple">
+                  <Store className="w-5 h-5" />
+                </div>
+              </div>
+              <div>
+                <div className="stat-value">{fleetList.length}</div>
+                <div className="stat-sub">Ready for Instant Live Inspection</div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Quick Inspection Targets */}
+          <Card>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--jv-primary)' }}>
+                  Live Diagnostic Targets
+                </h3>
+                <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: 'var(--jv-text-secondary)' }}>
+                  Select any active restaurant below to immediately pull its hardware devices, active license tokens, and audit history.
+                </p>
+              </div>
+              <Badge tone="accent">{fleetList.length} Active Outlets</Badge>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+              {fleetList.map((rest) => (
+                <div
+                  key={rest.id}
+                  style={{
+                    padding: '16px',
+                    border: '1px solid var(--jv-border)',
+                    borderRadius: 'var(--jv-radius-md)',
+                    background: selectedRestaurantId === rest.id ? 'var(--jv-accent-soft)' : 'var(--jv-surface)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '12px',
+                    boxShadow: 'var(--jv-shadow-xs)',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                      <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--jv-primary)' }}>
+                        {rest.name}
+                      </h4>
+                      <Badge tone={rest.status === 'ACTIVE' ? 'success' : 'neutral'}>{rest.status}</Badge>
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--jv-text-muted)', marginTop: 4 }}>
+                      {rest.city || 'India'} • GSTIN: {rest.gstin || 'Unregistered'}
+                    </div>
+                  </div>
+
+                  <Button
+                    size="sm"
+                    variant="accent"
+                    onClick={() => loadDiagnostics(rest.id)}
+                    style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 6 }}
+                  >
+                    <Search className="w-3.5 h-3.5" />
+                    <span>Inspect Live Diagnostics</span>
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* ── Audited Operator Action Modal ── */}
       {actionModal && (

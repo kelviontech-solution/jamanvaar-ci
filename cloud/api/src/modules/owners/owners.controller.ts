@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, UseGuards, UsePipes } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { OwnersService } from './owners.service';
 import { updateOwnerSchema } from './dto/owner.dto';
@@ -39,5 +39,17 @@ export class OwnersController {
   @Patch(':id/suspend')
   suspend(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
     return this.owners.setStatus(id, 'DISABLED', actor);
+  }
+
+  @Post(':id/reset-password')
+  resetPassword(
+    @Param('id') id: string,
+    @Body('password') password: string,
+    @CurrentPlatformUser() actor: PlatformUser
+  ) {
+    if (!password || password.trim().length < 4) {
+      throw new BadRequestException('Password must be at least 4 characters long');
+    }
+    return this.owners.resetPassword(id, password.trim(), actor);
   }
 }

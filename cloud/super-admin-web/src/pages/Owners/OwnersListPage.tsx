@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
-import type { TenantUser } from '../../api/types';
+import type { TenantUser, ActivationKey } from '../../api/types';
 import {
   Badge,
   BulkActionsBar,
@@ -15,7 +15,7 @@ import {
   SkeletonTable,
   statusTone
 } from '../../components/ui';
-import { Users, Send, CheckCircle2, UserCheck, ShieldAlert, Download } from 'lucide-react';
+import { Users, Send, CheckCircle2, UserCheck, ShieldAlert, Download, KeyRound, Copy } from 'lucide-react';
 import { exportRowsToCsv } from '../../lib/csvExport';
 import '../../components/shared.css';
 
@@ -33,6 +33,8 @@ export function OwnersListPage() {
 
   // Selected owner for detail modal
   const [detailOwner, setDetailOwner] = useState<TenantUser | null>(null);
+  const [ownerKeys, setOwnerKeys] = useState<ActivationKey[] | null>(null);
+  const [loadingOwnerKeys, setLoadingOwnerKeys] = useState(false);
 
   // Confirm Modal state
   const [confirmTarget, setConfirmTarget] = useState<{
@@ -64,6 +66,19 @@ export function OwnersListPage() {
   }, []);
 
   useEffect(load, [load]);
+
+  useEffect(() => {
+    if (detailOwner?.restaurant?.id) {
+      setLoadingOwnerKeys(true);
+      api
+        .get<ActivationKey[]>(`/api/v1/activation-keys?restaurantId=${detailOwner.restaurant.id}`)
+        .then(setOwnerKeys)
+        .catch(() => setOwnerKeys([]))
+        .finally(() => setLoadingOwnerKeys(false));
+    } else {
+      setOwnerKeys(null);
+    }
+  }, [detailOwner]);
 
   const filteredOwners = useMemo(() => {
     if (!owners) return [];
@@ -374,6 +389,74 @@ export function OwnersListPage() {
               <dt>Created Timestamp</dt>
               <dd>{new Date(detailOwner.createdAt).toLocaleString('en-IN')}</dd>
             </dl>
+
+            {detailOwner.restaurant && (
+              <div style={{ borderTop: '1px solid var(--jv-border)', paddingTop: 14, marginTop: 6 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <KeyRound className="w-4 h-4 text-orange-600" />
+                    <span style={{ fontSize: 13, fontWeight: 800, color: '#0B253A' }}>
+                      Hardware Activation Keys ({ownerKeys?.length ?? '…'})
+                    </span>
+                  </div>
+                  <Link
+                    to={`/restaurants/${detailOwner.restaurant.id}`}
+                    style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-accent)' }}
+                  >
+                    Open Restaurant Details →
+                  </Link>
+                </div>
+
+                {loadingOwnerKeys ? (
+                  <div style={{ fontSize: 12, color: '#64748b' }}>Loading activation keys…</div>
+                ) : !ownerKeys || ownerKeys.length === 0 ? (
+                  <div style={{ fontSize: 12, color: '#64748b', fontStyle: 'italic' }}>
+                    No activation keys generated yet.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 180, overflowY: 'auto' }}>
+                    {ownerKeys.map((k) => (
+                      <div
+                        key={k.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '8px 12px',
+                          borderRadius: 8,
+                          background: k.status === 'ACTIVE' ? '#fffaf5' : '#f8fafc',
+                          border: k.status === 'ACTIVE' ? '1px solid #fed7aa' : '1px solid #e2e8f0'
+                        }}
+                      >
+                        <div>
+                          <span className="mono" style={{ fontSize: 13, fontWeight: 800, color: '#0B253A' }}>
+                            {k.code}
+                          </span>
+                          <span style={{ marginLeft: 8, fontSize: 11, color: '#64748b' }}>
+                            ({k.allowedDeviceType} Terminal)
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <Badge tone={statusTone(k.status)} pulse={k.status === 'ACTIVE'}>{k.status}</Badge>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              navigator.clipboard.writeText(k.code);
+                              showToast(`Copied key "${k.code}" to clipboard!`);
+                            }}
+                            style={{ padding: '2px 8px', height: 'auto', fontSize: 11 }}
+                          >
+                            <Copy className="w-3 h-3 mr-1" />
+                            Copy
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div style={{ borderTop: '1px solid var(--jv-border)', paddingTop: 14, marginTop: 6, display: 'flex', gap: 10 }}>
               <Button

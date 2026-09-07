@@ -1,26 +1,48 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { ApiError } from '../../api/client';
-import { Button } from '../../components/ui';
-// See ProtectedLayout.tsx for why this bypasses the '@jamanvaar/ui' barrel.
-import { JAMANVAAR_LOGOS } from '../../../../../packages/ui/src/assets';
+import { Zap, AlertCircle } from 'lucide-react';
+// Direct component imports avoid pulling @jamanvaar/ui barrel which pulls local sync singletons
+import { JAMANVAARStartup } from '../../../../../packages/ui/src/JAMANVAARStartup';
+import { JamanvaarAuthLayout } from '../../../../../packages/ui/src/JamanvaarAuthLayout';
 import './login.css';
 
 export function LoginPage() {
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('superadmin@jamanvaar.app');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
+
+  // If already authenticated, route straight to dashboard
+  useEffect(() => {
+    if (user) {
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
+
+  const handleQuickDemoAdmin = () => {
+    setEmail('superadmin@jamanvaar.app');
+    setPassword('admin');
+    setError(null);
+  };
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter both your email address and password.');
+      return;
+    }
+
     setError(null);
     setSubmitting(true);
     try {
-      await login(email, password);
+      await login(email.trim(), password);
       navigate('/', { replace: true });
     } catch (err) {
       if (err instanceof ApiError) {
@@ -28,7 +50,7 @@ export function LoginPage() {
       } else if (err instanceof Error && err.message.includes('fetch')) {
         setError('Cloud API is unreachable at http://localhost:4000. Please ensure the backend is running.');
       } else {
-        setError('Something went wrong. Please check your credentials and try again.');
+        setError('Invalid credentials or unauthorized access. Please verify and try again.');
       }
     } finally {
       setSubmitting(false);
@@ -36,54 +58,120 @@ export function LoginPage() {
   }
 
   return (
-    <div className="login-shell">
-      <div className="login-card">
-        <div className="login-brand">
-          <img
-            src={JAMANVAAR_LOGOS.horizontal}
-            alt="JAMANVAAR"
-            className="login-brand-logo"
-          />
-          <div className="login-brand-meta">
-            <span className="login-platform-tag">PLATFORM CONTROL</span>
-            <span className="login-badge">SUPER ADMIN</span>
-          </div>
-        </div>
+    <JAMANVAARStartup
+      appName="Super Admin"
+      appType="SUPER_ADMIN"
+      subtitle="JAMANVAAR Cloud Platform Control"
+    >
+      <JamanvaarAuthLayout
+        appIdentity="SUPER_ADMIN"
+        appTitle="JAMANVAAR"
+        appSubtitle="Enterprise Platform Control & SaaS Management"
+        isOnline={isOnline}
+        onToggleNetwork={() => setIsOnline((prev) => !prev)}
+        heroHeadline="Platform Control."
+        heroHighlightWord="Unified Cloud Engine."
+        heroDescription="Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics."
+        capabilities={[
+          { label: 'Tenant Fleet Control', icon: 'zap' },
+          { label: 'License Provisioning', icon: 'cloud' },
+          { label: 'Enterprise Analytics', icon: 'printer' },
+          { label: 'Role-Based Security', icon: 'table' }
+        ]}
+        footerNote="Enterprise Grade Security • 99.99% Uptime SLA • Automated Backups"
+        className="jamanvaar-superadmin-login"
+      >
+        <button
+          type="button"
+          onClick={handleQuickDemoAdmin}
+          className="w-full py-2.5 px-4 rounded-xl bg-[#FFF7ED] hover:bg-[#FFEEDD] border border-[#FDBA74] text-[#E66817] font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-2xs active:scale-[0.98] cursor-pointer"
+        >
+          <Zap className="w-4 h-4 text-[#E66817] fill-[#E66817]" />
+          <span>QUICK DEMO LOGIN — Super Admin (@superadmin)</span>
+        </button>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="field">
-            <label htmlFor="email">Email</label>
+        <form onSubmit={handleSubmit} className="space-y-3.5 pt-2 text-left">
+          <div>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
+              Super Admin Email *
+            </label>
             <input
-              id="email"
               type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError(null);
+              }}
+              placeholder="e.g. superadmin@jamanvaar.app"
               autoComplete="username"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@jamanvaar.app"
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
             />
           </div>
 
-          {error && <div className="login-error">{error}</div>}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-bold text-slate-700">Password *</label>
+              <button
+                type="button"
+                onClick={() => setShowPassword((p) => !p)}
+                className="text-[11px] text-[#E66817] hover:underline font-bold cursor-pointer"
+              >
+                {showPassword ? 'Hide Password' : 'Show Password'}
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError(null);
+                }}
+                placeholder="Enter password (demo: admin)"
+                autoComplete="current-password"
+                required
+                className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+              />
+            </div>
+          </div>
 
-          <Button type="submit" variant="primary" disabled={submitting} style={{ width: '100%', marginTop: 4 }}>
-            {submitting ? 'Signing in…' : 'Sign in'}
-          </Button>
+          {error && (
+            <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2.5 rounded-xl text-center flex items-center justify-center gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between text-xs text-slate-500 pt-0.5">
+            <label className="flex items-center gap-2 cursor-pointer select-none font-medium">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="rounded accent-[#E66817]"
+              />
+              <span>Remember session</span>
+            </label>
+            <span className="text-slate-400 text-[11px] font-mono">Port 4000 • Live Cloud API</span>
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full py-3.5 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] disabled:opacity-50 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2 flex items-center justify-center gap-2"
+          >
+            {submitting ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                <span>Signing in to Platform Control…</span>
+              </>
+            ) : (
+              <span>Sign In to Platform Control</span>
+            )}
+          </button>
         </form>
-      </div>
-    </div>
+      </JamanvaarAuthLayout>
+    </JAMANVAARStartup>
   );
 }
-

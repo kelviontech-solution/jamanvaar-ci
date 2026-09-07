@@ -32,7 +32,8 @@ import {
   ChefHat,
   Smartphone,
   Info,
-  RefreshCw
+  RefreshCw,
+  Plus
 } from 'lucide-react';
 import '../../components/shared.css';
 import './onboarding.css';
@@ -116,7 +117,7 @@ interface ModulesForm {
 }
 
 interface ActivationForm {
-  deviceTypes: Array<'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK'>;
+  deviceTypes: Array<'ANY' | 'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK'>;
   expiryDays: string;
 }
 
@@ -162,7 +163,7 @@ const EMPTY_MODULES: ModulesForm = {
 };
 
 const EMPTY_ACTIVATION: ActivationForm = {
-  deviceTypes: ['POS', 'CAPTAIN', 'KDS'],
+  deviceTypes: ['ANY', 'POS', 'CAPTAIN', 'KDS'],
   expiryDays: '30'
 };
 
@@ -228,7 +229,7 @@ export function OnboardRestaurantPage() {
     }));
   }
 
-  function handleDeviceTypeToggle(type: 'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK') {
+  function handleDeviceTypeToggle(type: 'ANY' | 'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK') {
     setActivationForm((prev) => {
       const exists = prev.deviceTypes.includes(type);
       return {
@@ -392,6 +393,40 @@ export function OnboardRestaurantPage() {
       setStep('done');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Onboarding failed — please review error and retry.');
+    } finally {
+      setProcessing(false);
+    }
+  }
+
+  async function handleGenerateKeysOnDone() {
+    if (!restaurantId) return;
+    setProcessing(true);
+    try {
+      const results: ProvisionedKey[] = [];
+      const types = activationForm.deviceTypes.length > 0 ? activationForm.deviceTypes : (['POS', 'CAPTAIN', 'KDS'] as Array<'POS' | 'CAPTAIN' | 'KDS'>);
+      const keyExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      for (const type of types) {
+        const keyRes = await api.post<{ id: string; code: string; allowedDeviceType: string }>(
+          '/api/v1/activation-keys',
+          {
+            restaurantId,
+            subscriptionId,
+            allowedDeviceType: type,
+            expiresAt: keyExpiresAt
+          }
+        );
+        const qrSvg = generateQrSvg(keyRes.code, { size: 100, margin: 1 });
+        results.push({
+          id: keyRes.id,
+          code: keyRes.code,
+          deviceType: keyRes.allowedDeviceType,
+          qrSvg
+        });
+      }
+      setProvisionedKeys(results);
+      setCopyToast('Generated activation keys successfully!');
+    } catch (err) {
+      console.error('Failed to generate keys on done:', err);
     } finally {
       setProcessing(false);
     }
@@ -976,6 +1011,20 @@ export function OnboardRestaurantPage() {
             </p>
 
             <div className="device-key-picker">
+              <label className="device-key-option" style={{ border: activationForm.deviceTypes.includes('ANY') ? '1.5px solid #ea580c' : undefined, background: activationForm.deviceTypes.includes('ANY') ? '#fffaf5' : undefined }}>
+                <input
+                  type="checkbox"
+                  checked={activationForm.deviceTypes.includes('ANY')}
+                  onChange={() => handleDeviceTypeToggle('ANY')}
+                />
+                <div>
+                  <div className="device-key-option-label" style={{ fontWeight: 800, color: '#0b253a' }}>
+                    Restaurant Admin Console (POS_ADMIN) ★
+                  </div>
+                  <div className="device-key-option-desc">Manager PC / Browser Management Suite (http://localhost:5176)</div>
+                </div>
+              </label>
+
               <label className="device-key-option">
                 <input
                   type="checkbox"
@@ -1279,29 +1328,78 @@ export function OnboardRestaurantPage() {
             </div>
 
             {/* Hardware Activation Codes & QR Stamps */}
-            <div style={{ fontSize: 13, fontWeight: 800, color: '#0b253a', marginBottom: 12 }}>
-              2. Pre-Generated Device Activation Keys
-            </div>
-            <div className="device-keys-grid">
-              {provisionedKeys.map((k) => (
-                <div key={k.id} className="device-key-card">
-                  <div className="device-key-type-tag">{k.deviceType} TERMINAL</div>
-                  <div
-                    className="device-qr-wrapper"
-                    dangerouslySetInnerHTML={{ __html: k.qrSvg }}
-                    title={`Scan QR to activate ${k.deviceType}`}
-                  />
-                  <div className="device-code-pill">{k.code}</div>
+            <div style={{ marginTop: 24, padding: '18px 20px', borderRadius: 14, border: '1.5px solid #fed7aa', background: 'linear-gradient(180deg, #fffaf5 0%, #ffffff 100%)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <KeyRound className="w-5 h-5 text-orange-600" />
+                    <span style={{ fontSize: 16, fontWeight: 900, color: '#0b253a' }}>
+                      2. Pre-Generated Device Activation Keys ({provisionedKeys.length})
+                    </span>
+                  </div>
+                  <p style={{ margin: '6px 0 0 0', fontSize: 13, color: '#64748b' }}>
+                    Provide these keys to the restaurant owner. On first login at <strong>http://localhost:5176</strong> (or POS/Captain), entering the key registers and binds the device.
+                  </p>
+                </div>
+
+                {provisionedKeys.length > 0 && (
                   <Button
                     variant="ghost"
-                    style={{ fontSize: 11, padding: '4px 10px' }}
-                    onClick={() => handleCopy(k.code, `${k.deviceType} Key`)}
+                    size="sm"
+                    onClick={() => {
+                      const allText = provisionedKeys.map((k) => `${k.deviceType}: ${k.code}`).join(' | ');
+                      handleCopy(allText, 'All Activation Keys');
+                    }}
+                    style={{ fontWeight: 700, color: '#ea580c' }}
                   >
-                    <Copy className="w-3 h-3 mr-1" />
-                    Copy Code
+                    <Copy className="w-3.5 h-3.5 mr-1.5" />
+                    Copy All Keys
+                  </Button>
+                )}
+              </div>
+
+              <div style={{ padding: '10px 14px', background: '#ecfdf5', borderRadius: 8, border: '1px solid #a7f3d0', color: '#065f46', fontSize: 12.5, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <span>These keys are permanently saved and accessible anytime in <strong>Restaurant Details → Overview</strong> and <strong>Devices &amp; Keys</strong> tab.</span>
+              </div>
+
+              {provisionedKeys.length === 0 ? (
+                <div style={{ padding: '24px', textAlign: 'center', background: '#fff', borderRadius: 10, border: '1px dashed #cbd5e1' }}>
+                  <p style={{ margin: '0 0 12px 0', fontSize: 13, color: '#64748b' }}>
+                    No keys were provisioned yet for this restaurant.
+                  </p>
+                  <Button variant="accent" onClick={handleGenerateKeysOnDone} disabled={processing}>
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    {processing ? 'Generating Keys…' : '⚡ Generate Activation Keys Now'}
                   </Button>
                 </div>
-              ))}
+              ) : (
+                <div className="device-keys-grid">
+                  {provisionedKeys.map((k) => (
+                    <div key={k.id} className="device-key-card" style={{ border: '1.5px solid #fed7aa', boxShadow: '0 2px 8px rgba(234, 88, 12, 0.08)' }}>
+                      <div className="device-key-type-tag" style={{ background: '#ea580c', color: '#fff', fontWeight: 800 }}>
+                        {k.deviceType === 'ANY' || k.deviceType === 'POS_ADMIN' ? 'RESTAURANT ADMIN CONSOLE' : `${k.deviceType} TERMINAL`}
+                      </div>
+                      <div
+                        className="device-qr-wrapper"
+                        dangerouslySetInnerHTML={{ __html: k.qrSvg }}
+                        title={`Scan QR to activate ${k.deviceType}`}
+                      />
+                      <div className="device-code-pill" style={{ fontWeight: 900, color: '#0b253a', fontSize: 14 }}>
+                        {k.code}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        style={{ fontSize: 11, padding: '4px 10px', color: '#ea580c', fontWeight: 700 }}
+                        onClick={() => handleCopy(k.code, `${k.deviceType} Key`)}
+                      >
+                        <Copy className="w-3 h-3 mr-1" />
+                        Copy Code
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Handover Toolbar */}
@@ -1322,7 +1420,7 @@ export function OnboardRestaurantPage() {
 
               <div style={{ display: 'flex', gap: 10 }}>
                 <Button variant="accent" onClick={() => navigate(`/restaurants/${restaurantId}`)}>
-                  Manage Restaurant Detail →
+                  Open Restaurant Details &amp; Keys →
                 </Button>
               </div>
             </div>

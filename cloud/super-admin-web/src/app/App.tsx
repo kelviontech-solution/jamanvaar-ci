@@ -27,6 +27,11 @@ import { BackupsPage } from '../pages/Backups/BackupsPage';
 import { TeamPage } from '../pages/Team/TeamPage';
 import { PlatformActivatePage } from '../pages/Activate/PlatformActivatePage';
 import { TicketsPage } from '../pages/Tickets/TicketsPage';
+import { DeviceDetailPage } from '../pages/Devices/DeviceDetailPage';
+import { MasterCatalogPage } from '../pages/Catalog/MasterCatalogPage';
+import { SyncMonitorPage } from '../pages/SyncMonitor/SyncMonitorPage';
+import { OfflinePolicyPage } from '../pages/OfflinePolicy/OfflinePolicyPage';
+import { SandboxesPage } from '../pages/Sandboxes/SandboxesPage';
 
 /** Wraps a page element so a render crash on this one route can't blank the whole console. */
 function page(name: string, element: JSX.Element) {
@@ -50,6 +55,7 @@ export function App() {
               <Route path="/branches" element={page('BranchesList', <BranchesListPage />)} />
               <Route path="/plans" element={page('PlansList', <PlansListPage />)} />
               <Route path="/plans/:id" element={page('PlanDetail', <PlanDetailPage />)} />
+              <Route path="/catalog" element={page('MasterCatalog', <MasterCatalogPage />)} />
               <Route path="/subscriptions" element={page('SubscriptionsList', <SubscriptionsListPage />)} />
               <Route path="/billing" element={page('Billing', <BillingPage />)} />
               <Route path="/entitlements" element={page('Entitlements', <EntitlementsPage />)} />
@@ -57,7 +63,11 @@ export function App() {
               <Route path="/applications" element={page('Applications', <ApplicationsPage />)} />
               <Route path="/activation-keys" element={page('ActivationKeysList', <ActivationKeysListPage />)} />
               <Route path="/devices" element={page('DevicesList', <DevicesListPage />)} />
+              <Route path="/devices/:id" element={page('DeviceDetail', <DeviceDetailPage />)} />
+              <Route path="/sync-monitor" element={page('SyncMonitor', <SyncMonitorPage />)} />
               <Route path="/backups" element={page('Backups', <BackupsPage />)} />
+              <Route path="/sandboxes" element={page('Sandboxes', <SandboxesPage />)} />
+              <Route path="/offline-policy" element={page('OfflinePolicy', <OfflinePolicyPage />)} />
               <Route path="/team" element={page('Team', <TeamPage />)} />
               <Route path="/support" element={page('Support', <SupportPage />)} />
               <Route path="/tickets" element={page('Tickets', <TicketsPage />)} />

@@ -4,6 +4,7 @@ import type { PlatformSetting } from '../../api/types';
 import { Card, Button, Input, Badge } from '../../components/ui';
 import { Sliders, Save, ShieldCheck, Wrench, Building2, Bell, AlertTriangle } from 'lucide-react';
 import '../../components/shared.css';
+import './settings.css';
 
 export function PlatformSettingsPage() {
   const [settings, setSettings] = useState<PlatformSetting[]>([]);
@@ -129,25 +130,30 @@ export function PlatformSettingsPage() {
       {loading ? (
         <div className="page-loading">Loading platform configuration…</div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '1.5rem' }}>
+        <div className="settings-grid">
           {/* Platform Branding */}
-          <Card>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
-              <Building2 className="w-5 h-5" style={{ color: 'var(--jv-accent)' }} />
-              <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Platform Branding</h3>
+          <Card className="settings-card">
+            <div className="settings-card-header">
+              <div className="settings-card-icon">
+                <Building2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="settings-card-title">Platform Branding</h3>
+                <p className="settings-card-desc">Global platform identity displayed across tenant consoles</p>
+              </div>
             </div>
-            <form onSubmit={handleSaveBranding} className="modal-form">
+            <form onSubmit={handleSaveBranding} className="settings-form">
               <div className="form-field">
-                <label>Platform Name</label>
+                <label>Platform Name *</label>
                 <Input value={platformName} onChange={(e) => setPlatformName(e.target.value)} required />
               </div>
               <div className="form-field">
-                <label>Parent Company</label>
+                <label>Parent Company *</label>
                 <Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
               </div>
               <div className="form-row">
                 <div className="form-field">
-                  <label>Support Email</label>
+                  <label>Support Email *</label>
                   <Input type="email" value={supportEmail} onChange={(e) => setSupportEmail(e.target.value)} required />
                 </div>
                 <div className="form-field">
@@ -155,7 +161,7 @@ export function PlatformSettingsPage() {
                   <Input value={supportPhone} onChange={(e) => setSupportPhone(e.target.value)} />
                 </div>
               </div>
-              <div style={{ marginTop: '1rem' }}>
+              <div style={{ marginTop: '0.5rem' }}>
                 <Button type="submit" variant="accent" disabled={saving || loading}>
                   <Save className="w-4 h-4" />
                   <span>Save Branding</span>
@@ -165,14 +171,19 @@ export function PlatformSettingsPage() {
           </Card>
 
           {/* Onboarding Defaults */}
-          <Card>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
-              <Sliders className="w-5 h-5" style={{ color: 'var(--jv-accent)' }} />
-              <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Onboarding Default Quotas</h3>
+          <Card className="settings-card">
+            <div className="settings-card-header">
+              <div className="settings-card-icon">
+                <Sliders className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="settings-card-title">Onboarding Default Quotas</h3>
+                <p className="settings-card-desc">Default allocation when new restaurants are provisioned</p>
+              </div>
             </div>
-            <form onSubmit={handleSaveDefaults} className="modal-form">
+            <form onSubmit={handleSaveDefaults} className="settings-form">
               <div className="form-field">
-                <label>Default Trial Duration (Days)</label>
+                <label>Default Trial Duration (Days) *</label>
                 <Input
                   type="number"
                   value={trialDurationDays}
@@ -182,7 +193,7 @@ export function PlatformSettingsPage() {
               </div>
               <div className="form-row">
                 <div className="form-field">
-                  <label>Max Outlets per Trial</label>
+                  <label>Max Outlets per Trial *</label>
                   <Input
                     type="number"
                     value={maxTrialBranches}
@@ -191,7 +202,7 @@ export function PlatformSettingsPage() {
                   />
                 </div>
                 <div className="form-field">
-                  <label>Max Terminals per Trial</label>
+                  <label>Max Terminals per Trial *</label>
                   <Input
                     type="number"
                     value={maxTrialDevices}
@@ -200,7 +211,7 @@ export function PlatformSettingsPage() {
                   />
                 </div>
               </div>
-              <div style={{ marginTop: '1rem' }}>
+              <div style={{ marginTop: '0.5rem' }}>
                 <Button type="submit" variant="accent" disabled={saving || loading}>
                   <Save className="w-4 h-4" />
                   <span>Save Quotas</span>
@@ -210,41 +221,44 @@ export function PlatformSettingsPage() {
           </Card>
 
           {/* Maintenance & Operational Status */}
-          <Card>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
-              <Wrench className="w-5 h-5" style={{ color: 'var(--jv-accent)' }} />
-              <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Maintenance & Alerts</h3>
+          <Card className="settings-card">
+            <div className="settings-card-header">
+              <div className="settings-card-icon">
+                <Wrench className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="settings-card-title">Maintenance & Alerts</h3>
+                <p className="settings-card-desc">Global platform announcements and maintenance broadcast</p>
+              </div>
             </div>
-            <form onSubmit={handleSaveMaintenance} className="modal-form">
-              <div className="form-field" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '8px' }}>
+            <form onSubmit={handleSaveMaintenance} className="settings-form">
+              <div className={`maintenance-toggle-box ${maintenanceMode ? 'active' : ''}`}>
                 <input
                   type="checkbox"
                   id="maintenanceToggle"
+                  className="maintenance-checkbox"
                   checked={maintenanceMode}
                   onChange={(e) => setMaintenanceMode(e.target.checked)}
                 />
-                <div>
-                  <label htmlFor="maintenanceToggle" style={{ margin: 0, fontWeight: 600, cursor: 'pointer' }}>
-                    Platform Maintenance Mode
-                  </label>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-secondary)' }}>
-                    When active, tenant admins see a maintenance notice; offline local POS terminals continue operating uninterrupted.
-                  </div>
+                <div className="maintenance-content">
+                  <h4>Platform Maintenance Mode</h4>
+                  <p>
+                    When enabled, tenant admins see a maintenance notice in their portals. Offline POS terminals continue operating uninterrupted without loss of local data.
+                  </p>
                 </div>
               </div>
 
-              <div className="form-field" style={{ marginTop: '1rem' }}>
+              <div className="form-field" style={{ marginTop: '0.5rem' }}>
                 <label>Global Status Banner Message</label>
                 <textarea
                   value={statusBanner}
                   onChange={(e) => setStatusBanner(e.target.value)}
                   rows={3}
-                  className="input-textarea"
-                  placeholder="e.g. Scheduled database optimization on Sunday 2:00 AM IST..."
+                  placeholder="e.g. Scheduled database optimization on Sunday 2:00 AM IST. All offline devices remain operational."
                 />
               </div>
 
-              <div style={{ marginTop: '1rem' }}>
+              <div style={{ marginTop: '0.5rem' }}>
                 <Button type="submit" variant="accent" disabled={saving || loading}>
                   <Save className="w-4 h-4" />
                   <span>Save Status</span>

@@ -13,7 +13,7 @@ import {
   SkeletonTable,
   EmptyState
 } from '../../components/ui';
-import { LifeBuoy, Plus, Clock } from 'lucide-react';
+import { LifeBuoy, Plus, Clock, AlertCircle, ShieldCheck, CheckCircle2, Sparkles } from 'lucide-react';
 import '../../components/shared.css';
 
 const PRIORITY_TONE: Record<TicketPriority, BadgeTone> = {
@@ -173,7 +173,70 @@ export function TicketsPage() {
           {toast}
         </div>
       )}
-      {error && <div className="page-error">{error}</div>}
+      <div className="stat-grid">
+        <Card className="stat-tile">
+          <div className="stat-tile-top">
+            <div className="stat-label">Total Tickets</div>
+            <div className="stat-tile-icon stat-tile-icon-blue">
+              <LifeBuoy className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <div className="stat-value">{counts.ALL}</div>
+            <div className="stat-sub">Across All Tenant Outlets</div>
+          </div>
+        </Card>
+
+        <Card className="stat-tile">
+          <div className="stat-tile-top">
+            <div className="stat-label">Open / Unresolved</div>
+            <div className="stat-tile-icon stat-tile-icon-orange">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <div className="stat-value" style={{ color: (counts.OPEN || 0) > 0 ? '#ea580c' : 'inherit' }}>
+              {counts.OPEN || 0}
+            </div>
+            <div className="stat-sub">
+              {(counts.OPEN || 0) > 0 ? 'Requires Operator Response' : 'Queue Empty — All Clear'}
+            </div>
+          </div>
+        </Card>
+
+        <Card className="stat-tile">
+          <div className="stat-tile-top">
+            <div className="stat-label">In Progress</div>
+            <div className="stat-tile-icon stat-tile-icon-amber">
+              <Clock className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <div className="stat-value" style={{ color: (counts.IN_PROGRESS || 0) > 0 ? '#d97706' : 'inherit' }}>
+              {counts.IN_PROGRESS || 0}
+            </div>
+            <div className="stat-sub">Under Engineering Investigation</div>
+          </div>
+        </Card>
+
+        <Card className="stat-tile">
+          <div className="stat-tile-top">
+            <div className="stat-label">Resolved / Closed</div>
+            <div className="stat-tile-icon stat-tile-icon-green">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <div className="stat-value" style={{ color: '#059669' }}>
+              {(counts.RESOLVED || 0) + (counts.CLOSED || 0)}
+            </div>
+            <div className="stat-sub">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>100% SLA Compliance</span>
+            </div>
+          </div>
+        </Card>
+      </div>
 
       <div className="toolbar" style={{ marginTop: 12 }}>
         <FilterTabs<TicketStatus | 'ALL'>
@@ -194,12 +257,62 @@ export function TicketsPage() {
       ) : (
         <Card>
           {!tickets || tickets.length === 0 ? (
-            <EmptyState
-              icon={<LifeBuoy className="w-6 h-6 text-slate-400" />}
-              title="No tickets"
-              description="Support issues will show up here once created."
-              action={<Button variant="accent" onClick={() => setShowCreate(true)}>Create First Ticket</Button>}
-            />
+            <div style={{ padding: '36px 20px', textAlign: 'center' }}>
+              <EmptyState
+                icon={<LifeBuoy className="w-7 h-7 text-slate-400" />}
+                title="No support tickets found"
+                description="Support issues, hardware tickets, and tenant queries will appear here once filed."
+                action={
+                  <Button variant="accent" onClick={() => setShowCreate(true)}>
+                    <Plus className="w-4 h-4" />
+                    <span>Create Ticket</span>
+                  </Button>
+                }
+              />
+              <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid var(--jv-border)', maxWidth: 540, margin: '24px auto 0' }}>
+                <div style={{ fontSize: 11.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--jv-text-muted)', marginBottom: 10 }}>
+                  Quick Incident Scenarios
+                </div>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => {
+                      setNewSubject('POS Terminal Mesh Desync');
+                      setNewDescription('Billing counter terminal reporting intermittent offline sync with kitchen KDS.');
+                      setNewPriority('HIGH');
+                      setShowCreate(true);
+                    }}
+                  >
+                    + POS Mesh Desync
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => {
+                      setNewSubject('GST Invoice Discrepancy');
+                      setNewDescription('Tenant requesting statutory tax rate adjustment from 5% to 18% for corporate catering.');
+                      setNewPriority('MEDIUM');
+                      setShowCreate(true);
+                    }}
+                  >
+                    + GST Invoice Inquiry
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => {
+                      setNewSubject('Staff PIN Security Reset');
+                      setNewDescription('Manager requesting emergency PIN reset for restaurant admin console.');
+                      setNewPriority('URGENT');
+                      setShowCreate(true);
+                    }}
+                  >
+                    + Staff PIN Reset
+                  </button>
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="data-table-container">
               <table className="data-table">

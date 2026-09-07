@@ -115,6 +115,13 @@ model Restaurant {
   payments      Payment[]
   backups       Backup[]
   supportTickets SupportTicket[]
+  deviceCommands      DeviceCommand[]
+  menuSyndications    RestaurantMenuSyndication[]
+  syncEventLogs       SyncEventLog[]
+  syncConflicts       SyncConflict[]
+  offlineExtensions   OfflineExtension[]
+  sandboxes           RestaurantSandbox[]
+  restoreJobs         BackupRestoreJob[]
 }
 
 enum BranchStatus {
@@ -331,7 +338,21 @@ model Device {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  backups Backup[]
+  name             String?
+  ipAddress        String?
+  macAddress       String?
+  osPlatform       String?
+  isLocked         Boolean         @default(false)
+  lockReason       String?
+  lockedAt         DateTime?
+  pendingSyncCount Int             @default(0)
+  syncError        String?
+
+  backups          Backup[]
+  commands         DeviceCommand[]
+  syncEventLogs    SyncEventLog[]
+  syncConflicts    SyncConflict[]
+  offlineExtensions OfflineExtension[]
 
   @@index([restaurantId])
   @@index([branchId])
@@ -552,20 +573,250 @@ enum BackupStatus {
 }
 
 model Backup {
-  id             String       @id @default(uuid())
-  restaurantId   String
-  restaurant     Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  deviceId       String?
-  device         Device?      @relation(fields: [deviceId], references: [id], onDelete: SetNull)
-  method         BackupMethod @default(MANUAL)
-  status         BackupStatus @default(COMPLETED)
-  sizeBytes      Int
-  storageKey     String       // object key within the configured bucket
-  checksumSha256 String
-  errorMessage   String?
-  createdAt      DateTime     @default(now())
+  id                 String             @id @default(uuid())
+  restaurantId       String
+  restaurant         Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  deviceId           String?
+  device             Device?            @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  method             BackupMethod       @default(MANUAL)
+  status             BackupStatus       @default(COMPLETED)
+  sizeBytes          Int
+  storageKey         String             // object key within the configured bucket
+  checksumSha256     String
+  errorMessage       String?
+  verificationStatus String?            @default("UNVERIFIED") // UNVERIFIED, VERIFIED, CORRUPT
+  verifiedAt         DateTime?
+  retentionDays      Int                @default(30)
+  createdAt          DateTime           @default(now())
+
+  restoreJobs        BackupRestoreJob[]
 
   @@index([restaurantId])
   @@index([deviceId])
 }
+
+// ---------------------------------------------------------------------------
+// Device Remote Commands & MDM
+// ---------------------------------------------------------------------------
+
+enum DeviceCommandType {
+  LOCK
+  UNLOCK
+  FORCE_LOGOUT
+  REVOKE_SESSION
+  REVOKE_AUTH
+  REQUEST_SYNC
+  REQUEST_HEALTH
+  APP_UPDATE
+  RESTART_APP
+  CLEAR_CACHE
+  REQUEST_DIAGNOSTICS
+  DISABLE_DEVICE
+  ENABLE_DEVICE
+  WIPE_LOCAL_DATA
+}
+
+enum DeviceCommandStatus {
+  PENDING
+  SENT
+  ACKNOWLEDGED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  EXPIRED
+  CANCELLED
+}
+
+model DeviceCommand {
+  id             String              @id @default(uuid())
+  deviceId       String
+  device         Device              @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  restaurantId   String
+  restaurant     Restaurant          @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  commandType    DeviceCommandType
+  status         DeviceCommandStatus @default(PENDING)
+  payload        Json?
+  result         Json?
+  errorMessage   String?
+  issuedById     String?
+  issuedAt       DateTime            @default(now())
+  acknowledgedAt DateTime?
+  executedAt     DateTime?
+  expiresAt      DateTime
+
+  @@index([deviceId, status])
+  @@index([restaurantId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Master Menu Catalog & Syndication
+// ---------------------------------------------------------------------------
+
+model MasterMenuCategory {
+  id        String           @id @default(uuid())
+  name      String           @unique
+  slug      String           @unique
+  icon      String?
+  sortOrder Int              @default(0)
+  isActive  Boolean          @default(true)
+  items     MasterMenuItem[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model MasterMenuItem {
+  id                     String                      @id @default(uuid())
+  categoryId             String
+  category               MasterMenuCategory          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name                   String
+  description            String?
+  imageUrl               String?
+  basePrice              Int                         // in paise
+  preparationTimeMinutes Int                         @default(15)
+  dietaryType            String                      @default("VEG") // VEG, NON_VEG, VEGAN, JAIN, SWAMINARAYAN
+  isAvailable            Boolean                     @default(true)
+  allergens              Json?                       // string[]
+  tags                   Json?                       // string[]
+  taxRate                Int                         @default(500) // 5.00% (500 paise basis points)
+  hsnCode                String?                     @default("996331")
+  recipe                 Json?
+  syndications           RestaurantMenuSyndication[]
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
+
+  @@index([categoryId])
+}
+
+model RestaurantMenuSyndication {
+  id           String         @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  masterItemId String
+  masterItem   MasterMenuItem @relation(fields: [masterItemId], references: [id], onDelete: Cascade)
+  customPrice  Int?           // overridden restaurant price in paise
+  customName   String?
+  isCustomized Boolean        @default(false)
+  autoSync     Boolean        @default(true)
+  status       String         @default("ACTIVE")
+  lastSyncedAt DateTime       @default(now())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@unique([restaurantId, masterItemId])
+  @@index([restaurantId])
+}
+
+// ---------------------------------------------------------------------------
+// Sync Observability & Conflicts
+// ---------------------------------------------------------------------------
+
+model SyncEventLog {
+  id           String     @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branchId     String?
+  deviceId     String?
+  device       Device?    @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  entityType   String     // ORDER, MENU, INVENTORY, CUSTOMER
+  action       String     // CREATE, UPDATE, DELETE
+  status       String     // SUCCESS, FAILED, PENDING
+  latencyMs    Int        @default(0)
+  payloadSize  Int        @default(0)
+  errorMessage String?
+  timestamp    DateTime   @default(now())
+
+  @@index([restaurantId, timestamp])
+  @@index([status])
+}
+
+model SyncConflict {
+  id           String     @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branchId     String?
+  deviceId     String?
+  device       Device?    @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  entityType   String
+  entityId     String
+  localVersion Json
+  cloudVersion Json
+  reason       String
+  resolution   String     @default("PENDING") // PENDING, CLOUD_WINS, LOCAL_WINS, MANUAL_MERGE
+  resolvedAt   DateTime?
+  resolvedById String?
+  createdAt    DateTime   @default(now())
+
+  @@index([restaurantId])
+  @@index([resolution])
+}
+
+// ---------------------------------------------------------------------------
+// Emergency Offline Policy
+// ---------------------------------------------------------------------------
+
+model OfflineExtension {
+  id                   String     @id @default(uuid())
+  restaurantId         String
+  restaurant           Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branchId             String?
+  deviceId             String?
+  device               Device?    @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  extensionDays        Int
+  reason               String
+  requestedBy          String
+  approvedById         String
+  status               String     @default("ACTIVE") // ACTIVE, REVOKED, EXPIRED
+  certificatePayload   String
+  certificateSignature String
+  validFrom            DateTime   @default(now())
+  validUntil           DateTime
+  createdAt            DateTime   @default(now())
+
+  @@index([restaurantId])
+  @@index([deviceId])
+}
+
+// ---------------------------------------------------------------------------
+// Staging Sandbox Clones
+// ---------------------------------------------------------------------------
+
+model RestaurantSandbox {
+  id                 String     @id @default(uuid())
+  sourceRestaurantId String
+  sourceRestaurant   Restaurant @relation(fields: [sourceRestaurantId], references: [id], onDelete: Cascade)
+  name               String
+  environmentKey     String     @unique
+  status             String     @default("ACTIVE") // CREATING, ACTIVE, EXPIRED, DELETED
+  config             Json
+  expiresAt          DateTime
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  @@index([sourceRestaurantId])
+}
+
+// ---------------------------------------------------------------------------
+// Backup Restore Jobs
+// ---------------------------------------------------------------------------
+
+model BackupRestoreJob {
+  id             String     @id @default(uuid())
+  backupId       String
+  backup         Backup     @relation(fields: [backupId], references: [id], onDelete: Cascade)
+  restaurantId   String
+  restaurant     Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  targetType     String     // STAGING_PREVIEW, PRODUCTION_RESTORE
+  status         String     @default("PENDING") // PENDING, PREVIEW_READY, RESTORING, COMPLETED, FAILED
+  previewSummary Json?
+  errorMessage   String?
+  initiatedById  String
+  confirmedAt    DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime   @default(now())
+
+  @@index([restaurantId])
+  @@index([backupId])
+}
+
 

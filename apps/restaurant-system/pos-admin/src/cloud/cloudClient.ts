@@ -15,6 +15,8 @@ const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:40
 
 const RESTAURANT_ID_KEY = 'jamanvaar_cloud_restaurant_id';
 const ENTITLEMENTS_CACHE_KEY = 'jamanvaar_cloud_entitlements_cache';
+const DEVICE_ID_KEY = 'jamanvaar_cloud_device_id';
+const DEVICE_TOKEN_KEY = 'jamanvaar_cloud_device_token';
 
 export class CloudApiError extends Error {
   constructor(
@@ -54,6 +56,41 @@ function setRestaurantId(id: string) {
     localStorage.setItem(RESTAURANT_ID_KEY, id);
   } catch {
     // Storage unavailable (private mode, etc.) — connection just won't persist across reloads.
+  }
+}
+
+export function getStoredDeviceId(): string | null {
+  try {
+    return localStorage.getItem(DEVICE_ID_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function getStoredDeviceToken(): string | null {
+  try {
+    return localStorage.getItem(DEVICE_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function saveDeviceRegistration(deviceId: string, deviceToken: string, restaurantId: string) {
+  try {
+    localStorage.setItem(DEVICE_ID_KEY, deviceId);
+    localStorage.setItem(DEVICE_TOKEN_KEY, deviceToken);
+    localStorage.setItem(RESTAURANT_ID_KEY, restaurantId);
+  } catch {
+    // Storage unavailable
+  }
+}
+
+export function clearDeviceRegistration() {
+  try {
+    localStorage.removeItem(DEVICE_ID_KEY);
+    localStorage.removeItem(DEVICE_TOKEN_KEY);
+  } catch {
+    // ignore
   }
 }
 
@@ -148,24 +185,126 @@ export async function redeemActivationCode(code: string, appVersion?: string): P
   return result;
 }
 
-/** Step 2: the owner logs in with the credentials Super Admin (or a prior session) set up. */
+export interface CloudAuthSuccess {
+  requiresActivation: false;
+  user: { id: string; fullName: string; role: string; restaurantId: string; email: string };
+  restaurant: { id: string; name: string };
+  deviceId?: string;
+}
+
+export interface CloudAuthActivationRequired {
+  requiresActivation: true;
+  activationSessionToken: string;
+  restaurant: { id: string; name: string };
+  user: { id: string; fullName: string; email: string };
+  message: string;
+}
+
+export type CloudAuthResult = CloudAuthSuccess | CloudAuthActivationRequired;
+
+/**
+ * Universal Restaurant Admin Cloud Login:
+ * Sends email, password, and persistent device credentials.
+ * Returns either direct LOGIN_SUCCESS (requiresActivation: false) or ACTIVATION_REQUIRED (requiresActivation: true).
+ */
 export async function cloudLogin(
   email: string,
   password: string
-): Promise<{ id: string; fullName: string; role: string; restaurantId: string }> {
-  const restaurantId = getRestaurantId();
-  if (!restaurantId) {
-    throw new CloudApiError('Not connected — enter an activation code first', 400);
-  }
-  const result = await request<{
-    accessToken: string;
-    user: { id: string; fullName: string; role: string; restaurantId: string };
-  }>('/api/v1/tenant-auth/login', {
+): Promise<CloudAuthResult> {
+  const deviceId = getStoredDeviceId() || undefined;
+  const deviceToken = getStoredDeviceToken() || undefined;
+
+  const result = await request<
+    | {
+        status: 'LOGIN_SUCCESS';
+        requiresActivation: false;
+        accessToken: string;
+        user: { id: string; fullName: string; role: string; restaurantId: string; email: string };
+        restaurant: { id: string; name: string };
+        deviceId?: string;
+        deviceToken?: string;
+      }
+    | {
+        status: 'ACTIVATION_REQUIRED';
+        requiresActivation: true;
+        activationSessionToken: string;
+        restaurant: { id: string; name: string };
+        user: { id: string; fullName: string; email: string };
+        message: string;
+      }
+  >('/api/v1/tenant-auth/login', {
     method: 'POST',
-    body: { restaurantId, email, password }
+    body: {
+      email,
+      password,
+      deviceId,
+      deviceToken,
+      deviceType: 'POS_ADMIN'
+    }
   });
+
+  if (result.status === 'LOGIN_SUCCESS') {
+    accessToken = result.accessToken;
+    setRestaurantId(result.restaurant.id);
+    if (result.deviceId && result.deviceToken) {
+      saveDeviceRegistration(result.deviceId, result.deviceToken, result.restaurant.id);
+    }
+    return {
+      requiresActivation: false,
+      user: result.user,
+      restaurant: result.restaurant,
+      deviceId: result.deviceId
+    };
+  }
+
+  return {
+    requiresActivation: true,
+    activationSessionToken: result.activationSessionToken,
+    restaurant: result.restaurant,
+    user: result.user,
+    message: result.message
+  };
+}
+
+/**
+ * Redeems an activation key for this authenticated session, binds the device in PostgreSQL,
+ * and sets up persistent device credentials so future logins do not ask for activation.
+ */
+export async function cloudActivateDevice(
+  activationSessionToken: string,
+  activationKey: string
+): Promise<{
+  user: { id: string; fullName: string; role: string; restaurantId: string; email: string };
+  restaurant: { id: string; name: string };
+  deviceId: string;
+}> {
+  const result = await request<{
+    status: 'LOGIN_SUCCESS';
+    requiresActivation: false;
+    accessToken: string;
+    user: { id: string; fullName: string; role: string; restaurantId: string; email: string };
+    restaurant: { id: string; name: string };
+    deviceId: string;
+    deviceToken: string;
+  }>('/api/v1/tenant-auth/activate-device', {
+    method: 'POST',
+    body: {
+      activationSessionToken,
+      activationKey,
+      deviceType: 'POS_ADMIN',
+      deviceName: 'Restaurant Admin Console'
+    }
+  });
+
   accessToken = result.accessToken;
-  return result.user;
+  saveDeviceRegistration(result.deviceId, result.deviceToken, result.restaurant.id);
+  setRestaurantId(result.restaurant.id);
+
+  return {
+    user: result.user,
+    restaurant: result.restaurant,
+    deviceId: result.deviceId
+  };
 }
 
 /**

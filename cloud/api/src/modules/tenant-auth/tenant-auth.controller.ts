@@ -21,7 +21,10 @@ import {
   setInitialPasswordSchema,
   setTenantUserStatusSchema,
   tenantChangePasswordSchema,
-  tenantLoginSchema
+  tenantLoginSchema,
+  activateDeviceSchema,
+  TenantLoginDto,
+  ActivateDeviceDto
 } from './dto/login.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
@@ -60,12 +63,26 @@ export class TenantAuthController {
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(tenantLoginSchema))
   async login(
-    @Body() body: { restaurantId: string; email: string; password: string },
+    @Body() body: TenantLoginDto,
     @Res({ passthrough: true }) res: Response
   ) {
-    const result = await this.authService.login(body.restaurantId, body.email, body.password);
+    const result = await this.authService.login(body);
+    if (result.status === 'LOGIN_SUCCESS') {
+      this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
+    }
+    return result;
+  }
+
+  @Post('activate-device')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(activateDeviceSchema))
+  async activateDevice(
+    @Body() body: ActivateDeviceDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const result = await this.authService.activateDevice(body);
     this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
-    return { accessToken: result.accessToken, user: result.user };
+    return result;
   }
 
   @Post('refresh')

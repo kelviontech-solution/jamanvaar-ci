@@ -11,11 +11,11 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import { User, TenantUserStatus } from '@prisma/client';
+import { User, TenantUserStatus, Device } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
-import { hashOpaqueToken } from '../../common/security/token.util';
-import { CreateTenantStaffUserDto } from './dto/login.dto';
+import { hashOpaqueToken, generateOpaqueToken } from '../../common/security/token.util';
+import { CreateTenantStaffUserDto, TenantLoginDto, ActivateDeviceDto } from './dto/login.dto';
 
 export const TENANT_JWT_ISSUER = 'jamanvaar-tenant';
 export const TENANT_JWT_AUDIENCE = 'jamanvaar-tenant';
@@ -33,6 +33,29 @@ export interface TenantLoginResult {
   refreshTokenExpiresAt: Date;
   user: Pick<User, 'id' | 'restaurantId' | 'branchId' | 'email' | 'fullName' | 'role' | 'status'>;
 }
+
+export interface TenantLoginSuccess {
+  status: 'LOGIN_SUCCESS';
+  requiresActivation: false;
+  accessToken: string;
+  refreshToken: string;
+  refreshTokenExpiresAt: Date;
+  user: TenantLoginResult['user'];
+  restaurant: { id: string; name: string };
+  deviceId?: string;
+  deviceToken?: string;
+}
+
+export interface TenantActivationRequired {
+  status: 'ACTIVATION_REQUIRED';
+  requiresActivation: true;
+  activationSessionToken: string;
+  restaurant: { id: string; name: string };
+  user: { id: string; email: string; fullName: string };
+  message: string;
+}
+
+export type TenantAuthResponse = TenantLoginSuccess | TenantActivationRequired;
 
 function hashRefreshToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
@@ -174,37 +197,300 @@ export class TenantAuthService {
     });
   }
 
-  /** Never throws differently for unknown-user/wrong-password/pending-activation — response is uniform. */
-  async login(restaurantId: string, email: string, password: string): Promise<TenantLoginResult> {
-    const user = await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.user.findFirst({ where: { restaurantId, email } })
-    );
+  /**
+   * Universal Tenant / Restaurant Admin Login:
+   * 1. Resolves tenant user by email and validates bcrypt password.
+   * 2. Checks whether this physical device is already registered and ACTIVE.
+   * 3. If registered and active -> returns LOGIN_SUCCESS with session tokens.
+   * 4. If not registered/active -> returns ACTIVATION_REQUIRED with an activationSessionToken.
+   */
+  async login(dto: TenantLoginDto): Promise<TenantAuthResponse> {
+    const { email, password, restaurantId, deviceId, deviceToken, deviceType, appVersion } = dto;
 
-    const passwordHash = user?.passwordHash ?? '$2a$10$CwTycUXWue0Thq9StjUM0uJ8Q8T6b8f1Q8T6b8f1Q8T6b8f1Q8T6b';
-    const passwordOk = await bcrypt.compare(password, passwordHash);
+    // Look up user(s) matching this email across candidate tenants
+    const candidates = await this.prisma.runAsPlatform(async (tx) => {
+      return tx.user.findMany({
+        where: {
+          email,
+          ...(restaurantId ? { restaurantId } : {}),
+          status: { not: TenantUserStatus.DISABLED }
+        },
+        include: {
+          restaurant: {
+            select: { id: true, name: true, status: true, deletedAt: true }
+          }
+        }
+      });
+    });
 
-    if (!user || !user.passwordHash || !passwordOk || user.status !== TenantUserStatus.ACTIVE) {
+    let matchedUser: (typeof candidates)[0] | null = null;
+    for (const cand of candidates) {
+      if (cand.passwordHash && (await bcrypt.compare(password, cand.passwordHash))) {
+        matchedUser = cand;
+        break;
+      }
+    }
+
+    if (!matchedUser || !matchedUser.passwordHash || matchedUser.status !== TenantUserStatus.ACTIVE) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const accessToken = this.signAccessToken(user);
-    const { token: refreshToken, expiresAt } = await this.issueRefreshToken(user.id, user.restaurantId);
+    if (matchedUser.restaurant.status !== 'ACTIVE' || matchedUser.restaurant.deletedAt !== null) {
+      throw new ForbiddenException('Restaurant account is suspended or archived. Please contact Super Admin.');
+    }
+
+    // Check device activation state
+    let isDeviceActive = false;
+    let activeDevice: { id: string; type: string; status: string; deviceTokenHash: string | null } | null = null;
+
+    if (deviceId) {
+      activeDevice = await this.prisma.runAsTenant(matchedUser.restaurantId, async (tx) => {
+        return tx.device.findFirst({
+          where: {
+            id: deviceId,
+            restaurantId: matchedUser.restaurantId,
+            status: 'ACTIVE'
+          },
+          select: { id: true, type: true, status: true, deviceTokenHash: true }
+        });
+      });
+
+      if (activeDevice) {
+        if (deviceToken && activeDevice.deviceTokenHash) {
+          if (hashOpaqueToken(deviceToken) === activeDevice.deviceTokenHash) {
+            isDeviceActive = true;
+          }
+        } else {
+          isDeviceActive = true;
+        }
+      }
+    }
+
+    // If a device type or deviceId was passed (e.g. from POS, pos-admin, captain, kds):
+    const isDeviceFlow = Boolean(deviceType || deviceId);
+
+    // Case 1: Device is registered and active -> LOGIN_SUCCESS
+    if (isDeviceActive && activeDevice) {
+      const accessToken = this.signAccessToken(matchedUser);
+      const { token: refreshToken, expiresAt } = await this.issueRefreshToken(matchedUser.id, matchedUser.restaurantId);
+
+      await this.prisma.runAsTenant(matchedUser.restaurantId, (tx) =>
+        tx.device.update({
+          where: { id: activeDevice.id },
+          data: { lastSeenAt: new Date(), ...(appVersion ? { appVersion } : {}) }
+        })
+      );
+
+      await this.audit.log({
+        actorType: 'TENANT',
+        actorId: matchedUser.id,
+        restaurantId: matchedUser.restaurantId,
+        action: 'TENANT_LOGIN',
+        category: 'AUTH',
+        details: { email: matchedUser.email, deviceId: activeDevice.id }
+      });
+
+      return {
+        status: 'LOGIN_SUCCESS',
+        requiresActivation: false,
+        accessToken,
+        refreshToken,
+        refreshTokenExpiresAt: expiresAt,
+        user: publicUser(matchedUser),
+        restaurant: {
+          id: matchedUser.restaurant.id,
+          name: matchedUser.restaurant.name
+        },
+        deviceId: activeDevice.id
+      };
+    }
+
+    // Case 2: First-time login on this terminal device -> ACTIVATION_REQUIRED
+    if (isDeviceFlow) {
+      const activationPayload = {
+        sub: matchedUser.id,
+        restaurantId: matchedUser.restaurantId,
+        email: matchedUser.email,
+        type: 'DEVICE_ACTIVATION'
+      };
+      const activationSessionToken = this.jwt.sign(activationPayload, {
+        secret: this.config.get<string>('JWT_ACCESS_SECRET'),
+        expiresIn: '15m'
+      });
+
+      return {
+        status: 'ACTIVATION_REQUIRED',
+        requiresActivation: true,
+        activationSessionToken,
+        restaurant: {
+          id: matchedUser.restaurant.id,
+          name: matchedUser.restaurant.name
+        },
+        user: {
+          id: matchedUser.id,
+          email: matchedUser.email,
+          fullName: matchedUser.fullName
+        },
+        message: 'First-time device activation required. Please enter the activation key from your Super Admin Welcome Kit.'
+      };
+    }
+
+    // Case 3: Direct API / non-terminal login
+    const accessToken = this.signAccessToken(matchedUser);
+    const { token: refreshToken, expiresAt } = await this.issueRefreshToken(matchedUser.id, matchedUser.restaurantId);
 
     await this.audit.log({
       actorType: 'TENANT',
-      actorId: user.id,
-      restaurantId,
+      actorId: matchedUser.id,
+      restaurantId: matchedUser.restaurantId,
       action: 'TENANT_LOGIN',
       category: 'AUTH',
-      details: { email: user.email }
+      details: { email: matchedUser.email, isDirectApi: true }
     });
 
     return {
+      status: 'LOGIN_SUCCESS',
+      requiresActivation: false,
       accessToken,
       refreshToken,
       refreshTokenExpiresAt: expiresAt,
-      user: publicUser(user)
+      user: publicUser(matchedUser),
+      restaurant: {
+        id: matchedUser.restaurant.id,
+        name: matchedUser.restaurant.name
+      }
     };
+  }
+
+  /**
+   * Completes device onboarding when an activation key is entered.
+   * Atomically validates the key, binds the device, and mints access credentials.
+   */
+  async activateDevice(dto: ActivateDeviceDto): Promise<TenantLoginSuccess & { deviceToken: string }> {
+    let decoded: { sub: string; restaurantId: string; email: string; type: string };
+    try {
+      decoded = this.jwt.verify(dto.activationSessionToken, {
+        secret: this.config.get<string>('JWT_ACCESS_SECRET')
+      });
+    } catch {
+      throw new UnauthorizedException('Activation session has expired or is invalid. Please sign in again.');
+    }
+
+    if (decoded.type !== 'DEVICE_ACTIVATION') {
+      throw new UnauthorizedException('Invalid activation session');
+    }
+
+    return this.prisma.runAsPlatform(async (tx) => {
+      const code = dto.activationKey.trim().toUpperCase();
+      const key = await tx.activationKey.findUnique({
+        where: { code },
+        include: { restaurant: true }
+      });
+
+      if (!key) {
+        throw new NotFoundException('Invalid activation key. Please verify the code.');
+      }
+      if (key.restaurantId !== decoded.restaurantId) {
+        throw new BadRequestException('This activation key belongs to a different restaurant.');
+      }
+      if (key.status === 'REVOKED') {
+        throw new GoneException('This activation key has been revoked by Super Admin.');
+      }
+      if (key.status === 'REDEEMED') {
+        throw new ConflictException('This activation key has already been redeemed.');
+      }
+      if (key.status === 'EXPIRED' || key.expiresAt < new Date()) {
+        throw new GoneException('This activation key has expired. Request a new key in Super Admin.');
+      }
+
+      // Check device compatibility (for POS_ADMIN management console, any valid key for this restaurant is accepted)
+      const isCompatible =
+        dto.deviceType === 'POS_ADMIN' ||
+        key.allowedDeviceType === 'ANY' ||
+        key.allowedDeviceType === (dto.deviceType as any);
+
+      if (!isCompatible) {
+        throw new BadRequestException(
+          `This activation key is designated for ${key.allowedDeviceType} terminals, not ${dto.deviceType}.`
+        );
+      }
+
+      const deviceToken = generateOpaqueToken();
+
+      // Create or activate the device record
+      const device = await tx.device.create({
+        data: {
+          restaurantId: key.restaurantId,
+          type: dto.deviceType,
+          appVersion: dto.appVersion,
+          status: 'ACTIVE',
+          activatedAt: new Date(),
+          lastSeenAt: new Date(),
+          deviceTokenHash: hashOpaqueToken(deviceToken)
+        }
+      });
+
+      // Mark the key as redeemed
+      await tx.activationKey.update({
+        where: { id: key.id },
+        data: {
+          status: 'REDEEMED',
+          redeemedAt: new Date(),
+          redeemedByDeviceId: device.id
+        }
+      });
+
+      const user = await tx.user.findUnique({
+        where: { id: decoded.sub }
+      });
+      if (!user) throw new NotFoundException('User account not found');
+
+      const accessToken = this.signAccessToken(user);
+      const token = randomBytes(48).toString('base64url');
+      const ttlDays = Number(this.config.get<string>('JWT_REFRESH_TTL_DAYS') ?? 30);
+      const expiresAt = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000);
+
+      await tx.tenantRefreshToken.create({
+        data: {
+          userId: user.id,
+          restaurantId: user.restaurantId,
+          tokenHash: hashRefreshToken(token),
+          expiresAt
+        }
+      });
+
+      await this.audit.log(
+        {
+          actorType: 'TENANT',
+          actorId: user.id,
+          restaurantId: user.restaurantId,
+          action: 'DEVICE_ACTIVATED',
+          category: 'ACTIVATION',
+          details: {
+            deviceId: device.id,
+            deviceType: device.type,
+            activationKeyId: key.id,
+            email: user.email
+          }
+        },
+        tx
+      );
+
+      return {
+        status: 'LOGIN_SUCCESS',
+        requiresActivation: false,
+        accessToken,
+        refreshToken: token,
+        refreshTokenExpiresAt: expiresAt,
+        user: publicUser(user),
+        restaurant: {
+          id: key.restaurant.id,
+          name: key.restaurant.name
+        },
+        deviceId: device.id,
+        deviceToken
+      };
+    });
   }
 
   /** Rotates the refresh token — the old one is consumed even if reused later (replay is rejected). */

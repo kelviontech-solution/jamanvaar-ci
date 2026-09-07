@@ -1,17 +1,27 @@
 import { useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
-import type { CreateRestaurantInput, RestaurantDetail } from '../../api/types';
+import type { CreateRestaurantInput, RestaurantDetail, ActivationKey } from '../../api/types';
 import { Button } from '../../components/ui';
+import { Copy, Check, Eye, EyeOff, RefreshCw, KeyRound } from 'lucide-react';
 import './restaurants.css';
 
-const EMPTY: CreateRestaurantInput = {
-  name: '',
-  city: '',
-  state: '',
-  ownerName: '',
-  ownerEmail: '',
-  ownerPhone: ''
-};
+function generateRandomPassword(): string {
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower = 'abcdefghijkmnopqrstuvwxyz';
+  const digits = '23456789';
+  const symbols = '!@#$%&*';
+  const all = upper + lower + digits + symbols;
+  let pass = [
+    upper[Math.floor(Math.random() * upper.length)],
+    lower[Math.floor(Math.random() * lower.length)],
+    digits[Math.floor(Math.random() * digits.length)],
+    symbols[Math.floor(Math.random() * symbols.length)]
+  ];
+  for (let i = 0; i < 8; i++) {
+    pass.push(all[Math.floor(Math.random() * all.length)]);
+  }
+  return pass.sort(() => Math.random() - 0.5).join('');
+}
 
 export function CreateRestaurantModal({
   onClose,
@@ -20,14 +30,36 @@ export function CreateRestaurantModal({
   onClose: () => void;
   onCreated: () => void;
 }) {
-  const [form, setForm] = useState<CreateRestaurantInput>(EMPTY);
+  const [form, setForm] = useState<CreateRestaurantInput>({
+    name: '',
+    city: 'Ahmedabad',
+    state: 'Gujarat',
+    ownerName: '',
+    ownerEmail: '',
+    ownerPhone: '',
+    ownerPassword: generateRandomPassword()
+  });
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [created, setCreated] = useState<{ activationToken: string; emailSent: boolean } | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  const [createdResult, setCreatedResult] = useState<{
+    restaurant: RestaurantDetail;
+    ownerEmail: string;
+    ownerPassword?: string;
+    activationKey?: string;
+  } | null>(null);
 
   function update<K extends keyof CreateRestaurantInput>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  function handleCopy(text: string, id: string) {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(id);
+    setTimeout(() => setCopiedKey(null), 2500);
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -36,11 +68,30 @@ export function CreateRestaurantModal({
     setFieldErrors({});
     setSubmitting(true);
     try {
-      const res = await api.post<{ restaurant: RestaurantDetail; activationToken: string; emailSent: boolean }>(
+      const res = await api.post<{ restaurant: RestaurantDetail }>(
         '/api/v1/restaurants',
         form
       );
-      setCreated({ activationToken: res.activationToken, emailSent: res.emailSent });
+
+      // Also generate an initial terminal activation key for this restaurant
+      let keyResult: string | undefined;
+      try {
+        const keyRes = await api.post<ActivationKey>('/api/v1/activation-keys', {
+          restaurantId: res.restaurant.id,
+          allowedDeviceType: 'ANY',
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        });
+        keyResult = keyRes.code;
+      } catch (keyErr) {
+        console.warn('Auto key generation error:', keyErr);
+      }
+
+      setCreatedResult({
+        restaurant: res.restaurant,
+        ownerEmail: form.ownerEmail,
+        ownerPassword: form.ownerPassword,
+        activationKey: keyResult
+      });
     } catch (err) {
       if (err instanceof ApiError && err.issues) {
         setFieldErrors(Object.fromEntries(err.issues.map((i) => [i.path, i.message])));
@@ -54,67 +105,131 @@ export function CreateRestaurantModal({
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal" style={{ maxWidth: 580 }} onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Create restaurant</h2>
+          <h2>Quick Create Restaurant</h2>
           <button className="modal-close" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
 
-        {created ? (
+        {createdResult ? (
           <div className="modal-form">
-            {created.emailSent ? (
-              <p className="muted">
-                An invitation email was sent to <strong>{form.ownerEmail}</strong> with instructions to activate their account.
-              </p>
-            ) : (
-              <>
-                <p className="muted">
-                  The invitation email could not be sent (SMTP isn't configured on this server, or delivery failed) — relay this
-                  token to the owner yourself. It can only be redeemed once, and isn't shown again.
-                </p>
-                <div className="activation-code-display" style={{ fontSize: 13, wordBreak: 'break-all' }}>
-                  {created.activationToken}
+            <div style={{ padding: '12px 16px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, color: '#166534', fontSize: 14, fontWeight: 600 }}>
+              ✓ Restaurant & Owner Account Successfully Created!
+            </div>
+
+            <p className="muted" style={{ fontSize: 13, marginTop: 10 }}>
+              The owner account is activated and ready to log into Restaurant Admin immediately. Relay these credentials to the restaurant manager:
+            </p>
+
+            <div style={{ background: '#FFFDF9', border: '1px solid var(--jv-border)', borderRadius: 10, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <span style={{ fontSize: 11, color: 'var(--jv-text-secondary)', fontWeight: 700, textTransform: 'uppercase' }}>Restaurant</span>
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>{createdResult.restaurant.name}</div>
                 </div>
-              </>
-            )}
-            <div className="modal-actions">
+                <span className="badge badge-accent">ACTIVE TENANT</span>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--jv-border)', paddingTop: 10 }}>
+                <div>
+                  <span style={{ fontSize: 11, color: 'var(--jv-text-secondary)', fontWeight: 700, textTransform: 'uppercase' }}>Login Email</span>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>{createdResult.ownerEmail}</div>
+                </div>
+                <Button size="sm" variant="ghost" onClick={() => handleCopy(createdResult.ownerEmail, 'email')}>
+                  {copiedKey === 'email' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedKey === 'email' ? 'Copied' : 'Copy'}</span>
+                </Button>
+              </div>
+
+              {createdResult.ownerPassword && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--jv-border)', paddingTop: 10 }}>
+                  <div>
+                    <span style={{ fontSize: 11, color: 'var(--jv-text-secondary)', fontWeight: 700, textTransform: 'uppercase' }}>Password</span>
+                    <div className="mono" style={{ fontSize: 14, fontWeight: 700, color: 'var(--jv-navy, #0B253A)' }}>
+                      {createdResult.ownerPassword}
+                    </div>
+                  </div>
+                  <Button size="sm" variant="ghost" onClick={() => handleCopy(createdResult.ownerPassword!, 'pass')}>
+                    {copiedKey === 'pass' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedKey === 'pass' ? 'Copied' : 'Copy'}</span>
+                  </Button>
+                </div>
+              )}
+
+              {createdResult.activationKey && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--jv-border)', paddingTop: 10 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <KeyRound className="w-3.5 h-3.5 text-amber-600" />
+                      <span style={{ fontSize: 11, color: '#E66817', fontWeight: 800, textTransform: 'uppercase' }}>
+                        Restaurant Admin Activation Key
+                      </span>
+                    </div>
+                    <div className="mono" style={{ fontSize: 15, fontWeight: 800, color: '#E66817', letterSpacing: '0.05em', marginTop: 2 }}>
+                      {createdResult.activationKey}
+                    </div>
+                  </div>
+                  <Button size="sm" variant="ghost" onClick={() => handleCopy(createdResult.activationKey!, 'key')}>
+                    {copiedKey === 'key' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedKey === 'key' ? 'Copied' : 'Copy'}</span>
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div style={{ fontSize: 12, color: 'var(--jv-text-secondary)', background: 'var(--jv-bg-muted)', padding: '8px 12px', borderRadius: 6, marginTop: 4 }}>
+              💡 <strong>First Login Note:</strong> On the first login at <code>http://localhost:5176</code>, the owner will enter their email & password, then enter the Activation Key. Subsequent logins will authenticate directly without prompting for the key.
+            </div>
+
+            <div className="modal-actions" style={{ marginTop: 16 }}>
               <Button variant="primary" onClick={onCreated}>
-                Done
+                View Restaurant Workspace
               </Button>
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="modal-form">
-            <div className="form-section-label">Restaurant</div>
+            <div className="form-section-label">Restaurant Profile</div>
             <div className="form-grid">
               <div className="field">
-                <label>Restaurant name</label>
-                <input value={form.name} onChange={(e) => update('name', e.target.value)} required />
+                <label>Restaurant Name *</label>
+                <input
+                  placeholder="e.g. Havmor Restaurant"
+                  value={form.name}
+                  onChange={(e) => update('name', e.target.value)}
+                  required
+                />
                 {fieldErrors.name && <div className="error">{fieldErrors.name}</div>}
               </div>
               <div className="field">
                 <label>City</label>
-                <input value={form.city} onChange={(e) => update('city', e.target.value)} />
+                <input placeholder="e.g. Ahmedabad" value={form.city || ''} onChange={(e) => update('city', e.target.value)} />
               </div>
               <div className="field">
                 <label>State</label>
-                <input value={form.state} onChange={(e) => update('state', e.target.value)} />
+                <input placeholder="e.g. Gujarat" value={form.state || ''} onChange={(e) => update('state', e.target.value)} />
               </div>
             </div>
 
-            <div className="form-section-label">Owner</div>
+            <div className="form-section-label" style={{ marginTop: 14 }}>Owner Credentials</div>
             <div className="form-grid">
               <div className="field">
-                <label>Owner name</label>
-                <input value={form.ownerName} onChange={(e) => update('ownerName', e.target.value)} required />
+                <label>Owner Full Name *</label>
+                <input
+                  placeholder="e.g. Ramesh Patel"
+                  value={form.ownerName}
+                  onChange={(e) => update('ownerName', e.target.value)}
+                  required
+                />
                 {fieldErrors.ownerName && <div className="error">{fieldErrors.ownerName}</div>}
               </div>
               <div className="field">
-                <label>Owner email</label>
+                <label>Owner Email *</label>
                 <input
                   type="email"
+                  placeholder="owner@restaurant.com"
                   value={form.ownerEmail}
                   onChange={(e) => update('ownerEmail', e.target.value)}
                   required
@@ -122,23 +237,54 @@ export function CreateRestaurantModal({
                 {fieldErrors.ownerEmail && <div className="error">{fieldErrors.ownerEmail}</div>}
               </div>
               <div className="field">
-                <label>Owner phone</label>
-                <input value={form.ownerPhone} onChange={(e) => update('ownerPhone', e.target.value)} />
+                <label>Owner Phone</label>
+                <input placeholder="+91 9876543210" value={form.ownerPhone || ''} onChange={(e) => update('ownerPhone', e.target.value)} />
               </div>
             </div>
 
-            <p className="form-note">
-              A pending owner account is created for this email and invited by email to activate it.
+            <div className="field" style={{ marginTop: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <label style={{ margin: 0 }}>Initial Password *</label>
+                <button
+                  type="button"
+                  style={{ background: 'none', border: 'none', color: 'var(--jv-accent)', fontSize: 11.5, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+                  onClick={() => update('ownerPassword', generateRandomPassword())}
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  <span>Generate New</span>
+                </button>
+              </div>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className="mono"
+                  value={form.ownerPassword || ''}
+                  onChange={(e) => update('ownerPassword', e.target.value)}
+                  required
+                  style={{ paddingRight: 40 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748B', cursor: 'pointer' }}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <p className="form-note" style={{ marginTop: 8 }}>
+              Account will be created immediately ACTIVE with these credentials. A POS Admin hardware activation key will also be provisioned automatically.
             </p>
 
             {submitError && <div className="form-error">{submitError}</div>}
 
-            <div className="modal-actions">
+            <div className="modal-actions" style={{ marginTop: 18 }}>
               <Button type="button" variant="ghost" onClick={onClose}>
                 Cancel
               </Button>
               <Button type="submit" variant="primary" disabled={submitting}>
-                {submitting ? 'Creating…' : 'Create restaurant'}
+                {submitting ? 'Creating Restaurant…' : 'Create & Activate Restaurant'}
               </Button>
             </div>
           </form>

@@ -16,6 +16,7 @@ export const createRestaurantSchema = z.object({
   ownerName: z.string().trim().min(2, "Owner's name is required"),
   ownerEmail: z.string().trim().toLowerCase().email(),
   ownerPhone: z.string().trim().optional(),
+  ownerPassword: z.string().min(4).optional(),
 
   // Set by callers that immediately consume the activation token themselves
   // (e.g. the onboarding wizard's "set password now" mode, which calls

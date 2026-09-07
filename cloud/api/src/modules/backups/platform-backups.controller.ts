@@ -1,6 +1,8 @@
-import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { PlatformUser } from '@prisma/client';
 import { BackupsService } from './backups.service';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
+import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
 
 /** Super Admin visibility into a restaurant's backup history — read-only, no restore trigger here (restore stays a tenant/operator action to avoid Super Admin silently overwriting a restaurant's live data). */
 @Controller('api/v1/restaurants/:id/backups')
@@ -34,5 +36,31 @@ export class PlatformBackupsFleetController {
   @Post(':restaurantId/trigger')
   trigger(@Param('restaurantId') restaurantId: string) {
     return this.backups.triggerForRestaurant(restaurantId);
+  }
+
+  @Post(':backupId/verify')
+  verify(
+    @Param('backupId') backupId: string,
+    @CurrentPlatformUser() actor: PlatformUser
+  ) {
+    return this.backups.verifyBackup(backupId, actor);
+  }
+
+  @Post(':backupId/preview-restore')
+  previewRestore(
+    @Param('backupId') backupId: string,
+    @Body('targetType') targetType: 'STAGING_PREVIEW' | 'PRODUCTION_RESTORE',
+    @CurrentPlatformUser() actor: PlatformUser
+  ) {
+    return this.backups.previewRestore(backupId, targetType || 'STAGING_PREVIEW', actor);
+  }
+
+  @Post('restore-jobs/:jobId/confirm')
+  confirmRestore(
+    @Param('jobId') jobId: string,
+    @Body('confirmed') confirmed: boolean,
+    @CurrentPlatformUser() actor: PlatformUser
+  ) {
+    return this.backups.executeRestore(jobId, confirmed, actor);
   }
 }

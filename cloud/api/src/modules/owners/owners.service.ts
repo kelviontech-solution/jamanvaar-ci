@@ -3,6 +3,7 @@ import { PlatformUser, TenantUserStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { UpdateOwnerDto } from './dto/owner.dto';
+import * as bcrypt from 'bcryptjs';
 
 /** Never selects passwordHash — matches the same shape restaurants.service.ts already uses for owner rows. */
 const OWNER_SELECT = {
@@ -87,6 +88,40 @@ export class OwnersService {
           action: `OWNER_${status}`,
           category: 'OWNER',
           details: { ownerId: id, previousStatus: existing.status }
+        },
+        tx
+      );
+
+      return updated;
+    });
+  }
+
+  async resetPassword(id: string, newPassword: string, actor: PlatformUser) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const existing = await tx.user.findFirst({ where: { id } });
+      if (!existing) throw new NotFoundException('User not found');
+
+      const passwordHash = await bcrypt.hash(newPassword, 10);
+      const updated = await tx.user.update({
+        where: { id },
+        data: {
+          passwordHash,
+          status: TenantUserStatus.ACTIVE,
+          activatedAt: existing.activatedAt ?? new Date(),
+          activationTokenHash: null,
+          activationTokenExpiresAt: null
+        },
+        select: OWNER_SELECT
+      });
+
+      await this.audit.log(
+        {
+          actorType: 'PLATFORM',
+          actorId: actor.id,
+          restaurantId: existing.restaurantId,
+          action: 'OWNER_PASSWORD_RESET',
+          category: 'AUTH',
+          details: { userId: id, email: existing.email }
         },
         tx
       );

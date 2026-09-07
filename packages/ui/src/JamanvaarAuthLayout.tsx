@@ -121,11 +121,14 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
 
         {/* Real-time Connection Status Pills (Matching Reference Mockup) */}
         <div className="flex items-center gap-2.5 sm:gap-3 text-xs font-bold ml-auto">
-          {/* Local Core Status Badge */}
+          {/* Local Core / Cloud API Status Badge */}
           <div className="flex items-center gap-2 bg-white border border-[#EBE6DD] px-3.5 py-1.5 rounded-full shadow-2xs">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
             <span className="text-slate-600">
-              Local Core: <strong className="text-emerald-700 font-extrabold">Connected</strong>
+              {appIdentity === 'SUPER_ADMIN' ? 'Cloud API: ' : 'Local Core: '}
+              <strong className="text-emerald-700 font-extrabold">
+                {appIdentity === 'SUPER_ADMIN' ? 'Connected (Port 4000)' : 'Connected'}
+              </strong>
             </span>
           </div>
 
@@ -278,6 +281,8 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                     ? 'KITCHEN DISPLAY (KDS)'
                     : appIdentity === 'KIOSK_ADMIN'
                     ? 'KIOSK ADMIN'
+                    : appIdentity === 'SUPER_ADMIN'
+                    ? 'SUPER ADMIN'
                     : 'KIOSK TERMINAL'}
                 </span>
               </div>

@@ -1,15 +1,27 @@
 import { z } from 'zod';
 
-// Tenant User.email is only unique WITHIN a restaurant (@@unique([restaurantId, email])),
-// not globally — so a tenant login must always be scoped to a restaurantId, unlike
-// platform login which only needs an email. The client (e.g. Restaurant Admin) already
-// knows its own restaurantId from local activation/provisioning.
+// Tenant login accepts email + password, and optionally a restaurantId (if already known)
+// and deviceId/deviceToken (for checking whether this device has already been activated).
 export const tenantLoginSchema = z.object({
-  restaurantId: z.string().uuid(),
+  restaurantId: z.string().uuid().optional(),
   email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(1, 'Password is required')
+  password: z.string().min(1, 'Password is required'),
+  deviceId: z.string().optional(),
+  deviceToken: z.string().optional(),
+  deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN']).optional(),
+  appVersion: z.string().optional()
 });
 export type TenantLoginDto = z.infer<typeof tenantLoginSchema>;
+
+export const activateDeviceSchema = z.object({
+  activationSessionToken: z.string().min(1, 'Activation session token is required'),
+  activationKey: z.string().trim().min(1, 'Activation key is required'),
+  deviceId: z.string().optional(),
+  deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN']).default('POS_ADMIN'),
+  deviceName: z.string().optional(),
+  appVersion: z.string().optional()
+});
+export type ActivateDeviceDto = z.infer<typeof activateDeviceSchema>;
 
 // One-time bootstrap for a PENDING_ACTIVATION owner/staff user created with passwordHash=null
 // (see RestaurantsService.createRestaurant). Not a general "forgot password" flow.

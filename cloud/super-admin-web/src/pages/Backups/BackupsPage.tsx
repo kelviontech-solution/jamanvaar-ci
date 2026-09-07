@@ -35,6 +35,8 @@ interface BackupItem {
   sizeBytes: number;
   errorMessage: string | null;
   createdAt: string;
+  verificationStatus?: 'PENDING' | 'VERIFIED' | 'FAILED' | 'CORRUPTED';
+  sha256Checksum?: string;
 }
 
 interface BackupFleetResponse {
@@ -78,11 +80,65 @@ export function BackupsPage() {
   const [triggerError, setTriggerError] = useState<string | null>(null);
 
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+
+  // Restore Preview & Confirmation State
+  const [restoreModalTarget, setRestoreModalTarget] = useState<any | null>(null);
+  const [restorePreviewJob, setRestorePreviewJob] = useState<any | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [restoreExecuting, setRestoreExecuting] = useState(false);
 
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3500);
+  };
+
+  const handleVerifyBackup = async (backupId: string) => {
+    setVerifyingId(backupId);
+    try {
+      const res = await api.post<any>(`/api/v1/platform/backups/${backupId}/verify`, {});
+      showToast(`Backup verified: SHA-256 integrity is ${res.verificationStatus}`);
+      load();
+    } catch (e) {
+      showToast(e instanceof ApiError ? e.message : 'Verification failed');
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
+  const handleOpenRestorePreview = async (backup: any) => {
+    setRestoreModalTarget(backup);
+    setPreviewLoading(true);
+    setRestorePreviewJob(null);
+    try {
+      const job = await api.post<any>(`/api/v1/platform/backups/${backup.id}/preview-restore`, {
+        targetType: 'STAGING_PREVIEW'
+      });
+      setRestorePreviewJob(job);
+    } catch (e) {
+      showToast(e instanceof ApiError ? e.message : 'Failed to generate restore preview');
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
+  const handleExecuteRestore = async () => {
+    if (!restorePreviewJob) return;
+    setRestoreExecuting(true);
+    try {
+      await api.post(`/api/v1/platform/backups/restore-jobs/${restorePreviewJob.id}/confirm`, {
+        confirmed: true
+      });
+      showToast('Restore executed successfully. Safety pre-restore snapshot taken.');
+      setRestoreModalTarget(null);
+      setRestorePreviewJob(null);
+      load();
+    } catch (e) {
+      showToast(e instanceof ApiError ? e.message : 'Restore execution failed');
+    } finally {
+      setRestoreExecuting(false);
+    }
   };
 
   const load = () => {
@@ -282,13 +338,14 @@ export function BackupsPage() {
                   <th>Payload Size</th>
                   <th>Created At</th>
                   <th>Status</th>
-                  <th>Actions</th>
+                  <th>Integrity Verification</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={8}>
+                    <td colSpan={9}>
                       <EmptyState
                         icon={<Database className="w-8 h-8 text-secondary" />}
                         title="No Backups Found"
@@ -331,21 +388,96 @@ export function BackupsPage() {
                         </Badge>
                       </td>
                       <td>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          disabled={downloadingId === b.id || b.status !== 'COMPLETED'}
-                          icon={<Download className="w-3.5 h-3.5" />}
-                          onClick={() => handleDownload(b.restaurantId, b.id)}
-                        >
-                          {downloadingId === b.id ? 'Securing...' : 'Download'}
-                        </Button>
+                        <Badge tone={b.verificationStatus === 'VERIFIED' ? 'success' : 'neutral'}>
+                          {b.verificationStatus ?? 'UNVERIFIED'}
+                        </Badge>
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        <div style={{ display: 'inline-flex', gap: 6 }}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={verifyingId === b.id}
+                            onClick={() => handleVerifyBackup(b.id)}
+                          >
+                            {verifyingId === b.id ? 'Checking…' : 'Verify SHA'}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleOpenRestorePreview(b)}
+                          >
+                            Restore…
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={downloadingId === b.id || b.status !== 'COMPLETED'}
+                            icon={<Download className="w-3.5 h-3.5" />}
+                            onClick={() => handleDownload(b.restaurantId, b.id)}
+                          >
+                            {downloadingId === b.id ? 'Securing...' : 'Download'}
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Restore Safeguard Modal */}
+      {restoreModalTarget && (
+        <div className="modal-backdrop">
+          <div className="modal-card" style={{ maxWidth: 540 }}>
+            <div className="modal-header">
+              <h3>Restore Safeguard Workflow</h3>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setRestoreModalTarget(null)}
+              >
+                ×
+              </button>
+            </div>
+            <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: 12, fontSize: 13, color: '#166534' }}>
+                <strong>Production Protection Guarantee:</strong> Restoring this snapshot automatically creates a fresh pre-restore backup first. You can preview the staging topology before confirming.
+              </div>
+
+              {previewLoading ? (
+                <div style={{ padding: 24, textAlign: 'center', color: '#64748b' }}>Generating Staging Restore Preview…</div>
+              ) : restorePreviewJob ? (
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12, fontSize: 13 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ color: '#64748b' }}>Target Restaurant:</span>
+                    <strong>{restoreModalTarget.restaurantName}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ color: '#64748b' }}>Backup Snapshot Date:</span>
+                    <span>{new Date(restoreModalTarget.createdAt).toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#64748b' }}>Snapshot Size:</span>
+                    <span>{formatBytes(restoreModalTarget.sizeBytes)}</span>
+                  </div>
+                </div>
+              ) : null}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
+                <Button variant="ghost" onClick={() => setRestoreModalTarget(null)}>Cancel</Button>
+                <Button
+                  variant="accent"
+                  disabled={previewLoading || restoreExecuting}
+                  onClick={handleExecuteRestore}
+                >
+                  {restoreExecuting ? 'Executing Restore…' : 'Confirm Safe Restore'}
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}

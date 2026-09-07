@@ -11,6 +11,7 @@ import { applyTheme, getStoredTheme, type ThemePreference } from '../theme';
 // confirmed via a real browser session showing repeated connection-refused
 // noise on every page. This avoids pulling that module graph in at all.
 import { JAMANVAAR_LOGOS } from '../../../../packages/ui/src/assets';
+import { JAMANVAARStartup } from '../../../../packages/ui/src/JAMANVAARStartup';
 import {
   LayoutDashboard,
   Store,
@@ -39,7 +40,11 @@ import {
   Database,
   ChevronDown,
   Sun,
-  Moon
+  Moon,
+  Utensils,
+  Activity,
+  Boxes,
+  ShieldAlert
 } from 'lucide-react';
 import './layout.css';
 
@@ -57,44 +62,47 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    label: 'Overview',
-    items: [{ to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true }]
+    label: 'Platform Control Center',
+    items: [{ to: '/', label: 'Executive Dashboard', icon: LayoutDashboard, end: true }]
   },
   {
     label: 'Business Management',
     items: [
       { to: '/restaurants', label: 'Restaurants', icon: Store },
       { to: '/owners', label: 'Restaurant Owners', icon: Users },
-      { to: '/branches', label: 'Branches', icon: Building2 }
+      { to: '/branches', label: 'Branches', icon: Building2 },
+      { to: '/subscriptions', label: 'Subscriptions', icon: Repeat },
+      { to: '/billing', label: 'Invoices & Billing', icon: CreditCard }
     ]
   },
   {
     label: 'SaaS Management',
     items: [
-      { to: '/plans', label: 'Plans', icon: Package },
-      { to: '/subscriptions', label: 'Subscriptions', icon: Repeat },
-      { to: '/billing', label: 'Invoices & Billing', icon: CreditCard },
-      { to: '/entitlements', label: 'Feature Entitlements', icon: ShieldCheck },
-      { to: '/reports', label: 'Reports & Analytics', icon: BarChart3 }
-    ]
-  },
-  {
-    label: 'Device & Ecosystem',
-    items: [
-      { to: '/applications', label: 'Applications', icon: Layers },
+      { to: '/plans', label: 'Plans & Entitlements', icon: Package },
+      { to: '/catalog', label: 'Master Menu Catalog', icon: Utensils },
       { to: '/activation-keys', label: 'Activation Keys', icon: KeyRound },
-      { to: '/devices', label: 'Registered Devices', icon: Laptop2 }
+      { to: '/applications', label: 'Applications & Releases', icon: Layers }
     ]
   },
   {
-    label: 'Platform Operations',
+    label: 'Operations & MDM',
     items: [
+      { to: '/devices', label: 'Device Fleet / MDM', icon: Laptop2 },
+      { to: '/sync-monitor', label: 'Sync & Conflict Monitor', icon: Activity },
       { to: '/backups', label: 'Backups & Recovery', icon: Database },
-      { to: '/team', label: 'Platform Team', icon: ShieldCheck },
-      { to: '/support', label: 'Support & Diagnostics', icon: LifeBuoy },
-      { to: '/tickets', label: 'Support Tickets', icon: Ticket },
+      { to: '/system-health', label: 'System Telemetry', icon: HeartPulse },
+      { to: '/sandboxes', label: 'Staging Sandboxes', icon: Boxes }
+    ]
+  },
+  {
+    label: 'Security & Reports',
+    items: [
+      { to: '/reports', label: 'Reports & Analytics', icon: BarChart3 },
       { to: '/audit-logs', label: 'Audit Logs', icon: FileText },
-      { to: '/system-health', label: 'System Health', icon: HeartPulse },
+      { to: '/offline-policy', label: 'Emergency Offline Policy', icon: ShieldAlert },
+      { to: '/team', label: 'Platform Team', icon: ShieldCheck },
+      { to: '/tickets', label: 'Support Tickets', icon: Ticket },
+      { to: '/support', label: 'Diagnostics & Support', icon: LifeBuoy },
       { to: '/settings/platform', label: 'Platform Settings', icon: Sliders }
     ]
   },
@@ -287,7 +295,12 @@ export function ProtectedLayout() {
   }
 
   return (
-    <div className="app-shell">
+    <JAMANVAARStartup
+      appName="Super Admin"
+      appType="SUPER_ADMIN"
+      subtitle="JAMANVAAR Cloud Platform Control"
+    >
+      <div className="app-shell">
       {/* Mobile Drawer Backdrop */}
       {mobileMenuOpen && (
         <div
@@ -707,5 +720,6 @@ export function ProtectedLayout() {
         </main>
       </div>
     </div>
+    </JAMANVAARStartup>
   );
 }

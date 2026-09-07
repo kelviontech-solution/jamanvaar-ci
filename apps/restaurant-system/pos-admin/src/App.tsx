@@ -5,7 +5,7 @@ import {
   MenuRepository,
   NotificationRepository
 } from '@jamanvaar/database';
-import { isCloudConnected, redeemActivationCode, cloudLogin, cloudLogout, CloudApiError } from './cloud/cloudClient';
+import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError } from './cloud/cloudClient';
 import {
   Category,
   DiningTable,
@@ -173,101 +173,146 @@ export default function PosAdminApp() {
   const [authError, setAuthError] = useState('');
   const [isOnline, setIsOnline] = useState(true);
 
-  // Cloud-connected restaurant login — an alternative to the local demo/PIN
-  // login above for restaurants Super Admin has actually onboarded. Device
-  // activation (redeemActivationCode) only ever happens once per install —
-  // isCloudConnected() persists across reloads — after that this panel goes
-  // straight to owner email + password.
-  const [cloudPanelOpen, setCloudPanelOpen] = useState(false);
-  const [cloudActivationCode, setCloudActivationCode] = useState('');
-  const [cloudEmail, setCloudEmail] = useState('');
-  const [cloudPassword, setCloudPassword] = useState('');
-  const [cloudBusy, setCloudBusy] = useState(false);
-  const [cloudError, setCloudError] = useState('');
+  // Two-phase auth state: 'LOGIN' (enter email + password) or 'ACTIVATION_REQUIRED' (enter JMV key)
+  const [authScreenState, setAuthScreenState] = useState<'LOGIN' | 'ACTIVATION_REQUIRED'>('LOGIN');
+  const [activationSessionToken, setActivationSessionToken] = useState('');
+  const [activationKeyInput, setActivationKeyInput] = useState('');
+  const [activationBusy, setActivationBusy] = useState(false);
+  const [activationError, setActivationError] = useState('');
+  const [pendingTenant, setPendingTenant] = useState<{
+    restaurantId: string;
+    restaurantName: string;
+    ownerEmail: string;
+    ownerName: string;
+  } | null>(null);
+  const [loginBusy, setLoginBusy] = useState(false);
   const [cloudConnected, setCloudConnected] = useState(() => isCloudConnected());
 
-  const handleCloudActivate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setCloudError('');
-    setCloudBusy(true);
-    try {
-      await redeemActivationCode(cloudActivationCode.trim());
-      setCloudConnected(true);
-      setCloudActivationCode('');
-    } catch (err) {
-      setCloudError(err instanceof CloudApiError ? err.message : 'Could not activate — check the code and try again.');
-    } finally {
-      setCloudBusy(false);
+  const completeLogin = (
+    user: { id: string; fullName: string; role: string; restaurantId: string },
+    restaurant?: { id: string; name: string }
+  ) => {
+    setIsAdminLoggedIn(true);
+    setAuthError('');
+    setAuthPassword('');
+    setAuthScreenState('LOGIN');
+    setCloudConnected(true);
+
+    if (restaurant) {
+      db.restaurant.id = restaurant.id;
+      db.restaurant.name = restaurant.name;
     }
+
+    SessionPersistence.save('admin', {
+      userId: user.id,
+      fullName: user.fullName,
+      roleId: user.role === 'OWNER' ? 'role-admin' : 'role-manager',
+      restaurantId: user.restaurantId,
+      terminalId: 'ADMIN-01'
+    });
   };
 
-  const handleCloudLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setCloudError('');
-    setCloudBusy(true);
-    try {
-      const user = await cloudLogin(cloudEmail.trim(), cloudPassword);
-      setIsAdminLoggedIn(true);
-      setAuthError('');
-      setCloudPassword('');
-      SessionPersistence.save('admin', {
-        userId: user.id,
-        fullName: user.fullName,
-        roleId: user.role === 'OWNER' ? 'role-admin' : 'role-manager',
-        restaurantId: user.restaurantId,
-        terminalId: 'ADMIN-01'
-      });
-    } catch (err) {
-      setCloudError(err instanceof CloudApiError ? err.message : 'Login failed — check your email and password.');
-    } finally {
-      setCloudBusy(false);
-    }
-  };
-
-  const handleAdminLogin = (e?: React.FormEvent) => {
+  const handleAdminLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!authUsername.trim() || !authPassword.trim()) {
       setAuthError('Please enter both username/email and password.');
       return;
     }
 
-    const trimmedUser = authUsername.trim().toLowerCase();
-    const foundUser = db.users.find(
-      (u) =>
-        (u.username.toLowerCase() === trimmedUser || u.email?.toLowerCase() === trimmedUser) &&
-        (u.roleId === 'role-manager' || u.roleId === 'role-super-admin' || u.roleId === 'role-admin')
-    );
+    const trimmedUser = authUsername.trim();
+    setAuthError('');
+    setLoginBusy(true);
 
+    // Fast-path demo login for local development
     if (
-      foundUser ||
-      (trimmedUser === 'admin' &&
-        (authPassword === 'admin123' || authPassword === 'admin' || authPassword === 'demo'))
+      trimmedUser.toLowerCase() === 'admin' &&
+      (authPassword === 'admin123' || authPassword === 'admin' || authPassword === 'demo')
     ) {
-      setIsAdminLoggedIn(true);
-      setAuthError('');
-      SessionPersistence.save('admin', {
-        userId: foundUser?.id || 'admin-user',
-        fullName: foundUser?.fullName || 'Restaurant Admin',
-        roleId: foundUser?.roleId || 'role-admin',
-        restaurantId: 'restaurant-main',
-        terminalId: 'ADMIN-01'
-      });
-    } else {
-      setAuthError('Invalid credentials. Please verify your username and password.');
+      setLoginBusy(false);
+      completeLogin(
+        {
+          id: 'admin-user',
+          fullName: 'Restaurant Admin',
+          role: 'OWNER',
+          restaurantId: 'restaurant-main'
+        },
+        {
+          id: 'restaurant-main',
+          name: 'JAMANVAAR — Demo Restaurant'
+        }
+      );
+      return;
+    }
+
+    // Production Multi-Tenant Cloud Authentication
+    try {
+      const authResult = await cloudLogin(trimmedUser, authPassword);
+
+      if (authResult.requiresActivation) {
+        // First-time login on this device -> Prompt for Welcome Kit activation key
+        setActivationSessionToken(authResult.activationSessionToken);
+        setPendingTenant({
+          restaurantId: authResult.restaurant.id,
+          restaurantName: authResult.restaurant.name,
+          ownerEmail: authResult.user.email,
+          ownerName: authResult.user.fullName
+        });
+        setActivationKeyInput('');
+        setActivationError('');
+        setAuthScreenState('ACTIVATION_REQUIRED');
+      } else {
+        // Direct LOGIN_SUCCESS (device already registered in PostgreSQL)
+        completeLogin(authResult.user, authResult.restaurant);
+      }
+    } catch (err) {
+      // Local fallback if offline or db user match
+      const foundUser = db.users.find(
+        (u) =>
+          (u.username.toLowerCase() === trimmedUser.toLowerCase() || u.email?.toLowerCase() === trimmedUser.toLowerCase()) &&
+          (u.roleId === 'role-manager' || u.roleId === 'role-super-admin' || u.roleId === 'role-admin')
+      );
+      if (foundUser) {
+        completeLogin({
+          id: foundUser.id,
+          fullName: foundUser.fullName,
+          role: 'OWNER',
+          restaurantId: 'restaurant-main'
+        });
+      } else {
+        setAuthError(err instanceof CloudApiError ? err.message : 'Invalid credentials. Please verify your username and password.');
+      }
+    } finally {
+      setLoginBusy(false);
+    }
+  };
+
+  const handleActivateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activationKeyInput.trim()) {
+      setActivationError('Please enter the activation key from your Welcome Kit.');
+      return;
+    }
+    setActivationError('');
+    setActivationBusy(true);
+
+    try {
+      const res = await cloudActivateDevice(activationSessionToken, activationKeyInput.trim());
+      completeLogin(res.user, res.restaurant);
+    } catch (err) {
+      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed. Please verify the code.');
+    } finally {
+      setActivationBusy(false);
     }
   };
 
   const handleQuickDemoAdmin = () => {
     setAuthUsername('admin');
     setAuthPassword('admin123');
-    setIsAdminLoggedIn(true);
-    setAuthError('');
-    SessionPersistence.save('admin', {
-      userId: 'admin-user',
+    completeLogin({
+      id: 'admin-user',
       fullName: 'Restaurant Admin',
-      roleId: 'role-admin',
-      restaurantId: 'restaurant-main',
-      terminalId: 'ADMIN-01'
+      role: 'OWNER',
+      restaurantId: 'restaurant-main'
     });
   };
 
@@ -453,7 +498,7 @@ export default function PosAdminApp() {
           ]}
           footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
         >
-          {!cloudPanelOpen ? (
+          {authScreenState === 'LOGIN' ? (
             <>
               <button
                 type="button"
@@ -528,107 +573,90 @@ export default function PosAdminApp() {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2"
+                  disabled={loginBusy}
+                  className="w-full py-3.5 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] disabled:opacity-50 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2"
                 >
-                  Sign In to Admin
+                  {loginBusy ? 'Signing In…' : 'Sign In to Admin'}
                 </button>
               </form>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setCloudError('');
-                  setCloudPanelOpen(true);
-                }}
-                className="w-full text-center text-[11px] font-bold text-slate-500 hover:text-[#0B253A] underline cursor-pointer pt-1"
-              >
-                Restaurant Owner? Sign in with your JAMANVAAR Cloud account →
-              </button>
             </>
           ) : (
-            <div className="space-y-3.5">
-              <div className="text-center space-y-0.5">
-                <h3 className="text-sm font-black text-[#0B253A]">
-                  {cloudConnected ? 'Sign in to JAMANVAAR Cloud' : 'Activate this device'}
+            <div className="space-y-4 pt-1">
+              <div className="text-center space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                  <span>FIRST-TIME DEVICE ACTIVATION</span>
+                </div>
+                <h3 className="text-base font-black text-[#0B253A] pt-1">
+                  Activate Restaurant Admin Console
                 </h3>
-                <p className="text-[11px] text-slate-500">
-                  {cloudConnected
-                    ? 'Log in with the owner email and password issued by Super Admin.'
-                    : "Enter the activation code from your restaurant's Welcome Kit — this is only needed once."}
+                <p className="text-xs text-slate-500 max-w-xs mx-auto">
+                  Enter the hardware activation key from your Super Admin Welcome Kit to bind this terminal.
                 </p>
               </div>
 
-              {!cloudConnected ? (
-                <form onSubmit={handleCloudActivate} className="space-y-3">
-                  <input
-                    type="text"
-                    value={cloudActivationCode}
-                    onChange={(e) => setCloudActivationCode(e.target.value)}
-                    placeholder="JMV-XXXX-XXXX-XXXX"
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-center font-mono font-bold text-[#0B253A] focus:outline-hidden transition-colors"
-                    autoFocus
-                  />
-                  {cloudError && (
-                    <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center">
-                      {cloudError}
-                    </div>
-                  )}
-                  <button
-                    type="submit"
-                    disabled={cloudBusy || !cloudActivationCode.trim()}
-                    className="w-full py-3.5 rounded-2xl bg-[#0B253A] hover:bg-[#1E3A4C] disabled:opacity-40 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer"
-                  >
-                    {cloudBusy ? 'Activating…' : 'Activate'}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleCloudLogin} className="space-y-3">
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">Owner Email *</label>
-                    <input
-                      type="email"
-                      value={cloudEmail}
-                      onChange={(e) => setCloudEmail(e.target.value)}
-                      required
-                      autoFocus
-                      className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
-                    />
+              {pendingTenant && (
+                <div className="p-3.5 bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl space-y-1 text-left text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 font-medium">Restaurant:</span>
+                    <span className="font-bold text-[#0B253A]">{pendingTenant.restaurantName}</span>
                   </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">Password *</label>
-                    <input
-                      type="password"
-                      value={cloudPassword}
-                      onChange={(e) => setCloudPassword(e.target.value)}
-                      required
-                      className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
-                    />
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 font-medium">Owner Account:</span>
+                    <span className="font-mono text-[#0B253A] text-[11px]">{pendingTenant.ownerEmail}</span>
                   </div>
-                  {cloudError && (
-                    <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center">
-                      {cloudError}
-                    </div>
-                  )}
-                  <button
-                    type="submit"
-                    disabled={cloudBusy}
-                    className="w-full py-3.5 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] disabled:opacity-40 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer"
-                  >
-                    {cloudBusy ? 'Signing in…' : 'Sign In'}
-                  </button>
-                </form>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 font-medium">Device Role:</span>
+                    <span className="font-bold text-[#E66817]">POS_ADMIN (Management Console)</span>
+                  </div>
+                </div>
               )}
 
-              <button
-                type="button"
-                onClick={() => {
-                  setCloudError('');
-                  setCloudPanelOpen(false);
-                }}
-                className="w-full text-center text-[11px] font-bold text-slate-500 hover:text-[#0B253A] underline cursor-pointer"
-              >
-                ← Back to local / demo login
-              </button>
+              <form onSubmit={handleActivateSubmit} className="space-y-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
+                    Hardware Activation Key *
+                  </label>
+                  <input
+                    type="text"
+                    value={activationKeyInput}
+                    onChange={(e) => {
+                      setActivationKeyInput(e.target.value.toUpperCase());
+                      setActivationError('');
+                    }}
+                    placeholder="JMV-XXXX-XXXX-XXXX"
+                    autoFocus
+                    required
+                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-center font-mono font-bold tracking-wider text-[#0B253A] focus:outline-hidden transition-colors"
+                  />
+                </div>
+
+                {activationError && (
+                  <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2.5 rounded-xl text-center flex items-center justify-center gap-1.5">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>{activationError}</span>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={activationBusy || !activationKeyInput.trim()}
+                  className="w-full py-3.5 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] disabled:opacity-40 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2"
+                >
+                  {activationBusy ? 'Activating Terminal…' : 'Activate & Enter Portal'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthScreenState('LOGIN');
+                    setActivationError('');
+                  }}
+                  className="w-full py-2.5 text-center text-xs font-bold text-slate-500 hover:text-[#0B253A] transition-colors cursor-pointer"
+                >
+                  ← Back to Sign In
+                </button>
+              </form>
             </div>
           )}
         </JamanvaarAuthLayout>
