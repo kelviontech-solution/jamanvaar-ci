@@ -12,6 +12,8 @@
   "scripts": {
     "dev:sync": "node tooling/local-runtime/sync_server.cjs",
     "dev:cloud-api": "npm run start:dev --workspace=@jamanvaar/cloud-api",
+    "dev:super-admin": "npm run dev --workspace=@jamanvaar/super-admin-web",
+    "dev:cloud": "concurrently -n \"API,SUPER-ADMIN\" -c \"blue,magenta\" \"npm run dev:cloud-api\" \"npm run dev:super-admin\"",
     "test:cloud-api": "npm run test --workspace=@jamanvaar/cloud-api",
     "dev:kiosk": "npm run dev --workspace=@jamanvaar/kiosk-user",
     "dev:kiosk-admin": "npm run dev --workspace=@jamanvaar/kiosk-admin",
@@ -20,6 +22,7 @@
     "dev:captain": "npm run dev --workspace=@jamanvaar/captain",
     "dev:kds": "npm run dev --workspace=@jamanvaar/kds",
     "dev": "concurrently \"npm run dev:sync\" \"npm run dev:kiosk-admin\" \"npm run dev:kiosk\" \"npm run dev:pos\" \"npm run dev:pos-admin\" \"npm run dev:captain\" \"npm run dev:kds\"",
+    "dev:all": "concurrently -n \"API,SUPER,POS-ADM,POS,CAPT,KDS,KIOSK,K-ADM,SYNC\" -c \"blue,magenta,cyan,green,yellow,red,blueBright,magentaBright,gray\" \"npm run dev:cloud-api\" \"npm run dev:super-admin\" \"npm run dev:pos-admin\" \"npm run dev:pos\" \"npm run dev:captain\" \"npm run dev:kds\" \"npm run dev:kiosk\" \"npm run dev:kiosk-admin\" \"npm run dev:sync\"",
     "validate:menu": "node tooling/dev/validate_menu_assets.mjs",
     "validate:menu-assets": "node tooling/dev/validate_menu_assets.mjs",
     "prepare:images": "node tooling/dev/prepare_brand_assets.mjs && node tooling/dev/package_core_menu_images.mjs && node tooling/dev/download_real_food_images.mjs && node tooling/dev/prepare_menu_images.mjs && node tooling/dev/build_canonical_menu_catalog.mjs",
