@@ -257,6 +257,38 @@
   background: var(--jv-gold);
 }
 
+/* Dark Mode Badges */
+[data-theme='dark'] .badge-success {
+  background: rgba(16, 185, 129, 0.14);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+[data-theme='dark'] .badge-warning {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+[data-theme='dark'] .badge-error {
+  background: rgba(239, 68, 68, 0.14);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+[data-theme='dark'] .badge-neutral {
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+[data-theme='dark'] .badge-accent {
+  background: rgba(249, 115, 22, 0.15);
+  color: #fb923c;
+  border-color: rgba(249, 115, 22, 0.35);
+}
+[data-theme='dark'] .badge-gold {
+  background: rgba(226, 186, 109, 0.15);
+  color: #e2ba6d;
+  border-color: rgba(226, 186, 109, 0.35);
+}
+
 /* Empty States */
 .empty-state {
   display: flex;

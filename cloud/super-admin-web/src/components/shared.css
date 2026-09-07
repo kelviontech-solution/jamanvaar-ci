@@ -200,6 +200,7 @@
 }
 .modal {
   background: var(--jv-surface);
+  border: 1px solid var(--jv-border);
   border-radius: 14px;
   width: 100%;
   max-width: 560px;

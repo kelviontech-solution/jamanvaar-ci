@@ -474,7 +474,7 @@ export function ProtectedLayout() {
                             key={r.id}
                             type="button"
                             onMouseDown={() => goToSearchResult(`/restaurants/${r.id}`)}
-                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--jv-text)' }}
                           >
                             <Store className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                             <span style={{ fontWeight: 700 }}>{r.name}</span>
@@ -494,7 +494,7 @@ export function ProtectedLayout() {
                             key={o.id}
                             type="button"
                             onMouseDown={() => goToSearchResult(o.restaurant ? `/restaurants/${o.restaurant.id}` : '/owners')}
-                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--jv-text)' }}
                           >
                             <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                             <span style={{ fontWeight: 700 }}>{o.fullName}</span>
@@ -514,7 +514,7 @@ export function ProtectedLayout() {
                             key={d.id}
                             type="button"
                             onMouseDown={() => goToSearchResult('/devices')}
-                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--jv-text)' }}
                           >
                             <Laptop2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                             <span style={{ fontWeight: 700 }}>{d.type}</span>
@@ -534,7 +534,7 @@ export function ProtectedLayout() {
                             key={k.id}
                             type="button"
                             onMouseDown={() => goToSearchResult('/activation-keys')}
-                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--jv-text)' }}
                           >
                             <KeyRound className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                             <span style={{ fontWeight: 700, fontFamily: 'monospace' }}>{k.code}</span>

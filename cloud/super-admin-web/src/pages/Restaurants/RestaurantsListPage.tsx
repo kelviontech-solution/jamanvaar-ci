@@ -309,8 +309,9 @@ export function RestaurantsListPage() {
         <div
           style={{
             padding: '12px 18px',
-            background: '#0B253A',
-            color: '#fff',
+            background: 'var(--jv-surface)',
+            color: 'var(--jv-text)',
+            border: '1px solid var(--jv-border)',
             borderRadius: 8,
             marginBottom: 16,
             fontSize: 13,
@@ -318,7 +319,7 @@ export function RestaurantsListPage() {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            boxShadow: '0 4px 12px rgba(11, 37, 58, 0.25)'
+            boxShadow: 'var(--jv-shadow-card)'
           }}
         >
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
@@ -327,21 +328,7 @@ export function RestaurantsListPage() {
       )}
 
       {/* 2. Search & Filter Bar */}
-      <div
-        className="toolbar"
-        style={{
-          background: '#ffffff',
-          padding: '12px 16px',
-          borderRadius: 12,
-          border: '1px solid var(--jv-border, #E2E8F0)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          flexWrap: 'wrap',
-          marginBottom: 18,
-          boxShadow: '0 1px 3px rgba(11, 37, 58, 0.03)'
-        }}
-      >
+      <div className="restaurants-toolbar">
         {/* Search Input */}
         <div style={{ position: 'relative', width: 280 }}>
           <Search className="w-4 h-4 text-slate-400" style={{ position: 'absolute', left: 12, top: 11 }} />
@@ -357,7 +344,7 @@ export function RestaurantsListPage() {
             <button
               type="button"
               onClick={() => handleSearchChange('')}
-              style={{ position: 'absolute', right: 10, top: 11, background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8' }}
+              style={{ position: 'absolute', right: 10, top: 11, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-text-muted)' }}
             >
               <X className="w-4 h-4" />
             </button>
@@ -379,32 +366,11 @@ export function RestaurantsListPage() {
               key={t.id}
               type="button"
               onClick={() => setStatusFilter(t.id)}
-              style={{
-                padding: '6px 12px',
-                borderRadius: 20,
-                fontSize: 12.5,
-                fontWeight: statusFilter === t.id ? 700 : 500,
-                border: statusFilter === t.id ? '1px solid #0B253A' : '1px solid #E2E8F0',
-                background: statusFilter === t.id ? '#0B253A' : '#F8FAFC',
-                color: statusFilter === t.id ? '#FFFFFF' : '#475569',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                transition: 'all 0.15s ease'
-              }}
+              className={`filter-chip-btn ${statusFilter === t.id ? 'active' : ''}`}
             >
               <span>{t.label}</span>
               {typeof t.count === 'number' && (
-                <span
-                  style={{
-                    fontSize: 11,
-                    padding: '1px 6px',
-                    borderRadius: 10,
-                    background: statusFilter === t.id ? 'rgba(255, 255, 255, 0.2)' : '#E2E8F0',
-                    color: statusFilter === t.id ? '#FFFFFF' : '#64748B'
-                  }}
-                >
+                <span className="filter-chip-count">
                   {t.count}
                 </span>
               )}
@@ -416,16 +382,7 @@ export function RestaurantsListPage() {
         <select
           value={planFilter}
           onChange={(e) => setPlanFilter(e.target.value as PlanFilter)}
-          style={{
-            height: 36,
-            padding: '0 12px',
-            borderRadius: 8,
-            border: '1px solid #CBD5E1',
-            fontSize: 12.5,
-            background: '#FFF',
-            fontWeight: 500,
-            color: '#334155'
-          }}
+          className="filter-select-input"
         >
           <option value="ALL">All SaaS Tiers</option>
           <option value="CORE">CORE (₹5,000)</option>
@@ -438,16 +395,7 @@ export function RestaurantsListPage() {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortOption)}
-          style={{
-            height: 36,
-            padding: '0 12px',
-            borderRadius: 8,
-            border: '1px solid #CBD5E1',
-            fontSize: 12.5,
-            background: '#FFF',
-            fontWeight: 500,
-            color: '#334155'
-          }}
+          className="filter-select-input"
         >
           <option value="recent">Recently Onboarded</option>
           <option value="name_asc">Name (A → Z)</option>
@@ -462,7 +410,7 @@ export function RestaurantsListPage() {
           <button
             type="button"
             className="btn btn-ghost btn-sm"
-            style={{ fontSize: 12, color: '#E66817', fontWeight: 600 }}
+            style={{ fontSize: 12, color: 'var(--jv-accent)', fontWeight: 600 }}
             onClick={() => {
               setSearch('');
               setStatusFilter('ALL');
@@ -477,22 +425,11 @@ export function RestaurantsListPage() {
         <div className="spacer" />
 
         {/* View Toggle (Cards vs Table) */}
-        <div style={{ display: 'flex', border: '1px solid #CBD5E1', borderRadius: 8, overflow: 'hidden' }}>
+        <div className="view-toggle-group">
           <button
             type="button"
             onClick={() => setViewMode('cards')}
-            style={{
-              padding: '6px 10px',
-              border: 'none',
-              background: viewMode === 'cards' ? '#0B253A' : '#FFF',
-              color: viewMode === 'cards' ? '#FFF' : '#64748B',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              fontSize: 12,
-              fontWeight: 600
-            }}
+            className={`view-toggle-btn ${viewMode === 'cards' ? 'active' : ''}`}
             title="SaaS Cards View"
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -501,18 +438,7 @@ export function RestaurantsListPage() {
           <button
             type="button"
             onClick={() => setViewMode('table')}
-            style={{
-              padding: '6px 10px',
-              border: 'none',
-              background: viewMode === 'table' ? '#0B253A' : '#FFF',
-              color: viewMode === 'table' ? '#FFF' : '#64748B',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              fontSize: 12,
-              fontWeight: 600
-            }}
+            className={`view-toggle-btn ${viewMode === 'table' ? 'active' : ''}`}
             title="Tabular View"
           >
             <List className="w-3.5 h-3.5" />
@@ -520,7 +446,7 @@ export function RestaurantsListPage() {
           </button>
         </div>
 
-        <span className="muted" style={{ fontSize: 12.5, fontWeight: 600, color: '#64748B' }}>
+        <span className="muted" style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--jv-text-secondary)' }}>
           {filteredRestaurants.length} of {restaurants?.length ?? 0}
         </span>
       </div>
@@ -706,7 +632,7 @@ export function RestaurantsListPage() {
                   <div className="owner-contact-row">
                     <span className="owner-contact-item">
                       <User className="w-3.5 h-3.5 text-slate-400" />
-                      <span style={{ fontWeight: 600, color: '#1E293B' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--jv-text)' }}>
                         {owner?.fullName || 'Master Owner Not Assigned'}
                       </span>
                     </span>
@@ -715,7 +641,7 @@ export function RestaurantsListPage() {
                         <span className="muted">•</span>
                         <span className="owner-contact-item">
                           <Mail className="w-3.5 h-3.5 text-slate-400" />
-                          <span style={{ color: '#64748B' }}>{owner.email}</span>
+                          <span style={{ color: 'var(--jv-text-secondary)' }}>{owner.email}</span>
                         </span>
                       </>
                     )}

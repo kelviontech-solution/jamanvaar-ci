@@ -26,9 +26,12 @@
   --jv-bg-muted: #f4efe6;
   --jv-surface: #ffffff;
   --jv-surface-subtle: #fcfaf7;
+  --jv-surface-card: #ffffff;
+  --jv-surface-hover: #fbf9f6;
 
   --jv-border: #ebe6dd;
   --jv-border-hover: #d8d1c3;
+  --jv-border-subtle: #f0ebe1;
 
   --jv-text: #0b253a;
   --jv-text-secondary: #4a5568;
@@ -63,109 +66,111 @@
   color-scheme: light;
 }
 
-/* Dark theme — same token names, dark values. Applies when the OS/browser
-   prefers dark AND the user hasn't explicitly chosen light, or when the user
-   has explicitly chosen dark via the header toggle ([data-theme="dark"]).
-   Shadows are kept dark-neutral (black-based) rather than the light theme's
-   navy-tinted shadows, which read as muddy on a dark surface. */
+/* Dark theme — same token names, refined dark enterprise values. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --jv-primary: #e8edf2;
+    --jv-primary: #f1f5f9;
     --jv-primary-hover: #ffffff;
-    --jv-primary-soft: rgba(232, 237, 242, 0.08);
+    --jv-primary-soft: rgba(241, 245, 249, 0.08);
 
-    --jv-accent: #f0813a;
-    --jv-accent-hover: #ff9752;
-    --jv-accent-soft: rgba(240, 129, 58, 0.14);
-    --jv-accent-border: rgba(240, 129, 58, 0.35);
+    --jv-accent: #f97316;
+    --jv-accent-hover: #fb923c;
+    --jv-accent-soft: rgba(249, 115, 22, 0.14);
+    --jv-accent-border: rgba(249, 115, 22, 0.35);
 
-    --jv-gold: #d8b876;
-    --jv-gold-soft: rgba(216, 184, 118, 0.12);
-    --jv-gold-border: rgba(216, 184, 118, 0.3);
+    --jv-gold: #e2ba6d;
+    --jv-gold-soft: rgba(226, 186, 109, 0.12);
+    --jv-gold-border: rgba(226, 186, 109, 0.3);
 
     --jv-teal: #2dd4c9;
     --jv-teal-soft: rgba(45, 212, 201, 0.12);
 
-    --jv-bg: #0f1720;
-    --jv-bg-muted: #161f2b;
-    --jv-surface: #1a232f;
-    --jv-surface-subtle: #202a37;
+    --jv-bg: #0b1118;
+    --jv-bg-muted: #121c27;
+    --jv-surface: #14202e;
+    --jv-surface-subtle: #172637;
+    --jv-surface-card: #162436;
+    --jv-surface-hover: #1c2e44;
 
-    --jv-border: #2a3441;
-    --jv-border-hover: #3b4757;
+    --jv-border: #1f3349;
+    --jv-border-hover: #2e4a6a;
+    --jv-border-subtle: rgba(255, 255, 255, 0.08);
 
-    --jv-text: #eef2f6;
-    --jv-text-secondary: #b6c2d1;
-    --jv-text-muted: #8695a8;
-    --jv-text-light: #647186;
+    --jv-text: #f8fafc;
+    --jv-text-secondary: #94a3b8;
+    --jv-text-muted: #64748b;
+    --jv-text-light: #475569;
 
     --jv-success: #34d399;
-    --jv-success-soft: rgba(52, 211, 153, 0.12);
+    --jv-success-soft: rgba(52, 211, 153, 0.14);
     --jv-warning: #fbbf24;
-    --jv-warning-soft: rgba(251, 191, 36, 0.12);
+    --jv-warning-soft: rgba(251, 191, 36, 0.14);
     --jv-error: #f87171;
-    --jv-error-soft: rgba(248, 113, 113, 0.12);
-    --jv-online: #4ade80;
+    --jv-error-soft: rgba(248, 113, 113, 0.14);
+    --jv-online: #10b981;
 
-    --jv-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --jv-shadow-sm: 0 1px 4px 0 rgba(0, 0, 0, 0.28);
-    --jv-shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.35), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
-    --jv-shadow-card-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.45), 0 2px 6px 0 rgba(0, 0, 0, 0.25);
-    --jv-shadow-hero: 0 4px 20px -4px rgba(0, 0, 0, 0.4), 0 1px 4px 0 rgba(0, 0, 0, 0.22);
-    --jv-shadow-hero-hover: 0 10px 28px -6px rgba(0, 0, 0, 0.5), 0 2px 8px 0 rgba(0, 0, 0, 0.28);
-    --jv-shadow-saffron: 0 4px 14px 0 rgba(240, 129, 58, 0.3);
-    --jv-shadow-saffron-hover: 0 6px 20px 0 rgba(240, 129, 58, 0.45);
+    --jv-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --jv-shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.35);
+    --jv-shadow-card: 0 4px 14px -2px rgba(0, 0, 0, 0.4), 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+    --jv-shadow-card-hover: 0 10px 28px -4px rgba(0, 0, 0, 0.55), 0 3px 8px 0 rgba(0, 0, 0, 0.3);
+    --jv-shadow-hero: 0 6px 24px -4px rgba(0, 0, 0, 0.5), 0 2px 6px 0 rgba(0, 0, 0, 0.3);
+    --jv-shadow-hero-hover: 0 14px 34px -6px rgba(0, 0, 0, 0.65), 0 3px 10px 0 rgba(0, 0, 0, 0.35);
+    --jv-shadow-saffron: 0 4px 16px 0 rgba(249, 115, 22, 0.35);
+    --jv-shadow-saffron-hover: 0 8px 24px 0 rgba(249, 115, 22, 0.5);
 
     color-scheme: dark;
   }
 }
 
 :root[data-theme='dark'] {
-  --jv-primary: #e8edf2;
+  --jv-primary: #f1f5f9;
   --jv-primary-hover: #ffffff;
-  --jv-primary-soft: rgba(232, 237, 242, 0.08);
+  --jv-primary-soft: rgba(241, 245, 249, 0.08);
 
-  --jv-accent: #f0813a;
-  --jv-accent-hover: #ff9752;
-  --jv-accent-soft: rgba(240, 129, 58, 0.14);
-  --jv-accent-border: rgba(240, 129, 58, 0.35);
+  --jv-accent: #f97316;
+  --jv-accent-hover: #fb923c;
+  --jv-accent-soft: rgba(249, 115, 22, 0.14);
+  --jv-accent-border: rgba(249, 115, 22, 0.35);
 
-  --jv-gold: #d8b876;
-  --jv-gold-soft: rgba(216, 184, 118, 0.12);
-  --jv-gold-border: rgba(216, 184, 118, 0.3);
+  --jv-gold: #e2ba6d;
+  --jv-gold-soft: rgba(226, 186, 109, 0.12);
+  --jv-gold-border: rgba(226, 186, 109, 0.3);
 
   --jv-teal: #2dd4c9;
   --jv-teal-soft: rgba(45, 212, 201, 0.12);
 
-  --jv-bg: #0f1720;
-  --jv-bg-muted: #161f2b;
-  --jv-surface: #1a232f;
-  --jv-surface-subtle: #202a37;
+  --jv-bg: #0b1118;
+  --jv-bg-muted: #121c27;
+  --jv-surface: #14202e;
+  --jv-surface-subtle: #172637;
+  --jv-surface-card: #162436;
+  --jv-surface-hover: #1c2e44;
 
-  --jv-border: #2a3441;
-  --jv-border-hover: #3b4757;
+  --jv-border: #1f3349;
+  --jv-border-hover: #2e4a6a;
+  --jv-border-subtle: rgba(255, 255, 255, 0.08);
 
-  --jv-text: #eef2f6;
-  --jv-text-secondary: #b6c2d1;
-  --jv-text-muted: #8695a8;
-  --jv-text-light: #647186;
+  --jv-text: #f8fafc;
+  --jv-text-secondary: #94a3b8;
+  --jv-text-muted: #64748b;
+  --jv-text-light: #475569;
 
   --jv-success: #34d399;
-  --jv-success-soft: rgba(52, 211, 153, 0.12);
+  --jv-success-soft: rgba(52, 211, 153, 0.14);
   --jv-warning: #fbbf24;
-  --jv-warning-soft: rgba(251, 191, 36, 0.12);
+  --jv-warning-soft: rgba(251, 191, 36, 0.14);
   --jv-error: #f87171;
-  --jv-error-soft: rgba(248, 113, 113, 0.12);
-  --jv-online: #4ade80;
+  --jv-error-soft: rgba(248, 113, 113, 0.14);
+  --jv-online: #10b981;
 
-  --jv-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --jv-shadow-sm: 0 1px 4px 0 rgba(0, 0, 0, 0.28);
-  --jv-shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.35), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
-  --jv-shadow-card-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.45), 0 2px 6px 0 rgba(0, 0, 0, 0.25);
-  --jv-shadow-hero: 0 4px 20px -4px rgba(0, 0, 0, 0.4), 0 1px 4px 0 rgba(0, 0, 0, 0.22);
-  --jv-shadow-hero-hover: 0 10px 28px -6px rgba(0, 0, 0, 0.5), 0 2px 8px 0 rgba(0, 0, 0, 0.28);
-  --jv-shadow-saffron: 0 4px 14px 0 rgba(240, 129, 58, 0.3);
-  --jv-shadow-saffron-hover: 0 6px 20px 0 rgba(240, 129, 58, 0.45);
+  --jv-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --jv-shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.35);
+  --jv-shadow-card: 0 4px 14px -2px rgba(0, 0, 0, 0.4), 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+  --jv-shadow-card-hover: 0 10px 28px -4px rgba(0, 0, 0, 0.55), 0 3px 8px 0 rgba(0, 0, 0, 0.3);
+  --jv-shadow-hero: 0 6px 24px -4px rgba(0, 0, 0, 0.5), 0 2px 6px 0 rgba(0, 0, 0, 0.3);
+  --jv-shadow-hero-hover: 0 14px 34px -6px rgba(0, 0, 0, 0.65), 0 3px 10px 0 rgba(0, 0, 0, 0.35);
+  --jv-shadow-saffron: 0 4px 16px 0 rgba(249, 115, 22, 0.35);
+  --jv-shadow-saffron-hover: 0 8px 24px 0 rgba(249, 115, 22, 0.5);
 
   color-scheme: dark;
 }
@@ -178,6 +183,8 @@ html,
 body,
 #root {
   height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -202,12 +209,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d9d2c5;
+  background: var(--jv-border-hover);
   border-radius: var(--jv-radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b8ada0;
+  background: var(--jv-text-muted);
 }
 
 .mono {
