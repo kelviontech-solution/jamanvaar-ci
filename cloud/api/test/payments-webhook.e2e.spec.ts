@@ -1,10 +1,13 @@
 // cloud/api/test/payments-webhook.e2e.spec.ts
 import { createHmac } from 'crypto';
 import { INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { json, raw, urlencoded } from 'express';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestApp, createTestPlatformUser } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { AppModule } from '../src/app.module';
 
 const WEBHOOK_SECRET = 'test-webhook-secret-for-e2e';
 
@@ -143,5 +146,59 @@ describe('Cashfree webhook processing', () => {
     const events = await prisma.runAsPlatform((tx) => tx.webhookEvent.findMany({ where: { errorMessage: { contains: 'pay_does_not_exist' } } }));
     expect(events.length).toBe(1);
     expect(events[0].processingStatus).toBe('FAILED');
+  });
+
+  it('a valid signature over malformed JSON bytes is recorded as a failed WebhookEvent, not an unhandled exception', async () => {
+    // The shared `app` above is built via createTestApp(), which (per this file's Task 9
+    // environment note) never registers main.ts's path-scoped raw() middleware for this
+    // route — Nest's default JSON body-parser runs instead, and it rejects a malformed
+    // `application/json` body with its own 400 before the request ever reaches our
+    // controller. That's a different failure mode than the one under test here (the
+    // service returning a durably-recorded 200 for a *signature-valid* but malformed
+    // body) and supertest's `.send()` would re-serialize a JS value into valid JSON
+    // anyway, so genuinely malformed bytes can't reach the controller through `app`.
+    // A second, minimal app instance mirroring main.ts's raw()-then-json() wiring for
+    // this one route is built here instead, so the exact malformed bytes reach the
+    // controller unmodified, exactly as they would in production.
+    const rawModuleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    const rawApp = rawModuleRef.createNestApplication({ bodyParser: false });
+    rawApp.use('/api/v1/payments/cashfree/webhook', raw({ type: '*/*', limit: '1mb' }));
+    rawApp.use(json());
+    rawApp.use(urlencoded({ extended: true }));
+    await rawApp.init();
+
+    try {
+      // The providerEventKey for this branch is always `MALFORMED:${randomUUID()}` (there's
+      // no cf_payment_id/order_id to derive a stable key from), so — unlike the other test
+      // cases in this file — it never collides with a prior run's row, but it also never gets
+      // reused/deduped: every run inserts a brand-new row. Scoping by createdAt keeps this
+      // test's assertions about *its own* delivery correct even when the suite is re-run
+      // without clearing WebhookEvent (a permanent, provider-global audit log by design).
+      const testStartedAt = new Date();
+      const malformedBody = '{"type":"PAYMENT_SUCCESS_WEBHOOK", this is not valid json';
+      const timestamp = String(Math.floor(Date.now() / 1000));
+      const signature = createHmac('sha256', WEBHOOK_SECRET).update(timestamp + malformedBody).digest('base64');
+
+      const res = await request(rawApp.getHttpServer())
+        .post('/api/v1/payments/cashfree/webhook')
+        .set('Content-Type', 'application/json')
+        .set('x-webhook-signature', signature)
+        .set('x-webhook-timestamp', timestamp)
+        .send(malformedBody);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ received: true });
+
+      const events = await prisma.runAsPlatform((tx) =>
+        tx.webhookEvent.findMany({
+          where: { errorMessage: { contains: 'Malformed webhook payload JSON' }, createdAt: { gte: testStartedAt } }
+        })
+      );
+      expect(events.length).toBe(1);
+      expect(events[0].processingStatus).toBe('FAILED');
+      expect(events[0].signatureValid).toBe(true);
+    } finally {
+      await rawApp.close();
+    }
   });
 });

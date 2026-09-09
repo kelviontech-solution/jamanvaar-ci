@@ -130,7 +130,7 @@ export class PaymentsService {
             provider: 'CASHFREE',
             providerEventKey: `INVALID:${randomUUID()}`,
             eventType: 'UNKNOWN',
-            rawPayload: this.safeParseJson(rawBody),
+            rawPayload: this.safeParseJson(rawBody) ?? { unparsable: true },
             signatureValid: false,
             processingStatus: 'FAILED',
             errorMessage: 'Invalid or missing webhook signature'
@@ -140,7 +140,30 @@ export class PaymentsService {
       return;
     }
 
-    const payload = JSON.parse(rawBody.toString('utf8'));
+    // A valid signature only proves the sender holds the shared secret over these exact
+    // bytes — it says nothing about whether those bytes are well-formed JSON. Reuse
+    // safeParseJson (rather than a bare JSON.parse that would throw uncaught here) so a
+    // malformed body is recorded as a FAILED WebhookEvent and answered with the same
+    // durably-recorded 200 every other failure branch in this method uses, instead of an
+    // unhandled exception surfacing as a 500.
+    const parsed = this.safeParseJson(rawBody);
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      await this.prisma.runAsPlatform((tx) =>
+        tx.webhookEvent.create({
+          data: {
+            provider: 'CASHFREE',
+            providerEventKey: `MALFORMED:${randomUUID()}`,
+            eventType: 'UNKNOWN',
+            rawPayload: { unparsable: true },
+            signatureValid: true,
+            processingStatus: 'FAILED',
+            errorMessage: 'Malformed webhook payload JSON'
+          }
+        })
+      );
+      return;
+    }
+    const payload = parsed as Record<string, any>;
     const eventType: string = payload.type;
     const cfPaymentId: string | undefined = payload.data?.payment?.cf_payment_id;
     const providerOrderId: string | undefined = payload.data?.order?.order_id;
@@ -246,11 +269,13 @@ export class PaymentsService {
     await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id }, data: { processingStatus: 'FAILED', errorMessage, processedAt: new Date() } }));
   }
 
-  private safeParseJson(rawBody: Buffer): Prisma.InputJsonValue {
+  /** Returns the parsed JSON value, or `null` if `rawBody` isn't valid JSON — callers that
+   *  need a fallback payload for storage (rather than a failure signal) should use `?? { unparsable: true }`. */
+  private safeParseJson(rawBody: Buffer): Prisma.InputJsonValue | null {
     try {
       return JSON.parse(rawBody.toString('utf8'));
     } catch {
-      return { unparsable: true };
+      return null;
     }
   }
 }
