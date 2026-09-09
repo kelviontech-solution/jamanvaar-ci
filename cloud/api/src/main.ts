@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { json, urlencoded } from 'express';
+import { json, raw, urlencoded } from 'express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
@@ -11,6 +11,13 @@ async function bootstrap() {
   // backup upload (see modules/backups) — bodyParser: false + manual json()
   // lets that one route accept up to 20MB while everything else is unaffected.
   const app = await NestFactory.create(AppModule, { bodyParser: false });
+  // The Cashfree webhook needs the exact raw request bytes for HMAC signature
+  // verification (see CashfreeGatewayService.verifyWebhookSignature) — this
+  // path-scoped raw() must be registered before the blanket json() below.
+  // body-parser's own "already parsed" check (req._body) then makes json()
+  // skip this one path instead of double-consuming the request stream, so
+  // every other route is unaffected.
+  app.use('/api/v1/payments/cashfree/webhook', raw({ type: '*/*', limit: '1mb' }));
   app.use(json({ limit: '20mb' }));
   app.use(urlencoded({ extended: true, limit: '20mb' }));
   const config = app.get(ConfigService);
@@ -22,9 +29,6 @@ async function bootstrap() {
     })
   );
   app.use(cookieParser());
-  // Comma-separated allow-list — tenant client apps (Restaurant Admin, and
-  // eventually POS/Captain/Kiosk) run on different origins from Super Admin's
-  // own web console, and all of them need credentialed (cookie) requests.
   const allowedOrigins = (
     config.get<string>('CORS_ALLOWED_ORIGINS') ?? 'http://localhost:5180,http://localhost:5176'
   )
