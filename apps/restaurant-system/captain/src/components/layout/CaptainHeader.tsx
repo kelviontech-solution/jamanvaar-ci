@@ -83,12 +83,14 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
             <button
               type="button"
               onClick={() => setIsSyncInfoOpen((prev) => !prev)}
-              className="flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 text-emerald-800 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-black tracking-wide shadow-2xs transition-all cursor-pointer"
+              className={`flex items-center gap-1.5 border px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-black tracking-wide shadow-2xs transition-all cursor-pointer ${
+                meshOnline ? 'bg-emerald-50 hover:bg-emerald-100/80 border-emerald-200 text-emerald-800' : 'bg-rose-50 hover:bg-rose-100/80 border-rose-200 text-rose-800'
+              }`}
               title="Click to view Local Database & LAN Mesh Status"
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="hidden sm:inline">LOCAL + SYNCED</span>
-              <span className="sm:hidden">SYNCED</span>
+              <span className={`w-2 h-2 rounded-full ${meshOnline ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+              <span className="hidden sm:inline">{meshOnline ? `LOCAL + SYNCED${pendingSyncCount > 0 ? ` (${pendingSyncCount})` : ''}` : 'OFFLINE'}</span>
+              <span className="sm:hidden">{meshOnline ? 'SYNCED' : 'OFFLINE'}</span>
               <ChevronDown className="w-3 h-3 opacity-60" />
             </button>
 
@@ -206,7 +208,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                   </div>
                   <div className="flex justify-between">
                     <span>Assigned Tables:</span>
-                    <span className="font-bold text-[#0B253A]">1, 2, 3, 4, 5, 6, 12, 14</span>
+                    <span className="font-bold text-[#0B253A]">{(currentCaptain?.assignedTableNumbers || []).join(', ') || 'None'}</span>
                   </div>
                 </div>
 

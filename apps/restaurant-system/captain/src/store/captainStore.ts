@@ -152,13 +152,6 @@ interface CaptainState {
     foodServed: number;
     billsRequested: number;
   };
-  syncStatus: {
-    isOnline: boolean;
-    pendingSyncCount: number;
-    kdsConnected: boolean;
-    lastPingMs: number;
-  };
-
   // Actions
   login: (pin: string) => boolean;
   logout: () => void;
@@ -250,53 +243,12 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   guestCount: 2,
   attachedCustomer: null,
 
-  messages: [
-    {
-      id: 'msg-1',
-      senderName: 'Rahul Sharma (Captain)',
-      senderRole: 'CAPTAIN',
-      recipient: 'KITCHEN',
-      tableNumber: '12',
-      presetText: 'Food taking too long',
-      customNote: 'Guests have flight in 45 mins, please prioritize',
-      status: 'ACKNOWLEDGED',
-      createdAt: new Date(Date.now() - 10 * 60000).toISOString(),
-      updatedAt: new Date(Date.now() - 6 * 60000).toISOString()
-    },
-    {
-      id: 'msg-2',
-      senderName: 'Kitchen (Head Chef)',
-      senderRole: 'KITCHEN',
-      recipient: 'CAPTAIN',
-      tableNumber: '8',
-      presetText: 'Item unavailable in kitchen',
-      customNote: 'Shahi Malai Kofta sold out. Recommend Paneer Butter Masala.',
-      status: 'DELIVERED',
-      createdAt: new Date(Date.now() - 3 * 60000).toISOString(),
-      updatedAt: new Date(Date.now() - 3 * 60000).toISOString()
-    }
-  ],
+  // A fresh captain session starts with an empty inbox/request queue — these
+  // used to seed fake in-progress chatter and guest requests that made a
+  // brand-new session look like it already had live activity in progress.
+  messages: [],
 
-  customerRequests: [
-    {
-      id: 'cr-1',
-      tableNumber: '12',
-      type: 'WATER',
-      notes: 'Chilled bottle water requested',
-      createdAt: new Date(Date.now() - 4 * 60000).toISOString(),
-      isAcknowledged: false,
-      isResolved: false
-    },
-    {
-      id: 'cr-2',
-      tableNumber: '3',
-      type: 'PLATES',
-      notes: '2 extra small dessert quarter plates',
-      createdAt: new Date(Date.now() - 8 * 60000).toISOString(),
-      isAcknowledged: true,
-      isResolved: false
-    }
-  ],
+  customerRequests: [],
 
   // A fresh shift starts at zero — these used to seed non-zero demo values
   // that made a brand-new shift look like it already had activity.
@@ -326,66 +278,11 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   isNewMessageModalOpen: false,
 
   kots: captainDb.kots,
-  foodReadyItems: [
-    {
-      id: 'fr-101',
-      kotId: 'kot-seed-1',
-      kotNumber: '104',
-      orderId: 'ord-104',
-      orderNumber: 'ORD-104',
-      tableNumber: '12',
-      itemId: 'mi-1',
-      dishName: 'Paneer Tikka',
-      quantity: 2,
-      modifiers: ['Less Spicy'],
-      specialInstructions: 'Serve with mint chutney',
-      station: 'Tandoor Station',
-      readyAt: new Date(Date.now() - 2 * 60000).toISOString(),
-      elapsedSeconds: 120,
-      isServed: false
-    },
-    {
-      id: 'fr-102',
-      kotId: 'kot-seed-2',
-      kotNumber: '105',
-      orderId: 'ord-105',
-      orderNumber: 'ORD-105',
-      tableNumber: '8',
-      itemId: 'mi-4',
-      dishName: 'Crispy Corn Salt & Pepper',
-      quantity: 1,
-      modifiers: [],
-      specialInstructions: 'Extra crispy',
-      station: 'Starters Station',
-      readyAt: new Date(Date.now() - 4 * 60000).toISOString(),
-      elapsedSeconds: 240,
-      isServed: false
-    }
-  ],
-  notifications: [
-    {
-      id: 'notif-1',
-      type: 'TABLE_ASSIGNED',
-      title: 'Floor Assignment Active',
-      message: 'You are assigned to Floor Zone A (Tables 1–6, 12, 14)',
-      timestamp: new Date().toISOString(),
-      isRead: false
-    },
-    {
-      id: 'notif-2',
-      type: 'FOOD_READY',
-      title: '🔥 Food Ready at Tandoor',
-      message: 'Table #12 — Paneer Tikka x2 is ready for service',
-      timestamp: new Date(Date.now() - 2 * 60000).toISOString(),
-      isRead: false
-    }
-  ],
-  syncStatus: {
-    isOnline: true,
-    pendingSyncCount: 0,
-    kdsConnected: true,
-    lastPingMs: 14
-  },
+  // Real food-ready items and notifications arrive from actual kitchen
+  // activity (see markFoodReady/notification-pushing actions below) — a
+  // fresh session has none yet, rather than two pre-baked fake tickets.
+  foodReadyItems: [],
+  notifications: [],
 
   login: (pin: string) => {
     // SEC-006 fix: Authenticate against database users instead of hardcoded PIN bypass

@@ -16,6 +16,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { hashOpaqueToken, generateOpaqueToken } from '../../common/security/token.util';
 import { CreateTenantStaffUserDto, TenantLoginDto, ActivateDeviceDto } from './dto/login.dto';
+import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
+import { AppCode } from '@prisma/client';
 
 export const TENANT_JWT_ISSUER = 'jamanvaar-tenant';
 export const TENANT_JWT_AUDIENCE = 'jamanvaar-tenant';
@@ -79,7 +81,8 @@ export class TenantAuthService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly appEntitlements: ApplicationEntitlementsService
   ) {}
 
   private signAccessToken(user: User): string {
@@ -414,6 +417,17 @@ export class TenantAuthService {
           `This activation key is designated for ${key.allowedDeviceType} terminals, not ${dto.deviceType}.`
         );
       }
+
+      // Same real gate as activation-keys.service.ts's generate()/redeem() —
+      // this is a separate device-provisioning path (the tenant-auth
+      // login -> ACTIVATION_REQUIRED -> activate-device flow used by the
+      // Restaurant Admin / Kiosk Admin device-connect screens) and it was
+      // the one place a device could be created without ever checking the
+      // restaurant's application entitlements at all, POS_ADMIN's
+      // compatibility bypass above notwithstanding — compatibility with a
+      // specific key's allowedDeviceType and entitlement to the app itself
+      // are two different questions.
+      await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, dto.deviceType as AppCode);
 
       const deviceToken = generateOpaqueToken();
 

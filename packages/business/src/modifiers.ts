@@ -6,6 +6,19 @@ export interface ModifierValidationResult {
 }
 
 /**
+ * True only when at least one of an item's modifier groups actually demands
+ * a choice before the item is a valid order (matches validateModifiers'
+ * own definition of "required" below: isRequired OR minSelections > 0). An
+ * item whose only modifier groups are optional add-ons (extra cheese, etc.)
+ * returns false here — a UI can use that to add such an item straight to
+ * cart with its defaults instead of forcing a customization step open for
+ * every item that merely has *some* modifier group.
+ */
+export function hasRequiredModifierGroup(groups: ModifierGroup[] | undefined | null): boolean {
+  return Boolean(groups?.some((g) => g.isRequired || g.minSelections > 0));
+}
+
+/**
  * Validates selected modifiers against a list of modifier groups
  */
 export function validateModifiers(

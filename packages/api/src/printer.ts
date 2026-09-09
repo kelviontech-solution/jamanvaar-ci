@@ -1,6 +1,6 @@
-import { Order, PrinterDevice, PrinterHardwareStatus, PrintJob, ReceiptConfig, ReceiptPaperSize } from '@jamanvaar/types';
+import { KOTRecord, Order, PrinterDevice, PrinterHardwareStatus, PrinterRole, PrintJob, ReceiptConfig, ReceiptPaperSize } from '@jamanvaar/types';
 import { formatDate, formatINR, formatTime, generateUUID } from '@jamanvaar/utils';
-import { AuditRepository, db, ReceiptRepository } from '@jamanvaar/database';
+import { AuditRepository, db, PrintQueueRepository, ReceiptRepository } from '@jamanvaar/database';
 
 export class PrinterService {
   private static activePrinterId: string = 'prn-kiosk-01';
@@ -88,6 +88,111 @@ export class PrinterService {
   public static isOnline(): boolean {
     const active = this.getActivePrinter();
     return active ? active.status === 'READY' : false;
+  }
+
+  /**
+   * Retrieves configured physical printer for a specific operational role
+   * (kitchen station routing). Same resolution order as the POS terminal's
+   * printer service so a kitchen printer assignment behaves identically
+   * regardless of which app the order originated from.
+   */
+  public static getPrinterForRole(role: PrinterRole): PrinterDevice {
+    const found = db.configuredPrinters.find((p) => p.role === role && p.status === 'READY')
+      || db.configuredPrinters.find((p) => p.role === role)
+      || this.getActivePrinter();
+    return found;
+  }
+
+  /**
+   * Resolves the physical kitchen printer for a free-text station name
+   * (e.g. "Tandoor Section", "Beverages Bar") the same way the POS KOT
+   * router does, so a kiosk order's tickets land on the correct station
+   * printer instead of always the kiosk's single receipt printer.
+   */
+  public static getPrinterForStation(station: string = 'Main Kitchen'): PrinterDevice {
+    const norm = station.toLowerCase().trim();
+
+    if (norm.includes('tandoor')) {
+      return this.getPrinterForRole('TANDOOR');
+    }
+    if (norm.includes('bar') || norm.includes('beverage') || norm.includes('drink') || norm.includes('coffee')) {
+      return this.getPrinterForRole('BAR');
+    }
+    if (norm.includes('dessert') || norm.includes('sweet') || norm.includes('ice cream')) {
+      return this.getPrinterForRole('DESSERT');
+    }
+    return this.getPrinterForRole('KITCHEN');
+  }
+
+  /**
+   * Formats a Kitchen Order Ticket for a single station's KOT, matching
+   * the POS terminal's KOT layout so kitchen staff see one consistent
+   * ticket format regardless of order origin.
+   */
+  public static generateKOTText(kot: KOTRecord): string {
+    const width = 40;
+    const divider = '-'.repeat(width);
+    const doubleDivider = '='.repeat(width);
+
+    const pad = (left: string, right: string) => {
+      const space = Math.max(1, width - left.length - right.length);
+      return left + ' '.repeat(space) + right;
+    };
+
+    const center = (text: string) => {
+      const padLen = Math.max(0, Math.floor((width - text.length) / 2));
+      return ' '.repeat(padLen) + text;
+    };
+
+    const lines: string[] = [
+      center('*** KITCHEN ORDER TICKET ***'),
+      center(`STATION: [ ${kot.station.toUpperCase()} ]`),
+      doubleDivider,
+      pad(`KOT #: ${kot.kotNumber}`, `TYPE: ${kot.type}`),
+      pad(`ORDER #: ${kot.orderNumber}`, `TOKEN: #${kot.tokenNumber}`),
+      pad(kot.tableNumber ? `TABLE: ${kot.tableNumber}` : `TYPE: ${kot.orderType}`, `TIME: ${new Date(kot.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`),
+      pad(`SERVER / POS: ${kot.cashierName}`, ''),
+      divider,
+      pad('ITEM NAME', 'QTY'),
+      divider
+    ];
+
+    kot.items.forEach((item) => {
+      lines.push(pad(item.name, `x${item.quantity}`));
+      item.modifiers.forEach((mod) => lines.push(`  + ${mod.optionName}`));
+      if (item.specialInstructions) lines.push(`  * ${item.specialInstructions}`);
+    });
+
+    lines.push(doubleDivider);
+    return lines.join('\n');
+  }
+
+  /**
+   * Dispatches a Kitchen Order Ticket to the correct station printer,
+   * mirroring the POS terminal's KOT dispatch so kiosk orders route to
+   * the same physical kitchen printers instead of only the kiosk's own
+   * customer-facing receipt printer.
+   */
+  public static printKOT(kot: KOTRecord): PrintJob {
+    const printer = this.getPrinterForStation(kot.station);
+    const payload = this.generateKOTText(kot);
+
+    printer.lastPrintAt = new Date().toISOString();
+    db.notify();
+
+    return PrintQueueRepository.addJob({
+      type: 'KOT_TICKET',
+      printerId: printer.id,
+      printerName: printer.name,
+      targetStation: kot.station,
+      orderId: kot.orderId,
+      orderNumber: kot.orderNumber,
+      tokenNumber: kot.tokenNumber,
+      kotId: kot.id,
+      kotNumber: kot.kotNumber,
+      rawPayload: payload,
+      paperSize: printer.paperSize || '80mm'
+    });
   }
 
   /**

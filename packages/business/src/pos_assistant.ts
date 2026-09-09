@@ -608,24 +608,63 @@ export class PosAssistantService {
       }
 
       case 'POPULAR_COMBOS': {
+        // Real basket co-occurrence: count, for every pair of distinct items
+        // that ever appeared together in the same completed order, how many
+        // orders contained that pair — instead of a fixed example pairing.
+        const itemOrderCount: Record<string, number> = {};
+        const pairCount: Record<string, number> = {};
+        completedOrders.forEach((o) => {
+          const distinctNames = Array.from(new Set((o.items || []).map((it) => it.name)));
+          distinctNames.forEach((n) => { itemOrderCount[n] = (itemOrderCount[n] || 0) + 1; });
+          for (let i = 0; i < distinctNames.length; i++) {
+            for (let j = i + 1; j < distinctNames.length; j++) {
+              const key = [distinctNames[i], distinctNames[j]].sort().join(' :: ');
+              pairCount[key] = (pairCount[key] || 0) + 1;
+            }
+          }
+        });
+
+        const topPairEntry = Object.entries(pairCount).sort((a, b) => b[1] - a[1])[0];
+
+        if (!topPairEntry) {
+          return {
+            id, sender: 'ASSISTANT', timestamp, intent,
+            summaryText: 'Not enough completed orders with 2+ distinct items yet to detect a real pairing pattern.',
+            card: {
+              title: '💡 Smart Combination Insights',
+              badge: 'Not Enough Data',
+              badgeType: 'default',
+              metrics: [],
+              notes: 'Combination insights need multiple completed multi-item orders on this business day before a real pattern emerges.',
+              actions: [{ label: 'Open Menu Catalog', actionType: 'NAVIGATE_TAB', targetTab: 'MENU' }],
+              suggestions: ["🔥 Top Selling Items", "📊 Today's Sales"]
+            }
+          };
+        }
+
+        const [pairKey, coOccurrences] = topPairEntry;
+        const [itemA, itemB] = pairKey.split(' :: ');
+        const basePairOrders = Math.max(itemOrderCount[itemA] || 1, 1);
+        const coOccurrencePercent = Math.round((coOccurrences / basePairOrders) * 100);
+
         return {
           id,
           sender: 'ASSISTANT',
           timestamp,
           intent,
-          summaryText: 'Top ordered pairing: Paneer Tikka + Butter Naan + Dal Makhani (frequently ordered together).',
+          summaryText: `Top ordered pairing today: ${itemA} + ${itemB} (in ${coOccurrences} of today's orders).`,
           card: {
             title: '💡 Smart Combination Insights',
             badge: 'Frequent Pairing',
             badgeType: 'success',
-            highlightNumber: 'Paneer Tikka + Butter Naan + Dal Makhani',
-            highlightLabel: 'Frequently Ordered Together (74% co-occurrence)',
+            highlightNumber: `${itemA} + ${itemB}`,
+            highlightLabel: `Ordered Together ${coOccurrences}x Today (${coOccurrencePercent}% co-occurrence)`,
             metrics: [
-              { label: 'Primary Dish', value: 'Paneer Tikka (Tandoori)' },
-              { label: 'Recommended Bread', value: 'Butter Naan' },
-              { label: 'Recommended Gravy', value: 'Dal Makhani' }
+              { label: itemA, value: `${itemOrderCount[itemA] || 0} orders today` },
+              { label: itemB, value: `${itemOrderCount[itemB] || 0} orders today` },
+              { label: 'Ordered Together', value: `${coOccurrences} orders today` }
             ],
-            notes: '💡 Staff recommendation: Suggest Butter Naan whenever Paneer Tikka is added.',
+            notes: `💡 Staff recommendation: Suggest ${itemB} whenever ${itemA} is added.`,
             actions: [{ label: 'Open Menu Catalog', actionType: 'NAVIGATE_TAB', targetTab: 'MENU' }],
             suggestions: ["🔥 Top Selling Items", "📊 Today's Sales"]
           }
@@ -996,23 +1035,61 @@ export class PosAssistantService {
       }
 
       case 'BUSIEST_HOUR': {
+        // Real hour-of-day revenue distribution from today's completed
+        // orders, instead of a fixed "1-2:30pm / 7:30-9:30pm" guess.
+        const hourSales: number[] = new Array(24).fill(0);
+        const hourOrders: number[] = new Array(24).fill(0);
+        completedOrders.forEach((o) => {
+          const hr = new Date(o.createdAt).getHours();
+          hourSales[hr] += Number(o.totalAmount || 0);
+          hourOrders[hr] += 1;
+        });
+        const totalDaySales = hourSales.reduce((a, b) => a + b, 0);
+        const formatHour = (h: number) => {
+          const period = h >= 12 ? 'PM' : 'AM';
+          const display = h % 12 === 0 ? 12 : h % 12;
+          return `${display}:00 ${period}`;
+        };
+
+        if (totalDaySales <= 0) {
+          return {
+            id, sender: 'ASSISTANT', timestamp, intent,
+            summaryText: 'No completed orders yet today to determine a busiest hour.',
+            card: {
+              title: 'Busiest Trading Hours & Rush Periods',
+              badge: 'Not Enough Data',
+              badgeType: 'default',
+              metrics: [],
+              actions: [{ label: 'Open POS Reports', actionType: 'NAVIGATE_TAB', targetTab: 'REPORTS' }],
+              suggestions: ["🔥 Top Selling Items", "📊 Today's Sales"]
+            }
+          };
+        }
+
+        const peakHour = hourSales.reduce((best, val, idx) => (val > hourSales[best] ? idx : best), 0);
+        const peakPercent = Math.round((hourSales[peakHour] / totalDaySales) * 100);
+        const topHoursRanked = hourSales
+          .map((sales, hr) => ({ hr, sales, orders: hourOrders[hr] }))
+          .filter((h) => h.sales > 0)
+          .sort((a, b) => b.sales - a.sales)
+          .slice(0, 3);
+
         return {
           id,
           sender: 'ASSISTANT',
           timestamp,
           intent,
-          summaryText: 'Peak rush period is between 1:00 PM – 2:30 PM (Lunch) and 7:30 PM – 9:30 PM (Dinner).',
+          summaryText: `Peak rush hour today is ${formatHour(peakHour)}–${formatHour((peakHour + 1) % 24)} (${peakPercent}% of today's sales so far).`,
           card: {
             title: 'Busiest Trading Hours & Rush Periods',
             badge: 'Peak Analysis',
             badgeType: 'warning',
-            highlightNumber: '7:30 PM – 9:30 PM',
-            highlightLabel: 'Primary Dinner Rush (42% of Daily Sales)',
-            metrics: [
-              { label: 'Lunch Rush Window', value: '1:00 PM – 2:30 PM' },
-              { label: 'Dinner Rush Window', value: '7:30 PM – 9:30 PM' },
-              { label: 'Top Rush Category', value: 'Main Course & Tandoori Breads' }
-            ],
+            highlightNumber: `${formatHour(peakHour)}–${formatHour((peakHour + 1) % 24)}`,
+            highlightLabel: `Busiest Hour So Far (${peakPercent}% of Today's Sales)`,
+            metrics: topHoursRanked.map((h) => ({
+              label: `${formatHour(h.hr)}–${formatHour((h.hr + 1) % 24)}`,
+              value: `${formatINR(h.sales)} (${h.orders} orders)`
+            })),
             actions: [{ label: 'Open POS Reports', actionType: 'NAVIGATE_TAB', targetTab: 'REPORTS' }],
             suggestions: ["🔥 Top Selling Items", "📊 Today's Sales"]
           }

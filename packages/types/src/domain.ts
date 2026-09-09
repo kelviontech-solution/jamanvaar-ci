@@ -619,6 +619,47 @@ export interface QrOrderingSettings {
 export type VoiceStyle = 'STANDARD' | 'SHORT' | 'DISABLED';
 export type VoiceLanguage = 'en' | 'hi' | 'gu';
 
+/**
+ * Kiosk Admin/Super Admin-configurable customer-kiosk behavior — previously
+ * hardcoded as literal constants inside the kiosk app itself (which
+ * languages to offer and how long before the idle-timeout warning/reset
+ * fires). This is the config surface those constants should read from
+ * instead. Deliberately does NOT duplicate the welcome-screen tagline —
+ * that's already correctly per-language through the i18n system
+ * (packages/i18n), and a second, non-localized override field here would
+ * just create two conflicting sources of truth for the same text.
+ */
+export interface KioskDisplaySettings {
+  enabledLanguages: VoiceLanguage[];
+  defaultLanguage: VoiceLanguage;
+  /** Seconds of no touch/interaction before the idle warning appears. */
+  idleWarningAfterSeconds: number;
+  /** Seconds the idle warning counts down before the session resets. */
+  idleResetCountdownSeconds: number;
+}
+
+/**
+ * Kiosk Admin-editable content for the customer kiosk's first (Welcome)
+ * screen. Every text field is an optional literal override — when unset,
+ * the kiosk falls back to its normal translated i18n copy, so a restaurant
+ * that never touches this panel sees the same fully-localized screen as
+ * before. An override is shown as-is (not re-translated per language),
+ * which is an intentional trade-off: it's the simplest way to let an admin
+ * customize this screen without building a full per-language CMS for it.
+ */
+export interface WelcomeScreenSettings {
+  headingText?: string;
+  subtitleText?: string;
+  startOrderButtonText?: string;
+  supportingText?: string;
+  /** Indian heritage-inspired corner artwork. Default on. */
+  showHeritageArtwork: boolean;
+  /** Default OFF per product spec — most restaurants start with no
+   *  welcome-screen promo and opt in later. */
+  showPromoBanner: boolean;
+  promoBannerText?: string;
+}
+
 export interface VoiceConfig {
   enabled: boolean;
   style: VoiceStyle;
@@ -672,13 +713,15 @@ export interface DeviceHealth {
   kioskId: string;
   status: KioskStatus;
   isOnline: boolean;
-  cpuUsagePercent: number;
-  ramUsagePercent: number;
-  storageFreeGb: number;
+  // null when this build has no way to read the real value (no native
+  // system-info / hardware bridge available) — never a fabricated number.
+  cpuUsagePercent: number | null;
+  ramUsagePercent: number | null;
+  storageFreeGb: number | null;
   appVersion: string;
   isPrinterOnline: boolean;
-  isPaymentTerminalOnline: boolean;
-  isTouchscreenResponsive: boolean;
+  isPaymentTerminalOnline: boolean | null;
+  isTouchscreenResponsive: boolean | null;
   lastHeartbeat: string;
   pendingSyncEventsCount: number;
 }
@@ -1082,6 +1125,8 @@ export interface KOTRecord {
   serverName?: string;
   cashierName: string;
   createdAt: string;
+  readyAt?: string;
+  servedAt?: string;
   printed: boolean;
   status: KOTStatus;
 }

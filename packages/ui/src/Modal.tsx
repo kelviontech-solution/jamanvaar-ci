@@ -9,6 +9,14 @@ export interface ModalProps {
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
   showCloseButton?: boolean;
   className?: string;
+  /** Extra classes for the scrollable body wrapper (default just adds padding). */
+  bodyClassName?: string;
+  /**
+   * Optional bottom action bar rendered outside the scrollable body, pinned
+   * to the foot of the modal card — for a primary action (e.g. "Add to
+   * Cart") that must stay reachable without scrolling past long content.
+   */
+  footer?: React.ReactNode;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -18,7 +26,9 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   maxWidth = 'lg',
   showCloseButton = true,
-  className = ''
+  className = '',
+  bodyClassName = '',
+  footer
 }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -46,14 +56,17 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Backdrop */}
       <div className="fixed inset-0" onClick={onClose} />
 
-      {/* Modal Container */}
+      {/* Modal Container — capped to the viewport with an internal
+          scrolling body, so long content (e.g. several modifier groups)
+          scrolls within the card instead of pushing the primary action
+          off-screen or forcing the whole backdrop to scroll. */}
       <div
-        className={`relative w-full ${widthClasses[maxWidth]} bg-white rounded-3xl shadow-2xl border border-[#EBE6DD] overflow-hidden z-10 animate-scaleUp ${className}`}
+        className={`relative w-full ${widthClasses[maxWidth]} max-h-[90vh] bg-white rounded-3xl shadow-2xl border border-[#EBE6DD] overflow-hidden z-10 animate-scaleUp flex flex-col ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[#F3EFE6] bg-[#FBF9F5]">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#F3EFE6] bg-[#FBF9F5] shrink-0">
             <h2 className="text-xl font-bold text-[#0B253A]">{title}</h2>
             {showCloseButton && (
               <button
@@ -68,7 +81,12 @@ export const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* Body */}
-        <div className="p-6">{children}</div>
+        <div className={`p-6 overflow-y-auto flex-1 ${bodyClassName}`}>{children}</div>
+
+        {/* Sticky footer action bar */}
+        {footer && (
+          <div className="px-6 py-4 border-t border-[#F3EFE6] bg-white shrink-0">{footer}</div>
+        )}
       </div>
     </div>
   );

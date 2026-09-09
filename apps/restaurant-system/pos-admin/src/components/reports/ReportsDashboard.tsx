@@ -268,8 +268,8 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
   }, [currentOrders]);
 
   const eod = useMemo(() => {
-    return ReportDataEngine.getEodReconciliation(currentOrders);
-  }, [currentOrders]);
+    return ReportDataEngine.getEodReconciliation(currentOrders, dateRange);
+  }, [currentOrders, dateRange]);
 
   // Active Report Details
   const activeReport = useMemo(() => {
@@ -903,9 +903,11 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                   <p className="text-xs text-slate-400">Balancing cash drawer and digital settlements</p>
                 </div>
                 <span className={`px-3 py-1 rounded-full font-black text-xs ${
-                  eod.isBalanced ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                  eod.isBalanced === null ? 'bg-slate-100 text-slate-600' : eod.isBalanced ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                 }`}>
-                  {eod.isBalanced ? '✓ BALANCED' : `⚠ VARIANCE: ${formatINR(eod.cashDifference)}`}
+                  {eod.isBalanced === null
+                    ? 'NOT YET COUNTED'
+                    : eod.isBalanced ? '✓ BALANCED' : `⚠ VARIANCE: ${formatINR(eod.cashDifference || 0)}`}
                 </span>
               </div>
 
@@ -940,7 +942,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                     <div className="flex items-center justify-between">
                       <h4 className="font-extrabold text-xs text-[#0B253A]">{st.stationName}</h4>
                       <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-black">
-                        {st.avgPrepMinutes}m avg
+                        {st.avgPrepMinutes !== null ? `${st.avgPrepMinutes}m avg` : 'No data yet'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs font-mono text-slate-600 pt-1">

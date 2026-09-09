@@ -10,6 +10,7 @@ release/
 .DS_Store
 Thumbs.db
 .gemini/
+.claude/
 .jamanvaar/
 JAMANVAAR_DESKTOP_PACKAGE/
 *.zip

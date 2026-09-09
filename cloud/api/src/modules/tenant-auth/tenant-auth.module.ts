@@ -4,9 +4,10 @@ import { TenantAuthController, TenantMeController } from './tenant-auth.controll
 import { TenantAuthService } from './tenant-auth.service';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
 import { AuditModule } from '../audit/audit.module';
+import { ApplicationEntitlementsModule } from '../application-entitlements/application-entitlements.module';
 
 @Module({
-  imports: [JwtModule.register({}), AuditModule],
+  imports: [JwtModule.register({}), AuditModule, ApplicationEntitlementsModule],
   controllers: [TenantAuthController, TenantMeController],
   providers: [TenantAuthService, TenantAuthGuard],
   exports: [TenantAuthGuard, TenantAuthService, JwtModule]

@@ -11,6 +11,7 @@ import type {
   RestaurantReport
 } from '../../api/types';
 import { ENTITLEMENT_LABELS, type EntitlementKey } from '../../api/types';
+import { APP_CODES, APP_CODE_LABELS, type AppCode, type ApplicationEntitlement } from '../../api/types';
 import {
   Badge,
   Button,
@@ -61,7 +62,10 @@ import {
   Check,
   ShieldAlert,
   Activity,
-  HardDrive
+  HardDrive,
+  Grid3x3,
+  Power,
+  PowerOff
 } from 'lucide-react';
 
 type Tab =
@@ -69,6 +73,7 @@ type Tab =
   | 'owner'
   | 'branches'
   | 'subscription'
+  | 'applications'
   | 'plan'
   | 'entitlements'
   | 'devices'
@@ -83,6 +88,11 @@ const TABS: Array<{ key: Tab; label: string; icon: React.ComponentType<{ classNa
   { key: 'owner', label: 'Owner & Users', icon: Users },
   { key: 'branches', label: 'Branches', icon: Building2 },
   { key: 'subscription', label: 'Subscription', icon: Repeat },
+  // Previously the only place any application appeared was as a static,
+  // read-only pill on the Feature Entitlements tab (and only if the plan's
+  // JSON happened to have a matching boolean — Kiosk/Kiosk Admin never did).
+  // This is the real per-application enable/disable + device-count tab.
+  { key: 'applications', label: 'Applications', icon: Grid3x3 },
   { key: 'plan', label: 'Plan Quotas', icon: Package },
   { key: 'entitlements', label: 'Feature Entitlements', icon: ShieldCheck },
   { key: 'devices', label: 'Devices & Keys', icon: Laptop2 },
@@ -127,6 +137,8 @@ export function RestaurantDetailPage() {
   const [backups, setBackups] = useState<Backup[] | null>(null);
   const [reportsData, setReportsData] = useState<RestaurantReport | null>(null);
   const [reportsLoading, setReportsLoading] = useState(false);
+  const [appEntitlements, setAppEntitlements] = useState<ApplicationEntitlement[] | null>(null);
+  const [savingAppCode, setSavingAppCode] = useState<AppCode | null>(null);
 
   // Password reset modal state
   const [resetPasswordUser, setResetPasswordUser] = useState<{ id: string; name: string; email: string } | null>(null);
@@ -164,6 +176,10 @@ export function RestaurantDetailPage() {
       .then((res) => {
         setRestaurant(res);
         setError(null);
+        // Invalidate the cached application list — a plan change resyncs
+        // ApplicationEntitlement rows server-side (see subscriptions.service.ts
+        // changePlan), so a stale cached read here would show the old set.
+        setAppEntitlements(null);
       })
       .catch((err) =>
         setError(err instanceof ApiError && err.status === 404 ? 'Restaurant not found' : 'Failed to load restaurant')
@@ -196,7 +212,13 @@ export function RestaurantDetailPage() {
         .catch(() => {})
         .finally(() => setReportsLoading(false));
     }
-  }, [tab, id, activity, invoices, diagnostics, backups, reportsData]);
+    if (tab === 'applications' && !appEntitlements) {
+      api
+        .get<ApplicationEntitlement[]>(`/api/v1/restaurants/${id}/applications`)
+        .then(setAppEntitlements)
+        .catch(() => setAppEntitlements([]));
+    }
+  }, [tab, id, activity, invoices, diagnostics, backups, reportsData, appEntitlements]);
 
   async function executeConfirmedAction() {
     if (!confirmAction) return;
@@ -414,6 +436,23 @@ export function RestaurantDetailPage() {
     ) ?? restaurant.subscriptions[0];
   const effectiveTier = (activeSub?.plan.tier as 'CORE' | 'PRO') || 'CORE';
   const isPro = effectiveTier === 'PRO';
+
+  async function handleToggleApplication(appCode: AppCode, nextEnabled: boolean) {
+    if (!activeSub) return;
+    setSavingAppCode(appCode);
+    try {
+      const updated = await api.patch<ApplicationEntitlement>(
+        `/api/v1/subscriptions/${activeSub.id}/applications/${appCode}`,
+        { enabled: nextEnabled }
+      );
+      setAppEntitlements((prev) => (prev ? prev.map((e) => (e.appCode === appCode ? updated : e)) : prev));
+      showToast(`${APP_CODE_LABELS[appCode]} ${nextEnabled ? 'enabled' : 'disabled'} for this restaurant.`);
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : `Failed to update ${APP_CODE_LABELS[appCode]}`);
+    } finally {
+      setSavingAppCode(null);
+    }
+  }
 
   return (
     <div>
@@ -843,6 +882,88 @@ export function RestaurantDetailPage() {
           {/* Cryptographic Offline License Certificate */}
           <LicenseCertificatePanel restaurantId={restaurant.id} />
         </div>
+      )}
+
+      {/* TAB: APPLICATIONS — real per-application provisioning, not a
+          read-only reflection of the plan's entitlements JSON. Each row is
+          an actual ApplicationEntitlement DB row; toggling it here is what
+          activation-key generation/redemption is gated against. */}
+      {tab === 'applications' && (
+        <Card style={{ padding: 22 }}>
+          <div className="detail-card-title">
+            <div>
+              <span>Applications Provisioned</span>
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                What this restaurant can actually activate a device for — enabling an app here is what lets a
+                new activation key be generated or redeemed for it.
+              </p>
+            </div>
+            {activeSub && <Badge tone={isPro ? 'gold' : 'neutral'}>Plan: {activeSub.plan.name}</Badge>}
+          </div>
+
+          {!activeSub ? (
+            <EmptyState
+              title="No subscription assigned"
+              description="Assign a plan first — applications are provisioned per subscription."
+            />
+          ) : appEntitlements === null ? (
+            <SkeletonTable rows={6} cols={2} />
+          ) : appEntitlements.length === 0 ? (
+            <EmptyState
+              title="No application rows yet"
+              description="This subscription predates per-application entitlements. Change the plan (even to the same plan) to backfill them."
+            />
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12, marginTop: 4 }}>
+              {APP_CODES.map((code) => {
+                const row = appEntitlements.find((e) => e.appCode === code);
+                const enabled = row?.enabled ?? false;
+                const deviceCount = restaurant.devices.filter((d) => {
+                  // POS_ADMIN/KIOSK_ADMIN device rows use those exact type
+                  // strings — the same values as AppCode for every entry.
+                  return (d as { type: string }).type === code;
+                }).length;
+                const saving = savingAppCode === code;
+                return (
+                  <div
+                    key={code}
+                    style={{
+                      padding: '14px 16px',
+                      borderRadius: 12,
+                      border: enabled ? '1px solid #86efac' : '1px solid #e2e8f0',
+                      background: enabled ? '#f0fdf4' : '#f8fafc',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 8
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: enabled ? '#166534' : '#0B253A' }}>
+                          {APP_CODE_LABELS[code]}
+                        </div>
+                        <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                          {deviceCount} device{deviceCount === 1 ? '' : 's'} active
+                          {row?.deviceQuota ? ` · quota ${row.deviceQuota}` : ''}
+                        </div>
+                      </div>
+                      <Badge tone={enabled ? 'success' : 'neutral'}>{enabled ? 'Enabled' : 'Disabled'}</Badge>
+                    </div>
+                    <Button
+                      variant={enabled ? 'ghost' : 'primary'}
+                      disabled={saving}
+                      onClick={() => handleToggleApplication(code, !enabled)}
+                      style={{ alignSelf: 'flex-start' }}
+                    >
+                      {enabled ? <PowerOff className="w-3.5 h-3.5" /> : <Power className="w-3.5 h-3.5" />}
+                      {saving ? 'Saving…' : enabled ? 'Disable' : 'Enable'}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Card>
       )}
 
       {/* TAB 5: PLAN QUOTAS */}

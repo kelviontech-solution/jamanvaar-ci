@@ -154,7 +154,10 @@ export interface StationPerformanceRow {
   stationName: string;
   kotCount: number;
   itemsCount: number;
-  avgPrepMinutes: number;
+  // null when no KOT at this station in-range has actually reached READY
+  // yet — there is no real timing data to average, so we say so instead
+  // of guessing a number.
+  avgPrepMinutes: number | null;
   delayedKotCount: number;
 }
 
@@ -196,8 +199,12 @@ export interface EodReconciliationData {
   cashRefunds: number;
   cashExpenses: number;
   expectedCash: number;
-  actualCashCounted: number;
-  cashDifference: number;
+  // null until the business day(s) covering this range have actually been
+  // closed with a manager-entered cash count — never fabricated to match
+  // expectedCash, since that would hide a real shortage/overage.
+  actualCashCounted: number | null;
+  cashDifference: number | null;
+  isBalanced: boolean | null;
   upiSales: number;
   cardSales: number;
   totalSales: number;
@@ -205,7 +212,6 @@ export interface EodReconciliationData {
   cancelledOrders: number;
   discountsTotal: number;
   taxTotal: number;
-  isBalanced: boolean;
 }
 
 export class ReportDataEngine {
@@ -814,7 +820,10 @@ export class ReportDataEngine {
       'Chaat Counter'
     ];
 
-    return stations.map((stName, idx) => {
+    const orderIds = new Set(orders.map((o) => o.id));
+
+    return stations.map((stName) => {
+      const keyword = stName.split(' ')[0];
       let kotCount = 0;
       let itemsCount = 0;
       let delayed = 0;
@@ -823,7 +832,7 @@ export class ReportDataEngine {
         if (o.orderStatus === 'CANCELLED') return;
         const matchingItems = (o.items || []).filter((it) => {
           const mi = (db.menuItems || []).find((m) => m.id === it.menuItemId || m.name === it.name);
-          return (mi?.kitchenStation || 'Main Kitchen').includes(stName.split(' ')[0]);
+          return (mi?.kitchenStation || 'Main Kitchen').includes(keyword);
         });
 
         if (matchingItems.length > 0) {
@@ -836,12 +845,24 @@ export class ReportDataEngine {
         }
       });
 
-      const avgPrepMinutes = 11 + (idx * 2) + Math.round(Math.random() * 2);
+      // Real average prep time, derived from actual KOT createdAt -> readyAt
+      // timestamps for this station's tickets belonging to an in-range order.
+      const completedKots = (db.kots || []).filter(
+        (k) => orderIds.has(k.orderId) && k.station.includes(keyword) && k.readyAt
+      );
+      const avgPrepMinutes = completedKots.length > 0
+        ? Math.round(
+            completedKots.reduce(
+              (acc, k) => acc + (new Date(k.readyAt!).getTime() - new Date(k.createdAt).getTime()) / 60000,
+              0
+            ) / completedKots.length
+          )
+        : null;
 
       return {
         stationName: stName,
-        kotCount: Math.max(kotCount, 1),
-        itemsCount: Math.max(itemsCount, 2),
+        kotCount,
+        itemsCount,
         avgPrepMinutes,
         delayedKotCount: delayed
       };
@@ -878,11 +899,13 @@ export class ReportDataEngine {
   }
 
   /**
-   * End of Day Reconciliation
+   * End of Day Reconciliation. Pulls the real cash-drawer state from
+   * db.businessDays for whichever business day(s) fall inside the report's
+   * date range, instead of assuming a fixed opening float / zero cash-drops
+   * / an always-balanced drawer — those were previously hardcoded and could
+   * never surface a genuine cash shortage or overage.
    */
-  public static getEodReconciliation(orders: Order[]): EodReconciliationData {
-    const opening = 2000;
-
+  public static getEodReconciliation(orders: Order[], range?: ReportDateRange): EodReconciliationData {
     let cashSales = 0;
     let upiSales = 0;
     let cardSales = 0;
@@ -914,10 +937,23 @@ export class ReportDataEngine {
       }
     });
 
-    const cashDrops = 0;
-    const expectedCash = opening + cashSales - refunds - cashDrops;
-    const actualCashCounted = expectedCash; // In sync
-    const cashDifference = actualCashCounted - expectedCash;
+    // Resolve the real business day(s) covering this date range.
+    const matchingDays = range
+      ? (db.businessDays || []).filter((d) => {
+          const opened = new Date(d.openedAt);
+          return opened >= range.startDate && opened <= range.endDate;
+        })
+      : (db.businessDays || []).filter((d) => d.status === 'OPEN' || d.status === 'CLOSING' || d.status === 'REOPENED');
+
+    const sortedByOpen = [...matchingDays].sort((a, b) => new Date(a.openedAt).getTime() - new Date(b.openedAt).getTime());
+    const opening = sortedByOpen.length > 0 ? Number(sortedByOpen[0].openingCash || 0) : 0;
+    const cashIn = matchingDays.reduce((acc, d) => acc + Number(d.cashIn || 0), 0);
+    const cashDrops = matchingDays.reduce((acc, d) => acc + Number(d.cashOut || 0), 0);
+    const expectedCash = opening + cashSales + cashIn - refunds - cashDrops;
+
+    const allClosed = matchingDays.length > 0 && matchingDays.every((d) => d.status === 'CLOSED' && d.closingCash !== undefined);
+    const actualCashCounted = allClosed ? matchingDays.reduce((acc, d) => acc + Number(d.closingCash || 0), 0) : null;
+    const cashDifference = actualCashCounted !== null ? actualCashCounted - expectedCash : null;
 
     return {
       openingCash: opening,
@@ -934,7 +970,7 @@ export class ReportDataEngine {
       cancelledOrders: cancelled,
       discountsTotal: discounts,
       taxTotal,
-      isBalanced: Math.abs(cashDifference) === 0
+      isBalanced: cashDifference !== null ? Math.abs(cashDifference) < 1 : null
     };
   }
 }

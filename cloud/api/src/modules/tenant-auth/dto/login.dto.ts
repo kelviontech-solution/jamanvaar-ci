@@ -8,7 +8,7 @@ export const tenantLoginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
   deviceId: z.string().optional(),
   deviceToken: z.string().optional(),
-  deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN']).optional(),
+  deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN', 'KIOSK_ADMIN']).optional(),
   appVersion: z.string().optional()
 });
 export type TenantLoginDto = z.infer<typeof tenantLoginSchema>;
@@ -17,7 +17,7 @@ export const activateDeviceSchema = z.object({
   activationSessionToken: z.string().min(1, 'Activation session token is required'),
   activationKey: z.string().trim().min(1, 'Activation key is required'),
   deviceId: z.string().optional(),
-  deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN']).default('POS_ADMIN'),
+  deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN', 'KIOSK_ADMIN']).default('POS_ADMIN'),
   deviceName: z.string().optional(),
   appVersion: z.string().optional()
 });

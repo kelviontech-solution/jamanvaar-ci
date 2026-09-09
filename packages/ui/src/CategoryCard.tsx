@@ -8,13 +8,18 @@ export interface CategoryCardProps {
   isSelected?: boolean;
   onSelect: (category: Category) => void;
   className?: string;
+  /** Pre-resolved localized name (see @jamanvaar/utils localizedName) —
+   *  falls back to category.name when omitted, so existing callers that
+   *  don't pass this see no change at all. */
+  displayName?: string;
 }
 
 export const CategoryCard: React.FC<CategoryCardProps> = ({
   category,
   isSelected = false,
   onSelect,
-  className = ''
+  className = '',
+  displayName
 }) => {
   // Dynamically resolve icon if provided
   const IconComponent = (category.iconName && (Icons as any)[category.iconName])
@@ -35,7 +40,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       } ${className}`}
     >
       <IconComponent className={`w-4 h-4 ${isSelected ? 'text-[#E66817]' : 'text-[#4A5568]'}`} />
-      <span>{category.name}</span>
+      <span>{displayName || category.name}</span>
     </button>
   );
 };

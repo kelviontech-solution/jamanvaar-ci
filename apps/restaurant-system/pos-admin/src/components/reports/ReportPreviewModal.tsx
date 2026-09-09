@@ -66,6 +66,21 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
 
   const generatedTime = new Date();
 
+  // Deterministic content fingerprint (DJB2-style hash) instead of
+  // Math.random() — a document verification hash must actually change only
+  // when the underlying report content changes, and reproduce the same
+  // value on reprint of the same data.
+  const computeContentHash = (input: string): string => {
+    let hash = 5381;
+    for (let i = 0; i < input.length; i++) {
+      hash = (hash * 33) ^ input.charCodeAt(i);
+    }
+    return (hash >>> 0).toString(36).toUpperCase();
+  };
+  const systemHash = computeContentHash(
+    `${reportTitle}|${dateRange.label}|${orders.length}|${summary.netSales.current}|${summary.ordersCount.current}`
+  );
+
   // Print layout trigger
   const handlePrint = () => {
     window.print();
@@ -485,7 +500,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] text-slate-400 border-t border-slate-100 pt-3">
                 <span>JAMANVAAR POS Enterprise Edition • Software Brand by KELVIONTECH</span>
-                <span>Page 1 of 1 • System Hash: {Math.random().toString(36).substring(2, 10).toUpperCase()}</span>
+                <span>Page 1 of 1 • System Hash: {systemHash}</span>
               </div>
             </div>
           </div>

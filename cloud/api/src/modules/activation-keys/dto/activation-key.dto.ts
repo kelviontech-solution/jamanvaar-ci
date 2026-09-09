@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const generateActivationKeySchema = z.object({
   restaurantId: z.string().uuid(),
   subscriptionId: z.string().optional(),
-  allowedDeviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'ANY']).default('ANY'),
+  allowedDeviceType: z.enum(['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'ANY']).default('ANY'),
   expiresAt: z.coerce.date()
 });
 export type GenerateActivationKeyDto = z.infer<typeof generateActivationKeySchema>;
@@ -13,7 +13,7 @@ export type GenerateActivationKeyDto = z.infer<typeof generateActivationKeySchem
 // *allowance* on the key, never a real device's own identity.
 export const redeemActivationKeySchema = z.object({
   code: z.string().trim().min(1),
-  deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN']),
+  deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN', 'KIOSK_ADMIN']),
   appVersion: z.string().optional()
 });
 export type RedeemActivationKeyDto = z.infer<typeof redeemActivationKeySchema>;

@@ -44,6 +44,8 @@ import {
   StockMovement,
   SyncEvent,
   QrOrderingSettings,
+  KioskDisplaySettings,
+  WelcomeScreenSettings,
   TaxGroup,
   User,
   WaitlistEntry
@@ -51,6 +53,8 @@ import {
 
 import {
   DEFAULT_QR_SETTINGS,
+  DEFAULT_KIOSK_DISPLAY_SETTINGS,
+  DEFAULT_WELCOME_SCREEN_SETTINGS,
   SEED_CATEGORIES,
   SEED_COUPONS,
   SEED_MENU_ITEMS,
@@ -82,6 +86,8 @@ export class JamanvaarDatabase {
   public menuItems: MenuItem[] = [...SEED_MENU_ITEMS];
   public tables: DiningTable[] = [...SEED_TABLES];
   public qrSettings: QrOrderingSettings = { ...DEFAULT_QR_SETTINGS };
+  public kioskDisplaySettings: KioskDisplaySettings = { ...DEFAULT_KIOSK_DISPLAY_SETTINGS };
+  public welcomeScreenSettings: WelcomeScreenSettings = { ...DEFAULT_WELCOME_SCREEN_SETTINGS };
   public coupons: Coupon[] = [...SEED_COUPONS];
   public offers: Offer[] = [...SEED_OFFERS];
   public taxGroups: TaxGroup[] = [...SEED_TAX_GROUPS];
@@ -1345,6 +1351,13 @@ export class JamanvaarDatabase {
       // lost on every reload or process restart — an offline-first system
       // whose own offline queue doesn't survive a restart.
       localStorage.setItem(`${p}sync_events`, JSON.stringify(this.syncEvents));
+      localStorage.setItem(`${p}kiosk_display_settings`, JSON.stringify(this.kioskDisplaySettings));
+      localStorage.setItem(`${p}welcome_screen_settings`, JSON.stringify(this.welcomeScreenSettings));
+      // qrSettings had the same gap syncEvents/kioskDisplaySettings used to
+      // have — declared on this class but never actually persisted, so a
+      // restaurant's QR ordering configuration (min/max order value, waiter
+      // approval requirement, etc.) silently reverted to defaults on reload.
+      localStorage.setItem(`${p}qr_settings`, JSON.stringify(this.qrSettings));
       localStorage.setItem(`${p}sync_timestamp`, Date.now().toString());
     } catch (e) {
       console.warn('Storage save failed:', e);
@@ -1376,36 +1389,48 @@ export class JamanvaarDatabase {
         const parsed = JSON.parse(storedItems);
         if (Array.isArray(parsed)) {
           const seedMap = new Map<string, string>();
+          // Backfills menu-content translations onto items a browser already
+          // persisted before those translations existed in seed.ts — without
+          // this, a customer's localStorage forever shows English item names
+          // no matter what languages get added to the seed data later.
+          const translationsMap = new Map<string, MenuItem['translations']>();
           SEED_MENU_ITEMS.forEach((s) => {
             if (s.imageUrl) {
               seedMap.set(s.id, s.imageUrl);
               if (s.sku) seedMap.set(s.sku, s.imageUrl);
+            }
+            if (s.translations) {
+              translationsMap.set(s.id, s.translations);
+              if (s.sku) translationsMap.set(s.sku, s.translations);
             }
           });
 
           const cleanItems = parsed
             .filter((it: any) => it.dietaryType !== 'NON_VEG' && !it.name?.toLowerCase().includes('chicken'))
             .map((it: any) => {
+              const seedTranslations = translationsMap.get(it.id) || translationsMap.get(it.sku);
+              const withTranslations = seedTranslations && !it.translations ? { ...it, translations: seedTranslations } : it;
+
               if (seedMap.has(it.id)) {
-                return { ...it, imageUrl: seedMap.get(it.id)! };
+                return { ...withTranslations, imageUrl: seedMap.get(it.id)! };
               }
               if (seedMap.has(it.sku)) {
-                return { ...it, imageUrl: seedMap.get(it.sku)! };
+                return { ...withTranslations, imageUrl: seedMap.get(it.sku)! };
               }
               const nameLower = (it.name || '').toLowerCase();
-              if (nameLower.includes('hara bhara')) return { ...it, imageUrl: '/assets/menu/north-indian/hara-bhara-kebab.jpg' };
-              if (nameLower.includes('crispy corn')) return { ...it, imageUrl: '/assets/menu/fast-food/peri-peri-fries.jpg' };
-              if (nameLower.includes('cigar rolls') || nameLower.includes('cheese corn')) return { ...it, imageUrl: '/assets/menu/chinese/momos.jpg' };
-              if (nameLower.includes('paneer tikka')) return { ...it, imageUrl: '/assets/menu/north-indian/paneer-tikka.jpg' };
-              if (nameLower.includes('dal makhani')) return { ...it, imageUrl: '/assets/menu/north-indian/dal-makhani.jpg' };
-              if (nameLower.includes('paneer butter') || nameLower.includes('paneer makhani')) return { ...it, imageUrl: '/assets/menu/north-indian/paneer-butter-masala.jpg' };
-              if (nameLower.includes('butter naan')) return { ...it, imageUrl: '/assets/menu/north-indian/butter-naan.jpg' };
-              if (nameLower.includes('garlic') && nameLower.includes('naan')) return { ...it, imageUrl: '/assets/menu/pizza/garlic-bread.jpg' };
-              if (nameLower.includes('biryani')) return { ...it, imageUrl: '/assets/menu/north-indian/biryani.jpg' };
-              if (nameLower.includes('coffee') || nameLower.includes('frappe')) return { ...it, imageUrl: '/assets/menu/cafe/frappe.jpg' };
-              if (nameLower.includes('gulab jamun')) return { ...it, imageUrl: '/assets/menu/north-indian/gulab-jamun.jpg' };
-              if (nameLower.includes('thali')) return { ...it, imageUrl: '/assets/menu/gujarati/thali.jpg' };
-              return it;
+              if (nameLower.includes('hara bhara')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/hara-bhara-kebab.jpg' };
+              if (nameLower.includes('crispy corn')) return { ...withTranslations, imageUrl: '/assets/menu/fast-food/peri-peri-fries.jpg' };
+              if (nameLower.includes('cigar rolls') || nameLower.includes('cheese corn')) return { ...withTranslations, imageUrl: '/assets/menu/chinese/momos.jpg' };
+              if (nameLower.includes('paneer tikka')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/paneer-tikka.jpg' };
+              if (nameLower.includes('dal makhani')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/dal-makhani.jpg' };
+              if (nameLower.includes('paneer butter') || nameLower.includes('paneer makhani')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/paneer-butter-masala.jpg' };
+              if (nameLower.includes('butter naan')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/butter-naan.jpg' };
+              if (nameLower.includes('garlic') && nameLower.includes('naan')) return { ...withTranslations, imageUrl: '/assets/menu/pizza/garlic-bread.jpg' };
+              if (nameLower.includes('biryani')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/biryani.jpg' };
+              if (nameLower.includes('coffee') || nameLower.includes('frappe')) return { ...withTranslations, imageUrl: '/assets/menu/cafe/frappe.jpg' };
+              if (nameLower.includes('gulab jamun')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/gulab-jamun.jpg' };
+              if (nameLower.includes('thali')) return { ...withTranslations, imageUrl: '/assets/menu/gujarati/thali.jpg' };
+              return withTranslations;
             });
           if (cleanItems.length >= 8) {
             this.menuItems = cleanItems;
@@ -1627,6 +1652,27 @@ export class JamanvaarDatabase {
         try {
           const parsedSyncEvents = JSON.parse(storedSyncEvents);
           if (Array.isArray(parsedSyncEvents)) this.syncEvents = parsedSyncEvents;
+        } catch (_) {}
+      }
+
+      const storedKioskDisplaySettings = localStorage.getItem(`${p}kiosk_display_settings`);
+      if (storedKioskDisplaySettings) {
+        try {
+          this.kioskDisplaySettings = { ...DEFAULT_KIOSK_DISPLAY_SETTINGS, ...JSON.parse(storedKioskDisplaySettings) };
+        } catch (_) {}
+      }
+
+      const storedWelcomeScreenSettings = localStorage.getItem(`${p}welcome_screen_settings`);
+      if (storedWelcomeScreenSettings) {
+        try {
+          this.welcomeScreenSettings = { ...DEFAULT_WELCOME_SCREEN_SETTINGS, ...JSON.parse(storedWelcomeScreenSettings) };
+        } catch (_) {}
+      }
+
+      const storedQrSettings = localStorage.getItem(`${p}qr_settings`);
+      if (storedQrSettings) {
+        try {
+          this.qrSettings = { ...DEFAULT_QR_SETTINGS, ...JSON.parse(storedQrSettings) };
         } catch (_) {}
       }
     } catch (e) {

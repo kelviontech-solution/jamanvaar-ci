@@ -7,10 +7,12 @@ import {
   Offer,
   Outlet,
   QrOrderingSettings,
+  KioskDisplaySettings,
   Restaurant,
   Role,
   TaxGroup,
-  User
+  User,
+  WelcomeScreenSettings
 } from '@jamanvaar/types';
 
 export const DEFAULT_QR_SETTINGS: QrOrderingSettings = {
@@ -28,6 +30,18 @@ export const DEFAULT_QR_SETTINGS: QrOrderingSettings = {
   tableQrTemplate: 'SIGNATURE',
   enableNotificationSound: true,
   welcomeMessage: 'Welcome to JAMANVAAR! Scan to order fresh authentic delicacies directly to your table.'
+};
+
+export const DEFAULT_KIOSK_DISPLAY_SETTINGS: KioskDisplaySettings = {
+  enabledLanguages: ['en', 'hi', 'gu'],
+  defaultLanguage: 'en',
+  idleWarningAfterSeconds: 45,
+  idleResetCountdownSeconds: 15
+};
+
+export const DEFAULT_WELCOME_SCREEN_SETTINGS: WelcomeScreenSettings = {
+  showHeritageArtwork: true,
+  showPromoBanner: false
 };
 
 export const SEED_RESTAURANT: Restaurant = {
@@ -224,6 +238,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'HBK-01',
     name: 'Hara Bhara Kebab (6 Pcs)',
     description: 'Crispy spinach, green pea and paneer patties served with fresh mint chutney.',
+    translations: {
+      hi: { name: 'हरा भरा कबाब (6 पीस)', description: 'पालक, हरी मटर और पनीर से बने कुरकुरे कबाब, ताज़ी पुदीना चटनी के साथ।' },
+      gu: { name: 'હરા ભરા કબાબ (6 પીસ)', description: 'પાલક, વટાણા અને પનીરમાંથી બનેલા કડક કબાબ, તાજી ફુદીનાની ચટણી સાથે.' }
+    },
     price: 220,
     imageUrl: '/assets/menu/north-indian/hara-bhara-kebab.jpg',
     dietaryType: 'VEG',
@@ -250,6 +268,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'CC-02',
     name: 'Crispy Corn Salt & Pepper',
     description: 'Golden fried sweet corn tossed with bell peppers, green chillies & aromatic herbs.',
+    translations: {
+      hi: { name: 'क्रिस्पी कॉर्न सॉल्ट एंड पेपर', description: 'शिमला मिर्च, हरी मिर्च और सुगंधित मसालों के साथ तली हुई मीठी मक्का।' },
+      gu: { name: 'ક્રિસ્પી કોર્ન સોલ્ટ એન્ડ પેપર', description: 'કેપ્સિકમ, લીલા મરચાં અને સુગંધિત મસાલા સાથે તળેલી મીઠી મકાઈ.' }
+    },
     price: 240,
     imageUrl: '/assets/menu/starters/crispy-corn.jpg',
     dietaryType: 'VEG',
@@ -276,6 +298,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'CCR-03',
     name: 'Cheese Corn Cigar Rolls (5 Pcs)',
     description: 'Golden crispy rolls filled with melted mozzarella, sweet corn and herbs served with sweet chilli dip.',
+    translations: {
+      hi: { name: 'चीज़ कॉर्न सिगार रोल्स (5 पीस)', description: 'पिघले मोज़ेरेला, मीठी मक्की और हर्ब्स से भरे सुनहरे कुरकुरे रोल, स्वीट चिली डिप के साथ।' },
+      gu: { name: 'ચીઝ કોર્ન સિગાર રોલ્સ (5 પીસ)', description: 'પીગળેલા મોઝેરેલા, મીઠી મકાઈ અને હર્બ્સથી ભરેલા સોનેરી કડક રોલ્સ, સ્વીટ ચિલી ડિપ સાથે.' }
+    },
     price: 210,
     imageUrl: '/assets/menu/starters/cheese-corn-cigar-rolls.jpg',
     dietaryType: 'VEG',
@@ -302,6 +328,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'PT-04',
     name: 'Paneer Tikka (Tandoori Angaar)',
     description: 'Fresh malai cottage cheese cubes marinated in spiced curd and grilled over charcoal embers.',
+    translations: {
+      hi: { name: 'पनीर टिक्का (तंदूरी अंगार)', description: 'ताज़ा मलाई पनीर के टुकड़े मसालेदार दही में मैरीनेट करके कोयले पर भूने गए।' },
+      gu: { name: 'પનીર ટિક્કા (તંદૂરી અંગાર)', description: 'તાજા મલાઈ પનીરના ટુકડા મસાલેદાર દહીંમાં મેરીનેટ કરીને કોલસા પર શેકેલા.' }
+    },
     price: 260,
     imageUrl: '/assets/menu/north-indian/paneer-tikka.jpg',
     dietaryType: 'VEG',
@@ -328,6 +358,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'DM-05',
     name: 'Dal Makhani (Slow Cooked)',
     description: 'Slow-cooked black urad lentils simmered overnight with butter, tomatoes and fresh cream.',
+    translations: {
+      hi: { name: 'दाल मखनी (धीमी आंच पर पकी)', description: 'रात भर मक्खन, टमाटर और ताज़ी क्रीम के साथ धीमी आंच पर पकी काली उड़द दाल।' },
+      gu: { name: 'દાળ મખની (ધીમા તાપે રાંધેલી)', description: 'આખી રાત માખણ, ટામેટા અને તાજી ક્રીમ સાથે ધીમા તાપે રાંધેલી અડદની દાળ.' }
+    },
     price: 195,
     imageUrl: '/assets/menu/north-indian/dal-makhani.jpg',
     dietaryType: 'VEG',
@@ -354,6 +388,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'PBM-06',
     name: 'Paneer Butter Masala',
     description: 'Soft cottage cheese simmered in a luscious makhani gravy enriched with butter and cream.',
+    translations: {
+      hi: { name: 'पनीर बटर मसाला', description: 'मक्खन और क्रीम से भरपूर लज़ीज़ मखनी ग्रेवी में पका मुलायम पनीर।' },
+      gu: { name: 'પનીર બટર મસાલા', description: 'માખણ અને ક્રીમથી ભરપૂર સ્વાદિષ્ટ મખની ગ્રેવીમાં રાંધેલું નરમ પનીર.' }
+    },
     price: 250,
     imageUrl: '/assets/menu/north-indian/paneer-butter-masala.jpg',
     dietaryType: 'VEG',
@@ -380,6 +418,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'BN-07',
     name: 'Butter Naan (Tandoori)',
     description: 'Traditional clay-tandoor baked leavened bread brushed with melted pure Amul butter.',
+    translations: {
+      hi: { name: 'बटर नान (तंदूरी)', description: 'मिट्टी के तंदूर में पकी पारंपरिक रोटी, शुद्ध अमूल मक्खन से सजी।' },
+      gu: { name: 'બટર નાન (તંદૂરી)', description: 'માટીના તંદૂરમાં પકાવેલી પરંપરાગત રોટલી, શુદ્ધ અમૂલ માખણથી શણગારેલી.' }
+    },
     price: 60,
     imageUrl: '/assets/menu/north-indian/butter-naan.jpg',
     dietaryType: 'VEG',
@@ -406,6 +448,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'GN-08',
     name: 'Garlic Butter Naan',
     description: 'Fluffy tandoori bread generously garnished with minced roasted garlic, fresh coriander and butter.',
+    translations: {
+      hi: { name: 'गार्लिक बटर नान', description: 'भुने हुए कटे लहसुन, ताज़ा धनिया और मक्खन से सजी मुलायम तंदूरी रोटी।' },
+      gu: { name: 'ગાર્લિક બટર નાન', description: 'શેકેલા ઝીણા લસણ, તાજા કોથમીર અને માખણથી શણગારેલી નરમ તંદૂરી રોટલી.' }
+    },
     price: 75,
     imageUrl: '/assets/menu/north-indian/garlic-naan.jpg',
     dietaryType: 'VEG',
@@ -432,6 +478,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'VGB-09',
     name: 'Royal Veg Handi Dum Biryani',
     description: 'Farm fresh seasonal vegetables and paneer simmered in rich saffron infused basmati rice.',
+    translations: {
+      hi: { name: 'रॉयल वेज हांडी दम बिरयानी', description: 'ताज़ी मौसमी सब्ज़ियां और पनीर, केसर युक्त बासमती चावल में धीमी आंच पर पकाया गया।' },
+      gu: { name: 'રોયલ વેજ હાંડી દમ બિરયાની', description: 'તાજા મોસમી શાકભાજી અને પનીર, કેસર યુક્ત બાસમતી ચોખામાં ધીમા તાપે રાંધેલા.' }
+    },
     price: 240,
     imageUrl: '/assets/menu/north-indian/biryani.jpg',
     dietaryType: 'VEG',
@@ -458,6 +508,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'CC-10',
     name: 'Cold Coffee with Vanilla Ice Cream',
     description: 'Rich blended espresso with chilled milk and a velvety scoop of vanilla ice cream.',
+    translations: {
+      hi: { name: 'कोल्ड कॉफी विथ वनिला आइसक्रीम', description: 'ठंडे दूध और मलाईदार वनिला आइसक्रीम के साथ मिश्रित एस्प्रेसो।' },
+      gu: { name: 'કોલ્ડ કોફી વિથ વેનિલા આઇસક્રીમ', description: 'ઠંડા દૂધ અને મલાઈદાર વેનિલા આઇસક્રીમ સાથે મિક્સ કરેલી એસ્પ્રેસો.' }
+    },
     price: 120,
     imageUrl: '/assets/menu/cafe/cold-coffee.jpg',
     dietaryType: 'VEG',
@@ -484,6 +538,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'GJ-11',
     name: 'Shahi Gulab Jamun (2 Pcs)',
     description: 'Warm, soft khoya dumplings soaked in fragrant green cardamom and saffron syrup.',
+    translations: {
+      hi: { name: 'शाही गुलाब जामुन (2 पीस)', description: 'गरम, मुलायम खोया गोले, सुगंधित हरी इलायची और केसर की चाशनी में डूबे।' },
+      gu: { name: 'શાહી ગુલાબ જામુન (2 પીસ)', description: 'ગરમ, નરમ ખોયાના ગોળા, સુગંધિત ઇલાયચી અને કેસરની ચાસણીમાં ડૂબેલા.' }
+    },
     price: 80,
     imageUrl: '/assets/menu/desserts/gulab-jamun.jpg',
     dietaryType: 'VEG',
@@ -510,6 +568,10 @@ export const SEED_MENU_ITEMS: MenuItem[] = [
     sku: 'THL-12',
     name: 'Authentic Gujarati Special Thali',
     description: '2 Veg Sabzi, Gujarati Kadhi, Dal, 4 Phulka Roti, Jeera Rice, Farsan, Sweet, Pickle & Masala Chhas.',
+    translations: {
+      hi: { name: 'ऑथेंटिक गुजराती स्पेशल थाली', description: '2 वेज सब्ज़ी, गुजराती कढ़ी, दाल, 4 फुल्का रोटी, जीरा राइस, फरसान, मीठा, अचार और मसाला छाछ।' },
+      gu: { name: 'ઓથેન્ટિક ગુજરાતી સ્પેશિયલ થાળી', description: '2 વેજ શાક, ગુજરાતી કઢી, દાળ, 4 ફૂલકા રોટલી, જીરા રાઇસ, ફરસાણ, મીઠાઈ, અથાણું અને મસાલા છાસ.' }
+    },
     price: 280,
     imageUrl: '/assets/menu/gujarati/thali.jpg',
     dietaryType: 'VEG',

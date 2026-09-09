@@ -82,7 +82,7 @@ export class CustomerChatbotEngine {
       return {
         id,
         sender: 'ASSISTANT',
-        text: 'Based on live customer orders today, here are our most loved signature creations:',
+        text: 'Here are our most loved signature creations, picked by our chefs:',
         timestamp,
         actionItems: popular,
         suggestions: ['Show Combos', 'Show Vegetarian Dishes', 'Show Today\'s Coupons']
@@ -196,10 +196,30 @@ export class CustomerChatbotEngine {
 
     // 14. Intent: Prep time / Wait time
     if (q.includes('time') || q.includes('wait') || q.includes('ready') || q.includes('how long')) {
+      // Real average, computed from actual KOT createdAt -> readyAt gaps
+      // today, instead of a fixed "~10-15 minutes" guess.
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const completedToday = (db.kots || []).filter(
+        (k) => k.readyAt && new Date(k.createdAt) >= todayStart
+      );
+      const avgMinutes = completedToday.length > 0
+        ? Math.round(
+            completedToday.reduce(
+              (acc, k) => acc + (new Date(k.readyAt!).getTime() - new Date(k.createdAt).getTime()) / 60000,
+              0
+            ) / completedToday.length
+          )
+        : null;
+
+      const prepTimeText = avgMinutes !== null
+        ? `Today's average kitchen preparation time is ~${avgMinutes} minutes`
+        : 'Kitchen preparation typically takes 10-15 minutes';
+
       return {
         id,
         sender: 'ASSISTANT',
-        text: 'Current average kitchen preparation time is ~10-15 minutes. Once your order is placed, you will receive a Live Token with instant voice announcement when ready!',
+        text: `${prepTimeText}. Once your order is placed, you will receive a Live Token with instant voice announcement when ready!`,
         timestamp,
         suggestions: ['Start Ordering', 'Show Combos']
       };

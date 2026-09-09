@@ -10,7 +10,6 @@ import {
   Printer,
   CheckCircle2,
   AlertCircle,
-  Plus,
   RefreshCw,
   Search,
   Filter,
@@ -98,57 +97,6 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
     }
   };
 
-  const handleCreateTestKot = () => {
-    const highestKotNum = db.kots.reduce((max, k) => {
-      const num = parseInt(k.kotNumber.replace(/\D/g, ''), 10);
-      return !isNaN(num) && num > max ? num : max;
-    }, 0);
-
-    const nextKotSeq = highestKotNum + 1;
-    const newKot: KOTRecord = {
-      id: `kot-${Date.now()}`,
-      kotNumber: `KOT-${String(nextKotSeq).padStart(2, '0')}`,
-      orderId: `ord-${Date.now()}`,
-      orderNumber: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
-      tokenNumber: String(Math.floor(100 + Math.random() * 900)),
-      tableNumber: String(Math.floor(1 + Math.random() * 12)),
-      orderType: 'DINE_IN',
-      station: 'Main Kitchen',
-      type: 'FIRST',
-      items: [
-        {
-          id: `koti-${Date.now()}-1`,
-          menuItemId: 'item-pt',
-          name: 'Paneer Butter Masala',
-          quantity: 2,
-          modifiers: [],
-          specialInstructions: 'Medium Spicy, Extra Gravy',
-          kitchenStation: 'Main Kitchen',
-          status: 'PREPARING'
-        },
-        {
-          id: `koti-${Date.now()}-2`,
-          menuItemId: 'item-bn',
-          name: 'Butter Naan',
-          quantity: 4,
-          modifiers: [],
-          kitchenStation: 'Main Kitchen',
-          status: 'PREPARING'
-        }
-      ],
-      cashierName: 'Amit Dave',
-      serverName: 'Rahul Sharma',
-      createdAt: new Date().toISOString(),
-      printed: true,
-      status: 'PREPARING'
-    };
-
-    db.kots.unshift(newKot);
-    db.notify();
-    onKotUpdated();
-    showToast(`Created New Kitchen Ticket ${newKot.kotNumber}!`);
-  };
-
   // Helper for elapsed minutes
   const getElapsedMinutes = (isoString: string) => {
     const diffMs = Date.now() - new Date(isoString).getTime();
@@ -174,15 +122,6 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleCreateTestKot}
-            className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-black rounded-xl shadow-xs flex items-center gap-1.5 transition-all active:scale-95 min-h-[40px]"
-          >
-            <Plus className="w-4 h-4" />
-            <span>+ Dispatch KOT Ticket</span>
-          </button>
-        </div>
       </div>
 
       {/* 4 Summary KPI Cards */}
@@ -307,12 +246,6 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
               No active KOT tickets are waiting right now for the selected station or status.
             </p>
           </div>
-          <button
-            onClick={handleCreateTestKot}
-            className="px-4 py-2 bg-[#0B253A] hover:bg-[#1E3A4C] text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95"
-          >
-            + Dispatch Sample KOT
-          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

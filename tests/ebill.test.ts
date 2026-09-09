@@ -84,10 +84,21 @@ describe('EBillService', () => {
     expect(msg).toContain('https://kiosk.jamanvaar.com/track/ORD-99');
   });
 
-  it('should dispatch WhatsApp e-bill and return valid receipt record', async () => {
+  it('reports an honest failure for WhatsApp e-bill since no real gateway is configured, instead of a fabricated SENT status', async () => {
     const res = await EBillService.sendWhatsAppEBill(mockOrder, '9876543210', mockReceiptConfig);
-    expect(res.success).toBe(true);
-    expect(res.record.deliveryStatus).toBe('SENT');
+    expect(res.success).toBe(false);
+    expect(res.record.deliveryStatus).toBe('FAILED');
     expect(res.record.recipient).toBe('******3210');
+    expect(res.record.errorMessage).toMatch(/gateway/i);
+    // The message content is still built for real, ready for a future
+    // gateway integration — only the "was it actually delivered" claim changed.
+    expect(res.record.content).toContain('ORDER #ORD-99');
+  });
+
+  it('reports an honest failure for SMS e-bill since no real gateway is configured, instead of a fabricated SENT status', async () => {
+    const res = await EBillService.sendSmsEBill(mockOrder, '9876543210');
+    expect(res.success).toBe(false);
+    expect(res.record.deliveryStatus).toBe('FAILED');
+    expect(res.record.errorMessage).toMatch(/gateway/i);
   });
 });

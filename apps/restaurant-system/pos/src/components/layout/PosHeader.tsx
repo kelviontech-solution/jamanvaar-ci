@@ -12,6 +12,7 @@ import {
 import { PosCloseDayModal } from '../days/PosCloseDayModal';
 import { BusinessDayService } from '@jamanvaar/business';
 import { formatINR } from '@jamanvaar/utils';
+import { lanMeshSync } from '@jamanvaar/sync';
 import {
   Search,
   Wifi,
@@ -110,6 +111,19 @@ export const PosHeader: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
+  }, []);
+
+  // Real KDS mesh connectivity — getConnectedPeers() drops a peer after a
+  // missed heartbeat, so this genuinely reflects whether the kitchen
+  // display is actually reachable, instead of a permanently-green badge.
+  const [kdsConnected, setKdsConnected] = useState(
+    lanMeshSync.getConnectedPeers().some((p) => p.role === 'KDS')
+  );
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setKdsConnected(lanMeshSync.getConnectedPeers().some((p) => p.role === 'KDS'));
+    }, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   // Single authoritative business day summary
@@ -465,9 +479,9 @@ export const PosHeader: React.FC = () => {
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500">{currentUser?.email || 'amit.dave@jamanvaar.com'}</p>
-                <div className="flex items-center gap-1.5 text-[10px] text-emerald-700 font-bold pt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span>Online • Local Database Active</span>
+                <div className={`flex items-center gap-1.5 text-[10px] font-bold pt-0.5 ${isOnline ? 'text-emerald-700' : 'text-amber-700'}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                  <span>{isOnline ? 'Online' : 'Offline'} • Local Database Active</span>
                 </div>
               </div>
 
@@ -475,11 +489,11 @@ export const PosHeader: React.FC = () => {
               <div className="p-2 bg-slate-50 rounded-xl space-y-1 text-[11px]">
                 <div className="flex justify-between font-bold">
                   <span className="text-slate-500">Current Shift:</span>
-                  <span className="text-[#0B253A]">Shift #{activeShift?.id?.slice(-2) || '01'} (Active)</span>
+                  <span className="text-[#0B253A]">{activeShift ? `Shift #${activeShift.id.slice(-2) || '01'} (Active)` : 'No Active Shift'}</span>
                 </div>
                 <div className="flex justify-between font-bold">
                   <span className="text-slate-500">Opening Float:</span>
-                  <span className="font-mono text-[#0B253A]">₹2,000</span>
+                  <span className="font-mono text-[#0B253A]">{formatINR(activeShift?.openingCash ?? 0)}</span>
                 </div>
               </div>
 
@@ -492,8 +506,13 @@ export const PosHeader: React.FC = () => {
                   <span>System Health</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-slate-600"><Server className="w-3 h-3 text-emerald-600" />Local Database</span>
-                  <span className="font-bold text-emerald-700">ACTIVE</span>
+                  <span className="flex items-center gap-1.5 text-slate-600">
+                    <Server className={`w-3 h-3 ${hardwareStatus.localDb ? 'text-emerald-600' : 'text-rose-600'}`} />
+                    Local Database
+                  </span>
+                  <span className={`font-bold ${hardwareStatus.localDb ? 'text-emerald-700' : 'text-rose-700'}`}>
+                    {hardwareStatus.localDb ? 'ACTIVE' : 'UNAVAILABLE'}
+                  </span>
                 </div>
                 <div
                   onClick={() => {
@@ -511,8 +530,13 @@ export const PosHeader: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-slate-600"><ChefHat className="w-3 h-3 text-emerald-600" />KDS Kitchen Sync</span>
-                  <span className="font-bold text-emerald-700">SYNCED</span>
+                  <span className="flex items-center gap-1.5 text-slate-600">
+                    <ChefHat className={`w-3 h-3 ${kdsConnected ? 'text-emerald-600' : 'text-amber-600'}`} />
+                    KDS Kitchen Sync
+                  </span>
+                  <span className={`font-bold ${kdsConnected ? 'text-emerald-700' : 'text-amber-700'}`}>
+                    {kdsConnected ? 'SYNCED' : 'NOT CONNECTED'}
+                  </span>
                 </div>
                 <div onClick={toggleNetworkStatus} className="flex items-center justify-between cursor-pointer">
                   <span className="flex items-center gap-1.5 text-slate-600">

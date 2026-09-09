@@ -1,7 +1,7 @@
 import { NetworkState } from '@jamanvaar/types';
 
 export class NetworkStatusService {
-  private static currentState: NetworkState = typeof navigator !== 'undefined' && navigator.onLine ? 'ONLINE' : 'ONLINE';
+  private static currentState: NetworkState = typeof navigator !== 'undefined' && !navigator.onLine ? 'OFFLINE' : 'ONLINE';
   private static latencyMs: number = 18;
   private static listeners: Array<(state: NetworkState, latency: number) => void> = [];
 

@@ -4,13 +4,15 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { AssignSubscriptionDto } from './dto/subscription.dto';
 import { InvoicesService } from '../billing/invoices.service';
+import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 
 @Injectable()
 export class SubscriptionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
-    private readonly invoices: InvoicesService
+    private readonly invoices: InvoicesService,
+    private readonly appEntitlements: ApplicationEntitlementsService
   ) {}
 
   list() {
@@ -60,6 +62,19 @@ export class SubscriptionsService {
         include: { plan: true }
       });
 
+      // One ApplicationEntitlement row per AppCode, right away — a
+      // subscription that exists but has never been given an explicit
+      // application selection still needs a real, queryable answer to
+      // "is Kiosk enabled here", not an absent row that every caller has
+      // to interpret for itself.
+      await this.appEntitlements.ensureRowsForSubscription(
+        tx,
+        dto.restaurantId,
+        sub.id,
+        plan.tier,
+        dto.applications
+      );
+
       // Automatically generate first invoice for this subscription if plan price > 0 or status is ACTIVE
       await this.invoices.createInitialSubscriptionInvoice(
         tx,
@@ -95,6 +110,16 @@ export class SubscriptionsService {
       if (!newPlan) throw new NotFoundException('Plan not found');
 
       const updated = await tx.subscription.update({ where: { id }, data: { planId }, include: { plan: true } });
+
+      // Resync application access to the new tier's defaults. This is a
+      // deliberate reset, not a merge: a downgrade must actually turn off
+      // apps the new plan doesn't include (that's the whole point of
+      // enforcing entitlements at all — see assertAppEnabled), and an
+      // upgrade should light up the new apps automatically rather than
+      // leaving the operator to remember to flip six switches by hand. A
+      // restaurant-specific deviceQuota/config override on an existing row
+      // is untouched either way (see ensureRowsForSubscription).
+      await this.appEntitlements.ensureRowsForSubscription(tx, existing.restaurantId, id, newPlan.tier);
 
       await this.audit.log(
         {

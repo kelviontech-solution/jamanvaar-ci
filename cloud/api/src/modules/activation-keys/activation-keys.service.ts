@@ -1,10 +1,12 @@
 import { randomBytes } from 'crypto';
 import { BadRequestException, ConflictException, GoneException, Injectable, NotFoundException } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
+import { AppCode } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { GenerateActivationKeyDto, RedeemActivationKeyDto } from './dto/activation-key.dto';
 import { generateOpaqueToken, hashOpaqueToken } from '../../common/security/token.util';
+import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 
 /** JMV-XXXX-XXXX-XXXX — human-relayable but drawn from a cryptographically random 96-bit value, not a counter or a guessable pattern. */
 function generateCode(): string {
@@ -17,7 +19,8 @@ function generateCode(): string {
 export class ActivationKeysService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly appEntitlements: ApplicationEntitlementsService
   ) {}
 
   list(restaurantId?: string) {
@@ -51,6 +54,14 @@ export class ActivationKeysService {
           where: { id: dto.subscriptionId, restaurantId: dto.restaurantId }
         });
         if (!sub) throw new NotFoundException('Subscription not found for this restaurant');
+      }
+
+      // 'ANY' isn't scoped to one application yet — the meaningful gate for
+      // it is at redeem() below, once the redeeming device says what it
+      // actually is. A key generated for a specific app, though, should
+      // fail here rather than mint a code nobody can ever legitimately use.
+      if (dto.allowedDeviceType !== 'ANY') {
+        await this.appEntitlements.assertAppEnabled(tx, dto.restaurantId, dto.allowedDeviceType as AppCode);
       }
 
       // Retry on the astronomically unlikely code collision rather than trusting uniqueness blindly.
@@ -112,6 +123,14 @@ export class ActivationKeysService {
           `This activation code is only valid for ${key.allowedDeviceType} devices, not ${dto.deviceType}`
         );
       }
+
+      // The real gate: whatever the key allowed, this restaurant's current
+      // subscription must still actually include the app the device claims
+      // to be — closes the window where a key was generated while entitled
+      // but the plan was downgraded before it got redeemed (an 'ANY' key
+      // reaches this check for the first time here, since generate() above
+      // has nothing to check it against yet).
+      await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, dto.deviceType as AppCode);
 
       // The device's long-lived credential for everything it calls after this
       // point (e.g. PATCH /api/v1/devices/me/heartbeat) — returned once, here,

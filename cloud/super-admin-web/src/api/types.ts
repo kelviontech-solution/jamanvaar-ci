@@ -66,6 +66,30 @@ export interface PlanDetail extends Plan {
   subscriptions: Array<Subscription & { restaurant: { id: string; name: string; status: string } }>;
 }
 
+export const APP_CODES = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN'] as const;
+export type AppCode = (typeof APP_CODES)[number];
+
+export const APP_CODE_LABELS: Record<AppCode, string> = {
+  POS: 'POS',
+  POS_ADMIN: 'Restaurant Admin',
+  CAPTAIN: 'Captain App',
+  KDS: 'Kitchen Display (KDS)',
+  KIOSK: 'Self-Ordering Kiosk',
+  KIOSK_ADMIN: 'Kiosk Admin'
+};
+
+export interface ApplicationEntitlement {
+  id: string;
+  restaurantId: string;
+  subscriptionId: string;
+  appCode: AppCode;
+  enabled: boolean;
+  deviceQuota: number | null;
+  config: Record<string, unknown> | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Subscription {
   id: string;
   restaurantId: string;

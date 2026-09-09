@@ -1,8 +1,8 @@
 import React, { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
-import type { Plan, EntitlementKey } from '../../api/types';
-import { ENTITLEMENT_LABELS } from '../../api/types';
+import type { Plan, EntitlementKey, AppCode } from '../../api/types';
+import { ENTITLEMENT_LABELS, APP_CODES, APP_CODE_LABELS } from '../../api/types';
 import { Button, Card, Badge } from '../../components/ui';
 // See ProtectedLayout.tsx for why this bypasses the '@jamanvaar/ui' barrel.
 import { JAMANVAAR_LOGOS } from '../../../../../packages/ui/src/assets';
@@ -114,10 +114,16 @@ interface ModulesForm {
   branchCode: string;
   maxBranches: number;
   maxDevices: number;
+  // Which applications this restaurant actually gets provisioned with —
+  // previously this step only ever displayed the plan's entitlements as
+  // read-only pills; this is now a real selection sent to POST
+  // /subscriptions as `applications`, which creates the ApplicationEntitlement
+  // rows every app is gated against (see application-entitlements.service.ts).
+  applications: AppCode[];
 }
 
 interface ActivationForm {
-  deviceTypes: Array<'ANY' | 'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK'>;
+  deviceTypes: Array<'ANY' | 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN'>;
   expiryDays: string;
 }
 
@@ -159,12 +165,23 @@ const EMPTY_MODULES: ModulesForm = {
   branchName: 'Main Dining & Kitchen',
   branchCode: 'MAIN',
   maxBranches: 1,
-  maxDevices: 5
+  maxDevices: 5,
+  applications: []
 };
 
 const EMPTY_ACTIVATION: ActivationForm = {
-  deviceTypes: ['ANY', 'POS', 'CAPTAIN', 'KDS'],
+  deviceTypes: ['POS_ADMIN', 'POS', 'CAPTAIN', 'KDS'],
   expiryDays: '30'
+};
+
+// Mirrors DEFAULT_APPS_BY_TIER in cloud/api's application-entitlements.service.ts
+// — this copy only decides the checkbox starting state; the backend remains
+// the actual source of truth and applies its own defaults if a caller ever
+// omits `applications` entirely.
+const DEFAULT_APPS_BY_TIER: Record<string, AppCode[]> = {
+  CORE: ['POS', 'POS_ADMIN', 'KDS'],
+  PRO: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN'],
+  ENTERPRISE: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN']
 };
 
 export function OnboardRestaurantPage() {
@@ -229,7 +246,7 @@ export function OnboardRestaurantPage() {
     }));
   }
 
-  function handleDeviceTypeToggle(type: 'ANY' | 'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK') {
+  function handleDeviceTypeToggle(type: 'ANY' | 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN') {
     setActivationForm((prev) => {
       const exists = prev.deviceTypes.includes(type);
       return {
@@ -326,7 +343,8 @@ export function OnboardRestaurantPage() {
           restaurantId: rId,
           planId: selectedPlan.id,
           status: planForm.status,
-          expiresAt
+          expiresAt,
+          applications: modulesForm.applications
         });
         sId = sub.id;
         setSubscriptionId(sId);
@@ -757,6 +775,10 @@ export function OnboardRestaurantPage() {
           <form
             onSubmit={(e: FormEvent) => {
               e.preventDefault();
+              setModulesForm((m) => ({
+                ...m,
+                applications: m.applications.length > 0 ? m.applications : (DEFAULT_APPS_BY_TIER[selectedPlan?.tier ?? 'CORE'] ?? [])
+              }));
               setStep('modules');
             }}
             className="modal-form"
@@ -942,7 +964,14 @@ export function OnboardRestaurantPage() {
               </div>
             </div>
 
-            {/* Plan Entitlement Summary Tags */}
+            {/* Application selection — this used to be a read-only display
+                of whatever the plan's entitlements JSON happened to
+                contain (which never included Kiosk/Kiosk Admin at all).
+                It's now a real checklist: whatever is checked here is sent
+                as `applications` on the subscription-assign call and
+                becomes the restaurant's actual ApplicationEntitlement rows
+                — the same rows activation-key generation/redemption are
+                gated against. */}
             <div
               style={{
                 marginTop: 20,
@@ -952,8 +981,63 @@ export function OnboardRestaurantPage() {
                 border: '1px solid #e2e8f0'
               }}
             >
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 4, textTransform: 'uppercase' }}>
+                Applications to Provision
+              </div>
+              <p style={{ fontSize: 11, color: '#64748b', marginTop: 0, marginBottom: 10 }}>
+                Pre-selected from {selectedPlan?.name || 'the selected plan'}'s tier — uncheck anything this
+                restaurant shouldn't have, or enable one the plan doesn't normally include.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 8 }}>
+                {APP_CODES.map((code) => {
+                  const checked = modulesForm.applications.includes(code);
+                  return (
+                    <label
+                      key={code}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '8px 10px',
+                        borderRadius: 8,
+                        border: checked ? '1.5px solid #ea580c' : '1px solid #e2e8f0',
+                        backgroundColor: checked ? '#fffaf5' : '#fff',
+                        cursor: 'pointer',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: checked ? '#0B253A' : '#475569'
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() =>
+                          setModulesForm((m) => ({
+                            ...m,
+                            applications: checked ? m.applications.filter((a) => a !== code) : [...m.applications, code]
+                          }))
+                        }
+                      />
+                      {APP_CODE_LABELS[code]}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Plan Feature Entitlement Summary Tags (informational — the
+                separate Feature Entitlements matrix still governs these) */}
+            <div
+              style={{
+                marginTop: 12,
+                padding: '16px',
+                borderRadius: 12,
+                backgroundColor: '#f8fafc',
+                border: '1px solid #e2e8f0'
+              }}
+            >
               <div style={{ fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 8, textTransform: 'uppercase' }}>
-                Included Application Entitlements ({selectedPlan?.name || 'Selected Plan'}):
+                Plan Feature Entitlements ({selectedPlan?.name || 'Selected Plan'}):
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {selectedPlan &&
@@ -1011,11 +1095,16 @@ export function OnboardRestaurantPage() {
             </p>
 
             <div className="device-key-picker">
-              <label className="device-key-option" style={{ border: activationForm.deviceTypes.includes('ANY') ? '1.5px solid #ea580c' : undefined, background: activationForm.deviceTypes.includes('ANY') ? '#fffaf5' : undefined }}>
+              {/* Was secretly submitting allowedDeviceType: 'ANY' regardless
+                  of this checkbox's POS_ADMIN label — ActivationKeyDeviceType
+                  now has a real POS_ADMIN value, so this issues a key
+                  actually scoped to POS_ADMIN instead of one valid for any
+                  device type. */}
+              <label className="device-key-option" style={{ border: activationForm.deviceTypes.includes('POS_ADMIN') ? '1.5px solid #ea580c' : undefined, background: activationForm.deviceTypes.includes('POS_ADMIN') ? '#fffaf5' : undefined }}>
                 <input
                   type="checkbox"
-                  checked={activationForm.deviceTypes.includes('ANY')}
-                  onChange={() => handleDeviceTypeToggle('ANY')}
+                  checked={activationForm.deviceTypes.includes('POS_ADMIN')}
+                  onChange={() => handleDeviceTypeToggle('POS_ADMIN')}
                 />
                 <div>
                   <div className="device-key-option-label" style={{ fontWeight: 800, color: '#0b253a' }}>
@@ -1070,6 +1159,22 @@ export function OnboardRestaurantPage() {
                 <div>
                   <div className="device-key-option-label">Self-Order Kiosk</div>
                   <div className="device-key-option-desc">Customer Touchscreen Kiosk</div>
+                </div>
+              </label>
+
+              {/* Kiosk Admin previously had no checkbox anywhere in this
+                  wizard — there was no ActivationKeyDeviceType/DeviceType
+                  value for it to redeem as, so it could never be issued a
+                  key at all regardless of UI. */}
+              <label className="device-key-option">
+                <input
+                  type="checkbox"
+                  checked={activationForm.deviceTypes.includes('KIOSK_ADMIN')}
+                  onChange={() => handleDeviceTypeToggle('KIOSK_ADMIN')}
+                />
+                <div>
+                  <div className="device-key-option-label">Kiosk Admin Terminal</div>
+                  <div className="device-key-option-desc">Kiosk Fleet & Self-Ordering Configuration (http://localhost:5173)</div>
                 </div>
               </label>
             </div>

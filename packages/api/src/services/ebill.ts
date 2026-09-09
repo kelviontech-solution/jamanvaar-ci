@@ -63,6 +63,18 @@ export class EBillService {
   }
 
   /**
+   * No real WhatsApp Business API / SMS gateway is wired up anywhere in
+   * this codebase (no API credentials, no webhook, no provider client) —
+   * these methods used to unconditionally return success/'SENT' regardless,
+   * which told customers and managers a message was delivered when nothing
+   * was actually transmitted. Until a real gateway is integrated, both
+   * methods report an honest failure instead of a fabricated success, while
+   * still building the real message content and receipt record so wiring
+   * in an actual provider later only requires replacing this one check.
+   */
+  private static readonly GATEWAY_CONFIGURED = false;
+
+  /**
    * Send WhatsApp e-bill (dispatches through secure backend service)
    */
   public static async sendWhatsAppEBill(
@@ -92,6 +104,30 @@ export class EBillService {
 
     const messageContent = this.formatWhatsAppMessage(order, config);
     const masked = this.maskRecipient(phoneNumber);
+
+    if (!this.GATEWAY_CONFIGURED) {
+      const record: ReceiptRecord = {
+        id: `rec-err-${Date.now()}`,
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        tokenNumber: order.tokenNumber,
+        deliveryMethod: 'WHATSAPP',
+        deliveryStatus: 'FAILED',
+        recipient: masked,
+        content: messageContent,
+        createdAt: new Date().toISOString(),
+        errorMessage: 'No WhatsApp Business gateway is configured for this outlet'
+      };
+      order.eBillMethod = 'WHATSAPP';
+      order.eBillStatus = 'FAILED';
+      order.eBillRecipient = masked;
+      db.notify();
+      return {
+        success: false,
+        record,
+        message: 'WhatsApp e-bill not sent — no WhatsApp gateway is configured for this outlet yet. Please print the receipt instead.'
+      };
+    }
 
     const record: ReceiptRecord = {
       id: `rec-${Date.now()}`,
@@ -128,6 +164,30 @@ export class EBillService {
   ): Promise<{ success: boolean; record: ReceiptRecord; message: string }> {
     const masked = this.maskRecipient(phoneNumber);
     const smsText = `JAMANVAAR: Thank you for Order #${order.orderNumber} (Token #${order.tokenNumber}). Total: ${formatINR(order.totalAmount)}. Track live: https://kiosk.jamanvaar.com/track/${order.orderNumber}`;
+
+    if (!this.GATEWAY_CONFIGURED) {
+      const record: ReceiptRecord = {
+        id: `rec-sms-err-${Date.now()}`,
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        tokenNumber: order.tokenNumber,
+        deliveryMethod: 'SMS',
+        deliveryStatus: 'FAILED',
+        recipient: masked,
+        content: smsText,
+        createdAt: new Date().toISOString(),
+        errorMessage: 'No SMS gateway is configured for this outlet'
+      };
+      order.eBillMethod = 'SMS';
+      order.eBillStatus = 'FAILED';
+      order.eBillRecipient = masked;
+      db.notify();
+      return {
+        success: false,
+        record,
+        message: 'SMS e-bill not sent — no SMS gateway is configured for this outlet yet. Please print the receipt or use WhatsApp instead.'
+      };
+    }
 
     const record: ReceiptRecord = {
       id: `rec-sms-${Date.now()}`,

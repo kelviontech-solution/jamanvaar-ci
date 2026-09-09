@@ -43,6 +43,31 @@ describe('Activation code redemption (the other half of activation-keys generati
       ownerEmail: `redeem-owner-${Date.now()}@test.example.com`
     });
     restaurantId = restaurantRes.body.restaurant.id;
+
+    // A key/redemption is now gated on the restaurant's actual application
+    // entitlements (see ApplicationEntitlementsService.assertAppEnabled) —
+    // a restaurant with no subscription at all is correctly refused for
+    // every app, so this suite (which exercises POS/KDS/CAPTAIN) needs a
+    // real PRO subscription behind it, the same pattern tenant-auth.e2e
+    // uses for the equivalent entitlement-dependent assertions.
+    const planRes = await authed('post', '/api/v1/plans').send({
+      tier: 'PRO',
+      name: `TEST Activation Redeem Plan ${Date.now()}`,
+      priceMonthly: 700000,
+      maxBranches: 3,
+      maxDevices: 20,
+      maxUsers: 20,
+      entitlements: { posTerminal: true, captainApp: true }
+    });
+    expect(planRes.status).toBe(201);
+
+    const subRes = await authed('post', '/api/v1/subscriptions').send({
+      restaurantId,
+      planId: planRes.body.id,
+      status: 'ACTIVE',
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    });
+    expect(subRes.status).toBe(201);
   });
 
   afterAll(async () => {

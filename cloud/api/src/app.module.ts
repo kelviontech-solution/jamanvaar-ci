@@ -34,6 +34,7 @@ import { OfflinePolicyModule } from './modules/offline-policy/offline-policy.mod
 import { SandboxesModule } from './modules/sandboxes/sandboxes.module';
 import { AiAssistantModule } from './modules/ai-assistant/ai-assistant.module';
 import { QrOrderingModule } from './modules/qr-ordering/qr-ordering.module';
+import { ApplicationEntitlementsModule } from './modules/application-entitlements/application-entitlements.module';
 import { validateEnv } from './config/env.validation';
 
 @Module({
@@ -76,7 +77,8 @@ import { validateEnv } from './config/env.validation';
     OfflinePolicyModule,
     SandboxesModule,
     AiAssistantModule,
-    QrOrderingModule
+    QrOrderingModule,
+    ApplicationEntitlementsModule
   ],
   providers: [
     {

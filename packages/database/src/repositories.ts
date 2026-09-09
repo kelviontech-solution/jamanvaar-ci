@@ -56,13 +56,15 @@ import {
   ShiftRecord,
   StockMovement,
   QrOrderingSettings,
+  KioskDisplaySettings,
+  WelcomeScreenSettings,
   SyncEvent,
   User,
   WaitlistEntry
 } from '@jamanvaar/types';
 import { generateOrderNumber, generateTokenNumber, generateUUID } from '@jamanvaar/utils';
 import { db } from './db';
-import { DEFAULT_QR_SETTINGS } from './seed';
+import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS } from './seed';
 
 export class MenuRepository {
   public static getAllCategories(): Category[] {
@@ -1970,6 +1972,14 @@ export class KOTRepository {
     const kot = db.kots.find((k) => k.id === kotId);
     if (!kot) return null;
     kot.status = status;
+    // Stamp real completion timestamps so kitchen-performance reports can
+    // compute an actual average prep time instead of guessing one.
+    if (status === 'READY' && !kot.readyAt) {
+      kot.readyAt = new Date().toISOString();
+    }
+    if (status === 'SERVED' && !kot.servedAt) {
+      kot.servedAt = new Date().toISOString();
+    }
     db.notify();
     return kot;
   }
@@ -3120,6 +3130,71 @@ function generateSecureQrTokenSuffix(): string {
   const bytes = new Uint8Array(18);
   globalThis.crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Kiosk Admin/Super Admin-configurable customer-kiosk behavior — which
+ * languages the kiosk offers, the idle-timeout thresholds, and the welcome
+ * screen's tagline/logo size. These previously lived as literal constants
+ * inside the kiosk app itself; this is the real config surface those
+ * constants now read from, mirroring QrOrderingRepository's own
+ * get/update-with-audit-log shape below.
+ */
+export class KioskDisplaySettingsRepository {
+  public static getSettings(): KioskDisplaySettings {
+    if (!db.kioskDisplaySettings) {
+      db.kioskDisplaySettings = { ...DEFAULT_KIOSK_DISPLAY_SETTINGS };
+    }
+    return db.kioskDisplaySettings;
+  }
+
+  public static updateSettings(partial: Partial<KioskDisplaySettings>, actor: string = 'Kiosk Admin'): KioskDisplaySettings {
+    const current = this.getSettings();
+
+    // A restaurant with no enabled languages, or a default that isn't in
+    // the enabled list, would leave the kiosk unable to render a language
+    // screen at all — reject rather than silently produce that state.
+    const nextEnabled = partial.enabledLanguages ?? current.enabledLanguages;
+    if (nextEnabled.length === 0) {
+      throw new Error('At least one language must remain enabled.');
+    }
+    const nextDefault = partial.defaultLanguage ?? current.defaultLanguage;
+    if (!nextEnabled.includes(nextDefault)) {
+      throw new Error(`Default language "${nextDefault}" must be one of the enabled languages.`);
+    }
+
+    db.kioskDisplaySettings = { ...current, ...partial };
+    AuditRepository.log({
+      action: 'SETTINGS_UPDATE',
+      category: 'BUSINESS',
+      details: `Updated kiosk display settings: ${Object.keys(partial).join(', ')}`,
+      username: actor
+    });
+    db.notify();
+    return db.kioskDisplaySettings;
+  }
+}
+
+export class WelcomeScreenSettingsRepository {
+  public static getSettings(): WelcomeScreenSettings {
+    if (!db.welcomeScreenSettings) {
+      db.welcomeScreenSettings = { ...DEFAULT_WELCOME_SCREEN_SETTINGS };
+    }
+    return db.welcomeScreenSettings;
+  }
+
+  public static updateSettings(partial: Partial<WelcomeScreenSettings>, actor: string = 'Kiosk Admin'): WelcomeScreenSettings {
+    const current = this.getSettings();
+    db.welcomeScreenSettings = { ...current, ...partial };
+    AuditRepository.log({
+      action: 'SETTINGS_UPDATE',
+      category: 'BUSINESS',
+      details: `Updated welcome screen settings: ${Object.keys(partial).join(', ')}`,
+      username: actor
+    });
+    db.notify();
+    return db.welcomeScreenSettings;
+  }
 }
 
 export class QrOrderingRepository {

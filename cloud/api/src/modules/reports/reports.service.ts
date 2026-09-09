@@ -144,7 +144,7 @@ export class ReportsService {
       orderBy: { createdAt: 'desc' }
     });
 
-    const typeCounts: Record<string, number> = { POS: 0, CAPTAIN: 0, KDS: 0, KIOSK: 0, POS_ADMIN: 0 };
+    const typeCounts: Record<string, number> = { POS: 0, CAPTAIN: 0, KDS: 0, KIOSK: 0, POS_ADMIN: 0, KIOSK_ADMIN: 0 };
     for (const d of devices) {
       if (typeCounts[d.type] !== undefined) {
         typeCounts[d.type]++;

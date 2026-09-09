@@ -214,11 +214,12 @@ export class AdminChatbotEngine {
       const tables = db.tables;
       const occupied = tables.filter((t) => t.status === 'OCCUPIED');
       const available = tables.filter((t) => t.status === 'AVAILABLE');
+      const zones = Array.from(new Set(tables.map((t) => t.zone).filter(Boolean)));
 
       return {
         id,
         sender: 'ASSISTANT',
-        text: `🪑 **Dining Table Matrix & Table Occupancy:**\n• **Total Tables:** ${tables.length} tables\n• **Occupied Tables:** ${occupied.length} (${tables.length > 0 ? Math.round((occupied.length / tables.length) * 100) : 0}% occupancy)\n• **Available Tables:** ${available.length} free tables\n• **Active Dining Zones:** Main Hall, Family Section & AC Balcony`,
+        text: `🪑 **Dining Table Matrix & Table Occupancy:**\n• **Total Tables:** ${tables.length} tables\n• **Occupied Tables:** ${occupied.length} (${tables.length > 0 ? Math.round((occupied.length / tables.length) * 100) : 0}% occupancy)\n• **Available Tables:** ${available.length} free tables\n• **Active Dining Zones:** ${zones.length > 0 ? zones.join(', ') : 'No zones configured'}`,
         timestamp,
         actionLink: 'TABLES',
         suggestions: ['⏳ Active Kitchen Orders', '💰 Today\'s Live Sales']

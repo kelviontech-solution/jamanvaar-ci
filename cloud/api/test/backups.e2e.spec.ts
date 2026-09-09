@@ -90,6 +90,27 @@ describe('Real off-device backups (S3-compatible storage)', () => {
       .post('/api/v1/tenant-auth/login')
       .send({ restaurantId, email: ownerEmail, password: ownerPassword });
     tenantToken = tenantLogin.body.accessToken;
+
+    // The later "device can authenticate" test redeems a POS activation key
+    // — now gated on the restaurant's actual application entitlements (see
+    // ApplicationEntitlementsService.assertAppEnabled), so a real PRO
+    // subscription is needed for that redemption to succeed.
+    const planRes = await authed('post', '/api/v1/plans', platformToken).send({
+      tier: 'PRO',
+      name: `TEST Backups Plan ${Date.now()}`,
+      priceMonthly: 700000,
+      maxBranches: 3,
+      maxDevices: 20,
+      maxUsers: 20,
+      entitlements: { posTerminal: true }
+    });
+    expect(planRes.status).toBe(201);
+    await authed('post', '/api/v1/subscriptions', platformToken).send({
+      restaurantId,
+      planId: planRes.body.id,
+      status: 'ACTIVE',
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    });
   });
 
   afterAll(async () => {

@@ -1,5 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { DeviceType, PlatformUser } from '@prisma/client';
+import { AppCode, DeviceType, PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { PublishReleaseDto } from './dto/application.dto';
@@ -9,6 +9,11 @@ export interface AppMetadata {
   name: string;
   category: string;
   deviceType?: DeviceType;
+  // The AppRelease/APP_CATALOG `code` predates ApplicationEntitlement and
+  // uses 'RESTAURANT_ADMIN' where the entitlement schema's AppCode enum
+  // uses 'POS_ADMIN' for the same application — this is the bridge between
+  // the two rather than a silent rename of already-seeded release data.
+  entitlementAppCode: AppCode;
   description: string;
   defaultPort?: number;
 }
@@ -19,6 +24,7 @@ export const APP_CATALOG: AppMetadata[] = [
     name: 'Counter POS & Fast Billing',
     category: 'Counter & Cashier',
     deviceType: 'POS',
+    entitlementAppCode: 'POS',
     description: '100% offline-first billing terminal, ESC/POS printing, token routing, and GST invoices.',
     defaultPort: 5173
   },
@@ -27,6 +33,7 @@ export const APP_CATALOG: AppMetadata[] = [
     name: 'Restaurant Admin Portal',
     category: 'Back-Office & Operations',
     deviceType: 'POS_ADMIN',
+    entitlementAppCode: 'POS_ADMIN',
     description: 'Complete organization administration, menu editor, floor plan, reports, and cloud sync.',
     defaultPort: 5176
   },
@@ -35,6 +42,7 @@ export const APP_CATALOG: AppMetadata[] = [
     name: 'Captain App (Table-Side)',
     category: 'Service & Waiters',
     deviceType: 'CAPTAIN',
+    entitlementAppCode: 'CAPTAIN',
     description: 'Wireless table ordering, instant course firing, food ready alerts, and waiter metrics.',
     defaultPort: 5174
   },
@@ -43,6 +51,7 @@ export const APP_CATALOG: AppMetadata[] = [
     name: 'Kitchen Display System (KDS)',
     category: 'Kitchen & Production',
     deviceType: 'KDS',
+    entitlementAppCode: 'KDS',
     description: 'Multi-station prep routing, order queue timing, cook alert cards, and bump bar support.',
     defaultPort: 5175
   },
@@ -51,6 +60,7 @@ export const APP_CATALOG: AppMetadata[] = [
     name: 'Self-Ordering Kiosk',
     category: 'Customer Self-Service',
     deviceType: 'KIOSK',
+    entitlementAppCode: 'KIOSK',
     description: 'Visual digital catalog, custom modifiers, UPI BharatQR display, and self-checkout.',
     defaultPort: 5178
   },
@@ -58,7 +68,14 @@ export const APP_CATALOG: AppMetadata[] = [
     code: 'KIOSK_ADMIN',
     name: 'Kiosk Terminal Admin',
     category: 'Hardware & Terminal Config',
-    description: 'Kiosk peripheral configuration, terminal lock screen, and display branding.',
+    // Fix: this row previously had no deviceType at all, so its device
+    // counts were structurally hardcoded to zero (matchingDevices below is
+    // `meta.deviceType ? ... : []`) no matter how many real Kiosk Admin
+    // terminals existed — there was no DeviceType value for it to match
+    // against either (added in the same migration as ApplicationEntitlement).
+    deviceType: 'KIOSK_ADMIN',
+    entitlementAppCode: 'KIOSK_ADMIN',
+    description: 'Kiosk device fleet management, menu/branch assignment, availability, and order monitoring.',
     defaultPort: 5177
   }
 ];
@@ -80,6 +97,14 @@ export class ApplicationsService {
         select: { type: true, status: true, lastSeenAt: true, appVersion: true }
       });
 
+      // Real per-app entitlement counts — previously this endpoint reported
+      // nothing about which/how many restaurants actually have an app
+      // enabled, only device telemetry.
+      const enabledEntitlements = await tx.applicationEntitlement.findMany({
+        where: { enabled: true },
+        select: { appCode: true, restaurantId: true }
+      });
+
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
       return APP_CATALOG.map((meta) => {
@@ -95,6 +120,10 @@ export class ApplicationsService {
           (d) => d.status === 'ACTIVE' && d.lastSeenAt && new Date(d.lastSeenAt) > oneHourAgo
         ).length;
 
+        const assignedRestaurantIds = new Set(
+          enabledEntitlements.filter((e) => e.appCode === meta.entitlementAppCode).map((e) => e.restaurantId)
+        );
+
         return {
           ...meta,
           currentVersion: latestRelease?.version || '1.0.0',
@@ -108,6 +137,7 @@ export class ApplicationsService {
           activeDevices,
           onlineDevices,
           offlineDevices: activeDevices - onlineDevices,
+          assignedRestaurants: assignedRestaurantIds.size,
           recentReleases: releases.slice(0, 5)
         };
       });

@@ -6,12 +6,15 @@ import {
   CustomerRepository,
   db,
   FeedbackRepository,
+  KioskDisplaySettingsRepository,
   KioskRepository,
+  KOTRepository,
   MenuRepository,
   OrderRepository,
   ReceiptRepository,
   ServiceRequestRepository,
-  TableRepository
+  TableRepository,
+  WelcomeScreenSettingsRepository
 } from '@jamanvaar/database';
 import {
   CartItem,
@@ -39,6 +42,7 @@ import {
   calculateItemTotal,
   calculateItemUnitPrice,
   CustomerChatbotEngine,
+  hasRequiredModifierGroup,
   IdempotencyManager,
   RecommendationEngine,
   validateModifiers
@@ -55,9 +59,10 @@ import {
   ProductCard,
   StatusBadge,
   ThermalReceiptView,
-  JAMANVAARStartup
+  JAMANVAARStartup,
+  SplashCornerArtwork
 } from '@jamanvaar/ui';
-import { formatDate, formatINR, formatTime, generateIdempotencyKey, generateUUID, SoundService } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatTime, generateIdempotencyKey, generateUUID, localizedDescription, localizedName, SoundService } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
 import { EBillService, KdsMeshService, NetworkStatusService, PaymentService, PrinterService, VoiceService } from '@jamanvaar/api';
 import { SyncOutboxEngine } from '@jamanvaar/sync';
@@ -97,6 +102,7 @@ import {
   RotateCcw,
   Search,
   Send,
+  Settings,
   Share2,
   ShieldAlert,
   ShoppingBag,
@@ -117,6 +123,7 @@ import {
 } from 'lucide-react';
 
 type KioskStep =
+  | 'LANGUAGE_SELECT'
   | 'WELCOME'
   | 'ORDER_TYPE'
   | 'TABLE_SELECT'
@@ -125,9 +132,23 @@ type KioskStep =
   | 'CONFIRMATION'
   | 'TRACKING';
 
+/** Display labels for every language the kiosk *could* offer — which of
+ *  these actually show up is decided by KioskDisplaySettings.enabledLanguages,
+ *  not by this list, so Kiosk Admin can turn one off without a code change. */
+const LANGUAGE_OPTIONS: Array<{ code: SupportedLanguage; label: string; native: string }> = [
+  { code: 'en', label: 'English', native: 'English' },
+  { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
+  { code: 'gu', label: 'Gujarati', native: 'ગુજરાતી' }
+];
+
 export default function KioskUserApp() {
   const [dbTick, setDbTick] = useState(0);
-  const [lang, setLang] = useState<SupportedLanguage>('en');
+  const [lang, setLang] = useState<SupportedLanguage>(
+    () => KioskDisplaySettingsRepository.getSettings().defaultLanguage as SupportedLanguage
+  );
+  // Welcome (branding, "Start Order") is the very first screen — a customer
+  // should see which restaurant they're ordering from before anything else.
+  // Language is asked only after they tap Start Order, not on kiosk boot.
   const [step, setStep] = useState<KioskStep>('WELCOME');
 
   // Network Connectivity State (Section 121-129)
@@ -135,6 +156,7 @@ export default function KioskUserApp() {
 
   // Accessibility States
   const [isHighContrast, setIsHighContrast] = useState(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isLargeText, setIsLargeText] = useState(false);
 
   // Session & Order Details
@@ -191,6 +213,10 @@ export default function KioskUserApp() {
     printerName: ''
   });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  // The full thermal receipt used to render inline on the confirmation
+  // screen by default — a guest never asked to inspect a receipt mockup
+  // right after paying. It's now behind an explicit "View Receipt" action.
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
 
   // Digital E-Bill & WhatsApp Receipt States (Sections 130-152)
   const [isEBillModalOpen, setIsEBillModalOpen] = useState(false);
@@ -222,10 +248,17 @@ export default function KioskUserApp() {
     }
   ]);
 
-  // Inactivity Idle Timer
+  // Inactivity Idle Timer — thresholds are Kiosk Admin-configurable (see
+  // KioskDisplaySettingsRepository); read once per mount, same as
+  // defaultLanguage above, since a duration changing mid-session shouldn't
+  // reset an already-running countdown out from under the current guest.
+  const [idleThresholds] = useState(() => {
+    const s = KioskDisplaySettingsRepository.getSettings();
+    return { warningAfter: s.idleWarningAfterSeconds, resetCountdown: s.idleResetCountdownSeconds };
+  });
   const [idleSeconds, setIdleSeconds] = useState<number>(0);
   const [showIdleWarning, setShowIdleWarning] = useState<boolean>(false);
-  const [idleCountdown, setIdleCountdown] = useState<number>(15);
+  const [idleCountdown, setIdleCountdown] = useState<number>(idleThresholds.resetCountdown);
 
   const t = (key: TranslationKey) => translate(key, lang);
 
@@ -278,17 +311,17 @@ export default function KioskUserApp() {
     setIdleSeconds(0);
     if (showIdleWarning) {
       setShowIdleWarning(false);
-      setIdleCountdown(15);
+      setIdleCountdown(idleThresholds.resetCountdown);
     }
   };
 
   useEffect(() => {
-    if (step === 'WELCOME') return;
+    if (step === 'WELCOME' || step === 'LANGUAGE_SELECT') return;
 
     const interval = setInterval(() => {
       setIdleSeconds((prev) => {
         const next = prev + 1;
-        if (next >= 45 && !showIdleWarning) {
+        if (next >= idleThresholds.warningAfter && !showIdleWarning) {
           setShowIdleWarning(true);
         }
         return next;
@@ -305,7 +338,7 @@ export default function KioskUserApp() {
       setIdleCountdown((prev) => {
         if (prev <= 1) {
           handleFullSessionReset();
-          return 15;
+          return idleThresholds.resetCountdown;
         }
         return prev - 1;
       });
@@ -409,6 +442,11 @@ export default function KioskUserApp() {
   const staffDiscount = staffOverrideActive ? Math.round(rawCalculated.subtotal * 0.1) : 0;
   const netTotalPayable = Math.max(0, rawCalculated.totalPayable - redeemedPoints - staffDiscount);
 
+  // Read live so a Kiosk Admin toggling a language takes effect on the next
+  // render without requiring the terminal to be restarted.
+  const kioskSettings = KioskDisplaySettingsRepository.getSettings();
+  const welcomeSettings = WelcomeScreenSettingsRepository.getSettings();
+
   // Categories & Items from DB
   const categories = MenuRepository.getAllCategories();
   const menuItems = MenuRepository.getAllMenuItems();
@@ -434,33 +472,58 @@ export default function KioskUserApp() {
     cartItems.map((ci) => ci.menuItemId)
   );
 
-  // Handle Item Click -> If customizable, open modal, else add directly
-  const handleSelectItem = (item: MenuItem) => {
+  const defaultModifiersFor = (item: MenuItem): SelectedModifier[] => {
+    const defaults: SelectedModifier[] = [];
+    (item.modifierGroups || []).forEach((g) => {
+      const defOpt = g.options.find((o) => o.isDefault && o.isAvailable);
+      if (defOpt) {
+        defaults.push({
+          groupId: g.id,
+          groupName: g.name,
+          optionId: defOpt.id,
+          optionName: defOpt.name,
+          priceDelta: defOpt.priceDelta
+        });
+      }
+    });
+    return defaults;
+  };
+
+  /** Opens the customization modal unconditionally — used by the explicit
+   *  "Customize" button and by tapping the card itself, so a guest can
+   *  still add cheese/extra spice to something that has no *required*
+   *  choice, without every single item forcing that detour. */
+  const handleOpenCustomize = (item: MenuItem) => {
     SoundService.playTap();
     resetIdleTimer();
-    if (item.modifierGroupIds && item.modifierGroupIds.length > 0) {
-      setCustomizingItem(item);
-      setActiveItemQuantity(1);
-      setSpecialInstructions('');
+    setCustomizingItem(item);
+    setActiveItemQuantity(1);
+    setSpecialInstructions('');
+    setSelectedModifiers(defaultModifiersFor(item));
+  };
 
-      // Pre-select default modifiers
-      const defaults: SelectedModifier[] = [];
-      const groups = item.modifierGroups || [];
-      groups.forEach((g) => {
-        const defOpt = g.options.find((o) => o.isDefault && o.isAvailable);
-        if (defOpt) {
-          defaults.push({
-            groupId: g.id,
-            groupName: g.name,
-            optionId: defOpt.id,
-            optionName: defOpt.name,
-            priceDelta: defOpt.priceDelta
-          });
-        }
-      });
-      setSelectedModifiers(defaults);
+  // Tapping the card body itself (not the + or Customize buttons) should
+  // only open the options modal when the item actually has something to
+  // customize — otherwise it used to force the modal open for every card,
+  // including plain items like Butter Naan with zero modifier groups.
+  const handleCardClick = (item: MenuItem) => {
+    if (item.modifierGroupIds && item.modifierGroupIds.length > 0) {
+      handleOpenCustomize(item);
+    }
+  };
+
+  // The kiosk's "+" quick-add: only interrupt with the modal when the item
+  // genuinely cannot be ordered without a choice (e.g. spice level, size).
+  // An item with only optional add-ons (extra cheese, etc.) goes straight
+  // into the cart with its defaults — this was previously forcing the
+  // modal open for every item that had even one optional modifier group.
+  const handleSelectItem = (item: MenuItem) => {
+    if (hasRequiredModifierGroup(item.modifierGroups)) {
+      handleOpenCustomize(item);
     } else {
-      addToCartDirect(item, 1, [], '');
+      SoundService.playTap();
+      resetIdleTimer();
+      addToCartDirect(item, 1, defaultModifiersFor(item), '');
     }
   };
 
@@ -485,8 +548,18 @@ export default function KioskUserApp() {
       itemTotal
     };
 
+    // The cart drawer (below, isCartOpen) is a real right-side sidebar
+    // already — the gap was that reaching it always meant an extra tap on
+    // the floating bar. Auto-opening it the first time the cart goes from
+    // empty to non-empty gives an immediate "yes, that worked, here's your
+    // order" without interrupting a guest who's still browsing and adding
+    // more items afterward (which would re-open the drawer on every tap).
+    const wasEmpty = cartItems.length === 0;
     setCartItems((prev) => [...prev, newCartItem]);
     showToast(`${quantity}x ${item.name} ${t('added')}`);
+    if (wasEmpty) {
+      setIsCartOpen(true);
+    }
   };
 
   const handleSelectCombo = (combo: ComboDeal) => {
@@ -682,6 +755,31 @@ export default function KioskUserApp() {
     if (isCurrentlyOnline) {
       KdsMeshService.broadcastOrderCreated(newOrder);
     }
+
+    // Generate station-routed Kitchen Order Tickets so this order appears
+    // on the KDS board grouped by kitchen station, exactly like a POS
+    // order — previously the kiosk only printed a customer receipt and
+    // never created KOT records, so kitchen staff never saw kiosk orders.
+    const kotItems = cartItems.map((ci, idx) => ({
+      id: `koti-${Date.now()}-${idx}`,
+      menuItemId: ci.menuItemId,
+      name: ci.item.name,
+      quantity: ci.quantity,
+      modifiers: ci.selectedModifiers,
+      specialInstructions: ci.specialInstructions,
+      kitchenStation: ci.item.kitchenStation || 'Main Kitchen',
+      status: 'PREPARING' as const
+    }));
+    const kots = KOTRepository.generateKOT({
+      orderId: newOrder.id,
+      orderNumber: newOrder.orderNumber,
+      tokenNumber: newOrder.tokenNumber,
+      tableNumber: selectedTable?.tableNumber,
+      orderType,
+      items: kotItems,
+      cashierName: 'Kiosk Self-Order'
+    });
+    kots.forEach((kot) => PrinterService.printKOT(kot));
 
     // Auto dispatch thermal receipt
     PrinterService.printReceipt(newOrder);
@@ -889,18 +987,22 @@ export default function KioskUserApp() {
         </div>
       )}
 
-      {/* TOP HEADER */}
+      {/* TOP HEADER — hidden on the language-select screen itself, which
+          already asks the one question this header's language switcher
+          would otherwise duplicate, and reads cleaner as a distraction-free
+          first screen. */}
+      {step !== 'LANGUAGE_SELECT' && step !== 'WELCOME' && (
       <header className="h-20 sm:h-24 bg-white border-b border-[#EBE6DD] px-6 flex items-center justify-between shadow-sm sticky top-0 z-30">
         {/* Left: Real JAMANVAAR Brand Identity */}
         <div className="flex items-center gap-4">
-          {step !== 'WELCOME' && (
+          {(
             <button
               onClick={() => {
                 SoundService.playTap();
                 if (step === 'MENU') setStep('ORDER_TYPE');
                 else if (step === 'CHECKOUT_PAYMENT') setStep('MENU');
                 else if (step === 'TABLE_SELECT') setStep('ORDER_TYPE');
-                else if (step === 'ORDER_TYPE') setStep('WELCOME');
+                else if (step === 'ORDER_TYPE') setStep('LANGUAGE_SELECT');
               }}
               className="w-12 h-12 rounded-2xl bg-[#FBF9F5] border border-[#EBE6DD] text-[#0B253A] hover:bg-[#F4EFE6] flex items-center justify-center transition-transform active:scale-95"
             >
@@ -915,60 +1017,22 @@ export default function KioskUserApp() {
           />
         </div>
 
-        {/* Right: Controls & Network Status */}
+        {/* Right: Controls — trimmed to what a guest actually needs to see
+            on every screen (language, help, call staff, cart). Accessibility,
+            the network-simulation debug toggle, the phone-handoff QR, and
+            login-when-logged-out used to all sit here permanently, making
+            this read like a demo/dealer-review overlay rather than a
+            dedicated self-service machine. They're all still one tap away
+            in the "More" menu — nothing was removed, only decluttered. */}
         <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* Accessibility toggle — high-contrast + large-text mode already
-              existed in state/CSS but had no way to turn it on. */}
-          <button
-            onClick={() => {
-              const next = !(isHighContrast && isLargeText);
-              setIsHighContrast(next);
-              setIsLargeText(next);
-              showToast(next ? 'Accessibility mode on: larger text, higher contrast' : 'Accessibility mode off');
-            }}
-            title="Toggle larger text & higher contrast"
-            aria-pressed={isHighContrast && isLargeText}
-            className={`w-11 h-11 rounded-2xl border flex items-center justify-center transition-all active:scale-95 ${
-              isHighContrast && isLargeText
-                ? 'bg-[#0B253A] border-[#0B253A] text-white'
-                : 'bg-[#FBF9F5] border-[#EBE6DD] text-[#0B253A] hover:bg-[#F4EFE6]'
-            }`}
-          >
-            <Eye className="w-5 h-5" />
-          </button>
-
-          {/* Subtle Non-Scary Network Indicator (Section 122 & 153) */}
-          <button
-            onClick={() => {
-              const nextState = NetworkStatusService.toggleSimulatedOffline();
-              showToast(`Network switched to: ${nextState}`);
-            }}
-            title="Click to simulate Online / Offline transition"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-              networkState === 'ONLINE'
-                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                : networkState === 'SYNCING'
-                ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                : 'bg-amber-50 text-amber-800 border border-amber-200'
-            }`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                networkState === 'ONLINE'
-                  ? 'bg-emerald-500'
-                  : networkState === 'SYNCING'
-                  ? 'bg-blue-500 animate-spin'
-                  : 'bg-amber-500'
-              }`}
-            ></span>
-            <span className="hidden sm:inline">
-              {networkState === 'ONLINE'
-                ? 'ONLINE'
-                : networkState === 'SYNCING'
-                ? 'SYNCING...'
-                : 'OFFLINE'}
-            </span>
-          </button>
+          {/* Customer Loyalty Profile — shown only once actually logged in;
+              the login prompt itself moved into "More" below. */}
+          {loggedInAccount && (
+            <div className="hidden sm:flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-800">
+              <Award className="w-4 h-4 text-emerald-600" />
+              <span>{loggedInAccount.loyaltyPoints} Pts (₹{loggedInAccount.loyaltyPoints})</span>
+            </div>
+          )}
 
           {/* Customer Chatbot Assistant Trigger ("Need Help?") */}
           <button
@@ -978,24 +1042,13 @@ export default function KioskUserApp() {
             }}
             className="flex items-center gap-2 bg-[#E66817]/10 hover:bg-[#E66817]/20 text-[#E66817] px-3.5 py-2 rounded-xl text-xs font-bold border border-[#E66817]/30 transition-all active:scale-95"
           >
-            <Bot className="w-4 h-4" />
-            <span>Need Help?</span>
+            <Sparkles className="w-4 h-4" />
+            <span className="hidden sm:inline">Need Help?</span>
           </button>
 
-          {/* Mobile Handoff QR Button */}
-          <button
-            onClick={() => {
-              SoundService.playTap();
-              setIsHandoffModalOpen(true);
-            }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#FBF9F5] border border-[#EBE6DD] text-[#0B253A] text-xs font-bold hover:bg-[#F4EFE6]"
-            title="Scan QR to order on mobile phone"
-          >
-            <Smartphone className="w-4 h-4 text-[#E66817]" />
-            <span className="hidden md:inline">Order on Phone</span>
-          </button>
-
-          {/* Call Staff Button */}
+          {/* Call Staff Button — kept directly visible and one tap, not
+              behind an overflow menu, since it's the one control a guest
+              may urgently need. */}
           <button
             onClick={handleCallStaff}
             className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 font-bold text-xs hover:bg-amber-100 active:scale-95 transition-all shadow-sm"
@@ -1004,28 +1057,9 @@ export default function KioskUserApp() {
             <span className="hidden sm:inline">{t('callStaff')}</span>
           </button>
 
-          {/* Customer Loyalty Profile */}
-          {loggedInAccount ? (
-            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-800">
-              <Award className="w-4 h-4 text-emerald-600" />
-              <span>{loggedInAccount.loyaltyPoints} Pts (₹{loggedInAccount.loyaltyPoints})</span>
-            </div>
-          ) : (
-            <button
-              onClick={() => {
-                SoundService.playTap();
-                setIsAuthModalOpen(true);
-              }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#FBF9F5] border border-[#EBE6DD] text-xs font-bold text-[#0B253A] hover:bg-[#F4EFE6]"
-            >
-              <UserCheck className="w-4 h-4 text-[#E66817]" />
-              <span className="hidden sm:inline">Loyalty / Login</span>
-            </button>
-          )}
-
-          {/* Language Switcher */}
+          {/* Language Switcher — offers only what Kiosk Admin has enabled. */}
           <div className="flex items-center bg-[#FBF9F5] border border-[#EBE6DD] p-1 rounded-xl">
-            {(['en', 'hi', 'gu'] as SupportedLanguage[]).map((l) => (
+            {(kioskSettings.enabledLanguages as SupportedLanguage[]).map((l) => (
               <button
                 key={l}
                 onClick={() => {
@@ -1041,6 +1075,109 @@ export default function KioskUserApp() {
                 {l === 'en' ? 'EN' : l === 'hi' ? 'हिन्दी' : 'ગુજરાતી'}
               </button>
             ))}
+          </div>
+
+          {/* "More" overflow — everything below still works exactly as
+              before, just not permanently occupying the header. */}
+          <div className="relative">
+            <button
+              onClick={() => {
+                SoundService.playTap();
+                setIsMoreMenuOpen((v) => !v);
+              }}
+              title="More options"
+              aria-expanded={isMoreMenuOpen}
+              className={`w-11 h-11 rounded-2xl border flex items-center justify-center transition-all active:scale-95 ${
+                isMoreMenuOpen
+                  ? 'bg-[#0B253A] border-[#0B253A] text-white'
+                  : 'bg-[#FBF9F5] border-[#EBE6DD] text-[#0B253A] hover:bg-[#F4EFE6]'
+              }`}
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+
+            {isMoreMenuOpen && (
+              <>
+                {/* Backdrop to close on outside tap — a kiosk has no
+                    keyboard/Escape affordance, so this is the only way out. */}
+                <div className="fixed inset-0 z-40" onClick={() => setIsMoreMenuOpen(false)} />
+                <div className="absolute right-0 top-full mt-2 z-50 w-64 bg-white rounded-2xl border border-[#EBE6DD] shadow-xl p-2 space-y-1">
+                  {/* Network status — genuinely useful ambient info for an
+                      offline-first kiosk, just not something that needs to
+                      occupy the primary bar on every screen. */}
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-[#4A5568]">
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        networkState === 'ONLINE'
+                          ? 'bg-emerald-500'
+                          : networkState === 'SYNCING'
+                          ? 'bg-blue-500 animate-spin'
+                          : 'bg-amber-500'
+                      }`}
+                    ></span>
+                    <span>
+                      Network: {networkState === 'ONLINE' ? 'Online' : networkState === 'SYNCING' ? 'Syncing…' : 'Offline'}
+                    </span>
+                    <button
+                      onClick={() => {
+                        const nextState = NetworkStatusService.toggleSimulatedOffline();
+                        showToast(`Network switched to: ${nextState}`);
+                      }}
+                      title="Simulate online/offline (staff diagnostic)"
+                      className="ml-auto text-[10px] text-[#8C9BAE] underline"
+                    >
+                      simulate
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      const next = !(isHighContrast && isLargeText);
+                      setIsHighContrast(next);
+                      setIsLargeText(next);
+                      setIsMoreMenuOpen(false);
+                      showToast(next ? 'Accessibility mode on: larger text, higher contrast' : 'Accessibility mode off');
+                    }}
+                    aria-pressed={isHighContrast && isLargeText}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-[#0B253A] hover:bg-[#FBF9F5] text-left"
+                  >
+                    <Eye className="w-4 h-4 text-[#E66817]" />
+                    {isHighContrast && isLargeText ? 'Turn off larger text & contrast' : 'Larger text & higher contrast'}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      SoundService.playTap();
+                      setIsHandoffModalOpen(true);
+                      setIsMoreMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-[#0B253A] hover:bg-[#FBF9F5] text-left"
+                  >
+                    <Smartphone className="w-4 h-4 text-[#E66817]" />
+                    Order on Phone
+                  </button>
+
+                  {loggedInAccount ? (
+                    <div className="sm:hidden flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-emerald-800">
+                      <Award className="w-4 h-4 text-emerald-600" />
+                      {loggedInAccount.loyaltyPoints} Loyalty Points
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        SoundService.playTap();
+                        setIsAuthModalOpen(true);
+                        setIsMoreMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-[#0B253A] hover:bg-[#FBF9F5] text-left"
+                    >
+                      <UserCheck className="w-4 h-4 text-[#E66817]" />
+                      Loyalty / Login
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Cart Trigger Button */}
@@ -1064,10 +1201,85 @@ export default function KioskUserApp() {
           )}
         </div>
       </header>
+      )}
+
+      {/* STEP 0: LANGUAGE SELECTION — the very first thing a freshly-booted
+          kiosk asks. The header's own language switcher only handles
+          changing it later; this is the dedicated first choice. */}
+      {step === 'LANGUAGE_SELECT' && (
+        <div className="flex-1 flex flex-col items-center justify-center p-8 relative bg-gradient-to-b from-[#FBF9F5] via-[#FFFDF9] to-[#F7F2E7] text-center space-y-10">
+          <button
+            onClick={() => {
+              SoundService.playTap();
+              setStep('WELCOME');
+            }}
+            className="absolute top-6 left-6 w-11 h-11 rounded-2xl bg-white/80 hover:bg-white border border-[#EBE6DD] text-[#0B253A] flex items-center justify-center transition-transform active:scale-95 z-10"
+          >
+            <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
+          </button>
+          <div className="flex justify-center">
+            <JamanvaarLogo variant="horizontal" size="2xl" imgStyle={{ height: '96px', width: 'auto' }} className="drop-shadow-sm" />
+          </div>
+
+          <div className="space-y-2">
+            <h1 className="text-3xl sm:text-4xl font-black text-[#0B253A] tracking-tight font-serif">
+              Choose your language
+            </h1>
+            <p className="text-base text-[#4A5568] font-medium">भाषा चुनें • ભાષા પસંદ કરો</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full max-w-3xl">
+            {LANGUAGE_OPTIONS.filter((l) => kioskSettings.enabledLanguages.includes(l.code)).map((l) => (
+              <button
+                key={l.code}
+                onClick={() => {
+                  SoundService.playTap();
+                  setLang(l.code);
+                  setStep('ORDER_TYPE');
+                }}
+                className="bg-white p-8 rounded-3xl border-2 border-[#EBE6DD] hover:border-[#E66817] shadow-lg hover:shadow-xl flex flex-col items-center gap-2 transition-all duration-200 active:scale-95 group"
+              >
+                <span className="text-3xl font-black text-[#0B253A] group-hover:text-[#E66817] transition-colors">
+                  {l.native}
+                </span>
+                <span className="text-xs font-bold text-[#8C9BAE] uppercase tracking-wider">{l.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <p className="text-xs font-semibold text-[#8C9BAE] tracking-wide uppercase">
+            You can change this anytime from the header
+          </p>
+        </div>
+      )}
 
       {/* STEP 1: WELCOME SCREEN */}
       {step === 'WELCOME' && (
         <div className="flex-1 flex flex-col justify-between p-8 md:p-12 relative overflow-hidden bg-gradient-to-b from-[#FBF9F5] via-[#FFFDF9] to-[#F7F2E7]">
+          {/* Indian heritage-inspired corner artwork — Kiosk Admin can turn
+              this off. Dimmed well below the boot-splash's own opacity
+              (which is tuned for a brief full-screen moment, not a screen
+              guests sit looking at) so it reads as a subtle watermark. */}
+          {welcomeSettings.showHeritageArtwork && (
+            <div className="opacity-[0.35]">
+              <SplashCornerArtwork step={1} />
+            </div>
+          )}
+
+          {/* The only control on this screen besides Start Order — the full
+              header (language/loyalty/call-staff/etc.) is deliberately
+              hidden here so this reads as branding, not a dashboard. */}
+          <button
+            onClick={() => {
+              SoundService.playTap();
+              setIsChatbotOpen(true);
+            }}
+            className="absolute top-6 right-6 flex items-center gap-2 bg-white/80 hover:bg-white text-[#E66817] px-3.5 py-2 rounded-xl text-xs font-bold border border-[#E66817]/25 shadow-sm transition-all active:scale-95 z-10"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Need Help?</span>
+          </button>
+
           <div className="max-w-4xl mx-auto w-full text-center space-y-6 my-auto">
             <div className="flex justify-center pb-2">
               <JamanvaarLogo variant="horizontal" size="2xl" imgStyle={{ height: '110px', width: 'auto' }} className="drop-shadow-sm hover:scale-105 transition-transform" />
@@ -1080,12 +1292,21 @@ export default function KioskUserApp() {
 
             <div className="space-y-3">
               <h1 className="text-3xl sm:text-5xl font-black text-[#0B253A] tracking-tight font-serif">
-                {t('welcome')}
+                {welcomeSettings.headingText || t('welcome')}
               </h1>
               <p className="text-base sm:text-xl text-[#4A5568] max-w-2xl mx-auto font-medium leading-relaxed">
-                {t('tagline')}
+                {welcomeSettings.subtitleText || t('tagline')}
               </p>
             </div>
+
+            {/* Kiosk Admin-configurable promo banner — off by default; a
+                restaurant opts in from Kiosk Admin rather than this screen
+                always carrying an offer. */}
+            {welcomeSettings.showPromoBanner && welcomeSettings.promoBannerText && (
+              <div className="inline-flex items-center gap-2 bg-[#0B253A]/5 border border-[#0B253A]/15 px-5 py-2 rounded-full text-sm font-bold text-[#0B253A]">
+                <span>{welcomeSettings.promoBannerText}</span>
+              </div>
+            )}
 
             {/* Giant Touch Button */}
             <div className="pt-4">
@@ -1093,35 +1314,18 @@ export default function KioskUserApp() {
                 onClick={() => {
                   SoundService.playTap();
                   setSessionId(generateUUID());
-                  setStep('ORDER_TYPE');
+                  setStep('LANGUAGE_SELECT');
                 }}
                 className="w-full max-w-md mx-auto py-6 px-10 bg-[#E66817] hover:bg-[#F27A2B] active:bg-[#D1560D] text-white text-2xl sm:text-3xl font-black rounded-3xl shadow-2xl shadow-[#E66817]/40 flex items-center justify-center gap-4 transition-all duration-300 transform active:scale-95 pulse-glow"
               >
-                <span>{t('startOrder')}</span>
+                <span>{welcomeSettings.startOrderButtonText || t('startOrder')}</span>
                 <ChevronRight className="w-8 h-8 stroke-[3]" />
               </button>
               <p className="text-sm font-semibold text-[#8C9BAE] mt-4 tracking-wider uppercase">
-                {t('touchToBegin')}
+                {welcomeSettings.supportingText || t('touchToBegin')}
               </p>
             </div>
 
-            {/* Featured Combos on Welcome Screen */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto pt-4 text-left">
-              {combos.map((combo) => (
-                <div key={combo.id} className="bg-white p-5 rounded-2xl border border-[#EBE6DD] shadow-sm flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-[#E66817] shrink-0 font-bold">
-                    %
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-black uppercase text-[#E66817] bg-[#E66817]/10 px-2 py-0.5 rounded">
-                      SAVE ₹{combo.savingsAmount}
-                    </span>
-                    <h4 className="font-bold text-base text-[#0B253A] mt-1">{combo.name}</h4>
-                    <p className="text-xs text-[#4A5568]">{combo.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Footer Information */}
@@ -1146,7 +1350,7 @@ export default function KioskUserApp() {
               {t('selectOrderType')}
             </h2>
             <p className="text-base text-[#4A5568]">
-              Select whether you are dining in our restaurant or packing your feast for takeaway.
+              {t('selectOrderTypeSub')}
             </p>
           </div>
 
@@ -1167,7 +1371,7 @@ export default function KioskUserApp() {
                   {t('dineIn')}
                 </h3>
                 <p className="text-sm text-[#4A5568] mt-1">
-                  Enjoy your meal freshly served at your table
+                  {t('dineInDesc')}
                 </p>
               </div>
             </button>
@@ -1189,7 +1393,7 @@ export default function KioskUserApp() {
                   {t('takeaway')}
                 </h3>
                 <p className="text-sm text-[#4A5568] mt-1">
-                  Pick up fresh packed food at Counter 1
+                  {t('takeawayDesc')}
                 </p>
               </div>
             </button>
@@ -1250,7 +1454,11 @@ export default function KioskUserApp() {
 
       {/* STEP 4: MENU CATALOG */}
       {step === 'MENU' && (
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div
+          className={`flex-1 flex flex-col overflow-hidden transition-[margin] duration-300 ${
+            isCartOpen ? 'md:mr-[28rem]' : ''
+          }`}
+        >
           {/* Filter Bar */}
           <div className="bg-white border-b border-[#EBE6DD] px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
             <div className="relative w-full md:w-96">
@@ -1345,6 +1553,7 @@ export default function KioskUserApp() {
               <CategoryCard
                 key={cat.id}
                 category={cat}
+                displayName={localizedName(cat, lang)}
                 isSelected={selectedCategoryId === cat.id}
                 onSelect={() => {
                   SoundService.playTap();
@@ -1529,8 +1738,11 @@ export default function KioskUserApp() {
                       <ProductCard
                         key={item.id}
                         item={item}
+                        displayName={localizedName(item, lang)}
+                        displayDescription={localizedDescription(item, lang)}
                         onAdd={handleSelectItem}
-                        onSelectDetails={handleSelectItem}
+                        onSelectDetails={handleCardClick}
+                        onCustomize={handleOpenCustomize}
                       />
                     ))}
                   </div>
@@ -1784,10 +1996,14 @@ export default function KioskUserApp() {
             </div>
           </div>
 
-          {/* Dual Column Layout: Left (Token & Delivery) + Right (Physical Thermal Receipt Slip with Authentic Logo) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Left Column: Giant Token + Delivery Options + Quick Actions */}
-            <div className="lg:col-span-6 space-y-5">
+          {/* Single centered column: Token + delivery/receipt options + quick
+              actions. The full ThermalReceiptView used to render at full
+              size right alongside this by default — moved behind the
+              "View Receipt" action below (see the Modal at the end of this
+              block) so a guest isn't handed a receipt mockup to inspect
+              before they've even picked up their food. */}
+          <div className="grid grid-cols-1 place-items-center">
+            <div className="w-full max-w-xl space-y-5">
               {/* GIANT TOKEN DISPLAY */}
               <div className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-[#EBE6DD] shadow-xl text-center space-y-2">
                 <span className="text-xs font-black uppercase tracking-widest text-[#8C9BAE]">
@@ -1803,72 +2019,6 @@ export default function KioskUserApp() {
                   Pickup at: <strong>{placedOrder.pickupCounter || 'Counter 1'}</strong>
                 </div>
               </div>
-
-              {/* THERMAL PRINTER DISPATCH NOTIFICATION (Auto-Print Success vs Fallback Manual Print) */}
-              {autoPrintStatus.printed ? (
-                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-3xl p-4 sm:p-5 border-2 border-emerald-300 shadow-sm space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs">
-                        <Printer className="w-5 h-5 animate-bounce" />
-                      </div>
-                      <div className="text-left">
-                        <h4 className="font-bold text-xs text-emerald-950">Thermal Receipt Auto-Printed</h4>
-                        <p className="text-[11px] text-emerald-700 font-medium">
-                          Dispatched to {autoPrintStatus.printerName || '80mm Built-in Thermal Printer'}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] bg-emerald-200/80 text-emerald-900 font-bold px-2.5 py-1 rounded-full border border-emerald-400">
-                      ✓ Dispensed
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-emerald-800 bg-white/70 p-2 rounded-xl border border-emerald-200">
-                    📄 Please collect your physical 80mm tax receipt & token slip from the printer slot below.
-                  </p>
-                </div>
-              ) : (
-                <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-4 sm:p-5 border-2 border-amber-300 shadow-sm space-y-2.5">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-xs shrink-0">
-                        <Printer className="w-5 h-5" />
-                      </div>
-                      <div className="text-left min-w-0">
-                        <h4 className="font-bold text-xs text-amber-950">Receipt Not Auto-Printed</h4>
-                        <p className="text-[11px] text-amber-800 font-medium truncate">
-                          {autoPrintStatus.message || 'Thermal printer offline or paper out'}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="accent"
-                      size="sm"
-                      onClick={async () => {
-                        const activePrn = PrinterService.getActivePrinter();
-                        const res = await PrinterService.printReceipt(placedOrder);
-                        if (res.success) {
-                          setAutoPrintStatus({
-                            printed: true,
-                            message: res.message,
-                            printerName: activePrn.name
-                          });
-                          showToast('✓ Receipt printed successfully!');
-                        } else {
-                          showToast(res.message);
-                        }
-                      }}
-                      leftIcon={<Printer className="w-3.5 h-3.5" />}
-                      className="font-bold shadow-sm shrink-0 text-xs"
-                    >
-                      🖨️ Print Receipt
-                    </Button>
-                  </div>
-                  <p className="text-[11px] text-amber-900 bg-white/70 p-2 rounded-xl border border-amber-200">
-                    ⚠️ Automatic print did not dispense. Tap <strong>Print Receipt</strong> above or choose WhatsApp / SMS E-Bill below.
-                  </p>
-                </div>
-              )}
 
               {/* MULTILINGUAL AUDIO ANNOUNCEMENT (Hindi / Gujarati / English Voice) */}
               <div className="bg-white rounded-3xl p-4 sm:p-5 border border-[#EBE6DD] shadow-sm text-center space-y-2.5">
@@ -1927,30 +2077,32 @@ export default function KioskUserApp() {
                   Digital Delivery & E-Bill Options
                 </h4>
 
-                <div className={`grid ${autoPrintStatus.printed ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'} gap-2.5`}>
-                  {/* If not auto-printed, show manual print fallback button */}
-                  {!autoPrintStatus.printed && (
-                    <button
-                      onClick={async () => {
-                        const activePrn = PrinterService.getActivePrinter();
-                        const res = await PrinterService.printReceipt(placedOrder);
-                        if (res.success) {
-                          setAutoPrintStatus({
-                            printed: true,
-                            message: res.message,
-                            printerName: activePrn.name
-                          });
-                          showToast('✓ Receipt printed successfully!');
-                        } else {
-                          showToast(res.message);
-                        }
-                      }}
-                      className="p-3 rounded-2xl bg-[#FBF9F5] border border-[#EBE6DD] hover:bg-[#FFF4ED] hover:border-[#E66817] flex flex-col items-center gap-1.5 transition-all active:scale-95"
-                    >
-                      <Printer className="w-5 h-5 text-[#E66817]" />
-                      <span className="text-[11px] font-bold text-[#0B253A]">Print Slip</span>
-                    </button>
-                  )}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {/* Printing is always an explicit, on-demand action here —
+                      the app has no way to confirm paper actually came out
+                      of a physical printer, so it never claims a receipt
+                      was already dispensed; tapping this just queues a real
+                      print job to the configured printer. */}
+                  <button
+                    onClick={async () => {
+                      const activePrn = PrinterService.getActivePrinter();
+                      const res = await PrinterService.printReceipt(placedOrder);
+                      if (res.success) {
+                        setAutoPrintStatus({
+                          printed: true,
+                          message: res.message,
+                          printerName: activePrn.name
+                        });
+                        showToast(`Print job sent to ${activePrn.name}`);
+                      } else {
+                        showToast(res.message);
+                      }
+                    }}
+                    className="p-3 rounded-2xl bg-[#FBF9F5] border border-[#EBE6DD] hover:bg-[#FFF4ED] hover:border-[#E66817] flex flex-col items-center gap-1.5 transition-all active:scale-95"
+                  >
+                    <Printer className="w-5 h-5 text-[#E66817]" />
+                    <span className="text-[11px] font-bold text-[#0B253A]">Print Receipt</span>
+                  </button>
 
                   {/* Option 1: WhatsApp E-Bill */}
                   <button
@@ -2042,49 +2194,51 @@ export default function KioskUserApp() {
                   variant="outline"
                   size="sm"
                   className="w-full"
+                  onClick={() => {
+                    SoundService.playTap();
+                    setIsReceiptModalOpen(true);
+                  }}
+                  leftIcon={<FileText className="w-4 h-4" />}
+                >
+                  View Order Details
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
                   onClick={handleFullSessionReset}
                 >
                   ← {t('newOrder')}
                 </Button>
               </div>
             </div>
-
-            {/* Right Column: Visual Thermal Receipt Slip with Authentic JAMANVAAR Brand Logo */}
-            <div className="lg:col-span-6 flex flex-col items-center">
-              <div className="w-full text-center pb-2">
-                <span className="text-xs font-bold text-[#E66817] uppercase tracking-wider flex items-center justify-center gap-1.5">
-                  <FileText className="w-4 h-4" /> Official Restaurant Receipt
-                </span>
-              </div>
-
-              <ThermalReceiptView
-                order={placedOrder}
-                config={ReceiptRepository.getConfig()}
-                onPrint={
-                  !autoPrintStatus.printed
-                    ? async () => {
-                        const activePrn = PrinterService.getActivePrinter();
-                        const res = await PrinterService.printReceipt(placedOrder);
-                        if (res.success) {
-                          setAutoPrintStatus({
-                            printed: true,
-                            message: res.message,
-                            printerName: activePrn.name
-                          });
-                          showToast('✓ Receipt printed successfully!');
-                        } else {
-                          showToast(res.message);
-                        }
-                      }
-                    : undefined
-                }
-                onWhatsApp={() => {
-                  setSelectedEBillMethod('WHATSAPP');
-                  setIsEBillModalOpen(true);
-                }}
-              />
-            </div>
           </div>
+
+          {/* Full thermal receipt — on demand only, via "View Order Details" above. */}
+          <Modal isOpen={isReceiptModalOpen} onClose={() => setIsReceiptModalOpen(false)} title="Official Restaurant Receipt">
+            <ThermalReceiptView
+              order={placedOrder}
+              config={ReceiptRepository.getConfig()}
+              onPrint={async () => {
+                const activePrn = PrinterService.getActivePrinter();
+                const res = await PrinterService.printReceipt(placedOrder);
+                if (res.success) {
+                  setAutoPrintStatus({
+                    printed: true,
+                    message: res.message,
+                    printerName: activePrn.name
+                  });
+                  showToast(`Print job sent to ${activePrn.name}`);
+                } else {
+                  showToast(res.message);
+                }
+              }}
+              onWhatsApp={() => {
+                setSelectedEBillMethod('WHATSAPP');
+                setIsEBillModalOpen(true);
+              }}
+            />
+          </Modal>
         </div>
       )}
 
@@ -2207,23 +2361,61 @@ export default function KioskUserApp() {
         <Modal
           isOpen={true}
           onClose={() => setCustomizingItem(null)}
-          title={customizingItem.name}
+          title={localizedName(customizingItem, lang)}
           maxWidth="2xl"
+          footer={
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 bg-[#FBF9F5] border border-[#EBE6DD] px-3 py-2 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => {
+                    SoundService.playTap();
+                    setActiveItemQuantity((q) => Math.max(1, q - 1));
+                  }}
+                  className="w-8 h-8 rounded-lg bg-white border border-[#EBE6DD] flex items-center justify-center font-bold text-[#0B253A]"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="font-black text-lg w-6 text-center">{activeItemQuantity}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    SoundService.playTap();
+                    setActiveItemQuantity((q) => q + 1);
+                  }}
+                  className="w-8 h-8 rounded-lg bg-white border border-[#EBE6DD] flex items-center justify-center font-bold text-[#0B253A]"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+
+              <Button variant="accent" size="lg" className="flex-1" onClick={handleConfirmCustomization}>
+                Add to Cart • {formatINR(calculateItemTotal(customizingItem.price, activeItemQuantity, selectedModifiers))}
+              </Button>
+            </div>
+          }
         >
           <div className="space-y-6">
-            <div className="flex gap-4 items-center">
+            {/* A real, prominent product photo — this used to be a small
+                96x96 thumbnail squeezed beside the text, out of proportion
+                with a modal whose whole point is helping a guest decide
+                what they're customizing. */}
+            <div className="relative -mx-6 -mt-6">
               <img
                 src={customizingItem.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
                 alt={customizingItem.name}
-                className="w-24 h-24 rounded-2xl object-cover border border-[#EBE6DD]"
+                className="w-full h-40 sm:h-48 object-cover"
               />
-              <div>
+              <div className="absolute top-3 left-3">
                 <StatusBadge status={customizingItem.dietaryType} type="dietary" />
-                <h3 className="text-xl font-bold text-[#0B253A] mt-1">{customizingItem.name}</h3>
-                <p className="text-xs text-[#4A5568]">{customizingItem.description}</p>
-                <div className="text-lg font-black text-[#E66817] mt-1">
-                  {formatINR(calculateItemUnitPrice(customizingItem.price, selectedModifiers))}
-                </div>
+              </div>
+            </div>
+            <div>
+              {/* Name already shows in the Modal's own title bar above —
+                  no need to repeat it here. */}
+              <p className="text-xs text-[#4A5568]">{localizedDescription(customizingItem, lang)}</p>
+              <div className="text-lg font-black text-[#E66817] mt-1.5">
+                {formatINR(calculateItemUnitPrice(customizingItem.price, selectedModifiers))}
               </div>
             </div>
 
@@ -2338,47 +2530,20 @@ export default function KioskUserApp() {
                 className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
               />
             </div>
-
-            {/* Quantity Stepper & Add Button */}
-            <div className="border-t border-[#F3EFE6] pt-4 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 bg-[#FBF9F5] border border-[#EBE6DD] px-3 py-2 rounded-xl">
-                <button
-                  type="button"
-                  onClick={() => {
-                    SoundService.playTap();
-                    setActiveItemQuantity((q) => Math.max(1, q - 1));
-                  }}
-                  className="w-8 h-8 rounded-lg bg-white border border-[#EBE6DD] flex items-center justify-center font-bold text-[#0B253A]"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="font-black text-lg w-6 text-center">{activeItemQuantity}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    SoundService.playTap();
-                    setActiveItemQuantity((q) => q + 1);
-                  }}
-                  className="w-8 h-8 rounded-lg bg-white border border-[#EBE6DD] flex items-center justify-center font-bold text-[#0B253A]"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-
-              <Button variant="accent" size="lg" className="flex-1" onClick={handleConfirmCustomization}>
-                Add to Cart • {formatINR(calculateItemTotal(customizingItem.price, activeItemQuantity, selectedModifiers))}
-              </Button>
-            </div>
           </div>
         </Modal>
       )}
 
-      {/* CART DRAWER WITH SMART RECOMMENDATIONS */}
+      {/* CART SIDEBAR WITH SMART RECOMMENDATIONS — a real persistent side
+          panel, not a modal drawer: no dimming backdrop and no click-away
+          close, so a guest can keep browsing and tapping items in the menu
+          underneath while the cart stays open on the right. The outer
+          wrapper has pointer-events-none so only the panel itself (and its
+          own close button) intercepts taps; everywhere else passes through
+          to the menu behind it. */}
       {isCartOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="fixed inset-0" onClick={() => setIsCartOpen(false)} />
-
-          <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between z-10 animate-slideLeft">
+        <div className="fixed inset-0 z-40 flex justify-end pointer-events-none animate-fadeIn">
+          <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between border-l border-[#EBE6DD] animate-slideLeft pointer-events-auto">
             <div className="p-6 border-b border-[#F3EFE6] bg-[#FBF9F5] flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-black text-[#0B253A]">{t('orderSummary')}</h3>
@@ -2409,7 +2574,7 @@ export default function KioskUserApp() {
                       <div key={ci.cartItemId} className="py-4 space-y-2 first:pt-0 last:pb-0">
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <h4 className="font-bold text-base text-[#0B253A]">{ci.item.name}</h4>
+                            <h4 className="font-bold text-base text-[#0B253A]">{localizedName(ci.item, lang)}</h4>
                             {ci.selectedModifiers && ci.selectedModifiers.length > 0 && (
                               <div className="text-xs text-[#8C9BAE] mt-0.5">
                                 {ci.selectedModifiers.map((m) => `+ ${m.optionName}`).join(', ')}
@@ -2588,11 +2753,11 @@ export default function KioskUserApp() {
             <div className="p-5 border-b border-[#EBE6DD] bg-[#0B253A] text-white flex items-center justify-between shadow-md">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#E66817] to-[#f07d33] flex items-center justify-center shadow-md">
-                  <Bot className="w-6 h-6 text-white" />
+                  <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base flex items-center gap-2">
-                    JAMANVAAR Assistant
+                    JAMAN AI
                     <span className="text-[10px] bg-emerald-500 text-white font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
                       Live AI
                     </span>
@@ -3055,7 +3220,7 @@ export default function KioskUserApp() {
             className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-tr from-[#0B253A] to-[#163e5e] hover:from-[#E66817] hover:to-[#f07d33] text-white flex items-center justify-center shadow-2xl border-2 border-white/30 hover:scale-105 active:scale-95 transition-all relative group"
             title="JAMANVAAR Food Assistant"
           >
-            <Bot className="w-7 h-7 sm:w-8 sm:h-8 group-hover:rotate-12 transition-transform" />
+            <Sparkles className="w-7 h-7 sm:w-8 sm:h-8 group-hover:rotate-12 transition-transform" />
             <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white animate-ping" />
             <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white" />
           </button>

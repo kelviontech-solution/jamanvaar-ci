@@ -6,13 +6,16 @@ import {
   CustomerRepository,
   db,
   FeedbackRepository,
+  KioskDisplaySettingsRepository,
   KioskRepository,
   LicenseRepository,
   MenuRepository,
   OrderRepository,
+  PrinterRepository,
   ReceiptRepository,
   ServiceRequestRepository,
-  TableRepository
+  TableRepository,
+  WelcomeScreenSettingsRepository
 } from '@jamanvaar/database';
 import {
   Category,
@@ -55,9 +58,11 @@ import { DeviceHealthService, EBillService, KdsMeshService, NetworkStatusService
 import { AdminChatbotEngine, MenuBuilderService, ReportGeneratorService, SessionPersistence } from '@jamanvaar/business';
 import { FOOD_IMAGE_LIBRARY, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
 import { SyncOutboxEngine } from '@jamanvaar/sync';
+import { connectDeviceStep1, connectDeviceStep2, isDeviceConnected, CloudApiError } from './cloud/cloudClient';
 import {
   Activity,
   AlertCircle,
+  ArrowRight,
   Award,
   Bell,
   Bot,
@@ -149,6 +154,56 @@ export default function AdminApp() {
   // Network State (Online vs Offline)
   const [networkState, setNetworkState] = useState<NetworkState>('ONLINE');
   const [networkLatency, setNetworkLatency] = useState<number>(18);
+
+  // One-time cloud device connection — separate from the PIN/credential
+  // login below, which stays the fast day-to-day unlock once this terminal
+  // is connected. isDeviceConnected() persists across reloads, so this
+  // screen only ever appears the first time a kiosk-admin terminal is set
+  // up (see cloud/cloudClient.ts for why this is two calls, not one).
+  const [deviceConnected, setDeviceConnected] = useState(isDeviceConnected());
+  const [connectStep, setConnectStep] = useState<'CREDENTIALS' | 'ACTIVATION_KEY'>('CREDENTIALS');
+  const [connectRestaurantId, setConnectRestaurantId] = useState('');
+  const [connectEmail, setConnectEmail] = useState('');
+  const [connectPassword, setConnectPassword] = useState('');
+  const [connectActivationKey, setConnectActivationKey] = useState('');
+  const [connectActivationSessionToken, setConnectActivationSessionToken] = useState('');
+  const [connectRestaurantName, setConnectRestaurantName] = useState('');
+  const [connectBusy, setConnectBusy] = useState(false);
+  const [connectError, setConnectError] = useState('');
+
+  const handleConnectCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setConnectError('');
+    setConnectBusy(true);
+    try {
+      const result = await connectDeviceStep1(connectRestaurantId, connectEmail, connectPassword);
+      if (result.status === 'CONNECTED') {
+        setDeviceConnected(true);
+      } else {
+        setConnectActivationSessionToken(result.activationSessionToken);
+        setConnectRestaurantName(result.restaurantName);
+        setConnectStep('ACTIVATION_KEY');
+      }
+    } catch (err) {
+      setConnectError(err instanceof CloudApiError ? err.message : 'Could not connect — check your details and try again.');
+    } finally {
+      setConnectBusy(false);
+    }
+  };
+
+  const handleConnectActivationKey = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setConnectError('');
+    setConnectBusy(true);
+    try {
+      await connectDeviceStep2(connectActivationSessionToken, connectActivationKey, connectRestaurantId, connectEmail);
+      setDeviceConnected(true);
+    } catch (err) {
+      setConnectError(err instanceof CloudApiError ? err.message : 'Activation failed — check the key and try again.');
+    } finally {
+      setConnectBusy(false);
+    }
+  };
 
   // Kiosk Admin Authentication State — restored from persisted session
   const [isKioskAdminLoggedIn, setIsKioskAdminLoggedIn] = useState<boolean>(
@@ -780,6 +835,129 @@ export default function AdminApp() {
       : activeReportType === 'MONTHLY_SALES'
       ? ReportGeneratorService.generateMonthlySalesReport()
       : ReportGeneratorService.generateItemSalesReport();
+
+  // 0. ONE-TIME CLOUD DEVICE CONNECTION GATE — before the local admin
+  // credential login, mirroring Captain's connect screen. See
+  // cloud/cloudClient.ts for why this is two steps (credentials, then an
+  // activation key) rather than Captain's one-step flow.
+  if (!deviceConnected) {
+    return (
+      <JAMANVAARStartup appName="Kiosk Management" appType="KIOSK_ADMIN" subtitle="Hardware & Self-Ordering Fleet Control">
+        <JamanvaarAuthLayout
+          appIdentity="KIOSK_ADMIN"
+          appTitle="Kiosk Management"
+          appSubtitle="Connect this terminal to your restaurant before signing in."
+          heroHeadline="Self-Ordering Fleet."
+          heroHighlightWord="Zero Touch Errors."
+          heroDescription="Centralized terminal command, automatic catalog sync, real-time peripheral diagnostics and upsell recommendation tuning."
+        >
+          <div className="space-y-5">
+            {connectStep === 'CREDENTIALS' ? (
+              <>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-[#0B253A] tracking-tight">Connect this Terminal</h2>
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                    One-time setup — enter the Restaurant ID and login the restaurant owner generated for this terminal.
+                  </p>
+                </div>
+                <form onSubmit={handleConnectCredentials} className="space-y-3.5">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1.5">Restaurant ID *</label>
+                    <input
+                      type="text"
+                      value={connectRestaurantId}
+                      onChange={(e) => setConnectRestaurantId(e.target.value)}
+                      placeholder="From your restaurant's admin dashboard"
+                      required
+                      className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1.5">Login Email *</label>
+                    <input
+                      type="email"
+                      value={connectEmail}
+                      onChange={(e) => setConnectEmail(e.target.value)}
+                      required
+                      className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1.5">Password *</label>
+                    <input
+                      type="password"
+                      value={connectPassword}
+                      onChange={(e) => setConnectPassword(e.target.value)}
+                      required
+                      className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                    />
+                  </div>
+                  {connectError && (
+                    <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                      <span>{connectError}</span>
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={connectBusy}
+                    className="w-full py-4 rounded-2xl bg-[#0B253A] hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <span>{connectBusy ? 'Connecting…' : 'Continue'}</span>
+                    {!connectBusy && <ArrowRight className="w-4 h-4 text-[#E66817]" />}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-[#0B253A] tracking-tight">Activate this Terminal</h2>
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                    Signed in to <strong>{connectRestaurantName}</strong>. Enter the Kiosk Admin activation key from your Super Admin welcome kit to finish binding this terminal.
+                  </p>
+                </div>
+                <form onSubmit={handleConnectActivationKey} className="space-y-3.5">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1.5">Activation Key *</label>
+                    <input
+                      type="text"
+                      value={connectActivationKey}
+                      onChange={(e) => setConnectActivationKey(e.target.value)}
+                      placeholder="JMV-XXXX-XXXX-XXXX"
+                      required
+                      autoFocus
+                      className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-[#0B253A] font-semibold focus:outline-hidden transition-colors uppercase"
+                    />
+                  </div>
+                  {connectError && (
+                    <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                      <span>{connectError}</span>
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={connectBusy}
+                    className="w-full py-4 rounded-2xl bg-[#0B253A] hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <span>{connectBusy ? 'Activating…' : 'Activate Terminal'}</span>
+                    {!connectBusy && <ArrowRight className="w-4 h-4 text-[#E66817]" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setConnectStep('CREDENTIALS'); setConnectError(''); }}
+                    className="w-full text-center text-xs font-bold text-slate-500 hover:text-slate-700 py-1"
+                  >
+                    ← Back
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </JamanvaarAuthLayout>
+      </JAMANVAARStartup>
+    );
+  }
 
   // 1. KIOSK ADMIN AUTHENTICATION GATE SCREEN
   if (!isKioskAdminLoggedIn) {
@@ -2151,17 +2329,14 @@ export default function AdminApp() {
 
               {/* LIVE ORDERS CARD GRID */}
               {displayedOrders.length === 0 ? (
-                <div className="bg-white rounded-3xl p-12 text-center border border-[#EBE6DD] shadow-sm space-y-3">
-                  <div className="w-14 h-14 rounded-2xl bg-amber-50 text-[#E66817] flex items-center justify-center text-2xl mx-auto">
-                    📋
-                  </div>
-                  <h3 className="text-lg font-black text-[#0B253A]">No Orders Found</h3>
-                  <p className="text-xs text-[#4A5568] max-w-sm mx-auto">
-                    {orderSearchQuery || orderStatusFilter !== 'ALL'
+                <EmptyState
+                  title="No Orders Found"
+                  description={
+                    orderSearchQuery || orderStatusFilter !== 'ALL'
                       ? 'No orders match your active search and status filters. Try clearing them.'
-                      : 'No live orders recorded yet. Tap "+ Sim Kiosk Order" above or place an order on Customer Kiosk.'}
-                  </p>
-                </div>
+                      : 'No live orders recorded yet. Tap "+ Sim Kiosk Order" above or place an order on Customer Kiosk.'
+                  }
+                />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {displayedOrders.map((order) => {
@@ -3047,6 +3222,62 @@ export default function AdminApp() {
                   </div>
                 </div>
 
+                {/* Kitchen Printer Routing (maps a kitchen station to a
+                    physical printer, mirroring the POS terminal's KOT
+                    router so kiosk kitchen tickets print on the correct
+                    station printer instead of only the receipt printer) */}
+                <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-[#FBF9F5] border border-[#EBE6DD] flex items-center justify-center text-[#E66817]">
+                      <Printer className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-[#0B253A]">Kitchen Printer Routing</h3>
+                      <p className="text-xs text-[#4A5568]">Which physical printer handles each kitchen station's tickets</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD] text-xs space-y-3">
+                    {([
+                      { role: 'KITCHEN' as const, label: 'Main Kitchen / Curry Station' },
+                      { role: 'TANDOOR' as const, label: 'Tandoor Section' },
+                      { role: 'BAR' as const, label: 'Beverages Bar' },
+                      { role: 'DESSERT' as const, label: 'Dessert Counter' }
+                    ]).map(({ role, label }) => {
+                      const assigned = db.configuredPrinters.find((p) => p.role === role);
+                      return (
+                        <div key={role} className="flex items-center justify-between gap-2">
+                          <label className="text-[#8C9BAE] font-semibold shrink-0">{label}:</label>
+                          <select
+                            value={assigned?.id || ''}
+                            onChange={(e) => {
+                              const newPrinterId = e.target.value;
+                              // Exclusive assignment: clear this role off any
+                              // printer currently holding it before assigning
+                              // it to the newly chosen one.
+                              db.configuredPrinters.forEach((p) => {
+                                if (p.role === role && p.id !== newPrinterId) {
+                                  PrinterRepository.updatePrinter(p.id, { role: undefined });
+                                }
+                              });
+                              if (newPrinterId) {
+                                const updated = PrinterRepository.updatePrinter(newPrinterId, { role });
+                                if (updated) showToast(`${label} tickets will now print on: ${updated.name}`);
+                              }
+                            }}
+                            className="flex-1 bg-white border border-[#EBE6DD] rounded-xl px-2 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none"
+                          >
+                            <option value="">Unassigned (falls back to default printer)</option>
+                            {db.configuredPrinters.map((p) => (
+                              <option key={p.id} value={p.id}>{p.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {/* Payment Gateway Card */}
                 <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
                   <div className="flex items-center gap-3">
@@ -3625,6 +3856,184 @@ export default function AdminApp() {
                 <p className="text-sm text-[#4A5568] mt-1">
                   Brand configuration, GST taxation settings, and complete database backup & restore.
                 </p>
+              </div>
+
+              {/* Customer Kiosk Language & Idle Timeout — previously
+                  hardcoded literal constants inside the customer kiosk app
+                  itself; now a real config surface (KioskDisplaySettingsRepository)
+                  the kiosk reads live, so a change here takes effect on the
+                  terminal's next render without a code change or restart. */}
+              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+                <div>
+                  <h4 className="font-bold text-[#0B253A]">Customer Kiosk Language & Idle Timeout</h4>
+                  <p className="text-xs text-[#4A5568]">Which languages the self-order kiosk offers, and how long it waits before resetting an idle session.</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD]">
+                  {(
+                    [
+                      { code: 'en', label: 'English' },
+                      { code: 'hi', label: 'हिन्दी (Hindi)' },
+                      { code: 'gu', label: 'ગુજરાતી (Gujarati)' }
+                    ] as const
+                  ).map((opt) => {
+                    const settings = KioskDisplaySettingsRepository.getSettings();
+                    const isEnabled = settings.enabledLanguages.includes(opt.code);
+                    return (
+                      <label key={opt.code} className="flex items-center gap-2 text-xs font-bold text-[#0B253A]">
+                        <input
+                          type="checkbox"
+                          checked={isEnabled}
+                          onChange={() => {
+                            const current = KioskDisplaySettingsRepository.getSettings();
+                            const nextEnabled = isEnabled
+                              ? current.enabledLanguages.filter((l) => l !== opt.code)
+                              : [...current.enabledLanguages, opt.code];
+                            try {
+                              KioskDisplaySettingsRepository.updateSettings({ enabledLanguages: nextEnabled });
+                              showToast(`${opt.label} ${isEnabled ? 'disabled' : 'enabled'} on the customer kiosk.`);
+                            } catch (err) {
+                              showToast(err instanceof Error ? err.message : 'Could not update kiosk languages');
+                            }
+                          }}
+                        />
+                        {opt.label}
+                      </label>
+                    );
+                  })}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Default Language</label>
+                    <select
+                      value={KioskDisplaySettingsRepository.getSettings().defaultLanguage}
+                      onChange={(e) => {
+                        try {
+                          KioskDisplaySettingsRepository.updateSettings({ defaultLanguage: e.target.value as any });
+                          showToast(`Default kiosk language set to ${e.target.value}`);
+                        } catch (err) {
+                          showToast(err instanceof Error ? err.message : 'Could not update default language');
+                        }
+                      }}
+                      className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                    >
+                      {KioskDisplaySettingsRepository.getSettings().enabledLanguages.map((l) => (
+                        <option key={l} value={l}>{l === 'en' ? 'English' : l === 'hi' ? 'हिन्दी (Hindi)' : 'ગુજરાતી (Gujarati)'}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Idle Warning After (seconds)</label>
+                    <input
+                      type="number"
+                      min={5}
+                      value={KioskDisplaySettingsRepository.getSettings().idleWarningAfterSeconds}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (!Number.isFinite(val) || val < 5) return;
+                        KioskDisplaySettingsRepository.updateSettings({ idleWarningAfterSeconds: val });
+                      }}
+                      className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Welcome Screen Content — the customer kiosk's first screen
+                  used to hardcode its heading/subtitle/button copy and
+                  always show the heritage corner artwork with no way to
+                  turn any of it off; now a real config surface the kiosk
+                  reads live via WelcomeScreenSettingsRepository. */}
+              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+                <div>
+                  <h4 className="font-bold text-[#0B253A]">Welcome Screen Content</h4>
+                  <p className="text-xs text-[#4A5568]">Customize the first screen customers see. Leave a field blank to use the default translated text.</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Heading</label>
+                    <input
+                      type="text"
+                      placeholder="Welcome to JAMANVAAR"
+                      defaultValue={WelcomeScreenSettingsRepository.getSettings().headingText || ''}
+                      onBlur={(e) => WelcomeScreenSettingsRepository.updateSettings({ headingText: e.target.value || undefined })}
+                      className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Subtitle</label>
+                    <input
+                      type="text"
+                      placeholder="Authentic Flavors, Seamless Dining"
+                      defaultValue={WelcomeScreenSettingsRepository.getSettings().subtitleText || ''}
+                      onBlur={(e) => WelcomeScreenSettingsRepository.updateSettings({ subtitleText: e.target.value || undefined })}
+                      className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Start Order Button Text</label>
+                    <input
+                      type="text"
+                      placeholder="Start Order"
+                      defaultValue={WelcomeScreenSettingsRepository.getSettings().startOrderButtonText || ''}
+                      onBlur={(e) => WelcomeScreenSettingsRepository.updateSettings({ startOrderButtonText: e.target.value || undefined })}
+                      className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Supporting Text</label>
+                    <input
+                      type="text"
+                      placeholder="Tap to begin your order"
+                      defaultValue={WelcomeScreenSettingsRepository.getSettings().supportingText || ''}
+                      onBlur={(e) => WelcomeScreenSettingsRepository.updateSettings({ supportingText: e.target.value || undefined })}
+                      className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="welcome-heritage-artwork"
+                    checked={WelcomeScreenSettingsRepository.getSettings().showHeritageArtwork}
+                    onChange={(e) => {
+                      WelcomeScreenSettingsRepository.updateSettings({ showHeritageArtwork: e.target.checked });
+                      showToast(`Heritage corner artwork ${e.target.checked ? 'enabled' : 'disabled'} on the welcome screen.`);
+                    }}
+                  />
+                  <label htmlFor="welcome-heritage-artwork" className="text-xs font-bold text-[#0B253A]">
+                    Show Indian heritage corner artwork
+                  </label>
+                </div>
+
+                <div className="pt-2 border-t border-[#F3EFE6] space-y-3">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="welcome-promo-banner"
+                      checked={WelcomeScreenSettingsRepository.getSettings().showPromoBanner}
+                      onChange={(e) => {
+                        WelcomeScreenSettingsRepository.updateSettings({ showPromoBanner: e.target.checked });
+                        showToast(`Welcome screen promo banner ${e.target.checked ? 'enabled' : 'disabled'}.`);
+                      }}
+                    />
+                    <label htmlFor="welcome-promo-banner" className="text-xs font-bold text-[#0B253A]">
+                      Show a promotional banner on the welcome screen (off by default)
+                    </label>
+                  </div>
+                  {WelcomeScreenSettingsRepository.getSettings().showPromoBanner && (
+                    <input
+                      type="text"
+                      placeholder="e.g. Festive Thali Special — This Week Only"
+                      defaultValue={WelcomeScreenSettingsRepository.getSettings().promoBannerText || ''}
+                      onBlur={(e) => WelcomeScreenSettingsRepository.updateSettings({ promoBannerText: e.target.value || undefined })}
+                      className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                    />
+                  )}
+                </div>
               </div>
 
               <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-6">

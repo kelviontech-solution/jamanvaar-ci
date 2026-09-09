@@ -122,6 +122,7 @@ model Restaurant {
   offlineExtensions   OfflineExtension[]
   sandboxes           RestaurantSandbox[]
   restoreJobs         BackupRestoreJob[]
+  applicationEntitlements ApplicationEntitlement[]
 }
 
 enum BranchStatus {
@@ -265,15 +266,59 @@ model Subscription {
 
   activationKeys ActivationKey[]
   invoices       Invoice[]
+  applicationEntitlements ApplicationEntitlement[]
 
+  @@index([restaurantId])
+}
+
+// ---------------------------------------------------------------------------
+// Per-application provisioning. This is the reusable entitlement layer every
+// client app (POS, POS Admin, Captain, KDS, Kiosk, Kiosk Admin) is gated
+// against — one row per (subscription, appCode), rather than duplicating
+// "is this app enabled" logic per application the way Plan.entitlements'
+// flat boolean bag used to (and still does, for legacy/display purposes;
+// this table is the actual source of truth going forward). restaurantId is
+// denormalized here the same way ActivationKey does it, so the standard
+// tenant_isolation RLS policy shape (restaurantId-keyed) applies unchanged.
+// ---------------------------------------------------------------------------
+enum AppCode {
+  POS
+  POS_ADMIN
+  CAPTAIN
+  KDS
+  KIOSK
+  KIOSK_ADMIN
+}
+
+model ApplicationEntitlement {
+  id             String       @id @default(uuid())
+  restaurantId   String
+  restaurant     Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  appCode        AppCode
+  enabled        Boolean      @default(true)
+  // Null means "inherit the plan's overall maxDevices" rather than a
+  // per-app cap — most restaurants never need to override this.
+  deviceQuota    Int?
+  // Per-app configuration that doesn't belong on Restaurant/Branch: e.g.
+  // { "menuSource": "MAIN_MENU", "paymentMode": "COUNTER_ONLY" } for Kiosk.
+  // Optional and schemaless on purpose — each app defines its own shape.
+  config         Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([subscriptionId, appCode])
   @@index([restaurantId])
 }
 
 enum ActivationKeyDeviceType {
   POS
+  POS_ADMIN
   CAPTAIN
   KDS
   KIOSK
+  KIOSK_ADMIN
   ANY
 }
 
@@ -308,6 +353,7 @@ enum DeviceType {
   KDS
   KIOSK
   POS_ADMIN
+  KIOSK_ADMIN
 }
 
 enum DeviceStatus {
