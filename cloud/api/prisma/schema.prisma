@@ -123,6 +123,12 @@ model Restaurant {
   sandboxes           RestaurantSandbox[]
   restoreJobs         BackupRestoreJob[]
   applicationEntitlements ApplicationEntitlement[]
+  orders                  Order[]
+  paymentTransactions     PaymentTransaction[]
+  paymentConnection       RestaurantPaymentConnection?
+  refunds                 Refund[]
+  webhookEvents           WebhookEvent[]
+  menuSnapshotItems       MenuSnapshotItem[]
 }
 
 enum BranchStatus {
@@ -399,6 +405,7 @@ model Device {
   syncEventLogs    SyncEventLog[]
   syncConflicts    SyncConflict[]
   offlineExtensions OfflineExtension[]
+  orders           Order[]
 
   @@index([restaurantId])
   @@index([branchId])
@@ -864,6 +871,222 @@ model BackupRestoreJob {
 
   @@index([restaurantId])
   @@index([backupId])
+}
+
+// ---------------------------------------------------------------------------
+// Cashfree Payment Gateway — Phase 1 (see docs/superpowers/specs/2026-09-09-
+// cashfree-payment-phase1-design.md). Distinct model/enum names from the
+// existing Payment/PaymentMethod/PaymentStatus above, which are platform
+// subscription billing, not customer-order payments.
+// ---------------------------------------------------------------------------
+
+enum PaymentProvider {
+  CASHFREE
+}
+
+// Only PLATFORM_POOLED (Cashfree Easy Split, one JAMANVAAR-owned account) is
+// implemented in Phase 1. A true per-restaurant merchant-account mode would
+// be added later via `ALTER TYPE ... ADD VALUE`, the same way AppCode and
+// ActivationKeyDeviceType were extended in the application-entitlements
+// migration — it requires Cashfree Partner/Platform approval JAMANVAAR does
+// not have yet.
+enum PaymentConnectionType {
+  PLATFORM_POOLED
+}
+
+enum PaymentConnectionStatus {
+  NOT_CONNECTED
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+  DISCONNECTED
+}
+
+enum OrderPaymentStatus {
+  DRAFT
+  PENDING_PAYMENT
+  PAYMENT_PROCESSING
+  PAID
+  SENT_TO_POS
+  PAYMENT_FAILED
+  CANCELLED
+}
+
+enum PaymentTransactionStatus {
+  CREATED
+  PENDING
+  AUTHORIZED
+  SUCCESS
+  FAILED
+  USER_DROPPED
+  CANCELLED
+  REFUND_PENDING
+  PARTIALLY_REFUNDED
+  REFUNDED
+}
+
+enum PaymentTransactionMethod {
+  UPI
+  CARD
+  NET_BANKING
+  WALLET
+  OTHER
+}
+
+enum RefundStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum WebhookProcessingStatus {
+  RECEIVED
+  VERIFIED
+  PROCESSED
+  FAILED
+  IGNORED_DUPLICATE
+}
+
+// The trusted, backend-queryable copy of what a restaurant actually sells —
+// pushed by Kiosk Admin (which already has a live device connection)
+// whenever its local menu changes. Order totals are validated against this,
+// never against prices the kiosk sends at checkout time.
+model MenuSnapshotItem {
+  id             String     @id @default(uuid())
+  restaurantId   String
+  restaurant     Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  externalItemId String // the kiosk's own local item id
+  name           String
+  category       String?
+  basePrice      Int // paise
+  modifierGroups Json? // [{ id, name, isRequired, minSelections, maxSelections, options: [{ id, name, priceDelta }] }]
+  taxRate        Int        @default(0) // basis points, e.g. 500 = 5.00%
+  isAvailable    Boolean    @default(true)
+  syncedAt       DateTime   @default(now())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@unique([restaurantId, externalItemId])
+  @@index([restaurantId])
+}
+
+// Cloud order record — does not exist elsewhere; kiosks are offline-first
+// and never had a cloud order model before this. items is an immutable
+// snapshot captured at creation time from MenuSnapshotItem.
+model Order {
+  id              String             @id @default(uuid())
+  restaurantId    String
+  restaurant      Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  kioskId         String?
+  kiosk           Device?            @relation(fields: [kioskId], references: [id], onDelete: SetNull)
+  externalOrderId String // correlates to the kiosk's local order id; doubles as the idempotency key
+  items           Json // [{ externalItemId, name, quantity, unitPrice, modifiers, lineTotal }]
+  subtotal        Int // paise
+  taxAmount       Int // paise
+  discountAmount  Int                @default(0) // paise
+  totalAmount     Int // paise
+  currency        String             @default("INR")
+  status          OrderPaymentStatus @default(DRAFT)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  paymentTransactions PaymentTransaction[]
+
+  @@unique([restaurantId, externalOrderId])
+  @@index([restaurantId])
+  @@index([kioskId])
+}
+
+model PaymentTransaction {
+  id                String                    @id @default(uuid())
+  orderId           String
+  order             Order                     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  restaurantId      String
+  restaurant        Restaurant                @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  provider          PaymentProvider           @default(CASHFREE)
+  providerOrderId   String // the order_id we generate and send to Cashfree
+  providerPaymentId String? // Cashfree's cf_payment_id, known once paid/failed
+  amount            Int // paise
+  currency          String                    @default("INR")
+  status            PaymentTransactionStatus  @default(CREATED)
+  method            PaymentTransactionMethod?
+  paymentSessionId  String?
+  providerResponse  Json? // sanitized webhook/API response, no secrets
+  failureReason     String?
+  paidAt            DateTime?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  refunds Refund[]
+
+  @@unique([provider, providerOrderId])
+  @@index([restaurantId])
+  @@index([orderId])
+  @@index([providerPaymentId])
+}
+
+// One per restaurant. Represents the Cashfree Easy Split vendor
+// registration for Phase 1 (PLATFORM_POOLED) — settlement bank/UPI details,
+// not independent API credentials.
+model RestaurantPaymentConnection {
+  id                                String                  @id @default(uuid())
+  restaurantId                      String                  @unique
+  restaurant                        Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  provider                          PaymentProvider         @default(CASHFREE)
+  connectionType                    PaymentConnectionType   @default(PLATFORM_POOLED)
+  cashfreeVendorId                  String?
+  status                            PaymentConnectionStatus @default(NOT_CONNECTED)
+  settlementAccountName             String?
+  settlementAccountNumberEncrypted  String? // encrypted via credential-encryption.util
+  settlementIfsc                    String?
+  settlementUpiVpa                  String?
+  verifiedAt                        DateTime?
+  lastWebhookAt                     DateTime?
+  lastPaymentAt                     DateTime?
+  createdAt                         DateTime                @default(now())
+  updatedAt                         DateTime                @updatedAt
+}
+
+// Schema only in Phase 1 — no refund endpoint yet, so a later phase doesn't
+// need its own migration.
+model Refund {
+  id               String        @id @default(uuid())
+  paymentId        String
+  payment          PaymentTransaction @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  restaurantId     String
+  restaurant       Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  providerRefundId String?
+  amount           Int // paise
+  reason           String?
+  status           RefundStatus  @default(PENDING)
+  requestedBy      String?
+  processedAt      DateTime?
+  createdAt        DateTime      @default(now())
+
+  @@index([restaurantId])
+  @@index([paymentId])
+}
+
+// Every inbound webhook is stored raw before any processing, for idempotency
+// and audit. restaurantId is nullable — unknown until the payload is parsed
+// and matched to a PaymentTransaction — and backfilled once resolved.
+model WebhookEvent {
+  id               String                  @id @default(uuid())
+  restaurantId     String?
+  restaurant       Restaurant?             @relation(fields: [restaurantId], references: [id], onDelete: SetNull)
+  provider         PaymentProvider         @default(CASHFREE)
+  providerEventKey String // derived dedup key, e.g. `${type}:${cf_payment_id}` — Cashfree's payload carries no separate event id
+  eventType        String
+  rawPayload       Json
+  signatureValid   Boolean
+  processingStatus WebhookProcessingStatus @default(RECEIVED)
+  processedAt      DateTime?
+  retryCount       Int                     @default(0)
+  errorMessage     String?
+  createdAt        DateTime                @default(now())
+
+  @@unique([provider, providerEventKey])
+  @@index([restaurantId])
 }
 
 
