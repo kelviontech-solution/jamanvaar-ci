@@ -138,4 +138,47 @@ describe('Payment order creation', () => {
     expect(res.status).toBe(201);
     expect(res.body.amount).toBe(54600);
   });
+
+  it('returns the correct status shape for the owning kiosk', async () => {
+    const create = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: 'local-order-6', lines: validLines });
+    const res = await authed('get', `/api/v1/payments/${create.body.paymentId}/status`, kioskToken);
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({
+      paymentId: create.body.paymentId,
+      orderId: create.body.orderId,
+      status: 'PENDING',
+      amount: 54600,
+      currency: 'INR',
+      orderStatus: 'PENDING_PAYMENT'
+    });
+  });
+
+  it('a device from another restaurant cannot read this payment status', async () => {
+    const otherOwnerEmail = `pay-orders-other-owner-${Date.now()}@test.example.com`;
+    const otherRes = await authed('post', '/api/v1/restaurants', platformToken).send({
+      name: `TEST Other Pay Orders Restaurant ${Date.now()}`,
+      ownerName: 'Other Owner',
+      ownerEmail: otherOwnerEmail
+    });
+    const otherRestaurantId = otherRes.body.restaurant.id;
+    await authed('post', '/api/v1/subscriptions', platformToken).send({
+      restaurantId: otherRestaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    });
+    const otherKeyRes = await authed('post', '/api/v1/activation-keys', platformToken).send({
+      restaurantId: otherRestaurantId, allowedDeviceType: 'KIOSK', expiresAt: new Date(Date.now() + 86400000).toISOString()
+    });
+    const otherRedeemRes = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: otherKeyRes.body.code, deviceType: 'KIOSK' });
+    const otherKioskToken = otherRedeemRes.body.deviceToken;
+
+    const create = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: 'local-order-7', lines: validLines });
+    const res = await authed('get', `/api/v1/payments/${create.body.paymentId}/status`, otherKioskToken);
+    expect(res.status).toBe(404);
+
+    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: otherRestaurantId } }));
+  });
+
+  it('an unknown paymentId returns 404', async () => {
+    const res = await authed('get', '/api/v1/payments/00000000-0000-0000-0000-000000000000/status', kioskToken);
+    expect(res.status).toBe(404);
+  });
 });
