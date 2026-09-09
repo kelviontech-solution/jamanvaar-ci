@@ -119,4 +119,138 @@ export class PaymentsService {
     if (!payment) throw new NotFoundException('Payment not found');
     return { paymentId: payment.id, orderId: payment.orderId, status: payment.status, amount: payment.amount, currency: payment.currency, orderStatus: payment.order.status };
   }
+
+  async processCashfreeWebhook(rawBody: Buffer, signature: string | undefined, timestamp: string | undefined): Promise<void> {
+    const signatureValid = Boolean(signature && timestamp && this.cashfree.verifyWebhookSignature(rawBody, timestamp, signature));
+
+    if (!signatureValid) {
+      await this.prisma.runAsPlatform((tx) =>
+        tx.webhookEvent.create({
+          data: {
+            provider: 'CASHFREE',
+            providerEventKey: `INVALID:${randomUUID()}`,
+            eventType: 'UNKNOWN',
+            rawPayload: this.safeParseJson(rawBody),
+            signatureValid: false,
+            processingStatus: 'FAILED',
+            errorMessage: 'Invalid or missing webhook signature'
+          }
+        })
+      );
+      return;
+    }
+
+    const payload = JSON.parse(rawBody.toString('utf8'));
+    const eventType: string = payload.type;
+    const cfPaymentId: string | undefined = payload.data?.payment?.cf_payment_id;
+    const providerOrderId: string | undefined = payload.data?.order?.order_id;
+    const providerEventKey = `${eventType}:${cfPaymentId ?? providerOrderId ?? randomUUID()}`;
+
+    const existing = await this.prisma.runAsPlatform((tx) =>
+      tx.webhookEvent.findUnique({ where: { provider_providerEventKey: { provider: 'CASHFREE', providerEventKey } } })
+    );
+    if (existing && existing.processingStatus !== 'FAILED') {
+      // A prior delivery under this derived key already completed (successfully
+      // processed, or deliberately skipped as irrelevant/already-terminal) — this
+      // is a genuine duplicate delivery, not a retry of a failed attempt.
+      await this.prisma.runAsPlatform((tx) =>
+        tx.webhookEvent.update({ where: { id: existing.id }, data: { retryCount: { increment: 1 }, processingStatus: 'IGNORED_DUPLICATE' } })
+      );
+      return;
+    }
+
+    // Either no WebhookEvent exists yet for this key, or the only one we have
+    // FAILED (e.g. an earlier delivery under the same cf_payment_id carried a bad
+    // or missing amount). The (provider, providerEventKey) unique constraint means
+    // a failed row can't simply be superseded by a new one, so it is reused here —
+    // otherwise a corrected/legitimate retry would be silently swallowed forever as
+    // an "IGNORED_DUPLICATE" of its own earlier failure, permanently blocking a real
+    // payment from ever reaching SUCCESS.
+    const webhookEvent = existing
+      ? await this.prisma.runAsPlatform((tx) =>
+          tx.webhookEvent.update({
+            where: { id: existing.id },
+            data: { rawPayload: payload, signatureValid: true, processingStatus: 'VERIFIED', errorMessage: null, retryCount: { increment: 1 } }
+          })
+        )
+      : await this.prisma.runAsPlatform((tx) =>
+          tx.webhookEvent.create({
+            data: { provider: 'CASHFREE', providerEventKey, eventType, rawPayload: payload, signatureValid: true, processingStatus: 'VERIFIED' }
+          })
+        );
+
+    if (!providerOrderId) {
+      await this.markWebhookFailed(webhookEvent.id, 'Missing order_id in webhook payload');
+      return;
+    }
+
+    const payment = await this.prisma.runAsPlatform((tx) =>
+      tx.paymentTransaction.findUnique({ where: { provider_providerOrderId: { provider: 'CASHFREE', providerOrderId } } })
+    );
+    if (!payment) {
+      await this.markWebhookFailed(webhookEvent.id, `No PaymentTransaction found for providerOrderId ${providerOrderId}`);
+      return;
+    }
+
+    await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id: webhookEvent.id }, data: { restaurantId: payment.restaurantId } }));
+
+    const RELEVANT_TYPES = ['PAYMENT_SUCCESS_WEBHOOK', 'PAYMENT_FAILED_WEBHOOK', 'PAYMENT_USER_DROPPED_WEBHOOK'];
+    if (!RELEVANT_TYPES.includes(eventType)) {
+      await this.markWebhookProcessed(webhookEvent.id);
+      return;
+    }
+
+    const orderAmountRupees = payload.data?.order?.order_amount;
+    const orderCurrency = payload.data?.order?.order_currency;
+    const receivedAmountPaise = typeof orderAmountRupees === 'number' ? Math.round(orderAmountRupees * 100) : null;
+
+    if (receivedAmountPaise === null || receivedAmountPaise !== payment.amount || orderCurrency !== payment.currency) {
+      await this.markWebhookFailed(webhookEvent.id, `Amount/currency mismatch: expected ${payment.amount} ${payment.currency}, got ${receivedAmountPaise} ${orderCurrency}`);
+      return;
+    }
+
+    const TERMINAL_STATUSES = ['SUCCESS', 'REFUNDED', 'PARTIALLY_REFUNDED'];
+    if (TERMINAL_STATUSES.includes(payment.status)) {
+      await this.markWebhookProcessed(webhookEvent.id);
+      return;
+    }
+
+    const newStatus = eventType === 'PAYMENT_SUCCESS_WEBHOOK' ? 'SUCCESS' : eventType === 'PAYMENT_USER_DROPPED_WEBHOOK' ? 'USER_DROPPED' : 'FAILED';
+
+    await this.prisma.runAsTenant(payment.restaurantId, async (tx) => {
+      await tx.paymentTransaction.update({
+        where: { id: payment.id },
+        data: {
+          status: newStatus,
+          providerPaymentId: cfPaymentId,
+          providerResponse: payload as unknown as Prisma.InputJsonValue,
+          failureReason: newStatus === 'SUCCESS' ? null : (payload.data?.payment?.payment_message ?? null),
+          paidAt: newStatus === 'SUCCESS' ? new Date() : null
+        }
+      });
+      await tx.order.update({ where: { id: payment.orderId }, data: { status: newStatus === 'SUCCESS' ? 'PAID' : 'PAYMENT_FAILED' } });
+      await tx.restaurantPaymentConnection.updateMany({
+        where: { restaurantId: payment.restaurantId },
+        data: { lastWebhookAt: new Date(), ...(newStatus === 'SUCCESS' ? { lastPaymentAt: new Date() } : {}) }
+      });
+    });
+
+    await this.markWebhookProcessed(webhookEvent.id);
+  }
+
+  private async markWebhookProcessed(id: string): Promise<void> {
+    await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id }, data: { processingStatus: 'PROCESSED', processedAt: new Date() } }));
+  }
+
+  private async markWebhookFailed(id: string, errorMessage: string): Promise<void> {
+    await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id }, data: { processingStatus: 'FAILED', errorMessage, processedAt: new Date() } }));
+  }
+
+  private safeParseJson(rawBody: Buffer): Prisma.InputJsonValue {
+    try {
+      return JSON.parse(rawBody.toString('utf8'));
+    } catch {
+      return { unparsable: true };
+    }
+  }
 }
