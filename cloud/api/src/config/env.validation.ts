@@ -25,7 +25,25 @@ const envSchema = z.object({
   BACKUP_S3_BUCKET: z.string().optional(),
   BACKUP_S3_ACCESS_KEY_ID: z.string().optional(),
   BACKUP_S3_SECRET_ACCESS_KEY: z.string().optional(),
-  BACKUP_S3_FORCE_PATH_STYLE: z.enum(['true', 'false']).optional()
+  BACKUP_S3_FORCE_PATH_STYLE: z.enum(['true', 'false']).optional(),
+  // Optional: Cashfree Payment Gateway (see modules/payments). Degrades to a
+  // clear 503 on any payment operation when unset, rather than silently
+  // pretending a payment gateway is configured.
+  CASHFREE_CLIENT_ID: z.string().optional(),
+  CASHFREE_CLIENT_SECRET: z.string().optional(),
+  CASHFREE_ENVIRONMENT: z.enum(['sandbox', 'production']).default('sandbox'),
+  CASHFREE_API_VERSION: z.string().default('2025-01-01'),
+  // Cashfree signs webhooks with your account secret key
+  // (https://www.cashfree.com/docs/api-reference/vrs/webhook-signature-verification).
+  // Stored as its own var (rather than reusing CASHFREE_CLIENT_SECRET) so it
+  // can be rotated independently if Cashfree issues a dedicated webhook
+  // signing secret later — today, set it to the same value as
+  // CASHFREE_CLIENT_SECRET.
+  CASHFREE_WEBHOOK_SECRET: z.string().optional(),
+  CASHFREE_WEBHOOK_NOTIFY_URL: z.string().optional(),
+  // Optional: AES-256-GCM key (32 bytes, base64) for encrypting
+  // RestaurantPaymentConnection settlement bank details at rest.
+  PAYMENT_CREDENTIAL_ENCRYPTION_KEY: z.string().optional()
 });
 
 export type ValidatedEnv = z.infer<typeof envSchema>;
