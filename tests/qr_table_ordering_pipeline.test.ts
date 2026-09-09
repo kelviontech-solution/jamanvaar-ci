@@ -252,6 +252,85 @@ describe('JAMANVAAR QR Table Ordering System End-to-End Pipeline', () => {
       // Restore availability
       dish.isAvailable = originalAvail;
     });
+
+    it('Milestone Test: Create Table 12 -> Generate QR -> Scan QR -> Order Royal Veg Handi -> Order appears in POS -> KDS receives KOT -> Restaurant accepts -> Guest sees "Preparing"', () => {
+      // 1. Create or ensure Table 12
+      let tbl12 = db.tables.find((t) => t.tableNumber === '12');
+      if (!tbl12) {
+        tbl12 = QrOrderingRepository.addTable({ tableNumber: '12', zone: 'Dining area', capacity: 4 });
+      }
+      expect(tbl12).toBeDefined();
+
+      // 2. Generate QR
+      const qrData = QrOrderingRepository.generateTableQr('12');
+      expect(qrData.qrToken).toBeDefined();
+      expect(qrData.tableNumber).toBe('12');
+
+      // 3. Scan QR - verification
+      const verifyResult = QrOrderingRepository.verifyQrToken('12', qrData.qrToken);
+      expect(verifyResult.isValid).toBe(true);
+      expect(verifyResult.table?.tableNumber).toBe('12');
+
+      // 4. Ensure "Royal Veg Handi" (or main vegetarian curry dish) exists in canonical menu
+      let handiDish = db.menuItems.find((m) => m.name.toLowerCase().includes('handi') || m.name.toLowerCase().includes('veg'));
+      if (!handiDish) {
+        handiDish = db.menuItems[0];
+      }
+      expect(handiDish).toBeDefined();
+      handiDish.isAvailable = true;
+
+      // 5. Order Royal Veg Handi from Table 12 with valid QR token
+      const initialPosOrderCount = db.orders.length;
+      const initialKdsKotCount = db.kots.length;
+
+      const order = QrOrderingRepository.createCustomerQrOrder({
+        tableNumber: '12',
+        token: qrData.qrToken,
+        items: [
+          {
+            menuItemId: handiDish.id,
+            quantity: 1,
+            specialInstructions: 'Less oil, spicy'
+          }
+        ],
+        customerName: 'Aarav (Table 12)',
+        paymentMethod: 'UPI'
+      });
+
+      // 6. Order appears in shared order engine for POS
+      expect(db.orders.length).toBe(initialPosOrderCount + 1);
+      expect(order.source_type).toBe('QR_TABLE');
+      expect(order.orderType).toBe('QR_TABLE');
+      expect(order.tableNumber).toBe('12');
+      expect(order.items[0].menuItemId).toBe(handiDish.id);
+      expect(order.orderStatus).toBe('NEW');
+
+      // 7. KDS receives KOT ticket for table 12
+      expect(db.kots.length).toBeGreaterThan(initialKdsKotCount);
+      const kotsForOrder = db.kots.filter((k) => k.orderId === order.id);
+      expect(kotsForOrder.length).toBeGreaterThanOrEqual(1);
+      expect(kotsForOrder[0].tableNumber).toBe('12');
+      expect(kotsForOrder[0].items[0].name).toBe(handiDish.name);
+
+      // 8. Restaurant accepts order -> updates status to PREPARING
+      const acceptedOrder = QrOrderingRepository.updateOrderStatus(order.id, 'PREPARING', 'Kitchen Station Cook');
+      expect(acceptedOrder?.orderStatus).toBe('PREPARING');
+
+      // 9. Guest sees "Preparing"
+      const guestCheckedOrder = db.orders.find((o) => o.id === order.id);
+      expect(guestCheckedOrder?.orderStatus).toBe('PREPARING');
+
+      // 10. Advance to READY -> SERVED -> COMPLETED
+      const readyOrder = QrOrderingRepository.updateOrderStatus(order.id, 'READY', 'Kitchen Station Cook');
+      expect(readyOrder?.orderStatus).toBe('READY');
+
+      const servedOrder = QrOrderingRepository.updateOrderStatus(order.id, 'SERVED', 'Server Rohan');
+      expect(servedOrder?.orderStatus).toBe('SERVED');
+
+      const settledOrder = QrOrderingRepository.updateOrderStatus(order.id, 'COMPLETED', 'POS Cashier');
+      expect(settledOrder?.orderStatus).toBe('COMPLETED');
+      expect(settledOrder?.paymentStatus).toBe('SUCCESS');
+    });
   });
 
   describe('5. Super Admin 7K Plan Allotment & Entitlement Guardrails', () => {

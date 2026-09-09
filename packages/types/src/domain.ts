@@ -794,6 +794,40 @@ export interface PlanEntitlements {
   qrTableOrdering?: boolean;
 }
 
+/**
+ * Operational QR-ordering controls owned by the PLATFORM (Super Admin), not by
+ * the restaurant. The plan entitlement (`PlanEntitlements.qrTableOrdering`)
+ * decides whether the restaurant is *sold* QR ordering; this decides whether
+ * the platform is currently *allowing* it and within what limits.
+ *
+ * A restaurant admin must never be able to widen these — they arrive only from
+ * a verified cloud sync (see LicenseRepository.applyPlatformQrControl) and the
+ * guest ordering path enforces them on every scan.
+ */
+export interface PlatformQrControl {
+  /** Platform kill-switch. False blocks every guest scan regardless of plan. */
+  qrOrderingEnabled: boolean;
+  /** Hard ceiling on simultaneously QR-active tables. */
+  maxActiveTables: number;
+  /** Null means the platform sets no daily order ceiling. */
+  maxOrdersPerDay: number | null;
+  digitalMenu: boolean;
+  guestCustomization: boolean;
+  liveOrderTracking: boolean;
+  qrAnalytics: boolean;
+  onlinePayments: boolean;
+  /** When this control block was last received from the platform. */
+  syncedAt: string;
+}
+
+/** Real QR usage measured from this restaurant's own order data. */
+export interface QrUsageSnapshot {
+  activeTables: number;
+  ordersToday: number;
+  revenueToday: number;
+  reportedAt: string;
+}
+
 export interface LicenseInfo {
   planName: string;
   tier: PlanTier;
@@ -813,6 +847,12 @@ export interface LicenseInfo {
   /** Set only when this license was written via a cryptographically verified path (ENT-001 fix) — absent for test/legacy-set data. */
   verifiedAt?: string;
   verificationSource?: 'cloud-sync' | 'offline-certificate';
+  /**
+   * Platform-owned QR controls. Absent means the platform has never pushed a
+   * control block, in which case the plan entitlement alone governs and no
+   * extra platform restriction applies.
+   */
+  platformQrControl?: PlatformQrControl;
 }
 
 export interface ComboDeal {

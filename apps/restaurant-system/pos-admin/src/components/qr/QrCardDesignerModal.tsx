@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { DiningTable } from '@jamanvaar/types';
 import { db, QrOrderingRepository } from '@jamanvaar/database';
 import { generateQrSvg, generateQrDataUrl } from '@jamanvaar/utils';
@@ -8,13 +8,8 @@ import {
   Copy,
   Check,
   X,
-  Sparkles,
   QrCode,
-  Layers,
-  Palette,
-  Eye,
-  Sliders,
-  Smartphone,
+  AlertCircle,
   ExternalLink
 } from 'lucide-react';
 
@@ -23,6 +18,8 @@ interface QrCardDesignerModalProps {
   onClose: () => void;
   selectedTable?: DiningTable | null;
   initialBatchMode?: boolean;
+  /** Table numbers pre-selected in the Tables & QR grid, carried into the batch sheet. */
+  initialBatchTableNumbers?: string[];
 }
 
 export type QrTemplateType = 'SIGNATURE' | 'ELEGANT' | 'MODERN' | 'MINIMAL' | 'PREMIUM';
@@ -31,47 +28,56 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
   isOpen,
   onClose,
   selectedTable,
-  initialBatchMode = false
+  initialBatchMode = false,
+  initialBatchTableNumbers
 }) => {
   const [activeTemplate, setActiveTemplate] = useState<QrTemplateType>('SIGNATURE');
-  const [tableNumber, setTableNumber] = useState<string>(selectedTable?.tableNumber || '12');
+  const [tableNumber, setTableNumber] = useState<string>(selectedTable?.tableNumber || '');
   const [isBatchMode, setIsBatchMode] = useState<boolean>(initialBatchMode);
-  const [selectedBatchTables, setSelectedBatchTables] = useState<string[]>([]);
+  const [selectedBatchTables, setSelectedBatchTables] = useState<string[]>(initialBatchTableNumbers || []);
   const [copied, setCopied] = useState<boolean>(false);
+  const [tick, setTick] = useState<number>(0);
+
+  useEffect(() => {
+    const unsub = db.subscribe(() => setTick((t) => t + 1));
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setIsBatchMode(initialBatchMode);
+    setSelectedBatchTables(initialBatchTableNumbers || []);
+    if (selectedTable?.tableNumber) {
+      setTableNumber(selectedTable.tableNumber);
+    }
+  }, [selectedTable, isOpen, initialBatchMode, initialBatchTableNumbers]);
 
   const tables = db.tables;
-  const currentTable = tables.find((t) => t.tableNumber === tableNumber) || tables[0] || {
-    tableNumber: '12',
-    zone: 'AC Balcony',
-    capacity: 4
-  };
+  const currentTable: DiningTable | undefined = useMemo(() => {
+    return tables.find((t) => t.tableNumber === tableNumber) || tables[0];
+  }, [tables, tableNumber, tick]);
 
-  const restaurant = db.restaurant || { name: 'JAMANVAAR RESTAURANT', city: 'Ahmedabad' };
   const outlet = db.outlet || { name: 'Ahmedabad Flagship Store' };
 
-  // Host origin for deterministic public QR link
+  // Host origin for the public QR link
   const hostUrl = typeof window !== 'undefined' && window.location?.origin
     ? window.location.origin
-    : 'https://jamanvaar.menu';
+    : 'http://localhost:5176';
 
-  const getTableQrUrl = (tbl: DiningTable) => {
-    const token = tbl.qrToken || `jv_qr_${db.restaurant?.id || 'rest'}_${db.outlet?.id || 'br'}_tbl_${tbl.tableNumber}`;
-    return `${hostUrl}/?qrTable=${tbl.tableNumber}&token=${token}`;
+  /**
+   * Read-only during render. Issuing a token is a db mutation (db.notify()), so it must
+   * never happen inside the render path - tables missing a token render a clear
+   * "not issued yet" state and are fixed from the Tables & QR tab instead.
+   */
+  const getTableQrUrl = (tbl: DiningTable): string | null => {
+    if (!tbl.qrToken) return null;
+    return `${hostUrl}/?qrTable=${tbl.tableNumber}&token=${tbl.qrToken}`;
   };
 
-  const currentQrLink = getTableQrUrl(currentTable);
-
-  // SVG QR string for current table
-  const currentQrSvg = useMemo(() => {
-    return generateQrSvg(currentQrLink, {
-      color: activeTemplate === 'MINIMAL' ? '#000000' : '#0B253A',
-      backgroundColor: '#FFFFFF',
-      margin: 2,
-      size: 200
-    });
-  }, [currentQrLink, activeTemplate]);
+  const currentQrLink = currentTable ? getTableQrUrl(currentTable) : null;
 
   const handleCopyLink = () => {
+    if (!currentQrLink) return;
     navigator.clipboard.writeText(currentQrLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -81,8 +87,22 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
     window.print();
   };
 
-  const handleDownloadSvg = (tbl: DiningTable = currentTable) => {
-    const url = getTableQrUrl(tbl);
+  /** Issues QR tokens for any table in the sheet that has none, via the repository. */
+  const handleIssueMissingTokens = (targets: DiningTable[]) => {
+    const missing = targets.filter((t) => !t.qrToken);
+    if (missing.length === 0) return;
+    QrOrderingRepository.bulkGenerateQr(missing.map((t) => t.tableNumber));
+    setTick((t) => t + 1);
+  };
+
+  const handleDownloadSvg = (tbl?: DiningTable) => {
+    if (!tbl) return;
+    let url = getTableQrUrl(tbl);
+    if (!url) {
+      const generated = QrOrderingRepository.generateTableQr(tbl.tableNumber);
+      url = `${hostUrl}/?qrTable=${tbl.tableNumber}&token=${generated.qrToken}`;
+      setTick((t) => t + 1);
+    }
     const svgStr = generateQrSvg(url, {
       color: '#0B253A',
       backgroundColor: '#FFFFFF',
@@ -100,11 +120,15 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
 
   if (!isOpen) return null;
 
-  const batchPrintList = isBatchMode
+  const batchPrintList: DiningTable[] = isBatchMode
     ? selectedBatchTables.length > 0
       ? tables.filter((t) => selectedBatchTables.includes(t.tableNumber))
       : tables
-    : [currentTable];
+    : currentTable
+    ? [currentTable]
+    : [];
+
+  const tablesMissingTokens = batchPrintList.filter((t) => !t.qrToken);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-6 select-none animate-in fade-in duration-200">
@@ -199,11 +223,15 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                   onChange={(e) => setTableNumber(e.target.value)}
                   className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-black text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
                 >
-                  {tables.map((t) => (
-                    <option key={t.id} value={t.tableNumber}>
-                      Table {t.tableNumber} • {t.zone} ({t.capacity} Seats) {t.qrStatus === 'DISABLED' ? '• DISABLED' : ''}
-                    </option>
-                  ))}
+                  {tables.length === 0 ? (
+                    <option value="">No tables configured yet</option>
+                  ) : (
+                    tables.map((t) => (
+                      <option key={t.id} value={t.tableNumber}>
+                        Table {t.tableNumber} • {t.zone} ({t.capacity} Seats) {t.qrStatus === 'DISABLED' ? '• DISABLED' : ''}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
             ) : (
@@ -222,7 +250,9 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                     }}
                     className="text-[11px] font-bold text-[#E66817] hover:underline cursor-pointer"
                   >
-                    {selectedBatchTables.length === tables.length ? 'Deselect All' : 'Select All (12)'}
+                    {selectedBatchTables.length === tables.length && tables.length > 0
+                      ? 'Deselect All'
+                      : `Select All (${tables.length})`}
                   </button>
                 </div>
                 <div className="grid grid-cols-3 gap-1.5 max-h-40 overflow-y-auto p-1 bg-[#FAF7F2] rounded-xl border border-[#EBE6DD]">
@@ -289,6 +319,26 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
               </div>
             </div>
 
+            {/* Missing-token remediation, routed through the repository */}
+            {tablesMissingTokens.length > 0 && (
+              <div className="bg-amber-50 border border-amber-300 rounded-2xl p-3.5 space-y-2">
+                <div className="flex items-start gap-2 text-amber-900">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <p className="text-[11px] font-bold leading-snug">
+                    {tablesMissingTokens.length}{' '}
+                    {tablesMissingTokens.length === 1 ? 'table has' : 'tables have'} no QR token issued yet, so
+                    {tablesMissingTokens.length === 1 ? ' its standee' : ' their standees'} cannot be printed.
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleIssueMissingTokens(batchPrintList)}
+                  className="w-full py-2 rounded-xl bg-[#0B253A] hover:bg-[#123959] text-white text-xs font-black transition-colors cursor-pointer"
+                >
+                  Issue Secure QR {tablesMissingTokens.length === 1 ? 'Token' : 'Tokens'} Now
+                </button>
+              </div>
+            )}
+
             {/* Public Link & Copy */}
             <div className="bg-[#FAF7F2] p-3.5 rounded-2xl border border-[#EBE6DD] space-y-2 text-xs">
               <span className="text-[10px] font-black uppercase text-slate-400">Scannable Destination URL</span>
@@ -296,19 +346,22 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                 <input
                   type="text"
                   readOnly
-                  value={currentQrLink}
+                  value={currentQrLink || 'No QR token issued for this table yet'}
                   className="flex-1 bg-white border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 text-[11px] font-mono text-slate-600 truncate"
                 />
                 <button
                   onClick={handleCopyLink}
-                  className="p-1.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer"
+                  disabled={!currentQrLink}
+                  className="p-1.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Copy Guest Link"
                 >
                   {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
               <p className="text-[10px] text-slate-500">
-                Encodes table identity: Table {currentTable.tableNumber} ({currentTable.zone}).
+                {currentTable
+                  ? `Encodes table identity: Table ${currentTable.tableNumber} (${currentTable.zone}).`
+                  : 'Add a table in the Tables & QR tab to design a standee.'}
               </p>
             </div>
 
@@ -316,34 +369,45 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
             <div className="space-y-2 pt-2">
               <button
                 onClick={handlePrint}
-                className="w-full py-3 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-orange-500/25 transition-all cursor-pointer"
+                disabled={batchPrintList.length === 0 || tablesMissingTokens.length > 0}
+                className="w-full py-3 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-orange-500/25 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Printer className="w-4 h-4" />
                 <span>
                   {isBatchMode
-                    ? `Print ${batchPrintList.length} Standees Sheet`
-                    : `Print Table ${currentTable.tableNumber} Standee`}
+                    ? `Print ${batchPrintList.length} ${batchPrintList.length === 1 ? 'Standee' : 'Standees'} Sheet`
+                    : currentTable
+                    ? `Print Table ${currentTable.tableNumber} Standee`
+                    : 'No Table Selected'}
                 </span>
               </button>
 
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => handleDownloadSvg(currentTable)}
-                  className="py-2.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  disabled={!currentTable}
+                  className="py-2.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Download className="w-3.5 h-3.5 text-[#E66817]" />
                   <span>Download SVG</span>
                 </button>
 
-                <a
-                  href={currentQrLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="py-2.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 text-[#E66817]" />
-                  <span>Open URL</span>
-                </a>
+                {currentQrLink ? (
+                  <a
+                    href={currentQrLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-2.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-[#E66817]" />
+                    <span>Open URL</span>
+                  </a>
+                ) : (
+                  <span className="py-2.5 rounded-xl bg-slate-50 border border-[#EBE6DD] text-xs font-bold text-slate-400 flex items-center justify-center gap-1.5 text-center">
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Open URL</span>
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -351,15 +415,28 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
           {/* Right Live Standee Preview Area */}
           <div className="md:col-span-7 bg-[#EFEAE1] p-6 flex flex-col items-center justify-center overflow-y-auto min-h-[460px]">
             {/* Printable Container */}
+            {batchPrintList.length === 0 && (
+              <div className="text-center space-y-2 max-w-xs">
+                <QrCode className="w-10 h-10 text-slate-400 mx-auto stroke-1" />
+                <h4 className="text-sm font-black text-[#0B253A]">No tables to print</h4>
+                <p className="text-xs text-slate-500">
+                  Add restaurant tables in the Tables &amp; QR tab, then return here to design and print their
+                  standees.
+                </p>
+              </div>
+            )}
+
             <div id="printable-qr-standee-container" className="flex flex-wrap gap-6 justify-center items-center">
               {batchPrintList.map((tbl) => {
                 const qrUrl = getTableQrUrl(tbl);
-                const svgMarkup = generateQrSvg(qrUrl, {
-                  color: activeTemplate === 'MINIMAL' ? '#000000' : '#0B253A',
-                  backgroundColor: '#FFFFFF',
-                  margin: 2,
-                  size: 180
-                });
+                const svgMarkup = qrUrl
+                  ? generateQrSvg(qrUrl, {
+                      color: activeTemplate === 'MINIMAL' ? '#000000' : '#0B253A',
+                      backgroundColor: '#FFFFFF',
+                      margin: 2,
+                      size: 180
+                    })
+                  : null;
 
                 return (
                   <div
@@ -416,10 +493,19 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
 
                     {/* Real Scannable QR Code Frame */}
                     <div className="bg-white p-3.5 rounded-2xl border border-slate-300 shadow-md my-2">
-                      <div
-                        className="w-40 h-40 flex items-center justify-center"
-                        dangerouslySetInnerHTML={{ __html: svgMarkup }}
-                      />
+                      {svgMarkup ? (
+                        <div
+                          className="w-40 h-40 flex items-center justify-center"
+                          dangerouslySetInnerHTML={{ __html: svgMarkup }}
+                        />
+                      ) : (
+                        <div className="w-40 h-40 flex flex-col items-center justify-center gap-1.5 text-center text-slate-400 border-2 border-dashed border-slate-300 rounded-xl">
+                          <AlertCircle className="w-6 h-6" />
+                          <span className="text-[10px] font-black leading-tight px-2">
+                            QR token not issued for this table
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Instruction Callout */}

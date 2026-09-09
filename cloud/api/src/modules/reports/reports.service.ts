@@ -198,7 +198,11 @@ export class ReportsService {
       const invoices = await this.prisma.invoice.findMany({
         include: { restaurant: true, plan: true }
       });
-      const headers = ['Invoice Number', 'Restaurant', 'Plan', 'Subtotal (INR)', 'Tax Amount (INR)', 'Total (INR)', 'Status', 'Issued At'];
+      // BUG-LOW-002: was '(INR)' text — the super-admin-web frontend's own
+      // invoice CSV/table for this same data (BillingPage.tsx) already
+      // labels these columns '(₹)'; matching that instead of a second,
+      // inconsistent convention for the same figures.
+      const headers = ['Invoice Number', 'Restaurant', 'Plan', 'Subtotal (₹)', 'Tax Amount (₹)', 'Total (₹)', 'Status', 'Issued At'];
       const rows = invoices.map((i) => [
         i.invoiceNumber,
         `"${i.restaurant.name.replace(/"/g, '""')}"`,

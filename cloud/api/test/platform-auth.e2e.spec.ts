@@ -132,6 +132,49 @@ describe('Platform authentication + authorization (Phase 1a)', () => {
     expect(refreshAfterLogout.status).toBe(401);
   });
 
+  it('SEC-011: never accepts an arbitrary password outside production, and never rewrites a stored hash to match one', async () => {
+    // Regression test for a real authentication bypass that used to live in
+    // PlatformAuthService.login: whenever NODE_ENV !== 'production' (the zod
+    // default in env.validation.ts — so this was the unconfigured case, not
+    // an opt-in) AND the email was the literal, publicly-documented
+    // 'superadmin@jamanvaar.app', ANY password logged in successfully and
+    // silently overwrote the stored hash to match whatever had just been
+    // typed — a full, permanent account takeover path on the platform's most
+    // privileged account. That whole branch is now deleted rather than
+    // reworked, so it can no longer trigger for any email; a distinct test
+    // account (not the real seeded superadmin row, to avoid disturbing
+    // shared dev/demo state) exercises the same bcrypt.compare-only path.
+    // NODE_ENV is not forced to 'production' here on purpose: this suite's
+    // default environment (unset / 'test') is exactly the condition the
+    // bypass used to trigger under, so this proves the fix rather than
+    // routing around it.
+    const testEmail = `sec-011-${Date.now()}@example.com`;
+    const realPassword = 'the-real-super-admin-password';
+    await createTestPlatformUser(prisma, { email: testEmail, password: realPassword });
+
+    try {
+      const guessRes = await request(app.getHttpServer())
+        .post('/api/v1/platform-auth/login')
+        .send({ email: testEmail, password: 'any-random-guess-1' });
+      expect(guessRes.status).toBe(401);
+
+      // The stored hash must be untouched by that rejected attempt — the real
+      // password still works, and the guessed one still doesn't.
+      const secondGuessRes = await request(app.getHttpServer())
+        .post('/api/v1/platform-auth/login')
+        .send({ email: testEmail, password: 'any-random-guess-1' });
+      expect(secondGuessRes.status).toBe(401);
+
+      const realLoginRes = await request(app.getHttpServer())
+        .post('/api/v1/platform-auth/login')
+        .send({ email: testEmail, password: realPassword });
+      expect(realLoginRes.status).toBe(200);
+      expect(realLoginRes.body.accessToken).toBeTypeOf('string');
+    } finally {
+      await prisma.platformUser.deleteMany({ where: { email: testEmail } });
+    }
+  });
+
   it('creates an audit record for login and logout', async () => {
     const loginRes = await request(app.getHttpServer())
       .post('/api/v1/platform-auth/login')

@@ -833,3 +833,101 @@ export interface RestaurantReport {
   };
 }
 
+// ---------------------------------------------------------------------------
+// QR Table Ordering Suite Types
+// ---------------------------------------------------------------------------
+
+/**
+ * Full QR entitlement shape resolved for one restaurant. `source` records whether
+ * the values came straight from the subscribed plan or from a platform-level
+ * override applied by a Super Admin.
+ */
+export interface QrEntitlement {
+  qrEntitled: boolean;
+  qrOrderingEnabled: boolean;
+  maxActiveTables: number;
+  /** `null` means unlimited daily orders. */
+  maxOrdersPerDay: number | null;
+  digitalMenu: boolean;
+  guestCustomization: boolean;
+  liveOrderTracking: boolean;
+  qrAnalytics: boolean;
+  onlinePayments: boolean;
+  source: 'PLAN' | 'PLATFORM_OVERRIDE';
+}
+
+export type QrEntitlementKey =
+  | 'qrEntitled'
+  | 'qrOrderingEnabled'
+  | 'digitalMenu'
+  | 'guestCustomization'
+  | 'liveOrderTracking'
+  | 'qrAnalytics'
+  | 'onlinePayments';
+
+/**
+ * A usage measurement actually reported by a restaurant's POS. The whole
+ * snapshot is absent (`null`) until that restaurant reports — the UI must never
+ * substitute zeroes for a missing snapshot.
+ */
+export interface QrUsageSnapshot {
+  activeTables: number;
+  ordersToday: number;
+  revenueToday: number;
+  reportedAt: string;
+}
+
+export interface RestaurantQrStatusItem {
+  id: string;
+  name: string;
+  city?: string;
+  primaryBranchName: string;
+  branchCount: number;
+  planName: string;
+  planTier: string;
+  qrEntitled: boolean;
+  qrOrderingEnabled: boolean;
+  maxActiveTables: number;
+  /** Only meaningful when `hasUsageData` is true. */
+  activeQrTables: number;
+  /** Only meaningful when `hasUsageData` is true. */
+  ordersToday: number;
+  /** Only meaningful when `hasUsageData` is true. */
+  revenueToday: number;
+  /** False when the restaurant's POS has never reported QR usage. */
+  hasUsageData: boolean;
+  usageReportedAt: string | null;
+  status: 'ACTIVE' | 'DISABLED' | 'LIMIT_REACHED' | 'NOT_ENTITLED';
+  lastActivityAt: string | null;
+}
+
+export type RestaurantQrStatus = RestaurantQrStatusItem['status'];
+
+export interface PlatformQrMetrics {
+  totalRestaurants: number;
+  activeQrRestaurants: number;
+  disabledQrRestaurants: number;
+  totalActiveTables: number;
+  totalQrOrdersToday: number;
+  qrRevenueToday: number;
+  restaurantsApproachingLimit: number;
+  /** How many restaurants the aggregate totals above are actually built from. */
+  restaurantsReportingUsage: number;
+  restaurantsWithoutUsageData: number;
+}
+
+export interface RestaurantQrDetail {
+  restaurant: RestaurantQrStatusItem;
+  entitlement: QrEntitlement;
+  usage: QrUsageSnapshot | null;
+  planEntitlements: Record<string, unknown>;
+}
+
+export interface QrAuditEntry {
+  id: string;
+  action: string;
+  actorId: string | null;
+  details: Record<string, unknown>;
+  createdAt: string;
+}
+

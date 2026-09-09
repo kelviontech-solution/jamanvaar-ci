@@ -270,8 +270,12 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
       'Address',
       'Tags',
       'Total Visits',
-      'Lifetime Spend (INR)',
-      'Avg Order Value (INR)',
+      // BUG-LOW-002: was '(INR)' text while every other CSV/report export
+      // in this app (reportExportService.ts, the on-screen totals here and
+      // elsewhere via formatINR) labels currency columns with '(₹)' —
+      // standardizing on the glyph already used everywhere else.
+      'Lifetime Spend (₹)',
+      'Avg Order Value (₹)',
       'Loyalty Points',
       'Date of Birth',
       'Anniversary',

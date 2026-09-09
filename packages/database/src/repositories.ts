@@ -19,6 +19,8 @@ import {
   KOTRecord,
   KOTType,
   LicenseInfo,
+  PlatformQrControl,
+  QrUsageSnapshot,
   LoyaltyTier,
   LoyaltyReward,
   StaffShiftSchedule,
@@ -1509,6 +1511,54 @@ export class LicenseRepository {
    * production UI should call this directly any more (see SEC-002/ENT-001:
    * this used to be reachable from three unauthenticated button handlers).
    */
+  /**
+   * Records the platform's (Super Admin's) operational QR controls locally.
+   *
+   * This is the missing half of the QR entitlement chain: the PLAN decides
+   * whether QR ordering was sold to this restaurant, this decides whether the
+   * platform is currently allowing it and within what limits. Every guest scan
+   * is checked against it in QrOrderingRepository.verifyQrToken, so a Super
+   * Admin disabling QR ordering blocks guests here even though the plan tier
+   * is untouched.
+   *
+   * Only a verified cloud sync should call this. There is deliberately no
+   * restaurant-facing write path — a restaurant admin cannot widen its own
+   * limits, which is the whole point of the control block.
+   */
+  public static applyPlatformQrControl(
+    control: Omit<PlatformQrControl, 'syncedAt'>,
+    meta: { source: 'cloud-sync' | 'offline-certificate' }
+  ): LicenseInfo {
+    if (!Number.isFinite(control.maxActiveTables) || control.maxActiveTables < 0) {
+      throw new Error('Platform QR control rejected: maxActiveTables must be a non-negative number.');
+    }
+    if (
+      control.maxOrdersPerDay !== null &&
+      (!Number.isFinite(control.maxOrdersPerDay) || control.maxOrdersPerDay < 0)
+    ) {
+      throw new Error('Platform QR control rejected: maxOrdersPerDay must be null or a non-negative number.');
+    }
+
+    db.license = {
+      ...db.license,
+      platformQrControl: {
+        ...control,
+        maxActiveTables: Math.floor(control.maxActiveTables),
+        maxOrdersPerDay:
+          control.maxOrdersPerDay === null ? null : Math.floor(control.maxOrdersPerDay),
+        syncedAt: new Date().toISOString()
+      },
+      verificationSource: meta.source
+    };
+    db.notify();
+    return db.license;
+  }
+
+  /** The platform control block currently in force, or undefined if never synced. */
+  public static getPlatformQrControl(): PlatformQrControl | undefined {
+    return db.license?.platformQrControl;
+  }
+
   public static activatePlan(tier: 'CORE' | 'PRO', licenseKey?: string): LicenseInfo {
     const isPro = tier === 'PRO';
     const key = licenseKey || (isPro ? 'JAMAN-PRO-2026-AHM-8842-X' : 'JAMAN-CORE-2026-AHM-1104-X');
@@ -3099,6 +3149,61 @@ export class QrOrderingRepository {
     return db.tables;
   }
 
+  public static getTableByToken(token: string): DiningTable | undefined {
+    return db.tables.find((t) => t.qrToken === token);
+  }
+
+  public static addTable(tableData: Partial<DiningTable>): DiningTable {
+    const tableNumber = tableData.tableNumber || `${db.tables.length + 1}`;
+    const qrShortCode = `QR-TABLE-${tableNumber.padStart(3, '0')}`;
+    const qrToken = `jv_qr_tbl_${tableNumber}_${generateSecureQrTokenSuffix()}`;
+    const hostUrl = typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : 'https://jamanvaar.menu';
+    const fullUrl = `${hostUrl}/?qrTable=${tableNumber}&token=${qrToken}`;
+
+    const newTable: DiningTable = {
+      id: tableData.id || `tbl-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      outletId: tableData.outletId || db.outlet.id,
+      tableNumber,
+      capacity: tableData.capacity || 4,
+      zone: tableData.zone || 'Main Dining Hall',
+      floor: tableData.floor || 1,
+      status: 'AVAILABLE',
+      isActive: true,
+      qrShortCode,
+      qrToken,
+      qrStatus: 'ACTIVE',
+      qrCodeUrl: fullUrl,
+      totalOrdersToday: 0,
+      totalRevenueToday: 0
+    };
+
+    db.tables.push(newTable);
+    AuditRepository.log({
+      action: 'TABLE_CREATED',
+      category: 'SETTINGS',
+      details: `Created Table ${newTable.tableNumber} with QR code ${qrShortCode}`,
+      username: 'POS Admin'
+    });
+    db.notify();
+    return newTable;
+  }
+
+  public static deleteTable(tableIdOrNumber: string): boolean {
+    const idx = db.tables.findIndex((t) => t.id === tableIdOrNumber || t.tableNumber === tableIdOrNumber);
+    if (idx === -1) return false;
+    const removed = db.tables.splice(idx, 1)[0];
+    AuditRepository.log({
+      action: 'TABLE_DELETED',
+      category: 'SETTINGS',
+      details: `Deleted Table ${removed.tableNumber}`,
+      username: 'POS Admin'
+    });
+    db.notify();
+    return true;
+  }
+
   public static updateTable(tableId: string, updates: Partial<DiningTable>): DiningTable | null {
     const table = db.tables.find((t) => t.id === tableId || t.tableNumber === tableId);
     if (!table) return null;
@@ -3114,11 +3219,64 @@ export class QrOrderingRepository {
    * made the old token guessable). They may still be used by callers that
    * pass a fullUrl through a multi-tenant router.
    */
+  /** Tables currently offering QR ordering — the number the platform ceiling applies to. */
+  public static countActiveQrTables(): number {
+    return db.tables.filter((t) => t.qrStatus === 'ACTIVE').length;
+  }
+
+  /**
+   * Throws if activating QR on `tableNumber` would exceed the platform's
+   * maxActiveTables ceiling. Re-activating a table that is already ACTIVE is
+   * always allowed (it consumes no additional headroom).
+   */
+  private static assertActiveTableHeadroom(tableNumber: string): void {
+    const control = db.license?.platformQrControl;
+    if (!control) return;
+
+    const table = db.tables.find((t) => t.tableNumber === tableNumber || t.id === tableNumber);
+    if (table?.qrStatus === 'ACTIVE') return;
+
+    if (this.countActiveQrTables() >= control.maxActiveTables) {
+      throw new Error(
+        `QR table limit reached. This restaurant's plan allows ${control.maxActiveTables} QR-active tables. ` +
+          'Deactivate another table or contact JAMANVAAR to raise the limit.'
+      );
+    }
+  }
+
+  /**
+   * Real QR usage measured from this restaurant's own order data, for reporting
+   * up to the platform. Every figure is counted from db, never estimated — when
+   * there is no activity the numbers are genuinely zero.
+   */
+  public static getQrUsageSnapshot(): QrUsageSnapshot {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const qrOrdersToday = db.orders.filter(
+      (o) =>
+        (o.source_type === 'QR_TABLE' || o.orderType === 'QR_TABLE') &&
+        new Date(o.createdAt).getTime() >= startOfToday.getTime()
+    );
+
+    const revenueToday = qrOrdersToday
+      .filter((o) => o.orderStatus !== 'CANCELLED')
+      .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+
+    return {
+      activeTables: this.countActiveQrTables(),
+      ordersToday: qrOrdersToday.length,
+      revenueToday: Math.round(revenueToday * 100) / 100,
+      reportedAt: new Date().toISOString()
+    };
+  }
+
   public static generateTableQr(
     tableNumber: string,
     _restaurantId?: string,
     _branchId?: string
   ): { qrShortCode: string; fullUrl: string; tableNumber: string; qrToken: string } {
+    this.assertActiveTableHeadroom(tableNumber);
     const table = db.tables.find((t) => t.tableNumber === tableNumber || t.id === tableNumber);
     const tblNum = table ? table.tableNumber : tableNumber;
     const qrShortCode = `QR-TABLE-${tblNum.padStart(3, '0')}`;
@@ -3181,6 +3339,10 @@ export class QrOrderingRepository {
     let count = 0;
     db.tables.forEach((t) => {
       if (tableNumbers.includes(t.tableNumber) || tableNumbers.includes(t.id)) {
+        // Activating consumes platform headroom; deactivating always frees it.
+        if (status === 'ACTIVE') {
+          this.assertActiveTableHeadroom(t.tableNumber);
+        }
         t.qrStatus = status;
         count++;
       }
@@ -3209,6 +3371,18 @@ export class QrOrderingRepository {
       };
     }
 
+    // 2. Verify the PLATFORM control block (Super Admin kill-switch and limits).
+    //    The plan check above says QR ordering was sold to this restaurant; this
+    //    says the platform is currently allowing it. A restaurant admin cannot
+    //    relax either — there is no local write path for this block.
+    const platformControl = license?.platformQrControl;
+    if (platformControl && platformControl.qrOrderingEnabled === false) {
+      return {
+        isValid: false,
+        reason: 'QR Table Ordering has been disabled for this restaurant by JAMANVAAR platform administration.'
+      };
+    }
+
     const table = db.tables.find((t) => t.tableNumber === tableNumber || t.id === tableNumber);
     if (!table) {
       return { isValid: false, reason: `Table ${tableNumber} was not found in restaurant layout.` };
@@ -3227,13 +3401,6 @@ export class QrOrderingRepository {
       table.qrToken = `jv_qr_tbl_${table.tableNumber}_${generateSecureQrTokenSuffix()}`;
     }
 
-    // SEC-010 fix: exact match against the table's actual (random, unguessable)
-    // token, not a substring/prefix check — the old `.includes('tbl_N')` check
-    // passed for ANY string containing that substring, since the token format
-    // itself was fully derivable from public restaurant/branch/table IDs.
-    // A caller that omits `token` entirely (internal/staff-side status checks
-    // that don't route through a customer's scanned link) is unaffected —
-    // only an explicitly-supplied, wrong token is rejected here.
     if (token !== undefined && token !== table.qrToken) {
       return { isValid: false, reason: 'Security verification failed: QR token does not match this table.' };
     }
@@ -3327,7 +3494,40 @@ export class QrOrderingRepository {
       zone: 'Main Hall'
     };
 
-    // 2. Validate Items & Availability
+    // 2. Enforce the platform's daily QR order ceiling, if one is set.
+    const qrControl = db.license?.platformQrControl;
+    if (qrControl && qrControl.maxOrdersPerDay !== null) {
+      const { ordersToday } = this.getQrUsageSnapshot();
+      if (ordersToday >= qrControl.maxOrdersPerDay) {
+        throw new Error(
+          `This restaurant has reached its daily QR ordering limit of ${qrControl.maxOrdersPerDay} orders. ` +
+            'Please ask a member of staff to take your order.'
+        );
+      }
+    }
+
+    // 3. Enforce the restaurant's own QR ordering rules. These were editable in
+    //    the admin Settings tab but nothing acted on them, so a restaurant could
+    //    switch "repeat ordering" off and still receive repeat orders.
+    const qrSettings = this.getSettings();
+
+    if (qrSettings.allowRepeatOrdering === false) {
+      const liveStatuses = ['NEW', 'ACCEPTED', 'PREPARING', 'READY', 'SERVED'];
+      const openOrder = db.orders.find(
+        (o) =>
+          (o.source_type === 'QR_TABLE' || o.orderType === 'QR_TABLE') &&
+          o.tableNumber === params.tableNumber &&
+          liveStatuses.includes(o.orderStatus)
+      );
+      if (openOrder) {
+        throw new Error(
+          `Table ${params.tableNumber} already has an order in progress (${openOrder.orderNumber}). ` +
+            'Please ask a member of staff to add to it.'
+        );
+      }
+    }
+
+    // 4. Validate Items & Availability
     if (!params.items || params.items.length === 0) {
       throw new Error('Your cart is empty. Please select at least one dish.');
     }
@@ -3397,6 +3597,22 @@ export class QrOrderingRepository {
     const sgstAmount = Math.round(subtotal * 0.025 * 100) / 100;
     const taxAmount = cgstAmount + sgstAmount;
     const totalAmount = Math.round(subtotal + taxAmount);
+
+    // Order-value limits are checked here, on the authoritative total this
+    // method computed - never on a figure the browser sent.
+    if (qrSettings.minOrderValue > 0 && totalAmount < qrSettings.minOrderValue) {
+      throw new Error(
+        `Minimum order value for QR table ordering is ${qrSettings.minOrderValue}. ` +
+          `Your order total is ${totalAmount}. Please add a little more to your cart.`
+      );
+    }
+    if (qrSettings.maxOrderValue > 0 && totalAmount > qrSettings.maxOrderValue) {
+      throw new Error(
+        `This order total (${totalAmount}) exceeds the ${qrSettings.maxOrderValue} limit for self-ordering. ` +
+          'Please ask a member of staff to place it for you.'
+      );
+    }
+
     const routing = this.getStationRouting(orderItems);
 
     const newOrder: Order = {
@@ -3463,15 +3679,33 @@ export class QrOrderingRepository {
       };
     });
 
-    KOTRepository.generateKOT({
-      orderId: newOrder.id,
-      orderNumber: newOrder.orderNumber,
-      tokenNumber: newOrder.tokenNumber,
-      tableNumber: params.tableNumber,
-      orderType: 'QR_TABLE',
-      items: kotItems,
-      cashierName: 'Guest (Table QR Self-Order)'
-    });
+    // A restaurant that requires waiter approval (or has turned auto-dispatch
+    // off) does not want guest orders firing straight at the kitchen. Hold the
+    // KOT back; it is dispatched by dispatchPendingKot when staff accepts the
+    // order in POS. Both settings default to auto-send, so the normal path is
+    // unchanged.
+    const holdForApproval =
+      qrSettings.requireWaiterApproval === true || qrSettings.autoSendToKitchen === false;
+
+    if (holdForApproval) {
+      newOrder.timeline = newOrder.timeline || [];
+      newOrder.timeline.push({
+        status: 'NEW',
+        title: 'Awaiting Staff Approval',
+        timestamp: now.toISOString(),
+        note: 'Order is held pending staff approval before the kitchen ticket is issued.'
+      });
+    } else {
+      KOTRepository.generateKOT({
+        orderId: newOrder.id,
+        orderNumber: newOrder.orderNumber,
+        tokenNumber: newOrder.tokenNumber,
+        tableNumber: params.tableNumber,
+        orderType: 'QR_TABLE',
+        items: kotItems,
+        cashierName: 'Guest (Table QR Self-Order)'
+      });
+    }
 
     // 4. Update table status to OCCUPIED and record order stats
     const tblObj = db.tables.find((t) => t.tableNumber === params.tableNumber);
@@ -3511,6 +3745,43 @@ export class QrOrderingRepository {
     return newOrder;
   }
 
+  /**
+   * Issues the kitchen ticket for a QR order that was held for staff approval.
+   * Idempotent: an order that already has a KOT is left alone, so approving an
+   * order twice cannot double-fire the kitchen.
+   */
+  private static dispatchPendingKot(order: Order, actor: string): void {
+    const isQrOrder = order.source_type === 'QR_TABLE' || order.orderType === 'QR_TABLE';
+    if (!isQrOrder) return;
+
+    const alreadyDispatched = db.kots.some((k) => k.orderId === order.id);
+    if (alreadyDispatched) return;
+
+    const kotItems: import('@jamanvaar/types').KOTItem[] = order.items.map((oi) => {
+      const m = db.menuItems.find((menu) => menu.id === oi.menuItemId);
+      return {
+        id: `kot-item-${oi.id}`,
+        menuItemId: oi.menuItemId,
+        name: oi.name,
+        quantity: oi.quantity,
+        modifiers: oi.modifiers,
+        specialInstructions: oi.specialInstructions,
+        kitchenStation: m?.kitchenStation || 'Main Kitchen',
+        status: 'PREPARING'
+      };
+    });
+
+    KOTRepository.generateKOT({
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      tokenNumber: order.tokenNumber,
+      tableNumber: order.tableNumber || '',
+      orderType: 'QR_TABLE',
+      items: kotItems,
+      cashierName: actor
+    });
+  }
+
   public static updateOrderStatus(
     orderId: string,
     nextStatus: import('@jamanvaar/types').OrderStatus,
@@ -3519,6 +3790,12 @@ export class QrOrderingRepository {
   ): Order | null {
     const order = db.orders.find((o) => o.id === orderId || o.orderNumber === orderId);
     if (!order) return null;
+
+    // An order held for staff approval has no kitchen ticket yet. Accepting it
+    // is what releases the KOT, so approval is a real gate rather than a label.
+    if (nextStatus === 'ACCEPTED' || nextStatus === 'PREPARING') {
+      this.dispatchPendingKot(order, actor);
+    }
 
     order.orderStatus = nextStatus;
     order.updatedAt = new Date().toISOString();
@@ -3574,14 +3851,17 @@ export class QrOrderingRepository {
     activeTablesCount: number;
     pendingCount: number;
     completedCount: number;
-    topDish: string;
-    topTable: string;
+    /** Null when no QR order in scope has any items - there is genuinely no top dish. */
+    topDish: string | null;
+    /** Null when no QR order in scope produced revenue - there is genuinely no top table. */
+    topTable: string | null;
     tableBreakdown: Array<{
       tableNumber: string;
       zone: string;
       orderCount: number;
       revenue: number;
-      lastOrder: string;
+      /** Null when this table has not taken a QR order in scope. */
+      lastOrder: string | null;
     }>;
   } {
     const activeDay = BusinessDayRepository.getActiveBusinessDay();
@@ -3605,20 +3885,25 @@ export class QrOrderingRepository {
     const completedCount = scopedOrders.filter((o) => o.orderStatus === 'COMPLETED' || o.orderStatus === 'SERVED').length;
 
     // Table breakdown
-    const tableMap: Record<string, { count: number; revenue: number; zone: string; lastOrder: string }> = {};
+    const tableMap: Record<string, { count: number; revenue: number; zone: string; lastOrder: string | null }> = {};
     db.tables.forEach((t) => {
       tableMap[t.tableNumber] = {
         count: 0,
         revenue: 0,
         zone: t.zone,
-        lastOrder: t.lastOrderTime || '12:00 PM'
+        // A table with no QR order in scope has no last-order time. It used to
+        // report a flat "12:00 PM", which reads as a real measurement.
+        lastOrder: t.lastOrderTime || null
       };
     });
 
     scopedOrders.forEach((o) => {
-      const tblNum = o.tableNumber || '1';
+      // A QR order always carries its table (verifyQrToken resolved it), so an
+      // order without one is a data fault - surface it rather than silently
+      // crediting the revenue to Table 1.
+      const tblNum = o.tableNumber || 'UNASSIGNED';
       if (!tableMap[tblNum]) {
-        tableMap[tblNum] = { count: 0, revenue: 0, zone: 'Main Hall', lastOrder: 'Just now' };
+        tableMap[tblNum] = { count: 0, revenue: 0, zone: 'Unassigned', lastOrder: null };
       }
       tableMap[tblNum].count += 1;
       if (o.orderStatus !== 'CANCELLED' && o.orderStatus !== 'REFUNDED') {
@@ -3637,7 +3922,12 @@ export class QrOrderingRepository {
 
     // Find top table
     const sortedTables = [...tableBreakdown].sort((a, b) => b.revenue - a.revenue);
-    const topTable = sortedTables.length > 0 && sortedTables[0].revenue > 0 ? `Table ${sortedTables[0].tableNumber} (${sortedTables[0].zone})` : 'Table 12';
+    // No revenue in scope means there is no top table. Naming one anyway (this
+    // used to hardcode "Table 12") invents a winner out of an empty system.
+    const topTable =
+      sortedTables.length > 0 && sortedTables[0].revenue > 0
+        ? `Table ${sortedTables[0].tableNumber} (${sortedTables[0].zone})`
+        : null;
 
     // Find top dish
     const dishCounts: Record<string, number> = {};
@@ -3648,7 +3938,9 @@ export class QrOrderingRepository {
     });
 
     const topDishEntry = Object.entries(dishCounts).sort((a, b) => b[1] - a[1])[0];
-    const topDish = topDishEntry ? `${topDishEntry[0]} (${topDishEntry[1]} ordered)` : 'Paneer Tikka (Tandoori)';
+    // Likewise: an empty system has no best-selling dish. This used to name
+    // "Paneer Tikka (Tandoori)" regardless of whether anything had been sold.
+    const topDish = topDishEntry ? `${topDishEntry[0]} (${topDishEntry[1]} ordered)` : null;
 
     const activeTablesCount = db.tables.filter((t) => t.qrStatus === 'ACTIVE').length;
 

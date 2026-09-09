@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { db, QrOrderingRepository, BusinessDayRepository, MenuRepository } from '@jamanvaar/database';
+import { db, QrOrderingRepository, BusinessDayRepository, MenuRepository, TableRepository } from '@jamanvaar/database';
 import { Order, DiningTable, MenuItem, QrOrderingSettings, OrderStatus } from '@jamanvaar/types';
 import { EntitlementService, PLAN_DEFINITIONS } from '@jamanvaar/business';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, generateQrSvg, generateQrDataUrl } from '@jamanvaar/utils';
+import { lanMeshSync } from '@jamanvaar/sync';
 import {
   QrCode,
   Smartphone,
@@ -36,7 +37,10 @@ import {
   Check,
   Lock,
   Crown,
-  ShieldAlert
+  ShieldAlert,
+  Trash2,
+  RefreshCw,
+  X
 } from 'lucide-react';
 import { CustomerQrExperienceModal } from './CustomerQrExperienceModal';
 import { QrCardDesignerModal } from './QrCardDesignerModal';
@@ -50,7 +54,7 @@ export const QrOrderingModule: React.FC = () => {
 
   // Modals state
   const [isCustomerPreviewOpen, setIsCustomerPreviewOpen] = useState<boolean>(false);
-  const [previewTableNumber, setPreviewTableNumber] = useState<string>('12');
+  const [previewTableNumber, setPreviewTableNumber] = useState<string>('1');
   const [previewOrderId, setPreviewOrderId] = useState<string | undefined>(undefined);
 
   const [isCardDesignerOpen, setIsCardDesignerOpen] = useState<boolean>(false);
@@ -70,9 +74,39 @@ export const QrOrderingModule: React.FC = () => {
 
   const [analyticsDateRange, setAnalyticsDateRange] = useState<string>('TODAY');
 
+  // Table search and filters
+  const [tableSearch, setTableSearch] = useState<string>('');
+  const [tableZoneFilter, setTableZoneFilter] = useState<string>('ALL');
+  const [tableStatusFilter, setTableStatusFilter] = useState<string>('ALL');
+
+  // Table add / edit modal states
+  const [isAddTableOpen, setIsAddTableOpen] = useState<boolean>(false);
+  const [newTableNumber, setNewTableNumber] = useState<string>('');
+  const [newTableZone, setNewTableZone] = useState<string>('Main Dining Hall');
+  const [newTableCapacity, setNewTableCapacity] = useState<number>(4);
+  const [newTableFloor, setNewTableFloor] = useState<number>(1);
+
+  const [addTableError, setAddTableError] = useState<string | null>(null);
+
+  const [editingTable, setEditingTable] = useState<DiningTable | null>(null);
+  const [editCapacity, setEditCapacity] = useState<number>(4);
+  const [editZone, setEditZone] = useState<string>('Main Dining Hall');
+
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
   // Settings local state
   const [qrSettings, setQrSettings] = useState<QrOrderingSettings>(() => QrOrderingRepository.getSettings());
   const [settingsSavedToast, setSettingsSavedToast] = useState<boolean>(false);
+  // Free-text/number drafts so we persist on blur instead of on every keystroke
+  const [minOrderDraft, setMinOrderDraft] = useState<string>(() =>
+    String(QrOrderingRepository.getSettings().minOrderValue ?? 0)
+  );
+  const [maxOrderDraft, setMaxOrderDraft] = useState<string>(() =>
+    String(QrOrderingRepository.getSettings().maxOrderValue ?? 0)
+  );
+  const [welcomeDraft, setWelcomeDraft] = useState<string>(
+    () => QrOrderingRepository.getSettings().welcomeMessage || ''
+  );
 
   // Table selection & batch actions state
   const [selectedTableNumbers, setSelectedTableNumbers] = useState<string[]>([]);
@@ -87,15 +121,65 @@ export const QrOrderingModule: React.FC = () => {
     return unsub;
   }, []);
 
+  // Re-seed the settings drafts from the canonical record whenever the tab is opened,
+  // so a change made elsewhere (or on another device) is reflected here.
+  useEffect(() => {
+    if (activeSubTab !== 'SETTINGS') return;
+    const current = QrOrderingRepository.getSettings();
+    setMinOrderDraft(String(current.minOrderValue ?? 0));
+    setMaxOrderDraft(String(current.maxOrderValue ?? 0));
+    setWelcomeDraft(current.welcomeMessage || '');
+  }, [activeSubTab]);
+
   const tables = db.tables;
   const categories = db.categories;
   const menuItems = db.menuItems;
   const activeDay = BusinessDayRepository.getActiveBusinessDay();
 
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3200);
+  };
+
+  // Filtered tables
+  const filteredTables = useMemo(() => {
+    return tables.filter((t) => {
+      if (tableStatusFilter === 'ACTIVE' && t.qrStatus === 'DISABLED') return false;
+      if (tableStatusFilter === 'DISABLED' && t.qrStatus !== 'DISABLED') return false;
+      if (tableZoneFilter !== 'ALL' && t.zone !== tableZoneFilter) return false;
+      if (tableSearch.trim()) {
+        const q = tableSearch.toLowerCase();
+        const matchNum = t.tableNumber.toLowerCase().includes(q);
+        const matchZone = t.zone?.toLowerCase().includes(q);
+        return matchNum || matchZone;
+      }
+      return true;
+    });
+  }, [tables, tableStatusFilter, tableZoneFilter, tableSearch, tick]);
+
+  const distinctZones = useMemo(() => {
+    const set = new Set<string>();
+    tables.forEach((t) => {
+      if (t.zone) set.add(t.zone);
+    });
+    return Array.from(set);
+  }, [tables, tick]);
+
   // QR Orders list
   const allQrOrders = useMemo(() => {
     return QrOrderingRepository.getQrOrders();
   }, [tick, db.orders]);
+
+  const filteredMenuItems = useMemo(() => {
+    return menuItems.filter((item) => {
+      if (menuCategoryFilter !== 'ALL' && item.categoryId !== menuCategoryFilter) return false;
+      if (menuSearch.trim()) {
+        const q = menuSearch.toLowerCase();
+        return item.name.toLowerCase().includes(q) || (item.sku || '').toLowerCase().includes(q);
+      }
+      return true;
+    });
+  }, [menuItems, menuCategoryFilter, menuSearch, tick]);
 
   const filteredQrOrders = useMemo(() => {
     return allQrOrders.filter((o) => {
@@ -112,14 +196,93 @@ export const QrOrderingModule: React.FC = () => {
     });
   }, [allQrOrders, ordersStatusFilter, ordersTableFilter, ordersSearch]);
 
+  /** Real KOT tickets the kitchen received for the selected order. */
+  const kotsForSelectedOrder = useMemo(() => {
+    if (!selectedOrder) return [];
+    return db.kots.filter((k) => k.orderId === selectedOrder.id);
+  }, [selectedOrder, tick]);
+
   // Analytics Stats
   const qrStats = useMemo(() => {
     return QrOrderingRepository.getQrStats(analyticsDateRange);
   }, [tick, analyticsDateRange, db.orders]);
 
+  /**
+   * getQrStats() substitutes friendly placeholder strings for topDish/topTable when no
+   * QR orders exist. The UI must never present those as measured results, so anything
+   * derived from an empty order set is treated as "no data" here.
+   */
+  const hasQrOrderData = qrStats.totalOrders > 0;
+  const tablesWithoutQr = useMemo(() => tables.filter((t) => !t.qrToken), [tables, tick]);
+
+  /** Real service status for the Overview strip - no tile is hard-coded green. */
+  const serviceStatuses = useMemo(() => {
+    let meshOnline = false;
+    let peerCount = 0;
+    try {
+      meshOnline = lanMeshSync.getIsOnline();
+      peerCount = lanMeshSync.getConnectedPeers().length;
+    } catch (err) {
+      meshOnline = false;
+    }
+
+    const orderableDishes = menuItems.filter(
+      (m) => m.isAvailable !== false && m.isQrOrderingEnabled !== false
+    ).length;
+    const activeQrTables = tables.filter((t) => t.qrStatus === 'ACTIVE' && Boolean(t.qrToken)).length;
+    const openKots = db.kots.filter(
+      (k) => k.status !== 'SERVED' && k.status !== 'CANCELLED'
+    ).length;
+
+    return [
+      {
+        key: 'QR_ORDERING',
+        label: 'QR Ordering',
+        ok: qrSettings.isQrOrderingActive && qrSettings.allowCustomerOrdering,
+        value:
+          qrSettings.isQrOrderingActive && qrSettings.allowCustomerOrdering ? 'ACCEPTING ORDERS' : 'PAUSED'
+      },
+      {
+        key: 'MENU',
+        label: 'Digital Menu',
+        ok: orderableDishes > 0,
+        value: orderableDishes > 0 ? `${orderableDishes} DISHES LIVE` : 'NO DISHES LIVE'
+      },
+      {
+        key: 'TABLES',
+        label: 'Table QR',
+        ok: activeQrTables > 0,
+        value: activeQrTables > 0 ? `${activeQrTables} / ${tables.length} ACTIVE` : 'NONE ISSUED'
+      },
+      {
+        key: 'KDS',
+        label: 'KDS Routing',
+        ok: qrSettings.autoSendToKitchen,
+        value: qrSettings.autoSendToKitchen ? `${openKots} OPEN KOT` : 'AUTO-DISPATCH OFF'
+      },
+      {
+        key: 'MESH',
+        label: 'LAN Mesh Sync',
+        ok: meshOnline,
+        value: meshOnline ? `${peerCount} ${peerCount === 1 ? 'PEER' : 'PEERS'}` : 'OFFLINE'
+      }
+    ];
+  }, [qrSettings, menuItems, tables, tick]);
+
   // Handlers
-  const handleOpenCustomerPreview = (tblNum: string = '12', ordId?: string) => {
-    setPreviewTableNumber(tblNum);
+  /** Opens the guest experience against a REAL table record; never invents a table number. */
+  const handleOpenCustomerPreview = (tblNum?: string, ordId?: string) => {
+    const target =
+      (tblNum && tables.find((t) => t.tableNumber === tblNum)?.tableNumber) ||
+      tables.find((t) => t.qrStatus === 'ACTIVE')?.tableNumber ||
+      tables[0]?.tableNumber;
+
+    if (!target) {
+      showToast('Add a table in Tables & QR before opening the guest preview.');
+      return;
+    }
+
+    setPreviewTableNumber(target);
     setPreviewOrderId(ordId);
     setIsCustomerPreviewOpen(true);
   };
@@ -136,8 +299,149 @@ export const QrOrderingModule: React.FC = () => {
 
   const handleAdvanceOrderStatus = (orderId: string, nextStatus: OrderStatus) => {
     const updated = QrOrderingRepository.updateOrderStatus(orderId, nextStatus, 'POS Admin');
-    if (updated && selectedOrder?.id === orderId) {
-      setSelectedOrder({ ...updated });
+    if (updated) {
+      if (selectedOrder?.id === orderId) {
+        setSelectedOrder({ ...updated });
+      }
+      try {
+        lanMeshSync.broadcast('ORDER_UPDATED', updated);
+        lanMeshSync.broadcast('ORDER_STATUS_CHANGED', { orderId, orderStatus: nextStatus, order: updated });
+      } catch (err) {
+        console.warn('LAN Mesh order update broadcast skipped:', err);
+      }
+      setTick((t) => t + 1);
+      showToast(`Order #${updated.orderNumber} marked ${nextStatus}`);
+    }
+  };
+
+  const handleCancelOrder = (order: Order) => {
+    if (
+      !window.confirm(
+        `Cancel QR order #${order.orderNumber} for Table ${order.tableNumber}? The kitchen will need to be told separately if it has already started.`
+      )
+    ) {
+      return;
+    }
+    handleAdvanceOrderStatus(order.id, 'CANCELLED');
+  };
+
+  const handleDownloadQrSvg = (table: DiningTable) => {
+    const hostUrl = typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : 'http://localhost:5176';
+    let token = table.qrToken;
+    if (!token) {
+      const generated = QrOrderingRepository.generateTableQr(table.tableNumber);
+      token = generated.qrToken;
+    }
+    const url = `${hostUrl}/?qrTable=${table.tableNumber}&token=${token}`;
+    const svg = generateQrSvg(url, { size: 400, margin: 4 });
+    const blob = new Blob([svg], { type: 'image/svg+xml' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `JAMANVAAR-Table-${table.tableNumber}-QR.svg`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    showToast(`Downloaded Table ${table.tableNumber} vector QR SVG!`);
+  };
+
+  const handleCopyQrLink = (table: DiningTable) => {
+    const hostUrl = typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : 'http://localhost:5176';
+    let token = table.qrToken;
+    if (!token) {
+      const generated = QrOrderingRepository.generateTableQr(table.tableNumber);
+      token = generated.qrToken;
+    }
+    const url = `${hostUrl}/?qrTable=${table.tableNumber}&token=${token}`;
+    navigator.clipboard.writeText(url);
+    showToast(`Copied Table ${table.tableNumber} QR URL to clipboard!`);
+  };
+
+  const handleRegenerateQr = (table: DiningTable) => {
+    const result = QrOrderingRepository.regenerateTableQr(table.tableNumber);
+    setTick((t) => t + 1);
+    showToast(`Table ${result.tableNumber}: issued new secure token ${result.qrShortCode}`);
+  };
+
+  /** Issues a first QR token for a table that has never had one. */
+  const handleGenerateQr = (table: DiningTable) => {
+    const result = QrOrderingRepository.generateTableQr(table.tableNumber);
+    setTick((t) => t + 1);
+    showToast(`Table ${result.tableNumber}: QR ${result.qrShortCode} issued`);
+  };
+
+  const handleBulkRegenerateQr = () => {
+    if (selectedTableNumbers.length === 0) return;
+    if (
+      !window.confirm(
+        `Rotate QR tokens for ${selectedTableNumbers.length} table(s)? Standees already printed with the old tokens will stop working and must be reprinted.`
+      )
+    ) {
+      return;
+    }
+    const count = QrOrderingRepository.bulkGenerateQr(selectedTableNumbers);
+    setSelectedTableNumbers([]);
+    setTick((t) => t + 1);
+    showToast(`Rotated secure QR tokens for ${count} table${count === 1 ? '' : 's'}`);
+  };
+
+  const handleSaveAddTable = () => {
+    const num = newTableNumber.trim();
+    if (!num) {
+      setAddTableError('Enter a table number or name.');
+      return;
+    }
+    if (tables.some((t) => t.tableNumber.toLowerCase() === num.toLowerCase())) {
+      setAddTableError(`Table ${num} already exists in this outlet.`);
+      return;
+    }
+
+    // Render from the record the repository hands back, never from local assumptions
+    const created = QrOrderingRepository.addTable({
+      tableNumber: num,
+      zone: newTableZone.trim() || 'Main Dining Hall',
+      capacity: Number(newTableCapacity),
+      floor: Number(newTableFloor)
+    });
+
+    setIsAddTableOpen(false);
+    setAddTableError(null);
+    setNewTableNumber('');
+    setTick((t) => t + 1);
+    showToast(`Table ${created.tableNumber} created with QR ${created.qrShortCode}`);
+  };
+
+  const handleSaveEditTable = () => {
+    if (!editingTable) return;
+    const updated = TableRepository.updateTable(editingTable.id, {
+      capacity: Number(editCapacity),
+      zone: editZone.trim() || editingTable.zone
+    });
+    setEditingTable(null);
+    setTick((t) => t + 1);
+    showToast(
+      updated
+        ? `Table ${updated.tableNumber} updated (${updated.zone}, ${updated.capacity} seats)`
+        : 'That table no longer exists.'
+    );
+  };
+
+  const handleDeleteTable = (table: DiningTable) => {
+    if (table.status === 'OCCUPIED' || table.currentOrderId) {
+      showToast(`Table ${table.tableNumber} has a live order. Settle it before removing the table.`);
+      return;
+    }
+    if (
+      window.confirm(
+        `Remove Table ${table.tableNumber}? Its QR code will stop working and printed standees must be discarded.`
+      )
+    ) {
+      const removed = QrOrderingRepository.deleteTable(table.id);
+      setSelectedTableNumbers((prev) => prev.filter((n) => n !== table.tableNumber));
+      setTick((t) => t + 1);
+      showToast(removed ? `Removed Table ${table.tableNumber}` : 'That table was already removed.');
     }
   };
 
@@ -166,18 +470,24 @@ export const QrOrderingModule: React.FC = () => {
 
   const handleBulkUpdateStatus = (status: 'ACTIVE' | 'DISABLED') => {
     if (selectedTableNumbers.length === 0) return;
-    QrOrderingRepository.bulkUpdateQrStatus(selectedTableNumbers, status);
+    const count = QrOrderingRepository.bulkUpdateQrStatus(selectedTableNumbers, status);
     setSelectedTableNumbers([]);
     setTick((t) => t + 1);
+    showToast(`${count} table${count === 1 ? '' : 's'} set to ${status}`);
   };
 
   const handleToggleSingleTableStatus = (table: DiningTable) => {
     const nextStatus = table.qrStatus === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
     QrOrderingRepository.bulkUpdateQrStatus([table.tableNumber], nextStatus);
     setTick((t) => t + 1);
+    showToast(`Table ${table.tableNumber} QR ${nextStatus === 'ACTIVE' ? 'enabled' : 'disabled'}`);
   };
 
   const handleOpenBatchDesigner = () => {
+    if (tables.length === 0) {
+      showToast('Add at least one table before printing standees.');
+      return;
+    }
     setBatchDesignerMode(true);
     setDesignerTable(tables[0]);
     setIsCardDesignerOpen(true);
@@ -419,12 +729,23 @@ export const QrOrderingModule: React.FC = () => {
               <h1 className="text-lg sm:text-xl font-extrabold text-[#0B253A] tracking-tight">
                 Digital Ordering & QR Suite
               </h1>
-              <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                QR Active
+              <span
+                className={`text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                  qrSettings.isQrOrderingActive
+                    ? 'bg-emerald-100 text-emerald-800'
+                    : 'bg-slate-200 text-slate-700'
+                }`}
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    qrSettings.isQrOrderingActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-500'
+                  }`}
+                />
+                {qrSettings.isQrOrderingActive ? 'QR Active' : 'QR Paused'}
               </span>
               <span className="text-[10px] font-black bg-[#FAF7F2] text-[#0B253A] border border-[#EBE6DD] px-2 py-0.5 rounded-full">
-                PRO Plan (₹7,000/mo) • Allotted by Super Admin
+                {PLAN_DEFINITIONS[qrEntitlement.tier]?.name || qrEntitlement.tier} (
+                {formatINR(PLAN_DEFINITIONS[qrEntitlement.tier]?.price || 0)}/mo)
               </span>
             </div>
             <p className="text-xs text-slate-500">
@@ -436,11 +757,11 @@ export const QrOrderingModule: React.FC = () => {
         {/* Action Button */}
         <div className="flex items-center gap-2">
           <button
-            onClick={() => handleOpenCustomerPreview('12')}
+            onClick={() => handleOpenCustomerPreview()}
             className="bg-[#E66817] hover:bg-[#EA580C] text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 shadow-md shadow-[#E66817]/25 transition-all active:scale-95 cursor-pointer"
           >
             <Smartphone className="w-4 h-4" />
-            <span>📱 Test Scan-to-Order Simulator</span>
+            <span>📱 Open Live QR Ordering</span>
           </button>
         </div>
       </div>
@@ -507,17 +828,14 @@ export const QrOrderingModule: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-3">
                 <button
-                  onClick={() => handleOpenCustomerPreview('12')}
+                  onClick={() => handleOpenCustomerPreview()}
                   className="bg-[#E66817] hover:bg-[#EA580C] text-white px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg shadow-[#E66817]/30 transition-all active:scale-95 cursor-pointer"
                 >
                   <Smartphone className="w-4 h-4" />
                   <span>Launch Live Guest Preview</span>
                 </button>
                 <button
-                  onClick={() => {
-                    setDesignerTable(tables[11] || tables[0]);
-                    setIsCardDesignerOpen(true);
-                  }}
+                  onClick={handleOpenBatchDesigner}
                   className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
                 >
                   <Printer className="w-4 h-4" />
@@ -533,10 +851,21 @@ export const QrOrderingModule: React.FC = () => {
                   <span className="text-[11px] font-extrabold uppercase tracking-wider">Active Table QR</span>
                   <Grid className="w-4 h-4 text-emerald-600" />
                 </div>
-                <div className="font-mono font-black text-2xl text-[#0B253A]">{tables.length} Tables</div>
-                <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" /> All 12 tables mapped & active
-                </p>
+                <div className="font-mono font-black text-2xl text-[#0B253A]">
+                  {qrStats.activeTablesCount} / {tables.length}
+                </div>
+                {tablesWithoutQr.length > 0 ? (
+                  <button
+                    onClick={() => setActiveSubTab('TABLES')}
+                    className="text-[10px] text-amber-700 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                  >
+                    <AlertCircle className="w-3 h-3" /> {tablesWithoutQr.length} without a QR token
+                  </button>
+                ) : (
+                  <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Every table has a secure QR token
+                  </p>
+                )}
               </div>
 
               <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-1">
@@ -564,8 +893,12 @@ export const QrOrderingModule: React.FC = () => {
                   <span className="text-[11px] font-extrabold uppercase tracking-wider">Top Table Demand</span>
                   <TrendingUp className="w-4 h-4 text-purple-600" />
                 </div>
-                <div className="font-black text-base text-[#0B253A] truncate">{qrStats.topTable}</div>
-                <p className="text-[10px] text-purple-700 font-bold">Most popular dining spot</p>
+                <div className="font-black text-base text-[#0B253A] truncate">
+                  {hasQrOrderData ? qrStats.topTable : 'No data yet'}
+                </div>
+                <p className="text-[10px] text-purple-700 font-bold">
+                  {hasQrOrderData ? 'Most popular dining spot' : 'Ranks once QR orders arrive'}
+                </p>
               </div>
             </div>
 
@@ -580,46 +913,36 @@ export const QrOrderingModule: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                <div className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <div>
-                    <span className="text-[10px] text-emerald-800 font-bold block uppercase">QR Ordering</span>
-                    <span className="text-xs font-black text-emerald-950">● ACTIVE</span>
+                {serviceStatuses.map((svc) => (
+                  <div
+                    key={svc.key}
+                    className={`p-2.5 rounded-xl border flex items-center gap-2.5 ${
+                      svc.ok ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    <span
+                      className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                        svc.ok ? 'bg-emerald-500' : 'bg-slate-400'
+                      }`}
+                    />
+                    <div className="min-w-0">
+                      <span
+                        className={`text-[10px] font-bold block uppercase ${
+                          svc.ok ? 'text-emerald-800' : 'text-slate-500'
+                        }`}
+                      >
+                        {svc.label}
+                      </span>
+                      <span
+                        className={`text-xs font-black truncate block ${
+                          svc.ok ? 'text-emerald-950' : 'text-slate-600'
+                        }`}
+                      >
+                        {svc.value}
+                      </span>
+                    </div>
                   </div>
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <div>
-                    <span className="text-[10px] text-emerald-800 font-bold block uppercase">Digital Menu</span>
-                    <span className="text-xs font-black text-emerald-950">● LIVE</span>
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <div>
-                    <span className="text-[10px] text-emerald-800 font-bold block uppercase">POS Terminal</span>
-                    <span className="text-xs font-black text-emerald-950">● CONNECTED</span>
-                  </div>
-                </div>
-
-                {/* KDS Dispatch Ready - Real KOT Routing */}
-                <div className="p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-300 flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <div>
-                    <span className="text-[10px] text-emerald-800 font-bold block uppercase">KDS Routing</span>
-                    <span className="text-xs font-black text-emerald-950">● ONLINE & ROUTING</span>
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <div>
-                    <span className="text-[10px] text-emerald-800 font-bold block uppercase">Thermal Printer</span>
-                    <span className="text-xs font-black text-emerald-950">● READY</span>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -681,12 +1004,18 @@ export const QrOrderingModule: React.FC = () => {
                 <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-2">
                   <span className="text-[10px] font-black uppercase text-slate-400">Most Ordered Delicacy</span>
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-amber-50 border border-[#FED7AA] flex items-center justify-center text-[#E66817] font-black shrink-0">
-                      🍛
+                    <div className="w-12 h-12 rounded-xl bg-amber-50 border border-[#FED7AA] flex items-center justify-center text-[#E66817] shrink-0">
+                      <UtensilsCrossed className="w-5 h-5" />
                     </div>
-                    <div>
-                      <h4 className="font-extrabold text-xs text-[#0B253A]">{qrStats.topDish}</h4>
-                      <p className="text-[11px] text-slate-500">Highest scanned & customized dish</p>
+                    <div className="min-w-0">
+                      <h4 className="font-extrabold text-xs text-[#0B253A] truncate">
+                        {hasQrOrderData ? qrStats.topDish : 'No QR orders yet'}
+                      </h4>
+                      <p className="text-[11px] text-slate-500">
+                        {hasQrOrderData
+                          ? 'Highest scanned & customized dish'
+                          : 'This ranks the moment guests start ordering'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -711,6 +1040,16 @@ export const QrOrderingModule: React.FC = () => {
                 </div>
 
                 <div className="divide-y divide-slate-100">
+                  {allQrOrders.length === 0 && (
+                    <div className="py-10 text-center space-y-2">
+                      <ShoppingBag className="w-9 h-9 text-slate-300 mx-auto stroke-1" />
+                      <h4 className="text-xs font-black text-[#0B253A]">No table QR orders yet</h4>
+                      <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+                        Orders placed by guests scanning a table QR code appear here instantly, and route
+                        straight to POS billing and the kitchen KOT queue.
+                      </p>
+                    </div>
+                  )}
                   {allQrOrders.slice(0, 5).map((order) => (
                     <div
                       key={order.id}
@@ -729,7 +1068,7 @@ export const QrOrderingModule: React.FC = () => {
                             Token #{order.tokenNumber}
                           </span>
                           <span className="text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full">
-                            📍 Table {order.tableNumber || '12'}
+                            📍 Table {order.tableNumber || 'Unassigned'}
                           </span>
                           {order.customerNotes && (
                             <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded truncate max-w-[140px]">
@@ -763,6 +1102,8 @@ export const QrOrderingModule: React.FC = () => {
                                 ? 'bg-amber-100 text-amber-800 animate-pulse'
                                 : order.orderStatus === 'READY'
                                 ? 'bg-blue-100 text-blue-800'
+                                : order.orderStatus === 'CANCELLED' || order.orderStatus === 'REFUNDED'
+                                ? 'bg-rose-100 text-rose-800'
                                 : 'bg-slate-100 text-slate-700'
                             }`}
                           >
@@ -773,7 +1114,7 @@ export const QrOrderingModule: React.FC = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleOpenCustomerPreview(order.tableNumber || '12', order.id);
+                            handleOpenCustomerPreview(order.tableNumber || tables[0]?.tableNumber || '', order.id);
                           }}
                           className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
                           title="Open Live Customer Tracker"
@@ -794,26 +1135,29 @@ export const QrOrderingModule: React.FC = () => {
         {/* ============================================================ */}
         {activeSubTab === 'TABLES' && (
           <div className="space-y-4 max-w-7xl mx-auto">
-            {/* Action Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs">
-              <div>
+            {/* Action Bar matching Image 5 layout */}
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-5 rounded-3xl border border-[#EBE6DD] shadow-2xs">
+              <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-black text-[#0B253A]">Restaurant Table QR Management</h2>
-                  <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                  <h2 className="text-base font-black text-[#0B253A]">Tables & QR</h2>
+                  <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-200">
                     {tables.filter((t) => t.qrStatus !== 'DISABLED').length} / {tables.length} Active
                   </span>
                 </div>
-                <p className="text-xs text-slate-500">
-                  Every table has a unique deterministic identifier allotted by Super Admin. Select tables below for standee printing or operational status.
+                <p className="text-xs text-slate-500 font-medium">
+                  Operational table records connected directly to the POS order engine and guest QR scanner.
                 </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={handleSelectAllTables}
-                  className="bg-[#FAF7F2] hover:bg-slate-100 text-[#0B253A] border border-[#EBE6DD] px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer"
+                  disabled={tables.length === 0}
+                  className="bg-[#FAF7F2] hover:bg-slate-100 text-[#0B253A] border border-[#EBE6DD] px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {selectedTableNumbers.length === tables.length ? 'Deselect All' : `Select All (${tables.length})`}
+                  {selectedTableNumbers.length === tables.length && tables.length > 0
+                    ? 'Deselect All'
+                    : `Select All (${tables.length})`}
                 </button>
 
                 <button
@@ -821,8 +1165,57 @@ export const QrOrderingModule: React.FC = () => {
                   className="bg-[#0B253A] hover:bg-[#123959] text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5 text-[#E66817]" />
-                  <span>Batch Print All Standees</span>
+                  <span>Batch Print Standees</span>
                 </button>
+
+                {/* Primary [+ Add Table] button matching Image 5 */}
+                <button
+                  onClick={() => setIsAddTableOpen(true)}
+                  className="bg-[#0B253A] hover:bg-[#123959] text-white px-5 py-2 rounded-full text-xs font-black flex items-center gap-1.5 shadow-md shadow-[#0B253A]/20 transition-all cursor-pointer"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Table</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Filter and Search Strip */}
+            <div className="bg-white p-3.5 rounded-2xl border border-[#EBE6DD] shadow-2xs flex flex-wrap items-center justify-between gap-3">
+              <div className="relative flex-1 min-w-[220px] max-w-md">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={tableSearch}
+                  onChange={(e) => setTableSearch(e.target.value)}
+                  placeholder="Search table number, dining zone..."
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={tableZoneFilter}
+                  onChange={(e) => setTableZoneFilter(e.target.value)}
+                  className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+                >
+                  <option value="ALL">All Dining Areas ({distinctZones.length})</option>
+                  {distinctZones.map((z) => (
+                    <option key={z} value={z}>
+                      {z}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={tableStatusFilter}
+                  onChange={(e) => setTableStatusFilter(e.target.value)}
+                  className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+                >
+                  <option value="ALL">All QR Statuses</option>
+                  <option value="ACTIVE">● Active QR Only</option>
+                  <option value="DISABLED">● Disabled QR Only</option>
+                </select>
               </div>
             </div>
 
@@ -854,8 +1247,19 @@ export const QrOrderingModule: React.FC = () => {
                   </button>
 
                   <button
+                    onClick={handleBulkRegenerateQr}
+                    className="px-3 py-1.5 rounded-xl bg-white border border-amber-400 text-amber-800 hover:bg-amber-100 text-xs font-black flex items-center gap-1 cursor-pointer shadow-xs"
+                    title="Issue fresh high-entropy tokens for the selected tables"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Regenerate QR</span>
+                  </button>
+
+                  <button
                     onClick={() => {
+                      const first = tables.find((t) => selectedTableNumbers.includes(t.tableNumber));
                       setBatchDesignerMode(true);
+                      setDesignerTable(first || tables[0] || null);
                       setIsCardDesignerOpen(true);
                     }}
                     className="px-3.5 py-1.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-black flex items-center gap-1 cursor-pointer shadow-sm"
@@ -867,17 +1271,61 @@ export const QrOrderingModule: React.FC = () => {
               </div>
             )}
 
-            {/* Tables Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {tables.map((table) => {
-                const shortCode = table.qrShortCode || `QR-TABLE-${table.tableNumber.padStart(3, '0')}`;
-                const ordersToday = table.totalOrdersToday || allQrOrders.filter((o) => o.tableNumber === table.tableNumber).length;
-                const revenueToday = table.totalRevenueToday || allQrOrders
-                  .filter((o) => o.tableNumber === table.tableNumber && o.orderStatus !== 'CANCELLED')
-                  .reduce((s, o) => s + o.totalAmount, 0);
+            {/* Empty states: no tables at all vs. none matching the current filters */}
+            {tables.length === 0 && (
+              <div className="bg-white border border-[#EBE6DD] rounded-3xl p-12 text-center space-y-3 shadow-2xs">
+                <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] border border-[#FED7AA] flex items-center justify-center text-[#E66817] mx-auto">
+                  <Grid className="w-7 h-7" />
+                </div>
+                <h3 className="text-sm font-black text-[#0B253A]">No tables configured yet</h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                  Add your dining tables to generate secure QR codes, print tent-card standees, and start
+                  accepting guest self-orders straight into POS and the kitchen.
+                </p>
+                <button
+                  onClick={() => setIsAddTableOpen(true)}
+                  className="mt-1 px-5 py-2.5 rounded-full bg-[#0B253A] hover:bg-[#123959] text-white text-xs font-black inline-flex items-center gap-1.5 shadow-md cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Your First Table</span>
+                </button>
+              </div>
+            )}
 
+            {tables.length > 0 && filteredTables.length === 0 && (
+              <div className="bg-white border border-[#EBE6DD] rounded-3xl p-10 text-center space-y-3 shadow-2xs">
+                <Search className="w-9 h-9 text-slate-300 mx-auto stroke-1" />
+                <h3 className="text-sm font-black text-[#0B253A]">No tables match these filters</h3>
+                <p className="text-xs text-slate-500">
+                  {tables.length} table{tables.length === 1 ? '' : 's'} exist. Try clearing the search or zone
+                  and status filters.
+                </p>
+                <button
+                  onClick={() => {
+                    setTableSearch('');
+                    setTableZoneFilter('ALL');
+                    setTableStatusFilter('ALL');
+                  }}
+                  className="px-4 py-2 rounded-xl border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-black text-[#0B253A] cursor-pointer"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            )}
+
+            {/* Tables Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredTables.map((table) => {
+                const hasQrToken = Boolean(table.qrToken);
+                const shortCode = table.qrShortCode || (hasQrToken ? `QR-TABLE-${table.tableNumber}` : null);
                 const isSelected = selectedTableNumbers.includes(table.tableNumber);
                 const isActive = table.qrStatus !== 'DISABLED';
+                // Counts and revenue always come from the shared order engine, never local state
+                const tableOrders = allQrOrders.filter((o) => o.tableNumber === table.tableNumber);
+                const ordersToday = tableOrders.length;
+                const revenueToday = tableOrders
+                  .filter((o) => o.orderStatus !== 'CANCELLED' && o.orderStatus !== 'REFUNDED')
+                  .reduce((s, o) => s + o.totalAmount, 0);
 
                 return (
                   <div
@@ -886,94 +1334,166 @@ export const QrOrderingModule: React.FC = () => {
                       isSelected ? 'border-[#E66817] ring-1 ring-[#E66817]' : 'border-[#EBE6DD]'
                     }`}
                   >
+                    {/* Top Section matching Image 5: Icon + Table Name + Zone & Seats + Active Badge */}
                     <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-2.5">
+                      <div className="flex items-center gap-3">
                         <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => handleToggleTableSelect(table.tableNumber)}
-                          className="mt-1 accent-[#E66817] rounded cursor-pointer"
+                          className="accent-[#E66817] w-4 h-4 rounded cursor-pointer"
                         />
-                        <div>
+
+                        {/* QR Icon with subtle rounded background */}
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-600 shadow-2xs shrink-0">
+                          <QrCode className="w-6 h-6" />
+                        </div>
+
+                        <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <h3 className="text-base font-black text-[#0B253A]">TABLE {table.tableNumber}</h3>
-                            <span
-                              className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                                isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
-                              }`}
-                            >
-                              ● {isActive ? 'QR Active' : 'QR Disabled'}
-                            </span>
+                            <h3 className="text-base font-black text-[#0B253A]">
+                              Table {table.tableNumber}
+                            </h3>
                           </div>
-                          <p className="text-xs text-slate-500">{table.zone} • {table.capacity} Seats</p>
+                          <p className="text-xs text-slate-500 font-medium">
+                            {table.zone || 'Dining area'} • {table.capacity} seats
+                          </p>
                         </div>
                       </div>
 
-                      <div className="w-9 h-9 rounded-xl bg-amber-50 border border-[#FED7AA] flex items-center justify-center text-[#E66817] shrink-0">
-                        <QrCode className="w-4 h-4" />
+                      {/* Live QR + occupancy status, toggled through the repository */}
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                            table.status === 'OCCUPIED'
+                              ? 'bg-amber-100 text-amber-800'
+                              : table.status === 'RESERVED'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-slate-100 text-slate-600'
+                          }`}
+                          title="Live table occupancy from the shared order engine"
+                        >
+                          {table.status}
+                        </span>
+
+                        <button
+                          onClick={() => handleToggleSingleTableStatus(table)}
+                          className={`text-[11px] font-black px-2.5 py-0.5 rounded-full transition-colors cursor-pointer ${
+                            isActive
+                              ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                              : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                          }`}
+                          title={isActive ? 'Deactivate this table QR' : 'Activate this table QR'}
+                        >
+                          {isActive ? 'Active' : 'Disabled'}
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setEditingTable(table);
+                            setEditCapacity(table.capacity);
+                            setEditZone(table.zone || 'Main Dining Hall');
+                          }}
+                          className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                          title="Edit Table Details"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteTable(table)}
+                          className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                          title="Remove Table"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
 
-                    {/* Stats */}
-                    <div className="bg-[#FAF7F2] p-2.5 rounded-xl border border-[#EBE6DD] flex items-center justify-between text-xs">
-                      <div>
-                        <span className="text-[10px] text-slate-400 uppercase font-bold block">Orders Today</span>
-                        <span className="font-mono font-black text-[#0B253A]">{ordersToday} Orders</span>
+                    {/* Operational Stats Mini Strip */}
+                    <div className="bg-[#FAF7F2] px-3 py-2 rounded-xl border border-[#EBE6DD] flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5 text-slate-600">
+                        <span className="font-bold">Today:</span>
+                        <span className="font-mono font-black text-[#0B253A]">{ordersToday} orders</span>
                       </div>
-                      <div className="text-right">
-                        <span className="text-[10px] text-slate-400 uppercase font-bold block">Revenue</span>
+                      <div className="flex items-center gap-1.5 text-slate-600">
+                        <span className="font-bold">Revenue:</span>
                         <span className="font-mono font-black text-[#E66817]">{formatINR(revenueToday)}</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-500">
-                      <span className="font-mono font-bold text-slate-400">{shortCode}</span>
-                      <span>Last: {table.lastOrderTime || '12:45 PM'}</span>
-                    </div>
+                    {/* Divider */}
+                    <div className="border-t border-slate-100" />
 
-                    {/* Table Actions Row */}
-                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100">
-                      <button
-                        onClick={() => {
-                          setBatchDesignerMode(false);
-                          handleOpenDesigner(table);
-                        }}
-                        className="py-1.5 px-2.5 rounded-xl border border-slate-200 hover:bg-[#FAF7F2] text-xs font-black text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                      >
-                        <Printer className="w-3.5 h-3.5 text-[#E66817]" />
-                        <span>Standee</span>
-                      </button>
+                    {/* Bottom row: real QR short code + copy / rotate / view / download / print */}
+                    {hasQrToken ? (
+                      <div className="flex items-center justify-between gap-2 pt-0.5 flex-wrap">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs text-slate-500 font-medium">
+                            QR code: <span className="font-mono font-bold text-[#0B253A]">{shortCode}</span>
+                          </span>
 
-                      <button
-                        onClick={() => handleOpenCustomerPreview(table.tableNumber)}
-                        className="py-1.5 px-2.5 rounded-xl bg-[#FFF4ED] hover:bg-[#E66817] text-[#E66817] hover:text-white border border-[#E66817]/30 text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                      >
-                        <Smartphone className="w-3.5 h-3.5" />
-                        <span>Test Scan</span>
-                      </button>
-                    </div>
+                          <button
+                            onClick={() => handleCopyQrLink(table)}
+                            className="p-1 text-slate-400 hover:text-[#E66817] transition-colors"
+                            title="Copy QR Order Link"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
 
-                    {/* Secondary Management Row */}
-                    <div className="grid grid-cols-2 gap-2 pt-1 text-[11px]">
-                      <div
-                        className="py-1 px-2 rounded-lg bg-slate-50 text-slate-600 font-mono text-[10px] border border-slate-200 flex items-center justify-between"
-                        title={table.qrToken || 'Token will be provisioned by Super Admin'}
-                      >
-                        <span className="truncate max-w-[85px] font-bold">{table.qrToken ? 'Token Allotted' : 'Pending Allotment'}</span>
-                        <span className="text-[9px] font-black text-emerald-800 bg-emerald-100 px-1 rounded">Super Admin</span>
+                          <button
+                            onClick={() => handleRegenerateQr(table)}
+                            className="p-1 text-slate-400 hover:text-amber-600 transition-colors"
+                            title="Rotate security token (invalidates printed standees)"
+                          >
+                            <RefreshCw className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => handleOpenCustomerPreview(table.tableNumber)}
+                            className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-black text-[#0B253A] transition-colors cursor-pointer"
+                          >
+                            View
+                          </button>
+
+                          <button
+                            onClick={() => handleDownloadQrSvg(table)}
+                            className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-black text-[#0B253A] flex items-center gap-1 transition-colors cursor-pointer"
+                            title="Download Vector QR SVG"
+                          >
+                            <Download className="w-3 h-3 text-slate-500" />
+                            <span>Download</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setBatchDesignerMode(false);
+                              handleOpenDesigner(table);
+                            }}
+                            className="px-3.5 py-1.5 rounded-xl bg-[#0B253A] hover:bg-[#123959] text-white text-xs font-black flex items-center gap-1 transition-colors cursor-pointer shadow-xs"
+                          >
+                            <Printer className="w-3 h-3 text-[#E66817]" />
+                            <span>Print</span>
+                          </button>
+                        </div>
                       </div>
-
-                      <button
-                        onClick={() => handleToggleSingleTableStatus(table)}
-                        className={`py-1 px-2 rounded-lg font-bold border text-center cursor-pointer transition-colors ${
-                          isActive
-                            ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200'
-                            : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
-                        }`}
-                      >
-                        {isActive ? 'Disable QR' : 'Enable QR'}
-                      </button>
-                    </div>
+                    ) : (
+                      <div className="flex items-center justify-between gap-2 pt-0.5 flex-wrap">
+                        <span className="text-xs text-amber-700 font-bold flex items-center gap-1.5">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          No QR token issued
+                        </span>
+                        <button
+                          onClick={() => handleGenerateQr(table)}
+                          className="px-3.5 py-1.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-black flex items-center gap-1 transition-colors cursor-pointer shadow-xs"
+                        >
+                          <QrCode className="w-3 h-3" />
+                          <span>Generate QR</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -1021,7 +1541,7 @@ export const QrOrderingModule: React.FC = () => {
                 </select>
 
                 <button
-                  onClick={() => handleOpenCustomerPreview('12')}
+                  onClick={() => handleOpenCustomerPreview()}
                   className="bg-[#E66817] hover:bg-[#EA580C] text-white px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
                 >
                   <Eye className="w-3.5 h-3.5" />
@@ -1030,17 +1550,34 @@ export const QrOrderingModule: React.FC = () => {
               </div>
             </div>
 
+            {filteredMenuItems.length === 0 && (
+              <div className="bg-white border border-[#EBE6DD] rounded-3xl p-10 text-center space-y-3 shadow-2xs">
+                <UtensilsCrossed className="w-9 h-9 text-slate-300 mx-auto stroke-1" />
+                <h3 className="text-sm font-black text-[#0B253A]">
+                  {menuItems.length === 0 ? 'No dishes on the canonical menu' : 'No dishes match this search'}
+                </h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  {menuItems.length === 0
+                    ? 'Add dishes in Menu Management. The QR digital menu always mirrors the canonical catalog.'
+                    : `${menuItems.length} dishes exist. Try clearing the search or category filter.`}
+                </p>
+                {menuItems.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setMenuSearch('');
+                      setMenuCategoryFilter('ALL');
+                    }}
+                    className="px-4 py-2 rounded-xl border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-black text-[#0B253A] cursor-pointer"
+                  >
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Menu Items Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {menuItems
-                .filter((item) => {
-                  if (menuCategoryFilter !== 'ALL' && item.categoryId !== menuCategoryFilter) return false;
-                  if (menuSearch.trim()) {
-                    const q = menuSearch.toLowerCase();
-                    return item.name.toLowerCase().includes(q) || item.sku.toLowerCase().includes(q);
-                  }
-                  return true;
-                })
+              {filteredMenuItems
                 .map((item) => (
                   <div
                     key={item.id}
@@ -1070,19 +1607,31 @@ export const QrOrderingModule: React.FC = () => {
                     <div className="space-y-1.5 pt-2 border-t border-slate-100 text-[10px]">
                       <div className="flex items-center justify-between">
                         <span className="text-slate-500 font-bold">QR Ordering:</span>
-                        <span className="font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">
+                        <span
+                          className={`font-black px-1.5 py-0.2 rounded ${
+                            item.isQrOrderingEnabled !== false
+                              ? 'text-emerald-700 bg-emerald-50'
+                              : 'text-slate-500 bg-slate-100'
+                          }`}
+                        >
                           {item.isQrOrderingEnabled !== false ? '● Enabled' : '○ Disabled'}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-slate-500 font-bold">Kiosk Touch:</span>
-                        <span className="font-black text-purple-700 bg-purple-50 px-1.5 py-0.2 rounded">
+                        <span
+                          className={`font-black px-1.5 py-0.2 rounded ${
+                            item.isKioskEnabled !== false
+                              ? 'text-purple-700 bg-purple-50'
+                              : 'text-slate-500 bg-slate-100'
+                          }`}
+                        >
                           {item.isKioskEnabled !== false ? '● Enabled' : '○ Disabled'}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-slate-500 font-bold">Station Routing:</span>
-                        <span className="font-bold text-slate-700">{item.kitchenStation || 'Tandoor'}</span>
+                        <span className="font-bold text-slate-700">{item.kitchenStation || 'Unassigned'}</span>
                       </div>
                     </div>
 
@@ -1090,8 +1639,18 @@ export const QrOrderingModule: React.FC = () => {
                     <div className="grid grid-cols-2 gap-2 pt-1">
                       <button
                         onClick={() => {
-                          MenuRepository.toggleItemAvailability(item.id);
+                          const updated = MenuRepository.toggleItemAvailability(
+                            item.id,
+                            undefined,
+                            undefined,
+                            'POS Admin'
+                          );
                           setTick((t) => t + 1);
+                          if (updated) {
+                            showToast(
+                              `${updated.name} marked ${updated.isAvailable ? 'In Stock' : 'Sold Out'}`
+                            );
+                          }
                         }}
                         className={`py-1.5 px-2 rounded-xl text-xs font-black border text-center transition-colors cursor-pointer ${
                           item.isAvailable !== false
@@ -1136,19 +1695,27 @@ export const QrOrderingModule: React.FC = () => {
 
               {/* Status Filter Pills */}
               <div className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-xl border border-[#EBE6DD] overflow-x-auto">
-                {['ALL', 'NEW', 'ACCEPTED', 'PREPARING', 'READY', 'SERVED', 'COMPLETED'].map((st) => (
-                  <button
-                    key={st}
-                    onClick={() => setOrdersStatusFilter(st)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      ordersStatusFilter === st
-                        ? 'bg-[#E66817] text-white shadow-xs font-black'
-                        : 'text-slate-600 hover:text-[#0B253A]'
-                    }`}
-                  >
-                    {st}
-                  </button>
-                ))}
+                {['ALL', 'NEW', 'ACCEPTED', 'PREPARING', 'READY', 'SERVED', 'COMPLETED', 'CANCELLED'].map(
+                  (st) => {
+                    const count =
+                      st === 'ALL'
+                        ? allQrOrders.length
+                        : allQrOrders.filter((o) => o.orderStatus === st).length;
+                    return (
+                      <button
+                        key={st}
+                        onClick={() => setOrdersStatusFilter(st)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                          ordersStatusFilter === st
+                            ? 'bg-[#E66817] text-white shadow-xs font-black'
+                            : 'text-slate-600 hover:text-[#0B253A]'
+                        }`}
+                      >
+                        {st} <span className="font-mono opacity-70">{count}</span>
+                      </button>
+                    );
+                  }
+                )}
               </div>
 
               {/* Table Selector Filter */}
@@ -1175,13 +1742,13 @@ export const QrOrderingModule: React.FC = () => {
                     <ShoppingBag className="w-10 h-10 text-slate-300 mx-auto" />
                     <h4 className="text-xs font-black text-[#0B253A]">No QR Orders Found</h4>
                     <p className="text-[11px] text-slate-500">
-                      Use the customer simulator to place a new test QR order from Table 12.
+                      Place a new live QR table order to see it appear in real-time.
                     </p>
                     <button
-                      onClick={() => handleOpenCustomerPreview('12')}
+                      onClick={() => handleOpenCustomerPreview()}
                       className="px-4 py-2 bg-[#E66817] text-white text-xs font-black rounded-xl shadow-xs cursor-pointer"
                     >
-                      Place Demo QR Order
+                      Open Live QR Ordering
                     </button>
                   </div>
                 ) : (
@@ -1204,7 +1771,7 @@ export const QrOrderingModule: React.FC = () => {
                               #T-{order.tokenNumber}
                             </span>
                             <span className="text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full">
-                              Table {order.tableNumber || '12'}
+                              Table {order.tableNumber || 'Unassigned'}
                             </span>
                           </div>
 
@@ -1232,6 +1799,8 @@ export const QrOrderingModule: React.FC = () => {
                                 ? 'bg-amber-100 text-amber-800'
                                 : order.orderStatus === 'READY'
                                 ? 'bg-blue-100 text-blue-800'
+                                : order.orderStatus === 'CANCELLED' || order.orderStatus === 'REFUNDED'
+                                ? 'bg-rose-100 text-rose-800'
                                 : 'bg-slate-100 text-slate-700'
                             }`}
                           >
@@ -1267,7 +1836,7 @@ export const QrOrderingModule: React.FC = () => {
 
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => handleOpenCustomerPreview(selectedOrder.tableNumber || '12', selectedOrder.id)}
+                          onClick={() => handleOpenCustomerPreview(selectedOrder.tableNumber || tables[0]?.tableNumber || '', selectedOrder.id)}
                           className="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-[#E66817] border border-[#FED7AA] text-xs font-bold flex items-center gap-1 cursor-pointer"
                         >
                           <Smartphone className="w-3.5 h-3.5" />
@@ -1291,13 +1860,21 @@ export const QrOrderingModule: React.FC = () => {
                           <span>Kitchen Station Routing Dispatch</span>
                         </span>
                         <span className="text-[10px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
-                          DEMO SYNC READY
+                          {kotsForSelectedOrder.length}{' '}
+                          {kotsForSelectedOrder.length === 1 ? 'KOT DISPATCHED' : 'KOTS DISPATCHED'}
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-600">
                         {selectedOrder.kitchenRouting?.summaryText ||
                           QrOrderingRepository.getStationRouting(selectedOrder.items).summaryText}
                       </p>
+                      {kotsForSelectedOrder.length > 0 && (
+                        <p className="text-[10px] text-slate-500 font-mono">
+                          {kotsForSelectedOrder
+                            .map((k) => `${k.kotNumber || k.id} - ${k.status}`)
+                            .join('  |  ')}
+                        </p>
+                      )}
                     </div>
 
                     {/* Items List */}
@@ -1394,8 +1971,26 @@ export const QrOrderingModule: React.FC = () => {
                             onClick={() => handleAdvanceOrderStatus(selectedOrder.id, 'COMPLETED')}
                             className="px-3.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-black hover:bg-emerald-700 transition-all cursor-pointer"
                           >
-                            Complete & Settle
+                            Complete &amp; Settle
                           </button>
+                        )}
+
+                        {selectedOrder.orderStatus !== 'COMPLETED' &&
+                          selectedOrder.orderStatus !== 'CANCELLED' && (
+                            <button
+                              onClick={() => handleCancelOrder(selectedOrder)}
+                              className="px-3.5 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-xs font-black hover:bg-rose-100 transition-all cursor-pointer ml-auto"
+                            >
+                              Cancel Order
+                            </button>
+                          )}
+
+                        {(selectedOrder.orderStatus === 'COMPLETED' ||
+                          selectedOrder.orderStatus === 'CANCELLED') && (
+                          <span className="text-[11px] font-bold text-slate-400">
+                            This order is {selectedOrder.orderStatus.toLowerCase()} and can no longer be
+                            advanced.
+                          </span>
                         )}
                       </div>
                     </div>
@@ -1470,17 +2065,47 @@ export const QrOrderingModule: React.FC = () => {
 
               <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-1">
                 <span className="text-[11px] font-extrabold uppercase text-slate-500">Top Revenue Table</span>
-                <div className="font-black text-base text-[#0B253A] truncate">{qrStats.topTable}</div>
-                <p className="text-[10px] text-slate-500">Highest grossing dining station</p>
+                <div className="font-black text-base text-[#0B253A] truncate">
+                  {hasQrOrderData ? qrStats.topTable : 'No data'}
+                </div>
+                <p className="text-[10px] text-slate-500">
+                  {hasQrOrderData ? 'Highest grossing dining station' : 'Needs at least one QR order'}
+                </p>
               </div>
             </div>
 
-            {/* Table-by-Table Performance Grid (Part 15) */}
+            {/* Table-by-Table Performance Grid */}
             <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
-              <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
-                Table-by-Table QR Performance Breakdown
-              </h3>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+                  Table-by-Table QR Performance Breakdown
+                </h3>
+                <span className="text-[10px] font-bold text-slate-400">
+                  Computed from {qrStats.totalOrders} QR order{qrStats.totalOrders === 1 ? '' : 's'} in this
+                  period
+                </span>
+              </div>
 
+              {!hasQrOrderData ? (
+                <div className="py-12 text-center space-y-3">
+                  <TrendingUp className="w-10 h-10 text-slate-300 mx-auto stroke-1" />
+                  <h4 className="text-sm font-black text-[#0B253A]">
+                    No QR orders in the selected period
+                  </h4>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                    There is nothing to report yet for this date range. Adoption, guest spend and busiest-table
+                    rankings appear here as soon as guests order from a table QR code.
+                  </p>
+                  {analyticsDateRange !== 'ALL' && (
+                    <button
+                      onClick={() => setAnalyticsDateRange('ALL')}
+                      className="px-4 py-2 rounded-xl border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-black text-[#0B253A] cursor-pointer"
+                    >
+                      View All Time
+                    </button>
+                  )}
+                </div>
+              ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
@@ -1495,7 +2120,10 @@ export const QrOrderingModule: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {qrStats.tableBreakdown.map((tbl) => {
+                    {qrStats.tableBreakdown
+                      .filter((tbl) => tbl.orderCount > 0)
+                      .sort((a, b) => b.revenue - a.revenue)
+                      .map((tbl) => {
                       const avg = tbl.orderCount > 0 ? Math.round(tbl.revenue / tbl.orderCount) : 0;
                       return (
                         <tr key={tbl.tableNumber} className="hover:bg-[#FAF7F2] transition-colors">
@@ -1514,7 +2142,7 @@ export const QrOrderingModule: React.FC = () => {
                               onClick={() => handleOpenCustomerPreview(tbl.tableNumber)}
                               className="px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-[#E66817] text-[10px] font-black cursor-pointer"
                             >
-                              Simulate
+                              Open Guest View
                             </button>
                           </td>
                         </tr>
@@ -1523,6 +2151,7 @@ export const QrOrderingModule: React.FC = () => {
                   </tbody>
                 </table>
               </div>
+              )}
             </div>
           </div>
         )}
@@ -1646,6 +2275,87 @@ export const QrOrderingModule: React.FC = () => {
                     className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
                   />
                 </div>
+
+                <div className="py-3 flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-black text-[#0B253A] block">Repeat / Add-On Ordering</span>
+                    <span className="text-[11px] text-slate-500">Let a table place further rounds without rescanning the QR code</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={qrSettings.allowRepeatOrdering}
+                    onChange={(e) => handleSaveSettings({ allowRepeatOrdering: e.target.checked })}
+                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                  />
+                </div>
+
+                <div className="py-3 flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-black text-[#0B253A] block">Require Waiter Approval</span>
+                    <span className="text-[11px] text-slate-500">Hold guest orders for captain confirmation before kitchen dispatch</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={qrSettings.requireWaiterApproval}
+                    onChange={(e) => handleSaveSettings({ requireWaiterApproval: e.target.checked })}
+                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                  />
+                </div>
+
+                <div className="py-3 flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-black text-[#0B253A] block">Guest Self-Cancellation</span>
+                    <span className="text-[11px] text-slate-500">Allow guests to cancel their own order before the kitchen starts</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={qrSettings.allowCustomerCancellation}
+                    onChange={(e) => handleSaveSettings({ allowCustomerCancellation: e.target.checked })}
+                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Guest-Facing Presentation */}
+            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+              <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+                Guest-Facing Presentation
+              </h3>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-600">Default Standee Template</label>
+                <select
+                  value={qrSettings.tableQrTemplate}
+                  onChange={(e) =>
+                    handleSaveSettings({
+                      tableQrTemplate: e.target.value as QrOrderingSettings['tableQrTemplate']
+                    })
+                  }
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+                >
+                  <option value="SIGNATURE">JAMANVAAR Royal Signature</option>
+                  <option value="ELEGANT">Deep Navy Imperial</option>
+                  <option value="MODERN">Modern Ivory Card</option>
+                  <option value="MINIMAL">Ink-Saver Monochrome</option>
+                  <option value="PREMIUM">Premium Foil</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-600">Guest Welcome Message</label>
+                <textarea
+                  value={welcomeDraft}
+                  onChange={(e) => setWelcomeDraft(e.target.value)}
+                  onBlur={() => {
+                    if (welcomeDraft !== (qrSettings.welcomeMessage || '')) {
+                      handleSaveSettings({ welcomeMessage: welcomeDraft });
+                    }
+                  }}
+                  rows={2}
+                  placeholder="Shown at the top of the guest digital menu"
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl p-2.5 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                />
               </div>
             </div>
 
@@ -1658,22 +2368,47 @@ export const QrOrderingModule: React.FC = () => {
                   <label className="text-xs font-bold text-slate-600">Minimum Order Value (₹)</label>
                   <input
                     type="number"
-                    value={qrSettings.minOrderValue}
-                    onChange={(e) => handleSaveSettings({ minOrderValue: Number(e.target.value) })}
+                    min="0"
+                    value={minOrderDraft}
+                    onChange={(e) => setMinOrderDraft(e.target.value)}
+                    onBlur={() => {
+                      const next = Math.max(0, Number(minOrderDraft) || 0);
+                      setMinOrderDraft(String(next));
+                      if (next !== qrSettings.minOrderValue) {
+                        handleSaveSettings({ minOrderValue: next });
+                      }
+                    }}
                     className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-mono font-black text-[#0B253A] focus:outline-none focus:border-[#E66817]"
                   />
+                  <p className="text-[10px] text-slate-400">0 disables the minimum.</p>
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-600">Maximum Order Value (₹)</label>
                   <input
                     type="number"
-                    value={qrSettings.maxOrderValue}
-                    onChange={(e) => handleSaveSettings({ maxOrderValue: Number(e.target.value) })}
+                    min="0"
+                    value={maxOrderDraft}
+                    onChange={(e) => setMaxOrderDraft(e.target.value)}
+                    onBlur={() => {
+                      const next = Math.max(0, Number(maxOrderDraft) || 0);
+                      setMaxOrderDraft(String(next));
+                      if (next !== qrSettings.maxOrderValue) {
+                        handleSaveSettings({ maxOrderValue: next });
+                      }
+                    }}
                     className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-mono font-black text-[#0B253A] focus:outline-none focus:border-[#E66817]"
                   />
+                  <p className="text-[10px] text-slate-400">0 disables the cap.</p>
                 </div>
               </div>
+
+              {qrSettings.maxOrderValue > 0 && qrSettings.minOrderValue > qrSettings.maxOrderValue && (
+                <p className="text-[11px] font-bold text-rose-600 flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  Minimum is above the maximum, so no guest order can ever be accepted.
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -1695,6 +2430,7 @@ export const QrOrderingModule: React.FC = () => {
         }}
         selectedTable={designerTable}
         initialBatchMode={batchDesignerMode}
+        initialBatchTableNumbers={batchDesignerMode ? selectedTableNumbers : undefined}
       />
 
       <QrDishConfigModal
@@ -1702,6 +2438,190 @@ export const QrOrderingModule: React.FC = () => {
         onClose={() => setIsDishConfigOpen(false)}
         item={configDish}
       />
+
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="fixed bottom-5 right-5 z-50 bg-[#0B253A] text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-amber-400/30 text-xs font-bold animate-in fade-in slide-in-from-bottom-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
+      {/* Add Table Modal */}
+      {isAddTableOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-[#EBE6DD] space-y-4 animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-[#E66817]">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-[#0B253A]">Add New Restaurant Table</h3>
+                  <p className="text-[11px] text-slate-500">Creates table record with secure QR code</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAddTableOpen(false)}
+                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#0B253A]">Table Number / Name *</label>
+                <input
+                  type="text"
+                  value={newTableNumber}
+                  onChange={(e) => {
+                    setNewTableNumber(e.target.value);
+                    setAddTableError(null);
+                  }}
+                  placeholder="e.g. 12, T-14, VIP-1"
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-black text-sm text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  autoFocus
+                />
+                {addTableError && (
+                  <p className="text-[11px] font-bold text-rose-600">{addTableError}</p>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#0B253A]">Dining Area / Zone</label>
+                <input
+                  type="text"
+                  list="jv-qr-zone-options"
+                  value={newTableZone}
+                  onChange={(e) => setNewTableZone(e.target.value)}
+                  placeholder="Main Dining Hall"
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                />
+                <datalist id="jv-qr-zone-options">
+                  {distinctZones.map((z) => (
+                    <option key={z} value={z} />
+                  ))}
+                </datalist>
+                {distinctZones.length > 0 && (
+                  <p className="text-[10px] text-slate-400">
+                    Existing zones: {distinctZones.join(', ')}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#0B253A]">Seat Capacity</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="50"
+                    value={newTableCapacity}
+                    onChange={(e) => setNewTableCapacity(parseInt(e.target.value, 10) || 1)}
+                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#0B253A]">Floor</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={newTableFloor}
+                    onChange={(e) => setNewTableFloor(parseInt(e.target.value, 10) || 1)}
+                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  />
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-[11px]">
+                ✓ A high-entropy secure QR token (SEC-010) will be automatically generated and linked to this table.
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <button
+                onClick={() => setIsAddTableOpen(false)}
+                className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveAddTable}
+                className="px-4 py-2 rounded-xl bg-[#0B253A] hover:bg-[#123959] text-white text-xs font-black"
+              >
+                Create Table & QR
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Table Modal */}
+      {editingTable && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-[#EBE6DD] space-y-4 animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
+                  <Edit2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-[#0B253A]">Edit Table {editingTable.tableNumber}</h3>
+                  <p className="text-[11px] text-slate-500">Update dining area and seat capacity</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditingTable(null)}
+                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#0B253A]">Dining Area / Zone</label>
+                <input
+                  type="text"
+                  value={editZone}
+                  onChange={(e) => setEditZone(e.target.value)}
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#0B253A]">Seat Capacity</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="50"
+                  value={editCapacity}
+                  onChange={(e) => setEditCapacity(parseInt(e.target.value, 10) || 1)}
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                />
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <button
+                onClick={() => setEditingTable(null)}
+                className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEditTable}
+                className="px-4 py-2 rounded-xl bg-[#0B253A] hover:bg-[#123959] text-white text-xs font-black"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

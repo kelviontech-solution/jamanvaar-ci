@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '../auth/AuthContext';
 import { ProtectedLayout } from '../layout/ProtectedLayout';
 import { ErrorBoundary } from '../components/ErrorBoundary';
@@ -35,6 +35,7 @@ import { AiAssistantPage } from '../pages/AiAssistant/AiAssistantPage';
 import { SyncMonitorPage } from '../pages/SyncMonitor/SyncMonitorPage';
 import { OfflinePolicyPage } from '../pages/OfflinePolicy/OfflinePolicyPage';
 import { SandboxesPage } from '../pages/Sandboxes/SandboxesPage';
+import { QrOrderingPage } from '../pages/QrOrdering/QrOrderingPage';
 
 /** Wraps a page element so a render crash on this one route can't blank the whole console. */
 function page(name: string, element: JSX.Element) {
@@ -44,13 +45,18 @@ function page(name: string, element: JSX.Element) {
 export function App() {
   return (
     <ErrorBoundary boundaryName="root">
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthProvider>
           <Routes>
             <Route path="/login" element={page('Login', <LoginPage />)} />
             <Route path="/activate" element={page('Activate', <PlatformActivatePage />)} />
             <Route element={<ProtectedLayout />}>
               <Route path="/" element={page('Dashboard', <DashboardPage />)} />
+              {/* BUG-HIGH-001: "/dashboard" was never a registered path (the
+                  dashboard has always lived at "/") but is exactly the URL
+                  habit/muscle-memory or an old bookmark would produce —
+                  redirect it instead of 404ing. */}
+              <Route path="/dashboard" element={<Navigate to="/" replace />} />
               <Route path="/restaurants" element={page('RestaurantsList', <RestaurantsListPage />)} />
               <Route path="/restaurants/onboard" element={page('OnboardRestaurant', <OnboardRestaurantPage />)} />
               <Route path="/restaurants/:id" element={page('RestaurantDetail', <RestaurantDetailPage />)} />
@@ -60,6 +66,7 @@ export function App() {
               <Route path="/branches/:id" element={page('BranchDetail', <BranchDetailPage />)} />
               <Route path="/plans" element={page('PlansList', <PlansListPage />)} />
               <Route path="/plans/:id" element={page('PlanDetail', <PlanDetailPage />)} />
+              <Route path="/qr-ordering" element={page('QrOrdering', <QrOrderingPage />)} />
               <Route path="/ai-assistant" element={page('AiAssistant', <AiAssistantPage />)} />
               <Route path="/catalog" element={page('MasterCatalog', <MasterCatalogPage />)} />
               <Route path="/subscriptions" element={page('SubscriptionsList', <SubscriptionsListPage />)} />
@@ -81,6 +88,10 @@ export function App() {
               <Route path="/system-health" element={page('SystemHealth', <SystemHealthPage />)} />
               <Route path="/settings/platform" element={page('PlatformSettings', <PlatformSettingsPage />)} />
               <Route path="/profile" element={page('Profile', <ProfilePage />)} />
+              {/* Any other unmatched path while authenticated — back to the
+                  dashboard rather than a bare "No routes matched" console
+                  warning and a blank page. */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
         </AuthProvider>

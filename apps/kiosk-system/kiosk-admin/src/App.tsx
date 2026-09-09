@@ -901,8 +901,18 @@ export default function AdminApp() {
         </div>
       )}
 
-      {/* TOP STATUS BAR */}
-      <header className="h-16 sm:h-20 bg-white border-b border-[#EBE6DD] px-4 sm:px-6 flex items-center justify-between shadow-sm sticky top-0 z-30">
+      {/* TOP STATUS BAR
+          BUG-MED-001 fix: this row used to be a strict non-wrapping flex
+          with a FIXED height (h-16/h-20). Between the tab-pill status
+          badges appearing at "md" and the LOCAL SERVICE badge only hiding
+          below "xl", there is a width band (roughly 1024-1180px) where the
+          left cluster (brand + tab pills) and the right cluster (sound /
+          assistant / network / profile) don't both fit, and — because the
+          height was fixed rather than a minimum — anything past that hit
+          its shrink floor and rendered on top of its neighbour instead of
+          dropping to a second row. flex-wrap + min-h (not h) lets it grow
+          to two rows on narrow widths instead of colliding. */}
+      <header className="min-h-16 sm:min-h-20 bg-white border-b border-[#EBE6DD] px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-y-2 shadow-sm sticky top-0 z-30">
         {/* Left: Real JAMANVAAR Brand Identity */}
         <div className="flex items-center gap-4 sm:gap-6">
           <BrandHeader

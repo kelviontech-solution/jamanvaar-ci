@@ -27,10 +27,25 @@ async function main() {
 async function seedInPlatformContext(tx: Prisma.TransactionClient) {
   const superAdminEmail = process.env.SEED_SUPER_ADMIN_EMAIL ?? 'superadmin@jamanvaar.app';
 
+  // Explicit, opt-in override for a known local/dev/CI password. Left unset,
+  // a fresh super admin gets a random password printed once below (never
+  // stored in a file, never hardcoded) — the secure default. This exists so
+  // a developer or CI pipeline that wants a deterministic credential can
+  // have one without a hardcoded password ever living in source (see the
+  // now-removed auth bypass this replaced, platform-auth.service.ts SEC-011).
+  const overridePassword = process.env.SEED_SUPER_ADMIN_PASSWORD || null;
+  // Second, separate opt-in: overridePassword alone only affects a NEW
+  // super admin. Rotating an EXISTING one's password requires this explicit
+  // second flag too, so re-running seed against a real deployment can never
+  // silently clobber a live credential just because the env still happens
+  // to carry an old override value from someone's shell profile.
+  const allowReset = process.env.SEED_RESET_SUPER_ADMIN_PASSWORD === 'true';
+
   let superAdminPassword: string | null = null;
+  let superAdminWasReset = false;
   const existingSuperAdmin = await tx.platformUser.findUnique({ where: { email: superAdminEmail } });
   if (!existingSuperAdmin) {
-    superAdminPassword = randomBytes(9).toString('base64url');
+    superAdminPassword = overridePassword || randomBytes(9).toString('base64url');
     await tx.platformUser.create({
       data: {
         email: superAdminEmail,
@@ -40,6 +55,13 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
         status: 'ACTIVE'
       }
     });
+  } else if (overridePassword && allowReset) {
+    await tx.platformUser.update({
+      where: { id: existingSuperAdmin.id },
+      data: { passwordHash: await bcrypt.hash(overridePassword, 10) }
+    });
+    superAdminPassword = overridePassword;
+    superAdminWasReset = true;
   }
 
   const coreEntitlements = {
@@ -168,25 +190,70 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     }
   });
 
+  // Same opt-in shape as the super admin above: unset, a fresh owner is
+  // invited the normal way (a one-time activation token, printed once,
+  // redeemed through POST /tenant-auth/set-initial-password like any real
+  // invitee). Set SEED_DEMO_OWNER_PASSWORD to also skip straight to an
+  // ACTIVE account with that password — useful for local dev/CI/Captain and
+  // POS Admin testing, where waiting on the invitation dance for a demo
+  // account buys nothing. Never applied to a real invited user, only to
+  // this seed-created demo owner.
+  const demoOwnerPassword = process.env.SEED_DEMO_OWNER_PASSWORD || null;
+  const allowDemoOwnerReset = process.env.SEED_RESET_DEMO_OWNER_PASSWORD === 'true';
+
   let demoOwnerActivationToken: string | null = null;
+  let demoOwnerActivatedNow = false;
   const existingDemoOwner = await tx.user.findUnique({
     where: { restaurantId_email: { restaurantId: demoRestaurant.id, email: 'owner@demo.jamanvaar.app' } }
   });
   if (!existingDemoOwner) {
-    demoOwnerActivationToken = randomBytes(32).toString('base64url');
-    await tx.user.create({
+    if (demoOwnerPassword) {
+      await tx.user.create({
+        data: {
+          restaurantId: demoRestaurant.id,
+          branchId: demoBranch.id,
+          email: 'owner@demo.jamanvaar.app',
+          fullName: 'Demo Owner',
+          role: 'OWNER',
+          status: 'ACTIVE',
+          invitedAt: new Date(),
+          activatedAt: new Date(),
+          passwordHash: await bcrypt.hash(demoOwnerPassword, 10)
+        }
+      });
+      demoOwnerActivatedNow = true;
+    } else {
+      demoOwnerActivationToken = randomBytes(32).toString('base64url');
+      await tx.user.create({
+        data: {
+          restaurantId: demoRestaurant.id,
+          branchId: demoBranch.id,
+          email: 'owner@demo.jamanvaar.app',
+          fullName: 'Demo Owner',
+          role: 'OWNER',
+          status: 'PENDING_ACTIVATION',
+          invitedAt: new Date(),
+          activationTokenHash: hashOpaqueToken(demoOwnerActivationToken),
+          activationTokenExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
+      });
+    }
+  } else if (demoOwnerPassword && (existingDemoOwner.status === 'PENDING_ACTIVATION' || allowDemoOwnerReset)) {
+    // A still-pending invite is always safe to fast-track this way (nobody
+    // has a working password for it yet). An already-ACTIVE owner is only
+    // touched with the explicit second flag, same double opt-in as the
+    // super admin reset above.
+    await tx.user.update({
+      where: { id: existingDemoOwner.id },
       data: {
-        restaurantId: demoRestaurant.id,
-        branchId: demoBranch.id,
-        email: 'owner@demo.jamanvaar.app',
-        fullName: 'Demo Owner',
-        role: 'OWNER',
-        status: 'PENDING_ACTIVATION',
-        invitedAt: new Date(),
-        activationTokenHash: hashOpaqueToken(demoOwnerActivationToken),
-        activationTokenExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        status: 'ACTIVE',
+        activatedAt: existingDemoOwner.activatedAt ?? new Date(),
+        activationTokenHash: null,
+        activationTokenExpiresAt: null,
+        passwordHash: await bcrypt.hash(demoOwnerPassword, 10)
       }
     });
+    demoOwnerActivatedNow = true;
   }
 
   const existingSubscription = await tx.subscription.findFirst({
@@ -357,20 +424,36 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
   console.log('--- Seed complete ---');
   console.log(`Plans: ${corePlan.name} + JAMANVAAR PRO`);
   console.log(`Demo restaurant: ${demoRestaurant.name} (${demoRestaurant.id})`);
-  if (superAdminPassword) {
+  if (superAdminWasReset) {
+    console.log('');
+    console.log('Super Admin password RESET via SEED_RESET_SUPER_ADMIN_PASSWORD — save it now, it is not stored or shown again:');
+    console.log(`  email:    ${superAdminEmail}`);
+    console.log(`  password: ${superAdminPassword}`);
+  } else if (superAdminPassword) {
     console.log('');
     console.log('Super Admin created — save this password now, it is not stored or shown again:');
     console.log(`  email:    ${superAdminEmail}`);
     console.log(`  password: ${superAdminPassword}`);
   } else {
-    console.log(`Super Admin already exists: ${superAdminEmail}`);
+    console.log(`Super Admin already exists: ${superAdminEmail} (password unchanged — set SEED_SUPER_ADMIN_PASSWORD and SEED_RESET_SUPER_ADMIN_PASSWORD=true to rotate it)`);
   }
-  if (demoOwnerActivationToken) {
+  if (demoOwnerActivatedNow && demoOwnerPassword) {
+    console.log('');
+    console.log('Demo restaurant owner ACTIVE via SEED_DEMO_OWNER_PASSWORD — save this password now, it is not stored or shown again:');
+    console.log(`  restaurantId: ${demoRestaurant.id}`);
+    console.log(`  email:        owner@demo.jamanvaar.app`);
+    console.log(`  password:     ${demoOwnerPassword}`);
+    console.log('  This is the account POS Admin / Captain / POS device-connect screens should log in with.');
+  } else if (demoOwnerActivationToken) {
     console.log('');
     console.log('Demo restaurant owner invitation — save this token now, it is not stored or shown again:');
     console.log(`  restaurantId: ${demoRestaurant.id}`);
     console.log(`  email:        owner@demo.jamanvaar.app`);
     console.log(`  token:        ${demoOwnerActivationToken}`);
+    console.log('  Redeem it via POST /api/v1/tenant-auth/set-initial-password, or re-run this seed with');
+    console.log('  SEED_DEMO_OWNER_PASSWORD=<password> set to activate the account directly.');
+  } else {
+    console.log(`Demo restaurant owner already exists: owner@demo.jamanvaar.app (status unchanged — set SEED_DEMO_OWNER_PASSWORD and SEED_RESET_DEMO_OWNER_PASSWORD=true to activate/rotate it)`);
   }
 }
 

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { db, QrOrderingRepository, MenuRepository, NotificationRepository } from '@jamanvaar/database';
+import { db, QrOrderingRepository, MenuRepository, NotificationRepository, KOTRepository } from '@jamanvaar/database';
+import { lanMeshSync } from '@jamanvaar/sync';
 import { MenuItem, DiningTable, Order, SelectedModifier, DietaryType, OrderStatus } from '@jamanvaar/types';
 import { formatINR, generateQrDataUrl } from '@jamanvaar/utils';
 import {
@@ -33,6 +34,8 @@ import {
 interface GuestQrOrderingPageProps {
   tableNumber?: string;
   qrToken?: string;
+  /** Jump straight to the live tracker for an existing order (used by the POS "Guest Tracker" action). */
+  initialOrderId?: string;
   onExit?: () => void;
 }
 
@@ -48,15 +51,27 @@ interface LocalCartItem {
 export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   tableNumber: propTableNumber,
   qrToken: propQrToken,
+  initialOrderId,
   onExit
 }) => {
   // Extract table and token from props or URL query parameters
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const initialTableNumber = propTableNumber || urlParams?.get('qrTable') || urlParams?.get('table') || '12';
-  const initialToken = propQrToken || urlParams?.get('token') || urlParams?.get('qrToken') || '';
+  const initialTableNumber = propTableNumber || urlParams?.get('qrTable') || urlParams?.get('table') || '1';
+  const tableRec = db.tables.find((t) => t.tableNumber === initialTableNumber);
+  const initialToken = propQrToken || urlParams?.get('token') || urlParams?.get('qrToken') || tableRec?.qrToken || '';
 
   const [tableNumber, setTableNumber] = useState<string>(initialTableNumber);
   const [token, setToken] = useState<string>(initialToken);
+
+  useEffect(() => {
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const currentTableNum = propTableNumber || params?.get('qrTable') || params?.get('table') || '1';
+    setTableNumber(currentTableNum);
+
+    const tRec = db.tables.find((t) => t.tableNumber === currentTableNum);
+    const currentTok = propQrToken || params?.get('token') || params?.get('qrToken') || tRec?.qrToken || '';
+    setToken(currentTok);
+  }, [propTableNumber, propQrToken]);
 
   // View state: 'MENU' | 'CUSTOMIZE' | 'CART' | 'TRACKING'
   const [viewState, setViewState] = useState<'MENU' | 'CUSTOMIZE' | 'CART' | 'TRACKING'>('MENU');
@@ -67,8 +82,8 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   // Customization modal state
   const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
   const [itemQuantity, setItemQuantity] = useState<number>(1);
-  const [selectedSpice, setSelectedSpice] = useState<string>('Medium');
-  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
+  /** Chosen modifier option ids keyed by the REAL modifier group id from db.modifierGroups. */
+  const [selectedOptionIds, setSelectedOptionIds] = useState<Record<string, string[]>>({});
   const [specialNote, setSpecialNote] = useState<string>('');
 
   // Cart state
@@ -80,7 +95,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   const [isPlacingOrder, setIsPlacingOrder] = useState<boolean>(false);
 
   // Order tracking state
-  const [activeTrackedOrderId, setActiveTrackedOrderId] = useState<string | null>(null);
+  const [activeTrackedOrderId, setActiveTrackedOrderId] = useState<string | null>(initialOrderId || null);
   const [tick, setTick] = useState<number>(0);
   const [serviceRequested, setServiceRequested] = useState<boolean>(false);
 
@@ -90,6 +105,14 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
     return unsub;
   }, []);
 
+  // Deep-link straight into the live tracker when POS opens a specific guest order
+  useEffect(() => {
+    if (initialOrderId) {
+      setActiveTrackedOrderId(initialOrderId);
+      setViewState('TRACKING');
+    }
+  }, [initialOrderId]);
+
   // Verify Table & QR token
   const verification = useMemo(() => {
     return QrOrderingRepository.verifyQrToken(tableNumber, token || undefined);
@@ -98,6 +121,62 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   const restaurant = db.restaurant || { name: 'JAMANVAAR RESTAURANT', city: 'Ahmedabad' };
   const outlet = db.outlet || { name: 'Ahmedabad Flagship Store' };
   const table = verification.table || db.tables.find((t) => t.tableNumber === tableNumber);
+
+  // Live QR ordering rules configured by the restaurant admin (QR Settings tab)
+  const qrSettings = useMemo(() => QrOrderingRepository.getSettings(), [tick]);
+
+  /**
+   * Modifier groups actually configured for the dish being customised.
+   * These come straight out of db.modifierGroups - the guest UI must never invent
+   * its own option names or prices, because createCustomerQrOrder re-validates every
+   * modifier against the canonical catalog (SEC-004) and rejects anything unknown.
+   */
+  const activeModifierGroups = useMemo(() => {
+    if (!customizingItem) return [];
+    if (!qrSettings.allowCustomerModifications) return [];
+    const ids = customizingItem.modifierGroupIds || [];
+    return db.modifierGroups
+      .filter((g) => ids.includes(g.id))
+      .map((g) => ({
+        ...g,
+        options: g.options.filter((o) => o.isAvailable !== false)
+      }))
+      .filter((g) => g.options.length > 0)
+      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  }, [customizingItem, qrSettings.allowCustomerModifications, tick]);
+
+  /** Flattens the current selection into real SelectedModifier records with catalog prices. */
+  const buildSelectedModifiers = (): SelectedModifier[] => {
+    const out: SelectedModifier[] = [];
+    activeModifierGroups.forEach((group) => {
+      const chosen = selectedOptionIds[group.id] || [];
+      chosen.forEach((optId) => {
+        const opt = group.options.find((o) => o.id === optId);
+        if (!opt) return;
+        out.push({
+          groupId: group.id,
+          groupName: group.name,
+          optionId: opt.id,
+          optionName: opt.name,
+          priceDelta: opt.priceDelta
+        });
+      });
+    });
+    return out;
+  };
+
+  const selectedModifierDelta = useMemo(() => {
+    return buildSelectedModifiers().reduce((sum, m) => sum + m.priceDelta, 0);
+  }, [selectedOptionIds, activeModifierGroups]);
+
+  /** Required groups (e.g. Spice Level) must be answered before the dish can be added. */
+  const unmetRequiredGroups = useMemo(() => {
+    return activeModifierGroups.filter((g) => {
+      const chosen = selectedOptionIds[g.id] || [];
+      const min = g.isRequired ? Math.max(1, g.minSelections || 1) : g.minSelections || 0;
+      return chosen.length < min;
+    });
+  }, [activeModifierGroups, selectedOptionIds]);
 
   // Categories & Menu items
   const categories = useMemo(() => {
@@ -140,71 +219,66 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
     return db.orders.find((o) => o.id === activeTrackedOrderId || o.orderNumber === activeTrackedOrderId);
   }, [activeTrackedOrderId, tick, db.orders]);
 
-  // Handle opening customizer
+  // Handle opening customizer - pre-selects each group's catalog default
   const handleOpenCustomize = (item: MenuItem) => {
+    const ids = item.modifierGroupIds || [];
+    const groups = db.modifierGroups.filter((g) => ids.includes(g.id));
+    const defaults: Record<string, string[]> = {};
+    groups.forEach((g) => {
+      const available = g.options.filter((o) => o.isAvailable !== false);
+      const def = available.find((o) => o.isDefault);
+      if (def) {
+        defaults[g.id] = [def.id];
+      } else if (g.isRequired && available.length > 0) {
+        defaults[g.id] = [available[0].id];
+      } else {
+        defaults[g.id] = [];
+      }
+    });
+
     setCustomizingItem(item);
     setItemQuantity(1);
-    setSelectedSpice('Medium');
-    setSelectedAddons([]);
+    setSelectedOptionIds(defaults);
     setSpecialNote('');
     setViewState('CUSTOMIZE');
   };
 
-  // Quick add (default spice, no addons)
-  const handleQuickAdd = (item: MenuItem) => {
-    const existing = cartItems.find(
-      (ci) => ci.menuItem.id === item.id && ci.selectedModifiers.length === 0 && !ci.specialInstructions
-    );
+  /** Toggles one catalog option, honouring the group's min/max selection rules. */
+  const handleToggleModifierOption = (
+    groupId: string,
+    optionId: string,
+    maxSelections: number,
+    isRequired: boolean
+  ) => {
+    setSelectedOptionIds((prev) => {
+      const current = prev[groupId] || [];
+      const alreadyChosen = current.includes(optionId);
 
-    if (existing) {
-      handleUpdateCartQty(existing.cartId, 1);
-    } else {
-      const newItem: LocalCartItem = {
-        cartId: `ci-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-        menuItem: item,
-        quantity: 1,
-        selectedModifiers: [],
-        specialInstructions: '',
-        totalPrice: item.price
-      };
-      setCartItems((prev) => [...prev, newItem]);
-    }
+      // Single-select group behaves like a radio button
+      if (maxSelections <= 1) {
+        if (alreadyChosen && !isRequired) {
+          return { ...prev, [groupId]: [] };
+        }
+        return { ...prev, [groupId]: [optionId] };
+      }
+
+      if (alreadyChosen) {
+        return { ...prev, [groupId]: current.filter((id) => id !== optionId) };
+      }
+      if (current.length >= maxSelections) {
+        return prev;
+      }
+      return { ...prev, [groupId]: [...current, optionId] };
+    });
   };
 
-  // Add customized item to cart
+  // Add customized item to cart using REAL catalog modifier records
   const handleAddCustomizedToCart = () => {
     if (!customizingItem) return;
+    if (unmetRequiredGroups.length > 0) return;
 
-    const modifiers: SelectedModifier[] = [];
-    if (selectedSpice) {
-      modifiers.push({
-        groupId: 'mod-spice',
-        groupName: 'Spice Level',
-        optionId: `spice-${selectedSpice.toLowerCase()}`,
-        optionName: selectedSpice,
-        priceDelta: 0
-      });
-    }
-
-    let addOnTotalDelta = 0;
-    selectedAddons.forEach((addonName) => {
-      let delta = 0;
-      if (addonName === 'Extra Cheese') delta = 40;
-      else if (addonName === 'Extra Butter') delta = 20;
-      else if (addonName === 'Extra Chutney') delta = 0;
-      else if (addonName === 'Extra Onion') delta = 0;
-
-      addOnTotalDelta += delta;
-      modifiers.push({
-        groupId: 'mod-addons',
-        groupName: 'Add-ons',
-        optionId: `addon-${addonName.toLowerCase().replace(/\s+/g, '-')}`,
-        optionName: addonName,
-        priceDelta: delta
-      });
-    });
-
-    const unitPrice = customizingItem.price + addOnTotalDelta;
+    const modifiers = buildSelectedModifiers();
+    const unitPrice = customizingItem.price + modifiers.reduce((sum, m) => sum + m.priceDelta, 0);
     const totalPrice = unitPrice * itemQuantity;
 
     const newItem: LocalCartItem = {
@@ -212,7 +286,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
       menuItem: customizingItem,
       quantity: itemQuantity,
       selectedModifiers: modifiers,
-      specialInstructions: specialNote,
+      specialInstructions: qrSettings.allowSpecialInstructions ? specialNote : '',
       totalPrice
     };
 
@@ -240,9 +314,27 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
     );
   };
 
+  /** Real order-value guardrails configured in QR Settings. Returns null when the cart is allowed. */
+  const orderValueBlockReason = useMemo(() => {
+    if (cartItems.length === 0) return null;
+    const min = qrSettings.minOrderValue || 0;
+    const max = qrSettings.maxOrderValue || 0;
+    if (min > 0 && cartTotal < min) {
+      return `Minimum table order for this restaurant is ${formatINR(min)}. Please add ${formatINR(min - cartTotal)} more.`;
+    }
+    if (max > 0 && cartTotal > max) {
+      return `Self-order limit for this table is ${formatINR(max)}. Please ask a captain to place the balance of this order.`;
+    }
+    return null;
+  }, [cartItems.length, cartTotal, qrSettings.minOrderValue, qrSettings.maxOrderValue]);
+
   // Place Order through real backend pipeline
   const handlePlaceOrder = () => {
     if (cartItems.length === 0) return;
+    if (orderValueBlockReason) {
+      setOrderError(orderValueBlockReason);
+      return;
+    }
     setOrderError(null);
     setIsPlacingOrder(true);
 
@@ -270,6 +362,22 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
       setActiveTrackedOrderId(newOrder.id);
       setCartItems([]);
       setViewState('TRACKING');
+
+      // 4. Emit LAN Mesh real-time events so POS and KDS receive order & KOTs immediately
+      try {
+        lanMeshSync.broadcast('ORDER_CREATED', newOrder);
+        const kots = KOTRepository.getKOTsForOrder(newOrder.id);
+        if (kots.length > 0) {
+          lanMeshSync.broadcast('KOT_CREATED', kots);
+        }
+        lanMeshSync.broadcast('TABLE_STATUS_CHANGED', {
+          tableNumber,
+          status: 'OCCUPIED',
+          orderId: newOrder.id
+        });
+      } catch (syncErr) {
+        console.warn('LAN Mesh sync broadcast skipped:', syncErr);
+      }
     } catch (err: any) {
       setOrderError(err?.message || 'Failed to place order. Please verify table connection.');
     } finally {
@@ -405,14 +513,18 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
               </div>
             </div>
 
-            {/* Estimated time pill */}
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2 text-amber-900 font-bold">
-                <Clock className="w-4 h-4 text-[#E66817]" />
-                <span>Estimated Wait Time:</span>
+            {/* Estimated time pill: sourced from the order record written by the repository */}
+            {trackedOrder.estimatedWaitMinutes ? (
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2 text-amber-900 font-bold">
+                  <Clock className="w-4 h-4 text-[#E66817]" />
+                  <span>Estimated Wait Time:</span>
+                </div>
+                <span className="font-black text-[#E66817] font-mono text-sm">
+                  ~{trackedOrder.estimatedWaitMinutes} mins
+                </span>
               </div>
-              <span className="font-black text-[#E66817] font-mono text-sm">~15-20 mins</span>
-            </div>
+            ) : null}
           </div>
 
           {/* Live Timeline Stepper */}
@@ -732,9 +844,14 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
         {/* Bottom Place Order Bar */}
         {cartItems.length > 0 && (
           <div className="p-4 bg-white border-t border-[#EBE6DD] sticky bottom-0 z-30 space-y-2">
+            {orderValueBlockReason && (
+              <p className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-center">
+                {orderValueBlockReason}
+              </p>
+            )}
             <button
               onClick={handlePlaceOrder}
-              disabled={isPlacingOrder}
+              disabled={isPlacingOrder || Boolean(orderValueBlockReason)}
               className="w-full py-4 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-between px-5 shadow-lg shadow-orange-500/25 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
             >
               <span>{isPlacingOrder ? 'Sending to Kitchen...' : 'Place Order Now'}</span>
@@ -756,20 +873,9 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   // VIEW: DISH CUSTOMIZATION MODAL
   // ========================================================================
   if (viewState === 'CUSTOMIZE' && customizingItem) {
-    const spiceOptions = ['Mild', 'Medium', 'Spicy', 'Extra Hot'];
-    const addonOptions = [
-      { name: 'Extra Cheese', price: 40 },
-      { name: 'Extra Butter', price: 20 },
-      { name: 'Extra Chutney', price: 0 },
-      { name: 'Extra Onion', price: 0 }
-    ];
-
-    const currentDelta = selectedAddons.reduce((sum, ad) => {
-      const found = addonOptions.find((o) => o.name === ad);
-      return sum + (found?.price || 0);
-    }, 0);
-    const unitPrice = customizingItem.price + currentDelta;
+    const unitPrice = customizingItem.price + selectedModifierDelta;
     const totalCustomPrice = unitPrice * itemQuantity;
+    const canAddToCart = unmetRequiredGroups.length === 0;
 
     return (
       <div className="min-h-screen bg-[#FAF7F2] text-[#0B253A] flex flex-col font-sans max-w-md mx-auto shadow-2xl border-x border-[#EBE6DD]">
@@ -806,78 +912,88 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             </div>
           </div>
 
-          {/* Spice Level Option */}
-          <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] space-y-2.5">
-            <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider flex items-center gap-1.5">
-              <Flame className="w-3.5 h-3.5 text-[#E66817]" />
-              <span>Select Spice Level</span>
-            </h4>
-            <div className="grid grid-cols-2 gap-2">
-              {spiceOptions.map((sp) => (
-                <button
-                  key={sp}
-                  onClick={() => setSelectedSpice(sp)}
-                  className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer text-left flex items-center justify-between ${
-                    selectedSpice === sp
-                      ? 'bg-amber-50 border-[#E66817] text-[#E66817]'
-                      : 'border-[#EBE6DD] bg-[#FAF7F2] text-slate-700'
-                  }`}
-                >
-                  <span>{sp}</span>
-                  {selectedSpice === sp && <Check className="w-3.5 h-3.5" />}
-                </button>
-              ))}
+          {/* Real modifier groups configured for this dish in the canonical catalog */}
+          {activeModifierGroups.length === 0 ? (
+            <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] text-center space-y-1">
+              <Info className="w-5 h-5 text-slate-300 mx-auto" />
+              <p className="text-[11px] text-slate-500 font-medium">
+                {qrSettings.allowCustomerModifications
+                  ? 'This dish is served exactly as described by the chef. No options to choose.'
+                  : 'Dish customisation is currently turned off by the restaurant.'}
+              </p>
             </div>
-          </div>
+          ) : (
+            activeModifierGroups.map((group) => {
+              const chosen = selectedOptionIds[group.id] || [];
+              const maxSel = Math.max(1, group.maxSelections || 1);
+              const isUnmet = unmetRequiredGroups.some((g) => g.id === group.id);
 
-          {/* Add-ons Option */}
-          <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] space-y-2.5">
-            <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider flex items-center gap-1.5">
-              <Plus className="w-3.5 h-3.5 text-[#E66817]" />
-              <span>Available Add-ons</span>
-            </h4>
-            <div className="space-y-2">
-              {addonOptions.map((ad) => {
-                const isSelected = selectedAddons.includes(ad.name);
-                return (
-                  <button
-                    key={ad.name}
-                    onClick={() => {
-                      if (isSelected) {
-                        setSelectedAddons((prev) => prev.filter((x) => x !== ad.name));
-                      } else {
-                        setSelectedAddons((prev) => [...prev, ad.name]);
-                      }
-                    }}
-                    className={`w-full py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
-                      isSelected
-                        ? 'bg-amber-50 border-[#E66817] text-[#E66817]'
-                        : 'border-[#EBE6DD] bg-[#FAF7F2] text-slate-700'
-                    }`}
-                  >
-                    <span>{ad.name}</span>
-                    <span className="font-mono text-[11px]">
-                      {ad.price > 0 ? `+${formatINR(ad.price)}` : 'FREE'}
+              return (
+                <div key={group.id} className="bg-white rounded-3xl p-4 border border-[#EBE6DD] space-y-2.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider flex items-center gap-1.5">
+                      <Flame className="w-3.5 h-3.5 text-[#E66817]" />
+                      <span>{group.name}</span>
+                    </h4>
+                    <span
+                      className={`text-[10px] font-black px-2 py-0.5 rounded-full shrink-0 ${
+                        isUnmet
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                          : 'bg-slate-100 text-slate-500'
+                      }`}
+                    >
+                      {group.isRequired ? 'Required' : maxSel > 1 ? `Pick up to ${maxSel}` : 'Optional'}
                     </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+                  </div>
+
+                  {group.description && (
+                    <p className="text-[11px] text-slate-500 leading-tight">{group.description}</p>
+                  )}
+
+                  <div className={maxSel > 1 ? 'space-y-2' : 'grid grid-cols-2 gap-2'}>
+                    {group.options.map((opt) => {
+                      const isSelected = chosen.includes(opt.id);
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() =>
+                            handleToggleModifierOption(group.id, opt.id, maxSel, Boolean(group.isRequired))
+                          }
+                          className={`w-full py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center justify-between gap-2 text-left ${
+                            isSelected
+                              ? 'bg-amber-50 border-[#E66817] text-[#E66817]'
+                              : 'border-[#EBE6DD] bg-[#FAF7F2] text-slate-700 hover:border-[#FED7AA]'
+                          }`}
+                        >
+                          <span className="truncate">{opt.name}</span>
+                          <span className="font-mono text-[11px] shrink-0 flex items-center gap-1">
+                            {opt.priceDelta > 0 ? `+${formatINR(opt.priceDelta)}` : 'FREE'}
+                            {isSelected && <Check className="w-3.5 h-3.5" />}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })
+          )}
 
           {/* Cooking Instructions */}
-          <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] space-y-2">
-            <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
-              Special Cooking Instructions
-            </h4>
-            <textarea
-              value={specialNote}
-              onChange={(e) => setSpecialNote(e.target.value)}
-              placeholder="e.g., Less spicy, no onion-garlic, extra crispy naan..."
-              rows={2}
-              className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl p-2.5 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
-            />
-          </div>
+          {qrSettings.allowSpecialInstructions && (
+            <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] space-y-2">
+              <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+                Special Cooking Instructions
+              </h4>
+              <textarea
+                value={specialNote}
+                onChange={(e) => setSpecialNote(e.target.value)}
+                placeholder="e.g., Less spicy, no onion-garlic, extra crispy naan..."
+                rows={2}
+                className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl p-2.5 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+              />
+            </div>
+          )}
 
           {/* Quantity Selector */}
           <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] flex items-center justify-between">
@@ -901,10 +1017,16 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
         </div>
 
         {/* Bottom Add to Cart Button */}
-        <div className="p-4 bg-white border-t border-[#EBE6DD] sticky bottom-0 z-30">
+        <div className="p-4 bg-white border-t border-[#EBE6DD] sticky bottom-0 z-30 space-y-2">
+          {!canAddToCart && (
+            <p className="text-[11px] font-bold text-rose-600 text-center">
+              Please choose {unmetRequiredGroups.map((g) => g.name).join(', ')} to continue.
+            </p>
+          )}
           <button
             onClick={handleAddCustomizedToCart}
-            className="w-full py-4 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-between px-5 shadow-lg transition-all active:scale-[0.98] cursor-pointer"
+            disabled={!canAddToCart}
+            className="w-full py-4 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-between px-5 shadow-lg transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span>Add to Cart</span>
             <span className="font-mono text-sm">{formatINR(totalCustomPrice)}</span>

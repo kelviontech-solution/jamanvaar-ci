@@ -1339,6 +1339,12 @@ export class JamanvaarDatabase {
       localStorage.setItem(`${p}business_days`, JSON.stringify(this.businessDays));
       localStorage.setItem(`${p}eod_reports`, JSON.stringify(this.eodReports));
       localStorage.setItem(`${p}notifications`, JSON.stringify(this.notifications));
+      // BUG-HIGH-002 fix: syncEvents (the offline outbox queue — see
+      // SyncOutboxEngine.queueEvent in @jamanvaar/sync) was never persisted
+      // here, so any PENDING/FAILED event and its retry count was silently
+      // lost on every reload or process restart — an offline-first system
+      // whose own offline queue doesn't survive a restart.
+      localStorage.setItem(`${p}sync_events`, JSON.stringify(this.syncEvents));
       localStorage.setItem(`${p}sync_timestamp`, Date.now().toString());
     } catch (e) {
       console.warn('Storage save failed:', e);
@@ -1485,6 +1491,23 @@ export class JamanvaarDatabase {
         this.tables = [...SEED_TABLES];
       }
 
+      // Guarantee all tables have valid, persistent qrToken, qrShortCode, and qrCodeUrl
+      this.tables.forEach((t) => {
+        const seedMatch = SEED_TABLES.find((st) => st.tableNumber === t.tableNumber);
+        if (!t.qrToken) {
+          t.qrToken = seedMatch?.qrToken || `jv_qr_tbl_${t.tableNumber}_${t.id.replace(/[^a-zA-Z0-9]/g, '')}`;
+        }
+        if (!t.qrShortCode) {
+          t.qrShortCode = seedMatch?.qrShortCode || `QR-TABLE-${t.tableNumber.padStart(3, '0')}`;
+        }
+        if (!t.qrStatus) {
+          t.qrStatus = 'ACTIVE';
+        }
+        if (!t.qrCodeUrl) {
+          t.qrCodeUrl = `http://localhost:5176/?qrTable=${t.tableNumber}&token=${t.qrToken}`;
+        }
+      });
+
       const storedCoupons = localStorage.getItem(`${p}coupons`);
       if (storedCoupons) this.coupons = JSON.parse(storedCoupons);
 
@@ -1596,6 +1619,14 @@ export class JamanvaarDatabase {
         try {
           const parsedNotifs = JSON.parse(storedNotifs);
           if (Array.isArray(parsedNotifs)) this.notifications = parsedNotifs;
+        } catch (_) {}
+      }
+
+      const storedSyncEvents = localStorage.getItem(`${p}sync_events`);
+      if (storedSyncEvents) {
+        try {
+          const parsedSyncEvents = JSON.parse(storedSyncEvents);
+          if (Array.isArray(parsedSyncEvents)) this.syncEvents = parsedSyncEvents;
         } catch (_) {}
       }
     } catch (e) {

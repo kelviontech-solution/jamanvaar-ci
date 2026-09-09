@@ -63,7 +63,10 @@ export class CsvExportService {
       `"Period","${periodLabel}"`,
       `"Generated At","${new Date().toLocaleString('en-IN')}"`,
       '',
-      `"Metric","Amount (INR)"`,
+      // BUG-LOW-002: was 'Amount (INR)' text — every other currency-labeled
+      // CSV/report export in this codebase uses the '₹' glyph (formatINR in
+      // @jamanvaar/utils always emits it); standardizing on that here too.
+      `"Metric","Amount (₹)"`,
       `"Gross Food Sales",${summary.grossSales}`,
       `"Total Discounts",${summary.discountAmount}`,
       `"CGST (2.5%)",${summary.cgstAmount}`,
@@ -73,7 +76,7 @@ export class CsvExportService {
       `"Total Orders Billed",${summary.ordersCount}`,
       `"Average Order Value",${summary.avgOrderValue}`,
       '',
-      `"Payment Method","Collected (INR)"`,
+      `"Payment Method","Collected (₹)"`,
       `"Cash at Counter",${summary.paymentBreakdown.cash}`,
       `"UPI / QR",${summary.paymentBreakdown.upi}`,
       `"Credit / Debit Card",${summary.paymentBreakdown.card}`,

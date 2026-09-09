@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { MenuItem, DietaryType, SpiceLevel } from '@jamanvaar/types';
+import React, { useState, useEffect, useMemo } from 'react';
+import { MenuItem } from '@jamanvaar/types';
 import { db, MenuRepository } from '@jamanvaar/database';
 import { formatINR } from '@jamanvaar/utils';
-import { X, Check, UtensilsCrossed, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { X, Check, UtensilsCrossed, Image as ImageIcon } from 'lucide-react';
 
 interface QrDishConfigModalProps {
   isOpen: boolean;
@@ -17,41 +17,66 @@ export const QrDishConfigModal: React.FC<QrDishConfigModalProps> = ({
   item,
   onSave
 }) => {
+  // NOTE: every hook must run on every render - an early `return null` above these
+  // used to change the hook count between renders and crash React.
+  const [name, setName] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [price, setPrice] = useState<number>(0);
+  const [isDigitalMenuVisible, setIsDigitalMenuVisible] = useState<boolean>(true);
+  const [isQrOrderingEnabled, setIsQrOrderingEnabled] = useState<boolean>(true);
+  const [isKioskEnabled, setIsKioskEnabled] = useState<boolean>(true);
+  const [kitchenStation, setKitchenStation] = useState<string>('');
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Re-seed the form from the canonical record whenever a different dish is opened
+  useEffect(() => {
+    if (!item) return;
+    setName(item.name);
+    setDescription(item.description || '');
+    setPrice(item.price);
+    setIsDigitalMenuVisible(item.isDigitalMenuVisible ?? true);
+    setIsQrOrderingEnabled(item.isQrOrderingEnabled ?? true);
+    setIsKioskEnabled(item.isKioskEnabled ?? true);
+    setKitchenStation(item.kitchenStation || '');
+    setSaveError(null);
+  }, [item?.id, isOpen]);
+
+  /** Routing stations actually in use across the canonical menu, plus the item's own. */
+  const kitchenStations = useMemo(() => {
+    const set = new Set<string>();
+    db.menuItems.forEach((m) => {
+      if (m.kitchenStation) set.add(m.kitchenStation);
+    });
+    if (item?.kitchenStation) set.add(item.kitchenStation);
+    return Array.from(set).sort();
+  }, [item?.id, isOpen]);
+
   if (!isOpen || !item) return null;
 
-  const [name, setName] = useState(item.name);
-  const [description, setDescription] = useState(item.description);
-  const [price, setPrice] = useState<number>(item.price);
-  const [dietaryType, setDietaryType] = useState<DietaryType>(item.dietaryType || 'VEG');
-  const [spiceLevel, setSpiceLevel] = useState<SpiceLevel>(item.spiceLevel || 'MEDIUM');
-  const [isAvailable, setIsAvailable] = useState<boolean>(item.isAvailable ?? true);
-  const [isDigitalMenuVisible, setIsDigitalMenuVisible] = useState<boolean>(item.isDigitalMenuVisible ?? true);
-  const [isQrOrderingEnabled, setIsQrOrderingEnabled] = useState<boolean>(item.isQrOrderingEnabled ?? true);
-  const [isKioskEnabled, setIsKioskEnabled] = useState<boolean>(item.isKioskEnabled ?? true);
-  const [kitchenStation, setKitchenStation] = useState<string>(item.kitchenStation || 'Tandoor');
-
-  const categories = db.categories;
-
   const handleSave = () => {
-    const updated: MenuItem = {
-      ...item,
-      name,
+    if (!name.trim()) {
+      setSaveError('Dish name cannot be empty.');
+      return;
+    }
+    if (!Number.isFinite(price) || price < 0) {
+      setSaveError('Enter a valid price.');
+      return;
+    }
+
+    // Persist through the canonical repository, then render back what it returns
+    const updated = MenuRepository.updateMenuItem(item.id, {
+      name: name.trim(),
       description,
       price,
-      dietaryType,
-      spiceLevel,
-      isAvailable,
       isDigitalMenuVisible,
       isQrOrderingEnabled,
       isKioskEnabled,
-      kitchenStation
-    };
+      kitchenStation: kitchenStation || undefined
+    });
 
-    // Update in canonical db
-    const existingIdx = db.menuItems.findIndex((m) => m.id === item.id);
-    if (existingIdx >= 0) {
-      db.menuItems[existingIdx] = updated;
-      db.notify();
+    if (!updated) {
+      setSaveError('This dish is no longer on the canonical menu. Refresh and try again.');
+      return;
     }
 
     if (onSave) onSave(updated);
@@ -142,11 +167,12 @@ export const QrDishConfigModal: React.FC<QrDishConfigModalProps> = ({
                 onChange={(e) => setKitchenStation(e.target.value)}
                 className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
               >
-                <option value="Tandoor">Tandoor Station</option>
-                <option value="Curry Station">Curry Station</option>
-                <option value="Biryani Station">Biryani Station</option>
-                <option value="Beverages">Beverage Counter</option>
-                <option value="Dessert Station">Dessert Station</option>
+                <option value="">Unassigned</option>
+                {kitchenStations.map((st) => (
+                  <option key={st} value={st}>
+                    {st}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -197,7 +223,10 @@ export const QrDishConfigModal: React.FC<QrDishConfigModalProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="bg-white border-t border-[#EBE6DD] p-4 flex items-center justify-end gap-2.5 shrink-0">
+        <div className="bg-white border-t border-[#EBE6DD] p-4 flex items-center justify-end gap-2.5 shrink-0 flex-wrap">
+          {saveError && (
+            <span className="text-[11px] font-bold text-rose-600 mr-auto">{saveError}</span>
+          )}
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"

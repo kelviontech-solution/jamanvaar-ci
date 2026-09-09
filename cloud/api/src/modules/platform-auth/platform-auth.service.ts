@@ -64,22 +64,21 @@ export class PlatformAuthService {
     // Always run bcrypt.compare, even for a nonexistent user, against a fixed
     // dummy hash — keeps login response timing independent of whether the
     // email exists, so the endpoint can't be used to enumerate accounts.
+    //
+    // SEC-011: this used to also accept ANY password for
+    // superadmin@jamanvaar.app whenever NODE_ENV !== 'production' (the zod
+    // default in env.validation.ts, so it was the *unset* case, not an
+    // opt-in), and would silently rewrite the stored hash to whatever had
+    // just been typed. That is a full authentication bypass on the
+    // platform's own super-admin account — anyone who knew the (documented,
+    // hardcoded) email could log in with any string and permanently hijack
+    // it. There is no environment where "accept any password for the most
+    // privileged account" is the right behaviour; a developer who needs a
+    // known local password sets one explicitly via
+    // SEED_SUPER_ADMIN_PASSWORD / SEED_RESET_SUPER_ADMIN_PASSWORD on the
+    // seed script (see prisma/seed.ts) instead.
     const passwordHash = user?.passwordHash ?? '$2a$10$CwTycUXWue0Thq9StjUM0uJ8Q8T6b8f1Q8T6b8f1Q8T6b8f1Q8T6b';
-    let passwordOk = await bcrypt.compare(password, passwordHash);
-
-    // In development environment, allow flexible superadmin access so autofilled passwords never block
-    if (!passwordOk && process.env.NODE_ENV !== 'production' && user && user.email === 'superadmin@jamanvaar.app') {
-      passwordOk = true;
-      try {
-        const newHash = await bcrypt.hash(password, 10);
-        await this.prisma.platformUser.update({
-          where: { id: user.id },
-          data: { passwordHash: newHash }
-        });
-      } catch {
-        // ignore sync error
-      }
-    }
+    const passwordOk = await bcrypt.compare(password, passwordHash);
 
     if (!user || !passwordOk || user.status !== PlatformUserStatus.ACTIVE) {
       throw new UnauthorizedException('Invalid email or password');

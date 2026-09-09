@@ -10,6 +10,7 @@ export * from './menu_builder';
 export * from './pos_assistant';
 export * from './license_entitlements';
 export * from './license_certificate';
+export * from './qr_platform_sync';
 export * from './day_orders_service';
 export * from './eod_service';
 export * from './central_reporting_service';

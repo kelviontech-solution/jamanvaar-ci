@@ -33,6 +33,7 @@ import { SyncObservabilityModule } from './modules/sync-observability/sync-obser
 import { OfflinePolicyModule } from './modules/offline-policy/offline-policy.module';
 import { SandboxesModule } from './modules/sandboxes/sandboxes.module';
 import { AiAssistantModule } from './modules/ai-assistant/ai-assistant.module';
+import { QrOrderingModule } from './modules/qr-ordering/qr-ordering.module';
 import { validateEnv } from './config/env.validation';
 
 @Module({
@@ -74,7 +75,8 @@ import { validateEnv } from './config/env.validation';
     SyncObservabilityModule,
     OfflinePolicyModule,
     SandboxesModule,
-    AiAssistantModule
+    AiAssistantModule,
+    QrOrderingModule
   ],
   providers: [
     {
