@@ -1,12 +1,16 @@
 import { INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModuleBuilder } from '@nestjs/testing';
 import cookieParser from 'cookie-parser';
 import * as bcrypt from 'bcryptjs';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 
-export async function createTestApp(): Promise<INestApplication> {
-  const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+export async function createTestApp(
+  configure?: (builder: TestingModuleBuilder) => TestingModuleBuilder
+): Promise<INestApplication> {
+  let builder = Test.createTestingModule({ imports: [AppModule] });
+  if (configure) builder = configure(builder);
+  const moduleRef = await builder.compile();
   const app = moduleRef.createNestApplication();
   app.use(cookieParser());
   await app.init();
