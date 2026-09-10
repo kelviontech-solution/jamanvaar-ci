@@ -1,7 +1,13 @@
 import { Controller, Headers, HttpCode, Post, Req } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { Request } from 'express';
 import { PaymentsService } from './payments.service';
 
+// Cashfree webhook deliveries must never be rejected with a 429: the "always 200 once
+// durably recorded" contract (see processCashfreeWebhook) depends on every delivery
+// reaching the service's own idempotency/dedup logic, not on the global ThrottlerGuard's
+// 120 req/60s limit registered in app.module.ts via APP_GUARD.
+@SkipThrottle()
 @Controller('api/v1/payments/cashfree/webhook')
 export class CashfreeWebhookController {
   constructor(private readonly payments: PaymentsService) {}
