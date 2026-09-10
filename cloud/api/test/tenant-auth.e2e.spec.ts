@@ -130,6 +130,118 @@ describe('Tenant authentication + authorization', () => {
     expect(meRes.body).not.toHaveProperty('passwordHash');
   });
 
+  it('returnRefreshToken: true includes the refresh token directly in the response body', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: ownerEmail, password: ownerPassword, returnRefreshToken: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body.refreshToken).toBeTypeOf('string');
+    expect(res.body.refreshTokenExpiresAt).toBeTypeOf('string');
+    // Still sets the cookie too — additive, not a replacement for browser callers.
+    const refreshCookie = extractCookie(res.headers['set-cookie'], 'jamanvaar_tenant_refresh');
+    expect(refreshCookie).toBeDefined();
+  });
+
+  it('without returnRefreshToken, the response body has no refreshToken field (regression guard)', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: ownerEmail, password: ownerPassword });
+
+    expect(res.status).toBe(200);
+    expect(res.body.refreshToken).toBeUndefined();
+  });
+
+  it('adminOnly: true rejects a STAFF login with 403', async () => {
+    const ownerLoginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: ownerEmail, password: ownerPassword });
+    const ownerToken = ownerLoginRes.body.accessToken;
+
+    const staffEmail = `test-adminonly-staff-${Date.now()}@example.com`;
+    const staffPassword = 'staff-correct-horse-battery';
+    const createRes = await authed('post', '/api/v1/tenant/me/users', ownerToken).send({
+      email: staffEmail,
+      fullName: 'Front Desk Staff',
+      role: 'STAFF',
+      password: staffPassword
+    });
+    expect(createRes.status).toBe(201);
+
+    const staffLoginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: staffEmail, password: staffPassword, adminOnly: true });
+    expect(staffLoginRes.status).toBe(403);
+
+    // Cleanup — this test creates a real STAFF login on the shared test
+    // restaurant; remove it so later tests (e.g. "lists just the owner
+    // before any staff logins exist") aren't polluted by it.
+    await prisma.runAsTenant(restaurantId, (tx) => tx.user.deleteMany({ where: { email: staffEmail } }));
+  });
+
+  it('adminOnly: true succeeds for OWNER and for MANAGER', async () => {
+    const ownerRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: ownerEmail, password: ownerPassword, adminOnly: true });
+    expect(ownerRes.status).toBe(200);
+    expect(ownerRes.body.user.role).toBe('OWNER');
+
+    const ownerToken = ownerRes.body.accessToken;
+    const managerEmail = `test-adminonly-manager-${Date.now()}@example.com`;
+    const managerPassword = 'manager-correct-horse-battery';
+    await authed('post', '/api/v1/tenant/me/users', ownerToken).send({
+      email: managerEmail,
+      fullName: 'Shift Manager',
+      role: 'MANAGER',
+      password: managerPassword
+    });
+
+    const managerRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: managerEmail, password: managerPassword, adminOnly: true });
+    expect(managerRes.status).toBe(200);
+    expect(managerRes.body.user.role).toBe('MANAGER');
+
+    // Cleanup — see note in the previous test.
+    await prisma.runAsTenant(restaurantId, (tx) => tx.user.deleteMany({ where: { email: managerEmail } }));
+  });
+
+  it('refresh accepts a body refreshToken when no cookie is present, and rotates it', async () => {
+    const loginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: ownerEmail, password: ownerPassword, returnRefreshToken: true });
+    const originalRefreshToken = loginRes.body.refreshToken;
+
+    // No cookie jar on this bare `request(...)` call — proves the body path works standalone.
+    const refreshRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/refresh')
+      .send({ refreshToken: originalRefreshToken });
+
+    expect(refreshRes.status).toBe(200);
+    expect(refreshRes.body.accessToken).toBeTypeOf('string');
+    expect(refreshRes.body.refreshToken).toBeTypeOf('string');
+    expect(refreshRes.body.refreshToken).not.toBe(originalRefreshToken);
+  });
+
+  it('logout revokes a refresh token supplied via body (no cookie), confirmed by a subsequent refresh failing', async () => {
+    const loginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: ownerEmail, password: ownerPassword, returnRefreshToken: true });
+    const accessToken = loginRes.body.accessToken;
+    const refreshToken = loginRes.body.refreshToken;
+
+    const logoutRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/logout')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ refreshToken });
+    expect(logoutRes.status).toBe(200);
+
+    const refreshAfterLogout = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/refresh')
+      .send({ refreshToken });
+    expect(refreshAfterLogout.status).toBe(401);
+  });
+
   it('rejects a garbage/invalid bearer token', async () => {
     const res = await request(app.getHttpServer())
       .get('/api/v1/tenant/me')

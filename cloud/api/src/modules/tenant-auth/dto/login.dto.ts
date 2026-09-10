@@ -9,7 +9,13 @@ export const tenantLoginSchema = z.object({
   deviceId: z.string().optional(),
   deviceToken: z.string().optional(),
   deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN', 'KIOSK_ADMIN']).optional(),
-  appVersion: z.string().optional()
+  appVersion: z.string().optional(),
+  // Opt-in: include the refresh token directly in the response body, for
+  // cross-origin non-browser clients (e.g. Kiosk Admin's Tauri webview) that
+  // can't rely on the httpOnly/sameSite=lax cookie on cross-origin fetch.
+  returnRefreshToken: z.boolean().optional(),
+  // Opt-in: reject this login unless the matched user's role is OWNER or MANAGER.
+  adminOnly: z.boolean().optional()
 });
 export type TenantLoginDto = z.infer<typeof tenantLoginSchema>;
 
@@ -22,6 +28,11 @@ export const activateDeviceSchema = z.object({
   appVersion: z.string().optional()
 });
 export type ActivateDeviceDto = z.infer<typeof activateDeviceSchema>;
+
+export const tenantRefreshSchema = z.object({
+  refreshToken: z.string().optional()
+});
+export type TenantRefreshDto = z.infer<typeof tenantRefreshSchema>;
 
 // One-time bootstrap for a PENDING_ACTIVATION owner/staff user created with passwordHash=null
 // (see RestaurantsService.createRestaurant). Not a general "forgot password" flow.

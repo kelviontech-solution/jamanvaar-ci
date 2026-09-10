@@ -23,8 +23,10 @@ import {
   tenantChangePasswordSchema,
   tenantLoginSchema,
   activateDeviceSchema,
+  tenantRefreshSchema,
   TenantLoginDto,
-  ActivateDeviceDto
+  ActivateDeviceDto,
+  TenantRefreshDto
 } from './dto/login.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
@@ -69,6 +71,11 @@ export class TenantAuthController {
     const result = await this.authService.login(body);
     if (result.status === 'LOGIN_SUCCESS') {
       this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
+      if (body.returnRefreshToken) {
+        return { ...result, refreshToken: result.refreshToken, refreshTokenExpiresAt: result.refreshTokenExpiresAt };
+      }
+      const { refreshToken, refreshTokenExpiresAt, ...withoutRefreshToken } = result;
+      return withoutRefreshToken;
     }
     return result;
   }
@@ -87,13 +94,21 @@ export class TenantAuthController {
 
   @Post('refresh')
   @HttpCode(200)
-  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE];
+  @UsePipes(new ZodValidationPipe(tenantRefreshSchema))
+  async refresh(
+    @Req() req: Request,
+    @Body() body: TenantRefreshDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const refreshToken = req.cookies?.[REFRESH_COOKIE] ?? body.refreshToken;
     if (!refreshToken) {
       throw new UnauthorizedException('Missing refresh token');
     }
     const result = await this.authService.refresh(refreshToken);
     this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
+    if (body.refreshToken) {
+      return { accessToken: result.accessToken, user: result.user, refreshToken: result.refreshToken, refreshTokenExpiresAt: result.refreshTokenExpiresAt };
+    }
     return { accessToken: result.accessToken, user: result.user };
   }
 
@@ -102,10 +117,11 @@ export class TenantAuthController {
   @UseGuards(TenantAuthGuard)
   async logout(
     @Req() req: Request,
+    @Body() body: { refreshToken?: string },
     @Res({ passthrough: true }) res: Response,
     @CurrentTenantUser() user: User
   ) {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE];
+    const refreshToken = req.cookies?.[REFRESH_COOKIE] ?? body?.refreshToken;
     if (refreshToken) {
       await this.authService.logout(refreshToken, user.restaurantId, user.id);
     }

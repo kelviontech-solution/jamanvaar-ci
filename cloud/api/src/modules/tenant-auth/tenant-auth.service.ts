@@ -242,6 +242,10 @@ export class TenantAuthService {
       throw new ForbiddenException('Restaurant account is suspended or archived. Please contact Super Admin.');
     }
 
+    if (dto.adminOnly && matchedUser.role !== 'OWNER' && matchedUser.role !== 'MANAGER') {
+      throw new ForbiddenException('This login is restricted to restaurant owners and managers.');
+    }
+
     // Check device activation state
     let isDeviceActive = false;
     let activeDevice: { id: string; type: string; status: string; deviceTokenHash: string | null } | null = null;
