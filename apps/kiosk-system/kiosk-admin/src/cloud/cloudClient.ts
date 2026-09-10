@@ -167,6 +167,46 @@ const TENANT_USER_KEY = 'jamanvaar_kiosk_admin_tenant_user';
 let tenantAccessToken: string | null = null;
 let silentRefreshTimer: ReturnType<typeof setInterval> | null = null;
 
+/**
+ * Bumped every time the session is torn down (staffLogout, or an
+ * auth-failure clear inside refreshTenantSession). Each refreshTenantSession()
+ * call snapshots this value when it starts; if the epoch has moved by the
+ * time its network response lands, the response is stale — logout raced
+ * ahead of it — and is discarded instead of being allowed to repopulate
+ * tenantAccessToken or write a rotated refresh token back to storage. This
+ * is what makes "logged out" stick even against an in-flight refresh that
+ * started just before the logout call.
+ */
+let sessionEpoch = 0;
+
+type SessionExpiredListener = () => void;
+const sessionExpiredListeners = new Set<SessionExpiredListener>();
+
+/**
+ * Subscribe to be notified whenever the tenant session is cleared — whether
+ * from a deliberate staffLogout() or an async cause (refresh discovering the
+ * refresh token is dead). Returns an unsubscribe function. Fires on a
+ * deliberate logout too (clearTenantSession is the single choke point for
+ * all teardown); that's harmless since callers already set their own
+ * "logged out" UI state in that path.
+ */
+export function onSessionExpired(listener: SessionExpiredListener): () => void {
+  sessionExpiredListeners.add(listener);
+  return () => {
+    sessionExpiredListeners.delete(listener);
+  };
+}
+
+function notifySessionExpired(): void {
+  for (const listener of sessionExpiredListeners) {
+    try {
+      listener();
+    } catch {
+      // A misbehaving listener shouldn't stop the others from being notified.
+    }
+  }
+}
+
 export function getConnectedRestaurantId(): string | null {
   try {
     return localStorage.getItem(RESTAURANT_ID_KEY);
@@ -190,6 +230,7 @@ function persistTenantSession(refreshToken: string, user: StaffUser): void {
 }
 
 function clearTenantSession(): void {
+  sessionEpoch++;
   tenantAccessToken = null;
   try {
     localStorage.removeItem(TENANT_REFRESH_TOKEN_KEY);
@@ -197,6 +238,7 @@ function clearTenantSession(): void {
   } catch {
     // Storage unavailable — nothing to clean up.
   }
+  notifySessionExpired();
 }
 
 export function getTenantAccessToken(): string | null {
@@ -251,6 +293,38 @@ export async function staffLogin(restaurantId: string, email: string, password: 
   return user;
 }
 
+/**
+ * Standalone refresh call used only to obtain a fresh access token for
+ * staffLogout() when tenantAccessToken is null (app booted offline, or
+ * logout raced ahead of the boot-time refresh ever resolving). Deliberately
+ * NOT routed through refreshTenantSession(): staffLogout() has already
+ * bumped sessionEpoch by the time this runs, so refreshTenantSession's own
+ * epoch check would just discard its own result as stale. This helper talks
+ * to the server directly and hands its result back to the caller instead,
+ * touching no shared/module state.
+ *
+ * The refresh endpoint unconditionally rotates the refresh token (old one
+ * revoked server-side the instant this call is made), so the caller must
+ * revoke the *returned* refreshToken, not the one it started with.
+ */
+async function fetchAccessTokenForRevocation(
+  refreshToken: string
+): Promise<{ accessToken: string; refreshToken: string } | null> {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/tenant-auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken })
+    });
+    if (!res.ok) return null;
+    const data = await parseJsonResponse(res);
+    if (!data?.accessToken || !data?.refreshToken) return null;
+    return { accessToken: data.accessToken, refreshToken: data.refreshToken };
+  } catch {
+    return null;
+  }
+}
+
 export async function staffLogout(): Promise<void> {
   const refreshToken = (() => {
     try {
@@ -260,23 +334,49 @@ export async function staffLogout(): Promise<void> {
     }
   })();
 
+  // Invalidate any refresh already in flight (e.g. a periodic silent-refresh
+  // tick that started a moment ago) *before* awaiting anything below, so its
+  // response — however it resolves — gets discarded by refreshTenantSession's
+  // epoch check instead of landing after clearTenantSession() and resurrecting
+  // the session. See the sessionEpoch comment above for the full mechanism.
+  sessionEpoch++;
   stopSilentRefresh();
 
-  if (tenantAccessToken && refreshToken) {
-    try {
-      await fetch(`${API_BASE}/api/v1/tenant-auth/logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${tenantAccessToken}`
-        },
-        body: JSON.stringify({ refreshToken })
-      });
-    } catch {
-      // Offline or server unreachable — local logout still proceeds below.
+  if (refreshToken) {
+    let accessToken = tenantAccessToken;
+    let tokenToRevoke = refreshToken;
+
+    if (!accessToken) {
+      // No access token in memory — obtain one specifically so the
+      // revocation call below can be authenticated. This is what closes the
+      // "logout before the first boot-time refresh ever resolved" gap: the
+      // old code silently skipped the server call entirely in this case.
+      const fresh = await fetchAccessTokenForRevocation(refreshToken);
+      if (fresh) {
+        accessToken = fresh.accessToken;
+        tokenToRevoke = fresh.refreshToken;
+      }
+    }
+
+    if (accessToken) {
+      try {
+        await fetch(`${API_BASE}/api/v1/tenant-auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`
+          },
+          body: JSON.stringify({ refreshToken: tokenToRevoke })
+        });
+      } catch {
+        // Offline or server unreachable — local logout still proceeds below.
+      }
     }
   }
 
+  // Always ends with local state fully cleared, even if every server call
+  // above failed or was skipped (offline) — a logged-out UI must never be
+  // contingent on network success.
   clearTenantSession();
 }
 
@@ -292,6 +392,13 @@ async function refreshTenantSession(): Promise<boolean> {
   })();
   if (!refreshToken) return false;
 
+  // Snapshot the epoch before the network round-trip. If staffLogout() runs
+  // while this request is in flight, it bumps sessionEpoch and clears the
+  // session immediately; when this response lands afterward, the mismatch
+  // below is what stops it from writing a fresh tenantAccessToken or a
+  // rotated refresh token back into a session that's already been torn down.
+  const epochAtStart = sessionEpoch;
+
   try {
     const res = await fetch(`${API_BASE}/api/v1/tenant-auth/refresh`, {
       method: 'POST',
@@ -299,10 +406,28 @@ async function refreshTenantSession(): Promise<boolean> {
       body: JSON.stringify({ refreshToken })
     });
     const data = await parseJsonResponse(res);
-    if (!res.ok) {
-      clearTenantSession();
+
+    if (sessionEpoch !== epochAtStart) {
+      // Stale: a logout (or other session teardown) started after this
+      // request was sent. Discard the response entirely — do not touch
+      // tenantAccessToken or storage either way, ok or not.
       return false;
     }
+
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 403) {
+        // The refresh token itself is dead (expired/revoked) — this is a
+        // real auth failure, not a transient outage. Clear the session.
+        clearTenantSession();
+        return false;
+      }
+      // Any other non-OK status (500/502/503/429/...) is a transient server
+      // problem, not proof the refresh token is invalid. Leave state alone
+      // and let the next scheduled tick retry — logging every kiosk out
+      // because the API hiccuped once would be worse than briefly stale auth.
+      return true;
+    }
+
     tenantAccessToken = data.accessToken;
     if (data.refreshToken) {
       try {

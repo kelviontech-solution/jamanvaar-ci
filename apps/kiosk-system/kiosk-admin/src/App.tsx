@@ -68,7 +68,8 @@ import {
   isStaffLoggedIn,
   getStaffUser,
   startSilentRefresh,
-  getConnectedRestaurantId
+  getConnectedRestaurantId,
+  onSessionExpired
 } from './cloud/cloudClient';
 import {
   Activity,
@@ -228,6 +229,16 @@ export default function AdminApp() {
     if (isStaffLoggedIn()) {
       startSilentRefresh();
     }
+    // If the session dies asynchronously (a refresh discovers the refresh
+    // token is dead, or a race-safe logout finishes clearing state), reflect
+    // that in the UI immediately instead of leaving the admin screen visible
+    // until the next reload.
+    const unsubscribeSessionExpired = onSessionExpired(() => {
+      setIsKioskAdminLoggedIn(false);
+    });
+    return () => {
+      unsubscribeSessionExpired();
+    };
   }, []);
 
   const handleKioskAdminLogin = async (e?: React.FormEvent) => {
