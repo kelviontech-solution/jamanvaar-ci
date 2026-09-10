@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   AuditRepository,
   ComboRepository,
@@ -419,9 +419,13 @@ export default function AdminApp() {
   });
   const [paymentSubmitting, setPaymentSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (activeTab !== 'SETTINGS') return;
+  // Extracted from the effect below so the error banner's Retry button can
+  // re-run exactly the same fetch. Without it, a transient failure — most
+  // commonly this firing before startSilentRefresh() has landed its first
+  // token on app boot — left the card permanently stuck on an error line.
+  const loadPaymentConnection = useCallback(() => {
     setPaymentConnectionLoading(true);
+    setPaymentConnectionError('');
     getPaymentConnection()
       .then((data) => {
         setPaymentConnection(data);
@@ -430,6 +434,9 @@ export default function AdminApp() {
           accountType: (data.accountType as 'BUSINESS' | 'INDIVIDUAL') ?? prev.accountType,
           businessType: data.businessType ?? prev.businessType,
           pan: data.pan ?? prev.pan,
+          gst: data.gst ?? prev.gst,
+          cin: data.cin ?? prev.cin,
+          uidai: data.uidai ?? prev.uidai,
           contactName: data.contactName ?? prev.contactName,
           contactEmail: data.contactEmail ?? prev.contactEmail,
           contactPhone: data.contactPhone ?? prev.contactPhone,
@@ -440,7 +447,12 @@ export default function AdminApp() {
       })
       .catch((err) => setPaymentConnectionError(err instanceof CloudApiError ? err.message : 'Could not load payment connection status'))
       .finally(() => setPaymentConnectionLoading(false));
-  }, [activeTab]);
+  }, []);
+
+  useEffect(() => {
+    if (activeTab !== 'SETTINGS') return;
+    loadPaymentConnection();
+  }, [activeTab, loadPaymentConnection]);
 
   const handleSubmitPaymentConnection = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -451,7 +463,14 @@ export default function AdminApp() {
       setPaymentConnection(updated);
       showToast('Payment connection details submitted for review.');
     } catch (err) {
-      setPaymentConnectionError(err instanceof CloudApiError ? err.message : 'Submission failed');
+      // A 400 from the API's Zod pipe carries per-field `issues`; its own
+      // top-level message is only ever "Validation failed", which tells the
+      // restaurant nothing about which field was rejected.
+      if (err instanceof CloudApiError && err.issues?.length) {
+        setPaymentConnectionError(err.issues.map((i) => `${i.path}: ${i.message}`).join('; '));
+      } else {
+        setPaymentConnectionError(err instanceof CloudApiError ? err.message : 'Submission failed');
+      }
     } finally {
       setPaymentSubmitting(false);
     }
@@ -4011,14 +4030,29 @@ export default function AdminApp() {
                 )}
 
                 {paymentConnectionError && (
-                  <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl">
-                    {paymentConnectionError}
+                  <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl flex items-center justify-between gap-3">
+                    <span>{paymentConnectionError}</span>
+                    <button
+                      type="button"
+                      onClick={loadPaymentConnection}
+                      className="shrink-0 text-xs font-bold underline"
+                    >
+                      Retry
+                    </button>
                   </div>
                 )}
 
-                {(paymentConnection?.status === 'NOT_CONNECTED' ||
-                  paymentConnection?.status === 'PENDING_VERIFICATION' ||
-                  paymentConnection?.status === 'DISCONNECTED') && (
+                {/* A null connection means the load has not succeeded yet —
+                    getOwn() returns {status:'NOT_CONNECTED'} rather than 404
+                    for a brand-new restaurant — so it is treated as
+                    NOT_CONNECTED rather than blocking the form forever.
+                    Submission stays blocked only when we positively know the
+                    connection is ACTIVE or SUSPENDED. */}
+                {!paymentConnectionLoading &&
+                  (paymentConnection === null ||
+                    paymentConnection?.status === 'NOT_CONNECTED' ||
+                    paymentConnection?.status === 'PENDING_VERIFICATION' ||
+                    paymentConnection?.status === 'DISCONNECTED') && (
                   <form onSubmit={handleSubmitPaymentConnection} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-[#0B253A] mb-1">Account Type *</label>
@@ -4038,6 +4072,33 @@ export default function AdminApp() {
                         value={paymentFormFields.businessType ?? ''}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, businessType: e.target.value }))}
                         placeholder="e.g. Restaurant, Proprietorship"
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">GST Number</label>
+                      <input
+                        type="text"
+                        value={paymentFormFields.gst ?? ''}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, gst: e.target.value }))}
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">CIN</label>
+                      <input
+                        type="text"
+                        value={paymentFormFields.cin ?? ''}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, cin: e.target.value }))}
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Aadhaar / UIDAI (Individual accounts only)</label>
+                      <input
+                        type="text"
+                        value={paymentFormFields.uidai ?? ''}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, uidai: e.target.value }))}
                         className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
                       />
                     </div>

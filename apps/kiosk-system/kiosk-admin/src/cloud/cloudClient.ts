@@ -29,7 +29,14 @@ const DEVICE_TOKEN_KEY = 'jamanvaar_kiosk_admin_device_token';
 export class CloudApiError extends Error {
   constructor(
     message: string,
-    public status: number
+    public status: number,
+    /**
+     * Per-field Zod validation failures from cloud/api's ZodValidationPipe.
+     * Without these a 400 surfaces only as the generic "Validation failed",
+     * which tells the restaurant nothing about which field it rejected.
+     * Mirrors cloud/super-admin-web/src/api/client.ts's ApiError.
+     */
+    public issues?: Array<{ path: string; message: string }>
   ) {
     super(message);
   }
@@ -482,6 +489,12 @@ export interface PaymentConnectionStatus {
   accountType?: string | null;
   businessType?: string | null;
   pan?: string | null;
+  // toOwnView() in cloud/api has always returned these three; they were
+  // simply missing from this interface, which is why the form could never
+  // round-trip them.
+  gst?: string | null;
+  cin?: string | null;
+  uidai?: string | null;
   contactName?: string | null;
   contactEmail?: string | null;
   contactPhone?: string | null;
@@ -511,10 +524,14 @@ export async function getPaymentConnection(): Promise<PaymentConnectionStatus> {
 }
 
 export async function submitPaymentConnection(fields: PaymentConnectionFields): Promise<PaymentConnectionStatus> {
-  const res = await tenantFetch('/api/v1/tenant/payment-connection', { method: 'POST', body: JSON.stringify(fields) });
+  // The form always holds every field, including optional ones the user
+  // cleared back to ''. The API's optional string fields still carry
+  // .min(1), so an empty string is a 400 — omit them instead of sending ''.
+  const cleaned = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== '')) as PaymentConnectionFields;
+  const res = await tenantFetch('/api/v1/tenant/payment-connection', { method: 'POST', body: JSON.stringify(cleaned) });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
-    throw new CloudApiError(data?.message ?? `Submission failed (${res.status})`, res.status);
+    throw new CloudApiError(data?.message ?? `Submission failed (${res.status})`, res.status, data?.issues);
   }
   return data;
 }
