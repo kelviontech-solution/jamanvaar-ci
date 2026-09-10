@@ -13,6 +13,7 @@ describe('Payment connection onboarding', () => {
   let platformToken: string;
   let restaurantId: string;
   let ownerToken: string;
+  let createVendorMock: ReturnType<typeof vi.fn>;
 
   const authed = (method: 'get' | 'post' | 'patch', url: string, token: string) =>
     request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
@@ -31,10 +32,15 @@ describe('Payment connection onboarding', () => {
 
   beforeAll(async () => {
     process.env.PAYMENT_CREDENTIAL_ENCRYPTION_KEY = Buffer.alloc(32, 7).toString('base64');
+    // Kept as a named variable (rather than inline in useValue) so individual
+    // tests — specifically the phase-3 race test below — can swap in a
+    // one-time implementation via mockImplementationOnce and have it fall
+    // back to this default afterwards.
+    createVendorMock = vi.fn().mockResolvedValue({ vendorId: 'rest_mocked', status: 'IN_BENE_CREATION' });
     app = await createTestApp((builder) =>
       builder.overrideProvider(CashfreeGatewayService).useValue({
         isConfigured: () => true,
-        createVendor: vi.fn().mockResolvedValue({ vendorId: 'rest_mocked', status: 'IN_BENE_CREATION' }),
+        createVendor: createVendorMock,
         getVendorStatus: vi.fn().mockResolvedValue({ vendorId: 'rest_mocked', status: 'ACTIVE' })
       })
     );
@@ -190,6 +196,26 @@ describe('Payment connection onboarding', () => {
     const res = await authed('post', '/api/v1/tenant/payment-connection', ownerToken).send(validSubmission);
     expect(res.status).toBe(201);
     expect(res.body.status).toBe('PENDING_VERIFICATION');
+  });
+
+  it('approve refuses to overwrite if the connection status changed while Cashfree was being contacted', async () => {
+    // approve() is split into three phases specifically so the Cashfree
+    // network call runs with no DB transaction open; this simulates a
+    // concurrent disconnect racing that in-flight call, by mutating the row
+    // from inside the mocked createVendor implementation itself.
+    createVendorMock.mockImplementationOnce(async () => {
+      await prisma.runAsPlatform((tx) =>
+        tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { status: 'DISCONNECTED' } })
+      );
+      return { vendorId: 'rest_raced', status: 'IN_BENE_CREATION' };
+    });
+
+    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/approve`, platformToken);
+    expect(res.status).toBe(403);
+
+    const row = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId } }));
+    expect(row.status).toBe('DISCONNECTED'); // not silently overwritten back to ACTIVE
+    expect(row.cashfreeVendorId).not.toBe('rest_raced'); // the raced vendor write was refused
   });
 
   it('a tenant from another restaurant cannot see or act on this connection', async () => {

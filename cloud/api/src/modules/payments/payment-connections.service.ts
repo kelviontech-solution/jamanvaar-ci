@@ -149,7 +149,18 @@ export class PaymentConnectionsService {
   }
 
   async approve(restaurantId: string, actor: PlatformUser) {
-    return this.prisma.runAsPlatform(async (tx) => {
+    // Deliberately split into three phases rather than one runAsPlatform
+    // transaction spanning the whole method: runAsPlatform wraps its
+    // callback in a real Postgres transaction, and holding that open across
+    // the Cashfree network round-trip below risks statement/idle-in-tx
+    // timeouts turning a slow-but-legitimate call into a spurious failure,
+    // plus a narrow window where Cashfree creates the vendor but our own
+    // commit then fails, leaving us with no record of a vendor that exists.
+    // Phase 1 (read-only) gathers everything needed for the Cashfree call;
+    // phase 2 makes that call with no transaction open; phase 3 re-checks
+    // status (guarding a status change that raced phases 1-2, e.g. a
+    // concurrent disconnect or a second concurrent approve) before writing.
+    const prepared = await this.prisma.runAsPlatform(async (tx) => {
       const connection = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
       if (!connection) throw new NotFoundException('No payment connection for this restaurant');
       if (connection.status !== 'PENDING_VERIFICATION') {
@@ -173,23 +184,54 @@ export class PaymentConnectionsService {
           ? { vpa: connection.settlementUpiVpa, accountHolder: connection.settlementAccountName ?? connection.contactName }
           : undefined;
 
-      const result = await this.cashfree.createVendor({
+      return {
         vendorId,
-        status: 'ACTIVE',
+        bank,
+        upi,
         name: connection.contactName,
         email: connection.contactEmail,
         phone: connection.contactPhone,
-        kycDetails: {
-          accountType: connection.accountType as 'BUSINESS' | 'INDIVIDUAL',
-          businessType: connection.businessType ?? undefined,
-          pan: connection.pan,
-          gst: connection.gst ?? undefined,
-          cin: connection.cin ?? undefined,
-          uidai: connection.uidai ?? undefined
-        },
-        bank,
-        upi
-      });
+        accountType: connection.accountType as 'BUSINESS' | 'INDIVIDUAL',
+        businessType: connection.businessType ?? undefined,
+        pan: connection.pan,
+        gst: connection.gst ?? undefined,
+        cin: connection.cin ?? undefined,
+        uidai: connection.uidai ?? undefined
+      };
+    });
+
+    // Phase 2: the Cashfree network call, made with no DB transaction open.
+    const result = await this.cashfree.createVendor({
+      vendorId: prepared.vendorId,
+      status: 'ACTIVE',
+      name: prepared.name,
+      email: prepared.email,
+      phone: prepared.phone,
+      kycDetails: {
+        accountType: prepared.accountType,
+        businessType: prepared.businessType,
+        pan: prepared.pan,
+        gst: prepared.gst,
+        cin: prepared.cin,
+        uidai: prepared.uidai
+      },
+      bank: prepared.bank,
+      upi: prepared.upi
+    });
+
+    // Phase 3: re-check status before writing — it may have changed while
+    // phase 2 was in flight (a concurrent disconnect, or a second concurrent
+    // approve). If so, the Cashfree vendor from phase 2 was already created;
+    // cleaning that up at Cashfree is out of scope here, so we simply refuse
+    // to overwrite whatever the connection's current state now is.
+    return this.prisma.runAsPlatform(async (tx) => {
+      const connection = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
+      if (!connection) throw new NotFoundException('No payment connection for this restaurant');
+      if (connection.status !== 'PENDING_VERIFICATION') {
+        throw new ForbiddenException(
+          `Connection moved to ${connection.status} while contacting Cashfree — a vendor (${result.vendorId}) may already exist at Cashfree; resolve manually before retrying`
+        );
+      }
 
       const updated = await tx.restaurantPaymentConnection.update({
         where: { restaurantId },
