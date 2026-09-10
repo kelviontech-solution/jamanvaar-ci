@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  activateKioskDevice,
+  isKioskDeviceConnected,
+  getKioskDeviceId,
+  CloudApiError
+} from './cloud/cloudClient';
+import {
   AuditRepository,
   ComboRepository,
   CouponRepository,
@@ -142,6 +148,28 @@ const LANGUAGE_OPTIONS: Array<{ code: SupportedLanguage; label: string; native: 
 ];
 
 export default function KioskUserApp() {
+  // Device activation (Phase 3) — this terminal has no identity until an
+  // activation code is redeemed; everything below assumes a real device.
+  const [isDeviceActivated, setIsDeviceActivated] = useState<boolean>(() => isKioskDeviceConnected());
+  const [activationCode, setActivationCode] = useState('');
+  const [activationError, setActivationError] = useState('');
+  const [isActivating, setIsActivating] = useState(false);
+  const kioskId = getKioskDeviceId() ?? 'KIOSK-01';
+
+  const handleActivate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsActivating(true);
+    setActivationError('');
+    try {
+      await activateKioskDevice(activationCode);
+      setIsDeviceActivated(true);
+    } catch (err) {
+      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed');
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
   const [dbTick, setDbTick] = useState(0);
   const [lang, setLang] = useState<SupportedLanguage>(
     () => KioskDisplaySettingsRepository.getSettings().defaultLanguage as SupportedLanguage
@@ -370,7 +398,7 @@ export default function KioskUserApp() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          kioskId: 'KIOSK-01',
+          kioskId,
           version: '1.0.0',
           isPrinterOnline: PrinterService.isOnline()
         })
@@ -452,7 +480,7 @@ export default function KioskUserApp() {
   const menuItems = MenuRepository.getAllMenuItems();
   const combos = ComboRepository.getAllCombos();
   const tables = TableRepository.getAllTables();
-  const kioskConfig = KioskRepository.getKioskById('KIOSK-01');
+  const kioskConfig = KioskRepository.getKioskById(kioskId);
   const receiptConfig = ReceiptRepository.getConfig();
 
   // Filtered Menu Items
@@ -705,7 +733,7 @@ export default function KioskUserApp() {
     // Save order in SQLite database
     const newOrder = OrderRepository.createOrder({
       idempotencyKey,
-      kioskId: 'KIOSK-01',
+      kioskId,
       sessionId,
       orderType,
       tableId: selectedTable?.id,
@@ -745,7 +773,7 @@ export default function KioskUserApp() {
 
     // If offline, queue event into transactional sync outbox (Section 126)
     if (!isCurrentlyOnline) {
-      SyncOutboxEngine.queueEvent('ORDER_CREATED', newOrder, 'KIOSK-01');
+      SyncOutboxEngine.queueEvent('ORDER_CREATED', newOrder, kioskId);
     }
 
     // Audio chime on successful order
@@ -799,7 +827,7 @@ export default function KioskUserApp() {
     }
 
     AuditRepository.log({
-      kioskId: 'KIOSK-01',
+      kioskId,
       action: 'ORDER_PLACED',
       category: 'ORDER',
       details: `Customer placed Order ${newOrder.orderNumber} (Token #${newOrder.tokenNumber}, Total ₹${newOrder.totalAmount}, Mode: ${isCurrentlyOnline ? 'ONLINE' : 'OFFLINE_SAVED'})`
@@ -867,7 +895,7 @@ export default function KioskUserApp() {
     SoundService.playTap();
     resetIdleTimer();
     ServiceRequestRepository.create({
-      kioskId: 'KIOSK-01',
+      kioskId,
       tableNumber: selectedTable?.tableNumber,
       sessionId,
       type: 'CALL_STAFF'
@@ -901,7 +929,7 @@ export default function KioskUserApp() {
       setStaffPin('');
       showToast('Staff Mode Activated: 10% Manager Discount Applied');
       AuditRepository.log({
-        kioskId: 'KIOSK-01',
+        kioskId,
         action: 'STAFF_OVERRIDE_PIN_SUCCESS',
         category: 'STAFF_OVERRIDE',
         details: 'Staff authenticated on Kiosk User for customer assistance'
@@ -915,7 +943,7 @@ export default function KioskUserApp() {
   const handleSubmitFeedback = () => {
     FeedbackRepository.submit({
       orderId: placedOrder?.id,
-      kioskId: 'KIOSK-01',
+      kioskId,
       rating: feedbackRating,
       tags: feedbackTags
     });
@@ -947,6 +975,36 @@ export default function KioskUserApp() {
     }
   };
 
+  // Device activation gate — nothing below assumes a valid restaurant/
+  // device identity until this passes, so it runs before every other
+  // early-return (including the maintenance lock check right below).
+  if (!isDeviceActivated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF7F2] p-6">
+        <form onSubmit={handleActivate} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4 text-center">
+          <h1 className="text-2xl font-black text-[#0B253A]">Activate This Kiosk</h1>
+          <p className="text-sm text-[#4A5568]">Enter the activation code provided by JAMANVAAR to connect this device to your restaurant.</p>
+          <input
+            type="text"
+            value={activationCode}
+            onChange={(e) => setActivationCode(e.target.value)}
+            placeholder="Activation code"
+            className="w-full text-center text-lg font-mono bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-4 py-3"
+            autoFocus
+          />
+          {activationError && <p className="text-sm font-bold text-rose-700">{activationError}</p>}
+          <button
+            type="submit"
+            disabled={isActivating || !activationCode.trim()}
+            className="w-full py-3 rounded-2xl bg-[#E66817] text-white font-black uppercase tracking-wider disabled:opacity-60"
+          >
+            {isActivating ? 'Activating…' : 'Activate'}
+          </button>
+        </form>
+      </div>
+    );
+  }
+
   // Maintenance screen if locked by Admin
   if (kioskConfig && kioskConfig.isLocked) {
     return (
@@ -963,7 +1021,7 @@ export default function KioskUserApp() {
             Our self-ordering kiosk is currently undergoing scheduled updates. Please place your order at the main counter.
           </p>
           <div className="mt-6 pt-4 border-t border-[#F3EFE6] text-xs text-[#8C9BAE] font-medium">
-            JAMANVAAR • Terminal KIOSK-01
+            JAMANVAAR • Terminal {kioskId}
           </div>
         </div>
       </div>
@@ -1330,7 +1388,7 @@ export default function KioskUserApp() {
 
           {/* Footer Information */}
           <footer className="flex items-center justify-between text-xs text-[#8C9BAE] font-medium pt-4 border-t border-[#EBE6DD]">
-            <span>Terminal KIOSK-01 • Sindhu Bhavan Road, Ahmedabad</span>
+            <span>Terminal {kioskId}</span>
             <button
               onClick={() => setIsStaffPinModalOpen(true)}
               className="text-[11px] text-[#8C9BAE] hover:text-[#0B253A] flex items-center gap-1 opacity-60 hover:opacity-100"

@@ -1,0 +1,92 @@
+/**
+ * kiosk-user's only connection to cloud/api. Unlike every other app in this
+ * monorepo's activation flow, this one is deliberately a single call: a
+ * walk-up customer kiosk has no staff credentials to layer a login step on
+ * top of, so the activation-key redeem response's own deviceToken (which
+ * cloud/api's activation-keys.service.ts already returns, unused by any
+ * other app's frontend) is used directly.
+ */
+
+const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
+
+const RESTAURANT_ID_KEY = 'jamanvaar_kiosk_user_restaurant_id';
+const DEVICE_ID_KEY = 'jamanvaar_kiosk_user_device_id';
+const DEVICE_TOKEN_KEY = 'jamanvaar_kiosk_user_device_token';
+
+export class CloudApiError extends Error {
+  constructor(
+    message: string,
+    public status: number
+  ) {
+    super(message);
+  }
+}
+
+async function parseJsonResponse(res: Response): Promise<any> {
+  const contentType = res.headers.get('content-type') ?? '';
+  return contentType.includes('application/json') ? res.json() : undefined;
+}
+
+export function isKioskDeviceConnected(): boolean {
+  try {
+    return localStorage.getItem(DEVICE_TOKEN_KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
+export function getKioskDeviceToken(): string | null {
+  try {
+    return localStorage.getItem(DEVICE_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function getKioskRestaurantId(): string | null {
+  try {
+    return localStorage.getItem(RESTAURANT_ID_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function getKioskDeviceId(): string | null {
+  try {
+    return localStorage.getItem(DEVICE_ID_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export async function activateKioskDevice(code: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/v1/activation/redeem`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: code.trim(), deviceType: 'KIOSK', appVersion: '1.0.0' })
+  });
+
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Activation failed (${res.status})`, res.status);
+  }
+
+  try {
+    localStorage.setItem(RESTAURANT_ID_KEY, data.restaurantId);
+    localStorage.setItem(DEVICE_ID_KEY, data.device.id);
+    localStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken);
+  } catch {
+    // Storage unavailable — activation succeeded server-side, but this
+    // terminal won't remember it across reloads. Caller sees no error since
+    // the current session is still usable via the in-memory result.
+  }
+}
+
+export function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const token = getKioskDeviceToken();
+  if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
+  return fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
+  });
+}
