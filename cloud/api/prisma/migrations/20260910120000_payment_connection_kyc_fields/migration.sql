@@ -1,15 +1,19 @@
 -- CreateEnum
-CREATE TYPE "CashfreeAccountType" AS ENUM ('BUSINESS', 'INDIVIDUAL');
+DO $$ BEGIN
+  CREATE TYPE "CashfreeAccountType" AS ENUM ('BUSINESS', 'INDIVIDUAL');
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- AlterTable
 ALTER TABLE "RestaurantPaymentConnection"
-  ADD COLUMN "accountType" "CashfreeAccountType",
-  ADD COLUMN "businessType" TEXT,
-  ADD COLUMN "pan" TEXT,
-  ADD COLUMN "gst" TEXT,
-  ADD COLUMN "cin" TEXT,
-  ADD COLUMN "uidai" TEXT,
-  ADD COLUMN "contactName" TEXT,
-  ADD COLUMN "contactEmail" TEXT,
-  ADD COLUMN "contactPhone" TEXT,
-  ADD COLUMN "cashfreeVendorStatus" TEXT;
+  ADD COLUMN IF NOT EXISTS "accountType" "CashfreeAccountType",
+  ADD COLUMN IF NOT EXISTS "businessType" TEXT,
+  ADD COLUMN IF NOT EXISTS "pan" TEXT,
+  ADD COLUMN IF NOT EXISTS "gst" TEXT,
+  ADD COLUMN IF NOT EXISTS "cin" TEXT,
+  ADD COLUMN IF NOT EXISTS "uidai" TEXT,
+  ADD COLUMN IF NOT EXISTS "contactName" TEXT,
+  ADD COLUMN IF NOT EXISTS "contactEmail" TEXT,
+  ADD COLUMN IF NOT EXISTS "contactPhone" TEXT,
+  ADD COLUMN IF NOT EXISTS "cashfreeVendorStatus" TEXT;

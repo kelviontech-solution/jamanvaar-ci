@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ServiceUnavailableException } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser } from './helpers';
@@ -14,9 +14,34 @@ describe('Payment connection onboarding', () => {
   let restaurantId: string;
   let ownerToken: string;
   let createVendorMock: ReturnType<typeof vi.fn>;
+  let updateVendorMock: ReturnType<typeof vi.fn>;
 
   const authed = (method: 'get' | 'post' | 'patch', url: string, token: string) =>
     request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
+
+  /**
+   * Most tests in this file share one restaurant and run as a deliberate
+   * state machine; the reconnect and approve-failure tests below need their
+   * own isolated connection lifecycle instead, so they provision a throwaway
+   * restaurant with this.
+   */
+  const createRestaurantWithOwner = async (label: string) => {
+    const ownerEmail = `payconn-${label}-${Date.now()}@test.example.com`;
+    const ownerPassword = 'scoped-correct-horse-battery';
+    const res = await authed('post', '/api/v1/restaurants', platformToken).send({
+      name: `TEST Pay Connection ${label} ${Date.now()}`,
+      ownerName: 'Scoped Owner',
+      ownerEmail
+    });
+    const id = res.body.restaurant.id;
+    await request(app.getHttpServer()).post('/api/v1/tenant-auth/set-initial-password').send({
+      restaurantId: id, email: ownerEmail, activationToken: res.body.activationToken, newPassword: ownerPassword
+    });
+    const loginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId: id, email: ownerEmail, password: ownerPassword });
+    return { restaurantId: id as string, token: loginRes.body.accessToken as string };
+  };
 
   const validSubmission = {
     accountType: 'BUSINESS',
@@ -37,10 +62,15 @@ describe('Payment connection onboarding', () => {
     // one-time implementation via mockImplementationOnce and have it fall
     // back to this default afterwards.
     createVendorMock = vi.fn().mockResolvedValue({ vendorId: 'rest_mocked', status: 'IN_BENE_CREATION' });
+    // Every approval after the first PATCHes the vendor that already exists
+    // rather than re-creating it, so this mock echoes back whichever
+    // vendor_id approve() targeted.
+    updateVendorMock = vi.fn().mockImplementation(async (vendorId: string) => ({ vendorId, status: 'ACTIVE' }));
     app = await createTestApp((builder) =>
       builder.overrideProvider(CashfreeGatewayService).useValue({
         isConfigured: () => true,
         createVendor: createVendorMock,
+        updateVendor: updateVendorMock,
         getVendorStatus: vi.fn().mockResolvedValue({ vendorId: 'rest_mocked', status: 'ACTIVE' })
       })
     );
@@ -87,6 +117,35 @@ describe('Payment connection onboarding', () => {
       accountType: 'BUSINESS', pan: 'ABCDE1234F', contactName: 'X', contactEmail: 'x@example.com', contactPhone: '9876543210'
     });
     expect(res.status).toBe(400);
+  });
+
+  it('a STAFF-role token cannot submit payment connection details (403)', async () => {
+    const staffEmail = `test-payconn-staff-${Date.now()}@example.com`;
+    const staffPassword = 'staff-correct-horse-battery';
+    const createRes = await authed('post', '/api/v1/tenant/me/users', ownerToken).send({
+      email: staffEmail,
+      fullName: 'Front Desk Staff',
+      role: 'STAFF',
+      password: staffPassword
+    });
+    expect(createRes.status).toBe(201);
+
+    const staffLoginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: staffEmail, password: staffPassword });
+    const staffToken = staffLoginRes.body.accessToken;
+
+    const res = await authed('post', '/api/v1/tenant/payment-connection', staffToken).send({
+      accountType: 'INDIVIDUAL', pan: 'ABCDE1234F', contactName: 'X', contactEmail: 'x@example.com', contactPhone: '9876543210',
+      settlementUpiVpa: 'staff-attempt@upi'
+    });
+    expect(res.status).toBe(403);
+
+    // Confirm nothing was written — the guard trips before the service layer.
+    const getRes = await authed('get', '/api/v1/tenant/payment-connection', ownerToken);
+    expect(getRes.body.status).toBe('NOT_CONNECTED');
+
+    await prisma.runAsTenant(restaurantId, (tx) => tx.user.deleteMany({ where: { email: staffEmail } }));
   });
 
   it('accepts a UPI-only submission and moves status to PENDING_VERIFICATION', async () => {
@@ -202,8 +261,15 @@ describe('Payment connection onboarding', () => {
     // approve() is split into three phases specifically so the Cashfree
     // network call runs with no DB transaction open; this simulates a
     // concurrent disconnect racing that in-flight call, by mutating the row
-    // from inside the mocked createVendor implementation itself.
-    createVendorMock.mockImplementationOnce(async () => {
+    // from inside the mocked vendor-call implementation itself.
+    //
+    // By this point the shared restaurant already went through one
+    // approve() earlier in this file (see "approve calls
+    // CashfreeGatewayService.createVendor...") followed by disconnect +
+    // resubmit ("can resubmit after DISCONNECTED"), so it already carries a
+    // cashfreeVendorId — this second approve() call takes the updateVendor
+    // branch, not createVendor, so the race must be injected there.
+    updateVendorMock.mockImplementationOnce(async () => {
       await prisma.runAsPlatform((tx) =>
         tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { status: 'DISCONNECTED' } })
       );
@@ -216,6 +282,64 @@ describe('Payment connection onboarding', () => {
     const row = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId } }));
     expect(row.status).toBe('DISCONNECTED'); // not silently overwritten back to ACTIVE
     expect(row.cashfreeVendorId).not.toBe('rest_raced'); // the raced vendor write was refused
+  });
+
+  it('approve leaves the connection unchanged if Cashfree rejects the vendor call', async () => {
+    const { restaurantId: rid, token } = await createRestaurantWithOwner('approve-fail');
+    const submitRes = await authed('post', '/api/v1/tenant/payment-connection', token).send(validSubmission);
+    expect(submitRes.status).toBe(201);
+
+    createVendorMock.mockRejectedValueOnce(new ServiceUnavailableException('Cashfree unavailable'));
+    const approveRes = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken);
+    expect(approveRes.status).toBe(503);
+
+    const row = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId: rid } }));
+    expect(row.status).toBe('PENDING_VERIFICATION'); // never a silent partial success
+    expect(row.cashfreeVendorId).toBeNull();
+
+    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
+  });
+
+  it('reconnecting after DISCONNECTED updates the existing Cashfree vendor instead of creating a new one', async () => {
+    const { restaurantId: rid, token } = await createRestaurantWithOwner('reconnect');
+
+    const firstSubmit = await authed('post', '/api/v1/tenant/payment-connection', token).send(validSubmission);
+    expect(firstSubmit.status).toBe(201);
+
+    const createCallsBeforeFirst = createVendorMock.mock.calls.length;
+    const firstApprove = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken);
+    expect(firstApprove.status).toBe(200);
+    expect(createVendorMock.mock.calls.length).toBe(createCallsBeforeFirst + 1);
+    const firstVendorId = firstApprove.body.cashfreeVendorId;
+    expect(firstVendorId).toBeTruthy();
+
+    const disconnectRes = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/disconnect`, platformToken);
+    expect(disconnectRes.status).toBe(200);
+
+    const newBankSubmission = {
+      ...validSubmission,
+      settlementAccountName: 'New Bank Name',
+      settlementAccountNumber: '9998887770',
+      settlementIfsc: 'ICIC0000002'
+    };
+    const secondSubmit = await authed('post', '/api/v1/tenant/payment-connection', token).send(newBankSubmission);
+    expect(secondSubmit.status).toBe(201);
+    expect(secondSubmit.body.status).toBe('PENDING_VERIFICATION');
+
+    const createCallsBeforeSecond = createVendorMock.mock.calls.length;
+    const updateCallsBeforeSecond = updateVendorMock.mock.calls.length;
+    const secondApprove = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken);
+    expect(secondApprove.status).toBe(200);
+    // Same vendor_id as the first approval — never a fresh create.
+    expect(secondApprove.body.cashfreeVendorId).toBe(firstVendorId);
+    expect(createVendorMock.mock.calls.length).toBe(createCallsBeforeSecond); // not called again
+    expect(updateVendorMock.mock.calls.length).toBe(updateCallsBeforeSecond + 1);
+
+    const lastUpdateCall = updateVendorMock.mock.calls[updateVendorMock.mock.calls.length - 1];
+    expect(lastUpdateCall[0]).toBe(firstVendorId); // vendor_id passed as the path param
+    expect(lastUpdateCall[1].bank.accountNumber).toBe('9998887770'); // carries the NEW bank details
+
+    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
   });
 
   it('a tenant from another restaurant cannot see or act on this connection', async () => {

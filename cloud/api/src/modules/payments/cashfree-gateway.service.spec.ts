@@ -136,6 +136,51 @@ describe('CashfreeGatewayService', () => {
     expect(result.status).toBe('IN_BENE_CREATION');
   });
 
+  it('updateVendor PATCHes the vendor by id, with no vendor_id in the body', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ vendor_id: 'rest_abc123', status: 'ACTIVE' }), { status: 200 })
+    );
+
+    const result = await service.updateVendor('rest_abc123', {
+      status: 'ACTIVE',
+      name: 'Demo Restaurant',
+      email: 'owner@demo.jamanvaar.app',
+      phone: '9876543210',
+      kycDetails: { accountType: 'BUSINESS', businessType: 'Restaurant', pan: 'ABCDE1234F', gst: '24AAAAA0000A1Z5' },
+      bank: { accountNumber: '9998887770', accountHolder: 'Demo Restaurant', ifsc: 'ICIC0000002' }
+    });
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchSpy.mock.calls[0];
+    expect(url).toBe('https://sandbox.cashfree.com/pg/easy-split/vendors/rest_abc123');
+    expect(init?.method).toBe('PATCH');
+    const body = JSON.parse(init!.body as string);
+    expect(body.vendor_id).toBeUndefined(); // travels in the URL path, not the body
+    expect(body.kyc_details.account_type).toBe('BUSINESS');
+    expect(body.kyc_details.gst).toBe('24AAAAA0000A1Z5');
+    expect(body.bank.account_number).toBe('9998887770');
+    expect(body.bank.ifsc).toBe('ICIC0000002');
+    expect(body.upi).toBeUndefined();
+    expect(result.vendorId).toBe('rest_abc123');
+    expect(result.status).toBe('ACTIVE');
+  });
+
+  it('updateVendor throws when Cashfree responds with a non-2xx status', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify({ message: 'vendor not found' }), { status: 404 }));
+    await expect(
+      service.updateVendor('rest_missing', {
+        status: 'ACTIVE',
+        name: 'Demo Restaurant',
+        email: 'owner@demo.jamanvaar.app',
+        phone: '9876543210',
+        kycDetails: { accountType: 'INDIVIDUAL', pan: 'ABCDE1234F' },
+        upi: { vpa: 'demo@upi', accountHolder: 'Demo Restaurant' }
+      })
+    ).rejects.toThrow(ServiceUnavailableException);
+  });
+
   it('getVendorStatus fetches the vendor by id', async () => {
     const service = await buildService(CONFIGURED_ENV);
     const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(

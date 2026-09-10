@@ -192,6 +192,46 @@ export class CashfreeGatewayService {
     return { vendorId: body.vendor_id, status: body.status };
   }
 
+  /**
+   * Update Vendor (PATCH /pg/easy-split/vendors/{vendor_id}) —
+   * https://www.cashfree.com/docs/api-reference/payments/latest/split/vendors/update
+   *
+   * Used on every re-approval after the first, so a disconnect → resubmit →
+   * re-approve cycle carries the new bank/KYC details onto the vendor that
+   * already exists at Cashfree, instead of re-issuing a create call with a
+   * vendor_id Cashfree already holds (whose duplicate-create semantics are
+   * undocumented). vendor_id travels in the URL path, never in the body.
+   */
+  async updateVendor(vendorId: string, input: Omit<CreateCashfreeVendorInput, 'vendorId'>): Promise<CashfreeVendorResult> {
+    const res = await fetch(`${this.baseUrl()}/easy-split/vendors/${encodeURIComponent(vendorId)}`, {
+      method: 'PATCH',
+      headers: this.headers(),
+      body: JSON.stringify({
+        status: input.status,
+        name: input.name,
+        email: input.email,
+        phone: input.phone,
+        kyc_details: {
+          account_type: input.kycDetails.accountType,
+          ...(input.kycDetails.businessType ? { business_type: input.kycDetails.businessType } : {}),
+          pan: input.kycDetails.pan,
+          ...(input.kycDetails.gst ? { gst: input.kycDetails.gst } : {}),
+          ...(input.kycDetails.cin ? { cin: input.kycDetails.cin } : {}),
+          ...(input.kycDetails.uidai ? { uidai: input.kycDetails.uidai } : {})
+        },
+        ...(input.bank
+          ? { bank: { account_number: input.bank.accountNumber, account_holder: input.bank.accountHolder, ifsc: input.bank.ifsc } }
+          : {}),
+        ...(input.upi ? { upi: { vpa: input.upi.vpa, account_holder: input.upi.accountHolder } } : {})
+      })
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new ServiceUnavailableException(`Cashfree vendor update failed: ${body?.message ?? res.statusText}`);
+    }
+    return { vendorId: body.vendor_id, status: body.status };
+  }
+
   async getVendorStatus(vendorId: string): Promise<CashfreeVendorResult> {
     const res = await fetch(`${this.baseUrl()}/easy-split/vendors/${encodeURIComponent(vendorId)}`, {
       method: 'GET',
