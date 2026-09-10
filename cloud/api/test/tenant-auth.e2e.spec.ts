@@ -223,6 +223,40 @@ describe('Tenant authentication + authorization', () => {
     expect(refreshRes.body.refreshToken).not.toBe(originalRefreshToken);
   });
 
+  it('cookie-only refresh (no body refreshToken) omits refreshToken/refreshTokenExpiresAt from the response body', async () => {
+    const loginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: ownerEmail, password: ownerPassword });
+    const refreshCookie = extractCookie(loginRes.headers['set-cookie'], 'jamanvaar_tenant_refresh')!;
+
+    const refreshRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/refresh')
+      .set('Cookie', [`jamanvaar_tenant_refresh=${refreshCookie}`]);
+
+    expect(refreshRes.status).toBe(200);
+    expect(refreshRes.body.accessToken).toBeTypeOf('string');
+    expect(refreshRes.body.user).toBeTruthy();
+    expect(refreshRes.body.refreshToken).toBeUndefined();
+    expect(refreshRes.body.refreshTokenExpiresAt).toBeUndefined();
+  });
+
+  it('refresh prefers the cookie over a body refreshToken when both are present', async () => {
+    const loginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: ownerEmail, password: ownerPassword });
+    const refreshCookie = extractCookie(loginRes.headers['set-cookie'], 'jamanvaar_tenant_refresh')!;
+
+    // A deliberately wrong body refreshToken alongside the real cookie — if
+    // the body value were used instead of the cookie, this would 401.
+    const refreshRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/refresh')
+      .set('Cookie', [`jamanvaar_tenant_refresh=${refreshCookie}`])
+      .send({ refreshToken: 'garbage-wrong-refresh-token-value' });
+
+    expect(refreshRes.status).toBe(200);
+    expect(refreshRes.body.accessToken).toBeTypeOf('string');
+  });
+
   it('logout revokes a refresh token supplied via body (no cookie), confirmed by a subsequent refresh failing', async () => {
     const loginRes = await request(app.getHttpServer())
       .post('/api/v1/tenant-auth/login')
