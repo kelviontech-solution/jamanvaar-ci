@@ -72,6 +72,7 @@ import {
   onSessionExpired,
   getPaymentConnection,
   submitPaymentConnection,
+  syncMenuToCloud,
   type PaymentConnectionFields,
   type PaymentConnectionStatus
 } from './cloud/cloudClient';
@@ -243,6 +244,17 @@ export default function AdminApp() {
     return () => {
       unsubscribeSessionExpired();
     };
+  }, []);
+
+  // Push the current menu to cloud/api once, on boot, if this terminal is
+  // already device-connected — MenuSnapshotItem needs real data before
+  // kiosk-user can price any real order against it.
+  useEffect(() => {
+    if (!isDeviceConnected()) return;
+    syncMenuToCloud(MenuRepository.getAllMenuItems(), db.taxGroups).catch((err) => {
+      console.error('Menu sync failed:', err);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleKioskAdminLogin = async (e?: React.FormEvent) => {
@@ -771,6 +783,9 @@ export default function AdminApp() {
     });
 
     showToast(`Created dish: ${created.name}`);
+    syncMenuToCloud(MenuRepository.getAllMenuItems(), db.taxGroups).catch((err) => {
+      console.error('Menu sync failed:', err);
+    });
     setIsAddItemModalOpen(false);
     setNewItemName('');
     setNewItemSku('');

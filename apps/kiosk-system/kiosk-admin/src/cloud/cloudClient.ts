@@ -26,6 +26,14 @@ const RESTAURANT_ID_KEY = 'jamanvaar_kiosk_admin_restaurant_id';
 const DEVICE_LABEL_KEY = 'jamanvaar_kiosk_admin_device_label';
 const DEVICE_TOKEN_KEY = 'jamanvaar_kiosk_admin_device_token';
 
+function getDeviceToken(): string | null {
+  try {
+    return localStorage.getItem(DEVICE_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export class CloudApiError extends Error {
   constructor(
     message: string,
@@ -534,4 +542,88 @@ export async function submitPaymentConnection(fields: PaymentConnectionFields): 
     throw new CloudApiError(data?.message ?? `Submission failed (${res.status})`, res.status, data?.issues);
   }
   return data;
+}
+
+// --- Menu Sync (Phase 3 prerequisite) ---
+
+import type { MenuItem } from '@jamanvaar/types';
+
+interface MenuSyncItemPayload {
+  externalItemId: string;
+  name: string;
+  category?: string;
+  basePrice: number; // paise
+  modifierGroups: Array<{
+    id: string;
+    name: string;
+    isRequired: boolean;
+    minSelections: number;
+    maxSelections: number;
+    options: Array<{ id: string; name: string; priceDelta: number }>;
+  }>;
+  taxRate: number; // basis points, e.g. 500 = 5.00%
+  isAvailable: boolean;
+}
+
+/**
+ * The local domain model stores rupee amounts and treats item price as
+ * already tax-exclusive (packages/business/src/pricing.ts's calculateCart
+ * adds CGST+SGST on top of item.price unconditionally — confirmed directly,
+ * it does not consult TaxGroup.isInclusive). cloud/api's pricing.util.ts
+ * does the identical "add tax on top of basePrice" math, so this is a
+ * straightforward rupee->paise conversion, not a tax-inclusive/exclusive
+ * split.
+ */
+function toMenuSyncItem(item: MenuItem, taxRatePercent: number): MenuSyncItemPayload {
+  return {
+    externalItemId: item.id,
+    name: item.name,
+    category: undefined,
+    basePrice: Math.round((item.basePrice ?? item.price) * 100),
+    modifierGroups: (item.modifierGroups ?? []).map((g) => ({
+      id: g.id,
+      name: g.name,
+      isRequired: g.isRequired,
+      minSelections: g.minSelections,
+      maxSelections: g.maxSelections,
+      options: g.options.map((o) => ({ id: o.id, name: o.name, priceDelta: Math.round(o.priceDelta * 100) }))
+    })),
+    taxRate: Math.round(taxRatePercent * 100),
+    isAvailable: item.isAvailable
+  };
+}
+
+/**
+ * Pushes every kiosk-enabled menu item to cloud/api's MenuSnapshotItem
+ * table, which PaymentOrdersController prices kiosk-user's real orders
+ * against. A silent no-op (not an error) if this terminal has never been
+ * activated (getDeviceToken() null) or has no kiosk-enabled items — most
+ * callers of this function don't want a boot-time failure surfaced to the
+ * Kiosk Admin operator for something this invisible.
+ */
+export async function syncMenuToCloud(items: MenuItem[], taxGroups: Array<{ id: string; cgstPercent: number; sgstPercent: number }>): Promise<void> {
+  const token = getDeviceToken();
+  if (!token) return;
+
+  const kioskItems = items.filter((i) => i.isKioskEnabled);
+  if (kioskItems.length === 0) return;
+
+  const payload = {
+    items: kioskItems.map((item) => {
+      const taxGroup = taxGroups.find((tg) => tg.id === item.taxGroupId);
+      const taxRatePercent = taxGroup ? taxGroup.cgstPercent + taxGroup.sgstPercent : 0;
+      return toMenuSyncItem(item, taxRatePercent);
+    })
+  };
+
+  const res = await fetch(`${API_BASE}/api/v1/tenant/menu-sync`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const data = await parseJsonResponse(res);
+    throw new CloudApiError(data?.message ?? `Menu sync failed (${res.status})`, res.status);
+  }
 }
