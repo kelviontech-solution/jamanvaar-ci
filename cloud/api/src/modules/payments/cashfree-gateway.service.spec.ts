@@ -106,4 +106,48 @@ describe('CashfreeGatewayService', () => {
       ServiceUnavailableException
     );
   });
+
+  it('createVendor posts to the easy-split vendors endpoint with correct field mapping', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ vendor_id: 'rest_abc123', status: 'IN_BENE_CREATION' }), { status: 200 })
+    );
+
+    const result = await service.createVendor({
+      vendorId: 'rest_abc123',
+      status: 'ACTIVE',
+      name: 'Demo Restaurant',
+      email: 'owner@demo.jamanvaar.app',
+      phone: '9876543210',
+      kycDetails: { accountType: 'BUSINESS', businessType: 'Restaurant', pan: 'ABCDE1234F' },
+      bank: { accountNumber: '1234567890', accountHolder: 'Demo Restaurant', ifsc: 'HDFC0000001' }
+    });
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchSpy.mock.calls[0];
+    expect(url).toBe('https://sandbox.cashfree.com/pg/easy-split/vendors');
+    const body = JSON.parse(init!.body as string);
+    expect(body.vendor_id).toBe('rest_abc123');
+    expect(body.kyc_details.account_type).toBe('BUSINESS');
+    expect(body.kyc_details.pan).toBe('ABCDE1234F');
+    expect(body.bank.account_number).toBe('1234567890');
+    expect(body.upi).toBeUndefined();
+    expect(result.vendorId).toBe('rest_abc123');
+    expect(result.status).toBe('IN_BENE_CREATION');
+  });
+
+  it('getVendorStatus fetches the vendor by id', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ vendor_id: 'rest_abc123', status: 'ACTIVE' }), { status: 200 })
+    );
+
+    const result = await service.getVendorStatus('rest_abc123');
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://sandbox.cashfree.com/pg/easy-split/vendors/rest_abc123',
+      expect.objectContaining({ method: 'GET' })
+    );
+    expect(result.status).toBe('ACTIVE');
+  });
 });

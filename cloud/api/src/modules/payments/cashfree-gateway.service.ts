@@ -37,6 +37,29 @@ export interface CashfreeRefundResult {
   refundAmount: number;
 }
 
+export interface CreateCashfreeVendorInput {
+  vendorId: string; // alphanumeric/underscore only — a raw UUID's hyphens are rejected by Cashfree
+  status: 'ACTIVE' | 'BLOCKED' | 'DELETED';
+  name: string;
+  email: string;
+  phone: string;
+  kycDetails: {
+    accountType: 'BUSINESS' | 'INDIVIDUAL';
+    businessType?: string;
+    pan: string;
+    gst?: string;
+    cin?: string;
+    uidai?: string;
+  };
+  bank?: { accountNumber: string; accountHolder: string; ifsc: string };
+  upi?: { vpa: string; accountHolder: string };
+}
+
+export interface CashfreeVendorResult {
+  vendorId: string;
+  status: string;
+}
+
 // Kiosk walk-up customers never provide a phone number, but Cashfree's
 // Create Order API requires customer_details.customer_phone — a fixed
 // placeholder is used since this flow collects no real one.
@@ -136,5 +159,48 @@ export class CashfreeGatewayService {
     const actual = Buffer.from(signature);
     if (expected.length !== actual.length) return false;
     return timingSafeEqual(expected, actual);
+  }
+
+  async createVendor(input: CreateCashfreeVendorInput): Promise<CashfreeVendorResult> {
+    const res = await fetch(`${this.baseUrl()}/easy-split/vendors`, {
+      method: 'POST',
+      headers: this.headers(),
+      body: JSON.stringify({
+        vendor_id: input.vendorId,
+        status: input.status,
+        name: input.name,
+        email: input.email,
+        phone: input.phone,
+        kyc_details: {
+          account_type: input.kycDetails.accountType,
+          ...(input.kycDetails.businessType ? { business_type: input.kycDetails.businessType } : {}),
+          pan: input.kycDetails.pan,
+          ...(input.kycDetails.gst ? { gst: input.kycDetails.gst } : {}),
+          ...(input.kycDetails.cin ? { cin: input.kycDetails.cin } : {}),
+          ...(input.kycDetails.uidai ? { uidai: input.kycDetails.uidai } : {})
+        },
+        ...(input.bank
+          ? { bank: { account_number: input.bank.accountNumber, account_holder: input.bank.accountHolder, ifsc: input.bank.ifsc } }
+          : {}),
+        ...(input.upi ? { upi: { vpa: input.upi.vpa, account_holder: input.upi.accountHolder } } : {})
+      })
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new ServiceUnavailableException(`Cashfree vendor creation failed: ${body?.message ?? res.statusText}`);
+    }
+    return { vendorId: body.vendor_id, status: body.status };
+  }
+
+  async getVendorStatus(vendorId: string): Promise<CashfreeVendorResult> {
+    const res = await fetch(`${this.baseUrl()}/easy-split/vendors/${encodeURIComponent(vendorId)}`, {
+      method: 'GET',
+      headers: this.headers()
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new ServiceUnavailableException(`Cashfree vendor lookup failed: ${body?.message ?? res.statusText}`);
+    }
+    return { vendorId: body.vendor_id, status: body.status };
   }
 }

@@ -1029,6 +1029,11 @@ model PaymentTransaction {
 // One per restaurant. Represents the Cashfree Easy Split vendor
 // registration for Phase 1 (PLATFORM_POOLED) — settlement bank/UPI details,
 // not independent API credentials.
+enum CashfreeAccountType {
+  BUSINESS
+  INDIVIDUAL
+}
+
 model RestaurantPaymentConnection {
   id                                String                  @id @default(uuid())
   restaurantId                      String                  @unique
@@ -1036,6 +1041,16 @@ model RestaurantPaymentConnection {
   provider                          PaymentProvider         @default(CASHFREE)
   connectionType                    PaymentConnectionType   @default(PLATFORM_POOLED)
   cashfreeVendorId                  String?
+  accountType                       CashfreeAccountType?
+  businessType                      String? // free text, passed through to Cashfree verbatim — see plan's Global Constraints
+  pan                               String?
+  gst                               String?
+  cin                               String?
+  uidai                             String? // Aadhar, stored as String (not a number) to avoid precision/leading-zero loss
+  contactName                       String?
+  contactEmail                      String?
+  contactPhone                      String?
+  cashfreeVendorStatus              String? // Cashfree's own async verification status (IN_BENE_CREATION/ACTIVE/ACTION_REQUIRED/...), distinct from our own `status` field
   status                            PaymentConnectionStatus @default(NOT_CONNECTED)
   settlementAccountName             String?
   settlementAccountNumberEncrypted  String? // encrypted via credential-encryption.util
