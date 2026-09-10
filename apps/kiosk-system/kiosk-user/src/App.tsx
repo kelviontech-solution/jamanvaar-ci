@@ -1,9 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { load as loadCashfree } from '@cashfreepayments/cashfree-js';
 import {
   activateKioskDevice,
   isKioskDeviceConnected,
   getKioskDeviceId,
-  CloudApiError
+  getKioskRestaurantId,
+  createPaymentOrder,
+  getPaymentOrderStatus,
+  CloudApiError,
+  type CartLinePayload
 } from './cloud/cloudClient';
 import {
   AuditRepository,
@@ -49,7 +54,6 @@ import {
   calculateItemUnitPrice,
   CustomerChatbotEngine,
   hasRequiredModifierGroup,
-  IdempotencyManager,
   RecommendationEngine,
   validateModifiers
 } from '@jamanvaar/business';
@@ -70,7 +74,7 @@ import {
 } from '@jamanvaar/ui';
 import { formatDate, formatINR, formatTime, generateIdempotencyKey, generateUUID, localizedDescription, localizedName, SoundService } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
-import { EBillService, KdsMeshService, NetworkStatusService, PaymentService, PrinterService, VoiceService } from '@jamanvaar/api';
+import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService } from '@jamanvaar/api';
 import { SyncOutboxEngine } from '@jamanvaar/sync';
 import { APP_CONSTANTS } from '@jamanvaar/config';
 import {
@@ -83,7 +87,6 @@ import {
   ChevronRight,
   Clock,
   Coins,
-  CreditCard,
   Download,
   Eye,
   FileText,
@@ -220,18 +223,13 @@ export default function KioskUserApp() {
   const [couponError, setCouponError] = useState<string | null>(null);
 
   // Payment State Machine
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('UPI_QR');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('UPI');
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('CREATED');
-  const [paymentTxId, setPaymentTxId] = useState<string | null>(null);
-  const [upiQrData, setUpiQrData] = useState<string | null>(null);
   const [paymentTimeLeft, setPaymentTimeLeft] = useState<number>(180);
+  const [realPaymentId, setRealPaymentId] = useState<string | null>(null);
+  const [localOrderIdForPayment, setLocalOrderIdForPayment] = useState<string | null>(null);
+  const [cashfreeUnavailable, setCashfreeUnavailable] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  // Data-integrity fix: this used to be regenerated fresh inside
-  // handleFinalizePayment on every call, so the IdempotencyManager.isDuplicate
-  // check there could never trip — a double-tapped "Pay" button created two
-  // orders. Generated once per checkout attempt (when payment starts) and
-  // reused by every retry of finalizing THAT SAME attempt.
-  const orderIdempotencyKeyRef = useRef<string | null>(null);
 
   // Confirmed Order & Auto-Print State
   const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
@@ -374,10 +372,39 @@ export default function KioskUserApp() {
     return () => clearInterval(interval);
   }, [showIdleWarning]);
 
-  // Payment Countdown
+  // Payment Countdown + real-payment polling. The Cashfree webhook (handled
+  // entirely server-side) is what actually confirms payment — this only
+  // ever reflects what GET /api/v1/payments/:paymentId/status already
+  // recorded, never a client-side belief about success.
   useEffect(() => {
     if (step !== 'CHECKOUT_PAYMENT' || paymentStatus === 'SUCCESS' || paymentStatus === 'EXPIRED') return;
-    const interval = setInterval(() => {
+
+    const interval = setInterval(async () => {
+      if (realPaymentId) {
+        try {
+          const result = await getPaymentOrderStatus(realPaymentId);
+          if (result.status === 'SUCCESS') {
+            setPaymentStatus('SUCCESS');
+            if (localOrderIdForPayment) {
+              OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Cashfree UPI');
+              const settledOrder = OrderRepository.getOrderById(localOrderIdForPayment);
+              if (settledOrder) {
+                proceedToConfirmation(settledOrder, networkState === 'ONLINE');
+              }
+            }
+            return;
+          }
+          if (result.status === 'FAILED' || result.status === 'USER_DROPPED') {
+            setCashfreeUnavailable(true);
+            setPaymentTimeLeft(0);
+            setPaymentStatus('EXPIRED');
+            return;
+          }
+        } catch (err) {
+          console.error('Payment status poll failed:', err);
+        }
+      }
+
       setPaymentTimeLeft((prev) => {
         if (prev <= 1) {
           setPaymentStatus('EXPIRED');
@@ -385,9 +412,10 @@ export default function KioskUserApp() {
         }
         return prev - 1;
       });
-    }, 1000);
+    }, 3000);
+
     return () => clearInterval(interval);
-  }, [step, paymentStatus]);
+  }, [step, paymentStatus, realPaymentId, localOrderIdForPayment]);
 
   // Periodic Heartbeat to Authoritative Local Service
   useEffect(() => {
@@ -421,7 +449,6 @@ export default function KioskUserApp() {
       window.speechSynthesis.cancel();
     }
     setSessionId(generateUUID());
-    orderIdempotencyKeyRef.current = null;
     setStep('WELCOME');
     setCartItems([]);
     setSelectedTable(null);
@@ -431,7 +458,9 @@ export default function KioskUserApp() {
     setSelectedModifiers([]);
     setSpecialInstructions('');
     setPaymentStatus('CREATED');
-    setPaymentTxId(null);
+    setRealPaymentId(null);
+    setLocalOrderIdForPayment(null);
+    setCashfreeUnavailable(false);
     setPlacedOrder(null);
     setShowIdleWarning(false);
     setIdleSeconds(0);
@@ -677,62 +706,26 @@ export default function KioskUserApp() {
     resetIdleTimer();
     if (cartItems.length === 0) return;
 
-    // Offline payment safeguard (Section 128)
-    if (networkState === 'OFFLINE' && (paymentMethod === 'UPI_QR' || paymentMethod === 'CARD_TERMINAL')) {
+    if (networkState === 'OFFLINE' && paymentMethod === 'UPI') {
       setPaymentMethod('CASH_AT_COUNTER');
-      showToast('Internet offline: Switched to Pay Cash at Counter 1.');
+      showToast('Internet offline: Switched to Pay Cash at Counter.');
     }
 
     setIsCartOpen(false);
     setStep('CHECKOUT_PAYMENT');
-    setPaymentTimeLeft(180);
+    setPaymentTimeLeft(60);
     setPaymentStatus('WAITING_FOR_USER');
+    setCashfreeUnavailable(false);
 
-    const tempOrderId = `ord-${Date.now()}`;
-    const idempKey = generateIdempotencyKey('pay');
-    // One order-creation idempotency key per checkout attempt, reused by
-    // every call to handleFinalizePayment for this attempt (see ref comment).
-    orderIdempotencyKeyRef.current = generateIdempotencyKey('kiosk_ord');
+    const effectiveMethod = networkState === 'OFFLINE' ? 'CASH_AT_COUNTER' : paymentMethod;
 
-    try {
-      const res = await PaymentService.startPayment({
-        orderId: tempOrderId,
-        idempotencyKey: idempKey,
-        amount: netTotalPayable,
-        method: paymentMethod
-      });
-      setPaymentTxId(res.transactionId);
-      if (res.qrCodeData) {
-        setUpiQrData(res.qrCodeData);
-      }
-    } catch (e) {
-      console.error('Payment initiation error:', e);
-    }
-  };
-
-  // Complete Order Creation (Truthful Status: Online vs Offline)
-  const handleFinalizePayment = async () => {
-    resetIdleTimer();
-    setIsProcessingPayment(true);
-
-    // Fall back to a fresh key only if this was somehow reached without
-    // handleStartPayment having run first — the normal path always reuses
-    // the same key across retries so the duplicate check below is meaningful.
-    const idempotencyKey = orderIdempotencyKeyRef.current || generateIdempotencyKey('kiosk_ord');
-
-    if (IdempotencyManager.isDuplicate(idempotencyKey)) {
-      alert('Order already being processed.');
-      setIsProcessingPayment(false);
-      return;
-    }
-
-    IdempotencyManager.markProcessed(idempotencyKey);
-
-    const isCurrentlyOnline = networkState === 'ONLINE';
-
-    // Save order in SQLite database
-    const newOrder = OrderRepository.createOrder({
-      idempotencyKey,
+    // Create the local order PENDING first, before any network call, so it
+    // has a stable id — this order is what handleGetToken (cash-at-counter)
+    // and the real UPI success path below both act on. Never
+    // paymentStatus: 'SUCCESS' here; that only ever happens once a real
+    // payment is confirmed.
+    const pendingOrder = OrderRepository.createOrder({
+      idempotencyKey: generateIdempotencyKey('kiosk_ord'),
       kioskId,
       sessionId,
       orderType,
@@ -762,26 +755,69 @@ export default function KioskUserApp() {
       taxAmount: rawCalculated.taxAmount,
       roundOffAmount: rawCalculated.roundOffAmount,
       totalAmount: netTotalPayable,
-      paymentMethod,
-      paymentStatus: 'SUCCESS',
-      paymentTransactionId: paymentTxId || generateUUID(),
+      paymentMethod: effectiveMethod,
+      paymentStatus: 'PENDING',
       orderStatus: 'CONFIRMED',
       estimatedWaitMinutes: APP_CONSTANTS.DEFAULT_ESTIMATED_PREP_MINUTES,
-      syncStatus: isCurrentlyOnline ? 'SYNCED' : 'SAVED_LOCALLY',
-      isSynced: isCurrentlyOnline
+      syncStatus: networkState === 'ONLINE' ? 'SYNCED' : 'SAVED_LOCALLY',
+      isSynced: networkState === 'ONLINE'
     });
+    setLocalOrderIdForPayment(pendingOrder.id);
 
-    // If offline, queue event into transactional sync outbox (Section 126)
-    if (!isCurrentlyOnline) {
-      SyncOutboxEngine.queueEvent('ORDER_CREATED', newOrder, kioskId);
+    if (effectiveMethod !== 'UPI') {
+      // Cash-at-counter: the order is created, kitchen prep proceeds
+      // (handleGetToken), payment is settled for real later at the counter.
+      return;
     }
 
+    const restaurantId = getKioskRestaurantId();
+    if (!restaurantId) {
+      setCashfreeUnavailable(true);
+      return;
+    }
+
+    const lines: CartLinePayload[] = cartItems.map((ci) => ({
+      externalItemId: ci.menuItemId,
+      quantity: ci.quantity,
+      selectedOptionIds: ci.selectedModifiers.map((m) => m.optionId)
+    }));
+
+    try {
+      const result = await createPaymentOrder(pendingOrder.id, lines);
+      setRealPaymentId(result.paymentId);
+
+      if (!result.paymentSessionId) {
+        setCashfreeUnavailable(true);
+        return;
+      }
+
+      const cashfree = await loadCashfree({ mode: import.meta.env.VITE_CASHFREE_MODE ?? 'sandbox' });
+      if (!cashfree) {
+        setCashfreeUnavailable(true);
+        return;
+      }
+      cashfree.checkout({ paymentSessionId: result.paymentSessionId, redirectTarget: '_modal' });
+    } catch (err) {
+      // A 403 here means this restaurant's Cashfree connection isn't ACTIVE
+      // yet (payments.service.ts's own gate) — not a transient failure, so
+      // no retry is offered; fall straight to the cash-at-counter messaging.
+      console.error('Payment order creation failed:', err);
+      setCashfreeUnavailable(true);
+    }
+  };
+
+  // Complete Order Creation (Truthful Status: Online vs Offline)
+  // Shared confirmation/KOT/print/voice tail — runs once an order's real
+  // payment is settled, whichever path settled it: cash at the counter
+  // (handleGetToken) or a Cashfree-confirmed UPI payment (the polling
+  // effect above).
+  const proceedToConfirmation = async (order: Order, isCurrentlyOnline: boolean) => {
     // Audio chime on successful order
     SoundService.playSuccess();
 
     // Broadcast to KDS Kitchen Mesh if online
     if (isCurrentlyOnline) {
-      KdsMeshService.broadcastOrderCreated(newOrder);
+      KdsMeshService.broadcastOrderCreated(order);
     }
 
     // Generate station-routed Kitchen Order Tickets so this order appears
@@ -799,9 +835,9 @@ export default function KioskUserApp() {
       status: 'PREPARING' as const
     }));
     const kots = KOTRepository.generateKOT({
-      orderId: newOrder.id,
-      orderNumber: newOrder.orderNumber,
-      tokenNumber: newOrder.tokenNumber,
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      tokenNumber: order.tokenNumber,
       tableNumber: selectedTable?.tableNumber,
       orderType,
       items: kotItems,
@@ -810,7 +846,7 @@ export default function KioskUserApp() {
     kots.forEach((kot) => PrinterService.printKOT(kot));
 
     // Auto dispatch thermal receipt
-    PrinterService.printReceipt(newOrder);
+    PrinterService.printReceipt(order);
 
     // If logged in, award points (10% back in points) & record order
     if (loggedInAccount) {
@@ -830,10 +866,10 @@ export default function KioskUserApp() {
       kioskId,
       action: 'ORDER_PLACED',
       category: 'ORDER',
-      details: `Customer placed Order ${newOrder.orderNumber} (Token #${newOrder.tokenNumber}, Total ₹${newOrder.totalAmount}, Mode: ${isCurrentlyOnline ? 'ONLINE' : 'OFFLINE_SAVED'})`
+      details: `Customer placed Order ${order.orderNumber} (Token #${order.tokenNumber}, Total ₹${order.totalAmount}, Mode: ${isCurrentlyOnline ? 'ONLINE' : 'OFFLINE_SAVED'})`
     });
 
-    setPlacedOrder(newOrder);
+    setPlacedOrder(order);
     setPaymentStatus('SUCCESS');
     setIsProcessingPayment(false);
     setStep('CONFIRMATION');
@@ -841,7 +877,7 @@ export default function KioskUserApp() {
     // 1. Automatically dispatch receipt to thermal printer (Zero user prompts required)
     try {
       const activePrn = PrinterService.getActivePrinter();
-      const printRes = await PrinterService.printReceipt(newOrder);
+      const printRes = await PrinterService.printReceipt(order);
       setAutoPrintStatus({
         printed: printRes.success,
         message: printRes.message,
@@ -856,12 +892,29 @@ export default function KioskUserApp() {
 
     // 2. Trigger audio chime and spoken confirmation in selected language (Hindi/Gujarati/English)
     const voiceMsg = VoiceService.getConfirmationMessage(
-      newOrder.tokenNumber,
+      order.tokenNumber,
       lang,
       'STANDARD',
       isCurrentlyOnline
     );
     VoiceService.speak(voiceMsg, lang);
+  };
+
+  // Cash-at-counter confirmation: the order was already created PENDING in
+  // handleProceedToPayment — this just fetches it and runs the shared tail.
+  const handleGetToken = async () => {
+    resetIdleTimer();
+    setIsProcessingPayment(true);
+    if (!localOrderIdForPayment) {
+      setIsProcessingPayment(false);
+      return;
+    }
+    const order = OrderRepository.getOrderById(localOrderIdForPayment);
+    if (!order) {
+      setIsProcessingPayment(false);
+      return;
+    }
+    await proceedToConfirmation(order, networkState === 'ONLINE');
   };
 
   // Dispatch WhatsApp or SMS E-Bill
@@ -1866,19 +1919,19 @@ export default function KioskUserApp() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* UPI QR Payment */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* UPI Payment (real, via Cashfree) */}
             <button
               onClick={() => {
                 if (networkState === 'OFFLINE') {
-                  showToast('Internet required for UPI QR. Please choose Pay Cash at Counter.');
+                  showToast('Internet required for UPI. Please choose Pay Cash at Counter.');
                   return;
                 }
                 SoundService.playTap();
-                setPaymentMethod('UPI_QR');
+                setPaymentMethod('UPI');
               }}
               className={`p-6 rounded-3xl border-2 text-left space-y-4 transition-all duration-200 ${
-                paymentMethod === 'UPI_QR'
+                paymentMethod === 'UPI'
                   ? 'bg-white border-[#E66817] shadow-xl'
                   : 'bg-[#FBF9F5] border-[#EBE6DD] hover:bg-white'
               } ${networkState === 'OFFLINE' ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -1896,38 +1949,6 @@ export default function KioskUserApp() {
               <div>
                 <h4 className="text-xl font-bold text-[#0B253A]">{t('upiQr')}</h4>
                 <p className="text-xs text-[#4A5568] mt-1">{t('upiSubtitle')}</p>
-              </div>
-            </button>
-
-            {/* Card POS Payment */}
-            <button
-              onClick={() => {
-                if (networkState === 'OFFLINE') {
-                  showToast('Internet required for Card POS. Please choose Pay Cash at Counter.');
-                  return;
-                }
-                SoundService.playTap();
-                setPaymentMethod('CARD_TERMINAL');
-              }}
-              className={`p-6 rounded-3xl border-2 text-left space-y-4 transition-all duration-200 ${
-                paymentMethod === 'CARD_TERMINAL'
-                  ? 'bg-white border-[#E66817] shadow-xl'
-                  : 'bg-[#FBF9F5] border-[#EBE6DD] hover:bg-white'
-              } ${networkState === 'OFFLINE' ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-[#E66817] flex items-center justify-center">
-                  <CreditCard className="w-8 h-8" />
-                </div>
-                {networkState === 'OFFLINE' && (
-                  <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded">
-                    Requires Internet
-                  </span>
-                )}
-              </div>
-              <div>
-                <h4 className="text-xl font-bold text-[#0B253A]">{t('cardTerminal')}</h4>
-                <p className="text-xs text-[#4A5568] mt-1">{t('cardSubtitle')}</p>
               </div>
             </button>
 
@@ -1959,7 +1980,7 @@ export default function KioskUserApp() {
           </div>
 
           <div className="bg-white rounded-3xl p-8 border border-[#EBE6DD] shadow-lg max-w-xl mx-auto w-full text-center space-y-6">
-            {paymentStatus === 'EXPIRED' ? (
+            {paymentStatus === 'EXPIRED' && !cashfreeUnavailable ? (
               <div className="py-8 space-y-4">
                 <Clock className="w-16 h-16 text-rose-500 mx-auto" />
                 <h3 className="text-xl font-black text-[#0B253A]">Payment Session Expired</h3>
@@ -1972,7 +1993,7 @@ export default function KioskUserApp() {
                   className="w-full"
                   onClick={() => {
                     setPaymentStatus('CREATED');
-                    setPaymentTimeLeft(180);
+                    setPaymentTimeLeft(60);
                   }}
                 >
                   Try Again
@@ -1980,30 +2001,21 @@ export default function KioskUserApp() {
               </div>
             ) : (
               <>
-            {paymentMethod === 'UPI_QR' && (
+            {paymentMethod === 'UPI' && !cashfreeUnavailable && (
               <div className="space-y-4">
-                <p className="text-sm font-semibold text-[#4A5568]">{t('scanQrToPay')}</p>
-                <div className="w-56 h-56 mx-auto bg-white p-4 rounded-2xl border-2 border-slate-900 shadow-inner flex flex-col items-center justify-center relative">
-                  <QrCode className="w-44 h-44 text-[#0B253A]" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-lg bg-white border border-[#EBE6DD] p-1 flex items-center justify-center shadow-md">
-                      <span className="font-bold text-[10px] text-[#E66817]">JAMAN</span>
-                    </div>
-                  </div>
-                </div>
-
+                <p className="text-sm font-semibold text-[#4A5568]">Complete your payment in the window that opened.</p>
                 <div className="text-xs text-[#8C9BAE] font-medium flex items-center justify-center gap-1.5">
                   <Clock className="w-4 h-4 text-[#E66817]" />
-                  <span>{t('paymentExpiresIn')}: <strong className="text-[#0B253A] font-mono">{paymentTimeLeft}s</strong></span>
+                  <span>{t('paymentExpiresIn')}: <strong className="text-[#0B253A] font-mono">{paymentTimeLeft * 3}s</strong></span>
                 </div>
               </div>
             )}
 
-            {paymentMethod === 'CARD_TERMINAL' && (
+            {paymentMethod === 'UPI' && cashfreeUnavailable && (
               <div className="py-8 space-y-4">
-                <CreditCard className="w-16 h-16 text-[#E66817] mx-auto animate-bounce" />
-                <h3 className="text-xl font-black text-[#0B253A]">Card Reader Waiting...</h3>
-                <p className="text-sm text-[#4A5568]">Please tap, insert or swipe your debit/credit card.</p>
+                <Coins className="w-16 h-16 text-[#E66817] mx-auto" />
+                <h3 className="text-xl font-black text-[#0B253A]">Online Payment Unavailable</h3>
+                <p className="text-sm text-[#4A5568]">Please pay cash at the counter instead — your order is already confirmed.</p>
               </div>
             )}
 
@@ -2015,17 +2027,19 @@ export default function KioskUserApp() {
               </div>
             )}
 
-            <div className="pt-4 border-t border-[#F3EFE6]">
-              <Button
-                variant="accent"
-                size="touch"
-                className="w-full"
-                isLoading={isProcessingPayment}
-                onClick={handleFinalizePayment}
-              >
-                {paymentMethod === 'CASH_AT_COUNTER' ? 'Confirm & Get Token' : 'Simulate Payment Success'}
-              </Button>
-            </div>
+            {paymentMethod === 'CASH_AT_COUNTER' && (
+              <div className="pt-4 border-t border-[#F3EFE6]">
+                <Button
+                  variant="accent"
+                  size="touch"
+                  className="w-full"
+                  isLoading={isProcessingPayment}
+                  onClick={handleGetToken}
+                >
+                  Confirm & Get Token
+                </Button>
+              </div>
+            )}
               </>
             )}
           </div>

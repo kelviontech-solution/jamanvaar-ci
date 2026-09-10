@@ -90,3 +90,41 @@ export function deviceFetch(path: string, init: RequestInit = {}): Promise<Respo
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
   });
 }
+
+// --- Real Cashfree Payment (Phase 3) ---
+
+export interface PaymentOrderResult {
+  orderId: string;
+  paymentId: string;
+  paymentSessionId: string | null;
+  amount: number; // paise
+  currency: string;
+  status: string;
+}
+
+export interface CartLinePayload {
+  externalItemId: string;
+  quantity: number;
+  selectedOptionIds: string[];
+}
+
+export async function createPaymentOrder(externalOrderId: string, lines: CartLinePayload[]): Promise<PaymentOrderResult> {
+  const res = await deviceFetch('/api/v1/payments/orders', {
+    method: 'POST',
+    body: JSON.stringify({ externalOrderId, lines })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Payment order creation failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
+export async function getPaymentOrderStatus(paymentId: string): Promise<{ status: string; orderStatus: string }> {
+  const res = await deviceFetch(`/api/v1/payments/${paymentId}/status`);
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Payment status check failed (${res.status})`, res.status);
+  }
+  return data;
+}
