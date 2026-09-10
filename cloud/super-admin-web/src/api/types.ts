@@ -955,3 +955,34 @@ export interface QrAuditEntry {
   createdAt: string;
 }
 
+// ---------------------------------------------------------------------------
+// Payment Connections (Cashfree)
+// ---------------------------------------------------------------------------
+
+export interface PaymentConnection {
+  id: string;
+  restaurantId: string;
+  restaurant: { id: string; name: string };
+  status: 'NOT_CONNECTED' | 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DISCONNECTED';
+  accountType: 'BUSINESS' | 'INDIVIDUAL' | null;
+  businessType: string | null;
+  panMasked: string | null;
+  gstMasked: string | null;
+  cinMasked: string | null;
+  uidaiMasked: string | null;
+  contactName: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  settlementAccountName: string | null;
+  settlementAccountNumberMasked: string | null;
+  settlementIfsc: string | null;
+  settlementUpiVpa: string | null;
+  cashfreeVendorId: string | null;
+  cashfreeVendorStatus: string | null;
+  verifiedAt: string | null;
+  lastWebhookAt: string | null;
+  lastPaymentAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+

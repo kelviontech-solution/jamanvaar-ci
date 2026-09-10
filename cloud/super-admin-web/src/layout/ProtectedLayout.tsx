@@ -85,6 +85,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: '/ai-assistant', label: 'JAMAN AI Engine', icon: Sparkles },
       { to: '/catalog', label: 'Master Menu Catalog', icon: Utensils },
       { to: '/activation-keys', label: 'Activation Keys', icon: KeyRound },
+      { to: '/payment-connections', label: 'Payment Gateways', icon: CreditCard },
       { to: '/applications', label: 'Applications & Releases', icon: Layers }
     ]
   },
