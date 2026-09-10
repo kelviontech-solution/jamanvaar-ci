@@ -230,8 +230,18 @@ export const PosOrdersView: React.FC = () => {
                 (order.source_type === 'KIOSK' ||
                   (order.kioskId?.startsWith('KIOSK') && order.source_type !== 'POS' && order.source_type !== 'CAPTAIN'));
               const isCaptain = !isQr && order.source_type === 'CAPTAIN';
-              const isCounterCashPending =
-                order.paymentMethod === 'CASH_AT_COUNTER' && order.paymentStatus === 'PENDING';
+              // Any PENDING order can be settled with cash at the counter —
+              // not just ones the customer picked "Cash" for upfront. A
+              // kiosk order whose UPI attempt failed or timed out still
+              // carries paymentMethod: 'UPI' with paymentStatus: 'PENDING',
+              // and staff need to be able to collect cash for it too.
+              const isCounterCashPending = order.paymentStatus === 'PENDING';
+              // This specific order attempted a real UPI payment first —
+              // Cashfree's webhook (or this kiosk's own background
+              // reconciliation) may still confirm it after the visible
+              // countdown gave up, so staff should check with the customer
+              // before accepting cash for exactly this case.
+              const isUnconfirmedKioskUpi = isKiosk && order.paymentMethod === 'UPI' && order.paymentStatus === 'PENDING';
 
               return (
                 <div
@@ -314,18 +324,25 @@ export const PosOrdersView: React.FC = () => {
 
                     {/* Fast Cash at Counter Settle Action */}
                     {isCounterCashPending && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSettleCounterCash(order);
-                        }}
-                        className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
-                        title="Collect cash & print thermal receipt"
-                      >
-                        <CreditCard className="w-3.5 h-3.5" />
-                        <span>Settle Cash</span>
-                      </button>
+                      <div className="flex flex-col items-end gap-1">
+                        {isUnconfirmedKioskUpi && (
+                          <p className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded max-w-[220px] text-right">
+                            ⚠ Attempted UPI first — confirm with the customer they haven't already paid online before accepting cash.
+                          </p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSettleCounterCash(order);
+                          }}
+                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+                          title="Collect cash & print thermal receipt"
+                        >
+                          <CreditCard className="w-3.5 h-3.5" />
+                          <span>Settle Cash</span>
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>

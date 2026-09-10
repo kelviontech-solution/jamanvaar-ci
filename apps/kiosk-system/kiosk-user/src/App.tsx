@@ -230,6 +230,11 @@ export default function KioskUserApp() {
   const [localOrderIdForPayment, setLocalOrderIdForPayment] = useState<string | null>(null);
   const [cashfreeUnavailable, setCashfreeUnavailable] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  // Bounded window (from order creation) that background payment-status
+  // polling keeps running past the visible countdown's expiry, so a UPI
+  // payment that Cashfree confirms moments after the customer is told to
+  // pay cash still gets caught and settled automatically.
+  const reconciliationDeadlineRef = useRef<number | null>(null);
 
   // Confirmed Order & Auto-Print State
   const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
@@ -377,38 +382,56 @@ export default function KioskUserApp() {
   // ever reflects what GET /api/v1/payments/:paymentId/status already
   // recorded, never a client-side belief about success.
   useEffect(() => {
-    if (step !== 'CHECKOUT_PAYMENT' || paymentStatus === 'SUCCESS' || paymentStatus === 'EXPIRED') return;
+    if (step !== 'CHECKOUT_PAYMENT' || paymentStatus === 'SUCCESS') return;
+    if (!realPaymentId) {
+      // Cash-at-counter path: no real payment to poll, fall back to the
+      // plain visible countdown.
+      if (paymentStatus === 'EXPIRED') return;
+      const plainInterval = setInterval(() => {
+        setPaymentTimeLeft((prev) => {
+          if (prev <= 1) {
+            setPaymentStatus('EXPIRED');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 3000);
+      return () => clearInterval(plainInterval);
+    }
 
     const interval = setInterval(async () => {
-      if (realPaymentId) {
-        try {
-          const result = await getPaymentOrderStatus(realPaymentId);
-          if (result.status === 'SUCCESS') {
-            setPaymentStatus('SUCCESS');
-            if (localOrderIdForPayment) {
-              OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Cashfree UPI');
-              const settledOrder = OrderRepository.getOrderById(localOrderIdForPayment);
-              if (settledOrder) {
-                proceedToConfirmation(settledOrder, networkState === 'ONLINE');
-              }
+      if (reconciliationDeadlineRef.current && Date.now() > reconciliationDeadlineRef.current) {
+        clearInterval(interval);
+        return;
+      }
+
+      try {
+        const result = await getPaymentOrderStatus(realPaymentId);
+        if (result.status === 'SUCCESS') {
+          setPaymentStatus('SUCCESS');
+          if (localOrderIdForPayment) {
+            OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Cashfree UPI');
+            const settledOrder = OrderRepository.getOrderById(localOrderIdForPayment);
+            if (settledOrder) {
+              proceedToConfirmation(settledOrder, networkState === 'ONLINE');
             }
-            return;
           }
-          if (result.status === 'FAILED' || result.status === 'USER_DROPPED') {
-            setCashfreeUnavailable(true);
-            setPaymentTimeLeft(0);
-            setPaymentStatus('EXPIRED');
-            return;
-          }
-        } catch (err) {
-          console.error('Payment status poll failed:', err);
+          clearInterval(interval);
+          return;
         }
+        if (result.status === 'FAILED' || result.status === 'USER_DROPPED') {
+          setCashfreeUnavailable(true);
+          clearInterval(interval);
+          return;
+        }
+      } catch (err) {
+        console.error('Payment status poll failed:', err);
       }
 
       setPaymentTimeLeft((prev) => {
         if (prev <= 1) {
           setPaymentStatus('EXPIRED');
-          return 0;
+          return 0; // visible countdown stops; polling above continues silently until reconciliationDeadlineRef
         }
         return prev - 1;
       });
@@ -785,6 +808,7 @@ export default function KioskUserApp() {
     try {
       const result = await createPaymentOrder(pendingOrder.id, lines);
       setRealPaymentId(result.paymentId);
+      reconciliationDeadlineRef.current = Date.now() + 5 * 60 * 1000; // 5 minutes total from order creation
 
       if (!result.paymentSessionId) {
         setCashfreeUnavailable(true);
