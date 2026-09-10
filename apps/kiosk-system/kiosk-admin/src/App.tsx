@@ -55,10 +55,21 @@ import {
   JAMANVAARStartup
 } from '@jamanvaar/ui';
 import { DeviceHealthService, EBillService, KdsMeshService, NetworkStatusService, PaymentService, PrinterService, VoiceService } from '@jamanvaar/api';
-import { AdminChatbotEngine, MenuBuilderService, ReportGeneratorService, SessionPersistence } from '@jamanvaar/business';
+import { AdminChatbotEngine, MenuBuilderService, ReportGeneratorService } from '@jamanvaar/business';
 import { FOOD_IMAGE_LIBRARY, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
 import { SyncOutboxEngine } from '@jamanvaar/sync';
-import { connectDeviceStep1, connectDeviceStep2, isDeviceConnected, CloudApiError } from './cloud/cloudClient';
+import {
+  connectDeviceStep1,
+  connectDeviceStep2,
+  isDeviceConnected,
+  CloudApiError,
+  staffLogin,
+  staffLogout,
+  isStaffLoggedIn,
+  getStaffUser,
+  startSilentRefresh,
+  getConnectedRestaurantId
+} from './cloud/cloudClient';
 import {
   Activity,
   AlertCircle,
@@ -205,67 +216,50 @@ export default function AdminApp() {
     }
   };
 
-  // Kiosk Admin Authentication State — restored from persisted session
-  const [isKioskAdminLoggedIn, setIsKioskAdminLoggedIn] = useState<boolean>(
-    () => SessionPersistence.isValid('kiosk-admin')
-  );
-  const [authUsername, setAuthUsername] = useState('kiosk-admin');
+  // Kiosk Admin Authentication State — restored from a real tenant-user session
+  const [isKioskAdminLoggedIn, setIsKioskAdminLoggedIn] = useState<boolean>(() => isStaffLoggedIn());
+  const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
-  const [rememberMe, setRememberMe] = useState(true);
+  const [authBusy, setAuthBusy] = useState(false);
 
-  const handleKioskAdminLogin = (e?: React.FormEvent) => {
+  useEffect(() => {
+    if (isStaffLoggedIn()) {
+      startSilentRefresh();
+    }
+  }, []);
+
+  const handleKioskAdminLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!authUsername.trim() || !authPassword.trim()) {
-      setAuthError('Please enter username and password.');
+    if (!authEmail.trim() || !authPassword.trim()) {
+      setAuthError('Please enter email and password.');
       return;
     }
 
-    const validUsername =
-      authUsername.trim().toLowerCase() === 'admin' ||
-      authUsername.trim().toLowerCase() === 'kiosk-admin' ||
-      authUsername.trim().toLowerCase() === 'manager';
-    // The password was previously only checked for non-emptiness — any
-    // non-empty string logged in successfully as long as the username
-    // matched, making the field decorative. Require the actual demo
-    // password (same one the "Quick Demo Login" button fills in).
-    const validPassword = ['admin123', 'admin', 'demo'].includes(authPassword);
-
-    if (validUsername && validPassword) {
-      setIsKioskAdminLoggedIn(true);
-      setAuthError('');
-      // Persist session — no passwords stored
-      SessionPersistence.save('kiosk-admin', {
-        userId: 'kiosk-admin-user',
-        fullName: 'Kiosk Admin',
-        roleId: 'role-kiosk-admin',
-        restaurantId: 'restaurant-main',
-        terminalId: 'KIOSK-ADMIN-01'
-      });
-    } else {
-      setAuthError('Invalid credentials. Please try again.');
+    const restaurantId = getConnectedRestaurantId();
+    if (!restaurantId) {
+      setAuthError('This terminal is not connected to a restaurant yet.');
+      return;
     }
-  };
 
-  const handleQuickDemoKioskAdmin = () => {
-    setAuthUsername('kiosk-admin');
-    setAuthPassword('admin123');
-    setIsKioskAdminLoggedIn(true);
+    setAuthBusy(true);
     setAuthError('');
-    SessionPersistence.save('kiosk-admin', {
-      userId: 'kiosk-admin-user',
-      fullName: 'Kiosk Admin',
-      roleId: 'role-kiosk-admin',
-      restaurantId: 'restaurant-main',
-      terminalId: 'KIOSK-ADMIN-01'
-    });
+    try {
+      await staffLogin(restaurantId, authEmail, authPassword);
+      setIsKioskAdminLoggedIn(true);
+      setAuthPassword('');
+    } catch (err) {
+      setAuthError(err instanceof CloudApiError ? err.message : 'Login failed. Please try again.');
+    } finally {
+      setAuthBusy(false);
+    }
   };
 
   const handleKioskAdminLogout = () => {
     setIsKioskAdminLoggedIn(false);
     setAuthPassword('');
-    SessionPersistence.clear('kiosk-admin');
+    void staffLogout();
   };
 
   // Search & Filter states for Menu
@@ -983,28 +977,19 @@ export default function AdminApp() {
         ]}
         footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
       >
-        <button
-          type="button"
-          onClick={handleQuickDemoKioskAdmin}
-          className="w-full py-2.5 px-4 rounded-xl bg-[#FFF7ED] hover:bg-[#FFEEDD] border border-[#FDBA74] text-[#E66817] font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-2xs active:scale-[0.98] cursor-pointer"
-        >
-          <Zap className="w-4 h-4 text-[#E66817] fill-[#E66817]" />
-          <span>QUICK DEMO LOGIN — Kiosk Manager (@kiosk-admin)</span>
-        </button>
-
         <form onSubmit={handleKioskAdminLogin} className="space-y-3.5 pt-2">
           <div>
             <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
-              Username or Staff ID *
+              Email *
             </label>
             <input
-              type="text"
-              value={authUsername}
+              type="email"
+              value={authEmail}
               onChange={(e) => {
-                setAuthUsername(e.target.value);
+                setAuthEmail(e.target.value);
                 setAuthError('');
               }}
-              placeholder="e.g. kiosk-admin or manager"
+              placeholder="owner@yourrestaurant.com"
               className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
             />
           </div>
@@ -1028,7 +1013,7 @@ export default function AdminApp() {
                   setAuthPassword(e.target.value);
                   setAuthError('');
                 }}
-                placeholder="Enter kiosk manager password (demo: admin123)"
+                placeholder="Enter your password"
                 className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
               />
             </div>
@@ -1041,24 +1026,16 @@ export default function AdminApp() {
             </div>
           )}
 
-          <div className="flex items-center justify-between text-xs text-slate-500 pt-0.5">
-            <label className="flex items-center gap-2 cursor-pointer select-none font-medium">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="rounded accent-[#E66817]"
-              />
-              <span>Remember this terminal</span>
-            </label>
-            <span className="text-slate-400 text-[11px] font-mono">PIN: kiosk-admin / admin123</span>
-          </div>
+          <p className="text-xs text-slate-500 text-center pt-0.5">
+            Owners and managers only. Contact your Restaurant Admin if you need access.
+          </p>
 
           <button
             type="submit"
-            className="w-full py-3.5 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2"
+            disabled={authBusy}
+            className="w-full py-3.5 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Unlock Kiosk Admin
+            {authBusy ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
       </JamanvaarAuthLayout>
