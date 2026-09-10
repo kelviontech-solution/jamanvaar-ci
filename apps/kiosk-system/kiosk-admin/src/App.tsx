@@ -69,7 +69,11 @@ import {
   getStaffUser,
   startSilentRefresh,
   getConnectedRestaurantId,
-  onSessionExpired
+  onSessionExpired,
+  getPaymentConnection,
+  submitPaymentConnection,
+  type PaymentConnectionFields,
+  type PaymentConnectionStatus
 } from './cloud/cloudClient';
 import {
   Activity,
@@ -404,6 +408,54 @@ export default function AdminApp() {
 
   // Voice Configuration Form
   const [voiceForm, setVoiceForm] = useState(VoiceService.getConfig());
+
+  // Payment Gateway Connection (Settings tab) — restaurant's own Cashfree
+  // settlement/KYC submission, reviewed by JAMANVAAR before going live.
+  const [paymentConnection, setPaymentConnection] = useState<PaymentConnectionStatus | null>(null);
+  const [paymentConnectionLoading, setPaymentConnectionLoading] = useState(false);
+  const [paymentConnectionError, setPaymentConnectionError] = useState('');
+  const [paymentFormFields, setPaymentFormFields] = useState<PaymentConnectionFields>({
+    accountType: 'BUSINESS', pan: '', contactName: '', contactEmail: '', contactPhone: ''
+  });
+  const [paymentSubmitting, setPaymentSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (activeTab !== 'SETTINGS') return;
+    setPaymentConnectionLoading(true);
+    getPaymentConnection()
+      .then((data) => {
+        setPaymentConnection(data);
+        setPaymentFormFields((prev) => ({
+          ...prev,
+          accountType: (data.accountType as 'BUSINESS' | 'INDIVIDUAL') ?? prev.accountType,
+          businessType: data.businessType ?? prev.businessType,
+          pan: data.pan ?? prev.pan,
+          contactName: data.contactName ?? prev.contactName,
+          contactEmail: data.contactEmail ?? prev.contactEmail,
+          contactPhone: data.contactPhone ?? prev.contactPhone,
+          settlementAccountName: data.settlementAccountName ?? prev.settlementAccountName,
+          settlementIfsc: data.settlementIfsc ?? prev.settlementIfsc,
+          settlementUpiVpa: data.settlementUpiVpa ?? prev.settlementUpiVpa
+        }));
+      })
+      .catch((err) => setPaymentConnectionError(err instanceof CloudApiError ? err.message : 'Could not load payment connection status'))
+      .finally(() => setPaymentConnectionLoading(false));
+  }, [activeTab]);
+
+  const handleSubmitPaymentConnection = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPaymentSubmitting(true);
+    setPaymentConnectionError('');
+    try {
+      const updated = await submitPaymentConnection(paymentFormFields);
+      setPaymentConnection(updated);
+      showToast('Payment connection details submitted for review.');
+    } catch (err) {
+      setPaymentConnectionError(err instanceof CloudApiError ? err.message : 'Submission failed');
+    } finally {
+      setPaymentSubmitting(false);
+    }
+  };
 
   // Global Search Command Palette (Ctrl + K)
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
@@ -3926,6 +3978,157 @@ export default function AdminApp() {
                     />
                   </div>
                 </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+                <div>
+                  <h4 className="font-bold text-[#0B253A]">Payment Gateway</h4>
+                  <p className="text-xs text-[#4A5568]">
+                    Connect your restaurant's own Cashfree settlement account to receive kiosk payments.
+                    Your submission is reviewed by JAMANVAAR before it goes live.
+                  </p>
+                </div>
+
+                {paymentConnectionLoading && <p className="text-xs text-[#4A5568]">Loading…</p>}
+
+                {paymentConnection && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-[#0B253A]">Status:</span>
+                    <span
+                      className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                        paymentConnection.status === 'ACTIVE'
+                          ? 'bg-green-100 text-green-700'
+                          : paymentConnection.status === 'PENDING_VERIFICATION'
+                            ? 'bg-amber-100 text-amber-700'
+                            : paymentConnection.status === 'SUSPENDED' || paymentConnection.status === 'DISCONNECTED'
+                              ? 'bg-rose-100 text-rose-700'
+                              : 'bg-slate-100 text-slate-600'
+                      }`}
+                    >
+                      {paymentConnection.status.replace('_', ' ')}
+                    </span>
+                  </div>
+                )}
+
+                {paymentConnectionError && (
+                  <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl">
+                    {paymentConnectionError}
+                  </div>
+                )}
+
+                {(paymentConnection?.status === 'NOT_CONNECTED' ||
+                  paymentConnection?.status === 'PENDING_VERIFICATION' ||
+                  paymentConnection?.status === 'DISCONNECTED') && (
+                  <form onSubmit={handleSubmitPaymentConnection} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Account Type *</label>
+                      <select
+                        value={paymentFormFields.accountType}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, accountType: e.target.value as 'BUSINESS' | 'INDIVIDUAL' }))}
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold"
+                      >
+                        <option value="BUSINESS">Business</option>
+                        <option value="INDIVIDUAL">Individual</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Business Type</label>
+                      <input
+                        type="text"
+                        value={paymentFormFields.businessType ?? ''}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, businessType: e.target.value }))}
+                        placeholder="e.g. Restaurant, Proprietorship"
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">PAN *</label>
+                      <input
+                        type="text"
+                        required
+                        value={paymentFormFields.pan}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, pan: e.target.value }))}
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Contact Name *</label>
+                      <input
+                        type="text"
+                        required
+                        value={paymentFormFields.contactName}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, contactName: e.target.value }))}
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Contact Email *</label>
+                      <input
+                        type="email"
+                        required
+                        value={paymentFormFields.contactEmail}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, contactEmail: e.target.value }))}
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Contact Phone *</label>
+                      <input
+                        type="tel"
+                        required
+                        value={paymentFormFields.contactPhone}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, contactPhone: e.target.value }))}
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">UPI VPA (or fill bank details below)</label>
+                      <input
+                        type="text"
+                        value={paymentFormFields.settlementUpiVpa ?? ''}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, settlementUpiVpa: e.target.value }))}
+                        placeholder="restaurant@upi"
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Settlement Account Name</label>
+                      <input
+                        type="text"
+                        value={paymentFormFields.settlementAccountName ?? ''}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, settlementAccountName: e.target.value }))}
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Bank Account Number</label>
+                      <input
+                        type="text"
+                        value={paymentFormFields.settlementAccountNumber ?? ''}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, settlementAccountNumber: e.target.value }))}
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#0B253A] mb-1">IFSC</label>
+                      <input
+                        type="text"
+                        value={paymentFormFields.settlementIfsc ?? ''}
+                        onChange={(e) => setPaymentFormFields((p) => ({ ...p, settlementIfsc: e.target.value }))}
+                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <button
+                        type="submit"
+                        disabled={paymentSubmitting}
+                        className="py-3 px-6 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {paymentSubmitting ? 'Submitting…' : 'Submit for Review'}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
 
               {/* Welcome Screen Content — the customer kiosk's first screen

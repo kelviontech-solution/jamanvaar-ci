@@ -458,3 +458,63 @@ export function stopSilentRefresh(): void {
     silentRefreshTimer = null;
   }
 }
+
+// --- Payment Connection (Task 4) ---
+
+export interface PaymentConnectionFields {
+  accountType: 'BUSINESS' | 'INDIVIDUAL';
+  businessType?: string;
+  pan: string;
+  gst?: string;
+  cin?: string;
+  uidai?: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  settlementAccountName?: string;
+  settlementAccountNumber?: string;
+  settlementIfsc?: string;
+  settlementUpiVpa?: string;
+}
+
+export interface PaymentConnectionStatus {
+  status: 'NOT_CONNECTED' | 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DISCONNECTED';
+  accountType?: string | null;
+  businessType?: string | null;
+  pan?: string | null;
+  contactName?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  settlementAccountName?: string | null;
+  settlementIfsc?: string | null;
+  settlementUpiVpa?: string | null;
+}
+
+async function tenantFetch(path: string, init: RequestInit): Promise<Response> {
+  const token = getTenantAccessToken();
+  if (!token) {
+    throw new CloudApiError('Not signed in', 401);
+  }
+  return fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
+  });
+}
+
+export async function getPaymentConnection(): Promise<PaymentConnectionStatus> {
+  const res = await tenantFetch('/api/v1/tenant/payment-connection', { method: 'GET' });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Failed to load payment connection (${res.status})`, res.status);
+  }
+  return data;
+}
+
+export async function submitPaymentConnection(fields: PaymentConnectionFields): Promise<PaymentConnectionStatus> {
+  const res = await tenantFetch('/api/v1/tenant/payment-connection', { method: 'POST', body: JSON.stringify(fields) });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Submission failed (${res.status})`, res.status);
+  }
+  return data;
+}
