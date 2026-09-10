@@ -976,7 +976,7 @@ export interface PaymentConnection {
   settlementAccountName: string | null;
   settlementAccountNumberMasked: string | null;
   settlementIfsc: string | null;
-  settlementUpiVpa: string | null;
+  settlementUpiVpaMasked: string | null;
   cashfreeVendorId: string | null;
   cashfreeVendorStatus: string | null;
   verifiedAt: string | null;

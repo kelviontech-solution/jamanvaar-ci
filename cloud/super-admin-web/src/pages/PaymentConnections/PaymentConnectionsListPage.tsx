@@ -161,7 +161,7 @@ export function PaymentConnectionsListPage() {
                         <div className="muted" style={{ fontSize: 11 }}>{c.contactEmail ?? ''}</div>
                       </td>
                       <td style={{ fontSize: 12 }}>
-                        {c.settlementUpiVpa ? c.settlementUpiVpa : c.settlementAccountNumberMasked ? `${c.settlementAccountNumberMasked} (${c.settlementIfsc ?? ''})` : '—'}
+                        {c.settlementUpiVpaMasked ? c.settlementUpiVpaMasked : c.settlementAccountNumberMasked ? `${c.settlementAccountNumberMasked} (${c.settlementIfsc ?? ''})` : '—'}
                       </td>
                       <td style={{ fontSize: 12 }}>
                         {c.cashfreeVendorId ? (
