@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -121,7 +121,30 @@ export class PaymentsService {
   }
 
   async processCashfreeWebhook(rawBody: Buffer, signature: string | undefined, timestamp: string | undefined): Promise<void> {
-    const signatureValid = Boolean(signature && timestamp && this.cashfree.verifyWebhookSignature(rawBody, timestamp, signature));
+    let signatureValid: boolean;
+    try {
+      signatureValid = Boolean(signature && timestamp && this.cashfree.verifyWebhookSignature(rawBody, timestamp, signature));
+    } catch (err) {
+      if (!(err instanceof ServiceUnavailableException)) throw err;
+      // CASHFREE_WEBHOOK_SECRET isn't configured on this server. Every other failure branch
+      // in this method durably records a WebhookEvent and returns so the controller always
+      // responds 200 (per Cashfree's at-least-once delivery expectations) — this path must
+      // do the same rather than propagate and surface as an unhandled 500.
+      await this.prisma.runAsPlatform((tx) =>
+        tx.webhookEvent.create({
+          data: {
+            provider: 'CASHFREE',
+            providerEventKey: `UNCONFIGURED:${randomUUID()}`,
+            eventType: 'UNKNOWN',
+            rawPayload: this.safeParseJson(rawBody) ?? { unparsable: true },
+            signatureValid: false,
+            processingStatus: 'FAILED',
+            errorMessage: 'Cashfree webhook secret not configured on this server'
+          }
+        })
+      );
+      return;
+    }
 
     if (!signatureValid) {
       await this.prisma.runAsPlatform((tx) =>

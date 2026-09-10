@@ -201,4 +201,42 @@ describe('Cashfree webhook processing', () => {
       await rawApp.close();
     }
   });
+
+  it('an unconfigured webhook secret is recorded as a failed WebhookEvent, not an unhandled exception', async () => {
+    // ConfigService (via ConfigModule.forRoot's `validate` option) snapshots process.env into
+    // an internal validatedEnvConfig at module-init time and prefers that snapshot over live
+    // process.env on every subsequent .get() call — so mutating process.env.CASHFREE_WEBHOOK_SECRET
+    // after the shared `app` above has already booted would have no effect on it. A second,
+    // fresh app instance (same pattern the malformed-JSON test above uses) is built here instead,
+    // with the secret deleted from process.env *before* that instance compiles/initializes, so its
+    // ConfigService genuinely sees it as unset.
+    const savedSecret = process.env.CASHFREE_WEBHOOK_SECRET;
+    delete process.env.CASHFREE_WEBHOOK_SECRET;
+    let unconfiguredApp: INestApplication | undefined;
+    try {
+      unconfiguredApp = await createTestApp();
+
+      const testStartedAt = new Date();
+      const res = await request(unconfiguredApp.getHttpServer())
+        .post('/api/v1/payments/cashfree/webhook')
+        .set('x-webhook-signature', 'irrelevant-when-secret-is-unconfigured')
+        .set('x-webhook-timestamp', String(Math.floor(Date.now() / 1000)))
+        .send(successPayload(210));
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ received: true });
+
+      const events = await prisma.runAsPlatform((tx) =>
+        tx.webhookEvent.findMany({
+          where: { errorMessage: { contains: 'Cashfree webhook secret not configured' }, createdAt: { gte: testStartedAt } }
+        })
+      );
+      expect(events.length).toBe(1);
+      expect(events[0].processingStatus).toBe('FAILED');
+      expect(events[0].signatureValid).toBe(false);
+    } finally {
+      if (unconfiguredApp) await unconfiguredApp.close();
+      process.env.CASHFREE_WEBHOOK_SECRET = savedSecret;
+    }
+  });
 });
