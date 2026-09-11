@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createRefund, CloudApiError } from '../cloud/cloudClient';
 import { Order, OrderStatus } from '@jamanvaar/types';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 import { Modal, Button, printThermalReceipt } from '@jamanvaar/ui';
@@ -56,7 +57,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
     onOrderUpdated();
   };
 
-  const handleRefund = (e: React.FormEvent) => {
+  const handleRefund = async (e: React.FormEvent) => {
     e.preventDefault();
     setRefundError('');
     const amt = parseFloat(refundAmount) || order.totalAmount;
@@ -64,6 +65,16 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
       setRefundError('A valid amount and reason are required to process this refund.');
       return;
     }
+
+    if (order.paymentMethod === 'UPI' && order.paymentTransactionId) {
+      try {
+        await createRefund(order.paymentTransactionId, Math.round(amt * 100), refundReason);
+      } catch (err) {
+        setRefundError(err instanceof CloudApiError ? err.message : 'Refund request failed');
+        return; // never flip local status on a failed cloud refund
+      }
+    }
+
     OrderRepository.refundOrder(order.id, amt, refundReason, 'Manager');
     setIsRefunding(false);
     setRefundAmount('');

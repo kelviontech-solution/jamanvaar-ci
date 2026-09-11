@@ -594,4 +594,27 @@ export async function logTenantAiTelemetry(intent: string, queryText?: string): 
   }).catch(() => {});
 }
 
+/**
+ * The refund endpoint is device-authed, not session-authed like request<T>()
+ * above (which sends the owner-login accessToken) — so this bypasses
+ * request<T>() and sends the device token this app already has from its own
+ * existing activation flow instead.
+ */
+export async function createRefund(paymentId: string, amountPaise: number, reason: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
+  const token = getStoredDeviceToken();
+  if (!token) throw new CloudApiError('Device not activated', 401);
+
+  const res = await fetch(`${API_BASE}/api/v1/payments/${paymentId}/refund`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ amountPaise, reason })
+  });
+  const contentType = res.headers.get('content-type') ?? '';
+  const data = contentType.includes('application/json') ? await res.json() : undefined;
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Refund failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
 
