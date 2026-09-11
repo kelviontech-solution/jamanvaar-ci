@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { createRefund, CloudApiError } from '../../cloud/cloudClient';
 import { usePosStore } from '../../store/posStore';
 import { PosPrinterService } from '../../services/printerService';
 import { PdfReportBuilder, ReportFullData } from '../../services/pdfReportBuilder';
@@ -299,20 +300,36 @@ export const PosBillsView: React.FC = () => {
     if (!refundModalBill) return;
 
     const amt = Number(refundAmountInput) || refundModalBill.totalAmount;
+    const bill = refundModalBill;
+
     requestManagerOverride(
       'REFUND',
-      `Process Refund on Invoice #${refundModalBill.orderNumber}`,
-      `Refunding ₹${amt} on settled bill #${refundModalBill.orderNumber}`,
-      (mgr) => {
-        OrderRepository.refundOrder(refundModalBill.id, amt, refundReasonInput, mgr);
+      `Process Refund on Invoice #${bill.orderNumber}`,
+      `Refunding ₹${amt} on settled bill #${bill.orderNumber}`,
+      async (mgr) => {
+        // Only a real Cashfree UPI payment has a paymentTransactionId that
+        // matches a cloud PaymentTransaction — a locally-generated cash
+        // receipt id never does, so cash/card orders fall straight through
+        // to the existing local-only refund, unchanged.
+        if (bill.paymentMethod === 'UPI' && bill.paymentTransactionId) {
+          try {
+            await createRefund(bill.paymentTransactionId, Math.round(amt * 100), refundReasonInput);
+          } catch (err) {
+            const message = err instanceof CloudApiError ? err.message : 'Refund request failed';
+            showToast(`✗ Refund failed for Invoice #${bill.orderNumber}: ${message}`);
+            return; // never flip local status on a failed cloud refund
+          }
+        }
+
+        OrderRepository.refundOrder(bill.id, amt, refundReasonInput, mgr);
         AuditRepository.log({
           action: 'REFUND_INVOICE',
           category: 'PAYMENT',
-          details: `Refunded ₹${amt} on #${refundModalBill.orderNumber}. Reason: ${refundReasonInput}`,
+          details: `Refunded ₹${amt} on #${bill.orderNumber}. Reason: ${refundReasonInput}`,
           username: mgr
         });
         setRefundModalBill(null);
-        showToast(`✓ Refund of ₹${amt} processed for Invoice #${refundModalBill.orderNumber}`);
+        showToast(`✓ Refund of ₹${amt} processed for Invoice #${bill.orderNumber}`);
       }
     );
   };
