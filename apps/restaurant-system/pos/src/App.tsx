@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { activatePosDevice, isPosDeviceConnected, CloudApiError } from './cloud/cloudClient';
 import { usePosStore } from './store/posStore';
 import { db } from '@jamanvaar/database';
 import { PosLogin } from './components/auth/PosLogin';
@@ -32,6 +33,25 @@ import { NotificationToastContainer, JAMANVAARStartup } from '@jamanvaar/ui';
 import { UtensilsCrossed } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const [isDeviceActivated, setIsDeviceActivated] = useState<boolean>(() => isPosDeviceConnected());
+  const [activationCode, setActivationCode] = useState('');
+  const [activationError, setActivationError] = useState('');
+  const [isActivating, setIsActivating] = useState(false);
+
+  const handleActivate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsActivating(true);
+    setActivationError('');
+    try {
+      await activatePosDevice(activationCode);
+      setIsDeviceActivated(true);
+    } catch (err) {
+      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed');
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
   const {
     isAuthenticated,
     authStatus,
@@ -126,6 +146,38 @@ export const App: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [cart.items.length, setActiveTab, setIsPaymentOpen, holdCurrentOrder, setIsHoldOrdersOpen, setIsGlobalSearchOpen, setIsShiftModalOpen, setIsChatbotOpen, setIsShortcutsOpen]);
+
+  // Device activation gate — this terminal has no cloud identity until an
+  // activation code is redeemed. Runs before the auth state machine below:
+  // device identity comes before staff login.
+  if (!isDeviceActivated) {
+    return (
+      <JAMANVAARStartup appName="POS Terminal" appType="POS" subtitle="Restaurant Operations Platform">
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <form onSubmit={handleActivate} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4 text-center">
+            <h1 className="text-2xl font-black text-[#0B253A]">Activate This Terminal</h1>
+            <p className="text-sm text-[#4A5568]">Enter the activation code provided by JAMANVAAR to connect this POS terminal to your restaurant.</p>
+            <input
+              type="text"
+              value={activationCode}
+              onChange={(e) => setActivationCode(e.target.value)}
+              placeholder="Activation code"
+              className="w-full text-center text-lg font-mono bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-4 py-3"
+              autoFocus
+            />
+            {activationError && <p className="text-sm font-bold text-rose-700">{activationError}</p>}
+            <button
+              type="submit"
+              disabled={isActivating || !activationCode.trim()}
+              className="w-full py-3 rounded-2xl bg-[#E66817] text-white font-black uppercase tracking-wider disabled:opacity-60"
+            >
+              {isActivating ? 'Activating…' : 'Activate'}
+            </button>
+          </form>
+        </div>
+      </JAMANVAARStartup>
+    );
+  }
 
   // ───────────────────────────────────────────────────
   // AUTH STATE MACHINE GUARD
