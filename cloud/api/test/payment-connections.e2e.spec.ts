@@ -119,7 +119,7 @@ describe('Payment connection onboarding', () => {
     expect(res.status).toBe(400);
   });
 
-  it('a STAFF-role token cannot submit payment connection details (403)', async () => {
+  it('a STAFF-role token cannot submit or view payment connection details (403)', async () => {
     const staffEmail = `test-payconn-staff-${Date.now()}@example.com`;
     const staffPassword = 'staff-correct-horse-battery';
     const createRes = await authed('post', '/api/v1/tenant/me/users', ownerToken).send({
@@ -140,6 +140,11 @@ describe('Payment connection onboarding', () => {
       settlementUpiVpa: 'staff-attempt@upi'
     });
     expect(res.status).toBe(403);
+
+    // A STAFF token also can't read the connection — it would otherwise see
+    // unmasked PAN/GST/CIN/UIDAI/IFSC/VPA, which toOwnView() never masks.
+    const staffGetRes = await authed('get', '/api/v1/tenant/payment-connection', staffToken);
+    expect(staffGetRes.status).toBe(403);
 
     // Confirm nothing was written — the guard trips before the service layer.
     const getRes = await authed('get', '/api/v1/tenant/payment-connection', ownerToken);
