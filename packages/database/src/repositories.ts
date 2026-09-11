@@ -409,6 +409,14 @@ export class OrderRepository {
     return db.orders.find((o) => o.tokenNumber === token);
   }
 
+  public static updateOrder(id: string, updates: Partial<Order>): Order | null {
+    const idx = db.orders.findIndex((o) => o.id === id);
+    if (idx === -1) return null;
+    db.orders[idx] = { ...db.orders[idx], ...updates };
+    db.notify();
+    return db.orders[idx];
+  }
+
   /**
    * Data-integrity fix: `subtotal` must equal the sum of what the order's own
    * items actually cost (unit price × quantity) — discounts are tracked

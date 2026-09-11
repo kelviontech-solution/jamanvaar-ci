@@ -810,6 +810,19 @@ export default function KioskUserApp() {
       setRealPaymentId(result.paymentId);
       reconciliationDeadlineRef.current = Date.now() + 5 * 60 * 1000; // 5 minutes total from order creation
 
+      // The cloud prices independently from MenuSnapshotItem — reconcile the
+      // local order to match whatever Cashfree will actually charge, so the
+      // KOT, receipt, and revenue reports never disagree with the real
+      // payment. This can legitimately differ if a kiosk-admin price edit
+      // reached the cloud before it reached this terminal's own local menu
+      // cache (LAN sync lag) — the cloud amount is always the one actually
+      // charged, so it wins.
+      const localAmountPaise = Math.round(pendingOrder.totalAmount * 100);
+      if (result.amount !== localAmountPaise) {
+        OrderRepository.updateOrder(pendingOrder.id, { totalAmount: result.amount / 100 });
+        showToast('Your order total was updated to match the latest price.');
+      }
+
       if (!result.paymentSessionId) {
         setCashfreeUnavailable(true);
         return;
