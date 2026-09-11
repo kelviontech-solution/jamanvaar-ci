@@ -84,7 +84,8 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     captainApp: false,
     advancedCaptainReports: false,
     advancedServiceWorkflow: false,
-    qrTableOrdering: false
+    qrTableOrdering: false,
+    selfOrderKiosk: false
   };
 
   const proEntitlements = {
@@ -107,7 +108,8 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     captainApp: true,
     advancedCaptainReports: true,
     advancedServiceWorkflow: true,
-    qrTableOrdering: true
+    qrTableOrdering: true,
+    selfOrderKiosk: true
   };
 
   const corePlan = await tx.plan.upsert({
@@ -271,6 +273,28 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
       }
     });
     subId = newSub.id;
+  }
+
+  // The demo restaurant is meant to showcase/exercise every client app
+  // (POS, POS Admin, Captain, KDS, Kiosk, Kiosk Admin) for local dev/CI —
+  // but it's seeded on the CORE plan, whose tier defaults
+  // (DEFAULT_APPS_BY_TIER in application-entitlements.service.ts) don't
+  // include Captain/Kiosk/Kiosk Admin. Without this, a fresh Kiosk Admin
+  // terminal's activation step fails ApplicationEntitlementsService's
+  // assertAppEnabled check even after a correct login. Explicitly enable
+  // all six apps for this one demo subscription only — real restaurants
+  // still get the tier-gated defaults everywhere else.
+  if (subId) {
+    const allAppCodes = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN'] as const;
+    await Promise.all(
+      allAppCodes.map((appCode) =>
+        tx.applicationEntitlement.upsert({
+          where: { subscriptionId_appCode: { subscriptionId: subId!, appCode } },
+          create: { restaurantId: demoRestaurant.id, subscriptionId: subId!, appCode, enabled: true },
+          update: { enabled: true }
+        })
+      )
+    );
   }
 
   // Seed initial demo Invoice

@@ -586,6 +586,16 @@ export class JamanvaarDatabase {
       id: 'combo-biryani-feast',
       name: 'Royal Veg Biryani Feast Combo',
       description: 'Royal Veg Handi Dum Biryani + Boondi Raita + Chilled Cold Coffee + 2 pcs Shahi Gulab Jamun',
+      translations: {
+        hi: {
+          name: 'रॉयल वेज बिरयानी फीस्ट कॉम्बो',
+          description: 'रॉयल वेज हांडी दम बिरयानी + बूंदी रायता + ठंडी कोल्ड कॉफी + 2 पीस शाही गुलाब जामुन'
+        },
+        gu: {
+          name: 'રોયલ વેજ બિરયાની ફિસ્ટ કોમ્બો',
+          description: 'રોયલ વેજ હાંડી દમ બિરયાની + બૂંદી રાયતું + ઠંડી કોલ્ડ કોફી + 2 પીસ શાહી ગુલાબ જામુન'
+        }
+      },
       basePrice: 449,
       originalPrice: 560,
       savingsAmount: 111,
@@ -601,6 +611,16 @@ export class JamanvaarDatabase {
       id: 'combo-paneer-meal',
       name: 'Maharaja Paneer Thali Combo',
       description: 'Paneer Butter Masala + 2x Butter Naan + Dal Makhani + Cold Coffee with Ice Cream',
+      translations: {
+        hi: {
+          name: 'महाराजा पनीर थाली कॉम्बो',
+          description: 'पनीर बटर मसाला + 2x बटर नान + दाल मखनी + कोल्ड कॉफी विथ आइसक्रीम'
+        },
+        gu: {
+          name: 'મહારાજા પનીર થાળી કોમ્બો',
+          description: 'પનીર બટર મસાલા + 2x બટર નાન + દાળ મખની + કોલ્ડ કોફી વિથ આઇસક્રીમ'
+        }
+      },
       basePrice: 429,
       originalPrice: 530,
       savingsAmount: 101,
@@ -936,7 +956,8 @@ export class JamanvaarDatabase {
       captainApp: true,
       advancedCaptainReports: true,
       advancedServiceWorkflow: true,
-      qrTableOrdering: true
+      qrTableOrdering: true,
+      selfOrderKiosk: true
     }
   };
 
@@ -1447,7 +1468,30 @@ export class JamanvaarDatabase {
       if (storedMods) this.modifierGroups = JSON.parse(storedMods);
 
       const storedCombos = localStorage.getItem(`${p}combos`);
-      if (storedCombos) this.combos = JSON.parse(storedCombos);
+      if (storedCombos) {
+        try {
+          const parsedCombos = JSON.parse(storedCombos);
+          if (Array.isArray(parsedCombos)) {
+            // Same stale-localStorage-vs-fresh-seed gap as menuItems above —
+            // a browser that already saved combos before translations were
+            // added to them would otherwise show combo names/descriptions
+            // in English forever, regardless of the selected language.
+            const comboTranslationsById: Record<string, ComboDeal['translations']> = {
+              'combo-biryani-feast': {
+                hi: { name: 'रॉयल वेज बिरयानी फीस्ट कॉम्बो', description: 'रॉयल वेज हांडी दम बिरयानी + बूंदी रायता + ठंडी कोल्ड कॉफी + 2 पीस शाही गुलाब जामुन' },
+                gu: { name: 'રોયલ વેજ બિરયાની ફિસ્ટ કોમ્બો', description: 'રોયલ વેજ હાંડી દમ બિરયાની + બૂંદી રાયતું + ઠંડી કોલ્ડ કોફી + 2 પીસ શાહી ગુલાબ જામુન' }
+              },
+              'combo-paneer-meal': {
+                hi: { name: 'महाराजा पनीर थाली कॉम्बो', description: 'पनीर बटर मसाला + 2x बटर नान + दाल मखनी + कोल्ड कॉफी विथ आइसक्रीम' },
+                gu: { name: 'મહારાજા પનીર થાળી કોમ્બો', description: 'પનીર બટર મસાલા + 2x બટર નાન + દાળ મખની + કોલ્ડ કોફી વિથ આઇસક્રીમ' }
+              }
+            };
+            this.combos = parsedCombos.map((c: ComboDeal) =>
+              !c.translations && comboTranslationsById[c.id] ? { ...c, translations: comboTranslationsById[c.id] } : c
+            );
+          }
+        } catch (_) {}
+      }
 
       const storedLoyaltyTiers = localStorage.getItem(`${p}loyalty_tiers`);
       if (storedLoyaltyTiers) this.loyaltyTiers = JSON.parse(storedLoyaltyTiers);

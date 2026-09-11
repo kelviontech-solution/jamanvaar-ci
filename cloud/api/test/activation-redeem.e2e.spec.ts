@@ -11,6 +11,7 @@ describe('Activation code redemption (the other half of activation-keys generati
   const adminPassword = 'correct-horse-battery-staple';
   let platformToken: string;
   let restaurantId: string;
+  let planId: string;
 
   const authed = (method: 'get' | 'post' | 'patch', url: string) =>
     request(app.getHttpServer())
@@ -60,10 +61,11 @@ describe('Activation code redemption (the other half of activation-keys generati
       entitlements: { posTerminal: true, captainApp: true }
     });
     expect(planRes.status).toBe(201);
+    planId = planRes.body.id;
 
     const subRes = await authed('post', '/api/v1/subscriptions').send({
       restaurantId,
-      planId: planRes.body.id,
+      planId,
       status: 'ACTIVE',
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     });
@@ -71,7 +73,15 @@ describe('Activation code redemption (the other half of activation-keys generati
   });
 
   afterAll(async () => {
+    // Restaurant deletion cascades away its Subscription (see schema.prisma
+    // Subscription.restaurant onDelete: Cascade); the Plan row itself was
+    // previously never cleaned up at all, leaving a permanent "TEST
+    // Activation Redeem Plan <timestamp>" row visible in the real Super
+    // Admin Plans list forever.
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));
+    if (planId) {
+      await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: planId } }));
+    }
     await prisma.platformUser.deleteMany({ where: { email: adminEmail } });
     await app.close();
   });

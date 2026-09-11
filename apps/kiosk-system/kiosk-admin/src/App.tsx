@@ -52,7 +52,8 @@ import {
   ProductCard,
   StatusBadge,
   ThermalReceiptView,
-  JAMANVAARStartup
+  JAMANVAARStartup,
+  VirtualKeyboard
 } from '@jamanvaar/ui';
 import { DeviceHealthService, EBillService, KdsMeshService, NetworkStatusService, PaymentService, PrinterService, VoiceService } from '@jamanvaar/api';
 import { AdminChatbotEngine, MenuBuilderService, ReportGeneratorService } from '@jamanvaar/business';
@@ -369,6 +370,18 @@ export default function AdminApp() {
   const [newItemDesc, setNewItemDesc] = useState('');
   const [newItemDietary, setNewItemDietary] = useState<DietaryType>('VEG');
   const [newItemSpice, setNewItemSpice] = useState<SpiceLevel>('NONE');
+  // Hindi/Gujarati translations for the dish being created — there was
+  // previously no way at all to set these when adding an item, so every
+  // admin-added dish showed in English regardless of the kiosk's selected
+  // language. The virtual keyboard lets an admin without a native-script
+  // keyboard type these phonetically (see @jamanvaar/ui VirtualKeyboard).
+  const [newItemNameHi, setNewItemNameHi] = useState('');
+  const [newItemDescHi, setNewItemDescHi] = useState('');
+  const [newItemNameGu, setNewItemNameGu] = useState('');
+  const [newItemDescGu, setNewItemDescGu] = useState('');
+  const [activeKeyboardField, setActiveKeyboardField] = useState<
+    null | { lang: 'hi' | 'gu'; field: 'name' | 'description' }
+  >(null);
 
   // Form states for Category
   const [newCatName, setNewCatName] = useState('');
@@ -763,12 +776,17 @@ export default function AdminApp() {
     e.preventDefault();
     if (!newItemName || !newItemPrice) return;
 
+    const translations: MenuItem['translations'] = {};
+    if (newItemNameHi.trim()) translations.hi = { name: newItemNameHi.trim(), description: newItemDescHi.trim() || undefined };
+    if (newItemNameGu.trim()) translations.gu = { name: newItemNameGu.trim(), description: newItemDescGu.trim() || undefined };
+
     const created = MenuRepository.createMenuItem({
       name: newItemName,
       sku: newItemSku || `SKU-${Math.floor(100 + Math.random() * 900)}`,
       price: Number(newItemPrice),
       categoryId: newItemCategory || categories[0]?.id || 'cat-starters',
       description: newItemDesc,
+      translations: Object.keys(translations).length > 0 ? translations : undefined,
       dietaryType: newItemDietary,
       spiceLevel: newItemSpice,
       isAvailable: true,
@@ -790,6 +808,10 @@ export default function AdminApp() {
     setNewItemName('');
     setNewItemSku('');
     setNewItemDesc('');
+    setNewItemNameHi('');
+    setNewItemDescHi('');
+    setNewItemNameGu('');
+    setNewItemDescGu('');
   };
 
   const handleCreateCategory = (e: React.FormEvent) => {
@@ -5133,6 +5155,87 @@ export default function AdminApp() {
             />
           </div>
 
+          {/* Hindi/Gujarati translations — previously there was no way at
+              all to set these, so every admin-added dish showed only in
+              English on the customer kiosk regardless of selected
+              language. The keyboard button opens a phonetic on-screen
+              keyboard for admins without a native-script keyboard. */}
+          <div className="pt-2 border-t border-[#F3EFE6] space-y-3">
+            <p className="text-xs font-bold text-[#0B253A]">Translations (optional, shown when a customer selects that language)</p>
+
+            <div className="space-y-2 p-3 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD]">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[#0B253A]">हिन्दी Name</label>
+                <button
+                  type="button"
+                  onClick={() => setActiveKeyboardField({ lang: 'hi', field: 'name' })}
+                  className="text-[10px] font-bold text-[#E66817] px-2 py-0.5 rounded-md border border-[#E66817]/30 hover:bg-[#FFF4ED]"
+                >
+                  ⌨ Keyboard
+                </button>
+              </div>
+              <input
+                type="text"
+                value={newItemNameHi}
+                onChange={(e) => setNewItemNameHi(e.target.value)}
+                placeholder="e.g. पनीर टिक्का"
+                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-sm focus:outline-none"
+              />
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[#0B253A]">हिन्दी Description</label>
+                <button
+                  type="button"
+                  onClick={() => setActiveKeyboardField({ lang: 'hi', field: 'description' })}
+                  className="text-[10px] font-bold text-[#E66817] px-2 py-0.5 rounded-md border border-[#E66817]/30 hover:bg-[#FFF4ED]"
+                >
+                  ⌨ Keyboard
+                </button>
+              </div>
+              <textarea
+                rows={2}
+                value={newItemDescHi}
+                onChange={(e) => setNewItemDescHi(e.target.value)}
+                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-sm focus:outline-none"
+              />
+            </div>
+
+            <div className="space-y-2 p-3 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD]">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[#0B253A]">ગુજરાતી Name</label>
+                <button
+                  type="button"
+                  onClick={() => setActiveKeyboardField({ lang: 'gu', field: 'name' })}
+                  className="text-[10px] font-bold text-[#E66817] px-2 py-0.5 rounded-md border border-[#E66817]/30 hover:bg-[#FFF4ED]"
+                >
+                  ⌨ Keyboard
+                </button>
+              </div>
+              <input
+                type="text"
+                value={newItemNameGu}
+                onChange={(e) => setNewItemNameGu(e.target.value)}
+                placeholder="e.g. પનીર ટિક્કા"
+                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-sm focus:outline-none"
+              />
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[#0B253A]">ગુજરાતી Description</label>
+                <button
+                  type="button"
+                  onClick={() => setActiveKeyboardField({ lang: 'gu', field: 'description' })}
+                  className="text-[10px] font-bold text-[#E66817] px-2 py-0.5 rounded-md border border-[#E66817]/30 hover:bg-[#FFF4ED]"
+                >
+                  ⌨ Keyboard
+                </button>
+              </div>
+              <textarea
+                rows={2}
+                value={newItemDescGu}
+                onChange={(e) => setNewItemDescGu(e.target.value)}
+                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-sm focus:outline-none"
+              />
+            </div>
+          </div>
+
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="ghost" type="button" onClick={() => setIsAddItemModalOpen(false)}>
               Cancel
@@ -5143,6 +5246,29 @@ export default function AdminApp() {
           </div>
         </form>
       </Modal>
+
+      {/* Phonetic virtual keyboard for the Hindi/Gujarati translation
+          fields above — bound to whichever field was last opened. */}
+      {activeKeyboardField && (
+        <VirtualKeyboard
+          language={activeKeyboardField.lang}
+          value={
+            activeKeyboardField.lang === 'hi'
+              ? activeKeyboardField.field === 'name' ? newItemNameHi : newItemDescHi
+              : activeKeyboardField.field === 'name' ? newItemNameGu : newItemDescGu
+          }
+          onChange={(next) => {
+            if (activeKeyboardField.lang === 'hi') {
+              if (activeKeyboardField.field === 'name') setNewItemNameHi(next);
+              else setNewItemDescHi(next);
+            } else {
+              if (activeKeyboardField.field === 'name') setNewItemNameGu(next);
+              else setNewItemDescGu(next);
+            }
+          }}
+          onClose={() => setActiveKeyboardField(null)}
+        />
+      )}
 
       {/* MODAL: ADD CATEGORY */}
       <Modal

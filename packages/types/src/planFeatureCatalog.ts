@@ -5,11 +5,11 @@ import type { PlanEntitlements } from './domain';
  * plan comparison screens (e.g. Restaurant Admin's Subscription Plans view).
  *
  * These groups are descriptive detail underneath the real enforcement mechanism —
- * the 19 boolean flags on `PlanEntitlements` (packages/types/src/domain.ts), which is
+ * the boolean flags on `PlanEntitlements` (packages/types/src/domain.ts), which is
  * what `Plan.entitlements` actually stores in cloud/api and what any future
  * entitlement check gates on. `entitlementKeys` on each group is a best-effort tag
  * back to the flag(s) that conceptually govern it; some groups span more than one key
- * because the 19-flag schema is coarser than this marketing catalog.
+ * because that flag schema is coarser than this marketing catalog.
  */
 export interface PlanFeatureGroup {
   id: string;
@@ -341,7 +341,12 @@ export const PRO_PLAN_FEATURE_GROUPS: PlanFeatureGroup[] = [
     id: 'qr_kiosk',
     title: '2. QR Table Ordering & Kiosk',
     iconName: 'QrCode',
-    entitlementKeys: ['qrTableOrdering', 'advancedServiceWorkflow'],
+    // Kiosk's own features below were previously tagged only to
+    // qrTableOrdering/advancedServiceWorkflow — there was no distinct
+    // entitlement flag for Self-Order Kiosk at all, so a plan's real
+    // Kiosk/Kiosk Admin access (AppCode.KIOSK / KIOSK_ADMIN in cloud/api)
+    // was never actually represented here.
+    entitlementKeys: ['qrTableOrdering', 'advancedServiceWorkflow', 'selfOrderKiosk'],
     features: [
       'Table QR Code',
       'Unique QR per Table',
@@ -545,7 +550,8 @@ export const CORE_DEFAULT_ENTITLEMENTS: PlanEntitlements = {
   captainApp: false,
   advancedCaptainReports: false,
   advancedServiceWorkflow: false,
-  qrTableOrdering: false
+  qrTableOrdering: false,
+  selfOrderKiosk: false
 };
 
 export const PRO_DEFAULT_ENTITLEMENTS: PlanEntitlements = {
@@ -568,7 +574,8 @@ export const PRO_DEFAULT_ENTITLEMENTS: PlanEntitlements = {
   captainApp: true,
   advancedCaptainReports: true,
   advancedServiceWorkflow: true,
-  qrTableOrdering: true
+  qrTableOrdering: true,
+  selfOrderKiosk: true
 };
 
 export const PRO_EXCLUSIVE_KEYS: (keyof PlanEntitlements)[] = [
@@ -576,7 +583,8 @@ export const PRO_EXCLUSIVE_KEYS: (keyof PlanEntitlements)[] = [
   'advancedCaptainReports',
   'advancedServiceWorkflow',
   'qrTableOrdering',
-  'posAssistant'
+  'posAssistant',
+  'selfOrderKiosk'
 ];
 
 export const CORE_KEYS: (keyof PlanEntitlements)[] = [
@@ -610,7 +618,8 @@ export function resolveTierEntitlements(
       advancedCaptainReports: false,
       advancedServiceWorkflow: false,
       qrTableOrdering: false,
-      posAssistant: false
+      posAssistant: false,
+      selfOrderKiosk: false
     };
   }
 
@@ -679,7 +688,7 @@ export const OPERATIONAL_MODULE_CATEGORIES: OperationalModuleCategory[] = [
     name: '7. Connected Restaurant Ecosystem',
     description: 'Wireless Captain app for table-side ordering, QR table scan-to-order, self-service kiosk, real-time multi-terminal mesh sync, JAMAN AI assistant and advanced analytics.',
     isProExclusive: true,
-    entitlementKeys: ['captainApp', 'advancedCaptainReports', 'advancedServiceWorkflow', 'qrTableOrdering', 'posAssistant'],
+    entitlementKeys: ['captainApp', 'advancedCaptainReports', 'advancedServiceWorkflow', 'qrTableOrdering', 'posAssistant', 'selfOrderKiosk'],
     catalogGroupIds: ['captain', 'qr_kiosk', 'sync', 'ai', 'analytics']
   }
 ];

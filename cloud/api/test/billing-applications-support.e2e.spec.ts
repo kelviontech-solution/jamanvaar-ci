@@ -133,7 +133,15 @@ describe('New SaaS Modules: Invoices, Applications, Support, and Platform Settin
     });
 
     it('publishes a new application release', async () => {
-      const newVersion = `2.5.${Date.now() % 1000}`;
+      // AppRelease uniqueness is on (appCode, version) — `% 1000` throws
+      // away almost all of Date.now()'s entropy, so two runs of this suite
+      // within the same second (e.g. re-running the file, or CI retrying)
+      // could collide on an already-published version and get a 409 for a
+      // reason that has nothing to do with the behavior under test. The
+      // full timestamp is unique enough, and this row is cleaned up below
+      // so it never lingers as visible junk in the real Applications &
+      // Releases list either way.
+      const newVersion = `2.5.${Date.now()}`;
       const res = await authed('post', '/api/v1/applications/releases').send({
         appCode: 'POS',
         version: newVersion,
@@ -144,6 +152,10 @@ describe('New SaaS Modules: Invoices, Applications, Support, and Platform Settin
 
       expect(res.status).toBe(201);
       expect(res.body.version).toBe(newVersion);
+
+      await prisma.runAsPlatform((tx) =>
+        tx.appRelease.deleteMany({ where: { appCode: 'POS', version: newVersion } })
+      );
     });
   });
 
@@ -152,7 +164,13 @@ describe('New SaaS Modules: Invoices, Applications, Support, and Platform Settin
       const res = await authed('get', '/api/v1/support/search?q=Enterprise');
       expect(res.status).toBe(200);
       expect(res.body.restaurants.length).toBeGreaterThanOrEqual(1);
-      expect(res.body.restaurants[0].name).toContain('TEST Enterprise Dining');
+      // Assert this test's own restaurant is somewhere in the results,
+      // not that it's specifically first — the shared dev database can
+      // (and, as real onboarding gets used, increasingly will) contain
+      // other restaurants whose name/legal name also matches "Enterprise",
+      // which made this assertion fail on result ordering alone even
+      // though the search itself was correct.
+      expect(res.body.restaurants.some((r: { name: string }) => r.name.includes('TEST Enterprise Dining'))).toBe(true);
     });
 
     it('retrieves diagnostic health snapshot for a restaurant', async () => {

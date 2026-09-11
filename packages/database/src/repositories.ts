@@ -305,6 +305,7 @@ export class MenuRepository {
       sku: itemData.sku || `SKU-${Math.floor(100 + Math.random() * 900)}`,
       name: itemData.name || 'New Dish',
       description: itemData.description || '',
+      translations: itemData.translations,
       price: itemData.price || 100,
       imageUrl: itemData.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
       dietaryType: itemData.dietaryType || 'VEG',
@@ -1601,7 +1602,8 @@ export class LicenseRepository {
         captainApp: isPro,
         advancedCaptainReports: isPro,
         advancedServiceWorkflow: isPro,
-        qrTableOrdering: isPro
+        qrTableOrdering: isPro,
+        selfOrderKiosk: isPro
       }
     };
     db.notify();

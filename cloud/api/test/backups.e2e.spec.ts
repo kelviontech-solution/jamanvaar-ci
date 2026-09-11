@@ -32,6 +32,7 @@ describe('Real off-device backups (S3-compatible storage)', () => {
   const adminPassword = 'correct-horse-battery-staple';
   let platformToken: string;
   let restaurantId: string;
+  let planId: string;
   let ownerActivationToken: string;
   const ownerEmail = `test-backups-owner-${Date.now()}@example.com`;
   const ownerPassword = 'owner-correct-horse-battery';
@@ -105,9 +106,10 @@ describe('Real off-device backups (S3-compatible storage)', () => {
       entitlements: { posTerminal: true }
     });
     expect(planRes.status).toBe(201);
+    planId = planRes.body.id;
     await authed('post', '/api/v1/subscriptions', platformToken).send({
       restaurantId,
-      planId: planRes.body.id,
+      planId,
       status: 'ACTIVE',
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     });
@@ -122,7 +124,16 @@ describe('Real off-device backups (S3-compatible storage)', () => {
     delete process.env.BACKUP_S3_FORCE_PATH_STYLE;
 
     await prisma.runAsPlatform((tx) => tx.backup.deleteMany({ where: { restaurantId } }));
+    // Restaurant deletion cascades away its Subscription (see schema.prisma
+    // Subscription.restaurant onDelete: Cascade), which is what frees this
+    // Plan row up to delete too — the Plan row itself was previously never
+    // cleaned up at all, so every run of this suite left a permanent
+    // "TEST Backups Plan <timestamp>" row visible in the real Super Admin
+    // Plans list forever.
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));
+    if (planId) {
+      await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: planId } }));
+    }
     await prisma.platformUser.deleteMany({ where: { email: adminEmail } });
     await app.close();
     await new Promise<void>((resolve, reject) => s3.close((err?: Error) => (err ? reject(err) : resolve())));

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import type { Plan } from '../../api/types';
+import { ENTITLEMENT_KEYS } from '../../api/types';
 import {
   Badge,
   Button,
@@ -240,7 +241,10 @@ export function PlansListPage() {
                               borderRadius: 12
                             }}
                           >
-                            {activeEntCount}/20 Active
+                            {/* Was a literal "/20" — silently wrong the
+                                moment a 21st entitlement (e.g. Kiosk) got
+                                added, since it never changed to match. */}
+                            {activeEntCount}/{ENTITLEMENT_KEYS.length} Active
                           </span>
                         </td>
                         <td style={{ fontWeight: 700 }}>{p._count?.subscriptions ?? 0}</td>

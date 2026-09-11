@@ -76,6 +76,28 @@ describe('JAMANVAAR POS — Advanced Menu CRUD, Categories & Preloaded Starter P
     expect(MenuRepository.getMenuItemById(newItem.id)).toBeUndefined();
   });
 
+  it('persists Hindi/Gujarati translations passed to createMenuItem (previously silently dropped)', () => {
+    // createMenuItem used to hand-construct its return value field-by-field
+    // without copying `translations` through at all, so a dish created
+    // with a translation attached would still show up English-only on the
+    // customer kiosk no matter what language was selected.
+    const item = MenuRepository.createMenuItem({
+      name: 'Chilli Garlic Noodles',
+      sku: 'CGN-01',
+      price: 210,
+      translations: {
+        hi: { name: 'चिल्ली गार्लिक नूडल्स' },
+        gu: { name: 'ચિલી ગાર્લિક નૂડલ્સ' }
+      }
+    });
+
+    expect(item.translations?.hi?.name).toBe('चिल्ली गार्लिक नूडल्स');
+    expect(item.translations?.gu?.name).toBe('ચિલી ગાર્લિક નૂડલ્સ');
+
+    const persisted = MenuRepository.getMenuItemById(item.id);
+    expect(persisted?.translations?.hi?.name).toBe('चिल्ली गार्लिक नूडल्स');
+  });
+
   it('should load Preloaded Starter Menu Presets (Pizza & Cafe, North Indian, etc.)', () => {
     // Verify starter templates are available
     expect(PREBUILT_MENU_TEMPLATES.length).toBeGreaterThanOrEqual(8);

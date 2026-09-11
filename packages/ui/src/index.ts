@@ -19,3 +19,4 @@ export * from './SplashCornerArtwork';
 export * from './JamanAiFloatingButton';
 export * from './JamanAiAssistantModal';
 export * from './SoundManager';
+export * from './VirtualKeyboard';

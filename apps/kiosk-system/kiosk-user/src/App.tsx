@@ -53,7 +53,6 @@ import {
   calculateItemTotal,
   calculateItemUnitPrice,
   CustomerChatbotEngine,
-  hasRequiredModifierGroup,
   RecommendationEngine,
   validateModifiers
 } from '@jamanvaar/business';
@@ -89,7 +88,6 @@ import {
   Coins,
   Download,
   Eye,
-  FileText,
   Flame,
   Globe,
   Grid,
@@ -243,11 +241,13 @@ export default function KioskUserApp() {
     message: '',
     printerName: ''
   });
+  // Distinct from autoPrintStatus.printed (which is false both before the
+  // print attempt runs AND after it fails) — this only flips once the
+  // auto-print attempt has actually resolved, success or failure, so the
+  // auto-return-to-Welcome timer can wait for it without ever confusing
+  // "not tried yet" with "tried and failed".
+  const [printSettled, setPrintSettled] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  // The full thermal receipt used to render inline on the confirmation
-  // screen by default — a guest never asked to inspect a receipt mockup
-  // right after paying. It's now behind an explicit "View Receipt" action.
-  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
 
   // Digital E-Bill & WhatsApp Receipt States (Sections 130-152)
   const [isEBillModalOpen, setIsEBillModalOpen] = useState(false);
@@ -440,6 +440,20 @@ export default function KioskUserApp() {
     return () => clearInterval(interval);
   }, [step, paymentStatus, realPaymentId, localOrderIdForPayment]);
 
+  // Auto-return to the Welcome screen after the confirmation screen has had
+  // its receipt print attempt settle (success or failure — never before,
+  // so a guest isn't sent away while the printer is still working) plus a
+  // short read/tap window, so the kiosk frees itself up for the next guest
+  // without staff having to press "New Order" every time.
+  useEffect(() => {
+    if (step !== 'CONFIRMATION' || !printSettled) return;
+    const timer = setTimeout(() => {
+      handleFullSessionReset();
+    }, 5000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, printSettled]);
+
   // Periodic Heartbeat to Authoritative Local Service
   useEffect(() => {
     const sendHeartbeat = () => {
@@ -474,6 +488,8 @@ export default function KioskUserApp() {
     setSessionId(generateUUID());
     setStep('WELCOME');
     setCartItems([]);
+    setIsCartOpen(false);
+    setPrintSettled(false);
     setSelectedTable(null);
     setAppliedCoupon(null);
     setCouponCodeInput('');
@@ -592,19 +608,25 @@ export default function KioskUserApp() {
     }
   };
 
-  // The kiosk's "+" quick-add: only interrupt with the modal when the item
-  // genuinely cannot be ordered without a choice (e.g. spice level, size).
-  // An item with only optional add-ons (extra cheese, etc.) goes straight
-  // into the cart with its defaults — this was previously forcing the
-  // modal open for every item that had even one optional modifier group.
+  // The kiosk's "+" quick-add always adds directly with default options,
+  // even for an item that has a required modifier group — the modal only
+  // opens from the explicit "Customize" button now. Guests can still
+  // adjust a default choice afterward from the cart, but tapping + must
+  // never interrupt them with a card.
   const handleSelectItem = (item: MenuItem) => {
-    if (hasRequiredModifierGroup(item.modifierGroups)) {
-      handleOpenCustomize(item);
-    } else {
-      SoundService.playTap();
-      resetIdleTimer();
-      addToCartDirect(item, 1, defaultModifiersFor(item), '');
-    }
+    SoundService.playTap();
+    resetIdleTimer();
+    addToCartDirect(item, 1, defaultModifiersFor(item), '');
+  };
+
+  // Two selected-modifier sets are "the same customization" if every
+  // option in one has a matching option in the other, ignoring order.
+  const sameModifiers = (a: SelectedModifier[], b: SelectedModifier[]) => {
+    if (a.length !== b.length) return false;
+    const key = (m: SelectedModifier) => `${m.groupId}::${m.optionId}`;
+    const aKeys = a.map(key).sort();
+    const bKeys = b.map(key).sort();
+    return aKeys.every((k, idx) => k === bKeys[idx]);
   };
 
   const addToCartDirect = (
@@ -615,18 +637,6 @@ export default function KioskUserApp() {
   ) => {
     SoundService.playAdd();
     const unitPrice = calculateItemUnitPrice(item.price, modifiers);
-    const itemTotal = calculateItemTotal(item.price, quantity, modifiers);
-
-    const newCartItem: CartItem = {
-      cartItemId: generateUUID(),
-      menuItemId: item.id,
-      item,
-      quantity,
-      unitPrice,
-      selectedModifiers: modifiers,
-      specialInstructions: notes,
-      itemTotal
-    };
 
     // The cart drawer (below, isCartOpen) is a real right-side sidebar
     // already — the gap was that reaching it always meant an extra tap on
@@ -635,7 +645,45 @@ export default function KioskUserApp() {
     // order" without interrupting a guest who's still browsing and adding
     // more items afterward (which would re-open the drawer on every tap).
     const wasEmpty = cartItems.length === 0;
-    setCartItems((prev) => [...prev, newCartItem]);
+
+    setCartItems((prev) => {
+      // Adding the exact same item with the exact same customization and
+      // notes should increase that line's quantity, not create a second,
+      // visually-duplicate line — this used to always push a brand new
+      // line, so tapping + on "Butter Naan" twice showed two separate
+      // "Butter Naan x1" rows instead of one "Butter Naan x2" row.
+      const existingIdx = prev.findIndex(
+        (ci) =>
+          ci.menuItemId === item.id &&
+          ci.specialInstructions === notes &&
+          sameModifiers(ci.selectedModifiers, modifiers)
+      );
+
+      if (existingIdx !== -1) {
+        const next = [...prev];
+        const existing = next[existingIdx];
+        const nextQty = existing.quantity + quantity;
+        next[existingIdx] = {
+          ...existing,
+          quantity: nextQty,
+          itemTotal: calculateItemTotal(item.price, nextQty, existing.selectedModifiers)
+        };
+        return next;
+      }
+
+      const newCartItem: CartItem = {
+        cartItemId: generateUUID(),
+        menuItemId: item.id,
+        item,
+        quantity,
+        unitPrice,
+        selectedModifiers: modifiers,
+        specialInstructions: notes,
+        itemTotal: calculateItemTotal(item.price, quantity, modifiers)
+      };
+      return [...prev, newCartItem];
+    });
+
     showToast(`${quantity}x ${item.name} ${t('added')}`);
     if (wasEmpty) {
       setIsCartOpen(true);
@@ -882,9 +930,6 @@ export default function KioskUserApp() {
     });
     kots.forEach((kot) => PrinterService.printKOT(kot));
 
-    // Auto dispatch thermal receipt
-    PrinterService.printReceipt(order);
-
     // If logged in, award points (10% back in points) & record order
     if (loggedInAccount) {
       const earned = Math.floor(netTotalPayable * 0.1);
@@ -910,6 +955,7 @@ export default function KioskUserApp() {
     setPaymentStatus('SUCCESS');
     setIsProcessingPayment(false);
     setStep('CONFIRMATION');
+    setPrintSettled(false);
 
     // 1. Automatically dispatch receipt to thermal printer (Zero user prompts required)
     try {
@@ -925,6 +971,8 @@ export default function KioskUserApp() {
       }
     } catch (err) {
       console.warn('Auto print dispatch error:', err);
+    } finally {
+      setPrintSettled(true);
     }
 
     // 2. Trigger audio chime and spoken confirmation in selected language (Hindi/Gujarati/English)
@@ -1403,7 +1451,21 @@ export default function KioskUserApp() {
 
       {/* STEP 1: WELCOME SCREEN */}
       {step === 'WELCOME' && (
-        <div className="flex-1 flex flex-col justify-between p-8 md:p-12 relative overflow-hidden bg-gradient-to-b from-[#FBF9F5] via-[#FFFDF9] to-[#F7F2E7]">
+        <div
+          className="flex-1 flex flex-col justify-between p-8 md:p-12 relative overflow-hidden"
+          style={{
+            // Layered warm-palace gradient (radial "sunset glow" + soft navy
+            // vignette at the edges) instead of a flat 3-stop fade — CSS,
+            // not a raster image, so it stays crisp and lightweight at any
+            // kiosk display resolution or aspect ratio.
+            background: [
+              'radial-gradient(ellipse 90% 60% at 50% 8%, rgba(245,196,140,0.35) 0%, rgba(245,196,140,0.12) 35%, transparent 70%)',
+              'radial-gradient(ellipse 70% 50% at 15% 95%, rgba(230,104,23,0.10) 0%, transparent 65%)',
+              'radial-gradient(ellipse 70% 50% at 85% 95%, rgba(11,37,58,0.06) 0%, transparent 65%)',
+              'linear-gradient(180deg, #FDF8EE 0%, #FFFCF6 45%, #F8F0E1 100%)'
+            ].join(', ')
+          }}
+        >
           {/* Indian heritage-inspired corner artwork — Kiosk Admin can turn
               this off. Dimmed well below the boot-splash's own opacity
               (which is tuned for a brief full-screen moment, not a screen
@@ -1726,12 +1788,12 @@ export default function KioskUserApp() {
               >
                 <div className="z-10">
                   <span className="bg-white/20 text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
-                    👑 1-Tap Combo Add
+                    {t('bannerBiryaniTag')}
                   </span>
-                  <h4 className="text-base sm:text-lg font-black mt-1">Royal Veg Biryani Feast</h4>
-                  <p className="text-xs text-white/90 mt-0.5">Free Shahi Gulab Jamun & Raita • Save ₹111</p>
+                  <h4 className="text-base sm:text-lg font-black mt-1">{t('bannerBiryaniTitle')}</h4>
+                  <p className="text-xs text-white/90 mt-0.5">{t('bannerBiryaniSub')}</p>
                   <span className="inline-block mt-2 bg-white text-[#E66817] font-black text-xs px-3 py-1.5 rounded-xl shadow-sm group-hover:bg-[#0B253A] group-hover:text-white transition-colors">
-                    + Add Combo @ ₹449 ➔
+                    {t('bannerBiryaniCta')}
                   </span>
                 </div>
                 <img
@@ -1744,7 +1806,7 @@ export default function KioskUserApp() {
               {/* Banner 2: Gujarati Heritage Thali */}
               <div
                 onClick={() => {
-                  const thali = menuItems.find((m) => m.id === 'item-guj-thali') || menuItems[0];
+                  const thali = menuItems.find((m) => m.id === 'item-thali-guj') || menuItems[0];
                   if (thali) {
                     handleSelectItem(thali);
                   }
@@ -1753,12 +1815,12 @@ export default function KioskUserApp() {
               >
                 <div className="z-10">
                   <span className="bg-emerald-500/30 text-emerald-300 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
-                    ✨ Chef Signature
+                    {t('bannerThaliTag')}
                   </span>
-                  <h4 className="text-base sm:text-lg font-black mt-1">Gujarati Heritage Thali</h4>
-                  <p className="text-xs text-white/80 mt-0.5">12 Authentic Items Special Gujarati Feast</p>
+                  <h4 className="text-base sm:text-lg font-black mt-1">{t('bannerThaliTitle')}</h4>
+                  <p className="text-xs text-white/80 mt-0.5">{t('bannerThaliSub')}</p>
                   <span className="inline-block mt-2 bg-amber-400 text-[#0B253A] font-black text-xs px-3 py-1.5 rounded-xl shadow-sm group-hover:bg-white group-hover:text-[#0B253A] transition-colors">
-                    + Add Thali @ ₹280 ➔
+                    {t('bannerThaliCta')}
                   </span>
                 </div>
                 <img
@@ -1780,12 +1842,12 @@ export default function KioskUserApp() {
               >
                 <div className="z-10">
                   <span className="bg-white/20 text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
-                    ☕ Beverage Offer
+                    {t('bannerCoffeeTag')}
                   </span>
-                  <h4 className="text-base sm:text-lg font-black mt-1">Cold Coffee with Ice Cream</h4>
-                  <p className="text-xs text-white/90 mt-0.5">Velvety Ice Cream Scoop • 100% Arabica</p>
+                  <h4 className="text-base sm:text-lg font-black mt-1">{t('bannerCoffeeTitle')}</h4>
+                  <p className="text-xs text-white/90 mt-0.5">{t('bannerCoffeeSub')}</p>
                   <span className="inline-block mt-2 bg-white text-emerald-800 font-black text-xs px-3 py-1.5 rounded-xl shadow-sm group-hover:bg-[#0B253A] group-hover:text-white transition-colors">
-                    + Add Coffee @ ₹120 ➔
+                    {t('bannerCoffeeCta')}
                   </span>
                 </div>
                 <img
@@ -1806,11 +1868,16 @@ export default function KioskUserApp() {
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">🔥</span>
                     <h3 className="text-xl sm:text-2xl font-black text-[#0B253A]">
-                      Chef's Special Combo Meals
+                      {t('chefSpecialCombos')}
                     </h3>
                   </div>
                   <span className="text-xs font-bold text-[#E66817] bg-[#FFF4ED] px-3 py-1 rounded-full border border-[#FDBA74]">
-                    Save up to ₹111
+                    {/* Hindi/Gujarati phrase the amount before "up to X
+                        savings"; English phrases it after "Save up to X" —
+                        natural word order differs, not a typo. */}
+                    {lang === 'en'
+                      ? `${t('saveUpTo')} ${formatINR(Math.max(...combos.map((c) => c.savingsAmount)))}`
+                      : `${formatINR(Math.max(...combos.map((c) => c.savingsAmount)))} ${t('saveUpTo')}`}
                   </span>
                 </div>
 
@@ -1822,7 +1889,7 @@ export default function KioskUserApp() {
                     >
                       <img
                         src={combo.imageUrl}
-                        alt={combo.name}
+                        alt={localizedName(combo, lang)}
                         className="w-full sm:w-36 h-36 rounded-2xl object-cover shadow-sm"
                       />
                       <div className="flex-1 flex flex-col justify-between h-full space-y-2">
@@ -1832,11 +1899,11 @@ export default function KioskUserApp() {
                               <span className="w-2 h-2 rounded-full bg-emerald-600" />
                             </span>
                             <span className="text-xs font-black uppercase text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md">
-                              Pure Veg Combo
+                              {t('pureVegCombo')}
                             </span>
                           </div>
-                          <h4 className="font-black text-lg text-[#0B253A] mt-1">{combo.name}</h4>
-                          <p className="text-xs text-[#4A5568] leading-relaxed line-clamp-2">{combo.description}</p>
+                          <h4 className="font-black text-lg text-[#0B253A] mt-1">{localizedName(combo, lang)}</h4>
+                          <p className="text-xs text-[#4A5568] leading-relaxed line-clamp-2">{localizedDescription(combo, lang)}</p>
                         </div>
 
                         <div className="flex items-center justify-between pt-2 border-t border-[#EBE6DD]">
@@ -1852,7 +1919,7 @@ export default function KioskUserApp() {
                             onClick={() => handleSelectCombo(combo)}
                             className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#E66817] to-[#f07d33] hover:from-[#d1590f] hover:to-[#E66817] text-white font-black text-xs sm:text-sm shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center gap-1.5"
                           >
-                            <span>+ Add Combo</span>
+                            <span>{t('addCombo')}</span>
                           </button>
                         </div>
                       </div>
@@ -1899,8 +1966,11 @@ export default function KioskUserApp() {
             )}
           </div>
 
-          {/* Centered Floating Touch Cart & Checkout Dock (Easy Ergonomic Access) */}
-          {cartItems.length > 0 && (
+          {/* Centered Floating Touch Cart & Checkout Dock (Easy Ergonomic
+              Access) — hidden once the cart sidebar is already open since
+              it duplicates the sidebar's own totals/checkout and its
+              centered position could sit under the now-open panel. */}
+          {cartItems.length > 0 && !isCartOpen && (
             <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 w-[92%] sm:w-auto min-w-[340px] sm:min-w-[580px] max-w-3xl bg-[#0B253A]/95 backdrop-blur-md text-white rounded-3xl p-3.5 sm:p-4 shadow-[0_20px_60px_rgba(11,37,58,0.45)] border-2 border-white/20 flex items-center justify-between gap-4 animate-slideUp">
               {/* Left Details */}
               <div
@@ -2105,14 +2175,15 @@ export default function KioskUserApp() {
             </div>
           </div>
 
-          {/* Single centered column: Token + delivery/receipt options + quick
-              actions. The full ThermalReceiptView used to render at full
-              size right alongside this by default — moved behind the
-              "View Receipt" action below (see the Modal at the end of this
-              block) so a guest isn't handed a receipt mockup to inspect
-              before they've even picked up their food. */}
-          <div className="grid grid-cols-1 place-items-center">
-            <div className="w-full max-w-xl space-y-5">
+          {/* Two columns on wide kiosk displays: main confirmation info on
+              the left, receipt + kitchen ticket beside it on the right —
+              previously everything (including the receipt/KOT) stacked in
+              one long centered column, forcing a scroll past a lot of
+              unused horizontal space on a large kiosk screen just to see
+              the receipt. Collapses to a single stacked column on
+              narrower screens. */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start max-w-5xl mx-auto w-full">
+            <div className="w-full max-w-xl mx-auto lg:mx-0 space-y-5">
               {/* GIANT TOKEN DISPLAY */}
               <div className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-[#EBE6DD] shadow-xl text-center space-y-2">
                 <span className="text-xs font-black uppercase tracking-widest text-[#8C9BAE]">
@@ -2303,51 +2374,53 @@ export default function KioskUserApp() {
                   variant="outline"
                   size="sm"
                   className="w-full"
-                  onClick={() => {
-                    SoundService.playTap();
-                    setIsReceiptModalOpen(true);
-                  }}
-                  leftIcon={<FileText className="w-4 h-4" />}
-                >
-                  View Order Details
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
                   onClick={handleFullSessionReset}
                 >
                   ← {t('newOrder')}
                 </Button>
               </div>
             </div>
-          </div>
 
-          {/* Full thermal receipt — on demand only, via "View Order Details" above. */}
-          <Modal isOpen={isReceiptModalOpen} onClose={() => setIsReceiptModalOpen(false)} title="Official Restaurant Receipt">
-            <ThermalReceiptView
-              order={placedOrder}
-              config={ReceiptRepository.getConfig()}
-              onPrint={async () => {
-                const activePrn = PrinterService.getActivePrinter();
-                const res = await PrinterService.printReceipt(placedOrder);
-                if (res.success) {
-                  setAutoPrintStatus({
-                    printed: true,
-                    message: res.message,
-                    printerName: activePrn.name
-                  });
-                  showToast(`Print job sent to ${activePrn.name}`);
-                } else {
-                  showToast(res.message);
-                }
-              }}
-              onWhatsApp={() => {
-                setSelectedEBillMethod('WHATSAPP');
-                setIsEBillModalOpen(true);
-              }}
-            />
-          </Modal>
+            {/* RIGHT / "SIDE" COLUMN — receipt + kitchen ticket, beside the
+                main confirmation info on wide kiosk screens instead of
+                stacked further down the page. Shown directly rather than
+                hidden behind a tap, since there's no physical printer to
+                hand a guest/tester an actual slip. */}
+            <div className="w-full max-w-xl mx-auto lg:mx-0 space-y-5">
+              <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-sm space-y-3">
+                <h4 className="font-bold text-xs text-[#0B253A] uppercase tracking-wider text-center">
+                  Receipt
+                </h4>
+                <ThermalReceiptView order={placedOrder} config={ReceiptRepository.getConfig()} />
+              </div>
+
+              {/* KITCHEN ORDER TICKET(S) (KOT) — the real, station-routed
+                  tickets KOTRepository.generateKOT created for this order
+                  (see handleFinalizePayment), not a mockup. Each ticket is
+                  sized to its own content (not stretched across a grid
+                  column) so a single KOT doesn't look like an oversized,
+                  half-empty box. */}
+              {db.kots.filter((k) => k.orderId === placedOrder.id).length > 0 && (
+                <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-sm space-y-3">
+                  <h4 className="font-bold text-xs text-[#0B253A] uppercase tracking-wider text-center">
+                    Kitchen Order Ticket{db.kots.filter((k) => k.orderId === placedOrder.id).length > 1 ? 's' : ''} (KOT)
+                  </h4>
+                  <div className="flex flex-col items-center gap-3">
+                    {db.kots
+                      .filter((k) => k.orderId === placedOrder.id)
+                      .map((kot) => (
+                        <pre
+                          key={kot.id}
+                          className="bg-[#0B253A] text-emerald-300 text-[10px] leading-relaxed font-mono p-4 rounded-xl overflow-x-auto whitespace-pre w-full max-w-[300px] mx-auto"
+                        >
+                          {PrinterService.generateKOTText(kot)}
+                        </pre>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -2649,8 +2722,11 @@ export default function KioskUserApp() {
           underneath while the cart stays open on the right. The outer
           wrapper has pointer-events-none so only the panel itself (and its
           own close button) intercepts taps; everywhere else passes through
-          to the menu behind it. */}
-      {isCartOpen && (
+          to the menu behind it. Also never shown on WELCOME/LANGUAGE_SELECT
+          — a cart makes no sense before the order flow starts, and a
+          stale isCartOpen=true from a prior session (see
+          handleFullSessionReset) must not resurrect it there. */}
+      {isCartOpen && step !== 'WELCOME' && step !== 'LANGUAGE_SELECT' && (
         <div className="fixed inset-0 z-40 flex justify-end pointer-events-none animate-fadeIn">
           <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between border-l border-[#EBE6DD] animate-slideLeft pointer-events-auto">
             <div className="p-6 border-b border-[#F3EFE6] bg-[#FBF9F5] flex items-center justify-between">
@@ -2682,20 +2758,31 @@ export default function KioskUserApp() {
                     {cartItems.map((ci) => (
                       <div key={ci.cartItemId} className="py-4 space-y-2 first:pt-0 last:pb-0">
                         <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h4 className="font-bold text-base text-[#0B253A]">{localizedName(ci.item, lang)}</h4>
-                            {ci.selectedModifiers && ci.selectedModifiers.length > 0 && (
-                              <div className="text-xs text-[#8C9BAE] mt-0.5">
-                                {ci.selectedModifiers.map((m) => `+ ${m.optionName}`).join(', ')}
-                              </div>
-                            )}
-                            {ci.specialInstructions && (
-                              <div className="text-xs text-rose-600 font-medium mt-0.5">
-                                *{ci.specialInstructions}
-                              </div>
-                            )}
+                          <div className="flex items-start gap-3 min-w-0">
+                            <img
+                              src={ci.item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=60'}
+                              alt={localizedName(ci.item, lang)}
+                              className="w-14 h-14 rounded-xl object-cover shrink-0 border border-[#EBE6DD]"
+                              loading="lazy"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=60';
+                              }}
+                            />
+                            <div className="min-w-0">
+                              <h4 className="font-bold text-base text-[#0B253A]">{localizedName(ci.item, lang)}</h4>
+                              {ci.selectedModifiers && ci.selectedModifiers.length > 0 && (
+                                <div className="text-xs text-[#8C9BAE] mt-0.5">
+                                  {ci.selectedModifiers.map((m) => `+ ${m.optionName}`).join(', ')}
+                                </div>
+                              )}
+                              {ci.specialInstructions && (
+                                <div className="text-xs text-rose-600 font-medium mt-0.5">
+                                  *{ci.specialInstructions}
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          <span className="font-black text-base text-[#E66817]">
+                          <span className="font-black text-base text-[#E66817] shrink-0">
                             {formatINR(ci.itemTotal)}
                           </span>
                         </div>
@@ -3302,8 +3389,11 @@ export default function KioskUserApp() {
         </div>
       )}
 
-      {/* FLOATING CORNER CHATBOT AI ASSISTANT TRIGGER (Bottom Right) */}
-      {!isChatbotOpen && step !== 'CONFIRMATION' && (
+      {/* FLOATING CORNER CHATBOT AI ASSISTANT TRIGGER (Bottom Right) — hidden
+          while the cart sidebar is open since both are anchored to the same
+          bottom-right corner; without this the AI button physically sat on
+          top of the cart's "Proceed to Payment" button, blocking checkout. */}
+      {!isChatbotOpen && !isCartOpen && step !== 'CONFIRMATION' && (
         <div className="fixed bottom-6 right-6 z-40 flex items-center gap-3 animate-fadeIn">
           {/* Animated Speech Bubble Prompt */}
           <div

@@ -835,6 +835,11 @@ export interface PlanEntitlements {
   advancedCaptainReports: boolean;
   advancedServiceWorkflow: boolean;
   qrTableOrdering?: boolean;
+  /** Self-Order Kiosk + Kiosk Admin — a real, distinct PRO-tier feature
+   *  (AppCode.KIOSK / KIOSK_ADMIN in cloud/api) that this entitlement list
+   *  never represented at all until now, so it never showed up anywhere
+   *  a plan's feature set was displayed or gated. */
+  selfOrderKiosk?: boolean;
 }
 
 /**
@@ -902,6 +907,7 @@ export interface ComboDeal {
   id: string;
   name: string;
   description: string;
+  translations?: Record<string, { name: string; description?: string }>;
   basePrice: number;
   originalPrice: number;
   savingsAmount: number;

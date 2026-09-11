@@ -36,7 +36,8 @@ export const PLAN_DEFINITIONS: Record<PlanTier, PlanDefinition> = {
       { name: 'Captain App (Table-Side Ordering)', included: false, note: 'Available in PRO' },
       { name: 'Waiter & Captain Performance Analytics', included: false, note: 'Available in PRO' },
       { name: 'Captain ↔ KDS Real-Time Course Sync', included: false, note: 'Available in PRO' },
-      { name: 'QR Table Ordering & Digital Menu', included: false, note: 'Available in PRO (₹7,000)' }
+      { name: 'QR Table Ordering & Digital Menu', included: false, note: 'Available in PRO (₹7,000)' },
+      { name: 'Self-Order Kiosk & Kiosk Admin', included: false, note: 'Available in PRO (₹7,000)' }
     ]
   },
   PRO: {
@@ -54,7 +55,8 @@ export const PLAN_DEFINITIONS: Record<PlanTier, PlanDefinition> = {
       { name: 'Waiter Performance & Tip Allocation', included: true },
       { name: 'Captain ↔ POS ↔ KDS Real-Time Mesh Sync', included: true },
       { name: 'Advanced Operational Analytics & Flow Metrics', included: true },
-      { name: 'QR Table Ordering & Digital Menu (Allotted by Super Admin)', included: true }
+      { name: 'QR Table Ordering & Digital Menu (Allotted by Super Admin)', included: true },
+      { name: 'Self-Order Kiosk & Kiosk Admin Console', included: true }
     ]
   }
 };
@@ -104,6 +106,28 @@ export class EntitlementService {
         allowed: false,
         tier: license?.tier || 'CORE',
         message: 'QR Table Ordering is exclusively available in the JAMANVAAR PRO (₹7,000) plan. Allotment must be provisioned by Platform Super Admin.'
+      };
+    }
+
+    return {
+      allowed: true,
+      tier: 'PRO'
+    };
+  }
+
+  public static checkKioskAccess(): {
+    allowed: boolean;
+    tier: PlanTier;
+    message?: string;
+  } {
+    const license = LicenseRepository.getLicense();
+    const isPro = license?.tier === 'PRO' && Boolean(license?.entitlements?.selfOrderKiosk);
+
+    if (!isPro) {
+      return {
+        allowed: false,
+        tier: license?.tier || 'CORE',
+        message: 'Self-Order Kiosk is available in JAMANVAAR PRO (₹7,000). Upgrade your license to enable the customer kiosk and Kiosk Admin console.'
       };
     }
 

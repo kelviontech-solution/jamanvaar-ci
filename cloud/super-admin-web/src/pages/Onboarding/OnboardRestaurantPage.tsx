@@ -184,6 +184,29 @@ const DEFAULT_APPS_BY_TIER: Record<string, AppCode[]> = {
   ENTERPRISE: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN']
 };
 
+// A half-filled onboarding form used to simply vanish on any navigation
+// away (back button, accidental refresh, closing the tab) — everything
+// lived in plain useState with nothing backing it. This is the shape of
+// what gets saved as a resumable draft in localStorage. Provisioned keys
+// and other one-time-shown secrets are deliberately excluded: re-deriving
+// or re-issuing those isn't safe/idempotent, so a resumed draft re-enters
+// at whichever step the admin was on and re-runs that step's own action.
+const ONBOARDING_DRAFT_KEY = 'jamanvaar_onboarding_draft_v1';
+
+interface OnboardingDraft {
+  step: Step;
+  details: DetailsForm;
+  owner: OwnerForm;
+  planForm: PlanForm;
+  modulesForm: ModulesForm;
+  activationForm: ActivationForm;
+  restaurantId: string | null;
+  ownerActivationToken: string | null;
+  inviteEmailSent: boolean;
+  subscriptionId: string | null;
+  savedAt: string;
+}
+
 export function OnboardRestaurantPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>('details');
@@ -203,6 +226,90 @@ export function OnboardRestaurantPage() {
   const [ownerActivationToken, setOwnerActivationToken] = useState<string | null>(null);
   const [inviteEmailSent, setInviteEmailSent] = useState(false);
   const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
+
+  // Draft resume: a previous incomplete session's saved state, offered to
+  // the admin on mount rather than silently auto-applied — so navigating
+  // back in here deliberately to start a *different* restaurant doesn't
+  // get unexpectedly hijacked by an old draft.
+  const [pendingDraft, setPendingDraft] = useState<OnboardingDraft | null>(null);
+  const [draftResolved, setDraftResolved] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(ONBOARDING_DRAFT_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as OnboardingDraft;
+        if (parsed && parsed.step && parsed.step !== 'done') {
+          setPendingDraft(parsed);
+          return;
+        }
+      }
+    } catch {
+      // Corrupt/unreadable draft — treat as no draft rather than crash the page.
+    }
+    setDraftResolved(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function resumeDraft() {
+    if (!pendingDraft) return;
+    setStep(pendingDraft.step);
+    setDetails(pendingDraft.details);
+    setOwner(pendingDraft.owner);
+    setPlanForm(pendingDraft.planForm);
+    setModulesForm(pendingDraft.modulesForm);
+    setActivationForm(pendingDraft.activationForm);
+    setRestaurantId(pendingDraft.restaurantId);
+    setOwnerActivationToken(pendingDraft.ownerActivationToken);
+    setInviteEmailSent(pendingDraft.inviteEmailSent);
+    setSubscriptionId(pendingDraft.subscriptionId);
+    setPendingDraft(null);
+    setDraftResolved(true);
+  }
+
+  function discardDraft() {
+    try {
+      localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+    } catch {
+      // ignore
+    }
+    setPendingDraft(null);
+    setDraftResolved(true);
+  }
+
+  // Autosave — runs after the draft prompt (if any) has been resolved one
+  // way or the other, so it never overwrites a not-yet-reviewed draft with
+  // the fresh blank form the page mounted with.
+  useEffect(() => {
+    if (!draftResolved) return;
+    if (step === 'done') {
+      try {
+        localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+      } catch {
+        // ignore
+      }
+      return;
+    }
+    const draft: OnboardingDraft = {
+      step,
+      details,
+      owner,
+      planForm,
+      modulesForm,
+      activationForm,
+      restaurantId,
+      ownerActivationToken,
+      inviteEmailSent,
+      subscriptionId,
+      savedAt: new Date().toISOString()
+    };
+    try {
+      localStorage.setItem(ONBOARDING_DRAFT_KEY, JSON.stringify(draft));
+    } catch {
+      // Storage full/unavailable — draft-saving is a convenience, not a
+      // requirement, so fail silently rather than block the wizard.
+    }
+  }, [draftResolved, step, details, owner, planForm, modulesForm, activationForm, restaurantId, ownerActivationToken, inviteEmailSent, subscriptionId]);
   const [provisionedKeys, setProvisionedKeys] = useState<ProvisionedKey[]>([]);
   const [copyToast, setCopyToast] = useState<string | null>(null);
 
@@ -502,6 +609,30 @@ export function OnboardRestaurantPage() {
           ← Back to Restaurants
         </Button>
       </div>
+
+      {/* ── RESUME DRAFT PROMPT ── a half-filled form used to just vanish
+          on any navigation away; this offers the saved draft back rather
+          than silently applying or silently discarding it. */}
+      {pendingDraft && (
+        <div className="onboard-draft-banner">
+          <div>
+            <strong>Unfinished onboarding draft found</strong>
+            <span>
+              {' '}
+              — "{pendingDraft.details.name || 'Untitled restaurant'}", last edited{' '}
+              {new Date(pendingDraft.savedAt).toLocaleString('en-IN')} (step: {STEPS.find((s) => s.key === pendingDraft.step)?.label}).
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button variant="primary" onClick={resumeDraft}>
+              Resume Draft
+            </Button>
+            <Button variant="ghost" onClick={discardDraft}>
+              Discard & Start Fresh
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* ── PROGRESS STEPPER ── */}
       <div className="onboard-steps">
@@ -847,6 +978,33 @@ export function OnboardRestaurantPage() {
                         )}
                         <span className={isPro ? 'font-bold text-[#0b253a]' : 'text-slate-400 line-through'}>
                           QR Table Ordering & Standees
+                        </span>
+                      </li>
+                      {/* Self-Order Kiosk + its admin console are a real,
+                          distinct AppCode pair (KIOSK / KIOSK_ADMIN) gated
+                          the same way Captain/QR are — PRO-tier only per
+                          DEFAULT_APPS_BY_TIER in application-entitlements.
+                          service.ts — but this card never listed them at
+                          all, so an onboarding admin had no way to see
+                          whether a plan included Kiosk. */}
+                      <li className="plan-feature-item">
+                        {isPro ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        ) : (
+                          <span className="text-slate-400 font-bold">✕</span>
+                        )}
+                        <span className={isPro ? 'font-bold text-[#0b253a]' : 'text-slate-400 line-through'}>
+                          Self-Order Kiosk App
+                        </span>
+                      </li>
+                      <li className="plan-feature-item">
+                        {isPro ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        ) : (
+                          <span className="text-slate-400 font-bold">✕</span>
+                        )}
+                        <span className={isPro ? 'font-bold text-[#0b253a]' : 'text-slate-400 line-through'}>
+                          Kiosk Admin Dashboard
                         </span>
                       </li>
                     </ul>
