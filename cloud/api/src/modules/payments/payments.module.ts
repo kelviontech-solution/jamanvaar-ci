@@ -8,9 +8,11 @@ import { PaymentOrdersController } from './payment-orders.controller';
 import { CashfreeWebhookController } from './cashfree-webhook.controller';
 import { KioskPaymentConnectionController } from './kiosk-payment-connection.controller';
 import { PlatformPaymentConnectionsController } from './platform-payment-connections.controller';
+import { PlatformPaymentsController } from './platform-payments.controller';
 import { PaymentsService } from './payments.service';
 import { CashfreeGatewayService } from './cashfree-gateway.service';
 import { PaymentConnectionsService } from './payment-connections.service';
+import { PlatformPaymentsService } from './platform-payments.service';
 
 @Module({
   imports: [PrismaModule, AuditModule, TenantAuthModule],
@@ -19,9 +21,10 @@ import { PaymentConnectionsService } from './payment-connections.service';
     PaymentOrdersController,
     CashfreeWebhookController,
     KioskPaymentConnectionController,
-    PlatformPaymentConnectionsController
+    PlatformPaymentConnectionsController,
+    PlatformPaymentsController
   ],
-  providers: [PaymentsService, CashfreeGatewayService, MenuSyncService, PaymentConnectionsService],
+  providers: [PaymentsService, CashfreeGatewayService, MenuSyncService, PaymentConnectionsService, PlatformPaymentsService],
   exports: [PaymentsService, CashfreeGatewayService]
 })
 export class PaymentsModule {}
