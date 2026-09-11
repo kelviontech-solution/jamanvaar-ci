@@ -523,6 +523,50 @@ export interface TaxBreakup {
   description: string;
 }
 
+export interface PlatformPaymentOrder {
+  id: string;
+  externalOrderId: string;
+  subtotal: number; // paise
+  taxAmount: number; // paise
+  discountAmount: number; // paise
+  totalAmount: number; // paise
+  status: string;
+}
+
+export interface PlatformPaymentRefund {
+  id: string;
+  amount: number; // paise
+  status: 'PENDING' | 'SUCCESS' | 'FAILED';
+  reason: string | null;
+  createdAt: string;
+  processedAt: string | null;
+}
+
+export interface PlatformPayment {
+  id: string;
+  orderId: string;
+  restaurantId: string;
+  provider: 'CASHFREE';
+  providerOrderId: string;
+  providerPaymentId: string | null;
+  amount: number; // paise
+  currency: string;
+  status: 'CREATED' | 'PENDING' | 'AUTHORIZED' | 'SUCCESS' | 'FAILED' | 'USER_DROPPED' | 'CANCELLED' | 'REFUND_PENDING' | 'PARTIALLY_REFUNDED' | 'REFUNDED';
+  method: 'UPI' | 'CARD' | 'NET_BANKING' | 'WALLET' | 'OTHER' | null;
+  failureReason: string | null;
+  paidAt: string | null;
+  createdAt: string;
+  order: PlatformPaymentOrder;
+  refunds: PlatformPaymentRefund[];
+}
+
+export interface PlatformPaymentPage {
+  rows: PlatformPayment[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export interface Invoice {
   id: string;
   invoiceNumber: string;

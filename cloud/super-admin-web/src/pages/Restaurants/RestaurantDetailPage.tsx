@@ -8,7 +8,9 @@ import type {
   RestaurantDiagnostics,
   Plan,
   Backup,
-  RestaurantReport
+  RestaurantReport,
+  PlatformPayment,
+  PlatformPaymentPage
 } from '../../api/types';
 import { ENTITLEMENT_LABELS, type EntitlementKey } from '../../api/types';
 import { APP_CODES, APP_CODE_LABELS, type AppCode, type ApplicationEntitlement } from '../../api/types';
@@ -18,6 +20,7 @@ import {
   Card,
   ConfirmModal,
   EmptyState,
+  FilterTabs,
   Modal,
   SkeletonCard,
   SkeletonTable,
@@ -65,7 +68,8 @@ import {
   HardDrive,
   Grid3x3,
   Power,
-  PowerOff
+  PowerOff,
+  Wallet
 } from 'lucide-react';
 
 type Tab =
@@ -78,6 +82,7 @@ type Tab =
   | 'entitlements'
   | 'devices'
   | 'billing'
+  | 'payments'
   | 'reports'
   | 'activity'
   | 'support'
@@ -97,6 +102,7 @@ const TABS: Array<{ key: Tab; label: string; icon: React.ComponentType<{ classNa
   { key: 'entitlements', label: 'Feature Entitlements', icon: ShieldCheck },
   { key: 'devices', label: 'Devices & Keys', icon: Laptop2 },
   { key: 'billing', label: 'Billing & Invoices', icon: Receipt },
+  { key: 'payments', label: 'Payments', icon: Wallet },
   { key: 'reports', label: 'Reports & Analytics', icon: BarChart3 },
   { key: 'activity', label: 'Audit Logs', icon: FileText },
   { key: 'support', label: 'Support & Diagnostics', icon: LifeBuoy },
@@ -121,6 +127,30 @@ export function formatDeviceTypeLabel(type: string): string {
   }
 }
 
+// Page-local, not added to the shared statusTone() in components/ui.tsx —
+// that function's SUCCESS-shaped strings only recognize 'PAID'/'VERIFIED'
+// as success-like, and widening it would silently change badge colors on
+// every other page that already calls it.
+function paymentStatusTone(status: PlatformPayment['status']): 'success' | 'warning' | 'error' | 'neutral' {
+  switch (status) {
+    case 'SUCCESS':
+      return 'success';
+    case 'FAILED':
+    case 'USER_DROPPED':
+    case 'CANCELLED':
+      return 'error';
+    case 'PENDING':
+    case 'CREATED':
+    case 'AUTHORIZED':
+    case 'REFUND_PENDING':
+    case 'PARTIALLY_REFUNDED':
+      return 'warning';
+    case 'REFUNDED':
+    default:
+      return 'neutral';
+  }
+}
+
 export function RestaurantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [restaurant, setRestaurant] = useState<RestaurantDetail | null>(null);
@@ -133,6 +163,10 @@ export function RestaurantDetailPage() {
   // Secondary tab data
   const [activity, setActivity] = useState<AuditLogPage | null>(null);
   const [invoices, setInvoices] = useState<Invoice[] | null>(null);
+  const [payments, setPayments] = useState<PlatformPaymentPage | null>(null);
+  const [paymentsStatusFilter, setPaymentsStatusFilter] = useState<PlatformPayment['status'] | 'ALL'>('ALL');
+  const [paymentsPage, setPaymentsPage] = useState(1);
+  const [expandedPaymentId, setExpandedPaymentId] = useState<string | null>(null);
   const [diagnostics, setDiagnostics] = useState<RestaurantDiagnostics | null>(null);
   const [backups, setBackups] = useState<Backup[] | null>(null);
   const [reportsData, setReportsData] = useState<RestaurantReport | null>(null);
@@ -198,6 +232,14 @@ export function RestaurantDetailPage() {
     if (tab === 'billing' && !invoices) {
       api.get<Invoice[]>(`/api/v1/invoices?restaurantId=${id}`).then(setInvoices).catch(() => {});
     }
+    if (tab === 'payments') {
+      const params = new URLSearchParams({ restaurantId: id, page: String(paymentsPage), limit: '25' });
+      if (paymentsStatusFilter !== 'ALL') params.set('status', paymentsStatusFilter);
+      api
+        .get<PlatformPaymentPage>(`/api/v1/payments?${params.toString()}`)
+        .then(setPayments)
+        .catch(() => setPayments({ rows: [], total: 0, page: 1, limit: 25 }));
+    }
     if (tab === 'support' && !diagnostics) {
       api.get<RestaurantDiagnostics>(`/api/v1/support/diagnostics/${id}`).then(setDiagnostics).catch(() => {});
     }
@@ -218,7 +260,7 @@ export function RestaurantDetailPage() {
         .then(setAppEntitlements)
         .catch(() => setAppEntitlements([]));
     }
-  }, [tab, id, activity, invoices, diagnostics, backups, reportsData, appEntitlements]);
+  }, [tab, id, activity, invoices, diagnostics, backups, reportsData, appEntitlements, paymentsStatusFilter, paymentsPage]);
 
   async function executeConfirmedAction() {
     if (!confirmAction) return;
@@ -1312,6 +1354,136 @@ export function RestaurantDetailPage() {
             </table>
           )}
         </Card>
+      )}
+
+      {/* TAB: PAYMENTS */}
+      {tab === 'payments' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {payments && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
+              <div style={{ padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Transactions (this page)</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: '#0B253A', marginTop: 4 }}>{payments.total}</div>
+              </div>
+              <div style={{ padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Successful Amount</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: '#16a34a', marginTop: 4 }}>
+                  ₹{(payments.rows.filter((p) => p.status === 'SUCCESS').reduce((sum, p) => sum + p.amount, 0) / 100).toLocaleString('en-IN')}
+                </div>
+              </div>
+              <div style={{ padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Refunded Amount</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: '#ea580c', marginTop: 4 }}>
+                  ₹{(payments.rows.flatMap((p) => p.refunds).filter((r) => r.status === 'SUCCESS').reduce((sum, r) => sum + r.amount, 0) / 100).toLocaleString('en-IN')}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <Card>
+            <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
+              <div>
+                <span>Payments &amp; Refunds ({payments?.total ?? 0})</span>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                  Real Cashfree-backed payment transactions and refunds for this restaurant.
+                </p>
+              </div>
+            </div>
+            <div style={{ padding: '0 22px 14px' }}>
+              <FilterTabs<PlatformPayment['status'] | 'ALL'>
+                value={paymentsStatusFilter}
+                onChange={(val) => { setPaymentsStatusFilter(val); setPaymentsPage(1); }}
+                options={[
+                  { id: 'ALL', label: 'All' },
+                  { id: 'SUCCESS', label: 'Success' },
+                  { id: 'FAILED', label: 'Failed' },
+                  { id: 'PENDING', label: 'Pending' },
+                  { id: 'REFUND_PENDING', label: 'Refund Pending' },
+                  { id: 'PARTIALLY_REFUNDED', label: 'Partially Refunded' },
+                  { id: 'REFUNDED', label: 'Refunded' }
+                ]}
+              />
+            </div>
+            {!payments ? (
+              <div style={{ padding: 20 }}><SkeletonTable rows={4} cols={5} /></div>
+            ) : payments.rows.length === 0 ? (
+              <EmptyState title="No payments yet" description="Real orders and payments from this restaurant's kiosks and POS will appear here." />
+            ) : (
+              <>
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Order</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                      <th>Status</th>
+                      <th>Refunded</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payments.rows.map((p) => {
+                      const refundedAmount = p.refunds.filter((r) => r.status === 'SUCCESS').reduce((sum, r) => sum + r.amount, 0);
+                      const expanded = expandedPaymentId === p.id;
+                      return (
+                        <React.Fragment key={p.id}>
+                          <tr>
+                            <td style={{ fontSize: 12.5, whiteSpace: 'nowrap' }}>
+                              {new Date(p.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            </td>
+                            <td className="mono" style={{ fontSize: 12 }}>
+                              <button
+                                type="button"
+                                className="table-link"
+                                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left', font: 'inherit' }}
+                                onClick={() => setExpandedPaymentId(expanded ? null : p.id)}
+                              >
+                                {p.order.externalOrderId}
+                              </button>
+                            </td>
+                            <td style={{ fontWeight: 700 }}>₹{(p.amount / 100).toLocaleString('en-IN')}</td>
+                            <td>{p.method ?? '—'}</td>
+                            <td><Badge tone={paymentStatusTone(p.status)}>{p.status.replace('_', ' ')}</Badge></td>
+                            <td>{refundedAmount > 0 ? `₹${(refundedAmount / 100).toLocaleString('en-IN')}` : '—'}</td>
+                          </tr>
+                          {expanded && (
+                            <tr>
+                              <td colSpan={6} style={{ background: '#f8fafc', padding: '14px 22px', fontSize: 12.5 }}>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
+                                  <div><strong>Cashfree Order ID:</strong> {p.providerOrderId}</div>
+                                  <div><strong>Cashfree Payment ID:</strong> {p.providerPaymentId ?? '—'}</div>
+                                  {p.failureReason && <div><strong>Failure Reason:</strong> {p.failureReason}</div>}
+                                </div>
+                                {p.refunds.length > 0 && (
+                                  <div style={{ marginTop: 10 }}>
+                                    <strong>Refunds:</strong>
+                                    <ul style={{ margin: '6px 0 0', paddingLeft: 18 }}>
+                                      {p.refunds.map((r) => (
+                                        <li key={r.id}>
+                                          ₹{(r.amount / 100).toLocaleString('en-IN')} — <Badge tone={r.status === 'SUCCESS' ? 'success' : r.status === 'FAILED' ? 'error' : 'warning'}>{r.status}</Badge>
+                                          {r.reason ? ` — ${r.reason}` : ''}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10, padding: '14px 22px' }}>
+                  <span className="muted" style={{ fontSize: 12.5 }}>Page {payments.page} of {Math.max(1, Math.ceil(payments.total / payments.limit))}</span>
+                  <Button size="sm" variant="ghost" disabled={payments.page <= 1} onClick={() => setPaymentsPage((p) => p - 1)}>Prev</Button>
+                  <Button size="sm" variant="ghost" disabled={payments.page * payments.limit >= payments.total} onClick={() => setPaymentsPage((p) => p + 1)}>Next</Button>
+                </div>
+              </>
+            )}
+          </Card>
+        </div>
       )}
 
       {/* TAB 9: REPORTS & ANALYTICS */}
