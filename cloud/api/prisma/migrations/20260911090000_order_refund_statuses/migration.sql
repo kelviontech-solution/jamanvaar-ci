@@ -1,0 +1,12 @@
+-- AlterEnum
+DO $$ BEGIN
+  ALTER TYPE "OrderPaymentStatus" ADD VALUE IF NOT EXISTS 'PARTIALLY_REFUNDED';
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TYPE "OrderPaymentStatus" ADD VALUE IF NOT EXISTS 'REFUNDED';
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;

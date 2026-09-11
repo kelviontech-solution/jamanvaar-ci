@@ -910,6 +910,8 @@ enum OrderPaymentStatus {
   SENT_TO_POS
   PAYMENT_FAILED
   CANCELLED
+  PARTIALLY_REFUNDED
+  REFUNDED
 }
 
 enum PaymentTransactionStatus {

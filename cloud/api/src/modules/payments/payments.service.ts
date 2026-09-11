@@ -7,6 +7,7 @@ import { CashfreeGatewayService } from './cashfree-gateway.service';
 import { MenuSyncService } from './menu-sync.service';
 import { priceCart, PriceValidationError, MenuSnapshotItemLookup } from './pricing.util';
 import { CreatePaymentOrderDto } from './dto/create-payment-order.dto';
+import { CreateRefundDto } from './dto/create-refund.dto';
 
 const NON_TERMINAL_STATUSES = ['CREATED', 'PENDING', 'AUTHORIZED'];
 
@@ -120,6 +121,68 @@ export class PaymentsService {
     return { paymentId: payment.id, orderId: payment.orderId, status: payment.status, amount: payment.amount, currency: payment.currency, orderStatus: payment.order.status };
   }
 
+  async createRefund(restaurantId: string, paymentId: string, dto: CreateRefundDto) {
+    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId } })
+    );
+    if (!payment) throw new NotFoundException('Payment not found');
+
+    if (payment.status !== 'SUCCESS' && payment.status !== 'PARTIALLY_REFUNDED') {
+      throw new BadRequestException(`Cannot refund a payment in status ${payment.status}`);
+    }
+
+    // PENDING counts against the remaining balance too, not just SUCCESS — a
+    // second refund request issued before the first's webhook lands must not
+    // be approved against the same remaining balance.
+    const committed = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.refund.aggregate({
+        where: { paymentId: payment.id, status: { in: ['SUCCESS', 'PENDING'] } },
+        _sum: { amount: true }
+      })
+    );
+    const alreadyCommitted = committed._sum.amount ?? 0;
+    const remaining = payment.amount - alreadyCommitted;
+    if (dto.amountPaise > remaining) {
+      throw new BadRequestException(`Refund amount ${dto.amountPaise} exceeds remaining refundable amount ${remaining}`);
+    }
+
+    const refund = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.refund.create({
+        data: { paymentId: payment.id, restaurantId, amount: dto.amountPaise, reason: dto.reason, status: 'PENDING' }
+      })
+    );
+
+    let result;
+    try {
+      result = await this.cashfree.createRefund({
+        orderId: payment.providerOrderId,
+        refundId: refund.id,
+        amountPaise: dto.amountPaise,
+        note: dto.reason
+      });
+    } catch (err) {
+      await this.prisma.runAsTenant(restaurantId, (tx) => tx.refund.update({ where: { id: refund.id }, data: { status: 'FAILED' } }));
+      throw err;
+    }
+
+    // The synchronous response is informational only — store whatever
+    // Cashfree reports on the Refund row itself, but never let it flip
+    // PaymentTransaction/Order to a final refunded state. Only the
+    // REFUND_STATUS_WEBHOOK handler does that.
+    const informationalStatus = result.refundStatus === 'SUCCESS' ? 'SUCCESS' : result.refundStatus === 'FAILED' ? 'FAILED' : 'PENDING';
+    await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.refund.update({
+        where: { id: refund.id },
+        data: { providerRefundId: result.cfRefundId, status: informationalStatus }
+      })
+    );
+    await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.update({ where: { id: payment.id }, data: { status: 'REFUND_PENDING' } })
+    );
+
+    return { refundId: refund.id, providerRefundId: result.cfRefundId, status: result.refundStatus, amount: dto.amountPaise };
+  }
+
   async processCashfreeWebhook(rawBody: Buffer, signature: string | undefined, timestamp: string | undefined): Promise<void> {
     let signatureValid: boolean;
     try {
@@ -188,9 +251,18 @@ export class PaymentsService {
     }
     const payload = parsed as Record<string, any>;
     const eventType: string = payload.type;
-    const cfPaymentId: string | undefined = payload.data?.payment?.cf_payment_id;
-    const providerOrderId: string | undefined = payload.data?.order?.order_id;
-    const providerEventKey = `${eventType}:${cfPaymentId ?? providerOrderId ?? randomUUID()}`;
+    // REFUND_STATUS_WEBHOOK nests everything under data.refund instead of
+    // data.payment/data.order — both order_id and a payment-identifying id
+    // are still present there, verified against Cashfree's real refund
+    // webhook payload docs, so the same PaymentTransaction lookup below
+    // (by providerOrderId) works unchanged for refund events too.
+    const cfPaymentId: string | undefined = payload.data?.payment?.cf_payment_id ?? payload.data?.refund?.cf_payment_id;
+    const providerOrderId: string | undefined = payload.data?.order?.order_id ?? payload.data?.refund?.order_id;
+    const cfRefundId: string | undefined = payload.data?.refund?.cf_refund_id;
+    // cf_refund_id is the most specific identifier available for a refund
+    // event — falling back to cfPaymentId/providerOrderId would collide
+    // dedup keys across multiple refunds on the same payment.
+    const providerEventKey = `${eventType}:${cfRefundId ?? cfPaymentId ?? providerOrderId ?? randomUUID()}`;
 
     const existing = await this.prisma.runAsPlatform((tx) =>
       tx.webhookEvent.findUnique({ where: { provider_providerEventKey: { provider: 'CASHFREE', providerEventKey } } })
@@ -240,6 +312,11 @@ export class PaymentsService {
 
     await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id: webhookEvent.id }, data: { restaurantId: payment.restaurantId } }));
 
+    if (eventType === 'REFUND_STATUS_WEBHOOK') {
+      await this.handleRefundWebhook(payment, payload, webhookEvent.id);
+      return;
+    }
+
     const RELEVANT_TYPES = ['PAYMENT_SUCCESS_WEBHOOK', 'PAYMENT_FAILED_WEBHOOK', 'PAYMENT_USER_DROPPED_WEBHOOK'];
     if (!RELEVANT_TYPES.includes(eventType)) {
       await this.markWebhookProcessed(webhookEvent.id);
@@ -282,6 +359,67 @@ export class PaymentsService {
     });
 
     await this.markWebhookProcessed(webhookEvent.id);
+  }
+
+  private async handleRefundWebhook(
+    payment: { id: string; orderId: string; restaurantId: string; amount: number },
+    payload: Record<string, any>,
+    webhookEventId: string
+  ): Promise<void> {
+    const refundData = payload.data?.refund;
+    const cfRefundId: string | undefined = refundData?.cf_refund_id;
+    const refundStatus: string | undefined = refundData?.refund_status;
+    const refundAmountRupees = refundData?.refund_amount;
+    const receivedRefundAmountPaise = typeof refundAmountRupees === 'number' ? Math.round(refundAmountRupees * 100) : null;
+
+    if (!cfRefundId || receivedRefundAmountPaise === null) {
+      await this.markWebhookFailed(webhookEventId, 'Missing refund id or amount in REFUND_STATUS_WEBHOOK payload');
+      return;
+    }
+
+    const refund = await this.prisma.runAsPlatform((tx) => tx.refund.findFirst({ where: { paymentId: payment.id, providerRefundId: cfRefundId } }));
+    if (!refund) {
+      await this.markWebhookFailed(webhookEventId, `No Refund found for cf_refund_id ${cfRefundId}`);
+      return;
+    }
+
+    if (receivedRefundAmountPaise !== refund.amount) {
+      await this.markWebhookFailed(webhookEventId, `Refund amount mismatch: expected ${refund.amount}, got ${receivedRefundAmountPaise}`);
+      return;
+    }
+
+    if (refund.status === 'SUCCESS' || refund.status === 'FAILED') {
+      // Already terminal — a resent webhook for an already-processed refund.
+      await this.markWebhookProcessed(webhookEventId);
+      return;
+    }
+
+    const newRefundStatus = refundStatus === 'SUCCESS' ? 'SUCCESS' : refundStatus === 'FAILED' || refundStatus === 'CANCELLED' ? 'FAILED' : null;
+    if (!newRefundStatus) {
+      // Still processing at Cashfree's end — nothing final to record yet.
+      await this.markWebhookProcessed(webhookEventId);
+      return;
+    }
+
+    await this.prisma.runAsTenant(payment.restaurantId, async (tx) => {
+      await tx.refund.update({ where: { id: refund.id }, data: { status: newRefundStatus, processedAt: new Date() } });
+
+      if (newRefundStatus === 'SUCCESS') {
+        const totalRefunded = await tx.refund.aggregate({
+          where: { paymentId: payment.id, status: 'SUCCESS' },
+          _sum: { amount: true }
+        });
+        const refundedSoFar = totalRefunded._sum.amount ?? 0;
+        const isFullyRefunded = refundedSoFar >= payment.amount;
+        const finalStatus = isFullyRefunded ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
+
+        await tx.paymentTransaction.update({ where: { id: payment.id }, data: { status: finalStatus } });
+        await tx.order.update({ where: { id: payment.orderId }, data: { status: finalStatus } });
+      }
+      // FAILED: leave PaymentTransaction/Order status untouched — the money never left.
+    });
+
+    await this.markWebhookProcessed(webhookEventId);
   }
 
   private async markWebhookProcessed(id: string): Promise<void> {

@@ -2,6 +2,7 @@ import { Body, Controller, ForbiddenException, Get, Param, Post, UseGuards, UseP
 import { Device } from '@prisma/client';
 import { PaymentsService } from './payments.service';
 import { createPaymentOrderSchema, CreatePaymentOrderDto } from './dto/create-payment-order.dto';
+import { createRefundSchema, CreateRefundDto } from './dto/create-refund.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
 import { CurrentDevice } from '../../common/decorators/current-device.decorator';
@@ -23,5 +24,14 @@ export class PaymentOrdersController {
   @Get(':paymentId/status')
   async getStatus(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
     return this.payments.getPaymentStatus(device.restaurantId, paymentId);
+  }
+
+  @Post(':paymentId/refund')
+  @UsePipes(new ZodValidationPipe(createRefundSchema))
+  async refund(@Param('paymentId') paymentId: string, @Body() body: CreateRefundDto, @CurrentDevice() device: Device) {
+    if (device.type !== 'POS' && device.type !== 'POS_ADMIN') {
+      throw new ForbiddenException('Only a POS device can initiate a refund');
+    }
+    return this.payments.createRefund(device.restaurantId, paymentId, body);
   }
 }
