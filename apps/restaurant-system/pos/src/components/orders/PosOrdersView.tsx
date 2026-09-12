@@ -3,6 +3,7 @@ import { usePosStore } from '../../store/posStore';
 import { db, OrderRepository, BusinessDayRepository, QrOrderingRepository, RiderRepository } from '@jamanvaar/database';
 import { Order, OrderStatus } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
+import { getPaymentStatus } from '../../cloud/cloudClient';
 import {
   ShoppingBag,
   Search,
@@ -36,6 +37,7 @@ export const PosOrdersView: React.FC = () => {
   const [sourceFilter, setSourceFilter] = useState<string>('ALL');
   const [search, setSearch] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [checkingOrderId, setCheckingOrderId] = useState<string | null>(null);
 
   const activeDay = BusinessDayRepository.getActiveBusinessDay();
   const allOrders = db.orders;
@@ -95,7 +97,35 @@ export const PosOrdersView: React.FC = () => {
     return { total, completed, active, totalSales };
   }, [scopedOrders]);
 
-  const handleSettleCounterCash = (order: Order) => {
+  const handleSettleCounterCash = async (order: Order) => {
+    const isUnconfirmedKioskUpi = order.paymentMethod === 'UPI' && order.paymentStatus === 'PENDING';
+    // A UPI attempt may have landed at Cashfree moments after the kiosk gave
+    // up waiting — check the real cloud status before trusting the customer's
+    // word, so cash is never collected on top of a payment that already went
+    // through.
+    if (isUnconfirmedKioskUpi && order.paymentTransactionId) {
+      setCheckingOrderId(order.id);
+      try {
+        const result = await getPaymentStatus(order.paymentTransactionId);
+        if (result.status === 'SUCCESS') {
+          OrderRepository.settleOrder(order.id, 'UPI', undefined, order.paymentTransactionId, 'Cashfree UPI (reconciled at counter)');
+          const updated = OrderRepository.getOrderById(order.id);
+          if (updated) {
+            setLastCompletedOrder(updated);
+            setIsReceiptOpen(true);
+          }
+          alert('This order was already paid via UPI — do not collect cash. The receipt reflects the online payment.');
+          return;
+        }
+      } catch {
+        // Network/device-auth failure — fall through to manual cash
+        // settlement; staff already saw the on-screen warning and can ask
+        // the customer directly.
+      } finally {
+        setCheckingOrderId(null);
+      }
+    }
+
     OrderRepository.settleOrder(order.id, 'CASH', order.totalAmount, undefined, 'Cashier Counter');
     const updated = OrderRepository.getOrderById(order.id);
     if (updated) {
@@ -332,15 +362,16 @@ export const PosOrdersView: React.FC = () => {
                         )}
                         <button
                           type="button"
+                          disabled={checkingOrderId === order.id}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleSettleCounterCash(order);
                           }}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
-                          title="Collect cash & print thermal receipt"
+                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-wait text-white font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+                          title={isUnconfirmedKioskUpi ? 'Checks the real UPI payment status before collecting cash' : 'Collect cash & print thermal receipt'}
                         >
                           <CreditCard className="w-3.5 h-3.5" />
-                          <span>Settle Cash</span>
+                          <span>{checkingOrderId === order.id ? 'Checking…' : 'Settle Cash'}</span>
                         </button>
                       </div>
                     )}

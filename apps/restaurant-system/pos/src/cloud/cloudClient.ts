@@ -79,6 +79,15 @@ export function deviceFetch(path: string, init: RequestInit = {}): Promise<Respo
   });
 }
 
+export async function getPaymentStatus(paymentId: string): Promise<{ status: string; orderStatus: string }> {
+  const res = await deviceFetch(`/api/v1/payments/${paymentId}/status`);
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Payment status check failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
 export async function createRefund(paymentId: string, amountPaise: number, reason: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
   const res = await deviceFetch(`/api/v1/payments/${paymentId}/refund`, {
     method: 'POST',
