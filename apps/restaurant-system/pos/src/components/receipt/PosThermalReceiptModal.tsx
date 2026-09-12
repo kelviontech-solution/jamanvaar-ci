@@ -42,12 +42,13 @@ export const PosThermalReceiptModal: React.FC = () => {
   const config = ReceiptRepository.getConfig();
   const order = lastCompletedOrder;
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     try {
-      const job = PosPrinterService.printOrderReceipt(order, paperWidth);
+      const job = await PosPrinterService.printOrderReceipt(order, paperWidth);
       setActiveJobId(job.id);
 
-      // Check if printer is simulated as offline/warning
+      // Check if printer is simulated as offline/warning, or a real
+      // NETWORK_LAN dispatch genuinely failed.
       if (job.status === 'FAILED') {
         setPrintStatus('FAILED');
         setErrorMessage(job.errorMessage || 'Hardware printer offline or paper out');
