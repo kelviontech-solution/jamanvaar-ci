@@ -1,5 +1,8 @@
 export const gu = {
   welcome: 'જમણવારમાં આપનું સ્વાગત છે',
+  welcomeLine1: '{{name}}',
+  welcomeLine2: 'માં આપનું સ્વાગત છે',
+  heritageBadge: 'અધિકૃત ભારતીય વારસાગત સ્વાદ • તાજું બનાવેલું',
   tagline: 'સુવિધા સાથે, સ્વાદિષ્ટ વ્યવસાય',
   startOrder: 'ઓર્ડર શરૂ કરો',
   touchToBegin: 'ઓર્ડર કરવા માટે સ્ક્રીનને સ્પર્શ કરો',

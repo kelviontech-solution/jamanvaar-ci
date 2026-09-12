@@ -1396,6 +1396,9 @@ export class JamanvaarDatabase {
         if (this.restaurant && this.restaurant.legalName && (this.restaurant.legalName.includes('HOSPITALITY') || this.restaurant.legalName.includes('PVT LTD'))) {
           this.restaurant.legalName = 'JAMANVAAR by KELVIONTECH';
         }
+        if (this.restaurant && this.restaurant.name && this.restaurant.name.includes('JAMANVAAR')) {
+          this.restaurant.name = SEED_RESTAURANT.name;
+        }
       } else {
         this.restaurant = { ...SEED_RESTAURANT };
       }

@@ -1,5 +1,8 @@
 export const hi = {
   welcome: 'जमणवार में आपका स्वागत है',
+  welcomeLine1: '{{name}}',
+  welcomeLine2: 'में आपका स्वागत है',
+  heritageBadge: 'प्रामाणिक भारतीय विरासत का स्वाद • ताज़ा तैयार',
   tagline: 'स्वाद ऐसा जो दिल छू ले',
   startOrder: 'ऑर्डर शुरू करें',
   touchToBegin: 'ऑर्डर करने के लिए स्क्रीन छुएं',

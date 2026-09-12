@@ -148,7 +148,11 @@ export class VoiceService {
       try {
         window.speechSynthesis.cancel(); // Clear any pending speech
 
-        const utterance = new SpeechSynthesisUtterance(text);
+        // Sanitize text: replace Hindi purna viram (।) with a standard period.
+        // Some English or default TTS engines choke on `।` and stop reading entirely.
+        const cleanText = text.replace(/।/g, '.').replace(/\|/g, '.');
+
+        const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.volume = Math.max(0, Math.min(1, cfg.volume));
         utterance.rate = Math.max(0.5, Math.min(2, cfg.rate));
         utterance.pitch = Math.max(0.5, Math.min(2, cfg.pitch));
@@ -172,27 +176,27 @@ export class VoiceService {
               // Try Gujarati specific voices first
               matchedVoice = voices.find(
                 (v) =>
-                  v.lang.toLowerCase().includes('gu') ||
+                  v.lang.toLowerCase().startsWith('gu') ||
                   v.name.toLowerCase().includes('gujarati') ||
                   v.name.toLowerCase().includes('dhwani') ||
                   v.name.toLowerCase().includes('niranjan')
               );
               // Fallback to Hindi or Indian English voice for authentic Indian phonetic clarity
               if (!matchedVoice) {
-                matchedVoice = voices.find((v) => v.lang.toLowerCase().includes('hi') || v.lang.toLowerCase().includes('en-in'));
+                matchedVoice = voices.find((v) => v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('en-in') || v.lang.toLowerCase().includes('en_in'));
               }
             } else if (lang === 'hi') {
               // Try Hindi specific voices
               matchedVoice = voices.find(
                 (v) =>
-                  v.lang.toLowerCase().includes('hi') ||
+                  v.lang.toLowerCase().startsWith('hi') ||
                   v.name.toLowerCase().includes('hindi') ||
                   v.name.toLowerCase().includes('swara') ||
                   v.name.toLowerCase().includes('kalpana') ||
                   v.name.toLowerCase().includes('hemant')
               );
             } else {
-              matchedVoice = voices.find((v) => v.lang.toLowerCase().includes('en-in') || v.lang.toLowerCase().startsWith('en'));
+              matchedVoice = voices.find((v) => v.lang.toLowerCase().includes('en-in') || v.lang.toLowerCase().includes('en_in') || v.lang.toLowerCase().startsWith('en'));
             }
 
             if (!matchedVoice) {
@@ -205,26 +209,50 @@ export class VoiceService {
           }
         };
 
-        findAndSetVoice();
+        const triggerSpeech = () => {
+          findAndSetVoice();
+          
+          // Prevent garbage collection of the utterance by storing it globally.
+          // Chrome is known to cancel long utterances if they are garbage collected.
+          (window as any)._currentTTSUtterance = utterance;
 
-        // If voices aren't loaded yet, try onvoiceschanged
-        if (window.speechSynthesis.getVoices().length === 0) {
-          window.speechSynthesis.onvoiceschanged = () => {
-            findAndSetVoice();
+          utterance.onend = () => {
+            (window as any)._currentTTSUtterance = null;
+            resolve(true);
           };
-        }
-
-        utterance.onend = () => resolve(true);
-        utterance.onerror = () => resolve(false);
-
-        // Slight delay to allow harmonic chime to resonate
-        setTimeout(() => {
-          try {
-            window.speechSynthesis.speak(utterance);
-          } catch {
+          utterance.onerror = () => {
+            (window as any)._currentTTSUtterance = null;
             resolve(false);
-          }
-        }, 150);
+          };
+
+          // Slight delay to allow harmonic chime to resonate
+          setTimeout(() => {
+            try {
+              window.speechSynthesis.speak(utterance);
+            } catch {
+              resolve(false);
+            }
+          }, 150);
+        };
+
+        // If voices aren't loaded yet, wait for them via onvoiceschanged
+        if (window.speechSynthesis.getVoices().length === 0) {
+          let voicesResolved = false;
+          window.speechSynthesis.onvoiceschanged = () => {
+            if (voicesResolved) return;
+            voicesResolved = true;
+            triggerSpeech();
+          };
+          // Fallback in case onvoiceschanged never fires
+          setTimeout(() => {
+            if (!voicesResolved) {
+              voicesResolved = true;
+              triggerSpeech();
+            }
+          }, 1000);
+        } else {
+          triggerSpeech();
+        }
       } catch (err) {
         // Voice failure must NEVER throw or block the order flow
         resolve(false);

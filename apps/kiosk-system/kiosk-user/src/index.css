@@ -18,29 +18,14 @@
   touch-action: manipulation;
 }
 
-/* Smooth Touch Scrolling */
+/* Smooth Touch Scrolling (Hide scrollbars visually for kiosk) */
 .overflow-y-auto, .overflow-x-auto {
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: #CBD5E1 #FBF9F5;
+  scrollbar-width: none; /* Firefox */
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #FBF9F5;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  display: none; /* Chrome, Safari, Edge */
 }
 
 /* Animations */

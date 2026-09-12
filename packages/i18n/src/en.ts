@@ -1,6 +1,13 @@
 export const en = {
   // Common
   welcome: 'Welcome to JAMANVAAR',
+  // Two-line welcome heading with the restaurant's own (untranslated) name
+  // spliced in via {{name}} — word order differs by language (English
+  // puts the phrase before the name, Hindi/Gujarati after), so this is a
+  // line1/line2 pair rather than one prefix string.
+  welcomeLine1: 'Welcome to',
+  welcomeLine2: '{{name}}',
+  heritageBadge: 'Authentic Indian Heritage Flavors • Freshly Prepared',
   tagline: 'Authentic Flavors, Seamless Dining',
   startOrder: 'Start Order',
   touchToBegin: 'Touch screen to begin your order',

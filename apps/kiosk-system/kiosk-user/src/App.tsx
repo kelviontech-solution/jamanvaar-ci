@@ -59,7 +59,6 @@ import {
 } from '@jamanvaar/business';
 import {
   Button,
-  CategoryCard,
   EmptyState,
   JamanvaarLogo,
   BrandHeader,
@@ -69,8 +68,7 @@ import {
   ProductCard,
   StatusBadge,
   ThermalReceiptView,
-  JAMANVAARStartup,
-  SplashCornerArtwork
+  JAMANVAARStartup
 } from '@jamanvaar/ui';
 import { formatDate, formatINR, formatTime, generateIdempotencyKey, generateUUID, localizedDescription, localizedName, SoundService } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
@@ -123,12 +121,16 @@ import {
   Unlock,
   UserCheck,
   UtensilsCrossed,
-  Volume2,
   Wallet,
   Wifi,
   WifiOff,
   X
 } from 'lucide-react';
+// Namespace import used only to resolve a category's admin-set iconName to
+// an actual icon component for the left nav (see CategoryCard.tsx, which
+// does the same lookup) — everything else in this file uses the named
+// imports above for normal tree-shaken references.
+import * as LucideIcons from 'lucide-react';
 
 type KioskStep =
   | 'LANGUAGE_SELECT'
@@ -180,6 +182,44 @@ export default function KioskUserApp() {
   // should see which restaurant they're ordering from before anything else.
   // Language is asked only after they tap Start Order, not on kiosk boot.
   const [step, setStep] = useState<KioskStep>('WELCOME');
+
+  // Welcome → Language Select transition (purely visual — see the ~3s
+  // tap/exit/enter sequence below; none of these three flags touch routing
+  // or session state, they only drive CSS classes).
+  const [startOrderTapped, setStartOrderTapped] = useState(false);
+  const [welcomeExiting, setWelcomeExiting] = useState(false);
+  const [langEntered, setLangEntered] = useState(false);
+
+  const handleStartOrder = () => {
+    SoundService.playTap();
+    setStartOrderTapped(true);
+    window.setTimeout(() => setWelcomeExiting(true), 220);
+    window.setTimeout(() => {
+      setSessionId(generateUUID());
+      setStep('LANGUAGE_SELECT');
+    }, 650);
+  };
+
+  // Reset the transition flags whenever a step is (re)entered directly
+  // (e.g. the Language Select back button, or a full session reset) so the
+  // animation replays cleanly instead of mounting already mid-transition.
+  useEffect(() => {
+    if (step === 'WELCOME') {
+      setStartOrderTapped(false);
+      setWelcomeExiting(false);
+    }
+    if (step === 'LANGUAGE_SELECT') {
+      setLangEntered(false);
+      let raf2 = 0;
+      const raf1 = requestAnimationFrame(() => {
+        raf2 = requestAnimationFrame(() => setLangEntered(true));
+      });
+      return () => {
+        cancelAnimationFrame(raf1);
+        cancelAnimationFrame(raf2);
+      };
+    }
+  }, [step]);
 
   // Network Connectivity State (Section 121-129)
   const [networkState, setNetworkState] = useState<NetworkState>('ONLINE');
@@ -248,6 +288,7 @@ export default function KioskUserApp() {
   // auto-return-to-Welcome timer can wait for it without ever confusing
   // "not tried yet" with "tried and failed".
   const [printSettled, setPrintSettled] = useState(false);
+  const [speechSettled, setSpeechSettled] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Digital E-Bill & WhatsApp Receipt States (Sections 130-152)
@@ -439,21 +480,28 @@ export default function KioskUserApp() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [step, paymentStatus, realPaymentId, localOrderIdForPayment]);
+    // `lang` must be a dependency: the polling interval's closure captures
+    // whichever `proceedToConfirmation` (and thus whichever active
+    // language) existed when this effect last ran. Without `lang` here,
+    // a guest who changes language from the header while a UPI payment is
+    // still polling gets confirmation audio in the language that was
+    // active when polling *started*, not the one active when the payment
+    // actually succeeds — this is what was causing the wrong-language
+    // confirmation audio.
+  }, [step, paymentStatus, realPaymentId, localOrderIdForPayment, lang]);
 
   // Auto-return to the Welcome screen after the confirmation screen has had
-  // its receipt print attempt settle (success or failure — never before,
-  // so a guest isn't sent away while the printer is still working) plus a
-  // short read/tap window, so the kiosk frees itself up for the next guest
-  // without staff having to press "New Order" every time.
+  // its receipt print attempt settle, AND its confirmation voice announcement 
+  // has completely finished (plus a 3.5 second read/tap window).
   useEffect(() => {
-    if (step !== 'CONFIRMATION' || !printSettled) return;
+    if (step !== 'CONFIRMATION' || !printSettled || !speechSettled) return;
+    const POST_CONFIRMATION_DELAY = 3500;
     const timer = setTimeout(() => {
       handleFullSessionReset();
-    }, 5000);
+    }, POST_CONFIRMATION_DELAY);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, printSettled]);
+  }, [step, printSettled, speechSettled]);
 
   // Periodic Heartbeat to Authoritative Local Service
   useEffect(() => {
@@ -491,6 +539,7 @@ export default function KioskUserApp() {
     setCartItems([]);
     setIsCartOpen(false);
     setPrintSettled(false);
+    setSpeechSettled(false);
     setSelectedTable(null);
     setAppliedCoupon(null);
     setCouponCodeInput('');
@@ -563,6 +612,18 @@ export default function KioskUserApp() {
       dietaryFilter === 'ALL' || item.dietaryType === dietaryFilter;
     return matchesSearch && matchesCategory && matchesDietary;
   });
+
+  // Label for the CENTER column's heading in the kiosk menu's 10/70/20
+  // layout — mirrors whichever category the LEFT nav has selected.
+  const activeCategoryObj = categories.find((c) => c.id === selectedCategoryId);
+  const currentCategoryLabel =
+    selectedCategoryId === 'ALL'
+      ? 'All Dishes & Specialities'
+      : selectedCategoryId === 'cat-combos'
+      ? 'Combos & Deals'
+      : activeCategoryObj
+      ? localizedName(activeCategoryObj, lang)
+      : 'Menu';
 
   // Intelligent recommendations from RecommendationEngine
   const intelligentRecommendations = RecommendationEngine.getCartRecommendations(
@@ -685,7 +746,6 @@ export default function KioskUserApp() {
       return [...prev, newCartItem];
     });
 
-    showToast(`${quantity}x ${item.name} ${t('added')}`);
     if (wasEmpty) {
       setIsCartOpen(true);
     }
@@ -957,6 +1017,7 @@ export default function KioskUserApp() {
     setIsProcessingPayment(false);
     setStep('CONFIRMATION');
     setPrintSettled(false);
+    setSpeechSettled(false);
 
     // 1. Automatically dispatch receipt to thermal printer (Zero user prompts required)
     try {
@@ -983,7 +1044,12 @@ export default function KioskUserApp() {
       'STANDARD',
       isCurrentlyOnline
     );
-    VoiceService.speak(voiceMsg, lang);
+    
+    const voicePromise = VoiceService.speak(voiceMsg, lang);
+    const watchdogPromise = new Promise(resolve => setTimeout(resolve, 15000));
+    Promise.race([voicePromise, watchdogPromise]).finally(() => {
+      setSpeechSettled(true);
+    });
   };
 
   // Cash-at-counter confirmation: the order was already created PENDING in
@@ -1172,10 +1238,91 @@ export default function KioskUserApp() {
       <div
         onClick={resetIdleTimer}
         onTouchStart={resetIdleTimer}
-        className={`min-h-screen flex flex-col bg-[#FBF9F5] text-[#0B253A] select-none ${
+        className={`min-h-screen min-h-dvh flex flex-col bg-[#FBF9F5] text-[#0B253A] select-none ${
           isHighContrast ? 'contrast-125 saturate-150' : ''
         } ${isLargeText ? 'text-lg' : 'text-base'}`}
       >
+      {/* Welcome → Language Select transition — lightweight CSS
+          transform/opacity only, no libraries. Kept as one shared block
+          (rather than duplicated per-step) since both screens reference
+          these classes. See handleStartOrder / the step-effect above for
+          the JS side that flips these on and off. */}
+      <style>{`
+        @keyframes kioskStartOrderTap {
+          0% { transform: scale(1); }
+          45% { transform: scale(0.93); }
+          100% { transform: scale(1); }
+        }
+        .kiosk-start-order-btn.kiosk-tapped { animation: kioskStartOrderTap 0.22s ease-out; }
+
+        .kiosk-welcome-center {
+          transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .kiosk-welcome-center.kiosk-welcome-exiting {
+          opacity: 0;
+          transform: scale(0.96);
+        }
+        .kiosk-food-panel {
+          transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .kiosk-food-panel-left.kiosk-welcome-exiting { opacity: 0; transform: translateX(-32px); }
+        .kiosk-food-panel-right.kiosk-welcome-exiting { opacity: 0; transform: translateX(32px); }
+
+        .kiosk-lang-photo {
+          opacity: 0;
+          transform: scale(1.04);
+          transition: opacity 0.65s ease, transform 0.65s ease;
+        }
+        .kiosk-lang-page.kiosk-lang-entered .kiosk-lang-photo { opacity: 1; transform: scale(1); }
+
+        .kiosk-lang-logo,
+        .kiosk-lang-heading {
+          opacity: 0;
+          transform: translateY(14px);
+          transition: opacity 0.28s ease, transform 0.28s ease;
+        }
+        .kiosk-lang-page.kiosk-lang-entered .kiosk-lang-logo {
+          opacity: 1; transform: translateY(0); transition-delay: 0.02s;
+        }
+        .kiosk-lang-page.kiosk-lang-entered .kiosk-lang-heading {
+          opacity: 1; transform: translateY(0); transition-delay: 0.09s;
+        }
+
+        .kiosk-lang-card {
+          opacity: 0;
+          transform: translateY(16px);
+          transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .kiosk-lang-page.kiosk-lang-entered .kiosk-lang-card:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.22s; }
+        .kiosk-lang-page.kiosk-lang-entered .kiosk-lang-card:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+        .kiosk-lang-page.kiosk-lang-entered .kiosk-lang-card:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.38s; }
+
+        /* Menu screen — cart panel's own reveal, on top of the layout's
+           10/90 → 10/70/20 width transition (see the inline style on the
+           grid container below). Plays once on mount (cart empty → first
+           item added); does not replay on later item adds since the panel
+           stays mounted for as long as the cart is non-empty. */
+        @keyframes kioskCartReveal {
+          from { opacity: 0; transform: translateX(20px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        .kiosk-cart-panel { animation: kioskCartReveal 320ms ease-out; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .kiosk-start-order-btn.kiosk-tapped,
+          .kiosk-welcome-center,
+          .kiosk-food-panel,
+          .kiosk-lang-photo,
+          .kiosk-lang-logo,
+          .kiosk-lang-heading,
+          .kiosk-lang-card,
+          .kiosk-cart-panel {
+            animation: none !important;
+            transition: none !important;
+          }
+        }
+      `}</style>
+
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-6 right-6 z-50 bg-[#0B253A] text-white px-6 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-3 animate-bounce">
@@ -1189,7 +1336,7 @@ export default function KioskUserApp() {
           would otherwise duplicate, and reads cleaner as a distraction-free
           first screen. */}
       {step !== 'LANGUAGE_SELECT' && step !== 'WELCOME' && (
-      <header className="h-20 sm:h-24 bg-white border-b border-[#EBE6DD] px-6 flex items-center justify-between shadow-sm sticky top-0 z-30">
+      <header className="h-20 sm:h-24 bg-white border-b border-[#EBE6DD] px-6 flex items-center justify-between gap-2 shadow-sm sticky top-0 z-30">
         {/* Left: Real JAMANVAAR Brand Identity */}
         <div className="flex items-center gap-4">
           {(
@@ -1221,7 +1368,7 @@ export default function KioskUserApp() {
             this read like a demo/dealer-review overlay rather than a
             dedicated self-service machine. They're all still one tap away
             in the "More" menu — nothing was removed, only decluttered. */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        <div className="flex items-center gap-2">
           {/* Customer Loyalty Profile — shown only once actually logged in;
               the login prompt itself moved into "More" below. */}
           {loggedInAccount && (
@@ -1404,7 +1551,27 @@ export default function KioskUserApp() {
           kiosk asks. The header's own language switcher only handles
           changing it later; this is the dedicated first choice. */}
       {step === 'LANGUAGE_SELECT' && (
-        <div className="flex-1 flex flex-col items-center justify-center p-8 relative bg-gradient-to-b from-[#FBF9F5] via-[#FFFDF9] to-[#F7F2E7] text-center space-y-10">
+        <div className={`kiosk-lang-page w-full h-full flex-1 flex flex-col items-center justify-center p-8 relative isolate bg-[#FBF9F5] text-center space-y-10 ${langEntered ? 'kiosk-lang-entered' : ''}`}>
+          <style>{`
+            /* This photo's real detail (furniture, plants, marble floor,
+               signboard) sits in its bottom third at full width; the rest
+               is mostly open sky, so bg-bottom keeps the crop on that
+               detail instead of the blank middle/top. */
+            .kiosk-lang-bg { background-image: url('/language-selection-bg.png'); }
+          `}</style>
+
+          {/* Photo as its own layer (not the page's own background) so it
+              gets a visibly distinct fade-in of its own, instead of just
+              silently inheriting whatever opacity the page container ends
+              up at. */}
+          <div className="kiosk-lang-photo kiosk-lang-bg absolute inset-0 -z-20 bg-cover bg-bottom bg-no-repeat" />
+
+          {/* Light legibility wash — same treatment as the Welcome page's
+              own overlay: flat opacity (no gradient stops, so no possible
+              boundary line), inset-0 over the full w-full h-full container
+              for guaranteed 100% screen coverage. */}
+          <div className="absolute inset-0 -z-10 bg-white/50" />
+
           <button
             onClick={() => {
               SoundService.playTap();
@@ -1414,18 +1581,18 @@ export default function KioskUserApp() {
           >
             <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
           </button>
-          <div className="flex justify-center">
+          <div className="kiosk-lang-logo relative z-10 flex justify-center">
             <JamanvaarLogo variant="horizontal" size="2xl" imgStyle={{ height: '96px', width: 'auto' }} className="drop-shadow-sm" />
           </div>
 
-          <div className="space-y-2">
+          <div className="kiosk-lang-heading relative z-10 space-y-2">
             <h1 className="text-3xl sm:text-4xl font-black text-[#0B253A] tracking-tight font-serif">
               Choose your language
             </h1>
             <p className="text-base text-[#4A5568] font-medium">भाषा चुनें • ભાષા પસંદ કરો</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full max-w-3xl">
+          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-5 w-full max-w-3xl">
             {LANGUAGE_OPTIONS.filter((l) => kioskSettings.enabledLanguages.includes(l.code)).map((l) => (
               <button
                 key={l.code}
@@ -1434,7 +1601,7 @@ export default function KioskUserApp() {
                   setLang(l.code);
                   setStep('ORDER_TYPE');
                 }}
-                className="bg-white p-8 rounded-3xl border-2 border-[#EBE6DD] hover:border-[#E66817] shadow-lg hover:shadow-xl flex flex-col items-center gap-2 transition-all duration-200 active:scale-95 group"
+                className="kiosk-lang-card bg-white p-8 rounded-3xl border-2 border-[#EBE6DD] hover:border-[#E66817] shadow-lg hover:shadow-xl flex flex-col items-center gap-2 transition-all duration-200 active:scale-95 group"
               >
                 <span className="text-3xl font-black text-[#0B253A] group-hover:text-[#E66817] transition-colors">
                   {l.native}
@@ -1444,7 +1611,7 @@ export default function KioskUserApp() {
             ))}
           </div>
 
-          <p className="text-xs font-semibold text-[#8C9BAE] tracking-wide uppercase">
+          <p className="relative z-10 text-xs font-semibold text-[#8C9BAE] tracking-wide uppercase">
             You can change this anytime from the header
           </p>
         </div>
@@ -1452,95 +1619,93 @@ export default function KioskUserApp() {
 
       {/* STEP 1: WELCOME SCREEN */}
       {step === 'WELCOME' && (
-        <div
-          className="flex-1 flex flex-col justify-between p-8 md:p-12 relative overflow-hidden"
-          style={{
-            // Layered warm-palace gradient (radial "sunset glow" + soft navy
-            // vignette at the edges) instead of a flat 3-stop fade — CSS,
-            // not a raster image, so it stays crisp and lightweight at any
-            // kiosk display resolution or aspect ratio.
-            background: [
-              'radial-gradient(ellipse 90% 60% at 50% 8%, rgba(245,196,140,0.35) 0%, rgba(245,196,140,0.12) 35%, transparent 70%)',
-              'radial-gradient(ellipse 70% 50% at 15% 95%, rgba(230,104,23,0.10) 0%, transparent 65%)',
-              'radial-gradient(ellipse 70% 50% at 85% 95%, rgba(11,37,58,0.06) 0%, transparent 65%)',
-              'linear-gradient(180deg, #FDF8EE 0%, #FFFCF6 45%, #F8F0E1 100%)'
-            ].join(', ')
-          }}
-        >
-          {/* Indian heritage-inspired corner artwork — Kiosk Admin can turn
-              this off. Dimmed well below the boot-splash's own opacity
-              (which is tuned for a brief full-screen moment, not a screen
-              guests sit looking at) so it reads as a subtle watermark. */}
-          {welcomeSettings.showHeritageArtwork && (
-            <div className="opacity-[0.35]">
-              <SplashCornerArtwork step={1} />
-            </div>
-          )}
+        <div className="flex-1 w-full h-full relative isolate bg-[#FBF9F5] kiosk-bg bg-cover bg-bottom bg-no-repeat flex flex-col overflow-hidden">
+          <style>{`
+            .kiosk-bg { background-image: url('/language-selection-bg.png'); }
+          `}</style>
 
-          {/* The only control on this screen besides Start Order — the full
-              header (language/loyalty/call-staff/etc.) is deliberately
-              hidden here so this reads as branding, not a dashboard. */}
-          <button
-            onClick={() => {
-              SoundService.playTap();
-              setIsChatbotOpen(true);
-            }}
-            className="absolute top-6 right-6 flex items-center gap-2 bg-white/80 hover:bg-white text-[#E66817] px-3.5 py-2 rounded-xl text-xs font-bold border border-[#E66817]/25 shadow-sm transition-all active:scale-95 z-10"
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>Need Help?</span>
-          </button>
+          {/* Light legibility wash — flat opacity (no gradient stops, so no
+              possible boundary line), inset-0 over the full w-full h-full
+              container guarantees 100% screen coverage. */}
+          <div className="absolute inset-0 -z-10 bg-white/50" />
 
-          <div className="max-w-4xl mx-auto w-full text-center space-y-6 my-auto">
-            <div className="flex justify-center pb-2">
-              <JamanvaarLogo variant="horizontal" size="2xl" imgStyle={{ height: '110px', width: 'auto' }} className="drop-shadow-sm hover:scale-105 transition-transform" />
+          {/* 3-COLUMN LAYOUT — perfectly symmetric */}
+          <div className="flex-1 flex flex-row items-center justify-center">
+
+            {/* LEFT FOOD PANEL — fixed same width as right */}
+            <div className={`kiosk-food-panel kiosk-food-panel-left flex justify-end items-center h-full flex-shrink-0 ${welcomeExiting ? 'kiosk-welcome-exiting' : ''}`} style={{ width: '38vw' }}>
+              <img
+                src="/left-food-panel.png"
+                alt=""
+                className="h-[60vh] w-auto max-w-full object-contain pointer-events-none"
+              />
             </div>
 
-            <div className="inline-flex items-center gap-2 bg-[#E66817]/10 border border-[#E66817]/25 px-5 py-2 rounded-full text-sm font-bold text-[#E66817] shadow-sm animate-pulse">
-              <Sparkles className="w-4 h-4" />
-              <span>Authentic Indian Heritage Flavors • Freshly Prepared</span>
-            </div>
-
-            <div className="space-y-3">
-              <h1 className="text-3xl sm:text-5xl font-black text-[#0B253A] tracking-tight font-serif">
-                {welcomeSettings.headingText || t('welcome')}
-              </h1>
-              <p className="text-base sm:text-xl text-[#4A5568] max-w-2xl mx-auto font-medium leading-relaxed">
-                {welcomeSettings.subtitleText || t('tagline')}
-              </p>
-            </div>
-
-            {/* Kiosk Admin-configurable promo banner — off by default; a
-                restaurant opts in from Kiosk Admin rather than this screen
-                always carrying an offer. */}
-            {welcomeSettings.showPromoBanner && welcomeSettings.promoBannerText && (
-              <div className="inline-flex items-center gap-2 bg-[#0B253A]/5 border border-[#0B253A]/15 px-5 py-2 rounded-full text-sm font-bold text-[#0B253A]">
-                <span>{welcomeSettings.promoBannerText}</span>
+            {/* CENTER SAFE AREA */}
+            <div className={`kiosk-welcome-center flex-shrink-0 flex flex-col items-center text-center space-y-6 relative z-10 ${welcomeExiting ? 'kiosk-welcome-exiting' : ''}`} style={{ width: '440px' }}>
+              <div className="flex justify-center pb-2">
+                <JamanvaarLogo variant="horizontal" size="2xl" imgStyle={{ height: '110px', width: 'auto' }} className="drop-shadow-sm hover:scale-105 transition-transform" />
               </div>
-            )}
 
-            {/* Giant Touch Button */}
-            <div className="pt-4">
-              <button
-                onClick={() => {
-                  SoundService.playTap();
-                  setSessionId(generateUUID());
-                  setStep('LANGUAGE_SELECT');
-                }}
-                className="w-full max-w-md mx-auto py-6 px-10 bg-[#E66817] hover:bg-[#F27A2B] active:bg-[#D1560D] text-white text-2xl sm:text-3xl font-black rounded-3xl shadow-2xl shadow-[#E66817]/40 flex items-center justify-center gap-4 transition-all duration-300 transform active:scale-95 pulse-glow"
-              >
-                <span>{welcomeSettings.startOrderButtonText || t('startOrder')}</span>
-                <ChevronRight className="w-8 h-8 stroke-[3]" />
-              </button>
-              <p className="text-sm font-semibold text-[#8C9BAE] mt-4 tracking-wider uppercase">
-                {welcomeSettings.supportingText || t('touchToBegin')}
-              </p>
+              <div className="inline-flex items-center gap-2 bg-[#E66817]/10 border border-[#E66817]/25 px-4 py-2 rounded-full text-sm font-bold text-[#E66817] shadow-sm animate-pulse text-center">
+                <Sparkles className="w-4 h-4 flex-shrink-0" />
+                <span>{t('heritageBadge')}</span>
+              </div>
+
+              <div className="space-y-3">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#0B253A] tracking-tight font-serif">
+                  {lang === 'en' && welcomeSettings.headingText ? (
+                    welcomeSettings.headingText
+                  ) : (
+                    <>
+                      <span className="block whitespace-nowrap">{t('welcomeLine1').replace('{{name}}', db.restaurant.name)}</span>
+                      <span className="block whitespace-nowrap">{t('welcomeLine2').replace('{{name}}', db.restaurant.name)}</span>
+                    </>
+                  )}
+                </h1>
+                <p className="text-base sm:text-xl text-[#4A5568] font-medium leading-relaxed">
+                  {(lang === 'en' && welcomeSettings.subtitleText) || t('tagline')}
+                </p>
+              </div>
+
+              {/* Kiosk Admin-configurable promo banner — off by default; a
+                  restaurant opts in from Kiosk Admin rather than this screen
+                  always carrying an offer. */}
+              {welcomeSettings.showPromoBanner && welcomeSettings.promoBannerText && (
+                <div className="inline-flex items-center gap-2 bg-[#0B253A]/5 border border-[#0B253A]/15 px-5 py-2 rounded-full text-sm font-bold text-[#0B253A]">
+                  <span>{welcomeSettings.promoBannerText}</span>
+                </div>
+              )}
+
+              {/* Giant Touch Button */}
+              <div className="pt-4 w-full">
+                <button
+                  onClick={handleStartOrder}
+                  disabled={startOrderTapped}
+                  className={`kiosk-start-order-btn w-full py-6 px-10 bg-[#E66817] hover:bg-[#F27A2B] active:bg-[#D1560D] text-white text-2xl sm:text-3xl font-black rounded-3xl shadow-2xl shadow-[#E66817]/40 flex items-center justify-center gap-4 transition-all duration-300 transform active:scale-95 pulse-glow ${startOrderTapped ? 'kiosk-tapped' : ''}`}
+                >
+                  <span>{(lang === 'en' && welcomeSettings.startOrderButtonText) || t('startOrder')}</span>
+                  <ChevronRight className="w-8 h-8 stroke-[3]" />
+                </button>
+                <p className="text-sm font-semibold text-[#8C9BAE] mt-4 tracking-wider uppercase">
+                  {(lang === 'en' && welcomeSettings.supportingText) || t('touchToBegin')}
+                </p>
+              </div>
+            </div>
+
+            {/* RIGHT FOOD PANEL — fixed same width as left */}
+            <div className={`kiosk-food-panel kiosk-food-panel-right flex justify-start items-center h-full flex-shrink-0 ${welcomeExiting ? 'kiosk-welcome-exiting' : ''}`} style={{ width: '38vw' }}>
+              <img
+                src="/right-food-panel.png"
+                alt=""
+                className="h-[60vh] w-auto max-w-full object-contain pointer-events-none"
+              />
             </div>
 
           </div>
 
           {/* Footer Information */}
-          <footer className="flex items-center justify-between text-xs text-[#8C9BAE] font-medium pt-4 border-t border-[#EBE6DD]">
+          <footer className="flex items-center justify-between text-xs text-[#8C9BAE] font-medium px-8 pb-4 relative z-10">
             <span>Terminal {kioskId}</span>
             <button
               onClick={() => setIsStaffPinModalOpen(true)}
@@ -1666,354 +1831,521 @@ export default function KioskUserApp() {
       {/* STEP 4: MENU CATALOG */}
       {step === 'MENU' && (
         <div
-          className={`flex-1 flex flex-col overflow-hidden transition-[margin] duration-300 ${
-            isCartOpen ? 'md:mr-[28rem]' : ''
-          }`}
+          // Explicit, DEFINITE height (not flex-1) — the app shell above is
+          // sized with min-h-screen (a floor, not a fixed height), so in a
+          // column flex container flex-grow has no real "extra space" to
+          // distribute and never actually clamps this block; its content
+          // was free to grow the whole page. Pinning the exact height here
+          // (viewport minus the header's own h-20/h-24) gives every nested
+          // overflow-hidden/overflow-y-auto below a genuinely bounded box
+          // to work against, independent of the ambiguous parent sizing —
+          // this is what makes the three-panel independent scroll actually
+          // hold, not just the panels' own overflow classes.
+          className="h-[calc(100dvh-80px)] sm:h-[calc(100dvh-96px)] min-h-0 grid overflow-hidden transition-[grid-template-columns] duration-300 ease-out"
+          style={{
+            // Real CSS Grid, always 3 tracks (so the transition above can
+            // actually interpolate — browsers won't smoothly animate a
+            // track COUNT change, only track SIZE). The cart's track is
+            // 0fr when empty, which computes to a hard 0px regardless of
+            // its content — combined with min-width:0 + overflow-hidden on
+            // every track below, this is what stops the cart's own min-w
+            // floor from ever forcing the row wider than the viewport.
+            gridTemplateColumns: cartItems.length > 0 ? '10fr 60fr 30fr' : '10fr 90fr 0fr',
+            boxSizing: 'border-box'
+          }}
         >
-          {/* Filter Bar */}
-          <div className="bg-white border-b border-[#EBE6DD] px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
-            <div className="relative w-full md:w-96">
-              <Search className="w-5 h-5 text-[#8C9BAE] absolute left-4 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('searchDishPlaceholder')}
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-2xl pl-12 pr-4 py-3 text-base text-[#0B253A] placeholder-[#8C9BAE] focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
-              />
-            </div>
-
-            <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
-              <button
-                onClick={() => {
-                  SoundService.playTap();
-                  setDietaryFilter('ALL');
-                }}
-                className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all ${
-                  dietaryFilter === 'ALL'
-                    ? 'bg-[#0B253A] text-white shadow-sm'
-                    : 'bg-[#FBF9F5] text-[#4A5568] border border-[#EBE6DD] hover:bg-[#F4EFE6]'
-                }`}
-              >
-                {t('allMenu')}
-              </button>
-              <button
-                onClick={() => {
-                  SoundService.playTap();
-                  setDietaryFilter('VEG');
-                }}
-                className={`px-4 py-2.5 rounded-xl font-bold text-sm flex items-center gap-1.5 transition-all ${
-                  dietaryFilter === 'VEG'
-                    ? 'bg-[#16A34A] text-white shadow-sm'
-                    : 'bg-[#ECFDF5] text-[#16A34A] border border-[#A7F3D0]'
-                }`}
-              >
-                <span className="w-2 h-2 rounded-full bg-current"></span>
-                {t('pureVeg')}
-              </button>
-              <button
-                onClick={() => {
-                  SoundService.playTap();
-                  setDietaryFilter('JAIN');
-                }}
-                className={`px-4 py-2.5 rounded-xl font-bold text-sm flex items-center gap-1.5 transition-all ${
-                  dietaryFilter === 'JAIN'
-                    ? 'bg-[#E66817] text-white shadow-sm'
-                    : 'bg-[#FFF4ED] text-[#E66817] border border-[#FDBA74]'
-                }`}
-              >
-                <span className="w-2 h-2 rounded-full bg-current"></span>
-                🌱 Pure Jain
-              </button>
-            </div>
-          </div>
-
-          {/* Sticky Category Pills Bar */}
-          <div className="bg-[#FBF9F5] border-b border-[#EBE6DD] px-6 py-3 flex items-center gap-2 overflow-x-auto select-none">
+          {/* LEFT — CATEGORY NAVIGATION (~10%): own vertical scroll, large
+              touch targets, stays put while center/right scroll
+              independently. Replaces the old horizontal pill bar — this is
+              the one and only category nav now. */}
+          <div className="min-w-0 h-full overflow-y-auto overflow-x-hidden bg-white border-r border-[#EBE6DD] flex flex-col items-center py-4 px-2 space-y-2">
             <button
               onClick={() => {
                 SoundService.playTap();
                 setSelectedCategoryId('ALL');
               }}
-              className={`px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base whitespace-nowrap transition-all ${
-                selectedCategoryId === 'ALL'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'bg-white border border-[#EBE6DD] text-[#0B253A] hover:bg-[#F8F6F0]'
-              }`}
+              className="w-full flex flex-col items-center justify-center gap-1.5 px-1 py-4 rounded-3xl font-bold text-xs sm:text-sm leading-tight text-center transition-all active:scale-95 bg-[#E66817] text-white shadow-md shadow-[#E66817]/25"
             >
-              {t('allMenu')}
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-1">
+                <Grid className="w-5 h-5 text-white" />
+              </div>
+              <span className="break-words line-clamp-2">{t('allMenu')}</span>
             </button>
 
-            {/* Combos & Super Saver Deals Category Pill */}
+            {/* Combos & Super Saver Deals */}
             <button
               onClick={() => {
                 SoundService.playTap();
                 setSelectedCategoryId('cat-combos');
               }}
-              className={`px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base whitespace-nowrap flex items-center gap-2 transition-all ${
+              className={`w-full flex flex-col items-center justify-center gap-1.5 px-1 py-4 rounded-3xl font-bold text-xs sm:text-sm leading-tight text-center transition-all active:scale-95 ${
                 selectedCategoryId === 'cat-combos'
-                  ? 'bg-gradient-to-r from-[#E66817] to-[#F59E0B] text-white shadow-md shadow-[#E66817]/30'
-                  : 'bg-white border border-[#EBE6DD] text-[#E66817] hover:bg-[#FFF4ED]'
+                  ? 'bg-[#FFF4ED] text-[#0B253A]'
+                  : 'bg-transparent text-[#4A5568] hover:bg-gray-50'
               }`}
             >
-              <span>🔥</span>
-              <span>Combos & Deals ({combos.length})</span>
+              <div className="w-12 h-12 rounded-full bg-[#FFF4ED] border border-[#FDBA74] flex items-center justify-center mb-1 text-xl">
+                🔥
+              </div>
+              <span className="break-words line-clamp-2">Combos & Deals</span>
             </button>
 
-            {categories.map((cat) => (
-              <CategoryCard
-                key={cat.id}
-                category={cat}
-                displayName={localizedName(cat, lang)}
-                isSelected={selectedCategoryId === cat.id}
-                onSelect={() => {
-                  SoundService.playTap();
-                  setSelectedCategoryId(cat.id);
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Sunmi Touch Kiosk Hero Banner & Daypart Specials Carousel */}
-          <div className="px-6 md:px-8 pt-4 pb-2">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Banner 1: Mega Combo Deal (1-Tap Direct Add) */}
-              <div
-                onClick={() => {
-                  const biryaniCombo = combos.find((c) => c.id === 'combo-biryani-feast') || combos[0];
-                  if (biryaniCombo) {
-                    handleSelectCombo(biryaniCombo);
-                  }
-                }}
-                className="bg-gradient-to-r from-[#E66817] to-[#F59E0B] rounded-3xl p-4 sm:p-5 text-white flex items-center justify-between shadow-md cursor-pointer hover:shadow-lg transition-all group overflow-hidden relative active:scale-98"
-              >
-                <div className="z-10">
-                  <span className="bg-white/20 text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
-                    {t('bannerBiryaniTag')}
-                  </span>
-                  <h4 className="text-base sm:text-lg font-black mt-1">{t('bannerBiryaniTitle')}</h4>
-                  <p className="text-xs text-white/90 mt-0.5">{t('bannerBiryaniSub')}</p>
-                  <span className="inline-block mt-2 bg-white text-[#E66817] font-black text-xs px-3 py-1.5 rounded-xl shadow-sm group-hover:bg-[#0B253A] group-hover:text-white transition-colors">
-                    {t('bannerBiryaniCta')}
-                  </span>
-                </div>
-                <img
-                  src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=400&q=80"
-                  alt="Biryani Deal"
-                  className="w-24 h-24 rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform shrink-0"
-                />
-              </div>
-
-              {/* Banner 2: Gujarati Heritage Thali */}
-              <div
-                onClick={() => {
-                  const thali = menuItems.find((m) => m.id === 'item-thali-guj') || menuItems[0];
-                  if (thali) {
-                    handleSelectItem(thali);
-                  }
-                }}
-                className="bg-gradient-to-r from-[#0B253A] to-[#1E3A8A] rounded-3xl p-4 sm:p-5 text-white flex items-center justify-between shadow-md cursor-pointer hover:shadow-lg transition-all group overflow-hidden relative active:scale-98"
-              >
-                <div className="z-10">
-                  <span className="bg-emerald-500/30 text-emerald-300 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
-                    {t('bannerThaliTag')}
-                  </span>
-                  <h4 className="text-base sm:text-lg font-black mt-1">{t('bannerThaliTitle')}</h4>
-                  <p className="text-xs text-white/80 mt-0.5">{t('bannerThaliSub')}</p>
-                  <span className="inline-block mt-2 bg-amber-400 text-[#0B253A] font-black text-xs px-3 py-1.5 rounded-xl shadow-sm group-hover:bg-white group-hover:text-[#0B253A] transition-colors">
-                    {t('bannerThaliCta')}
-                  </span>
-                </div>
-                <img
-                  src="https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=400&q=80"
-                  alt="Gujarati Thali"
-                  className="w-24 h-24 rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform shrink-0"
-                />
-              </div>
-
-              {/* Banner 3: Happy Hours Treat */}
-              <div
-                onClick={() => {
-                  const coffee = menuItems.find((m) => m.id === 'item-cc-ice') || menuItems[0];
-                  if (coffee) {
-                    handleSelectItem(coffee);
-                  }
-                }}
-                className="bg-gradient-to-r from-[#059669] to-[#10B981] rounded-3xl p-4 sm:p-5 text-white flex items-center justify-between shadow-md cursor-pointer hover:shadow-lg transition-all group overflow-hidden relative hidden md:flex active:scale-98"
-              >
-                <div className="z-10">
-                  <span className="bg-white/20 text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
-                    {t('bannerCoffeeTag')}
-                  </span>
-                  <h4 className="text-base sm:text-lg font-black mt-1">{t('bannerCoffeeTitle')}</h4>
-                  <p className="text-xs text-white/90 mt-0.5">{t('bannerCoffeeSub')}</p>
-                  <span className="inline-block mt-2 bg-white text-emerald-800 font-black text-xs px-3 py-1.5 rounded-xl shadow-sm group-hover:bg-[#0B253A] group-hover:text-white transition-colors">
-                    {t('bannerCoffeeCta')}
-                  </span>
-                </div>
-                <img
-                  src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=400&q=80"
-                  alt="Cold Coffee"
-                  className="w-24 h-24 rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform shrink-0"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Menu Items & Combos Grid */}
-          <div className="flex-1 overflow-y-auto p-6 md:p-8 pb-32 space-y-8">
-            {/* Show Combos Section when on ALL or Combos tab */}
-            {(selectedCategoryId === 'ALL' || selectedCategoryId === 'cat-combos') && combos.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🔥</span>
-                    <h3 className="text-xl sm:text-2xl font-black text-[#0B253A]">
-                      {t('chefSpecialCombos')}
-                    </h3>
-                  </div>
-                  <span className="text-xs font-bold text-[#E66817] bg-[#FFF4ED] px-3 py-1 rounded-full border border-[#FDBA74]">
-                    {/* Hindi/Gujarati phrase the amount before "up to X
-                        savings"; English phrases it after "Save up to X" —
-                        natural word order differs, not a typo. */}
-                    {lang === 'en'
-                      ? `${t('saveUpTo')} ${formatINR(Math.max(...combos.map((c) => c.savingsAmount)))}`
-                      : `${formatINR(Math.max(...combos.map((c) => c.savingsAmount)))} ${t('saveUpTo')}`}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {combos.map((combo) => (
-                    <div
-                      key={combo.id}
-                      className="bg-white rounded-3xl p-5 border-2 border-[#EBE6DD] hover:border-[#E66817] shadow-sm hover:shadow-xl transition-all duration-200 flex flex-col sm:flex-row gap-5 items-center justify-between"
-                    >
-                      <img
-                        src={combo.imageUrl}
-                        alt={localizedName(combo, lang)}
-                        className="w-full sm:w-36 h-36 rounded-2xl object-cover shadow-sm"
-                      />
-                      <div className="flex-1 flex flex-col justify-between h-full space-y-2">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="w-4 h-4 border border-emerald-600 flex items-center justify-center p-0.5 rounded-sm">
-                              <span className="w-2 h-2 rounded-full bg-emerald-600" />
-                            </span>
-                            <span className="text-xs font-black uppercase text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md">
-                              {t('pureVegCombo')}
-                            </span>
-                          </div>
-                          <h4 className="font-black text-lg text-[#0B253A] mt-1">{localizedName(combo, lang)}</h4>
-                          <p className="text-xs text-[#4A5568] leading-relaxed line-clamp-2">{localizedDescription(combo, lang)}</p>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-2 border-t border-[#EBE6DD]">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xl font-black text-[#0B253A]">₹{combo.basePrice}</span>
-                              <span className="text-xs line-through text-[#8C9BAE]">₹{combo.originalPrice}</span>
-                            </div>
-                            <span className="text-[11px] font-bold text-emerald-600">Save ₹{combo.savingsAmount}</span>
-                          </div>
-
-                          <button
-                            onClick={() => handleSelectCombo(combo)}
-                            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#E66817] to-[#f07d33] hover:from-[#d1590f] hover:to-[#E66817] text-white font-black text-xs sm:text-sm shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center gap-1.5"
-                          >
-                            <span>{t('addCombo')}</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Individual Dishes Grid */}
-            {selectedCategoryId !== 'cat-combos' && (
-              <div className="space-y-4">
-                {selectedCategoryId === 'ALL' && (
-                  <h3 className="text-xl sm:text-2xl font-black text-[#0B253A]">All Dishes & Specialities</h3>
-                )}
-
-                {filteredItems.length === 0 ? (
-                  <EmptyState
-                    title="No dishes found"
-                    description="Try another search term or filter category."
-                    actionText="View All Dishes"
-                    onAction={() => {
-                      setSelectedCategoryId('ALL');
-                      setDietaryFilter('ALL');
-                      setSearchQuery('');
-                    }}
-                  />
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredItems.map((item) => (
-                      <ProductCard
-                        key={item.id}
-                        item={item}
-                        displayName={localizedName(item, lang)}
-                        displayDescription={localizedDescription(item, lang)}
-                        onAdd={handleSelectItem}
-                        onSelectDetails={handleCardClick}
-                        onCustomize={handleOpenCustomize}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Centered Floating Touch Cart & Checkout Dock (Easy Ergonomic
-              Access) — hidden once the cart sidebar is already open since
-              it duplicates the sidebar's own totals/checkout and its
-              centered position could sit under the now-open panel. */}
-          {cartItems.length > 0 && !isCartOpen && (
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 w-[92%] sm:w-auto min-w-[340px] sm:min-w-[580px] max-w-3xl bg-[#0B253A]/95 backdrop-blur-md text-white rounded-3xl p-3.5 sm:p-4 shadow-[0_20px_60px_rgba(11,37,58,0.45)] border-2 border-white/20 flex items-center justify-between gap-4 animate-slideUp">
-              {/* Left Details */}
-              <div
-                onClick={() => {
-                  SoundService.playTap();
-                  setIsCartOpen(true);
-                }}
-                className="flex items-center gap-3.5 cursor-pointer pl-1 group select-none"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-[#E66817] flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-                  <ShoppingBag className="w-6 h-6 stroke-[2.5]" />
-                </div>
-                <div>
-                  <div className="text-sm sm:text-base font-black text-white flex items-center gap-2">
-                    <span>{cartItems.reduce((s, it) => s + it.quantity, 0)} Items Added</span>
-                    <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                      {orderType}
-                    </span>
-                  </div>
-                  <div className="text-xs text-white/70 font-medium mt-0.5">
-                    Payable: <strong className="text-amber-300 text-sm font-black">{formatINR(netTotalPayable)}</strong>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Centered Action Button */}
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="accent"
-                  size="lg"
+            {categories.map((cat) => {
+              const CategoryIcon =
+                (cat.iconName && (LucideIcons as any)[cat.iconName]) || UtensilsCrossed;
+              return (
+                <button
+                  key={cat.id}
                   onClick={() => {
                     SoundService.playTap();
-                    setIsCartOpen(true);
+                    setSelectedCategoryId(cat.id);
                   }}
-                  className="bg-gradient-to-r from-[#E66817] to-[#f07d33] hover:from-[#d55b0e] hover:to-[#e66817] text-white font-black text-sm sm:text-base px-6 sm:px-8 py-3.5 rounded-2xl shadow-xl active:scale-95 transition-all flex items-center gap-2"
+                  className={`w-full flex flex-col items-center justify-center gap-1.5 px-1 py-4 rounded-3xl font-bold text-xs sm:text-sm leading-tight text-center transition-all active:scale-95 ${
+                    selectedCategoryId === cat.id
+                      ? 'bg-[#FFF4ED] text-[#0B253A]'
+                      : 'bg-transparent text-[#4A5568] hover:bg-gray-50'
+                  }`}
                 >
-                  <span>{t('viewCart')} & Checkout</span>
-                  <ChevronRight className="w-5 h-5 stroke-[3]" />
-                </Button>
+                  <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 mb-1 border-2 border-transparent shadow-sm">
+                    {/* Use cast to any to safely check imageUrl property if it exists, fallback to icon */}
+                    {(cat as any).imageUrl ? (
+                      <img src={(cat as any).imageUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-[#FBF9F5] flex items-center justify-center text-[#E66817]">
+                        <CategoryIcon className="w-5 h-5" />
+                      </div>
+                    )}
+                  </div>
+                  <span className="break-words line-clamp-2">{localizedName(cat, lang)}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* CENTER — MENU ITEMS (~70%, or ~90% before the first item is
+              added): the filter bar stays put, everything below it scrolls
+              on its own. */}
+          <div className="min-w-0 h-full flex flex-col overflow-hidden">
+            {/* Filter Bar */}
+            <div className="bg-white border-b border-[#EBE6DD] px-4 sm:px-6 py-3 flex items-center gap-3 shadow-sm shrink-0 min-w-0">
+              <div className="relative flex-1 min-w-0">
+                <Search className="w-4 h-4 text-[#8C9BAE] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t('searchDishPlaceholder')}
+                  className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl pl-10 pr-4 py-2.5 text-sm font-semibold text-[#0B253A] placeholder-[#8C9BAE] focus:outline-none focus:ring-2 focus:ring-[#0B253A] transition-all min-w-0"
+                />
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  onClick={() => {
+                    SoundService.playTap();
+                    setDietaryFilter('ALL');
+                  }}
+                  className={`px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all ${
+                    dietaryFilter === 'ALL'
+                      ? 'bg-[#0B253A] text-white shadow-sm'
+                      : 'bg-[#FBF9F5] text-[#4A5568] border border-[#EBE6DD] hover:bg-[#F4EFE6]'
+                  }`}
+                >
+                  {t('allMenu')}
+                </button>
+                <button
+                  onClick={() => {
+                    SoundService.playTap();
+                    setDietaryFilter('VEG');
+                  }}
+                  className={`px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap flex items-center gap-1.5 transition-all ${
+                    dietaryFilter === 'VEG'
+                      ? 'bg-[#16A34A] text-white shadow-sm border border-[#16A34A]'
+                      : 'bg-[#FBF9F5] text-[#4A5568] border border-[#EBE6DD] hover:bg-emerald-50'
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${dietaryFilter === 'VEG' ? 'bg-white' : 'bg-[#16A34A]'}`}></span>
+                  {t('pureVeg')}
+                </button>
+                <button
+                  onClick={() => {
+                    SoundService.playTap();
+                    setDietaryFilter('JAIN');
+                  }}
+                  className={`px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap flex items-center gap-1.5 transition-all ${
+                    dietaryFilter === 'JAIN'
+                      ? 'bg-[#E66817] text-white shadow-sm border border-[#E66817]'
+                      : 'bg-[#FBF9F5] text-[#4A5568] border border-[#EBE6DD] hover:bg-orange-50'
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${dietaryFilter === 'JAIN' ? 'bg-white' : 'bg-[#E66817]'}`}></span>
+                  🌱 Pure Jain
+                </button>
               </div>
             </div>
-          )}
+
+            {/* Scrollable: hero banners + category title + grid */}
+            <div className="flex-1 overflow-y-auto pb-8">
+              {/* Featured deals — a compact horizontally-scrolling strip
+                  (small thumbnail + two lines of text) instead of three
+                  full-width hero cards, so the actual food menu below is
+                  what the eye lands on. Same three tap targets/handlers as
+                  before, just far less visual weight. Titles/subs pull from
+                  the shared i18n banner keys so the deal copy is translated
+                  along with the rest of the kiosk. */}
+              <div className="px-4 sm:px-6 md:px-8 pt-4">
+                <div className="flex items-center gap-3 overflow-x-auto pb-1">
+                  <button
+                    onClick={() => {
+                      const biryaniCombo = combos.find((c) => c.id === 'combo-biryani-feast') || combos[0];
+                      if (biryaniCombo) {
+                        handleSelectCombo(biryaniCombo);
+                      }
+                    }}
+                    className="shrink-0 flex items-center gap-2.5 bg-[#FFF4ED] hover:bg-[#FFEAD9] border border-[#FDBA74] rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=200&q=80"
+                      alt=""
+                      className="w-11 h-11 rounded-xl object-cover shrink-0"
+                    />
+                    <div>
+                      <span className="block text-xs sm:text-sm font-black text-[#E66817] whitespace-nowrap">{t('bannerBiryaniTitle')}</span>
+                      <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹449 · Save ₹111</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const thali = menuItems.find((m) => m.id === 'item-thali-guj') || menuItems[0];
+                      if (thali) {
+                        handleSelectItem(thali);
+                      }
+                    }}
+                    className="shrink-0 flex items-center gap-2.5 bg-[#F4EFE6] hover:bg-[#EFE7D8] border border-[#EBE6DD] rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=200&q=80"
+                      alt=""
+                      className="w-11 h-11 rounded-xl object-cover shrink-0"
+                    />
+                    <div>
+                      <span className="block text-xs sm:text-sm font-black text-[#0B253A] whitespace-nowrap">{t('bannerThaliTitle')}</span>
+                      <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹280 · Chef Signature</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const coffee = menuItems.find((m) => m.id === 'item-cc-ice') || menuItems[0];
+                      if (coffee) {
+                        handleSelectItem(coffee);
+                      }
+                    }}
+                    className="shrink-0 hidden sm:flex items-center gap-2.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=200&q=80"
+                      alt=""
+                      className="w-11 h-11 rounded-xl object-cover shrink-0"
+                    />
+                    <div>
+                      <span className="block text-xs sm:text-sm font-black text-emerald-800 whitespace-nowrap">{t('bannerCoffeeTitle')}</span>
+                      <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹120 · Beverage Offer</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Menu Items & Combos Grid */}
+              <div className="px-4 sm:px-6 md:px-8 space-y-6">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-[#0B253A]">{currentCategoryLabel}</h2>
+                  {activeCategoryObj && activeCategoryObj.description && (
+                    <p className="text-[#4A5568] text-sm mt-1">{localizedDescription(activeCategoryObj, lang)}</p>
+                  )}
+                </div>
+
+                {/* Show Combos Section when on ALL or Combos tab — no extra
+                    "Chef's Special Combo Meals" sub-heading here; the
+                    category title above already says what's being browsed. */}
+                {(selectedCategoryId === 'ALL' || selectedCategoryId === 'cat-combos') && combos.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))' }}>
+                      {combos.map((combo) => (
+                        <div
+                          key={combo.id}
+                          className="bg-white rounded-3xl p-5 border-2 border-[#EBE6DD] hover:border-[#E66817] shadow-sm hover:shadow-xl transition-all duration-200 flex flex-col sm:flex-row gap-5 items-center justify-between"
+                        >
+                          <img
+                            src={combo.imageUrl}
+                            alt={localizedName(combo, lang)}
+                            className="w-full sm:w-36 h-36 rounded-2xl object-cover shadow-sm shrink-0"
+                          />
+                          <div className="flex-1 flex flex-col justify-between h-full space-y-2">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="w-4 h-4 border border-emerald-600 flex items-center justify-center p-0.5 rounded-sm shrink-0" title="Pure Veg">
+                                  <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                                </span>
+                                <h4 className="font-black text-lg text-[#0B253A] line-clamp-1">{localizedName(combo, lang)}</h4>
+                              </div>
+                              <p className="text-xs text-[#4A5568] leading-relaxed line-clamp-1">{localizedDescription(combo, lang)}</p>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2">
+                              <div className="flex flex-col">
+                                <div className="text-xl font-black text-[#E66817]">₹{combo.basePrice} <span className="text-sm line-through text-[#8C9BAE] font-medium ml-1">₹{combo.originalPrice}</span></div>
+                                <span className="text-[11px] font-bold text-emerald-600">Save ₹{combo.savingsAmount}</span>
+                              </div>
+
+                              <button
+                                onClick={() => handleSelectCombo(combo)}
+                                className="w-10 h-10 rounded-full bg-[#E66817] hover:bg-[#F27A2B] active:bg-[#D1560D] text-white flex items-center justify-center shadow-sm shadow-[#E66817]/25 transition-transform active:scale-90 shrink-0"
+                                title="Add Combo to Cart"
+                              >
+                                <Plus className="w-5 h-5 stroke-[2.5]" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Individual Dishes Grid — auto-fill so the column count
+                    adapts to the CENTER column's actual rendered width
+                    (which itself changes with the cart open/closed), not
+                    just the overall viewport breakpoint. */}
+                {selectedCategoryId !== 'cat-combos' && (
+                  <div className="space-y-4">
+                    {filteredItems.length === 0 ? (
+                      <EmptyState
+                        title="No dishes found"
+                        description="Try another search term or filter category."
+                        actionText="View All Dishes"
+                        onAction={() => {
+                          setSelectedCategoryId('ALL');
+                          setDietaryFilter('ALL');
+                          setSearchQuery('');
+                        }}
+                      />
+                    ) : (
+                      <div
+                        className="grid gap-6"
+                        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))' }}
+                      >
+                        {filteredItems.map((item) => (
+                          <ProductCard
+                            key={item.id}
+                            item={item}
+                            displayName={localizedName(item, lang)}
+                            displayDescription={localizedDescription(item, lang)}
+                            onAdd={handleSelectItem}
+                            onSelectDetails={handleCardClick}
+                            onCustomize={handleOpenCustomize}
+                            hideOpsBadges
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT — CART (~20-30%, slides out smoothly via layout tr) */}
+          <div
+            className="min-w-0 h-full overflow-hidden transition-opacity duration-300 ease-out"
+            style={{ opacity: cartItems.length > 0 ? 1 : 0 }}
+          >
+            {cartItems.length > 0 && (
+              <div className="kiosk-cart-panel h-full w-full min-w-0 box-border bg-white border-l border-[#EBE6DD] flex flex-col shadow-[-4px_0_15px_rgba(0,0,0,0.03)]">
+                <div className="px-5 py-4 sm:px-6 sm:py-5 bg-[#0B253A] shrink-0">
+                  <h2 className="text-lg sm:text-xl font-black text-white flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <ShoppingBag className="w-5 h-5" />
+                      {t('orderSummary')}
+                      <span className="ml-1 bg-[#E66817] text-white text-xs px-2.5 py-0.5 rounded-full align-middle">
+                        {cartItems.reduce((acc, ci) => acc + ci.quantity, 0)}
+                      </span>
+                    </span>
+                    <button
+                      onClick={handleFullSessionReset}
+                      className="text-xs font-bold text-white/90 hover:text-white flex items-center gap-1.5 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Clear All
+                    </button>
+                  </h2>
+                </div>
+
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-5 sm:p-6 space-y-4 bg-white">
+                  <div className="divide-y divide-[#F3EFE6]">
+                    {cartItems.map((ci) => (
+                      <div key={ci.cartItemId} className="py-4 first:pt-0 last:pb-0">
+                        <div className="flex items-start gap-3 relative">
+                          {ci.item.imageUrl && (
+                            <img src={ci.item.imageUrl} alt="" className="w-16 h-16 rounded-xl object-cover shrink-0 border border-[#F3EFE6]" />
+                          )}
+                          <div className="flex-1 min-w-0 pr-6">
+                            <h4 className="font-bold text-sm text-[#0B253A] leading-snug">{localizedName(ci.item, lang)}</h4>
+                            <span className="font-black text-sm text-[#E66817] block mt-0.5">
+                              {formatINR(ci.itemTotal)}
+                            </span>
+                            {ci.selectedModifiers && ci.selectedModifiers.length > 0 && (
+                              <div className="text-[10px] text-[#8C9BAE] mt-1 leading-tight">
+                                {ci.selectedModifiers.map((m) => `+ ${m.optionName}`).join(', ')}
+                              </div>
+                            )}
+                            {ci.specialInstructions && (
+                              <div className="text-xs text-rose-600 font-medium mt-0.5">
+                                *{ci.specialInstructions}
+                              </div>
+                            )}
+                          </div>
+                          
+                          <button
+                            onClick={() => updateCartItemQuantity(ci.cartItemId, -ci.quantity)}
+                            className="absolute top-0 right-0 text-[#8C9BAE] hover:text-[#0B253A] p-1 transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="flex justify-end mt-2">
+                          <div className="flex items-center gap-3 bg-white border border-[#EBE6DD] py-1 px-1 rounded-xl shadow-sm">
+                            <button
+                              onClick={() => updateCartItemQuantity(ci.cartItemId, -1)}
+                              className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center active:bg-gray-200 transition-colors"
+                            >
+                              <Minus className="w-4 h-4 text-[#0B253A]" />
+                            </button>
+                            <span className="font-bold text-base w-6 text-center text-[#0B253A]">{ci.quantity}</span>
+                            <button
+                              onClick={() => updateCartItemQuantity(ci.cartItemId, 1)}
+                              className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center active:bg-gray-200 transition-colors"
+                            >
+                              <Plus className="w-4 h-4 text-[#0B253A]" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Smart Recommendations Engine */}
+                  {intelligentRecommendations.length > 0 && (
+                    <div className="pt-4 space-y-3">
+                      <div className="flex items-center justify-between text-[#4A5568] px-1">
+                        <span className="text-sm font-bold flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                          Add-ons (Suggested)
+                        </span>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
+                      </div>
+                      <div className="space-y-2">
+                        {intelligentRecommendations.map((rec) => (
+                          <div key={rec.item.id} className="p-3 bg-white rounded-xl border border-[#EBE6DD] flex items-center justify-between shadow-sm">
+                            <div className="flex items-center gap-3 min-w-0 pr-2">
+                              <img src={rec.item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=60'} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#F3EFE6]" />
+                              <div className="min-w-0">
+                                <h5 className="font-bold text-sm text-[#0B253A] truncate">{rec.item.name}</h5>
+                                <span className="text-sm font-black text-[#E66817] block">{formatINR(rec.item.price)}</span>
+                              </div>
+                            </div>
+                            <button
+                              className="px-4 py-1.5 rounded-full border border-[#EBE6DD] bg-white text-[#0B253A] text-xs font-bold hover:bg-gray-50 active:bg-gray-100 transition-colors shrink-0"
+                              onClick={() => handleSelectItem(rec.item)}
+                            >
+                              Add
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Financial Summary */}
+                <div className="p-5 sm:p-6 border-t border-[#F3EFE6] bg-[#FBF9F5] space-y-4 shrink-0">
+
+                  {/* Loyalty Redemption Option */}
+                  {loggedInAccount && loggedInAccount.loyaltyPoints > 0 && (
+                    <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs">
+                      <div>
+                        <span className="font-bold text-emerald-900">Redeem Loyalty Points</span>
+                        <p className="text-[10px] text-emerald-700">Balance: {loggedInAccount.loyaltyPoints} Pts</p>
+                      </div>
+                      {redeemedPoints > 0 ? (
+                        <button
+                          onClick={() => setRedeemedPoints(0)}
+                          className="text-xs font-bold text-rose-600"
+                        >
+                          Remove (₹{redeemedPoints})
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setRedeemedPoints(Math.min(loggedInAccount.loyaltyPoints, rawCalculated.subtotal))}
+                          className="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded-lg"
+                        >
+                          Redeem ₹{Math.min(loggedInAccount.loyaltyPoints, rawCalculated.subtotal)}
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Subtotal / Tax breakdown */}
+                  <div className="text-xs space-y-1.5 pt-2 border-t border-[#EBE6DD]">
+                    <div className="flex justify-between text-[#4A5568]">
+                      <span>{t('subtotal')}</span>
+                      <span>{formatINR(rawCalculated.subtotal)}</span>
+                    </div>
+                    {rawCalculated.discountAmount > 0 && (
+                      <div className="flex justify-between text-emerald-600 font-bold">
+                        <span>{t('discount')} ({appliedCoupon?.code})</span>
+                        <span>-{formatINR(rawCalculated.discountAmount)}</span>
+                      </div>
+                    )}
+                    {redeemedPoints > 0 && (
+                      <div className="flex justify-between text-emerald-600 font-bold">
+                        <span>Loyalty Reward Points</span>
+                        <span>-{formatINR(redeemedPoints)}</span>
+                      </div>
+                    )}
+                    {staffDiscount > 0 && (
+                      <div className="flex justify-between text-indigo-600 font-bold">
+                        <span>Staff Manager Discount (10%)</span>
+                        <span>-{formatINR(staffDiscount)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-[#4A5568]">
+                      <span>{t('cgst')} (2.5%)</span>
+                      <span>{formatINR(rawCalculated.cgstAmount)}</span>
+                    </div>
+                    <div className="flex justify-between text-[#4A5568]">
+                      <span>{t('sgst')} (2.5%)</span>
+                      <span>{formatINR(rawCalculated.sgstAmount)}</span>
+                    </div>
+                    <div className="flex justify-between text-base font-black text-[#0B253A] pt-2 border-t border-[#EBE6DD]">
+                      <span>{t('totalPayable')}</span>
+                      <span className="text-[#E66817] text-lg">{formatINR(netTotalPayable)}</span>
+                    </div>
+                  </div>
+
+                  <Button
+                    variant="accent"
+                    size="touch"
+                    className="w-full"
+                    onClick={handleProceedToPayment}
+                  >
+                    {t('proceedToPayment')}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -2198,57 +2530,6 @@ export default function KioskUserApp() {
                 </div>
                 <div className="text-xs font-semibold text-emerald-700 bg-emerald-50 py-1 px-3 rounded-full inline-block mt-1">
                   Pickup at: <strong>{placedOrder.pickupCounter || 'Counter 1'}</strong>
-                </div>
-              </div>
-
-              {/* MULTILINGUAL AUDIO ANNOUNCEMENT (Hindi / Gujarati / English Voice) */}
-              <div className="bg-white rounded-3xl p-4 sm:p-5 border border-[#EBE6DD] shadow-sm text-center space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-xs text-[#0B253A] uppercase tracking-wider flex items-center gap-1.5">
-                    <Volume2 className="w-4 h-4 text-[#E66817]" /> Voice Order Announcement
-                  </h4>
-                  <span className="text-[10px] text-[#8C9BAE] font-semibold">Tap to replay</span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const msg = VoiceService.getConfirmationMessage(placedOrder.tokenNumber, 'hi', 'STANDARD', true);
-                      VoiceService.speak(msg, 'hi');
-                      showToast('Playing Hindi confirmation voice...');
-                    }}
-                    className="p-2.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-95 group"
-                  >
-                    <span className="text-sm">🇮🇳 🔊</span>
-                    <span className="text-[11px] font-bold text-[#0B253A] group-hover:text-[#E66817]">हिंदी (Hindi)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const msg = VoiceService.getConfirmationMessage(placedOrder.tokenNumber, 'gu', 'STANDARD', true);
-                      VoiceService.speak(msg, 'gu');
-                      showToast('Playing Gujarati confirmation voice...');
-                    }}
-                    className="p-2.5 bg-[#FEF3C7] hover:bg-[#FDE68A] border border-[#FCD34D] rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-95 group"
-                  >
-                    <span className="text-sm">🇮🇳 🔊</span>
-                    <span className="text-[11px] font-bold text-[#0B253A] group-hover:text-[#E66817]">ગુજરાતી (Gujarati)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const msg = VoiceService.getConfirmationMessage(placedOrder.tokenNumber, 'en', 'STANDARD', true);
-                      VoiceService.speak(msg, 'en');
-                      showToast('Playing English confirmation voice...');
-                    }}
-                    className="p-2.5 bg-[#EFF6FF] hover:bg-[#DBEAFE] border border-[#93C5FD] rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-95 group"
-                  >
-                    <span className="text-sm">🇬🇧 🔊</span>
-                    <span className="text-[11px] font-bold text-[#0B253A] group-hover:text-blue-700">English</span>
-                  </button>
                 </div>
               </div>
 
@@ -2718,228 +2999,7 @@ export default function KioskUserApp() {
       )}
 
       {/* CART SIDEBAR WITH SMART RECOMMENDATIONS — a real persistent side
-          panel, not a modal drawer: no dimming backdrop and no click-away
-          close, so a guest can keep browsing and tapping items in the menu
-          underneath while the cart stays open on the right. The outer
-          wrapper has pointer-events-none so only the panel itself (and its
-          own close button) intercepts taps; everywhere else passes through
-          to the menu behind it. Also never shown on WELCOME/LANGUAGE_SELECT
-          — a cart makes no sense before the order flow starts, and a
-          stale isCartOpen=true from a prior session (see
-          handleFullSessionReset) must not resurrect it there. */}
-      {isCartOpen && step !== 'WELCOME' && step !== 'LANGUAGE_SELECT' && (
-        <div className="fixed inset-0 z-40 flex justify-end pointer-events-none animate-fadeIn">
-          <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between border-l border-[#EBE6DD] animate-slideLeft pointer-events-auto">
-            <div className="p-6 border-b border-[#F3EFE6] bg-[#FBF9F5] flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-black text-[#0B253A]">{t('orderSummary')}</h3>
-                <p className="text-xs text-[#4A5568]">
-                  {orderType} {selectedTable ? `• Table ${selectedTable.tableNumber}` : ''}
-                </p>
-              </div>
-              <button
-                onClick={() => setIsCartOpen(false)}
-                className="w-9 h-9 rounded-full bg-white border border-[#EBE6DD] flex items-center justify-center text-[#4A5568]"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
-              {cartItems.length === 0 ? (
-                <EmptyState
-                  title={t('emptyCart')}
-                  description={t('emptyCartSub')}
-                  actionText={t('continueShopping')}
-                  onAction={() => setIsCartOpen(false)}
-                />
-              ) : (
-                <>
-                  <div className="divide-y divide-[#F3EFE6]">
-                    {cartItems.map((ci) => (
-                      <div key={ci.cartItemId} className="py-4 space-y-2 first:pt-0 last:pb-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-start gap-3 min-w-0">
-                            <img
-                              src={ci.item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=60'}
-                              alt={localizedName(ci.item, lang)}
-                              className="w-14 h-14 rounded-xl object-cover shrink-0 border border-[#EBE6DD]"
-                              loading="lazy"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=60';
-                              }}
-                            />
-                            <div className="min-w-0">
-                              <h4 className="font-bold text-base text-[#0B253A]">{localizedName(ci.item, lang)}</h4>
-                              {ci.selectedModifiers && ci.selectedModifiers.length > 0 && (
-                                <div className="text-xs text-[#8C9BAE] mt-0.5">
-                                  {ci.selectedModifiers.map((m) => `+ ${m.optionName}`).join(', ')}
-                                </div>
-                              )}
-                              {ci.specialInstructions && (
-                                <div className="text-xs text-rose-600 font-medium mt-0.5">
-                                  *{ci.specialInstructions}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <span className="font-black text-base text-[#E66817] shrink-0">
-                            {formatINR(ci.itemTotal)}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-1">
-                          <div className="flex items-center gap-2 bg-[#FBF9F5] border border-[#EBE6DD] px-2 py-1 rounded-xl">
-                            <button
-                              onClick={() => updateCartItemQuantity(ci.cartItemId, -1)}
-                              className="w-6 h-6 rounded bg-white border border-[#EBE6DD] flex items-center justify-center font-bold"
-                            >
-                              <Minus className="w-3.5 h-3.5" />
-                            </button>
-                            <span className="font-bold text-sm w-4 text-center">{ci.quantity}</span>
-                            <button
-                              onClick={() => updateCartItemQuantity(ci.cartItemId, 1)}
-                              className="w-6 h-6 rounded bg-white border border-[#EBE6DD] flex items-center justify-center font-bold"
-                            >
-                              <Plus className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-
-                          <button
-                            onClick={() => updateCartItemQuantity(ci.cartItemId, -ci.quantity)}
-                            className="text-xs font-semibold text-rose-600 hover:text-rose-800 p-1"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Smart Recommendations Engine */}
-                  {intelligentRecommendations.length > 0 && (
-                    <div className="pt-4 border-t border-[#F3EFE6] space-y-2">
-                      <span className="text-xs font-bold text-[#E66817] uppercase tracking-wider flex items-center gap-1">
-                        <Sparkles className="w-3.5 h-3.5" /> Smart Food Pairings
-                      </span>
-                      <div className="space-y-2">
-                        {intelligentRecommendations.map((rec) => (
-                          <div key={rec.item.id} className="p-3 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD] flex items-center justify-between">
-                            <div className="pr-2">
-                              <h5 className="font-bold text-xs text-[#0B253A]">{rec.item.name}</h5>
-                              <p className="text-[10px] text-[#8C9BAE] mt-0.5 leading-tight">{rec.explanation}</p>
-                              <span className="text-xs font-black text-[#E66817] mt-1 inline-block">{formatINR(rec.item.price)}</span>
-                            </div>
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => handleSelectItem(rec.item)}
-                            >
-                              + Add
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Financial Summary & Promo Coupon */}
-            {cartItems.length > 0 && (
-              <div className="p-6 border-t border-[#F3EFE6] bg-[#FBF9F5] space-y-4">
-                {/* Coupon input */}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={couponCodeInput}
-                    onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
-                    placeholder={t('couponPlaceholder')}
-                    className="flex-1 bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-mono font-bold uppercase focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
-                  />
-                  <Button variant="secondary" size="sm" onClick={handleApplyCoupon}>
-                    {t('apply')}
-                  </Button>
-                </div>
-                {couponError && <p className="text-xs text-rose-600 font-semibold">{couponError}</p>}
-
-                {/* Loyalty Redemption Option */}
-                {loggedInAccount && loggedInAccount.loyaltyPoints > 0 && (
-                  <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs">
-                    <div>
-                      <span className="font-bold text-emerald-900">Redeem Loyalty Points</span>
-                      <p className="text-[10px] text-emerald-700">Balance: {loggedInAccount.loyaltyPoints} Pts</p>
-                    </div>
-                    {redeemedPoints > 0 ? (
-                      <button
-                        onClick={() => setRedeemedPoints(0)}
-                        className="text-xs font-bold text-rose-600"
-                      >
-                        Remove (₹{redeemedPoints})
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => setRedeemedPoints(Math.min(loggedInAccount.loyaltyPoints, rawCalculated.subtotal))}
-                        className="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded-lg"
-                      >
-                        Redeem ₹{Math.min(loggedInAccount.loyaltyPoints, rawCalculated.subtotal)}
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {/* Subtotal / Tax breakdown */}
-                <div className="text-xs space-y-1.5 pt-2 border-t border-[#EBE6DD]">
-                  <div className="flex justify-between text-[#4A5568]">
-                    <span>{t('subtotal')}</span>
-                    <span>{formatINR(rawCalculated.subtotal)}</span>
-                  </div>
-                  {rawCalculated.discountAmount > 0 && (
-                    <div className="flex justify-between text-emerald-600 font-bold">
-                      <span>{t('discount')} ({appliedCoupon?.code})</span>
-                      <span>-{formatINR(rawCalculated.discountAmount)}</span>
-                    </div>
-                  )}
-                  {redeemedPoints > 0 && (
-                    <div className="flex justify-between text-emerald-600 font-bold">
-                      <span>Loyalty Reward Points</span>
-                      <span>-{formatINR(redeemedPoints)}</span>
-                    </div>
-                  )}
-                  {staffDiscount > 0 && (
-                    <div className="flex justify-between text-indigo-600 font-bold">
-                      <span>Staff Manager Discount (10%)</span>
-                      <span>-{formatINR(staffDiscount)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-[#4A5568]">
-                    <span>{t('cgst')} (2.5%)</span>
-                    <span>{formatINR(rawCalculated.cgstAmount)}</span>
-                  </div>
-                  <div className="flex justify-between text-[#4A5568]">
-                    <span>{t('sgst')} (2.5%)</span>
-                    <span>{formatINR(rawCalculated.sgstAmount)}</span>
-                  </div>
-                  <div className="flex justify-between text-base font-black text-[#0B253A] pt-2 border-t border-[#EBE6DD]">
-                    <span>{t('totalPayable')}</span>
-                    <span className="text-[#E66817] text-lg">{formatINR(netTotalPayable)}</span>
-                  </div>
-                </div>
-
-                <Button
-                  variant="accent"
-                  size="touch"
-                  className="w-full"
-                  onClick={handleProceedToPayment}
-                >
-                  {t('proceedToPayment')}
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* DRAWER: CUSTOMER ASSISTANT CHATBOT ("Need Help?" / Complete Conversational Ordering) */}
       {isChatbotOpen && (
@@ -3043,7 +3103,6 @@ export default function KioskUserApp() {
                             size="sm"
                             onClick={() => {
                               handleSelectItem(item);
-                              showToast(`Added ${item.name} to order!`);
                             }}
                             className="shrink-0 font-bold"
                           >
@@ -3079,7 +3138,6 @@ export default function KioskUserApp() {
                             size="sm"
                             onClick={() => {
                               handleSelectCombo(combo);
-                              showToast(`Added combo package: ${combo.name}!`);
                             }}
                             className="shrink-0 font-bold"
                           >
@@ -3393,24 +3451,10 @@ export default function KioskUserApp() {
       {/* FLOATING CORNER CHATBOT AI ASSISTANT TRIGGER (Bottom Right) — hidden
           while the cart sidebar is open since both are anchored to the same
           bottom-right corner; without this the AI button physically sat on
-          top of the cart's "Proceed to Payment" button, blocking checkout. */}
-      {!isChatbotOpen && !isCartOpen && step !== 'CONFIRMATION' && (
+          top of the cart's "Proceed to Payment" button, blocking checkout.
+          Also hidden on WELCOME, which has its own clean layout. */}
+      {!isChatbotOpen && !isCartOpen && step !== 'CONFIRMATION' && step !== 'WELCOME' && (
         <div className="fixed bottom-6 right-6 z-40 flex items-center gap-3 animate-fadeIn">
-          {/* Animated Speech Bubble Prompt */}
-          <div
-            onClick={() => {
-              SoundService.playTap();
-              setIsChatbotOpen(true);
-            }}
-            className="hidden sm:flex items-center gap-2 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-[#EBE6DD] text-xs font-bold text-[#0B253A] cursor-pointer hover:shadow-2xl hover:border-[#E66817] transition-all group"
-          >
-            <Sparkles className="w-4 h-4 text-[#E66817] animate-pulse" />
-            <span>Need help deciding? Ask AI Assistant</span>
-            <span className="text-[10px] bg-[#E66817]/10 text-[#E66817] px-2 py-0.5 rounded-full font-black">
-              24x7
-            </span>
-          </div>
-
           {/* Floating Action Button */}
           <button
             onClick={() => {

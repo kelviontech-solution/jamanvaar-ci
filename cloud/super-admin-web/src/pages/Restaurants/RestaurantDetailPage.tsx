@@ -34,6 +34,7 @@ import { EditRestaurantModal } from './EditRestaurantModal';
 import { CreateBranchModal } from '../Branches/CreateBranchModal';
 import { GenerateActivationKeyModal } from '../ActivationKeys/GenerateActivationKeyModal';
 import { AssignSubscriptionModal } from '../Subscriptions/AssignSubscriptionModal';
+import { ChangePlanModal } from '../Subscriptions/ChangePlanModal';
 import { LicenseCertificatePanel } from './LicenseCertificatePanel';
 import {
   Store,
@@ -1839,14 +1840,25 @@ export function RestaurantDetailPage() {
         />
       )}
       {modal === 'subscription' && (
-        <AssignSubscriptionModal
-          restaurantId={restaurant.id}
-          onClose={() => setModal(null)}
-          onSaved={() => {
-            setModal(null);
-            load();
-          }}
-        />
+        activeSub ? (
+          <ChangePlanModal
+            subscription={{ ...activeSub, restaurant: { id: restaurant.id, name: restaurant.name, status: restaurant.status } }}
+            onClose={() => setModal(null)}
+            onSaved={() => {
+              setModal(null);
+              load();
+            }}
+          />
+        ) : (
+          <AssignSubscriptionModal
+            restaurantId={restaurant.id}
+            onClose={() => setModal(null)}
+            onSaved={() => {
+              setModal(null);
+              load();
+            }}
+          />
+        )
       )}
 
       {/* Reset Password Modal */}

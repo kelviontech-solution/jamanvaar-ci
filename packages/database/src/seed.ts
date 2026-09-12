@@ -46,7 +46,7 @@ export const DEFAULT_WELCOME_SCREEN_SETTINGS: WelcomeScreenSettings = {
 
 export const SEED_RESTAURANT: Restaurant = {
   id: 'rest-jamanvaar-main',
-  name: 'JAMANVAAR RESTAURANT',
+  name: 'My Restaurant',
   legalName: 'JAMANVAAR FOODS & HOSPITALITY PRIVATE LIMITED',
   tagline: 'Authentic Indian Cuisine & Seamless Dining by KELVIONTECH',
   logoUrl: '/assets/branding/jamanvaar-logo.png',
