@@ -128,3 +128,19 @@ export async function getPaymentOrderStatus(paymentId: string): Promise<{ status
   }
   return data;
 }
+
+export async function sendReceipt(
+  channel: 'WHATSAPP' | 'SMS',
+  phoneNumber: string,
+  templateParams: string[]
+): Promise<{ success: boolean; providerMessageId?: string; errorMessage?: string }> {
+  const res = await deviceFetch('/api/v1/receipts/send', {
+    method: 'POST',
+    body: JSON.stringify({ channel, phoneNumber, templateParams })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Receipt send failed (${res.status})`, res.status);
+  }
+  return data;
+}
