@@ -119,6 +119,15 @@ describe('Payment connection onboarding', () => {
     expect(res.status).toBe(400);
   });
 
+  it('rejects a submission with both bank and UPI details — exactly one is required, not "at least one"', async () => {
+    const res = await authed('post', '/api/v1/tenant/payment-connection', ownerToken).send({
+      accountType: 'BUSINESS', pan: 'ABCDE1234F', contactName: 'X', contactEmail: 'x@example.com', contactPhone: '9876543210',
+      settlementUpiVpa: 'demo@upi',
+      settlementAccountName: 'Demo Restaurant', settlementAccountNumber: '1234567890', settlementIfsc: 'HDFC0000001'
+    });
+    expect(res.status).toBe(400);
+  });
+
   it('a STAFF-role token cannot submit or view payment connection details (403)', async () => {
     const staffEmail = `test-payconn-staff-${Date.now()}@example.com`;
     const staffPassword = 'staff-correct-horse-battery';

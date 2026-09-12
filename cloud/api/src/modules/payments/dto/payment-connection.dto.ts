@@ -17,9 +17,11 @@ export const submitPaymentConnectionSchema = z
     settlementUpiVpa: z.string().trim().min(1).optional()
   })
   .refine(
-    (data) =>
-      Boolean(data.settlementUpiVpa) ||
-      Boolean(data.settlementAccountNumber && data.settlementIfsc && data.settlementAccountName),
-    { message: 'Provide either a UPI VPA, or a settlement account name + account number + IFSC' }
+    (data) => {
+      const hasUpi = Boolean(data.settlementUpiVpa);
+      const hasBank = Boolean(data.settlementAccountNumber && data.settlementIfsc && data.settlementAccountName);
+      return hasUpi !== hasBank; // exactly one, matching Cashfree's own bank-XOR-upi vendor requirement
+    },
+    { message: 'Provide either a UPI VPA, or a settlement account name + account number + IFSC — not both' }
   );
 export type SubmitPaymentConnectionDto = z.infer<typeof submitPaymentConnectionSchema>;
