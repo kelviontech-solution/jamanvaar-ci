@@ -306,6 +306,17 @@ export class PrinterService {
    */
   public static generateEscPosBytecode(order: Order, paperSize: ReceiptPaperSize = '80mm'): Uint8Array {
     const text = this.generateReceiptText(order, undefined, paperSize);
+    return this.wrapEscPos(text);
+  }
+
+  /**
+   * Wraps already-formatted receipt/KOT text in real ESC/POS init + cut
+   * command bytes. Factored out of generateEscPosBytecode so the print
+   * queue's real network dispatch (see dispatchToNetworkPrinter) can wrap
+   * a job's own formattedText directly, without regenerating it from an
+   * Order the queue may not have (a KOT job never had one).
+   */
+  private static wrapEscPos(text: string): Uint8Array {
     const encoder = new TextEncoder();
     const textBytes = encoder.encode(text + '\n\n\n');
 
@@ -321,6 +332,26 @@ export class PrinterService {
     fullPayload.set(cutCmd, initCmd.length + textBytes.length);
 
     return fullPayload;
+  }
+
+  /**
+   * True only inside an actual compiled Tauri desktop app — never in the
+   * Vitest suite or a browser preview, which have no IPC bridge to a real
+   * printer. Gates every real network-dispatch attempt in this file.
+   */
+  private static isTauriRuntime(): boolean {
+    return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+  }
+
+  /**
+   * Sends already-formatted text to a real NETWORK_LAN printer over raw TCP
+   * (port 9100 by default — the standard raw-print port most networked
+   * ESC/POS printers support), via the send_escpos_bytes Tauri command.
+   */
+  private static async dispatchToNetworkPrinter(printer: PrinterDevice, text: string): Promise<void> {
+    const { invoke } = await import('@tauri-apps/api/core');
+    const bytes = Array.from(this.wrapEscPos(text));
+    await invoke('send_escpos_bytes', { ip: printer.ipAddress, port: Number(printer.port) || 9100, bytes });
   }
 
   /**
@@ -397,7 +428,11 @@ export class PrinterService {
           throw new Error(`Thermal printer "${printer.name}" is currently offline or paper out`);
         }
 
-        // Simulate physical ESC/POS byte transmission to Windows spooler / serial port
+        if (printer.interfaceType === 'NETWORK_LAN' && printer.ipAddress && this.isTauriRuntime()) {
+          await this.dispatchToNetworkPrinter(printer, job.formattedText || '');
+        }
+        // Every other interface type, and any non-Tauri runtime (Vitest,
+        // a browser preview), has no real transport yet — simulated success.
         job.status = 'PRINTED';
         job.printedAt = new Date().toISOString();
         printer.lastPrintAt = new Date().toISOString();
