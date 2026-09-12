@@ -234,7 +234,7 @@ export async function sendReceipt(
 }
 ```
 
-(POS's `cloudClient.ts` uses `getStoredDeviceToken()` directly rather than a `deviceFetch` helper, per Phase 4a's refund wiring — `sendReceipt` there follows that same direct-token pattern instead, not `deviceFetch`.)
+(POS's own `cloudClient.ts` — distinct from POS-Admin's — already has its own `deviceFetch` helper, identical in shape to kiosk-user's; `sendReceipt` there uses it the same way.)
 
 **Call-site updates:**
 
