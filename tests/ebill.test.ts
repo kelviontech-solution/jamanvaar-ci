@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { EBillService } from '../packages/api/src/services/ebill';
 import { Order, ReceiptConfig } from '../packages/types/src';
 
@@ -84,21 +84,47 @@ describe('EBillService', () => {
     expect(msg).toContain('https://kiosk.jamanvaar.com/track/ORD-99');
   });
 
-  it('reports an honest failure for WhatsApp e-bill since no real gateway is configured, instead of a fabricated SENT status', async () => {
-    const res = await EBillService.sendWhatsAppEBill(mockOrder, '9876543210', mockReceiptConfig);
-    expect(res.success).toBe(false);
-    expect(res.record.deliveryStatus).toBe('FAILED');
+  it('sends a real WhatsApp e-bill when the injected send function succeeds', async () => {
+    const sendFn = vi.fn().mockResolvedValue({ success: true, providerMessageId: 'wamid.123' });
+    const res = await EBillService.sendWhatsAppEBill(mockOrder, '9876543210', mockReceiptConfig, sendFn);
+    expect(res.success).toBe(true);
+    expect(res.record.deliveryStatus).toBe('SENT');
     expect(res.record.recipient).toBe('******3210');
-    expect(res.record.errorMessage).toMatch(/gateway/i);
-    // The message content is still built for real, ready for a future
-    // gateway integration — only the "was it actually delivered" claim changed.
+    // content is still the human-readable formatted text for the admin's
+    // receipt history — it is not the literal WhatsApp template payload sent.
     expect(res.record.content).toContain('ORDER #ORD-99');
+    expect(sendFn).toHaveBeenCalledWith('WHATSAPP', '9876543210', ['ORD-99', '108', expect.stringContaining('252')]);
   });
 
-  it('reports an honest failure for SMS e-bill since no real gateway is configured, instead of a fabricated SENT status', async () => {
-    const res = await EBillService.sendSmsEBill(mockOrder, '9876543210');
+  it('reports a real provider failure for WhatsApp e-bill when the injected send function fails', async () => {
+    const sendFn = vi.fn().mockResolvedValue({ success: false, errorMessage: 'Template not approved by Meta' });
+    const res = await EBillService.sendWhatsAppEBill(mockOrder, '9876543210', mockReceiptConfig, sendFn);
     expect(res.success).toBe(false);
     expect(res.record.deliveryStatus).toBe('FAILED');
-    expect(res.record.errorMessage).toMatch(/gateway/i);
+    expect(res.record.errorMessage).toBe('Template not approved by Meta');
+  });
+
+  it('reports a connectivity failure for WhatsApp e-bill when the injected send function throws', async () => {
+    const sendFn = vi.fn().mockRejectedValue(new Error('Network unreachable'));
+    const res = await EBillService.sendWhatsAppEBill(mockOrder, '9876543210', mockReceiptConfig, sendFn);
+    expect(res.success).toBe(false);
+    expect(res.record.deliveryStatus).toBe('FAILED');
+    expect(res.record.errorMessage).toBe('Network unreachable');
+  });
+
+  it('sends a real SMS e-bill when the injected send function succeeds', async () => {
+    const sendFn = vi.fn().mockResolvedValue({ success: true, providerMessageId: 'msg91-req-1' });
+    const res = await EBillService.sendSmsEBill(mockOrder, '9876543210', sendFn);
+    expect(res.success).toBe(true);
+    expect(res.record.deliveryStatus).toBe('SENT');
+    expect(sendFn).toHaveBeenCalledWith('SMS', '9876543210', ['ORD-99', '108', expect.stringContaining('252')]);
+  });
+
+  it('reports a real provider failure for SMS e-bill when the injected send function fails', async () => {
+    const sendFn = vi.fn().mockResolvedValue({ success: false, errorMessage: 'DLT template mismatch' });
+    const res = await EBillService.sendSmsEBill(mockOrder, '9876543210', sendFn);
+    expect(res.success).toBe(false);
+    expect(res.record.deliveryStatus).toBe('FAILED');
+    expect(res.record.errorMessage).toBe('DLT template mismatch');
   });
 });

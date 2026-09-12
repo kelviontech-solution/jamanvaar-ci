@@ -2,6 +2,12 @@ import { Order, ReceiptConfig, ReceiptDeliveryMethod, ReceiptDeliveryStatus, Rec
 import { db } from '@jamanvaar/database';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 
+export type SendReceiptFn = (
+  channel: 'WHATSAPP' | 'SMS',
+  phoneNumber: string,
+  templateParams: string[]
+) => Promise<{ success: boolean; providerMessageId?: string; errorMessage?: string }>;
+
 export class EBillService {
   /**
    * Mask sensitive phone numbers for customer privacy (e.g. +91 9876543210 -> ******3210)
@@ -63,24 +69,16 @@ export class EBillService {
   }
 
   /**
-   * No real WhatsApp Business API / SMS gateway is wired up anywhere in
-   * this codebase (no API credentials, no webhook, no provider client) —
-   * these methods used to unconditionally return success/'SENT' regardless,
-   * which told customers and managers a message was delivered when nothing
-   * was actually transmitted. Until a real gateway is integrated, both
-   * methods report an honest failure instead of a fabricated success, while
-   * still building the real message content and receipt record so wiring
-   * in an actual provider later only requires replacing this one check.
-   */
-  private static readonly GATEWAY_CONFIGURED = false;
-
-  /**
-   * Send WhatsApp e-bill (dispatches through secure backend service)
+   * Send WhatsApp e-bill. `sendFn` is the app-specific device-authed call to
+   * cloud/api's POST /api/v1/receipts/send — packages/api has no fetch/API
+   * base URL of its own, so the actual network call is always injected by
+   * the calling Tauri app's own cloudClient.ts.
    */
   public static async sendWhatsAppEBill(
     order: Order,
     phoneNumber: string,
-    config: ReceiptConfig
+    config: ReceiptConfig,
+    sendFn: SendReceiptFn
   ): Promise<{ success: boolean; record: ReceiptRecord; message: string }> {
     const isVal = this.validateIndianPhone(phoneNumber);
     if (!isVal) {
@@ -102,10 +100,24 @@ export class EBillService {
       };
     }
 
+    // content is the human-readable audit copy shown in receipt history —
+    // NOT the literal wire payload. The real WhatsApp send is a pre-approved
+    // template (see templateParams below); free text cannot be sent to a
+    // customer who hasn't messaged the business first.
     const messageContent = this.formatWhatsAppMessage(order, config);
     const masked = this.maskRecipient(phoneNumber);
+    // Fixed external contract: the restaurant's approved WhatsApp template
+    // must accept these three values, in this order, as {{1}}, {{2}}, {{3}}.
+    const templateParams = [order.orderNumber, order.tokenNumber, formatINR(order.totalAmount)];
 
-    if (!this.GATEWAY_CONFIGURED) {
+    let sendResult: { success: boolean; providerMessageId?: string; errorMessage?: string };
+    try {
+      sendResult = await sendFn('WHATSAPP', phoneNumber, templateParams);
+    } catch (err: any) {
+      sendResult = { success: false, errorMessage: err?.message || 'Failed to reach the notification service' };
+    }
+
+    if (!sendResult.success) {
       const record: ReceiptRecord = {
         id: `rec-err-${Date.now()}`,
         orderId: order.id,
@@ -116,7 +128,7 @@ export class EBillService {
         recipient: masked,
         content: messageContent,
         createdAt: new Date().toISOString(),
-        errorMessage: 'No WhatsApp Business gateway is configured for this outlet'
+        errorMessage: sendResult.errorMessage || 'WhatsApp send failed'
       };
       order.eBillMethod = 'WHATSAPP';
       order.eBillStatus = 'FAILED';
@@ -125,7 +137,7 @@ export class EBillService {
       return {
         success: false,
         record,
-        message: 'WhatsApp e-bill not sent — no WhatsApp gateway is configured for this outlet yet. Please print the receipt instead.'
+        message: `WhatsApp e-bill not sent — ${sendResult.errorMessage || 'send failed'}`
       };
     }
 
@@ -142,7 +154,6 @@ export class EBillService {
       sentAt: new Date().toISOString()
     };
 
-    // Update order state
     order.eBillMethod = 'WHATSAPP';
     order.eBillStatus = 'SENT';
     order.eBillRecipient = masked;
@@ -156,16 +167,25 @@ export class EBillService {
   }
 
   /**
-   * Send SMS e-bill
+   * Send SMS e-bill via the same injected sendFn as WhatsApp.
    */
   public static async sendSmsEBill(
     order: Order,
-    phoneNumber: string
+    phoneNumber: string,
+    sendFn: SendReceiptFn
   ): Promise<{ success: boolean; record: ReceiptRecord; message: string }> {
     const masked = this.maskRecipient(phoneNumber);
     const smsText = `JAMANVAAR: Thank you for Order #${order.orderNumber} (Token #${order.tokenNumber}). Total: ${formatINR(order.totalAmount)}. Track live: https://kiosk.jamanvaar.com/track/${order.orderNumber}`;
+    const templateParams = [order.orderNumber, order.tokenNumber, formatINR(order.totalAmount)];
 
-    if (!this.GATEWAY_CONFIGURED) {
+    let sendResult: { success: boolean; providerMessageId?: string; errorMessage?: string };
+    try {
+      sendResult = await sendFn('SMS', phoneNumber, templateParams);
+    } catch (err: any) {
+      sendResult = { success: false, errorMessage: err?.message || 'Failed to reach the notification service' };
+    }
+
+    if (!sendResult.success) {
       const record: ReceiptRecord = {
         id: `rec-sms-err-${Date.now()}`,
         orderId: order.id,
@@ -176,7 +196,7 @@ export class EBillService {
         recipient: masked,
         content: smsText,
         createdAt: new Date().toISOString(),
-        errorMessage: 'No SMS gateway is configured for this outlet'
+        errorMessage: sendResult.errorMessage || 'SMS send failed'
       };
       order.eBillMethod = 'SMS';
       order.eBillStatus = 'FAILED';
@@ -185,7 +205,7 @@ export class EBillService {
       return {
         success: false,
         record,
-        message: 'SMS e-bill not sent — no SMS gateway is configured for this outlet yet. Please print the receipt or use WhatsApp instead.'
+        message: `SMS e-bill not sent — ${sendResult.errorMessage || 'send failed'}`
       };
     }
 
