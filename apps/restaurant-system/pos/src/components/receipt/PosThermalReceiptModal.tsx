@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, ReceiptRepository, PrintQueueRepository } from '@jamanvaar/database';
 import { PosPrinterService } from '../../services/printerService';
+import { EBillService } from '@jamanvaar/api';
+import { sendReceipt } from '../../cloud/cloudClient';
 import { ThermalReceiptView } from '@jamanvaar/ui';
 import {
   X,
@@ -30,8 +32,10 @@ export const PosThermalReceiptModal: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
   const [shareToast, setShareToast] = useState('');
+  const [sendError, setSendError] = useState('');
   const [phonePromptOpen, setPhonePromptOpen] = useState(false);
   const [inputPhone, setInputPhone] = useState('');
+  const [pendingChannel, setPendingChannel] = useState<'WHATSAPP' | 'SMS'>('WHATSAPP');
 
   if (!isReceiptOpen || !lastCompletedOrder) return null;
 
@@ -73,16 +77,32 @@ export const PosThermalReceiptModal: React.FC = () => {
 
   const handleWhatsAppClick = () => {
     if (!order.customerPhone) {
+      setPendingChannel('WHATSAPP');
       setPhonePromptOpen(true);
     } else {
-      dispatchDigitalReceipt('WhatsApp', order.customerPhone);
+      dispatchDigitalReceipt('WHATSAPP', order.customerPhone);
     }
   };
 
-  const dispatchDigitalReceipt = (channel: string, targetPhone: string) => {
-    setShareToast(`E-Receipt sent via ${channel} to ${targetPhone}!`);
+  const dispatchDigitalReceipt = async (channel: 'WHATSAPP' | 'SMS', targetPhone: string) => {
+    if (!EBillService.validateIndianPhone(targetPhone)) {
+      setSendError('Enter a valid 10-digit Indian mobile number');
+      setTimeout(() => setSendError(''), 4000);
+      return;
+    }
     setPhonePromptOpen(false);
-    setTimeout(() => setShareToast(''), 3000);
+    const res =
+      channel === 'WHATSAPP'
+        ? await EBillService.sendWhatsAppEBill(order, targetPhone, config, sendReceipt)
+        : await EBillService.sendSmsEBill(order, targetPhone, sendReceipt);
+    ReceiptRepository.addRecord(res.record);
+    if (res.success) {
+      setShareToast(res.message);
+      setTimeout(() => setShareToast(''), 3000);
+    } else {
+      setSendError(res.message);
+      setTimeout(() => setSendError(''), 4000);
+    }
   };
 
   const handleDownloadTxt = () => {
@@ -171,6 +191,12 @@ export const PosThermalReceiptModal: React.FC = () => {
           </div>
         )}
 
+        {sendError && (
+          <div className="p-2.5 bg-rose-50 text-rose-900 text-xs font-bold text-center border-t border-rose-200">
+            ⚠ {sendError}
+          </div>
+        )}
+
         {printStatus === 'SUCCESS' && (
           <div className="p-2.5 bg-emerald-500 text-white text-xs font-bold text-center flex items-center justify-center gap-1.5">
             <CheckCircle2 className="w-4 h-4" />
@@ -208,10 +234,10 @@ export const PosThermalReceiptModal: React.FC = () => {
           </div>
         )}
 
-        {/* Customer Phone Prompt for WhatsApp Share */}
+        {/* Customer Phone Prompt for WhatsApp/SMS Share */}
         {phonePromptOpen && (
           <div className="p-3 bg-[#0B253A] text-white border-t border-[#1E3A4C] flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold">Enter Customer WhatsApp #:</span>
+            <span className="text-xs font-semibold">Enter Customer {pendingChannel === 'WHATSAPP' ? 'WhatsApp' : 'Mobile'} #:</span>
             <div className="flex items-center gap-1.5">
               <input
                 type="tel"
@@ -221,7 +247,7 @@ export const PosThermalReceiptModal: React.FC = () => {
                 className="bg-[#0B2B39] border border-[#1E3A4C] rounded-lg px-2 py-1 text-xs text-white w-36 font-mono focus:outline-hidden focus:border-[#E66817]"
               />
               <button
-                onClick={() => dispatchDigitalReceipt('WhatsApp', inputPhone || '9876543210')}
+                onClick={() => dispatchDigitalReceipt(pendingChannel, inputPhone)}
                 className="px-3 py-1 bg-[#E66817] text-white rounded-lg font-bold text-xs"
               >
                 Send
@@ -250,7 +276,14 @@ export const PosThermalReceiptModal: React.FC = () => {
             </button>
 
             <button
-              onClick={() => dispatchDigitalReceipt('SMS', order.customerPhone || '9876543210')}
+              onClick={() => {
+                if (order.customerPhone) {
+                  dispatchDigitalReceipt('SMS', order.customerPhone);
+                } else {
+                  setPendingChannel('SMS');
+                  setPhonePromptOpen(true);
+                }
+              }}
               className="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 text-xs font-bold flex items-center gap-1.5 transition-colors"
             >
               <Mail className="w-3.5 h-3.5" />
