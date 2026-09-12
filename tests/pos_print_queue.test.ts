@@ -50,9 +50,9 @@ describe('POS Thermal Print Queue & Hardware HAL Tests', () => {
     expect(receiptText).toContain('551');
   });
 
-  it('dispatches receipt print job to Print Queue with SUCCESS status and allows retry', () => {
+  it('dispatches receipt print job to Print Queue with SUCCESS status and allows retry', async () => {
     const order = OrderRepository.getOrderById('ord-1043') || db.orders[0];
-    const job = PosPrinterService.printOrderReceipt(order, '80mm');
+    const job = await PosPrinterService.printOrderReceipt(order, '80mm');
 
     expect(job).toBeDefined();
     expect(job.status).toBe('SUCCESS');

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { db, OrderRepository, PrintQueueRepository, ReceiptRepository } from '@jamanvaar/database';
 import { PosPrinterService } from '../apps/restaurant-system/pos/src/services/printerService';
 import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
@@ -105,7 +105,7 @@ describe('JAMANVAAR POS — Touchscreen & Automatic Printer System Suite', () =>
     expect(receipt58).toContain('588');
   });
 
-  it('5. should dispatch persistent print jobs on receipt printing and survive in queue', () => {
+  it('5. should dispatch persistent print jobs on receipt printing and survive in queue', async () => {
     const order = OrderRepository.createOrder({
       orderType: 'TAKEAWAY',
       items: [
@@ -134,7 +134,7 @@ describe('JAMANVAAR POS — Touchscreen & Automatic Printer System Suite', () =>
       source_type: 'POS'
     });
 
-    const job = PosPrinterService.printOrderReceipt(order, '80mm');
+    const job = await PosPrinterService.printOrderReceipt(order, '80mm');
     expect(job).toBeDefined();
     expect(job.orderId).toBe(order.id);
     expect(job.status).toBe('SUCCESS');
@@ -160,7 +160,7 @@ describe('JAMANVAAR POS — Touchscreen & Automatic Printer System Suite', () =>
     expect(db.printJobs.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('7. should support manual reprint with audit logging and preserve original sale integrity', () => {
+  it('7. should support manual reprint with audit logging and preserve original sale integrity', async () => {
     const order = OrderRepository.createOrder({
       orderType: 'DINE_IN',
       tableNumber: 'T-01',
@@ -190,7 +190,7 @@ describe('JAMANVAAR POS — Touchscreen & Automatic Printer System Suite', () =>
       source_type: 'POS'
     });
 
-    const reprintJob = PosPrinterService.reprintReceipt(order, 'Customer lost receipt', 'Cashier Om');
+    const reprintJob = await PosPrinterService.reprintReceipt(order, 'Customer lost receipt', 'Cashier Om');
     expect(reprintJob).toBeDefined();
     expect(reprintJob.isReprint).toBe(true);
     expect(db.printJobs.length).toBe(1);
@@ -201,12 +201,42 @@ describe('JAMANVAAR POS — Touchscreen & Automatic Printer System Suite', () =>
     expect(reprintAudit?.details).toContain(order.orderNumber);
   });
 
-  it('8. should support diagnostic test slip printing to any configured printer', () => {
-    const testJob = PosPrinterService.printTestSlip('prn-tandoor-01', '80mm');
+  it('8. should support diagnostic test slip printing to any configured printer', async () => {
+    const testJob = await PosPrinterService.printTestSlip('prn-tandoor-01', '80mm');
     expect(testJob).toBeDefined();
     expect(testJob.type).toBe('TEST_PAGE');
     expect(testJob.rawPayload).toContain('HARDWARE DIAGNOSTIC TEST SLIP');
     expect(testJob.rawPayload).toContain('Tandoor');
+  });
+
+  it('9. dispatches real ESC/POS bytes to a NETWORK_LAN kitchen printer inside a Tauri runtime, and corrects the job to FAILED on a real send failure', async () => {
+    const invokeMock = vi.fn().mockRejectedValue(new Error('ECONNREFUSED'));
+    vi.doMock('@tauri-apps/api/core', () => ({ invoke: invokeMock }));
+    (globalThis as any).window = (globalThis as any).window || {};
+    (globalThis as any).window.__TAURI_INTERNALS__ = {};
+
+    const kot: KOTRecord = {
+      id: 'kot-net-1',
+      kotNumber: 'KOT-901',
+      orderId: 'ord-net-1',
+      orderNumber: 'ORD-901',
+      tokenNumber: '901',
+      station: 'Main Kitchen',
+      type: 'FIRST',
+      orderType: 'DINE_IN',
+      cashierName: 'Cashier Om',
+      items: [],
+      createdAt: new Date().toISOString(),
+      printed: false,
+      status: 'PENDING'
+    };
+
+    const job = await PosPrinterService.printKOT(kot);
+    expect(job.status).toBe('FAILED');
+    expect(job.errorMessage).toContain('ECONNREFUSED');
+
+    vi.doUnmock('@tauri-apps/api/core');
+    delete (globalThis as any).window.__TAURI_INTERNALS__;
   });
 
   it('9. should continue offline billing and receipt printing without internet connection', async () => {

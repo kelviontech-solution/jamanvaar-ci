@@ -178,60 +178,49 @@ export class PosPrinterService {
   }
 
   /**
+   * True only inside an actual compiled Tauri desktop app — mirrors
+   * PrinterService's identical check in packages/api/src/printer.ts.
+   */
+  private static isTauriRuntime(): boolean {
+    return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+  }
+
+  /**
+   * Wraps already-formatted receipt/KOT text in real ESC/POS init + cut
+   * command bytes.
+   */
+  private static wrapEscPos(text: string): Uint8Array {
+    const encoder = new TextEncoder();
+    const textBytes = encoder.encode(text + '\n\n\n');
+    const initCmd = new Uint8Array([0x1b, 0x40]);
+    const cutCmd = new Uint8Array([0x1d, 0x56, 0x42, 0x00]);
+    const fullPayload = new Uint8Array(initCmd.length + textBytes.length + cutCmd.length);
+    fullPayload.set(initCmd, 0);
+    fullPayload.set(textBytes, initCmd.length);
+    fullPayload.set(cutCmd, initCmd.length + textBytes.length);
+    return fullPayload;
+  }
+
+  /**
+   * Sends already-formatted text to a real NETWORK_LAN printer over raw TCP
+   * via the send_escpos_bytes Tauri command.
+   */
+  private static async dispatchToNetworkPrinter(printer: PrinterDevice, text: string): Promise<void> {
+    const { invoke } = await import('@tauri-apps/api/core');
+    const bytes = Array.from(this.wrapEscPos(text));
+    await invoke('send_escpos_bytes', { ip: printer.ipAddress, port: Number(printer.port) || 9100, bytes });
+  }
+
+  /**
    * Dispatch Receipt Print Job to Configured Receipt Printer
    */
-  public static printOrderReceipt(order: Order, paperSize?: ReceiptPaperSize): PrintJob {
+  public static async printOrderReceipt(order: Order, paperSize?: ReceiptPaperSize): Promise<PrintJob> {
     const printer = this.getPrinterForRole('RECEIPT');
     const effectivePaperSize = paperSize || printer.paperSize || '80mm';
     const payload = this.generateReceiptText(order, effectivePaperSize);
 
     printer.lastPrintAt = new Date().toISOString();
     db.notify();
-
-    return PrintQueueRepository.addJob({
-      type: effectivePaperSize === '80mm' ? 'RECEIPT_80MM' : 'RECEIPT_58MM',
-      printerId: printer.id,
-      printerName: printer.name,
-      orderId: order.id,
-      orderNumber: order.orderNumber,
-      tokenNumber: order.tokenNumber,
-      rawPayload: payload,
-      paperSize: effectivePaperSize
-    });
-  }
-
-  /**
-   * Dispatch KOT Print Job to Station Printer
-   */
-  public static printKOT(kot: KOTRecord): PrintJob {
-    const printer = this.getPrinterForStation(kot.station);
-    const payload = this.generateKOTText(kot);
-
-    printer.lastPrintAt = new Date().toISOString();
-    db.notify();
-
-    return PrintQueueRepository.addJob({
-      type: 'KOT_TICKET',
-      printerId: printer.id,
-      printerName: printer.name,
-      targetStation: kot.station,
-      orderId: kot.orderId,
-      orderNumber: kot.orderNumber,
-      tokenNumber: kot.tokenNumber,
-      kotId: kot.id,
-      kotNumber: kot.kotNumber,
-      rawPayload: payload,
-      paperSize: printer.paperSize || '80mm'
-    });
-  }
-
-  /**
-   * Dispatch Manual Reprint with Audit Logging
-   */
-  public static reprintReceipt(order: Order, reason?: string, username: string = 'Cashier'): PrintJob {
-    const printer = this.getPrinterForRole('RECEIPT');
-    const effectivePaperSize = printer.paperSize || '80mm';
-    const payload = this.generateReceiptText(order, effectivePaperSize);
 
     const job = PrintQueueRepository.addJob({
       type: effectivePaperSize === '80mm' ? 'RECEIPT_80MM' : 'RECEIPT_58MM',
@@ -244,7 +233,81 @@ export class PosPrinterService {
       paperSize: effectivePaperSize
     });
 
+    if (printer.interfaceType === 'NETWORK_LAN' && printer.ipAddress && this.isTauriRuntime()) {
+      try {
+        await this.dispatchToNetworkPrinter(printer, payload);
+      } catch (err: any) {
+        return PrintQueueRepository.updateJobStatus(job.id, 'FAILED', err?.message || 'Printer communication failed') || job;
+      }
+    }
+
+    return job;
+  }
+
+  /**
+   * Dispatch KOT Print Job to Station Printer
+   */
+  public static async printKOT(kot: KOTRecord): Promise<PrintJob> {
+    const printer = this.getPrinterForStation(kot.station);
+    const payload = this.generateKOTText(kot);
+
+    printer.lastPrintAt = new Date().toISOString();
+    db.notify();
+
+    const job = PrintQueueRepository.addJob({
+      type: 'KOT_TICKET',
+      printerId: printer.id,
+      printerName: printer.name,
+      targetStation: kot.station,
+      orderId: kot.orderId,
+      orderNumber: kot.orderNumber,
+      tokenNumber: kot.tokenNumber,
+      kotId: kot.id,
+      kotNumber: kot.kotNumber,
+      rawPayload: payload,
+      paperSize: printer.paperSize || '80mm'
+    });
+
+    if (printer.interfaceType === 'NETWORK_LAN' && printer.ipAddress && this.isTauriRuntime()) {
+      try {
+        await this.dispatchToNetworkPrinter(printer, payload);
+      } catch (err: any) {
+        return PrintQueueRepository.updateJobStatus(job.id, 'FAILED', err?.message || 'Printer communication failed') || job;
+      }
+    }
+
+    return job;
+  }
+
+  /**
+   * Dispatch Manual Reprint with Audit Logging
+   */
+  public static async reprintReceipt(order: Order, reason?: string, username: string = 'Cashier'): Promise<PrintJob> {
+    const printer = this.getPrinterForRole('RECEIPT');
+    const effectivePaperSize = printer.paperSize || '80mm';
+    const payload = this.generateReceiptText(order, effectivePaperSize);
+
+    let job = PrintQueueRepository.addJob({
+      type: effectivePaperSize === '80mm' ? 'RECEIPT_80MM' : 'RECEIPT_58MM',
+      printerId: printer.id,
+      printerName: printer.name,
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      tokenNumber: order.tokenNumber,
+      rawPayload: payload,
+      paperSize: effectivePaperSize
+    });
+
     job.isReprint = true;
+
+    if (printer.interfaceType === 'NETWORK_LAN' && printer.ipAddress && this.isTauriRuntime()) {
+      try {
+        await this.dispatchToNetworkPrinter(printer, payload);
+      } catch (err: any) {
+        const failed = PrintQueueRepository.updateJobStatus(job.id, 'FAILED', err?.message || 'Printer communication failed');
+        if (failed) job = { ...failed, isReprint: true };
+      }
+    }
 
     AuditRepository.log({
       action: 'RECEIPT_REPRINT',
@@ -260,9 +323,9 @@ export class PosPrinterService {
   /**
    * Dispatch Diagnostic Test Slip to Selected Printer
    */
-  public static printTestSlip(printerId: string, paperSize: ReceiptPaperSize = '80mm'): PrintJob {
+  public static async printTestSlip(printerId: string, paperSize: ReceiptPaperSize = '80mm'): Promise<PrintJob> {
     const printer = db.configuredPrinters.find((p) => p.id === printerId) || this.getPrinterForRole('RECEIPT');
-    
+
     const rawPayload = `
 ========================================
             JAMANVAAR POS
@@ -284,12 +347,22 @@ ESC/POS Thermal Auto-Cutter Test OK
     printer.lastPrintAt = new Date().toISOString();
     db.notify();
 
-    return PrintQueueRepository.addJob({
+    const job = PrintQueueRepository.addJob({
       type: 'TEST_PAGE',
       printerId: printer.id,
       printerName: printer.name,
       rawPayload,
       paperSize
     });
+
+    if (printer.interfaceType === 'NETWORK_LAN' && printer.ipAddress && this.isTauriRuntime()) {
+      try {
+        await this.dispatchToNetworkPrinter(printer, rawPayload);
+      } catch (err: any) {
+        return PrintQueueRepository.updateJobStatus(job.id, 'FAILED', err?.message || 'Printer communication failed') || job;
+      }
+    }
+
+    return job;
   }
 }
