@@ -7,6 +7,7 @@ import {
   getKioskRestaurantId,
   createPaymentOrder,
   getPaymentOrderStatus,
+  sendReceipt,
   CloudApiError,
   type CartLinePayload
 } from './cloud/cloudClient';
@@ -1008,18 +1009,18 @@ export default function KioskUserApp() {
     if (!placedOrder || !eBillPhoneInput) return;
 
     if (selectedEBillMethod === 'WHATSAPP') {
-      const res = await EBillService.sendWhatsAppEBill(placedOrder, eBillPhoneInput, receiptConfig);
+      const res = await EBillService.sendWhatsAppEBill(placedOrder, eBillPhoneInput, receiptConfig, sendReceipt);
+      ReceiptRepository.addRecord(res.record);
       if (res.success) {
-        ReceiptRepository.addRecord(res.record);
         setEBillSuccessMessage(res.message);
         showToast(res.message);
       } else {
         alert(res.message);
       }
     } else if (selectedEBillMethod === 'SMS') {
-      const res = await EBillService.sendSmsEBill(placedOrder, eBillPhoneInput);
+      const res = await EBillService.sendSmsEBill(placedOrder, eBillPhoneInput, sendReceipt);
+      ReceiptRepository.addRecord(res.record);
       if (res.success) {
-        ReceiptRepository.addRecord(res.record);
         setEBillSuccessMessage(res.message);
         showToast(res.message);
       } else {
