@@ -15,7 +15,7 @@ export function GenerateActivationKeyModal({
 }) {
   const [restaurants, setRestaurants] = useState<RestaurantListItem[]>([]);
   const [restaurantId, setRestaurantId] = useState(fixedRestaurantId ?? '');
-  const [deviceType, setDeviceType] = useState<'ANY' | 'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK'>('ANY');
+  const [deviceType, setDeviceType] = useState<'ANY' | 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN'>('ANY');
   const [expiryDays, setExpiryDays] = useState('30');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -106,11 +106,13 @@ export function GenerateActivationKeyModal({
               <div className="field">
                 <label>Allowed device type</label>
                 <select value={deviceType} onChange={(e) => setDeviceType(e.target.value as typeof deviceType)}>
-                  <option value="ANY">Restaurant Admin Console (POS_ADMIN / Any Terminal)</option>
+                  <option value="ANY">Restaurant Admin Console (Any Terminal)</option>
+                  <option value="POS_ADMIN">Restaurant Admin Console (POS_ADMIN)</option>
                   <option value="POS">Main Billing Counter POS</option>
                   <option value="CAPTAIN">Captain Waiter Tablet</option>
                   <option value="KDS">Kitchen Order Display (KDS)</option>
                   <option value="KIOSK">Self-Order Kiosk</option>
+                  <option value="KIOSK_ADMIN">Kiosk Admin Console (http://localhost:5173)</option>
                 </select>
               </div>
               <div className="field">

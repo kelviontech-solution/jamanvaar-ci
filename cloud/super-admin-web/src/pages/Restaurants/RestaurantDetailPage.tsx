@@ -123,6 +123,8 @@ export function formatDeviceTypeLabel(type: string): string {
       return 'KITCHEN DISPLAY (KDS)';
     case 'KIOSK':
       return 'SELF-ORDER KIOSK';
+    case 'KIOSK_ADMIN':
+      return 'KIOSK ADMIN CONSOLE';
     default:
       return `${type} TERMINAL`;
   }
@@ -640,6 +642,13 @@ export function RestaurantDetailPage() {
                 </div>
                 <p style={{ margin: '6px 0 0 0', fontSize: 13, color: '#64748b' }}>
                   Relay these keys to the restaurant owner. On first login at <strong>Restaurant Admin (http://localhost:5176)</strong>, <strong>POS</strong>, or <strong>Captain</strong>, entering this key registers and binds the device.
+                  {restaurant.activationKeys.some((k) => k.allowedDeviceType === 'KIOSK_ADMIN') && (
+                    <>
+                      {' '}
+                      A <strong>KIOSK_ADMIN</strong> key must instead be entered at the{' '}
+                      <strong>Kiosk Admin console (http://localhost:5173)</strong>.
+                    </>
+                  )}
                 </p>
               </div>
 

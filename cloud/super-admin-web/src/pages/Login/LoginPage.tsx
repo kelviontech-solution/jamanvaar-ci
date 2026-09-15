@@ -28,7 +28,7 @@ export function LoginPage() {
 
   const handleQuickDemoAdmin = () => {
     setEmail('superadmin@jamanvaar.app');
-    setPassword('admin');
+    setPassword('admin1234');
     setError(null);
   };
 

@@ -217,7 +217,22 @@ export default function AdminApp() {
       await connectDeviceStep2(connectActivationSessionToken, connectActivationKey, connectRestaurantId, connectEmail);
       setDeviceConnected(true);
     } catch (err) {
-      setConnectError(err instanceof CloudApiError ? err.message : 'Activation failed — check the key and try again.');
+      if (err instanceof CloudApiError) {
+        // cloud/api's raw message here is technical ("This activation key is
+        // designated for KIOSK terminals, not KIOSK_ADMIN.") and gives a
+        // non-technical restaurant operator no recourse — they don't know
+        // KIOSK (customer terminal) and KIOSK_ADMIN (this console) are
+        // separate keys, or where to get the right one. Reword it in place
+        // rather than showing the backend's wording verbatim.
+        const mismatch = err.message.match(/designated for (\w+) terminals, not KIOSK_ADMIN/i);
+        setConnectError(
+          mismatch
+            ? `That key is for ${mismatch[1]} devices, not Kiosk Admin. Ask your Super Admin for the key labeled "KIOSK_ADMIN" in this restaurant's Welcome Kit — it's separate from the "${mismatch[1]}" key.`
+            : err.message
+        );
+      } else {
+        setConnectError('Activation failed — check the key and try again.');
+      }
     } finally {
       setConnectBusy(false);
     }
@@ -1041,6 +1056,10 @@ export default function AdminApp() {
                       autoFocus
                       className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-[#0B253A] font-semibold focus:outline-hidden transition-colors uppercase"
                     />
+                    <p className="text-[11px] text-slate-500 font-medium mt-1.5">
+                      Use the key labeled <strong>KIOSK_ADMIN</strong> from the Welcome Kit — it's different from the
+                      <strong> KIOSK</strong> key used on the customer-facing ordering screen.
+                    </p>
                   </div>
                   {connectError && (
                     <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">

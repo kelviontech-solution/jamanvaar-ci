@@ -158,7 +158,7 @@ export interface ActivationKey {
   code: string;
   restaurantId: string;
   status: 'ACTIVE' | 'REDEEMED' | 'REVOKED' | 'EXPIRED';
-  allowedDeviceType: 'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'ANY';
+  allowedDeviceType: 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'ANY';
   expiresAt: string;
   redeemedAt: string | null;
   createdAt: string;
@@ -169,7 +169,7 @@ export interface Device {
   id: string;
   restaurantId: string;
   branchId: string | null;
-  type: 'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'POS_ADMIN';
+  type: 'POS' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'POS_ADMIN' | 'KIOSK_ADMIN';
   status: 'PENDING' | 'ACTIVE' | 'REVOKED';
   name?: string | null;
   ipAddress?: string | null;

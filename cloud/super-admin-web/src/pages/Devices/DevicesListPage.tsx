@@ -250,6 +250,7 @@ export function DevicesListPage() {
           <option value="CAPTAIN">Captain Device</option>
           <option value="KDS">Kitchen Display</option>
           <option value="KIOSK">Self-Service Kiosk</option>
+          <option value="KIOSK_ADMIN">Kiosk Admin Console</option>
         </select>
 
         {(search || statusFilter !== 'ALL' || typeFilter !== 'ALL') && (
@@ -305,8 +306,8 @@ export function DevicesListPage() {
                         </div>
                       </td>
                       <td style={{ padding: '14px' }}>
-                        <Badge tone={d.type === 'POS_ADMIN' ? 'accent' : 'neutral'}>
-                          {d.type === 'POS_ADMIN' ? 'RESTAURANT ADMIN' : d.type}
+                        <Badge tone={d.type === 'POS_ADMIN' || d.type === 'KIOSK_ADMIN' ? 'accent' : 'neutral'}>
+                          {d.type === 'POS_ADMIN' ? 'RESTAURANT ADMIN' : d.type === 'KIOSK_ADMIN' ? 'KIOSK ADMIN' : d.type}
                         </Badge>
                       </td>
                       <td style={{ padding: '14px' }}>

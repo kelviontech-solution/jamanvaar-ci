@@ -169,8 +169,13 @@ const EMPTY_MODULES: ModulesForm = {
   applications: []
 };
 
+// Left empty rather than a fixed guess — the modules step (which knows the
+// actual entitled apps for this plan/tier) fills this in when the operator
+// advances past it, so a Kiosk-entitled restaurant gets KIOSK_ADMIN
+// pre-checked instead of relying on the operator to notice and check it
+// themselves (see BUG-001: KIOSK_ADMIN key silently never got generated).
 const EMPTY_ACTIVATION: ActivationForm = {
-  deviceTypes: ['POS_ADMIN', 'POS', 'CAPTAIN', 'KDS'],
+  deviceTypes: [],
   expiryDays: '30'
 };
 
@@ -558,13 +563,15 @@ export function OnboardRestaurantPage() {
   }
 
   function getHandoverWhatsAppText(): string {
+    const hasKioskAdmin = provisionedKeys.some((k) => k.deviceType === 'KIOSK_ADMIN');
     const lines = [
       `*WELCOME TO JAMANVAAR RESTAURANT PLATFORM*`,
       `Namaste ${owner.ownerName},`,
       `Your restaurant *${details.name}* is officially onboarded and activated on JAMANVAAR SaaS.`,
       ``,
       `*YOUR RESTAURANT ADMIN CREDENTIALS:*`,
-      `• Portal: http://localhost:5176`,
+      `• Restaurant Admin Portal (POS/Captain/KDS): http://localhost:5176`,
+      ...(hasKioskAdmin ? [`• Kiosk Admin Portal: http://localhost:5173`] : []),
       `• Restaurant ID: ${restaurantId || '—'}`,
       `• Login Email: ${owner.ownerEmail}`,
       owner.passwordMode === 'set_now'
@@ -589,7 +596,12 @@ export function OnboardRestaurantPage() {
       `1. Open Restaurant Admin on your manager PC (http://localhost:5176).`,
       `2. Go to Subscription / Activation and enter your activation key.`,
       `3. Enter your login credentials to verify your live menu and POS terminals.`,
-      `4. For assistance, contact KELVIONTECH Platform Support.`
+      ...(hasKioskAdmin
+        ? [
+            `4. To manage your self-order kiosks, open the Kiosk Admin console (http://localhost:5173) and enter your KIOSK_ADMIN key.`,
+            `5. For assistance, contact KELVIONTECH Platform Support.`
+          ]
+        : [`4. For assistance, contact KELVIONTECH Platform Support.`])
     );
 
     return lines.join('\n');
@@ -1065,6 +1077,14 @@ export function OnboardRestaurantPage() {
           <form
             onSubmit={(e: FormEvent) => {
               e.preventDefault();
+              // Pre-check the hardware-key checklist to match whatever apps
+              // were just entitled above — only on the first arrival (i.e.
+              // deviceTypes is still empty) so a deliberate manual edit made
+              // after going back and forth isn't silently clobbered.
+              setActivationForm((f) => ({
+                ...f,
+                deviceTypes: f.deviceTypes.length > 0 ? f.deviceTypes : (modulesForm.applications as ActivationForm['deviceTypes'])
+              }));
               setStep('activation');
             }}
             className="modal-form"
@@ -1518,12 +1538,12 @@ export function OnboardRestaurantPage() {
                 </div>
 
                 <div className="credential-item">
-                  <span className="credential-label">Admin Portal URL</span>
+                  <span className="credential-label">Restaurant Admin Portal URL (POS / Captain / KDS)</span>
                   <div className="credential-value">
                     <span>http://localhost:5176</span>
                     <button
                       type="button"
-                      onClick={() => handleCopy('http://localhost:5176', 'Portal URL')}
+                      onClick={() => handleCopy('http://localhost:5176', 'Restaurant Admin Portal URL')}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
                       title="Copy"
                     >
@@ -1531,6 +1551,27 @@ export function OnboardRestaurantPage() {
                     </button>
                   </div>
                 </div>
+
+                {/* Kiosk Admin (:5173) is a separate console from Restaurant
+                    Admin (:5176) — a Kiosk-entitled restaurant was only ever
+                    handed the 5176 URL, leaving the owner with no way to find
+                    where to redeem their KIOSK_ADMIN key (BUG-002). */}
+                {provisionedKeys.some((k) => k.deviceType === 'KIOSK_ADMIN') && (
+                  <div className="credential-item">
+                    <span className="credential-label">Kiosk Admin Portal URL</span>
+                    <div className="credential-value">
+                      <span>http://localhost:5173</span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy('http://localhost:5173', 'Kiosk Admin Portal URL')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
+                        title="Copy"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 <div className="credential-item">
                   <span className="credential-label">Owner Login Email</span>
@@ -1601,7 +1642,15 @@ export function OnboardRestaurantPage() {
                     </span>
                   </div>
                   <p style={{ margin: '6px 0 0 0', fontSize: 13, color: '#64748b' }}>
-                    Provide these keys to the restaurant owner. On first login at <strong>http://localhost:5176</strong> (or POS/Captain), entering the key registers and binds the device.
+                    Provide these keys to the restaurant owner. On first login, entering the matching key registers and
+                    binds the device — <strong>POS_ADMIN / POS / CAPTAIN / KDS</strong> keys at{' '}
+                    <strong>http://localhost:5176</strong>
+                    {provisionedKeys.some((k) => k.deviceType === 'KIOSK_ADMIN') && (
+                      <>
+                        , and the <strong>KIOSK_ADMIN</strong> key at <strong>http://localhost:5173</strong>
+                      </>
+                    )}
+                    .
                   </p>
                 </div>
 
@@ -1641,7 +1690,11 @@ export function OnboardRestaurantPage() {
                   {provisionedKeys.map((k) => (
                     <div key={k.id} className="device-key-card" style={{ border: '1.5px solid #fed7aa', boxShadow: '0 2px 8px rgba(234, 88, 12, 0.08)' }}>
                       <div className="device-key-type-tag" style={{ background: '#ea580c', color: '#fff', fontWeight: 800 }}>
-                        {k.deviceType === 'ANY' || k.deviceType === 'POS_ADMIN' ? 'RESTAURANT ADMIN CONSOLE' : `${k.deviceType} TERMINAL`}
+                        {k.deviceType === 'ANY' || k.deviceType === 'POS_ADMIN'
+                          ? 'RESTAURANT ADMIN CONSOLE'
+                          : k.deviceType === 'KIOSK_ADMIN'
+                            ? 'KIOSK ADMIN CONSOLE'
+                            : `${k.deviceType} TERMINAL`}
                       </div>
                       <div
                         className="device-qr-wrapper"
