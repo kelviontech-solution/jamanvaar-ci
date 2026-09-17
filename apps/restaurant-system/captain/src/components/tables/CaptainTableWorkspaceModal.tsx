@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useCaptainStore, CartItemEntry } from '../../store/captainStore';
 import { DiningTable, MenuItem, SelectedModifier } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
+import { EmptyState } from '@jamanvaar/ui';
 import { CaptainModifierModal } from '../modals/CaptainModifierModal';
 import {
   X,
@@ -294,17 +295,14 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                     ))}
                   </div>
                 ) : (
-                  <div className="p-8 text-center rounded-3xl bg-jaman-cream border border-dashed border-jaman-border space-y-3">
-                    <UtensilsCrossed className="w-8 h-8 text-slate-400 mx-auto" />
-                    <p className="text-xs font-bold text-slate-600">No dishes added to Table {table.tableNumber} yet.</p>
-                    <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                      <button
-                        type="button"
-                        onClick={() => setActiveWorkspaceTab('MENU')}
-                        className="px-4 py-2 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs transition-colors cursor-pointer"
-                      >
-                        + Open Menu & Add Dishes
-                      </button>
+                  <div className="space-y-3">
+                    <EmptyState
+                      icon={<UtensilsCrossed className="w-8 h-8" />}
+                      description={`No dishes added to Table ${table.tableNumber} yet.`}
+                      actionText="+ Open Menu & Add Dishes"
+                      onAction={() => setActiveWorkspaceTab('MENU')}
+                    />
+                    <div className="flex justify-center -mt-2">
                       <button
                         type="button"
                         onClick={() => {
@@ -321,7 +319,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                       </button>
                     </div>
                     {repeatOrderError && (
-                      <p className="text-[11px] font-bold text-rose-600">{repeatOrderError}</p>
+                      <p className="text-[11px] font-bold text-rose-600 text-center">{repeatOrderError}</p>
                     )}
                   </div>
                 )}

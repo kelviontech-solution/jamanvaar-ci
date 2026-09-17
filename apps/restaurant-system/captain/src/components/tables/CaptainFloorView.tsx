@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useCaptainStore } from '../../store/captainStore';
 import { CaptainTableCard } from './CaptainTableCard';
 import { DiningTable } from '@jamanvaar/types';
+import { EmptyState } from '@jamanvaar/ui';
 import {
   Search,
   Filter,
@@ -305,32 +306,23 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
         </div>
       ) : (
         /* ── Actionable Empty State (No Blank Voids!) ── */
-        <div className="p-8 sm:p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-4">
-          <div className="w-16 h-16 rounded-3xl bg-[#FFF4ED] text-jaman-saffron mx-auto flex items-center justify-center shadow-xs">
-            <UtensilsCrossed className="w-8 h-8" />
-          </div>
-          <div className="max-w-md mx-auto">
-            <h3 className="text-lg font-black text-jaman-navy">No tables match your current filter</h3>
-            <p className="text-xs text-slate-500 font-medium mt-1">
-              {tableFilter === 'BILL_REQUESTED'
-                ? 'No tables currently have pending bill requests on this floor.'
-                : tableFilter === 'FOOD_READY'
-                ? 'No tables currently have ready dishes waiting in the kitchen.'
-                : 'Try adjusting your zone or search criteria to view more floor tables.'}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setTableFilter('ALL_TABLES');
-              setSelectedZone('ALL');
-              setLocalSearch('');
-            }}
-            className="px-5 py-2.5 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-black text-xs shadow-md transition-all active:scale-95 cursor-pointer"
-          >
-            Show All {tables.length} Floor Tables
-          </button>
-        </div>
+        <EmptyState
+          icon={<UtensilsCrossed className="w-8 h-8" />}
+          title="No tables match your current filter"
+          description={
+            tableFilter === 'BILL_REQUESTED'
+              ? 'No tables currently have pending bill requests on this floor.'
+              : tableFilter === 'FOOD_READY'
+              ? 'No tables currently have ready dishes waiting in the kitchen.'
+              : 'Try adjusting your zone or search criteria to view more floor tables.'
+          }
+          actionText={`Show All ${tables.length} Floor Tables`}
+          onAction={() => {
+            setTableFilter('ALL_TABLES');
+            setSelectedZone('ALL');
+            setLocalSearch('');
+          }}
+        />
       )}
     </div>
   );
