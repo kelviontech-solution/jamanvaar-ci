@@ -6,6 +6,7 @@ import { CentralReportingService } from '@jamanvaar/business';
 import { PosPrinterService } from '../../services/printerService';
 import { PdfReportBuilder, ReportFullData } from '../../services/pdfReportBuilder';
 import { formatINR } from '@jamanvaar/utils';
+import { EmptyState } from '@jamanvaar/ui';
 import {
   Clock,
   CircleDollarSign,
@@ -753,8 +754,8 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
           })}
 
           {filteredHistoricalShifts.length === 0 && (
-            <div className="col-span-full py-12 text-center text-slate-400 text-xs">
-              No historical shifts found for the selected filter.
+            <div className="col-span-full">
+              <EmptyState description="No historical shifts found for the selected filter." />
             </div>
           )}
         </div>

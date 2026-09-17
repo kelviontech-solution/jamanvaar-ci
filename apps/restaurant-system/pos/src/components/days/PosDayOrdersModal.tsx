@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { BusinessDay, Order, OrderStatus, OrderType, PaymentMethod } from '@jamanvaar/types';
 import { BusinessDayRepository } from '@jamanvaar/database';
 import { formatINR } from '@jamanvaar/utils';
+import { EmptyState } from '@jamanvaar/ui';
 import {
   X,
   Search,
@@ -246,11 +247,11 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
             })}
 
             {filteredOrders.length === 0 && (
-              <div className="p-12 text-center text-slate-400 space-y-2">
-                <ShoppingBag className="w-10 h-10 mx-auto opacity-30" />
-                <div className="font-bold text-sm">No orders matched your filters</div>
-                <div className="text-xs">Try clearing your search query or selecting "All Statuses"</div>
-              </div>
+              <EmptyState
+                icon={<ShoppingBag className="w-8 h-8" />}
+                title="No orders matched your filters"
+                description='Try clearing your search query or selecting "All Statuses"'
+              />
             )}
           </div>
 

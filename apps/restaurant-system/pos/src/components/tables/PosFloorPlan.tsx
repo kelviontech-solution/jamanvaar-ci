@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { usePosStore } from "../../store/posStore";
 import { db, OrderRepository } from "@jamanvaar/database";
 import { DiningTable } from "@jamanvaar/types";
-import { sound } from "@jamanvaar/ui";
+import { sound, EmptyState } from "@jamanvaar/ui";
 import { PosTableDrawer } from "./PosTableDrawer";
 import {
   LayoutGrid,
@@ -327,34 +327,20 @@ export const PosFloorPlan: React.FC = () => {
       {/* Table Grid or Empty State */}
       <div className="flex-1 overflow-y-auto pr-1">
         {tables.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center">
-              <AlertTriangle className="w-8 h-8 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-lg font-extrabold text-jaman-navy">No Tables Configured</p>
-              <p className="text-sm text-slate-500 mt-1 max-w-xs">
-                No dining tables found. Please configure your floor layout in Settings.
-              </p>
-            </div>
-            <button
-              onClick={() => setActiveTab("SETTINGS")}
-              className="px-4 py-2 rounded-xl bg-jaman-saffron text-white font-bold text-sm hover:bg-[#EA580C] transition-colors shadow-sm"
-            >
-              Configure Tables
-            </button>
-          </div>
+          <EmptyState
+            icon={<AlertTriangle className="w-8 h-8" />}
+            title="No Tables Configured"
+            description="No dining tables found. Please configure your floor layout in Settings."
+            actionText="Configure Tables"
+            onAction={() => setActiveTab("SETTINGS")}
+          />
         ) : filteredTables.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
-            <LayoutGrid className="w-10 h-10 text-slate-300" />
-            <p className="text-sm font-semibold text-slate-400">No tables match this filter</p>
-            <button
-              onClick={() => { setSelectedZone("ALL"); setStatusFilter("ALL"); }}
-              className="px-3 py-1.5 text-xs font-bold rounded-xl bg-white border border-jaman-border text-slate-600 hover:bg-slate-50"
-            >
-              Clear Filters
-            </button>
-          </div>
+          <EmptyState
+            icon={<LayoutGrid className="w-8 h-8" />}
+            title="No tables match this filter"
+            actionText="Clear Filters"
+            onAction={() => { setSelectedZone("ALL"); setStatusFilter("ALL"); }}
+          />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5">
             {filteredTables.map((table) => (

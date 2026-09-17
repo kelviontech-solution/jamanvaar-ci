@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { usePosStore } from '../../store/posStore';
+import { EmptyState } from '@jamanvaar/ui';
 import {
   db,
   MenuRepository,
@@ -690,13 +691,11 @@ export const PosMenuManagerModal: React.FC<{
             {/* Dishes Grid */}
             <div className="flex-1 overflow-y-auto pr-1">
               {filteredItems.length === 0 ? (
-                <div className="bg-white border border-jaman-border rounded-3xl p-12 text-center space-y-3">
-                  <Utensils className="w-12 h-12 text-slate-300 mx-auto" />
-                  <h4 className="text-base font-black text-jaman-navy">No dishes match your search</h4>
-                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                    Try changing your category filter, search query, or import authentic dishes from the Preloaded Starter Library.
-                  </p>
-                </div>
+                <EmptyState
+                  icon={<Utensils className="w-8 h-8" />}
+                  title="No dishes match your search"
+                  description="Try changing your category filter, search query, or import authentic dishes from the Preloaded Starter Library."
+                />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
                   {filteredItems.map((item) => {
