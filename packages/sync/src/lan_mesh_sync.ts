@@ -17,12 +17,14 @@ export interface MeshPeerInfo {
   deviceId: string;
   role: MeshDeviceRole;
   name: string;
-  ipAddress: string;
+  /** Not populated: a browser cannot discover its own LAN-visible IP address. */
+  ipAddress?: string;
   appVersion: string;
   lastHeartbeat: string;
   status: 'ONLINE' | 'OFFLINE' | 'SYNCING';
   assignedSection?: string;
-  latencyMs: number;
+  /** Not populated: this transport (BroadcastChannel/localStorage) has no real round-trip ping. Consumers should derive freshness from lastHeartbeat instead. */
+  latencyMs?: number;
 }
 
 export interface MeshSyncEvent<T = any> {
@@ -323,11 +325,9 @@ export class LanMeshSyncEngine {
       deviceId: this.deviceId,
       role: this.deviceRole,
       name: this.deviceName,
-      ipAddress: '192.168.1.100',
-      appVersion: '2.0.0',
+      appVersion: '1.0.0',
       lastHeartbeat: new Date().toISOString(),
-      status: 'ONLINE',
-      latencyMs: 12
+      status: 'ONLINE'
     };
 
     if (this.channel) {

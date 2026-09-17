@@ -36,6 +36,8 @@ import { AiAssistantModule } from './modules/ai-assistant/ai-assistant.module';
 import { QrOrderingModule } from './modules/qr-ordering/qr-ordering.module';
 import { ApplicationEntitlementsModule } from './modules/application-entitlements/application-entitlements.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { OrderSyncModule } from './modules/order-sync/order-sync.module';
+import { EntitySyncModule } from './modules/entity-sync/entity-sync.module';
 import { validateEnv } from './config/env.validation';
 
 @Module({
@@ -80,7 +82,9 @@ import { validateEnv } from './config/env.validation';
     AiAssistantModule,
     QrOrderingModule,
     ApplicationEntitlementsModule,
-    PaymentsModule
+    PaymentsModule,
+    OrderSyncModule,
+    EntitySyncModule
   ],
   providers: [
     {
