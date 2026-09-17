@@ -144,7 +144,8 @@ import {
   WifiOff,
   Zap,
   ShieldAlert,
-  X
+  X,
+  Menu
 } from 'lucide-react';
 
 type AdminTab =
@@ -167,6 +168,11 @@ type AdminTab =
 
 export default function AdminApp() {
   const [activeTab, setActiveTab] = useState<AdminTab>('DASHBOARD');
+  // The nav sidebar used to always render at its full 256px desktop width,
+  // leaving almost no room for content on a phone-width screen (headings
+  // wrapping mid-word, KPI cards truncated). Off-canvas below lg, same
+  // slide-in/backdrop pattern already used by Super Admin's sidebar.
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [dbTick, setDbTick] = useState(0);
 
   // Network State (Online vs Offline)
@@ -1250,6 +1256,14 @@ export default function AdminApp() {
       <header className="min-h-16 sm:min-h-20 bg-white border-b border-jaman-border px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-y-2 shadow-sm sticky top-0 z-30">
         {/* Left: Real JAMANVAAR Brand Identity */}
         <div className="flex items-center gap-4 sm:gap-6">
+          <button
+            type="button"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            className="lg:hidden w-10 h-10 rounded-xl border border-jaman-border bg-white text-jaman-navy flex items-center justify-center shrink-0"
+            aria-label="Open navigation menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
           <BrandHeader
             app="KIOSK_ADMIN"
             restaurantName={db.restaurant.name}
@@ -1383,10 +1397,33 @@ export default function AdminApp() {
       </header>
 
       {/* BODY WITH SIDEBAR & MAIN VIEW */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* LEFT ADMIN SIDEBAR */}
-        <aside className="w-64 bg-white border-r border-jaman-border flex flex-col justify-between p-3 shrink-0 overflow-y-auto">
-          <nav className="space-y-1">
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Backdrop — closes the sidebar on outside tap, mobile only */}
+        {isMobileSidebarOpen && (
+          <div
+            className="lg:hidden fixed inset-0 bg-black/50 z-40"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+        )}
+
+        {/* LEFT ADMIN SIDEBAR — off-canvas below lg (slides in over content,
+            closes on outside tap or after picking a section), a normal
+            static column at lg and above (unchanged desktop behavior). */}
+        <aside
+          className={`w-64 bg-white border-r border-jaman-border flex flex-col justify-between p-3 shrink-0 overflow-y-auto fixed inset-y-0 left-0 z-50 transition-transform duration-200 lg:static lg:translate-x-0 lg:z-auto ${
+            isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <div>
+            <button
+              type="button"
+              onClick={() => setIsMobileSidebarOpen(false)}
+              className="lg:hidden w-9 h-9 mb-2 ml-auto rounded-xl border border-jaman-border text-jaman-navy flex items-center justify-center"
+              aria-label="Close navigation menu"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <nav className="space-y-1" onClick={() => setIsMobileSidebarOpen(false)}>
             <button
               onClick={() => setActiveTab('DASHBOARD')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
@@ -1599,7 +1636,8 @@ export default function AdminApp() {
               <Settings className="w-4 h-4 text-jaman-saffron" />
               <span>Settings & Backup</span>
             </button>
-          </nav>
+            </nav>
+          </div>
 
           {/* Bottom Sidebar Footer */}
           <div className="pt-4 border-t border-jaman-border mt-4 text-center">
