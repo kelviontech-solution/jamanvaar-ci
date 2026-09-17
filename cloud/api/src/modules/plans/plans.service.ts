@@ -19,9 +19,18 @@ export class PlansService {
     private readonly audit: AuditService
   ) {}
 
-  list() {
+  /**
+   * `excludeTestFixtures` filters out the `TEST `-prefixed plans e2e specs
+   * create against this same database (see cloud/api/test/*.e2e.spec.ts —
+   * every one of them names its fixtures this way) — the exact "plan picker
+   * flooded with test plans" the QA audit found in Onboarding. Defaults to
+   * false so Super Admin's own Plans management page keeps seeing
+   * everything, including old/test plans it may want to clean up.
+   */
+  list(opts: { excludeTestFixtures?: boolean } = {}) {
     return this.prisma.runAsPlatform((tx) =>
       tx.plan.findMany({
+        where: opts.excludeTestFixtures ? { name: { not: { startsWith: 'TEST ' } } } : undefined,
         orderBy: { createdAt: 'asc' },
         include: { _count: { select: { subscriptions: true } } }
       })

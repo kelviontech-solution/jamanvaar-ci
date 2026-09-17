@@ -86,6 +86,14 @@ describe('SaaS management modules: Plans, Subscriptions, Activation Keys, Device
       expect(res.body.some((p: { id: string }) => p.id === planId)).toBe(true);
     });
 
+    it('excludeTestFixtures=true hides TEST-prefixed plans (the Onboarding picker flooded with test plans) without affecting the default list', async () => {
+      const withoutFilter = await authed('get', '/api/v1/plans');
+      expect(withoutFilter.body.some((p: { id: string }) => p.id === planId)).toBe(true);
+
+      const withFilter = await authed('get', '/api/v1/plans?excludeTestFixtures=true');
+      expect(withFilter.body.some((p: { id: string }) => p.id === planId)).toBe(false);
+    });
+
     it('deactivates and reactivates a plan', async () => {
       const deactivate = await authed('patch', `/api/v1/plans/${planId}/deactivate`);
       expect(deactivate.status).toBe(200);

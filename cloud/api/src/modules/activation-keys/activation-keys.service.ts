@@ -166,7 +166,16 @@ export class ActivationKeysService {
         tx
       );
 
-      return { device, restaurantId: key.restaurantId, deviceToken };
+      // Real branding for the device to adopt immediately — without this, a
+      // freshly-activated terminal (e.g. Kiosk's welcome screen) keeps
+      // showing its local seed placeholder ("My Restaurant") until some
+      // other, unrelated sync happens to overwrite it.
+      const restaurant = await tx.restaurant.findUnique({
+        where: { id: key.restaurantId },
+        select: { name: true, gstin: true, address: true }
+      });
+
+      return { device, restaurantId: key.restaurantId, deviceToken, restaurant };
     });
   }
 

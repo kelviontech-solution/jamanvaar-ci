@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { PlansService } from './plans.service';
 import { createPlanSchema, updatePlanSchema } from './dto/plan.dto';
@@ -12,8 +12,8 @@ export class PlansController {
   constructor(private readonly plans: PlansService) {}
 
   @Get()
-  list() {
-    return this.plans.list();
+  list(@Query('excludeTestFixtures') excludeTestFixtures?: string) {
+    return this.plans.list({ excludeTestFixtures: excludeTestFixtures === 'true' });
   }
 
   @Get(':id')
