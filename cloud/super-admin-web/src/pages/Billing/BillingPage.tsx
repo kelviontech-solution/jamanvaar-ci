@@ -337,7 +337,7 @@ export function BillingPage() {
             Commercial SaaS receivables, statutory GST 18% tax invoices, and verified payment reconciliations.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <Button
             variant="ghost"
             onClick={handleRunRenewalCheck}
@@ -368,17 +368,19 @@ export function BillingPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 8,
           fontSize: 13,
           color: '#475569'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, minWidth: 0, flex: '1 1 260px' }}>
+          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" style={{ marginTop: 2 }} />
           <span>
             <strong>Payment Gateway Integration:</strong> Manual Reconciliation & UPI/NEFT Bank Settled. Automated renewal generator and webhook listener active.
           </span>
         </div>
-        <span className="badge badge-neutral" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <span className="badge badge-neutral" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
           SANDBOX + PRODUCTION ENGINE
         </span>
       </div>

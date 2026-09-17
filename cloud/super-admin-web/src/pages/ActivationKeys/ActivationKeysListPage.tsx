@@ -167,7 +167,7 @@ export function ActivationKeysListPage() {
             One-time hardware provisioning tokens for POS, Captain, KDS, and Kiosk terminal authentication.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <Button variant="ghost" onClick={handleExportCsv} disabled={!keys || keys.length === 0}>
             <Download className="w-4 h-4" />
             <span>Export CSV</span>

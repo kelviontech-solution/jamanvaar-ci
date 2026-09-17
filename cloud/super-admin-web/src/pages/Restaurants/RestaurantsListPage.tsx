@@ -288,7 +288,7 @@ export function RestaurantsListPage() {
             Manage every restaurant tenant, branch, subscription, and connected device from one place.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <Button variant="ghost" onClick={handleExportCsv} disabled={!restaurants || restaurants.length === 0}>
             <Download className="w-4 h-4" />
             <span>Export CSV</span>

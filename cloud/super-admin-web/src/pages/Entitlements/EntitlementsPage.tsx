@@ -71,7 +71,7 @@ export function EntitlementsPage() {
             Plan allotments govern customer terminal access authoritatively.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <select
             value={selectedTierFilter}
             onChange={(e) => setSelectedTierFilter(e.target.value as 'ALL' | 'ACTIVE_ONLY')}

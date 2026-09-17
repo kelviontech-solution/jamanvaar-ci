@@ -62,7 +62,7 @@ export function PlanDetailPage() {
             {plan.description || `${plan.tier} tier plan licensing by KELVIONTECH`}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <Badge tone={statusTone(plan.status)}>{plan.status}</Badge>
         </div>
       </div>

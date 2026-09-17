@@ -49,7 +49,7 @@ export function SystemHealthPage() {
             Live operational diagnostics, database roundtrip latency, and core cloud microservices telemetry.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer' }}>
             <input
               type="checkbox"
