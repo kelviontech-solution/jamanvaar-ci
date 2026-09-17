@@ -59,6 +59,39 @@ All verified against the actual code, not assumed from memory:
 
 ---
 
+## 3a. UX Consistency Phase 1 — Complete
+
+Following this session's bug-fixing pass, a separate, explicitly-scoped UX
+initiative (spec: `docs/superpowers/specs/2026-09-17-ux-consistency-phase1-design.md`,
+plan: `docs/superpowers/plans/2026-09-17-ux-consistency-phase1.md`) addressed
+the "visual/interaction consistency" work-stream across all 7 apps:
+
+- The `jaman-navy`/`jaman-saffron`/etc. color tokens — already configured in
+  every app's Tailwind config but never actually used (every app hardcoded
+  raw hex instead) — are now wired into real use everywhere: all `.ts`/`.tsx`/
+  `.css`/`.html` files across all 6 Tailwind-based apps, via a mechanical,
+  same-value script (`scripts/replace-brand-color-tokens.mjs`), verified
+  zero-diff-in-rendered-color by construction.
+- Empty/loading/error states that were hand-rolled independently in
+  pos-admin, pos, captain, and kds are now migrated onto the existing shared
+  `packages/ui` `EmptyState` component, preserving each screen's original
+  copy and actions.
+- Super Admin's separate component system (`cloud/super-admin-web`'s own
+  `ui.tsx`/`ui.css`, which already used color values pixel-identical to the
+  `jaman-*` tokens) was visually aligned to match `packages/ui`'s
+  `EmptyState`/`ErrorState` shape (icon-box size/radius/background, title
+  size, a real alert icon instead of a bare `!` glyph) without merging
+  codebases.
+
+Full suite still at 398/398; `tsc --noEmit` clean across all 7 apps.
+
+**Not done by this phase** (deliberately out of scope, listed as Phases 2-4
+below): reducing clicks/steps for common tasks, mobile/responsive layout
+fixes, and onboarding/guidance improvements. Each needs its own
+brainstorm → spec → plan cycle when picked up.
+
+---
+
 ## 4. Has the *Experience* Actually Improved?
 
 Be precise about what kind of work this was: **almost all of it was data-integrity and connectivity work — making real things real and making broken buttons work — not visual/interaction design polish.** Those are different kinds of improvement, and it's worth separating them honestly.
@@ -80,8 +113,11 @@ The audit's own "how this could be simplified" recommendations (§11–§14) are
 | **Cloud Backup on by default**, or a first-run reminder | ❌ Still manual/opt-in |
 | **A single "is my data trustworthy" indicator** | ❌ Not built (less urgent now that fake data was removed outright, but no positive "this is live" affordance exists either) |
 | **Captain "Request Cancel (needs manager PIN)"** for an already-fired item | ❌ Not built |
-| General visual/interaction polish — consistent design language across apps, fewer taps to complete common tasks, onboarding walkthroughs, clearer empty states everywhere (not just where this session touched) | ❌ Not attempted |
-| Mobile/responsive layout (Super Admin's Restaurants page was found broken at phone width) | ❌ Not re-tested or fixed |
+| Consistent design language / color tokens across apps | ✅ Done (Phase 1, §3a) |
+| Consolidated empty/loading/error states | ✅ Done for pos-admin/pos/captain/kds (Phase 1, §3a) |
+| Fewer taps to complete common tasks | ❌ Not attempted — Phase 2 |
+| Mobile/responsive layout (Super Admin's Restaurants page was found broken at phone width) | ❌ Not re-tested or fixed — Phase 3 |
+| Onboarding walkthroughs / guidance | ❌ Not attempted — Phase 4 |
 | Accessibility (screen reader support) | ❌ Never tested — no screen reader available in the original audit's tooling |
 
 **Honest answer: no, experience has not increased uniformly across all 7 apps.** It has increased specifically wherever a broken/fake thing was blocking someone from trusting or using a feature. It has not increased in the "smooth, few-clicks, polished, consistent" sense the phrase usually means — that work hasn't started yet.
