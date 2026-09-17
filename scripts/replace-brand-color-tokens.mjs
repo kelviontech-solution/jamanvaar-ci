@@ -20,7 +20,7 @@ const TOKEN_MAP = {
   '1E3A4C': 'darkBorder'
 };
 
-const EXTENSIONS = new Set(['.ts', '.tsx', '.css']);
+const EXTENSIONS = new Set(['.ts', '.tsx', '.css', '.html']);
 
 function buildPattern() {
   const hexAlternation = Object.keys(TOKEN_MAP).join('|');
