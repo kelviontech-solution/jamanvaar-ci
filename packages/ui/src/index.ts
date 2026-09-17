@@ -20,3 +20,4 @@ export * from './JamanAiFloatingButton';
 export * from './JamanAiAssistantModal';
 export * from './SoundManager';
 export * from './VirtualKeyboard';
+export * from './ActivationWelcomeScreen';

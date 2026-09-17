@@ -32,7 +32,7 @@ import { PosChatbot } from './components/assistant/PosChatbot';
 import { ManagerOverrideModal } from './components/common/ManagerOverrideModal';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 import { CrashRecoveryBanner } from './components/common/CrashRecoveryBanner';
-import { NotificationToastContainer, JAMANVAARStartup } from '@jamanvaar/ui';
+import { NotificationToastContainer, JAMANVAARStartup, ActivationWelcomeScreen } from '@jamanvaar/ui';
 import { UtensilsCrossed } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -40,6 +40,10 @@ export const App: React.FC = () => {
   const [activationCode, setActivationCode] = useState('');
   const [activationError, setActivationError] = useState('');
   const [isActivating, setIsActivating] = useState(false);
+  // Only true right after THIS activation succeeds (not on every subsequent
+  // load of an already-activated terminal) — a one-time orientation screen,
+  // not a persistent state.
+  const [showActivationWelcome, setShowActivationWelcome] = useState(false);
 
   const handleActivate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +52,7 @@ export const App: React.FC = () => {
     try {
       await activatePosDevice(activationCode);
       setIsDeviceActivated(true);
+      setShowActivationWelcome(true);
     } catch (err) {
       setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed');
     } finally {
@@ -278,6 +283,20 @@ export const App: React.FC = () => {
           </form>
         </div>
       </JAMANVAARStartup>
+    );
+  }
+
+  if (showActivationWelcome) {
+    return (
+      <ActivationWelcomeScreen
+        appName="POS Terminal"
+        tips={[
+          'Sign in with your 4-digit staff PIN.',
+          'Tap a dish to add it — Customize opens options for dishes that have them.',
+          'Send KOT fires the ticket to the kitchen; Instant Bill skips that for quick takeaway sales.'
+        ]}
+        onContinue={() => setShowActivationWelcome(false)}
+      />
     );
   }
 

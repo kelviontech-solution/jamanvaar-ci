@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { OnboardingChecklistCard } from './components/OnboardingChecklistCard';
 import {
   AuditRepository,
   ComboRepository,
@@ -53,7 +54,8 @@ import {
   StatusBadge,
   ThermalReceiptView,
   JAMANVAARStartup,
-  VirtualKeyboard
+  VirtualKeyboard,
+  ActivationWelcomeScreen
 } from '@jamanvaar/ui';
 import { DeviceHealthService, EBillService, KdsMeshService, NetworkStatusService, PaymentService, PrinterService, VoiceService } from '@jamanvaar/api';
 import { AdminChatbotEngine, MenuBuilderService, ReportGeneratorService } from '@jamanvaar/business';
@@ -194,6 +196,9 @@ export default function AdminApp() {
   const [connectRestaurantName, setConnectRestaurantName] = useState('');
   const [connectBusy, setConnectBusy] = useState(false);
   const [connectError, setConnectError] = useState('');
+  // Only true right after THIS connection succeeds — a one-time
+  // orientation screen, not a persistent state.
+  const [showActivationWelcome, setShowActivationWelcome] = useState(false);
 
   const handleConnectCredentials = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,6 +208,7 @@ export default function AdminApp() {
       const result = await connectDeviceStep1(connectRestaurantId, connectEmail, connectPassword);
       if (result.status === 'CONNECTED') {
         setDeviceConnected(true);
+        setShowActivationWelcome(true);
       } else {
         setConnectActivationSessionToken(result.activationSessionToken);
         setConnectRestaurantName(result.restaurantName);
@@ -222,6 +228,7 @@ export default function AdminApp() {
     try {
       await connectDeviceStep2(connectActivationSessionToken, connectActivationKey, connectRestaurantId, connectEmail);
       setDeviceConnected(true);
+      setShowActivationWelcome(true);
     } catch (err) {
       if (err instanceof CloudApiError) {
         // cloud/api's raw message here is technical ("This activation key is
@@ -1139,6 +1146,20 @@ export default function AdminApp() {
     );
   }
 
+  if (showActivationWelcome) {
+    return (
+      <ActivationWelcomeScreen
+        appName="Kiosk Admin console"
+        tips={[
+          'Sign in with your administrator credentials.',
+          'Add dishes to your menu, then activate a customer-facing Kiosk terminal.',
+          'The dashboard checklist below tracks the rest of first-time setup.'
+        ]}
+        onContinue={() => setShowActivationWelcome(false)}
+      />
+    );
+  }
+
   // 1. KIOSK ADMIN AUTHENTICATION GATE SCREEN
   if (!isKioskAdminLoggedIn) {
     return (
@@ -1664,6 +1685,16 @@ export default function AdminApp() {
                   </p>
                 </div>
               </div>
+
+              <OnboardingChecklistCard
+                items={[
+                  { id: 'menu', label: 'Add dishes to your menu', done: menuItems.length > 0, onGo: () => setActiveTab('MENU') },
+                  { id: 'terminal', label: 'Activate a Kiosk terminal', done: kiosks.length > 0, onGo: () => setActiveTab('KIOSKS') },
+                  { id: 'offers', label: 'Create an offer or coupon', done: coupons.length > 0, onGo: () => setActiveTab('COUPONS') },
+                  { id: 'staff', label: 'Add your team members', done: db.users.length > 1, onGo: () => setActiveTab('STAFF') },
+                  { id: 'first_order', label: 'Take your first order', done: orders.length > 0, onGo: () => setActiveTab('ORDERS_KDS') }
+                ]}
+              />
 
               {/* Top 5 KPI Cards */}
               <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">

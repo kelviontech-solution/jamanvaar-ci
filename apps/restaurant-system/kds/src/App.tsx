@@ -8,7 +8,8 @@ import {
   BrandHeader,
   NotificationToastContainer,
   JAMANVAARStartup,
-  EmptyState
+  EmptyState,
+  ActivationWelcomeScreen
 } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
 import { sound } from '@jamanvaar/ui';
@@ -40,6 +41,9 @@ export const App: React.FC = () => {
   const [activationCode, setActivationCode] = useState('');
   const [activationError, setActivationError] = useState('');
   const [isActivating, setIsActivating] = useState(false);
+  // Only true right after THIS activation succeeds — a one-time
+  // orientation screen, not a persistent state.
+  const [showActivationWelcome, setShowActivationWelcome] = useState(false);
 
   const handleActivate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +52,7 @@ export const App: React.FC = () => {
     try {
       await activateKdsDevice(activationCode);
       setIsDeviceActivated(true);
+      setShowActivationWelcome(true);
     } catch (err) {
       setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed');
     } finally {
@@ -387,6 +392,20 @@ export const App: React.FC = () => {
           </form>
         </div>
       </JAMANVAARStartup>
+    );
+  }
+
+  if (showActivationWelcome) {
+    return (
+      <ActivationWelcomeScreen
+        appName="Kitchen Display"
+        tips={[
+          'Pick your station (or "All") on the next screen.',
+          'Real orders sent from POS, Captain, or Kiosk appear here automatically — nothing to configure.',
+          'Mark a ticket Ready or Served with one tap once it\'s cooking.'
+        ]}
+        onContinue={() => setShowActivationWelcome(false)}
+      />
     );
   }
 

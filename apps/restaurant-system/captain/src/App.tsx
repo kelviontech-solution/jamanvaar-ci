@@ -5,7 +5,8 @@ import { captainDb } from '@jamanvaar/database';
 import { EntitlementService } from '@jamanvaar/business';
 import {
   JamanvaarAuthLayout,
-  JAMANVAARStartup
+  JAMANVAARStartup,
+  ActivationWelcomeScreen
 } from '@jamanvaar/ui';
 import { isDeviceConnected, connectDevice, activateCaptainDevice, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
 import { SyncOutboxEngine, EntitySyncEngine } from '@jamanvaar/sync';
@@ -76,6 +77,9 @@ export const App: React.FC = () => {
   const [activationKeyInput, setActivationKeyInput] = useState('');
   const [activationBusy, setActivationBusy] = useState(false);
   const [activationError, setActivationError] = useState('');
+  // Only true right after THIS connection succeeds — a one-time orientation
+  // screen, not a persistent state.
+  const [showActivationWelcome, setShowActivationWelcome] = useState(false);
 
   const handleConnectDevice = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,6 +92,7 @@ export const App: React.FC = () => {
         setAwaitingActivationKey(true);
       } else {
         setDeviceConnected(true);
+        setShowActivationWelcome(true);
       }
     } catch (err) {
       setConnectError(err instanceof CloudApiError ? err.message : 'Could not connect — check your details and try again.');
@@ -104,6 +109,7 @@ export const App: React.FC = () => {
       await activateCaptainDevice(activationSessionToken, activationKeyInput);
       setAwaitingActivationKey(false);
       setDeviceConnected(true);
+      setShowActivationWelcome(true);
     } catch (err) {
       setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed. Please verify the code.');
     } finally {
@@ -382,6 +388,20 @@ export const App: React.FC = () => {
           </div>
         </JamanvaarAuthLayout>
       </JAMANVAARStartup>
+    );
+  }
+
+  if (showActivationWelcome) {
+    return (
+      <ActivationWelcomeScreen
+        appName="Captain tablet"
+        tips={[
+          'Sign in with your 4-digit staff PIN.',
+          'Tap a table to open it, add dishes, and fire the KOT to the kitchen.',
+          'Send Bill Request notifies the counter — POS handles the actual payment.'
+        ]}
+        onContinue={() => setShowActivationWelcome(false)}
+      />
     );
   }
 
