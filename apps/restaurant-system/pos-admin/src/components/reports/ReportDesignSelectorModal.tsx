@@ -207,19 +207,32 @@ export const ReportDesignSelectorModal: React.FC<ReportDesignSelectorModalProps>
                         </div>
                       </div>
 
-                      {/* Mini Bar Graphic */}
-                      <div className="pt-1">
-                        <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden flex">
-                          <div className="bg-emerald-600 h-full" style={{ width: '45%' }} title="Cash" />
-                          <div className="bg-blue-600 h-full" style={{ width: '35%' }} title="UPI" />
-                          <div className="bg-indigo-600 h-full" style={{ width: '20%' }} title="Card" />
-                        </div>
-                        <div className="flex justify-between text-[8px] font-mono text-slate-400 pt-0.5">
-                          <span>Cash 45%</span>
-                          <span>UPI 35%</span>
-                          <span>Card 20%</span>
-                        </div>
-                      </div>
+                      {/* Mini Bar Graphic — was a hardcoded 45/35/20% split
+                          under a "LIVE DATA" badge regardless of what the
+                          real tender totals above it actually were. */}
+                      {(() => {
+                        const cash = summary.cashCollected.current;
+                        const upi = summary.upiCollected.current;
+                        const card = summary.cardCollected.current;
+                        const total = cash + upi + card;
+                        const cashPct = total > 0 ? Math.round((cash / total) * 100) : 0;
+                        const upiPct = total > 0 ? Math.round((upi / total) * 100) : 0;
+                        const cardPct = total > 0 ? Math.max(0, 100 - cashPct - upiPct) : 0;
+                        return (
+                          <div className="pt-1">
+                            <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden flex">
+                              <div className="bg-emerald-600 h-full" style={{ width: `${cashPct}%` }} title="Cash" />
+                              <div className="bg-blue-600 h-full" style={{ width: `${upiPct}%` }} title="UPI" />
+                              <div className="bg-indigo-600 h-full" style={{ width: `${cardPct}%` }} title="Card" />
+                            </div>
+                            <div className="flex justify-between text-[8px] font-mono text-slate-400 pt-0.5">
+                              <span>Cash {cashPct}%</span>
+                              <span>UPI {upiPct}%</span>
+                              <span>Card {cardPct}%</span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     {/* Features list */}

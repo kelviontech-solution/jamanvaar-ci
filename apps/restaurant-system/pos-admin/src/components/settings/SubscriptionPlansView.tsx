@@ -900,7 +900,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 { cap: 'Kitchen KOT & Basic KDS Spooling', core: '✓ Included', pro: '✓ Included' },
                 { cap: 'Kitchen Inventory & Stock Alerts', core: '✓ Included', pro: '✓ Included' },
                 { cap: 'Daily Sales & Operational Reports', core: '✓ Included', pro: '✓ Included' },
-                { cap: '100% Offline SQLite Local Engine', core: '✓ Included', pro: '✓ Included' },
+                { cap: '100% Offline Local Engine', core: '✓ Included', pro: '✓ Included' },
                 { cap: 'Wireless Captain App for Waiters', core: '—', pro: '✓ Full Captain Suite' },
                 { cap: 'Table-Side QR Code Ordering', core: '—', pro: '✓ Included' },
                 { cap: 'Self-Service Customer Touch Kiosk', core: '—', pro: '✓ Included' },

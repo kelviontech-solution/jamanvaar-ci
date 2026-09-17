@@ -49,6 +49,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
   const [secondaryColor, setSecondaryColor] = useState(db.restaurant.secondaryColor || '#E66817');
   const [ownerName, setOwnerName] = useState(db.restaurant.ownerName || 'Ramesh Patel');
   const [managerName, setManagerName] = useState(db.restaurant.managerName || 'Pooja Shah');
+  const [showJamanAI, setShowJamanAI] = useState(db.restaurant.showJamanAI !== false);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,6 +81,20 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
     db.outlet.state = state;
     db.outlet.phone = phone;
 
+    // This panel's own label claims it governs "GST tax invoices, and
+    // thermal bills" — but db.receiptConfig (what Kiosk/POS actually print
+    // on a customer receipt) is a separate record nothing here ever touched,
+    // so a real GSTIN entered here never reached a real customer invoice.
+    // Kiosk Admin's own Receipt Settings tab can still override these
+    // afterward for a legitimate per-outlet GSTIN if one is ever needed.
+    db.receiptConfig.restaurantName = name;
+    db.receiptConfig.address = address;
+    db.receiptConfig.phone = phone;
+    db.receiptConfig.gstin = gstin;
+    db.receiptConfig.fssaiNumber = fssaiNumber;
+
+    db.restaurant.showJamanAI = showJamanAI;
+
     db.notify();
     onUpdated();
     showToast('Restaurant Branding & Accounting Profile Saved!');
@@ -106,6 +121,27 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
           <CheckCircle2 className="w-4 h-4" />
           <span>Save Changes</span>
         </button>
+      </div>
+
+      {/* App Preferences — layered on top of the platform-wide JAMAN AI
+          entitlement toggle in Super Admin, which only controls whether the
+          feature exists at all; this is the per-restaurant opt-out. */}
+      <div className="bg-white p-5 rounded-3xl border border-[#EBE6DD] shadow-2xs flex items-center justify-between gap-4">
+        <div>
+          <span className="text-sm font-black text-[#0B253A] block">Show JAMAN AI Assistant</span>
+          <span className="text-xs text-slate-500">
+            Displays the floating JAMAN AI button on POS, Captain and this Admin console. Turning this off hides it for every staff member at this restaurant.
+          </span>
+        </div>
+        <label className="relative inline-flex items-center cursor-pointer shrink-0">
+          <input
+            type="checkbox"
+            checked={showJamanAI}
+            onChange={(e) => setShowJamanAI(e.target.checked)}
+            className="sr-only peer"
+          />
+          <div className="w-11 h-6 bg-slate-200 peer-checked:bg-[#E66817] rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5" />
+        </label>
       </div>
 
       {/* Live Preview Card */}

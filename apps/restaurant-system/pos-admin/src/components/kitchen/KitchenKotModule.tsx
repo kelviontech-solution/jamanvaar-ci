@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { KOTRecord, KOTItem, KOTStatus } from '@jamanvaar/types';
 import { db, KOTRepository, AuditRepository } from '@jamanvaar/database';
+import { lanMeshSync } from '@jamanvaar/sync';
 import { formatTime } from '@jamanvaar/utils';
 import { printThermalKotTicket } from '@jamanvaar/ui';
 import {
@@ -92,6 +93,9 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
         details: `KOT ${updated.kotNumber} marked ${newStatus}`,
         username: 'Kitchen Display'
       });
+      // Broadcast so POS's own Kitchen Orders view and KDS reflect this
+      // change instead of silently disagreeing about the same ticket.
+      lanMeshSync.broadcast('KOT_STATUS_CHANGED', { kotId: updated.id, status: newStatus });
       onKotUpdated();
       showToast(`KOT ${updated.kotNumber} marked as ${newStatus}`);
     }
@@ -307,6 +311,13 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
                     </span>
                   </div>
                 </div>
+
+                {/* Order-level Chef Note (distinct from per-item specialInstructions) */}
+                {kot.orderNotes && (
+                  <div className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-1 rounded-md">
+                    ⚡ Note: {kot.orderNotes}
+                  </div>
+                )}
 
                 {/* Items List */}
                 <div className="space-y-2 text-xs divide-y divide-slate-100">

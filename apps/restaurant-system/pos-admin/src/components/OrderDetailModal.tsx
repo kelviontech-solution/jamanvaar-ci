@@ -3,7 +3,7 @@ import { createRefund, CloudApiError } from '../cloud/cloudClient';
 import { Order, OrderStatus } from '@jamanvaar/types';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 import { Modal, Button, printThermalReceipt } from '@jamanvaar/ui';
-import { OrderRepository, AuditRepository, db } from '@jamanvaar/database';
+import { OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
 import { Printer, XCircle, RefreshCw, CheckCircle, Clock, Utensils, AlertTriangle } from 'lucide-react';
 
 interface OrderDetailModalProps {
@@ -30,7 +30,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
   if (!order) return null;
 
   const handlePrint = () => {
-    printThermalReceipt(order, '80mm', db.receiptConfig);
+    printThermalReceipt(order, '80mm', ReceiptRepository.getConfig());
   };
 
   const handleAdvanceStatus = (newStatus: OrderStatus) => {
@@ -51,7 +51,12 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
       setVoidError('A reason is required to void this order.');
       return;
     }
-    OrderRepository.voidOrder(order.id, voidReason, 'Manager');
+    try {
+      OrderRepository.voidOrder(order.id, voidReason, 'Manager');
+    } catch (err: any) {
+      setVoidError(err?.message || 'Void failed.');
+      return;
+    }
     setIsVoiding(false);
     setVoidReason('');
     onOrderUpdated();
@@ -75,7 +80,12 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
       }
     }
 
-    OrderRepository.refundOrder(order.id, amt, refundReason, 'Manager');
+    try {
+      OrderRepository.refundOrder(order.id, amt, refundReason, 'Manager');
+    } catch (err: any) {
+      setRefundError(err?.message || 'Refund failed.');
+      return;
+    }
     setIsRefunding(false);
     setRefundAmount('');
     setRefundReason('');

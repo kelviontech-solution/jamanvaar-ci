@@ -595,6 +595,74 @@ export async function logTenantAiTelemetry(intent: string, queryText?: string): 
 }
 
 /**
+ * Real QR-table activity exists locally the whole time — the platform-level
+ * QR Ordering Suite in Super Admin showed 0 usage for every restaurant not
+ * because nothing happened, but because no client ever called this
+ * already-real endpoint to report it.
+ */
+export async function reportQrUsage(input: { activeTables: number; ordersToday: number; revenueToday: number }): Promise<void> {
+  if (!isCloudLoggedIn()) return;
+  await request('/api/v1/tenant/qr-ordering/usage', {
+    method: 'POST',
+    body: input
+  }).catch(() => {});
+}
+
+/** Same device-authed bypass pattern as createRefund() below — order-sync and entity-sync are DeviceAuthGuard endpoints, not user-session ones. */
+function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const token = getStoredDeviceToken();
+  if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
+  return fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
+  });
+}
+
+async function parseJsonResponse(res: Response): Promise<any> {
+  const contentType = res.headers.get('content-type') ?? '';
+  return contentType.includes('application/json') ? res.json() : undefined;
+}
+
+export async function pushEntitySync(
+  entityType: string,
+  events: Array<{ externalId: string; payload: Record<string, unknown> }>
+): Promise<{ results: Array<{ externalId: string; status: 'ok' | 'error'; syncVersion?: number; error?: string }>; serverTime: string }> {
+  const res = await deviceFetch(`/api/v1/entity-sync/${entityType}`, {
+    method: 'POST',
+    body: JSON.stringify({ events })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Entity sync push failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
+export async function pullEntitySync(
+  entityType: string,
+  since?: string
+): Promise<{ entities: Array<{ externalId: string; payload: Record<string, unknown>; updatedAt: string }>; serverTime: string }> {
+  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+  const res = await deviceFetch(`/api/v1/entity-sync/${entityType}${query}`);
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Entity sync pull failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
+export async function reportDeviceHeartbeat(): Promise<void> {
+  try {
+    await deviceFetch('/api/v1/devices/me/heartbeat', {
+      method: 'PATCH',
+      body: JSON.stringify({ syncStatus: 'ok', appVersion: '1.0.0' })
+    });
+  } catch {
+    // Best-effort.
+  }
+}
+
+/**
  * The refund endpoint is device-authed, not session-authed like request<T>()
  * above (which sends the owner-login accessToken) — so this bypasses
  * request<T>() and sends the device token this app already has from its own

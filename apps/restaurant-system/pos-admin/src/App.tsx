@@ -4,9 +4,11 @@ import {
   db,
   LicenseRepository,
   MenuRepository,
-  NotificationRepository
+  NotificationRepository,
+  QrOrderingRepository
 } from '@jamanvaar/database';
-import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError, logTenantAiTelemetry } from './cloud/cloudClient';
+import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError, logTenantAiTelemetry, reportQrUsage, pushEntitySync, pullEntitySync, reportDeviceHeartbeat, getStoredDeviceToken } from './cloud/cloudClient';
+import { EntitySyncEngine } from '@jamanvaar/sync';
 import {
   Category,
   DiningTable,
@@ -59,7 +61,6 @@ import {
   TrendingUp,
   UtensilsCrossed,
   Users,
-  Zap,
   Sparkles,
   ArrowRight
 } from 'lucide-react';
@@ -226,27 +227,6 @@ export default function PosAdminApp() {
     setAuthError('');
     setLoginBusy(true);
 
-    // Fast-path demo login for local development
-    if (
-      trimmedUser.toLowerCase() === 'admin' &&
-      (authPassword === 'admin123' || authPassword === 'admin' || authPassword === 'demo')
-    ) {
-      setLoginBusy(false);
-      completeLogin(
-        {
-          id: 'admin-user',
-          fullName: 'Restaurant Admin',
-          role: 'OWNER',
-          restaurantId: 'restaurant-main'
-        },
-        {
-          id: 'restaurant-main',
-          name: 'JAMANVAAR — Demo Restaurant'
-        }
-      );
-      return;
-    }
-
     // Production Multi-Tenant Cloud Authentication
     try {
       const authResult = await cloudLogin(trimmedUser, authPassword);
@@ -268,22 +248,14 @@ export default function PosAdminApp() {
         completeLogin(authResult.user, authResult.restaurant);
       }
     } catch (err) {
-      // Local fallback if offline or db user match
-      const foundUser = db.users.find(
-        (u) =>
-          (u.username.toLowerCase() === trimmedUser.toLowerCase() || u.email?.toLowerCase() === trimmedUser.toLowerCase()) &&
-          (u.roleId === 'role-manager' || u.roleId === 'role-super-admin' || u.roleId === 'role-admin')
+      // No local credential store exists for admin accounts, so a failed cloud
+      // auth call cannot be resolved locally — surface the real error instead
+      // of granting access on username/role match alone.
+      setAuthError(
+        err instanceof CloudApiError
+          ? err.message
+          : 'Unable to reach the server to verify credentials. Please check your connection and try again.'
       );
-      if (foundUser) {
-        completeLogin({
-          id: foundUser.id,
-          fullName: foundUser.fullName,
-          role: 'OWNER',
-          restaurantId: 'restaurant-main'
-        });
-      } else {
-        setAuthError(err instanceof CloudApiError ? err.message : 'Invalid credentials. Please verify your username and password.');
-      }
     } finally {
       setLoginBusy(false);
     }
@@ -306,17 +278,6 @@ export default function PosAdminApp() {
     } finally {
       setActivationBusy(false);
     }
-  };
-
-  const handleQuickDemoAdmin = () => {
-    setAuthUsername('admin');
-    setAuthPassword('admin123');
-    completeLogin({
-      id: 'admin-user',
-      fullName: 'Restaurant Admin',
-      role: 'OWNER',
-      restaurantId: 'restaurant-main'
-    });
   };
 
   const handleAdminLogout = () => {
@@ -438,6 +399,62 @@ export default function PosAdminApp() {
     };
   }, []);
 
+  // Real QR-table activity has always existed locally — Super Admin's QR
+  // Ordering Suite showed 0 usage for every restaurant not because nothing
+  // happened, but because no client ever called the real, already-existing
+  // reporting endpoint. Only meaningful once this session has an actual
+  // owner/manager login (reportQrUsage no-ops itself when logged out).
+  useEffect(() => {
+    if (!cloudConnected) return;
+    const report = () => {
+      const stats = QrOrderingRepository.getQrStats('TODAY');
+      void reportQrUsage({
+        activeTables: stats.activeTablesCount,
+        ordersToday: stats.totalOrders,
+        revenueToday: stats.totalRevenue
+      });
+    };
+    report();
+    const interval = setInterval(report, 60000);
+    return () => clearInterval(interval);
+  }, [cloudConnected]);
+
+  // Database-layer gap: the menu previously lived only in whichever device's
+  // browser created it — Restaurant Admin is the actual menu-editing
+  // surface, so its edits are what most needs a durable cloud copy. Gated on
+  // the device token specifically (not cloudConnected/the user session),
+  // since entity-sync is a DeviceAuthGuard endpoint.
+  useEffect(() => {
+    if (!getStoredDeviceToken()) return;
+    EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
+
+    const syncMenu = async () => {
+      await EntitySyncEngine.pushSnapshot(
+        'MENU_ITEM',
+        db.menuItems.map((m) => ({ externalId: m.id, payload: m as unknown as Record<string, unknown> }))
+      );
+      await EntitySyncEngine.catchUp('MENU_ITEM', (remote) => {
+        const incoming = remote.payload as unknown as MenuItem;
+        if (!incoming || !incoming.id) return;
+        const idx = db.menuItems.findIndex((m) => m.id === incoming.id);
+        if (idx >= 0) {
+          db.menuItems[idx] = { ...db.menuItems[idx], ...incoming };
+        } else {
+          db.menuItems.push(incoming);
+        }
+      });
+      db.notify();
+    };
+
+    void syncMenu();
+    void reportDeviceHeartbeat();
+    const interval = setInterval(() => {
+      void syncMenu();
+      void reportDeviceHeartbeat();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [cloudConnected]);
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -514,15 +531,6 @@ export default function PosAdminApp() {
         >
           {authScreenState === 'LOGIN' ? (
             <>
-              <button
-                type="button"
-                onClick={handleQuickDemoAdmin}
-                className="w-full py-2.5 px-4 rounded-xl bg-[#FFF7ED] hover:bg-[#FFEEDD] border border-[#FDBA74] text-[#E66817] font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-2xs active:scale-[0.98] cursor-pointer"
-              >
-                <Zap className="w-4 h-4 text-[#E66817] fill-[#E66817]" />
-                <span>QUICK DEMO LOGIN — Restaurant Admin (@admin)</span>
-              </button>
-
               <form onSubmit={handleAdminLogin} className="space-y-3.5 pt-2">
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
@@ -559,7 +567,7 @@ export default function PosAdminApp() {
                         setAuthPassword(e.target.value);
                         setAuthError('');
                       }}
-                      placeholder="Enter admin password (demo: admin123)"
+                      placeholder="Enter admin password"
                       className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
                     />
                   </div>
@@ -582,7 +590,6 @@ export default function PosAdminApp() {
                     />
                     <span>Remember this device</span>
                   </label>
-                  <span className="text-slate-400 text-[11px] font-mono">PIN: admin / admin123</span>
                 </div>
 
                 <button
@@ -1330,12 +1337,14 @@ export default function PosAdminApp() {
 
         <NotificationToastContainer role="POS_ADMIN" />
 
-        <JamanAiFloatingButton
-          onClick={handleOpenAssistant}
-          isOpen={isAssistantOpen}
-          position="bottom-right"
-          className="bottom-4! right-4! sm:bottom-6! sm:right-6!"
-        />
+        {db.restaurant?.showJamanAI !== false && (
+          <JamanAiFloatingButton
+            onClick={handleOpenAssistant}
+            isOpen={isAssistantOpen}
+            position="bottom-right"
+            className="bottom-4! right-4! sm:bottom-6! sm:right-6!"
+          />
+        )}
 
         <JamanAiAssistantModal
           isOpen={isAssistantOpen}
@@ -1374,7 +1383,7 @@ export default function PosAdminApp() {
                   Unlock Intelligent Restaurant Operations
                 </h3>
                 <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                  JAMAN AI connects directly to your restaurant's local SQLite ledger to deliver instant operational answers, revenue projections, delayed kitchen alerts, and cash drawer auditing.
+                  JAMAN AI connects directly to your restaurant's local device data to deliver instant operational answers, revenue projections, delayed kitchen alerts, and cash drawer auditing.
                 </p>
               </div>
 

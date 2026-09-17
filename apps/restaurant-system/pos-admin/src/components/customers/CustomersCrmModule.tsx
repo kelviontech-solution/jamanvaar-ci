@@ -525,20 +525,31 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
           <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
             <Users className="w-6 h-6" />
           </div>
-          <h3 className="font-black text-base text-[#0B253A]">No Customer Profiles Found</h3>
-          <p className="text-xs text-slate-500 max-w-md mx-auto">
-            No guest records matched the selected dining segment, tag filter, or search query.
-          </p>
-          <button
-            onClick={() => {
-              setSearchQuery('');
-              setSegmentFilter('ALL');
-              setTagFilter('ALL');
-            }}
-            className="px-4 py-2 bg-[#0B253A] text-white text-xs font-bold rounded-xl shadow-xs"
-          >
-            Reset Filters & View All
-          </button>
+          {customers.length === 0 ? (
+            <>
+              <h3 className="font-black text-base text-[#0B253A]">No Guest Profiles Yet</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                Real guest profiles appear here automatically once a customer is attached to an order at POS, Kiosk, or Captain — no demo data is shown until then.
+              </p>
+            </>
+          ) : (
+            <>
+              <h3 className="font-black text-base text-[#0B253A]">No Customer Profiles Found</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                No guest records matched the selected dining segment, tag filter, or search query.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSegmentFilter('ALL');
+                  setTagFilter('ALL');
+                }}
+                className="px-4 py-2 bg-[#0B253A] text-white text-xs font-bold rounded-xl shadow-xs"
+              >
+                Reset Filters & View All
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <div className="bg-white rounded-3xl border border-[#EBE6DD] overflow-hidden shadow-xs">

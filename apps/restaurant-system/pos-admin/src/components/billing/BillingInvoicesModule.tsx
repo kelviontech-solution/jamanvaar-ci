@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Order, PaymentMethod, OrderType, OrderStatus } from '@jamanvaar/types';
 import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
-import { db, AuditRepository, OrderRepository } from '@jamanvaar/database';
+import { db, AuditRepository, OrderRepository, ReceiptRepository } from '@jamanvaar/database';
 import { DayOrdersService, ReportGeneratorService, CentralReportingService } from '@jamanvaar/business';
 import { printThermalReceipt } from '@jamanvaar/ui';
 import {
@@ -1329,7 +1329,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 <button
                   onClick={() => {
                     showToast(`Reprinting Receipt for #${selectedOrder.orderNumber}...`);
-                    printThermalReceipt(selectedOrder, '80mm', db.receiptConfig);
+                    printThermalReceipt(selectedOrder, '80mm', ReceiptRepository.getConfig());
                   }}
                   className="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-[#0B253A] font-bold text-xs rounded-xl flex items-center gap-1.5"
                 >

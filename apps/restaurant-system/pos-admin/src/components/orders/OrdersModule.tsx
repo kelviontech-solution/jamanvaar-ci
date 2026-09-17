@@ -6,7 +6,7 @@ import {
   DaySummary,
   DateFilterPreset
 } from '@jamanvaar/business';
-import { db, OrderRepository, AuditRepository } from '@jamanvaar/database';
+import { db, OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
 import {
   Search,
   Calendar,
@@ -968,7 +968,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => printThermalReceipt(receiptOrder, '80mm', db.receiptConfig)}
+                onClick={() => printThermalReceipt(receiptOrder, '80mm', ReceiptRepository.getConfig())}
                 className="flex-1 py-2.5 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs min-h-[44px]"
               >
                 <Printer className="w-4 h-4" />

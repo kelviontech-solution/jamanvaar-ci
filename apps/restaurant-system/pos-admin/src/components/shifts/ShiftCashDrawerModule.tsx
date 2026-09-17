@@ -201,7 +201,7 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
             <span className="font-extrabold text-sm text-[#0B253A]">
               Register Shift Audit History ({shifts.length})
             </span>
-            <span className="text-xs text-slate-400 font-semibold">Local SQLite Ledger</span>
+            <span className="text-xs text-slate-400 font-semibold">Local Offline Ledger</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">

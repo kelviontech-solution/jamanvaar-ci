@@ -600,7 +600,7 @@ export const QrOrderingModule: React.FC = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>100% Offline-First SQLite Engine</span>
+                  <span>100% Offline-First Local Engine</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-emerald-600" />
