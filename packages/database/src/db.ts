@@ -95,178 +95,22 @@ export class JamanvaarDatabase {
   public users: User[] = [...SEED_USERS];
   public devices: DeviceRecord[] = [];
 
-  public kiosks: KioskDevice[] = [
-    {
-      id: 'kiosk-01',
-      outletId: 'out-ahmedabad-central',
-      kioskCode: 'KIOSK-01',
-      name: 'Main Lobby Kiosk #1',
-      locationDescription: 'Ground Floor Entry',
-      status: 'ONLINE',
-      orderTypesAllowed: ['DINE_IN', 'TAKEAWAY'],
-      allowCashAtCounter: true,
-      defaultLanguage: 'en',
-      idleTimeoutSeconds: 60,
-      ipAddress: '192.168.1.101',
-      macAddress: 'AA:BB:CC:11:22:33',
-      appVersion: '1.0.0',
-      lastHeartbeat: new Date().toISOString(),
-      lastSyncAt: new Date().toISOString(),
-      isLocked: false,
-      createdAt: '2026-01-01T00:00:00Z',
-      updatedAt: '2026-08-25T08:00:00Z'
-    },
-    {
-      id: 'kiosk-02',
-      outletId: 'out-ahmedabad-central',
-      kioskCode: 'KIOSK-02',
-      name: 'Dining Area Kiosk #2',
-      locationDescription: 'Main Dining Hall Central',
-      status: 'ONLINE',
-      orderTypesAllowed: ['DINE_IN', 'TAKEAWAY'],
-      allowCashAtCounter: true,
-      defaultLanguage: 'en',
-      idleTimeoutSeconds: 60,
-      ipAddress: '192.168.1.102',
-      macAddress: 'AA:BB:CC:11:22:34',
-      appVersion: '1.0.0',
-      lastHeartbeat: new Date().toISOString(),
-      lastSyncAt: new Date().toISOString(),
-      isLocked: false,
-      createdAt: '2026-01-01T00:00:00Z',
-      updatedAt: '2026-08-25T08:00:00Z'
-    },
-    {
-      id: 'kiosk-03',
-      outletId: 'out-ahmedabad-central',
-      kioskCode: 'KIOSK-03',
-      name: 'Express Takeaway Kiosk #3',
-      locationDescription: 'Takeaway Counter Wing',
-      status: 'OFFLINE',
-      orderTypesAllowed: ['TAKEAWAY'],
-      allowCashAtCounter: true,
-      defaultLanguage: 'en',
-      idleTimeoutSeconds: 60,
-      ipAddress: '192.168.1.103',
-      macAddress: 'AA:BB:CC:11:22:35',
-      appVersion: '1.0.0',
-      lastHeartbeat: new Date(Date.now() - 3600000).toISOString(),
-      lastSyncAt: new Date(Date.now() - 3600000).toISOString(),
-      isLocked: false,
-      createdAt: '2026-01-01T00:00:00Z',
-      updatedAt: '2026-08-25T08:00:00Z'
-    }
-  ];
+  // Was 3 fabricated kiosk terminals with fake IPs/MAC addresses that never
+  // corresponded to any real activated device (QA audit BUG-004). Real
+  // entries are now upserted by KioskRepository.upsertFromHeartbeat as
+  // actual Kiosk devices join the LAN mesh — see kiosk-admin's App.tsx.
+  public kiosks: KioskDevice[] = [];
 
   public orders: Order[] = generateSeedOrders();
 
-  public businessDays: BusinessDay[] = [
-    {
-      id: 'BD-20260831',
-      businessDate: '2026-08-31',
-      displayDate: '31 August 2026',
-      openedAt: new Date(Date.now() - 28800000).toISOString(),
-      openedBy: 'Amit Dave (Lead Cashier)',
-      status: 'OPEN',
-      openingCash: 2000,
-      cashIn: 500,
-      cashOut: 300,
-      grossSales: 61200,
-      discounts: 900,
-      netSales: 59583,
-      tax: 2836,
-      totalCollected: 59583,
-      cashSales: 20011,
-      upiSales: 15361,
-      cardSales: 12576,
-      otherPayments: 11635,
-      orderCount: 83,
-      completedOrderCount: 80,
-      cancelledOrderCount: 2,
-      refundedOrderCount: 1,
-      dineInCount: 50,
-      takeawayCount: 20,
-      deliveryCount: 8,
-      tokenCount: 5,
-      terminalId: 'POS-01',
-      createdAt: '2026-08-31T08:00:00.000Z',
-      updatedAt: '2026-08-31T20:00:00.000Z'
-    },
-    {
-      id: 'BD-20260830',
-      businessDate: '2026-08-30',
-      displayDate: '30 August 2026',
-      openedAt: '2026-08-30T08:00:00.000Z',
-      closedAt: '2026-08-31T02:15:00.000Z',
-      openedBy: 'Amit Dave (Lead Cashier)',
-      closedBy: 'Rahul Sharma (Cashier)',
-      status: 'CLOSED',
-      openingCash: 2000,
-      closingCash: 20200,
-      expectedCash: 20200,
-      cashVariance: 0,
-      varianceReason: 'Balanced',
-      cashIn: 0,
-      cashOut: 0,
-      grossSales: 53500,
-      discounts: 1020,
-      netSales: 52480,
-      tax: 2499,
-      totalCollected: 52480,
-      cashSales: 18200,
-      upiSales: 21000,
-      cardSales: 13280,
-      otherPayments: 0,
-      orderCount: 74,
-      completedOrderCount: 72,
-      cancelledOrderCount: 1,
-      refundedOrderCount: 1,
-      dineInCount: 44,
-      takeawayCount: 20,
-      deliveryCount: 6,
-      tokenCount: 4,
-      terminalId: 'POS-01',
-      createdAt: '2026-08-30T08:00:00.000Z',
-      updatedAt: '2026-08-31T02:15:00.000Z'
-    },
-    {
-      id: 'BD-20260829',
-      businessDate: '2026-08-29',
-      displayDate: '29 August 2026',
-      openedAt: '2026-08-29T08:00:00.000Z',
-      closedAt: '2026-08-30T01:45:00.000Z',
-      openedBy: 'Amit Dave (Lead Cashier)',
-      closedBy: 'Amit Dave (Lead Cashier)',
-      status: 'CLOSED',
-      openingCash: 2000,
-      closingCash: 18500,
-      expectedCash: 18500,
-      cashVariance: 0,
-      varianceReason: 'Balanced',
-      cashIn: 0,
-      cashOut: 0,
-      grossSales: 49800,
-      discounts: 880,
-      netSales: 48920,
-      tax: 2329,
-      totalCollected: 48920,
-      cashSales: 16500,
-      upiSales: 19420,
-      cardSales: 13000,
-      otherPayments: 0,
-      orderCount: 68,
-      completedOrderCount: 67,
-      cancelledOrderCount: 1,
-      refundedOrderCount: 0,
-      dineInCount: 40,
-      takeawayCount: 18,
-      deliveryCount: 6,
-      tokenCount: 4,
-      terminalId: 'POS-01',
-      createdAt: '2026-08-29T08:00:00.000Z',
-      updatedAt: '2026-08-30T01:45:00.000Z'
-    }
-  ];
+  // Was 3 fabricated CLOSED business days (Aug 29-31) with invented gross
+  // sales/order counts, plus one fake "today, OPEN" day already showing
+  // Rs.61,200 in sales before any real order existed. BusinessDayRepository
+  // .getActiveBusinessDay() correctly bootstraps a real, all-zero "today"
+  // business day on demand -- historical days are only ever added when a
+  // real day actually closes.
+  public businessDays: BusinessDay[] = [];
+
 
   public paymentTransactions: PaymentTransaction[] = [];
   public receipts: Receipt[] = [];
@@ -276,310 +120,33 @@ export class JamanvaarDatabase {
   public menuImportHistory: MenuImportRecord[] = [];
   public shifts: ShiftRecord[] = generateSeedShifts();
   public cashMovements: CashMovement[] = [];
-  public kots: KOTRecord[] = [
-    {
-      id: 'kot-101',
-      kotNumber: 'KOT-01',
-      orderId: 'ord-1043',
-      orderNumber: 'ORD-43',
-      tokenNumber: '101',
-      tableNumber: '3',
-      orderType: 'DINE_IN',
-      station: 'Main Kitchen',
-      type: 'FIRST',
-      items: [
-        {
-          id: 'koti-1',
-          menuItemId: 'item-pt',
-          name: 'Paneer Tikka (Tandoori)',
-          quantity: 2,
-          modifiers: [{ groupId: 'mod-addons', groupName: 'Add-Ons', optionId: 'opt-cheese', optionName: 'Extra Cheese', priceDelta: 35 }],
-          specialInstructions: 'Less Spicy, Extra Chutney',
-          kitchenStation: 'Main Kitchen',
-          status: 'PREPARING'
-        },
-        {
-          id: 'koti-3',
-          menuItemId: 'item-dm',
-          name: 'Dal Makhani (Maa Ki Dal)',
-          quantity: 1,
-          modifiers: [],
-          kitchenStation: 'Main Kitchen',
-          status: 'PREPARING'
-        }
-      ],
-      serverName: 'Rahul Sharma',
-      cashierName: 'Amit Dave',
-      createdAt: new Date(Date.now() - 480000).toISOString(),
-      printed: true,
-      status: 'PREPARING'
-    },
-    {
-      id: 'kot-102',
-      kotNumber: 'KOT-02',
-      orderId: 'ord-1043',
-      orderNumber: 'ORD-43',
-      tokenNumber: '101',
-      tableNumber: '3',
-      orderType: 'DINE_IN',
-      station: 'Tandoor',
-      type: 'FIRST',
-      items: [
-        {
-          id: 'koti-4',
-          menuItemId: 'item-bn',
-          name: 'Butter Naan',
-          quantity: 3,
-          modifiers: [],
-          specialInstructions: 'Crispy, Extra Butter',
-          kitchenStation: 'Tandoor',
-          status: 'PREPARING'
-        },
-        {
-          id: 'koti-5',
-          menuItemId: 'item-gn',
-          name: 'Garlic Butter Naan',
-          quantity: 2,
-          modifiers: [],
-          kitchenStation: 'Tandoor',
-          status: 'PREPARING'
-        }
-      ],
-      serverName: 'Rahul Sharma',
-      cashierName: 'Amit Dave',
-      createdAt: new Date(Date.now() - 420000).toISOString(),
-      printed: true,
-      status: 'PREPARING'
-    },
-    {
-      id: 'kot-103',
-      kotNumber: 'KOT-03',
-      orderId: 'ord-1044',
-      orderNumber: 'ORD-44',
-      tokenNumber: '102',
-      tableNumber: '1',
-      orderType: 'DINE_IN',
-      station: 'Bar',
-      type: 'FIRST',
-      items: [
-        {
-          id: 'koti-6',
-          menuItemId: 'item-lassi',
-          name: 'Royal Mango Lassi',
-          quantity: 2,
-          modifiers: [],
-          specialInstructions: 'Chilled, Less Sweet',
-          kitchenStation: 'Bar',
-          status: 'READY'
-        },
-        {
-          id: 'koti-7',
-          menuItemId: 'item-chai',
-          name: 'Special Masala Chai',
-          quantity: 2,
-          modifiers: [],
-          kitchenStation: 'Bar',
-          status: 'READY'
-        }
-      ],
-      serverName: 'Vikram Mehta',
-      cashierName: 'Amit Dave',
-      createdAt: new Date(Date.now() - 720000).toISOString(),
-      printed: true,
-      status: 'READY'
-    },
-    {
-      id: 'kot-104',
-      kotNumber: 'KOT-04',
-      orderId: 'ord-1045',
-      orderNumber: 'ORD-45',
-      tokenNumber: '104',
-      orderType: 'TAKEAWAY',
-      station: 'Dessert',
-      type: 'FIRST',
-      items: [
-        {
-          id: 'koti-8',
-          menuItemId: 'item-gj',
-          name: 'Gulab Jamun with Rabdi (2 Pcs)',
-          quantity: 2,
-          modifiers: [],
-          specialInstructions: 'Pack in warm container',
-          kitchenStation: 'Dessert',
-          status: 'PREPARING'
-        }
-      ],
-      serverName: 'Amit Dave',
-      cashierName: 'Amit Dave',
-      createdAt: new Date(Date.now() - 180000).toISOString(),
-      printed: true,
-      status: 'PREPARING'
-    }
-  ];
+  // Was 4 fabricated kitchen tickets (kot-101..kot-104) referencing fake
+  // orders (ord-1043..ord-1045) that don't exist in db.orders -- every
+  // fresh install showed KDS/Admin Kitchen views a plausible-looking
+  // "in preparation" queue that was entirely invented. Real KOTs are
+  // created by KOTRepository.generateKOT when a real order is sent.
+  public kots: KOTRecord[] = [];
   public heldOrders: HeldOrder[] = [];
   public managerOverrides: ManagerOverrideRequest[] = [];
-  public reservations: Reservation[] = [
-    {
-      id: 'res-01',
-      customerName: 'Ketan Sheth',
-      customerPhone: '9825012345',
-      guestCount: 6,
-      tableNumber: '16',
-      tableId: 'tbl-16',
-      reservationTime: new Date(Date.now() + 7200000).toISOString(),
-      status: 'CONFIRMED',
-      specialRequests: 'AC section, Family celebration',
-      createdAt: new Date(Date.now() - 86400000).toISOString()
-    }
-  ];
+  // Was one fabricated reservation ("Ketan Sheth") for table 16 — which
+  // doesn't exist in the real 12-table floor plan (SEED_TABLES), a data
+  // bug on top of being invented guest activity. Real reservations are
+  // created through the actual Reservations UI.
+  public reservations: Reservation[] = [];
   public waitlist: WaitlistEntry[] = [];
   public eodReports: EodReport[] = [];
-  public feedbacks: CustomerFeedback[] = [
-    {
-      id: 'fb-1',
-      orderId: 'ord-1043',
-      kioskId: 'KIOSK-01',
-      rating: 5,
-      tags: ['Food Quality', 'Speed of Service'],
-      comments: 'Authentic flavors and super fast touch kiosk ordering!',
-      createdAt: new Date(Date.now() - 3600000).toISOString()
-    }
-  ];
+  // Was one fabricated 5-star review referencing a fake order id — real
+  // feedback is created by CustomerFeedback submission at the Kiosk.
+  public feedbacks: CustomerFeedback[] = [];
 
-  public customerAccounts: CustomerAccount[] = [
-    {
-      phone: '9876543210',
-      name: 'Ramesh Patel',
-      email: 'ramesh.patel@gmail.com',
-      address: 'A-402, Satellite Towers, Satellite, Ahmedabad',
-      dob: '1984-09-12',
-      anniversary: '2010-12-08',
-      notes: 'Prefers mild spices and table near window. VIP regular guest.',
-      tags: ['VIP', 'FAMILY'],
-      loyaltyPoints: 340,
-      favoriteItemIds: ['item-pt', 'item-dm', 'item-bn'],
-      recentOrderIds: ['ord-1043', 'ord-9901'],
-      totalVisits: 8,
-      totalSpend: 14850,
-      createdAt: '2026-01-15T10:30:00.000Z',
-      lastVisitAt: new Date(Date.now() - 7200000).toISOString()
-    },
-    {
-      phone: '9822334455',
-      name: 'Dr. Neha Shah',
-      email: 'dr.neha.shah@apollo.org',
-      address: 'Flat 6B, Orchid Elegance, Bodakdev, Ahmedabad',
-      dob: '1990-08-31',
-      anniversary: '2018-02-14',
-      notes: 'Strict Jain preparation only (no onion, no garlic).',
-      tags: ['VIP', 'JAIN'],
-      loyaltyPoints: 260,
-      favoriteItemIds: ['item-guj-thali', 'item-gj'],
-      recentOrderIds: ['ord-9902', 'ord-1044'],
-      totalVisits: 6,
-      totalSpend: 9240,
-      createdAt: '2026-02-10T14:15:00.000Z',
-      lastVisitAt: new Date(Date.now() - 86400000).toISOString()
-    },
-    {
-      phone: '9899001122',
-      name: 'Amit Verma',
-      email: 'amit.verma@techcorp.in',
-      address: 'Plot 12, Prahlad Nagar Garden Road, Ahmedabad',
-      dob: '1988-11-20',
-      notes: 'Corporate client. Always requests GST invoice with company details.',
-      tags: ['CORPORATE', 'REGULAR'],
-      loyaltyPoints: 180,
-      favoriteItemIds: ['item-vbir', 'item-cc-ice'],
-      recentOrderIds: ['ord-9903'],
-      totalVisits: 5,
-      totalSpend: 7890,
-      createdAt: '2026-03-01T11:00:00.000Z',
-      lastVisitAt: new Date(Date.now() - 172800000).toISOString()
-    },
-    {
-      phone: '9811223344',
-      name: 'Priya Joshi',
-      email: 'priya.joshi@designstudio.com',
-      address: '301, Shivalik High Street, Vastrapur, Ahmedabad',
-      dob: '1995-04-18',
-      anniversary: '2022-11-25',
-      notes: 'Vegan preference. Loves fresh mint beverages and tandoori starters.',
-      tags: ['REGULAR', 'VEGAN'],
-      loyaltyPoints: 150,
-      favoriteItemIds: ['item-corn', 'item-pt'],
-      recentOrderIds: ['ord-9904'],
-      totalVisits: 4,
-      totalSpend: 4680,
-      createdAt: '2026-04-12T16:20:00.000Z',
-      lastVisitAt: new Date(Date.now() - 259200000).toISOString()
-    },
-    {
-      phone: '9833445566',
-      name: 'Sanjay Mehta',
-      email: 'sanjay.mehta@investments.co',
-      address: 'B-12, Heritage Bungalows, SG Highway, Ahmedabad',
-      dob: '1976-06-05',
-      anniversary: '2002-05-10',
-      notes: 'Loves Royal Dum Biryani. Family weekend regular.',
-      tags: ['VIP', 'FAMILY'],
-      loyaltyPoints: 490,
-      favoriteItemIds: ['item-vbir', 'item-dm', 'item-bn'],
-      recentOrderIds: ['ord-9905'],
-      totalVisits: 9,
-      totalSpend: 18720,
-      createdAt: '2026-01-05T09:00:00.000Z',
-      lastVisitAt: new Date(Date.now() - 345600000).toISOString()
-    },
-    {
-      phone: '9844556677',
-      name: 'Kavita Reddy',
-      email: 'kavita.reddy@gmail.com',
-      address: 'A-201, Maple Tree Garden, Memnagar, Ahmedabad',
-      dob: '1992-10-15',
-      notes: 'Enjoys desserts and starters.',
-      tags: ['REGULAR'],
-      loyaltyPoints: 90,
-      favoriteItemIds: ['item-gj', 'item-corn'],
-      recentOrderIds: [],
-      totalVisits: 3,
-      totalSpend: 3150,
-      createdAt: '2026-05-18T12:00:00.000Z',
-      lastVisitAt: new Date(Date.now() - 604800000).toISOString()
-    },
-    {
-      phone: '9855667788',
-      name: 'Rajesh Gupta',
-      email: 'rajesh.gupta@consulting.in',
-      address: '404, Titanium City Center, Anandnagar, Ahmedabad',
-      dob: '1982-01-22',
-      notes: 'Quick counter takeaway guest.',
-      tags: ['CORPORATE'],
-      loyaltyPoints: 60,
-      favoriteItemIds: ['item-vbir'],
-      recentOrderIds: [],
-      totalVisits: 2,
-      totalSpend: 1640,
-      createdAt: '2026-06-25T15:30:00.000Z',
-      lastVisitAt: new Date(Date.now() - 1209600000).toISOString()
-    },
-    {
-      phone: '9866778899',
-      name: 'Ananya Desai',
-      email: 'ananya.desai@outlook.com',
-      address: '702, Shaligram Plus, Thaltej, Ahmedabad',
-      dob: '1998-07-09',
-      notes: 'College group regular for Cold Coffee & Starters.',
-      tags: ['REGULAR'],
-      loyaltyPoints: 110,
-      favoriteItemIds: ['item-cc-ice', 'item-corn'],
-      recentOrderIds: [],
-      totalVisits: 3,
-      totalSpend: 2850,
-      createdAt: '2026-07-10T17:45:00.000Z',
-      lastVisitAt: new Date(Date.now() - 1814400000).toISOString()
-    }
-  ];
+  // Was 8 fabricated guest profiles with invented visit counts, loyalty
+  // balances and lifetime-spend totals, none of it backed by any real order
+  // — the exact "CRM shows guests who never existed" pattern the QA audit
+  // flagged. Real profiles are created automatically the moment a real order
+  // attaches a customer (see CustomerRepository.getOrCreateAccount /
+  // earnPointsForOrder), so this starts empty rather than pre-populated with
+  // invented history.
+  public customerAccounts: CustomerAccount[] = [];
 
   public combos: ComboDeal[] = [
     {
@@ -794,7 +361,7 @@ export class JamanvaarDatabase {
     restaurantName: 'JAMANVAAR Restaurant',
     address: 'Sindhu Bhavan Road, Bodakdev, Ahmedabad, Gujarat 380054',
     phone: '+91 79 4890 1234',
-    gstin: '24AAAAA0000A1Z5',
+    gstin: '24ABCDE1234F1Z5', // matches SEED_RESTAURANT.gstin in seed.ts — these two used to seed different values with nothing to keep them in sync
     fssaiNumber: '10722001000452',
     footerMessage: 'Freshly Prepared • Zero Preservatives • Pure Heritage Taste',
     thankYouMessage: 'Thank you for dining at JAMANVAAR! Please visit again.',
@@ -989,6 +556,15 @@ export class JamanvaarDatabase {
   };
 
   private customSyncServerUrl: string = '';
+  // Tracks the LAN sync server's own SEC-005 pairing gate: /api/sync and
+  // /api/events are Bearer-token-protected, and nothing here ever performs
+  // the /devices/pair handshake that would obtain that token, so every
+  // request is structurally guaranteed to 401 until a real pairing flow
+  // exists. Rather than spam that rejection every 8 seconds forever (the
+  // "LAN Sync 401 polling loop" from the QA audit), this stops retrying
+  // after the first 401 instead of looping indefinitely.
+  private serverSyncUnauthorized = false;
+  private serverSyncPollTimer: ReturnType<typeof setInterval> | null = null;
   private listeners: Set<() => void> = new Set();
   private broadcastChannel: BroadcastChannel | null = null;
   public getSyncServerUrl(): string {
@@ -1084,6 +660,7 @@ export class JamanvaarDatabase {
 
   private pushToServer(): void {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
+    if (this.serverSyncUnauthorized) return;
     try {
       fetch(`${this.getSyncServerUrl()}/api/sync`, {
         method: 'POST',
@@ -1124,7 +701,11 @@ export class JamanvaarDatabase {
           license: this.license,
           taxGroups: this.taxGroups
         })
-      }).catch(() => {});
+      })
+        .then((res) => {
+          if (res.status === 401) this.serverSyncUnauthorized = true;
+        })
+        .catch(() => {});
     } catch {
       // Ignore network errors
     }
@@ -1133,10 +714,27 @@ export class JamanvaarDatabase {
   private initServerSync(): void {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
 
+    // A prior call (e.g. setSyncServerUrl pointing at a new server) may have
+    // left a poll timer and an unauthorized flag from the old target running
+    // — clear both so re-syncing against a different server gets a fresh
+    // attempt instead of inheriting the previous one's rejection.
+    if (this.serverSyncPollTimer) {
+      clearInterval(this.serverSyncPollTimer);
+      this.serverSyncPollTimer = null;
+    }
+    this.serverSyncUnauthorized = false;
+
     // 1. Initial Pull from Sync Server
     fetch(`${this.getSyncServerUrl()}/api/sync`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          this.serverSyncUnauthorized = true;
+          return null;
+        }
+        return res.json();
+      })
       .then((data) => {
+        if (!data) return;
         if (data && data.orders && Array.isArray(data.orders) && data.orders.length > 0) {
           const map = new Map<string, Order>();
           this.orders.forEach((o) => map.set(o.id, o));
@@ -1238,10 +836,24 @@ export class JamanvaarDatabase {
     } catch (e) {}
 
     // 3. Fallback Interval Polling (every 8 seconds, zero feedback recursion)
-    setInterval(() => {
+    this.serverSyncPollTimer = setInterval(() => {
+      if (this.serverSyncUnauthorized) {
+        if (this.serverSyncPollTimer) {
+          clearInterval(this.serverSyncPollTimer);
+          this.serverSyncPollTimer = null;
+        }
+        return;
+      }
       fetch(`${this.getSyncServerUrl()}/api/sync`)
-        .then((res) => res.json())
+        .then((res) => {
+          if (res.status === 401) {
+            this.serverSyncUnauthorized = true;
+            return null;
+          }
+          return res.json();
+        })
         .then((data) => {
+          if (!data) return;
           if (data && data.orders && Array.isArray(data.orders)) {
             let changed = false;
             const map = new Map<string, Order>();

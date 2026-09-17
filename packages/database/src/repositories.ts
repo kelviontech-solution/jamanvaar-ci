@@ -38,6 +38,7 @@ import {
   ModifierGroup,
   Offer,
   Order,
+  OrderItem,
   OrderStatus,
   OrderType,
   PaymentMethod,
@@ -626,6 +627,13 @@ export class OrderRepository {
     const prevStatus = order.orderStatus;
     order.orderStatus = status;
     order.updatedAt = new Date().toISOString();
+    // A locally-made status change (POS/Restaurant Admin advancing an order)
+    // needs to reach the cloud mirror again — without this, only the order's
+    // initial creation would ever get pushed and every status change after
+    // that would be invisible to other devices relying on the sync bridge's
+    // catch-up pull. (This was mistakenly added only to QrOrderingRepository's
+    // separate updateOrderStatus below, not here, in an earlier pass.)
+    order.syncStatus = 'SAVED_LOCALLY';
 
     if (!order.timeline) order.timeline = [];
     order.timeline.push({
@@ -723,7 +731,7 @@ export class OrderRepository {
     // advanced totalSpend/totalVisits on an actual paid order; only a
     // manual addPoints() call existed, never wired to checkout.
     if (order.customerPhone) {
-      CustomerRepository.earnPointsForOrder(order.customerPhone, order.totalAmount);
+      CustomerRepository.earnPointsForOrder(order.customerPhone, order.totalAmount, order.id);
     }
 
     db.notify();
@@ -744,11 +752,22 @@ export class OrderRepository {
   public static voidOrder(id: string, reason: string, managerName: string): Order | null {
     const order = db.orders.find((o) => o.id === id);
     if (!order) return null;
+    // A paid order's revenue is already booked into shift/business-day
+    // totals — cancelling its status here without reversing those would
+    // silently corrupt cash-drawer reconciliation. refundOrder() below does
+    // that reversal; void is only for a bill that was never actually paid.
+    if (order.paymentStatus === 'SUCCESS') {
+      throw new Error('This order has already been paid — use Refund instead of Void.');
+    }
+    if (order.orderStatus === 'CANCELLED' || order.orderStatus === 'REFUNDED') {
+      throw new Error('This order has already been voided or refunded.');
+    }
 
     const now = new Date().toISOString();
     order.orderStatus = 'CANCELLED';
     order.paymentStatus = 'CANCELLED';
     order.updatedAt = now;
+    order.syncStatus = 'SAVED_LOCALLY';
 
     if (!order.timeline) order.timeline = [];
     order.timeline.push({
@@ -792,11 +811,26 @@ export class OrderRepository {
   public static refundOrder(id: string, refundAmount: number, reason: string, managerName: string): Order | null {
     const order = db.orders.find((o) => o.id === id);
     if (!order) return null;
+    if (order.paymentStatus !== 'SUCCESS') {
+      throw new Error('Only a paid order can be refunded.');
+    }
+    if (order.orderStatus === 'REFUNDED') {
+      throw new Error('This order has already been refunded.');
+    }
+    if (refundAmount <= 0 || refundAmount > order.totalAmount) {
+      throw new Error(`Refund amount must be between ₹1 and the order total (₹${order.totalAmount}).`);
+    }
 
     const now = new Date().toISOString();
+    const isFullRefund = refundAmount === order.totalAmount;
     order.orderStatus = 'REFUNDED';
-    order.paymentStatus = 'REFUNDED';
+    // A partial refund settles a lesser amount back to the guest but the
+    // order itself was still genuinely paid — only a full refund reverses
+    // paymentStatus itself, matching the same distinction createOrder's own
+    // paymentStatus/orderStatus split already makes elsewhere.
+    order.paymentStatus = isFullRefund ? 'REFUNDED' : order.paymentStatus;
     order.updatedAt = now;
+    order.syncStatus = 'SAVED_LOCALLY';
 
     if (!order.timeline) order.timeline = [];
     order.timeline.push({
@@ -806,6 +840,27 @@ export class OrderRepository {
       timestamp: now,
       actor: managerName
     });
+
+    // Reverses the same shift counters createOrder/completePayment
+    // incremented — without this, a processed refund leaves the cash
+    // drawer's expected-vs-actual reconciliation silently wrong for the
+    // rest of the shift.
+    const activeShift = ShiftRepository.getActiveShift();
+    if (activeShift) {
+      activeShift.totalSales -= refundAmount;
+      const pMethod = order.paymentMethod;
+      if (pMethod === 'CASH' || pMethod === 'CASH_AT_COUNTER') {
+        activeShift.totalCashSales -= refundAmount;
+        activeShift.expectedCash -= refundAmount;
+      } else if (pMethod === 'UPI' || pMethod === 'UPI_QR') {
+        activeShift.totalUpiSales -= refundAmount;
+      } else if (pMethod === 'CARD' || pMethod === 'CARD_TERMINAL') {
+        activeShift.totalCardSales -= refundAmount;
+      }
+    }
+    if (order.businessDayId) {
+      BusinessDayRepository.recalculateMetrics(order.businessDayId);
+    }
 
     AuditRepository.log({
       action: 'REFUND',
@@ -1069,6 +1124,54 @@ export class KioskRepository {
       db.notify();
     }
   }
+
+  /**
+   * Upserts a fleet entry from a real, currently-connected Kiosk mesh
+   * heartbeat, so the Kiosk Terminal Fleet screen reflects devices that
+   * actually activated and joined the mesh, instead of a fabricated
+   * fixture list. Fields the browser genuinely cannot know (ipAddress,
+   * macAddress) are left unset rather than faked.
+   */
+  public static upsertFromHeartbeat(peer: { deviceId: string; name: string; appVersion: string; lastHeartbeat: string }): void {
+    const existing = db.kiosks.find((k) => k.id === peer.deviceId || k.kioskCode === peer.deviceId);
+    if (existing) {
+      existing.name = peer.name || existing.name;
+      existing.appVersion = peer.appVersion;
+      existing.lastHeartbeat = peer.lastHeartbeat;
+      if (!existing.isLocked) existing.status = 'ONLINE';
+      existing.updatedAt = new Date().toISOString();
+    } else {
+      db.kiosks.push({
+        id: peer.deviceId,
+        outletId: db.restaurant.id,
+        kioskCode: peer.deviceId,
+        name: peer.name || peer.deviceId,
+        status: 'ONLINE',
+        orderTypesAllowed: ['DINE_IN', 'TAKEAWAY'],
+        allowCashAtCounter: true,
+        defaultLanguage: 'en',
+        idleTimeoutSeconds: 60,
+        appVersion: peer.appVersion,
+        lastHeartbeat: peer.lastHeartbeat,
+        isLocked: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    }
+    db.notify();
+  }
+
+  /** Marks any kiosk not seen recently as OFFLINE, mirroring the mesh's own staleness window. */
+  public static markStaleOffline(activeDeviceIds: Set<string>): void {
+    let changed = false;
+    db.kiosks.forEach((k) => {
+      if (!activeDeviceIds.has(k.id) && k.status !== 'OFFLINE') {
+        k.status = 'OFFLINE';
+        changed = true;
+      }
+    });
+    if (changed) db.notify();
+  }
 }
 
 export class ServiceRequestRepository {
@@ -1179,15 +1282,32 @@ export class CustomerRepository {
     if (existing) {
       existing.name = cust.name || existing.name;
       if (cust.loyaltyPoints !== undefined) existing.loyaltyPoints = cust.loyaltyPoints;
+      // Was silently dropping every other field the CRM "Add Customer" form
+      // collects (email, address, dob, anniversary, notes, tags) on repeat
+      // calls — a staff member re-attaching an existing phone number with
+      // updated details would see them vanish.
+      if (cust.email !== undefined) existing.email = cust.email;
+      if (cust.address !== undefined) existing.address = cust.address;
+      if (cust.dob !== undefined) existing.dob = cust.dob;
+      if (cust.anniversary !== undefined) existing.anniversary = cust.anniversary;
+      if (cust.notes !== undefined) existing.notes = cust.notes;
+      if (cust.tags !== undefined) existing.tags = cust.tags;
       db.notify();
       return existing;
     }
     const newCust: CustomerAccount = {
       phone: cust.phone,
       name: cust.name,
+      email: cust.email,
+      address: cust.address,
+      dob: cust.dob,
+      anniversary: cust.anniversary,
+      notes: cust.notes,
+      tags: cust.tags || [],
       loyaltyPoints: cust.loyaltyPoints || 50,
       favoriteItemIds: cust.favoriteItemIds || [],
-      recentOrderIds: cust.recentOrderIds || []
+      recentOrderIds: cust.recentOrderIds || [],
+      createdAt: cust.createdAt || new Date().toISOString()
     };
     db.customerAccounts.push(newCust);
     AuditRepository.log({
@@ -1335,13 +1455,20 @@ export class CustomerRepository {
    * fields nothing ever updated — a customer's tier could never actually
    * change from real activity.
    */
-  public static earnPointsForOrder(phone: string, orderTotal: number): number {
+  public static earnPointsForOrder(phone: string, orderTotal: number, orderId?: string): number {
     const account = this.getOrCreateAccount(phone);
     const tierBefore = this.getTierForAccount(account);
 
     account.totalSpend = (account.totalSpend || 0) + orderTotal;
     account.totalVisits = (account.totalVisits || 0) + 1;
     account.lastVisitAt = new Date().toISOString();
+    // Was only ever initialized to [] and never appended to — a customer's
+    // "360° view" (Restaurant Admin CRM) could never show their actual
+    // order history even after totalSpend/totalVisits were wired up.
+    if (orderId) {
+      if (!account.recentOrderIds) account.recentOrderIds = [];
+      account.recentOrderIds = [orderId, ...account.recentOrderIds.filter((id) => id !== orderId)].slice(0, 20);
+    }
 
     const tier = this.getTierForAccount(account) || tierBefore;
     const basePoints = Math.floor(orderTotal / 10);
@@ -1661,7 +1788,19 @@ export class ComboRepository {
 
 export class ReceiptRepository {
   public static getConfig(): ReceiptConfig {
-    return db.receiptConfig;
+    // Restaurant Settings (db.restaurant) is the canonical source for
+    // legal/branding fields — overlay them live so a receipt can never
+    // print a stale/independently-seeded GSTIN, address or phone that
+    // disagrees with what the owner actually saved (the "third
+    // independently-hardcoded GSTIN" bug the QA audit found on the Kiosk).
+    return {
+      ...db.receiptConfig,
+      restaurantName: db.restaurant.name || db.receiptConfig.restaurantName,
+      address: db.restaurant.address || db.receiptConfig.address,
+      phone: db.restaurant.phone || db.receiptConfig.phone,
+      gstin: db.restaurant.gstin || db.receiptConfig.gstin,
+      fssaiNumber: db.restaurant.fssaiNumber || db.receiptConfig.fssaiNumber
+    };
   }
 
   public static updateConfig(updates: Partial<ReceiptConfig>): ReceiptConfig {
@@ -1922,6 +2061,7 @@ export class KOTRepository {
     type?: KOTType;
     cashierName: string;
     serverName?: string;
+    orderNotes?: string;
   }): KOTRecord[] {
     const existingKots = this.getKOTsForOrder(params.orderId);
     const isFirst = existingKots.length === 0;
@@ -1959,7 +2099,8 @@ export class KOTRepository {
         serverName: params.serverName,
         createdAt: new Date().toISOString(),
         printed: true,
-        status: 'PREPARING'
+        status: 'PREPARING',
+        orderNotes: params.orderNotes
       };
 
       nextKotSeq++;
@@ -1990,6 +2131,24 @@ export class KOTRepository {
     if (status === 'SERVED' && !kot.servedAt) {
       kot.servedAt = new Date().toISOString();
     }
+
+    // Mirror onto the parent Order so the cloud sync bridge — which reads
+    // Order.items[].kitchenStatus, not db.kots — actually sees a kitchen-side
+    // status change. KOT items and Order items are separate id spaces (see
+    // posStore.ts's sendKOT, which mints them independently), so the match
+    // has to go through menuItemId rather than id.
+    const order = db.orders.find((o) => o.id === kot.orderId);
+    if (order) {
+      const kotMenuItemIds = new Set(kot.items.map((i) => i.menuItemId));
+      order.items.forEach((oi) => {
+        if (kotMenuItemIds.has(oi.menuItemId)) {
+          oi.kitchenStatus = status as OrderItem['kitchenStatus'];
+        }
+      });
+      order.updatedAt = new Date().toISOString();
+      order.syncStatus = 'SAVED_LOCALLY';
+    }
+
     db.notify();
     return kot;
   }
@@ -3884,6 +4043,12 @@ export class QrOrderingRepository {
 
     order.orderStatus = nextStatus;
     order.updatedAt = new Date().toISOString();
+    // A locally-made status change (KDS marking PREPARING/READY, Captain
+    // marking SERVED, POS completing) needs to reach the cloud mirror again —
+    // without this, only the order's initial creation would ever get pushed
+    // and every status change after that would be invisible to other devices
+    // relying on the sync bridge's catch-up pull.
+    order.syncStatus = 'SAVED_LOCALLY';
 
     const stageTitles: Record<string, string> = {
       ACCEPTED: 'Order Accepted by POS',

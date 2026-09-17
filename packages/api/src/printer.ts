@@ -163,6 +163,12 @@ export class PrinterService {
       if (item.specialInstructions) lines.push(`  * ${item.specialInstructions}`);
     });
 
+    if (kot.orderNotes) {
+      lines.push(divider);
+      lines.push('NOTE:');
+      lines.push(kot.orderNotes);
+    }
+
     lines.push(doubleDivider);
     return lines.join('\n');
   }

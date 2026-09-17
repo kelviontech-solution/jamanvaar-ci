@@ -67,6 +67,12 @@ export interface Restaurant {
   managerName?: string;
   instantBillConfig?: InstantBillConfig;
   discountConfig?: DiscountConfig;
+  // Per-restaurant opt-out for the JAMAN AI floating assistant widget in
+  // POS/Captain/Restaurant Admin — layered on top of the platform-wide
+  // ApplicationEntitlement toggle in Super Admin, which only gates whether
+  // the *feature* exists at all, not whether an individual restaurant wants
+  // the widget visible. Undefined means shown (opt-out, not opt-in).
+  showJamanAI?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -1135,6 +1141,8 @@ export interface KOTRecord {
   servedAt?: string;
   printed: boolean;
   status: KOTStatus;
+  /** Order-level free-text note (e.g. allergy/dietary instructions), distinct from per-item specialInstructions. */
+  orderNotes?: string;
 }
 
 export type KOT = KOTRecord;

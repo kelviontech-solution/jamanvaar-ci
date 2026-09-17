@@ -1,5 +1,25 @@
 /**
- * SQLite Relational Schema DDL for JAMANVAAR Kiosk Platform
+ * SQLite Relational Schema DDL for JAMANVAAR Kiosk Platform.
+ *
+ * NOT EXECUTED ANYWHERE. This string documents the intended shape of the
+ * operational data model (menu/orders/tables/staff/CRM/inventory) that the
+ * real runtime — db.ts's JamanvaarDatabase — currently implements as plain
+ * in-memory JS arrays persisted via localStorage.setItem, not as SQLite.
+ * There is no better-sqlite3/sql.js/Prisma-SQLite engine anywhere in this
+ * package; nothing ever runs this DDL against a real database. Grep the repo
+ * for `SQLITE_SCHEMA_DDL` before trusting that it does — it has exactly one
+ * reference, this file's own declaration.
+ *
+ * The corresponding real database for this operational domain is
+ * cloud/api/prisma/schema.prisma's SyncedOrder/SyncedEntity models (see
+ * modules/order-sync and modules/entity-sync) — genuine Postgres tables with
+ * row-level security, reachable from local apps via packages/sync's
+ * SyncOutboxEngine/EntitySyncEngine. Replacing this file's local persistence
+ * with a real embedded SQLite engine (meaningful mainly for the Tauri
+ * desktop shell, where crash-durability and real querying would matter more
+ * than they do for a browser tab) is a separate, substantial undertaking —
+ * a full rewrite of db.ts's ~1800 lines and every app that imports it — not
+ * attempted here.
  */
 
 export const SQLITE_SCHEMA_DDL = `
