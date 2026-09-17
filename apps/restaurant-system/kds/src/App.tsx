@@ -365,21 +365,21 @@ export const App: React.FC = () => {
       <JAMANVAARStartup appName="Kitchen Display (KDS)" appType="KDS" subtitle="Kitchen Production & Expediter System">
         <div className="min-h-screen flex items-center justify-center p-6">
           <form onSubmit={handleActivate} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4 text-center">
-            <h1 className="text-2xl font-black text-[#0B253A]">Activate This Terminal</h1>
+            <h1 className="text-2xl font-black text-jaman-navy">Activate This Terminal</h1>
             <p className="text-sm text-[#4A5568]">Enter the activation code provided by JAMANVAAR to connect this Kitchen Display to your restaurant.</p>
             <input
               type="text"
               value={activationCode}
               onChange={(e) => setActivationCode(e.target.value)}
               placeholder="Activation code"
-              className="w-full text-center text-lg font-mono bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-4 py-3"
+              className="w-full text-center text-lg font-mono bg-jaman-cream border border-jaman-border rounded-xl px-4 py-3"
               autoFocus
             />
             {activationError && <p className="text-sm font-bold text-rose-700">{activationError}</p>}
             <button
               type="submit"
               disabled={isActivating || !activationCode.trim()}
-              className="w-full py-3 rounded-2xl bg-[#E66817] text-white font-black uppercase tracking-wider disabled:opacity-60"
+              className="w-full py-3 rounded-2xl bg-jaman-saffron text-white font-black uppercase tracking-wider disabled:opacity-60"
             >
               {isActivating ? 'Activating…' : 'Activate'}
             </button>
@@ -422,8 +422,8 @@ export const App: React.FC = () => {
                   onClick={() => setKdsStationSelection(st.id)}
                   className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                     kdsStationSelection === st.id
-                      ? 'bg-[#0B253A] text-white border-[#0B253A] shadow-xs'
-                      : 'bg-[#FAF7F2] border-[#EBE6DD] text-slate-700 hover:bg-slate-100'
+                      ? 'bg-jaman-navy text-white border-jaman-navy shadow-xs'
+                      : 'bg-jaman-cream border-jaman-border text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   <span className="text-xs font-black block">{st.label}</span>
@@ -435,7 +435,7 @@ export const App: React.FC = () => {
           {/* PIN Input & Numpad */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-[#0B253A] uppercase tracking-wider">
+              <label className="text-xs font-bold text-jaman-navy uppercase tracking-wider">
                 Kitchen Staff PIN
               </label>
             </div>
@@ -445,7 +445,7 @@ export const App: React.FC = () => {
               value={kdsPin}
               readOnly
               placeholder="• • • •"
-              className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3 px-4 rounded-2xl bg-white border border-[#EBE6DD] focus:border-[#E66817] outline-none text-[#0B253A]"
+              className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3 px-4 rounded-2xl bg-white border border-jaman-border focus:border-jaman-saffron outline-none text-jaman-navy"
             />
             {kdsPinError && (
               <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
@@ -464,7 +464,7 @@ export const App: React.FC = () => {
                     else if (k === '⌫') setKdsPin((prev) => prev.slice(0, -1));
                     else handleKdsPinPress(k);
                   }}
-                  className="h-12 sm:h-13 rounded-2xl bg-white hover:border-[#E66817] hover:bg-amber-50/30 active:scale-95 text-lg font-black transition-all flex items-center justify-center border border-[#EBE6DD] text-[#0B253A] shadow-2xs cursor-pointer"
+                  className="h-12 sm:h-13 rounded-2xl bg-white hover:border-jaman-saffron hover:bg-amber-50/30 active:scale-95 text-lg font-black transition-all flex items-center justify-center border border-jaman-border text-jaman-navy shadow-2xs cursor-pointer"
                 >
                   {k === '⌫' ? (
                     <Delete className="w-4 h-4 text-rose-600" />
@@ -487,9 +487,9 @@ export const App: React.FC = () => {
   // =========================================================================
   return (
     <JAMANVAARStartup appName="Kitchen Display (KDS)" appType="KDS" subtitle="Kitchen Production & Expediter System">
-      <div className="min-h-screen bg-[#FAF7F2] text-[#0B253A] flex flex-col select-none font-sans">
+      <div className="min-h-screen bg-jaman-cream text-jaman-navy flex flex-col select-none font-sans">
         {/* TOP HEADER: Brand, Station Selector, Live Clock, Switch Station */}
-        <header className="bg-white border-b border-[#EBE6DD] px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs shrink-0 z-10">
+        <header className="bg-white border-b border-jaman-border px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs shrink-0 z-10">
           <div className="flex items-center gap-3">
             <BrandHeader
               app="KDS"
@@ -497,14 +497,14 @@ export const App: React.FC = () => {
               badgeSize="sm"
               showContext={false}
             />
-            <div className="hidden lg:flex items-center gap-1.5 bg-[#FFF4ED] border border-[#FDBA74] px-3 py-1.5 rounded-xl text-xs font-bold text-[#E66817]">
+            <div className="hidden lg:flex items-center gap-1.5 bg-[#FFF4ED] border border-[#FDBA74] px-3 py-1.5 rounded-xl text-xs font-bold text-jaman-saffron">
               <span>Station:</span>
-              <span className="font-black text-[#0B253A]">{selectedStation}</span>
+              <span className="font-black text-jaman-navy">{selectedStation}</span>
             </div>
           </div>
 
           {/* Center: Touch Station Selector Pills */}
-          <div className="flex items-center gap-1.5 bg-[#FAF7F2] p-1 rounded-2xl border border-[#EBE6DD] overflow-x-auto">
+          <div className="flex items-center gap-1.5 bg-jaman-cream p-1 rounded-2xl border border-jaman-border overflow-x-auto">
             {[
               { id: 'ALL', label: '🍽 All' },
               { id: 'Main Kitchen', label: '🍳 Main' },
@@ -518,8 +518,8 @@ export const App: React.FC = () => {
                 onClick={() => setSelectedStation(st.id)}
                 className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap active:scale-95 cursor-pointer ${
                   selectedStation === st.id
-                    ? 'bg-[#0B253A] text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-white hover:text-[#0B253A]'
+                    ? 'bg-jaman-navy text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-white hover:text-jaman-navy'
                 }`}
               >
                 {st.label}
@@ -538,8 +538,8 @@ export const App: React.FC = () => {
             </div>
 
             {/* Cooking Counter */}
-            <div className="bg-[#FFF4ED] border border-[#FDBA74] px-3 py-1.5 rounded-xl text-xs font-bold text-[#E66817] flex items-center gap-1.5 shadow-2xs">
-              <Flame className="w-4 h-4 text-[#E66817]" />
+            <div className="bg-[#FFF4ED] border border-[#FDBA74] px-3 py-1.5 rounded-xl text-xs font-bold text-jaman-saffron flex items-center gap-1.5 shadow-2xs">
+              <Flame className="w-4 h-4 text-jaman-saffron" />
               <span className="font-mono font-black">{activePreparingCount}</span>
               <span className="hidden md:inline font-bold text-[11px]">Cooking</span>
             </div>
@@ -556,7 +556,7 @@ export const App: React.FC = () => {
               type="button"
               onClick={handleKdsLogout}
               title="Switch kitchen station or logout"
-              className="flex items-center gap-1.5 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-[#EBE6DD] hover:border-rose-300 px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs cursor-pointer"
+              className="flex items-center gap-1.5 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-jaman-border hover:border-rose-300 px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden xl:inline">Switch Station</span>
@@ -565,7 +565,7 @@ export const App: React.FC = () => {
         </header>
 
         {/* STATUS NAVIGATION BAR */}
-        <div className="bg-white border-b border-[#EBE6DD] px-4 sm:px-6 py-2.5 shrink-0 shadow-2xs">
+        <div className="bg-white border-b border-jaman-border px-4 sm:px-6 py-2.5 shrink-0 shadow-2xs">
           <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto max-w-[1920px] mx-auto">
             {[
               { id: 'ALL', label: 'ACTIVE TICKETS', count: activePreparingCount + readyPickupCount, icon: UtensilsCrossed },
@@ -581,16 +581,16 @@ export const App: React.FC = () => {
                   onClick={() => setStatusFilter(tab.id as any)}
                   className={`min-h-[46px] px-4 sm:px-6 rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center gap-2.5 shrink-0 active:scale-95 cursor-pointer ${
                     isSelected
-                      ? 'bg-[#E66817] text-white shadow-md shadow-orange-500/25'
-                      : 'bg-[#FAF7F2] border border-[#EBE6DD] text-slate-700 hover:bg-[#F0ECE1] hover:text-[#0B253A]'
+                      ? 'bg-jaman-saffron text-white shadow-md shadow-orange-500/25'
+                      : 'bg-jaman-cream border border-jaman-border text-slate-700 hover:bg-[#F0ECE1] hover:text-jaman-navy'
                   }`}
                 >
                   <span>{tab.label}</span>
                   <span
                     className={`px-2 py-0.5 rounded-full text-xs font-mono font-black ${
                       isSelected
-                        ? 'bg-white text-[#E66817]'
-                        : 'bg-white border border-[#EBE6DD] text-slate-600'
+                        ? 'bg-white text-jaman-saffron'
+                        : 'bg-white border border-jaman-border text-slate-600'
                     }`}
                   >
                     {tab.count}
@@ -621,7 +621,7 @@ export const App: React.FC = () => {
                       ? 'border-amber-400'
                       : isServed
                       ? 'border-slate-200 opacity-75'
-                      : 'border-[#EBE6DD]'
+                      : 'border-jaman-border'
                   }`}
                 >
                   {/* State Accent Top Bar */}
@@ -639,13 +639,13 @@ export const App: React.FC = () => {
 
                   {/* Header: Token, KOT Number, Table, Order Type & Elapsed Timer */}
                   <div className="p-4 sm:p-5 space-y-3.5">
-                    <div className="flex items-start justify-between gap-2 border-b border-[#EBE6DD] pb-3">
+                    <div className="flex items-start justify-between gap-2 border-b border-jaman-border pb-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B253A]">
+                          <span className="text-2xl sm:text-3xl font-black font-mono text-jaman-navy">
                             #{kot.tokenNumber}
                           </span>
-                          <span className="text-xs font-black bg-[#E66817] text-white px-2 py-0.5 rounded-md font-mono">
+                          <span className="text-xs font-black bg-jaman-saffron text-white px-2 py-0.5 rounded-md font-mono">
                             {kot.kotNumber}
                           </span>
                         </div>
@@ -667,7 +667,7 @@ export const App: React.FC = () => {
                               Delayed: {elapsed.diffMins}m
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold text-slate-600 bg-[#FAF7F2] border border-[#EBE6DD] font-mono">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold text-slate-600 bg-jaman-cream border border-jaman-border font-mono">
                               <Clock className="w-3 h-3 text-slate-400" />
                               {elapsed.timeStr}
                             </span>
@@ -689,14 +689,14 @@ export const App: React.FC = () => {
                       {kot.items.map((it: any, idx: number) => (
                         <div
                           key={idx}
-                          className="bg-[#FAF7F2] p-3 rounded-2xl border border-[#EBE6DD] space-y-1"
+                          className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border space-y-1"
                         >
                           <div className="flex items-start gap-2">
-                            <span className="font-mono font-black text-base sm:text-lg text-[#E66817] leading-none shrink-0">
+                            <span className="font-mono font-black text-base sm:text-lg text-jaman-saffron leading-none shrink-0">
                               {it.quantity}×
                             </span>
                             <div className="flex-1 min-w-0">
-                              <span className="font-black text-xs sm:text-sm text-[#0B253A] leading-snug block">
+                              <span className="font-black text-xs sm:text-sm text-jaman-navy leading-snug block">
                                 {it.name}
                               </span>
 
@@ -729,9 +729,9 @@ export const App: React.FC = () => {
                   </div>
 
                   {/* Card Footer & Large Touch Action Button (48px height) */}
-                  <div className="p-4 sm:p-5 bg-[#FAF7F2] border-t border-[#EBE6DD] space-y-3">
+                  <div className="p-4 sm:p-5 bg-jaman-cream border-t border-jaman-border space-y-3">
                     <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
-                      <span>Captain: <strong className="text-[#0B253A]">{kot.cashierName || 'Rahul'}</strong></span>
+                      <span>Captain: <strong className="text-jaman-navy">{kot.cashierName || 'Rahul'}</strong></span>
                       <span className="font-mono text-slate-400">#{kot.id.slice(-5)}</span>
                     </div>
 
@@ -762,7 +762,7 @@ export const App: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => updateStatus(kot.id, 'SERVED')}
-                        className="w-full min-h-[48px] rounded-2xl bg-gradient-to-r from-[#0B253A] to-[#1E3A4C] hover:from-[#1E3A4C] hover:to-[#2B4C63] text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-slate-900/20 active:scale-95 transition-all cursor-pointer"
+                        className="w-full min-h-[48px] rounded-2xl bg-gradient-to-r from-jaman-navy to-jaman-darkBorder hover:from-jaman-darkBorder hover:to-[#2B4C63] text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-slate-900/20 active:scale-95 transition-all cursor-pointer"
                       >
                         <CheckCheck className="w-4 h-4 text-emerald-400" />
                         <span>MARK SERVED ✓</span>
@@ -782,11 +782,11 @@ export const App: React.FC = () => {
 
             {/* Empty State */}
             {filteredKots.length === 0 && (
-              <div className="col-span-full text-center py-20 bg-white rounded-3xl border border-[#EBE6DD] shadow-xs space-y-4 p-6">
-                <div className="w-16 h-16 rounded-3xl bg-[#FFF4ED] text-[#E66817] mx-auto flex items-center justify-center shadow-2xs border border-[#FDBA74]">
+              <div className="col-span-full text-center py-20 bg-white rounded-3xl border border-jaman-border shadow-xs space-y-4 p-6">
+                <div className="w-16 h-16 rounded-3xl bg-[#FFF4ED] text-jaman-saffron mx-auto flex items-center justify-center shadow-2xs border border-[#FDBA74]">
                   <ChefHat className="w-8 h-8" />
                 </div>
-                <h3 className="text-lg font-black text-[#0B253A]">All Kitchen Orders Cleared</h3>
+                <h3 className="text-lg font-black text-jaman-navy">All Kitchen Orders Cleared</h3>
                 <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
                   No tickets currently waiting for preparation at this station. New orders sent from POS terminals or Captain tablets will appear here instantly.
                 </p>
