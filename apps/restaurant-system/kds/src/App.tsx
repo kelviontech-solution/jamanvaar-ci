@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { db, kdsDb, KOTRepository, AuditRepository } from '@jamanvaar/database';
-import { lanMeshSync } from '@jamanvaar/sync';
+import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository } from '@jamanvaar/database';
+import { lanMeshSync, SyncOutboxEngine } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus } from '@jamanvaar/types';
+import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
 import {
   JamanvaarAuthLayout,
   BrandHeader,
@@ -30,6 +31,48 @@ import {
 
 export const App: React.FC = () => {
   const [kots, setKots] = useState<KOTRecord[]>(kdsDb.kots);
+
+  // Device activation gate — same activation-key flow as POS/POS-admin.
+  // Without a device token this terminal has no way to reach cloud/api at
+  // all, so it stays on LAN-mesh-only visibility until activated.
+  const [isDeviceActivated, setIsDeviceActivated] = useState<boolean>(() => isKdsDeviceConnected());
+  const [activationCode, setActivationCode] = useState('');
+  const [activationError, setActivationError] = useState('');
+  const [isActivating, setIsActivating] = useState(false);
+
+  const handleActivate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsActivating(true);
+    setActivationError('');
+    try {
+      await activateKdsDevice(activationCode);
+      setIsDeviceActivated(true);
+    } catch (err) {
+      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed');
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isDeviceActivated) {
+      SyncOutboxEngine.configureTransport(null);
+      return;
+    }
+    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    void SyncOutboxEngine.catchUpFromCloud();
+    void SyncOutboxEngine.processOutbox();
+    void reportHeartbeat();
+
+    const interval = setInterval(() => {
+      void SyncOutboxEngine.processOutbox();
+      void SyncOutboxEngine.catchUpFromCloud();
+      void reportHeartbeat();
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [isDeviceActivated]);
+
   // KDS Authentication State — restored from persisted session
   const _kdsSession = SessionPersistence.load('kds');
   const [isKdsLoggedIn, setIsKdsLoggedIn] = useState<boolean>(_kdsSession !== null);
@@ -129,49 +172,68 @@ export const App: React.FC = () => {
         setKots([...kdsDb.kots]);
       });
 
+      // 6. Internal messages from Captain/POS addressed to the Kitchen — a
+      // message sent to "Kitchen" previously vanished silently, since KDS
+      // never listened for INTERNAL_MESSAGE_SENT at all despite Captain
+      // already broadcasting it correctly.
+      const unsubMessage = lanMeshSync.on('INTERNAL_MESSAGE_SENT', (event) => {
+        const msg = event.payload as { recipient?: string; senderName?: string; presetText?: string; customNote?: string; tableNumber?: string } | undefined;
+        if (!msg || (msg.recipient !== 'KITCHEN' && msg.recipient !== 'ALL')) return;
+        sound.play('kot');
+        NotificationRepository.createNotification({
+          type: 'MANAGER_ALERT' as any,
+          title: `💬 Message from ${msg.senderName || 'Floor Staff'}${msg.tableNumber ? ` — Table ${msg.tableNumber}` : ''}`,
+          message: msg.customNote || msg.presetText || 'New message for the kitchen.',
+          priority: 'HIGH',
+          targetRoles: ['KDS', 'ALL'],
+          tableNumber: msg.tableNumber
+        });
+      });
+
       return () => {
         unsubKot();
         unsubServed();
         unsubFoodReady();
         unsubDb();
+        unsubMessage();
       };
     }
   }, []);
 
+  const [kdsPinError, setKdsPinError] = useState(false);
+
+  // Same fix as Captain's SEC-006: authenticate against real db.users
+  // records instead of accepting any 4-digit sequence. Previously this
+  // logged any staff member in the moment they'd typed 4 digits, checking
+  // nothing — not even a hardcoded PIN, unlike Captain/POS Admin's
+  // (already-fixed or already-removed) demo bypasses.
   const handleKdsPinPress = (digit: string) => {
     if (kdsPin.length < 4) {
       const next = kdsPin + digit;
       setKdsPin(next);
       if (next.length === 4) {
-        setSelectedStation(kdsStationSelection);
-        setIsKdsLoggedIn(true);
-        SessionPersistence.save('kds', {
-          userId: 'kds-device',
-          fullName: `KDS — ${kdsStationSelection}`,
-          roleId: 'KDS_STATION',
-          restaurantId: 'restaurant-main',
-          stationId: kdsStationSelection.toLowerCase().replace(/\s+/g, '-'),
-          stationName: kdsStationSelection,
-          terminalId: 'KDS-01'
-        });
+        const userPool = (db.users || []) as (import('@jamanvaar/types').User & { pinCode?: string })[];
+        const matchedUser = userPool.find((u) => u.pinCode === next && u.isActive);
+
+        if (matchedUser) {
+          setKdsPinError(false);
+          setSelectedStation(kdsStationSelection);
+          setIsKdsLoggedIn(true);
+          SessionPersistence.save('kds', {
+            userId: matchedUser.id,
+            fullName: matchedUser.fullName,
+            roleId: matchedUser.roleId || 'KDS_STATION',
+            restaurantId: matchedUser.restaurantId || 'restaurant-main',
+            stationId: kdsStationSelection.toLowerCase().replace(/\s+/g, '-'),
+            stationName: kdsStationSelection,
+            terminalId: 'KDS-01'
+          });
+        } else {
+          setKdsPinError(true);
+        }
         setKdsPin('');
       }
     }
-  };
-
-  const handleQuickDemoKds = () => {
-    const station = kdsStationSelection || 'ALL';
-    setSelectedStation(station);
-    setIsKdsLoggedIn(true);
-    SessionPersistence.save('kds', {
-      userId: 'kds-device',
-      fullName: `KDS — ${station}`,
-      roleId: 'KDS_STATION',
-      restaurantId: 'restaurant-main',
-      stationId: station.toLowerCase().replace(/\s+/g, '-'),
-      stationName: station,
-      terminalId: 'KDS-01'
-    });
   };
 
   const handleKdsLogout = () => {
@@ -253,6 +315,10 @@ export const App: React.FC = () => {
         username: 'Head Chef'
       });
 
+      // Broadcast the raw status change so POS's/Admin's own Kitchen views
+      // stay in sync for every transition, not just READY/SERVED.
+      lanMeshSync.broadcast('KOT_STATUS_CHANGED', { kotId: targetKot.id, status: nextStatus });
+
       // Broadcast to Captain, POS & Admin
       if (nextStatus === 'READY') {
         lanMeshSync.broadcast('FOOD_READY', {
@@ -290,6 +356,38 @@ export const App: React.FC = () => {
     const timeStr = `${diffMins.toString().padStart(2, '0')}:${diffSecs.toString().padStart(2, '0')}`;
     return { timeStr, diffMins, isDelayed, isWarning };
   };
+
+  // Device activation gate — this terminal has no cloud identity until an
+  // activation code is redeemed. Runs before the PIN-login screen below,
+  // mirroring POS's activation-before-staff-login order.
+  if (!isDeviceActivated) {
+    return (
+      <JAMANVAARStartup appName="Kitchen Display (KDS)" appType="KDS" subtitle="Kitchen Production & Expediter System">
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <form onSubmit={handleActivate} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4 text-center">
+            <h1 className="text-2xl font-black text-[#0B253A]">Activate This Terminal</h1>
+            <p className="text-sm text-[#4A5568]">Enter the activation code provided by JAMANVAAR to connect this Kitchen Display to your restaurant.</p>
+            <input
+              type="text"
+              value={activationCode}
+              onChange={(e) => setActivationCode(e.target.value)}
+              placeholder="Activation code"
+              className="w-full text-center text-lg font-mono bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-4 py-3"
+              autoFocus
+            />
+            {activationError && <p className="text-sm font-bold text-rose-700">{activationError}</p>}
+            <button
+              type="submit"
+              disabled={isActivating || !activationCode.trim()}
+              className="w-full py-3 rounded-2xl bg-[#E66817] text-white font-black uppercase tracking-wider disabled:opacity-60"
+            >
+              {isActivating ? 'Activating…' : 'Activate'}
+            </button>
+          </form>
+        </div>
+      </JAMANVAARStartup>
+    );
+  }
 
   // =========================================================================
   // 1. KDS AUTHENTICATION & STATION LOCK SCREEN
@@ -334,30 +432,12 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Demo Login Pill */}
-          <div className="p-3.5 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] flex items-center justify-between">
-            <div>
-              <span className="text-xs font-black text-[#0B253A] block">⚡ Quick Chef Sign In</span>
-              <span className="text-[11px] text-slate-600 font-medium">
-                Launch KDS on {kdsStationSelection}
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={handleQuickDemoKds}
-              className="px-4 py-2 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs shadow-sm transition-all active:scale-95 cursor-pointer"
-            >
-              Open KDS (1234)
-            </button>
-          </div>
-
           {/* PIN Input & Numpad */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-[#0B253A] uppercase tracking-wider">
                 Kitchen Staff PIN
               </label>
-              <span className="text-[11px] text-slate-400 font-mono">Default: 1234</span>
             </div>
             <input
               type="password"
@@ -367,6 +447,12 @@ export const App: React.FC = () => {
               placeholder="• • • •"
               className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3 px-4 rounded-2xl bg-white border border-[#EBE6DD] focus:border-[#E66817] outline-none text-[#0B253A]"
             />
+            {kdsPinError && (
+              <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>Incorrect PIN. Please try again.</span>
+              </div>
+            )}
 
             <div className="grid grid-cols-3 gap-2 pt-1">
               {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '⌫'].map((k) => (
@@ -589,6 +675,14 @@ export const App: React.FC = () => {
                         </div>
                       )}
                     </div>
+
+                    {/* Order-level Chef Note (distinct from per-item specialInstructions) */}
+                    {kot.orderNotes && (
+                      <div className="px-2.5 py-1.5 rounded-xl bg-amber-100/80 text-amber-900 text-xs font-bold flex items-start gap-1.5 border border-amber-300/60">
+                        <AlertCircle className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
+                        <span>{kot.orderNotes}</span>
+                      </div>
+                    )}
 
                     {/* Food Items Ordered */}
                     <div className="space-y-2.5">
