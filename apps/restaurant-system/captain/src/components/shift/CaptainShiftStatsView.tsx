@@ -40,9 +40,9 @@ export const CaptainShiftStatsView: React.FC = () => {
   return (
     <div className="space-y-5 max-w-4xl mx-auto pb-16 md:pb-6">
       {/* Shift Header Card */}
-      <div className="bg-[#0B253A] text-white p-6 rounded-3xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-jaman-navy text-white p-6 rounded-3xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-14 h-14 rounded-2xl bg-[#E66817] text-white flex items-center justify-center font-black text-2xl shadow-sm">
+          <div className="w-14 h-14 rounded-2xl bg-jaman-saffron text-white flex items-center justify-center font-black text-2xl shadow-sm">
             {currentCaptain?.name?.charAt(0) || 'R'}
           </div>
           <div>
@@ -61,7 +61,7 @@ export const CaptainShiftStatsView: React.FC = () => {
         {/* Shift Timer */}
         <div className="bg-white/10 p-3 rounded-2xl border border-white/10 flex items-center gap-2 self-stretch sm:self-auto justify-between sm:justify-start">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
-            <Clock className="w-4 h-4 text-[#E66817]" />
+            <Clock className="w-4 h-4 text-jaman-saffron" />
             <span>Shift Time:</span>
           </div>
           <span className="text-sm font-black font-mono text-white">
@@ -72,67 +72,67 @@ export const CaptainShiftStatsView: React.FC = () => {
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
-        <div className="p-4 rounded-3xl bg-white border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="p-4 rounded-3xl bg-white border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
             <Users className="w-4 h-4 text-emerald-600" />
             <span>Tables Served</span>
           </div>
-          <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B253A] block">
+          <span className="text-2xl sm:text-3xl font-black font-mono text-jaman-navy block">
             {shiftStats.tablesServed}
           </span>
           <span className="text-[10px] text-slate-400 font-semibold">Today's completed seatings</span>
         </div>
 
-        <div className="p-4 rounded-3xl bg-white border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="p-4 rounded-3xl bg-white border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
-            <ShoppingBag className="w-4 h-4 text-[#E66817]" />
+            <ShoppingBag className="w-4 h-4 text-jaman-saffron" />
             <span>Orders Taken</span>
           </div>
-          <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B253A] block">
+          <span className="text-2xl sm:text-3xl font-black font-mono text-jaman-navy block">
             {shiftStats.ordersTaken}
           </span>
           <span className="text-[10px] text-slate-400 font-semibold">Live order sessions</span>
         </div>
 
-        <div className="p-4 rounded-3xl bg-white border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="p-4 rounded-3xl bg-white border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
             <Flame className="w-4 h-4 text-emerald-600" />
             <span>Food Delivered</span>
           </div>
-          <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B253A] block">
+          <span className="text-2xl sm:text-3xl font-black font-mono text-jaman-navy block">
             {shiftStats.foodServed}
           </span>
           <span className="text-[10px] text-slate-400 font-semibold">Ready dishes served to tables</span>
         </div>
 
-        <div className="p-4 rounded-3xl bg-white border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="p-4 rounded-3xl bg-white border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
             <Receipt className="w-4 h-4 text-purple-600" />
             <span>Bills Requested</span>
           </div>
-          <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B253A] block">
+          <span className="text-2xl sm:text-3xl font-black font-mono text-jaman-navy block">
             {shiftStats.billsRequested}
           </span>
           <span className="text-[10px] text-slate-400 font-semibold">Table settlements initiated</span>
         </div>
 
-        <div className="p-4 rounded-3xl bg-white border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="p-4 rounded-3xl bg-white border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
             <Award className="w-4 h-4 text-amber-600" />
             <span>Assigned Tables</span>
           </div>
-          <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B253A] block">
+          <span className="text-2xl sm:text-3xl font-black font-mono text-jaman-navy block">
             {assignedCount}
           </span>
           <span className="text-[10px] text-slate-400 font-semibold">Tables 1-6, 12, 14 in Zone A</span>
         </div>
 
-        <div className="p-4 rounded-3xl bg-white border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="p-4 rounded-3xl bg-white border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
             <Timer className="w-4 h-4 text-blue-600" />
             <span>Currently Active</span>
           </div>
-          <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B253A] block">
+          <span className="text-2xl sm:text-3xl font-black font-mono text-jaman-navy block">
             {activeOccupied}
           </span>
           <span className="text-[10px] text-slate-400 font-semibold">Seated tables on floor</span>
@@ -140,9 +140,9 @@ export const CaptainShiftStatsView: React.FC = () => {
       </div>
 
       {/* End Shift Action */}
-      <div className="p-5 rounded-3xl bg-white border border-[#EBE6DD] flex items-center justify-between gap-4">
+      <div className="p-5 rounded-3xl bg-white border border-jaman-border flex items-center justify-between gap-4">
         <div>
-          <h4 className="font-extrabold text-sm text-[#0B253A]">Captain Shift Handover</h4>
+          <h4 className="font-extrabold text-sm text-jaman-navy">Captain Shift Handover</h4>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
             End your shift session and transfer active floor assignments to the incoming captain.
           </p>

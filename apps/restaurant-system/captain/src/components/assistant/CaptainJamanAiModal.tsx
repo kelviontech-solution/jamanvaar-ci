@@ -117,11 +117,11 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:justify-end p-0 sm:p-4">
-      <div className="w-full sm:max-w-md h-[85vh] sm:h-[90vh] bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#EBE6DD] flex flex-col justify-between overflow-hidden animate-in slide-in-from-bottom sm:slide-in-from-right duration-200">
+      <div className="w-full sm:max-w-md h-[85vh] sm:h-[90vh] bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-jaman-border flex flex-col justify-between overflow-hidden animate-in slide-in-from-bottom sm:slide-in-from-right duration-200">
         {/* Header */}
-        <div className="p-4 bg-[#0B253A] text-white flex items-center justify-between">
+        <div className="p-4 bg-jaman-navy text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-[#E66817] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-jaman-saffron flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white fill-white" />
             </div>
             <div>
@@ -139,9 +139,9 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
         </div>
 
         {/* Content & Answers */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#FAF7F2]">
+        <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-jaman-cream">
           {/* Intro Card */}
-          <div className="p-3.5 rounded-2xl bg-white border border-[#EBE6DD] text-xs text-[#0B253A] space-y-1 shadow-2xs">
+          <div className="p-3.5 rounded-2xl bg-white border border-jaman-border text-xs text-jaman-navy space-y-1 shadow-2xs">
             <p className="font-bold">
               🙏 Namaste Captain {currentCaptain?.name || 'Rahul'}!
             </p>
@@ -152,12 +152,12 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
 
           {/* Active AI Query Response */}
           {response && (
-            <div className="p-4 rounded-2xl bg-white border-2 border-[#E66817] shadow-sm text-xs space-y-2 animate-in fade-in">
-              <div className="flex items-center gap-1.5 font-bold text-[#E66817]">
+            <div className="p-4 rounded-2xl bg-white border-2 border-jaman-saffron shadow-sm text-xs space-y-2 animate-in fade-in">
+              <div className="flex items-center gap-1.5 font-bold text-jaman-saffron">
                 <Bot className="w-4 h-4" />
                 <span>Real-Time Floor Answer:</span>
               </div>
-              <div className="whitespace-pre-line leading-relaxed text-[#0B253A] font-medium">
+              <div className="whitespace-pre-line leading-relaxed text-jaman-navy font-medium">
                 {response}
               </div>
             </div>
@@ -165,7 +165,7 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
         </div>
 
         {/* Preloaded Captain Query Chips Footer */}
-        <div className="p-4 bg-white border-t border-[#EBE6DD] space-y-2.5">
+        <div className="p-4 bg-white border-t border-jaman-border space-y-2.5">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
             Preloaded Captain Floor Inquiries:
           </span>
@@ -184,8 +184,8 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
                 onClick={() => runQuery(chip.id)}
                 className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
                   activeQuery === chip.id
-                    ? 'bg-[#E66817] text-white shadow-xs'
-                    : 'bg-[#FAF7F2] hover:bg-[#FFF4ED] border border-slate-200 hover:border-[#E66817] text-slate-700 hover:text-[#E66817]'
+                    ? 'bg-jaman-saffron text-white shadow-xs'
+                    : 'bg-jaman-cream hover:bg-[#FFF4ED] border border-slate-200 hover:border-jaman-saffron text-slate-700 hover:text-jaman-saffron'
                 }`}
               >
                 {chip.label}

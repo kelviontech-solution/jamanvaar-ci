@@ -73,9 +73,9 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end">
       <div className="w-full max-w-sm bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-200">
         {/* Header */}
-        <div className="p-4 bg-[#0B253A] text-white flex items-center justify-between">
+        <div className="p-4 bg-jaman-navy text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#E66817] flex items-center justify-center font-black text-sm">
+            <div className="w-9 h-9 rounded-xl bg-jaman-saffron flex items-center justify-center font-black text-sm">
               {currentCaptain?.name?.charAt(0) || 'R'}
             </div>
             <div>
@@ -93,7 +93,7 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
         </div>
 
         {/* Content Navigation List */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-2.5 bg-[#FAF7F2]">
+        <div className="flex-1 p-4 overflow-y-auto space-y-2.5 bg-jaman-cream">
           {/* AI Quick Trigger — hidden when this restaurant opted out */}
           {captainDb.restaurant?.showJamanAI !== false && (
           <button
@@ -105,15 +105,15 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
             className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-[#FFF4ED] to-[#FFE8D6] border border-[#FDBA74] flex items-center justify-between text-left shadow-2xs hover:brightness-95 transition-all cursor-pointer"
           >
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-[#E66817] text-white flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-jaman-saffron text-white flex items-center justify-center">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
-                <span className="font-black text-xs text-[#0B253A] block">JAMAN AI Intelligence</span>
+                <span className="font-black text-xs text-jaman-navy block">JAMAN AI Intelligence</span>
                 <span className="text-[10px] text-slate-500 font-medium">Ask floor, kitchen & bill questions</span>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-[#E66817]" />
+            <ChevronRight className="w-4 h-4 text-jaman-saffron" />
           </button>
           )}
 
@@ -131,15 +131,15 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
                   onSelectTab(item.id);
                   onClose();
                 }}
-                className="w-full p-3.5 rounded-2xl bg-white border border-[#EBE6DD] hover:border-[#E66817] text-left transition-all shadow-2xs flex items-center justify-between gap-3 group cursor-pointer"
+                className="w-full p-3.5 rounded-2xl bg-white border border-jaman-border hover:border-jaman-saffron text-left transition-all shadow-2xs flex items-center justify-between gap-3 group cursor-pointer"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[#FAF7F2] group-hover:bg-[#FFF4ED] text-slate-600 group-hover:text-[#E66817] flex items-center justify-center transition-colors mt-0.5">
+                  <div className="w-8 h-8 rounded-xl bg-jaman-cream group-hover:bg-[#FFF4ED] text-slate-600 group-hover:text-jaman-saffron flex items-center justify-center transition-colors mt-0.5">
                     <Icon className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] transition-colors">
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron transition-colors">
                         {item.label}
                       </span>
                       {item.count !== null && item.count > 0 && (
@@ -153,14 +153,14 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
                     </p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-[#E66817] transition-colors shrink-0" />
+                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-jaman-saffron transition-colors shrink-0" />
               </button>
             );
           })}
         </div>
 
         {/* Footer: Sign Out Action */}
-        <div className="p-4 bg-white border-t border-[#EBE6DD]">
+        <div className="p-4 bg-white border-t border-jaman-border">
           <button
             type="button"
             onClick={() => {

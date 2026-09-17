@@ -178,16 +178,16 @@ export const App: React.FC = () => {
             👑
           </div>
           <div className="space-y-2">
-            <span className="inline-block text-[11px] font-black uppercase tracking-widest text-[#E66817] bg-[#FFF4ED] px-3 py-1 rounded-full border border-[#FDBA74]">
+            <span className="inline-block text-[11px] font-black uppercase tracking-widest text-jaman-saffron bg-[#FFF4ED] px-3 py-1 rounded-full border border-[#FDBA74]">
               JAMANVAAR PRO (₹7,000) Exclusive
             </span>
-            <h1 className="text-2xl font-black text-[#0B253A] tracking-tight">Captain App Locked</h1>
+            <h1 className="text-2xl font-black text-jaman-navy tracking-tight">Captain App Locked</h1>
             <p className="text-sm text-slate-600 leading-relaxed font-medium">
               {entitlement.message || 'Wireless Table Ordering and Captain Service workflows are available only on the JAMANVAAR PRO (₹7,000) subscription plan.'}
             </p>
           </div>
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 font-medium text-left space-y-2">
-            <div className="font-bold text-[#0B253A]">Current Plan Status:</div>
+            <div className="font-bold text-jaman-navy">Current Plan Status:</div>
             <div className="flex justify-between">
               <span>Restaurant Plan:</span>
               <span className="font-bold text-slate-900">{entitlement.tier}</span>
@@ -274,7 +274,7 @@ export const App: React.FC = () => {
         >
           <div className="space-y-5">
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-[#0B253A] tracking-tight">Activate this Tablet</h2>
+              <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Activate this Tablet</h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
                 This tablet hasn't connected before — enter the activation key from your Super Admin Welcome Kit to finish setup.
               </p>
@@ -289,7 +289,7 @@ export const App: React.FC = () => {
                   placeholder="From your Welcome Kit"
                   required
                   autoFocus
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                  className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                 />
               </div>
               {activationError && (
@@ -301,10 +301,10 @@ export const App: React.FC = () => {
               <button
                 type="submit"
                 disabled={activationBusy || !activationKeyInput.trim()}
-                className="w-full py-4 rounded-2xl bg-[#0B253A] hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>{activationBusy ? 'Activating…' : 'Activate Tablet'}</span>
-                {!activationBusy && <ArrowRight className="w-4 h-4 text-[#E66817]" />}
+                {!activationBusy && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
               </button>
             </form>
           </div>
@@ -326,7 +326,7 @@ export const App: React.FC = () => {
         >
           <div className="space-y-5">
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-[#0B253A] tracking-tight">Connect this Tablet</h2>
+              <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Connect this Tablet</h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
                 One-time setup — enter the Restaurant ID and login the restaurant owner generated for this tablet.
                 You won't be asked again after this.
@@ -341,7 +341,7 @@ export const App: React.FC = () => {
                   onChange={(e) => setConnectRestaurantId(e.target.value)}
                   placeholder="From your restaurant's admin dashboard"
                   required
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                  className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                 />
               </div>
               <div>
@@ -351,7 +351,7 @@ export const App: React.FC = () => {
                   value={connectEmail}
                   onChange={(e) => setConnectEmail(e.target.value)}
                   required
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                  className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                 />
               </div>
               <div>
@@ -361,7 +361,7 @@ export const App: React.FC = () => {
                   value={connectPassword}
                   onChange={(e) => setConnectPassword(e.target.value)}
                   required
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                  className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                 />
               </div>
               {connectError && (
@@ -373,10 +373,10 @@ export const App: React.FC = () => {
               <button
                 type="submit"
                 disabled={connectBusy}
-                className="w-full py-4 rounded-2xl bg-[#0B253A] hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>{connectBusy ? 'Connecting…' : 'Connect Tablet'}</span>
-                {!connectBusy && <ArrowRight className="w-4 h-4 text-[#E66817]" />}
+                {!connectBusy && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
               </button>
             </form>
           </div>
@@ -398,7 +398,7 @@ export const App: React.FC = () => {
         >
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-[#0B253A] tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">
                 Floor Captain Sign In
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
@@ -407,9 +407,9 @@ export const App: React.FC = () => {
             </div>
 
             {/* Authorized Staff Help Notice */}
-            <div className="p-3.5 rounded-2xl bg-[#FDFBF7] border border-[#EBE6DD] flex items-center justify-between">
+            <div className="p-3.5 rounded-2xl bg-[#FDFBF7] border border-jaman-border flex items-center justify-between">
               <div>
-                <span className="text-xs font-black text-[#0B253A] block">🔒 Registered Staff Access</span>
+                <span className="text-xs font-black text-jaman-navy block">🔒 Registered Staff Access</span>
                 <span className="text-[11px] text-slate-600 font-medium">Ask your manager for your 4-digit staff PIN</span>
               </div>
             </div>
@@ -417,7 +417,7 @@ export const App: React.FC = () => {
             {/* PIN Input & Keypad */}
             <form onSubmit={handlePinSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-[#0B253A] uppercase tracking-wider mb-2">
+                <label className="block text-xs font-bold text-jaman-navy uppercase tracking-wider mb-2">
                   Staff 4-Digit PIN
                 </label>
                 <div className="relative">
@@ -430,7 +430,7 @@ export const App: React.FC = () => {
                       setPinInput(e.target.value);
                     }}
                     placeholder="• • • •"
-                    className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3.5 px-4 rounded-2xl bg-white border border-[#EBE6DD] focus:border-[#E66817] focus:ring-2 focus:ring-[#E66817]/20 outline-none text-[#0B253A]"
+                    className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3.5 px-4 rounded-2xl bg-white border border-jaman-border focus:border-jaman-saffron focus:ring-2 focus:ring-jaman-saffron/20 outline-none text-jaman-navy"
                   />
                 </div>
                 {pinError && (
@@ -457,7 +457,7 @@ export const App: React.FC = () => {
                         }
                       }
                     }}
-                    className="h-14 rounded-2xl bg-[#FAF7F2] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] text-lg font-black font-mono text-[#0B253A] active:scale-95 transition-all cursor-pointer flex items-center justify-center shadow-2xs"
+                    className="h-14 rounded-2xl bg-jaman-cream hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border text-lg font-black font-mono text-jaman-navy active:scale-95 transition-all cursor-pointer flex items-center justify-center shadow-2xs"
                   >
                     {num}
                   </button>
@@ -484,7 +484,7 @@ export const App: React.FC = () => {
                       }
                     }
                   }}
-                  className="h-14 rounded-2xl bg-[#FAF7F2] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] text-lg font-black font-mono text-[#0B253A] active:scale-95 transition-all cursor-pointer flex items-center justify-center shadow-2xs"
+                  className="h-14 rounded-2xl bg-jaman-cream hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border text-lg font-black font-mono text-jaman-navy active:scale-95 transition-all cursor-pointer flex items-center justify-center shadow-2xs"
                 >
                   0
                 </button>
@@ -500,10 +500,10 @@ export const App: React.FC = () => {
               <button
                 type="submit"
                 disabled={pinInput.length === 0}
-                className="w-full py-4 rounded-2xl bg-[#0B253A] hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>Unlock Captain Terminal</span>
-                <ArrowRight className="w-4 h-4 text-[#E66817]" />
+                <ArrowRight className="w-4 h-4 text-jaman-saffron" />
               </button>
             </form>
           </div>
@@ -517,7 +517,7 @@ export const App: React.FC = () => {
   // =========================================================================
   return (
     <JAMANVAARStartup appName="CAPTAIN APP" appType="CAPTAIN">
-      <div className="min-h-screen bg-[#FBF8F2] flex flex-col select-none text-[#0B253A]">
+      <div className="min-h-screen bg-[#FBF8F2] flex flex-col select-none text-jaman-navy">
         {/* ── Brand Header with Master Logo & Quick Actions ── */}
         <CaptainHeader
           onOpenNotifications={() => setIsNotificationsOpen(true)}
@@ -594,11 +594,11 @@ export const App: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsAiAssistantOpen(true)}
-          className="fixed bottom-16 md:bottom-6 right-4 md:right-6 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-[#0B253A] to-[#1a4a6e] text-white flex items-center justify-center shadow-2xl border-2 border-[#E66817] hover:scale-105 active:scale-95 transition-all cursor-pointer group"
+          className="fixed bottom-16 md:bottom-6 right-4 md:right-6 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-jaman-navy to-[#1a4a6e] text-white flex items-center justify-center shadow-2xl border-2 border-jaman-saffron hover:scale-105 active:scale-95 transition-all cursor-pointer group"
           title="JAMAN AI Floor Intelligence Assistant"
           aria-label="Open JAMAN AI Floor Intelligence Assistant"
         >
-          <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-[#E66817] fill-[#E66817] group-hover:rotate-12 transition-transform" />
+          <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-jaman-saffron fill-jaman-saffron group-hover:rotate-12 transition-transform" />
           <span className="sr-only">JAMAN AI</span>
         </button>
         )}

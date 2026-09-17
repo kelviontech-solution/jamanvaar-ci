@@ -49,7 +49,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
   const unreadNotifs = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <header className="bg-white border-b border-[#EBE6DD] px-3 sm:px-5 py-2.5 sticky top-0 z-30 shadow-2xs">
+    <header className="bg-white border-b border-jaman-border px-3 sm:px-5 py-2.5 sticky top-0 z-30 shadow-2xs">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
         {/* Left: Prominent Official Master Brand Header */}
         <div className="flex items-center gap-3 shrink-0">
@@ -63,11 +63,11 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
             showContext={false}
           />
 
-          <div className="hidden md:block h-6 w-px bg-[#EBE6DD]" />
+          <div className="hidden md:block h-6 w-px bg-jaman-border" />
 
           {/* Captain Name & Assigned Zone Lockup */}
-          <div className="hidden sm:flex items-center gap-2 bg-[#FAF7F2] border border-[#EBE6DD] px-3 py-1 rounded-full text-xs font-bold text-[#0B253A]">
-            <div className="w-5 h-5 rounded-full bg-[#E66817] text-white flex items-center justify-center text-[10px] font-black">
+          <div className="hidden sm:flex items-center gap-2 bg-jaman-cream border border-jaman-border px-3 py-1 rounded-full text-xs font-bold text-jaman-navy">
+            <div className="w-5 h-5 rounded-full bg-jaman-saffron text-white flex items-center justify-center text-[10px] font-black">
               {currentCaptain?.name?.charAt(0) || 'R'}
             </div>
             <span className="font-extrabold">{currentCaptain?.name || 'Rahul Sharma'}</span>
@@ -97,12 +97,12 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
             {/* Connection Detail Popover */}
             {isSyncInfoOpen && (
               <div
-                className="absolute right-0 mt-2 w-72 bg-white border border-[#EBE6DD] rounded-2xl shadow-xl p-3 text-xs text-[#0B253A] z-50 animate-in fade-in zoom-in-95 duration-100 space-y-2.5"
+                className="absolute right-0 mt-2 w-72 bg-white border border-jaman-border rounded-2xl shadow-xl p-3 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100 space-y-2.5"
                 onMouseLeave={() => setIsSyncInfoOpen(false)}
               >
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <div className="flex items-center gap-1.5 font-black text-xs">
-                    <Server className="w-3.5 h-3.5 text-[#E66817]" />
+                    <Server className="w-3.5 h-3.5 text-jaman-saffron" />
                     <span>Real-Time Mesh & Hardware Sync</span>
                   </div>
                   <button onClick={() => setIsSyncInfoOpen(false)} className="text-slate-400 hover:text-slate-600">
@@ -156,7 +156,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
           <button
             type="button"
             onClick={onOpenQuickMessage}
-            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-[#E66817] font-extrabold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-jaman-saffron font-extrabold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
             title="Compose quick operational message to Kitchen, POS, or Manager"
           >
             <MessageSquare className="w-3.5 h-3.5" />
@@ -167,7 +167,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
           <button
             type="button"
             onClick={onOpenNotifications}
-            className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
+            className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
             title="Floor Notifications & Alerts"
           >
             <Bell className="w-4 h-4" />
@@ -183,9 +183,9 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
             <button
               type="button"
               onClick={() => setIsProfileOpen((prev) => !prev)}
-              className="flex items-center gap-1.5 bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] px-2 py-1 rounded-xl transition-colors shadow-2xs text-[#0B253A] cursor-pointer"
+              className="flex items-center gap-1.5 bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border px-2 py-1 rounded-xl transition-colors shadow-2xs text-jaman-navy cursor-pointer"
             >
-              <div className="w-6 h-6 rounded-lg bg-[#E66817] text-white flex items-center justify-center font-black text-xs">
+              <div className="w-6 h-6 rounded-lg bg-jaman-saffron text-white flex items-center justify-center font-black text-xs">
                 {currentCaptain?.name?.charAt(0) || 'R'}
               </div>
               <ChevronDown className="w-3 h-3 text-slate-400" />
@@ -193,11 +193,11 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
 
             {isProfileOpen && (
               <div
-                className="absolute right-0 mt-2 w-56 bg-white border border-[#EBE6DD] rounded-2xl shadow-xl p-2 text-xs text-[#0B253A] z-50 animate-in fade-in zoom-in-95 duration-100"
+                className="absolute right-0 mt-2 w-56 bg-white border border-jaman-border rounded-2xl shadow-xl p-2 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100"
                 onMouseLeave={() => setIsProfileOpen(false)}
               >
-                <div className="p-2.5 border-b border-[#EBE6DD] mb-1 bg-[#FAF7F2] rounded-xl">
-                  <p className="font-extrabold text-sm text-[#0B253A]">{currentCaptain?.name || 'Rahul Sharma'}</p>
+                <div className="p-2.5 border-b border-jaman-border mb-1 bg-jaman-cream rounded-xl">
+                  <p className="font-extrabold text-sm text-jaman-navy">{currentCaptain?.name || 'Rahul Sharma'}</p>
                   <p className="text-[11px] text-slate-500 font-medium">Floor Captain • Main Dining</p>
                 </div>
 
@@ -208,7 +208,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                   </div>
                   <div className="flex justify-between">
                     <span>Assigned Tables:</span>
-                    <span className="font-bold text-[#0B253A]">{(currentCaptain?.assignedTableNumbers || []).join(', ') || 'None'}</span>
+                    <span className="font-bold text-jaman-navy">{(currentCaptain?.assignedTableNumbers || []).join(', ') || 'None'}</span>
                   </div>
                 </div>
 

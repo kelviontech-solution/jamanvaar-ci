@@ -60,11 +60,11 @@ export const CaptainMessagesView: React.FC = () => {
       {/* ── Left 2 Columns: Message Feed ── */}
       <div className="lg:col-span-2 space-y-4">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-[#EBE6DD] shadow-2xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-jaman-border shadow-2xs">
           <div>
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-[#E66817]" />
-              <h2 className="text-xl font-black text-[#0B253A]">Floor & Kitchen Communications</h2>
+              <MessageSquare className="w-5 h-5 text-jaman-saffron" />
+              <h2 className="text-xl font-black text-jaman-navy">Floor & Kitchen Communications</h2>
             </div>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
               Live operational messaging between Captain, Kitchen, Cashier, and Manager.
@@ -84,8 +84,8 @@ export const CaptainMessagesView: React.FC = () => {
                 onClick={() => setFilter(flt.id as any)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
                   filter === flt.id
-                    ? 'bg-[#0B253A] text-white shadow-xs'
-                    : 'bg-[#FAF7F2] text-slate-600 hover:bg-slate-100'
+                    ? 'bg-jaman-navy text-white shadow-xs'
+                    : 'bg-jaman-cream text-slate-600 hover:bg-slate-100'
                 }`}
               >
                 {flt.label}
@@ -107,21 +107,21 @@ export const CaptainMessagesView: React.FC = () => {
                 <div
                   key={msg.id}
                   className={`bg-white rounded-3xl border p-4 sm:p-5 space-y-3 shadow-2xs transition-all ${
-                    msg.status === 'RESOLVED' ? 'border-[#EBE6DD] opacity-75' : 'border-[#FDBA74] bg-[#FFFBF7]'
+                    msg.status === 'RESOLVED' ? 'border-jaman-border opacity-75' : 'border-[#FDBA74] bg-[#FFFBF7]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-[#0B253A] bg-slate-100 px-2 py-0.5 rounded-md">
+                        <span className="text-xs font-black text-jaman-navy bg-slate-100 px-2 py-0.5 rounded-md">
                           From: {msg.senderName}
                         </span>
                         <span className="text-xs font-bold text-slate-400">➔</span>
-                        <span className="text-xs font-black text-[#E66817] bg-[#FFF4ED] px-2 py-0.5 rounded-md border border-[#FDBA74]">
+                        <span className="text-xs font-black text-jaman-saffron bg-[#FFF4ED] px-2 py-0.5 rounded-md border border-[#FDBA74]">
                           {getRecipientBadge(msg.recipient)}
                         </span>
                         {msg.tableNumber && (
-                          <span className="text-xs font-black bg-[#0B253A] text-white px-2 py-0.5 rounded-md">
+                          <span className="text-xs font-black bg-jaman-navy text-white px-2 py-0.5 rounded-md">
                             TABLE {msg.tableNumber}
                           </span>
                         )}
@@ -135,8 +135,8 @@ export const CaptainMessagesView: React.FC = () => {
                   </div>
 
                   {/* Message Body */}
-                  <div className="p-3 rounded-2xl bg-white border border-[#EBE6DD] space-y-1">
-                    <p className="font-extrabold text-xs sm:text-sm text-[#0B253A]">
+                  <div className="p-3 rounded-2xl bg-white border border-jaman-border space-y-1">
+                    <p className="font-extrabold text-xs sm:text-sm text-jaman-navy">
                       {msg.presetText}
                     </p>
                     {msg.customNote && (
@@ -188,9 +188,9 @@ export const CaptainMessagesView: React.FC = () => {
             })}
           </div>
         ) : (
-          <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-[#EBE6DD] space-y-3">
+          <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-3">
             <MessageSquare className="w-12 h-12 text-slate-400 mx-auto" />
-            <h3 className="text-lg font-black text-[#0B253A]">No Active Messages</h3>
+            <h3 className="text-lg font-black text-jaman-navy">No Active Messages</h3>
             <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
               All communications have been resolved. Use the composer on the right to send an operational note.
             </p>
@@ -199,10 +199,10 @@ export const CaptainMessagesView: React.FC = () => {
       </div>
 
       {/* ── Right 1 Column: Fast Message Composer ── */}
-      <div className="bg-white rounded-3xl border border-[#EBE6DD] p-5 space-y-4 shadow-2xs self-start sticky top-24">
+      <div className="bg-white rounded-3xl border border-jaman-border p-5 space-y-4 shadow-2xs self-start sticky top-24">
         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-          <Send className="w-4 h-4 text-[#E66817]" />
-          <h3 className="text-base font-black text-[#0B253A]">Quick Message Composer</h3>
+          <Send className="w-4 h-4 text-jaman-saffron" />
+          <h3 className="text-base font-black text-jaman-navy">Quick Message Composer</h3>
         </div>
 
         <form onSubmit={handleSend} className="space-y-3.5">
@@ -224,8 +224,8 @@ export const CaptainMessagesView: React.FC = () => {
                   onClick={() => setRecipient(r.id as any)}
                   className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     recipient === r.id
-                      ? 'bg-[#0B253A] text-white shadow-2xs'
-                      : 'bg-[#FAF7F2] text-slate-600 hover:bg-slate-100 border border-[#EBE6DD]'
+                      ? 'bg-jaman-navy text-white shadow-2xs'
+                      : 'bg-jaman-cream text-slate-600 hover:bg-slate-100 border border-jaman-border'
                   }`}
                 >
                   {r.label}
@@ -244,7 +244,7 @@ export const CaptainMessagesView: React.FC = () => {
               value={tableNumber}
               onChange={(e) => setTableNumber(e.target.value)}
               placeholder="e.g. 12 or leave empty for general"
-              className="w-full px-3.5 py-2 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl text-xs font-bold text-[#0B253A] outline-none focus:bg-white focus:border-[#E66817]"
+              className="w-full px-3.5 py-2 bg-jaman-cream border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
             />
           </div>
 
@@ -261,8 +261,8 @@ export const CaptainMessagesView: React.FC = () => {
                   onClick={() => setPreset(msg)}
                   className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-left transition-all cursor-pointer ${
                     preset === msg
-                      ? 'bg-[#FFF4ED] text-[#E66817] border border-[#FDBA74]'
-                      : 'bg-[#FAF7F2] text-slate-600 border border-transparent hover:border-slate-200'
+                      ? 'bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74]'
+                      : 'bg-jaman-cream text-slate-600 border border-transparent hover:border-slate-200'
                   }`}
                 >
                   ⚡ {msg}
@@ -281,13 +281,13 @@ export const CaptainMessagesView: React.FC = () => {
               value={customNote}
               onChange={(e) => setCustomNote(e.target.value)}
               placeholder="Type any specific details..."
-              className="w-full px-3.5 py-2 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl text-xs text-[#0B253A] outline-none focus:bg-white focus:border-[#E66817]"
+              className="w-full px-3.5 py-2 bg-jaman-cream border border-jaman-border rounded-xl text-xs text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm shadow-md shadow-[#E66817]/20 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm shadow-md shadow-jaman-saffron/20 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
           >
             <Send className="w-4 h-4" />
             <span>Send Message Broadcast</span>

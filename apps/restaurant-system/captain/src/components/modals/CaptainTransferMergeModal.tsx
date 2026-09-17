@@ -35,11 +35,11 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#EBE6DD] space-y-4 animate-in fade-in zoom-in-95 duration-150">
+      <div className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-jaman-border space-y-4 animate-in fade-in zoom-in-95 duration-150">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <GitMerge className="w-5 h-5 text-[#E66817]" />
-            <h3 className="text-lg font-black text-[#0B253A]">
+            <GitMerge className="w-5 h-5 text-jaman-saffron" />
+            <h3 className="text-lg font-black text-jaman-navy">
               {mode === 'TRANSFER' ? 'Transfer Table' : 'Merge Tables'}
             </h3>
           </div>
@@ -53,7 +53,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
         </div>
 
         {/* Mode Switcher */}
-        <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD]">
+        <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-jaman-cream border border-jaman-border">
           <button
             type="button"
             onClick={() => {
@@ -61,7 +61,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
               setTargetTableNumber('');
             }}
             className={`py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
-              mode === 'TRANSFER' ? 'bg-[#0B253A] text-white shadow-xs' : 'text-slate-600 hover:text-[#0B253A]'
+              mode === 'TRANSFER' ? 'bg-jaman-navy text-white shadow-xs' : 'text-slate-600 hover:text-jaman-navy'
             }`}
           >
             Transfer Order
@@ -73,7 +73,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
               setTargetTableNumber('');
             }}
             className={`py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
-              mode === 'MERGE' ? 'bg-[#0B253A] text-white shadow-xs' : 'text-slate-600 hover:text-[#0B253A]'
+              mode === 'MERGE' ? 'bg-jaman-navy text-white shadow-xs' : 'text-slate-600 hover:text-jaman-navy'
             }`}
           >
             Merge 2 Tables
@@ -103,7 +103,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
                   onClick={() => setTargetTableNumber(t.tableNumber)}
                   className={`p-2.5 rounded-2xl border text-center transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-[#E66817] text-white border-[#E66817] shadow-sm'
+                      ? 'bg-jaman-saffron text-white border-jaman-saffron shadow-sm'
                       : isAvail
                       ? 'bg-white hover:bg-emerald-50 border-emerald-300 text-emerald-800'
                       : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
@@ -132,7 +132,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
             type="button"
             onClick={handleAction}
             disabled={!targetTableNumber}
-            className="py-3 rounded-xl bg-[#E66817] hover:bg-[#EA580C] disabled:opacity-50 text-white font-black text-xs shadow-md transition-all flex items-center justify-center gap-1.5"
+            className="py-3 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-50 text-white font-black text-xs shadow-md transition-all flex items-center justify-center gap-1.5"
           >
             <span>Confirm {mode === 'TRANSFER' ? 'Transfer' : 'Merge'}</span>
             <ArrowRight className="w-4 h-4" />

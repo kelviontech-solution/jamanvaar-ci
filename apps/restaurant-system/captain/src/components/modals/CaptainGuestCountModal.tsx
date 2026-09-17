@@ -21,11 +21,11 @@ export const CaptainGuestCountModal: React.FC<CaptainGuestCountModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#EBE6DD] space-y-5 animate-in fade-in zoom-in-95 duration-150">
+      <div className="w-full max-w-sm bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-jaman-border space-y-5 animate-in fade-in zoom-in-95 duration-150">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xl font-black text-[#0B253A]">Open Table {table.tableNumber}</span>
+              <span className="text-xl font-black text-jaman-navy">Open Table {table.tableNumber}</span>
               <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                 Seating
               </span>
@@ -44,7 +44,7 @@ export const CaptainGuestCountModal: React.FC<CaptainGuestCountModalProps> = ({
         </div>
 
         {/* Guest Count Selector */}
-        <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] text-center space-y-3">
+        <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border text-center space-y-3">
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
             Select Number of Guests
           </span>
@@ -53,17 +53,17 @@ export const CaptainGuestCountModal: React.FC<CaptainGuestCountModalProps> = ({
             <button
               type="button"
               onClick={() => setGuests((g) => Math.max(1, g - 1))}
-              className="w-12 h-12 rounded-2xl bg-white border border-[#EBE6DD] text-[#0B253A] font-black text-lg flex items-center justify-center shadow-xs active:scale-95 transition-all hover:bg-slate-50 cursor-pointer"
+              className="w-12 h-12 rounded-2xl bg-white border border-jaman-border text-jaman-navy font-black text-lg flex items-center justify-center shadow-xs active:scale-95 transition-all hover:bg-slate-50 cursor-pointer"
             >
               <Minus className="w-5 h-5" />
             </button>
-            <div className="w-20 py-2 rounded-2xl bg-white border border-[#EBE6DD] shadow-xs">
-              <span className="text-3xl font-black font-mono text-[#0B253A]">{guests}</span>
+            <div className="w-20 py-2 rounded-2xl bg-white border border-jaman-border shadow-xs">
+              <span className="text-3xl font-black font-mono text-jaman-navy">{guests}</span>
             </div>
             <button
               type="button"
               onClick={() => setGuests((g) => Math.min(20, g + 1))}
-              className="w-12 h-12 rounded-2xl bg-white border border-[#EBE6DD] text-[#0B253A] font-black text-lg flex items-center justify-center shadow-xs active:scale-95 transition-all hover:bg-slate-50 cursor-pointer"
+              className="w-12 h-12 rounded-2xl bg-white border border-jaman-border text-jaman-navy font-black text-lg flex items-center justify-center shadow-xs active:scale-95 transition-all hover:bg-slate-50 cursor-pointer"
             >
               <Plus className="w-5 h-5" />
             </button>
@@ -78,8 +78,8 @@ export const CaptainGuestCountModal: React.FC<CaptainGuestCountModalProps> = ({
                 onClick={() => setGuests(preset)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   guests === preset
-                    ? 'bg-[#E66817] text-white shadow-xs'
-                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-[#EBE6DD]'
+                    ? 'bg-jaman-saffron text-white shadow-xs'
+                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-jaman-border'
                 }`}
               >
                 {preset} {preset === 1 ? 'Guest' : 'Guests'}

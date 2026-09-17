@@ -43,9 +43,9 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end">
       <div className="w-full max-w-sm bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-200">
         {/* Header */}
-        <div className="p-4 bg-[#0B253A] text-white flex items-center justify-between">
+        <div className="p-4 bg-jaman-navy text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-[#E66817]" />
+            <Bell className="w-5 h-5 text-jaman-saffron" />
             <h3 className="font-extrabold text-sm">Floor Notification Alerts</h3>
           </div>
           <button
@@ -58,7 +58,7 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
         </div>
 
         {/* Notifications List */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-2.5 bg-[#FAF7F2]">
+        <div className="flex-1 p-4 overflow-y-auto space-y-2.5 bg-jaman-cream">
           {notifications.length > 0 ? (
             notifications.map((notif) => {
               const elapsedMins = Math.max(
@@ -72,12 +72,12 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
                   onClick={() => handleNotificationClick(notif)}
                   className={`p-3.5 rounded-2xl border text-left transition-all shadow-2xs space-y-1.5 cursor-pointer ${
                     notif.isRead
-                      ? 'bg-white border-[#EBE6DD] opacity-80'
+                      ? 'bg-white border-jaman-border opacity-80'
                       : 'bg-[#FFFBF7] border-[#FDBA74]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <span className="font-black text-xs text-[#0B253A] leading-tight">
+                    <span className="font-black text-xs text-jaman-navy leading-tight">
                       {notif.title}
                     </span>
                     <span className="text-[10px] text-slate-400 font-bold shrink-0">
@@ -90,7 +90,7 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
                   </p>
 
                   {notif.tableNumber && (
-                    <div className="pt-1 flex items-center justify-between text-[11px] font-bold text-[#E66817]">
+                    <div className="pt-1 flex items-center justify-between text-[11px] font-bold text-jaman-saffron">
                       <span>Table {notif.tableNumber}</span>
                       <span className="text-xs underline">Open Table ➔</span>
                     </div>
@@ -108,7 +108,7 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
 
         {/* Footer Actions */}
         {notifications.length > 0 && (
-          <div className="p-4 bg-white border-t border-[#EBE6DD] flex items-center justify-between">
+          <div className="p-4 bg-white border-t border-jaman-border flex items-center justify-between">
             <button
               type="button"
               onClick={clearAllNotifications}
@@ -120,7 +120,7 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-[#0B253A] text-white text-xs font-bold"
+              className="px-4 py-2 rounded-xl bg-jaman-navy text-white text-xs font-bold"
             >
               Close
             </button>

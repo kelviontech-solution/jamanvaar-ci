@@ -61,11 +61,11 @@ export const CaptainGuestRequestsView: React.FC = () => {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-[#EBE6DD] shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-jaman-border shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-amber-600" />
-            <h2 className="text-xl font-black text-[#0B253A]">Guest Service Requests</h2>
+            <h2 className="text-xl font-black text-jaman-navy">Guest Service Requests</h2>
             <span className="bg-amber-100 text-amber-900 text-xs font-black px-2.5 py-0.5 rounded-full">
               {pendingRequests.length} Pending
             </span>
@@ -78,7 +78,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsAddModalOpen(true)}
-          className="px-4 py-2 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs shadow-sm flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
+          className="px-4 py-2 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs shadow-sm flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>+ Log Guest Request</span>
@@ -106,7 +106,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
                         {getRequestIcon(req.type)}
                       </div>
                       <div>
-                        <span className="text-xl font-black text-[#0B253A]">TABLE {req.tableNumber}</span>
+                        <span className="text-xl font-black text-jaman-navy">TABLE {req.tableNumber}</span>
                         <span className="text-xs font-black text-amber-800 uppercase block tracking-wider">
                           {req.type.replace('_', ' ')}
                         </span>
@@ -120,7 +120,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
                   </div>
 
                   {req.notes && (
-                    <div className="mt-3 p-3 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] text-xs text-slate-700 font-medium">
+                    <div className="mt-3 p-3 rounded-2xl bg-jaman-cream border border-jaman-border text-xs text-slate-700 font-medium">
                       <span className="font-bold text-slate-900 block mb-0.5">Guest Note:</span>
                       {req.notes}
                     </div>
@@ -153,9 +153,9 @@ export const CaptainGuestRequestsView: React.FC = () => {
           })}
         </div>
       ) : (
-        <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-[#EBE6DD] space-y-3">
+        <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-3">
           <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-          <h3 className="text-lg font-black text-[#0B253A]">All Guest Requests Completed!</h3>
+          <h3 className="text-lg font-black text-jaman-navy">All Guest Requests Completed!</h3>
           <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
             No pending diner requests on your floor right now.
           </p>
@@ -167,10 +167,10 @@ export const CaptainGuestRequestsView: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <form
             onSubmit={handleCreateRequest}
-            className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-[#EBE6DD] space-y-4 animate-in fade-in zoom-in-95 duration-150"
+            className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-jaman-border space-y-4 animate-in fade-in zoom-in-95 duration-150"
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-black text-[#0B253A]">Log Guest Request</h3>
+              <h3 className="text-lg font-black text-jaman-navy">Log Guest Request</h3>
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
@@ -189,7 +189,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
                 value={newReqTable}
                 onChange={(e) => setNewReqTable(e.target.value)}
                 placeholder="e.g. 12"
-                className="w-full px-3.5 py-2.5 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl text-xs font-bold text-[#0B253A] outline-none focus:bg-white focus:border-[#E66817]"
+                className="w-full px-3.5 py-2.5 bg-jaman-cream border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
                 required
               />
             </div>
@@ -213,8 +213,8 @@ export const CaptainGuestRequestsView: React.FC = () => {
                     onClick={() => setNewReqType(t.id as any)}
                     className={`p-2.5 rounded-xl border text-xs font-bold text-left transition-all cursor-pointer ${
                       newReqType === t.id
-                        ? 'bg-[#0B253A] text-white border-[#0B253A]'
-                        : 'bg-[#FAF7F2] border-[#EBE6DD] text-slate-700 hover:bg-slate-100'
+                        ? 'bg-jaman-navy text-white border-jaman-navy'
+                        : 'bg-jaman-cream border-jaman-border text-slate-700 hover:bg-slate-100'
                     }`}
                   >
                     {t.label}
@@ -232,7 +232,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
                 value={newReqNotes}
                 onChange={(e) => setNewReqNotes(e.target.value)}
                 placeholder="e.g. Warm water, 2 small forks..."
-                className="w-full px-3.5 py-2.5 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl text-xs text-[#0B253A] outline-none focus:bg-white focus:border-[#E66817]"
+                className="w-full px-3.5 py-2.5 bg-jaman-cream border border-jaman-border rounded-xl text-xs text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
               />
             </div>
 
@@ -246,7 +246,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs shadow-md"
+                className="flex-1 py-3 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs shadow-md"
               >
                 Submit Request
               </button>

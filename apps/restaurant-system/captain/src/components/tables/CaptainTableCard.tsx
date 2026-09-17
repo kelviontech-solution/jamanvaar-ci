@@ -59,15 +59,15 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
           : isBillReq
           ? 'border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/15'
           : isOccupied
-          ? 'border-[#E66817] bg-[#FFFBF7]'
-          : 'border-[#EBE6DD] hover:border-slate-300'
+          ? 'border-jaman-saffron bg-[#FFFBF7]'
+          : 'border-jaman-border hover:border-slate-300'
       }`}
     >
       {/* ── 1. Card Top: Table Number, Section & Status Pill ── */}
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xl sm:text-2xl font-black text-[#0B253A] tracking-tight">
+            <span className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">
               TABLE {table.tableNumber}
             </span>
             {isFoodReady && (
@@ -92,7 +92,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
               : isFoodReady
               ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
               : isOccupied
-              ? 'bg-[#FFF4ED] text-[#E66817] border border-[#FDBA74]'
+              ? 'bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74]'
               : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
           }`}
         >
@@ -101,7 +101,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
       </div>
 
       {/* ── 2. Card Middle: Order Details, Guests & Financials ── */}
-      <div className="p-3 rounded-2xl bg-white border border-[#EBE6DD] space-y-2">
+      <div className="p-3 rounded-2xl bg-white border border-jaman-border space-y-2">
         <div className="flex items-center justify-between text-xs font-bold">
           <div className="flex items-center gap-1.5 text-slate-600">
             <Users className="w-4 h-4 text-slate-400" />
@@ -109,7 +109,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
           </div>
           <div className="text-right">
             <span className="text-[10px] text-slate-400 uppercase block font-bold">Order Value</span>
-            <span className="text-sm font-black font-mono text-[#0B253A]">
+            <span className="text-sm font-black font-mono text-jaman-navy">
               {activeOrder ? formatINR(activeOrder.totalAmount) : '—'}
             </span>
           </div>
@@ -118,7 +118,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
         {/* Order Meta / Elapsed Timer */}
         {activeOrder ? (
           <div className="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-medium text-slate-500">
-            <div className="flex items-center gap-1 font-mono font-bold text-[#0B253A]">
+            <div className="flex items-center gap-1 font-mono font-bold text-jaman-navy">
               <span>#{activeOrder.orderNumber?.slice(-4) || '—'}</span>
               <span className="text-slate-300">•</span>
               <span className="text-slate-600 font-sans">{captainName}</span>
@@ -178,9 +178,9 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
             <button
               type="button"
               onClick={() => onOpenWorkspace(table)}
-              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-[#0B253A] hover:bg-[#163E5E] text-white font-black text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-1.5 truncate"
+              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-black text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-1.5 truncate"
             >
-              <UtensilsCrossed className="w-3.5 h-3.5 text-[#E66817]" />
+              <UtensilsCrossed className="w-3.5 h-3.5 text-jaman-saffron" />
               <span className="truncate">{activeOrder ? 'VIEW ORDER' : 'TAKE ORDER'}</span>
             </button>
             <button

@@ -40,7 +40,7 @@ export const CaptainAttentionStrip: React.FC<CaptainAttentionStripProps> = ({
     <section className="bg-[#FFF8F0] border-b border-[#FDBA74]/40 px-3 sm:px-5 py-2 select-none shadow-2xs">
       <div className="max-w-7xl mx-auto flex items-center gap-2 overflow-x-auto scrollbar-none">
         {/* Label */}
-        <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-[#E66817] shrink-0 mr-1">
+        <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-jaman-saffron shrink-0 mr-1">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Priority Actions:</span>
         </div>
@@ -52,7 +52,7 @@ export const CaptainAttentionStrip: React.FC<CaptainAttentionStripProps> = ({
           className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shrink-0 transition-all cursor-pointer ${
             activeFoodReady.length > 0
               ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 animate-pulse active:scale-95'
-              : 'bg-white hover:bg-slate-50 border border-[#EBE6DD] text-slate-500 hover:text-emerald-700'
+              : 'bg-white hover:bg-slate-50 border border-jaman-border text-slate-500 hover:text-emerald-700'
           }`}
           title="Dishes ready in kitchen waiting for pickup and delivery"
         >
@@ -70,7 +70,7 @@ export const CaptainAttentionStrip: React.FC<CaptainAttentionStripProps> = ({
           className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shrink-0 transition-all cursor-pointer ${
             billRequestedCount > 0
               ? 'bg-purple-700 hover:bg-purple-800 text-white shadow-sm shadow-purple-700/20 active:scale-95'
-              : 'bg-white hover:bg-slate-50 border border-[#EBE6DD] text-slate-500 hover:text-purple-700'
+              : 'bg-white hover:bg-slate-50 border border-jaman-border text-slate-500 hover:text-purple-700'
           }`}
           title="Tables asking for bill and settlement"
         >
@@ -85,7 +85,7 @@ export const CaptainAttentionStrip: React.FC<CaptainAttentionStripProps> = ({
           className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shrink-0 transition-all cursor-pointer ${
             delayedKotsCount > 0
               ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm shadow-rose-600/20 animate-pulse active:scale-95'
-              : 'bg-white hover:bg-slate-50 border border-[#EBE6DD] text-slate-500 hover:text-rose-700'
+              : 'bg-white hover:bg-slate-50 border border-jaman-border text-slate-500 hover:text-rose-700'
           }`}
           title="Kitchen orders exceeding 15 min preparation time"
         >
@@ -100,7 +100,7 @@ export const CaptainAttentionStrip: React.FC<CaptainAttentionStripProps> = ({
           className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shrink-0 transition-all cursor-pointer ${
             pendingRequestsCount > 0
               ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-sm shadow-amber-600/20 active:scale-95'
-              : 'bg-white hover:bg-slate-50 border border-[#EBE6DD] text-slate-500 hover:text-amber-700'
+              : 'bg-white hover:bg-slate-50 border border-jaman-border text-slate-500 hover:text-amber-700'
           }`}
           title="Guest service requests: Water, Extra Plates, Cutlery, Cleaning"
         >
@@ -114,12 +114,12 @@ export const CaptainAttentionStrip: React.FC<CaptainAttentionStripProps> = ({
           onClick={() => onNavigateToTab('MESSAGES')}
           className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shrink-0 transition-all cursor-pointer ${
             unreadMessagesCount > 0
-              ? 'bg-[#0B253A] hover:bg-[#163E5E] text-white shadow-sm active:scale-95'
-              : 'bg-white hover:bg-slate-50 border border-[#EBE6DD] text-slate-500 hover:text-[#0B253A]'
+              ? 'bg-jaman-navy hover:bg-[#163E5E] text-white shadow-sm active:scale-95'
+              : 'bg-white hover:bg-slate-50 border border-jaman-border text-slate-500 hover:text-jaman-navy'
           }`}
           title="Staff and Kitchen communications"
         >
-          <MessageSquare className={`w-3.5 h-3.5 ${unreadMessagesCount > 0 ? 'text-[#E66817]' : 'text-slate-400'}`} />
+          <MessageSquare className={`w-3.5 h-3.5 ${unreadMessagesCount > 0 ? 'text-jaman-saffron' : 'text-slate-400'}`} />
           <span>Messages ({unreadMessagesCount})</span>
         </button>
       </div>

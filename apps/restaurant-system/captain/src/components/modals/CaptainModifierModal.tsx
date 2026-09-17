@@ -83,15 +83,15 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#EBE6DD] space-y-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+      <div className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-jaman-border space-y-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
               <span className={`w-3 h-3 rounded-full ${item.dietaryType === 'VEG' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-              <h3 className="text-lg font-black text-[#0B253A]">{item.name}</h3>
+              <h3 className="text-lg font-black text-jaman-navy">{item.name}</h3>
             </div>
-            <span className="text-xs text-[#E66817] font-bold font-mono block mt-0.5">
+            <span className="text-xs text-jaman-saffron font-bold font-mono block mt-0.5">
               Base Price: {formatINR(item.price)}
             </span>
           </div>
@@ -117,8 +117,8 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
                 onClick={() => setSpice(lvl)}
                 className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   spice === lvl
-                    ? 'bg-[#0B253A] text-white shadow-xs'
-                    : 'bg-[#FAF7F2] text-slate-600 hover:bg-slate-100 border border-[#EBE6DD]'
+                    ? 'bg-jaman-navy text-white shadow-xs'
+                    : 'bg-jaman-cream text-slate-600 hover:bg-slate-100 border border-jaman-border'
                 }`}
               >
                 {lvl === 'MILD' ? '🌿 Mild' : lvl === 'MEDIUM' ? '🌶️ Regular' : '🔥 Extra Spicy'}
@@ -139,7 +139,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
               className={`w-full p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
                 isJain
                   ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
-                  : 'bg-[#FAF7F2] border-[#EBE6DD] text-slate-600'
+                  : 'bg-jaman-cream border-jaman-border text-slate-600'
               }`}
             >
               <span>Jain (No Onion, No Garlic)</span>
@@ -152,7 +152,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
               className={`w-full p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
                 extraCheese
                   ? 'bg-amber-50 border-amber-300 text-amber-800'
-                  : 'bg-[#FAF7F2] border-[#EBE6DD] text-slate-600'
+                  : 'bg-jaman-cream border-jaman-border text-slate-600'
               }`}
             >
               <span>Extra Cheese (+₹40)</span>
@@ -165,7 +165,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
               className={`w-full p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
                 extraButter
                   ? 'bg-amber-50 border-amber-300 text-amber-800'
-                  : 'bg-[#FAF7F2] border-[#EBE6DD] text-slate-600'
+                  : 'bg-jaman-cream border-jaman-border text-slate-600'
               }`}
             >
               <span>Extra Butter (+₹25)</span>
@@ -191,8 +191,8 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
                 onClick={() => setCourse(c.id as any)}
                 className={`py-2 px-2 rounded-xl text-[11px] font-bold text-center transition-all cursor-pointer ${
                   course === c.id
-                    ? 'bg-[#E66817] text-white shadow-xs'
-                    : 'bg-[#FAF7F2] text-slate-600 hover:bg-slate-100 border border-[#EBE6DD]'
+                    ? 'bg-jaman-saffron text-white shadow-xs'
+                    : 'bg-jaman-cream text-slate-600 hover:bg-slate-100 border border-jaman-border'
                 }`}
               >
                 {c.label}
@@ -211,7 +211,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="e.g. Less oil, extra crispy, gluten sensitive..."
-            className="w-full px-3 py-2 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl text-xs text-[#0B253A] outline-none focus:bg-white focus:border-[#E66817]"
+            className="w-full px-3 py-2 bg-jaman-cream border border-jaman-border rounded-xl text-xs text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
           />
         </div>
 
@@ -221,15 +221,15 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#0B253A] font-black flex items-center justify-center cursor-pointer"
+              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-jaman-navy font-black flex items-center justify-center cursor-pointer"
             >
               <Minus className="w-4 h-4" />
             </button>
-            <span className="w-8 text-center text-lg font-black font-mono text-[#0B253A]">{quantity}</span>
+            <span className="w-8 text-center text-lg font-black font-mono text-jaman-navy">{quantity}</span>
             <button
               type="button"
               onClick={() => setQuantity((q) => q + 1)}
-              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#0B253A] font-black flex items-center justify-center cursor-pointer"
+              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-jaman-navy font-black flex items-center justify-center cursor-pointer"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -238,7 +238,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
           <button
             type="button"
             onClick={handleAdd}
-            className="flex-1 py-3 px-4 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm shadow-md shadow-[#E66817]/20 transition-all active:scale-98 cursor-pointer flex items-center justify-between"
+            className="flex-1 py-3 px-4 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm shadow-md shadow-jaman-saffron/20 transition-all active:scale-98 cursor-pointer flex items-center justify-between"
           >
             <span>Add to Order</span>
             <span className="font-mono">{formatINR(totalPrice)}</span>

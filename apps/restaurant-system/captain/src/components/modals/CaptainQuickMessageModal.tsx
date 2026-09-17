@@ -32,12 +32,12 @@ export const CaptainQuickMessageModal: React.FC<CaptainQuickMessageModalProps> =
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#EBE6DD] space-y-4 animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-jaman-border space-y-4 animate-in fade-in zoom-in-95 duration-150"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-[#E66817]" />
-            <h3 className="text-lg font-black text-[#0B253A]">Send Staff Message</h3>
+            <MessageSquare className="w-5 h-5 text-jaman-saffron" />
+            <h3 className="text-lg font-black text-jaman-navy">Send Staff Message</h3>
           </div>
           <button
             type="button"
@@ -66,8 +66,8 @@ export const CaptainQuickMessageModal: React.FC<CaptainQuickMessageModalProps> =
                 onClick={() => setRecipient(r.id as any)}
                 className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   recipient === r.id
-                    ? 'bg-[#0B253A] text-white shadow-2xs'
-                    : 'bg-[#FAF7F2] text-slate-600 hover:bg-slate-100 border border-[#EBE6DD]'
+                    ? 'bg-jaman-navy text-white shadow-2xs'
+                    : 'bg-jaman-cream text-slate-600 hover:bg-slate-100 border border-jaman-border'
                 }`}
               >
                 {r.label}
@@ -86,7 +86,7 @@ export const CaptainQuickMessageModal: React.FC<CaptainQuickMessageModalProps> =
             value={tableNumber}
             onChange={(e) => setTableNumber(e.target.value)}
             placeholder="e.g. 12 or leave empty"
-            className="w-full px-3.5 py-2 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl text-xs font-bold text-[#0B253A] outline-none focus:bg-white focus:border-[#E66817]"
+            className="w-full px-3.5 py-2 bg-jaman-cream border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
           />
         </div>
 
@@ -103,8 +103,8 @@ export const CaptainQuickMessageModal: React.FC<CaptainQuickMessageModalProps> =
                 onClick={() => setPreset(msg)}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold text-left transition-all cursor-pointer ${
                   preset === msg
-                    ? 'bg-[#FFF4ED] text-[#E66817] border border-[#FDBA74]'
-                    : 'bg-[#FAF7F2] text-slate-600 border border-transparent hover:border-slate-200'
+                    ? 'bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74]'
+                    : 'bg-jaman-cream text-slate-600 border border-transparent hover:border-slate-200'
                 }`}
               >
                 ⚡ {msg}
@@ -123,7 +123,7 @@ export const CaptainQuickMessageModal: React.FC<CaptainQuickMessageModalProps> =
             value={customNote}
             onChange={(e) => setCustomNote(e.target.value)}
             placeholder="e.g. Flight in 30 mins, please prioritize"
-            className="w-full px-3.5 py-2 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl text-xs text-[#0B253A] outline-none focus:bg-white focus:border-[#E66817]"
+            className="w-full px-3.5 py-2 bg-jaman-cream border border-jaman-border rounded-xl text-xs text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
           />
         </div>
 
@@ -138,7 +138,7 @@ export const CaptainQuickMessageModal: React.FC<CaptainQuickMessageModalProps> =
           </button>
           <button
             type="submit"
-            className="py-3 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs shadow-md flex items-center justify-center gap-1.5"
+            className="py-3 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs shadow-md flex items-center justify-center gap-1.5"
           >
             <Send className="w-3.5 h-3.5" />
             <span>Send Broadcast</span>
