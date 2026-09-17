@@ -92,6 +92,32 @@ brainstorm → spec → plan cycle when picked up.
 
 ---
 
+## 3b. UX Phase 2 — Reduce Clicks/Steps — Complete
+
+Research found most of the platform already got a click-reduction pass in
+earlier work this session (POS and Kiosk customer app's direct-add
+`onAdd`/`onCustomize` `ProductCard` pattern, KDS's single-tap ready flow,
+Kiosk Admin's already-visible fleet badge). Five concrete, low-risk gaps
+remained and are now fixed:
+
+- **POS**: the standard-payment receipt modal now auto-dismisses ~6s after
+  opening (the print already happened automatically at settlement) unless
+  the cashier is actively using it to share/reprint/download — it no longer
+  blocks the next sale. PIN entry auto-submits at the 4th digit, matching
+  Captain's and KDS's PIN pads.
+- **Restaurant Admin**: the Orders screen now opens straight into today's
+  drill-down instead of a "Today" tile the manager clicked into 100% of
+  the time anyway.
+- **Captain** (the biggest real gap — never got the earlier polish pass):
+  every dish tap forced a customization modal open even to accept its own
+  defaults unchanged; the quick-add "+" is now a real direct-add button.
+  Opening a fresh table now lands on the menu instead of an empty Order
+  tab requiring an extra tap to reach it.
+
+Full suite still at 398/398; `tsc --noEmit` clean on pos, pos-admin, captain.
+
+---
+
 ## 4. Has the *Experience* Actually Improved?
 
 Be precise about what kind of work this was: **almost all of it was data-integrity and connectivity work — making real things real and making broken buttons work — not visual/interaction design polish.** Those are different kinds of improvement, and it's worth separating them honestly.
@@ -115,7 +141,7 @@ The audit's own "how this could be simplified" recommendations (§11–§14) are
 | **Captain "Request Cancel (needs manager PIN)"** for an already-fired item | ❌ Not built |
 | Consistent design language / color tokens across apps | ✅ Done (Phase 1, §3a) |
 | Consolidated empty/loading/error states | ✅ Done for pos-admin/pos/captain/kds (Phase 1, §3a) |
-| Fewer taps to complete common tasks | ❌ Not attempted — Phase 2 |
+| Fewer taps to complete common tasks | ✅ Done (Phase 2, §3b) |
 | Mobile/responsive layout (Super Admin's Restaurants page was found broken at phone width) | ❌ Not re-tested or fixed — Phase 3 |
 | Onboarding walkthroughs / guidance | ❌ Not attempted — Phase 4 |
 | Accessibility (screen reader support) | ❌ Never tested — no screen reader available in the original audit's tooling |
