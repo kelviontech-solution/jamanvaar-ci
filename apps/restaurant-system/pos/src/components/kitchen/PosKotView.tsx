@@ -72,12 +72,12 @@ export const PosKotView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] p-4 sm:p-6 overflow-hidden select-none">
+    <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-hidden select-none">
       {/* Top Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4 shrink-0">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B253A] flex items-center gap-2">
-            <ChefHat className="w-6 h-6 text-[#E66817]" />
+          <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
+            <ChefHat className="w-6 h-6 text-jaman-saffron" />
             <span>Kitchen Orders & KOT Tickets</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -86,7 +86,7 @@ export const PosKotView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="bg-white border border-[#EBE6DD] px-3 py-1.5 rounded-xl shadow-2xs text-xs font-bold text-slate-700 flex items-center gap-1.5">
+          <div className="bg-white border border-jaman-border px-3 py-1.5 rounded-xl shadow-2xs text-xs font-bold text-slate-700 flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>KDS Connected • Live Sync</span>
           </div>
@@ -101,8 +101,8 @@ export const PosKotView: React.FC = () => {
             onClick={() => setSelectedStation('ALL')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors ${
               selectedStation === 'ALL'
-                ? 'bg-[#0B253A] text-white shadow-xs'
-                : 'bg-white border border-[#EBE6DD] text-slate-600 hover:bg-slate-50'
+                ? 'bg-jaman-navy text-white shadow-xs'
+                : 'bg-white border border-jaman-border text-slate-600 hover:bg-slate-50'
             }`}
           >
             All Stations
@@ -113,8 +113,8 @@ export const PosKotView: React.FC = () => {
               onClick={() => setSelectedStation(st)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
                 selectedStation === st
-                  ? 'bg-[#0B253A] text-white shadow-xs'
-                  : 'bg-white border border-[#EBE6DD] text-slate-600 hover:bg-slate-50'
+                  ? 'bg-jaman-navy text-white shadow-xs'
+                  : 'bg-white border border-jaman-border text-slate-600 hover:bg-slate-50'
               }`}
             >
               {st}
@@ -123,7 +123,7 @@ export const PosKotView: React.FC = () => {
         </div>
 
         {/* Status Filters */}
-        <div className="flex items-center gap-1.5 bg-white border border-[#EBE6DD] p-1 rounded-xl shadow-2xs">
+        <div className="flex items-center gap-1.5 bg-white border border-jaman-border p-1 rounded-xl shadow-2xs">
           {[
             { id: 'ACTIVE', label: 'In Progress' },
             { id: 'READY', label: 'Ready for Service' },
@@ -134,8 +134,8 @@ export const PosKotView: React.FC = () => {
               onClick={() => setStatusFilter(sf.id)}
               className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors ${
                 statusFilter === sf.id
-                  ? 'bg-[#E66817] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-[#0B253A]'
+                  ? 'bg-jaman-saffron text-white shadow-xs'
+                  : 'text-slate-600 hover:text-jaman-navy'
               }`}
             >
               {sf.label}
@@ -162,17 +162,17 @@ export const PosKotView: React.FC = () => {
                       ? 'border-emerald-500 bg-emerald-50/20'
                       : isCancelled
                       ? 'border-slate-200 opacity-60 bg-slate-50'
-                      : 'border-[#EBE6DD] hover:border-slate-400'
+                      : 'border-jaman-border hover:border-slate-400'
                   }`}
                 >
                   {/* KOT Header */}
                   <div className="flex items-start justify-between border-b border-slate-100 pb-2.5 mb-2.5">
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono font-black text-sm text-[#0B253A]">
+                        <span className="font-mono font-black text-sm text-jaman-navy">
                           {kot.kotNumber}
                         </span>
-                        <span className="text-[10px] font-bold bg-[#E66817]/10 text-[#E66817] px-1.5 py-0.5 rounded border border-[#E66817]/20">
+                        <span className="text-[10px] font-bold bg-jaman-saffron/10 text-jaman-saffron px-1.5 py-0.5 rounded border border-jaman-saffron/20">
                           {kot.type}
                         </span>
                       </div>
@@ -184,7 +184,7 @@ export const PosKotView: React.FC = () => {
                     </div>
 
                     <div className="text-right">
-                      <span className="font-extrabold text-base text-[#0B253A] font-mono">
+                      <span className="font-extrabold text-base text-jaman-navy font-mono">
                         {kot.tableNumber ? `T-${kot.tableNumber}` : `Token #${kot.tokenNumber}`}
                       </span>
                       <div className="text-[10px] text-slate-400 font-bold uppercase">{kot.orderType}</div>
@@ -202,7 +202,7 @@ export const PosKotView: React.FC = () => {
                   <div className="space-y-2 mb-4 flex-1">
                     {kot.items.map((it, idx) => (
                       <div key={idx} className="text-xs">
-                        <div className="flex items-baseline justify-between font-bold text-[#0B253A]">
+                        <div className="flex items-baseline justify-between font-bold text-jaman-navy">
                           <span className="flex-1">{it.name}</span>
                           <span className="w-8 text-right font-black text-sm bg-slate-100 px-1.5 py-0.5 rounded">
                             ×{it.quantity}
@@ -248,7 +248,7 @@ export const PosKotView: React.FC = () => {
                     {isReady && (
                       <button
                         onClick={() => handleUpdateStatus(kot.id, 'SERVED')}
-                        className="flex-1 py-2 px-3 rounded-xl bg-[#0B253A] hover:bg-[#1E3A4C] text-white font-bold text-xs flex items-center justify-center gap-1 shadow-xs"
+                        className="flex-1 py-2 px-3 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold text-xs flex items-center justify-center gap-1 shadow-xs"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Mark Served</span>
@@ -269,7 +269,7 @@ export const PosKotView: React.FC = () => {
         ) : (
           <div className="h-64 flex flex-col items-center justify-center text-center text-slate-400 my-auto bg-white/50 border-2 border-dashed border-slate-200 rounded-3xl p-6">
             <ChefHat className="w-12 h-12 text-slate-300 mb-2 stroke-1" />
-            <h4 className="font-bold text-sm text-[#0B253A]">No active KOTs</h4>
+            <h4 className="font-bold text-sm text-jaman-navy">No active KOTs</h4>
             <p className="text-xs text-slate-400 mt-0.5">
               Newly created orders and dispatched KOTs will stream here in real time.
             </p>

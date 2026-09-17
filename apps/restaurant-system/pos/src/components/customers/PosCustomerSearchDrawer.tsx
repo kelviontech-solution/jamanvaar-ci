@@ -47,11 +47,11 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-3xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-[#0B253A] text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
+        <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <User className="w-5 h-5 text-[#E66817]" />
+            <User className="w-5 h-5 text-jaman-saffron" />
             <div>
               <h2 className="text-base font-bold text-white leading-tight">Customer / CRM Search</h2>
               <span className="text-xs text-slate-300">Fast phone lookup & loyalty lookup</span>
@@ -67,7 +67,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
         </div>
 
         {/* Search Input Bar */}
-        <div className="p-4 bg-white border-b border-[#EBE6DD] space-y-3">
+        <div className="p-4 bg-white border-b border-jaman-border space-y-3">
           <div className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -76,7 +76,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
               placeholder="Search by 10-digit mobile number or customer name..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-mono text-[#0B253A] placeholder:font-sans placeholder:text-slate-400 focus:outline-hidden focus:border-[#E66817] focus:bg-white transition-all"
+              className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-mono text-jaman-navy placeholder:font-sans placeholder:text-slate-400 focus:outline-hidden focus:border-jaman-saffron focus:bg-white transition-all"
             />
           </div>
 
@@ -90,7 +90,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
                 setIsCreating(true);
                 setNewPhone(query.replace(/\D/g, ''));
               }}
-              className="px-3 py-1.5 rounded-xl bg-[#E66817]/10 hover:bg-[#E66817]/20 text-[#E66817] text-xs font-bold flex items-center gap-1.5 transition-colors"
+              className="px-3 py-1.5 rounded-xl bg-jaman-saffron/10 hover:bg-jaman-saffron/20 text-jaman-saffron text-xs font-bold flex items-center gap-1.5 transition-colors"
             >
               <UserPlus className="w-3.5 h-3.5" />
               <span>+ Create New Customer</span>
@@ -101,7 +101,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
         {/* New Customer Form Modal */}
         {isCreating && (
           <form onSubmit={handleCreateCustomer} className="p-4 bg-amber-50/80 border-b border-amber-200 space-y-3">
-            <h4 className="text-xs font-bold text-[#0B253A] uppercase">Register Customer Profile</h4>
+            <h4 className="text-xs font-bold text-jaman-navy uppercase">Register Customer Profile</h4>
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="text-[10px] font-bold text-slate-600 block mb-0.5">Mobile Number *</label>
@@ -136,7 +136,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
               </button>
               <button
                 type="submit"
-                className="px-4 py-1 bg-[#E66817] text-white rounded-lg text-xs font-bold shadow-xs"
+                className="px-4 py-1 bg-jaman-saffron text-white rounded-lg text-xs font-bold shadow-xs"
               >
                 Save & Attach
               </button>
@@ -155,13 +155,13 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
                   onClick={() => handleSelect(customer)}
                   className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                     isSelected
-                      ? 'bg-[#E66817]/10 border-[#E66817] shadow-xs'
-                      : 'bg-white border-[#EBE6DD] hover:border-slate-400'
+                      ? 'bg-jaman-saffron/10 border-jaman-saffron shadow-xs'
+                      : 'bg-white border-jaman-border hover:border-slate-400'
                   }`}
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-xs sm:text-sm text-[#0B253A]">{customer.name}</span>
+                      <span className="font-bold text-xs sm:text-sm text-jaman-navy">{customer.name}</span>
                       {isSelected && (
                         <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full flex items-center gap-0.5">
                           <Check className="w-3 h-3" /> Attached
@@ -181,7 +181,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
                     </div>
                   </div>
 
-                  <button className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#E66817] hover:text-white text-slate-700 text-xs font-bold transition-colors">
+                  <button className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-jaman-saffron hover:text-white text-slate-700 text-xs font-bold transition-colors">
                     {isSelected ? 'Change' : 'Select'}
                   </button>
                 </div>
@@ -196,7 +196,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
                   setIsCreating(true);
                   setNewPhone(query.replace(/\D/g, ''));
                 }}
-                className="mt-2 text-xs font-bold text-[#E66817] hover:underline"
+                className="mt-2 text-xs font-bold text-jaman-saffron hover:underline"
               >
                 + Register this phone number
               </button>
@@ -205,7 +205,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-white border-t border-[#EBE6DD] flex justify-between items-center shrink-0">
+        <div className="p-3 bg-white border-t border-jaman-border flex justify-between items-center shrink-0">
           {selectedCustomer ? (
             <button
               onClick={() => {
@@ -222,7 +222,7 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
 
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-[#0B253A] text-white rounded-xl font-bold text-xs"
+            className="px-4 py-2 bg-jaman-navy text-white rounded-xl font-bold text-xs"
           >
             Close
           </button>

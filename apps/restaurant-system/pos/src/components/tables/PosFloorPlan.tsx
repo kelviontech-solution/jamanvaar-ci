@@ -22,8 +22,8 @@ const STATUS_STYLES: Record<string, { border: string; badge: string }> = {
     badge: "bg-emerald-100 text-emerald-800 border-emerald-300"
   },
   OCCUPIED: {
-    border: "border-[#0B253A]/40 hover:border-[#0B253A]",
-    badge: "bg-[#0B253A] text-white border-[#0B253A]"
+    border: "border-jaman-navy/40 hover:border-jaman-navy",
+    badge: "bg-jaman-navy text-white border-jaman-navy"
   },
   BILL_REQUESTED: {
     border: "border-teal-400 hover:border-teal-600",
@@ -106,11 +106,11 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
             {table.zone || "Hall"}
           </span>
           <div className="flex items-center gap-2">
-            <h3 className="text-xl sm:text-2xl font-black text-[#0B253A] leading-none mt-0.5">
+            <h3 className="text-xl sm:text-2xl font-black text-jaman-navy leading-none mt-0.5">
               T-{table.tableNumber}
             </h3>
             {table.qrStatus === 'ACTIVE' && (
-              <span className="text-[9px] font-black bg-amber-50 text-[#E66817] border border-[#FED7AA] px-1.5 py-0.2 rounded flex items-center gap-0.5" title="QR ordering active for this table">
+              <span className="text-[9px] font-black bg-amber-50 text-jaman-saffron border border-[#FED7AA] px-1.5 py-0.2 rounded flex items-center gap-0.5" title="QR ordering active for this table">
                 <QrCode className="w-2.5 h-2.5" />
                 <span>QR</span>
               </span>
@@ -127,7 +127,7 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
           <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <span>{table.capacity} Seater</span>
           {table.currentGuests != null && table.currentGuests > 0 && (
-            <span className="text-[#0B253A] font-bold ml-1">· {table.currentGuests} guests</span>
+            <span className="text-jaman-navy font-bold ml-1">· {table.currentGuests} guests</span>
           )}
         </div>
 
@@ -152,7 +152,7 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
         {activeOrder && (
           <div className="pt-1.5 border-t border-slate-100 flex items-baseline justify-between">
             <span className="text-[10px] text-slate-400">Order:</span>
-            <span className="font-mono font-extrabold text-sm text-[#0B253A]">
+            <span className="font-mono font-extrabold text-sm text-jaman-navy">
               Rs.{activeOrder.totalAmount ?? 0}
             </span>
           </div>
@@ -177,7 +177,7 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
         ) : (
           <button
             onClick={(e) => onViewOrder(e, table)}
-            className="w-full py-2 rounded-xl bg-[#0B253A] hover:bg-[#1E3A4C] text-white font-bold text-xs shadow-xs transition-colors active:scale-95 flex items-center justify-center gap-1"
+            className="w-full py-2 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold text-xs shadow-xs transition-colors active:scale-95 flex items-center justify-center gap-1"
           >
             View Order <ChevronRight className="w-3 h-3" />
           </button>
@@ -247,12 +247,12 @@ export const PosFloorPlan: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] p-4 sm:p-6 overflow-hidden select-none">
+    <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-hidden select-none">
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4 mb-4 shrink-0">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B253A] flex items-center gap-2">
-            <LayoutGrid className="w-6 h-6 text-[#E66817]" />
+          <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
+            <LayoutGrid className="w-6 h-6 text-jaman-saffron" />
             <span>Floor Plan &amp; Dining Tables</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -261,7 +261,7 @@ export const PosFloorPlan: React.FC = () => {
         </div>
         <button
           onClick={() => setActiveTab("SETTINGS")}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#EBE6DD] text-xs font-bold text-slate-600 hover:bg-[#F5F0E8] transition-colors shadow-2xs"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-jaman-border text-xs font-bold text-slate-600 hover:bg-[#F5F0E8] transition-colors shadow-2xs"
         >
           <Settings className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Manage Tables</span>
@@ -272,31 +272,31 @@ export const PosFloorPlan: React.FC = () => {
       <div className="flex items-center gap-2 flex-wrap mb-4 shrink-0">
         <button
           onClick={() => setStatusFilter("ALL")}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs border ${statusFilter === "ALL" ? "bg-slate-800 text-white border-slate-800" : "bg-white border-[#EBE6DD] text-slate-600 hover:bg-slate-50"}`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs border ${statusFilter === "ALL" ? "bg-slate-800 text-white border-slate-800" : "bg-white border-jaman-border text-slate-600 hover:bg-slate-50"}`}
         >
           <span className="w-2 h-2 rounded-full bg-slate-400" /> All {stats.total}
         </button>
         <button
           onClick={() => setStatusFilter("AVAILABLE")}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs border ${statusFilter === "AVAILABLE" ? "bg-emerald-600 text-white border-emerald-600" : "bg-white border-[#EBE6DD] text-slate-600 hover:bg-emerald-50"}`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs border ${statusFilter === "AVAILABLE" ? "bg-emerald-600 text-white border-emerald-600" : "bg-white border-jaman-border text-slate-600 hover:bg-emerald-50"}`}
         >
           <span className="w-2 h-2 rounded-full bg-emerald-500" /> Available {stats.available}
         </button>
         <button
           onClick={() => setStatusFilter("OCCUPIED")}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs border ${statusFilter === "OCCUPIED" ? "bg-[#0B253A] text-white border-[#0B253A]" : "bg-white border-[#EBE6DD] text-slate-600 hover:bg-slate-50"}`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs border ${statusFilter === "OCCUPIED" ? "bg-jaman-navy text-white border-jaman-navy" : "bg-white border-jaman-border text-slate-600 hover:bg-slate-50"}`}
         >
-          <span className="w-2 h-2 rounded-full bg-[#0B253A]" /> Occupied {stats.occupied}
+          <span className="w-2 h-2 rounded-full bg-jaman-navy" /> Occupied {stats.occupied}
         </button>
         <button
           onClick={() => setStatusFilter("BILLING")}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs border ${statusFilter === "BILLING" ? "bg-teal-600 text-white border-teal-600" : "bg-white border-[#EBE6DD] text-slate-600 hover:bg-teal-50"}`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs border ${statusFilter === "BILLING" ? "bg-teal-600 text-white border-teal-600" : "bg-white border-jaman-border text-slate-600 hover:bg-teal-50"}`}
         >
           <CreditCard className="w-3.5 h-3.5 text-teal-500" /> Billing {stats.billing}
         </button>
         <button
           onClick={() => setStatusFilter("RESERVED")}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs border ${statusFilter === "RESERVED" ? "bg-purple-600 text-white border-purple-600" : "bg-white border-[#EBE6DD] text-slate-600 hover:bg-purple-50"}`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs border ${statusFilter === "RESERVED" ? "bg-purple-600 text-white border-purple-600" : "bg-white border-jaman-border text-slate-600 hover:bg-purple-50"}`}
         >
           <Calendar className="w-3.5 h-3.5 text-purple-500" /> Reserved {stats.reserved}
         </button>
@@ -308,7 +308,7 @@ export const PosFloorPlan: React.FC = () => {
           <span className="text-[10px] font-bold uppercase text-slate-400 mr-1">Zone:</span>
           <button
             onClick={() => setSelectedZone("ALL")}
-            className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${selectedZone === "ALL" ? "bg-[#0B253A] text-white shadow-xs" : "bg-white border border-[#EBE6DD] text-slate-600 hover:bg-slate-50"}`}
+            className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${selectedZone === "ALL" ? "bg-jaman-navy text-white shadow-xs" : "bg-white border border-jaman-border text-slate-600 hover:bg-slate-50"}`}
           >
             All Zones
           </button>
@@ -316,7 +316,7 @@ export const PosFloorPlan: React.FC = () => {
             <button
               key={z}
               onClick={() => setSelectedZone(z)}
-              className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${selectedZone === z ? "bg-[#0B253A] text-white shadow-xs" : "bg-white border border-[#EBE6DD] text-slate-600 hover:bg-slate-50"}`}
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${selectedZone === z ? "bg-jaman-navy text-white shadow-xs" : "bg-white border border-jaman-border text-slate-600 hover:bg-slate-50"}`}
             >
               {z}
             </button>
@@ -332,14 +332,14 @@ export const PosFloorPlan: React.FC = () => {
               <AlertTriangle className="w-8 h-8 text-amber-500" />
             </div>
             <div>
-              <p className="text-lg font-extrabold text-[#0B253A]">No Tables Configured</p>
+              <p className="text-lg font-extrabold text-jaman-navy">No Tables Configured</p>
               <p className="text-sm text-slate-500 mt-1 max-w-xs">
                 No dining tables found. Please configure your floor layout in Settings.
               </p>
             </div>
             <button
               onClick={() => setActiveTab("SETTINGS")}
-              className="px-4 py-2 rounded-xl bg-[#E66817] text-white font-bold text-sm hover:bg-[#EA580C] transition-colors shadow-sm"
+              className="px-4 py-2 rounded-xl bg-jaman-saffron text-white font-bold text-sm hover:bg-[#EA580C] transition-colors shadow-sm"
             >
               Configure Tables
             </button>
@@ -350,7 +350,7 @@ export const PosFloorPlan: React.FC = () => {
             <p className="text-sm font-semibold text-slate-400">No tables match this filter</p>
             <button
               onClick={() => { setSelectedZone("ALL"); setStatusFilter("ALL"); }}
-              className="px-3 py-1.5 text-xs font-bold rounded-xl bg-white border border-[#EBE6DD] text-slate-600 hover:bg-slate-50"
+              className="px-3 py-1.5 text-xs font-bold rounded-xl bg-white border border-jaman-border text-slate-600 hover:bg-slate-50"
             >
               Clear Filters
             </button>

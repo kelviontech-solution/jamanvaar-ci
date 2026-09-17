@@ -473,14 +473,14 @@ export const PosBillsView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] p-4 sm:p-6 overflow-hidden select-none space-y-4">
+    <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-hidden select-none space-y-4">
       
       {/* 1. Page Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div>
           <div className="flex items-center gap-2">
-            <Receipt className="w-6 h-6 text-[#E66817]" />
-            <h1 className="text-xl sm:text-2xl font-black text-[#0B253A]">Bills & Invoices</h1>
+            <Receipt className="w-6 h-6 text-jaman-saffron" />
+            <h1 className="text-xl sm:text-2xl font-black text-jaman-navy">Bills & Invoices</h1>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
             View, search, reprint receipts, issue refunds and manage completed restaurant transactions.
@@ -498,7 +498,7 @@ export const PosBillsView: React.FC = () => {
           <button
             type="button"
             onClick={handleExportCsv}
-            className="px-3 py-2 bg-white hover:bg-slate-50 border border-[#EBE6DD] rounded-xl text-xs font-bold text-[#0B253A] flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+            className="px-3 py-2 bg-white hover:bg-slate-50 border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
             <span>Export CSV</span>
@@ -507,7 +507,7 @@ export const PosBillsView: React.FC = () => {
           <button
             type="button"
             onClick={handleDownloadPdf}
-            className="px-3 py-2 bg-[#0B253A] hover:bg-[#1E3A4C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+            className="px-3 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Download PDF</span>
@@ -536,8 +536,8 @@ export const PosBillsView: React.FC = () => {
               }}
               className={`px-4 py-2 rounded-2xl text-xs font-black transition-all cursor-pointer whitespace-nowrap min-h-[44px] flex items-center gap-1.5 ${
                 isActive
-                  ? 'bg-[#0B253A] text-white shadow-xs'
-                  : 'bg-white text-slate-700 hover:bg-[#F5F0E8] border border-[#EBE6DD]'
+                  ? 'bg-jaman-navy text-white shadow-xs'
+                  : 'bg-white text-slate-700 hover:bg-[#F5F0E8] border border-jaman-border'
               }`}
             >
               <Calendar className="w-3.5 h-3.5 opacity-80" />
@@ -549,14 +549,14 @@ export const PosBillsView: React.FC = () => {
 
       {/* Custom Date Pickers if CUSTOM is selected */}
       {selectedPeriod === 'CUSTOM' && (
-        <div className="p-3 bg-white border border-[#EBE6DD] rounded-2xl flex items-center gap-3 flex-wrap shrink-0 animate-in fade-in text-xs">
+        <div className="p-3 bg-white border border-jaman-border rounded-2xl flex items-center gap-3 flex-wrap shrink-0 animate-in fade-in text-xs">
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-500">From:</span>
             <input
               type="date"
               value={customStartDate}
               onChange={(e) => setCustomStartDate(e.target.value)}
-              className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-1.5 font-mono font-bold text-[#0B253A]"
+              className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-1.5 font-mono font-bold text-jaman-navy"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -565,7 +565,7 @@ export const PosBillsView: React.FC = () => {
               type="date"
               value={customEndDate}
               onChange={(e) => setCustomEndDate(e.target.value)}
-              className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-1.5 font-mono font-bold text-[#0B253A]"
+              className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-1.5 font-mono font-bold text-jaman-navy"
             />
           </div>
           <span className="text-[11px] font-bold text-slate-400">
@@ -576,11 +576,11 @@ export const PosBillsView: React.FC = () => {
 
       {/* 3. Dynamic Period Financial Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0 text-xs">
-        <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD] shadow-2xs">
+        <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs">
           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
             Total Invoices
           </span>
-          <strong className="text-xl font-black font-mono text-[#0B253A] block mt-0.5">
+          <strong className="text-xl font-black font-mono text-jaman-navy block mt-0.5">
             {periodStats.totalCount}
           </strong>
           <span className="text-[10px] text-slate-500 font-medium mt-1 inline-block">
@@ -588,7 +588,7 @@ export const PosBillsView: React.FC = () => {
           </span>
         </div>
 
-        <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD] shadow-2xs">
+        <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs">
           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
             Total Sales
           </span>
@@ -600,7 +600,7 @@ export const PosBillsView: React.FC = () => {
           </span>
         </div>
 
-        <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD] shadow-2xs">
+        <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs">
           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
             Cash Collection
           </span>
@@ -612,7 +612,7 @@ export const PosBillsView: React.FC = () => {
           </span>
         </div>
 
-        <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD] shadow-2xs">
+        <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs">
           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
             UPI + Card POS
           </span>
@@ -631,13 +631,13 @@ export const PosBillsView: React.FC = () => {
           <button
             type="button"
             onClick={() => setSelectedPeriod('TODAY')}
-            className="p-3 bg-white hover:bg-amber-50/60 border border-[#EBE6DD] rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
+            className="p-3 bg-white hover:bg-amber-50/60 border border-jaman-border rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
           >
             <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
               <span>TODAY</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#E66817] group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffron group-hover:translate-x-1 transition-transform" />
             </div>
-            <strong className="text-base font-black text-[#0B253A] block mt-1">
+            <strong className="text-base font-black text-jaman-navy block mt-1">
               {formatINR(periodOverview.today.sales)}
             </strong>
             <span className="text-[11px] text-slate-500">{periodOverview.today.count} Bills</span>
@@ -646,13 +646,13 @@ export const PosBillsView: React.FC = () => {
           <button
             type="button"
             onClick={() => setSelectedPeriod('YESTERDAY')}
-            className="p-3 bg-white hover:bg-amber-50/60 border border-[#EBE6DD] rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
+            className="p-3 bg-white hover:bg-amber-50/60 border border-jaman-border rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
           >
             <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
               <span>YESTERDAY</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#E66817] group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffron group-hover:translate-x-1 transition-transform" />
             </div>
-            <strong className="text-base font-black text-[#0B253A] block mt-1">
+            <strong className="text-base font-black text-jaman-navy block mt-1">
               {formatINR(periodOverview.yesterday.sales)}
             </strong>
             <span className="text-[11px] text-slate-500">{periodOverview.yesterday.count} Bills</span>
@@ -661,13 +661,13 @@ export const PosBillsView: React.FC = () => {
           <button
             type="button"
             onClick={() => setSelectedPeriod('THIS_WEEK')}
-            className="p-3 bg-white hover:bg-amber-50/60 border border-[#EBE6DD] rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
+            className="p-3 bg-white hover:bg-amber-50/60 border border-jaman-border rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
           >
             <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
               <span>THIS WEEK</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#E66817] group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffron group-hover:translate-x-1 transition-transform" />
             </div>
-            <strong className="text-base font-black text-[#0B253A] block mt-1">
+            <strong className="text-base font-black text-jaman-navy block mt-1">
               {formatINR(periodOverview.week.sales)}
             </strong>
             <span className="text-[11px] text-slate-500">{periodOverview.week.count} Bills</span>
@@ -676,13 +676,13 @@ export const PosBillsView: React.FC = () => {
           <button
             type="button"
             onClick={() => setSelectedPeriod('THIS_MONTH')}
-            className="p-3 bg-white hover:bg-amber-50/60 border border-[#EBE6DD] rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
+            className="p-3 bg-white hover:bg-amber-50/60 border border-jaman-border rounded-2xl text-left transition-all shadow-2xs group cursor-pointer"
           >
             <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
               <span>THIS MONTH</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#E66817] group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-jaman-saffron group-hover:translate-x-1 transition-transform" />
             </div>
-            <strong className="text-base font-black text-[#0B253A] block mt-1">
+            <strong className="text-base font-black text-jaman-navy block mt-1">
               {formatINR(periodOverview.month.sales)}
             </strong>
             <span className="text-[11px] text-slate-500">{periodOverview.month.count} Bills</span>
@@ -698,8 +698,8 @@ export const PosBillsView: React.FC = () => {
             onClick={() => setSelectedDateDrilldown(null)}
             className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
               selectedDateDrilldown === null
-                ? 'bg-[#0B253A] text-white'
-                : 'bg-white border border-[#EBE6DD] text-slate-700'
+                ? 'bg-jaman-navy text-white'
+                : 'bg-white border border-jaman-border text-slate-700'
             }`}
           >
             All Days ({dailyDateBreakdown.length})
@@ -711,8 +711,8 @@ export const PosBillsView: React.FC = () => {
               onClick={() => setSelectedDateDrilldown(d.dateStr)}
               className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all ${
                 selectedDateDrilldown === d.dateStr
-                  ? 'bg-[#E66817] text-white'
-                  : 'bg-white border border-[#EBE6DD] text-slate-700 hover:bg-slate-100'
+                  ? 'bg-jaman-saffron text-white'
+                  : 'bg-white border border-jaman-border text-slate-700 hover:bg-slate-100'
               }`}
             >
               <span>{d.label}</span> • <span className="font-mono">{formatINR(d.sales)}</span> ({d.count})
@@ -730,7 +730,7 @@ export const PosBillsView: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search invoice #, token #, customer phone, cashier, transaction ID..."
-            className="w-full bg-white border border-[#EBE6DD] rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817] shadow-2xs"
+            className="w-full bg-white border border-jaman-border rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron shadow-2xs"
           />
           {search && (
             <button
@@ -750,20 +750,20 @@ export const PosBillsView: React.FC = () => {
           className={`px-3.5 py-2.5 rounded-2xl border text-xs font-black flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer ${
             isFilterOpen || selectedOrderType !== 'ALL' || selectedPaymentMethod !== 'ALL' || selectedStatus !== 'ALL' || selectedCashier !== 'ALL'
               ? 'bg-amber-50 border-amber-300 text-amber-900'
-              : 'bg-white border-[#EBE6DD] text-slate-700 hover:bg-slate-50'
+              : 'bg-white border-jaman-border text-slate-700 hover:bg-slate-50'
           }`}
         >
           <Filter className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Filters</span>
           {(selectedOrderType !== 'ALL' || selectedPaymentMethod !== 'ALL' || selectedStatus !== 'ALL' || selectedCashier !== 'ALL') && (
-            <span className="w-2 h-2 rounded-full bg-[#E66817]" />
+            <span className="w-2 h-2 rounded-full bg-jaman-saffron" />
           )}
         </button>
       </div>
 
       {/* Expandable Filter Drawer */}
       {isFilterOpen && (
-        <div className="p-3.5 bg-white border border-[#EBE6DD] rounded-2xl grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0 animate-in fade-in text-xs">
+        <div className="p-3.5 bg-white border border-jaman-border rounded-2xl grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0 animate-in fade-in text-xs">
           <div>
             <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">
               Order Type
@@ -771,7 +771,7 @@ export const PosBillsView: React.FC = () => {
             <select
               value={selectedOrderType}
               onChange={(e) => setSelectedOrderType(e.target.value)}
-              className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 font-bold text-[#0B253A]"
+              className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-2.5 py-1.5 font-bold text-jaman-navy"
             >
               <option value="ALL">All Types</option>
               <option value="DINE_IN">Dine-In</option>
@@ -787,7 +787,7 @@ export const PosBillsView: React.FC = () => {
             <select
               value={selectedPaymentMethod}
               onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-              className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 font-bold text-[#0B253A]"
+              className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-2.5 py-1.5 font-bold text-jaman-navy"
             >
               <option value="ALL">All Methods</option>
               <option value="CASH">Cash</option>
@@ -804,7 +804,7 @@ export const PosBillsView: React.FC = () => {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 font-bold text-[#0B253A]"
+              className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-2.5 py-1.5 font-bold text-jaman-navy"
             >
               <option value="ALL">All Statuses</option>
               <option value="COMPLETED">Completed (Paid)</option>
@@ -820,7 +820,7 @@ export const PosBillsView: React.FC = () => {
             <select
               value={selectedCashier}
               onChange={(e) => setSelectedCashier(e.target.value)}
-              className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 font-bold text-[#0B253A]"
+              className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-2.5 py-1.5 font-bold text-jaman-navy"
             >
               <option value="ALL">All Cashiers</option>
               {uniqueCashiers.map((c) => (
@@ -839,23 +839,23 @@ export const PosBillsView: React.FC = () => {
             const isCollapsed = !!collapsedBlocks[groupKey];
 
             return (
-              <div key={groupKey} className="bg-white border border-[#EBE6DD] rounded-2xl overflow-hidden shadow-2xs">
+              <div key={groupKey} className="bg-white border border-jaman-border rounded-2xl overflow-hidden shadow-2xs">
                 {/* Time Block Header */}
                 <button
                   type="button"
                   onClick={() => toggleBlockCollapse(groupKey)}
-                  className="w-full px-4 py-2.5 bg-[#FAF7F2] hover:bg-[#F5F0E8] border-b border-[#EBE6DD] flex items-center justify-between transition-colors cursor-pointer"
+                  className="w-full px-4 py-2.5 bg-jaman-cream hover:bg-[#F5F0E8] border-b border-jaman-border flex items-center justify-between transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
-                    <Clock className="w-3.5 h-3.5 text-[#E66817]" />
-                    <span className="font-black text-xs text-[#0B253A]">{group.label}</span>
-                    <span className="bg-white border border-[#EBE6DD] text-slate-600 text-[10px] font-bold px-2 py-0.2 rounded-full">
+                    <Clock className="w-3.5 h-3.5 text-jaman-saffron" />
+                    <span className="font-black text-xs text-jaman-navy">{group.label}</span>
+                    <span className="bg-white border border-jaman-border text-slate-600 text-[10px] font-bold px-2 py-0.2 rounded-full">
                       {group.bills.length} {group.bills.length === 1 ? 'bill' : 'bills'}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <strong className="font-mono font-black text-xs text-[#0B253A]">
+                    <strong className="font-mono font-black text-xs text-jaman-navy">
                       {formatINR(group.totalAmount)}
                     </strong>
                     {isCollapsed ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronUp className="w-4 h-4 text-slate-400" />}
@@ -895,9 +895,9 @@ export const PosBillsView: React.FC = () => {
                 />
               ))
             ) : (
-              <div className="p-12 text-center bg-white border border-[#EBE6DD] rounded-3xl space-y-3">
+              <div className="p-12 text-center bg-white border border-jaman-border rounded-3xl space-y-3">
                 <Receipt className="w-12 h-12 text-slate-300 mx-auto" />
-                <h3 className="font-black text-sm text-[#0B253A]">No invoices found</h3>
+                <h3 className="font-black text-sm text-jaman-navy">No invoices found</h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
                   No billing transactions matched the selected period or filters.
                 </p>
@@ -911,7 +911,7 @@ export const PosBillsView: React.FC = () => {
                       setSelectedStatus('ALL');
                       setSelectedCashier('ALL');
                     }}
-                    className="px-4 py-2 bg-[#FAF7F2] hover:bg-slate-100 border border-[#EBE6DD] text-xs font-bold text-[#0B253A] rounded-xl"
+                    className="px-4 py-2 bg-jaman-cream hover:bg-slate-100 border border-jaman-border text-xs font-bold text-jaman-navy rounded-xl"
                   >
                     Clear Filters
                   </button>
@@ -925,19 +925,19 @@ export const PosBillsView: React.FC = () => {
       {/* MODAL 1: VIEW INVOICE DETAIL MODAL */}
       {detailModalBill && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
-          <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-2xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+          <div className="bg-jaman-cream border border-jaman-border w-full max-w-2xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
             {/* Modal Header */}
-            <div className="p-4 bg-white border-b border-[#EBE6DD] flex items-center justify-between shrink-0">
+            <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#E66817] to-amber-500 text-white flex items-center justify-center font-bold shadow-xs">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-jaman-saffron to-amber-500 text-white flex items-center justify-center font-bold shadow-xs">
                   <Receipt className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-black text-sm text-[#0B253A]">
+                    <h3 className="font-black text-sm text-jaman-navy">
                       Invoice #{detailModalBill.orderNumber}
                     </h3>
-                    <span className="font-mono text-[10px] font-black bg-[#0B253A] text-white px-2 py-0.2 rounded">
+                    <span className="font-mono text-[10px] font-black bg-jaman-navy text-white px-2 py-0.2 rounded">
                       Token #{detailModalBill.tokenNumber}
                     </span>
                   </div>
@@ -952,15 +952,15 @@ export const PosBillsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleReprint(detailModalBill)}
-                  className="px-3 py-1.5 bg-[#FAF7F2] hover:bg-slate-100 border border-[#EBE6DD] rounded-xl text-xs font-bold text-[#0B253A] flex items-center gap-1"
+                  className="px-3 py-1.5 bg-jaman-cream hover:bg-slate-100 border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy flex items-center gap-1"
                 >
-                  <Printer className="w-3.5 h-3.5 text-[#E66817]" />
+                  <Printer className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Reprint</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setDetailModalBill(null)}
-                  className="p-1 text-slate-400 hover:text-[#0B253A] rounded-lg"
+                  className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -970,35 +970,35 @@ export const PosBillsView: React.FC = () => {
             {/* Modal Body */}
             <div className="p-5 overflow-y-auto space-y-4 text-xs">
               {/* Order Meta Strip */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-white p-3.5 rounded-2xl border border-[#EBE6DD]">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-white p-3.5 rounded-2xl border border-jaman-border">
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 block uppercase">Order Type</span>
-                  <strong className="text-[#0B253A] block">{detailModalBill.orderType}</strong>
+                  <strong className="text-jaman-navy block">{detailModalBill.orderType}</strong>
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 block uppercase">Table / Guest</span>
-                  <strong className="text-[#0B253A] block">{detailModalBill.tableNumber || detailModalBill.customerName || 'Walk-in'}</strong>
+                  <strong className="text-jaman-navy block">{detailModalBill.tableNumber || detailModalBill.customerName || 'Walk-in'}</strong>
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 block uppercase">Payment Method</span>
-                  <strong className="text-[#0B253A] block">{detailModalBill.paymentMethod}</strong>
+                  <strong className="text-jaman-navy block">{detailModalBill.paymentMethod}</strong>
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 block uppercase">Cashier</span>
-                  <strong className="text-[#0B253A] block">{detailModalBill.cashierName || 'Cashier'}</strong>
+                  <strong className="text-jaman-navy block">{detailModalBill.cashierName || 'Cashier'}</strong>
                 </div>
               </div>
 
               {/* Items Table */}
-              <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden">
-                <div className="p-3 bg-[#FAF7F2] border-b border-[#EBE6DD] font-black text-xs text-[#0B253A]">
+              <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden">
+                <div className="p-3 bg-jaman-cream border-b border-jaman-border font-black text-xs text-jaman-navy">
                   Billed Items & Modifiers ({detailModalBill.items.length})
                 </div>
                 <div className="divide-y divide-slate-100">
                   {detailModalBill.items.map((it, idx) => (
                     <div key={idx} className="p-3 flex justify-between items-start">
                       <div>
-                        <strong className="text-[#0B253A] block">{it.name}</strong>
+                        <strong className="text-jaman-navy block">{it.name}</strong>
                         <span className="text-[11px] text-slate-400 font-mono">
                           {it.quantity} × {formatINR(it.unitPrice)}
                         </span>
@@ -1008,17 +1008,17 @@ export const PosBillsView: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <strong className="font-mono text-[#0B253A]">{formatINR(it.totalPrice)}</strong>
+                      <strong className="font-mono text-jaman-navy">{formatINR(it.totalPrice)}</strong>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Financial Calculation Breakdown */}
-              <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] space-y-2 text-slate-600">
+              <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-2 text-slate-600">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(detailModalBill.subtotal || detailModalBill.totalAmount)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(detailModalBill.subtotal || detailModalBill.totalAmount)}</strong>
                 </div>
                 {detailModalBill.discountAmount ? (
                   <div className="flex justify-between text-emerald-700">
@@ -1028,15 +1028,15 @@ export const PosBillsView: React.FC = () => {
                 ) : null}
                 <div className="flex justify-between">
                   <span>CGST (2.5%):</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(detailModalBill.cgstAmount || Math.round(detailModalBill.totalAmount * 0.0238))}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(detailModalBill.cgstAmount || Math.round(detailModalBill.totalAmount * 0.0238))}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>SGST (2.5%):</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(detailModalBill.sgstAmount || Math.round(detailModalBill.totalAmount * 0.0238))}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(detailModalBill.sgstAmount || Math.round(detailModalBill.totalAmount * 0.0238))}</strong>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-slate-100 text-sm font-black text-[#0B253A]">
+                <div className="flex justify-between pt-2 border-t border-slate-100 text-sm font-black text-jaman-navy">
                   <span>Total Amount Paid:</span>
-                  <span className="font-mono text-[#E66817]">{formatINR(detailModalBill.totalAmount)}</span>
+                  <span className="font-mono text-jaman-saffron">{formatINR(detailModalBill.totalAmount)}</span>
                 </div>
               </div>
 
@@ -1075,40 +1075,40 @@ export const PosBillsView: React.FC = () => {
       {/* MODAL 2: PROTECTED REFUND MODAL */}
       {refundModalBill && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
-          <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
-            <div className="p-4 bg-white border-b border-[#EBE6DD] flex items-center justify-between">
+          <div className="bg-jaman-cream border border-jaman-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+            <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold">
                   <Ban className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-[#0B253A]">Process Invoice Refund</h3>
+                  <h3 className="font-black text-sm text-jaman-navy">Process Invoice Refund</h3>
                   <span className="text-[10px] text-slate-400">Invoice #{refundModalBill.orderNumber}</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setRefundModalBill(null)}
-                className="p-1 text-slate-400 hover:text-[#0B253A] rounded-lg"
+                className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleConfirmRefund} className="p-5 space-y-4 text-xs">
-              <div className="p-3 bg-white rounded-2xl border border-[#EBE6DD] space-y-1 text-slate-600">
+              <div className="p-3 bg-white rounded-2xl border border-jaman-border space-y-1 text-slate-600">
                 <div className="flex justify-between">
                   <span>Billed Total:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(refundModalBill.totalAmount)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(refundModalBill.totalAmount)}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Payment Method:</span>
-                  <strong className="text-[#0B253A]">{refundModalBill.paymentMethod}</strong>
+                  <strong className="text-jaman-navy">{refundModalBill.paymentMethod}</strong>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-black text-[#0B253A] mb-1">
+                <label className="block text-xs font-black text-jaman-navy mb-1">
                   Refund Amount (₹):
                 </label>
                 <input
@@ -1118,18 +1118,18 @@ export const PosBillsView: React.FC = () => {
                   max={refundModalBill.totalAmount}
                   value={refundAmountInput}
                   onChange={(e) => setRefundAmountInput(e.target.value)}
-                  className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-lg font-mono font-black text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-lg font-mono font-black text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#0B253A] mb-1">
+                <label className="block text-xs font-bold text-jaman-navy mb-1">
                   Reason for Refund:
                 </label>
                 <select
                   value={refundReasonInput}
                   onChange={(e) => setRefundReasonInput(e.target.value)}
-                  className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-[#0B253A]"
+                  className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 font-bold text-jaman-navy"
                 >
                   <option value="Customer Request">Customer Request / Change of Mind</option>
                   <option value="Food Quality Issue">Food Quality Issue</option>
@@ -1162,21 +1162,21 @@ export const PosBillsView: React.FC = () => {
       {/* MODAL 3: REOPEN BILL MODAL */}
       {reopenModalBill && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
-          <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
-            <div className="p-4 bg-white border-b border-[#EBE6DD] flex items-center justify-between">
+          <div className="bg-jaman-cream border border-jaman-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+            <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
                   <RotateCcw className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-[#0B253A]">Reopen Completed Invoice</h3>
+                  <h3 className="font-black text-sm text-jaman-navy">Reopen Completed Invoice</h3>
                   <span className="text-[10px] text-slate-400">Invoice #{reopenModalBill.orderNumber}</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setReopenModalBill(null)}
-                className="p-1 text-slate-400 hover:text-[#0B253A] rounded-lg"
+                className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1191,7 +1191,7 @@ export const PosBillsView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#0B253A] mb-1">
+                <label className="block text-xs font-bold text-jaman-navy mb-1">
                   Reason for Reopening:
                 </label>
                 <input
@@ -1200,7 +1200,7 @@ export const PosBillsView: React.FC = () => {
                   value={reopenReasonInput}
                   onChange={(e) => setReopenReasonInput(e.target.value)}
                   placeholder="e.g. Guest added dessert after payment"
-                  className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-[#0B253A] focus:outline-none"
+                  className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 font-bold text-jaman-navy focus:outline-none"
                 />
               </div>
 
@@ -1214,7 +1214,7 @@ export const PosBillsView: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#0B253A] hover:bg-[#1E3A4C] text-white rounded-xl font-black shadow-xs"
+                  className="px-5 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white rounded-xl font-black shadow-xs"
                 >
                   Confirm Reopen
                 </button>
@@ -1248,14 +1248,14 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
   const isCancelled = bill.orderStatus === 'CANCELLED';
 
   return (
-    <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 hover:border-slate-400 hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+    <div className="bg-white border border-jaman-border rounded-2xl p-4 hover:border-slate-400 hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
       {/* Left: Invoice Identity & Details */}
       <div className="space-y-1.5">
         <div className="flex items-center gap-2 flex-wrap">
-          <strong className="text-sm font-black text-[#0B253A]">
+          <strong className="text-sm font-black text-jaman-navy">
             #{bill.orderNumber}
           </strong>
-          <span className="text-xs font-black bg-[#0B253A] text-white px-2 py-0.5 rounded-lg font-mono">
+          <span className="text-xs font-black bg-jaman-navy text-white px-2 py-0.5 rounded-lg font-mono">
             Token #{bill.tokenNumber}
           </span>
           <span className="text-[10px] font-black bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md uppercase">
@@ -1295,7 +1295,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
       {/* Right: Pricing & Actions */}
       <div className="flex items-center gap-4 self-end sm:self-center">
         <div className="text-right">
-          <strong className="text-base font-black font-mono text-[#0B253A] block">
+          <strong className="text-base font-black font-mono text-jaman-navy block">
             {formatINR(bill.totalAmount)}
           </strong>
           <span className="text-[10px] text-slate-400 block font-mono">
@@ -1308,7 +1308,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
           <button
             type="button"
             onClick={onView}
-            className="px-3 py-2 bg-slate-100 hover:bg-[#0B253A] hover:text-white text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-2xs min-h-[38px] flex items-center gap-1"
+            className="px-3 py-2 bg-slate-100 hover:bg-jaman-navy hover:text-white text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-2xs min-h-[38px] flex items-center gap-1"
           >
             <Eye className="w-3.5 h-3.5" />
             <span>View</span>
@@ -1317,10 +1317,10 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
           <button
             type="button"
             onClick={onReprint}
-            className="px-3 py-2 bg-slate-100 hover:bg-[#FAF7F2] text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-2xs min-h-[38px] flex items-center gap-1"
+            className="px-3 py-2 bg-slate-100 hover:bg-jaman-cream text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-2xs min-h-[38px] flex items-center gap-1"
             title="Reprint Tax Receipt"
           >
-            <Printer className="w-3.5 h-3.5 text-[#E66817]" />
+            <Printer className="w-3.5 h-3.5 text-jaman-saffron" />
             <span className="hidden md:inline">Reprint</span>
           </button>
 

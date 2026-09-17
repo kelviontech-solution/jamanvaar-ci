@@ -257,21 +257,21 @@ export const App: React.FC = () => {
       <JAMANVAARStartup appName="POS Terminal" appType="POS" subtitle="Restaurant Operations Platform">
         <div className="min-h-screen flex items-center justify-center p-6">
           <form onSubmit={handleActivate} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4 text-center">
-            <h1 className="text-2xl font-black text-[#0B253A]">Activate This Terminal</h1>
+            <h1 className="text-2xl font-black text-jaman-navy">Activate This Terminal</h1>
             <p className="text-sm text-[#4A5568]">Enter the activation code provided by JAMANVAAR to connect this POS terminal to your restaurant.</p>
             <input
               type="text"
               value={activationCode}
               onChange={(e) => setActivationCode(e.target.value)}
               placeholder="Activation code"
-              className="w-full text-center text-lg font-mono bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-4 py-3"
+              className="w-full text-center text-lg font-mono bg-jaman-cream border border-jaman-border rounded-xl px-4 py-3"
               autoFocus
             />
             {activationError && <p className="text-sm font-bold text-rose-700">{activationError}</p>}
             <button
               type="submit"
               disabled={isActivating || !activationCode.trim()}
-              className="w-full py-3 rounded-2xl bg-[#E66817] text-white font-black uppercase tracking-wider disabled:opacity-60"
+              className="w-full py-3 rounded-2xl bg-jaman-saffron text-white font-black uppercase tracking-wider disabled:opacity-60"
             >
               {isActivating ? 'Activating…' : 'Activate'}
             </button>
@@ -303,7 +303,7 @@ export const App: React.FC = () => {
 
   return (
     <JAMANVAARStartup appName="POS Terminal" appType="POS" subtitle="Restaurant Operations Platform">
-      <div className="h-screen w-screen flex flex-col bg-[#FAF7F2] overflow-hidden select-none">
+      <div className="h-screen w-screen flex flex-col bg-jaman-cream overflow-hidden select-none">
         {/* Top Application Header */}
         <PosHeader />
 
@@ -382,12 +382,12 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
   render() {
     if (this.state.hasError) {
       return (
-        <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#FAF7F2] p-6 text-center select-none">
-          <div className="bg-white p-8 rounded-3xl border border-[#EBE6DD] shadow-2xl max-w-md w-full space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-[#E66817] flex items-center justify-center mx-auto shadow-sm">
+        <div className="h-screen w-screen flex flex-col items-center justify-center bg-jaman-cream p-6 text-center select-none">
+          <div className="bg-white p-8 rounded-3xl border border-jaman-border shadow-2xl max-w-md w-full space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center mx-auto shadow-sm">
               <UtensilsCrossed className="w-7 h-7" />
             </div>
-            <h2 className="text-xl font-black text-[#0B253A]">JAMANVAAR POS Recovered</h2>
+            <h2 className="text-xl font-black text-jaman-navy">JAMANVAAR POS Recovered</h2>
             <p className="text-xs text-slate-500">
               An unexpected UI exception was safely intercepted. Your database, cart items, and shift transactions are completely safe.
             </p>
@@ -402,7 +402,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
                   this.setState({ hasError: false, error: undefined });
                   window.location.reload();
                 }}
-                className="px-5 py-2.5 bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-black rounded-xl shadow-lg shadow-[#E66817]/30 transition-all cursor-pointer"
+                className="px-5 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-black rounded-xl shadow-lg shadow-jaman-saffron/30 transition-all cursor-pointer"
               >
                 ↻ Restore POS Workspace
               </button>

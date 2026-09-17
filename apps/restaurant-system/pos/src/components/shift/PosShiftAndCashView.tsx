@@ -352,14 +352,14 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] p-4 sm:p-6 overflow-y-auto select-none space-y-6">
+    <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-y-auto select-none space-y-6">
       
       {/* 1. Page Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div>
           <div className="flex items-center gap-2">
-            <Clock className="w-6 h-6 text-[#E66817]" />
-            <h1 className="text-xl sm:text-2xl font-black text-[#0B253A]">Shift & Cash Management</h1>
+            <Clock className="w-6 h-6 text-jaman-saffron" />
+            <h1 className="text-xl sm:text-2xl font-black text-jaman-navy">Shift & Cash Management</h1>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
             Manage cashier shifts, cash drawer movements, float reconciliation and settlements.
@@ -379,7 +379,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               <button
                 type="button"
                 onClick={() => setCashMovementModalOpen(true)}
-                className="px-3.5 py-2 bg-white hover:bg-slate-50 text-[#0B253A] border border-[#EBE6DD] rounded-xl text-xs font-black flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                className="px-3.5 py-2 bg-white hover:bg-slate-50 text-jaman-navy border border-jaman-border rounded-xl text-xs font-black flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
               >
                 <CircleDollarSign className="w-4 h-4 text-amber-600" />
                 <span>+ Cash Movement</span>
@@ -398,7 +398,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
             <button
               type="button"
               onClick={() => setOpenShiftModalOpen(true)}
-              className="px-5 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm shadow-[#E66817]/25 transition-all active:scale-95 cursor-pointer"
+              className="px-5 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm shadow-jaman-saffron/25 transition-all active:scale-95 cursor-pointer"
             >
               <Unlock className="w-4 h-4" />
               <span>+ Open New Shift</span>
@@ -413,12 +413,12 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
           {/* Card Top: Shift Title & Status */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[#E66817] flex items-center justify-center font-black">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-jaman-saffron flex items-center justify-center font-black">
                 <Clock className="w-6 h-6" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-black text-[#0B253A]">
+                  <h2 className="text-lg font-black text-jaman-navy">
                     Active Shift #{activeShift.id.slice(-2) || '01'}
                   </h2>
                   <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
@@ -426,9 +426,9 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                   </span>
                 </div>
                 <div className="text-xs text-slate-500 flex items-center gap-3 mt-0.5 flex-wrap">
-                  <span>Cashier: <strong className="text-[#0B253A]">{activeShift.cashierName}</strong></span>
+                  <span>Cashier: <strong className="text-jaman-navy">{activeShift.cashierName}</strong></span>
                   <span>•</span>
-                  <span>Terminal: <strong className="font-mono text-[#0B253A]">{activeShift.posId}</strong></span>
+                  <span>Terminal: <strong className="font-mono text-jaman-navy">{activeShift.posId}</strong></span>
                   <span>•</span>
                   <span>Opened: {new Date(activeShift.openedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
@@ -440,7 +440,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
                 Expected Drawer Cash
               </span>
-              <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B253A]">
+              <span className="text-2xl sm:text-3xl font-black font-mono text-jaman-navy">
                 {formatINR(expectedDrawerCash)}
               </span>
             </div>
@@ -448,11 +448,11 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
 
           {/* Row 1: Primary Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div className="p-3.5 bg-[#FAF7F2] rounded-2xl border border-[#EBE6DD]">
+            <div className="p-3.5 bg-jaman-cream rounded-2xl border border-jaman-border">
               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
                 Total Shift Sales
               </span>
-              <strong className="text-xl font-black font-mono text-[#0B253A] block mt-0.5">
+              <strong className="text-xl font-black font-mono text-jaman-navy block mt-0.5">
                 {formatINR(totalShiftSales)}
               </strong>
               <span className="text-[10px] text-emerald-600 font-bold mt-1 inline-block">
@@ -460,7 +460,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               </span>
             </div>
 
-            <div className="p-3.5 bg-[#FAF7F2] rounded-2xl border border-[#EBE6DD]">
+            <div className="p-3.5 bg-jaman-cream rounded-2xl border border-jaman-border">
               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
                 Cash Sales Added
               </span>
@@ -472,7 +472,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               </span>
             </div>
 
-            <div className="p-3.5 bg-[#FAF7F2] rounded-2xl border border-[#EBE6DD]">
+            <div className="p-3.5 bg-jaman-cream rounded-2xl border border-jaman-border">
               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
                 UPI / Digital QR
               </span>
@@ -484,7 +484,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               </span>
             </div>
 
-            <div className="p-3.5 bg-[#FAF7F2] rounded-2xl border border-[#EBE6DD]">
+            <div className="p-3.5 bg-jaman-cream rounded-2xl border border-jaman-border">
               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
                 Opening Cash Float
               </span>
@@ -501,9 +501,9 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
             {/* Left: Cash Drawer Exact Formula */}
-            <div className="bg-[#FAF7F2] p-4 rounded-2xl border border-[#EBE6DD] space-y-2 text-xs">
+            <div className="bg-jaman-cream p-4 rounded-2xl border border-jaman-border space-y-2 text-xs">
               <div className="flex items-center justify-between border-b border-slate-200/80 pb-2">
-                <h3 className="font-black uppercase tracking-wider text-xs text-[#0B253A]">
+                <h3 className="font-black uppercase tracking-wider text-xs text-jaman-navy">
                   Cash Drawer Mathematical Reconciliation
                 </h3>
                 <span className="text-[10px] font-mono text-slate-400">REAL-TIME MATH</span>
@@ -512,7 +512,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               <div className="space-y-1.5 text-slate-600">
                 <div className="flex justify-between">
                   <span>Opening Float:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(activeShift.openingCash)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(activeShift.openingCash)}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>+ Cash Sales:</span>
@@ -526,17 +526,17 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                   <span>- Cash Out (Paid Out):</span>
                   <strong className="font-mono text-rose-600">- {formatINR(totalCashOut)}</strong>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-slate-200/80 font-black text-sm text-[#0B253A]">
+                <div className="flex justify-between pt-2 border-t border-slate-200/80 font-black text-sm text-jaman-navy">
                   <span>= Current Expected Cash in Drawer:</span>
-                  <span className="font-mono text-[#E66817]">{formatINR(expectedDrawerCash)}</span>
+                  <span className="font-mono text-jaman-saffron">{formatINR(expectedDrawerCash)}</span>
                 </div>
               </div>
             </div>
 
             {/* Right: Payment Settlement Tender Mix */}
-            <div className="bg-[#FAF7F2] p-4 rounded-2xl border border-[#EBE6DD] space-y-2 text-xs">
+            <div className="bg-jaman-cream p-4 rounded-2xl border border-jaman-border space-y-2 text-xs">
               <div className="flex items-center justify-between border-b border-slate-200/80 pb-2">
-                <h3 className="font-black uppercase tracking-wider text-xs text-[#0B253A]">
+                <h3 className="font-black uppercase tracking-wider text-xs text-jaman-navy">
                   Shift Payment Channel Breakdown
                 </h3>
                 <span className="text-[10px] font-mono text-slate-400">TENDER SETTLEMENT</span>
@@ -545,41 +545,41 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               <div className="space-y-1.5 text-slate-600">
                 <div className="flex justify-between">
                   <span>Cash Collections:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(shiftCashSales)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(shiftCashSales)}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>UPI / Bharat QR:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(shiftUpiSales)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(shiftUpiSales)}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Card POS Terminal:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(shiftCardSales)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(shiftCardSales)}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Discounts Granted:</span>
                   <strong className="font-mono text-rose-600">- {formatINR(shiftDiscounts)}</strong>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-slate-200/80 font-black text-sm text-[#0B253A]">
+                <div className="flex justify-between pt-2 border-t border-slate-200/80 font-black text-sm text-jaman-navy">
                   <span>Total Net Sales:</span>
-                  <span className="font-mono text-[#0B253A]">{formatINR(totalShiftSales)}</span>
+                  <span className="font-mono text-jaman-navy">{formatINR(totalShiftSales)}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Row 3: Cash Movements Log for Active Shift */}
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 space-y-3">
+          <div className="bg-white border border-jaman-border rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <div className="flex items-center gap-2">
-                <CircleDollarSign className="w-4 h-4 text-[#E66817]" />
-                <h3 className="font-black text-xs uppercase tracking-wider text-[#0B253A]">
+                <CircleDollarSign className="w-4 h-4 text-jaman-saffron" />
+                <h3 className="font-black text-xs uppercase tracking-wider text-jaman-navy">
                   Cash Movements in this Shift ({activeMovements.length})
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setCashMovementModalOpen(true)}
-                className="text-xs font-bold text-[#E66817] hover:underline"
+                className="text-xs font-bold text-jaman-saffron hover:underline"
               >
                 + Record Movement
               </button>
@@ -596,7 +596,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                         {mov.type === 'CASH_IN' ? '↓ CASH IN' : '↑ CASH OUT'}
                       </span>
                       <div>
-                        <strong className="text-[#0B253A] block">{mov.reason}</strong>
+                        <strong className="text-jaman-navy block">{mov.reason}</strong>
                         <span className="text-[10px] text-slate-400">
                           By {mov.cashierName} • {new Date(mov.timestamp).toLocaleTimeString('en-IN')}
                         </span>
@@ -621,11 +621,11 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
       ) : (
         /* Empty State: No Active Shift */
         <div className="bg-white border-2 border-dashed border-slate-300 rounded-3xl p-10 text-center space-y-4 shadow-2xs">
-          <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-200 text-[#E66817] mx-auto flex items-center justify-center">
+          <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-200 text-jaman-saffron mx-auto flex items-center justify-center">
             <Lock className="w-8 h-8 opacity-60" />
           </div>
           <div className="space-y-1">
-            <h2 className="text-lg font-black text-[#0B253A]">No Active Cashier Shift</h2>
+            <h2 className="text-lg font-black text-jaman-navy">No Active Cashier Shift</h2>
             <p className="text-xs text-slate-500 max-w-md mx-auto">
               Open a new shift with a starting drawer float to begin accepting counter billing and tracking cash reconciliation.
             </p>
@@ -633,7 +633,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
           <button
             type="button"
             onClick={() => setOpenShiftModalOpen(true)}
-            className="px-6 py-3 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-2xl font-black text-xs inline-flex items-center gap-2 shadow-md shadow-[#E66817]/25 transition-all cursor-pointer"
+            className="px-6 py-3 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-2xl font-black text-xs inline-flex items-center gap-2 shadow-md shadow-jaman-saffron/25 transition-all cursor-pointer"
           >
             <Unlock className="w-4 h-4" />
             <span>Open Cashier Shift Now</span>
@@ -642,10 +642,10 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
       )}
 
       {/* 3. Historical Shifts Section */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#EBE6DD] shadow-2xs space-y-4">
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-jaman-border shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div>
-            <h3 className="font-black text-base text-[#0B253A]">Historical Shift Archives</h3>
+            <h3 className="font-black text-base text-jaman-navy">Historical Shift Archives</h3>
             <p className="text-xs text-slate-500">Permanent cashier shift records, actual counts, and variance audits.</p>
           </div>
 
@@ -664,8 +664,8 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 onClick={() => setSelectedHistoryFilter(f.id as any)}
                 className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   selectedHistoryFilter === f.id
-                    ? 'bg-[#0B253A] text-white'
-                    : 'bg-[#FAF7F2] text-slate-700 hover:bg-slate-100 border border-[#EBE6DD]'
+                    ? 'bg-jaman-navy text-white'
+                    : 'bg-jaman-cream text-slate-700 hover:bg-slate-100 border border-jaman-border'
                 }`}
               >
                 {f.label}
@@ -682,12 +682,12 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
             return (
               <div
                 key={shift.id}
-                className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl p-4 hover:border-slate-400 hover:shadow-sm transition-all space-y-3 flex flex-col justify-between"
+                className="bg-jaman-cream border border-jaman-border rounded-2xl p-4 hover:border-slate-400 hover:shadow-sm transition-all space-y-3 flex flex-col justify-between"
               >
                 <div className="space-y-2">
-                  <div className="flex items-start justify-between gap-2 border-b border-[#EBE6DD]/60 pb-2">
+                  <div className="flex items-start justify-between gap-2 border-b border-jaman-border/60 pb-2">
                     <div>
-                      <h4 className="font-black text-sm text-[#0B253A]">{shift.id}</h4>
+                      <h4 className="font-black text-sm text-jaman-navy">{shift.id}</h4>
                       <span className="text-[11px] text-slate-500 font-bold block">{shift.cashierName}</span>
                     </div>
 
@@ -703,11 +703,11 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                   <div className="text-xs space-y-1 text-slate-600">
                     <div className="flex justify-between">
                       <span>Total Sales:</span>
-                      <strong className="font-mono text-[#0B253A]">{formatINR(shift.totalSales)}</strong>
+                      <strong className="font-mono text-jaman-navy">{formatINR(shift.totalSales)}</strong>
                     </div>
                     <div className="flex justify-between">
                       <span>Orders Handled:</span>
-                      <strong className="font-mono text-[#0B253A]">{shift.totalOrders}</strong>
+                      <strong className="font-mono text-jaman-navy">{shift.totalOrders}</strong>
                     </div>
                     <div className="flex justify-between">
                       <span>Cash Collected:</span>
@@ -715,26 +715,26 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                     </div>
                     <div className="flex justify-between">
                       <span>Counted Cash:</span>
-                      <strong className="font-mono text-[#0B253A]">{formatINR(shift.closingCash || shift.actualCash || 0)}</strong>
+                      <strong className="font-mono text-jaman-navy">{formatINR(shift.closingCash || shift.actualCash || 0)}</strong>
                     </div>
-                    <div className="text-[10px] text-slate-400 pt-1 border-t border-[#EBE6DD]/60">
+                    <div className="text-[10px] text-slate-400 pt-1 border-t border-jaman-border/60">
                       {new Date(shift.openedAt).toLocaleDateString('en-IN')} • {new Date(shift.openedAt).toLocaleTimeString('en-IN')} → {shift.closedAt ? new Date(shift.closedAt).toLocaleTimeString('en-IN') : 'Closed'}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-[#EBE6DD]/60 gap-2">
+                <div className="flex items-center justify-between pt-2 border-t border-jaman-border/60 gap-2">
                   <button
                     type="button"
                     onClick={() => setSelectedHistoricalShift(shift)}
-                    className="flex-1 py-1.5 bg-white hover:bg-slate-50 text-[#0B253A] border border-[#EBE6DD] rounded-xl text-xs font-bold transition-all shadow-2xs"
+                    className="flex-1 py-1.5 bg-white hover:bg-slate-50 text-jaman-navy border border-jaman-border rounded-xl text-xs font-bold transition-all shadow-2xs"
                   >
                     View Details
                   </button>
                   <button
                     type="button"
                     onClick={() => handlePrintShiftTicket(shift)}
-                    className="p-1.5 bg-white hover:bg-slate-50 text-[#0B253A] border border-[#EBE6DD] rounded-xl transition-all shadow-2xs"
+                    className="p-1.5 bg-white hover:bg-slate-50 text-jaman-navy border border-jaman-border rounded-xl transition-all shadow-2xs"
                     title="Print Shift Ticket"
                   >
                     <Printer className="w-3.5 h-3.5" />
@@ -742,7 +742,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                   <button
                     type="button"
                     onClick={() => handleDownloadShiftPdf(shift)}
-                    className="p-1.5 bg-white hover:bg-slate-50 text-[#0B253A] border border-[#EBE6DD] rounded-xl transition-all shadow-2xs"
+                    className="p-1.5 bg-white hover:bg-slate-50 text-jaman-navy border border-jaman-border rounded-xl transition-all shadow-2xs"
                     title="Download Shift PDF"
                   >
                     <Download className="w-3.5 h-3.5" />
@@ -763,41 +763,41 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
       {/* MODAL 1: OPEN SHIFT MODAL */}
       {openShiftModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
-          <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
-            <div className="p-4 bg-white border-b border-[#EBE6DD] flex items-center justify-between">
+          <div className="bg-jaman-cream border border-jaman-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+            <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-amber-100 text-[#E66817] flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-jaman-saffron flex items-center justify-center font-bold">
                   <Unlock className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-[#0B253A]">Start New Cashier Shift</h3>
+                  <h3 className="font-black text-sm text-jaman-navy">Start New Cashier Shift</h3>
                   <span className="text-[10px] text-slate-400">POS Terminal: {posTerminalId}</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setOpenShiftModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-[#0B253A] rounded-lg"
+                className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleOpenShiftSubmit} className="p-5 space-y-4">
-              <div className="p-3 bg-white rounded-2xl border border-[#EBE6DD] text-xs space-y-1 text-slate-600">
+              <div className="p-3 bg-white rounded-2xl border border-jaman-border text-xs space-y-1 text-slate-600">
                 <div className="flex justify-between">
                   <span>Assigned Cashier:</span>
-                  <strong className="text-[#0B253A]">{currentUser?.fullName || 'Amit Dave (Lead Cashier)'}</strong>
+                  <strong className="text-jaman-navy">{currentUser?.fullName || 'Amit Dave (Lead Cashier)'}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Opening Date & Time:</span>
-                  <strong className="text-[#0B253A]">{new Date().toLocaleString('en-IN')}</strong>
+                  <strong className="text-jaman-navy">{new Date().toLocaleString('en-IN')}</strong>
                 </div>
               </div>
 
               {/* Opening Float Input & Presets */}
               <div className="space-y-2">
-                <label className="block text-xs font-black text-[#0B253A]">
+                <label className="block text-xs font-black text-jaman-navy">
                   Opening Cash Float in Drawer (₹):
                 </label>
                 <input
@@ -806,7 +806,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                   min="0"
                   value={openingFloatInput}
                   onChange={(e) => setOpeningFloatInput(e.target.value)}
-                  className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xl font-mono font-black text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xl font-mono font-black text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
 
                 <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 pt-1">
@@ -815,7 +815,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                       key={amt}
                       type="button"
                       onClick={() => setOpeningFloatInput(String(amt))}
-                      className="py-1 bg-white hover:bg-slate-100 border border-[#EBE6DD] rounded-lg text-[11px] font-bold text-[#0B253A]"
+                      className="py-1 bg-white hover:bg-slate-100 border border-jaman-border rounded-lg text-[11px] font-bold text-jaman-navy"
                     >
                       ₹{amt}
                     </button>
@@ -825,7 +825,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
 
               {/* Notes */}
               <div>
-                <label className="block text-xs font-bold text-[#0B253A] mb-1">
+                <label className="block text-xs font-bold text-jaman-navy mb-1">
                   Opening Note (Optional):
                 </label>
                 <input
@@ -833,7 +833,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                   value={openingNotesInput}
                   onChange={(e) => setOpeningNotesInput(e.target.value)}
                   placeholder="e.g. Starting drawer for morning shift"
-                  className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none"
+                  className="w-full bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none"
                 />
               </div>
 
@@ -847,7 +847,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-xl text-xs font-black shadow-sm shadow-[#E66817]/25"
+                  className="px-5 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-black shadow-sm shadow-jaman-saffron/25"
                 >
                   Start Shift
                 </button>
@@ -860,21 +860,21 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
       {/* MODAL 2: RECORD CASH MOVEMENT MODAL */}
       {cashMovementModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
-          <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
-            <div className="p-4 bg-white border-b border-[#EBE6DD] flex items-center justify-between">
+          <div className="bg-jaman-cream border border-jaman-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+            <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
                   <CircleDollarSign className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-[#0B253A]">Record Cash Movement</h3>
+                  <h3 className="font-black text-sm text-jaman-navy">Record Cash Movement</h3>
                   <span className="text-[10px] text-slate-400">Shift #{activeShift?.id?.slice(-2)} Drawer</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setCashMovementModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-[#0B253A] rounded-lg"
+                className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -889,7 +889,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                   className={`py-2 rounded-xl text-xs font-black transition-all ${
                     movementType === 'CASH_IN'
                       ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'bg-white border border-[#EBE6DD] text-slate-700'
+                      : 'bg-white border border-jaman-border text-slate-700'
                   }`}
                 >
                   ↓ Cash In (Paid In)
@@ -900,7 +900,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                   className={`py-2 rounded-xl text-xs font-black transition-all ${
                     movementType === 'CASH_OUT'
                       ? 'bg-rose-600 text-white shadow-xs'
-                      : 'bg-white border border-[#EBE6DD] text-slate-700'
+                      : 'bg-white border border-jaman-border text-slate-700'
                   }`}
                 >
                   ↑ Cash Out (Paid Out)
@@ -909,7 +909,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
 
               {/* Amount */}
               <div>
-                <label className="block text-xs font-black text-[#0B253A] mb-1">
+                <label className="block text-xs font-black text-jaman-navy mb-1">
                   Amount (₹):
                 </label>
                 <input
@@ -919,19 +919,19 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                   value={movementAmount}
                   onChange={(e) => setMovementAmount(e.target.value)}
                   placeholder="Enter amount..."
-                  className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-lg font-mono font-black text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-lg font-mono font-black text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
               </div>
 
               {/* Reason Preset */}
               <div>
-                <label className="block text-xs font-bold text-[#0B253A] mb-1">
+                <label className="block text-xs font-bold text-jaman-navy mb-1">
                   Reason / Purpose:
                 </label>
                 <select
                   value={movementReason}
                   onChange={(e) => setMovementReason(e.target.value)}
-                  className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A] focus:outline-none"
+                  className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy focus:outline-none"
                 >
                   <option value="Petty Cash Expense">Petty Cash Expense (Daily Dairy, Ice, Vegetables)</option>
                   <option value="Bank Float Top-up">Bank Float Top-up (Added Change)</option>
@@ -943,7 +943,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
 
               {/* Notes */}
               <div>
-                <label className="block text-xs font-bold text-[#0B253A] mb-1">
+                <label className="block text-xs font-bold text-jaman-navy mb-1">
                   Optional Details:
                 </label>
                 <input
@@ -951,7 +951,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                   value={movementNotes}
                   onChange={(e) => setMovementNotes(e.target.value)}
                   placeholder="e.g. Receipt #104, Vendor Milk delivery"
-                  className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none"
+                  className="w-full bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none"
                 />
               </div>
 
@@ -965,7 +965,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#0B253A] hover:bg-[#1E3A4C] text-white rounded-xl text-xs font-black shadow-xs"
+                  className="px-5 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white rounded-xl text-xs font-black shadow-xs"
                 >
                   Confirm Movement
                 </button>
@@ -978,21 +978,21 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
       {/* MODAL 3: CLOSE SHIFT WITH DENOMINATIONS MODAL */}
       {closeShiftModalOpen && activeShift && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
-          <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
-            <div className="p-4 bg-white border-b border-[#EBE6DD] flex items-center justify-between shrink-0">
+          <div className="bg-jaman-cream border border-jaman-border w-full max-w-xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+            <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold">
                   <Lock className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-[#0B253A]">Close Cashier Shift & Settle Drawer</h3>
+                  <h3 className="font-black text-sm text-jaman-navy">Close Cashier Shift & Settle Drawer</h3>
                   <span className="text-[10px] text-slate-400">Shift #{activeShift.id.slice(-2)} • {activeShift.cashierName}</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setCloseShiftModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-[#0B253A] rounded-lg"
+                className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1000,29 +1000,29 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
 
             <form onSubmit={handleCloseShiftSubmit} className="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
               {/* Expected Summary Box */}
-              <div className="bg-white p-3.5 rounded-2xl border border-[#EBE6DD] space-y-1.5 text-slate-600">
+              <div className="bg-white p-3.5 rounded-2xl border border-jaman-border space-y-1.5 text-slate-600">
                 <div className="flex justify-between">
                   <span>Opening Float:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(activeShift.openingCash)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(activeShift.openingCash)}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Cash Sales Collected:</span>
-                  <strong className="font-mono text-[#0B253A]">+ {formatINR(shiftCashSales)}</strong>
+                  <strong className="font-mono text-jaman-navy">+ {formatINR(shiftCashSales)}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Net Cash Movements:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(totalCashIn - totalCashOut)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(totalCashIn - totalCashOut)}</strong>
                 </div>
-                <div className="flex justify-between pt-1.5 border-t border-slate-100 font-bold text-sm text-[#0B253A]">
+                <div className="flex justify-between pt-1.5 border-t border-slate-100 font-bold text-sm text-jaman-navy">
                   <span>Expected Drawer Cash:</span>
-                  <span className="font-mono text-[#E66817]">{formatINR(expectedDrawerCash)}</span>
+                  <span className="font-mono text-jaman-saffron">{formatINR(expectedDrawerCash)}</span>
                 </div>
               </div>
 
               {/* Denomination Counter Grid */}
-              <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] space-y-2.5">
+              <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-2.5">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
-                  <strong className="text-xs uppercase tracking-wider text-[#0B253A]">
+                  <strong className="text-xs uppercase tracking-wider text-jaman-navy">
                     Cash Drawer Denomination Count
                   </strong>
                   <span className="text-[10px] text-slate-400 font-mono">CURRENCY CALCULATOR</span>
@@ -1038,7 +1038,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                     { label: '₹20', val: denom20, set: setDenom20 },
                     { label: '₹10', val: denom10, set: setDenom10 }
                   ].map((d, idx) => (
-                    <div key={idx} className="p-2 rounded-xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1">
+                    <div key={idx} className="p-2 rounded-xl bg-jaman-cream border border-jaman-border space-y-1">
                       <span className="text-[10px] font-bold text-slate-500 block">{d.label}</span>
                       <input
                         type="number"
@@ -1046,12 +1046,12 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                         value={d.val === 0 ? '' : d.val}
                         onChange={(e) => d.set(Number(e.target.value) || 0)}
                         placeholder="0"
-                        className="w-full bg-white border border-[#EBE6DD] rounded-lg px-2 py-1 text-center font-mono font-bold text-xs"
+                        className="w-full bg-white border border-jaman-border rounded-lg px-2 py-1 text-center font-mono font-bold text-xs"
                       />
                     </div>
                   ))}
 
-                  <div className="p-2 rounded-xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1">
+                  <div className="p-2 rounded-xl bg-jaman-cream border border-jaman-border space-y-1">
                     <span className="text-[10px] font-bold text-slate-500 block">Coins (₹)</span>
                     <input
                       type="number"
@@ -1059,7 +1059,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                       value={denomCoins === 0 ? '' : denomCoins}
                       onChange={(e) => setDenomCoins(Number(e.target.value) || 0)}
                       placeholder="0"
-                      className="w-full bg-white border border-[#EBE6DD] rounded-lg px-2 py-1 text-center font-mono font-bold text-xs"
+                      className="w-full bg-white border border-jaman-border rounded-lg px-2 py-1 text-center font-mono font-bold text-xs"
                     />
                   </div>
                 </div>
@@ -1068,7 +1068,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 <div className="p-3 bg-[#FFFDFB] rounded-xl border border-amber-300 space-y-1 mt-2">
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-slate-700">Counted Cash:</span>
-                    <span className="font-mono font-black text-base text-[#0B253A]">{formatINR(countedCash)}</span>
+                    <span className="font-mono font-black text-base text-jaman-navy">{formatINR(countedCash)}</span>
                   </div>
                   <div className="flex justify-between items-center pt-1 border-t border-amber-200">
                     <span className="font-bold text-slate-700">Calculated Variance:</span>
@@ -1093,7 +1093,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                     value={closeShiftNotes}
                     onChange={(e) => setCloseShiftNotes(e.target.value)}
                     placeholder="e.g. Customer change rounding, coin shortage"
-                    className="w-full bg-white border border-rose-300 rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A] focus:outline-none"
+                    className="w-full bg-white border border-rose-300 rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy focus:outline-none"
                   />
                 </div>
               )}
@@ -1122,14 +1122,14 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
       {/* MODAL 4: HISTORICAL SHIFT DETAIL INSPECTOR */}
       {selectedHistoricalShift && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
-          <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-2xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
-            <div className="p-4 bg-white border-b border-[#EBE6DD] flex items-center justify-between shrink-0">
+          <div className="bg-jaman-cream border border-jaman-border w-full max-w-2xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+            <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#0B253A] text-white flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-xl bg-jaman-navy text-white flex items-center justify-center font-bold">
                   <Clock className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-[#0B253A]">Shift Statement — {selectedHistoricalShift.id}</h3>
+                  <h3 className="font-black text-sm text-jaman-navy">Shift Statement — {selectedHistoricalShift.id}</h3>
                   <span className="text-[10px] text-slate-400">Cashier: {selectedHistoricalShift.cashierName} • {selectedHistoricalShift.posId}</span>
                 </div>
               </div>
@@ -1137,7 +1137,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 <button
                   type="button"
                   onClick={() => handlePrintShiftTicket(selectedHistoricalShift)}
-                  className="px-3 py-1.5 bg-[#FAF7F2] hover:bg-slate-100 border border-[#EBE6DD] rounded-xl text-xs font-bold flex items-center gap-1.5 text-[#0B253A]"
+                  className="px-3 py-1.5 bg-jaman-cream hover:bg-slate-100 border border-jaman-border rounded-xl text-xs font-bold flex items-center gap-1.5 text-jaman-navy"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Print</span>
@@ -1145,7 +1145,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 <button
                   type="button"
                   onClick={() => handleDownloadShiftPdf(selectedHistoricalShift)}
-                  className="px-3 py-1.5 bg-[#FAF7F2] hover:bg-slate-100 border border-[#EBE6DD] rounded-xl text-xs font-bold flex items-center gap-1.5 text-[#0B253A]"
+                  className="px-3 py-1.5 bg-jaman-cream hover:bg-slate-100 border border-jaman-border rounded-xl text-xs font-bold flex items-center gap-1.5 text-jaman-navy"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>PDF</span>
@@ -1153,7 +1153,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 <button
                   type="button"
                   onClick={() => setSelectedHistoricalShift(null)}
-                  className="p-1 text-slate-400 hover:text-[#0B253A] rounded-lg"
+                  className="p-1 text-slate-400 hover:text-jaman-navy rounded-lg"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1162,26 +1162,26 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
 
             <div className="p-5 overflow-y-auto space-y-4 text-xs">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <div className="bg-white p-3 rounded-2xl border border-[#EBE6DD]">
+                <div className="bg-white p-3 rounded-2xl border border-jaman-border">
                   <span className="text-[10px] text-slate-400 block font-bold uppercase">Total Sales</span>
-                  <strong className="font-mono text-base font-black text-[#0B253A]">{formatINR(selectedHistoricalShift.totalSales)}</strong>
+                  <strong className="font-mono text-base font-black text-jaman-navy">{formatINR(selectedHistoricalShift.totalSales)}</strong>
                 </div>
-                <div className="bg-white p-3 rounded-2xl border border-[#EBE6DD]">
+                <div className="bg-white p-3 rounded-2xl border border-jaman-border">
                   <span className="text-[10px] text-slate-400 block font-bold uppercase">Orders</span>
-                  <strong className="font-mono text-base font-black text-[#0B253A]">{selectedHistoricalShift.totalOrders}</strong>
+                  <strong className="font-mono text-base font-black text-jaman-navy">{selectedHistoricalShift.totalOrders}</strong>
                 </div>
-                <div className="bg-white p-3 rounded-2xl border border-[#EBE6DD]">
+                <div className="bg-white p-3 rounded-2xl border border-jaman-border">
                   <span className="text-[10px] text-slate-400 block font-bold uppercase">Cash Sales</span>
                   <strong className="font-mono text-base font-black text-amber-700">{formatINR(selectedHistoricalShift.totalCashSales)}</strong>
                 </div>
-                <div className="bg-white p-3 rounded-2xl border border-[#EBE6DD]">
+                <div className="bg-white p-3 rounded-2xl border border-jaman-border">
                   <span className="text-[10px] text-slate-400 block font-bold uppercase">Counted Cash</span>
-                  <strong className="font-mono text-base font-black text-[#0B253A]">{formatINR(selectedHistoricalShift.closingCash || selectedHistoricalShift.actualCash || 0)}</strong>
+                  <strong className="font-mono text-base font-black text-jaman-navy">{formatINR(selectedHistoricalShift.closingCash || selectedHistoricalShift.actualCash || 0)}</strong>
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] space-y-2 text-slate-600">
-                <span className="font-black uppercase tracking-wider text-xs text-[#0B253A] block border-b border-slate-100 pb-1.5">
+              <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-2 text-slate-600">
+                <span className="font-black uppercase tracking-wider text-xs text-jaman-navy block border-b border-slate-100 pb-1.5">
                   Shift Timing & Reconciliation
                 </span>
                 <div className="flex justify-between">
@@ -1194,11 +1194,11 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 </div>
                 <div className="flex justify-between">
                   <span>Opening Float:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(selectedHistoricalShift.openingCash)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(selectedHistoricalShift.openingCash)}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Expected Drawer:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(selectedHistoricalShift.expectedCash)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(selectedHistoricalShift.expectedCash)}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Closing Variance:</span>

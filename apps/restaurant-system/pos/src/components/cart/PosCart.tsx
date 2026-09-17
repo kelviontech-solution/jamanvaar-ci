@@ -124,13 +124,13 @@ export const PosCart: React.FC = () => {
   const quickFavorites = db.menuItems.filter((i) => i.isAvailable !== false).slice(0, 4);
 
   return (
-    <div className="w-84 md:w-92 lg:w-96 min-w-[340px] max-w-[420px] bg-white border-l border-[#EBE6DD] flex flex-col h-full select-none shrink-0 shadow-lg z-10">
+    <div className="w-84 md:w-92 lg:w-96 min-w-[340px] max-w-[420px] bg-white border-l border-jaman-border flex flex-col h-full select-none shrink-0 shadow-lg z-10">
       {/* Active Order Header */}
-      <div className="p-3 border-b border-[#EBE6DD] bg-slate-50/80 shrink-0 space-y-2">
+      <div className="p-3 border-b border-jaman-border bg-slate-50/80 shrink-0 space-y-2">
         {/* Order Identifier & Clear Button */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <span className="font-extrabold text-xs text-[#0B2B39] uppercase tracking-wide">
+            <span className="font-extrabold text-xs text-jaman-deepNavy uppercase tracking-wide">
               New Order — Unsaved
             </span>
             <span className="text-[10px] text-slate-400 font-medium">
@@ -177,7 +177,7 @@ export const PosCart: React.FC = () => {
         </div>
 
         {/* Order Type Switcher (Comfortable 48px+ touch targets) */}
-        <div className="grid grid-cols-4 gap-1.5 bg-[#FAF7F2] border border-[#EBE6DD] p-1.5 rounded-2xl">
+        <div className="grid grid-cols-4 gap-1.5 bg-jaman-cream border border-jaman-border p-1.5 rounded-2xl">
           {orderTypes.map((t) => {
             const active = orderType === t.id;
             return (
@@ -187,8 +187,8 @@ export const PosCart: React.FC = () => {
                 onClick={() => setOrderType(t.id)}
                 className={`min-h-[48px] py-1.5 px-1 rounded-xl text-xs font-black transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer active:scale-95 ${
                   active
-                    ? 'bg-[#E66817] text-white shadow-sm ring-2 ring-[#E66817]/25'
-                    : 'bg-white border border-[#EBE6DD] text-slate-700 hover:text-[#0B253A] hover:border-[#E66817]/40 shadow-2xs'
+                    ? 'bg-jaman-saffron text-white shadow-sm ring-2 ring-jaman-saffron/25'
+                    : 'bg-white border border-jaman-border text-slate-700 hover:text-jaman-navy hover:border-jaman-saffron/40 shadow-2xs'
                 }`}
               >
                 <span className="text-base leading-none">{t.icon}</span>
@@ -200,13 +200,13 @@ export const PosCart: React.FC = () => {
 
         {/* Dine-In Table Pill (min 46px height) */}
         {orderType === 'DINE_IN' && (
-          <div className="flex items-center justify-between bg-white border border-[#EBE6DD] px-3.5 py-2 rounded-2xl text-xs shadow-2xs">
+          <div className="flex items-center justify-between bg-white border border-jaman-border px-3.5 py-2 rounded-2xl text-xs shadow-2xs">
             <button
               type="button"
               onClick={() => setActiveTab('TABLES')}
-              className="min-h-[36px] flex items-center gap-2 text-[#0B2B39] font-black hover:text-[#E66817] transition-colors truncate cursor-pointer"
+              className="min-h-[36px] flex items-center gap-2 text-jaman-deepNavy font-black hover:text-jaman-saffron transition-colors truncate cursor-pointer"
             >
-              <Utensils className="w-4 h-4 text-[#E66817] shrink-0" />
+              <Utensils className="w-4 h-4 text-jaman-saffron shrink-0" />
               <span className="truncate text-xs sm:text-sm">
                 {selectedTable ? `Table #${selectedTable.tableNumber}` : 'Select Table'}
               </span>
@@ -219,7 +219,7 @@ export const PosCart: React.FC = () => {
                 <select
                   value={guestCount}
                   onChange={(e) => setGuestCount(Number(e.target.value))}
-                  className="bg-slate-100 border border-slate-200 rounded-lg px-2 py-1 font-black text-xs text-[#0B2B39] cursor-pointer"
+                  className="bg-slate-100 border border-slate-200 rounded-lg px-2 py-1 font-black text-xs text-jaman-deepNavy cursor-pointer"
                 >
                   {[1, 2, 3, 4, 5, 6, 8, 10, 12].map((n) => (
                     <option key={n} value={n}>
@@ -236,7 +236,7 @@ export const PosCart: React.FC = () => {
         <div className="grid grid-cols-2 gap-1.5">
           <button
             onClick={() => setCustomerDrawerOpen(true)}
-            className="flex items-center gap-1.5 bg-white border border-[#EBE6DD] hover:border-slate-400 px-2.5 py-1.5 rounded-xl text-xs text-left truncate transition-colors"
+            className="flex items-center gap-1.5 bg-white border border-jaman-border hover:border-slate-400 px-2.5 py-1.5 rounded-xl text-xs text-left truncate transition-colors"
           >
             <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <span className="truncate font-semibold text-slate-700 text-[11px]">
@@ -249,7 +249,7 @@ export const PosCart: React.FC = () => {
             className={`flex items-center gap-1.5 border px-2.5 py-1.5 rounded-xl text-xs text-left truncate transition-colors ${
               orderNotes
                 ? 'bg-amber-50 border-amber-300 text-amber-800'
-                : 'bg-white border-[#EBE6DD] hover:border-slate-400 text-slate-700'
+                : 'bg-white border-jaman-border hover:border-slate-400 text-slate-700'
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5 text-amber-500 shrink-0" />
@@ -261,13 +261,13 @@ export const PosCart: React.FC = () => {
       </div>
 
       {/* Cart Items List or Rich Functional Empty State */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-[#FAF7F2]/40">
+      <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-jaman-cream/40">
         {hasItems ? (
           <>
             {cart.items.map((ci) => (
               <div
                 key={ci.cartItemId}
-                className="bg-white border border-[#EBE6DD] rounded-2xl p-2.5 shadow-2xs space-y-1.5 hover:border-slate-400 transition-colors"
+                className="bg-white border border-jaman-border rounded-2xl p-2.5 shadow-2xs space-y-1.5 hover:border-slate-400 transition-colors"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
@@ -278,7 +278,7 @@ export const PosCart: React.FC = () => {
                           ci.item.dietaryType === 'NON_VEG' ? 'bg-rose-600' : 'bg-emerald-600'
                         }`}
                       />
-                      <h4 className="font-bold text-xs text-[#0B2B39] leading-tight truncate">
+                      <h4 className="font-bold text-xs text-jaman-deepNavy leading-tight truncate">
                         {ci.item.name}
                       </h4>
                     </div>
@@ -302,7 +302,7 @@ export const PosCart: React.FC = () => {
                   </div>
 
                   <div className="text-right">
-                    <span className="font-bold text-xs text-[#0B2B39]">₹{ci.itemTotal}</span>
+                    <span className="font-bold text-xs text-jaman-deepNavy">₹{ci.itemTotal}</span>
                     <span className="block text-[10px] text-slate-400 font-mono">
                       @ ₹{ci.unitPrice}
                     </span>
@@ -345,13 +345,13 @@ export const PosCart: React.FC = () => {
                     >
                       <Minus className="w-4 h-4 stroke-[2.5]" />
                     </button>
-                    <span className="font-mono font-black text-sm text-[#0B2B39] min-w-[28px] text-center">
+                    <span className="font-mono font-black text-sm text-jaman-deepNavy min-w-[28px] text-center">
                       {ci.quantity}
                     </span>
                     <button
                       type="button"
                       onClick={() => { sound.play('click'); updateItemQuantity(ci.cartItemId, 1); }}
-                      className="w-9 h-9 rounded-lg bg-[#E66817] hover:bg-[#EA580C] text-white font-black flex items-center justify-center shadow-2xs active:scale-95 cursor-pointer"
+                      className="w-9 h-9 rounded-lg bg-jaman-saffron hover:bg-[#EA580C] text-white font-black flex items-center justify-center shadow-2xs active:scale-95 cursor-pointer"
                       title="Increase quantity"
                     >
                       <Plus className="w-4 h-4 stroke-[3]" />
@@ -362,9 +362,9 @@ export const PosCart: React.FC = () => {
             ))}
 
             {/* Smart Suggestions: Often Ordered Together */}
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-2.5 shadow-2xs space-y-1.5 mt-2">
+            <div className="bg-white border border-jaman-border rounded-2xl p-2.5 shadow-2xs space-y-1.5 mt-2">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-[#E66817]" />
+                <Sparkles className="w-3 h-3 text-jaman-saffron" />
                 <span>Frequently Paired Together</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -372,9 +372,9 @@ export const PosCart: React.FC = () => {
                   <button
                     key={item.id}
                     onClick={() => { sound.play('add'); addItemToCart(item); }}
-                    className="px-2 py-1 rounded-lg bg-[#FAF7F2] hover:bg-[#FFF4ED] border border-[#EBE6DD] hover:border-[#FDBA74] text-[11px] font-bold text-[#0B2B39] flex items-center gap-1 transition-colors"
+                    className="px-2 py-1 rounded-lg bg-jaman-cream hover:bg-[#FFF4ED] border border-jaman-border hover:border-[#FDBA74] text-[11px] font-bold text-jaman-deepNavy flex items-center gap-1 transition-colors"
                   >
-                    <Plus className="w-3 h-3 text-[#E66817]" />
+                    <Plus className="w-3 h-3 text-jaman-saffron" />
                     <span>{item.name}</span>
                     <span className="text-slate-400 font-mono text-[10px]">₹{item.price}</span>
                   </button>
@@ -393,7 +393,7 @@ export const PosCart: React.FC = () => {
               />
             </div>
             <div>
-              <h4 className="font-black text-sm text-[#0B2B39]">Billing Counter Ready</h4>
+              <h4 className="font-black text-sm text-jaman-deepNavy">Billing Counter Ready</h4>
               <p className="text-xs text-slate-400 max-w-[200px] mx-auto mt-1 leading-relaxed">
                 Tap any dish from the menu to add it to this order.
               </p>
@@ -404,10 +404,10 @@ export const PosCart: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setRepeatModalOpen(true)}
-                className="w-full py-2.5 px-3 bg-[#FFFDFB] hover:bg-[#FFF4ED] border border-[#EBE6DD] hover:border-[#FDBA74] text-[#0B2B39] hover:text-[#E66817] rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs mt-2 cursor-pointer active:scale-98"
+                className="w-full py-2.5 px-3 bg-[#FFFDFB] hover:bg-[#FFF4ED] border border-jaman-border hover:border-[#FDBA74] text-jaman-deepNavy hover:text-jaman-saffron rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs mt-2 cursor-pointer active:scale-98"
                 title="Repeat previous order"
               >
-                <RotateCcw className="w-3.5 h-3.5 text-[#E66817]" />
+                <RotateCcw className="w-3.5 h-3.5 text-jaman-saffron" />
                 <span>↻ Repeat Last Order</span>
               </button>
             )}
@@ -416,7 +416,7 @@ export const PosCart: React.FC = () => {
       </div>
 
       {/* Bottom Financials & Settle Panel */}
-      <div className="p-3.5 bg-white border-t border-[#EBE6DD] shrink-0 space-y-2">
+      <div className="p-3.5 bg-white border-t border-jaman-border shrink-0 space-y-2">
         {/* Quick Discounts & Hold Order Button */}
         <div className="flex items-center justify-between gap-2">
           <button
@@ -427,11 +427,11 @@ export const PosCart: React.FC = () => {
               cart.discountAmount > 0
                 ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-2xs'
                 : hasItems
-                ? 'bg-[#FAF7F2] border-[#EBE6DD] text-slate-700 hover:border-[#E66817]/40 hover:text-[#0B253A]'
-                : 'bg-[#FAF7F2] border-[#EBE6DD] text-slate-400 cursor-not-allowed opacity-75'
+                ? 'bg-jaman-cream border-jaman-border text-slate-700 hover:border-jaman-saffron/40 hover:text-jaman-navy'
+                : 'bg-jaman-cream border-jaman-border text-slate-400 cursor-not-allowed opacity-75'
             }`}
           >
-            <Tag className={`w-3.5 h-3.5 ${cart.discountAmount > 0 ? 'text-emerald-600' : 'text-[#E66817]'}`} />
+            <Tag className={`w-3.5 h-3.5 ${cart.discountAmount > 0 ? 'text-emerald-600' : 'text-jaman-saffron'}`} />
             <span>
               {cart.discountAmount > 0
                 ? `${billDiscountPercent > 0 ? `${billDiscountPercent}% Off` : `-₹${cart.discountAmount}`}`
@@ -446,7 +446,7 @@ export const PosCart: React.FC = () => {
             className={`px-3 py-2 rounded-2xl border text-xs font-black flex items-center gap-1.5 transition-all ${
               hasItems
                 ? 'border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 cursor-pointer shadow-2xs'
-                : 'bg-[#FAF7F2] border-[#EBE6DD] text-slate-400 cursor-not-allowed opacity-75'
+                : 'bg-jaman-cream border-jaman-border text-slate-400 cursor-not-allowed opacity-75'
             }`}
             title="Save this order for later"
           >
@@ -459,7 +459,7 @@ export const PosCart: React.FC = () => {
         <div className="space-y-1 text-xs text-slate-600 border-t border-slate-200/80 pt-2 font-medium">
           <div className="flex justify-between">
             <span>Subtotal</span>
-            <span className="font-mono font-bold text-[#0B2B39]">₹{cart.subtotal}</span>
+            <span className="font-mono font-bold text-jaman-deepNavy">₹{cart.subtotal}</span>
           </div>
 
           {cart.discountAmount > 0 && (
@@ -503,9 +503,9 @@ export const PosCart: React.FC = () => {
             </div>
           )}
 
-          <div className="flex justify-between items-baseline pt-1 border-t border-slate-200 font-extrabold text-base text-[#0B2B39]">
+          <div className="flex justify-between items-baseline pt-1 border-t border-slate-200 font-extrabold text-base text-jaman-deepNavy">
             <span>Total Payable</span>
-            <span className="text-xl text-[#0B2B39] font-mono">₹{cart.totalPayable}</span>
+            <span className="text-xl text-jaman-deepNavy font-mono">₹{cart.totalPayable}</span>
           </div>
         </div>
 
@@ -526,11 +526,11 @@ export const PosCart: React.FC = () => {
             disabled={!hasItems || isSendingKot}
             className={`min-h-[52px] px-3 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
               hasItems && !isSendingKot
-                ? 'bg-[#0B253A] hover:bg-[#133A58] text-white border-2 border-[#0B253A] shadow-md shadow-[#0B253A]/20 active:scale-[0.98] cursor-pointer'
+                ? 'bg-jaman-navy hover:bg-[#133A58] text-white border-2 border-jaman-navy shadow-md shadow-jaman-navy/20 active:scale-[0.98] cursor-pointer'
                 : 'bg-slate-100/90 border border-slate-300/80 text-slate-500 cursor-not-allowed opacity-80'
             }`}
           >
-            <Flame className={`w-5 h-5 shrink-0 ${hasItems && !isSendingKot ? 'text-[#E66817] fill-[#E66817]' : 'text-slate-400 fill-slate-300'}`} />
+            <Flame className={`w-5 h-5 shrink-0 ${hasItems && !isSendingKot ? 'text-jaman-saffron fill-jaman-saffron' : 'text-slate-400 fill-slate-300'}`} />
             <span className="truncate">{kotSentState ? '✓ KOT SENT' : 'SEND KOT'}</span>
           </button>
 
@@ -558,7 +558,7 @@ export const PosCart: React.FC = () => {
             disabled={!hasItems || isInstantBillProcessing}
             className={`w-full min-h-[54px] px-3.5 sm:px-4 py-2.5 rounded-2xl flex items-center justify-between transition-all select-none border-2 ${
               hasItems && !isInstantBillProcessing
-                ? 'bg-gradient-to-r from-[#E66817] via-[#EA580C] to-[#F59E0B] hover:brightness-105 text-white border-amber-400/50 shadow-lg shadow-[#E66817]/25 active:scale-[0.98] cursor-pointer'
+                ? 'bg-gradient-to-r from-jaman-saffron via-[#EA580C] to-[#F59E0B] hover:brightness-105 text-white border-amber-400/50 shadow-lg shadow-jaman-saffron/25 active:scale-[0.98] cursor-pointer'
                 : 'bg-amber-50/80 border-amber-200/90 text-amber-900/60 cursor-not-allowed opacity-85'
             }`}
           >

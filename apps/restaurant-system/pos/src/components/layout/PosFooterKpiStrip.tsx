@@ -30,47 +30,47 @@ export const PosFooterKpiStrip: React.FC = () => {
   const pendingKots = db.kots.filter((k) => k.status === 'PREPARING' || k.status === 'PENDING');
 
   return (
-    <footer className="h-9 bg-white border-t border-[#EBE6DD] px-3 sm:px-4 flex items-center justify-between text-[#0B253A] select-none shrink-0 z-20 text-xs shadow-2xs">
+    <footer className="h-9 bg-white border-t border-jaman-border px-3 sm:px-4 flex items-center justify-between text-jaman-navy select-none shrink-0 z-20 text-xs shadow-2xs">
       {/* Left & Middle KPI Metrics */}
       <div className="flex items-center gap-4 overflow-x-auto scrollbar-none py-0.5">
         {/* Sales */}
         <button
           onClick={() => setActiveTab('REPORTS')}
-          className="flex items-center gap-1.5 hover:text-[#E66817] transition-colors pr-3 border-r border-[#EBE6DD]"
+          className="flex items-center gap-1.5 hover:text-jaman-saffron transition-colors pr-3 border-r border-jaman-border"
           title="Click to open Sales Reports"
         >
-          <TrendingUp className="w-3.5 h-3.5 text-[#E66817]" />
+          <TrendingUp className="w-3.5 h-3.5 text-jaman-saffron" />
           <span className="text-slate-400 text-[11px]">Today Sales:</span>
-          <strong className="font-mono font-black text-[#0B253A] text-xs">{formatINR(todaySales)}</strong>
+          <strong className="font-mono font-black text-jaman-navy text-xs">{formatINR(todaySales)}</strong>
         </button>
 
         {/* Orders */}
         <button
           onClick={() => setActiveTab('ORDERS')}
-          className="flex items-center gap-1.5 hover:text-emerald-600 transition-colors pr-3 border-r border-[#EBE6DD]"
+          className="flex items-center gap-1.5 hover:text-emerald-600 transition-colors pr-3 border-r border-jaman-border"
           title="Click to view Live Orders"
         >
           <ShoppingBag className="w-3.5 h-3.5 text-emerald-600" />
           <span className="text-slate-400 text-[11px]">Orders:</span>
-          <strong className="font-mono font-black text-[#0B253A] text-xs">{totalOrdersCount}</strong>
+          <strong className="font-mono font-black text-jaman-navy text-xs">{totalOrdersCount}</strong>
         </button>
 
         {/* AOV */}
-        <div className="hidden sm:flex items-center gap-1.5 pr-3 border-r border-[#EBE6DD]">
+        <div className="hidden sm:flex items-center gap-1.5 pr-3 border-r border-jaman-border">
           <Clock className="w-3.5 h-3.5 text-blue-600" />
           <span className="text-slate-400 text-[11px]">AOV:</span>
-          <strong className="font-mono font-bold text-[#0B253A] text-xs">{formatINR(aov)}</strong>
+          <strong className="font-mono font-bold text-jaman-navy text-xs">{formatINR(aov)}</strong>
         </div>
 
         {/* Tables */}
         <button
           onClick={() => setActiveTab('TABLES')}
-          className="hidden md:flex items-center gap-1.5 hover:text-amber-600 transition-colors pr-3 border-r border-[#EBE6DD]"
+          className="hidden md:flex items-center gap-1.5 hover:text-amber-600 transition-colors pr-3 border-r border-jaman-border"
           title="Click to open Floor Plan"
         >
           <LayoutGrid className="w-3.5 h-3.5 text-amber-600" />
           <span className="text-slate-400 text-[11px]">Tables:</span>
-          <strong className="font-mono font-black text-[#0B253A] text-xs">
+          <strong className="font-mono font-black text-jaman-navy text-xs">
             {occupancyPct}% ({occupiedTables.length}/{tables.length})
           </strong>
         </button>
@@ -83,7 +83,7 @@ export const PosFooterKpiStrip: React.FC = () => {
         >
           <ChefHat className="w-3.5 h-3.5 text-rose-600" />
           <span className="text-slate-400 text-[11px]">Pending KOT:</span>
-          <strong className="font-mono font-black text-[#0B253A] text-xs">{pendingKots.length}</strong>
+          <strong className="font-mono font-black text-jaman-navy text-xs">{pendingKots.length}</strong>
         </button>
       </div>
 

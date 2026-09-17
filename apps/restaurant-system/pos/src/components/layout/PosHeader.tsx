@@ -174,7 +174,7 @@ export const PosHeader: React.FC = () => {
   };
 
   return (
-    <header className="w-full h-14 bg-white border-b border-[#EBE6DD] px-2 sm:px-4 flex items-center justify-between text-[#0B253A] select-none shrink-0 z-30 shadow-2xs max-w-full overflow-visible">
+    <header className="w-full h-14 bg-white border-b border-jaman-border px-2 sm:px-4 flex items-center justify-between text-jaman-navy select-none shrink-0 z-30 shadow-2xs max-w-full overflow-visible">
       {/* Left: Brand Header & New Order */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <BrandHeader
@@ -191,7 +191,7 @@ export const PosHeader: React.FC = () => {
           <button
             type="button"
             onClick={() => setNewOrderDropdownOpen((prev) => !prev)}
-            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-extrabold text-xs flex items-center gap-1.5 shadow-sm shadow-[#E66817]/20 transition-all active:scale-95 cursor-pointer shrink-0"
+            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-extrabold text-xs flex items-center gap-1.5 shadow-sm shadow-jaman-saffron/20 transition-all active:scale-95 cursor-pointer shrink-0"
             title="Start fresh order"
           >
             <PlusCircle className="w-3.5 h-3.5" />
@@ -200,19 +200,19 @@ export const PosHeader: React.FC = () => {
           </button>
 
           {newOrderDropdownOpen && (
-            <div className="absolute left-0 mt-2 w-52 bg-white border border-[#EBE6DD] rounded-2xl shadow-xl p-1.5 text-xs text-[#0B253A] z-50 animate-in fade-in zoom-in-95 duration-100">
+            <div className="absolute left-0 mt-2 w-52 bg-white border border-jaman-border rounded-2xl shadow-xl p-1.5 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100">
               <button
                 type="button"
                 onClick={() => handleStartNewOrder('DINE_IN')}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-[#0B253A] cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-jaman-cream text-left transition-colors font-bold text-jaman-navy cursor-pointer"
               >
-                <UtensilsCrossed className="w-4 h-4 text-[#E66817]" />
+                <UtensilsCrossed className="w-4 h-4 text-jaman-saffron" />
                 <span>Dine-In (Floor Table)</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleStartNewOrder('TAKEAWAY')}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-[#0B253A] cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-jaman-cream text-left transition-colors font-bold text-jaman-navy cursor-pointer"
               >
                 <ShoppingBag className="w-4 h-4 text-emerald-600" />
                 <span>Quick Takeaway</span>
@@ -220,7 +220,7 @@ export const PosHeader: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleStartNewOrder('DELIVERY')}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-[#0B253A] cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-jaman-cream text-left transition-colors font-bold text-jaman-navy cursor-pointer"
               >
                 <Bike className="w-4 h-4 text-blue-600" />
                 <span>Delivery Order</span>
@@ -235,11 +235,11 @@ export const PosHeader: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsGlobalSearchOpen(true)}
-          className="w-full h-9 sm:h-10 bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] hover:border-[#E66817]/60 rounded-xl px-2.5 sm:px-3.5 flex items-center justify-between text-slate-500 text-xs sm:text-sm transition-all shadow-2xs group active:scale-[0.99] cursor-pointer"
+          className="w-full h-9 sm:h-10 bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border hover:border-jaman-saffron/60 rounded-xl px-2.5 sm:px-3.5 flex items-center justify-between text-slate-500 text-xs sm:text-sm transition-all shadow-2xs group active:scale-[0.99] cursor-pointer"
           title="Search dishes, SKU, tables, bills, customers"
         >
           <div className="flex items-center gap-2 truncate">
-            <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#E66817] transition-colors shrink-0" />
+            <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-jaman-saffron transition-colors shrink-0" />
             <span className="truncate text-xs font-medium">Search dishes, SKU, tables, bills, customers...</span>
           </div>
         </button>
@@ -294,11 +294,11 @@ export const PosHeader: React.FC = () => {
 
           {/* Business Day + Shift Popover */}
           {isBusinessDayPanelOpen && (
-            <div className="absolute right-0 mt-2 w-80 bg-white border border-[#EBE6DD] rounded-2xl shadow-2xl p-4 text-xs text-[#0B253A] z-50 animate-in fade-in zoom-in-95 duration-100 space-y-3">
+            <div className="absolute right-0 mt-2 w-80 bg-white border border-jaman-border rounded-2xl shadow-2xl p-4 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100 space-y-3">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <div>
                   <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Accounting Business Day</p>
-                  <p className="font-black text-sm text-[#0B253A]">{daySummary.display_date}</p>
+                  <p className="font-black text-sm text-jaman-navy">{daySummary.display_date}</p>
                   <span className="text-[10px] font-mono text-slate-400">{daySummary.business_day_id}</span>
                 </div>
                 <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
@@ -335,16 +335,16 @@ export const PosHeader: React.FC = () => {
               </div>
 
               {/* Actions */}
-              <div className="border-t border-[#EBE6DD] pt-2.5 space-y-2">
+              <div className="border-t border-jaman-border pt-2.5 space-y-2">
                 <button
                   type="button"
                   onClick={() => {
                     setIsBusinessDayPanelOpen(false);
                     setActiveTab('DAYS');
                   }}
-                  className="w-full py-2 rounded-xl bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] text-xs font-bold text-[#0B253A] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-2 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border text-xs font-bold text-jaman-navy transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-[#E66817]" />
+                  <Calendar className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>View Day History & Reports</span>
                 </button>
 
@@ -356,11 +356,11 @@ export const PosHeader: React.FC = () => {
                   }}
                   className={`w-full py-2 rounded-xl border text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
                     activeShift
-                      ? 'bg-[#FAF7F2] hover:bg-[#F5F0E8] border-[#EBE6DD] text-[#0B253A]'
+                      ? 'bg-jaman-cream hover:bg-[#F5F0E8] border-jaman-border text-jaman-navy'
                       : 'bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900'
                   }`}
                 >
-                  <Clock className={`w-3.5 h-3.5 ${activeShift ? 'text-[#E66817]' : 'text-amber-700'}`} />
+                  <Clock className={`w-3.5 h-3.5 ${activeShift ? 'text-jaman-saffron' : 'text-amber-700'}`} />
                   <span>{activeShift ? `Shift #${activeShift.id.slice(-2) || '01'} — Open Drawer` : 'Shift Closed — Open New Shift'}</span>
                 </button>
 
@@ -370,7 +370,7 @@ export const PosHeader: React.FC = () => {
                     setIsBusinessDayPanelOpen(false);
                     setIsCashDrawerModalOpen(true);
                   }}
-                  className="w-full py-2 rounded-xl bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] text-xs font-bold text-amber-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-2 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border text-xs font-bold text-amber-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <CircleDollarSign className="w-3.5 h-3.5 text-amber-600" />
                   <span>Cash In / Out (Float Adjustment)</span>
@@ -407,7 +407,7 @@ export const PosHeader: React.FC = () => {
         <button
           type="button"
           onClick={() => { sound.play('notification'); setIsNotifDrawerOpen(true); }}
-          className="relative w-8 h-8 rounded-xl bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer shrink-0"
+          className="relative w-8 h-8 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer shrink-0"
           title="Notifications & System Events"
         >
           <Bell className="w-4 h-4" />
@@ -428,15 +428,15 @@ export const PosHeader: React.FC = () => {
           onClick={() => setIsChatbotOpen(true)}
           className={`relative flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-black transition-all shadow-2xs cursor-pointer shrink-0 ${
             isChatbotOpen
-              ? 'bg-[#0B253A] text-white border-[#0B253A]'
+              ? 'bg-jaman-navy text-white border-jaman-navy'
               : aiAlertCount > 0
-              ? 'bg-[#FFF4ED] hover:bg-[#FFE8D6] border-[#FDBA74] text-[#E66817]'
-              : 'bg-white hover:bg-[#FFF4ED] border-[#EBE6DD] hover:border-[#FDBA74] text-[#0B253A] hover:text-[#E66817]'
+              ? 'bg-[#FFF4ED] hover:bg-[#FFE8D6] border-[#FDBA74] text-jaman-saffron'
+              : 'bg-white hover:bg-[#FFF4ED] border-jaman-border hover:border-[#FDBA74] text-jaman-navy hover:text-jaman-saffron'
           }`}
           title="JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)"
           aria-label="Open JAMAN AI Assistant"
         >
-          <Sparkles className="w-3.5 h-3.5 text-[#E66817]" />
+          <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />
           <span className="hidden md:inline tracking-tight">JAMAN AI</span>
           {aiAlertCount > 0 && !isChatbotOpen && (
             <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-rose-600 text-white text-[9px] font-black px-1 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
@@ -451,10 +451,10 @@ export const PosHeader: React.FC = () => {
           <button
             type="button"
             onClick={() => setProfileDropdownOpen((prev) => !prev)}
-            className="flex items-center gap-1.5 bg-[#FAF7F2] hover:bg-[#F5F0E8] border border-[#EBE6DD] px-2 py-1 rounded-xl transition-colors shadow-2xs text-[#0B253A] cursor-pointer"
+            className="flex items-center gap-1.5 bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border px-2 py-1 rounded-xl transition-colors shadow-2xs text-jaman-navy cursor-pointer"
             title={allSystemsOk ? 'User Profile & Session Options — All Systems OK' : 'User Profile & Session Options — Hardware needs attention'}
           >
-            <div className="relative w-6 h-6 rounded-lg bg-[#E66817] text-white flex items-center justify-center font-black text-xs">
+            <div className="relative w-6 h-6 rounded-lg bg-jaman-saffron text-white flex items-center justify-center font-black text-xs">
               {currentUser?.fullName?.charAt(0) || 'A'}
               <span
                 className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-white ${
@@ -475,11 +475,11 @@ export const PosHeader: React.FC = () => {
 
           {/* Profile Dropdown Popover */}
           {profileDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-white border border-[#EBE6DD] rounded-2xl shadow-2xl p-2 text-xs text-[#0B253A] z-50 animate-in fade-in zoom-in-95 duration-100 space-y-1">
-              <div className="p-2.5 border-b border-[#EBE6DD] bg-[#FAF7F2] rounded-xl space-y-1">
+            <div className="absolute right-0 mt-2 w-64 bg-white border border-jaman-border rounded-2xl shadow-2xl p-2 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100 space-y-1">
+              <div className="p-2.5 border-b border-jaman-border bg-jaman-cream rounded-xl space-y-1">
                 <div className="flex items-center justify-between">
-                  <p className="font-black text-sm text-[#0B253A]">{currentUser?.fullName || 'Amit Dave'}</p>
-                  <span className="text-[10px] font-bold bg-[#E66817]/10 text-[#E66817] px-1.5 py-0.5 rounded">
+                  <p className="font-black text-sm text-jaman-navy">{currentUser?.fullName || 'Amit Dave'}</p>
+                  <span className="text-[10px] font-bold bg-jaman-saffron/10 text-jaman-saffron px-1.5 py-0.5 rounded">
                     POS-01
                   </span>
                 </div>
@@ -494,11 +494,11 @@ export const PosHeader: React.FC = () => {
               <div className="p-2 bg-slate-50 rounded-xl space-y-1 text-[11px]">
                 <div className="flex justify-between font-bold">
                   <span className="text-slate-500">Current Shift:</span>
-                  <span className="text-[#0B253A]">{activeShift ? `Shift #${activeShift.id.slice(-2) || '01'} (Active)` : 'No Active Shift'}</span>
+                  <span className="text-jaman-navy">{activeShift ? `Shift #${activeShift.id.slice(-2) || '01'} (Active)` : 'No Active Shift'}</span>
                 </div>
                 <div className="flex justify-between font-bold">
                   <span className="text-slate-500">Opening Float:</span>
-                  <span className="font-mono text-[#0B253A]">{formatINR(activeShift?.openingCash ?? 0)}</span>
+                  <span className="font-mono text-jaman-navy">{formatINR(activeShift?.openingCash ?? 0)}</span>
                 </div>
               </div>
 
@@ -561,9 +561,9 @@ export const PosHeader: React.FC = () => {
                     setProfileDropdownOpen(false);
                     setActiveTab('SHIFTS');
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-slate-700 cursor-pointer"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-jaman-cream text-left transition-colors font-bold text-slate-700 cursor-pointer"
                 >
-                  <Clock className="w-3.5 h-3.5 text-[#E66817]" />
+                  <Clock className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Current Shift & Drawer</span>
                 </button>
 
@@ -573,7 +573,7 @@ export const PosHeader: React.FC = () => {
                     setProfileDropdownOpen(false);
                     setIsNotifDrawerOpen(true);
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-slate-700 cursor-pointer"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-jaman-cream text-left transition-colors font-bold text-slate-700 cursor-pointer"
                 >
                   <Bell className="w-3.5 h-3.5 text-blue-600" />
                   <span>System Notifications</span>
@@ -585,7 +585,7 @@ export const PosHeader: React.FC = () => {
                     setProfileDropdownOpen(false);
                     setIsPrintQueueOpen(true);
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-slate-700 cursor-pointer"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-jaman-cream text-left transition-colors font-bold text-slate-700 cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Thermal Printer & Queue</span>
@@ -597,14 +597,14 @@ export const PosHeader: React.FC = () => {
                     setProfileDropdownOpen(false);
                     lockTerminal();
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-[#FAF7F2] text-left transition-colors font-bold text-amber-700 cursor-pointer"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-jaman-cream text-left transition-colors font-bold text-amber-700 cursor-pointer"
                 >
                   <Lock className="w-3.5 h-3.5 text-amber-500" />
                   <span>Lock Screen (PIN)</span>
                 </button>
               </div>
 
-              <div className="border-t border-[#EBE6DD] my-1" />
+              <div className="border-t border-jaman-border my-1" />
 
               <button
                 type="button"

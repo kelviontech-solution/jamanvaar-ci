@@ -41,15 +41,15 @@ export const PosInstantBillConfirmationModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in">
-      <div className="bg-white border-2 border-[#EBE6DD] rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+      <div className="bg-white border-2 border-jaman-border rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-amber-100 text-amber-900 rounded-xl flex items-center justify-center">
-              <Zap className="w-4 h-4 text-[#E66817] fill-[#E66817]" />
+              <Zap className="w-4 h-4 text-jaman-saffron fill-jaman-saffron" />
             </div>
             <div>
-              <h3 className="text-sm font-black text-[#0B253A] uppercase tracking-wide">Instant Bill</h3>
+              <h3 className="text-sm font-black text-jaman-navy uppercase tracking-wide">Instant Bill</h3>
               <span className="text-[10px] text-slate-500 font-bold">Fast-Track Counter Checkout</span>
             </div>
           </div>
@@ -63,11 +63,11 @@ export const PosInstantBillConfirmationModal: React.FC = () => {
         </div>
 
         {/* Summary Details */}
-        <div className="bg-[#FAF7F2] p-4 rounded-2xl border border-[#EBE6DD] space-y-2 text-center">
+        <div className="bg-jaman-cream p-4 rounded-2xl border border-jaman-border space-y-2 text-center">
           <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
             TOTAL PAYABLE
           </span>
-          <div className="text-3xl font-black font-mono text-[#0B253A]">
+          <div className="text-3xl font-black font-mono text-jaman-navy">
             {formatINR(cart.totalPayable)}
           </div>
           <div className="flex items-center justify-center gap-2 text-xs font-bold text-slate-600 pt-1 border-t border-slate-200/80">
@@ -113,7 +113,7 @@ export const PosInstantBillConfirmationModal: React.FC = () => {
             type="button"
             disabled={isInstantBillProcessing}
             onClick={() => handleConfirm()}
-            className="flex-2 px-4 py-2.5 bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-[#E66817]/20 active:scale-95 transition-all"
+            className="flex-2 px-4 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-jaman-saffron/20 active:scale-95 transition-all"
           >
             <Check className="w-4 h-4" />
             <span>{isInstantBillProcessing ? 'Printing...' : 'BILL & PRINT'}</span>

@@ -98,12 +98,12 @@ export const PosDayHistoryView: React.FC = () => {
   ];
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] p-4 sm:p-6 overflow-y-auto select-none space-y-5">
+    <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-y-auto select-none space-y-5">
       {/* 1. Page Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B253A] flex items-center gap-2">
-            <CalendarDays className="w-6 h-6 text-[#E66817]" />
+          <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
+            <CalendarDays className="w-6 h-6 text-jaman-saffron" />
             <span>Business Days & Day History</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -128,7 +128,7 @@ export const PosDayHistoryView: React.FC = () => {
 
       {/* 2. Active Business Day Hero Card */}
       {activeDay && (
-        <div className="bg-gradient-to-r from-[#0B253A] via-[#123652] to-[#0B253A] text-white p-5 sm:p-6 rounded-3xl shadow-md border border-[#EBE6DD]/20 space-y-4">
+        <div className="bg-gradient-to-r from-jaman-navy via-[#123652] to-jaman-navy text-white p-5 sm:p-6 rounded-3xl shadow-md border border-jaman-border/20 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
@@ -170,7 +170,7 @@ export const PosDayHistoryView: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleOpenCloseModal}
-                  className="px-4 py-1.5 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm shadow-[#E66817]/25 cursor-pointer"
+                  className="px-4 py-1.5 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm shadow-jaman-saffron/25 cursor-pointer"
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>Close Day</span>
@@ -219,7 +219,7 @@ export const PosDayHistoryView: React.FC = () => {
       )}
 
       {/* 3. Search & Filter Bar */}
-      <div className="bg-white border border-[#EBE6DD] rounded-2xl p-3 shadow-2xs flex flex-wrap items-center justify-between gap-3 shrink-0">
+      <div className="bg-white border border-jaman-border rounded-2xl p-3 shadow-2xs flex flex-wrap items-center justify-between gap-3 shrink-0">
         {/* Preset Buttons */}
         <div className="flex items-center gap-1.5 flex-wrap">
           {filterOptions.map((f) => (
@@ -229,8 +229,8 @@ export const PosDayHistoryView: React.FC = () => {
               onClick={() => setSelectedFilter(f.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 selectedFilter === f.id
-                  ? 'bg-[#0B253A] text-white shadow-2xs'
-                  : 'bg-[#FAF7F2] text-slate-700 hover:bg-slate-100 border border-[#EBE6DD]'
+                  ? 'bg-jaman-navy text-white shadow-2xs'
+                  : 'bg-jaman-cream text-slate-700 hover:bg-slate-100 border border-jaman-border'
               }`}
             >
               {f.label}
@@ -246,7 +246,7 @@ export const PosDayHistoryView: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by date (e.g. 31 Aug) or Day ID..."
-            className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl pl-9 pr-3 py-1 text-xs text-[#0B253A] font-bold focus:outline-none focus:border-[#E66817]"
+            className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-9 pr-3 py-1 text-xs text-jaman-navy font-bold focus:outline-none focus:border-jaman-saffron"
           />
         </div>
       </div>
@@ -254,7 +254,7 @@ export const PosDayHistoryView: React.FC = () => {
       {/* 4. Permanent Day Cards Grid */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-extrabold text-xs uppercase tracking-wider text-[#0B253A]">
+          <h3 className="font-extrabold text-xs uppercase tracking-wider text-jaman-navy">
             Permanent Day Archives ({filteredDays.length})
           </h3>
           <span className="text-[10px] text-slate-400 font-mono">AUTHORITATIVE</span>
@@ -271,12 +271,12 @@ export const PosDayHistoryView: React.FC = () => {
             return (
               <div
                 key={day.id}
-                className="bg-white border border-[#EBE6DD] rounded-3xl p-5 shadow-2xs hover:shadow-md hover:border-slate-400 transition-all flex flex-col justify-between space-y-4"
+                className="bg-white border border-jaman-border rounded-3xl p-5 shadow-2xs hover:shadow-md hover:border-slate-400 transition-all flex flex-col justify-between space-y-4"
               >
                 {/* Top Row: Date & Status Badge */}
                 <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-3">
                   <div>
-                    <h4 className="text-base font-black text-[#0B253A]">{summary.display_date}</h4>
+                    <h4 className="text-base font-black text-jaman-navy">{summary.display_date}</h4>
                     <span className="text-[11px] font-mono text-slate-400">{summary.business_day_id}</span>
                   </div>
 
@@ -294,7 +294,7 @@ export const PosDayHistoryView: React.FC = () => {
                   <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
                     Total Net Revenue
                   </span>
-                  <div className="text-2xl font-black font-mono text-[#0B253A]">
+                  <div className="text-2xl font-black font-mono text-jaman-navy">
                     {formatINR(summary.net_sales)}
                   </div>
                   <span className="text-xs font-bold text-emerald-600 block">
@@ -303,7 +303,7 @@ export const PosDayHistoryView: React.FC = () => {
                 </div>
 
                 {/* Tender Breakdown Mini-Row */}
-                <div className="grid grid-cols-3 gap-1.5 p-2.5 bg-[#FAF7F2] rounded-2xl text-[11px] border border-[#EBE6DD]/60">
+                <div className="grid grid-cols-3 gap-1.5 p-2.5 bg-jaman-cream rounded-2xl text-[11px] border border-jaman-border/60">
                   <div>
                     <span className="text-slate-400 text-[9px] block uppercase">Cash</span>
                     <strong className="font-mono text-slate-800">{formatINR(summary.cash_sales)}</strong>
@@ -327,7 +327,7 @@ export const PosDayHistoryView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleDayClick(day)}
-                    className="px-3.5 py-1.5 bg-[#FAF7F2] hover:bg-[#0B253A] hover:text-white text-[#0B253A] border border-[#EBE6DD] rounded-xl font-extrabold text-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                    className="px-3.5 py-1.5 bg-jaman-cream hover:bg-jaman-navy hover:text-white text-jaman-navy border border-jaman-border rounded-xl font-extrabold text-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-2xs"
                   >
                     <span>View Day</span>
                     <ArrowRight className="w-3.5 h-3.5" />

@@ -56,12 +56,12 @@ export const ManagerOverrideModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-[#FAF7F2] border-2 border-amber-500 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col items-center">
+      <div className="bg-jaman-cream border-2 border-amber-500 rounded-3xl max-w-sm w-full p-6 shadow-2xl flex flex-col items-center">
         <div className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center mb-3">
           <ShieldAlert className="w-7 h-7 text-amber-600" />
         </div>
 
-        <h2 className="text-base font-extrabold text-[#0B253A] text-center">
+        <h2 className="text-base font-extrabold text-jaman-navy text-center">
           {pendingOverride.title}
         </h2>
         <p className="text-xs text-slate-500 text-center mt-1 mb-4">
@@ -108,7 +108,7 @@ export const ManagerOverrideModal: React.FC = () => {
                 className={`h-11 rounded-xl font-bold text-base flex items-center justify-center keypad-btn border transition-colors ${
                   isAction
                     ? 'bg-slate-100 border-slate-200 text-slate-600'
-                    : 'bg-white border-slate-200 text-[#0B253A] hover:border-amber-500'
+                    : 'bg-white border-slate-200 text-jaman-navy hover:border-amber-500'
                 }`}
               >
                 {key === '⌫' ? <Delete className="w-4 h-4 text-slate-500" /> : key}

@@ -33,12 +33,12 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-[#0B253A] text-white p-4 sm:p-5 flex items-center justify-between">
+        <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
-              <RotateCcw className="w-5 h-5 text-[#E66817]" />
+              <RotateCcw className="w-5 h-5 text-jaman-saffron" />
             </div>
             <div>
               <h2 className="text-base font-bold text-white leading-tight">Repeat Previous Order</h2>
@@ -60,14 +60,14 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
             <>
               {/* Selected Order Summary Card */}
               {selectedOrder && (
-                <div className="bg-white border-2 border-[#E66817] rounded-2xl p-4 shadow-sm space-y-3">
+                <div className="bg-white border-2 border-jaman-saffron rounded-2xl p-4 shadow-sm space-y-3">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-sm text-[#0B253A]">
+                        <span className="font-extrabold text-sm text-jaman-navy">
                           {selectedOrder.orderNumber}
                         </span>
-                        <span className="text-[10px] font-black bg-[#FFF4ED] text-[#E66817] border border-[#FDBA74] px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-black bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74] px-2 py-0.5 rounded-full">
                           Token #{selectedOrder.tokenNumber}
                         </span>
                         <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
@@ -88,7 +88,7 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
 
                     <div className="text-right">
                       <span className="text-[10px] text-slate-400 font-semibold block">TOTAL AMOUNT</span>
-                      <span className="text-lg font-black font-mono text-[#0B253A]">
+                      <span className="text-lg font-black font-mono text-jaman-navy">
                         {formatINR(selectedOrder.totalAmount)}
                       </span>
                     </div>
@@ -102,17 +102,17 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
                         className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100 text-xs"
                       >
                         <div className="flex items-center gap-2">
-                          <span className="font-black text-[#E66817] font-mono w-6 text-center">
+                          <span className="font-black text-jaman-saffron font-mono w-6 text-center">
                             {it.quantity}×
                           </span>
-                          <span className="font-bold text-[#0B253A]">{it.name}</span>
+                          <span className="font-bold text-jaman-navy">{it.name}</span>
                           {it.specialInstructions && (
                             <span className="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
                               {it.specialInstructions}
                             </span>
                           )}
                         </div>
-                        <span className="font-mono font-bold text-[#0B253A]">
+                        <span className="font-mono font-bold text-jaman-navy">
                           {formatINR(it.totalPrice || it.unitPrice * it.quantity)}
                         </span>
                       </div>
@@ -137,13 +137,13 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
                           onClick={() => setSelectedOrder(ord)}
                           className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all ${
                             isSelected
-                              ? 'border-[#E66817] bg-[#FFFDFB] shadow-xs'
+                              ? 'border-jaman-saffron bg-[#FFFDFB] shadow-xs'
                               : 'border-slate-200 bg-white hover:border-slate-300'
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-xs text-[#0B253A]">{ord.orderNumber}</span>
-                            <span className="font-mono font-black text-xs text-[#0B253A]">
+                            <span className="font-bold text-xs text-jaman-navy">{ord.orderNumber}</span>
+                            <span className="font-mono font-black text-xs text-jaman-navy">
                               {formatINR(ord.totalAmount)}
                             </span>
                           </div>
@@ -167,7 +167,7 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
         </div>
 
         {/* Footer */}
-        <div className="bg-white border-t border-[#EBE6DD] p-4 sm:p-5 flex items-center justify-between gap-3">
+        <div className="bg-white border-t border-jaman-border p-4 sm:p-5 flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={onClose}
@@ -180,7 +180,7 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
             <button
               type="button"
               onClick={() => handleConfirmRepeat()}
-              className="flex-1 bg-[#E66817] hover:bg-[#EA580C] text-white py-3 px-6 rounded-xl font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#E66817]/25 active:scale-[0.99] transition-transform cursor-pointer"
+              className="flex-1 bg-jaman-saffron hover:bg-[#EA580C] text-white py-3 px-6 rounded-xl font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-jaman-saffron/25 active:scale-[0.99] transition-transform cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
               <span>Load into Cart ({formatINR(selectedOrder.totalAmount)})</span>

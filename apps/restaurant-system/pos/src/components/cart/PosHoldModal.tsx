@@ -12,9 +12,9 @@ export const PosHoldModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-[#0B253A] text-white p-4 sm:p-5 flex items-center justify-between">
+        <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <CirclePause className="w-5 h-5 text-amber-400" />
             <div>
@@ -39,11 +39,11 @@ export const PosHoldModal: React.FC = () => {
             heldOrders.map((h) => (
               <div
                 key={h.id}
-                className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:border-amber-400 transition-colors"
+                className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:border-amber-400 transition-colors"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-[#0B253A]">{h.label}</span>
+                    <span className="font-bold text-sm text-jaman-navy">{h.label}</span>
                     <span className="text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full">
                       {h.orderType}
                     </span>
@@ -56,7 +56,7 @@ export const PosHoldModal: React.FC = () => {
                     <span>{h.itemCount} items</span>
                   </div>
 
-                  <div className="text-xs font-mono font-extrabold text-[#0B253A]">
+                  <div className="text-xs font-mono font-extrabold text-jaman-navy">
                     Total: ₹{h.totalAmount}
                   </div>
                 </div>
@@ -67,7 +67,7 @@ export const PosHoldModal: React.FC = () => {
                       recallHeldOrder(h.id);
                       setIsHoldOrdersOpen(false);
                     }}
-                    className="px-3.5 py-2 rounded-xl bg-[#E66817] hover:bg-[#F97316] text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
+                    className="px-3.5 py-2 rounded-xl bg-jaman-saffron hover:bg-jaman-orange text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
                   >
                     <Play className="w-3.5 h-3.5 fill-white" />
                     <span>Recall Cart</span>

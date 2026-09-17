@@ -487,16 +487,16 @@ export const PosMenuManagerModal: React.FC<{
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 animate-in fade-in duration-150">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-3xl w-full max-w-6xl h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-jaman-cream border border-jaman-border rounded-3xl w-full max-w-6xl h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         {/* MODAL HEADER */}
-        <div className="bg-white border-b border-[#EBE6DD] px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="bg-white border-b border-jaman-border px-6 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] flex items-center justify-center text-[#E66817] shadow-2xs">
+            <div className="w-10 h-10 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] flex items-center justify-center text-jaman-saffron shadow-2xs">
               <Utensils className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-black text-[#0B253A] tracking-tight">Menu & Catalog Manager</h2>
+                <h2 className="text-lg font-black text-jaman-navy tracking-tight">Menu & Catalog Manager</h2>
                 {isDraftMode && (
                   <span className="px-2 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-amber-800 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3 text-amber-600" />
@@ -525,7 +525,7 @@ export const PosMenuManagerModal: React.FC<{
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-[#0B253A] transition-colors"
+              className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-jaman-navy transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
@@ -558,14 +558,14 @@ export const PosMenuManagerModal: React.FC<{
         )}
 
         {/* NAVIGATION TABS */}
-        <div className="bg-white border-b border-[#EBE6DD] px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className="bg-white border-b border-jaman-border px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setActiveTab('ITEMS')}
               className={`px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'ITEMS'
-                  ? 'bg-[#0B253A] text-white shadow-xs'
-                  : 'bg-[#FAF7F2] text-slate-600 hover:bg-slate-200/60'
+                  ? 'bg-jaman-navy text-white shadow-xs'
+                  : 'bg-jaman-cream text-slate-600 hover:bg-slate-200/60'
               }`}
             >
               <Utensils className="w-4 h-4" />
@@ -576,8 +576,8 @@ export const PosMenuManagerModal: React.FC<{
               onClick={() => setActiveTab('CATEGORIES')}
               className={`px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'CATEGORIES'
-                  ? 'bg-[#0B253A] text-white shadow-xs'
-                  : 'bg-[#FAF7F2] text-slate-600 hover:bg-slate-200/60'
+                  ? 'bg-jaman-navy text-white shadow-xs'
+                  : 'bg-jaman-cream text-slate-600 hover:bg-slate-200/60'
               }`}
             >
               <Layers className="w-4 h-4" />
@@ -591,8 +591,8 @@ export const PosMenuManagerModal: React.FC<{
               }}
               className={`px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'PRESETS'
-                  ? 'bg-[#E66817] text-white shadow-xs'
-                  : 'bg-[#FFF4ED] text-[#E66817] border border-[#FDBA74] hover:bg-[#FFE8D6]'
+                  ? 'bg-jaman-saffron text-white shadow-xs'
+                  : 'bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74] hover:bg-[#FFE8D6]'
               }`}
             >
               <Sparkles className="w-4 h-4" />
@@ -603,8 +603,8 @@ export const PosMenuManagerModal: React.FC<{
               onClick={() => setActiveTab('BULK')}
               className={`px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'BULK'
-                  ? 'bg-[#0B253A] text-white shadow-xs'
-                  : 'bg-[#FAF7F2] text-slate-600 hover:bg-slate-200/60'
+                  ? 'bg-jaman-navy text-white shadow-xs'
+                  : 'bg-jaman-cream text-slate-600 hover:bg-slate-200/60'
               }`}
             >
               <Sliders className="w-4 h-4" />
@@ -615,7 +615,7 @@ export const PosMenuManagerModal: React.FC<{
           <div className="flex items-center gap-2">
             <button
               onClick={handleExportCSV}
-              className="px-3 py-1.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-white border border-jaman-border hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
               title="Export CSV Menu Catalog"
             >
               <Download className="w-3.5 h-3.5 text-slate-500" />
@@ -623,7 +623,7 @@ export const PosMenuManagerModal: React.FC<{
             </button>
             <button
               onClick={handleExportMenu}
-              className="px-3 py-1.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-white border border-jaman-border hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
               title="Export Full JSON Menu Backup"
             >
               <Download className="w-3.5 h-3.5 text-slate-500" />
@@ -645,14 +645,14 @@ export const PosMenuManagerModal: React.FC<{
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search dish name, SKU..."
-                    className="w-full pl-9 pr-4 py-2 bg-white border border-[#EBE6DD] rounded-xl text-xs font-bold text-[#0B253A] placeholder:text-slate-400 focus:outline-hidden focus:border-[#E66817]"
+                    className="w-full pl-9 pr-4 py-2 bg-white border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-hidden focus:border-jaman-saffron"
                   />
                 </div>
 
                 <select
                   value={selectedCatFilter}
                   onChange={(e) => setSelectedCatFilter(e.target.value)}
-                  className="bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A] focus:outline-hidden"
+                  className="bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy focus:outline-hidden"
                 >
                   <option value="ALL">All Categories ({menuItems.length})</option>
                   {categories.map((c) => (
@@ -680,7 +680,7 @@ export const PosMenuManagerModal: React.FC<{
                   });
                   setIsItemFormOpen(true);
                 }}
-                className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Create New Dish</span>
@@ -690,9 +690,9 @@ export const PosMenuManagerModal: React.FC<{
             {/* Dishes Grid */}
             <div className="flex-1 overflow-y-auto pr-1">
               {filteredItems.length === 0 ? (
-                <div className="bg-white border border-[#EBE6DD] rounded-3xl p-12 text-center space-y-3">
+                <div className="bg-white border border-jaman-border rounded-3xl p-12 text-center space-y-3">
                   <Utensils className="w-12 h-12 text-slate-300 mx-auto" />
-                  <h4 className="text-base font-black text-[#0B253A]">No dishes match your search</h4>
+                  <h4 className="text-base font-black text-jaman-navy">No dishes match your search</h4>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">
                     Try changing your category filter, search query, or import authentic dishes from the Preloaded Starter Library.
                   </p>
@@ -705,7 +705,7 @@ export const PosMenuManagerModal: React.FC<{
                       <div
                         key={item.id}
                         className={`bg-white border rounded-2xl p-3.5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between ${
-                          item.isAvailable ? 'border-[#EBE6DD]' : 'border-slate-200 opacity-60 bg-slate-50'
+                          item.isAvailable ? 'border-jaman-border' : 'border-slate-200 opacity-60 bg-slate-50'
                         }`}
                       >
                         <div className="space-y-2">
@@ -737,7 +737,7 @@ export const PosMenuManagerModal: React.FC<{
                                       : 'bg-rose-500'
                                   }`}
                                 />
-                                <h4 className="font-extrabold text-xs text-[#0B253A] truncate leading-tight">
+                                <h4 className="font-extrabold text-xs text-jaman-navy truncate leading-tight">
                                   {item.name}
                                 </h4>
                               </div>
@@ -745,7 +745,7 @@ export const PosMenuManagerModal: React.FC<{
                                 {item.sku || 'NO-SKU'} • {cat?.name || 'Unassigned'}
                               </span>
                               <div className="flex items-center gap-2 mt-1">
-                                <span className="font-mono font-black text-sm text-[#0B253A]">
+                                <span className="font-mono font-black text-sm text-jaman-navy">
                                   {formatINR(item.price)}
                                 </span>
                                 {item.kitchenStation && (
@@ -795,7 +795,7 @@ export const PosMenuManagerModal: React.FC<{
                                 setReviewingDish(item);
                                 setIsReviewModalOpen(true);
                               }}
-                              className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-[#E66817] transition-colors"
+                              className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-jaman-saffron transition-colors"
                               title="Inspect Image Quality & License"
                             >
                               <Camera className="w-3.5 h-3.5" />
@@ -805,7 +805,7 @@ export const PosMenuManagerModal: React.FC<{
                                 setEditingItem({ ...item });
                                 setIsItemFormOpen(true);
                               }}
-                              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 hover:text-[#0B253A] transition-colors"
+                              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 hover:text-jaman-navy transition-colors"
                               title="Edit Dish"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
@@ -833,7 +833,7 @@ export const PosMenuManagerModal: React.FC<{
           <div className="flex-1 p-6 overflow-hidden flex flex-col space-y-4">
             <div className="flex items-center justify-between shrink-0">
               <div>
-                <h3 className="text-sm font-extrabold text-[#0B253A]">Menu Categories</h3>
+                <h3 className="text-sm font-extrabold text-jaman-navy">Menu Categories</h3>
                 <p className="text-xs text-slate-500">Manage categories, icons, and visual sort order</p>
               </div>
 
@@ -847,7 +847,7 @@ export const PosMenuManagerModal: React.FC<{
                   });
                   setIsCategoryFormOpen(true);
                 }}
-                className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Category</span>
@@ -861,10 +861,10 @@ export const PosMenuManagerModal: React.FC<{
                   return (
                     <div
                       key={cat.id}
-                      className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs hover:shadow-md transition-all flex items-center justify-between"
+                      className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs hover:shadow-md transition-all flex items-center justify-between"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-[#FAF7F2] border border-[#EBE6DD] flex items-center justify-center text-[#E66817] overflow-hidden">
+                        <div className="w-12 h-12 rounded-xl bg-jaman-cream border border-jaman-border flex items-center justify-center text-jaman-saffron overflow-hidden">
                           {cat.imageUrl ? (
                             <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover" />
                           ) : (
@@ -872,7 +872,7 @@ export const PosMenuManagerModal: React.FC<{
                           )}
                         </div>
                         <div>
-                          <h4 className="font-extrabold text-sm text-[#0B253A]">{cat.name}</h4>
+                          <h4 className="font-extrabold text-sm text-jaman-navy">{cat.name}</h4>
                           <span className="text-xs text-slate-400 font-medium">{itemsCount} Dishes</span>
                         </div>
                       </div>
@@ -883,7 +883,7 @@ export const PosMenuManagerModal: React.FC<{
                             setEditingCategory({ ...cat });
                             setIsCategoryFormOpen(true);
                           }}
-                          className="p-2 rounded-xl hover:bg-slate-100 text-slate-600 hover:text-[#0B253A] transition-colors"
+                          className="p-2 rounded-xl hover:bg-slate-100 text-slate-600 hover:text-jaman-navy transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -909,11 +909,11 @@ export const PosMenuManagerModal: React.FC<{
             {presetWizardStep === 'GALLERY' && (
               <div className="flex-1 p-6 overflow-hidden flex flex-col space-y-4">
                 {/* Header & Filter Strip */}
-                <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 space-y-3 shrink-0">
+                <div className="bg-white border border-jaman-border rounded-2xl p-4 space-y-3 shrink-0">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <h3 className="text-sm font-extrabold text-[#0B253A] flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-[#E66817]" />
+                      <h3 className="text-sm font-extrabold text-jaman-navy flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-jaman-saffron" />
                         <span>Preloaded Restaurant Starter Library</span>
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
@@ -926,8 +926,8 @@ export const PosMenuManagerModal: React.FC<{
                         onClick={() => setShowImportHistory(!showImportHistory)}
                         className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors ${
                           showImportHistory
-                            ? 'bg-[#0B253A] text-white'
-                            : 'bg-[#FAF7F2] border border-[#EBE6DD] text-slate-700 hover:bg-slate-200/60'
+                            ? 'bg-jaman-navy text-white'
+                            : 'bg-jaman-cream border border-jaman-border text-slate-700 hover:bg-slate-200/60'
                         }`}
                       >
                         <History className="w-3.5 h-3.5" />
@@ -953,8 +953,8 @@ export const PosMenuManagerModal: React.FC<{
                           onClick={() => setTemplateFilterGroup(grp.id)}
                           className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                             templateFilterGroup === grp.id
-                              ? 'bg-[#E66817] text-white shadow-2xs'
-                              : 'bg-[#FAF7F2] text-slate-600 hover:bg-slate-200/60'
+                              ? 'bg-jaman-saffron text-white shadow-2xs'
+                              : 'bg-jaman-cream text-slate-600 hover:bg-slate-200/60'
                           }`}
                         >
                           {grp.label}
@@ -969,7 +969,7 @@ export const PosMenuManagerModal: React.FC<{
                         value={templateSearchQuery}
                         onChange={(e) => setTemplateSearchQuery(e.target.value)}
                         placeholder="Search restaurant type..."
-                        className="w-full pl-8 pr-3 py-1.5 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl text-xs font-bold text-[#0B253A] placeholder:text-slate-400 focus:outline-hidden focus:border-[#E66817]"
+                        className="w-full pl-8 pr-3 py-1.5 bg-jaman-cream border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-hidden focus:border-jaman-saffron"
                       />
                     </div>
                   </div>
@@ -988,7 +988,7 @@ export const PosMenuManagerModal: React.FC<{
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-36 overflow-y-auto">
                         {importHistory.map((rec) => (
                           <div key={rec.id} className="bg-white border border-amber-200/80 rounded-xl p-2.5 text-xs space-y-0.5">
-                            <div className="flex items-center justify-between font-black text-[#0B253A]">
+                            <div className="flex items-center justify-between font-black text-jaman-navy">
                               <span>{rec.templateName}</span>
                               <span className="text-[10px] text-amber-700 font-mono">v{rec.version}</span>
                             </div>
@@ -1010,7 +1010,7 @@ export const PosMenuManagerModal: React.FC<{
                       return (
                         <div
                           key={tpl.id}
-                          className="bg-white border border-[#EBE6DD] hover:border-[#E66817] rounded-3xl p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                          className="bg-white border border-jaman-border hover:border-jaman-saffron rounded-3xl p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
                         >
                           <div className="space-y-3">
                             <div className="flex items-center justify-between">
@@ -1023,7 +1023,7 @@ export const PosMenuManagerModal: React.FC<{
                                   </span>
                                 )}
                                 {tpl.badge && (
-                                  <span className="bg-[#FFF4ED] text-[#E66817] text-[10px] font-black px-2 py-0.5 rounded-full border border-[#FDBA74]">
+                                  <span className="bg-[#FFF4ED] text-jaman-saffron text-[10px] font-black px-2 py-0.5 rounded-full border border-[#FDBA74]">
                                     {tpl.badge}
                                   </span>
                                 )}
@@ -1031,8 +1031,8 @@ export const PosMenuManagerModal: React.FC<{
                             </div>
 
                             <div>
-                              <h4 className="text-base font-black text-[#0B253A] leading-tight">{tpl.name}</h4>
-                              <span className="text-xs text-[#E66817] font-bold block mt-0.5">{tpl.cuisine}</span>
+                              <h4 className="text-base font-black text-jaman-navy leading-tight">{tpl.name}</h4>
+                              <span className="text-xs text-jaman-saffron font-bold block mt-0.5">{tpl.cuisine}</span>
                             </div>
 
                             <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{tpl.description}</p>
@@ -1042,14 +1042,14 @@ export const PosMenuManagerModal: React.FC<{
                               <span>•</span>
                               <span>~{tpl.approxItemCount} Dishes</span>
                               <span>•</span>
-                              <span className="font-mono text-[#0B253A] font-bold">{tpl.priceRange || '₹50 - ₹350'}</span>
+                              <span className="font-mono text-jaman-navy font-bold">{tpl.priceRange || '₹50 - ₹350'}</span>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-2 pt-2">
                             <button
                               onClick={() => handleOpenTemplatePreview(tpl)}
-                              className="flex-1 py-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#FFF4ED] border border-[#EBE6DD] hover:border-[#E66817] text-[#0B253A] font-bold text-xs transition-colors text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                              className="flex-1 py-2.5 rounded-xl bg-jaman-cream hover:bg-[#FFF4ED] border border-jaman-border hover:border-jaman-saffron text-jaman-navy font-bold text-xs transition-colors text-center flex items-center justify-center gap-1.5 cursor-pointer"
                             >
                               <Eye className="w-3.5 h-3.5 text-slate-500" />
                               <span>Preview & Select</span>
@@ -1060,7 +1060,7 @@ export const PosMenuManagerModal: React.FC<{
                                 handleOpenTemplatePreview(tpl);
                                 handleProceedToConflictReview();
                               }}
-                              className="px-4 py-2.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs transition-colors shadow-2xs flex items-center gap-1 cursor-pointer"
+                              className="px-4 py-2.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs transition-colors shadow-2xs flex items-center gap-1 cursor-pointer"
                             >
                               <span>+ Add</span>
                             </button>
@@ -1077,11 +1077,11 @@ export const PosMenuManagerModal: React.FC<{
             {presetWizardStep === 'PREVIEW' && selectedTemplate && (
               <div className="flex-1 p-6 overflow-hidden flex flex-col space-y-4">
                 {/* Header Summary */}
-                <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shrink-0">
+                <div className="bg-white border border-jaman-border rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shrink-0">
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setPresetWizardStep('GALLERY')}
-                      className="p-2 rounded-xl bg-[#FAF7F2] hover:bg-slate-200 text-slate-600 transition-colors"
+                      className="p-2 rounded-xl bg-jaman-cream hover:bg-slate-200 text-slate-600 transition-colors"
                       title="Back to Templates"
                     >
                       <ArrowLeft className="w-5 h-5" />
@@ -1089,8 +1089,8 @@ export const PosMenuManagerModal: React.FC<{
                     <span className="text-3xl">{selectedTemplate.icon}</span>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-black text-[#0B253A]">{selectedTemplate.name}</h3>
-                        <span className="text-xs text-[#E66817] font-bold">• {selectedTemplate.cuisine}</span>
+                        <h3 className="text-base font-black text-jaman-navy">{selectedTemplate.name}</h3>
+                        <span className="text-xs text-jaman-saffron font-bold">• {selectedTemplate.cuisine}</span>
                       </div>
                       <p className="text-xs text-slate-500">{selectedTemplate.description}</p>
                     </div>
@@ -1099,10 +1099,10 @@ export const PosMenuManagerModal: React.FC<{
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => handleToggleAllDishesInTemplate(selectedTemplate)}
-                      className="px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#EBE6DD] hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-jaman-cream border border-jaman-border hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer"
                     >
                       {selectedDishKeys.size > 0 ? (
-                        <CheckSquare className="w-4 h-4 text-[#E66817]" />
+                        <CheckSquare className="w-4 h-4 text-jaman-saffron" />
                       ) : (
                         <Square className="w-4 h-4 text-slate-400" />
                       )}
@@ -1114,7 +1114,7 @@ export const PosMenuManagerModal: React.FC<{
                     <button
                       onClick={handleProceedToConflictReview}
                       disabled={selectedDishKeys.size === 0}
-                      className="px-5 py-2.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] disabled:bg-slate-200 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+                      className="px-5 py-2.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] disabled:bg-slate-200 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer"
                     >
                       <span>Add Selected ({selectedDishKeys.size} dishes)</span>
                       <ArrowRight className="w-4 h-4" />
@@ -1129,8 +1129,8 @@ export const PosMenuManagerModal: React.FC<{
                       onClick={() => setPreviewCatSlug('ALL')}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                         previewCatSlug === 'ALL'
-                          ? 'bg-[#0B253A] text-white shadow-2xs'
-                          : 'bg-white border border-[#EBE6DD] text-slate-700 hover:bg-slate-100'
+                          ? 'bg-jaman-navy text-white shadow-2xs'
+                          : 'bg-white border border-jaman-border text-slate-700 hover:bg-slate-100'
                       }`}
                     >
                       All Categories ({selectedTemplate.categories.reduce((acc, c) => acc + c.items.length, 0)})
@@ -1142,8 +1142,8 @@ export const PosMenuManagerModal: React.FC<{
                         onClick={() => setPreviewCatSlug(cat.slug)}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                           previewCatSlug === cat.slug
-                            ? 'bg-[#E66817] text-white shadow-2xs'
-                            : 'bg-white border border-[#EBE6DD] text-slate-700 hover:bg-slate-100'
+                            ? 'bg-jaman-saffron text-white shadow-2xs'
+                            : 'bg-white border border-jaman-border text-slate-700 hover:bg-slate-100'
                         }`}
                       >
                         {cat.name} ({cat.items.length})
@@ -1158,7 +1158,7 @@ export const PosMenuManagerModal: React.FC<{
                       value={previewDishSearch}
                       onChange={(e) => setPreviewDishSearch(e.target.value)}
                       placeholder="Search within preview..."
-                      className="w-full pl-8 pr-3 py-1.5 bg-white border border-[#EBE6DD] rounded-xl text-xs font-bold text-[#0B253A] placeholder:text-slate-400 focus:outline-hidden"
+                      className="w-full pl-8 pr-3 py-1.5 bg-white border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-hidden"
                     />
                   </div>
                 </div>
@@ -1181,16 +1181,16 @@ export const PosMenuManagerModal: React.FC<{
                       if (filteredCatItems.length === 0) return null;
 
                       return (
-                        <div key={cat.slug} className="bg-white border border-[#EBE6DD] rounded-3xl p-5 space-y-4">
+                        <div key={cat.slug} className="bg-white border border-jaman-border rounded-3xl p-5 space-y-4">
                           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                             <div className="flex items-center gap-2.5">
-                              <h4 className="text-sm font-black text-[#0B253A]">{cat.name}</h4>
+                              <h4 className="text-sm font-black text-jaman-navy">{cat.name}</h4>
                               <span className="text-xs text-slate-400 font-medium">({filteredCatItems.length} Dishes)</span>
                             </div>
 
                             <button
                               onClick={() => handleToggleCategoryDishes(selectedTemplate, cat)}
-                              className="text-xs font-bold text-[#E66817] hover:underline flex items-center gap-1 cursor-pointer"
+                              className="text-xs font-bold text-jaman-saffron hover:underline flex items-center gap-1 cursor-pointer"
                             >
                               Toggle Category Selection
                             </button>
@@ -1207,8 +1207,8 @@ export const PosMenuManagerModal: React.FC<{
                                   onClick={() => handleToggleDishKey(key)}
                                   className={`border rounded-2xl p-3.5 transition-all flex flex-col justify-between cursor-pointer ${
                                     isSelected
-                                      ? 'bg-amber-50/40 border-[#E66817] shadow-2xs'
-                                      : 'bg-[#FAF7F2] border-[#EBE6DD] opacity-75 hover:opacity-100'
+                                      ? 'bg-amber-50/40 border-jaman-saffron shadow-2xs'
+                                      : 'bg-jaman-cream border-jaman-border opacity-75 hover:opacity-100'
                                   }`}
                                 >
                                   <div className="space-y-2.5">
@@ -1241,7 +1241,7 @@ export const PosMenuManagerModal: React.FC<{
                                                   : 'bg-rose-500'
                                               }`}
                                             />
-                                            <h5 className="font-extrabold text-xs text-[#0B253A] truncate">
+                                            <h5 className="font-extrabold text-xs text-jaman-navy truncate">
                                               {item.name}
                                             </h5>
                                           </div>
@@ -1249,7 +1249,7 @@ export const PosMenuManagerModal: React.FC<{
                                             type="checkbox"
                                             checked={isSelected}
                                             onChange={() => {}} // Handled by parent container click
-                                            className="w-4 h-4 text-[#E66817] rounded border-slate-300 cursor-pointer shrink-0 ml-1"
+                                            className="w-4 h-4 text-jaman-saffron rounded border-slate-300 cursor-pointer shrink-0 ml-1"
                                           />
                                         </div>
 
@@ -1258,7 +1258,7 @@ export const PosMenuManagerModal: React.FC<{
                                         </span>
 
                                         <div className="flex items-center gap-2 mt-1">
-                                          <span className="font-mono font-black text-xs text-[#0B253A]">
+                                          <span className="font-mono font-black text-xs text-jaman-navy">
                                             ₹{item.suggestedPrice}
                                           </span>
                                           {item.kitchenStation && (
@@ -1281,7 +1281,7 @@ export const PosMenuManagerModal: React.FC<{
                                       {item.prepTimeMinutes}m prep
                                     </span>
                                     {item.tags && item.tags.length > 0 && (
-                                      <span className="font-bold text-[#E66817]">{item.tags[0]}</span>
+                                      <span className="font-bold text-jaman-saffron">{item.tags[0]}</span>
                                     )}
                                   </div>
                                 </div>
@@ -1298,17 +1298,17 @@ export const PosMenuManagerModal: React.FC<{
             {/* STEP 3: CONFLICT RESOLUTION & CATEGORY MAPPING REVIEW */}
             {presetWizardStep === 'CONFLICTS' && analysisResult && selectedTemplate && (
               <div className="flex-1 p-6 overflow-hidden flex flex-col space-y-4">
-                <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shrink-0">
+                <div className="bg-white border border-jaman-border rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shrink-0">
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setPresetWizardStep('PREVIEW')}
-                      className="p-2 rounded-xl bg-[#FAF7F2] hover:bg-slate-200 text-slate-600 transition-colors"
+                      className="p-2 rounded-xl bg-jaman-cream hover:bg-slate-200 text-slate-600 transition-colors"
                       title="Back to Preview"
                     >
                       <ArrowLeft className="w-5 h-5" />
                     </button>
                     <div>
-                      <h3 className="text-base font-black text-[#0B253A]">Import Review & Merge Plan</h3>
+                      <h3 className="text-base font-black text-jaman-navy">Import Review & Merge Plan</h3>
                       <p className="text-xs text-slate-500">
                         {analysisResult.totalDishesToImport} dishes selected • {analysisResult.newCategoriesCount} new categories • {analysisResult.matchedCategoriesCount} existing categories matched
                       </p>
@@ -1325,7 +1325,7 @@ export const PosMenuManagerModal: React.FC<{
                     <button
                       onClick={handleExecuteImport}
                       disabled={isImporting}
-                      className="px-6 py-2.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+                      className="px-6 py-2.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer"
                     >
                       {isImporting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
                       <span>{isImporting ? 'Importing...' : 'Add to Existing Menu (Draft)'}</span>
@@ -1335,24 +1335,24 @@ export const PosMenuManagerModal: React.FC<{
 
                 <div className="flex-1 overflow-y-auto pr-1 space-y-6">
                   {/* Category Mapping Card */}
-                  <div className="bg-white border border-[#EBE6DD] rounded-3xl p-5 space-y-3">
-                    <h4 className="text-sm font-black text-[#0B253A] flex items-center gap-2">
-                      <Layers className="w-4 h-4 text-[#E66817]" />
+                  <div className="bg-white border border-jaman-border rounded-3xl p-5 space-y-3">
+                    <h4 className="text-sm font-black text-jaman-navy flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-jaman-saffron" />
                       <span>Category Mapping & Creation</span>
                     </h4>
                     <p className="text-xs text-slate-500">
                       Existing categories will be reused automatically to avoid duplicate folders. You can also force creation of a new category if desired.
                     </p>
 
-                    <div className="divide-y divide-slate-100 border border-[#EBE6DD] rounded-2xl overflow-hidden">
+                    <div className="divide-y divide-slate-100 border border-jaman-border rounded-2xl overflow-hidden">
                       {analysisResult.categoryMappings.map((m) => {
                         const key = `${m.templateId}::${m.categorySlug}`;
                         const currentMapping = customCatMappings[key] || { action: m.action, existingCategoryId: m.existingCategoryId };
 
                         return (
-                          <div key={key} className="p-3.5 flex flex-wrap items-center justify-between gap-3 bg-[#FAF7F2]/50 hover:bg-white text-xs">
+                          <div key={key} className="p-3.5 flex flex-wrap items-center justify-between gap-3 bg-jaman-cream/50 hover:bg-white text-xs">
                             <div>
-                              <strong className="text-[#0B253A] block">{m.categoryName}</strong>
+                              <strong className="text-jaman-navy block">{m.categoryName}</strong>
                               <span className="text-[11px] text-slate-500">{m.dishesCount} dishes to import</span>
                             </div>
 
@@ -1373,7 +1373,7 @@ export const PosMenuManagerModal: React.FC<{
                                         }
                                       })
                                     }
-                                    className="bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 font-bold text-xs text-[#0B253A]"
+                                    className="bg-white border border-jaman-border rounded-xl px-3 py-1.5 font-bold text-xs text-jaman-navy"
                                   >
                                     <option value="USE_EXISTING">Merge into Existing Category</option>
                                     <option value="CREATE_NEW">Create Separate New Category</option>
@@ -1392,8 +1392,8 @@ export const PosMenuManagerModal: React.FC<{
                   </div>
 
                   {/* Duplicate Dish Conflict Resolution */}
-                  <div className="bg-white border border-[#EBE6DD] rounded-3xl p-5 space-y-3">
-                    <h4 className="text-sm font-black text-[#0B253A] flex items-center gap-2">
+                  <div className="bg-white border border-jaman-border rounded-3xl p-5 space-y-3">
+                    <h4 className="text-sm font-black text-jaman-navy flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-amber-600" />
                       <span>
                         Duplicate Dish Conflicts ({analysisResult.dishConflicts.length})
@@ -1409,17 +1409,17 @@ export const PosMenuManagerModal: React.FC<{
                         <span>Zero conflicts! All selected dishes are unique and will be added cleanly.</span>
                       </div>
                     ) : (
-                      <div className="divide-y divide-slate-100 border border-[#EBE6DD] rounded-2xl overflow-hidden">
+                      <div className="divide-y divide-slate-100 border border-jaman-border rounded-2xl overflow-hidden">
                         {analysisResult.dishConflicts.map((c) => {
                           const choice = dishConflictChoices[c.key] || 'KEEP_EXISTING';
                           return (
-                            <div key={c.key} className="p-3.5 flex flex-wrap items-center justify-between gap-3 bg-[#FAF7F2]/50 hover:bg-white text-xs">
+                            <div key={c.key} className="p-3.5 flex flex-wrap items-center justify-between gap-3 bg-jaman-cream/50 hover:bg-white text-xs">
                               <div className="space-y-0.5">
-                                <strong className="text-[#0B253A] block">{c.importedName}</strong>
+                                <strong className="text-jaman-navy block">{c.importedName}</strong>
                                 <div className="text-[11px] text-slate-500 flex items-center gap-3">
                                   <span>Current: <b className="text-slate-800">₹{c.existingPrice}</b> ({c.existingCategoryName})</span>
                                   <span>•</span>
-                                  <span>Template: <b className="text-[#E66817]">₹{c.importedPrice}</b></span>
+                                  <span>Template: <b className="text-jaman-saffron">₹{c.importedPrice}</b></span>
                                 </div>
                               </div>
 
@@ -1432,7 +1432,7 @@ export const PosMenuManagerModal: React.FC<{
                                       [c.key]: e.target.value as any
                                     })
                                   }
-                                  className="bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 font-bold text-xs text-[#0B253A]"
+                                  className="bg-white border border-jaman-border rounded-xl px-3 py-1.5 font-bold text-xs text-jaman-navy"
                                 >
                                   <option value="KEEP_EXISTING">Keep Existing (Safe Default)</option>
                                   <option value="UPDATE_EXISTING">Update Price & Info from Template</option>
@@ -1453,32 +1453,32 @@ export const PosMenuManagerModal: React.FC<{
             {/* STEP 4: IMPORT SUMMARY & DRAFT REVIEW */}
             {presetWizardStep === 'SUMMARY' && lastImportResult && selectedTemplate && (
               <div className="flex-1 p-8 overflow-y-auto flex items-center justify-center">
-                <div className="bg-white border border-[#EBE6DD] rounded-3xl p-8 max-w-xl w-full text-center space-y-6 shadow-xl animate-in zoom-in-95 duration-150">
+                <div className="bg-white border border-jaman-border rounded-3xl p-8 max-w-xl w-full text-center space-y-6 shadow-xl animate-in zoom-in-95 duration-150">
                   <div className="w-16 h-16 rounded-3xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-2xs">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-black text-[#0B253A]">Import Complete into Draft!</h3>
+                    <h3 className="text-lg font-black text-jaman-navy">Import Complete into Draft!</h3>
                     <p className="text-xs text-slate-500 mt-1">{lastImportResult.summaryMessage}</p>
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
-                    <div className="bg-[#FAF7F2] p-3 rounded-2xl border border-[#EBE6DD]">
+                    <div className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border">
                       <span className="text-[10px] font-bold text-slate-400 uppercase">Dishes Added</span>
-                      <strong className="text-base font-black text-[#0B253A] block">+{lastImportResult.importedItemsCount}</strong>
+                      <strong className="text-base font-black text-jaman-navy block">+{lastImportResult.importedItemsCount}</strong>
                     </div>
-                    <div className="bg-[#FAF7F2] p-3 rounded-2xl border border-[#EBE6DD]">
+                    <div className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border">
                       <span className="text-[10px] font-bold text-slate-400 uppercase">New Categories</span>
-                      <strong className="text-base font-black text-[#0B253A] block">+{lastImportResult.importedCategoriesCount}</strong>
+                      <strong className="text-base font-black text-jaman-navy block">+{lastImportResult.importedCategoriesCount}</strong>
                     </div>
-                    <div className="bg-[#FAF7F2] p-3 rounded-2xl border border-[#EBE6DD]">
+                    <div className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border">
                       <span className="text-[10px] font-bold text-slate-400 uppercase">Cat Matched</span>
                       <strong className="text-base font-black text-emerald-700 block">{lastImportResult.matchedCategoriesCount}</strong>
                     </div>
-                    <div className="bg-[#FAF7F2] p-3 rounded-2xl border border-[#EBE6DD]">
+                    <div className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border">
                       <span className="text-[10px] font-bold text-slate-400 uppercase">Stations Set</span>
-                      <strong className="text-base font-black text-[#E66817] block">{lastImportResult.stationsAssignedCount}</strong>
+                      <strong className="text-base font-black text-jaman-saffron block">{lastImportResult.stationsAssignedCount}</strong>
                     </div>
                   </div>
 
@@ -1495,7 +1495,7 @@ export const PosMenuManagerModal: React.FC<{
                         setActiveTab('ITEMS');
                         setPresetWizardStep('GALLERY');
                       }}
-                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#0B253A] hover:bg-[#071724] text-white font-bold text-xs transition-colors cursor-pointer"
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-jaman-navy hover:bg-[#071724] text-white font-bold text-xs transition-colors cursor-pointer"
                     >
                       Review & Edit in Menu Manager
                     </button>
@@ -1528,8 +1528,8 @@ export const PosMenuManagerModal: React.FC<{
               </span>
             </div>
 
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 space-y-4">
-              <h3 className="text-sm font-extrabold text-[#0B253A]">Bulk Percentage Price Delta</h3>
+            <div className="bg-white border border-jaman-border rounded-2xl p-5 space-y-4">
+              <h3 className="text-sm font-extrabold text-jaman-navy">Bulk Percentage Price Delta</h3>
 
               <div className="space-y-3 text-xs">
                 <div>
@@ -1537,7 +1537,7 @@ export const PosMenuManagerModal: React.FC<{
                   <select
                     value={bulkCategory}
                     onChange={(e) => setBulkCategory(e.target.value)}
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-[#0B253A]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-jaman-navy"
                   >
                     <option value="ALL">Entire Menu (All Categories)</option>
                     {categories.map((c) => (
@@ -1555,7 +1555,7 @@ export const PosMenuManagerModal: React.FC<{
                       type="number"
                       value={bulkDeltaPercent}
                       onChange={(e) => setBulkDeltaPercent(parseFloat(e.target.value) || 0)}
-                      className="w-32 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-mono font-black text-sm text-[#0B253A]"
+                      className="w-32 bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-mono font-black text-sm text-jaman-navy"
                     />
                     <div className="flex gap-1.5">
                       {[5, 10, 15, -5, -10].map((pct) => (
@@ -1573,7 +1573,7 @@ export const PosMenuManagerModal: React.FC<{
 
                 <button
                   onClick={handleApplyBulkPrice}
-                  className="w-full py-2.5 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-colors mt-2 cursor-pointer"
+                  className="w-full py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-colors mt-2 cursor-pointer"
                 >
                   Apply {bulkDeltaPercent > 0 ? '+' : ''}{bulkDeltaPercent}% Price Update
                 </button>
@@ -1586,9 +1586,9 @@ export const PosMenuManagerModal: React.FC<{
       {/* Item Form Drawer / Modal */}
       {isItemFormOpen && editingItem && (
         <div className="fixed inset-0 z-60 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white border border-[#EBE6DD] rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-4">
+          <div className="bg-white border border-jaman-border rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-extrabold text-base text-[#0B253A]">
+              <h3 className="font-extrabold text-base text-jaman-navy">
                 {editingItem.id ? 'Edit Dish' : 'Create New Dish'}
               </h3>
               <button onClick={() => setIsItemFormOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-400">
@@ -1605,7 +1605,7 @@ export const PosMenuManagerModal: React.FC<{
                   value={editingItem.name || ''}
                   onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
                   placeholder="e.g. Paneer Tikka Angara"
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy"
                 />
               </div>
 
@@ -1617,7 +1617,7 @@ export const PosMenuManagerModal: React.FC<{
                     required
                     value={editingItem.price || ''}
                     onChange={(e) => setEditingItem({ ...editingItem, price: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-mono font-bold text-[#0B253A]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-bold text-jaman-navy"
                   />
                 </div>
 
@@ -1627,7 +1627,7 @@ export const PosMenuManagerModal: React.FC<{
                     type="text"
                     value={editingItem.sku || ''}
                     onChange={(e) => setEditingItem({ ...editingItem, sku: e.target.value })}
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-mono font-bold text-[#0B253A]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-bold text-jaman-navy"
                   />
                 </div>
               </div>
@@ -1638,7 +1638,7 @@ export const PosMenuManagerModal: React.FC<{
                   <select
                     value={editingItem.categoryId || ''}
                     onChange={(e) => setEditingItem({ ...editingItem, categoryId: e.target.value })}
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -1653,7 +1653,7 @@ export const PosMenuManagerModal: React.FC<{
                   <select
                     value={editingItem.kitchenStation || 'Main Kitchen'}
                     onChange={(e) => setEditingItem({ ...editingItem, kitchenStation: e.target.value })}
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy"
                   >
                     <option value="Main Kitchen">Main Kitchen</option>
                     <option value="Tandoor">Tandoor</option>
@@ -1675,7 +1675,7 @@ export const PosMenuManagerModal: React.FC<{
                   <select
                     value={editingItem.dietaryType || 'VEG'}
                     onChange={(e) => setEditingItem({ ...editingItem, dietaryType: e.target.value as DietaryType })}
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy"
                   >
                     <option value="VEG">🟢 Vegetarian</option>
                     <option value="JAIN">🌾 Jain Safe</option>
@@ -1690,7 +1690,7 @@ export const PosMenuManagerModal: React.FC<{
                     type="number"
                     value={editingItem.prepTimeMinutes || 10}
                     onChange={(e) => setEditingItem({ ...editingItem, prepTimeMinutes: parseInt(e.target.value) || 10 })}
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-mono font-bold text-[#0B253A]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-bold text-jaman-navy"
                   />
                 </div>
               </div>
@@ -1702,15 +1702,15 @@ export const PosMenuManagerModal: React.FC<{
                   value={editingItem.description || ''}
                   onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
                   placeholder="Appetizing description for receipt and kiosk..."
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-medium text-[#0B253A]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-medium text-jaman-navy"
                 />
               </div>
 
               {/* Customization & Modifier Groups Selector */}
-              <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl p-3.5 space-y-2.5">
+              <div className="bg-jaman-cream border border-jaman-border rounded-2xl p-3.5 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className="font-bold text-slate-700 flex items-center gap-1.5 text-xs">
-                    <Sliders className="w-3.5 h-3.5 text-[#E66817]" />
+                    <Sliders className="w-3.5 h-3.5 text-jaman-saffron" />
                     <span>Customization & Modifier Groups</span>
                   </label>
                   <span className="text-[10px] text-slate-400 font-bold bg-white px-2 py-0.5 rounded-full border border-slate-200">
@@ -1718,7 +1718,7 @@ export const PosMenuManagerModal: React.FC<{
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500">
-                  Select which customization options are available for this dish (enables the <strong className="text-[#E66817]">MOD</strong> button on the POS card).
+                  Select which customization options are available for this dish (enables the <strong className="text-jaman-saffron">MOD</strong> button on the POS card).
                 </p>
 
                 <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
@@ -1736,8 +1736,8 @@ export const PosMenuManagerModal: React.FC<{
                         }}
                         className={`p-2.5 rounded-xl border transition-all flex items-center justify-between cursor-pointer ${
                           isChecked
-                            ? 'bg-[#FFF7ED] border-[#E66817] shadow-2xs'
-                            : 'bg-white border-[#EBE6DD] hover:border-slate-300'
+                            ? 'bg-[#FFF7ED] border-jaman-saffron shadow-2xs'
+                            : 'bg-white border-jaman-border hover:border-slate-300'
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
@@ -1745,11 +1745,11 @@ export const PosMenuManagerModal: React.FC<{
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => {}}
-                            className="w-4 h-4 rounded text-[#E66817] focus:ring-[#E66817] cursor-pointer"
+                            className="w-4 h-4 rounded text-jaman-saffron focus:ring-jaman-saffron cursor-pointer"
                           />
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-xs text-[#0B253A] truncate">{group.name}</span>
+                              <span className="font-bold text-xs text-jaman-navy truncate">{group.name}</span>
                               {group.isRequired && (
                                 <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-rose-50 text-rose-600 border border-rose-200">
                                   Required
@@ -1762,7 +1762,7 @@ export const PosMenuManagerModal: React.FC<{
                           </div>
                         </div>
                         <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
-                          isChecked ? 'bg-[#E66817] text-white' : 'bg-slate-100 text-slate-500'
+                          isChecked ? 'bg-jaman-saffron text-white' : 'bg-slate-100 text-slate-500'
                         }`}>
                           {isChecked ? '✓ Active' : '+ Add'}
                         </span>
@@ -1773,10 +1773,10 @@ export const PosMenuManagerModal: React.FC<{
               </div>
 
               {/* Photo Upload Section */}
-              <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl p-3.5 space-y-2.5">
+              <div className="bg-jaman-cream border border-jaman-border rounded-2xl p-3.5 space-y-2.5">
                 <label className="font-bold text-slate-700 flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1.5">
-                    <Camera className="w-3.5 h-3.5 text-[#E66817]" />
+                    <Camera className="w-3.5 h-3.5 text-jaman-saffron" />
                     <span>Dish Photo</span>
                   </span>
                   {editingItem.imageUrl && (
@@ -1799,7 +1799,7 @@ export const PosMenuManagerModal: React.FC<{
                 />
 
                 <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-xl bg-white border border-[#EBE6DD] overflow-hidden flex items-center justify-center shrink-0">
+                  <div className="w-14 h-14 rounded-xl bg-white border border-jaman-border overflow-hidden flex items-center justify-center shrink-0">
                     {editingItem.imageUrl ? (
                       <img src={editingItem.imageUrl} alt="Dish" className="w-full h-full object-cover" />
                     ) : (
@@ -1812,7 +1812,7 @@ export const PosMenuManagerModal: React.FC<{
                       <button
                         type="button"
                         onClick={() => dishFileInputRef.current?.click()}
-                        className="px-3 py-1.5 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                        className="px-3 py-1.5 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
                       >
                         <UploadCloud className="w-3.5 h-3.5" />
                         <span>{editingItem.imageUrl ? 'Change Photo' : 'Upload from Device'}</span>
@@ -1821,7 +1821,7 @@ export const PosMenuManagerModal: React.FC<{
                       <button
                         type="button"
                         onClick={() => setShowDishPresets(!showDishPresets)}
-                        className="px-2.5 py-1.5 border border-[#EBE6DD] bg-white rounded-xl text-xs font-bold flex items-center gap-1 text-slate-700 cursor-pointer"
+                        className="px-2.5 py-1.5 border border-jaman-border bg-white rounded-xl text-xs font-bold flex items-center gap-1 text-slate-700 cursor-pointer"
                       >
                         <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                         <span>Presets</span>
@@ -1830,7 +1830,7 @@ export const PosMenuManagerModal: React.FC<{
                       <button
                         type="button"
                         onClick={() => setShowDishUrlInput(!showDishUrlInput)}
-                        className="px-2.5 py-1.5 border border-[#EBE6DD] bg-white rounded-xl text-xs font-bold flex items-center gap-1 text-slate-700 cursor-pointer"
+                        className="px-2.5 py-1.5 border border-jaman-border bg-white rounded-xl text-xs font-bold flex items-center gap-1 text-slate-700 cursor-pointer"
                       >
                         <LinkIcon className="w-3.5 h-3.5 text-blue-500" />
                         <span>URL</span>
@@ -1840,7 +1840,7 @@ export const PosMenuManagerModal: React.FC<{
                 </div>
 
                 {showDishPresets && (
-                  <div className="bg-white border border-[#EBE6DD] rounded-xl p-2.5 space-y-1.5">
+                  <div className="bg-white border border-jaman-border rounded-xl p-2.5 space-y-1.5">
                     <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">
                       Tap a Dish Photo Preset:
                     </span>
@@ -1853,10 +1853,10 @@ export const PosMenuManagerModal: React.FC<{
                             setEditingItem({ ...editingItem, imageUrl: preset.url });
                             setShowDishPresets(false);
                           }}
-                          className="p-1.5 rounded-lg border border-slate-100 hover:border-[#E66817] hover:bg-amber-50/40 text-left transition-colors flex items-center gap-2 cursor-pointer"
+                          className="p-1.5 rounded-lg border border-slate-100 hover:border-jaman-saffron hover:bg-amber-50/40 text-left transition-colors flex items-center gap-2 cursor-pointer"
                         >
                           <img src={preset.url} alt={preset.name} className="w-7 h-7 rounded-md object-cover shrink-0" />
-                          <span className="text-[10px] font-bold text-[#0B253A] truncate">{preset.name}</span>
+                          <span className="text-[10px] font-bold text-jaman-navy truncate">{preset.name}</span>
                         </button>
                       ))}
                     </div>
@@ -1871,7 +1871,7 @@ export const PosMenuManagerModal: React.FC<{
                       value={editingItem.imageUrl || ''}
                       onChange={(e) => setEditingItem({ ...editingItem, imageUrl: e.target.value })}
                       placeholder="https://images.unsplash.com/... or /assets/dish.jpg"
-                      className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs text-[#0B253A]"
+                      className="w-full bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs text-jaman-navy"
                     />
                   </div>
                 )}
@@ -1887,7 +1887,7 @@ export const PosMenuManagerModal: React.FC<{
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold rounded-xl shadow-xs cursor-pointer"
+                  className="px-5 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold rounded-xl shadow-xs cursor-pointer"
                 >
                   Save Dish
                 </button>
@@ -1900,9 +1900,9 @@ export const PosMenuManagerModal: React.FC<{
       {/* Category Form Modal */}
       {isCategoryFormOpen && editingCategory && (
         <div className="fixed inset-0 z-60 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white border border-[#EBE6DD] rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-white border border-jaman-border rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-extrabold text-base text-[#0B253A]">
+              <h3 className="font-extrabold text-base text-jaman-navy">
                 {editingCategory.id ? 'Edit Category' : 'New Category'}
               </h3>
               <button onClick={() => setIsCategoryFormOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-400">
@@ -1919,14 +1919,14 @@ export const PosMenuManagerModal: React.FC<{
                   value={editingCategory.name || ''}
                   onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
                   placeholder="e.g. Starters & Quick Bites"
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-[#0B253A]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-jaman-navy"
                 />
               </div>
 
               {/* Category Photo Upload */}
-              <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl p-3 space-y-2">
+              <div className="bg-jaman-cream border border-jaman-border rounded-2xl p-3 space-y-2">
                 <label className="font-bold text-slate-700 flex items-center gap-1.5 text-xs">
-                  <Camera className="w-3.5 h-3.5 text-[#E66817]" />
+                  <Camera className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Category Icon / Image</span>
                 </label>
 
@@ -1939,7 +1939,7 @@ export const PosMenuManagerModal: React.FC<{
                 />
 
                 <div className="flex items-center gap-2.5">
-                  <div className="w-12 h-12 rounded-xl bg-white border border-[#EBE6DD] overflow-hidden flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-white border border-jaman-border overflow-hidden flex items-center justify-center shrink-0">
                     {editingCategory.imageUrl ? (
                       <img src={editingCategory.imageUrl} alt="Category" className="w-full h-full object-cover" />
                     ) : (
@@ -1951,7 +1951,7 @@ export const PosMenuManagerModal: React.FC<{
                     <button
                       type="button"
                       onClick={() => categoryFileInputRef.current?.click()}
-                      className="px-2.5 py-1 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                      className="px-2.5 py-1 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer"
                     >
                       <UploadCloud className="w-3 h-3" />
                       <span>Upload from Device</span>
@@ -1979,7 +1979,7 @@ export const PosMenuManagerModal: React.FC<{
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold rounded-xl shadow-xs cursor-pointer"
+                  className="px-5 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold rounded-xl shadow-xs cursor-pointer"
                 >
                   Save Category
                 </button>
@@ -1992,27 +1992,27 @@ export const PosMenuManagerModal: React.FC<{
       {/* IMAGE QUALITY & LICENSE REVIEW MODAL */}
       {isReviewModalOpen && reviewingDish && (
         <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#EBE6DD] rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-jaman-border rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-[#E66817]">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-jaman-saffron">
                   <Camera className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-base text-[#0B253A]">Image Quality & License Review</h3>
+                  <h3 className="font-extrabold text-base text-jaman-navy">Image Quality & License Review</h3>
                   <p className="text-[11px] text-slate-500">Dish Name ➔ Description ➔ Food Photo ➔ License Agreement</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsReviewModalOpen(false)}
-                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-[#0B253A] cursor-pointer"
+                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-jaman-navy cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Dish Info Header */}
-            <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl p-4 flex items-center justify-between">
+            <div className="bg-jaman-cream border border-jaman-border rounded-2xl p-4 flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2">
                   <span
@@ -2024,8 +2024,8 @@ export const PosMenuManagerModal: React.FC<{
                         : 'bg-rose-500'
                     }`}
                   />
-                  <h4 className="font-extrabold text-sm text-[#0B253A]">{reviewingDish.name}</h4>
-                  <span className="text-[10px] font-mono font-bold bg-white px-2 py-0.5 rounded-md border border-[#EBE6DD] text-slate-600">
+                  <h4 className="font-extrabold text-sm text-jaman-navy">{reviewingDish.name}</h4>
+                  <span className="text-[10px] font-mono font-bold bg-white px-2 py-0.5 rounded-md border border-jaman-border text-slate-600">
                     {reviewingDish.sku || 'NO-SKU'}
                   </span>
                 </div>
@@ -2033,7 +2033,7 @@ export const PosMenuManagerModal: React.FC<{
               </div>
 
               <div className="text-right shrink-0 ml-4">
-                <span className="font-mono font-black text-sm text-[#0B253A] block">{formatINR(reviewingDish.price)}</span>
+                <span className="font-mono font-black text-sm text-jaman-navy block">{formatINR(reviewingDish.price)}</span>
                 {reviewingDish.imageApproved ? (
                   <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full mt-1">
                     <Check className="w-3 h-3" /> Approved
@@ -2049,7 +2049,7 @@ export const PosMenuManagerModal: React.FC<{
             {/* Full-width Image Preview */}
             <div className="space-y-2">
               <label className="font-bold text-xs text-slate-700 block">Actual Packaged Food Photography:</label>
-              <div className="w-full h-56 rounded-2xl bg-slate-900 border border-[#EBE6DD] overflow-hidden relative flex items-center justify-center group">
+              <div className="w-full h-56 rounded-2xl bg-slate-900 border border-jaman-border overflow-hidden relative flex items-center justify-center group">
                 {reviewingDish.imageUrl ? (
                   <img
                     src={reviewingDish.imageUrl}
@@ -2138,12 +2138,12 @@ export const PosMenuManagerModal: React.FC<{
                     }}
                     className={`p-1.5 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer ${
                       reviewingDish.imageUrl === preset.url
-                        ? 'border-[#E66817] bg-amber-50 font-bold'
+                        ? 'border-jaman-saffron bg-amber-50 font-bold'
                         : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
                     <img src={preset.url} alt={preset.name} className="w-6 h-6 rounded-md object-cover shrink-0" />
-                    <span className="text-[10px] text-[#0B253A] truncate">{preset.name}</span>
+                    <span className="text-[10px] text-jaman-navy truncate">{preset.name}</span>
                   </button>
                 ))}
               </div>

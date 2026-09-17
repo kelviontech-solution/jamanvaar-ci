@@ -77,17 +77,17 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in select-none">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-6xl h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+      <div className="bg-jaman-cream border border-jaman-border w-full max-w-6xl h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         
         {/* Top Header */}
-        <div className="p-4 sm:p-5 bg-white border-b border-[#EBE6DD] flex items-center justify-between gap-4 shrink-0">
+        <div className="p-4 sm:p-5 bg-white border-b border-jaman-border flex items-center justify-between gap-4 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-[#E66817]">
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-jaman-saffron">
               <ShoppingBag className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black text-[#0B253A]">
+                <h2 className="text-base sm:text-lg font-black text-jaman-navy">
                   All Orders for {businessDay.displayDate}
                 </h2>
                 <span className="font-mono text-xs text-slate-400">({businessDay.id})</span>
@@ -101,14 +101,14 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-[#0B253A] rounded-xl hover:bg-slate-100 transition-colors"
+            className="p-2 text-slate-400 hover:text-jaman-navy rounded-xl hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Filter Ribbon */}
-        <div className="p-3 bg-[#FAF7F2] border-b border-[#EBE6DD] flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className="p-3 bg-jaman-cream border-b border-jaman-border flex flex-wrap items-center justify-between gap-3 shrink-0">
           {/* Search */}
           <div className="relative min-w-[240px] flex-1 max-w-md">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -117,7 +117,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by Order #, Token #, Customer, Dish..."
-              className="w-full bg-white border border-[#EBE6DD] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#0B253A] font-bold placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-white border border-jaman-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-jaman-navy font-bold placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
             />
           </div>
 
@@ -127,7 +127,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-white border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 font-bold text-[#0B253A] focus:outline-none"
+              className="bg-white border border-jaman-border rounded-xl px-2.5 py-1.5 font-bold text-jaman-navy focus:outline-none"
             >
               <option value="ALL">All Statuses</option>
               <option value="COMPLETED">Completed</option>
@@ -141,7 +141,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="bg-white border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 font-bold text-[#0B253A] focus:outline-none"
+              className="bg-white border border-jaman-border rounded-xl px-2.5 py-1.5 font-bold text-jaman-navy focus:outline-none"
             >
               <option value="ALL">All Types</option>
               <option value="DINE_IN">Dine-In</option>
@@ -153,7 +153,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
             <select
               value={sourceFilter}
               onChange={(e) => setSourceFilter(e.target.value)}
-              className="bg-white border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 font-bold text-[#0B253A] focus:outline-none"
+              className="bg-white border border-jaman-border rounded-xl px-2.5 py-1.5 font-bold text-jaman-navy focus:outline-none"
             >
               <option value="ALL">All Sources</option>
               <option value="POS">Counter POS</option>
@@ -166,7 +166,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
             <select
               value={paymentFilter}
               onChange={(e) => setPaymentFilter(e.target.value)}
-              className="bg-white border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 font-bold text-[#0B253A] focus:outline-none"
+              className="bg-white border border-jaman-border rounded-xl px-2.5 py-1.5 font-bold text-jaman-navy focus:outline-none"
             >
               <option value="ALL">All Payments</option>
               <option value="CASH">Cash</option>
@@ -179,7 +179,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
         {/* Content Area: Left Orders List, Right Order Details Inspector */}
         <div className="flex-1 flex overflow-hidden">
           {/* Order Rows List */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-2 border-r border-[#EBE6DD]">
+          <div className="flex-1 overflow-y-auto p-4 space-y-2 border-r border-jaman-border">
             {filteredOrders.map((o) => {
               const isSelected = selectedOrder?.id === o.id;
               const formattedTime = new Date(o.createdAt).toLocaleTimeString('en-IN', {
@@ -193,8 +193,8 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                   onClick={() => setSelectedOrder(o)}
                   className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
                     isSelected
-                      ? 'bg-[#0B253A] text-white border-[#0B253A] shadow-md'
-                      : 'bg-white border-[#EBE6DD] hover:border-slate-400 hover:shadow-2xs text-[#0B253A]'
+                      ? 'bg-jaman-navy text-white border-jaman-navy shadow-md'
+                      : 'bg-white border-jaman-border hover:border-slate-400 hover:shadow-2xs text-jaman-navy'
                   }`}
                 >
                   {/* Left Metadata */}
@@ -257,17 +257,17 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
           {/* Right Selected Order Inspector */}
           <div className="w-80 lg:w-96 bg-white overflow-y-auto p-5 shrink-0 hidden md:block">
             {selectedOrder ? (
-              <div className="space-y-4 text-xs text-[#0B253A]">
+              <div className="space-y-4 text-xs text-jaman-navy">
                 {/* Header */}
-                <div className="border-b border-[#EBE6DD] pb-3 space-y-1">
+                <div className="border-b border-jaman-border pb-3 space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="font-mono font-extrabold text-base">{selectedOrder.orderNumber}</span>
-                    <span className="bg-[#E66817] text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                    <span className="bg-jaman-saffron text-white text-[10px] font-black px-2 py-0.5 rounded-full">
                       Token #{selectedOrder.tokenNumber}
                     </span>
                   </div>
                   <div className="text-[11px] text-slate-500">
-                    Business Day: <strong className="text-[#0B253A] font-mono">{businessDay.id}</strong>
+                    Business Day: <strong className="text-jaman-navy font-mono">{businessDay.id}</strong>
                   </div>
                   <div className="text-[11px] text-slate-500">
                     Placed: {new Date(selectedOrder.createdAt).toLocaleString('en-IN')}
@@ -281,9 +281,9 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                   </span>
                   <div className="space-y-1.5">
                     {selectedOrder.items.map((it, idx) => (
-                      <div key={idx} className="flex justify-between items-center p-2 rounded-xl bg-[#FAF7F2] border border-[#EBE6DD]">
+                      <div key={idx} className="flex justify-between items-center p-2 rounded-xl bg-jaman-cream border border-jaman-border">
                         <div>
-                          <strong className="text-xs text-[#0B253A] block">{it.name}</strong>
+                          <strong className="text-xs text-jaman-navy block">{it.name}</strong>
                           <span className="text-[10px] text-slate-500">{it.quantity} x {formatINR(it.unitPrice)}</span>
                         </div>
                         <span className="font-mono font-bold text-xs">{formatINR(it.totalPrice)}</span>
@@ -293,7 +293,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                 </div>
 
                 {/* Financial Summary */}
-                <div className="p-3 bg-[#FAF7F2] rounded-2xl border border-[#EBE6DD] space-y-1.5 text-slate-600">
+                <div className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border space-y-1.5 text-slate-600">
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
                     <span className="font-mono">{formatINR(selectedOrder.subtotal || selectedOrder.totalAmount)}</span>
@@ -312,9 +312,9 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                     <span>SGST (2.5%):</span>
                     <span className="font-mono">{formatINR(selectedOrder.sgstAmount || 0)}</span>
                   </div>
-                  <div className="flex justify-between pt-1.5 border-t border-slate-200 font-black text-sm text-[#0B253A]">
+                  <div className="flex justify-between pt-1.5 border-t border-slate-200 font-black text-sm text-jaman-navy">
                     <span>Grand Total:</span>
-                    <span className="font-mono text-[#E66817]">{formatINR(selectedOrder.totalAmount)}</span>
+                    <span className="font-mono text-jaman-saffron">{formatINR(selectedOrder.totalAmount)}</span>
                   </div>
                 </div>
 
@@ -322,15 +322,15 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                 <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-[11px] space-y-1 text-slate-500">
                   <div className="flex justify-between">
                     <span>Source Terminal:</span>
-                    <strong className="font-mono text-[#0B253A]">{selectedOrder.kioskId || 'POS-01'}</strong>
+                    <strong className="font-mono text-jaman-navy">{selectedOrder.kioskId || 'POS-01'}</strong>
                   </div>
                   <div className="flex justify-between">
                     <span>Order Type:</span>
-                    <strong className="text-[#0B253A]">{selectedOrder.orderType}</strong>
+                    <strong className="text-jaman-navy">{selectedOrder.orderType}</strong>
                   </div>
                   <div className="flex justify-between">
                     <span>Payment Tender:</span>
-                    <strong className="text-[#0B253A]">{selectedOrder.paymentMethod} ({selectedOrder.paymentStatus})</strong>
+                    <strong className="text-jaman-navy">{selectedOrder.paymentMethod} ({selectedOrder.paymentStatus})</strong>
                   </div>
                 </div>
               </div>

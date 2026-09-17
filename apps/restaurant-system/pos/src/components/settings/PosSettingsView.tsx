@@ -207,12 +207,12 @@ ESC/POS Command Engine Verified OK
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] p-4 sm:p-6 overflow-y-auto select-none space-y-5">
+    <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-y-auto select-none space-y-5">
       {/* Top Header & Settings Navigation Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B253A] flex items-center gap-2">
-            <Settings className="w-6 h-6 text-[#E66817]" />
+          <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
+            <Settings className="w-6 h-6 text-jaman-saffron" />
             <span>POS System & License Settings</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -221,13 +221,13 @@ ESC/POS Command Engine Verified OK
         </div>
 
         {/* Settings View Switcher */}
-        <div className="bg-white border border-[#EBE6DD] p-1 rounded-2xl flex items-center gap-1 shadow-2xs">
+        <div className="bg-white border border-jaman-border p-1 rounded-2xl flex items-center gap-1 shadow-2xs">
           <button
             onClick={() => setActiveSettingsTab('HARDWARE')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeSettingsTab === 'HARDWARE'
-                ? 'bg-[#E66817] text-white shadow-xs'
-                : 'text-slate-600 hover:text-[#0B253A] hover:bg-[#FAF7F2]'
+                ? 'bg-jaman-saffron text-white shadow-xs'
+                : 'text-slate-600 hover:text-jaman-navy hover:bg-jaman-cream'
             }`}
           >
             Hardware & Printers
@@ -236,8 +236,8 @@ ESC/POS Command Engine Verified OK
             onClick={() => setActiveSettingsTab('REPORTS')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
               activeSettingsTab === 'REPORTS'
-                ? 'bg-[#E66817] text-white shadow-xs'
-                : 'text-slate-600 hover:text-[#0B253A] hover:bg-[#FAF7F2]'
+                ? 'bg-jaman-saffron text-white shadow-xs'
+                : 'text-slate-600 hover:text-jaman-navy hover:bg-jaman-cream'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
@@ -247,8 +247,8 @@ ESC/POS Command Engine Verified OK
             onClick={() => setActiveSettingsTab('INSTANT_BILL')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
               activeSettingsTab === 'INSTANT_BILL'
-                ? 'bg-[#E66817] text-white shadow-xs'
-                : 'text-slate-600 hover:text-[#0B253A] hover:bg-[#FAF7F2]'
+                ? 'bg-jaman-saffron text-white shadow-xs'
+                : 'text-slate-600 hover:text-jaman-navy hover:bg-jaman-cream'
             }`}
           >
             <Zap className="w-3.5 h-3.5" />
@@ -258,8 +258,8 @@ ESC/POS Command Engine Verified OK
             onClick={() => setActiveSettingsTab('DATABASE')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeSettingsTab === 'DATABASE'
-                ? 'bg-[#E66817] text-white shadow-xs'
-                : 'text-slate-600 hover:text-[#0B253A] hover:bg-[#FAF7F2]'
+                ? 'bg-jaman-saffron text-white shadow-xs'
+                : 'text-slate-600 hover:text-jaman-navy hover:bg-jaman-cream'
             }`}
           >
             Local DB & Sync
@@ -268,8 +268,8 @@ ESC/POS Command Engine Verified OK
             onClick={() => setActiveSettingsTab('LICENSE')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
               activeSettingsTab === 'LICENSE'
-                ? 'bg-[#E66817] text-white shadow-xs'
-                : 'text-slate-600 hover:text-[#0B253A] hover:bg-[#FAF7F2]'
+                ? 'bg-jaman-saffron text-white shadow-xs'
+                : 'text-slate-600 hover:text-jaman-navy hover:bg-jaman-cream'
             }`}
           >
             <Award className="w-3.5 h-3.5" />
@@ -312,11 +312,11 @@ ESC/POS Command Engine Verified OK
 
       {/* ─────────── SOUND SETTINGS CARD (always visible on HARDWARE tab) ─────────── */}
       {activeSettingsTab === 'HARDWARE' && (
-        <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+        <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
-              {soundEnabled ? <Volume2 className="w-5 h-5 text-[#E66817]" /> : <VolumeX className="w-5 h-5 text-slate-400" />}
-              <h3 className="font-bold text-sm text-[#0B253A]">Sound Effects</h3>
+              {soundEnabled ? <Volume2 className="w-5 h-5 text-jaman-saffron" /> : <VolumeX className="w-5 h-5 text-slate-400" />}
+              <h3 className="font-bold text-sm text-jaman-navy">Sound Effects</h3>
             </div>
             <span className="text-[10px] font-black bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full">
               AUDIO FEEDBACK
@@ -327,7 +327,7 @@ ESC/POS Command Engine Verified OK
             {/* Enable / Disable Toggle */}
             <div className="flex items-center justify-between">
               <div>
-                <strong className="text-[#0B253A] block">Enable Sound Feedback</strong>
+                <strong className="text-jaman-navy block">Enable Sound Feedback</strong>
                 <span className="text-slate-500">Click, add, remove, payment, KOT, and notification sounds</span>
               </div>
               <button
@@ -340,7 +340,7 @@ ESC/POS Command Engine Verified OK
                   if (next) sound.play('success');
                 }}
                 className={`relative inline-flex h-7 w-12 items-center rounded-full border-2 transition-all cursor-pointer ${
-                  soundEnabled ? 'bg-[#E66817] border-[#E66817]' : 'bg-slate-200 border-slate-300'
+                  soundEnabled ? 'bg-jaman-saffron border-jaman-saffron' : 'bg-slate-200 border-slate-300'
                 }`}
               >
                 <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
@@ -352,7 +352,7 @@ ESC/POS Command Engine Verified OK
             {/* Volume Control */}
             {soundEnabled && (
               <div className="space-y-2">
-                <strong className="text-[#0B253A] block">Volume Level</strong>
+                <strong className="text-jaman-navy block">Volume Level</strong>
                 <div className="grid grid-cols-3 gap-2">
                   {(['LOW', 'MEDIUM', 'HIGH'] as SoundVolume[]).map((vol) => (
                     <button
@@ -366,8 +366,8 @@ ESC/POS Command Engine Verified OK
                       }}
                       className={`py-2 rounded-xl border font-bold transition-all ${
                         soundVolume === vol
-                          ? 'bg-[#0B253A] text-white border-[#0B253A] shadow-xs'
-                          : 'bg-[#FAF7F2] border-[#EBE6DD] text-slate-600 hover:bg-white hover:border-slate-400'
+                          ? 'bg-jaman-navy text-white border-jaman-navy shadow-xs'
+                          : 'bg-jaman-cream border-jaman-border text-slate-600 hover:bg-white hover:border-slate-400'
                       }`}
                     >
                       {vol === 'LOW' ? '🔈 Low' : vol === 'MEDIUM' ? '🔉 Medium' : '🔊 High'}
@@ -391,7 +391,7 @@ ESC/POS Command Engine Verified OK
                   }
                   setTimeout(() => setSoundTestFeedback(''), 2500);
                 }}
-                className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-black rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-black rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <Volume2 className="w-3.5 h-3.5" />
                 Play Test Sound
@@ -412,11 +412,11 @@ ESC/POS Command Engine Verified OK
       {activeSettingsTab === 'REPORTS' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Default Template & Design Selector Card */}
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-[#E66817]" />
-                <h3 className="font-bold text-sm text-[#0B253A]">Default Report Template & Layout</h3>
+                <FileText className="w-5 h-5 text-jaman-saffron" />
+                <h3 className="font-bold text-sm text-jaman-navy">Default Report Template & Layout</h3>
               </div>
               <span className="text-[10px] font-black bg-blue-100 text-blue-900 px-2 py-0.5 rounded-full">
                 5 TEMPLATES
@@ -424,7 +424,7 @@ ESC/POS Command Engine Verified OK
             </div>
 
             <div className="space-y-3 text-xs">
-              <strong className="text-[#0B253A] block">Selected Report Design Theme:</strong>
+              <strong className="text-jaman-navy block">Selected Report Design Theme:</strong>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
                   { id: 'CLASSIC', name: 'Classic Accounting', desc: 'Standard audit tables & borders' },
@@ -443,8 +443,8 @@ ESC/POS Command Engine Verified OK
                     }}
                     className={`p-3 rounded-xl border text-left transition-all ${
                       reportDefaultDesign === t.id
-                        ? 'bg-[#0B253A] text-white border-[#0B253A] shadow-xs'
-                        : 'bg-[#FAF7F2] border-[#EBE6DD] text-[#0B253A] hover:bg-white'
+                        ? 'bg-jaman-navy text-white border-jaman-navy shadow-xs'
+                        : 'bg-jaman-cream border-jaman-border text-jaman-navy hover:bg-white'
                     }`}
                   >
                     <div className="font-extrabold text-xs">{t.name}</div>
@@ -456,9 +456,9 @@ ESC/POS Command Engine Verified OK
               </div>
 
               {/* Business Cutoff Rule */}
-              <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#EBE6DD] space-y-2 mt-3">
+              <div className="p-3 bg-jaman-cream rounded-xl border border-jaman-border space-y-2 mt-3">
                 <div className="flex justify-between items-center">
-                  <strong className="text-[#0B253A]">Business Day Cutoff Time</strong>
+                  <strong className="text-jaman-navy">Business Day Cutoff Time</strong>
                   <select
                     value={businessCutoffTime}
                     onChange={(e) => {
@@ -466,7 +466,7 @@ ESC/POS Command Engine Verified OK
                       setReportFeedback(`Business day cutoff updated to ${e.target.value}`);
                       setTimeout(() => setReportFeedback(''), 3000);
                     }}
-                    className="bg-white border border-[#EBE6DD] rounded-lg px-2.5 py-1 text-xs font-bold text-[#0B253A] focus:outline-none"
+                    className="bg-white border border-jaman-border rounded-lg px-2.5 py-1 text-xs font-bold text-jaman-navy focus:outline-none"
                   >
                     <option value="12:00 AM">12:00 AM (Midnight)</option>
                     <option value="04:00 AM">04:00 AM (Night Operations)</option>
@@ -482,11 +482,11 @@ ESC/POS Command Engine Verified OK
           </div>
 
           {/* Report Content Options & Branding Card */}
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Building className="w-5 h-5 text-[#E66817]" />
-                <h3 className="font-bold text-sm text-[#0B253A]">Report Output & Branding Inclusions</h3>
+                <Building className="w-5 h-5 text-jaman-saffron" />
+                <h3 className="font-bold text-sm text-jaman-navy">Report Output & Branding Inclusions</h3>
               </div>
               <span className="text-[10px] font-mono text-slate-400">PDF & EXPORT</span>
             </div>
@@ -498,8 +498,8 @@ ESC/POS Command Engine Verified OK
                 { label: 'Include GST & Tax Allocation Statement', state: reportIncludeTaxes, set: setReportIncludeTaxes },
                 { label: 'Include Top-Selling Dishes & Menu Velocity', state: reportIncludeTopItems, set: setReportIncludeTopItems }
               ].map((opt, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2.5 bg-[#FAF7F2] rounded-xl border border-[#EBE6DD]">
-                  <span className="font-bold text-[#0B253A]">{opt.label}</span>
+                <div key={idx} className="flex items-center justify-between p-2.5 bg-jaman-cream rounded-xl border border-jaman-border">
+                  <span className="font-bold text-jaman-navy">{opt.label}</span>
                   <button
                     type="button"
                     onClick={() => opt.set(!opt.state)}
@@ -520,15 +520,15 @@ ESC/POS Command Engine Verified OK
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1 text-slate-600 mt-2">
                 <div className="flex justify-between">
                   <span>Legal Entity:</span>
-                  <strong className="font-mono text-[#0B253A]">{db.restaurant.name}</strong>
+                  <strong className="font-mono text-jaman-navy">{db.restaurant.name}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>GSTIN Number:</span>
-                  <strong className="font-mono text-[#0B253A]">24AAACJ1234F1Z5</strong>
+                  <strong className="font-mono text-jaman-navy">24AAACJ1234F1Z5</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Default Paper Size:</span>
-                  <strong className="font-mono text-[#0B253A]">A4 (210 x 297 mm)</strong>
+                  <strong className="font-mono text-jaman-navy">A4 (210 x 297 mm)</strong>
                 </div>
               </div>
             </div>
@@ -540,11 +540,11 @@ ESC/POS Command Engine Verified OK
       {activeSettingsTab === 'INSTANT_BILL' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Main Instant Bill Configuration Card */}
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-[#E66817]" />
-                <h3 className="font-bold text-sm text-[#0B253A]">⚡ Instant Bill / Quick Checkout</h3>
+                <Zap className="w-5 h-5 text-jaman-saffron" />
+                <h3 className="font-bold text-sm text-jaman-navy">⚡ Instant Bill / Quick Checkout</h3>
               </div>
               <span className="text-[10px] font-black bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-200">
                 1-TAP BILLING
@@ -555,7 +555,7 @@ ESC/POS Command Engine Verified OK
               {/* Enable Instant Bill Toggle */}
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
-                  <strong className="text-[#0B253A] block">Enable Instant Bill Shortcut</strong>
+                  <strong className="text-jaman-navy block">Enable Instant Bill Shortcut</strong>
                   <span className="text-[11px] text-slate-400">
                     Bypasses payment allocation overview and settles immediately
                   </span>
@@ -581,7 +581,7 @@ ESC/POS Command Engine Verified OK
 
               {/* Default Payment Channel */}
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                <strong className="text-[#0B253A] block">Default Instant Bill Payment Method</strong>
+                <strong className="text-jaman-navy block">Default Instant Bill Payment Method</strong>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {[
                     { id: 'CASH', label: 'Cash at Counter' },
@@ -600,7 +600,7 @@ ESC/POS Command Engine Verified OK
                       }}
                       className={`p-2 rounded-xl text-left border font-bold transition-all ${
                         instantBillCfg.paymentMethod === m.id
-                          ? 'bg-[#0B253A] text-white border-[#0B253A] shadow-xs'
+                          ? 'bg-jaman-navy text-white border-jaman-navy shadow-xs'
                           : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
@@ -613,7 +613,7 @@ ESC/POS Command Engine Verified OK
               {/* Auto Print After Instant Bill */}
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
-                  <strong className="text-[#0B253A] block">Auto-Print Thermal Bill After Settle</strong>
+                  <strong className="text-jaman-navy block">Auto-Print Thermal Bill After Settle</strong>
                   <span className="text-[11px] text-slate-400">
                     Immediately send receipt to 80mm thermal hardware queue
                   </span>
@@ -640,7 +640,7 @@ ESC/POS Command Engine Verified OK
               {/* Ask For Confirmation */}
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
-                  <strong className="text-[#0B253A] block">Ask For 1-Tap Confirmation Dialog</strong>
+                  <strong className="text-jaman-navy block">Ask For 1-Tap Confirmation Dialog</strong>
                   <span className="text-[11px] text-slate-400">
                     Display compact modal to confirm total before firing printer (Recommended: OFF for max speed)
                   </span>
@@ -667,7 +667,7 @@ ESC/POS Command Engine Verified OK
               {/* Send KOT before Bill */}
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
-                  <strong className="text-[#0B253A] block">Send KOT Ticket to Kitchen Stations</strong>
+                  <strong className="text-jaman-navy block">Send KOT Ticket to Kitchen Stations</strong>
                   <span className="text-[11px] text-slate-400">
                     Automatically route KOT to kitchen displays / printers alongside customer bill
                   </span>
@@ -694,16 +694,16 @@ ESC/POS Command Engine Verified OK
           </div>
 
           {/* Configuration Preview & Test Simulator Card */}
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-[#0B253A]" />
-                <h3 className="font-bold text-sm text-[#0B253A]">Live Configuration Preview</h3>
+                <FileText className="w-5 h-5 text-jaman-navy" />
+                <h3 className="font-bold text-sm text-jaman-navy">Live Configuration Preview</h3>
               </div>
               <span className="text-[10px] font-mono text-slate-400">STATUS PREVIEW</span>
             </div>
 
-            <div className="bg-[#FAF7F2] p-4 rounded-2xl border border-[#EBE6DD] space-y-3 text-xs">
+            <div className="bg-jaman-cream p-4 rounded-2xl border border-jaman-border space-y-3 text-xs">
               <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
                 <span className="text-slate-500 font-bold">Instant Bill Status:</span>
                 <span className={`font-black px-2 py-0.5 rounded text-[11px] ${
@@ -715,7 +715,7 @@ ESC/POS Command Engine Verified OK
 
               <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
                 <span className="text-slate-500 font-bold">Tender Channel:</span>
-                <span className="font-mono font-black text-[#0B253A] uppercase">{instantBillCfg.paymentMethod}</span>
+                <span className="font-mono font-black text-jaman-navy uppercase">{instantBillCfg.paymentMethod}</span>
               </div>
 
               <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
@@ -748,7 +748,7 @@ ESC/POS Command Engine Verified OK
                   setInstantBillFeedback('Dispatched safe test receipt to hardware print queue!');
                   setTimeout(() => setInstantBillFeedback(''), 3000);
                 }}
-                className="w-full py-2.5 bg-[#0B253A] hover:bg-[#1E3A4C] text-white font-black text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-2.5 bg-jaman-navy hover:bg-jaman-darkBorder text-white font-black text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
                 <span>⚡ Test Instant Bill Print (Safe Simulation)</span>
@@ -765,13 +765,13 @@ ESC/POS Command Engine Verified OK
       {activeSettingsTab === 'HARDWARE' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Auto-Print Rules Card */}
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-[#E66817]" />
-                <h3 className="font-bold text-sm text-[#0B253A]">Printing & Automation Rules</h3>
+                <Sliders className="w-5 h-5 text-jaman-saffron" />
+                <h3 className="font-bold text-sm text-jaman-navy">Printing & Automation Rules</h3>
               </div>
-              <span className="text-[10px] font-bold bg-[#E66817]/10 text-[#E66817] px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold bg-jaman-saffron/10 text-jaman-saffron px-2 py-0.5 rounded-full">
                 AUTO-PRINT
               </span>
             </div>
@@ -779,7 +779,7 @@ ESC/POS Command Engine Verified OK
             <div className="space-y-3 text-xs">
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
-                  <strong className="text-[#0B253A] block">Auto-Print Receipt on Settlement</strong>
+                  <strong className="text-jaman-navy block">Auto-Print Receipt on Settlement</strong>
                   <span className="text-[11px] text-slate-400">
                     Automatically queue thermal receipt upon successful payment
                   </span>
@@ -787,7 +787,7 @@ ESC/POS Command Engine Verified OK
                 <button
                   onClick={() => setAutoPrintReceipt(!autoPrintReceipt)}
                   className={`w-11 h-6 rounded-full p-1 transition-colors ${
-                    autoPrintReceipt ? 'bg-[#E66817]' : 'bg-slate-300'
+                    autoPrintReceipt ? 'bg-jaman-saffron' : 'bg-slate-300'
                   }`}
                 >
                   <div
@@ -800,7 +800,7 @@ ESC/POS Command Engine Verified OK
 
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
-                  <strong className="text-[#0B253A] block">Auto-Print KOT on Order Dispatch</strong>
+                  <strong className="text-jaman-navy block">Auto-Print KOT on Order Dispatch</strong>
                   <span className="text-[11px] text-slate-400">
                     Send kitchen tickets to station printers automatically
                   </span>
@@ -808,7 +808,7 @@ ESC/POS Command Engine Verified OK
                 <button
                   onClick={() => setAutoPrintKot(!autoPrintKot)}
                   className={`w-11 h-6 rounded-full p-1 transition-colors ${
-                    autoPrintKot ? 'bg-[#E66817]' : 'bg-slate-300'
+                    autoPrintKot ? 'bg-jaman-saffron' : 'bg-slate-300'
                   }`}
                 >
                   <div
@@ -821,7 +821,7 @@ ESC/POS Command Engine Verified OK
 
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div>
-                  <strong className="text-[#0B253A] block">Default Paper Width</strong>
+                  <strong className="text-jaman-navy block">Default Paper Width</strong>
                   <span className="text-[11px] text-slate-400">Standard counter roll dimension</span>
                 </div>
                 <div className="flex gap-1.5">
@@ -829,7 +829,7 @@ ESC/POS Command Engine Verified OK
                     onClick={() => setDefaultPaperSize('80mm')}
                     className={`px-3 py-1 rounded-lg font-mono font-bold transition-colors ${
                       defaultPaperSize === '80mm'
-                        ? 'bg-[#E66817] text-white'
+                        ? 'bg-jaman-saffron text-white'
                         : 'bg-white border border-slate-200 text-slate-600'
                     }`}
                   >
@@ -839,7 +839,7 @@ ESC/POS Command Engine Verified OK
                     onClick={() => setDefaultPaperSize('58mm')}
                     className={`px-3 py-1 rounded-lg font-mono font-bold transition-colors ${
                       defaultPaperSize === '58mm'
-                        ? 'bg-[#E66817] text-white'
+                        ? 'bg-jaman-saffron text-white'
                         : 'bg-white border border-slate-200 text-slate-600'
                     }`}
                   >
@@ -851,12 +851,12 @@ ESC/POS Command Engine Verified OK
           </div>
 
           {/* Configured Printers Station */}
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Printer className="w-5 h-5 text-[#E66817]" />
+                <Printer className="w-5 h-5 text-jaman-saffron" />
                 <div>
-                  <h3 className="font-bold text-sm text-[#0B253A]">Printers & Hardware Devices</h3>
+                  <h3 className="font-bold text-sm text-jaman-navy">Printers & Hardware Devices</h3>
                   <span className="text-[10px] text-slate-400">Auto-detected Windows, USB & LAN Thermal Printers</span>
                 </div>
               </div>
@@ -865,7 +865,7 @@ ESC/POS Command Engine Verified OK
                   type="button"
                   onClick={handleScanPrinters}
                   disabled={isScanningPrinters}
-                  className="px-2.5 py-1.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-[#E66817] border border-[#FDBA74] rounded-xl font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                  className="px-2.5 py-1.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-jaman-saffron border border-[#FDBA74] rounded-xl font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-2xs"
                   title="Scan for connected physical & network printers"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isScanningPrinters ? 'animate-spin' : ''}`} />
@@ -873,7 +873,7 @@ ESC/POS Command Engine Verified OK
                 </button>
                 <button
                   onClick={() => setIsPrintQueueOpen(true)}
-                  className="text-[11px] font-bold text-[#0B253A] hover:text-[#E66817] hover:underline"
+                  className="text-[11px] font-bold text-jaman-navy hover:text-jaman-saffron hover:underline"
                 >
                   Print Queue
                 </button>
@@ -884,11 +884,11 @@ ESC/POS Command Engine Verified OK
               {db.configuredPrinters.map((pr) => (
                 <div
                   key={pr.id}
-                  className="p-3 bg-[#FAF7F2] rounded-2xl border border-[#EBE6DD] flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-300 transition-colors"
+                  className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-300 transition-colors"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <strong className="text-[#0B253A] text-xs">{pr.name}</strong>
+                      <strong className="text-jaman-navy text-xs">{pr.name}</strong>
                       <span className="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono font-bold">
                         {pr.paperSize}
                       </span>
@@ -918,7 +918,7 @@ ESC/POS Command Engine Verified OK
                     <select
                       value={pr.role || 'GENERAL'}
                       onChange={(e) => handleAssignRole(pr.id, e.target.value as PrinterRole)}
-                      className="bg-white border border-[#EBE6DD] rounded-xl px-2 py-1 text-[11px] font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] shadow-2xs"
+                      className="bg-white border border-jaman-border rounded-xl px-2 py-1 text-[11px] font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron shadow-2xs"
                       title="Assign printer role"
                     >
                       <option value="RECEIPT">RECEIPT PRINTER</option>
@@ -933,7 +933,7 @@ ESC/POS Command Engine Verified OK
                     <button
                       type="button"
                       onClick={() => handleTestPrint(pr.name, pr.paperSize as any, pr.id)}
-                      className="px-3 py-1.5 bg-white border border-slate-300 hover:border-[#E66817] hover:text-[#E66817] rounded-xl font-black text-xs transition-all active:scale-95 shadow-2xs cursor-pointer"
+                      className="px-3 py-1.5 bg-white border border-slate-300 hover:border-jaman-saffron hover:text-jaman-saffron rounded-xl font-black text-xs transition-all active:scale-95 shadow-2xs cursor-pointer"
                     >
                       Test Print
                     </button>
@@ -948,11 +948,11 @@ ESC/POS Command Engine Verified OK
       {/* TAB 2: LOCAL DB & SYNC */}
       {activeSettingsTab === 'DATABASE' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Database className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-bold text-sm text-[#0B253A]">Local Storage Health</h3>
+                <h3 className="font-bold text-sm text-jaman-navy">Local Storage Health</h3>
               </div>
               <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
                 HEALTHY
@@ -963,25 +963,25 @@ ESC/POS Command Engine Verified OK
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Database Engine:</span>
-                  <strong className="font-mono text-[#0B253A]">Browser LocalStorage (device-local)</strong>
+                  <strong className="font-mono text-jaman-navy">Browser LocalStorage (device-local)</strong>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Total Menu Dishes:</span>
-                  <strong className="font-mono text-[#0B253A]">{db.menuItems.length} records</strong>
+                  <strong className="font-mono text-jaman-navy">{db.menuItems.length} records</strong>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Total Orders:</span>
-                  <strong className="font-mono text-[#0B253A]">{db.orders.length} records</strong>
+                  <strong className="font-mono text-jaman-navy">{db.orders.length} records</strong>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Print Queue Buffer:</span>
-                  <strong className="font-mono text-[#0B253A]">{db.printJobs.length} jobs</strong>
+                  <strong className="font-mono text-jaman-navy">{db.printJobs.length} jobs</strong>
                 </div>
               </div>
 
               <button
                 onClick={handleForceSync}
-                className="w-full py-2.5 bg-[#0B253A] hover:bg-[#1E3A4C] text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-2xs"
+                className="w-full py-2.5 bg-jaman-navy hover:bg-jaman-darkBorder text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-2xs"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Force Local Database Synchronization</span>
@@ -989,11 +989,11 @@ ESC/POS Command Engine Verified OK
             </div>
           </div>
 
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Server className="w-5 h-5 text-blue-600" />
-                <h3 className="font-bold text-sm text-[#0B253A]">Offline Resilience Engine</h3>
+                <h3 className="font-bold text-sm text-jaman-navy">Offline Resilience Engine</h3>
               </div>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isOnline ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
                 {isOnline ? 'ONLINE' : 'OFFLINE MODE'}
@@ -1023,15 +1023,15 @@ ESC/POS Command Engine Verified OK
       {activeSettingsTab === 'LICENSE' && (
         <div className="space-y-6">
           {/* Active License Details Card */}
-          <div className="bg-white border border-[#EBE6DD] rounded-3xl p-6 shadow-sm space-y-4">
+          <div className="bg-white border border-jaman-border rounded-3xl p-6 shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] text-[#E66817] flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-2xl bg-[#FFF4ED] border border-[#FDBA74] text-jaman-saffron flex items-center justify-center shadow-xs">
                   <Award className="w-6 h-6" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-black text-[#0B253A] leading-tight">
+                    <h2 className="text-lg font-black text-jaman-navy leading-tight">
                       {currentLicense.planName}
                     </h2>
                     <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
@@ -1048,7 +1048,7 @@ ESC/POS Command Engine Verified OK
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-sans">
                   Active Price Tier
                 </span>
-                <span className="text-xl font-black text-[#0B253A]">
+                <span className="text-xl font-black text-jaman-navy">
                   {formatINR(currentLicense.price)}
                 </span>
               </div>
@@ -1056,38 +1056,38 @@ ESC/POS Command Engine Verified OK
 
             {/* License Metadata Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div className="p-3 bg-[#FAF7F2] rounded-2xl border border-[#EBE6DD]">
+              <div className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border">
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
                   License Key
                 </span>
-                <strong className="font-mono text-[#0B253A] text-xs block truncate mt-0.5">
+                <strong className="font-mono text-jaman-navy text-xs block truncate mt-0.5">
                   {currentLicense.licenseKey}
                 </strong>
               </div>
 
-              <div className="p-3 bg-[#FAF7F2] rounded-2xl border border-[#EBE6DD]">
+              <div className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border">
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
                   Terminal ID
                 </span>
-                <strong className="font-mono text-[#0B253A] text-xs block mt-0.5">
+                <strong className="font-mono text-jaman-navy text-xs block mt-0.5">
                   {currentLicense.terminalId || posTerminalId}
                 </strong>
               </div>
 
-              <div className="p-3 bg-[#FAF7F2] rounded-2xl border border-[#EBE6DD]">
+              <div className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border">
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
                   Allowed Terminals
                 </span>
-                <strong className="font-mono text-[#0B253A] text-xs block mt-0.5">
+                <strong className="font-mono text-jaman-navy text-xs block mt-0.5">
                   {currentLicense.activeDevicesCount} / {currentLicense.allowedDevicesCount} Active
                 </strong>
               </div>
 
-              <div className="p-3 bg-[#FAF7F2] rounded-2xl border border-[#EBE6DD]">
+              <div className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border">
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
                   Valid Until
                 </span>
-                <strong className="font-mono text-[#0B253A] text-xs block mt-0.5">
+                <strong className="font-mono text-jaman-navy text-xs block mt-0.5">
                   {new Date(currentLicense.validUntil).toLocaleDateString('en-IN', {
                     day: 'numeric',
                     month: 'short',
@@ -1104,12 +1104,12 @@ ESC/POS Command Engine Verified OK
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-lg font-black text-[#0B253A]">Available Software Editions</h3>
+                <h3 className="text-lg font-black text-jaman-navy">Available Software Editions</h3>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Commercial restaurant POS & connected restaurant ecosystem licensing by KELVIONTECH.
                 </p>
               </div>
-              <span className="text-[11px] font-bold text-slate-500 bg-[#FAF7F2] border border-[#EBE6DD] px-3 py-1 rounded-xl w-fit">
+              <span className="text-[11px] font-bold text-slate-500 bg-jaman-cream border border-jaman-border px-3 py-1 rounded-xl w-fit">
                 Lifetime License • No Monthly Commissions • 100% Offline-First
               </span>
             </div>
@@ -1121,8 +1121,8 @@ ESC/POS Command Engine Verified OK
               <div
                 className={`lg:col-span-5 bg-white rounded-3xl p-5 sm:p-6 border flex flex-col justify-between transition-all select-none ${
                   currentTier === 'CORE'
-                    ? 'border-[#0B253A] shadow-md ring-2 ring-[#0B253A]/10'
-                    : 'border-[#EBE6DD] shadow-2xs hover:border-slate-300'
+                    ? 'border-jaman-navy shadow-md ring-2 ring-jaman-navy/10'
+                    : 'border-jaman-border shadow-2xs hover:border-slate-300'
                 }`}
               >
                 <div className="space-y-4">
@@ -1132,19 +1132,19 @@ ESC/POS Command Engine Verified OK
                       <span className="text-[10px] font-black tracking-wider uppercase text-slate-400 block">
                         FOUNDATION EDITION
                       </span>
-                      <h4 className="text-xl sm:text-2xl font-black text-[#0B253A]">JAMANVAAR CORE</h4>
+                      <h4 className="text-xl sm:text-2xl font-black text-jaman-navy">JAMANVAAR CORE</h4>
                       <span className="text-xs text-slate-600 font-bold block mt-0.5">
                         POS + Complete Restaurant Management
                       </span>
                     </div>
                     <div className="text-right shrink-0">
-                      <span className="text-2xl sm:text-3xl font-black text-[#0B253A] font-mono">₹5,000</span>
+                      <span className="text-2xl sm:text-3xl font-black text-jaman-navy font-mono">₹5,000</span>
                       <span className="text-[10px] text-slate-400 block">per license</span>
                     </div>
                   </div>
 
                   {/* Positioning Tagline */}
-                  <p className="text-xs text-slate-600 leading-relaxed bg-[#FAF7F2] p-3 rounded-2xl border border-[#EBE6DD]">
+                  <p className="text-xs text-slate-600 leading-relaxed bg-jaman-cream p-3 rounded-2xl border border-jaman-border">
                     Complete offline-first restaurant POS for billing, payments, tables, kitchen operations, inventory and daily restaurant management.
                   </p>
 
@@ -1157,7 +1157,7 @@ ESC/POS Command Engine Verified OK
                       <button
                         type="button"
                         onClick={() => setShowAllCoreFeatures(!showAllCoreFeatures)}
-                        className="text-[10px] font-bold text-slate-500 hover:text-[#0B253A] underline cursor-pointer"
+                        className="text-[10px] font-bold text-slate-500 hover:text-jaman-navy underline cursor-pointer"
                       >
                         {showAllCoreFeatures ? 'Collapse All' : 'Expand All'}
                       </button>
@@ -1422,11 +1422,11 @@ ESC/POS Command Engine Verified OK
                       const isExpanded = expandedCoreCategory === group.id || showAllCoreFeatures;
 
                       return (
-                        <div key={group.id} className="border border-[#EBE6DD] rounded-2xl overflow-hidden bg-white shadow-2xs">
+                        <div key={group.id} className="border border-jaman-border rounded-2xl overflow-hidden bg-white shadow-2xs">
                           <button
                             type="button"
                             onClick={() => setExpandedCoreCategory(expandedCoreCategory === group.id ? null : group.id)}
-                            className="w-full px-3.5 py-2.5 bg-[#FAF7F2] hover:bg-slate-100 flex items-center justify-between font-bold text-xs text-[#0B253A] cursor-pointer transition-colors"
+                            className="w-full px-3.5 py-2.5 bg-jaman-cream hover:bg-slate-100 flex items-center justify-between font-bold text-xs text-jaman-navy cursor-pointer transition-colors"
                           >
                             <div className="flex items-center gap-2">
                               <Check className="w-4 h-4 text-emerald-600 shrink-0 stroke-[2.5]" />
@@ -1440,7 +1440,7 @@ ESC/POS Command Engine Verified OK
                             </div>
                           </button>
                           {isExpanded && (
-                            <div className="p-3 text-[11px] text-slate-700 bg-white border-t border-[#EBE6DD]">
+                            <div className="p-3 text-[11px] text-slate-700 bg-white border-t border-jaman-border">
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1.5">
                                 {group.features.map((feat, fIdx) => (
                                   <div key={fIdx} className="flex items-start gap-1.5 leading-snug">
@@ -1484,12 +1484,12 @@ ESC/POS Command Engine Verified OK
               <div
                 className={`lg:col-span-7 bg-gradient-to-b from-[#FFFDFB] via-white to-[#FFFDFB] rounded-3xl p-5 sm:p-7 border-2 flex flex-col justify-between transition-all select-none relative shadow-xl ${
                   currentTier === 'PRO'
-                    ? 'border-[#E66817] ring-4 ring-[#E66817]/20 shadow-2xl'
-                    : 'border-[#FDBA74] hover:border-[#E66817]'
+                    ? 'border-jaman-saffron ring-4 ring-jaman-saffron/20 shadow-2xl'
+                    : 'border-[#FDBA74] hover:border-jaman-saffron'
                 }`}
               >
                 {/* Recommended Flagship Ribbon */}
-                <div className="absolute -top-3.5 right-6 bg-gradient-to-r from-[#E66817] to-[#EA580C] text-white text-[11px] font-black px-4 py-1 rounded-full shadow-lg uppercase tracking-wider flex items-center gap-1.5">
+                <div className="absolute -top-3.5 right-6 bg-gradient-to-r from-jaman-saffron to-[#EA580C] text-white text-[11px] font-black px-4 py-1 rounded-full shadow-lg uppercase tracking-wider flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 animate-pulse" />
                   <span>RECOMMENDED • BEST VALUE</span>
                 </div>
@@ -1498,10 +1498,10 @@ ESC/POS Command Engine Verified OK
                   {/* Header */}
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 border-b border-amber-200/60 pb-4">
                     <div>
-                      <span className="text-[10px] font-black tracking-widest uppercase text-[#E66817] block">
+                      <span className="text-[10px] font-black tracking-widest uppercase text-jaman-saffron block">
                         FLAGSHIP CONNECTED RESTAURANT ECOSYSTEM
                       </span>
-                      <h4 className="text-2xl sm:text-3xl font-black text-[#0B253A] flex items-center gap-2">
+                      <h4 className="text-2xl sm:text-3xl font-black text-jaman-navy flex items-center gap-2">
                         <span>JAMANVAAR PRO</span>
                       </h4>
                       <span className="text-xs text-slate-700 font-bold block mt-0.5">
@@ -1511,7 +1511,7 @@ ESC/POS Command Engine Verified OK
 
                     <div className="text-left sm:text-right shrink-0">
                       <div className="flex items-baseline gap-1 sm:justify-end">
-                        <span className="text-3xl sm:text-4xl font-black text-[#0B253A] font-mono">₹7,000</span>
+                        <span className="text-3xl sm:text-4xl font-black text-jaman-navy font-mono">₹7,000</span>
                       </div>
                       <span className="text-[10px] text-slate-400 block font-sans">per license</span>
                     </div>
@@ -1529,12 +1529,12 @@ ESC/POS Command Engine Verified OK
                       <span>✓ EVERYTHING IN CORE IS INCLUDED (183 Base Features)</span>
                     </div>
 
-                    <div className="p-2.5 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 rounded-xl border border-amber-300 text-xs text-[#0B253A] flex items-center justify-between gap-2 font-black">
-                      <div className="flex items-center gap-1.5 text-[#E66817]">
-                        <Sparkles className="w-4 h-4 text-[#E66817] shrink-0" />
+                    <div className="p-2.5 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 rounded-xl border border-amber-300 text-xs text-jaman-navy flex items-center justify-between gap-2 font-black">
+                      <div className="flex items-center gap-1.5 text-jaman-saffron">
+                        <Sparkles className="w-4 h-4 text-jaman-saffron shrink-0" />
                         <span>⭐ ONLY ₹2,000 MORE THAN CORE</span>
                       </div>
-                      <span className="text-[11px] font-bold text-[#E66817] bg-white px-2.5 py-0.5 rounded-full shadow-2xs border border-amber-200">
+                      <span className="text-[11px] font-bold text-jaman-saffron bg-white px-2.5 py-0.5 rounded-full shadow-2xs border border-amber-200">
                         ⭐ RECOMMENDED • BEST VALUE
                       </span>
                     </div>
@@ -1543,13 +1543,13 @@ ESC/POS Command Engine Verified OK
                   {/* PRO Feature Modules Accordion */}
                   <div className="space-y-2.5 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase text-[#E66817] tracking-wider block">
+                      <span className="text-[10px] font-black uppercase text-jaman-saffron tracking-wider block">
                         ⭐ PRO CONNECTED MODULES (173 EXCLUSIVE CAPABILITIES):
                       </span>
                       <button
                         type="button"
                         onClick={() => setShowAllProFeatures(!showAllProFeatures)}
-                        className="text-[10px] font-bold text-[#E66817] hover:text-[#EA580C] underline cursor-pointer"
+                        className="text-[10px] font-bold text-jaman-saffron hover:text-[#EA580C] underline cursor-pointer"
                       >
                         {showAllProFeatures ? 'Collapse All PRO' : 'Expand All PRO'}
                       </button>
@@ -1789,7 +1789,7 @@ ESC/POS Command Engine Verified OK
                           key={group.id}
                           className={`rounded-2xl overflow-hidden bg-white shadow-2xs transition-all ${
                             group.isFlagship
-                              ? 'border-2 border-[#E66817]/60 ring-2 ring-[#E66817]/10'
+                              ? 'border-2 border-jaman-saffron/60 ring-2 ring-jaman-saffron/10'
                               : 'border border-amber-200/80'
                           }`}
                         >
@@ -1798,21 +1798,21 @@ ESC/POS Command Engine Verified OK
                             onClick={() => setExpandedProCategory(expandedProCategory === group.id ? null : group.id)}
                             className={`w-full px-3.5 py-3 flex items-center justify-between font-black text-xs cursor-pointer transition-colors ${
                               group.isFlagship
-                                ? 'bg-gradient-to-r from-[#FFF7F0] to-[#FFFDF9] hover:bg-amber-50 text-[#0B253A]'
-                                : 'bg-[#FFFDFB] hover:bg-amber-50/50 text-[#0B253A]'
+                                ? 'bg-gradient-to-r from-[#FFF7F0] to-[#FFFDF9] hover:bg-amber-50 text-jaman-navy'
+                                : 'bg-[#FFFDFB] hover:bg-amber-50/50 text-jaman-navy'
                             }`}
                           >
                             <div className="flex items-center gap-2.5 text-left">
-                              <div className="w-6 h-6 rounded-lg bg-orange-100 text-[#E66817] flex items-center justify-center shrink-0">
+                              <div className="w-6 h-6 rounded-lg bg-orange-100 text-jaman-saffron flex items-center justify-center shrink-0">
                                 <Icon className="w-3.5 h-3.5" />
                               </div>
                               <span className="tracking-tight">{group.title}</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-slate-400 shrink-0">
-                              <span className="text-[10px] font-mono font-bold text-[#E66817] bg-[#FFF4EB] border border-[#FED7AA] px-2 py-0.5 rounded-full">
+                              <span className="text-[10px] font-mono font-bold text-jaman-saffron bg-[#FFF4EB] border border-[#FED7AA] px-2 py-0.5 rounded-full">
                                 {group.features.length} features
                               </span>
-                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-[#E66817]" /> : <ChevronDown className="w-3.5 h-3.5 text-[#E66817]" />}
+                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-jaman-saffron" /> : <ChevronDown className="w-3.5 h-3.5 text-jaman-saffron" />}
                             </div>
                           </button>
 
@@ -1821,7 +1821,7 @@ ESC/POS Command Engine Verified OK
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1.5">
                                 {group.features.map((feat, fIdx) => (
                                   <div key={fIdx} className="flex items-start gap-1.5 leading-snug">
-                                    <Check className="w-3.5 h-3.5 text-[#E66817] shrink-0 mt-0.5 stroke-[2.5]" />
+                                    <Check className="w-3.5 h-3.5 text-jaman-saffron shrink-0 mt-0.5 stroke-[2.5]" />
                                     <span className="font-medium text-slate-700">{feat}</span>
                                   </div>
                                 ))}
@@ -1834,7 +1834,7 @@ ESC/POS Command Engine Verified OK
                   </div>
 
                   {/* PRO VALUE SUMMARY BANNER */}
-                  <div className="p-4 bg-gradient-to-br from-[#0B253A] to-[#1E3A4C] text-white rounded-2xl shadow-md space-y-3">
+                  <div className="p-4 bg-gradient-to-br from-jaman-navy to-jaman-darkBorder text-white rounded-2xl shadow-md space-y-3">
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
                       <strong className="text-xs font-black tracking-wide text-amber-200">
@@ -1866,8 +1866,8 @@ ESC/POS Command Engine Verified OK
 
                 {/* Card Bottom / Primary CTA */}
                 <div className="pt-5 border-t border-amber-200/80 mt-4 space-y-2">
-                  <div className="text-[10px] font-black tracking-wider uppercase text-[#E66817] text-center flex items-center justify-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5 text-[#E66817]" />
+                  <div className="text-[10px] font-black tracking-wider uppercase text-jaman-saffron text-center flex items-center justify-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />
                     <span>RUN + CONNECT + GROW YOUR RESTAURANT</span>
                   </div>
 
@@ -1880,7 +1880,7 @@ ESC/POS Command Engine Verified OK
                     <div className="space-y-1 text-center">
                       <button
                         onClick={() => handleActivateTier('PRO')}
-                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#E66817] via-[#EA580C] to-[#E66817] hover:from-[#EA580C] hover:to-[#C2410C] text-white font-black text-sm uppercase tracking-wider shadow-xl shadow-[#E66817]/30 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-jaman-saffron via-[#EA580C] to-jaman-saffron hover:from-[#EA580C] hover:to-[#C2410C] text-white font-black text-sm uppercase tracking-wider shadow-xl shadow-jaman-saffron/30 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
                       >
                         <Sparkles className="w-4 h-4" />
                         <span>CHOOSE JAMANVAAR PRO — ₹7,000 →</span>
@@ -1895,20 +1895,20 @@ ESC/POS Command Engine Verified OK
             </div>
 
             {/* SECTION 2: WHY RESTAURANTS UPGRADE TO PRO (4 Pillars) */}
-            <div className="bg-white rounded-3xl p-6 border border-[#EBE6DD] shadow-2xs space-y-4">
+            <div className="bg-white rounded-3xl p-6 border border-jaman-border shadow-2xs space-y-4">
               <div>
-                <span className="text-[10px] font-black uppercase text-[#E66817] tracking-widest block">
+                <span className="text-[10px] font-black uppercase text-jaman-saffron tracking-widest block">
                   COMMERCIAL ADVANTAGE
                 </span>
-                <h4 className="text-base font-black text-[#0B253A]">Why Restaurants Upgrade to JAMANVAAR PRO</h4>
+                <h4 className="text-base font-black text-jaman-navy">Why Restaurants Upgrade to JAMANVAAR PRO</h4>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
-                  <div className="w-8 h-8 rounded-xl bg-orange-100 text-[#E66817] flex items-center justify-center font-black text-xs">
+                <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
+                  <div className="w-8 h-8 rounded-xl bg-orange-100 text-jaman-saffron flex items-center justify-center font-black text-xs">
                     01
                   </div>
-                  <strong className="text-xs font-black text-[#0B253A] block">
+                  <strong className="text-xs font-black text-jaman-navy block">
                     📱 SERVE FROM THE TABLE
                   </strong>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
@@ -1916,11 +1916,11 @@ ESC/POS Command Engine Verified OK
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
+                <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
                   <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-xs">
                     02
                   </div>
-                  <strong className="text-xs font-black text-[#0B253A] block">
+                  <strong className="text-xs font-black text-jaman-navy block">
                     📲 LET CUSTOMERS ORDER
                   </strong>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
@@ -1928,11 +1928,11 @@ ESC/POS Command Engine Verified OK
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
+                <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
                   <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-black text-xs">
                     03
                   </div>
-                  <strong className="text-xs font-black text-[#0B253A] block">
+                  <strong className="text-xs font-black text-jaman-navy block">
                     ⚡ CONNECT FLOOR & KITCHEN
                   </strong>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
@@ -1940,11 +1940,11 @@ ESC/POS Command Engine Verified OK
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
+                <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
                   <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-black text-xs">
                     04
                   </div>
-                  <strong className="text-xs font-black text-[#0B253A] block">
+                  <strong className="text-xs font-black text-jaman-navy block">
                     📊 RUN WITH INTELLIGENCE
                   </strong>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
@@ -1955,10 +1955,10 @@ ESC/POS Command Engine Verified OK
             </div>
 
             {/* SECTION 3: CORE vs PRO SIDE-BY-SIDE MATRIX */}
-            <div className="bg-white rounded-3xl p-6 border border-[#EBE6DD] shadow-2xs space-y-3">
+            <div className="bg-white rounded-3xl p-6 border border-jaman-border shadow-2xs space-y-3">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
-                  <h4 className="text-sm font-black text-[#0B253A]">CORE vs PRO — Feature Comparison Matrix</h4>
+                  <h4 className="text-sm font-black text-jaman-navy">CORE vs PRO — Feature Comparison Matrix</h4>
                   <span className="text-[11px] text-slate-500">Every feature is backed by production-grade offline-first code.</span>
                 </div>
                 <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">OFFICIAL FEATURE MATRIX</span>
@@ -1967,10 +1967,10 @@ ESC/POS Command Engine Verified OK
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="border-b border-[#EBE6DD] text-slate-400 font-bold text-[10px] uppercase">
+                    <tr className="border-b border-jaman-border text-slate-400 font-bold text-[10px] uppercase">
                       <th className="py-2.5 px-3">Software Capability</th>
                       <th className="py-2.5 px-3 text-center w-36">CORE (₹5,000)</th>
-                      <th className="py-2.5 px-3 text-center w-48 bg-amber-50/60 text-[#E66817]">PRO (₹7,000)</th>
+                      <th className="py-2.5 px-3 text-center w-48 bg-amber-50/60 text-jaman-saffron">PRO (₹7,000)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -1994,9 +1994,9 @@ ESC/POS Command Engine Verified OK
                       { cap: 'Connected Multi-Device Health Monitoring', core: 'Basic', pro: '✓ Live 6-Node Mesh' }
                     ].map((row, idx) => (
                       <tr key={idx} className="hover:bg-slate-50/80">
-                        <td className="py-2.5 px-3 font-bold text-[#0B253A]">{row.cap}</td>
+                        <td className="py-2.5 px-3 font-bold text-jaman-navy">{row.cap}</td>
                         <td className="py-2.5 px-3 text-center text-slate-700 font-mono text-[11px]">{row.core}</td>
-                        <td className="py-2.5 px-3 text-center font-bold text-[#E66817] bg-amber-50/30 font-mono text-[11px]">
+                        <td className="py-2.5 px-3 text-center font-bold text-jaman-saffron bg-amber-50/30 font-mono text-[11px]">
                           {row.pro}
                         </td>
                       </tr>
@@ -2007,11 +2007,11 @@ ESC/POS Command Engine Verified OK
             </div>
 
             {/* Offline License Certificate Activation */}
-            <div className="bg-white border border-[#EBE6DD] rounded-3xl p-6 shadow-2xs space-y-3">
+            <div className="bg-white border border-jaman-border rounded-3xl p-6 shadow-2xs space-y-3">
               <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <KeyRound className="w-5 h-5 text-[#E66817]" />
+                <KeyRound className="w-5 h-5 text-jaman-saffron" />
                 <div>
-                  <h4 className="text-sm font-bold text-[#0B253A]">Offline License Certificate</h4>
+                  <h4 className="text-sm font-bold text-jaman-navy">Offline License Certificate</h4>
                   <p className="text-[11px] text-slate-500">
                     Paste the signed License Certificate Super Admin generated for this restaurant. It is
                     cryptographically verified — a plan cannot be changed without one.
@@ -2025,13 +2025,13 @@ ESC/POS Command Engine Verified OK
                   value={dealerKeyInput}
                   onChange={(e) => setDealerKeyInput(e.target.value)}
                   placeholder="Paste the License Certificate from Super Admin..."
-                  className="w-full sm:flex-1 bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl px-4 py-2.5 text-xs font-mono font-bold text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
+                  className="w-full sm:flex-1 bg-jaman-cream border border-jaman-border rounded-2xl px-4 py-2.5 text-xs font-mono font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
                 />
 
                 <button
                   onClick={handleApplyCertificate}
                   disabled={!dealerKeyInput.trim()}
-                  className="w-full sm:w-auto px-6 py-2.5 bg-[#0B253A] hover:bg-[#1E3A4C] disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-2.5 bg-jaman-navy hover:bg-jaman-darkBorder disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
                 >
                   Verify & Apply Certificate
                 </button>

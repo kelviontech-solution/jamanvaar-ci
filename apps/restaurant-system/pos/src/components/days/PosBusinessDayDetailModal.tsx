@@ -187,17 +187,17 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in select-none">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+      <div className="bg-jaman-cream border border-jaman-border w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         
         {/* Top Action Header */}
-        <div className="p-4 sm:p-5 bg-white border-b border-[#EBE6DD] flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className="p-4 sm:p-5 bg-white border-b border-jaman-border flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#0B253A] flex items-center justify-center text-white">
+            <div className="w-10 h-10 rounded-2xl bg-jaman-navy flex items-center justify-center text-white">
               <Calendar className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black text-[#0B253A]">
+                <h2 className="text-base sm:text-lg font-black text-jaman-navy">
                   Business Day — {businessDay.displayDate}
                 </h2>
                 <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
@@ -226,9 +226,9 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
             <button
               type="button"
               onClick={() => setIsOrdersModalOpen(true)}
-              className="px-3 py-1.5 bg-[#FAF7F2] hover:bg-[#F0EBE1] border border-[#EBE6DD] text-[#0B253A] rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+              className="px-3 py-1.5 bg-jaman-cream hover:bg-[#F0EBE1] border border-jaman-border text-jaman-navy rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
             >
-              <ShoppingBag className="w-3.5 h-3.5 text-[#E66817]" />
+              <ShoppingBag className="w-3.5 h-3.5 text-jaman-saffron" />
               <span>View Orders ({orders.length})</span>
             </button>
 
@@ -237,9 +237,9 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
               type="button"
               onClick={handleDownloadPdf}
               disabled={isDownloadingPdf}
-              className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-[#EBE6DD] text-[#0B253A] rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+              className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-[#E66817]" />
+              <Download className="w-3.5 h-3.5 text-jaman-saffron" />
               <span>Download PDF</span>
             </button>
 
@@ -247,9 +247,9 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
             <button
               type="button"
               onClick={handlePrintReport}
-              className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-[#EBE6DD] text-[#0B253A] rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+              className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
             >
-              <Printer className="w-3.5 h-3.5 text-[#0B253A]" />
+              <Printer className="w-3.5 h-3.5 text-jaman-navy" />
               <span>Print</span>
             </button>
 
@@ -270,7 +270,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-[#0B253A] rounded-xl hover:bg-slate-100 transition-colors"
+              className="p-1.5 text-slate-400 hover:text-jaman-navy rounded-xl hover:bg-slate-100 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -281,11 +281,11 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
           {/* 1. Primary Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs">
+            <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
               <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
                 Total Net Sales
               </span>
-              <div className="text-2xl font-black font-mono text-[#0B253A] mt-0.5">
+              <div className="text-2xl font-black font-mono text-jaman-navy mt-0.5">
                 {formatINR(businessDay.netSales)}
               </div>
               <span className="text-[10px] text-emerald-600 font-bold mt-1 inline-block">
@@ -293,7 +293,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
               </span>
             </div>
 
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs">
+            <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
               <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
                 Cash Collections
               </span>
@@ -305,7 +305,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
               </span>
             </div>
 
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs">
+            <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
               <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
                 UPI / Dynamic QR
               </span>
@@ -317,7 +317,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
               </span>
             </div>
 
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs">
+            <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
               <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
                 Total Tax (GST 5%)
               </span>
@@ -333,9 +333,9 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
           {/* 2. Financial Breakdown & Cash Drawer Reconciliation */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Financial Statement */}
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 space-y-3 shadow-2xs">
+            <div className="bg-white border border-jaman-border rounded-2xl p-4 space-y-3 shadow-2xs">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                <h3 className="font-extrabold text-xs uppercase tracking-wider text-[#0B253A]">
+                <h3 className="font-extrabold text-xs uppercase tracking-wider text-jaman-navy">
                   Financial & Revenue Audit
                 </h3>
                 <span className="text-[10px] font-mono text-slate-400">STATEMENT</span>
@@ -344,7 +344,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between text-slate-600">
                   <span>Gross Sales:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(businessDay.grossSales)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(businessDay.grossSales)}</strong>
                 </div>
                 <div className="flex justify-between text-slate-600">
                   <span>Discounts Granted:</span>
@@ -358,7 +358,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
                   <span>SGST (2.5%):</span>
                   <strong className="font-mono text-slate-800">{formatINR(Math.round(businessDay.tax / 2))}</strong>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-slate-100 font-black text-sm text-[#0B253A]">
+                <div className="flex justify-between pt-2 border-t border-slate-100 font-black text-sm text-jaman-navy">
                   <span>Net Collected Revenue:</span>
                   <span className="font-mono text-emerald-700">{formatINR(businessDay.netSales)}</span>
                 </div>
@@ -366,9 +366,9 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
             </div>
 
             {/* Cash Drawer Reconciliation */}
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 space-y-3 shadow-2xs">
+            <div className="bg-white border border-jaman-border rounded-2xl p-4 space-y-3 shadow-2xs">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                <h3 className="font-extrabold text-xs uppercase tracking-wider text-[#0B253A]">
+                <h3 className="font-extrabold text-xs uppercase tracking-wider text-jaman-navy">
                   Cash Drawer & Variance Audit
                 </h3>
                 <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
@@ -381,29 +381,29 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between text-slate-600">
                   <span>Opening Float:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(businessDay.openingCash)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(businessDay.openingCash)}</strong>
                 </div>
                 <div className="flex justify-between text-slate-600">
                   <span>Cash Sales Added:</span>
-                  <strong className="font-mono text-[#0B253A]">+ {formatINR(businessDay.cashSales)}</strong>
+                  <strong className="font-mono text-jaman-navy">+ {formatINR(businessDay.cashSales)}</strong>
                 </div>
                 <div className="flex justify-between text-slate-600">
                   <span>Cash In / Paid In:</span>
-                  <strong className="font-mono text-[#0B253A]">+ {formatINR(businessDay.cashIn || 0)}</strong>
+                  <strong className="font-mono text-jaman-navy">+ {formatINR(businessDay.cashIn || 0)}</strong>
                 </div>
                 <div className="flex justify-between text-slate-600">
                   <span>Cash Out / Paid Out:</span>
-                  <strong className="font-mono text-[#0B253A]">- {formatINR(businessDay.cashOut || 0)}</strong>
+                  <strong className="font-mono text-jaman-navy">- {formatINR(businessDay.cashOut || 0)}</strong>
                 </div>
                 <div className="flex justify-between text-slate-600">
                   <span>Expected Drawer Cash:</span>
-                  <strong className="font-mono text-[#0B253A]">
+                  <strong className="font-mono text-jaman-navy">
                     {formatINR(businessDay.expectedCash || (businessDay.openingCash + businessDay.cashSales + (businessDay.cashIn || 0) - (businessDay.cashOut || 0)))}
                   </strong>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-slate-100 font-black text-sm text-[#0B253A]">
+                <div className="flex justify-between pt-2 border-t border-slate-100 font-black text-sm text-jaman-navy">
                   <span>Actual Closing Cash Count:</span>
-                  <span className="font-mono text-[#E66817]">
+                  <span className="font-mono text-jaman-saffron">
                     {businessDay.closingCash !== undefined ? formatINR(businessDay.closingCash) : 'Not Closed Yet'}
                   </span>
                 </div>
@@ -412,9 +412,9 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
           </div>
 
           {/* 3. Top Dishes Table */}
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 space-y-3 shadow-2xs">
+          <div className="bg-white border border-jaman-border rounded-2xl p-4 space-y-3 shadow-2xs">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <h3 className="font-extrabold text-xs uppercase tracking-wider text-[#0B253A]">
+              <h3 className="font-extrabold text-xs uppercase tracking-wider text-jaman-navy">
                 Top Selling Items ({topItems.length})
               </h3>
               <span className="text-[10px] text-slate-400 font-mono">RANKED BY QTY</span>
@@ -425,11 +425,11 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
                 <div key={idx} className="flex justify-between items-center py-2">
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-slate-400 w-5">{idx + 1}.</span>
-                    <strong className="text-[#0B253A]">{it.name}</strong>
+                    <strong className="text-jaman-navy">{it.name}</strong>
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-slate-500 font-mono">{it.qty} sold</span>
-                    <strong className="font-mono text-[#0B253A]">{formatINR(it.revenue)}</strong>
+                    <strong className="font-mono text-jaman-navy">{formatINR(it.revenue)}</strong>
                   </div>
                 </div>
               ))}
@@ -448,7 +448,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
       {/* Reopen Day Confirmation Modal */}
       {reopenModalOpen && (
         <div className="fixed inset-0 z-60 bg-black/70 flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white border border-[#EBE6DD] p-6 rounded-3xl max-w-md w-full shadow-2xl space-y-4">
+          <div className="bg-white border border-jaman-border p-6 rounded-3xl max-w-md w-full shadow-2xl space-y-4">
             <div className="flex items-center gap-2 text-rose-600 font-black text-sm">
               <ShieldAlert className="w-5 h-5" />
               <span>Admin Authorization — Reopen Day</span>
@@ -457,7 +457,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
               Reopening Business Day <strong>{businessDay.id}</strong> allows additional orders or financial edits. An audit trail entry will be recorded.
             </p>
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">
+              <label className="block text-xs font-bold text-jaman-navy mb-1">
                 Reason for Reopening:
               </label>
               <input
@@ -465,7 +465,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
                 value={reopenReason}
                 onChange={(e) => setReopenReason(e.target.value)}
                 placeholder="e.g. Settlement adjustment, missed late night bill"
-                className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-rose-500"
+                className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy focus:outline-none focus:border-rose-500"
               />
             </div>
             <div className="flex items-center justify-end gap-2 pt-2">

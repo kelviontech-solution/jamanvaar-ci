@@ -92,15 +92,15 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in select-none">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-xl rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+      <div className="bg-jaman-cream border border-jaman-border w-full max-w-xl rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         {/* Top Header */}
-        <div className="p-4 sm:p-5 bg-white border-b border-[#EBE6DD] flex items-center justify-between gap-3 shrink-0">
+        <div className="p-4 sm:p-5 bg-white border-b border-jaman-border flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-[#E66817]">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-jaman-saffron">
               <Lock className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-black text-[#0B253A]">
+              <h2 className="text-base font-black text-jaman-navy">
                 End of Day Settlement — {summary.display_date}
               </h2>
               <span className="text-[11px] text-slate-400 font-mono">
@@ -112,7 +112,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-[#0B253A] rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-jaman-navy rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -124,7 +124,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
           {step === 1 && (
             <div className="space-y-4 animate-in fade-in">
               <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                <span className="text-xs font-black uppercase tracking-wider text-[#0B253A]">
+                <span className="text-xs font-black uppercase tracking-wider text-jaman-navy">
                   Step 1: Business Day Performance Summary
                 </span>
                 <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
@@ -134,46 +134,46 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
 
               {/* Financial KPI Grid */}
               <div className="grid grid-cols-3 gap-2.5 text-xs">
-                <div className="p-3 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-3 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Gross Sales</span>
-                  <strong className="text-sm sm:text-base font-black font-mono text-[#0B253A]">{formatINR(summary.gross_sales)}</strong>
+                  <strong className="text-sm sm:text-base font-black font-mono text-jaman-navy">{formatINR(summary.gross_sales)}</strong>
                 </div>
-                <div className="p-3 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-3 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Discounts</span>
                   <strong className="text-sm sm:text-base font-black font-mono text-rose-600">- {formatINR(summary.discounts)}</strong>
                 </div>
-                <div className="p-3 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-3 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">GST (5%)</span>
                   <strong className="text-sm sm:text-base font-black font-mono text-slate-700">{formatINR(summary.tax_amount)}</strong>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2.5 text-xs">
-                <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-3.5 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Net Restaurant Revenue</span>
                   <strong className="text-lg font-black font-mono text-emerald-700">{formatINR(summary.net_sales)}</strong>
                 </div>
-                <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-3.5 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Total Completed Orders</span>
-                  <strong className="text-lg font-black font-mono text-[#0B253A]">{summary.completed_orders} of {summary.total_orders}</strong>
+                  <strong className="text-lg font-black font-mono text-jaman-navy">{summary.completed_orders} of {summary.total_orders}</strong>
                 </div>
               </div>
 
               {/* Payment Summary */}
-              <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD] space-y-2 text-xs">
-                <span className="font-bold text-[#0B253A] block">Payment Collections Breakdown:</span>
+              <div className="p-3.5 bg-white rounded-2xl border border-jaman-border space-y-2 text-xs">
+                <span className="font-bold text-jaman-navy block">Payment Collections Breakdown:</span>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
                     <span className="text-[10px] text-slate-400 block font-bold">💵 Cash</span>
-                    <strong className="font-mono text-xs font-black text-[#0B253A]">{formatINR(summary.cash_sales)}</strong>
+                    <strong className="font-mono text-xs font-black text-jaman-navy">{formatINR(summary.cash_sales)}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
                     <span className="text-[10px] text-slate-400 block font-bold">📱 UPI / QR</span>
-                    <strong className="font-mono text-xs font-black text-[#0B253A]">{formatINR(summary.upi_sales)}</strong>
+                    <strong className="font-mono text-xs font-black text-jaman-navy">{formatINR(summary.upi_sales)}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
                     <span className="text-[10px] text-slate-400 block font-bold">💳 Card</span>
-                    <strong className="font-mono text-xs font-black text-[#0B253A]">{formatINR(summary.card_sales)}</strong>
+                    <strong className="font-mono text-xs font-black text-jaman-navy">{formatINR(summary.card_sales)}</strong>
                   </div>
                 </div>
               </div>
@@ -190,7 +190,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="px-5 py-2.5 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  className="px-5 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <span>Step 2: Check Open Orders</span>
                   <ArrowRight className="w-4 h-4" />
@@ -203,14 +203,14 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
           {step === 2 && (
             <div className="space-y-4 animate-in fade-in">
               <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                <span className="text-xs font-black uppercase tracking-wider text-[#0B253A]">
+                <span className="text-xs font-black uppercase tracking-wider text-jaman-navy">
                   Step 2: Open Items & Pre-Close Validation
                 </span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white border border-[#EBE6DD] space-y-3">
+              <div className="p-4 rounded-2xl bg-white border border-jaman-border space-y-3">
                 <div className="space-y-2 text-xs">
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF7F2] border border-[#EBE6DD]">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-jaman-cream border border-jaman-border">
                     <span className="font-bold text-slate-700">Active Dining / In-Progress Orders:</span>
                     <span className={`font-black px-2.5 py-0.5 rounded-full ${
                       summary.active_orders === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'
@@ -219,7 +219,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF7F2] border border-[#EBE6DD]">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-jaman-cream border border-jaman-border">
                     <span className="font-bold text-slate-700">Unpaid / Pending Invoices:</span>
                     <span className={`font-black px-2.5 py-0.5 rounded-full ${
                       summary.unpaid_orders_count === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
@@ -228,7 +228,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF7F2] border border-[#EBE6DD]">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-jaman-cream border border-jaman-border">
                     <span className="font-bold text-slate-700">Pending Kitchen KOT Tickets:</span>
                     <span className={`font-black px-2.5 py-0.5 rounded-full ${
                       summary.active_kots_count === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'
@@ -237,7 +237,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF7F2] border border-[#EBE6DD]">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-jaman-cream border border-jaman-border">
                     <span className="font-bold text-slate-700">Cart Sessions on Hold:</span>
                     <span className={`font-black px-2.5 py-0.5 rounded-full ${
                       summary.held_carts_count === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-800'
@@ -270,7 +270,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="px-5 py-2.5 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  className="px-5 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <span>Step 3: Cash Drawer Count</span>
                   <ArrowRight className="w-4 h-4" />
@@ -283,16 +283,16 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
           {step === 3 && (
             <div className="space-y-4 animate-in fade-in">
               <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                <span className="text-xs font-black uppercase tracking-wider text-[#0B253A]">
+                <span className="text-xs font-black uppercase tracking-wider text-jaman-navy">
                   Step 3: Cash Drawer Reconciliation
                 </span>
                 <span className="text-[10px] font-mono text-slate-400">DRAWER MATH</span>
               </div>
 
-              <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] space-y-2 text-xs text-slate-600">
+              <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-2 text-xs text-slate-600">
                 <div className="flex justify-between">
                   <span>Opening Cash Float:</span>
-                  <strong className="font-mono text-[#0B253A]">{formatINR(summary.opening_cash)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(summary.opening_cash)}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Cash Sales Collected:</span>
@@ -302,15 +302,15 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                   <span>Cash Refunds Paid Out:</span>
                   <strong className="font-mono text-rose-600">- {formatINR(summary.refunds)}</strong>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-slate-100 font-bold text-sm text-[#0B253A]">
+                <div className="flex justify-between pt-2 border-t border-slate-100 font-bold text-sm text-jaman-navy">
                   <span>Expected Cash in Drawer:</span>
-                  <span className="font-mono text-base font-black text-[#0B253A]">{formatINR(expectedCash)}</span>
+                  <span className="font-mono text-base font-black text-jaman-navy">{formatINR(expectedCash)}</span>
                 </div>
               </div>
 
               {/* Counted Cash Input */}
               <div className="bg-[#FFFDFB] p-4 rounded-2xl border-2 border-amber-500/40 space-y-2">
-                <label className="block text-xs font-black text-[#0B253A]">
+                <label className="block text-xs font-black text-jaman-navy">
                   Enter Counted Physical Cash in Drawer:
                 </label>
                 <div className="flex items-center gap-2">
@@ -320,7 +320,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                     value={actualCashInput}
                     onChange={(e) => setActualCashInput(e.target.value)}
                     placeholder={String(expectedCash)}
-                    className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xl font-black font-mono text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xl font-black font-mono text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                   <button
                     type="button"
@@ -348,7 +348,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                       value={varianceReason}
                       onChange={(e) => setVarianceReason(e.target.value)}
                       placeholder="Reason for cash discrepancy (required for audit)..."
-                      className="w-full bg-white border border-rose-300 rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none"
+                      className="w-full bg-white border border-rose-300 rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none"
                     />
                   </div>
                 )}
@@ -366,7 +366,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStep(4)}
-                  className="px-5 py-2.5 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  className="px-5 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <span>Step 4: Payment Reconciliation</span>
                   <ArrowRight className="w-4 h-4" />
@@ -379,18 +379,18 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
           {step === 4 && (
             <div className="space-y-4 animate-in fade-in">
               <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                <span className="text-xs font-black uppercase tracking-wider text-[#0B253A]">
+                <span className="text-xs font-black uppercase tracking-wider text-jaman-navy">
                   Step 4: Digital & Non-Cash Settlement
                 </span>
               </div>
 
-              <div className="p-4 bg-white rounded-2xl border border-[#EBE6DD] space-y-3 text-xs">
+              <div className="p-4 bg-white rounded-2xl border border-jaman-border space-y-3 text-xs">
                 <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
                   <div className="flex items-center gap-2">
                     <Banknote className="w-4 h-4 text-emerald-600" />
                     <span className="font-bold">Cash Drawer Settled:</span>
                   </div>
-                  <strong className="font-mono font-black text-sm text-[#0B253A]">{formatINR(actualCash)}</strong>
+                  <strong className="font-mono font-black text-sm text-jaman-navy">{formatINR(actualCash)}</strong>
                 </div>
 
                 <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
@@ -409,9 +409,9 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                   <strong className="font-mono font-black text-sm text-purple-700">{formatINR(summary.card_sales)}</strong>
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-[#FFF4ED] border border-[#FDBA74] rounded-xl text-[#0B253A]">
+                <div className="flex items-center justify-between p-3 bg-[#FFF4ED] border border-[#FDBA74] rounded-xl text-jaman-navy">
                   <span className="font-extrabold">Total Day Net Collections:</span>
-                  <strong className="font-mono font-black text-base text-[#E66817]">
+                  <strong className="font-mono font-black text-base text-jaman-saffron">
                     {formatINR(summary.net_collected)}
                   </strong>
                 </div>
@@ -429,7 +429,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStep(5)}
-                  className="px-5 py-2.5 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  className="px-5 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <span>Step 5: Final Confirmation & Lock</span>
                   <ArrowRight className="w-4 h-4" />
@@ -442,7 +442,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
           {step === 5 && (
             <div className="space-y-4 animate-in fade-in">
               <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                <span className="text-xs font-black uppercase tracking-wider text-[#0B253A]">
+                <span className="text-xs font-black uppercase tracking-wider text-jaman-navy">
                   Step 5: Final Confirmation & Day Lock
                 </span>
                 <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
@@ -450,11 +450,11 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 </span>
               </div>
 
-              <div className="p-4 bg-white rounded-2xl border border-[#EBE6DD] space-y-3 text-xs">
+              <div className="p-4 bg-white rounded-2xl border border-jaman-border space-y-3 text-xs">
                 <div className="flex items-start gap-2.5">
                   <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                   <div className="space-y-1">
-                    <strong className="font-black text-[#0B253A] block">
+                    <strong className="font-black text-jaman-navy block">
                       Locking Business Day: {summary.display_date} ({summary.business_day_id})
                     </strong>
                     <p className="text-slate-500 leading-relaxed">
@@ -466,15 +466,15 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 <div className="p-3 bg-slate-50 rounded-xl space-y-1 font-mono text-[11px]">
                   <div className="flex justify-between">
                     <span>Authorized Cashier:</span>
-                    <strong className="text-[#0B253A]">Amit Dave (Lead Cashier)</strong>
+                    <strong className="text-jaman-navy">Amit Dave (Lead Cashier)</strong>
                   </div>
                   <div className="flex justify-between">
                     <span>Closing Net Revenue:</span>
-                    <strong className="text-[#0B253A]">{formatINR(summary.net_sales)}</strong>
+                    <strong className="text-jaman-navy">{formatINR(summary.net_sales)}</strong>
                   </div>
                   <div className="flex justify-between">
                     <span>Final Cash Counted:</span>
-                    <strong className="text-[#0B253A]">{formatINR(actualCash)}</strong>
+                    <strong className="text-jaman-navy">{formatINR(actualCash)}</strong>
                   </div>
                 </div>
               </div>
@@ -520,10 +520,10 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
 
               {/* 1. Closed Business Day Summary */}
               <div className="space-y-1">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[#0B253A] text-xs font-black">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-jaman-navy text-xs font-black">
                   <span>✓ BUSINESS DAY CLOSED</span>
                 </div>
-                <h3 className="text-lg font-black text-[#0B253A]">
+                <h3 className="text-lg font-black text-jaman-navy">
                   {closedResult.closedDay.displayDate}
                 </h3>
                 <p className="text-xs text-slate-500 font-mono">
@@ -531,14 +531,14 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 </p>
               </div>
 
-              <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD] grid grid-cols-3 gap-2 text-center text-xs">
+              <div className="p-3.5 bg-white rounded-2xl border border-jaman-border grid grid-cols-3 gap-2 text-center text-xs">
                 <div>
                   <span className="text-[10px] text-slate-400 block uppercase font-bold">Final Sales</span>
-                  <strong className="font-mono text-sm font-black text-[#0B253A]">{formatINR(closedResult.closedDay.netSales)}</strong>
+                  <strong className="font-mono text-sm font-black text-jaman-navy">{formatINR(closedResult.closedDay.netSales)}</strong>
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 block uppercase font-bold">Orders</span>
-                  <strong className="font-mono text-sm font-black text-[#0B253A]">{closedResult.closedDay.orderCount}</strong>
+                  <strong className="font-mono text-sm font-black text-jaman-navy">{closedResult.closedDay.orderCount}</strong>
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 block uppercase font-bold">Cash Variance</span>
@@ -567,7 +567,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                     onClose();
                     if (onStartNewOrder) onStartNewOrder();
                   }}
-                  className="py-2.5 bg-[#E66817] hover:bg-[#d55e14] text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-orange-500/20 transition-all cursor-pointer"
+                  className="py-2.5 bg-jaman-saffron hover:bg-[#d55e14] text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-orange-500/20 transition-all cursor-pointer"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>Start New Order</span>
@@ -579,7 +579,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                     onClose();
                     if (onViewEodReport) onViewEodReport(closedResult.closedDay);
                   }}
-                  className="py-2.5 bg-[#0B253A] hover:bg-[#123652] text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                  className="py-2.5 bg-jaman-navy hover:bg-[#123652] text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                 >
                   <FileText className="w-4 h-4" />
                   <span>View EOD Report</span>

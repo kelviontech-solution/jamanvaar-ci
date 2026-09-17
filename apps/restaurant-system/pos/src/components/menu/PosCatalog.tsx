@@ -257,15 +257,15 @@ export const PosCatalog: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#FAF7F2] p-2.5 space-y-2 select-none min-w-0">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-jaman-cream p-2.5 space-y-2 select-none min-w-0">
       {/* 1. VISIBLE & TACTILE TOUCHSCREEN CATEGORY NAVIGATION (Height: 44px, Bold 13-14px font) */}
-      <div className="relative flex items-center shrink-0 bg-white border border-[#EBE6DD] rounded-2xl p-1.5 shadow-2xs">
+      <div className="relative flex items-center shrink-0 bg-white border border-jaman-border rounded-2xl p-1.5 shadow-2xs">
         {/* Left Scroll Button (visible when scrollable) */}
         {canScrollLeft && (
           <button
             type="button"
             onClick={() => scrollCategories('LEFT')}
-            className="w-8 h-9 rounded-xl bg-[#FAF7F2] hover:bg-orange-50 active:scale-95 text-slate-600 hover:text-[#E66817] flex items-center justify-center transition-all shrink-0 mr-1.5 cursor-pointer border border-[#EBE6DD] z-10"
+            className="w-8 h-9 rounded-xl bg-jaman-cream hover:bg-orange-50 active:scale-95 text-slate-600 hover:text-jaman-saffron flex items-center justify-center transition-all shrink-0 mr-1.5 cursor-pointer border border-jaman-border z-10"
             title="Scroll categories left"
           >
             <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
@@ -284,17 +284,17 @@ export const PosCatalog: React.FC = () => {
             onClick={() => { sound.play('click'); setSelectedCategory('ALL'); }}
             className={`min-h-[42px] px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black whitespace-nowrap transition-all flex items-center gap-2 shrink-0 cursor-pointer active:scale-98 ${
               selectedCategory === 'ALL'
-                ? 'bg-[#E66817] text-white shadow-xs'
-                : 'bg-[#FAF7F2] hover:bg-white border border-[#EBE6DD] text-[#0B253A] hover:border-[#E66817]/40'
+                ? 'bg-jaman-saffron text-white shadow-xs'
+                : 'bg-jaman-cream hover:bg-white border border-jaman-border text-jaman-navy hover:border-jaman-saffron/40'
             }`}
           >
-            <Sparkles className={`w-4 h-4 shrink-0 ${selectedCategory === 'ALL' ? 'text-white' : 'text-[#E66817]'}`} />
+            <Sparkles className={`w-4 h-4 shrink-0 ${selectedCategory === 'ALL' ? 'text-white' : 'text-jaman-saffron'}`} />
             <span>ALL MENU</span>
             <span
               className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md ${
                 selectedCategory === 'ALL'
                   ? 'bg-black/20 text-white'
-                  : 'bg-white text-slate-600 border border-[#EBE6DD]'
+                  : 'bg-white text-slate-600 border border-jaman-border'
               }`}
             >
               {db.menuItems.length}
@@ -315,8 +315,8 @@ export const PosCatalog: React.FC = () => {
                 title={group.primaryCategory.name}
                 className={`min-h-[42px] px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2 shrink-0 cursor-pointer active:scale-98 ${
                   isSelected
-                    ? 'bg-[#E66817] text-white shadow-xs'
-                    : 'bg-[#FAF7F2] hover:bg-white border border-[#EBE6DD] text-[#0B253A] hover:border-[#E66817]/40'
+                    ? 'bg-jaman-saffron text-white shadow-xs'
+                    : 'bg-jaman-cream hover:bg-white border border-jaman-border text-jaman-navy hover:border-jaman-saffron/40'
                 }`}
               >
                 <span>{group.displayLabel}</span>
@@ -324,7 +324,7 @@ export const PosCatalog: React.FC = () => {
                   className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md ${
                     isSelected
                       ? 'bg-black/20 text-white'
-                      : 'bg-white text-slate-600 border border-[#EBE6DD]'
+                      : 'bg-white text-slate-600 border border-jaman-border'
                   }`}
                 >
                   {group.totalDishCount}
@@ -339,7 +339,7 @@ export const PosCatalog: React.FC = () => {
           <button
             type="button"
             onClick={() => scrollCategories('RIGHT')}
-            className="w-8 h-9 rounded-xl bg-[#FAF7F2] hover:bg-orange-50 active:scale-95 text-slate-600 hover:text-[#E66817] flex items-center justify-center transition-all shrink-0 ml-1.5 cursor-pointer border border-[#EBE6DD] z-10"
+            className="w-8 h-9 rounded-xl bg-jaman-cream hover:bg-orange-50 active:scale-95 text-slate-600 hover:text-jaman-saffron flex items-center justify-center transition-all shrink-0 ml-1.5 cursor-pointer border border-jaman-border z-10"
             title="Scroll categories right"
           >
             <ChevronRight className="w-5 h-5 stroke-[2.5]" />
@@ -350,11 +350,11 @@ export const PosCatalog: React.FC = () => {
       {/* 2. SECONDARY TOOLBAR: DIETARY FILTERS + QUICK ADD */}
       <div className="flex items-center justify-between gap-2 shrink-0 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {/* Left: Food Type Dietary Filter Pills */}
-        <div className="flex items-center gap-1.5 bg-white border border-[#EBE6DD] p-1 rounded-xl shadow-2xs shrink-0">
+        <div className="flex items-center gap-1.5 bg-white border border-jaman-border p-1 rounded-xl shadow-2xs shrink-0">
           {[
-            { id: 'ALL', label: 'All', icon: '🍽️', activeBg: 'bg-[#0B253A] text-white' },
+            { id: 'ALL', label: 'All', icon: '🍽️', activeBg: 'bg-jaman-navy text-white' },
             { id: 'VEG', label: 'Veg', icon: '🟢', activeBg: 'bg-[#16A34A] text-white' },
-            { id: 'JAIN', label: 'Jain', icon: '🌾', activeBg: 'bg-[#E66817] text-white' },
+            { id: 'JAIN', label: 'Jain', icon: '🌾', activeBg: 'bg-jaman-saffron text-white' },
             { id: 'NON_VEG', label: 'Non-Veg', icon: '🍗', activeBg: 'bg-rose-700 text-white' }
           ].map((df) => {
             const active = dietaryFilter === df.id;
@@ -366,7 +366,7 @@ export const PosCatalog: React.FC = () => {
                 className={`min-h-[32px] px-2.5 py-1 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
                   active
                     ? `${df.activeBg} shadow-xs font-black`
-                    : 'bg-[#FAF7F2] border border-transparent text-[#0B253A] hover:bg-slate-100'
+                    : 'bg-jaman-cream border border-transparent text-jaman-navy hover:bg-slate-100'
                 }`}
               >
                 <span>{df.icon}</span>
@@ -378,8 +378,8 @@ export const PosCatalog: React.FC = () => {
 
         {/* Middle: Quick Add Chips */}
         <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto shrink min-w-0">
-          <div className="flex items-center gap-1 bg-[#FFF4ED] border border-[#FDBA74] px-2 py-1 rounded-lg text-xs font-black text-[#E66817] shrink-0">
-            <Zap className="w-3 h-3 fill-[#E66817]" />
+          <div className="flex items-center gap-1 bg-[#FFF4ED] border border-[#FDBA74] px-2 py-1 rounded-lg text-xs font-black text-jaman-saffron shrink-0">
+            <Zap className="w-3 h-3 fill-jaman-saffron" />
             <span>QUICK:</span>
           </div>
 
@@ -388,12 +388,12 @@ export const PosCatalog: React.FC = () => {
               key={item.id}
               type="button"
               onClick={() => usePosStore.getState().addItemToCart(item)}
-              className="min-h-[32px] bg-white border border-[#EBE6DD] hover:border-[#E66817] hover:bg-[#FFFDFB] px-2.5 py-1 rounded-lg text-xs font-bold text-[#0B253A] flex items-center gap-1.5 transition-all shadow-2xs active:scale-95 shrink-0 whitespace-nowrap cursor-pointer"
+              className="min-h-[32px] bg-white border border-jaman-border hover:border-jaman-saffron hover:bg-[#FFFDFB] px-2.5 py-1 rounded-lg text-xs font-bold text-jaman-navy flex items-center gap-1.5 transition-all shadow-2xs active:scale-95 shrink-0 whitespace-nowrap cursor-pointer"
               title={`1-Tap Add ${item.name} (₹${item.price})`}
             >
               <span className="truncate max-w-[130px]">{item.name}</span>
-              <span className="font-mono text-[#E66817] font-black text-xs">₹{item.price}</span>
-              <Plus className="w-3 h-3 text-[#E66817] stroke-[3]" />
+              <span className="font-mono text-jaman-saffron font-black text-xs">₹{item.price}</span>
+              <Plus className="w-3 h-3 text-jaman-saffron stroke-[3]" />
             </button>
           ))}
         </div>
@@ -402,12 +402,12 @@ export const PosCatalog: React.FC = () => {
         <div className="flex items-center gap-1.5 ml-auto shrink-0">
           {searchQuery && (
             <div className="flex items-center gap-1.5 bg-[#FFF4ED] border border-[#FDBA74] px-2.5 py-1 rounded-lg text-xs shrink-0 animate-in fade-in">
-              <Search className="w-3.5 h-3.5 text-[#E66817]" />
+              <Search className="w-3.5 h-3.5 text-jaman-saffron" />
               <span className="text-slate-600 font-bold truncate max-w-[110px]">"{searchQuery}"</span>
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="w-4 h-4 rounded bg-orange-200/60 hover:bg-rose-100 text-[#E66817] hover:text-rose-600 flex items-center justify-center font-black cursor-pointer"
+                className="w-4 h-4 rounded bg-orange-200/60 hover:bg-rose-100 text-jaman-saffron hover:text-rose-600 flex items-center justify-center font-black cursor-pointer"
                 title="Clear Search"
               >
                 <X className="w-3 h-3 stroke-[3]" />
@@ -418,10 +418,10 @@ export const PosCatalog: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsMenuManagerOpen(true)}
-            className="min-h-[32px] px-3 py-1 bg-white hover:bg-[#FFF4ED] border border-[#EBE6DD] hover:border-[#FDBA74] text-[#0B253A] hover:text-[#E66817] rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs active:scale-95 cursor-pointer"
+            className="min-h-[32px] px-3 py-1 bg-white hover:bg-[#FFF4ED] border border-jaman-border hover:border-[#FDBA74] text-jaman-navy hover:text-jaman-saffron rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs active:scale-95 cursor-pointer"
             title="Open Menu Manager & Prebuilt Starter Library (30 Types)"
           >
-            <Settings2 className="w-3.5 h-3.5 text-[#E66817]" />
+            <Settings2 className="w-3.5 h-3.5 text-jaman-saffron" />
             <span className="hidden md:inline">Menu</span>
           </button>
         </div>
@@ -436,11 +436,11 @@ export const PosCatalog: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="h-64 flex flex-col items-center justify-center text-center p-6 bg-white rounded-3xl border border-[#EBE6DD] shadow-2xs space-y-3">
-            <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-[#E66817] flex items-center justify-center shadow-xs">
+          <div className="h-64 flex flex-col items-center justify-center text-center p-6 bg-white rounded-3xl border border-jaman-border shadow-2xs space-y-3">
+            <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center shadow-xs">
               <Utensils className="w-7 h-7" />
             </div>
-            <h3 className="text-base font-black text-[#0B253A]">No dishes match your selection</h3>
+            <h3 className="text-base font-black text-jaman-navy">No dishes match your selection</h3>
             <p className="text-xs text-slate-400 max-w-sm">
               Try choosing "All Menu" or clearing the active search filter to view all dishes.
             </p>
@@ -451,7 +451,7 @@ export const PosCatalog: React.FC = () => {
                 setDietaryFilter('ALL');
                 setSearchQuery('');
               }}
-              className="min-h-[40px] px-5 py-1.5 rounded-xl bg-[#E66817] text-white font-bold text-xs shadow-md shadow-[#E66817]/20 active:scale-95 cursor-pointer"
+              className="min-h-[40px] px-5 py-1.5 rounded-xl bg-jaman-saffron text-white font-bold text-xs shadow-md shadow-jaman-saffron/20 active:scale-95 cursor-pointer"
             >
               Reset Filters
             </button>

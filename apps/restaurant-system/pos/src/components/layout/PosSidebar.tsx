@@ -57,7 +57,7 @@ export const PosSidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-16 lg:w-48 xl:w-52 bg-white border-r border-[#EBE6DD] flex flex-col justify-between select-none shrink-0 z-20 shadow-2xs">
+    <aside className="w-16 lg:w-48 xl:w-52 bg-white border-r border-jaman-border flex flex-col justify-between select-none shrink-0 z-20 shadow-2xs">
       {/* Primary Navigation Links */}
       <nav className="p-2 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
@@ -70,8 +70,8 @@ export const PosSidebar: React.FC = () => {
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs transition-all relative ${
                 isActive
-                  ? 'bg-[#E66817] text-white shadow-sm shadow-[#E66817]/25'
-                  : 'text-[#4A5568] hover:bg-[#FAF7F2] hover:text-[#0B253A]'
+                  ? 'bg-jaman-saffron text-white shadow-sm shadow-jaman-saffron/25'
+                  : 'text-[#4A5568] hover:bg-jaman-cream hover:text-jaman-navy'
               }`}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -83,7 +83,7 @@ export const PosSidebar: React.FC = () => {
               {item.badge !== undefined && item.badge > 0 && (
                 <span
                   className={`ml-auto text-[10px] font-black px-1.5 py-0.2 rounded-full ${
-                    isActive ? 'bg-white text-[#E66817]' : 'bg-[#E66817] text-white'
+                    isActive ? 'bg-white text-jaman-saffron' : 'bg-jaman-saffron text-white'
                   }`}
                 >
                   {item.badge}
@@ -94,17 +94,17 @@ export const PosSidebar: React.FC = () => {
         })}
 
         {/* ✨ Dedicated AI ASSISTANT Navigation Trigger in Sidebar */}
-        <div className="pt-2 border-t border-[#EBE6DD] my-1">
+        <div className="pt-2 border-t border-jaman-border my-1">
           <button
             onClick={() => setIsChatbotOpen(true)}
-            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-black text-xs transition-all relative bg-gradient-to-r from-amber-500/10 via-[#E66817]/10 to-amber-500/10 hover:from-amber-500/20 hover:to-[#E66817]/20 border border-[#FED7AA] text-[#E66817] shadow-2xs group cursor-pointer active:scale-98"
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-black text-xs transition-all relative bg-gradient-to-r from-amber-500/10 via-jaman-saffron/10 to-amber-500/10 hover:from-amber-500/20 hover:to-jaman-saffron/20 border border-[#FED7AA] text-jaman-saffron shadow-2xs group cursor-pointer active:scale-98"
             title="JAMAN AI Assistant (Voice & Conversational POS Actions)"
           >
-            <Sparkles className="w-4 h-4 text-[#E66817] group-hover:rotate-12 transition-transform shrink-0 animate-pulse" />
+            <Sparkles className="w-4 h-4 text-jaman-saffron group-hover:rotate-12 transition-transform shrink-0 animate-pulse" />
             <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap font-extrabold">
               JAMAN AI Assistant
             </span>
-            <span className="hidden lg:inline-block ml-auto text-[9px] font-black bg-[#E66817] text-white px-1.5 py-0.2 rounded-full uppercase">
+            <span className="hidden lg:inline-block ml-auto text-[9px] font-black bg-jaman-saffron text-white px-1.5 py-0.2 rounded-full uppercase">
               AI
             </span>
           </button>
@@ -112,14 +112,14 @@ export const PosSidebar: React.FC = () => {
       </nav>
 
       {/* Bottom Area: Print Queue Trigger & Held Orders */}
-      <div className="p-2 border-t border-[#EBE6DD] space-y-1.5 bg-[#FAF7F2]/40">
+      <div className="p-2 border-t border-jaman-border space-y-1.5 bg-jaman-cream/40">
         {/* Hardware Print Queue Trigger */}
         <button
           onClick={() => setIsPrintQueueOpen(true)}
           className={`w-full p-2 rounded-xl flex items-center justify-between transition-colors text-xs font-bold ${
             failedPrintsCount > 0
               ? 'bg-rose-50 border border-rose-200 text-rose-700'
-              : 'bg-white hover:bg-[#FAF7F2] border border-[#EBE6DD] text-[#0B253A]'
+              : 'bg-white hover:bg-jaman-cream border border-jaman-border text-jaman-navy'
           }`}
           title="Print Queue"
         >
@@ -149,7 +149,7 @@ export const PosSidebar: React.FC = () => {
           </div>
         )}
 
-        <div className="hidden lg:block text-[10px] text-slate-500 px-2 py-1 text-center bg-white rounded-lg border border-[#EBE6DD] font-semibold">
+        <div className="hidden lg:block text-[10px] text-slate-500 px-2 py-1 text-center bg-white rounded-lg border border-jaman-border font-semibold">
           <span>Core: <strong className="text-emerald-700">Offline First</strong></span>
         </div>
       </div>

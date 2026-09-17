@@ -46,11 +46,11 @@ export const PosOrderNotesModal: React.FC<PosOrderNotesModalProps> = ({ isOpen, 
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-3xl max-w-md w-full shadow-2xl overflow-hidden">
+      <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-md w-full shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-[#0B253A] text-white p-4 flex items-center justify-between">
+        <div className="bg-jaman-navy text-white p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-[#E66817]" />
+            <MessageSquare className="w-4 h-4 text-jaman-saffron" />
             <h3 className="text-sm font-bold text-white">Kitchen & Chef Instructions</h3>
           </div>
           <button onClick={onClose} className="text-slate-300 hover:text-white">
@@ -74,7 +74,7 @@ export const PosOrderNotesModal: React.FC<PosOrderNotesModalProps> = ({ isOpen, 
                     onClick={() => toggleChip(chip)}
                     className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1 ${
                       isActive
-                        ? 'bg-[#E66817] text-white shadow-xs'
+                        ? 'bg-jaman-saffron text-white shadow-xs'
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
@@ -95,13 +95,13 @@ export const PosOrderNotesModal: React.FC<PosOrderNotesModalProps> = ({ isOpen, 
               placeholder="e.g. VIP guest, urgent preparation, no plastic cutlery..."
               value={customText}
               onChange={(e) => setCustomText(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-[#0B253A] focus:outline-hidden focus:border-[#E66817] focus:bg-white resize-none"
+              className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-jaman-navy focus:outline-hidden focus:border-jaman-saffron focus:bg-white resize-none"
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-[#FAF7F2] border-t border-[#EBE6DD] flex justify-end gap-2">
+        <div className="p-3 bg-jaman-cream border-t border-jaman-border flex justify-end gap-2">
           <button
             type="button"
             onClick={onClose}
@@ -112,7 +112,7 @@ export const PosOrderNotesModal: React.FC<PosOrderNotesModalProps> = ({ isOpen, 
           <button
             type="button"
             onClick={handleSave}
-            className="px-4 py-1.5 rounded-xl bg-[#E66817] text-white font-bold text-xs shadow-xs hover:bg-[#F97316]"
+            className="px-4 py-1.5 rounded-xl bg-jaman-saffron text-white font-bold text-xs shadow-xs hover:bg-jaman-orange"
           >
             Save Instructions
           </button>

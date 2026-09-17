@@ -66,11 +66,11 @@ export const PosShiftModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-[#0B253A] text-white p-5 flex items-center justify-between shrink-0">
+        <div className="bg-jaman-navy text-white p-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <Clock className="w-5 h-5 text-[#E66817]" />
+            <Clock className="w-5 h-5 text-jaman-saffron" />
             <div>
               <h2 className="text-base font-bold text-white leading-tight">Shift & Cash Drawer Management</h2>
               <span className="text-xs text-slate-300">Terminal POS-01 • Cashier: {currentUser?.fullName}</span>
@@ -86,12 +86,12 @@ export const PosShiftModal: React.FC = () => {
         </div>
 
         {/* Tab Selector */}
-        <div className="p-3 bg-white border-b border-[#EBE6DD] flex gap-2 shrink-0">
+        <div className="p-3 bg-white border-b border-jaman-border flex gap-2 shrink-0">
           <button
             onClick={() => setActiveTab('SUMMARY')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
               activeTab === 'SUMMARY'
-                ? 'bg-[#0B253A] text-white shadow-xs'
+                ? 'bg-jaman-navy text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -103,7 +103,7 @@ export const PosShiftModal: React.FC = () => {
               onClick={() => setActiveTab('CLOSE')}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
                 activeTab === 'CLOSE'
-                  ? 'bg-[#E66817] text-white shadow-xs'
+                  ? 'bg-jaman-saffron text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -135,7 +135,7 @@ export const PosShiftModal: React.FC = () => {
           {/* SUMMARY TAB */}
           {activeTab === 'SUMMARY' && currentShift && (
             <div className="space-y-4">
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-3">
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-3">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <span className="text-xs font-bold text-slate-500 uppercase">Active Shift Info</span>
                   <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
@@ -146,11 +146,11 @@ export const PosShiftModal: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div>
                     <span className="text-slate-400 block text-[10px]">Opened At</span>
-                    <strong className="text-[#0B253A]">{new Date(currentShift.openedAt).toLocaleTimeString()}</strong>
+                    <strong className="text-jaman-navy">{new Date(currentShift.openedAt).toLocaleTimeString()}</strong>
                   </div>
                   <div>
                     <span className="text-slate-400 block text-[10px]">Opening Float</span>
-                    <strong className="text-[#0B253A] font-mono">₹{currentShift.openingCash}</strong>
+                    <strong className="text-jaman-navy font-mono">₹{currentShift.openingCash}</strong>
                   </div>
                   <div>
                     <span className="text-slate-400 block text-[10px]">Total Sales</span>
@@ -158,12 +158,12 @@ export const PosShiftModal: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-slate-400 block text-[10px]">Orders Count</span>
-                    <strong className="text-[#0B253A]">{currentShift.totalOrders} bills</strong>
+                    <strong className="text-jaman-navy">{currentShift.totalOrders} bills</strong>
                   </div>
                 </div>
 
                 {/* Expected Cash in Drawer */}
-                <div className="bg-[#0B253A] text-white p-3.5 rounded-xl flex items-center justify-between mt-2">
+                <div className="bg-jaman-navy text-white p-3.5 rounded-xl flex items-center justify-between mt-2">
                   <div>
                     <span className="text-[10px] text-slate-300 uppercase font-bold block">Expected Cash in Drawer</span>
                     <span className="text-xs text-slate-400">(Opening Float + Cash Sales ± Cash Move)</span>
@@ -175,20 +175,20 @@ export const PosShiftModal: React.FC = () => {
               </div>
 
               {/* Payment Mix Breakdown */}
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-2">
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-2">
                 <span className="text-xs font-bold text-slate-700 block">Payment Mix Collection</span>
                 <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between">
                     <span className="text-slate-600">Cash Collections:</span>
-                    <span className="font-mono font-bold text-[#0B253A]">₹{currentShift.totalCashSales}</span>
+                    <span className="font-mono font-bold text-jaman-navy">₹{currentShift.totalCashSales}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">UPI / QR Collections:</span>
-                    <span className="font-mono font-bold text-[#0B253A]">₹{currentShift.totalUpiSales}</span>
+                    <span className="font-mono font-bold text-jaman-navy">₹{currentShift.totalUpiSales}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Card Collections:</span>
-                    <span className="font-mono font-bold text-[#0B253A]">₹{currentShift.totalCardSales}</span>
+                    <span className="font-mono font-bold text-jaman-navy">₹{currentShift.totalCardSales}</span>
                   </div>
                 </div>
               </div>
@@ -206,7 +206,7 @@ export const PosShiftModal: React.FC = () => {
                 <div>Please count physical cash notes in the drawer and enter the total below.</div>
               </div>
 
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 space-y-3">
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 space-y-3">
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1">
                     Actual Cash Counted (₹) *
@@ -218,7 +218,7 @@ export const PosShiftModal: React.FC = () => {
                     value={actualCashInput}
                     onChange={(e) => setActualCashInput(e.target.value)}
                     placeholder={`Expected: ₹${currentShift.expectedCash}`}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                 </div>
 
@@ -245,14 +245,14 @@ export const PosShiftModal: React.FC = () => {
                     value={closingNotes}
                     onChange={(e) => setClosingNotes(e.target.value)}
                     placeholder="e.g. Handed over to Evening Cashier Suresh"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-2xl bg-[#E66817] hover:bg-[#F97316] text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-[#E66817]/25 cursor-pointer"
+                className="w-full py-3.5 rounded-2xl bg-jaman-saffron hover:bg-jaman-orange text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-jaman-saffron/25 cursor-pointer"
               >
                 Confirm & Close Shift
               </button>
@@ -262,8 +262,8 @@ export const PosShiftModal: React.FC = () => {
           {/* OPEN NEW SHIFT TAB */}
           {activeTab === 'NEW' && (
             <form onSubmit={handleOpenNewShift} className="space-y-4">
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 space-y-3">
-                <h3 className="text-sm font-bold text-[#0B253A]">Start New Cashier Shift</h3>
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 space-y-3">
+                <h3 className="text-sm font-bold text-jaman-navy">Start New Cashier Shift</h3>
 
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1">
@@ -275,7 +275,7 @@ export const PosShiftModal: React.FC = () => {
                     value={newOpeningFloat}
                     onChange={(e) => setNewOpeningFloat(e.target.value)}
                     placeholder="e.g. 2000"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                 </div>
 
@@ -288,7 +288,7 @@ export const PosShiftModal: React.FC = () => {
                     value={newShiftNotes}
                     onChange={(e) => setNewShiftNotes(e.target.value)}
                     placeholder="e.g. Evening shift opening float verified"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                 </div>
               </div>

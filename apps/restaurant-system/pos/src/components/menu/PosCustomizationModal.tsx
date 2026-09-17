@@ -96,9 +96,9 @@ export const PosCustomizationModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-[#0B253A] text-white p-4 sm:p-5 flex items-center justify-between">
+        <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-white/10 overflow-hidden border border-white/20 shrink-0">
               <img
@@ -114,7 +114,7 @@ export const PosCustomizationModal: React.FC = () => {
               <div className="text-xs text-slate-300 flex items-center gap-2 mt-0.5">
                 <span>Base: ₹{customizingItem.price}</span>
                 <span>•</span>
-                <span className="text-[#E66817] font-semibold">{customizingItem.kitchenStation || 'Kitchen'}</span>
+                <span className="text-jaman-saffron font-semibold">{customizingItem.kitchenStation || 'Kitchen'}</span>
               </div>
             </div>
           </div>
@@ -131,10 +131,10 @@ export const PosCustomizationModal: React.FC = () => {
         <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1">
           {/* Modifier Groups */}
           {modifierGroups.map((group) => (
-            <div key={group.id} className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs">
+            <div key={group.id} className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h3 className="font-bold text-sm text-[#0B253A]">{group.name}</h3>
+                  <h3 className="font-bold text-sm text-jaman-navy">{group.name}</h3>
                   <span className="text-[11px] text-slate-400">
                     {group.isRequired ? 'Required • Choose 1' : `Optional • Max ${group.maxSelections}`}
                   </span>
@@ -156,7 +156,7 @@ export const PosCustomizationModal: React.FC = () => {
                       onClick={() => handleToggleOption(group, opt)}
                       className={`p-3 rounded-xl border text-left flex items-center justify-between transition-all ${
                         selected
-                          ? 'border-[#E66817] bg-[#E66817]/10 text-[#0B253A] font-bold shadow-xs'
+                          ? 'border-jaman-saffron bg-jaman-saffron/10 text-jaman-navy font-bold shadow-xs'
                           : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
                       }`}
                     >
@@ -164,7 +164,7 @@ export const PosCustomizationModal: React.FC = () => {
                         <div
                           className={`w-4 h-4 rounded-md border flex items-center justify-center ${
                             selected
-                              ? 'bg-[#E66817] border-[#E66817] text-white'
+                              ? 'bg-jaman-saffron border-jaman-saffron text-white'
                               : 'border-slate-300'
                           }`}
                         >
@@ -184,10 +184,10 @@ export const PosCustomizationModal: React.FC = () => {
           ))}
 
           {/* Quick Cooking Instructions */}
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs">
+          <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-4 h-4 text-[#E66817]" />
-              <h3 className="font-bold text-sm text-[#0B253A]">Kitchen Instructions</h3>
+              <Sparkles className="w-4 h-4 text-jaman-saffron" />
+              <h3 className="font-bold text-sm text-jaman-navy">Kitchen Instructions</h3>
             </div>
 
             <div className="flex flex-wrap gap-2 mb-3">
@@ -200,7 +200,7 @@ export const PosCustomizationModal: React.FC = () => {
                     onClick={() => toggleQuickInstruction(text)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                       active
-                        ? 'bg-[#0B253A] text-white border-[#0B253A]'
+                        ? 'bg-jaman-navy text-white border-jaman-navy'
                         : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-400'
                     }`}
                   >
@@ -216,14 +216,14 @@ export const PosCustomizationModal: React.FC = () => {
                 value={specialInstructions}
                 onChange={(e) => setSpecialInstructions(e.target.value)}
                 placeholder="Custom instruction for kitchen chef..."
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
               />
             </div>
           </div>
         </div>
 
         {/* Footer: Quantity & Confirm Add */}
-        <div className="bg-white border-t border-[#EBE6DD] p-4 sm:p-5 flex items-center justify-between gap-4">
+        <div className="bg-white border-t border-jaman-border p-4 sm:p-5 flex items-center justify-between gap-4">
           {/* Quantity Controls */}
           <div className="flex items-center gap-3 bg-slate-100 border border-slate-200 rounded-2xl p-1">
             <button
@@ -232,7 +232,7 @@ export const PosCustomizationModal: React.FC = () => {
             >
               <Minus className="w-4 h-4" />
             </button>
-            <span className="w-8 text-center font-extrabold text-base text-[#0B253A]">
+            <span className="w-8 text-center font-extrabold text-base text-jaman-navy">
               {quantity}
             </span>
             <button
@@ -246,7 +246,7 @@ export const PosCustomizationModal: React.FC = () => {
           {/* Add to Order Button */}
           <button
             onClick={handleAddToCart}
-            className="flex-1 bg-[#E66817] hover:bg-[#F97316] text-white py-3.5 px-6 rounded-2xl font-extrabold text-sm uppercase tracking-wider flex items-center justify-between shadow-lg shadow-[#E66817]/25 active:scale-[0.99] transition-transform cursor-pointer"
+            className="flex-1 bg-jaman-saffron hover:bg-jaman-orange text-white py-3.5 px-6 rounded-2xl font-extrabold text-sm uppercase tracking-wider flex items-center justify-between shadow-lg shadow-jaman-saffron/25 active:scale-[0.99] transition-transform cursor-pointer"
           >
             <span>Add to Order</span>
             <span>₹{totalPrice}</span>

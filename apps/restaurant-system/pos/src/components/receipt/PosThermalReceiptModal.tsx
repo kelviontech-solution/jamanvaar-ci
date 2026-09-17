@@ -123,15 +123,15 @@ export const PosThermalReceiptModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Top Header */}
-        <div className="bg-white border-b border-[#EBE6DD] text-[#0B253A] p-4 sm:p-5 flex items-center justify-between shrink-0">
+        <div className="bg-white border-b border-jaman-border text-jaman-navy p-4 sm:p-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <Printer className="w-5 h-5 text-[#E66817]" />
+            <Printer className="w-5 h-5 text-jaman-saffron" />
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-[#0B253A] leading-tight">PRINT RECEIPT</h2>
-                <span className="bg-[#FFF4ED] text-[#E66817] text-[10px] font-black px-2 py-0.5 rounded border border-[#FDBA74]">
+                <h2 className="text-base font-bold text-jaman-navy leading-tight">PRINT RECEIPT</h2>
+                <span className="bg-[#FFF4ED] text-jaman-saffron text-[10px] font-black px-2 py-0.5 rounded border border-[#FDBA74]">
                   {order.paymentMethod}
                 </span>
               </div>
@@ -143,13 +143,13 @@ export const PosThermalReceiptModal: React.FC = () => {
 
           <div className="flex items-center gap-2">
             {/* Paper Size Switcher */}
-            <div className="bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl p-0.5 flex text-xs">
+            <div className="bg-jaman-ivory border border-jaman-border rounded-xl p-0.5 flex text-xs">
               <button
                 onClick={() => setPaperWidth('80mm')}
                 className={`px-2.5 py-1 rounded-lg font-bold transition-colors ${
                   paperWidth === '80mm'
-                    ? 'bg-[#E66817] text-white shadow-xs'
-                    : 'text-slate-500 hover:text-[#0B253A]'
+                    ? 'bg-jaman-saffron text-white shadow-xs'
+                    : 'text-slate-500 hover:text-jaman-navy'
                 }`}
               >
                 80mm
@@ -158,8 +158,8 @@ export const PosThermalReceiptModal: React.FC = () => {
                 onClick={() => setPaperWidth('58mm')}
                 className={`px-2.5 py-1 rounded-lg font-bold transition-colors ${
                   paperWidth === '58mm'
-                    ? 'bg-[#E66817] text-white shadow-xs'
-                    : 'text-slate-500 hover:text-[#0B253A]'
+                    ? 'bg-jaman-saffron text-white shadow-xs'
+                    : 'text-slate-500 hover:text-jaman-navy'
                 }`}
               >
                 58mm
@@ -168,7 +168,7 @@ export const PosThermalReceiptModal: React.FC = () => {
 
             <button
               onClick={() => setIsReceiptOpen(false)}
-              className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-[#0B253A] transition-colors"
+              className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-jaman-navy transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -237,7 +237,7 @@ export const PosThermalReceiptModal: React.FC = () => {
 
         {/* Customer Phone Prompt for WhatsApp/SMS Share */}
         {phonePromptOpen && (
-          <div className="p-3 bg-[#0B253A] text-white border-t border-[#1E3A4C] flex items-center justify-between gap-2">
+          <div className="p-3 bg-jaman-navy text-white border-t border-jaman-darkBorder flex items-center justify-between gap-2">
             <span className="text-xs font-semibold">Enter Customer {pendingChannel === 'WHATSAPP' ? 'WhatsApp' : 'Mobile'} #:</span>
             <div className="flex items-center gap-1.5">
               <input
@@ -245,11 +245,11 @@ export const PosThermalReceiptModal: React.FC = () => {
                 placeholder="10-digit mobile"
                 value={inputPhone}
                 onChange={(e) => setInputPhone(e.target.value)}
-                className="bg-[#0B2B39] border border-[#1E3A4C] rounded-lg px-2 py-1 text-xs text-white w-36 font-mono focus:outline-hidden focus:border-[#E66817]"
+                className="bg-jaman-deepNavy border border-jaman-darkBorder rounded-lg px-2 py-1 text-xs text-white w-36 font-mono focus:outline-hidden focus:border-jaman-saffron"
               />
               <button
                 onClick={() => dispatchDigitalReceipt(pendingChannel, inputPhone)}
-                className="px-3 py-1 bg-[#E66817] text-white rounded-lg font-bold text-xs"
+                className="px-3 py-1 bg-jaman-saffron text-white rounded-lg font-bold text-xs"
               >
                 Send
               </button>
@@ -264,7 +264,7 @@ export const PosThermalReceiptModal: React.FC = () => {
         )}
 
         {/* Bottom Actions Bar */}
-        <div className="bg-white border-t border-[#EBE6DD] p-4 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className="bg-white border-t border-jaman-border p-4 flex flex-wrap items-center justify-between gap-3 shrink-0">
           {/* Digital Receipt Options */}
           <div className="flex items-center gap-1.5">
             <button
@@ -313,7 +313,7 @@ export const PosThermalReceiptModal: React.FC = () => {
 
             <button
               onClick={handlePrint}
-              className="px-6 py-2.5 rounded-xl bg-[#E66817] hover:bg-[#F97316] text-white font-extrabold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-[#E66817]/25 transition-transform active:scale-95"
+              className="px-6 py-2.5 rounded-xl bg-jaman-saffron hover:bg-jaman-orange text-white font-extrabold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-jaman-saffron/25 transition-transform active:scale-95"
             >
               <Printer className="w-4 h-4" />
               <span>Print Receipt</span>

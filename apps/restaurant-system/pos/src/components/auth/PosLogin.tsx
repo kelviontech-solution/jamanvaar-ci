@@ -93,9 +93,9 @@ export const PosLogin: React.FC = () => {
       <button
         type="button"
         onClick={handleQuickDemo}
-        className="w-full py-2.5 px-4 rounded-xl bg-[#FFF7ED] hover:bg-[#FFEEDD] border border-[#FDBA74] text-[#E66817] font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-2xs active:scale-[0.98] cursor-pointer"
+        className="w-full py-2.5 px-4 rounded-xl bg-[#FFF7ED] hover:bg-[#FFEEDD] border border-[#FDBA74] text-jaman-saffron font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-2xs active:scale-[0.98] cursor-pointer"
       >
-        <Zap className="w-4 h-4 text-[#E66817] fill-[#E66817]" />
+        <Zap className="w-4 h-4 text-jaman-saffron fill-jaman-saffron" />
         <span>QUICK DEMO LOGIN — Cashier Session (PIN: 1111)</span>
       </button>
 
@@ -127,8 +127,8 @@ export const PosLogin: React.FC = () => {
                 }}
                 className={`min-h-[52px] p-2.5 sm:p-3 rounded-2xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-[#FFF7ED] border-2 border-[#E66817] text-[#0B253A] shadow-xs'
-                    : 'bg-white border-[#EBE6DD] text-slate-700 hover:border-slate-300'
+                    ? 'bg-[#FFF7ED] border-2 border-jaman-saffron text-jaman-navy shadow-xs'
+                    : 'bg-white border-jaman-border text-slate-700 hover:border-slate-300'
                 }`}
               >
                 <div
@@ -137,7 +137,7 @@ export const PosLogin: React.FC = () => {
                   {user.fullName.charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-extrabold text-xs text-[#0B253A] truncate leading-tight">
+                  <div className="font-extrabold text-xs text-jaman-navy truncate leading-tight">
                     {user.fullName}
                   </div>
                   <div className="text-[10px] text-slate-400 font-medium truncate capitalize mt-0.5">
@@ -145,7 +145,7 @@ export const PosLogin: React.FC = () => {
                   </div>
                 </div>
                 {isSelected && (
-                  <div className="w-5 h-5 rounded-full bg-[#E66817] flex items-center justify-center text-white shrink-0 shadow-2xs">
+                  <div className="w-5 h-5 rounded-full bg-jaman-saffron flex items-center justify-center text-white shrink-0 shadow-2xs">
                     <Check className="w-3 h-3 stroke-[3]" />
                   </div>
                 )}
@@ -165,7 +165,7 @@ export const PosLogin: React.FC = () => {
                 key={idx}
                 className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 transition-all flex items-center justify-center ${
                   isFilled
-                    ? 'border-[#0B253A] bg-[#0B253A] scale-110 shadow-xs'
+                    ? 'border-jaman-navy bg-jaman-navy scale-110 shadow-xs'
                     : 'border-slate-300 bg-transparent'
                 }`}
               />
@@ -196,8 +196,8 @@ export const PosLogin: React.FC = () => {
               }}
               className={`h-13 sm:h-14 rounded-2xl font-black text-xl sm:text-2xl flex items-center justify-center transition-all active:scale-95 select-none cursor-pointer border ${
                 isAction
-                  ? 'bg-slate-50 border-[#EBE6DD] text-rose-600 hover:bg-rose-50'
-                  : 'bg-white border-[#EBE6DD] text-[#0B253A] hover:border-[#E66817] hover:bg-amber-50/30 shadow-2xs'
+                  ? 'bg-slate-50 border-jaman-border text-rose-600 hover:bg-rose-50'
+                  : 'bg-white border-jaman-border text-jaman-navy hover:border-jaman-saffron hover:bg-amber-50/30 shadow-2xs'
               }`}
             >
               {key === '⌫' ? (
@@ -219,7 +219,7 @@ export const PosLogin: React.FC = () => {
         disabled={pin.length !== 4 || isVerifying}
         className={`w-full py-3.5 sm:py-4 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md mt-1 ${
           pin.length === 4 && !isVerifying
-            ? 'bg-[#E66817] hover:bg-[#EA580C] text-white shadow-orange-500/25 cursor-pointer active:scale-[0.99]'
+            ? 'bg-jaman-saffron hover:bg-[#EA580C] text-white shadow-orange-500/25 cursor-pointer active:scale-[0.99]'
             : 'bg-slate-200 text-slate-400 cursor-not-allowed'
         }`}
       >

@@ -29,7 +29,7 @@ export const CrashRecoveryBanner: React.FC = () => {
       <div className="flex items-center gap-2">
         <button
           onClick={recoverDraftSession}
-          className="px-3 py-1.5 rounded-lg bg-[#0B253A] hover:bg-[#1E3A4C] text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition-colors"
+          className="px-3 py-1.5 rounded-lg bg-jaman-navy hover:bg-jaman-darkBorder text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Restore Order</span>

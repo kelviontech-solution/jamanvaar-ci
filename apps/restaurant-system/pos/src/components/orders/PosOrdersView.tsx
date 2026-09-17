@@ -187,13 +187,13 @@ export const PosOrdersView: React.FC = () => {
 
   return (
     <>
-    <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] p-4 sm:p-6 overflow-hidden select-none">
+    <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-hidden select-none">
       {/* Header & Session Scope Indicator */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4 shrink-0">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B253A] flex items-center gap-2">
-              <ShoppingBag className="w-6 h-6 text-[#E66817]" />
+            <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
+              <ShoppingBag className="w-6 h-6 text-jaman-saffron" />
               <span>Live Restaurant Orders</span>
             </h1>
             <span className="text-xs font-black bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full flex items-center gap-1">
@@ -209,14 +209,14 @@ export const PosOrdersView: React.FC = () => {
         </div>
 
         {/* Scope Pill Selector: Active Session vs Complete History */}
-        <div className="flex items-center gap-1.5 bg-white border border-[#EBE6DD] p-1 rounded-2xl shadow-2xs">
+        <div className="flex items-center gap-1.5 bg-white border border-jaman-border p-1 rounded-2xl shadow-2xs">
           <button
             type="button"
             onClick={() => setScopeFilter('ACTIVE_DAY')}
             className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
               scopeFilter === 'ACTIVE_DAY'
-                ? 'bg-[#E66817] text-white shadow-xs'
-                : 'text-slate-600 hover:text-[#0B253A] hover:bg-slate-50'
+                ? 'bg-jaman-saffron text-white shadow-xs'
+                : 'text-slate-600 hover:text-jaman-navy hover:bg-slate-50'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -228,8 +228,8 @@ export const PosOrdersView: React.FC = () => {
             onClick={() => setScopeFilter('ALL_DAYS')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
               scopeFilter === 'ALL_DAYS'
-                ? 'bg-[#0B253A] text-white shadow-xs'
-                : 'text-slate-600 hover:text-[#0B253A] hover:bg-slate-50'
+                ? 'bg-jaman-navy text-white shadow-xs'
+                : 'text-slate-600 hover:text-jaman-navy hover:bg-slate-50'
             }`}
             title="View complete historical orders across all past days"
           >
@@ -249,12 +249,12 @@ export const PosOrdersView: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search order #, token, table, customer..."
-            className="w-full bg-white border border-[#EBE6DD] rounded-xl pl-9 pr-3 py-2 text-xs font-semibold text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
+            className="w-full bg-white border border-jaman-border rounded-xl pl-9 pr-3 py-2 text-xs font-semibold text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
           />
         </div>
 
         {/* Source Pills */}
-        <div className="flex items-center gap-1 bg-white border border-[#EBE6DD] p-1 rounded-xl shadow-2xs overflow-x-auto">
+        <div className="flex items-center gap-1 bg-white border border-jaman-border p-1 rounded-xl shadow-2xs overflow-x-auto">
           {[
             { id: 'ALL', label: 'All Sources' },
             { id: 'QR_TABLE', label: '🟠 QR Table' },
@@ -268,8 +268,8 @@ export const PosOrdersView: React.FC = () => {
               onClick={() => setSourceFilter(src.id)}
               className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
                 sourceFilter === src.id
-                  ? 'bg-[#0B253A] text-white shadow-xs font-black'
-                  : 'text-slate-600 hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-xs font-black'
+                  : 'text-slate-600 hover:text-jaman-navy'
               }`}
             >
               {src.label}
@@ -278,7 +278,7 @@ export const PosOrdersView: React.FC = () => {
         </div>
 
         {/* Status Pills */}
-        <div className="flex items-center gap-1 bg-white border border-[#EBE6DD] p-1 rounded-xl shadow-2xs">
+        <div className="flex items-center gap-1 bg-white border border-jaman-border p-1 rounded-xl shadow-2xs">
           {['ALL', 'NEW', 'CONFIRMED', 'PREPARING', 'READY', 'SERVED', 'COMPLETED'].map((st) => (
             <button
               key={st}
@@ -286,8 +286,8 @@ export const PosOrdersView: React.FC = () => {
               onClick={() => setStatusFilter(st)}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold capitalize transition-colors cursor-pointer ${
                 statusFilter === st
-                  ? 'bg-[#E66817] text-white shadow-xs font-black'
-                  : 'text-slate-600 hover:text-[#0B253A]'
+                  ? 'bg-jaman-saffron text-white shadow-xs font-black'
+                  : 'text-slate-600 hover:text-jaman-navy'
               }`}
             >
               {st.toLowerCase()}
@@ -299,7 +299,7 @@ export const PosOrdersView: React.FC = () => {
       {/* Orders List & Preview Pane */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 overflow-hidden">
         {/* Left: Orders Table */}
-        <div className="lg:col-span-8 bg-white border border-[#EBE6DD] rounded-2xl overflow-y-auto shadow-2xs divide-y divide-slate-100">
+        <div className="lg:col-span-8 bg-white border border-jaman-border rounded-2xl overflow-y-auto shadow-2xs divide-y divide-slate-100">
           {filteredOrders.length > 0 ? (
             filteredOrders.map((order) => {
               const isQr = order.source_type === 'QR_TABLE' || order.orderType === 'QR_TABLE';
@@ -327,16 +327,16 @@ export const PosOrdersView: React.FC = () => {
                   onClick={() => setSelectedOrder(order)}
                   className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer transition-colors ${
                     selectedOrder?.id === order.id
-                      ? 'bg-amber-50/60 border-l-4 border-l-[#E66817]'
+                      ? 'bg-amber-50/60 border-l-4 border-l-jaman-saffron'
                       : 'hover:bg-slate-50'
                   }`}
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-black text-sm text-[#0B253A]">
+                      <span className="font-black text-sm text-jaman-navy">
                         #{order.orderNumber}
                       </span>
-                      <span className="text-xs font-black bg-[#E66817] text-white px-2 py-0.5 rounded-md font-mono">
+                      <span className="text-xs font-black bg-jaman-saffron text-white px-2 py-0.5 rounded-md font-mono">
                         Token #{order.tokenNumber}
                       </span>
                       <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded uppercase">
@@ -382,7 +382,7 @@ export const PosOrdersView: React.FC = () => {
 
                   <div className="flex items-center gap-3 self-end sm:self-center">
                     <div className="text-right">
-                      <div className="font-mono font-black text-base text-[#0B253A]">
+                      <div className="font-mono font-black text-base text-jaman-navy">
                         {formatINR(order.totalAmount)}
                       </div>
                       <span
@@ -430,7 +430,7 @@ export const PosOrdersView: React.FC = () => {
           ) : (
             <div className="p-12 text-center text-slate-400 space-y-3">
               <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-              <h3 className="font-black text-base text-[#0B253A]">
+              <h3 className="font-black text-base text-jaman-navy">
                 {scopeFilter === 'ACTIVE_DAY'
                   ? `Active Session Ready • 0 Live Orders`
                   : 'No Orders Found in Archive'}
@@ -444,9 +444,9 @@ export const PosOrdersView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setScopeFilter('ALL_DAYS')}
-                  className="px-4 py-2 bg-white border border-[#EBE6DD] hover:border-[#E66817] text-[#0B253A] rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95 inline-flex items-center gap-1.5"
+                  className="px-4 py-2 bg-white border border-jaman-border hover:border-jaman-saffron text-jaman-navy rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95 inline-flex items-center gap-1.5"
                 >
-                  <History className="w-3.5 h-3.5 text-[#E66817]" />
+                  <History className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>View Past Orders History ({allOrders.length})</span>
                 </button>
               )}
@@ -455,15 +455,15 @@ export const PosOrdersView: React.FC = () => {
         </div>
 
         {/* Right: Selected Order Detail Preview Pane */}
-        <div className="lg:col-span-4 bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs flex flex-col justify-between overflow-y-auto">
+        <div className="lg:col-span-4 bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs flex flex-col justify-between overflow-y-auto">
           {selectedOrder ? (
             <div className="space-y-4">
               <div className="border-b border-slate-100 pb-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono font-black text-lg text-[#0B253A]">
+                  <span className="font-mono font-black text-lg text-jaman-navy">
                     #{selectedOrder.orderNumber}
                   </span>
-                  <span className="text-xs font-black bg-[#E66817] text-white px-2 py-0.5 rounded-md font-mono">
+                  <span className="text-xs font-black bg-jaman-saffron text-white px-2 py-0.5 rounded-md font-mono">
                     Token #{selectedOrder.tokenNumber}
                   </span>
                 </div>
@@ -479,18 +479,18 @@ export const PosOrdersView: React.FC = () => {
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Order Type:</span>
-                  <strong className="text-[#0B253A] uppercase">{selectedOrder.orderType}</strong>
+                  <strong className="text-jaman-navy uppercase">{selectedOrder.orderType}</strong>
                 </div>
                 {selectedOrder.tableNumber && (
                   <div className="flex justify-between">
                     <span className="text-slate-400">Table:</span>
-                    <strong className="text-[#0B253A]">Table {selectedOrder.tableNumber}</strong>
+                    <strong className="text-jaman-navy">Table {selectedOrder.tableNumber}</strong>
                   </div>
                 )}
                 {selectedOrder.customerName && (
                   <div className="flex justify-between">
                     <span className="text-slate-400">Customer:</span>
-                    <strong className="text-[#0B253A]">{selectedOrder.customerName}</strong>
+                    <strong className="text-jaman-navy">{selectedOrder.customerName}</strong>
                   </div>
                 )}
                 {selectedOrder.customerPhone && (
@@ -501,7 +501,7 @@ export const PosOrdersView: React.FC = () => {
                 )}
                 <div className="flex justify-between">
                   <span className="text-slate-400">Payment:</span>
-                  <span className="font-bold text-[#0B253A]">
+                  <span className="font-bold text-jaman-navy">
                     {selectedOrder.paymentMethod || 'CASH'} ({selectedOrder.paymentStatus})
                   </span>
                 </div>
@@ -562,10 +562,10 @@ export const PosOrdersView: React.FC = () => {
               )}
 
               {/* Kitchen Station Routing Breakdown */}
-              <div className="p-2.5 rounded-xl bg-[#FAF7F2] border border-[#EBE6DD] text-xs space-y-1">
-                <div className="flex items-center justify-between font-black text-[#0B253A]">
+              <div className="p-2.5 rounded-xl bg-jaman-cream border border-jaman-border text-xs space-y-1">
+                <div className="flex items-center justify-between font-black text-jaman-navy">
                   <span className="flex items-center gap-1.5">
-                    <ChefHat className="w-3.5 h-3.5 text-[#E66817]" />
+                    <ChefHat className="w-3.5 h-3.5 text-jaman-saffron" />
                     <span>Kitchen Station Dispatch</span>
                   </span>
                   <span className="text-[10px] font-bold bg-purple-100 text-purple-800 px-1.5 py-0.2 rounded">
@@ -590,7 +590,7 @@ export const PosOrdersView: React.FC = () => {
                       className="p-2 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between text-xs"
                     >
                       <div>
-                        <span className="font-bold text-[#0B253A] block">
+                        <span className="font-bold text-jaman-navy block">
                           {item.quantity}x {item.name}
                         </span>
                         {item.modifiers && item.modifiers.length > 0 && (
@@ -604,7 +604,7 @@ export const PosOrdersView: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <span className="font-mono font-bold text-[#0B253A]">
+                      <span className="font-mono font-bold text-jaman-navy">
                         {formatINR(item.totalPrice)}
                       </span>
                     </div>
@@ -628,9 +628,9 @@ export const PosOrdersView: React.FC = () => {
                   <span>GST Tax (5%):</span>
                   <span className="font-mono">{formatINR(selectedOrder.taxAmount)}</span>
                 </div>
-                <div className="flex justify-between text-sm font-black text-[#0B253A] pt-1 border-t border-dashed border-slate-200">
+                <div className="flex justify-between text-sm font-black text-jaman-navy pt-1 border-t border-dashed border-slate-200">
                   <span>Total Payable:</span>
-                  <span className="font-mono text-[#E66817]">{formatINR(selectedOrder.totalAmount)}</span>
+                  <span className="font-mono text-jaman-saffron">{formatINR(selectedOrder.totalAmount)}</span>
                 </div>
               </div>
 
@@ -641,14 +641,14 @@ export const PosOrdersView: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleAdvanceStatus(selectedOrder.id, 'ACCEPTED')}
-                      className="py-2 bg-[#0B253A] hover:bg-[#123959] text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+                      className="py-2 bg-jaman-navy hover:bg-[#123959] text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
                     >
                       Accept Order
                     </button>
                     <button
                       type="button"
                       onClick={() => handleAdvanceStatus(selectedOrder.id, 'PREPARING')}
-                      className="py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs rounded-xl shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-1"
+                      className="py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs rounded-xl shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-1"
                     >
                       <Flame className="w-3.5 h-3.5" />
                       <span>Send to KOT</span>
@@ -660,7 +660,7 @@ export const PosOrdersView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleAdvanceStatus(selectedOrder.id, 'PREPARING')}
-                    className="w-full py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs rounded-xl shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-1"
+                    className="w-full py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs rounded-xl shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-1"
                   >
                     <Flame className="w-3.5 h-3.5" />
                     <span>Send to Kitchen (KOT)</span>
@@ -705,7 +705,7 @@ export const PosOrdersView: React.FC = () => {
                   }}
                   className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  <Printer className="w-3.5 h-3.5 text-[#E66817]" />
+                  <Printer className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Print Thermal Receipt</span>
                 </button>
 
@@ -746,14 +746,14 @@ export const PosOrdersView: React.FC = () => {
 
     {refundVoidMode && selectedOrder && (
       <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
-        <div className="bg-white border border-[#EBE6DD] rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="bg-white border border-jaman-border rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
           <div className="flex items-center gap-2.5">
             {refundVoidMode === 'REFUND' ? (
               <Undo2 className="w-5 h-5 text-rose-600" />
             ) : (
               <Ban className="w-5 h-5 text-rose-600" />
             )}
-            <h2 className="text-base font-extrabold text-[#0B253A]">
+            <h2 className="text-base font-extrabold text-jaman-navy">
               {refundVoidMode === 'REFUND' ? 'Refund Order' : 'Void Order'} #{selectedOrder.orderNumber}
             </h2>
           </div>
@@ -767,7 +767,7 @@ export const PosOrdersView: React.FC = () => {
                 max={selectedOrder.totalAmount}
                 value={refundAmountInput}
                 onChange={(e) => setRefundAmountInput(e.target.value)}
-                className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-rose-400 rounded-2xl px-4 py-2.5 text-sm font-mono font-bold text-[#0B253A] focus:outline-hidden"
+                className="w-full bg-jaman-cream border border-jaman-border focus:border-rose-400 rounded-2xl px-4 py-2.5 text-sm font-mono font-bold text-jaman-navy focus:outline-hidden"
               />
               <span className="text-[11px] text-slate-400">Order total: {formatINR(selectedOrder.totalAmount)}</span>
             </div>
@@ -780,7 +780,7 @@ export const PosOrdersView: React.FC = () => {
               onChange={(e) => setRefundVoidReason(e.target.value)}
               placeholder={refundVoidMode === 'REFUND' ? 'e.g. Wrong item billed, customer complaint' : 'e.g. Kitchen error, customer left'}
               rows={3}
-              className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-rose-400 rounded-2xl px-4 py-2.5 text-sm text-[#0B253A] focus:outline-hidden resize-none"
+              className="w-full bg-jaman-cream border border-jaman-border focus:border-rose-400 rounded-2xl px-4 py-2.5 text-sm text-jaman-navy focus:outline-hidden resize-none"
             />
           </div>
 

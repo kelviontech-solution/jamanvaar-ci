@@ -98,14 +98,14 @@ Dispatched to ${printer.name}
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in select-none">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-4xl max-h-[95vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+      <div className="bg-jaman-cream border border-jaman-border w-full max-w-4xl max-h-[95vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         
         {/* Top Modal Action Bar */}
-        <div className="p-4 bg-white border-b border-[#EBE6DD] flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className="p-4 bg-white border-b border-jaman-border flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-[#E66817]" />
+            <FileText className="w-5 h-5 text-jaman-saffron" />
             <div>
-              <h2 className="font-extrabold text-sm text-[#0B253A]">
+              <h2 className="font-extrabold text-sm text-jaman-navy">
                 Report Preview & Export Studio
               </h2>
               <span className="text-[10px] text-slate-400">
@@ -124,11 +124,11 @@ Dispatched to ${printer.name}
           {/* Controls: Zoom, Download, Print, Close */}
           <div className="flex items-center gap-2 flex-wrap">
             {/* Zoom */}
-            <div className="hidden sm:flex items-center bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl p-0.5">
+            <div className="hidden sm:flex items-center bg-jaman-cream border border-jaman-border rounded-xl p-0.5">
               <button
                 type="button"
                 onClick={() => setZoomLevel((z) => Math.max(75, z - 15))}
-                className="p-1 text-slate-500 hover:text-[#0B253A] rounded-lg"
+                className="p-1 text-slate-500 hover:text-jaman-navy rounded-lg"
                 title="Zoom Out"
               >
                 <ZoomOut className="w-4 h-4" />
@@ -137,7 +137,7 @@ Dispatched to ${printer.name}
               <button
                 type="button"
                 onClick={() => setZoomLevel((z) => Math.min(130, z + 15))}
-                className="p-1 text-slate-500 hover:text-[#0B253A] rounded-lg"
+                className="p-1 text-slate-500 hover:text-jaman-navy rounded-lg"
                 title="Zoom In"
               >
                 <ZoomIn className="w-4 h-4" />
@@ -148,9 +148,9 @@ Dispatched to ${printer.name}
             <button
               type="button"
               onClick={handlePrintReport}
-              className="px-3 py-1.5 bg-[#FAF7F2] hover:bg-[#F0EBE1] border border-[#EBE6DD] text-[#0B253A] rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer active:scale-95"
+              className="px-3 py-1.5 bg-jaman-cream hover:bg-[#F0EBE1] border border-jaman-border text-jaman-navy rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer active:scale-95"
             >
-              <Printer className="w-3.5 h-3.5 text-[#E66817]" />
+              <Printer className="w-3.5 h-3.5 text-jaman-saffron" />
               <span className="hidden sm:inline">Print Report</span>
             </button>
 
@@ -159,7 +159,7 @@ Dispatched to ${printer.name}
               type="button"
               onClick={handleDownloadPdf}
               disabled={isGeneratingPdf}
-              className="px-4 py-1.5 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-xl font-black text-xs flex items-center gap-1.5 shadow-sm shadow-[#E66817]/25 transition-all active:scale-95 cursor-pointer"
+              className="px-4 py-1.5 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl font-black text-xs flex items-center gap-1.5 shadow-sm shadow-jaman-saffron/25 transition-all active:scale-95 cursor-pointer"
             >
               {isGeneratingPdf ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -173,7 +173,7 @@ Dispatched to ${printer.name}
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-[#0B253A] rounded-xl hover:bg-slate-100 transition-colors"
+              className="p-1.5 text-slate-400 hover:text-jaman-navy rounded-xl hover:bg-slate-100 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -181,7 +181,7 @@ Dispatched to ${printer.name}
         </div>
 
         {/* Design Template Selector Ribbon */}
-        <div className="px-4 py-2 bg-[#FAF7F2] border-b border-[#EBE6DD] flex items-center justify-between gap-2 overflow-x-auto shrink-0">
+        <div className="px-4 py-2 bg-jaman-cream border-b border-jaman-border flex items-center justify-between gap-2 overflow-x-auto shrink-0">
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] font-black uppercase text-slate-400 mr-1 hidden sm:inline">
               Design Template:
@@ -193,8 +193,8 @@ Dispatched to ${printer.name}
                 onClick={() => setSelectedDesign(d.id)}
                 className={`px-3 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   selectedDesign === d.id
-                    ? 'bg-[#0B253A] text-white shadow-xs'
-                    : 'bg-white border border-[#EBE6DD] text-slate-700 hover:bg-slate-50'
+                    ? 'bg-jaman-navy text-white shadow-xs'
+                    : 'bg-white border border-jaman-border text-slate-700 hover:bg-slate-50'
                 }`}
               >
                 <span>{d.label}</span>
