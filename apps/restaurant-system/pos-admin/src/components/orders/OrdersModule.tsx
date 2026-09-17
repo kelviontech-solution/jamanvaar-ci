@@ -37,7 +37,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { OrderDetailModal } from '../OrderDetailModal';
-import { ThermalReceiptView, printThermalReceipt } from '@jamanvaar/ui';
+import { ThermalReceiptView, printThermalReceipt, EmptyState } from '@jamanvaar/ui';
 
 interface OrdersModuleProps {
   orders: Order[];
@@ -500,28 +500,19 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           </div>
 
           {filteredDaySummaries.length === 0 && (
-            <div className="text-center py-16 bg-white rounded-3xl border border-jaman-border shadow-2xs space-y-4 max-w-xl mx-auto my-6 p-6">
-              <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffron mx-auto flex items-center justify-center border border-[#FDBA74]/40 shadow-xs">
-                <ShoppingBag className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-black text-base text-jaman-navy">No Orders Found</h3>
-                <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  There are no customer orders matching the selected date period or search query.
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFilterPreset('TODAY');
-                    setDaysSearchQuery('');
-                  }}
-                  className="px-4 py-2 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white text-xs font-bold transition-all shadow-xs"
-                >
-                  View Today's Orders
-                </button>
-                {daysSearchQuery && (
+            <div className="max-w-xl mx-auto my-6">
+              <EmptyState
+                icon={<ShoppingBag className="w-8 h-8" />}
+                title="No Orders Found"
+                description="There are no customer orders matching the selected date period or search query."
+                actionText="View Today's Orders"
+                onAction={() => {
+                  setFilterPreset('TODAY');
+                  setDaysSearchQuery('');
+                }}
+              />
+              {daysSearchQuery && (
+                <div className="flex justify-center -mt-4">
                   <button
                     type="button"
                     onClick={() => setDaysSearchQuery('')}
@@ -529,8 +520,8 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                   >
                     Clear Search
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
 

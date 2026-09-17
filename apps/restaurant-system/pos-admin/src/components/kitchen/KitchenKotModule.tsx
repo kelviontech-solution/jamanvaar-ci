@@ -3,7 +3,7 @@ import { KOTRecord, KOTItem, KOTStatus } from '@jamanvaar/types';
 import { db, KOTRepository, AuditRepository } from '@jamanvaar/database';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { formatTime } from '@jamanvaar/utils';
-import { printThermalKotTicket } from '@jamanvaar/ui';
+import { printThermalKotTicket, EmptyState } from '@jamanvaar/ui';
 import {
   Flame,
   ChefHat,
@@ -240,16 +240,12 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
 
       {/* KOT Cards Grid */}
       {filteredKots.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-jaman-border shadow-2xs space-y-3 max-w-lg mx-auto my-6">
-          <div className="w-14 h-14 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto border border-emerald-200/60 shadow-xs">
-            <ChefHat className="w-7 h-7" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="font-black text-base text-jaman-navy">Your Kitchen is Clear</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              No active KOT tickets are waiting right now for the selected station or status.
-            </p>
-          </div>
+        <div className="max-w-lg mx-auto my-6">
+          <EmptyState
+            icon={<ChefHat className="w-8 h-8" />}
+            title="Your Kitchen is Clear"
+            description="No active KOT tickets are waiting right now for the selected station or status."
+          />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

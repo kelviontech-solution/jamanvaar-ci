@@ -4,6 +4,7 @@ import { db, CustomerRepository, AuditRepository } from '@jamanvaar/database';
 import { LoyaltyProgramModal } from './LoyaltyProgramModal';
 import { MarketingCampaignsModal } from './MarketingCampaignsModal';
 import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
+import { EmptyState } from '@jamanvaar/ui';
 import {
   Users,
   Search,
@@ -521,36 +522,25 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
 
       {/* 5. CUSTOMERS DIRECTORY TABLE */}
       {filteredCustomers.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-jaman-border space-y-3">
-          <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
-            <Users className="w-6 h-6" />
-          </div>
-          {customers.length === 0 ? (
-            <>
-              <h3 className="font-black text-base text-jaman-navy">No Guest Profiles Yet</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
-                Real guest profiles appear here automatically once a customer is attached to an order at POS, Kiosk, or Captain — no demo data is shown until then.
-              </p>
-            </>
-          ) : (
-            <>
-              <h3 className="font-black text-base text-jaman-navy">No Customer Profiles Found</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
-                No guest records matched the selected dining segment, tag filter, or search query.
-              </p>
-              <button
-                onClick={() => {
+        <EmptyState
+          icon={<Users className="w-8 h-8" />}
+          title={customers.length === 0 ? 'No Guest Profiles Yet' : 'No Customer Profiles Found'}
+          description={
+            customers.length === 0
+              ? 'Real guest profiles appear here automatically once a customer is attached to an order at POS, Kiosk, or Captain — no demo data is shown until then.'
+              : 'No guest records matched the selected dining segment, tag filter, or search query.'
+          }
+          actionText={customers.length > 0 ? 'Reset Filters & View All' : undefined}
+          onAction={
+            customers.length > 0
+              ? () => {
                   setSearchQuery('');
                   setSegmentFilter('ALL');
                   setTagFilter('ALL');
-                }}
-                className="px-4 py-2 bg-jaman-navy text-white text-xs font-bold rounded-xl shadow-xs"
-              >
-                Reset Filters & View All
-              </button>
-            </>
-          )}
-        </div>
+                }
+              : undefined
+          }
+        />
       ) : (
         <div className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-xs">
           <div className="overflow-x-auto">

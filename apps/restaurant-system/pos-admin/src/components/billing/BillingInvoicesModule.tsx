@@ -3,7 +3,7 @@ import { Order, PaymentMethod, OrderType, OrderStatus } from '@jamanvaar/types';
 import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
 import { db, AuditRepository, OrderRepository, ReceiptRepository } from '@jamanvaar/database';
 import { DayOrdersService, ReportGeneratorService, CentralReportingService } from '@jamanvaar/business';
-import { printThermalReceipt } from '@jamanvaar/ui';
+import { printThermalReceipt, EmptyState } from '@jamanvaar/ui';
 import {
   DollarSign,
   CreditCard,
@@ -854,21 +854,13 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
       {/* 6. COMPLETE ORDER LEDGER TABLE / DAY GROUPED VIEW */}
       {/* ========================================================================= */}
       {filteredOrders.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-jaman-border space-y-3">
-          <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
-            <Receipt className="w-6 h-6" />
-          </div>
-          <h3 className="font-black text-base text-jaman-navy">No Invoices or Orders Found</h3>
-          <p className="text-xs text-slate-500 max-w-md mx-auto">
-            No transaction records matched the selected date scope, tender filters, or search criteria.
-          </p>
-          <button
-            onClick={handleClearAllFilters}
-            className="px-4 py-2 bg-jaman-navy text-white text-xs font-bold rounded-xl shadow-xs"
-          >
-            Clear Filters & Show All Records
-          </button>
-        </div>
+        <EmptyState
+          icon={<Receipt className="w-8 h-8" />}
+          title="No Invoices or Orders Found"
+          description="No transaction records matched the selected date scope, tender filters, or search criteria."
+          actionText="Clear Filters & Show All Records"
+          onAction={handleClearAllFilters}
+        />
       ) : viewMode === 'DAY_GROUPED' ? (
         /* DAY GROUPED LEDGER VIEW */
         <div className="space-y-4">
