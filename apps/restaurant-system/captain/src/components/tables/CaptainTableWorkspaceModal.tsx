@@ -55,7 +55,13 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
     repeatPreviousOrder
   } = useCaptainStore();
 
-  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<'ORDER' | 'MENU'>('ORDER');
+  // A freshly-opened table with nothing ordered yet should land straight on
+  // the menu, not an empty "Order" tab the captain has to tap through —
+  // that extra step was pure friction on top of the mandatory guest-count
+  // modal already gating this screen.
+  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<'ORDER' | 'MENU'>(() =>
+    cartItems.length === 0 ? 'MENU' : 'ORDER'
+  );
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [dietaryFilter, setDietaryFilter] = useState<'ALL' | 'VEG' | 'JAIN' | 'NON_VEG'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -501,9 +507,24 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                         <span className="font-black font-mono text-xs text-jaman-navy">
                           {formatINR(item.price)}
                         </span>
-                        <span className="w-7 h-7 rounded-lg bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center font-black text-xs hover:bg-jaman-saffron hover:text-white transition-colors">
+                        {/* Direct-add with default options (no spice change,
+                            no Jain, no extras) — the same result a captain
+                            gets by opening Customize and tapping "Add to
+                            Order" without changing anything, so every dish
+                            no longer forces the modal open just to accept
+                            the defaults. Tapping the rest of the card still
+                            opens Customize for a real modifier change. */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addItemToCart(item, [], '', 'COURSE_1', 1);
+                          }}
+                          className="w-7 h-7 rounded-lg bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center font-black text-xs hover:bg-jaman-saffron hover:text-white transition-colors cursor-pointer active:scale-90"
+                          title="Quick Add"
+                        >
                           +
-                        </span>
+                        </button>
                       </div>
                     </div>
                   ))}
