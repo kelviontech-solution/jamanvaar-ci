@@ -118,6 +118,53 @@ Full suite still at 398/398; `tsc --noEmit` clean on pos, pos-admin, captain.
 
 ---
 
+## 3c. UX Phase 3 — Mobile/Responsive Layout — Complete
+
+Unlike Phases 1-2, this one couldn't be scoped from code review alone —
+responsive bugs only show up under an actual narrow viewport. Live-tested
+every app at 390×844 (a real phone size) with Playwright, clicking through
+real flows rather than just loading each landing screen. Found and fixed
+9 genuine overflow/layout bugs, confirmed via `document.documentElement.
+scrollWidth` before and after each fix, not just visual inspection:
+
+- **Super Admin** (8 pages): the exact bug the original audit flagged on
+  the Restaurants page — a page-header button row with no `flex-wrap`,
+  clipping "Onboard Restaurant" off-screen — turned out to be the same
+  copy-pasted pattern on 4 more pages (Activation Keys, System Health,
+  Billing, Plan Detail). Also found during verification: Billing's gateway
+  status banner had text squeezed into an unreadable one-word-per-line
+  column with a badge overlapping it; the onboarding wizard's 2-column
+  form grid never collapsed to one column, truncating every input's
+  placeholder; the wizard's "resume draft" banner clipped its own second
+  button off-screen.
+- **Kiosk (customer)**: the top header used a fixed height with no wrap,
+  silently hiding the cart/more controls off-screen with no way to reach
+  them. The category-rail CSS Grid column computed to ~39px at phone
+  width (too narrow for its own buttons), and the search/filter row had
+  the same issue — both fixed with a real minimum width / scrollable
+  fallback instead of a hard clip.
+- **Kiosk Admin**: the most severe finding — the 256px nav sidebar had
+  *zero* responsive handling at all (unlike every other app here),
+  permanently eating most of a phone-width screen and wrapping headings
+  mid-word. Given a real off-canvas slide-in sidebar (hamburger toggle,
+  backdrop, auto-close on navigate), ported from the same pattern Super
+  Admin already uses successfully.
+- **Captain**: same missing-`flex-wrap` header pattern as Kiosk — fixed
+  identically.
+- **POS**: live-tested and already fully responsive (icon-only rail,
+  proper wrapping) — no changes needed, matching the original audit's own
+  spot-check finding.
+- **KDS**: not tested live — no local activation credentials available in
+  this session, and it's realistically always deployed on a fixed kitchen
+  wall display rather than viewed on a phone, so this is a low-value gap
+  to chase further rather than an oversight.
+
+`tsc --noEmit` clean across all 7 apps; full suite at 397/398 (one
+pre-existing flaky Tauri test, confirmed passing in isolation, unrelated
+to these changes).
+
+---
+
 ## 4. Has the *Experience* Actually Improved?
 
 Be precise about what kind of work this was: **almost all of it was data-integrity and connectivity work — making real things real and making broken buttons work — not visual/interaction design polish.** Those are different kinds of improvement, and it's worth separating them honestly.
@@ -142,7 +189,7 @@ The audit's own "how this could be simplified" recommendations (§11–§14) are
 | Consistent design language / color tokens across apps | ✅ Done (Phase 1, §3a) |
 | Consolidated empty/loading/error states | ✅ Done for pos-admin/pos/captain/kds (Phase 1, §3a) |
 | Fewer taps to complete common tasks | ✅ Done (Phase 2, §3b) |
-| Mobile/responsive layout (Super Admin's Restaurants page was found broken at phone width) | ❌ Not re-tested or fixed — Phase 3 |
+| Mobile/responsive layout (Super Admin's Restaurants page was found broken at phone width) | ✅ Done (Phase 3, §3c) |
 | Onboarding walkthroughs / guidance | ❌ Not attempted — Phase 4 |
 | Accessibility (screen reader support) | ❌ Never tested — no screen reader available in the original audit's tooling |
 
