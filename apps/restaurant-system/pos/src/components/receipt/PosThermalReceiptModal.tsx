@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, ReceiptRepository, PrintQueueRepository } from '@jamanvaar/database';
 import { PosPrinterService } from '../../services/printerService';
@@ -36,6 +36,20 @@ export const PosThermalReceiptModal: React.FC = () => {
   const [phonePromptOpen, setPhonePromptOpen] = useState(false);
   const [inputPhone, setInputPhone] = useState('');
   const [pendingChannel, setPendingChannel] = useState<'WHATSAPP' | 'SMS'>('WHATSAPP');
+  const hasInteracted = useRef(false);
+
+  // The actual print already fired automatically at settlement (before this
+  // modal ever opened), so this screen is a review/share surface, not a
+  // required step — auto-dismiss it so the cashier can start the next sale
+  // immediately, unless they're actively using it (share/reprint/download).
+  useEffect(() => {
+    if (!isReceiptOpen || !lastCompletedOrder) return;
+    hasInteracted.current = false;
+    const timer = setTimeout(() => {
+      if (!hasInteracted.current) setIsReceiptOpen(false);
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [isReceiptOpen, lastCompletedOrder?.id]);
 
   if (!isReceiptOpen || !lastCompletedOrder) return null;
 
@@ -43,6 +57,7 @@ export const PosThermalReceiptModal: React.FC = () => {
   const order = lastCompletedOrder;
 
   const handlePrint = async () => {
+    hasInteracted.current = true;
     try {
       const job = await PosPrinterService.printOrderReceipt(order, paperWidth);
       setActiveJobId(job.id);
@@ -63,6 +78,7 @@ export const PosThermalReceiptModal: React.FC = () => {
   };
 
   const handleRetryPrint = () => {
+    hasInteracted.current = true;
     if (activeJobId) {
       const retried = PrintQueueRepository.retryJob(activeJobId);
       if (retried && retried.status === 'SUCCESS') {
@@ -77,6 +93,7 @@ export const PosThermalReceiptModal: React.FC = () => {
   };
 
   const handleWhatsAppClick = () => {
+    hasInteracted.current = true;
     if (!order.customerPhone) {
       setPendingChannel('WHATSAPP');
       setPhonePromptOpen(true);
@@ -86,6 +103,7 @@ export const PosThermalReceiptModal: React.FC = () => {
   };
 
   const dispatchDigitalReceipt = async (channel: 'WHATSAPP' | 'SMS', targetPhone: string) => {
+    hasInteracted.current = true;
     if (!EBillService.validateIndianPhone(targetPhone)) {
       setSendError('Enter a valid 10-digit Indian mobile number');
       setTimeout(() => setSendError(''), 4000);
@@ -107,6 +125,7 @@ export const PosThermalReceiptModal: React.FC = () => {
   };
 
   const handleDownloadTxt = () => {
+    hasInteracted.current = true;
     const rawText = PosPrinterService.generateReceiptText(order, paperWidth);
     const blob = new Blob([rawText], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);

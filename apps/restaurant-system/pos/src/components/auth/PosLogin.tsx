@@ -28,7 +28,14 @@ export const PosLogin: React.FC = () => {
 
   const handleKeyPress = (num: string) => {
     if (pin.length < 4) {
-      setPin((prev) => prev + num);
+      const next = pin + num;
+      setPin(next);
+      // Auto-submit at 4 digits, matching Captain's and KDS's PIN pads —
+      // requiring a separate "unlock" tap after typing the full PIN is
+      // friction hit on every login/shift-change, on every terminal.
+      if (next.length === 4) {
+        setTimeout(() => handleSubmit(next), 50);
+      }
     }
   };
 
