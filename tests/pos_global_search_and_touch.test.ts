@@ -30,14 +30,20 @@ describe('JAMANVAAR POS — Global Multi-Domain Search & Touch Engine', () => {
   });
 
   it('3. should match customers by full name or phone number', () => {
+    // No more ambient fabricated demo customers — create a real one to search for.
+    const testPhone = '9876500010';
+    CustomerRepository.createCustomer({ phone: testPhone, name: 'Search Test Guest' });
+
     const customers = CustomerRepository.getAll();
     expect(customers.length).toBeGreaterThan(0);
 
-    const firstCustomer = customers[0];
+    const firstCustomer = customers.find((c) => c.phone === testPhone)!;
     const phoneQuery = firstCustomer.phone.slice(-4);
     const matched = CustomerRepository.getAll().filter((c) => c.phone.includes(phoneQuery));
     expect(matched.length).toBeGreaterThan(0);
     expect(matched.some((c) => c.phone === firstCustomer.phone)).toBe(true);
+
+    CustomerRepository.deleteCustomer(testPhone);
   });
 
   it('4. should match orders and settled invoices by order number, token, and customer', () => {

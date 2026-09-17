@@ -92,6 +92,26 @@ describe('Cross-Application Cluster Sync (Kiosk ↔ Kiosk Admin & POS ↔ POS Ad
   });
 
   it('3. Kiosk Admin modifies kiosk hardware settings ➔ propagates to Kiosk User', () => {
+    // Kiosk fleet is no longer pre-seeded with fabricated hardware (QA audit
+    // BUG-004) — a real terminal is added the same way a live device would
+    // register itself (KioskRepository.upsertFromHeartbeat), then verified.
+    const realKiosk: KioskDevice = {
+      id: 'kiosk-01',
+      outletId: 'out-1',
+      kioskCode: 'kiosk-01',
+      name: 'Main Lobby Kiosk',
+      status: 'ONLINE',
+      orderTypesAllowed: ['DINE_IN', 'TAKEAWAY'],
+      allowCashAtCounter: true,
+      defaultLanguage: 'en',
+      idleTimeoutSeconds: 60,
+      appVersion: '1.0.0',
+      isLocked: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    kioskAdminDb.kiosks.push(realKiosk);
+
     // 1. Kiosk Admin locks kiosk for maintenance
     const targetKiosk = kioskAdminDb.kiosks.find((k) => k.id === 'kiosk-01');
     if (targetKiosk) {

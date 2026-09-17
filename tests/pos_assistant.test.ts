@@ -3,8 +3,25 @@ import { db, OrderRepository } from '@jamanvaar/database';
 import { PosAssistantService } from '../packages/business/src/pos_assistant';
 
 describe('JAMANVAAR POS Smart Assistant Engine Tests', () => {
+  // No more ambient fabricated seed orders — create a couple of real, paid
+  // orders so "today's sales"/"top items" queries have real history to answer from.
   beforeEach(() => {
     db.resetToDefaultSeed();
+    const item = db.menuItems[0];
+    OrderRepository.createOrder({
+      orderType: 'DINE_IN',
+      tableNumber: '1',
+      items: [
+        { id: 'oi-assist-1', orderId: '', menuItemId: item.id, name: item.name, sku: item.sku, quantity: 2, unitPrice: item.price, modifiers: [], totalPrice: item.price * 2, kitchenStatus: 'SERVED' }
+      ],
+      subtotal: item.price * 2,
+      taxAmount: 0,
+      totalAmount: item.price * 2,
+      paymentMethod: 'CASH',
+      paymentStatus: 'SUCCESS',
+      orderStatus: 'COMPLETED',
+      source_type: 'POS'
+    });
   });
 
   it('correctly answers "Today\'s Sales" from real database without hallucination', () => {

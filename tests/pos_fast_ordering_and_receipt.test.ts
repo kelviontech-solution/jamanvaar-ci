@@ -57,7 +57,11 @@ describe('POS Fast Cashier UX, Receipt & Ordering Tests', () => {
   });
 
   it('generates professional Indian restaurant thermal receipt matching exact hierarchy', () => {
-    const order = OrderRepository.getOrderById('ord-1043') || db.orders[0];
+    // No more ambient fabricated seed orders — settle a real cart first.
+    const store = usePosStore.getState();
+    store.addItemToCart(db.menuItems.find((m) => m.id === 'item-pt') || db.menuItems[0]);
+    const order = store.completePayment('CASH', 1000)!;
+    expect(order).toBeDefined();
     const receiptText = PosPrinterService.generateReceiptText(order, '80mm');
 
     expect(receiptText).toContain('JAMANVAAR');

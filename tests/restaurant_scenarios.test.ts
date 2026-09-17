@@ -184,7 +184,21 @@ describe('JAMANVAAR End-to-End Restaurant Owner & Customer Scenarios', () => {
       const defaultPrn = db.configuredPrinters.find((p) => p.isDefault) || db.configuredPrinters[0];
       expect(defaultPrn.paperSize).toBe('80mm');
 
-      const existingOrder = db.orders[0];
+      // No more ambient fabricated seed orders — create a real one to print.
+      const printItem = MenuRepository.getAllMenuItems()[0];
+      const existingOrder = OrderRepository.createOrder({
+        orderType: 'TAKEAWAY',
+        items: [
+          { id: 'oi-print-1', orderId: '', menuItemId: printItem.id, name: printItem.name, sku: printItem.sku, quantity: 1, unitPrice: printItem.price, modifiers: [], totalPrice: printItem.price, kitchenStatus: 'SERVED' }
+        ],
+        subtotal: printItem.price,
+        taxAmount: 0,
+        totalAmount: printItem.price,
+        paymentMethod: 'CASH',
+        paymentStatus: 'SUCCESS',
+        orderStatus: 'COMPLETED',
+        source_type: 'POS'
+      });
       const res = PrinterService.queuePrintJob(existingOrder);
 
       expect(res.success).toBe(true);
@@ -194,7 +208,22 @@ describe('JAMANVAAR End-to-End Restaurant Owner & Customer Scenarios', () => {
 
   describe('👨‍🍳 Scenario 5: Restaurant Owner KDS Lifecycle & Live Urgency Timers', () => {
     it('should advance order status smoothly through CONFIRMED -> PREPARING -> READY -> COMPLETED', () => {
-      const order = OrderRepository.getAllOrders()[0];
+      // No more ambient fabricated seed orders — create a real one to advance.
+      const kdsItem = MenuRepository.getAllMenuItems()[0];
+      const order = OrderRepository.createOrder({
+        orderType: 'DINE_IN',
+        tableNumber: '2',
+        items: [
+          { id: 'oi-kds-1', orderId: '', menuItemId: kdsItem.id, name: kdsItem.name, sku: kdsItem.sku, quantity: 1, unitPrice: kdsItem.price, modifiers: [], totalPrice: kdsItem.price, kitchenStatus: 'PREPARING' }
+        ],
+        subtotal: kdsItem.price,
+        taxAmount: 0,
+        totalAmount: kdsItem.price,
+        paymentMethod: 'CASH',
+        paymentStatus: 'PENDING',
+        orderStatus: 'CONFIRMED',
+        source_type: 'POS'
+      });
 
       KdsMeshService.advanceKitchenStatus(order.id, 'PREPARING');
       let current = OrderRepository.getOrderById(order.id)!;

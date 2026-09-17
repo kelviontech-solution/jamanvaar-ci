@@ -53,8 +53,32 @@ describe('JAMANVAAR POS — Cashier UX Polish & Workflows', () => {
   });
 
   it('3. should support repeating previous order accurately', () => {
-    // Ensure there is at least one order in db
-    const existingOrder = db.orders[0];
+    // Create a real order to repeat (no more ambient fabricated seed orders)
+    const item = db.menuItems[0];
+    const existingOrder = OrderRepository.createOrder({
+      orderType: 'TAKEAWAY',
+      items: [
+        {
+          id: 'oi-repeat-1',
+          orderId: '',
+          menuItemId: item.id,
+          name: item.name,
+          sku: item.sku,
+          quantity: 1,
+          unitPrice: item.price,
+          modifiers: [],
+          totalPrice: item.price,
+          kitchenStatus: 'SERVED'
+        }
+      ],
+      subtotal: item.price,
+      taxAmount: 0,
+      totalAmount: item.price,
+      paymentMethod: 'CASH',
+      paymentStatus: 'SUCCESS',
+      orderStatus: 'COMPLETED',
+      source_type: 'POS'
+    });
     expect(existingOrder).toBeDefined();
 
     // Call repeatOrder

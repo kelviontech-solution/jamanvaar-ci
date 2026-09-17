@@ -1,9 +1,55 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { EodReportService } from '@jamanvaar/business';
-import { db } from '@jamanvaar/database';
+import { db, OrderRepository } from '@jamanvaar/database';
 import { EodReport } from '@jamanvaar/types';
 
 describe('JAMANVAAR Restaurant Admin — Premium End of Day (EOD) Z-Report System', () => {
+  // The database no longer ships with ~77 fabricated historical orders (see
+  // packages/database/src/seed.ts's generateSeedOrders — it used to invent
+  // an entire day's sales on every fresh install). This suite tests real
+  // report aggregation, so it creates its own explicit, real-looking orders.
+  beforeEach(() => {
+    db.orders = [];
+    const fixtures: Array<{ orderType: 'DINE_IN' | 'TAKEAWAY'; tableNumber?: string; paymentMethod: 'CASH' | 'UPI_QR' | 'CARD_TERMINAL'; itemName: string; itemPrice: number; qty: number }> = [
+      { orderType: 'DINE_IN', tableNumber: '3', paymentMethod: 'CASH', itemName: 'Paneer Tikka', itemPrice: 240, qty: 2 },
+      { orderType: 'DINE_IN', tableNumber: '5', paymentMethod: 'UPI_QR', itemName: 'Royal Veg Dum Biryani', itemPrice: 280, qty: 1 },
+      { orderType: 'TAKEAWAY', paymentMethod: 'CARD_TERMINAL', itemName: 'Butter Naan', itemPrice: 60, qty: 4 }
+    ];
+    fixtures.forEach((f, idx) => {
+      const items = [
+        {
+          id: `oi-eod-${idx}`,
+          orderId: '',
+          menuItemId: `item-eod-${idx}`,
+          name: f.itemName,
+          sku: `EOD-${idx}`,
+          quantity: f.qty,
+          unitPrice: f.itemPrice,
+          modifiers: [],
+          totalPrice: f.itemPrice * f.qty,
+          kitchenStatus: 'SERVED' as const
+        }
+      ];
+      const subtotal = f.itemPrice * f.qty;
+      const cgstAmount = Math.round(subtotal * 0.025 * 100) / 100;
+      const sgstAmount = cgstAmount;
+      OrderRepository.createOrder({
+        orderType: f.orderType,
+        tableNumber: f.tableNumber,
+        items,
+        subtotal,
+        cgstAmount,
+        sgstAmount,
+        taxAmount: cgstAmount + sgstAmount,
+        totalAmount: Math.round(subtotal + cgstAmount + sgstAmount),
+        paymentMethod: f.paymentMethod,
+        paymentStatus: 'SUCCESS',
+        orderStatus: 'COMPLETED',
+        source_type: 'POS'
+      });
+    });
+  });
+
   it('should accurately calculate comprehensive EOD Z-Report from real database orders', () => {
     const report = EodReportService.generateEodReport(
       undefined,

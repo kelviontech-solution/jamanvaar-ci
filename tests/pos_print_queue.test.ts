@@ -51,7 +51,31 @@ describe('POS Thermal Print Queue & Hardware HAL Tests', () => {
   });
 
   it('dispatches receipt print job to Print Queue with SUCCESS status and allows retry', async () => {
-    const order = OrderRepository.getOrderById('ord-1043') || db.orders[0];
+    // No more ambient fabricated seed orders — create a real one directly.
+    const order = OrderRepository.createOrder({
+      orderType: 'TAKEAWAY',
+      items: [
+        {
+          id: 'oi-prn-2',
+          orderId: '',
+          menuItemId: 'item-bn',
+          name: 'Butter Naan',
+          sku: 'BN',
+          quantity: 2,
+          unitPrice: 60,
+          modifiers: [],
+          totalPrice: 120,
+          kitchenStatus: 'SERVED'
+        }
+      ],
+      subtotal: 120,
+      taxAmount: 6,
+      totalAmount: 126,
+      paymentMethod: 'CASH',
+      paymentStatus: 'SUCCESS',
+      orderStatus: 'COMPLETED',
+      source_type: 'POS'
+    });
     const job = await PosPrinterService.printOrderReceipt(order, '80mm');
 
     expect(job).toBeDefined();

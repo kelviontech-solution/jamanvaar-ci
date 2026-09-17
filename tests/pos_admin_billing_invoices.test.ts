@@ -3,8 +3,47 @@ import { db, OrderRepository, AuditRepository } from '@jamanvaar/database';
 import { ReportGeneratorService } from '@jamanvaar/business';
 
 describe('JAMANVAAR POS & Admin — Billing / Invoices Ledger Redesign', () => {
+  // No more ambient fabricated seed orders (see generateSeedOrders in
+  // packages/database/src/seed.ts) — this suite creates its own explicit,
+  // real order fixtures across CASH/UPI/CARD tenders.
   beforeEach(() => {
     db.resetToDefaultSeed();
+    db.orders = [];
+    const tenders: Array<{ method: 'CASH' | 'UPI_QR' | 'CARD_TERMINAL'; price: number }> = [
+      { method: 'CASH', price: 320 },
+      { method: 'UPI_QR', price: 480 },
+      { method: 'CARD_TERMINAL', price: 610 },
+      { method: 'CASH', price: 275 },
+      { method: 'UPI_QR', price: 395 }
+    ];
+    tenders.forEach((t, idx) => {
+      const items = [
+        {
+          id: `oi-bill-${idx}`,
+          orderId: '',
+          menuItemId: `item-bill-${idx}`,
+          name: 'Royal Veg Dum Biryani',
+          sku: `BILL-${idx}`,
+          quantity: 1,
+          unitPrice: t.price,
+          modifiers: [],
+          totalPrice: t.price,
+          kitchenStatus: 'SERVED' as const
+        }
+      ];
+      OrderRepository.createOrder({
+        orderType: 'DINE_IN',
+        tableNumber: String(idx + 1),
+        items,
+        subtotal: t.price,
+        taxAmount: 0,
+        totalAmount: t.price,
+        paymentMethod: t.method,
+        paymentStatus: 'SUCCESS',
+        orderStatus: 'COMPLETED',
+        source_type: 'POS'
+      });
+    });
   });
 
   it('1. should accurately aggregate revenue summary cards for payment tenders', () => {
