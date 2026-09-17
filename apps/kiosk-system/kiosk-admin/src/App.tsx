@@ -1025,7 +1025,7 @@ export default function AdminApp() {
             {connectStep === 'CREDENTIALS' ? (
               <>
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-black text-[#0B253A] tracking-tight">Connect this Terminal</h2>
+                  <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Connect this Terminal</h2>
                   <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
                     One-time setup — enter the Restaurant ID and login the restaurant owner generated for this terminal.
                   </p>
@@ -1039,7 +1039,7 @@ export default function AdminApp() {
                       onChange={(e) => setConnectRestaurantId(e.target.value)}
                       placeholder="From your restaurant's admin dashboard"
                       required
-                      className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                      className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                     />
                   </div>
                   <div>
@@ -1049,7 +1049,7 @@ export default function AdminApp() {
                       value={connectEmail}
                       onChange={(e) => setConnectEmail(e.target.value)}
                       required
-                      className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                      className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                     />
                   </div>
                   <div>
@@ -1059,7 +1059,7 @@ export default function AdminApp() {
                       value={connectPassword}
                       onChange={(e) => setConnectPassword(e.target.value)}
                       required
-                      className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                      className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                     />
                   </div>
                   {connectError && (
@@ -1071,17 +1071,17 @@ export default function AdminApp() {
                   <button
                     type="submit"
                     disabled={connectBusy}
-                    className="w-full py-4 rounded-2xl bg-[#0B253A] hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <span>{connectBusy ? 'Connecting…' : 'Continue'}</span>
-                    {!connectBusy && <ArrowRight className="w-4 h-4 text-[#E66817]" />}
+                    {!connectBusy && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
                   </button>
                 </form>
               </>
             ) : (
               <>
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-black text-[#0B253A] tracking-tight">Activate this Terminal</h2>
+                  <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Activate this Terminal</h2>
                   <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
                     Signed in to <strong>{connectRestaurantName}</strong>. Enter the Kiosk Admin activation key from your Super Admin welcome kit to finish binding this terminal.
                   </p>
@@ -1096,7 +1096,7 @@ export default function AdminApp() {
                       placeholder="JMV-XXXX-XXXX-XXXX"
                       required
                       autoFocus
-                      className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-[#0B253A] font-semibold focus:outline-hidden transition-colors uppercase"
+                      className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors uppercase"
                     />
                     <p className="text-[11px] text-slate-500 font-medium mt-1.5">
                       Use the key labeled <strong>KIOSK_ADMIN</strong> from the Welcome Kit — it's different from the
@@ -1112,10 +1112,10 @@ export default function AdminApp() {
                   <button
                     type="submit"
                     disabled={connectBusy}
-                    className="w-full py-4 rounded-2xl bg-[#0B253A] hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <span>{connectBusy ? 'Activating…' : 'Activate Terminal'}</span>
-                    {!connectBusy && <ArrowRight className="w-4 h-4 text-[#E66817]" />}
+                    {!connectBusy && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
                   </button>
                   <button
                     type="button"
@@ -1170,7 +1170,7 @@ export default function AdminApp() {
                 setAuthError('');
               }}
               placeholder="owner@yourrestaurant.com"
-              className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+              className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
             />
           </div>
 
@@ -1180,7 +1180,7 @@ export default function AdminApp() {
               <button
                 type="button"
                 onClick={() => setShowPassword((p) => !p)}
-                className="text-[11px] text-[#E66817] hover:underline font-bold"
+                className="text-[11px] text-jaman-saffron hover:underline font-bold"
               >
                 {showPassword ? 'Hide Password' : 'Show Password'}
               </button>
@@ -1194,7 +1194,7 @@ export default function AdminApp() {
                   setAuthError('');
                 }}
                 placeholder="Enter your password"
-                className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
               />
             </div>
           </div>
@@ -1213,7 +1213,7 @@ export default function AdminApp() {
           <button
             type="submit"
             disabled={authBusy}
-            className="w-full py-3.5 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full py-3.5 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {authBusy ? 'Signing in...' : 'Sign In'}
           </button>
@@ -1227,10 +1227,10 @@ export default function AdminApp() {
     <JAMANVAARStartup appName="Kiosk Management" appType="KIOSK_ADMIN" subtitle="Hardware & Self-Ordering Fleet Control">
       <>
         {/* NORMAL INTERACTIVE ADMIN UI (Hidden during print) */}
-        <div className="print:hidden min-h-screen bg-[#FBF9F5] flex flex-col select-none">
+        <div className="print:hidden min-h-screen bg-jaman-ivory flex flex-col select-none">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 bg-[#0B253A] text-white px-5 py-3 rounded-2xl shadow-xl border border-white/10 flex items-center gap-3 animate-bounce">
+        <div className="fixed top-5 right-5 z-50 bg-jaman-navy text-white px-5 py-3 rounded-2xl shadow-xl border border-white/10 flex items-center gap-3 animate-bounce">
           <CheckCircle2 className="w-5 h-5 text-[#16A34A]" />
           <span className="font-semibold text-sm">{toastMessage}</span>
         </div>
@@ -1247,7 +1247,7 @@ export default function AdminApp() {
           its shrink floor and rendered on top of its neighbour instead of
           dropping to a second row. flex-wrap + min-h (not h) lets it grow
           to two rows on narrow widths instead of colliding. */}
-      <header className="min-h-16 sm:min-h-20 bg-white border-b border-[#EBE6DD] px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-y-2 shadow-sm sticky top-0 z-30">
+      <header className="min-h-16 sm:min-h-20 bg-white border-b border-jaman-border px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-y-2 shadow-sm sticky top-0 z-30">
         {/* Left: Real JAMANVAAR Brand Identity */}
         <div className="flex items-center gap-4 sm:gap-6">
           <BrandHeader
@@ -1263,8 +1263,8 @@ export default function AdminApp() {
               onClick={() => setActiveTab('DASHBOARD')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 activeTab === 'DASHBOARD'
-                  ? 'bg-[#0B253A] text-white shadow-sm'
-                  : 'text-[#4A5568] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-sm'
+                  : 'text-[#4A5568] hover:text-jaman-navy'
               }`}
             >
               Control POS
@@ -1273,8 +1273,8 @@ export default function AdminApp() {
               onClick={() => setActiveTab('ORDERS_KDS')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 activeTab === 'ORDERS_KDS'
-                  ? 'bg-[#0B253A] text-white shadow-sm'
-                  : 'text-[#4A5568] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-sm'
+                  : 'text-[#4A5568] hover:text-jaman-navy'
               }`}
             >
               KDS Kitchen ({pendingKOT})
@@ -1283,8 +1283,8 @@ export default function AdminApp() {
               onClick={() => setActiveTab('KIOSKS')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 activeTab === 'KIOSKS'
-                  ? 'bg-[#0B253A] text-white shadow-sm'
-                  : 'text-[#4A5568] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-sm'
+                  : 'text-[#4A5568] hover:text-jaman-navy'
               }`}
             >
               Kiosk Terminals ({kiosks.filter((k) => k.status === 'ONLINE').length}/{kiosks.length})
@@ -1295,7 +1295,7 @@ export default function AdminApp() {
         {/* Right Status & Network State */}
         <div className="flex items-center gap-3 sm:gap-4">
           {/* LOCAL RESTAURANT SERVICE & DB REALTIME STATUS BADGE */}
-          <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-[#F8F6F0] border border-[#EBE6DD] rounded-xl text-xs font-bold">
+          <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-[#F8F6F0] border border-jaman-border rounded-xl text-xs font-bold">
             <span className={`flex items-center gap-1.5 ${localServiceHealth.status === 'CONNECTED' ? 'text-emerald-700' : 'text-rose-600'}`}>
               <span className={`w-2 h-2 rounded-full ${localServiceHealth.status === 'CONNECTED' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
               LOCAL SERVICE: {localServiceHealth.status}
@@ -1319,16 +1319,16 @@ export default function AdminApp() {
                 : 'bg-slate-100 text-slate-500 border-slate-300'
             }`}
           >
-            {orderSoundEnabled ? <Volume2 className="w-4 h-4 text-[#E66817]" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
+            {orderSoundEnabled ? <Volume2 className="w-4 h-4 text-jaman-saffron" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
             <span className="hidden sm:inline">{orderSoundEnabled ? 'Sound ON' : 'Muted'}</span>
           </button>
 
           {/* Admin Intelligence Bot Trigger */}
           <button
             onClick={() => setIsAssistantOpen(true)}
-            className="flex items-center gap-2 bg-[#0B253A] hover:bg-[#163650] text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-[#0B253A]/20 transition-all active:scale-95"
+            className="flex items-center gap-2 bg-jaman-navy hover:bg-[#163650] text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-jaman-navy/20 transition-all active:scale-95"
           >
-            <Bot className="w-4 h-4 text-[#E66817]" />
+            <Bot className="w-4 h-4 text-jaman-saffron" />
             <span className="hidden sm:inline">JAMANVAAR Assistant</span>
           </button>
 
@@ -1360,12 +1360,12 @@ export default function AdminApp() {
           </button>
 
           {/* Cashier profile avatar */}
-          <div className="flex items-center gap-2 pl-2 border-l border-[#EBE6DD]">
-            <div className="w-8 h-8 rounded-full bg-[#E66817] text-white flex items-center justify-center font-bold text-xs shadow-sm">
+          <div className="flex items-center gap-2 pl-2 border-l border-jaman-border">
+            <div className="w-8 h-8 rounded-full bg-jaman-saffron text-white flex items-center justify-center font-bold text-xs shadow-sm">
               M
             </div>
             <div className="hidden sm:block text-left leading-tight">
-              <div className="text-xs font-bold text-[#0B253A]">Manager</div>
+              <div className="text-xs font-bold text-jaman-navy">Manager</div>
               <div className="text-[10px] uppercase tracking-wider text-[#8C9BAE] font-semibold">KIOSK ADMIN</div>
             </div>
 
@@ -1385,17 +1385,17 @@ export default function AdminApp() {
       {/* BODY WITH SIDEBAR & MAIN VIEW */}
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT ADMIN SIDEBAR */}
-        <aside className="w-64 bg-white border-r border-[#EBE6DD] flex flex-col justify-between p-3 shrink-0 overflow-y-auto">
+        <aside className="w-64 bg-white border-r border-jaman-border flex flex-col justify-between p-3 shrink-0 overflow-y-auto">
           <nav className="space-y-1">
             <button
               onClick={() => setActiveTab('DASHBOARD')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'DASHBOARD'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <LayoutDashboard className="w-4 h-4 text-[#E66817]" />
+              <LayoutDashboard className="w-4 h-4 text-jaman-saffron" />
               <span>Dashboard</span>
             </button>
 
@@ -1403,11 +1403,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('MENU')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'MENU'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <UtensilsCrossed className="w-4 h-4 text-[#E66817]" />
+              <UtensilsCrossed className="w-4 h-4 text-jaman-saffron" />
               <span>Menu Management</span>
             </button>
 
@@ -1415,11 +1415,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('COMBOS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'COMBOS'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <PackagePlus className="w-4 h-4 text-[#E66817]" />
+              <PackagePlus className="w-4 h-4 text-jaman-saffron" />
               <span>Combos & Meal Deals</span>
             </button>
 
@@ -1427,12 +1427,12 @@ export default function AdminApp() {
               onClick={() => setActiveTab('ORDERS_KDS')}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'ORDERS_KDS'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Flame className="w-4 h-4 text-[#E66817]" />
+                <Flame className="w-4 h-4 text-jaman-saffron" />
                 <span>Orders & KDS</span>
               </div>
               <div className="flex items-center gap-1.5">
@@ -1442,7 +1442,7 @@ export default function AdminApp() {
                   </span>
                 )}
                 {pendingKOT > 0 && newOrdersCount === 0 && (
-                  <span className="bg-[#E66817] text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                  <span className="bg-jaman-saffron text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">
                     {pendingKOT}
                   </span>
                 )}
@@ -1453,11 +1453,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('TABLES')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'TABLES'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <Grid className="w-4 h-4 text-[#E66817]" />
+              <Grid className="w-4 h-4 text-jaman-saffron" />
               <span>Table Layout</span>
             </button>
 
@@ -1465,11 +1465,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('KIOSKS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'KIOSKS'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <Store className="w-4 h-4 text-[#E66817]" />
+              <Store className="w-4 h-4 text-jaman-saffron" />
               <span>Kiosk Terminals</span>
             </button>
 
@@ -1477,11 +1477,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('COUPONS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'COUPONS'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <Tag className="w-4 h-4 text-[#E66817]" />
+              <Tag className="w-4 h-4 text-jaman-saffron" />
               <span>Offers & Coupons</span>
             </button>
 
@@ -1489,11 +1489,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('RECEIPTS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'RECEIPTS'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <ReceiptText className="w-4 h-4 text-[#E66817]" />
+              <ReceiptText className="w-4 h-4 text-jaman-saffron" />
               <span>Receipt & E-Bill</span>
             </button>
 
@@ -1501,11 +1501,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('HARDWARE')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'HARDWARE'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <Printer className="w-4 h-4 text-[#E66817]" />
+              <Printer className="w-4 h-4 text-jaman-saffron" />
               <span>Hardware & Diagnostics</span>
             </button>
 
@@ -1513,11 +1513,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('FEEDBACK')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'FEEDBACK'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <MessageSquare className="w-4 h-4 text-[#E66817]" />
+              <MessageSquare className="w-4 h-4 text-jaman-saffron" />
               <span>Customer Feedback</span>
             </button>
 
@@ -1525,11 +1525,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('REPORTS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'REPORTS'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <TrendingUp className="w-4 h-4 text-[#E66817]" />
+              <TrendingUp className="w-4 h-4 text-jaman-saffron" />
               <span>Reports & Export</span>
             </button>
 
@@ -1537,11 +1537,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('STAFF')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'STAFF'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <Users className="w-4 h-4 text-[#E66817]" />
+              <Users className="w-4 h-4 text-jaman-saffron" />
               <span>Staff & Roles</span>
             </button>
 
@@ -1549,12 +1549,12 @@ export default function AdminApp() {
               onClick={() => setActiveTab('SYNC')}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'SYNC'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
               <div className="flex items-center gap-3">
-                <RefreshCw className="w-4 h-4 text-[#E66817]" />
+                <RefreshCw className="w-4 h-4 text-jaman-saffron" />
                 <span>Sync Center</span>
               </div>
               {syncStats.pendingCount > 0 && (
@@ -1568,11 +1568,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('AUDIT')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'AUDIT'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <Activity className="w-4 h-4 text-[#E66817]" />
+              <Activity className="w-4 h-4 text-jaman-saffron" />
               <span>Audit Activity Logs</span>
             </button>
 
@@ -1580,11 +1580,11 @@ export default function AdminApp() {
               onClick={() => setActiveTab('LICENSE')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'LICENSE'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <ShieldCheck className="w-4 h-4 text-[#E66817]" />
+              <ShieldCheck className="w-4 h-4 text-jaman-saffron" />
               <span>License & Entitlement</span>
             </button>
 
@@ -1592,33 +1592,33 @@ export default function AdminApp() {
               onClick={() => setActiveTab('SETTINGS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'SETTINGS'
-                  ? 'bg-[#0B253A] text-white shadow-md shadow-[#0B253A]/20'
-                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
-              <Settings className="w-4 h-4 text-[#E66817]" />
+              <Settings className="w-4 h-4 text-jaman-saffron" />
               <span>Settings & Backup</span>
             </button>
           </nav>
 
           {/* Bottom Sidebar Footer */}
-          <div className="pt-4 border-t border-[#EBE6DD] mt-4 text-center">
-            <div className="flex items-center justify-center gap-1 text-[11px] font-bold text-[#0B253A]">
+          <div className="pt-4 border-t border-jaman-border mt-4 text-center">
+            <div className="flex items-center justify-center gap-1 text-[11px] font-bold text-jaman-navy">
               <span>JAMANVAAR Kiosk Admin</span>
-              <span className="text-[#E66817]">v1.0.0</span>
+              <span className="text-jaman-saffron">v1.0.0</span>
             </div>
             <p className="text-[10px] text-[#8C9BAE]">Kelviontech Systems</p>
           </div>
         </aside>
 
         {/* MAIN CONTENT AREA */}
-        <main className="flex-1 bg-[#FBF9F5] p-6 overflow-y-auto">
+        <main className="flex-1 bg-jaman-ivory p-6 overflow-y-auto">
           {/* TAB 1: DASHBOARD */}
           {activeTab === 'DASHBOARD' && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">
                     Restaurant Operations Overview
                   </h1>
                   <p className="text-sm text-[#4A5568] mt-1">
@@ -1664,12 +1664,12 @@ export default function AdminApp() {
               {/* VISUAL ANALYTICS & HOURLY PEAK CHARTS DECK */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* 1. Hourly Sales Peak & Rush Curve Chart */}
-                <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm flex flex-col justify-between">
+                <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-jaman-border shadow-sm flex flex-col justify-between">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-[#E66817]" />
-                        <h2 className="text-lg font-black text-[#0B253A]">Hourly Sales Velocity & Dining Rush</h2>
+                        <TrendingUp className="w-5 h-5 text-jaman-saffron" />
+                        <h2 className="text-lg font-black text-jaman-navy">Hourly Sales Velocity & Dining Rush</h2>
                       </div>
                       <p className="text-xs text-[#8C9BAE] mt-0.5">Live order velocity throughout the day • Lunch (1-3 PM) & Dinner (7-10 PM)</p>
                     </div>
@@ -1681,11 +1681,11 @@ export default function AdminApp() {
 
                   {/* Hourly Bar Graph — computed from today's real orders */}
                   <div className="pt-4 pb-2">
-                    <div className="h-44 flex items-end justify-between gap-1.5 sm:gap-2 px-2 border-b border-[#EBE6DD]">
+                    <div className="h-44 flex items-end justify-between gap-1.5 sm:gap-2 px-2 border-b border-jaman-border">
                       {hourlyBars.map((bar, idx) => (
                         <div key={idx} className="flex-1 flex flex-col items-center gap-1 group relative">
                           {/* Tooltip on hover */}
-                          <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-[#0B253A] text-white text-[10px] font-bold px-2 py-0.5 rounded shadow pointer-events-none transition-opacity whitespace-nowrap z-20">
+                          <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-jaman-navy text-white text-[10px] font-bold px-2 py-0.5 rounded shadow pointer-events-none transition-opacity whitespace-nowrap z-20">
                             {bar.hour}: ₹{bar.amount}
                           </div>
                           <div className="w-full bg-[#F4EFE6] rounded-t-lg h-36 flex items-end overflow-hidden">
@@ -1693,12 +1693,12 @@ export default function AdminApp() {
                               style={{ height: `${bar.pct}%` }}
                               className={`w-full rounded-t-md transition-all duration-500 group-hover:brightness-110 ${
                                 bar.isPeak
-                                  ? 'bg-gradient-to-t from-[#E66817] to-[#FED7AA]'
-                                  : 'bg-gradient-to-t from-[#0B253A] to-[#3B82F6]'
+                                  ? 'bg-gradient-to-t from-jaman-saffron to-[#FED7AA]'
+                                  : 'bg-gradient-to-t from-jaman-navy to-[#3B82F6]'
                               }`}
                             ></div>
                           </div>
-                          <span className="text-[9px] sm:text-[10px] font-bold text-[#8C9BAE] mt-1 group-hover:text-[#0B253A]">
+                          <span className="text-[9px] sm:text-[10px] font-bold text-[#8C9BAE] mt-1 group-hover:text-jaman-navy">
                             {bar.hour}
                           </span>
                         </div>
@@ -1709,75 +1709,75 @@ export default function AdminApp() {
                   <div className="flex items-center justify-between text-xs text-[#8C9BAE] pt-3">
                     <div className="flex items-center gap-4">
                       <span className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded bg-gradient-to-t from-[#E66817] to-[#FED7AA]"></span>
-                        <strong className="text-[#0B253A]">Peak Rush Hours</strong>
+                        <span className="w-3 h-3 rounded bg-gradient-to-t from-jaman-saffron to-[#FED7AA]"></span>
+                        <strong className="text-jaman-navy">Peak Rush Hours</strong>
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded bg-gradient-to-t from-[#0B253A] to-[#3B82F6]"></span>
+                        <span className="w-3 h-3 rounded bg-gradient-to-t from-jaman-navy to-[#3B82F6]"></span>
                         <span>Standard Hours</span>
                       </span>
                     </div>
-                    <span className="font-bold text-[#0B253A]">Total Day Revenue: {formatINR(todayRevenue)}</span>
+                    <span className="font-bold text-jaman-navy">Total Day Revenue: {formatINR(todayRevenue)}</span>
                   </div>
                 </div>
 
                 {/* 2. Payment Gateway Distribution Card */}
-                <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm flex flex-col justify-between">
+                <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <CreditCard className="w-5 h-5 text-[#E66817]" />
-                        <h2 className="text-lg font-black text-[#0B253A]">Payment Channels</h2>
+                        <CreditCard className="w-5 h-5 text-jaman-saffron" />
+                        <h2 className="text-lg font-black text-jaman-navy">Payment Channels</h2>
                       </div>
                       <span className="text-xs text-[#8C9BAE]">Real-time Split</span>
                     </div>
 
                     <div className="space-y-4">
                       {/* UPI QR Split */}
-                      <div className="p-3.5 rounded-xl bg-[#FBF9F5] border border-[#EBE6DD] space-y-1.5">
+                      <div className="p-3.5 rounded-xl bg-jaman-ivory border border-jaman-border space-y-1.5">
                         <div className="flex items-center justify-between text-xs font-bold">
-                          <div className="flex items-center gap-2 text-[#0B253A]">
+                          <div className="flex items-center gap-2 text-jaman-navy">
                             <QrCode className="w-4 h-4 text-[#16A34A]" />
                             <span>UPI Dynamic QR</span>
                           </div>
                           <span className="text-emerald-700 font-black">{upiPct}% ({formatINR(upiRevenue)})</span>
                         </div>
-                        <div className="w-full h-2 rounded-full bg-[#EBE6DD] overflow-hidden">
+                        <div className="w-full h-2 rounded-full bg-jaman-border overflow-hidden">
                           <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${upiPct}%` }}></div>
                         </div>
                       </div>
 
                       {/* Card POS Split */}
-                      <div className="p-3.5 rounded-xl bg-[#FBF9F5] border border-[#EBE6DD] space-y-1.5">
+                      <div className="p-3.5 rounded-xl bg-jaman-ivory border border-jaman-border space-y-1.5">
                         <div className="flex items-center justify-between text-xs font-bold">
-                          <div className="flex items-center gap-2 text-[#0B253A]">
+                          <div className="flex items-center gap-2 text-jaman-navy">
                             <CreditCard className="w-4 h-4 text-[#3B82F6]" />
                             <span>Card EDC Terminal</span>
                           </div>
                           <span className="text-blue-700 font-black">{cardPct}% ({formatINR(cardRevenue)})</span>
                         </div>
-                        <div className="w-full h-2 rounded-full bg-[#EBE6DD] overflow-hidden">
+                        <div className="w-full h-2 rounded-full bg-jaman-border overflow-hidden">
                           <div className="h-full bg-blue-500 rounded-full" style={{ width: `${cardPct}%` }}></div>
                         </div>
                       </div>
 
                       {/* Cash Split */}
-                      <div className="p-3.5 rounded-xl bg-[#FBF9F5] border border-[#EBE6DD] space-y-1.5">
+                      <div className="p-3.5 rounded-xl bg-jaman-ivory border border-jaman-border space-y-1.5">
                         <div className="flex items-center justify-between text-xs font-bold">
-                          <div className="flex items-center gap-2 text-[#0B253A]">
-                            <Coins className="w-4 h-4 text-[#E66817]" />
+                          <div className="flex items-center gap-2 text-jaman-navy">
+                            <Coins className="w-4 h-4 text-jaman-saffron" />
                             <span>Cash at Counter</span>
                           </div>
-                          <span className="text-[#E66817] font-black">{cashPct}% ({formatINR(cashRevenue)})</span>
+                          <span className="text-jaman-saffron font-black">{cashPct}% ({formatINR(cashRevenue)})</span>
                         </div>
-                        <div className="w-full h-2 rounded-full bg-[#EBE6DD] overflow-hidden">
-                          <div className="h-full bg-[#E66817] rounded-full" style={{ width: `${cashPct}%` }}></div>
+                        <div className="w-full h-2 rounded-full bg-jaman-border overflow-hidden">
+                          <div className="h-full bg-jaman-saffron rounded-full" style={{ width: `${cashPct}%` }}></div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-[#EBE6DD] flex items-center justify-between">
+                  <div className="mt-4 pt-3 border-t border-jaman-border flex items-center justify-between">
                     <span className="text-xs text-[#8C9BAE]">Settlement Status:</span>
                     <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
                       ✓ Instant UPI Direct Bank
@@ -1787,11 +1787,11 @@ export default function AdminApp() {
               </div>
 
               {/* Kiosk Terminals Health Summary */}
-              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm">
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Store className="w-5 h-5 text-[#E66817]" />
-                    <h2 className="text-lg font-bold text-[#0B253A]">Active Kiosk Hardware Matrix</h2>
+                    <Store className="w-5 h-5 text-jaman-saffron" />
+                    <h2 className="text-lg font-bold text-jaman-navy">Active Kiosk Hardware Matrix</h2>
                   </div>
                   <span className="text-xs text-[#8C9BAE] font-medium">Real-time Heartbeat</span>
                 </div>
@@ -1805,11 +1805,11 @@ export default function AdminApp() {
                   {kiosks.map((k) => (
                     <div
                       key={k.id}
-                      className="p-4 rounded-xl border border-[#EBE6DD] bg-[#FBF9F5] flex items-center justify-between"
+                      className="p-4 rounded-xl border border-jaman-border bg-jaman-ivory flex items-center justify-between"
                     >
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-sm text-[#0B253A]">{k.name}</span>
+                          <span className="font-bold text-sm text-jaman-navy">{k.name}</span>
                           <StatusBadge status={k.status} type="kiosk" />
                         </div>
                         <p className="text-xs text-[#4A5568] mt-1">{k.locationDescription}</p>
@@ -1828,7 +1828,7 @@ export default function AdminApp() {
                             });
                             showToast(`${k.name} set to ${newStatus}`);
                           }}
-                          className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white border border-[#EBE6DD] hover:bg-slate-50 text-[#0B253A]"
+                          className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white border border-jaman-border hover:bg-slate-50 text-jaman-navy"
                         >
                           {k.status === 'ONLINE' ? 'Set Maint.' : 'Activate'}
                         </button>
@@ -1839,11 +1839,11 @@ export default function AdminApp() {
               </div>
 
               {/* Live Kitchen & Order Feed */}
-              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm">
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Flame className="w-5 h-5 text-[#E66817]" />
-                    <h2 className="text-lg font-bold text-[#0B253A]">Recent Order Stream</h2>
+                    <Flame className="w-5 h-5 text-jaman-saffron" />
+                    <h2 className="text-lg font-bold text-jaman-navy">Recent Order Stream</h2>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => setActiveTab('ORDERS_KDS')}>
                     View Full KDS Board
@@ -1855,8 +1855,8 @@ export default function AdminApp() {
                     <div key={order.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-black text-[#0B253A]">{order.orderNumber}</span>
-                          <span className="bg-[#E66817]/10 text-[#E66817] font-bold text-xs px-2 py-0.5 rounded">
+                          <span className="font-black text-jaman-navy">{order.orderNumber}</span>
+                          <span className="bg-jaman-saffron/10 text-jaman-saffron font-bold text-xs px-2 py-0.5 rounded">
                             TOKEN #{order.tokenNumber}
                           </span>
                           <span className="text-xs font-semibold text-[#4A5568]">
@@ -1875,7 +1875,7 @@ export default function AdminApp() {
                       </div>
 
                       <div className="flex items-center gap-3 self-end sm:self-center">
-                        <span className="text-base font-black text-[#E66817]">{formatINR(order.totalAmount)}</span>
+                        <span className="text-base font-black text-jaman-saffron">{formatINR(order.totalAmount)}</span>
                         <Button
                           variant="secondary"
                           size="sm"
@@ -1918,10 +1918,10 @@ export default function AdminApp() {
           {activeTab === 'MENU' && (
             <div className="space-y-6">
               {/* Header with Stats, Completeness Score & Action Bar */}
-              <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#EBE6DD] shadow-sm">
+              <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-jaman-border shadow-sm">
                 <div>
                   <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-black text-[#0B253A]">Menu & Catalog Builder</h1>
+                    <h1 className="text-2xl font-black text-jaman-navy">Menu & Catalog Builder</h1>
                     <span
                       className={`text-xs font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
                         isMenuDraft
@@ -1940,12 +1940,12 @@ export default function AdminApp() {
                 {/* Completeness Score Bar */}
                 <div
                   onClick={() => setIsMissingDataModalOpen(true)}
-                  className="flex items-center gap-3 bg-[#FBF9F5] px-4 py-2 rounded-xl border border-[#EBE6DD] cursor-pointer hover:border-[#E66817] transition-all"
+                  className="flex items-center gap-3 bg-jaman-ivory px-4 py-2 rounded-xl border border-jaman-border cursor-pointer hover:border-jaman-saffron transition-all"
                   title="Click to view and fix missing data"
                 >
                   <div className="text-right">
                     <span className="text-[10px] font-bold text-[#8C9BAE] uppercase block">Completeness</span>
-                    <span className="text-sm font-black text-[#0B253A]">{completenessReport.score}% Ready</span>
+                    <span className="text-sm font-black text-jaman-navy">{completenessReport.score}% Ready</span>
                   </div>
                   <div className="w-24 bg-slate-200 h-2.5 rounded-full overflow-hidden">
                     <div
@@ -1975,7 +1975,7 @@ export default function AdminApp() {
                       setTemplateStep('SELECT');
                       setIsPrebuiltMenuModalOpen(true);
                     }}
-                    className="shadow-sm font-bold bg-[#E66817] hover:bg-[#d55b0e]"
+                    className="shadow-sm font-bold bg-jaman-saffron hover:bg-[#d55b0e]"
                   >
                     🍽️ Load Prebuilt Menu
                   </Button>
@@ -1995,7 +1995,7 @@ export default function AdminApp() {
                     variant="primary"
                     size="sm"
                     onClick={() => setIsPublishModalOpen(true)}
-                    className="bg-[#0B253A] text-white hover:bg-[#163e5e] font-bold"
+                    className="bg-jaman-navy text-white hover:bg-[#163e5e] font-bold"
                   >
                     🚀 Publish
                   </Button>
@@ -2006,7 +2006,7 @@ export default function AdminApp() {
                     variant="accent"
                     size="sm"
                     onClick={() => setIsAddItemModalOpen(true)}
-                    className="bg-[#E66817] hover:bg-[#d55b0e] text-white font-bold shadow-xs"
+                    className="bg-jaman-saffron hover:bg-[#d55b0e] text-white font-bold shadow-xs"
                     leftIcon={<Plus className="w-3.5 h-3.5" />}
                   >
                     + Add Menu Dish
@@ -2041,7 +2041,7 @@ export default function AdminApp() {
               )}
 
               {/* Search & Dietary Filters Bar */}
-              <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="relative w-full md:w-96">
                   <Search className="w-4 h-4 text-[#8C9BAE] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
@@ -2049,7 +2049,7 @@ export default function AdminApp() {
                     value={menuSearch}
                     onChange={(e) => setMenuSearch(e.target.value)}
                     placeholder="Search dish name, SKU, or tags..."
-                    className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl pl-10 pr-4 py-2 text-sm text-[#0B253A] placeholder-[#8C9BAE] focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                    className="w-full bg-jaman-ivory border border-jaman-border rounded-xl pl-10 pr-4 py-2 text-sm text-jaman-navy placeholder-[#8C9BAE] focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                   />
                 </div>
 
@@ -2060,8 +2060,8 @@ export default function AdminApp() {
                       onClick={() => setDietaryFilter(diet)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                         dietaryFilter === diet
-                          ? 'bg-[#0B253A] text-white shadow-sm'
-                          : 'bg-[#FBF9F5] border border-[#EBE6DD] text-[#4A5568] hover:bg-[#F4EFE6]'
+                          ? 'bg-jaman-navy text-white shadow-sm'
+                          : 'bg-jaman-ivory border border-jaman-border text-[#4A5568] hover:bg-[#F4EFE6]'
                       }`}
                     >
                       {diet === 'ALL' ? 'All Dietary' : diet.replace('_', ' ')}
@@ -2077,8 +2077,8 @@ export default function AdminApp() {
                     onClick={() => setSelectedCategoryFilter('ALL')}
                     className={`px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                       selectedCategoryFilter === 'ALL'
-                        ? 'bg-[#0B253A] text-white shadow-md'
-                        : 'bg-white border border-[#EBE6DD] text-[#0B253A] hover:bg-[#F8F6F0]'
+                        ? 'bg-jaman-navy text-white shadow-md'
+                        : 'bg-white border border-jaman-border text-jaman-navy hover:bg-[#F8F6F0]'
                     }`}
                   >
                     All Categories ({menuItems.length})
@@ -2097,7 +2097,7 @@ export default function AdminApp() {
                   variant="accent"
                   size="sm"
                   onClick={() => setIsAddItemModalOpen(true)}
-                  className="bg-[#E66817] hover:bg-[#d55b0e] text-white font-bold whitespace-nowrap shadow-xs shrink-0"
+                  className="bg-jaman-saffron hover:bg-[#d55b0e] text-white font-bold whitespace-nowrap shadow-xs shrink-0"
                   leftIcon={<Plus className="w-4 h-4" />}
                 >
                   + Add Menu Dish
@@ -2143,7 +2143,7 @@ export default function AdminApp() {
                               setSelectedImageTargetItem(item);
                               setIsImageLibraryModalOpen(true);
                             }}
-                            className="text-[11px] font-bold text-[#0B253A] bg-[#FBF9F5] hover:bg-[#EBE6DD] px-2 py-1 rounded-lg border border-[#EBE6DD]"
+                            className="text-[11px] font-bold text-jaman-navy bg-jaman-ivory hover:bg-jaman-border px-2 py-1 rounded-lg border border-jaman-border"
                             title="Assign / Replace Image from Hub"
                           >
                             🖼️ Photo
@@ -2173,7 +2173,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Combos & Value Meal Deals</h1>
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Combos & Value Meal Deals</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Manage multi-item combo packages, bundle pricing, savings badges, and kiosk promotions.
                   </p>
@@ -2185,19 +2185,19 @@ export default function AdminApp() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {combos.map((combo) => (
-                  <div key={combo.id} className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm flex flex-col justify-between space-y-4">
+                  <div key={combo.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm flex flex-col justify-between space-y-4">
                     <div>
                       <div className="flex items-start justify-between">
                         <div>
-                          <span className="text-[10px] font-black uppercase text-[#E66817] bg-[#E66817]/10 px-2 py-0.5 rounded">
+                          <span className="text-[10px] font-black uppercase text-jaman-saffron bg-jaman-saffron/10 px-2 py-0.5 rounded">
                             SAVE ₹{combo.savingsAmount}
                           </span>
-                          <h3 className="text-lg font-bold text-[#0B253A] mt-2">{combo.name}</h3>
+                          <h3 className="text-lg font-bold text-jaman-navy mt-2">{combo.name}</h3>
                           <p className="text-xs text-[#4A5568] mt-1">{combo.description}</p>
                         </div>
                         <div className="text-right">
                           <span className="text-xs text-[#8C9BAE] line-through">₹{combo.originalPrice}</span>
-                          <div className="text-xl font-black text-[#E66817]">{formatINR(combo.basePrice)}</div>
+                          <div className="text-xl font-black text-jaman-saffron">{formatINR(combo.basePrice)}</div>
                         </div>
                       </div>
                     </div>
@@ -2237,7 +2237,7 @@ export default function AdminApp() {
 
           {/* REAL-TIME NEW ORDER ARRIVAL ALERT BANNER */}
           {newOrderArrivalAlert && (
-            <div className="bg-gradient-to-r from-rose-600 via-[#E66817] to-amber-600 text-white p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4 animate-bounce border-2 border-white/20">
+            <div className="bg-gradient-to-r from-rose-600 via-jaman-saffron to-amber-600 text-white p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4 animate-bounce border-2 border-white/20">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl shrink-0">
                   🔔
@@ -2261,7 +2261,7 @@ export default function AdminApp() {
                     setSelectedOrderDetail(newOrderArrivalAlert);
                     setNewOrderArrivalAlert(null);
                   }}
-                  className="px-4 py-2 bg-white text-[#0B253A] rounded-xl text-xs font-black hover:bg-slate-100 shadow-md transition-all active:scale-95"
+                  className="px-4 py-2 bg-white text-jaman-navy rounded-xl text-xs font-black hover:bg-slate-100 shadow-md transition-all active:scale-95"
                 >
                   👁️ View Order
                 </button>
@@ -2289,10 +2289,10 @@ export default function AdminApp() {
           {activeTab === 'ORDERS_KDS' && (
             <div className="space-y-6">
               {/* TOP HEADER & LIVE CONNECTION STATUS */}
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#EBE6DD] shadow-sm">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-jaman-border shadow-sm">
                 <div>
                   <div className="flex items-center gap-3">
-                    <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Orders & Kitchen Display (KDS)</h1>
+                    <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Orders & Kitchen Display (KDS)</h1>
                     <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full border border-emerald-300 flex items-center gap-1.5 shadow-xs">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                       Local Realtime Active (:5178)
@@ -2316,7 +2316,7 @@ export default function AdminApp() {
                         : 'bg-slate-100 text-slate-500 border-slate-300'
                     }`}
                   >
-                    {orderSoundEnabled ? <Volume2 className="w-4 h-4 text-[#E66817]" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
+                    {orderSoundEnabled ? <Volume2 className="w-4 h-4 text-jaman-saffron" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
                     <span>Sound: {orderSoundEnabled ? 'ON' : 'OFF'}</span>
                   </button>
 
@@ -2326,9 +2326,9 @@ export default function AdminApp() {
                       db.notify();
                       showToast(`✓ Refreshed ${orders.length} orders from local service.`);
                     }}
-                    className="px-3.5 py-2 rounded-xl bg-white border border-[#EBE6DD] hover:bg-[#FBF9F5] text-xs font-bold text-[#0B253A] flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
+                    className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border hover:bg-jaman-ivory text-xs font-bold text-jaman-navy flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
                   >
-                    <RefreshCw className="w-3.5 h-3.5 text-[#E66817]" />
+                    <RefreshCw className="w-3.5 h-3.5 text-jaman-saffron" />
                     <span>Sync ({orders.length})</span>
                   </button>
 
@@ -2337,7 +2337,7 @@ export default function AdminApp() {
                     href="http://localhost:5174"
                     target="_blank"
                     rel="noreferrer"
-                    className="px-3.5 py-2 rounded-xl bg-[#E66817] hover:bg-[#d55b0e] text-white text-xs font-bold shadow-md shadow-[#E66817]/20 active:scale-95 transition-all flex items-center gap-1.5"
+                    className="px-3.5 py-2 rounded-xl bg-jaman-saffron hover:bg-[#d55b0e] text-white text-xs font-bold shadow-md shadow-jaman-saffron/20 active:scale-95 transition-all flex items-center gap-1.5"
                   >
                     <span>📱 Open Kiosk Screen</span>
                   </a>
@@ -2345,7 +2345,7 @@ export default function AdminApp() {
               </div>
 
               {/* STATUS FILTER PILL DECK */}
-              <div className="flex flex-wrap items-center gap-2 border-b border-[#EBE6DD] pb-3">
+              <div className="flex flex-wrap items-center gap-2 border-b border-jaman-border pb-3">
                 {[
                   { id: 'ALL', label: 'All Orders', count: orders.length, color: 'bg-slate-800 text-white' },
                   { id: 'NEW', label: '🔴 New Unacknowledged', count: newOrdersCount, color: 'bg-rose-600 text-white animate-pulse' },
@@ -2360,7 +2360,7 @@ export default function AdminApp() {
                     className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
                       orderStatusFilter === st.id
                         ? `${st.color} shadow-sm`
-                        : 'bg-white text-[#4A5568] border border-[#EBE6DD] hover:bg-[#F8F6F0]'
+                        : 'bg-white text-[#4A5568] border border-jaman-border hover:bg-[#F8F6F0]'
                     }`}
                   >
                     <span>{st.label}</span>
@@ -2376,7 +2376,7 @@ export default function AdminApp() {
               </div>
 
               {/* SEARCH, TERMINAL & TYPE FILTERS TOOLBAR */}
-              <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-center">
+              <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-center">
                 {/* Search Bar */}
                 <div className="relative">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -2385,7 +2385,7 @@ export default function AdminApp() {
                     value={orderSearchQuery}
                     onChange={(e) => setOrderSearchQuery(e.target.value)}
                     placeholder="Search Order#, Token, Phone, Name..."
-                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#F8F6F0] border border-[#EBE6DD] text-xs font-medium focus:outline-none focus:border-[#E66817]"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#F8F6F0] border border-jaman-border text-xs font-medium focus:outline-none focus:border-jaman-saffron"
                   />
                   {orderSearchQuery && (
                     <button
@@ -2402,7 +2402,7 @@ export default function AdminApp() {
                   <select
                     value={orderKioskFilter}
                     onChange={(e) => setOrderKioskFilter(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#F8F6F0] border border-[#EBE6DD] text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F8F6F0] border border-jaman-border text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   >
                     <option value="ALL">🖥️ All Kiosks (Any Terminal)</option>
                     <option value="KIOSK-01">🖥️ KIOSK-01 (Touch Terminal 1)</option>
@@ -2416,7 +2416,7 @@ export default function AdminApp() {
                   <select
                     value={orderTypeFilter}
                     onChange={(e) => setOrderTypeFilter(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#F8F6F0] border border-[#EBE6DD] text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F8F6F0] border border-jaman-border text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   >
                     <option value="ALL">🍽️ All Order Types</option>
                     <option value="DINE_IN">🍽️ Dine-In Tables</option>
@@ -2429,7 +2429,7 @@ export default function AdminApp() {
                   <select
                     value={orderSortBy}
                     onChange={(e) => setOrderSortBy(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#F8F6F0] border border-[#EBE6DD] text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#F8F6F0] border border-jaman-border text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   >
                     <option value="NEWEST">⏳ Sort: Newest First</option>
                     <option value="OLDEST">⏳ Sort: Oldest First</option>
@@ -2464,18 +2464,18 @@ export default function AdminApp() {
                             ? 'bg-amber-50/40 border-amber-300'
                             : order.orderStatus === 'READY'
                             ? 'bg-emerald-50/40 border-emerald-300'
-                            : 'bg-white border-[#EBE6DD]'
+                            : 'bg-white border-jaman-border'
                         }`}
                       >
                         {/* Order Card Top Bar */}
                         <div className="p-4 border-b border-black/5 flex items-center justify-between bg-white/80">
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="text-xl font-black text-[#0B253A]">#{order.tokenNumber}</span>
+                              <span className="text-xl font-black text-jaman-navy">#{order.tokenNumber}</span>
                               <span className="text-xs font-bold text-[#4A5568]">{order.orderNumber}</span>
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-[11px] font-bold text-[#0B253A] bg-slate-100 px-2 py-0.5 rounded">
+                              <span className="text-[11px] font-bold text-jaman-navy bg-slate-100 px-2 py-0.5 rounded">
                                 {order.kioskId || 'KIOSK-01'}
                               </span>
                               <span className="text-xs font-semibold text-[#8C9BAE]">
@@ -2502,11 +2502,11 @@ export default function AdminApp() {
                           {order.items.map((it) => (
                             <div key={it.id} className="border-b border-slate-100 pb-2 last:border-0 last:pb-0">
                               <div className="flex items-start justify-between">
-                                <span className="font-bold text-sm text-[#0B253A]">
-                                  <span className="text-[#E66817] font-black mr-1.5">{it.quantity}×</span>
+                                <span className="font-bold text-sm text-jaman-navy">
+                                  <span className="text-jaman-saffron font-black mr-1.5">{it.quantity}×</span>
                                   {it.name}
                                 </span>
-                                <span className="text-xs font-bold text-[#0B253A]">{formatINR(it.totalPrice)}</span>
+                                <span className="text-xs font-bold text-jaman-navy">{formatINR(it.totalPrice)}</span>
                               </div>
                               {it.modifiers && it.modifiers.length > 0 && (
                                 <div className="text-xs text-slate-500 pl-5 mt-0.5">
@@ -2529,7 +2529,7 @@ export default function AdminApp() {
                               ✓ PAID ({order.paymentMethod})
                             </span>
                           </div>
-                          <div className="text-right font-black text-sm text-[#0B253A]">
+                          <div className="text-right font-black text-sm text-jaman-navy">
                             Total: {formatINR(order.totalAmount)}
                           </div>
                         </div>
@@ -2538,7 +2538,7 @@ export default function AdminApp() {
                         <div className="p-3.5 border-t border-black/5 bg-white/80 flex items-center justify-between gap-2">
                           <button
                             onClick={() => setSelectedOrderDetail(order)}
-                            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-[#0B253A] flex items-center gap-1 transition-all active:scale-95"
+                            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-jaman-navy flex items-center gap-1 transition-all active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5 text-slate-600" />
                             <span>View</span>
@@ -2602,7 +2602,7 @@ export default function AdminApp() {
                                 showToast(res.message);
                               }}
                               title="Reprint 80mm Physical Thermal Slip"
-                              className="p-2 rounded-xl bg-slate-100 hover:bg-[#FFF4ED] hover:text-[#E66817] text-slate-600 transition-all"
+                              className="p-2 rounded-xl bg-slate-100 hover:bg-[#FFF4ED] hover:text-jaman-saffron text-slate-600 transition-all"
                             >
                               <Printer className="w-4 h-4" />
                             </button>
@@ -2625,10 +2625,10 @@ export default function AdminApp() {
             >
               <div className="space-y-6">
                 {/* Header Summary */}
-                <div className="bg-[#FAF8F5] p-4 rounded-2xl border border-[#EBE6DD] flex flex-wrap items-center justify-between gap-4">
+                <div className="bg-[#FAF8F5] p-4 rounded-2xl border border-jaman-border flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl font-black text-[#E66817]">Token #{selectedOrderDetail.tokenNumber}</span>
+                      <span className="text-2xl font-black text-jaman-saffron">Token #{selectedOrderDetail.tokenNumber}</span>
                       <StatusBadge status={selectedOrderDetail.orderStatus} />
                     </div>
                     <p className="text-xs text-[#4A5568] mt-1 font-medium">
@@ -2637,7 +2637,7 @@ export default function AdminApp() {
                   </div>
                   <div className="text-right">
                     <div className="text-xs font-bold text-[#8C9BAE]">Order Type</div>
-                    <div className="text-sm font-black text-[#0B253A]">
+                    <div className="text-sm font-black text-jaman-navy">
                       {selectedOrderDetail.orderType} {selectedOrderDetail.tableNumber ? `(Table ${selectedOrderDetail.tableNumber})` : ''}
                     </div>
                   </div>
@@ -2645,10 +2645,10 @@ export default function AdminApp() {
 
                 {/* Items & Breakdown */}
                 <div className="space-y-3">
-                  <h4 className="font-bold text-xs text-[#0B253A] uppercase tracking-wider">Itemized Breakdown</h4>
-                  <div className="border border-[#EBE6DD] rounded-2xl overflow-hidden">
+                  <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider">Itemized Breakdown</h4>
+                  <div className="border border-jaman-border rounded-2xl overflow-hidden">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-slate-700 font-bold uppercase text-[10px]">
+                      <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-700 font-bold uppercase text-[10px]">
                         <tr>
                           <th className="py-2.5 px-3">Item Details</th>
                           <th className="py-2.5 px-3 text-center">Qty</th>
@@ -2660,7 +2660,7 @@ export default function AdminApp() {
                         {selectedOrderDetail.items.map((it) => (
                           <tr key={it.id} className="hover:bg-slate-50/50">
                             <td className="py-2.5 px-3">
-                              <div className="font-bold text-[#0B253A]">{it.name}</div>
+                              <div className="font-bold text-jaman-navy">{it.name}</div>
                               <div className="text-[10px] text-slate-500 font-mono">{it.sku}</div>
                               {it.modifiers && it.modifiers.length > 0 && (
                                 <div className="text-[11px] text-slate-500 mt-0.5">
@@ -2675,7 +2675,7 @@ export default function AdminApp() {
                             </td>
                             <td className="py-2.5 px-3 text-center font-bold">{it.quantity}</td>
                             <td className="py-2.5 px-3 text-right text-slate-600">{formatINR(it.unitPrice)}</td>
-                            <td className="py-2.5 px-3 text-right font-black text-[#0B253A]">{formatINR(it.totalPrice)}</td>
+                            <td className="py-2.5 px-3 text-right font-black text-jaman-navy">{formatINR(it.totalPrice)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -2684,7 +2684,7 @@ export default function AdminApp() {
                 </div>
 
                 {/* Financial Ledger */}
-                <div className="bg-[#FBF9F5] p-4 rounded-2xl border border-[#EBE6DD] space-y-1.5 text-xs">
+                <div className="bg-jaman-ivory p-4 rounded-2xl border border-jaman-border space-y-1.5 text-xs">
                   <div className="flex justify-between text-slate-600">
                     <span>Subtotal:</span>
                     <span>{formatINR(selectedOrderDetail.subtotal)}</span>
@@ -2703,24 +2703,24 @@ export default function AdminApp() {
                     <span>SGST @ 2.5%:</span>
                     <span>{formatINR(selectedOrderDetail.sgstAmount)}</span>
                   </div>
-                  <div className="flex justify-between font-black text-sm text-[#0B253A] pt-2 border-t border-slate-200">
+                  <div className="flex justify-between font-black text-sm text-jaman-navy pt-2 border-t border-slate-200">
                     <span>Total Amount:</span>
-                    <span className="text-[#E66817]">{formatINR(selectedOrderDetail.totalAmount)}</span>
+                    <span className="text-jaman-saffron">{formatINR(selectedOrderDetail.totalAmount)}</span>
                   </div>
                 </div>
 
                 {/* Payment & Audit Info */}
                 <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="p-3 bg-white border border-[#EBE6DD] rounded-xl">
+                  <div className="p-3 bg-white border border-jaman-border rounded-xl">
                     <span className="text-[10px] text-slate-400 font-bold uppercase block">Payment Method</span>
                     <span className="font-bold text-emerald-700">✓ {selectedOrderDetail.paymentMethod} (PAID)</span>
                     <span className="text-[10px] text-slate-500 font-mono block mt-0.5">
                       TxID: {selectedOrderDetail.paymentTransactionId || 'OFFLINE_TX_OK'}
                     </span>
                   </div>
-                  <div className="p-3 bg-white border border-[#EBE6DD] rounded-xl">
+                  <div className="p-3 bg-white border border-jaman-border rounded-xl">
                     <span className="text-[10px] text-slate-400 font-bold uppercase block">Customer & Counter</span>
-                    <span className="font-bold text-[#0B253A]">
+                    <span className="font-bold text-jaman-navy">
                       {selectedOrderDetail.customerPhone ? `📞 ${selectedOrderDetail.customerPhone}` : 'Walk-in Guest'}
                     </span>
                     <span className="text-[10px] text-slate-500 block mt-0.5">
@@ -2731,10 +2731,10 @@ export default function AdminApp() {
 
                 {/* Order Timeline (Step-by-Step History) */}
                 <div className="space-y-2.5">
-                  <h4 className="font-bold text-xs text-[#0B253A] uppercase tracking-wider flex items-center gap-1.5">
-                    <History className="w-3.5 h-3.5 text-[#E66817]" /> Authoritative Order Timeline
+                  <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider flex items-center gap-1.5">
+                    <History className="w-3.5 h-3.5 text-jaman-saffron" /> Authoritative Order Timeline
                   </h4>
-                  <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 space-y-3">
+                  <div className="bg-white border border-jaman-border rounded-2xl p-4 space-y-3">
                     {(selectedOrderDetail.timeline && selectedOrderDetail.timeline.length > 0
                       ? selectedOrderDetail.timeline
                       : [
@@ -2752,9 +2752,9 @@ export default function AdminApp() {
                         ]
                     ).map((event, idx) => (
                       <div key={idx} className="flex items-start gap-3 text-xs">
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#E66817] mt-1 shrink-0"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-jaman-saffron mt-1 shrink-0"></div>
                         <div className="flex-1">
-                          <div className="font-bold text-[#0B253A]">{event.title}</div>
+                          <div className="font-bold text-jaman-navy">{event.title}</div>
                           <div className="text-[10px] text-slate-500">
                             {formatDate(event.timestamp)} {formatTime(event.timestamp)} {event.actor ? `• By ${event.actor}` : ''}
                           </div>
@@ -2765,7 +2765,7 @@ export default function AdminApp() {
                 </div>
 
                 {/* Modal Action Buttons */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#EBE6DD]">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-jaman-border">
                   <Button
                     variant="outline"
                     size="sm"
@@ -2773,7 +2773,7 @@ export default function AdminApp() {
                       const res = await PrinterService.printReceipt(selectedOrderDetail);
                       showToast(res.message);
                     }}
-                    leftIcon={<Printer className="w-4 h-4 text-[#E66817]" />}
+                    leftIcon={<Printer className="w-4 h-4 text-jaman-saffron" />}
                   >
                     Reprint Thermal Slip
                   </Button>
@@ -2847,7 +2847,7 @@ export default function AdminApp() {
           {activeTab === 'TABLES' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Dining Table Management</h1>
+                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Dining Table Management</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Live floor plan, occupancy status, and table QR code generation.
                 </p>
@@ -2860,12 +2860,12 @@ export default function AdminApp() {
                     className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
                       t.status === 'OCCUPIED'
                         ? 'bg-amber-50 border-amber-300'
-                        : 'bg-white border-[#EBE6DD]'
+                        : 'bg-white border-jaman-border'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xl font-black text-[#0B253A]">T-{t.tableNumber}</span>
+                        <span className="text-xl font-black text-jaman-navy">T-{t.tableNumber}</span>
                         <span
                           className={`w-2.5 h-2.5 rounded-full ${
                             t.status === 'OCCUPIED' ? 'bg-amber-500' : 'bg-emerald-500'
@@ -2882,7 +2882,7 @@ export default function AdminApp() {
                         TableRepository.updateTableStatus(t.id, newStat);
                         showToast(`Table ${t.tableNumber} is now ${newStat}`);
                       }}
-                      className="mt-4 w-full py-1.5 rounded-xl text-xs font-bold bg-white border border-[#EBE6DD] hover:bg-slate-50 text-[#0B253A]"
+                      className="mt-4 w-full py-1.5 rounded-xl text-xs font-bold bg-white border border-jaman-border hover:bg-slate-50 text-jaman-navy"
                     >
                       {t.status === 'AVAILABLE' ? 'Mark Occupied' : 'Clear Table'}
                     </button>
@@ -2896,7 +2896,7 @@ export default function AdminApp() {
           {activeTab === 'KIOSKS' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Kiosk Terminal Control</h1>
+                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Kiosk Terminal Control</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Manage self-ordering stations, lockdown states, maintenance modes, and idle timeouts.
                 </p>
@@ -2911,11 +2911,11 @@ export default function AdminApp() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {kiosks.map((k) => (
-                  <div key={k.id} className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+                  <div key={k.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-bold text-[#0B253A]">{k.name}</h3>
+                          <h3 className="text-lg font-bold text-jaman-navy">{k.name}</h3>
                           <StatusBadge status={k.status} type="kiosk" />
                         </div>
                         <p className="text-xs text-[#4A5568] mt-1">{k.locationDescription}</p>
@@ -2925,24 +2925,24 @@ export default function AdminApp() {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-xs bg-[#FBF9F5] p-3 rounded-xl border border-[#EBE6DD]">
+                    <div className="grid grid-cols-2 gap-2 text-xs bg-jaman-ivory p-3 rounded-xl border border-jaman-border">
                       <div>
                         <span className="text-[#8C9BAE]">Allowed Modes:</span>
-                        <div className="font-semibold text-[#0B253A]">{k.orderTypesAllowed.join(', ')}</div>
+                        <div className="font-semibold text-jaman-navy">{k.orderTypesAllowed.join(', ')}</div>
                       </div>
                       <div>
                         <span className="text-[#8C9BAE]">Idle Reset:</span>
-                        <div className="font-semibold text-[#0B253A]">{k.idleTimeoutSeconds} seconds</div>
+                        <div className="font-semibold text-jaman-navy">{k.idleTimeoutSeconds} seconds</div>
                       </div>
                       <div>
                         <span className="text-[#8C9BAE]">Last Seen:</span>
-                        <div className="font-semibold text-[#0B253A] font-mono">
+                        <div className="font-semibold text-jaman-navy font-mono">
                           {k.lastHeartbeat ? formatTime(k.lastHeartbeat) : '—'}
                         </div>
                       </div>
                       <div>
                         <span className="text-[#8C9BAE]">Version:</span>
-                        <div className="font-semibold text-[#0B253A] font-mono">{k.appVersion}</div>
+                        <div className="font-semibold text-jaman-navy font-mono">{k.appVersion}</div>
                       </div>
                     </div>
 
@@ -2994,7 +2994,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Offers & Promo Coupons</h1>
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Offers & Promo Coupons</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Manage customer discounts, threshold promotions, and kiosk exclusive promo codes.
                   </p>
@@ -3006,17 +3006,17 @@ export default function AdminApp() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {coupons.map((c) => (
-                  <div key={c.id} className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm flex flex-col justify-between">
+                  <div key={c.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="font-mono text-lg font-black text-[#E66817] bg-[#E66817]/10 px-3 py-1 rounded-xl border border-[#E66817]/20">
+                        <span className="font-mono text-lg font-black text-jaman-saffron bg-jaman-saffron/10 px-3 py-1 rounded-xl border border-jaman-saffron/20">
                           {c.code}
                         </span>
                         <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
                           ACTIVE
                         </span>
                       </div>
-                      <p className="text-sm font-semibold text-[#0B253A] mt-3">{c.description}</p>
+                      <p className="text-sm font-semibold text-jaman-navy mt-3">{c.description}</p>
                       <div className="text-xs text-[#8C9BAE] mt-2 space-y-1">
                         <div>Min Order Value: ₹{c.minOrderValue}</div>
                         <div>Times Used: {c.usageCount} times</div>
@@ -3048,7 +3048,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Receipt & E-Bill System</h1>
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Receipt & E-Bill System</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Configure thermal paper dimensions (58mm vs 80mm), WhatsApp digital receipt templates, and audit history.
                   </p>
@@ -3057,84 +3057,84 @@ export default function AdminApp() {
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left 2 Cols: Form */}
-                <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm">
+                <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-jaman-border shadow-sm">
                   <form onSubmit={handleSaveReceiptConfig} className="space-y-4">
-                    <h3 className="font-bold text-base text-[#0B253A]">Header & Legal Tax Information</h3>
+                    <h3 className="font-bold text-base text-jaman-navy">Header & Legal Tax Information</h3>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-[#0B253A] mb-1">Restaurant Header Name</label>
+                        <label className="block text-xs font-bold text-jaman-navy mb-1">Restaurant Header Name</label>
                         <input
                           type="text"
                           value={receiptForm.restaurantName}
                           onChange={(e) => setReceiptForm({ ...receiptForm, restaurantName: e.target.value })}
-                          className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                          className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[#0B253A] mb-1">Contact Phone</label>
+                        <label className="block text-xs font-bold text-jaman-navy mb-1">Contact Phone</label>
                         <input
                           type="text"
                           value={receiptForm.phone}
                           onChange={(e) => setReceiptForm({ ...receiptForm, phone: e.target.value })}
-                          className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                          className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-[#0B253A] mb-1">GSTIN Number</label>
+                        <label className="block text-xs font-bold text-jaman-navy mb-1">GSTIN Number</label>
                         <input
                           type="text"
                           value={receiptForm.gstin}
                           onChange={(e) => setReceiptForm({ ...receiptForm, gstin: e.target.value })}
-                          className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                          className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[#0B253A] mb-1">FSSAI License</label>
+                        <label className="block text-xs font-bold text-jaman-navy mb-1">FSSAI License</label>
                         <input
                           type="text"
                           value={receiptForm.fssaiNumber}
                           onChange={(e) => setReceiptForm({ ...receiptForm, fssaiNumber: e.target.value })}
-                          className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                          className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Outlet Full Address</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Outlet Full Address</label>
                       <input
                         type="text"
                         value={receiptForm.address}
                         onChange={(e) => setReceiptForm({ ...receiptForm, address: e.target.value })}
-                        className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                        className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                       />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-[#0B253A] mb-1">Thank You Closing Message</label>
+                        <label className="block text-xs font-bold text-jaman-navy mb-1">Thank You Closing Message</label>
                         <input
                           type="text"
                           value={receiptForm.thankYouMessage}
                           onChange={(e) => setReceiptForm({ ...receiptForm, thankYouMessage: e.target.value })}
-                          className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                          className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[#0B253A] mb-1">Footer Heritage Tagline</label>
+                        <label className="block text-xs font-bold text-jaman-navy mb-1">Footer Heritage Tagline</label>
                         <input
                           type="text"
                           value={receiptForm.footerMessage}
                           onChange={(e) => setReceiptForm({ ...receiptForm, footerMessage: e.target.value })}
-                          className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                          className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                         />
                       </div>
                     </div>
 
-                    <h3 className="font-bold text-base text-[#0B253A] pt-3 border-t border-[#F3EFE6]">
+                    <h3 className="font-bold text-base text-jaman-navy pt-3 border-t border-[#F3EFE6]">
                       Paper Dimension & Display Rules
                     </h3>
 
@@ -3144,8 +3144,8 @@ export default function AdminApp() {
                         onClick={() => setReceiptForm({ ...receiptForm, paperSize: '80mm' })}
                         className={`p-3 rounded-xl border text-center font-bold text-xs ${
                           receiptForm.paperSize === '80mm'
-                            ? 'bg-[#0B253A] text-white border-[#0B253A]'
-                            : 'bg-[#FBF9F5] border-[#EBE6DD] text-[#0B253A]'
+                            ? 'bg-jaman-navy text-white border-jaman-navy'
+                            : 'bg-jaman-ivory border-jaman-border text-jaman-navy'
                         }`}
                       >
                         80mm Standard POS
@@ -3156,29 +3156,29 @@ export default function AdminApp() {
                         onClick={() => setReceiptForm({ ...receiptForm, paperSize: '58mm' })}
                         className={`p-3 rounded-xl border text-center font-bold text-xs ${
                           receiptForm.paperSize === '58mm'
-                            ? 'bg-[#0B253A] text-white border-[#0B253A]'
-                            : 'bg-[#FBF9F5] border-[#EBE6DD] text-[#0B253A]'
+                            ? 'bg-jaman-navy text-white border-jaman-navy'
+                            : 'bg-jaman-ivory border-jaman-border text-jaman-navy'
                         }`}
                       >
                         58mm Compact POS
                       </button>
 
-                      <label className="flex items-center gap-2 p-3 bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl text-xs font-semibold text-[#0B253A] cursor-pointer">
+                      <label className="flex items-center gap-2 p-3 bg-jaman-ivory border border-jaman-border rounded-xl text-xs font-semibold text-jaman-navy cursor-pointer">
                         <input
                           type="checkbox"
                           checked={receiptForm.showTaxBreakup}
                           onChange={(e) => setReceiptForm({ ...receiptForm, showTaxBreakup: e.target.checked })}
-                          className="rounded text-[#E66817]"
+                          className="rounded text-jaman-saffron"
                         />
                         Tax Breakup (GST)
                       </label>
 
-                      <label className="flex items-center gap-2 p-3 bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl text-xs font-semibold text-[#0B253A] cursor-pointer">
+                      <label className="flex items-center gap-2 p-3 bg-jaman-ivory border border-jaman-border rounded-xl text-xs font-semibold text-jaman-navy cursor-pointer">
                         <input
                           type="checkbox"
                           checked={receiptForm.enableWhatsApp}
                           onChange={(e) => setReceiptForm({ ...receiptForm, enableWhatsApp: e.target.checked })}
-                          className="rounded text-[#E66817]"
+                          className="rounded text-jaman-saffron"
                         />
                         WhatsApp Bill
                       </label>
@@ -3193,9 +3193,9 @@ export default function AdminApp() {
                 </div>
 
                 {/* Right Col: Live Authentic Thermal Receipt View with Brand Logo */}
-                <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm flex flex-col items-center justify-between">
+                <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm flex flex-col items-center justify-between">
                   <div className="w-full">
-                    <h3 className="font-bold text-sm text-[#0B253A] mb-3 text-center">
+                    <h3 className="font-bold text-sm text-jaman-navy mb-3 text-center">
                       Live Receipt Preview ({receiptForm.paperSize})
                     </h3>
                     <div className="flex justify-center">
@@ -3213,8 +3213,8 @@ export default function AdminApp() {
               </div>
 
               {/* Receipt History Log Table */}
-              <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-sm">
-                <div className="p-4 bg-[#FBF9F5] border-b border-[#EBE6DD] font-bold text-sm text-[#0B253A] flex items-center justify-between">
+              <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-sm">
+                <div className="p-4 bg-jaman-ivory border-b border-jaman-border font-bold text-sm text-jaman-navy flex items-center justify-between">
                   <span>Digital E-Bill Transmission Audit Log</span>
                   <span className="text-xs text-[#8C9BAE] font-normal">{receiptRecords.length} records</span>
                 </div>
@@ -3224,7 +3224,7 @@ export default function AdminApp() {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-[#8C9BAE] uppercase font-bold">
+                      <thead className="bg-[#F8F6F0] border-b border-jaman-border text-[#8C9BAE] uppercase font-bold">
                         <tr>
                           <th className="py-3 px-4">Order / Token</th>
                           <th className="py-3 px-4">Channel</th>
@@ -3235,10 +3235,10 @@ export default function AdminApp() {
                       </thead>
                       <tbody className="divide-y divide-[#F3EFE6]">
                         {receiptRecords.map((rec) => (
-                          <tr key={rec.id} className="hover:bg-[#FBF9F5]">
-                            <td className="py-3 px-4 font-bold text-[#0B253A]">{rec.orderNumber} (#{rec.tokenNumber})</td>
-                            <td className="py-3 px-4 font-semibold text-[#E66817]">{rec.deliveryMethod}</td>
-                            <td className="py-3 px-4 font-mono font-bold text-[#0B253A]">{rec.recipient}</td>
+                          <tr key={rec.id} className="hover:bg-jaman-ivory">
+                            <td className="py-3 px-4 font-bold text-jaman-navy">{rec.orderNumber} (#{rec.tokenNumber})</td>
+                            <td className="py-3 px-4 font-semibold text-jaman-saffron">{rec.deliveryMethod}</td>
+                            <td className="py-3 px-4 font-mono font-bold text-jaman-navy">{rec.recipient}</td>
                             <td className="py-3 px-4 text-[#8C9BAE]">{formatTime(rec.createdAt)}</td>
                             <td className="py-3 px-4">
                               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700">
@@ -3260,7 +3260,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Hardware Diagnostics & Monitoring</h1>
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Hardware Diagnostics & Monitoring</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Manage ESC/POS thermal printers, payment terminals, touch calibration, and hardware diagnostic self-tests.
                   </p>
@@ -3277,14 +3277,14 @@ export default function AdminApp() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Thermal Printer Card & Discovery (Sections 3, 9, 28) */}
-                <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+                <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-[#FBF9F5] border border-[#EBE6DD] flex items-center justify-center text-[#E66817]">
+                      <div className="w-12 h-12 rounded-2xl bg-jaman-ivory border border-jaman-border flex items-center justify-center text-jaman-saffron">
                         <Printer className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-[#0B253A]">{PrinterService.getActivePrinter().name}</h3>
+                        <h3 className="text-lg font-bold text-jaman-navy">{PrinterService.getActivePrinter().name}</h3>
                         <p className="text-xs text-[#4A5568]">{PrinterService.getActivePrinter().paperSize} Direct Thermal Line ({PrinterService.getActivePrinter().interfaceType} • {PrinterService.getActivePrinter().port})</p>
                       </div>
                     </div>
@@ -3294,7 +3294,7 @@ export default function AdminApp() {
                   </div>
 
                   {/* Connected Hardware Select */}
-                  <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD] text-xs space-y-3">
+                  <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border text-xs space-y-3">
                     <div>
                       <label className="block text-[#8C9BAE] font-semibold mb-1">Configured Kiosk Printer Device:</label>
                       <select
@@ -3305,7 +3305,7 @@ export default function AdminApp() {
                             showToast(`Active printer set to: ${updated.name}`);
                           }
                         }}
-                        className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A] focus:outline-none"
+                        className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy focus:outline-none"
                       >
                         {db.configuredPrinters.map((p) => (
                           <option key={p.id} value={p.id}>
@@ -3318,11 +3318,11 @@ export default function AdminApp() {
                     <div className="grid grid-cols-2 gap-2 pt-1">
                       <div>
                         <span className="text-[#8C9BAE]">Model:</span>
-                        <div className="font-semibold text-[#0B253A]">{PrinterService.getActivePrinter().modelName}</div>
+                        <div className="font-semibold text-jaman-navy">{PrinterService.getActivePrinter().modelName}</div>
                       </div>
                       <div>
                         <span className="text-[#8C9BAE]">Last Test Print:</span>
-                        <div className="font-semibold text-[#0B253A]">{formatTime(PrinterService.getActivePrinter().lastTestAt || new Date().toISOString())}</div>
+                        <div className="font-semibold text-jaman-navy">{formatTime(PrinterService.getActivePrinter().lastTestAt || new Date().toISOString())}</div>
                       </div>
                     </div>
                   </div>
@@ -3356,18 +3356,18 @@ export default function AdminApp() {
                     physical printer, mirroring the POS terminal's KOT
                     router so kiosk kitchen tickets print on the correct
                     station printer instead of only the receipt printer) */}
-                <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+                <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-[#FBF9F5] border border-[#EBE6DD] flex items-center justify-center text-[#E66817]">
+                    <div className="w-12 h-12 rounded-2xl bg-jaman-ivory border border-jaman-border flex items-center justify-center text-jaman-saffron">
                       <Printer className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-[#0B253A]">Kitchen Printer Routing</h3>
+                      <h3 className="text-lg font-bold text-jaman-navy">Kitchen Printer Routing</h3>
                       <p className="text-xs text-[#4A5568]">Which physical printer handles each kitchen station's tickets</p>
                     </div>
                   </div>
 
-                  <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD] text-xs space-y-3">
+                  <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border text-xs space-y-3">
                     {([
                       { role: 'KITCHEN' as const, label: 'Main Kitchen / Curry Station' },
                       { role: 'TANDOOR' as const, label: 'Tandoor Section' },
@@ -3395,7 +3395,7 @@ export default function AdminApp() {
                                 if (updated) showToast(`${label} tickets will now print on: ${updated.name}`);
                               }
                             }}
-                            className="flex-1 bg-white border border-[#EBE6DD] rounded-xl px-2 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none"
+                            className="flex-1 bg-white border border-jaman-border rounded-xl px-2 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none"
                           >
                             <option value="">Unassigned (falls back to default printer)</option>
                             {db.configuredPrinters.map((p) => (
@@ -3414,18 +3414,18 @@ export default function AdminApp() {
                     played a success sound) with no backing data model at
                     all. The real connection — actually wired to
                     cloud/api, managed in Settings — is summarized here instead. */}
-                <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+                <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-[#FBF9F5] border border-[#EBE6DD] flex items-center justify-center text-[#E66817]">
+                    <div className="w-12 h-12 rounded-2xl bg-jaman-ivory border border-jaman-border flex items-center justify-center text-jaman-saffron">
                       <QrCode className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-[#0B253A]">Payment Gateway Connection</h3>
+                      <h3 className="text-lg font-bold text-jaman-navy">Payment Gateway Connection</h3>
                       <p className="text-xs text-[#4A5568]">Cashfree settlement account for kiosk payments</p>
                     </div>
                   </div>
 
-                  <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD] text-xs">
+                  <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border text-xs">
                     {paymentConnectionLoading ? (
                       <span className="text-[#8C9BAE]">Loading connection status…</span>
                     ) : paymentConnection ? (
@@ -3462,8 +3462,8 @@ export default function AdminApp() {
               </div>
 
               {/* Transactional Print Queue Table (Sections 14-17) */}
-              <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-sm">
-                <div className="p-4 bg-[#FBF9F5] border-b border-[#EBE6DD] font-bold text-sm text-[#0B253A] flex items-center justify-between">
+              <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-sm">
+                <div className="p-4 bg-jaman-ivory border-b border-jaman-border font-bold text-sm text-jaman-navy flex items-center justify-between">
                   <span>Transactional Print Queue Spooler</span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs bg-slate-100 px-2 py-0.5 rounded font-mono font-bold">
@@ -3487,7 +3487,7 @@ export default function AdminApp() {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-[#8C9BAE] uppercase font-bold">
+                      <thead className="bg-[#F8F6F0] border-b border-jaman-border text-[#8C9BAE] uppercase font-bold">
                         <tr>
                           <th className="py-3 px-4">Job ID</th>
                           <th className="py-3 px-4">Order / Token</th>
@@ -3500,9 +3500,9 @@ export default function AdminApp() {
                       </thead>
                       <tbody className="divide-y divide-[#F3EFE6]">
                         {db.printJobs.slice(0, 8).map((job) => (
-                          <tr key={job.id} className="hover:bg-[#FBF9F5]">
-                            <td className="py-3 px-4 font-mono font-bold text-[#0B253A]">{job.id.substring(0, 14)}...</td>
-                            <td className="py-3 px-4 font-bold text-[#0B253A]">#{job.orderNumber} (TOKEN #{job.tokenNumber})</td>
+                          <tr key={job.id} className="hover:bg-jaman-ivory">
+                            <td className="py-3 px-4 font-mono font-bold text-jaman-navy">{job.id.substring(0, 14)}...</td>
+                            <td className="py-3 px-4 font-bold text-jaman-navy">#{job.orderNumber} (TOKEN #{job.tokenNumber})</td>
                             <td className="py-3 px-4">
                               <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                                 job.status === 'PRINTED'
@@ -3523,7 +3523,7 @@ export default function AdminApp() {
                                   const res = await PrinterService.reprintReceipt(job.orderId || '', 'admin');
                                   showToast(res.message);
                                 }}
-                                className="text-xs font-bold text-[#E66817] hover:underline"
+                                className="text-xs font-bold text-jaman-saffron hover:underline"
                               >
                                 [REPRINT]
                               </button>
@@ -3542,7 +3542,7 @@ export default function AdminApp() {
           {activeTab === 'FEEDBACK' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Customer Experience & Feedback</h1>
+                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Customer Experience & Feedback</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Real-time ratings, service speed impressions, and customer reviews submitted via kiosks.
                 </p>
@@ -3569,7 +3569,7 @@ export default function AdminApp() {
                 />
               </div>
 
-              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm divide-y divide-[#F3EFE6]">
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm divide-y divide-[#F3EFE6]">
                 {feedbacks.map((fb) => (
                   <div key={fb.id} className="py-4 space-y-2 first:pt-0 last:pb-0">
                     <div className="flex items-center justify-between">
@@ -3582,7 +3582,7 @@ export default function AdminApp() {
                             />
                           ))}
                         </div>
-                        <span className="text-xs font-bold text-[#0B253A]">{fb.rating} Stars</span>
+                        <span className="text-xs font-bold text-jaman-navy">{fb.rating} Stars</span>
                         <span className="text-xs text-[#8C9BAE]">• {fb.kioskId}</span>
                       </div>
                       <span className="text-xs text-[#8C9BAE]">{formatTime(fb.createdAt)}</span>
@@ -3590,14 +3590,14 @@ export default function AdminApp() {
 
                     <div className="flex flex-wrap gap-1.5">
                       {fb.tags.map((tg: string) => (
-                        <span key={tg} className="bg-[#FBF9F5] border border-[#EBE6DD] px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-[#0B253A]">
+                        <span key={tg} className="bg-jaman-ivory border border-jaman-border px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-jaman-navy">
                           ✓ {tg}
                         </span>
                       ))}
                     </div>
 
                     {fb.comments && (
-                      <p className="text-xs text-[#4A5568] bg-[#FBF9F5] p-3 rounded-xl border border-[#EBE6DD]">
+                      <p className="text-xs text-[#4A5568] bg-jaman-ivory p-3 rounded-xl border border-jaman-border">
                         "{fb.comments}"
                       </p>
                     )}
@@ -3612,7 +3612,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Financial & Operations Reports</h1>
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Financial & Operations Reports</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Export real transaction records, item sales, and tax metrics directly to CSV or printable document.
                   </p>
@@ -3622,8 +3622,8 @@ export default function AdminApp() {
                   <Button
                     variant="primary"
                     size="sm"
-                    className="bg-[#0B253A] text-white hover:bg-[#163e5e]"
-                    leftIcon={<Receipt className="w-4 h-4 text-[#E66817]" />}
+                    className="bg-jaman-navy text-white hover:bg-[#163e5e]"
+                    leftIcon={<Receipt className="w-4 h-4 text-jaman-saffron" />}
                     onClick={() => setIsZReportModalOpen(true)}
                   >
                     Daily Z-Report & WhatsApp
@@ -3663,14 +3663,14 @@ export default function AdminApp() {
               </div>
 
               {/* Report Selector Pills, Chart Toggle & Dealer Action Deck */}
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#EBE6DD]">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-jaman-border">
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => setActiveReportType('DAILY_SALES')}
                     className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                       activeReportType === 'DAILY_SALES'
-                        ? 'bg-[#0B253A] text-white shadow-md'
-                        : 'bg-[#FBF9F5] border border-[#EBE6DD] text-[#4A5568] hover:bg-[#F8F6F0]'
+                        ? 'bg-jaman-navy text-white shadow-md'
+                        : 'bg-jaman-ivory border border-jaman-border text-[#4A5568] hover:bg-[#F8F6F0]'
                     }`}
                   >
                     📊 Daily Sales Audit
@@ -3679,8 +3679,8 @@ export default function AdminApp() {
                     onClick={() => setActiveReportType('MONTHLY_SALES')}
                     className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                       activeReportType === 'MONTHLY_SALES'
-                        ? 'bg-[#0B253A] text-white shadow-md'
-                        : 'bg-[#FBF9F5] border border-[#EBE6DD] text-[#4A5568] hover:bg-[#F8F6F0]'
+                        ? 'bg-jaman-navy text-white shadow-md'
+                        : 'bg-jaman-ivory border border-jaman-border text-[#4A5568] hover:bg-[#F8F6F0]'
                     }`}
                   >
                     🗓️ Monthly 30-Day Ledger
@@ -3689,8 +3689,8 @@ export default function AdminApp() {
                     onClick={() => setActiveReportType('ITEM_SALES')}
                     className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                       activeReportType === 'ITEM_SALES'
-                        ? 'bg-[#0B253A] text-white shadow-md'
-                        : 'bg-[#FBF9F5] border border-[#EBE6DD] text-[#4A5568] hover:bg-[#F8F6F0]'
+                        ? 'bg-jaman-navy text-white shadow-md'
+                        : 'bg-jaman-ivory border border-jaman-border text-[#4A5568] hover:bg-[#F8F6F0]'
                     }`}
                   >
                     🏆 Item Sales & Popularity
@@ -3699,7 +3699,7 @@ export default function AdminApp() {
 
                 {/* Option to Add Charts to Report */}
                 <div className="flex flex-wrap items-center gap-3">
-                  <label className="flex items-center gap-2 cursor-pointer bg-[#FBF9F5] px-3.5 py-1.5 rounded-xl border border-[#EBE6DD] text-xs font-bold text-[#0B253A] hover:bg-[#FFF4ED] transition-colors shadow-2xs">
+                  <label className="flex items-center gap-2 cursor-pointer bg-jaman-ivory px-3.5 py-1.5 rounded-xl border border-jaman-border text-xs font-bold text-jaman-navy hover:bg-[#FFF4ED] transition-colors shadow-2xs">
                     <input
                       type="checkbox"
                       checked={includeChartsInReport}
@@ -3707,14 +3707,14 @@ export default function AdminApp() {
                         setIncludeChartsInReport(e.target.checked);
                         showToast(`Report charts ${e.target.checked ? 'ENABLED' : 'DISABLED'}`);
                       }}
-                      className="rounded text-[#E66817] focus:ring-[#E66817]"
+                      className="rounded text-jaman-saffron focus:ring-jaman-saffron"
                     />
                     <span>📈 Include Charts in Report</span>
                   </label>
 
                   <button
                     onClick={() => setIsEditRestaurantModalOpen(true)}
-                    className="px-3 py-1.5 rounded-xl border border-[#EBE6DD] bg-white hover:bg-[#F8F6F0] text-[#0B253A] text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
+                    className="px-3 py-1.5 rounded-xl border border-jaman-border bg-white hover:bg-[#F8F6F0] text-jaman-navy text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
                   >
                     <span>🏪 Edit Profile</span>
                   </button>
@@ -3750,32 +3750,32 @@ export default function AdminApp() {
 
               {/* Report Summary Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="p-4 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-4 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs text-[#8C9BAE] font-semibold">Total Revenue:</span>
-                  <div className="text-xl font-black text-[#0B253A] mt-1">{formatINR(currentReport.summaryMetrics.totalRevenue)}</div>
+                  <div className="text-xl font-black text-jaman-navy mt-1">{formatINR(currentReport.summaryMetrics.totalRevenue)}</div>
                 </div>
-                <div className="p-4 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-4 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs text-[#8C9BAE] font-semibold">Orders Count:</span>
-                  <div className="text-xl font-black text-[#0B253A] mt-1">{currentReport.summaryMetrics.totalOrders}</div>
+                  <div className="text-xl font-black text-jaman-navy mt-1">{currentReport.summaryMetrics.totalOrders}</div>
                 </div>
-                <div className="p-4 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-4 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs text-[#8C9BAE] font-semibold">Total Discounts:</span>
                   <div className="text-xl font-black text-emerald-600 mt-1">{formatINR(currentReport.summaryMetrics.totalDiscount)}</div>
                 </div>
-                <div className="p-4 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-4 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs text-[#8C9BAE] font-semibold">GST Collected (5%):</span>
-                  <div className="text-xl font-black text-[#E66817] mt-1">{formatINR(currentReport.summaryMetrics.totalTax)}</div>
+                  <div className="text-xl font-black text-jaman-saffron mt-1">{formatINR(currentReport.summaryMetrics.totalTax)}</div>
                 </div>
               </div>
 
               {/* Report Data Table */}
-              <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-sm">
-                <div className="p-4 bg-[#FBF9F5] border-b border-[#EBE6DD] font-bold text-sm text-[#0B253A]">
+              <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-sm">
+                <div className="p-4 bg-jaman-ivory border-b border-jaman-border font-bold text-sm text-jaman-navy">
                   {currentReport.title} ({formatDate(currentReport.generatedAt)})
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-[#8C9BAE] uppercase font-bold">
+                    <thead className="bg-[#F8F6F0] border-b border-jaman-border text-[#8C9BAE] uppercase font-bold">
                       <tr>
                         <th className="py-3 px-4">Item / Order</th>
                         <th className="py-3 px-4">Type / SKU</th>
@@ -3786,11 +3786,11 @@ export default function AdminApp() {
                     </thead>
                     <tbody className="divide-y divide-[#F3EFE6]">
                       {currentReport.rows.map((row, idx) => (
-                        <tr key={idx} className="hover:bg-[#FBF9F5]">
-                          <td className="py-3 px-4 font-bold text-[#0B253A]">{row.label}</td>
+                        <tr key={idx} className="hover:bg-jaman-ivory">
+                          <td className="py-3 px-4 font-bold text-jaman-navy">{row.label}</td>
                           <td className="py-3 px-4 text-[#4A5568]">{row.metric1}</td>
-                          <td className="py-3 px-4 font-bold text-[#0B253A]">{row.metric2}</td>
-                          <td className="py-3 px-4 font-bold text-[#E66817]">{row.metric3}</td>
+                          <td className="py-3 px-4 font-bold text-jaman-navy">{row.metric2}</td>
+                          <td className="py-3 px-4 font-bold text-jaman-saffron">{row.metric3}</td>
                           <td className="py-3 px-4 text-[#4A5568]">{row.metric4 || '—'}</td>
                         </tr>
                       ))}
@@ -3805,7 +3805,7 @@ export default function AdminApp() {
           {activeTab === 'STAFF' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Staff & RBAC Permissions</h1>
+                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Staff & RBAC Permissions</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Manage operators, managers, cashiers, and granular access control rules.
                 </p>
@@ -3813,14 +3813,14 @@ export default function AdminApp() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {db.users.map((u) => (
-                  <div key={u.id} className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-3">
+                  <div key={u.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#0B253A] text-white flex items-center justify-center font-bold">
+                        <div className="w-10 h-10 rounded-full bg-jaman-navy text-white flex items-center justify-center font-bold">
                           {u.fullName[0]}
                         </div>
                         <div>
-                          <h4 className="font-bold text-[#0B253A]">{u.fullName}</h4>
+                          <h4 className="font-bold text-jaman-navy">{u.fullName}</h4>
                           <p className="text-xs text-[#8C9BAE]">@{u.username} • {u.email}</p>
                         </div>
                       </div>
@@ -3839,7 +3839,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Network & Cloud Sync Center</h1>
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Network & Cloud Sync Center</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Live transactional outbox, retry queues, cloud latency telemetry, and conflict replay engine.
                   </p>
@@ -3859,37 +3859,37 @@ export default function AdminApp() {
 
               {/* Sync Metrics Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <div className="p-5 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-5 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs font-semibold text-[#8C9BAE]">Cloud API Status:</span>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`w-3 h-3 rounded-full ${networkState === 'ONLINE' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
-                    <span className="text-lg font-black text-[#0B253A]">{networkState}</span>
+                    <span className="text-lg font-black text-jaman-navy">{networkState}</span>
                   </div>
                   <span className="text-[11px] text-[#8C9BAE]">Round-trip: {networkLatency}ms</span>
                 </div>
 
-                <div className="p-5 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-5 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs font-semibold text-[#8C9BAE]">Pending Outbox:</span>
                   <div className="text-2xl font-black text-amber-600 mt-1">{syncStats.pendingCount}</div>
                   <span className="text-[11px] text-[#8C9BAE]">Queued for cloud upload</span>
                 </div>
 
-                <div className="p-5 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-5 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs font-semibold text-[#8C9BAE]">Fully Synced Orders:</span>
                   <div className="text-2xl font-black text-emerald-600 mt-1">{syncStats.syncedCount}</div>
                   <span className="text-[11px] text-[#8C9BAE]">Stored safely on central POS</span>
                 </div>
 
-                <div className="p-5 bg-white rounded-2xl border border-[#EBE6DD]">
+                <div className="p-5 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs font-semibold text-[#8C9BAE]">Failed Exceptions:</span>
                   <div className="text-2xl font-black text-rose-600 mt-1">{syncStats.failedCount}</div>
                   <span className="text-[11px] text-[#8C9BAE]">Auto-retry on reconnect</span>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-sm text-[#0B253A]">Transactional Outbox Events</span>
+                  <span className="font-bold text-sm text-jaman-navy">Transactional Outbox Events</span>
                   <span className="text-xs bg-slate-100 px-2 py-0.5 rounded font-mono font-bold">
                     {db.syncEvents.length} Total Events
                   </span>
@@ -3901,7 +3901,7 @@ export default function AdminApp() {
                   <div className="divide-y divide-[#F3EFE6]">
                     {db.syncEvents.map((evt) => (
                       <div key={evt.id} className="py-2.5 flex items-center justify-between text-xs">
-                        <span className="font-mono font-bold text-[#0B253A]">{evt.eventType}</span>
+                        <span className="font-mono font-bold text-jaman-navy">{evt.eventType}</span>
                         <StatusBadge status={evt.status} />
                       </div>
                     ))}
@@ -3915,19 +3915,19 @@ export default function AdminApp() {
           {activeTab === 'AUDIT' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">Audit Trail & Security Logs</h1>
+                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Audit Trail & Security Logs</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Immutable tamper-evident record of all menu, price, order, and device state transitions.
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm divide-y divide-[#F3EFE6]">
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm divide-y divide-[#F3EFE6]">
                 {auditLogs.map((log) => (
                   <div key={log.id} className="py-3 flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-[#0B253A]">{log.action}</span>
-                        <span className="text-[10px] uppercase font-bold text-[#E66817] bg-[#E66817]/10 px-1.5 py-0.5 rounded">
+                        <span className="text-xs font-black text-jaman-navy">{log.action}</span>
+                        <span className="text-[10px] uppercase font-bold text-jaman-saffron bg-jaman-saffron/10 px-1.5 py-0.5 rounded">
                           {log.category}
                         </span>
                         <span className="text-xs text-[#8C9BAE]">by @{log.username || 'system'}</span>
@@ -3947,17 +3947,17 @@ export default function AdminApp() {
           {activeTab === 'LICENSE' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">License & Terminal Entitlements</h1>
+                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">License & Terminal Entitlements</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Enterprise franchise plan entitlements, authorized device capacity, and security certificates.
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-6">
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-6">
                 <div className="flex items-start justify-between">
                   <div>
-                    <span className="text-xs font-bold text-[#E66817] uppercase tracking-wider">Plan Subscription</span>
-                    <h3 className="text-2xl font-black text-[#0B253A] mt-1">{license.planName}</h3>
+                    <span className="text-xs font-bold text-jaman-saffron uppercase tracking-wider">Plan Subscription</span>
+                    <h3 className="text-2xl font-black text-jaman-navy mt-1">{license.planName}</h3>
                     <p className="text-xs text-[#4A5568] mt-0.5">Tier: {license.tier} • Certified for Windows 10/11 Touch Kiosks</p>
                   </div>
                   <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
@@ -3967,21 +3967,21 @@ export default function AdminApp() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-[#F3EFE6]">
-                  <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD]">
+                  <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
                     <span className="text-xs text-[#8C9BAE] font-semibold">Active Kiosks:</span>
-                    <div className="text-xl font-black text-[#0B253A] mt-1">
+                    <div className="text-xl font-black text-jaman-navy mt-1">
                       {license.activeDevicesCount} / {license.allowedDevicesCount}
                     </div>
                   </div>
-                  <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD]">
+                  <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
                     <span className="text-xs text-[#8C9BAE] font-semibold">Valid Until:</span>
-                    <div className="text-base font-black text-[#0B253A] mt-1">
+                    <div className="text-base font-black text-jaman-navy mt-1">
                       {formatDate(license.validUntil)}
                     </div>
                   </div>
-                  <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD]">
+                  <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
                     <span className="text-xs text-[#8C9BAE] font-semibold">License Key:</span>
-                    <div className="text-xs font-mono font-bold text-[#0B253A] mt-1 truncate">
+                    <div className="text-xs font-mono font-bold text-jaman-navy mt-1 truncate">
                       {license.licenseKey}
                     </div>
                   </div>
@@ -3994,7 +3994,7 @@ export default function AdminApp() {
           {activeTab === 'SETTINGS' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">System Settings & Backup</h1>
+                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">System Settings & Backup</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Brand configuration, GST taxation settings, and complete database backup & restore.
                 </p>
@@ -4005,13 +4005,13 @@ export default function AdminApp() {
                   itself; now a real config surface (KioskDisplaySettingsRepository)
                   the kiosk reads live, so a change here takes effect on the
                   terminal's next render without a code change or restart. */}
-              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
                 <div>
-                  <h4 className="font-bold text-[#0B253A]">Customer Kiosk Language & Idle Timeout</h4>
+                  <h4 className="font-bold text-jaman-navy">Customer Kiosk Language & Idle Timeout</h4>
                   <p className="text-xs text-[#4A5568]">Which languages the self-order kiosk offers, and how long it waits before resetting an idle session.</p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD]">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
                   {(
                     [
                       { code: 'en', label: 'English' },
@@ -4022,7 +4022,7 @@ export default function AdminApp() {
                     const settings = KioskDisplaySettingsRepository.getSettings();
                     const isEnabled = settings.enabledLanguages.includes(opt.code);
                     return (
-                      <label key={opt.code} className="flex items-center gap-2 text-xs font-bold text-[#0B253A]">
+                      <label key={opt.code} className="flex items-center gap-2 text-xs font-bold text-jaman-navy">
                         <input
                           type="checkbox"
                           checked={isEnabled}
@@ -4047,7 +4047,7 @@ export default function AdminApp() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Default Language</label>
+                    <label className="block text-xs font-bold text-jaman-navy mb-1">Default Language</label>
                     <select
                       value={KioskDisplaySettingsRepository.getSettings().defaultLanguage}
                       onChange={(e) => {
@@ -4058,7 +4058,7 @@ export default function AdminApp() {
                           showToast(err instanceof Error ? err.message : 'Could not update default language');
                         }
                       }}
-                      className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                      className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
                     >
                       {KioskDisplaySettingsRepository.getSettings().enabledLanguages.map((l) => (
                         <option key={l} value={l}>{l === 'en' ? 'English' : l === 'hi' ? 'हिन्दी (Hindi)' : 'ગુજરાતી (Gujarati)'}</option>
@@ -4066,7 +4066,7 @@ export default function AdminApp() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Idle Warning After (seconds)</label>
+                    <label className="block text-xs font-bold text-jaman-navy mb-1">Idle Warning After (seconds)</label>
                     <input
                       type="number"
                       min={5}
@@ -4076,15 +4076,15 @@ export default function AdminApp() {
                         if (!Number.isFinite(val) || val < 5) return;
                         KioskDisplaySettingsRepository.updateSettings({ idleWarningAfterSeconds: val });
                       }}
-                      className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                      className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
                 <div>
-                  <h4 className="font-bold text-[#0B253A]">Payment Gateway</h4>
+                  <h4 className="font-bold text-jaman-navy">Payment Gateway</h4>
                   <p className="text-xs text-[#4A5568]">
                     Connect your restaurant's own Cashfree settlement account to receive kiosk payments.
                     Your submission is reviewed by JAMANVAAR before it goes live.
@@ -4095,7 +4095,7 @@ export default function AdminApp() {
 
                 {paymentConnection && (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#0B253A]">Status:</span>
+                    <span className="text-xs font-bold text-jaman-navy">Status:</span>
                     <span
                       className={`text-xs font-bold px-2.5 py-1 rounded-full ${
                         paymentConnection.status === 'ACTIVE'
@@ -4138,135 +4138,135 @@ export default function AdminApp() {
                     paymentConnection?.status === 'DISCONNECTED') && (
                   <form onSubmit={handleSubmitPaymentConnection} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Account Type *</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Account Type *</label>
                       <select
                         value={paymentFormFields.accountType}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, accountType: e.target.value as 'BUSINESS' | 'INDIVIDUAL' }))}
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold"
                       >
                         <option value="BUSINESS">Business</option>
                         <option value="INDIVIDUAL">Individual</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Business Type</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Business Type</label>
                       <input
                         type="text"
                         value={paymentFormFields.businessType ?? ''}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, businessType: e.target.value }))}
                         placeholder="e.g. Restaurant, Proprietorship"
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">GST Number</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">GST Number</label>
                       <input
                         type="text"
                         value={paymentFormFields.gst ?? ''}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, gst: e.target.value }))}
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">CIN</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">CIN</label>
                       <input
                         type="text"
                         value={paymentFormFields.cin ?? ''}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, cin: e.target.value }))}
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Aadhaar / UIDAI (Individual accounts only)</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Aadhaar / UIDAI (Individual accounts only)</label>
                       <input
                         type="text"
                         value={paymentFormFields.uidai ?? ''}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, uidai: e.target.value }))}
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">PAN *</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">PAN *</label>
                       <input
                         type="text"
                         required
                         value={paymentFormFields.pan}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, pan: e.target.value }))}
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Contact Name *</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Contact Name *</label>
                       <input
                         type="text"
                         required
                         value={paymentFormFields.contactName}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, contactName: e.target.value }))}
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Contact Email *</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Contact Email *</label>
                       <input
                         type="email"
                         required
                         value={paymentFormFields.contactEmail}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, contactEmail: e.target.value }))}
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Contact Phone *</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Contact Phone *</label>
                       <input
                         type="tel"
                         required
                         value={paymentFormFields.contactPhone}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, contactPhone: e.target.value }))}
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">UPI VPA (or fill bank details below)</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">UPI VPA (or fill bank details below)</label>
                       <input
                         type="text"
                         value={paymentFormFields.settlementUpiVpa ?? ''}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, settlementUpiVpa: e.target.value }))}
                         placeholder="restaurant@upi"
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Settlement Account Name</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Settlement Account Name</label>
                       <input
                         type="text"
                         value={paymentFormFields.settlementAccountName ?? ''}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, settlementAccountName: e.target.value }))}
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Bank Account Number</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Bank Account Number</label>
                       <input
                         type="text"
                         value={paymentFormFields.settlementAccountNumber ?? ''}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, settlementAccountNumber: e.target.value }))}
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">IFSC</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">IFSC</label>
                       <input
                         type="text"
                         value={paymentFormFields.settlementIfsc ?? ''}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, settlementIfsc: e.target.value }))}
-                        className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                     <div className="sm:col-span-2">
                       <button
                         type="submit"
                         disabled={paymentSubmitting}
-                        className="py-3 px-6 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="py-3 px-6 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         {paymentSubmitting ? 'Submitting…' : 'Submit for Review'}
                       </button>
@@ -4280,51 +4280,51 @@ export default function AdminApp() {
                   always show the heritage corner artwork with no way to
                   turn any of it off; now a real config surface the kiosk
                   reads live via WelcomeScreenSettingsRepository. */}
-              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
                 <div>
-                  <h4 className="font-bold text-[#0B253A]">Welcome Screen Content</h4>
+                  <h4 className="font-bold text-jaman-navy">Welcome Screen Content</h4>
                   <p className="text-xs text-[#4A5568]">Customize the first screen customers see. Leave a field blank to use the default translated text.</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Heading</label>
+                    <label className="block text-xs font-bold text-jaman-navy mb-1">Heading</label>
                     <input
                       type="text"
                       placeholder="Welcome to JAMANVAAR"
                       defaultValue={WelcomeScreenSettingsRepository.getSettings().headingText || ''}
                       onBlur={(e) => WelcomeScreenSettingsRepository.updateSettings({ headingText: e.target.value || undefined })}
-                      className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                      className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Subtitle</label>
+                    <label className="block text-xs font-bold text-jaman-navy mb-1">Subtitle</label>
                     <input
                       type="text"
                       placeholder="Authentic Flavors, Seamless Dining"
                       defaultValue={WelcomeScreenSettingsRepository.getSettings().subtitleText || ''}
                       onBlur={(e) => WelcomeScreenSettingsRepository.updateSettings({ subtitleText: e.target.value || undefined })}
-                      className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                      className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Start Order Button Text</label>
+                    <label className="block text-xs font-bold text-jaman-navy mb-1">Start Order Button Text</label>
                     <input
                       type="text"
                       placeholder="Start Order"
                       defaultValue={WelcomeScreenSettingsRepository.getSettings().startOrderButtonText || ''}
                       onBlur={(e) => WelcomeScreenSettingsRepository.updateSettings({ startOrderButtonText: e.target.value || undefined })}
-                      className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                      className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#0B253A] mb-1">Supporting Text</label>
+                    <label className="block text-xs font-bold text-jaman-navy mb-1">Supporting Text</label>
                     <input
                       type="text"
                       placeholder="Tap to begin your order"
                       defaultValue={WelcomeScreenSettingsRepository.getSettings().supportingText || ''}
                       onBlur={(e) => WelcomeScreenSettingsRepository.updateSettings({ supportingText: e.target.value || undefined })}
-                      className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                      className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
                     />
                   </div>
                 </div>
@@ -4339,7 +4339,7 @@ export default function AdminApp() {
                       showToast(`Heritage corner artwork ${e.target.checked ? 'enabled' : 'disabled'} on the welcome screen.`);
                     }}
                   />
-                  <label htmlFor="welcome-heritage-artwork" className="text-xs font-bold text-[#0B253A]">
+                  <label htmlFor="welcome-heritage-artwork" className="text-xs font-bold text-jaman-navy">
                     Show Indian heritage corner artwork
                   </label>
                 </div>
@@ -4355,7 +4355,7 @@ export default function AdminApp() {
                         showToast(`Welcome screen promo banner ${e.target.checked ? 'enabled' : 'disabled'}.`);
                       }}
                     />
-                    <label htmlFor="welcome-promo-banner" className="text-xs font-bold text-[#0B253A]">
+                    <label htmlFor="welcome-promo-banner" className="text-xs font-bold text-jaman-navy">
                       Show a promotional banner on the welcome screen (off by default)
                     </label>
                   </div>
@@ -4365,18 +4365,18 @@ export default function AdminApp() {
                       placeholder="e.g. Festive Thali Special — This Week Only"
                       defaultValue={WelcomeScreenSettingsRepository.getSettings().promoBannerText || ''}
                       onBlur={(e) => WelcomeScreenSettingsRepository.updateSettings({ promoBannerText: e.target.value || undefined })}
-                      className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                      className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
                     />
                   )}
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-6">
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-6">
                 {/* Audio & Voice Settings (Sections 169-174, 213-216) */}
                 <div className="pt-4 border-t border-[#F3EFE6] space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-bold text-[#0B253A]">Kiosk Audio & Multilingual Voice Synthesis</h4>
+                      <h4 className="font-bold text-jaman-navy">Kiosk Audio & Multilingual Voice Synthesis</h4>
                       <p className="text-xs text-[#4A5568]">Configure announcement speech language, volume, style, and test synthesized audio.</p>
                     </div>
                     <Button
@@ -4392,9 +4392,9 @@ export default function AdminApp() {
                     </Button>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD]">
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Voice Language</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Voice Language</label>
                       <select
                         value={voiceForm.language}
                         onChange={(e) => {
@@ -4402,7 +4402,7 @@ export default function AdminApp() {
                           setVoiceForm({ ...updated });
                           showToast(`Voice language set to ${e.target.value}`);
                         }}
-                        className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                        className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
                       >
                         <option value="hi">हिन्दी (Hindi)</option>
                         <option value="en">English (India)</option>
@@ -4411,14 +4411,14 @@ export default function AdminApp() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">Speech Style</label>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Speech Style</label>
                       <select
                         value={voiceForm.style}
                         onChange={(e) => {
                           const updated = VoiceService.updateConfig({ style: e.target.value as any });
                           setVoiceForm({ ...updated });
                         }}
-                        className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
+                        className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
                       >
                         <option value="STANDARD">Standard Complete</option>
                         <option value="SHORT">Short Token Only</option>
@@ -4427,8 +4427,8 @@ export default function AdminApp() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-[#0B253A] mb-1">
-                        Speech Rate: <span className="text-[#E66817] font-bold">{voiceForm.rate}x</span>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">
+                        Speech Rate: <span className="text-jaman-saffron font-bold">{voiceForm.rate}x</span>
                       </label>
                       <input
                         type="range"
@@ -4440,12 +4440,12 @@ export default function AdminApp() {
                           const updated = VoiceService.updateConfig({ rate: parseFloat(e.target.value) });
                           setVoiceForm({ ...updated });
                         }}
-                        className="w-full accent-[#E66817]"
+                        className="w-full accent-jaman-saffron"
                       />
                     </div>
 
                     <div className="flex items-center gap-2 pt-4">
-                      <label className="flex items-center gap-2 text-xs font-bold text-[#0B253A] cursor-pointer">
+                      <label className="flex items-center gap-2 text-xs font-bold text-jaman-navy cursor-pointer">
                         <input
                           type="checkbox"
                           checked={voiceForm.quietMode}
@@ -4454,7 +4454,7 @@ export default function AdminApp() {
                             setVoiceForm({ ...updated });
                             showToast(e.target.checked ? 'Quiet mode enabled (Visual only)' : 'Quiet mode disabled');
                           }}
-                          className="rounded text-[#E66817]"
+                          className="rounded text-jaman-saffron"
                         />
                         Quiet Mode (Silent)
                       </label>
@@ -4464,13 +4464,13 @@ export default function AdminApp() {
 
                 <div className="flex items-center justify-between pb-4 border-b border-[#F3EFE6]">
                   <div>
-                    <h4 className="font-bold text-[#0B253A]">Restaurant Legal Identity & Business Profile</h4>
+                    <h4 className="font-bold text-jaman-navy">Restaurant Legal Identity & Business Profile</h4>
                     <p className="text-xs text-[#4A5568]">Customize legal business name, outlet location, GSTIN, FSSAI license, phone, and report headers.</p>
                   </div>
                   <Button
                     variant="accent"
                     size="sm"
-                    className="bg-[#E66817] hover:bg-[#d55b0e] text-white font-bold"
+                    className="bg-jaman-saffron hover:bg-[#d55b0e] text-white font-bold"
                     onClick={() => setIsEditRestaurantModalOpen(true)}
                   >
                     🏪 Edit Restaurant Profile
@@ -4479,7 +4479,7 @@ export default function AdminApp() {
 
                 <div className="flex items-center justify-between pb-4 border-b border-[#F3EFE6]">
                   <div>
-                    <h4 className="font-bold text-[#0B253A]">Reset Database to Default Demo Seed</h4>
+                    <h4 className="font-bold text-jaman-navy">Reset Database to Default Demo Seed</h4>
                     <p className="text-xs text-[#4A5568]">Restores all menu items, categories, combos, and Ahmedabad flagship demo setup.</p>
                   </div>
                   <Button
@@ -4498,7 +4498,7 @@ export default function AdminApp() {
 
                 <div className="flex items-center justify-between pb-4 border-b border-[#F3EFE6]">
                   <div>
-                    <h4 className="font-bold text-[#0B253A]">Export Database Backup (JSON)</h4>
+                    <h4 className="font-bold text-jaman-navy">Export Database Backup (JSON)</h4>
                     <p className="text-xs text-[#4A5568]">Download complete state snapshot for disaster recovery.</p>
                   </div>
                   <Button
@@ -4531,9 +4531,9 @@ export default function AdminApp() {
           <div className="fixed inset-0" onClick={() => setIsAssistantOpen(false)} />
           <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col justify-between z-10">
             {/* Assistant Header with Database Sync Badge */}
-            <div className="p-4 sm:p-5 border-b border-[#EBE6DD] bg-[#0B253A] text-white flex items-center justify-between shadow-md">
+            <div className="p-4 sm:p-5 border-b border-jaman-border bg-jaman-navy text-white flex items-center justify-between shadow-md">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#E66817] flex items-center justify-center shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-jaman-saffron flex items-center justify-center shadow-sm">
                   <Bot className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -4577,7 +4577,7 @@ export default function AdminApp() {
             </div>
 
             {/* Chat Message Stream */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-[#FBF9F5]">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-jaman-ivory">
               {chatMessages.map((msg) => (
                 <div
                   key={msg.id}
@@ -4586,21 +4586,21 @@ export default function AdminApp() {
                   <div
                     className={`max-w-[90%] p-4 rounded-2xl text-xs whitespace-pre-wrap leading-relaxed shadow-xs ${
                       msg.sender === 'USER'
-                        ? 'bg-[#0B253A] text-white rounded-br-none font-bold'
-                        : 'bg-white border border-[#EBE6DD] text-[#0B253A] rounded-bl-none'
+                        ? 'bg-jaman-navy text-white rounded-br-none font-bold'
+                        : 'bg-white border border-jaman-border text-jaman-navy rounded-bl-none'
                     }`}
                   >
                     {msg.text}
 
                     {msg.actionLink && (
-                      <div className="mt-3 pt-2.5 border-t border-[#EBE6DD] flex items-center justify-between">
+                      <div className="mt-3 pt-2.5 border-t border-jaman-border flex items-center justify-between">
                         <span className="text-[10px] text-[#8C9BAE] font-medium">Quick Navigation:</span>
                         <button
                           onClick={() => {
                             setActiveTab(msg.actionLink as AdminTab);
                             setIsAssistantOpen(false);
                           }}
-                          className="px-3 py-1 bg-[#E66817] hover:bg-[#d55b0e] text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1"
+                          className="px-3 py-1 bg-jaman-saffron hover:bg-[#d55b0e] text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1"
                         >
                           <span>→ Go to {msg.actionLink} Tab</span>
                         </button>
@@ -4615,7 +4615,7 @@ export default function AdminApp() {
                         <button
                           key={i}
                           onClick={() => handleSendAssistantQuery(sug)}
-                          className="px-3 py-1.5 rounded-full bg-white border border-[#EBE6DD] text-[11px] font-bold text-[#0B253A] hover:bg-[#FFF4ED] hover:border-[#E66817] transition-all shadow-2xs"
+                          className="px-3 py-1.5 rounded-full bg-white border border-jaman-border text-[11px] font-bold text-jaman-navy hover:bg-[#FFF4ED] hover:border-jaman-saffron transition-all shadow-2xs"
                         >
                           ⚡ {sug}
                         </button>
@@ -4627,7 +4627,7 @@ export default function AdminApp() {
             </div>
 
             {/* PRELOADED ACTION & QUERY COMMAND DECK (No typing required) */}
-            <div className="p-4 border-t border-[#EBE6DD] bg-white space-y-3 shadow-lg">
+            <div className="p-4 border-t border-jaman-border bg-white space-y-3 shadow-lg">
               {/* Category Filter Pills */}
               <div className="flex items-center justify-between gap-1 overflow-x-auto pb-1">
                 {[
@@ -4641,8 +4641,8 @@ export default function AdminApp() {
                     onClick={() => setBotActionCategory(tab.id as any)}
                     className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all whitespace-nowrap ${
                       botActionCategory === tab.id
-                        ? 'bg-[#0B253A] text-white shadow-xs'
-                        : 'bg-[#FBF9F5] border border-[#EBE6DD] text-[#4A5568] hover:bg-[#F4EFE6]'
+                        ? 'bg-jaman-navy text-white shadow-xs'
+                        : 'bg-jaman-ivory border border-jaman-border text-[#4A5568] hover:bg-[#F4EFE6]'
                     }`}
                   >
                     {tab.label}
@@ -4656,30 +4656,30 @@ export default function AdminApp() {
                   <>
                     <button
                       onClick={() => handleSendAssistantQuery('How much did I sell today?')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">💰 Today's Live Sales</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">💰 Today's Live Sales</span>
                       <span className="text-[10px] text-[#8C9BAE]">Gross revenue & tickets</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show payment breakdown')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">💳 Payment Methods</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">💳 Payment Methods</span>
                       <span className="text-[10px] text-[#8C9BAE]">UPI vs Card vs Cash</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show GST and taxes')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">🧾 GST 5% Taxes</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🧾 GST 5% Taxes</span>
                       <span className="text-[10px] text-[#8C9BAE]">CGST/SGST ledger</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show promotional coupons')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">🎁 Promo Coupons</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🎁 Promo Coupons</span>
                       <span className="text-[10px] text-[#8C9BAE]">Active discounts & deals</span>
                     </button>
                   </>
@@ -4689,30 +4689,30 @@ export default function AdminApp() {
                   <>
                     <button
                       onClick={() => handleSendAssistantQuery('Show top selling dishes')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">🏆 Top 5 Best Sellers</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🏆 Top 5 Best Sellers</span>
                       <span className="text-[10px] text-[#8C9BAE]">Most popular dishes</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show live kitchen KDS status')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">👨‍🍳 Active Kitchen KOTs</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">👨‍🍳 Active Kitchen KOTs</span>
                       <span className="text-[10px] text-[#8C9BAE]">Preparing tokens & queue</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show 86 sold out items')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">🚫 Out of Stock (86)</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🚫 Out of Stock (86)</span>
                       <span className="text-[10px] text-[#8C9BAE]">Unavailable dish list</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show menu catalog summary')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">🍽️ Menu Catalog</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🍽️ Menu Catalog</span>
                       <span className="text-[10px] text-[#8C9BAE]">Total items & combos</span>
                     </button>
                   </>
@@ -4722,30 +4722,30 @@ export default function AdminApp() {
                   <>
                     <button
                       onClick={() => handleSendAssistantQuery('Show kiosk terminal matrix status')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">🖥️ Kiosk Matrix Health</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🖥️ Kiosk Matrix Health</span>
                       <span className="text-[10px] text-[#8C9BAE]">Online terminals & IPs</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show thermal printer status')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">🖨️ Thermal Printer</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🖨️ Thermal Printer</span>
                       <span className="text-[10px] text-[#8C9BAE]">80mm ESC/POS hardware</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show table occupancy')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">🪑 Dining Tables</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🪑 Dining Tables</span>
                       <span className="text-[10px] text-[#8C9BAE]">Occupied & free tables</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show cancelled and refunded orders')}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">⚠️ Cancelled & Refunds</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">⚠️ Cancelled & Refunds</span>
                       <span className="text-[10px] text-[#8C9BAE]">Voided order tickets</span>
                     </button>
                   </>
@@ -4757,9 +4757,9 @@ export default function AdminApp() {
                       onClick={() => {
                         handleSendAssistantQuery('Generate daily sales audit report');
                       }}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">📊 Open Reports Tab</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">📊 Open Reports Tab</span>
                       <span className="text-[10px] text-[#8C9BAE]">Daily audit & PDF print</span>
                     </button>
                     <button
@@ -4767,9 +4767,9 @@ export default function AdminApp() {
                         setIsAssistantOpen(false);
                         window.print();
                       }}
-                      className="p-2.5 bg-[#FBF9F5] hover:bg-[#FFF4ED] hover:border-[#E66817] border border-[#EBE6DD] rounded-xl text-left transition-all group"
+                      className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
-                      <span className="font-bold text-xs text-[#0B253A] group-hover:text-[#E66817] block">🖨️ Print Daily Report</span>
+                      <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🖨️ Print Daily Report</span>
                       <span className="text-[10px] text-[#8C9BAE]">Instant official export</span>
                     </button>
                     <button
@@ -4797,11 +4797,11 @@ export default function AdminApp() {
           {/* Animated Speech Bubble Prompt */}
           <div
             onClick={() => setIsAssistantOpen(true)}
-            className="hidden sm:flex items-center gap-2 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-[#EBE6DD] text-xs font-bold text-[#0B253A] cursor-pointer hover:shadow-2xl hover:border-[#E66817] transition-all group"
+            className="hidden sm:flex items-center gap-2 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-jaman-border text-xs font-bold text-jaman-navy cursor-pointer hover:shadow-2xl hover:border-jaman-saffron transition-all group"
           >
-            <Sparkles className="w-4 h-4 text-[#E66817] animate-pulse" />
+            <Sparkles className="w-4 h-4 text-jaman-saffron animate-pulse" />
             <span>Operations Intelligence • Ask AI</span>
-            <span className="text-[10px] bg-[#E66817]/10 text-[#E66817] px-2 py-0.5 rounded-full font-black">
+            <span className="text-[10px] bg-jaman-saffron/10 text-jaman-saffron px-2 py-0.5 rounded-full font-black">
               24x7
             </span>
           </div>
@@ -4809,7 +4809,7 @@ export default function AdminApp() {
           {/* Floating Action Button */}
           <button
             onClick={() => setIsAssistantOpen(true)}
-            className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-tr from-[#0B253A] to-[#163e5e] hover:from-[#E66817] hover:to-[#f07d33] text-white flex items-center justify-center shadow-2xl border-2 border-white/30 hover:scale-105 active:scale-95 transition-all relative group"
+            className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-tr from-jaman-navy to-[#163e5e] hover:from-jaman-saffron hover:to-[#f07d33] text-white flex items-center justify-center shadow-2xl border-2 border-white/30 hover:scale-105 active:scale-95 transition-all relative group"
             title="JAMANVAAR Operations Assistant"
           >
             <Bot className="w-7 h-7 sm:w-8 sm:h-8 group-hover:rotate-12 transition-transform" />
@@ -4827,7 +4827,7 @@ export default function AdminApp() {
         maxWidth="2xl"
       >
         <div className="space-y-6">
-          <div className="bg-[#0B253A] text-white p-5 rounded-2xl flex items-center justify-between">
+          <div className="bg-jaman-navy text-white p-5 rounded-2xl flex items-center justify-between">
             <div>
               <span className="text-xs text-amber-400 font-bold uppercase tracking-wider">Official Store Settlement</span>
               <h3 className="text-xl font-black mt-0.5">JAMANVAAR Restaurant #01</h3>
@@ -4869,20 +4869,20 @@ export default function AdminApp() {
           </div>
 
           {/* Tax & Margin Summary */}
-          <div className="bg-[#FBF9F5] p-4 rounded-xl border border-[#EBE6DD] space-y-2 text-xs">
-            <div className="flex justify-between py-1 border-b border-[#EBE6DD]">
+          <div className="bg-jaman-ivory p-4 rounded-xl border border-jaman-border space-y-2 text-xs">
+            <div className="flex justify-between py-1 border-b border-jaman-border">
               <span className="text-[#4A5568]">Total Completed Tickets:</span>
-              <span className="font-bold text-[#0B253A]">{orders.filter(o => o.paymentStatus === 'SUCCESS').length} Orders</span>
+              <span className="font-bold text-jaman-navy">{orders.filter(o => o.paymentStatus === 'SUCCESS').length} Orders</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-[#EBE6DD]">
+            <div className="flex justify-between py-1 border-b border-jaman-border">
               <span className="text-[#4A5568]">Gross Sales:</span>
-              <span className="font-bold text-[#0B253A]">{formatINR(orders.reduce((s, o) => s + o.totalAmount, 0))}</span>
+              <span className="font-bold text-jaman-navy">{formatINR(orders.reduce((s, o) => s + o.totalAmount, 0))}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-[#EBE6DD]">
+            <div className="flex justify-between py-1 border-b border-jaman-border">
               <span className="text-[#4A5568]">CGST (2.5%) + SGST (2.5%):</span>
-              <span className="font-bold text-[#E66817]">{formatINR(Math.round(orders.reduce((s, o) => s + o.totalAmount, 0) * 0.0476))}</span>
+              <span className="font-bold text-jaman-saffron">{formatINR(Math.round(orders.reduce((s, o) => s + o.totalAmount, 0) * 0.0476))}</span>
             </div>
-            <div className="flex justify-between py-1 text-sm font-black text-[#0B253A]">
+            <div className="flex justify-between py-1 text-sm font-black text-jaman-navy">
               <span>Net Store Revenue:</span>
               <span>{formatINR(orders.reduce((s, o) => s + o.totalAmount, 0))}</span>
             </div>
@@ -4933,10 +4933,10 @@ export default function AdminApp() {
 
           <div className="grid grid-cols-2 gap-4">
             {/* Test 1: Audio Chime */}
-            <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD] space-y-2">
+            <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-[#0B253A]">Speaker & Audio</span>
-                <Volume2 className="w-4 h-4 text-[#E66817]" />
+                <span className="font-bold text-sm text-jaman-navy">Speaker & Audio</span>
+                <Volume2 className="w-4 h-4 text-jaman-saffron" />
               </div>
               <p className="text-xs text-[#8C9BAE]">Plays 4-tone harmonic chime</p>
               <Button
@@ -4953,10 +4953,10 @@ export default function AdminApp() {
             </div>
 
             {/* Test 2: ESC/POS Thermal Print */}
-            <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD] space-y-2">
+            <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-[#0B253A]">Thermal Printer</span>
-                <Printer className="w-4 h-4 text-[#E66817]" />
+                <span className="font-bold text-sm text-jaman-navy">Thermal Printer</span>
+                <Printer className="w-4 h-4 text-jaman-saffron" />
               </div>
               <p className="text-xs text-[#8C9BAE]">80mm pattern & cutter test</p>
               <Button
@@ -4973,10 +4973,10 @@ export default function AdminApp() {
             </div>
 
             {/* Test 3: Card POS Terminal */}
-            <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD] space-y-2">
+            <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-[#0B253A]">Card POS Echo</span>
-                <CreditCard className="w-4 h-4 text-[#E66817]" />
+                <span className="font-bold text-sm text-jaman-navy">Card POS Echo</span>
+                <CreditCard className="w-4 h-4 text-jaman-saffron" />
               </div>
               <p className="text-xs text-[#8C9BAE]">Echo request to EMV reader</p>
               <Button
@@ -4992,10 +4992,10 @@ export default function AdminApp() {
             </div>
 
             {/* Test 4: Cloud Latency */}
-            <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD] space-y-2">
+            <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-[#0B253A]">Network Latency</span>
-                <Wifi className="w-4 h-4 text-[#E66817]" />
+                <span className="font-bold text-sm text-jaman-navy">Network Latency</span>
+                <Wifi className="w-4 h-4 text-jaman-saffron" />
               </div>
               <p className="text-xs text-[#8C9BAE]">Round-trip time to the local sync server</p>
               <Button
@@ -5032,50 +5032,50 @@ export default function AdminApp() {
       >
         <form onSubmit={handleCreateCombo} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-[#0B253A] mb-1">Combo Name *</label>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Combo Name *</label>
             <input
               type="text"
               required
               value={comboName}
               onChange={(e) => setComboName(e.target.value)}
               placeholder="E.g., Royal Tandoori Feast, Biryani Mega Saver"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Combo Bundle Price (₹) *</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Combo Bundle Price (₹) *</label>
               <input
                 type="number"
                 required
                 min={1}
                 value={comboPrice}
                 onChange={(e) => setComboPrice(Number(e.target.value))}
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Original Individual Price (₹)</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Original Individual Price (₹)</label>
               <input
                 type="number"
                 required
                 min={1}
                 value={comboOriginalPrice}
                 onChange={(e) => setComboOriginalPrice(Number(e.target.value))}
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#0B253A] mb-1">Combo Description</label>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Combo Description</label>
             <textarea
               rows={2}
               value={comboDesc}
               onChange={(e) => setComboDesc(e.target.value)}
               placeholder="E.g., Main Biryani + Mixed Raita + Cold Coffee + 2 Gulab Jamun"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             />
           </div>
 
@@ -5086,8 +5086,8 @@ export default function AdminApp() {
             { label: 'Desserts (optional)', ids: comboDessertItemIds, setIds: setComboDessertItemIds }
           ] as const).map((slot) => (
             <div key={slot.label}>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">{slot.label}</label>
-              <div className="max-h-28 overflow-y-auto border border-[#EBE6DD] rounded-xl bg-[#FBF9F5] p-2 space-y-1">
+              <label className="block text-xs font-bold text-jaman-navy mb-1">{slot.label}</label>
+              <div className="max-h-28 overflow-y-auto border border-jaman-border rounded-xl bg-jaman-ivory p-2 space-y-1">
                 {menuItems.length === 0 ? (
                   <p className="text-xs text-slate-400 px-1 py-1">No dishes yet — add menu items first.</p>
                 ) : (
@@ -5098,7 +5098,7 @@ export default function AdminApp() {
                         checked={slot.ids.includes(item.id)}
                         onChange={() => toggleComboItem(slot.setIds)(item.id)}
                       />
-                      <span className="font-semibold text-[#0B253A]">{item.name}</span>
+                      <span className="font-semibold text-jaman-navy">{item.name}</span>
                       <span className="text-slate-400 font-mono ml-auto">₹{item.price}</span>
                     </label>
                   ))
@@ -5126,48 +5126,48 @@ export default function AdminApp() {
       >
         <form onSubmit={handleCreateMenuItem} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-[#0B253A] mb-1">Dish Name *</label>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Dish Name *</label>
             <input
               type="text"
               required
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               placeholder="E.g., Chicken Dum Biryani, Paneer Lababdar"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Price (₹) *</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Price (₹) *</label>
               <input
                 type="number"
                 required
                 min={1}
                 value={newItemPrice}
                 onChange={(e) => setNewItemPrice(Number(e.target.value))}
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">SKU Code</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">SKU Code</label>
               <input
                 type="text"
                 value={newItemSku}
                 onChange={(e) => setNewItemSku(e.target.value)}
                 placeholder="E.g., CDB-01"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Category</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Category</label>
               <select
                 value={newItemCategory}
                 onChange={(e) => setNewItemCategory(e.target.value)}
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -5177,11 +5177,11 @@ export default function AdminApp() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Dietary Tag</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Dietary Tag</label>
               <select
                 value={newItemDietary}
                 onChange={(e) => setNewItemDietary(e.target.value as DietaryType)}
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               >
                 <option value="VEG">Pure Veg</option>
                 <option value="NON_VEG">Non-Veg</option>
@@ -5191,13 +5191,13 @@ export default function AdminApp() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#0B253A] mb-1">Description</label>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Description</label>
             <textarea
               rows={2}
               value={newItemDesc}
               onChange={(e) => setNewItemDesc(e.target.value)}
               placeholder="Short appetizing description for customer kiosk..."
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             />
           </div>
 
@@ -5207,15 +5207,15 @@ export default function AdminApp() {
               language. The keyboard button opens a phonetic on-screen
               keyboard for admins without a native-script keyboard. */}
           <div className="pt-2 border-t border-[#F3EFE6] space-y-3">
-            <p className="text-xs font-bold text-[#0B253A]">Translations (optional, shown when a customer selects that language)</p>
+            <p className="text-xs font-bold text-jaman-navy">Translations (optional, shown when a customer selects that language)</p>
 
-            <div className="space-y-2 p-3 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD]">
+            <div className="space-y-2 p-3 bg-jaman-ivory rounded-xl border border-jaman-border">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-[#0B253A]">हिन्दी Name</label>
+                <label className="text-xs font-bold text-jaman-navy">हिन्दी Name</label>
                 <button
                   type="button"
                   onClick={() => setActiveKeyboardField({ lang: 'hi', field: 'name' })}
-                  className="text-[10px] font-bold text-[#E66817] px-2 py-0.5 rounded-md border border-[#E66817]/30 hover:bg-[#FFF4ED]"
+                  className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
                 >
                   ⌨ Keyboard
                 </button>
@@ -5225,14 +5225,14 @@ export default function AdminApp() {
                 value={newItemNameHi}
                 onChange={(e) => setNewItemNameHi(e.target.value)}
                 placeholder="e.g. पनीर टिक्का"
-                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-sm focus:outline-none"
+                className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
               />
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-[#0B253A]">हिन्दी Description</label>
+                <label className="text-xs font-bold text-jaman-navy">हिन्दी Description</label>
                 <button
                   type="button"
                   onClick={() => setActiveKeyboardField({ lang: 'hi', field: 'description' })}
-                  className="text-[10px] font-bold text-[#E66817] px-2 py-0.5 rounded-md border border-[#E66817]/30 hover:bg-[#FFF4ED]"
+                  className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
                 >
                   ⌨ Keyboard
                 </button>
@@ -5241,17 +5241,17 @@ export default function AdminApp() {
                 rows={2}
                 value={newItemDescHi}
                 onChange={(e) => setNewItemDescHi(e.target.value)}
-                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-sm focus:outline-none"
+                className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
               />
             </div>
 
-            <div className="space-y-2 p-3 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD]">
+            <div className="space-y-2 p-3 bg-jaman-ivory rounded-xl border border-jaman-border">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-[#0B253A]">ગુજરાતી Name</label>
+                <label className="text-xs font-bold text-jaman-navy">ગુજરાતી Name</label>
                 <button
                   type="button"
                   onClick={() => setActiveKeyboardField({ lang: 'gu', field: 'name' })}
-                  className="text-[10px] font-bold text-[#E66817] px-2 py-0.5 rounded-md border border-[#E66817]/30 hover:bg-[#FFF4ED]"
+                  className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
                 >
                   ⌨ Keyboard
                 </button>
@@ -5261,14 +5261,14 @@ export default function AdminApp() {
                 value={newItemNameGu}
                 onChange={(e) => setNewItemNameGu(e.target.value)}
                 placeholder="e.g. પનીર ટિક્કા"
-                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-sm focus:outline-none"
+                className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
               />
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-[#0B253A]">ગુજરાતી Description</label>
+                <label className="text-xs font-bold text-jaman-navy">ગુજરાતી Description</label>
                 <button
                   type="button"
                   onClick={() => setActiveKeyboardField({ lang: 'gu', field: 'description' })}
-                  className="text-[10px] font-bold text-[#E66817] px-2 py-0.5 rounded-md border border-[#E66817]/30 hover:bg-[#FFF4ED]"
+                  className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
                 >
                   ⌨ Keyboard
                 </button>
@@ -5277,7 +5277,7 @@ export default function AdminApp() {
                 rows={2}
                 value={newItemDescGu}
                 onChange={(e) => setNewItemDescGu(e.target.value)}
-                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-sm focus:outline-none"
+                className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
               />
             </div>
           </div>
@@ -5324,14 +5324,14 @@ export default function AdminApp() {
       >
         <form onSubmit={handleCreateCategory} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-[#0B253A] mb-1">Category Name *</label>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Category Name *</label>
             <input
               type="text"
               required
               value={newCatName}
               onChange={(e) => setNewCatName(e.target.value)}
               placeholder="E.g., Tandoori Platters, South Indian, Desserts"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             />
           </div>
 
@@ -5354,38 +5354,38 @@ export default function AdminApp() {
       >
         <form onSubmit={handleCreateCoupon} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-[#0B253A] mb-1">Promo Code *</label>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Promo Code *</label>
             <input
               type="text"
               required
               value={newCouponCode}
               onChange={(e) => setNewCouponCode(e.target.value.toUpperCase())}
               placeholder="E.g., FESTIVE100, WELCOME20"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Discount Amount (₹)</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Discount Amount (₹)</label>
               <input
                 type="number"
                 required
                 min={5}
                 value={newCouponValue}
                 onChange={(e) => setNewCouponValue(Number(e.target.value))}
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Min Order (₹)</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Min Order (₹)</label>
               <input
                 type="number"
                 required
                 min={0}
                 value={newCouponMin}
                 onChange={(e) => setNewCouponMin(Number(e.target.value))}
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
           </div>
@@ -5417,7 +5417,7 @@ export default function AdminApp() {
               value={globalSearchQuery}
               onChange={(e) => setGlobalSearchQuery(e.target.value)}
               placeholder="Search dishes, orders, tokens, tables, coupons, or staff..."
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl pl-11 pr-4 py-3 text-sm text-[#0B253A] placeholder-[#8C9BAE] focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl pl-11 pr-4 py-3 text-sm text-jaman-navy placeholder-[#8C9BAE] focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             />
           </div>
 
@@ -5433,13 +5433,13 @@ export default function AdminApp() {
                     setActiveTab('MENU');
                     setIsGlobalSearchOpen(false);
                   }}
-                  className="p-3 hover:bg-[#FBF9F5] flex items-center justify-between cursor-pointer rounded-xl"
+                  className="p-3 hover:bg-jaman-ivory flex items-center justify-between cursor-pointer rounded-xl"
                 >
                   <div>
-                    <span className="font-bold text-[#0B253A] block">{it.name}</span>
+                    <span className="font-bold text-jaman-navy block">{it.name}</span>
                     <span className="text-[10px] text-[#8C9BAE]">SKU: {it.sku} • {it.dietaryType}</span>
                   </div>
-                  <span className="font-black text-[#E66817]">{formatINR(it.price)}</span>
+                  <span className="font-black text-jaman-saffron">{formatINR(it.price)}</span>
                 </div>
               ))}
 
@@ -5454,10 +5454,10 @@ export default function AdminApp() {
                     setActiveTab('ORDERS_KDS');
                     setIsGlobalSearchOpen(false);
                   }}
-                  className="p-3 hover:bg-[#FBF9F5] flex items-center justify-between cursor-pointer rounded-xl"
+                  className="p-3 hover:bg-jaman-ivory flex items-center justify-between cursor-pointer rounded-xl"
                 >
                   <div>
-                    <span className="font-bold text-[#0B253A] block">{ord.orderNumber} (TOKEN #{ord.tokenNumber})</span>
+                    <span className="font-bold text-jaman-navy block">{ord.orderNumber} (TOKEN #{ord.tokenNumber})</span>
                     <span className="text-[10px] text-[#8C9BAE]">{ord.orderType} • {formatTime(ord.createdAt)}</span>
                   </div>
                   <span className="font-black text-emerald-600">{formatINR(ord.totalAmount)}</span>
@@ -5475,10 +5475,10 @@ export default function AdminApp() {
                     setActiveTab('COUPONS');
                     setIsGlobalSearchOpen(false);
                   }}
-                  className="p-3 hover:bg-[#FBF9F5] flex items-center justify-between cursor-pointer rounded-xl"
+                  className="p-3 hover:bg-jaman-ivory flex items-center justify-between cursor-pointer rounded-xl"
                 >
                   <div>
-                    <span className="font-bold font-mono text-[#0B253A] block">COUPON: {cpn.code}</span>
+                    <span className="font-bold font-mono text-jaman-navy block">COUPON: {cpn.code}</span>
                     <span className="text-[10px] text-[#8C9BAE]">{cpn.description}</span>
                   </div>
                   <span className="text-xs font-bold text-indigo-600">₹{cpn.discountValue} OFF</span>
@@ -5502,23 +5502,23 @@ export default function AdminApp() {
       >
         <div className="space-y-4 py-2 select-none">
           {/* Wizard Step Indicator */}
-          <div className="flex items-center justify-between pb-3 border-b border-[#EBE6DD]">
+          <div className="flex items-center justify-between pb-3 border-b border-jaman-border">
             <div className="flex items-center gap-2">
               <span
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${
-                  templateStep === 'SELECT' ? 'bg-[#E66817] text-white' : 'bg-emerald-100 text-emerald-800'
+                  templateStep === 'SELECT' ? 'bg-jaman-saffron text-white' : 'bg-emerald-100 text-emerald-800'
                 }`}
               >
                 1
               </span>
-              <span className="text-xs font-bold text-[#0B253A]">Choose Restaurant Type</span>
+              <span className="text-xs font-bold text-jaman-navy">Choose Restaurant Type</span>
             </div>
-            <div className="w-12 h-0.5 bg-[#EBE6DD]" />
+            <div className="w-12 h-0.5 bg-jaman-border" />
             <div className="flex items-center gap-2">
               <span
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${
                   templateStep === 'PREVIEW'
-                    ? 'bg-[#E66817] text-white'
+                    ? 'bg-jaman-saffron text-white'
                     : templateStep === 'IMPORT_OPTIONS'
                     ? 'bg-emerald-100 text-emerald-800'
                     : 'bg-slate-100 text-slate-400'
@@ -5526,18 +5526,18 @@ export default function AdminApp() {
               >
                 2
               </span>
-              <span className="text-xs font-bold text-[#0B253A]">Preview Menu</span>
+              <span className="text-xs font-bold text-jaman-navy">Preview Menu</span>
             </div>
-            <div className="w-12 h-0.5 bg-[#EBE6DD]" />
+            <div className="w-12 h-0.5 bg-jaman-border" />
             <div className="flex items-center gap-2">
               <span
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${
-                  templateStep === 'IMPORT_OPTIONS' ? 'bg-[#E66817] text-white' : 'bg-slate-100 text-slate-400'
+                  templateStep === 'IMPORT_OPTIONS' ? 'bg-jaman-saffron text-white' : 'bg-slate-100 text-slate-400'
                 }`}
               >
                 3
               </span>
-              <span className="text-xs font-bold text-[#0B253A]">Import to Draft</span>
+              <span className="text-xs font-bold text-jaman-navy">Import to Draft</span>
             </div>
           </div>
 
@@ -5552,7 +5552,7 @@ export default function AdminApp() {
                     value={templateSearchQuery}
                     onChange={(e) => setTemplateSearchQuery(e.target.value)}
                     placeholder="Search restaurant type (e.g. Pizza, Thali, Cafe)..."
-                    className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl pl-10 pr-4 py-2 text-xs text-[#0B253A] placeholder-[#8C9BAE] focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                    className="w-full bg-jaman-ivory border border-jaman-border rounded-xl pl-10 pr-4 py-2 text-xs text-jaman-navy placeholder-[#8C9BAE] focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                   />
                 </div>
 
@@ -5563,8 +5563,8 @@ export default function AdminApp() {
                       onClick={() => setSelectedCuisineFilter(cuisine)}
                       className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all ${
                         selectedCuisineFilter === cuisine
-                          ? 'bg-[#0B253A] text-white shadow-xs'
-                          : 'bg-[#FBF9F5] border border-[#EBE6DD] text-[#4A5568] hover:bg-[#F4EFE6]'
+                          ? 'bg-jaman-navy text-white shadow-xs'
+                          : 'bg-jaman-ivory border border-jaman-border text-[#4A5568] hover:bg-[#F4EFE6]'
                       }`}
                     >
                       {cuisine}
@@ -5597,8 +5597,8 @@ export default function AdminApp() {
                       }}
                       className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
                         isSelected
-                          ? 'border-[#E66817] bg-[#FFF4ED] shadow-sm'
-                          : 'border-[#EBE6DD] bg-white hover:border-[#8C9BAE]/60'
+                          ? 'border-jaman-saffron bg-[#FFF4ED] shadow-sm'
+                          : 'border-jaman-border bg-white hover:border-[#8C9BAE]/60'
                       }`}
                     >
                       <div>
@@ -5607,24 +5607,24 @@ export default function AdminApp() {
                             {tpl.icon}
                           </div>
                           {tpl.badge && (
-                            <span className="text-[9px] font-black uppercase tracking-wider text-[#E66817] bg-[#E66817]/10 px-2 py-0.5 rounded-full">
+                            <span className="text-[9px] font-black uppercase tracking-wider text-jaman-saffron bg-jaman-saffron/10 px-2 py-0.5 rounded-full">
                               {tpl.badge}
                             </span>
                           )}
                         </div>
 
-                        <h4 className="font-bold text-sm text-[#0B253A] mt-2.5">{tpl.name}</h4>
+                        <h4 className="font-bold text-sm text-jaman-navy mt-2.5">{tpl.name}</h4>
                         <span className="text-[10px] font-semibold text-[#8C9BAE] block">{tpl.cuisine}</span>
                         <p className="text-[11px] text-[#4A5568] line-clamp-2 mt-1.5">{tpl.description}</p>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-[#EBE6DD]/60 text-[11px]">
-                        <span className="font-bold text-[#0B253A]">
+                      <div className="flex items-center justify-between pt-2 border-t border-jaman-border/60 text-[11px]">
+                        <span className="font-bold text-jaman-navy">
                           {tpl.categoryCount} Cats • ~{tpl.approxItemCount} Dishes
                         </span>
                         <span
                           className={`font-black text-xs ${
-                            isSelected ? 'text-[#E66817]' : 'text-slate-400'
+                            isSelected ? 'text-jaman-saffron' : 'text-slate-400'
                           }`}
                         >
                           {isSelected ? '✓ Selected' : '+ Select'}
@@ -5636,8 +5636,8 @@ export default function AdminApp() {
               </div>
 
               {/* Bottom Actions */}
-              <div className="flex items-center justify-between pt-3 border-t border-[#EBE6DD]">
-                <span className="text-xs font-bold text-[#0B253A]">
+              <div className="flex items-center justify-between pt-3 border-t border-jaman-border">
+                <span className="text-xs font-bold text-jaman-navy">
                   {selectedTemplateIds.length} template(s) chosen (Multi-select enabled)
                 </span>
                 <div className="flex items-center gap-2">
@@ -5659,8 +5659,8 @@ export default function AdminApp() {
           {/* STEP 2: PREVIEW TEMPLATE DETAILS */}
           {templateStep === 'PREVIEW' && (
             <div className="space-y-4">
-              <div className="bg-[#F8F6F0] p-4 rounded-2xl border border-[#EBE6DD]">
-                <h4 className="font-bold text-xs text-[#0B253A] mb-2 uppercase tracking-wider">
+              <div className="bg-[#F8F6F0] p-4 rounded-2xl border border-jaman-border">
+                <h4 className="font-bold text-xs text-jaman-navy mb-2 uppercase tracking-wider">
                   Selected Templates to Preview:
                 </h4>
                 <div className="flex flex-wrap gap-2">
@@ -5669,7 +5669,7 @@ export default function AdminApp() {
                     return (
                       <span
                         key={tid}
-                        className="bg-white border border-[#EBE6DD] px-3 py-1 rounded-xl text-xs font-bold text-[#0B253A] flex items-center gap-1.5"
+                        className="bg-white border border-jaman-border px-3 py-1 rounded-xl text-xs font-bold text-jaman-navy flex items-center gap-1.5"
                       >
                         <span>{tpl?.icon}</span>
                         <span>{tpl?.name}</span>
@@ -5681,29 +5681,29 @@ export default function AdminApp() {
 
               <div className="max-h-80 overflow-y-auto space-y-4 pr-1">
                 {PREBUILT_MENU_TEMPLATES.filter((t) => selectedTemplateIds.includes(t.id)).map((tpl) => (
-                  <div key={tpl.id} className="bg-white rounded-2xl p-4 border border-[#EBE6DD] space-y-3">
-                    <h4 className="font-bold text-sm text-[#0B253A] flex items-center gap-2">
+                  <div key={tpl.id} className="bg-white rounded-2xl p-4 border border-jaman-border space-y-3">
+                    <h4 className="font-bold text-sm text-jaman-navy flex items-center gap-2">
                       <span>{tpl.icon}</span>
                       <span>{tpl.name} Menu Structure</span>
                     </h4>
 
                     <div className="space-y-3">
                       {tpl.categories.map((cat, idx) => (
-                        <div key={idx} className="bg-[#FBF9F5] p-3 rounded-xl border border-[#EBE6DD]">
-                          <span className="font-bold text-xs text-[#0B253A] block">
+                        <div key={idx} className="bg-jaman-ivory p-3 rounded-xl border border-jaman-border">
+                          <span className="font-bold text-xs text-jaman-navy block">
                             📂 {cat.name} ({cat.items.length} dishes)
                           </span>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                             {cat.items.map((it, iidx) => (
                               <div
                                 key={iidx}
-                                className="bg-white p-2.5 rounded-lg border border-[#EBE6DD] flex items-center justify-between text-xs"
+                                className="bg-white p-2.5 rounded-lg border border-jaman-border flex items-center justify-between text-xs"
                               >
                                 <div>
-                                  <span className="font-semibold text-[#0B253A] block">{it.name}</span>
+                                  <span className="font-semibold text-jaman-navy block">{it.name}</span>
                                   <span className="text-[10px] text-[#8C9BAE]">{it.dietaryType} • {it.prepTimeMinutes}m prep</span>
                                 </div>
-                                <span className="font-black text-[#E66817]">₹{it.suggestedPrice}</span>
+                                <span className="font-black text-jaman-saffron">₹{it.suggestedPrice}</span>
                               </div>
                             ))}
                           </div>
@@ -5715,7 +5715,7 @@ export default function AdminApp() {
               </div>
 
               {/* Bottom Actions */}
-              <div className="flex items-center justify-between pt-3 border-t border-[#EBE6DD]">
+              <div className="flex items-center justify-between pt-3 border-t border-jaman-border">
                 <Button variant="secondary" onClick={() => setTemplateStep('SELECT')}>
                   ← Back to Selection
                 </Button>
@@ -5741,53 +5741,53 @@ export default function AdminApp() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Modules to import */}
-                <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] space-y-3">
-                  <h4 className="font-bold text-xs text-[#0B253A] uppercase tracking-wider">
+                <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-3">
+                  <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider">
                     Select Data Modules to Import:
                   </h4>
                   <div className="space-y-2 text-xs">
-                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-[#0B253A]">
+                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-jaman-navy">
                       <input
                         type="checkbox"
                         checked={importCategoriesOpt}
                         onChange={(e) => setImportCategoriesOpt(e.target.checked)}
-                        className="rounded text-[#E66817]"
+                        className="rounded text-jaman-saffron"
                       />
                       <span>Categories & Taxonomy</span>
                     </label>
-                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-[#0B253A]">
+                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-jaman-navy">
                       <input
                         type="checkbox"
                         checked={importItemsOpt}
                         onChange={(e) => setImportItemsOpt(e.target.checked)}
-                        className="rounded text-[#E66817]"
+                        className="rounded text-jaman-saffron"
                       />
                       <span>Dishes, Recipes & Descriptions</span>
                     </label>
-                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-[#0B253A]">
+                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-jaman-navy">
                       <input
                         type="checkbox"
                         checked={importImagesOpt}
                         onChange={(e) => setImportImagesOpt(e.target.checked)}
-                        className="rounded text-[#E66817]"
+                        className="rounded text-jaman-saffron"
                       />
                       <span>Curated Food Images</span>
                     </label>
-                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-[#0B253A]">
+                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-jaman-navy">
                       <input
                         type="checkbox"
                         checked={importCombosOpt}
                         onChange={(e) => setImportCombosOpt(e.target.checked)}
-                        className="rounded text-[#E66817]"
+                        className="rounded text-jaman-saffron"
                       />
                       <span>Combos & Value Deal Bundles</span>
                     </label>
-                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-[#0B253A]">
+                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-jaman-navy">
                       <input
                         type="checkbox"
                         checked={importSuggestedPricesOpt}
                         onChange={(e) => setImportSuggestedPricesOpt(e.target.checked)}
-                        className="rounded text-[#E66817]"
+                        className="rounded text-jaman-saffron"
                       />
                       <span>Suggested Starting Prices</span>
                     </label>
@@ -5795,44 +5795,44 @@ export default function AdminApp() {
                 </div>
 
                 {/* Duplicate Resolution */}
-                <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] space-y-3">
-                  <h4 className="font-bold text-xs text-[#0B253A] uppercase tracking-wider">
+                <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-3">
+                  <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider">
                     Duplicate Item Handling Strategy:
                   </h4>
                   <div className="space-y-2.5 text-xs">
-                    <label className="flex items-start gap-2 cursor-pointer text-[#0B253A]">
+                    <label className="flex items-start gap-2 cursor-pointer text-jaman-navy">
                       <input
                         type="radio"
                         name="dupStrategy"
                         checked={duplicateStrategy === 'KEEP_EXISTING'}
                         onChange={() => setDuplicateStrategy('KEEP_EXISTING')}
-                        className="mt-0.5 text-[#E66817]"
+                        className="mt-0.5 text-jaman-saffron"
                       />
                       <div>
                         <strong className="block">Keep Existing Dishes</strong>
                         <span className="text-[10px] text-[#8C9BAE]">Do not overwrite items with matching names</span>
                       </div>
                     </label>
-                    <label className="flex items-start gap-2 cursor-pointer text-[#0B253A]">
+                    <label className="flex items-start gap-2 cursor-pointer text-jaman-navy">
                       <input
                         type="radio"
                         name="dupStrategy"
                         checked={duplicateStrategy === 'REPLACE_DUPLICATE'}
                         onChange={() => setDuplicateStrategy('REPLACE_DUPLICATE')}
-                        className="mt-0.5 text-[#E66817]"
+                        className="mt-0.5 text-jaman-saffron"
                       />
                       <div>
                         <strong className="block">Update / Overwrite Duplicates</strong>
                         <span className="text-[10px] text-[#8C9BAE]">Replace details with the template version</span>
                       </div>
                     </label>
-                    <label className="flex items-start gap-2 cursor-pointer text-[#0B253A]">
+                    <label className="flex items-start gap-2 cursor-pointer text-jaman-navy">
                       <input
                         type="radio"
                         name="dupStrategy"
                         checked={duplicateStrategy === 'IMPORT_AS_NEW'}
                         onChange={() => setDuplicateStrategy('IMPORT_AS_NEW')}
-                        className="mt-0.5 text-[#E66817]"
+                        className="mt-0.5 text-jaman-saffron"
                       />
                       <div>
                         <strong className="block">Import All as New Dishes</strong>
@@ -5844,13 +5844,13 @@ export default function AdminApp() {
               </div>
 
               {/* Bottom Actions */}
-              <div className="flex items-center justify-between pt-3 border-t border-[#EBE6DD]">
+              <div className="flex items-center justify-between pt-3 border-t border-jaman-border">
                 <Button variant="secondary" onClick={() => setTemplateStep('PREVIEW')}>
                   ← Back
                 </Button>
                 <Button
                   variant="accent"
-                  className="font-bold shadow-md bg-[#E66817]"
+                  className="font-bold shadow-md bg-jaman-saffron"
                   onClick={() => {
                     try {
                       const res = MenuBuilderService.importTemplates(selectedTemplateIds, {
@@ -5892,11 +5892,11 @@ export default function AdminApp() {
           </p>
 
           <div>
-            <label className="block text-xs font-bold text-[#0B253A] mb-1">Target Category</label>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Target Category</label>
             <select
               value={bulkCategory}
               onChange={(e) => setBulkCategory(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             >
               <option value="ALL">All Categories ({menuItems.length} items)</option>
               {categories.map((c) => (
@@ -5909,29 +5909,29 @@ export default function AdminApp() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Percentage Change (%)</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Percentage Change (%)</label>
               <input
                 type="number"
                 value={bulkPercentageDelta}
                 onChange={(e) => setBulkPercentageDelta(Number(e.target.value))}
                 placeholder="E.g. +10 or -5"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Fixed Amount Delta (₹)</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Fixed Amount Delta (₹)</label>
               <input
                 type="number"
                 value={bulkFixedDelta}
                 onChange={(e) => setBulkFixedDelta(Number(e.target.value))}
                 placeholder="E.g. +10 or -10"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#0B253A] mb-1">Price Rounding Rule</label>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Price Rounding Rule</label>
             <div className="grid grid-cols-3 gap-2">
               {[
                 { label: 'Round to ₹5', val: 5 },
@@ -5944,8 +5944,8 @@ export default function AdminApp() {
                   onClick={() => setBulkRounding(r.val as 1 | 5 | 10)}
                   className={`p-2.5 rounded-xl border text-xs font-bold ${
                     bulkRounding === r.val
-                      ? 'bg-[#0B253A] text-white border-[#0B253A]'
-                      : 'bg-[#FBF9F5] border-[#EBE6DD] text-[#0B253A]'
+                      ? 'bg-jaman-navy text-white border-jaman-navy'
+                      : 'bg-jaman-ivory border-jaman-border text-jaman-navy'
                   }`}
                 >
                   {r.label}
@@ -5954,7 +5954,7 @@ export default function AdminApp() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#EBE6DD]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-jaman-border">
             <Button variant="ghost" onClick={() => setIsBulkPriceModalOpen(false)}>
               Cancel
             </Button>
@@ -5993,30 +5993,30 @@ export default function AdminApp() {
         <div className="space-y-4 py-2 select-none">
           {/* Target Dish Context Banner */}
           {selectedImageTargetItem && (
-            <div className="bg-[#FFF4ED] p-3.5 rounded-2xl border border-[#E66817]/20 flex items-center justify-between gap-3">
+            <div className="bg-[#FFF4ED] p-3.5 rounded-2xl border border-jaman-saffron/20 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <img
                   src={uploadedImagePreview || customImageUrlInput || selectedImageTargetItem.imageUrl || '/jamanvaar.png.png'}
                   alt={selectedImageTargetItem.name}
-                  className="w-12 h-12 rounded-xl object-cover border border-[#E66817]/30 shadow-xs"
+                  className="w-12 h-12 rounded-xl object-cover border border-jaman-saffron/30 shadow-xs"
                 />
                 <div>
-                  <h4 className="text-xs font-black text-[#0B253A]">{selectedImageTargetItem.name}</h4>
+                  <h4 className="text-xs font-black text-jaman-navy">{selectedImageTargetItem.name}</h4>
                   <p className="text-[11px] text-[#4A5568]">{selectedImageTargetItem.description}</p>
                 </div>
               </div>
-              <span className="text-xs font-black text-[#E66817] shrink-0">{formatINR(selectedImageTargetItem.price)}</span>
+              <span className="text-xs font-black text-jaman-saffron shrink-0">{formatINR(selectedImageTargetItem.price)}</span>
             </div>
           )}
 
           {/* Mode Selector Tabs */}
-          <div className="flex items-center gap-2 border-b border-[#EBE6DD] pb-2">
+          <div className="flex items-center gap-2 border-b border-jaman-border pb-2">
             <button
               onClick={() => setPhotoSourceTab('UPLOAD')}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
                 photoSourceTab === 'UPLOAD'
-                  ? 'bg-[#0B253A] text-white shadow-sm'
-                  : 'bg-[#FBF9F5] border border-[#EBE6DD] text-[#4A5568] hover:bg-[#F4EFE6]'
+                  ? 'bg-jaman-navy text-white shadow-sm'
+                  : 'bg-jaman-ivory border border-jaman-border text-[#4A5568] hover:bg-[#F4EFE6]'
               }`}
             >
               <span>📁 Upload from Device / Laptop</span>
@@ -6030,8 +6030,8 @@ export default function AdminApp() {
               }}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
                 photoSourceTab === 'URL'
-                  ? 'bg-[#0B253A] text-white shadow-sm'
-                  : 'bg-[#FBF9F5] border border-[#EBE6DD] text-[#4A5568] hover:bg-[#F4EFE6]'
+                  ? 'bg-jaman-navy text-white shadow-sm'
+                  : 'bg-jaman-ivory border border-jaman-border text-[#4A5568] hover:bg-[#F4EFE6]'
               }`}
             >
               <span>🔗 Paste Web Image Link / URL</span>
@@ -6040,8 +6040,8 @@ export default function AdminApp() {
               onClick={() => setPhotoSourceTab('LIBRARY')}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
                 photoSourceTab === 'LIBRARY'
-                  ? 'bg-[#0B253A] text-white shadow-sm'
-                  : 'bg-[#FBF9F5] border border-[#EBE6DD] text-[#4A5568] hover:bg-[#F4EFE6]'
+                  ? 'bg-jaman-navy text-white shadow-sm'
+                  : 'bg-jaman-ivory border border-jaman-border text-[#4A5568] hover:bg-[#F4EFE6]'
               }`}
             >
               <span>🎨 Curated Food Gallery</span>
@@ -6053,7 +6053,7 @@ export default function AdminApp() {
             <div className="space-y-4">
               <div
                 className={`border-2 border-dashed rounded-2xl p-6 text-center transition-colors flex flex-col items-center justify-center gap-3 cursor-pointer ${
-                  uploadedImagePreview ? 'border-emerald-400 bg-emerald-50/40' : 'border-[#D4CBBF] bg-[#FBF9F5] hover:border-[#E66817] hover:bg-[#FFF4ED]/30'
+                  uploadedImagePreview ? 'border-emerald-400 bg-emerald-50/40' : 'border-[#D4CBBF] bg-jaman-ivory hover:border-jaman-saffron hover:bg-[#FFF4ED]/30'
                 }`}
                 onClick={() => {
                   const input = document.getElementById('device-photo-input') as HTMLInputElement;
@@ -6097,14 +6097,14 @@ export default function AdminApp() {
                   </div>
                 ) : (
                   <>
-                    <div className="w-14 h-14 rounded-2xl bg-white border border-[#EBE6DD] flex items-center justify-center text-2xl shadow-xs text-[#E66817]">
+                    <div className="w-14 h-14 rounded-2xl bg-white border border-jaman-border flex items-center justify-center text-2xl shadow-xs text-jaman-saffron">
                       📸
                     </div>
                     <div>
-                      <h4 className="font-bold text-xs text-[#0B253A]">Click to Browse or Drag Photo Here</h4>
+                      <h4 className="font-bold text-xs text-jaman-navy">Click to Browse or Drag Photo Here</h4>
                       <p className="text-[11px] text-[#4A5568] mt-0.5">Supports PNG, JPG, WEBP, and camera photos from laptop or kiosk</p>
                     </div>
-                    <span className="inline-block px-3 py-1 bg-white border border-[#EBE6DD] rounded-xl text-xs font-bold text-[#0B253A] shadow-2xs">
+                    <span className="inline-block px-3 py-1 bg-white border border-jaman-border rounded-xl text-xs font-bold text-jaman-navy shadow-2xs">
                       Choose Image File
                     </span>
                   </>
@@ -6126,7 +6126,7 @@ export default function AdminApp() {
                   <Button
                     variant="accent"
                     size="sm"
-                    className="bg-[#E66817] hover:bg-[#d55b0e] font-bold text-white shadow-md"
+                    className="bg-jaman-saffron hover:bg-[#d55b0e] font-bold text-white shadow-md"
                     onClick={() => {
                       MenuRepository.updateMenuItem(selectedImageTargetItem.id, { imageUrl: uploadedImagePreview });
                       showToast(`✓ Photo uploaded and applied to ${selectedImageTargetItem.name}!`);
@@ -6145,15 +6145,15 @@ export default function AdminApp() {
           {/* TAB 2: PASTE URL LINK */}
           {photoSourceTab === 'URL' && (
             <div className="space-y-4">
-              <div className="bg-[#F8F6F0] p-4 rounded-2xl border border-[#EBE6DD] space-y-3">
-                <label className="block text-xs font-bold text-[#0B253A]">Web Image URL Link</label>
+              <div className="bg-[#F8F6F0] p-4 rounded-2xl border border-jaman-border space-y-3">
+                <label className="block text-xs font-bold text-jaman-navy">Web Image URL Link</label>
                 <div className="flex gap-2">
                   <input
                     type="url"
                     value={customImageUrlInput}
                     onChange={(e) => setCustomImageUrlInput(e.target.value)}
                     placeholder="https://images.unsplash.com/... or https://your-server.com/photo.jpg"
-                    className="flex-1 bg-white border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                    className="flex-1 bg-white border border-jaman-border rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                   />
                   {selectedImageTargetItem && (
                     <Button
@@ -6167,7 +6167,7 @@ export default function AdminApp() {
                         setSelectedImageTargetItem(null);
                         setCustomImageUrlInput('');
                       }}
-                      className="bg-[#E66817] hover:bg-[#d55b0e] text-white font-bold shrink-0 shadow-sm"
+                      className="bg-jaman-saffron hover:bg-[#d55b0e] text-white font-bold shrink-0 shadow-sm"
                     >
                       Save to Dish
                     </Button>
@@ -6176,14 +6176,14 @@ export default function AdminApp() {
 
                 {/* Live Image URL Preview */}
                 {customImageUrlInput.trim() && (
-                  <div className="mt-3 p-3 bg-white rounded-xl border border-[#EBE6DD] flex items-center gap-4">
+                  <div className="mt-3 p-3 bg-white rounded-xl border border-jaman-border flex items-center gap-4">
                     <img
                       src={customImageUrlInput.trim()}
                       alt="URL Preview"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/jamanvaar.png.png';
                       }}
-                      className="w-20 h-20 rounded-xl object-cover border border-[#EBE6DD]"
+                      className="w-20 h-20 rounded-xl object-cover border border-jaman-border"
                     />
                     <div>
                       <span className="text-xs font-bold text-emerald-800 block">✓ Live Image Preview</span>
@@ -6211,7 +6211,7 @@ export default function AdminApp() {
                     <button
                       key={idx}
                       onClick={() => setCustomImageUrlInput(preset.url)}
-                      className="px-2.5 py-1 bg-[#FBF9F5] hover:bg-[#FFF4ED] text-[#0B253A] border border-[#EBE6DD] rounded-lg text-xs font-semibold transition-colors"
+                      className="px-2.5 py-1 bg-jaman-ivory hover:bg-[#FFF4ED] text-jaman-navy border border-jaman-border rounded-lg text-xs font-semibold transition-colors"
                     >
                       {preset.label}
                     </button>
@@ -6233,7 +6233,7 @@ export default function AdminApp() {
                     value={imageSearchQuery}
                     onChange={(e) => setImageSearchQuery(e.target.value)}
                     placeholder="Search food photos (e.g. Pizza, Biryani, Thali)..."
-                    className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl pl-10 pr-4 py-2 text-xs text-[#0B253A] placeholder-[#8C9BAE] focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                    className="w-full bg-jaman-ivory border border-jaman-border rounded-xl pl-10 pr-4 py-2 text-xs text-jaman-navy placeholder-[#8C9BAE] focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                   />
                 </div>
 
@@ -6244,8 +6244,8 @@ export default function AdminApp() {
                       onClick={() => setSelectedImageCuisine(c)}
                       className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all ${
                         selectedImageCuisine === c
-                          ? 'bg-[#0B253A] text-white shadow-xs'
-                          : 'bg-[#FBF9F5] border border-[#EBE6DD] text-[#4A5568] hover:bg-[#F4EFE6]'
+                          ? 'bg-jaman-navy text-white shadow-xs'
+                          : 'bg-jaman-ivory border border-jaman-border text-[#4A5568] hover:bg-[#F4EFE6]'
                       }`}
                     >
                       {c}
@@ -6279,7 +6279,7 @@ export default function AdminApp() {
                         setPhotoSourceTab('URL');
                       }
                     }}
-                    className="group relative bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-xs hover:border-[#E66817] hover:shadow-md cursor-pointer transition-all flex flex-col justify-between"
+                    className="group relative bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-xs hover:border-jaman-saffron hover:shadow-md cursor-pointer transition-all flex flex-col justify-between"
                   >
                     <img
                       src={img.url}
@@ -6287,9 +6287,9 @@ export default function AdminApp() {
                       className="w-full h-28 object-cover group-hover:scale-105 transition-transform"
                     />
                     <div className="p-2.5">
-                      <span className="text-[11px] font-bold text-[#0B253A] block truncate">{img.title}</span>
+                      <span className="text-[11px] font-bold text-jaman-navy block truncate">{img.title}</span>
                       <span className="text-[9px] text-[#8C9BAE] block">{img.category} • {img.cuisine}</span>
-                      <button className="w-full mt-2 py-1 bg-[#0B253A] group-hover:bg-[#E66817] text-white text-[10px] font-bold rounded-lg transition-colors">
+                      <button className="w-full mt-2 py-1 bg-jaman-navy group-hover:bg-jaman-saffron text-white text-[10px] font-bold rounded-lg transition-colors">
                         {selectedImageTargetItem ? 'Assign to Dish' : 'Select Photo'}
                       </button>
                     </div>
@@ -6299,7 +6299,7 @@ export default function AdminApp() {
             </div>
           )}
 
-          <div className="flex justify-end pt-2 border-t border-[#EBE6DD]">
+          <div className="flex justify-end pt-2 border-t border-jaman-border">
             <Button
               variant="primary"
               onClick={() => {
@@ -6322,15 +6322,15 @@ export default function AdminApp() {
         maxWidth="2xl"
       >
         <div className="space-y-4 py-2 select-none">
-          <div className="flex items-center justify-between bg-[#F8F6F0] p-4 rounded-2xl border border-[#EBE6DD]">
+          <div className="flex items-center justify-between bg-[#F8F6F0] p-4 rounded-2xl border border-jaman-border">
             <div>
-              <span className="text-xs font-bold text-[#0B253A] block">Overall Readiness Score</span>
+              <span className="text-xs font-bold text-jaman-navy block">Overall Readiness Score</span>
               <span className="text-xs text-[#4A5568]">
                 {completenessReport.readyItemsCount} of {completenessReport.totalItems} dishes are 100% complete
               </span>
             </div>
             <div className="text-right">
-              <span className="text-2xl font-black text-[#0B253A]">{completenessReport.score}%</span>
+              <span className="text-2xl font-black text-jaman-navy">{completenessReport.score}%</span>
             </div>
           </div>
 
@@ -6345,11 +6345,11 @@ export default function AdminApp() {
               {completenessReport.issues.map((issue, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD] flex items-center justify-between gap-3 shadow-xs"
+                  className="p-3.5 bg-white rounded-2xl border border-jaman-border flex items-center justify-between gap-3 shadow-xs"
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-xs text-[#0B253A]">{issue.itemName}</span>
+                      <span className="font-bold text-xs text-jaman-navy">{issue.itemName}</span>
                       <span className="text-[10px] bg-slate-100 text-[#8C9BAE] px-2 py-0.5 rounded font-semibold">
                         {issue.categoryName}
                       </span>
@@ -6362,7 +6362,7 @@ export default function AdminApp() {
                       <input
                         type="number"
                         placeholder="₹ Price"
-                        className="w-20 bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 text-xs font-bold"
+                        className="w-20 bg-jaman-ivory border border-jaman-border rounded-xl px-2.5 py-1.5 text-xs font-bold"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             const val = Number((e.target as HTMLInputElement).value);
@@ -6380,7 +6380,7 @@ export default function AdminApp() {
             </div>
           )}
 
-          <div className="flex justify-end pt-3 border-t border-[#EBE6DD]">
+          <div className="flex justify-end pt-3 border-t border-jaman-border">
             <Button variant="primary" onClick={() => setIsMissingDataModalOpen(false)}>
               Done
             </Button>
@@ -6396,7 +6396,7 @@ export default function AdminApp() {
         maxWidth="3xl"
       >
         <div className="space-y-4 py-2 select-none">
-          <div className="bg-[#0B253A] text-white p-4 rounded-2xl flex items-center justify-between">
+          <div className="bg-jaman-navy text-white p-4 rounded-2xl flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-xs font-bold">Kiosk Screen Emulator ({menuItems.length} dishes)</span>
@@ -6410,8 +6410,8 @@ export default function AdminApp() {
               onClick={() => setPreviewCategoryFilter('ALL')}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 previewCategoryFilter === 'ALL'
-                  ? 'bg-[#0B253A] text-white shadow-md'
-                  : 'bg-white border border-[#EBE6DD] text-[#0B253A]'
+                  ? 'bg-jaman-navy text-white shadow-md'
+                  : 'bg-white border border-jaman-border text-jaman-navy'
               }`}
             >
               All Categories ({menuItems.length})
@@ -6422,8 +6422,8 @@ export default function AdminApp() {
                 onClick={() => setPreviewCategoryFilter(c.id)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                   previewCategoryFilter === c.id
-                    ? 'bg-[#0B253A] text-white shadow-md'
-                    : 'bg-white border border-[#EBE6DD] text-[#0B253A]'
+                    ? 'bg-jaman-navy text-white shadow-md'
+                    : 'bg-white border border-jaman-border text-jaman-navy'
                 }`}
               >
                 {c.name}
@@ -6436,7 +6436,7 @@ export default function AdminApp() {
             {menuItems
               .filter((it) => previewCategoryFilter === 'ALL' || it.categoryId === previewCategoryFilter)
               .map((item) => (
-                <div key={item.id} className="bg-white rounded-2xl p-3 border border-[#EBE6DD] shadow-xs flex flex-col justify-between space-y-2">
+                <div key={item.id} className="bg-white rounded-2xl p-3 border border-jaman-border shadow-xs flex flex-col justify-between space-y-2">
                   <div>
                     <img
                       src={item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
@@ -6447,12 +6447,12 @@ export default function AdminApp() {
                       <StatusBadge status={item.dietaryType} type="dietary" />
                       <span className="text-[10px] text-[#8C9BAE]">{item.prepTimeMinutes}m</span>
                     </div>
-                    <h5 className="font-bold text-xs text-[#0B253A] mt-1">{item.name}</h5>
+                    <h5 className="font-bold text-xs text-jaman-navy mt-1">{item.name}</h5>
                     <p className="text-[10px] text-[#4A5568] line-clamp-2 mt-0.5">{item.description}</p>
                   </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-[#EBE6DD]">
-                    <span className="text-xs font-black text-[#E66817]">{formatINR(item.price)}</span>
-                    <button className="px-2.5 py-1 bg-[#E66817] text-white text-[10px] font-bold rounded-lg opacity-80">
+                  <div className="flex items-center justify-between pt-2 border-t border-jaman-border">
+                    <span className="text-xs font-black text-jaman-saffron">{formatINR(item.price)}</span>
+                    <button className="px-2.5 py-1 bg-jaman-saffron text-white text-[10px] font-bold rounded-lg opacity-80">
                       + Add
                     </button>
                   </div>
@@ -6460,7 +6460,7 @@ export default function AdminApp() {
               ))}
           </div>
 
-          <div className="flex justify-end pt-3 border-t border-[#EBE6DD]">
+          <div className="flex justify-end pt-3 border-t border-jaman-border">
             <Button variant="primary" onClick={() => setIsKioskMenuPreviewModalOpen(false)}>
               Close Preview
             </Button>
@@ -6483,7 +6483,7 @@ export default function AdminApp() {
             </p>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] space-y-2 text-xs">
+          <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-2 text-xs">
             <div className="flex justify-between font-bold">
               <span>Total Dishes:</span>
               <span>{menuItems.length} items</span>
@@ -6499,23 +6499,23 @@ export default function AdminApp() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#0B253A] mb-1">Publish Release Notes</label>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Publish Release Notes</label>
             <input
               type="text"
               value={publishNotes}
               onChange={(e) => setPublishNotes(e.target.value)}
               placeholder="E.g. Loaded Italian & Pizza template, updated weekend pricing"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#EBE6DD]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-jaman-border">
             <Button variant="ghost" onClick={() => setIsPublishModalOpen(false)}>
               Cancel
             </Button>
             <Button
               variant="accent"
-              className="font-bold shadow-md bg-[#0B253A] text-white"
+              className="font-bold shadow-md bg-jaman-navy text-white"
               onClick={() => {
                 try {
                   const snap = MenuBuilderService.publishMenu('Admin POS', publishNotes);
@@ -6581,14 +6581,14 @@ export default function AdminApp() {
             </Button>
           </div>
 
-          <div className="pt-3 border-t border-[#EBE6DD] space-y-2">
-            <label className="block text-xs font-bold text-[#0B253A]">Import Menu from JSON</label>
+          <div className="pt-3 border-t border-jaman-border space-y-2">
+            <label className="block text-xs font-bold text-jaman-navy">Import Menu from JSON</label>
             <textarea
               rows={4}
               value={importJsonInput}
               onChange={(e) => setImportJsonInput(e.target.value)}
               placeholder="Paste JAMANVAAR Menu JSON backup string here..."
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl p-3 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl p-3 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             />
             <Button
               variant="accent"
@@ -6608,7 +6608,7 @@ export default function AdminApp() {
             </Button>
           </div>
 
-          <div className="flex justify-end pt-2 border-t border-[#EBE6DD]">
+          <div className="flex justify-end pt-2 border-t border-jaman-border">
             <Button variant="primary" onClick={() => setIsImportExportModalOpen(false)}>
               Close
             </Button>
@@ -6624,7 +6624,7 @@ export default function AdminApp() {
         maxWidth="xl"
       >
         <div className="space-y-4 py-2 select-none">
-          <div className="bg-[#0B253A] text-white p-5 rounded-2xl space-y-3">
+          <div className="bg-jaman-navy text-white p-5 rounded-2xl space-y-3">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div>
                 <h3 className="font-black text-lg text-[#FED7AA]">JAMANVAAR DAILY Z-REPORT</h3>
@@ -6655,7 +6655,7 @@ export default function AdminApp() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#EBE6DD]">
+          <div className="flex items-center justify-between gap-3 pt-3 border-t border-jaman-border">
             <Button
               variant="outline"
               size="sm"
@@ -6704,7 +6704,7 @@ export default function AdminApp() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#0B253A] mb-1">
+            <label className="block text-xs font-bold text-jaman-navy mb-1">
               Type <span className="font-mono text-rose-600 font-black">CONFIRM</span> to proceed:
             </label>
             <input
@@ -6712,11 +6712,11 @@ export default function AdminApp() {
               value={resetConfirmationText}
               onChange={(e) => setResetConfirmationText(e.target.value.toUpperCase())}
               placeholder="CONFIRM"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-[#EBE6DD]">
+          <div className="flex justify-end gap-2 pt-3 border-t border-jaman-border">
             <Button variant="ghost" onClick={() => setIsResetDataModalOpen(false)}>
               Cancel
             </Button>
@@ -6786,8 +6786,8 @@ export default function AdminApp() {
           }}
           className="space-y-4 py-2 select-none"
         >
-          <div className="bg-[#F8F6F0] p-4 rounded-2xl border border-[#EBE6DD] space-y-1">
-            <h4 className="font-bold text-xs text-[#0B253A]">Customize Business Identity Everywhere</h4>
+          <div className="bg-[#F8F6F0] p-4 rounded-2xl border border-jaman-border space-y-1">
+            <h4 className="font-bold text-xs text-jaman-navy">Customize Business Identity Everywhere</h4>
             <p className="text-[11px] text-[#4A5568]">
               The legal name set here will print directly on your official sales PDF reports, thermal customer receipts, and digital invoices.
             </p>
@@ -6795,45 +6795,45 @@ export default function AdminApp() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Restaurant Legal Entity Name *</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Restaurant Legal Entity Name *</label>
               <input
                 type="text"
                 required
                 value={restForm.legalName}
                 onChange={(e) => setRestForm({ ...restForm, legalName: e.target.value })}
                 placeholder="E.g. JAMANVAAR by KELVIONTECH"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Brand Name / Display Title *</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Brand Name / Display Title *</label>
               <input
                 type="text"
                 required
                 value={restForm.name}
                 onChange={(e) => setRestForm({ ...restForm, name: e.target.value })}
                 placeholder="E.g. JAMANVAAR by KELVIONTECH"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Outlet / Branch Name *</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Outlet / Branch Name *</label>
               <input
                 type="text"
                 required
                 value={restForm.outletName}
                 onChange={(e) => setRestForm({ ...restForm, outletName: e.target.value })}
                 placeholder="E.g. Ahmedabad Flagship Store"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">City & State *</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">City & State *</label>
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="text"
@@ -6841,7 +6841,7 @@ export default function AdminApp() {
                   value={restForm.city}
                   onChange={(e) => setRestForm({ ...restForm, city: e.target.value })}
                   placeholder="City"
-                  className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                  className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                 />
                 <input
                   type="text"
@@ -6849,80 +6849,80 @@ export default function AdminApp() {
                   value={restForm.state}
                   onChange={(e) => setRestForm({ ...restForm, state: e.target.value })}
                   placeholder="State"
-                  className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                  className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                 />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#0B253A] mb-1">Complete Street Address *</label>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Complete Street Address *</label>
             <input
               type="text"
               required
               value={restForm.address}
               onChange={(e) => setRestForm({ ...restForm, address: e.target.value })}
               placeholder="E.g. Sindhu Bhavan Road, Bodakdev, Ahmedabad, Gujarat 380054"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">GSTIN Number</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">GSTIN Number</label>
               <input
                 type="text"
                 value={restForm.gstin}
                 onChange={(e) => setRestForm({ ...restForm, gstin: e.target.value.toUpperCase() })}
                 placeholder="24AAAAA0000A1Z5"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">FSSAI License Number</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">FSSAI License Number</label>
               <input
                 type="text"
                 value={restForm.fssai}
                 onChange={(e) => setRestForm({ ...restForm, fssai: e.target.value })}
                 placeholder="10020021000123"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Contact Phone</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Contact Phone</label>
               <input
                 type="text"
                 value={restForm.phone}
                 onChange={(e) => setRestForm({ ...restForm, phone: e.target.value })}
                 placeholder="+91 79 4890 1234"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#0B253A] mb-1">Contact Email</label>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Contact Email</label>
               <input
                 type="email"
                 value={restForm.email}
                 onChange={(e) => setRestForm({ ...restForm, email: e.target.value })}
                 placeholder="hello@jamanvaar.com"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0B253A]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-[#EBE6DD]">
+          <div className="flex justify-end gap-3 pt-3 border-t border-jaman-border">
             <Button variant="ghost" type="button" onClick={() => setIsEditRestaurantModalOpen(false)}>
               Cancel
             </Button>
             <Button
               variant="accent"
               type="submit"
-              className="bg-[#E66817] hover:bg-[#d55b0e] text-white font-bold shadow-md"
+              className="bg-jaman-saffron hover:bg-[#d55b0e] text-white font-bold shadow-md"
             >
               Save Restaurant Profile
             </Button>
@@ -6936,17 +6936,17 @@ export default function AdminApp() {
     {/* ========================================================================= */}
     <div className="hidden print:block printable-report-wrapper font-sans text-black p-6 space-y-6 bg-white">
       {/* Restaurant Brand & Audit Header */}
-      <div className="flex items-center justify-between border-b-2 border-[#0B253A] pb-4">
+      <div className="flex items-center justify-between border-b-2 border-jaman-navy pb-4">
         <div className="flex items-center gap-4">
           <JamanvaarLogo variant="horizontal" size="lg" imgStyle={{ height: '52px', width: 'auto' }} />
           <div>
-            <h1 className="text-xl font-black text-[#0B253A] tracking-tight">{db.restaurant.legalName || 'JAMANVAAR by KELVIONTECH'}</h1>
+            <h1 className="text-xl font-black text-jaman-navy tracking-tight">{db.restaurant.legalName || 'JAMANVAAR by KELVIONTECH'}</h1>
             <p className="text-xs text-gray-600">{db.outlet.name} • {db.outlet.address}, {db.outlet.city}</p>
             <p className="text-[11px] font-mono text-gray-500 mt-0.5">GSTIN: {db.restaurant.gstin} • FSSAI: {restForm.fssai || '10020021000123'}</p>
           </div>
         </div>
         <div className="text-right">
-          <span className="inline-block bg-[#0B253A] text-white text-[10px] font-black uppercase px-3 py-1 rounded">
+          <span className="inline-block bg-jaman-navy text-white text-[10px] font-black uppercase px-3 py-1 rounded">
             {activeReportType === 'MONTHLY_SALES' ? '30-Day Monthly Audit' : 'Daily Sales Audit'}
           </span>
           <p className="text-xs font-bold text-gray-800 mt-1">Generated: {formatDate(new Date())} {formatTime(new Date())}</p>
@@ -6957,7 +6957,7 @@ export default function AdminApp() {
       {/* Report Title Banner */}
       <div className="bg-[#F8F6F0] p-3.5 rounded-xl border border-gray-200 flex items-center justify-between">
         <div>
-          <h2 className="text-base font-black text-[#0B253A]">{currentReport.title}</h2>
+          <h2 className="text-base font-black text-jaman-navy">{currentReport.title}</h2>
           <p className="text-xs text-gray-600">Period: {formatDate(currentReport.dateFrom)} to {formatDate(currentReport.dateTo)}</p>
         </div>
         <div className="text-right">
@@ -6969,11 +6969,11 @@ export default function AdminApp() {
       <div className="grid grid-cols-4 gap-3 page-break-avoid">
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
           <span className="text-[10px] font-bold uppercase text-gray-500 block">Gross Revenue</span>
-          <span className="text-lg font-black text-[#0B253A]">{formatINR(currentReport.summaryMetrics.totalRevenue)}</span>
+          <span className="text-lg font-black text-jaman-navy">{formatINR(currentReport.summaryMetrics.totalRevenue)}</span>
         </div>
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
           <span className="text-[10px] font-bold uppercase text-gray-500 block">Completed Orders</span>
-          <span className="text-lg font-black text-[#0B253A]">{currentReport.summaryMetrics.totalOrders}</span>
+          <span className="text-lg font-black text-jaman-navy">{currentReport.summaryMetrics.totalOrders}</span>
         </div>
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
           <span className="text-[10px] font-bold uppercase text-gray-500 block">Discounts & Promos</span>
@@ -6981,7 +6981,7 @@ export default function AdminApp() {
         </div>
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
           <span className="text-[10px] font-bold uppercase text-gray-500 block">GST Collected (5%)</span>
-          <span className="text-lg font-black text-[#E66817]">{formatINR(currentReport.summaryMetrics.totalTax)}</span>
+          <span className="text-lg font-black text-jaman-saffron">{formatINR(currentReport.summaryMetrics.totalTax)}</span>
         </div>
       </div>
 
@@ -6990,7 +6990,7 @@ export default function AdminApp() {
         <div className="grid grid-cols-2 gap-4 page-break-avoid">
           {/* Hourly Rush Chart */}
           <div className="p-4 border border-gray-200 rounded-xl bg-white">
-            <h4 className="text-xs font-black text-[#0B253A] mb-2 uppercase tracking-wide">
+            <h4 className="text-xs font-black text-jaman-navy mb-2 uppercase tracking-wide">
               📊 Dining Velocity & Peak Rush (Lunch 1-3 PM & Dinner 7-10 PM)
             </h4>
             <div className="h-28 flex items-end justify-between gap-1 border-b border-gray-200 pb-1">
@@ -7003,7 +7003,7 @@ export default function AdminApp() {
               ].map((b, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
                   <div className="w-full bg-gray-100 rounded-t h-20 flex items-end">
-                    <div style={{ height: `${b.p}%` }} className="w-full bg-[#0B253A] rounded-t"></div>
+                    <div style={{ height: `${b.p}%` }} className="w-full bg-jaman-navy rounded-t"></div>
                   </div>
                   <span className="text-[8px] font-bold text-gray-600">{b.h}</span>
                 </div>
@@ -7013,7 +7013,7 @@ export default function AdminApp() {
 
           {/* Payment Channel Split */}
           <div className="p-4 border border-gray-200 rounded-xl bg-white flex flex-col justify-between">
-            <h4 className="text-xs font-black text-[#0B253A] mb-2 uppercase tracking-wide">
+            <h4 className="text-xs font-black text-jaman-navy mb-2 uppercase tracking-wide">
               💳 Payment Channels Distribution
             </h4>
             <div className="space-y-2">
@@ -7023,7 +7023,7 @@ export default function AdminApp() {
                   <span>{formatINR(Math.round(currentReport.summaryMetrics.totalRevenue * 0.68))}</span>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#0B253A] rounded-full" style={{ width: '68%' }}></div>
+                  <div className="h-full bg-jaman-navy rounded-full" style={{ width: '68%' }}></div>
                 </div>
               </div>
               <div>
@@ -7041,7 +7041,7 @@ export default function AdminApp() {
                   <span>{formatINR(Math.round(currentReport.summaryMetrics.totalRevenue * 0.1))}</span>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#E66817] rounded-full" style={{ width: '10%' }}></div>
+                  <div className="h-full bg-jaman-saffron rounded-full" style={{ width: '10%' }}></div>
                 </div>
               </div>
             </div>
@@ -7066,7 +7066,7 @@ export default function AdminApp() {
               <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'}>
                 <td className="py-2.5 px-3 font-bold text-gray-900">{row.label}</td>
                 <td className="py-2.5 px-3 text-gray-600">{row.metric1}</td>
-                <td className="py-2.5 px-3 font-black text-[#0B253A]">{row.metric2}</td>
+                <td className="py-2.5 px-3 font-black text-jaman-navy">{row.metric2}</td>
                 <td className="py-2.5 px-3 font-bold text-gray-700">{row.metric3}</td>
                 <td className="py-2.5 px-3 text-gray-600">{row.metric4 || 'COMPLETED'}</td>
               </tr>
