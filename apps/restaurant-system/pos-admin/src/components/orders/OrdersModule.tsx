@@ -51,8 +51,18 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
   showToast
 }) => {
   // Navigation & View Level: 'DAYS_LIST' | 'DAY_DRILLDOWN'
-  const [viewLevel, setViewLevel] = useState<'DAYS_LIST' | 'DAY_DRILLDOWN'>('DAYS_LIST');
-  const [selectedDayKey, setSelectedDayKey] = useState<string>('');
+  // Default preset is TODAY (below), and the single most common lookup is
+  // checking/reprinting a recent order — so if today already has orders,
+  // open straight into that day's drill-down instead of making the manager
+  // click into a "Today" tile they'd land on 100% of the time anyway.
+  const [viewLevel, setViewLevel] = useState<'DAYS_LIST' | 'DAY_DRILLDOWN'>(() => {
+    const today = DayOrdersService.getAllDaysSummaries(orders, 'TODAY', undefined, undefined, 6)[0];
+    return today ? 'DAY_DRILLDOWN' : 'DAYS_LIST';
+  });
+  const [selectedDayKey, setSelectedDayKey] = useState<string>(() => {
+    const today = DayOrdersService.getAllDaysSummaries(orders, 'TODAY', undefined, undefined, 6)[0];
+    return today?.dateKey || '';
+  });
 
   // Date Filter Presets
   const [filterPreset, setFilterPreset] = useState<DateFilterPreset>('TODAY');
