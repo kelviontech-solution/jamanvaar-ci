@@ -7,7 +7,8 @@ import {
   JamanvaarAuthLayout,
   BrandHeader,
   NotificationToastContainer,
-  JAMANVAARStartup
+  JAMANVAARStartup,
+  EmptyState
 } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
 import { sound } from '@jamanvaar/ui';
@@ -782,14 +783,12 @@ export const App: React.FC = () => {
 
             {/* Empty State */}
             {filteredKots.length === 0 && (
-              <div className="col-span-full text-center py-20 bg-white rounded-3xl border border-jaman-border shadow-xs space-y-4 p-6">
-                <div className="w-16 h-16 rounded-3xl bg-[#FFF4ED] text-jaman-saffron mx-auto flex items-center justify-center shadow-2xs border border-[#FDBA74]">
-                  <ChefHat className="w-8 h-8" />
-                </div>
-                <h3 className="text-lg font-black text-jaman-navy">All Kitchen Orders Cleared</h3>
-                <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-                  No tickets currently waiting for preparation at this station. New orders sent from POS terminals or Captain tablets will appear here instantly.
-                </p>
+              <div className="col-span-full">
+                <EmptyState
+                  icon={<ChefHat className="w-8 h-8" />}
+                  title="All Kitchen Orders Cleared"
+                  description="No tickets currently waiting for preparation at this station. New orders sent from POS terminals or Captain tablets will appear here instantly."
+                />
               </div>
             )}
           </div>
