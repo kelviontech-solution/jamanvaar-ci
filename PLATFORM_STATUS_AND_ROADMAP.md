@@ -190,7 +190,7 @@ The audit's own "how this could be simplified" recommendations (§11–§14) are
 | Consolidated empty/loading/error states | ✅ Done for pos-admin/pos/captain/kds (Phase 1, §3a) |
 | Fewer taps to complete common tasks | ✅ Done (Phase 2, §3b) |
 | Mobile/responsive layout (Super Admin's Restaurants page was found broken at phone width) | ✅ Done (Phase 3, §3c) |
-| Onboarding walkthroughs / guidance | ❌ Not attempted — Phase 4 |
+| Onboarding walkthroughs / guidance | ⚠️ Partial — Restaurant Admin has a real first-run checklist (`OnboardingChecklistCard.tsx`, predates this session); no other app has one — Phase 4 |
 | Accessibility (screen reader support) | ❌ Never tested — no screen reader available in the original audit's tooling |
 
 **Honest answer: no, experience has not increased uniformly across all 7 apps.** It has increased specifically wherever a broken/fake thing was blocking someone from trusting or using a feature. It has not increased in the "smooth, few-clicks, polished, consistent" sense the phrase usually means — that work hasn't started yet.
