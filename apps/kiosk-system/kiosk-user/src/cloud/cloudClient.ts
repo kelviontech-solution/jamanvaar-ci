@@ -59,7 +59,13 @@ export function getKioskDeviceId(): string | null {
   }
 }
 
-export async function activateKioskDevice(code: string): Promise<void> {
+export interface ActivationRestaurantBranding {
+  name: string;
+  gstin: string | null;
+  address: string | null;
+}
+
+export async function activateKioskDevice(code: string): Promise<ActivationRestaurantBranding | null> {
   const res = await fetch(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -80,6 +86,10 @@ export async function activateKioskDevice(code: string): Promise<void> {
     // terminal won't remember it across reloads. Caller sees no error since
     // the current session is still usable via the in-memory result.
   }
+
+  // Real branding, so the welcome screen stops showing db.ts's local seed
+  // placeholder ("My Restaurant") the moment this terminal is activated.
+  return data.restaurant ?? null;
 }
 
 export function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
@@ -89,6 +99,46 @@ export function deviceFetch(path: string, init: RequestInit = {}): Promise<Respo
     ...init,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
   });
+}
+
+// --- Order sync bridge (POS/KDS/Captain/Kiosk share this endpoint) ---
+
+import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder } from '@jamanvaar/sync';
+
+export async function pushOrderSync(
+  events: OrderSyncPushEvent[]
+): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
+  const res = await deviceFetch('/api/v1/orders/sync', {
+    method: 'POST',
+    body: JSON.stringify({ events })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Order sync push failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
+export async function pullOrderSync(since?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string }> {
+  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+  const res = await deviceFetch(`/api/v1/orders/sync${query}`);
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Order sync pull failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
+export async function reportHeartbeat(): Promise<void> {
+  try {
+    await deviceFetch('/api/v1/devices/me/heartbeat', {
+      method: 'PATCH',
+      body: JSON.stringify({ syncStatus: 'ok', appVersion: '1.0.0' })
+    });
+  } catch {
+    // Best-effort — a missed heartbeat just means this device shows stale
+    // "last seen" in Super Admin until the next successful one.
+  }
 }
 
 // --- Real Cashfree Payment (Phase 3) ---

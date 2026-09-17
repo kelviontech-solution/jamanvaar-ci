@@ -8,6 +8,9 @@ import {
   createPaymentOrder,
   getPaymentOrderStatus,
   sendReceipt,
+  pushOrderSync,
+  pullOrderSync,
+  reportHeartbeat,
   CloudApiError,
   type CartLinePayload
 } from './cloud/cloudClient';
@@ -37,6 +40,7 @@ import {
   CustomerAccount,
   DietaryType,
   DiningTable,
+  KioskDevice,
   MenuItem,
   ModifierGroup,
   ModifierOption,
@@ -73,7 +77,7 @@ import {
 import { formatDate, formatINR, formatTime, generateIdempotencyKey, generateUUID, localizedDescription, localizedName, SoundService } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
 import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService } from '@jamanvaar/api';
-import { SyncOutboxEngine } from '@jamanvaar/sync';
+import { SyncOutboxEngine, lanMeshSync } from '@jamanvaar/sync';
 import { APP_CONSTANTS } from '@jamanvaar/config';
 import {
   AlertCircle,
@@ -165,7 +169,13 @@ export default function KioskUserApp() {
     setIsActivating(true);
     setActivationError('');
     try {
-      await activateKioskDevice(activationCode);
+      const branding = await activateKioskDevice(activationCode);
+      if (branding) {
+        db.restaurant.name = branding.name;
+        if (branding.gstin) db.restaurant.gstin = branding.gstin;
+        if (branding.address) db.restaurant.address = branding.address;
+        db.notify();
+      }
       setIsDeviceActivated(true);
     } catch (err) {
       setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed');
@@ -173,6 +183,51 @@ export default function KioskUserApp() {
       setIsActivating(false);
     }
   };
+
+  // Wires the real sync bridge (Phase 3) so orders placed here actually
+  // reach KDS/Captain via a persisted, catch-up-capable path instead of the
+  // "✓ Sent to Kitchen" badge below being asserted rather than proven.
+  useEffect(() => {
+    if (!isDeviceActivated) {
+      SyncOutboxEngine.configureTransport(null);
+      return;
+    }
+    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    void SyncOutboxEngine.processOutbox();
+    void reportHeartbeat();
+
+    // Join the LAN mesh as a real KIOSK_USER peer so Kiosk Admin's Terminal
+    // Fleet screen can see this device actually connected, instead of the
+    // fixed fake fleet the QA audit found (BUG-004).
+    lanMeshSync.registerDevice('KIOSK_USER', kioskId, `Kiosk Terminal (${kioskId})`);
+    KioskRepository.upsertFromHeartbeat({
+      deviceId: kioskId,
+      name: `Kiosk Terminal (${kioskId})`,
+      appVersion: '1.0.0',
+      lastHeartbeat: new Date().toISOString()
+    });
+
+    // Enforce a real Lock/Maintenance command from Kiosk Admin — the audit
+    // found this previously only toggled a value nothing ever read.
+    const unsubLockdown = lanMeshSync.on<{ kioskId: string; isLocked: boolean; status: KioskDevice['status'] }>(
+      'KIOSK_LOCKDOWN_COMMAND',
+      (event) => {
+        if (event.payload.kioskId === kioskId) {
+          KioskRepository.updateKioskStatus(kioskId, event.payload.status, event.payload.isLocked);
+        }
+      }
+    );
+
+    const interval = setInterval(() => {
+      void SyncOutboxEngine.processOutbox();
+      void reportHeartbeat();
+    }, 15000);
+
+    return () => {
+      clearInterval(interval);
+      unsubLockdown();
+    };
+  }, [isDeviceActivated]);
 
   const [dbTick, setDbTick] = useState(0);
   const [lang, setLang] = useState<SupportedLanguage>(
@@ -601,8 +656,10 @@ export default function KioskUserApp() {
   const kioskConfig = KioskRepository.getKioskById(kioskId);
   const receiptConfig = ReceiptRepository.getConfig();
 
-  // Filtered Menu Items
+  // Filtered Menu Items — excludes items marked unavailable/sold-out in
+  // Kiosk Admin so a guest can never see or order a dish that's 86'd.
   const filteredItems = menuItems.filter((item) => {
+    if (!item.isAvailable) return false;
     const matchesSearch =
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.sku.toLowerCase().includes(searchQuery.toLowerCase());
@@ -891,8 +948,13 @@ export default function KioskUserApp() {
       paymentStatus: 'PENDING',
       orderStatus: 'CONFIRMED',
       estimatedWaitMinutes: APP_CONSTANTS.DEFAULT_ESTIMATED_PREP_MINUTES,
-      syncStatus: networkState === 'ONLINE' ? 'SYNCED' : 'SAVED_LOCALLY',
-      isSynced: networkState === 'ONLINE'
+      // Being online is not the same as having actually reached the cloud —
+      // only SyncOutboxEngine.processOutbox() flipping this to SYNCED after
+      // a real push means that. Marking it SYNCED here just because the
+      // network looked up is the exact false-confirmation bug (BUG-009's
+      // Kiosk-facing symptom: a "✓ Sent to Kitchen" badge that isn't true).
+      syncStatus: 'SAVED_LOCALLY',
+      isSynced: false
     });
     setLocalOrderIdForPayment(pendingOrder.id);
 
@@ -1125,10 +1187,22 @@ export default function KioskUserApp() {
     setChatInput('');
   };
 
-  // Staff PIN Check
+  // Staff PIN Check — was a hardcoded '1234' bypass (printed on-screen) with
+  // zero backend verification, the same bug class as pos-admin's admin123
+  // backdoor and KDS's unchecked PIN, just applied here to unlock a manager
+  // discount override. Now validates against a real db.users record with a
+  // manager/admin-tier role, same as Captain's SEC-006 fix.
   const handleStaffPinVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    if (staffPin === '1234') {
+    const userPool = (db.users || []) as (import('@jamanvaar/types').User & { pinCode?: string })[];
+    const matchedUser = userPool.find(
+      (u) =>
+        u.pinCode === staffPin &&
+        u.isActive &&
+        (u.roleId === 'role-manager' || u.roleId === 'role-admin' || u.roleId === 'role-super-admin')
+    );
+
+    if (matchedUser) {
       setStaffOverrideActive(true);
       setIsStaffPinModalOpen(false);
       setStaffPin('');
@@ -1137,10 +1211,17 @@ export default function KioskUserApp() {
         kioskId,
         action: 'STAFF_OVERRIDE_PIN_SUCCESS',
         category: 'STAFF_OVERRIDE',
-        details: 'Staff authenticated on Kiosk User for customer assistance'
+        details: `Staff authenticated on Kiosk User for customer assistance by ${matchedUser.fullName}`
       });
     } else {
-      alert('Invalid Staff PIN (Default Demo PIN: 1234)');
+      setStaffPin('');
+      showToast('Invalid staff PIN.');
+      AuditRepository.log({
+        kioskId,
+        action: 'STAFF_OVERRIDE_PIN_FAILED',
+        category: 'STAFF_OVERRIDE',
+        details: 'Staff override PIN entry failed verification'
+      });
     }
   };
 
@@ -1995,65 +2076,72 @@ export default function KioskUserApp() {
                   along with the rest of the kiosk. */}
               <div className="px-4 sm:px-6 md:px-8 pt-4">
                 <div className="flex items-center gap-3 overflow-x-auto pb-1">
-                  <button
-                    onClick={() => {
-                      const biryaniCombo = combos.find((c) => c.id === 'combo-biryani-feast') || combos[0];
-                      if (biryaniCombo) {
-                        handleSelectCombo(biryaniCombo);
-                      }
-                    }}
-                    className="shrink-0 flex items-center gap-2.5 bg-[#FFF4ED] hover:bg-[#FFEAD9] border border-[#FDBA74] rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
-                  >
-                    <img
-                      src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=200&q=80"
-                      alt=""
-                      className="w-11 h-11 rounded-xl object-cover shrink-0"
-                    />
-                    <div>
-                      <span className="block text-xs sm:text-sm font-black text-[#E66817] whitespace-nowrap">{t('bannerBiryaniTitle')}</span>
-                      <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹449 · Save ₹111</span>
-                    </div>
-                  </button>
+                  {(() => {
+                    // Was hardcoded literal prices/photos that could silently
+                    // diverge from the resolved item/combo's real current
+                    // price and image the moment either was edited in Menu
+                    // Builder — now read directly off the resolved object.
+                    const biryaniCombo = combos.find((c) => c.id === 'combo-biryani-feast') || combos[0];
+                    const thali = menuItems.find((m) => m.id === 'item-thali-guj') || menuItems[0];
+                    const coffee = menuItems.find((m) => m.id === 'item-cc-ice') || menuItems[0];
+                    return (
+                      <>
+                        {biryaniCombo && (
+                          <button
+                            onClick={() => handleSelectCombo(biryaniCombo)}
+                            className="shrink-0 flex items-center gap-2.5 bg-[#FFF4ED] hover:bg-[#FFEAD9] border border-[#FDBA74] rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
+                          >
+                            <img
+                              src={biryaniCombo.imageUrl || 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=200&q=80'}
+                              alt=""
+                              className="w-11 h-11 rounded-xl object-cover shrink-0"
+                            />
+                            <div>
+                              <span className="block text-xs sm:text-sm font-black text-[#E66817] whitespace-nowrap">{t('bannerBiryaniTitle')}</span>
+                              <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">
+                                ₹{biryaniCombo.basePrice}
+                                {biryaniCombo.savingsAmount ? ` · Save ₹${biryaniCombo.savingsAmount}` : ''}
+                              </span>
+                            </div>
+                          </button>
+                        )}
 
-                  <button
-                    onClick={() => {
-                      const thali = menuItems.find((m) => m.id === 'item-thali-guj') || menuItems[0];
-                      if (thali) {
-                        handleSelectItem(thali);
-                      }
-                    }}
-                    className="shrink-0 flex items-center gap-2.5 bg-[#F4EFE6] hover:bg-[#EFE7D8] border border-[#EBE6DD] rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
-                  >
-                    <img
-                      src="https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=200&q=80"
-                      alt=""
-                      className="w-11 h-11 rounded-xl object-cover shrink-0"
-                    />
-                    <div>
-                      <span className="block text-xs sm:text-sm font-black text-[#0B253A] whitespace-nowrap">{t('bannerThaliTitle')}</span>
-                      <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹280 · Chef Signature</span>
-                    </div>
-                  </button>
+                        {thali && (
+                          <button
+                            onClick={() => handleSelectItem(thali)}
+                            className="shrink-0 flex items-center gap-2.5 bg-[#F4EFE6] hover:bg-[#EFE7D8] border border-[#EBE6DD] rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
+                          >
+                            <img
+                              src={thali.imageUrl || 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=200&q=80'}
+                              alt=""
+                              className="w-11 h-11 rounded-xl object-cover shrink-0"
+                            />
+                            <div>
+                              <span className="block text-xs sm:text-sm font-black text-[#0B253A] whitespace-nowrap">{t('bannerThaliTitle')}</span>
+                              <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹{thali.price} · Chef Signature</span>
+                            </div>
+                          </button>
+                        )}
 
-                  <button
-                    onClick={() => {
-                      const coffee = menuItems.find((m) => m.id === 'item-cc-ice') || menuItems[0];
-                      if (coffee) {
-                        handleSelectItem(coffee);
-                      }
-                    }}
-                    className="shrink-0 hidden sm:flex items-center gap-2.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
-                  >
-                    <img
-                      src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=200&q=80"
-                      alt=""
-                      className="w-11 h-11 rounded-xl object-cover shrink-0"
-                    />
-                    <div>
-                      <span className="block text-xs sm:text-sm font-black text-emerald-800 whitespace-nowrap">{t('bannerCoffeeTitle')}</span>
-                      <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹120 · Beverage Offer</span>
-                    </div>
-                  </button>
+                        {coffee && (
+                          <button
+                            onClick={() => handleSelectItem(coffee)}
+                            className="shrink-0 hidden sm:flex items-center gap-2.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
+                          >
+                            <img
+                              src={coffee.imageUrl || 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=200&q=80'}
+                              alt=""
+                              className="w-11 h-11 rounded-xl object-cover shrink-0"
+                            />
+                            <div>
+                              <span className="block text-xs sm:text-sm font-black text-emerald-800 whitespace-nowrap">{t('bannerCoffeeTitle')}</span>
+                              <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹{coffee.price} · Beverage Offer</span>
+                            </div>
+                          </button>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -2499,12 +2587,38 @@ export default function KioskUserApp() {
             <p className="text-xs text-[#4A5568]">
               {placedOrder.orderNumber} • {placedOrder.orderType} {placedOrder.tableNumber ? `(Table ${placedOrder.tableNumber})` : ''}
             </p>
-            {/* Live Order Confirmed Badge */}
+            {/* Live Order Confirmed Badge — reflects the order's actual
+                syncStatus (kept current by db.subscribe's re-render, see
+                dbTick) instead of asserting delivery unconditionally. */}
             <div className="pt-0.5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold shadow-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Order Sent to Kitchen (KDS) ✓
-              </span>
+              {(() => {
+                const liveOrder = OrderRepository.getOrderById(placedOrder.id) ?? placedOrder;
+                const status =
+                  liveOrder.syncStatus === 'SYNCED' || !liveOrder.syncStatus
+                    ? 'delivered'
+                    : liveOrder.syncStatus === 'FAILED'
+                    ? 'failed'
+                    : 'pending';
+                const style =
+                  status === 'delivered'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : status === 'failed'
+                    ? 'bg-rose-50 text-rose-700 border-rose-200'
+                    : 'bg-amber-50 text-amber-700 border-amber-200';
+                const dot = status === 'delivered' ? 'bg-emerald-500' : status === 'failed' ? 'bg-rose-500' : 'bg-amber-500';
+                const label =
+                  status === 'delivered'
+                    ? 'Order Sent to Kitchen (KDS) ✓'
+                    : status === 'failed'
+                    ? 'Kitchen alert delayed — please tell a staff member'
+                    : 'Sending to Kitchen…';
+                return (
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold shadow-xs border ${style}`}>
+                    <span className={`w-2 h-2 rounded-full animate-pulse ${dot}`}></span>
+                    {label}
+                  </span>
+                );
+              })()}
             </div>
           </div>
 
@@ -3372,7 +3486,7 @@ export default function KioskUserApp() {
       >
         <form onSubmit={handleStaffPinVerify} className="space-y-4 py-2">
           <p className="text-xs text-[#4A5568]">
-            Enter 4-digit staff authorization PIN to unlock manager assistance, discounts, or session cancel. (Demo PIN: <strong>1234</strong>)
+            Enter 4-digit staff authorization PIN to unlock manager assistance, discounts, or session cancel.
           </p>
           <input
             type="password"
