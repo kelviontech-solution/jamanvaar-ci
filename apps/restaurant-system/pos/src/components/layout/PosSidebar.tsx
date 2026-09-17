@@ -26,7 +26,7 @@ interface NavItem {
 }
 
 export const PosSidebar: React.FC = () => {
-  const { activeTab, setActiveTab, setIsPrintQueueOpen, setIsChatbotOpen } = usePosStore();
+  const { activeTab, setActiveTab, setIsPrintQueueOpen, setIsChatbotOpen, setIsHoldOrdersOpen } = usePosStore();
 
   // Calculate live badge counts for active business session
   const activeDay = BusinessDayRepository.getActiveBusinessDay();
@@ -136,7 +136,7 @@ export const PosSidebar: React.FC = () => {
 
         {heldCartsCount > 0 && (
           <div
-            onClick={() => setActiveTab('ORDERS')}
+            onClick={() => setIsHoldOrdersOpen(true)}
             className="p-2 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between cursor-pointer hover:bg-amber-100 transition-colors"
           >
             <div className="flex items-center gap-2 text-amber-800 text-xs font-bold">

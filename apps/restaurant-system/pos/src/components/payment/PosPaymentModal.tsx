@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { PaymentMethod } from '@jamanvaar/types';
 import { formatINR, generateUUID } from '@jamanvaar/utils';
@@ -117,6 +117,10 @@ export const PosPaymentModal: React.FC = () => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  // Ref guard: a rapid double-click/double-Enter can fire handleSettle a
+  // second time before React commits the isProcessing state update, which
+  // would otherwise settle the same bill twice.
+  const settlingRef = useRef(false);
 
   // Initialize or synchronize on modal open & payable change
   useEffect(() => {
@@ -327,6 +331,7 @@ export const PosPaymentModal: React.FC = () => {
 
   // Settle and Confirm Payment
   const handleSettle = () => {
+    if (settlingRef.current) return;
     setErrorMessage('');
 
     if (totalAllocated !== totalPayable) {
@@ -356,6 +361,7 @@ export const PosPaymentModal: React.FC = () => {
       finalMethod = single === 'CASH' ? 'CASH' : single === 'UPI' ? 'UPI_QR' : single === 'CARD' ? 'CARD' : 'WALLET';
     }
 
+    settlingRef.current = true;
     setIsProcessing(true);
 
     try {
@@ -371,6 +377,7 @@ export const PosPaymentModal: React.FC = () => {
 
       if (!res) {
         sound.play('error');
+        settlingRef.current = false;
         setIsProcessing(false);
         setErrorMessage('Failed to finalize settlement. Please try again.');
       } else {
@@ -378,6 +385,7 @@ export const PosPaymentModal: React.FC = () => {
       }
     } catch (err: any) {
       sound.play('error');
+      settlingRef.current = false;
       setIsProcessing(false);
       setErrorMessage(err?.message || 'An error occurred during payment settlement.');
     }

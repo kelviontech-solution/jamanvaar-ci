@@ -134,9 +134,6 @@ export const ManagerOverrideModal: React.FC = () => {
           </button>
         </div>
 
-        <div className="text-[10px] text-slate-400 mt-3">
-          Demo Manager PIN: <strong>5678</strong> • Admin: <strong>9999</strong>
-        </div>
       </div>
     </div>
   );

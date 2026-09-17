@@ -4,6 +4,15 @@
  * response's own deviceToken is used directly, no second login step.
  */
 
+import type {
+  OrderSyncPushEvent,
+  OrderSyncPushResult,
+  CloudSyncedOrder,
+  EntitySyncEvent,
+  EntitySyncPushResult,
+  CloudSyncedEntity
+} from '@jamanvaar/sync';
+
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 
 const RESTAURANT_ID_KEY = 'jamanvaar_pos_restaurant_id';
@@ -98,6 +107,70 @@ export async function createRefund(paymentId: string, amountPaise: number, reaso
     throw new CloudApiError(data?.message ?? `Refund failed (${res.status})`, res.status);
   }
   return data;
+}
+
+export async function pushOrderSync(
+  events: OrderSyncPushEvent[]
+): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
+  const res = await deviceFetch('/api/v1/orders/sync', {
+    method: 'POST',
+    body: JSON.stringify({ events })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Order sync push failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
+export async function pullOrderSync(since?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string }> {
+  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+  const res = await deviceFetch(`/api/v1/orders/sync${query}`);
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Order sync pull failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
+export async function pushEntitySync(
+  entityType: string,
+  events: EntitySyncEvent[]
+): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
+  const res = await deviceFetch(`/api/v1/entity-sync/${entityType}`, {
+    method: 'POST',
+    body: JSON.stringify({ events })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Entity sync push failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
+export async function pullEntitySync(
+  entityType: string,
+  since?: string
+): Promise<{ entities: CloudSyncedEntity[]; serverTime: string }> {
+  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+  const res = await deviceFetch(`/api/v1/entity-sync/${entityType}${query}`);
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Entity sync pull failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
+export async function reportHeartbeat(): Promise<void> {
+  try {
+    await deviceFetch('/api/v1/devices/me/heartbeat', {
+      method: 'PATCH',
+      body: JSON.stringify({ syncStatus: 'ok', appVersion: '1.0.0' })
+    });
+  } catch {
+    // Best-effort — a missed heartbeat just means this device shows stale
+    // "last seen" in Super Admin until the next successful one, not a real error.
+  }
 }
 
 export async function sendReceipt(

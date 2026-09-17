@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { OrderType } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
@@ -65,6 +65,11 @@ export const PosCart: React.FC = () => {
   const [repeatModalOpen, setRepeatModalOpen] = useState(false);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [kotSentState, setKotSentState] = useState(false);
+  const [isSendingKot, setIsSendingKot] = useState(false);
+  // Ref, not just state: a rapid double-click can fire the second event
+  // before React commits the `disabled` attribute from setState, so the
+  // guard that actually blocks re-entry has to be a synchronous flag.
+  const sendingKotRef = useRef(false);
 
   const orderTypes: { id: OrderType; label: string; icon: string }[] = [
     { id: 'DINE_IN', label: 'Dine-In', icon: '🍽️' },
@@ -93,13 +98,23 @@ export const PosCart: React.FC = () => {
   };
 
   const handleSendKot = () => {
-    const kots = sendKOT();
-    if (kots && kots.length > 0) {
-      sound.play('kot');
-      setKotSentState(true);
-      setTimeout(() => setKotSentState(false), 3000);
-    } else {
-      sound.play('warning');
+    if (sendingKotRef.current) return;
+    sendingKotRef.current = true;
+    setIsSendingKot(true);
+    try {
+      const kots = sendKOT();
+      if (kots && kots.length > 0) {
+        sound.play('kot');
+        setKotSentState(true);
+        setTimeout(() => setKotSentState(false), 3000);
+      } else {
+        sound.play('warning');
+      }
+    } finally {
+      setTimeout(() => {
+        sendingKotRef.current = false;
+        setIsSendingKot(false);
+      }, 1200);
     }
   };
 
@@ -508,14 +523,14 @@ export const PosCart: React.FC = () => {
           <button
             type="button"
             onClick={handleSendKot}
-            disabled={!hasItems}
+            disabled={!hasItems || isSendingKot}
             className={`min-h-[52px] px-3 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
-              hasItems
+              hasItems && !isSendingKot
                 ? 'bg-[#0B253A] hover:bg-[#133A58] text-white border-2 border-[#0B253A] shadow-md shadow-[#0B253A]/20 active:scale-[0.98] cursor-pointer'
                 : 'bg-slate-100/90 border border-slate-300/80 text-slate-500 cursor-not-allowed opacity-80'
             }`}
           >
-            <Flame className={`w-5 h-5 shrink-0 ${hasItems ? 'text-[#E66817] fill-[#E66817]' : 'text-slate-400 fill-slate-300'}`} />
+            <Flame className={`w-5 h-5 shrink-0 ${hasItems && !isSendingKot ? 'text-[#E66817] fill-[#E66817]' : 'text-slate-400 fill-slate-300'}`} />
             <span className="truncate">{kotSentState ? '✓ KOT SENT' : 'SEND KOT'}</span>
           </button>
 

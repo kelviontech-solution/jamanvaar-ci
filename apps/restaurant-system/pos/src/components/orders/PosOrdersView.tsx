@@ -19,7 +19,9 @@ import {
   Calendar,
   Sparkles,
   History,
-  Flame
+  Flame,
+  Undo2,
+  Ban
 } from 'lucide-react';
 
 export const PosOrdersView: React.FC = () => {
@@ -29,7 +31,9 @@ export const PosOrdersView: React.FC = () => {
     setActiveTab,
     setLastCompletedOrder,
     setIsReceiptOpen,
-    setIsPaymentOpen
+    setIsPaymentOpen,
+    requestManagerOverride,
+    currentUser
   } = usePosStore();
 
   const [scopeFilter, setScopeFilter] = useState<'ACTIVE_DAY' | 'ALL_DAYS'>('ACTIVE_DAY');
@@ -38,6 +42,10 @@ export const PosOrdersView: React.FC = () => {
   const [search, setSearch] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [checkingOrderId, setCheckingOrderId] = useState<string | null>(null);
+  const [refundVoidMode, setRefundVoidMode] = useState<'REFUND' | 'VOID' | null>(null);
+  const [refundVoidReason, setRefundVoidReason] = useState('');
+  const [refundAmountInput, setRefundAmountInput] = useState('');
+  const [refundVoidError, setRefundVoidError] = useState('');
 
   const activeDay = BusinessDayRepository.getActiveBusinessDay();
   const allOrders = db.orders;
@@ -138,7 +146,47 @@ export const PosOrdersView: React.FC = () => {
     OrderRepository.updateOrderStatus(orderId, nextStatus, 'POS Cashier');
   };
 
+  const openRefundVoid = (mode: 'REFUND' | 'VOID') => {
+    if (!selectedOrder) return;
+    setRefundVoidMode(mode);
+    setRefundVoidReason('');
+    setRefundAmountInput(selectedOrder.totalAmount.toString());
+    setRefundVoidError('');
+  };
+
+  const submitRefundVoid = () => {
+    if (!selectedOrder || !refundVoidMode) return;
+    if (!refundVoidReason.trim()) {
+      setRefundVoidError('Please enter a reason.');
+      return;
+    }
+
+    const orderId = selectedOrder.id;
+    const mode = refundVoidMode;
+    const reason = refundVoidReason.trim();
+    const amount = Number(refundAmountInput);
+
+    requestManagerOverride(
+      mode === 'REFUND' ? 'REFUND' : 'VOID_ORDER',
+      mode === 'REFUND' ? `Refund Order #${selectedOrder.orderNumber}` : `Void Order #${selectedOrder.orderNumber}`,
+      `${currentUser?.fullName || 'Cashier'} requested a ${mode === 'REFUND' ? `₹${amount} refund` : 'void'} — ${reason}`,
+      (managerName: string) => {
+        try {
+          const updated =
+            mode === 'REFUND'
+              ? OrderRepository.refundOrder(orderId, amount, reason, managerName)
+              : OrderRepository.voidOrder(orderId, reason, managerName);
+          if (updated) setSelectedOrder(updated);
+          setRefundVoidMode(null);
+        } catch (err: any) {
+          setRefundVoidError(err?.message || 'Action failed.');
+        }
+      }
+    );
+  };
+
   return (
+    <>
     <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] p-4 sm:p-6 overflow-hidden select-none">
       {/* Header & Session Scope Indicator */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4 shrink-0">
@@ -660,6 +708,30 @@ export const PosOrdersView: React.FC = () => {
                   <Printer className="w-3.5 h-3.5 text-[#E66817]" />
                   <span>Print Thermal Receipt</span>
                 </button>
+
+                {selectedOrder.orderStatus !== 'CANCELLED' && selectedOrder.orderStatus !== 'REFUNDED' && (
+                  <>
+                    {selectedOrder.paymentStatus === 'SUCCESS' ? (
+                      <button
+                        type="button"
+                        onClick={() => openRefundVoid('REFUND')}
+                        className="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Undo2 className="w-3.5 h-3.5" />
+                        <span>Refund Order</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openRefundVoid('VOID')}
+                        className="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Ban className="w-3.5 h-3.5" />
+                        <span>Void Order</span>
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           ) : (
@@ -671,5 +743,72 @@ export const PosOrdersView: React.FC = () => {
         </div>
       </div>
     </div>
+
+    {refundVoidMode && selectedOrder && (
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
+        <div className="bg-white border border-[#EBE6DD] rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+          <div className="flex items-center gap-2.5">
+            {refundVoidMode === 'REFUND' ? (
+              <Undo2 className="w-5 h-5 text-rose-600" />
+            ) : (
+              <Ban className="w-5 h-5 text-rose-600" />
+            )}
+            <h2 className="text-base font-extrabold text-[#0B253A]">
+              {refundVoidMode === 'REFUND' ? 'Refund Order' : 'Void Order'} #{selectedOrder.orderNumber}
+            </h2>
+          </div>
+
+          {refundVoidMode === 'REFUND' && (
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Refund Amount (₹)</label>
+              <input
+                type="number"
+                min={1}
+                max={selectedOrder.totalAmount}
+                value={refundAmountInput}
+                onChange={(e) => setRefundAmountInput(e.target.value)}
+                className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-rose-400 rounded-2xl px-4 py-2.5 text-sm font-mono font-bold text-[#0B253A] focus:outline-hidden"
+              />
+              <span className="text-[11px] text-slate-400">Order total: {formatINR(selectedOrder.totalAmount)}</span>
+            </div>
+          )}
+
+          <div>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Reason *</label>
+            <textarea
+              value={refundVoidReason}
+              onChange={(e) => setRefundVoidReason(e.target.value)}
+              placeholder={refundVoidMode === 'REFUND' ? 'e.g. Wrong item billed, customer complaint' : 'e.g. Kitchen error, customer left'}
+              rows={3}
+              className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-rose-400 rounded-2xl px-4 py-2.5 text-sm text-[#0B253A] focus:outline-hidden resize-none"
+            />
+          </div>
+
+          {refundVoidError && (
+            <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center">
+              {refundVoidError}
+            </div>
+          )}
+
+          <div className="flex gap-2 pt-1">
+            <button
+              type="button"
+              onClick={submitRefundVoid}
+              className="flex-1 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs uppercase tracking-wider transition-all cursor-pointer"
+            >
+              {refundVoidMode === 'REFUND' ? 'Continue to Manager Approval' : 'Continue to Manager Approval'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setRefundVoidMode(null)}
+              className="px-5 py-3 rounded-2xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200 cursor-pointer"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };

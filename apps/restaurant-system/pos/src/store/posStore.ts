@@ -1006,7 +1006,8 @@ export const usePosStore = create<PosState>((set, get) => {
           paymentMethod: 'CASH',
           paymentStatus: 'PENDING',
           orderStatus: 'PREPARING',
-          source_type: 'POS'
+          source_type: 'POS',
+          syncStatus: 'SAVED_LOCALLY'
         });
 
         if (state.selectedTable) {
@@ -1034,7 +1035,8 @@ export const usePosStore = create<PosState>((set, get) => {
         tableNumber: state.selectedTable?.tableNumber,
         orderType: state.orderType,
         items: kotItems,
-        cashierName: state.currentUser?.fullName || 'Cashier'
+        cashierName: state.currentUser?.fullName || 'Cashier',
+        orderNotes: state.orderNotes || undefined
       });
 
       // 3. Dispatch Print Jobs to Print Queue for each KOT Station

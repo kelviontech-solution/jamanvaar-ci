@@ -3,6 +3,7 @@ import { usePosStore } from '../../store/posStore';
 import { db, KOTRepository } from '@jamanvaar/database';
 import { KOTRecord, KOTStatus } from '@jamanvaar/types';
 import { sound } from '@jamanvaar/ui';
+import { lanMeshSync } from '@jamanvaar/sync';
 import {
   ChefHat,
   Clock,
@@ -44,6 +45,9 @@ export const PosKotView: React.FC = () => {
 
   const handleUpdateStatus = (kotId: string, nextStatus: KOTStatus) => {
     KOTRepository.updateKOTStatus(kotId, nextStatus);
+    // Broadcast so Restaurant Admin's Kitchen/KOT view and KDS reflect this
+    // change instead of silently disagreeing about the same ticket.
+    lanMeshSync.broadcast('KOT_STATUS_CHANGED', { kotId, status: nextStatus });
     if (nextStatus === 'READY' || nextStatus === 'SERVED') {
       sound.play('success');
     }
@@ -62,6 +66,7 @@ export const PosKotView: React.FC = () => {
       `Cancellation requested for KOT #${kot.kotNumber} (Order #${kot.orderNumber})`,
       (mgr) => {
         KOTRepository.updateKOTStatus(kot.id, 'CANCELLED');
+        lanMeshSync.broadcast('KOT_STATUS_CHANGED', { kotId: kot.id, status: 'CANCELLED' });
       }
     );
   };
@@ -185,6 +190,13 @@ export const PosKotView: React.FC = () => {
                       <div className="text-[10px] text-slate-400 font-bold uppercase">{kot.orderType}</div>
                     </div>
                   </div>
+
+                  {/* Order-level Chef Note (distinct from per-item specialInstructions) */}
+                  {kot.orderNotes && (
+                    <div className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-1 rounded-md mb-2.5">
+                      ⚡ Note: {kot.orderNotes}
+                    </div>
+                  )}
 
                   {/* KOT Items */}
                   <div className="space-y-2 mb-4 flex-1">

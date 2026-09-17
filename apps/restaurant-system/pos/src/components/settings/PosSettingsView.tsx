@@ -952,7 +952,7 @@ ESC/POS Command Engine Verified OK
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Database className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-bold text-sm text-[#0B253A]">Local SQLite & Storage Health</h3>
+                <h3 className="font-bold text-sm text-[#0B253A]">Local Storage Health</h3>
               </div>
               <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
                 HEALTHY
@@ -963,7 +963,7 @@ ESC/POS Command Engine Verified OK
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Database Engine:</span>
-                  <strong className="font-mono text-[#0B253A]">Local SQLite DB + LocalStorage Sync</strong>
+                  <strong className="font-mono text-[#0B253A]">Browser LocalStorage (device-local)</strong>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Total Menu Dishes:</span>
@@ -1340,7 +1340,7 @@ ESC/POS Command Engine Verified OK
                         title: '7. Offline-First Operations',
                         icon: HardDrive,
                         features: [
-                          'Local SQLite Database',
+                          'Local Device Storage',
                           'Offline Billing',
                           'Offline Order Creation',
                           'Offline Menu Access',
@@ -1981,7 +1981,7 @@ ESC/POS Command Engine Verified OK
                       { cap: 'Kitchen KOT & Basic KDS Spooling', core: '✓ Included', pro: '✓ Included' },
                       { cap: 'Kitchen Inventory & Stock Alerts', core: '✓ Included', pro: '✓ Included' },
                       { cap: 'Daily Sales & Operational Reports', core: '✓ Included', pro: '✓ Included' },
-                      { cap: '100% Offline SQLite Local Engine', core: '✓ Included', pro: '✓ Included' },
+                      { cap: '100% Offline Local Engine', core: '✓ Included', pro: '✓ Included' },
                       { cap: 'Wireless Captain App for Waiters', core: '—', pro: '✓ Full Captain Suite' },
                       { cap: 'Table-Side QR Code Ordering', core: '—', pro: '✓ Included' },
                       { cap: 'Self-Service Customer Touch Kiosk', core: '—', pro: '✓ Included' },

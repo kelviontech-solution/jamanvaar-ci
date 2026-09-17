@@ -321,7 +321,12 @@ export const PosBillsView: React.FC = () => {
           }
         }
 
-        OrderRepository.refundOrder(bill.id, amt, refundReasonInput, mgr);
+        try {
+          OrderRepository.refundOrder(bill.id, amt, refundReasonInput, mgr);
+        } catch (err: any) {
+          showToast(`✗ Refund failed for Invoice #${bill.orderNumber}: ${err?.message || 'Unknown error'}`);
+          return;
+        }
         AuditRepository.log({
           action: 'REFUND_INVOICE',
           category: 'PAYMENT',

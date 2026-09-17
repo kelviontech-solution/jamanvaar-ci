@@ -418,7 +418,11 @@ export const PosHeader: React.FC = () => {
           )}
         </button>
 
-        {/* JAMAN AI Button */}
+        {/* JAMAN AI Button — hidden when this restaurant has opted out via
+            Restaurant Admin's "Show JAMAN AI Assistant" setting. Previously
+            unconditional: the only real on/off control was a platform-wide
+            entitlement, with no per-restaurant preference at all. */}
+        {db.restaurant?.showJamanAI !== false && (
         <button
           type="button"
           onClick={() => setIsChatbotOpen(true)}
@@ -440,6 +444,7 @@ export const PosHeader: React.FC = () => {
             </span>
           )}
         </button>
+        )}
 
         {/* ── CASHIER PROFILE MENU (AMIT DAVE ▼) ── */}
         <div ref={profileRef} className="relative shrink-0">

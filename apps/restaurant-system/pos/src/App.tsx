@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { activatePosDevice, isPosDeviceConnected, CloudApiError } from './cloud/cloudClient';
+import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
 import { usePosStore } from './store/posStore';
-import { db } from '@jamanvaar/database';
+import { db, CustomerRepository, NotificationRepository } from '@jamanvaar/database';
+import type { MenuItem } from '@jamanvaar/types';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync } from '@jamanvaar/sync';
+import { sound } from '@jamanvaar/ui';
 import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
 import { PosSidebar } from './components/layout/PosSidebar';
@@ -82,6 +85,105 @@ export const App: React.FC = () => {
     });
     return unsubscribe;
   }, []);
+
+  // Real-time LAN mesh — without this, POS only ever broadcasts (sendKOT
+  // etc.) and never attaches to receive anything back, so events other
+  // devices fire (Captain's bill request, food-ready, table transfers) never
+  // apply to POS's own db at all, let alone surface as a notification. This
+  // was a genuine gap: KDS/Captain both call setAttachedDatabase, POS never did.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    lanMeshSync.registerDevice('POS', 'POS-01', 'POS Terminal');
+    lanMeshSync.setAttachedDatabase(db);
+
+    const unsubBillRequested = lanMeshSync.on('BILL_REQUESTED', (event) => {
+      const { tableNumber, captainName } = event.payload || {};
+      if (!tableNumber) return;
+      sound.play('kot');
+      NotificationRepository.createNotification({
+        type: 'MANAGER_ALERT' as any,
+        title: `🧾 Bill Requested — Table ${tableNumber}`,
+        message: `${captainName || 'Captain'} requested the bill for Table ${tableNumber}.`,
+        priority: 'HIGH',
+        targetRoles: ['POS', 'POS_ADMIN', 'ALL'],
+        tableNumber
+      });
+    });
+
+    return () => {
+      unsubBillRequested();
+    };
+  }, []);
+
+  // Wire the real cloud sync bridge once this terminal is activated — without
+  // this, orders would sit at SAVED_LOCALLY forever and no other device
+  // (KDS, Captain) would ever see them via the cloud catch-up path.
+  useEffect(() => {
+    if (!isDeviceActivated) {
+      SyncOutboxEngine.configureTransport(null);
+      return;
+    }
+    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
+
+    // CRM has no per-record dirty flag the way Order.syncStatus does (see
+    // entity_sync.ts), so this pushes the restaurant's full current customer
+    // list each tick — proportionate for CRM list sizes, not a delta sync.
+    const syncCrm = async () => {
+      await EntitySyncEngine.pushSnapshot(
+        'CUSTOMER',
+        db.customerAccounts.map((c) => ({ externalId: c.phone, payload: c as unknown as Record<string, unknown> }))
+      );
+      await EntitySyncEngine.catchUp('CUSTOMER', (remote) => {
+        CustomerRepository.createCustomer({
+          phone: remote.externalId,
+          name: (remote.payload.name as string) || 'Valued Guest',
+          loyaltyPoints: (remote.payload.loyaltyPoints as number) ?? 0,
+          tags: remote.payload.tags as string[] | undefined
+        });
+      });
+    };
+
+    // Database-layer gap: the menu previously lived only in this device's
+    // own browser storage — clearing it, or a brand-new terminal, meant
+    // starting from the seed menu with no way to recover a restaurant's
+    // real one. Every device now pushes its full current menu and merges
+    // in whatever other devices have pushed, so the menu has a real,
+    // durable copy in Postgres instead of existing on exactly one screen.
+    const syncMenu = async () => {
+      await EntitySyncEngine.pushSnapshot(
+        'MENU_ITEM',
+        db.menuItems.map((m) => ({ externalId: m.id, payload: m as unknown as Record<string, unknown> }))
+      );
+      await EntitySyncEngine.catchUp('MENU_ITEM', (remote) => {
+        const incoming = remote.payload as unknown as MenuItem;
+        if (!incoming || !incoming.id) return;
+        const idx = db.menuItems.findIndex((m) => m.id === incoming.id);
+        if (idx >= 0) {
+          db.menuItems[idx] = { ...db.menuItems[idx], ...incoming };
+        } else {
+          db.menuItems.push(incoming);
+        }
+      });
+      db.notify();
+    };
+
+    void SyncOutboxEngine.catchUpFromCloud();
+    void SyncOutboxEngine.processOutbox();
+    void syncCrm();
+    void syncMenu();
+    void reportHeartbeat();
+
+    const interval = setInterval(() => {
+      void SyncOutboxEngine.processOutbox();
+      void SyncOutboxEngine.catchUpFromCloud();
+      void syncCrm();
+      void syncMenu();
+      void reportHeartbeat();
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [isDeviceActivated]);
 
   // Global Keyboard Shortcuts (F1 - F10, Ctrl+K, Escape)
   useEffect(() => {
