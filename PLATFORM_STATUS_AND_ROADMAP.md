@@ -165,6 +165,43 @@ to these changes).
 
 ---
 
+## 3d. UX Phase 4 — Onboarding & Guidance — Complete
+
+Research first corrected an assumption: Restaurant Admin already has a real
+first-run checklist (`OnboardingChecklistCard.tsx`, predating this
+session) — genuinely well-built, reflecting live DB state rather than a
+canned tutorial. Nothing else in the platform had an equivalent. Three
+concrete gaps closed:
+
+- **Kiosk Admin dashboard** now has the same checklist pattern (menu,
+  terminal activation, offers, staff, first order) — it had nothing before.
+- **A shared "You're Connected!" screen** now appears once, right after
+  first successful device activation, on POS, Captain, KDS, and Kiosk
+  Admin — all four previously dropped straight from "activation succeeded"
+  into the main login/dashboard screen with zero orientation for whoever
+  just set the device up. One reusable component (`packages/ui`), 2-3
+  concrete first-steps per app, shown only once per activation (an
+  already-activated terminal skips it on every subsequent load, same as
+  before).
+- **POS's dead `HelpCircle` import** — imported but never rendered
+  anywhere, evidence of an abandoned affordance — is now a real touch-only
+  "Quick Help" popover for a new cashier. Deliberately contains no
+  keyboard-shortcut references, since POS is touch-first and
+  `tests/pos_touch_first_no_shortcuts_ui.test.ts` enforces that; re-run and
+  confirmed passing after this change.
+
+Not done: Kiosk (customer) app was checked and found not to need this —
+a walk-in customer isn't staff needing orientation, and its post-activation
+Welcome screen is already well-designed. Super Admin already has the most
+mature guidance in the platform (a full 7-step onboarding wizard) and
+wasn't touched further.
+
+`tsc --noEmit` clean across all 4 touched apps; full suite green (same
+established flaky-under-parallel-load printer tests, confirmed passing
+in isolation, unrelated to these changes).
+
+---
+
 ## 4. Has the *Experience* Actually Improved?
 
 Be precise about what kind of work this was: **almost all of it was data-integrity and connectivity work — making real things real and making broken buttons work — not visual/interaction design polish.** Those are different kinds of improvement, and it's worth separating them honestly.
@@ -190,7 +227,7 @@ The audit's own "how this could be simplified" recommendations (§11–§14) are
 | Consolidated empty/loading/error states | ✅ Done for pos-admin/pos/captain/kds (Phase 1, §3a) |
 | Fewer taps to complete common tasks | ✅ Done (Phase 2, §3b) |
 | Mobile/responsive layout (Super Admin's Restaurants page was found broken at phone width) | ✅ Done (Phase 3, §3c) |
-| Onboarding walkthroughs / guidance | ⚠️ Partial — Restaurant Admin has a real first-run checklist (`OnboardingChecklistCard.tsx`, predates this session); no other app has one — Phase 4 |
+| Onboarding walkthroughs / guidance | ✅ Done (Phase 4, §3d) |
 | Accessibility (screen reader support) | ❌ Never tested — no screen reader available in the original audit's tooling |
 
 **Honest answer: no, experience has not increased uniformly across all 7 apps.** It has increased specifically wherever a broken/fake thing was blocking someone from trusting or using a feature. It has not increased in the "smooth, few-clicks, polished, consistent" sense the phrase usually means — that work hasn't started yet.
@@ -201,12 +238,15 @@ The audit's own "how this could be simplified" recommendations (§11–§14) are
 
 Roughly in order of impact-to-effort, based on what's still open:
 
+All 4 originally-scoped UX phases (visual consistency, click-reduction,
+mobile/responsive, onboarding/guidance) are now complete. What remains:
+
 1. **QR Ordering → Super Admin reporting gap** — re-verify and close if still broken (not checked this session).
 2. **Cloud Backup on by default / first-run reminder** — real data-loss risk for a restaurant with no IT staff; the mechanism already exists (real S3 backend), it's just opt-in.
 3. **Captain "Request Cancel" action** — small, well-scoped, closes a real daily-friction gap (a captain facing a guest who wants to cancel an already-fired dish currently has nothing to tap).
 4. **pos-admin refund/void re-authentication** — bring it to parity with POS's PIN-gated flow, if you want defense-in-depth there too.
-5. **A genuine UX/interaction-design pass**, app by app — this is the "make it smooth and easy" work and is a different kind of project from bug-fixing: reducing steps for common tasks, consistent visual language across all 7 apps, better onboarding, mobile responsiveness, and a real accessibility pass. This is large enough that it should be scoped one app at a time rather than attempted as one sweep.
-6. **Formal accessibility and load testing** — genuinely never done; needs tooling this session didn't have (a real screen reader, a load-testing harness).
+5. **Formal accessibility and load testing** — genuinely never done; needs tooling this session didn't have (a real screen reader, a load-testing harness).
+6. **KDS live-viewport testing** — not tested at phone width this session (no local activation credentials available); low priority since it's realistically always a fixed kitchen wall display.
 
 ---
 
