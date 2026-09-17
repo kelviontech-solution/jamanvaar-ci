@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useCaptainStore } from './store/captainStore';
-import { DiningTable } from '@jamanvaar/types';
+import { DiningTable, MenuItem } from '@jamanvaar/types';
 import { captainDb } from '@jamanvaar/database';
 import { EntitlementService } from '@jamanvaar/business';
 import {
   JamanvaarAuthLayout,
   JAMANVAARStartup
 } from '@jamanvaar/ui';
-import { isDeviceConnected, connectDevice, CloudApiError } from './cloud/cloudClient';
+import { isDeviceConnected, connectDevice, activateCaptainDevice, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
+import { SyncOutboxEngine, EntitySyncEngine } from '@jamanvaar/sync';
 
 // Captain Modular Layout & Views
 import { CaptainHeader } from './components/layout/CaptainHeader';
@@ -67,19 +68,88 @@ export const App: React.FC = () => {
   const [connectBusy, setConnectBusy] = useState(false);
   const [connectError, setConnectError] = useState('');
 
+  // A tablet cloud/api has never seen before comes back ACTIVATION_REQUIRED
+  // from the login step — the same Welcome Kit activation key pos-admin
+  // uses is needed once before this device has a real token.
+  const [awaitingActivationKey, setAwaitingActivationKey] = useState(false);
+  const [activationSessionToken, setActivationSessionToken] = useState('');
+  const [activationKeyInput, setActivationKeyInput] = useState('');
+  const [activationBusy, setActivationBusy] = useState(false);
+  const [activationError, setActivationError] = useState('');
+
   const handleConnectDevice = async (e: React.FormEvent) => {
     e.preventDefault();
     setConnectError('');
     setConnectBusy(true);
     try {
-      await connectDevice(connectRestaurantId, connectEmail, connectPassword);
-      setDeviceConnected(true);
+      const result = await connectDevice(connectRestaurantId, connectEmail, connectPassword);
+      if (result.requiresActivation && result.activationSessionToken) {
+        setActivationSessionToken(result.activationSessionToken);
+        setAwaitingActivationKey(true);
+      } else {
+        setDeviceConnected(true);
+      }
     } catch (err) {
       setConnectError(err instanceof CloudApiError ? err.message : 'Could not connect — check your details and try again.');
     } finally {
       setConnectBusy(false);
     }
   };
+
+  const handleActivateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setActivationError('');
+    setActivationBusy(true);
+    try {
+      await activateCaptainDevice(activationSessionToken, activationKeyInput);
+      setAwaitingActivationKey(false);
+      setDeviceConnected(true);
+    } catch (err) {
+      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed. Please verify the code.');
+    } finally {
+      setActivationBusy(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!deviceConnected) {
+      SyncOutboxEngine.configureTransport(null);
+      return;
+    }
+    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
+
+    // Captain never edits the menu — only pulls whatever POS/Restaurant
+    // Admin have pushed, so a Captain tablet with its own cleared/fresh
+    // storage still gets the real menu instead of the local seed fallback.
+    const syncMenu = async () => {
+      await EntitySyncEngine.catchUp('MENU_ITEM', (remote) => {
+        const incoming = remote.payload as unknown as MenuItem;
+        if (!incoming || !incoming.id) return;
+        const idx = captainDb.menuItems.findIndex((m) => m.id === incoming.id);
+        if (idx >= 0) {
+          captainDb.menuItems[idx] = { ...captainDb.menuItems[idx], ...incoming };
+        } else {
+          captainDb.menuItems.push(incoming);
+        }
+      });
+      captainDb.notify();
+    };
+
+    void SyncOutboxEngine.catchUpFromCloud();
+    void SyncOutboxEngine.processOutbox();
+    void syncMenu();
+    void reportHeartbeat();
+
+    const interval = setInterval(() => {
+      void SyncOutboxEngine.processOutbox();
+      void SyncOutboxEngine.catchUpFromCloud();
+      void syncMenu();
+      void reportHeartbeat();
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [deviceConnected]);
 
   // Active Modals State
   const [guestModalTable, setGuestModalTable] = useState<DiningTable | null>(null);
@@ -191,6 +261,58 @@ export const App: React.FC = () => {
     );
   }
 
+  if (!deviceConnected && awaitingActivationKey) {
+    return (
+      <JAMANVAARStartup appName="CAPTAIN APP" appType="CAPTAIN" minDurationMs={1500}>
+        <JamanvaarAuthLayout
+          appIdentity="CAPTAIN"
+          appTitle="Floor Captain & Service"
+          appSubtitle="High-Speed Table Orders & Service"
+          heroHeadline="Touch-First Restaurant Floor Command"
+          heroHighlightWord="Instant KOT"
+          heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
+        >
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-[#0B253A] tracking-tight">Activate this Tablet</h2>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                This tablet hasn't connected before — enter the activation key from your Super Admin Welcome Kit to finish setup.
+              </p>
+            </div>
+            <form onSubmit={handleActivateSubmit} className="space-y-3.5">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1.5">Activation Key *</label>
+                <input
+                  type="text"
+                  value={activationKeyInput}
+                  onChange={(e) => setActivationKeyInput(e.target.value)}
+                  placeholder="From your Welcome Kit"
+                  required
+                  autoFocus
+                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
+                />
+              </div>
+              {activationError && (
+                <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{activationError}</span>
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={activationBusy || !activationKeyInput.trim()}
+                className="w-full py-4 rounded-2xl bg-[#0B253A] hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>{activationBusy ? 'Activating…' : 'Activate Tablet'}</span>
+                {!activationBusy && <ArrowRight className="w-4 h-4 text-[#E66817]" />}
+              </button>
+            </form>
+          </div>
+        </JamanvaarAuthLayout>
+      </JAMANVAARStartup>
+    );
+  }
+
   if (!deviceConnected) {
     return (
       <JAMANVAARStartup appName="CAPTAIN APP" appType="CAPTAIN" minDurationMs={1500}>
@@ -288,7 +410,7 @@ export const App: React.FC = () => {
             <div className="p-3.5 rounded-2xl bg-[#FDFBF7] border border-[#EBE6DD] flex items-center justify-between">
               <div>
                 <span className="text-xs font-black text-[#0B253A] block">🔒 Registered Staff Access</span>
-                <span className="text-[11px] text-slate-600 font-medium">Captain PIN: 2222 • Cashier PIN: 1234 • Manager: 5678</span>
+                <span className="text-[11px] text-slate-600 font-medium">Ask your manager for your 4-digit staff PIN</span>
               </div>
             </div>
 
@@ -466,7 +588,9 @@ export const App: React.FC = () => {
           )}
         </main>
 
-        {/* ── Floating Branded JAMAN AI Assistant Button ── */}
+        {/* ── Floating Branded JAMAN AI Assistant Button — hidden when this
+            restaurant opted out via Restaurant Admin settings ── */}
+        {captainDb.restaurant?.showJamanAI !== false && (
         <button
           type="button"
           onClick={() => setIsAiAssistantOpen(true)}
@@ -477,6 +601,7 @@ export const App: React.FC = () => {
           <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-[#E66817] fill-[#E66817] group-hover:rotate-12 transition-transform" />
           <span className="sr-only">JAMAN AI</span>
         </button>
+        )}
 
         {/* ── All Modals & Workspaces ── */}
         {/* 1. Table Workspace Modal */}

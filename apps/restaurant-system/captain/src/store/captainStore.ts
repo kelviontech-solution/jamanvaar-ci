@@ -701,7 +701,8 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
         paymentMethod: 'CASH',
         paymentStatus: 'PENDING',
         orderStatus: 'PREPARING',
-        source_type: 'CAPTAIN'
+        source_type: 'CAPTAIN',
+        syncStatus: 'SAVED_LOCALLY'
       });
 
       if (table) {
@@ -729,6 +730,10 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       order.totalAmount = order.subtotal + order.taxAmount;
       order.orderStatus = 'PREPARING';
       order.updatedAt = new Date().toISOString();
+      // Without this, adding items to an already-existing table order from
+      // Captain would never reach the cloud sync bridge — only a brand-new
+      // order's creation would (BUG-009's Captain-specific gap).
+      order.syncStatus = 'SAVED_LOCALLY';
     }
 
     // 2. Generate KOT strictly for newly fired items

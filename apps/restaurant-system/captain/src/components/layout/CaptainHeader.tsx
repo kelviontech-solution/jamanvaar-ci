@@ -128,7 +128,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                         posPeer ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100'
                       }`}
                     >
-                      {posPeer ? `CONNECTED (${posPeer.latencyMs}ms)` : 'NOT DETECTED'}
+                      {posPeer ? 'CONNECTED' : 'NOT DETECTED'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50">
@@ -138,7 +138,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                         kdsPeer ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100'
                       }`}
                     >
-                      {kdsPeer ? `LIVE (${kdsPeer.latencyMs}ms)` : 'NOT DETECTED'}
+                      {kdsPeer ? 'LIVE' : 'NOT DETECTED'}
                     </span>
                   </div>
                 </div>

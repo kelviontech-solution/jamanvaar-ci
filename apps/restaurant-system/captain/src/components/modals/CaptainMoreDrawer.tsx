@@ -1,5 +1,6 @@
 import React from 'react';
 import { useCaptainStore } from '../../store/captainStore';
+import { captainDb } from '@jamanvaar/database';
 import {
   X,
   ChefHat,
@@ -93,7 +94,8 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
 
         {/* Content Navigation List */}
         <div className="flex-1 p-4 overflow-y-auto space-y-2.5 bg-[#FAF7F2]">
-          {/* AI Quick Trigger */}
+          {/* AI Quick Trigger — hidden when this restaurant opted out */}
+          {captainDb.restaurant?.showJamanAI !== false && (
           <button
             type="button"
             onClick={() => {
@@ -113,6 +115,7 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
             </div>
             <ChevronRight className="w-4 h-4 text-[#E66817]" />
           </button>
+          )}
 
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1 pt-2">
             Floor Operations:
