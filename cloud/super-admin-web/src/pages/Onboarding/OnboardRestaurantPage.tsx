@@ -329,7 +329,7 @@ export function OnboardRestaurantPage() {
 
   useEffect(() => {
     api
-      .get<Plan[]>('/api/v1/plans')
+      .get<Plan[]>('/api/v1/plans?excludeTestFixtures=true')
       .then((all) => {
         const active = all.filter((p) => p.status === 'ACTIVE');
         setPlans(active);

@@ -249,18 +249,22 @@ export function DashboardPage() {
             </div>
 
             <div className="telemetry-grid-4">
-              {/* Cloud API & Gateway */}
+              {/* Cloud API & Gateway — was permanently hardcoded "● UP" /
+                  "100% Healthy" regardless of what the backend actually
+                  reported, unlike every other tile on this row. */}
               <div className="telemetry-tile">
                 <div className="telemetry-tile-top">
                   <span className="telemetry-tile-title">Cloud API Gateway</span>
-                  <Badge tone="success">
-                    ● UP
+                  <Badge tone={summary.operations?.platformHealth?.apiStatus === 'UP' ? 'success' : 'error'}>
+                    ● {summary.operations?.platformHealth?.apiStatus ?? 'UP'}
                   </Badge>
                 </div>
                 <div className="telemetry-tile-body">
                   <div className="telemetry-tile-metric">
-                    100%
-                    <span style={{ fontSize: 12, color: '#047857', fontWeight: 600 }}>Healthy</span>
+                    {summary.operations?.platformHealth?.apiStatus === 'UP' ? '100%' : '—'}
+                    <span style={{ fontSize: 12, color: summary.operations?.platformHealth?.apiStatus === 'UP' ? '#047857' : '#B91C1C', fontWeight: 600 }}>
+                      {summary.operations?.platformHealth?.apiStatus === 'UP' ? 'Healthy' : 'Degraded'}
+                    </span>
                   </div>
                   <span className="telemetry-tile-sub">
                     Uptime: {Math.floor((summary.operations?.platformHealth?.uptimeSeconds ?? 120) / 60)}m • Port 4000
@@ -306,12 +310,14 @@ export function DashboardPage() {
                 </div>
               </div>
 
-              {/* Automated Backup Fleet */}
+              {/* Automated Backup Fleet — badge was hardcoded ACTIVE
+                  regardless of failedBackups, unlike the adjacent DB
+                  status badge which is already conditional. */}
               <div className="telemetry-tile">
                 <div className="telemetry-tile-top">
                   <span className="telemetry-tile-title">Backup Fleet</span>
-                  <Badge tone="success">
-                    ACTIVE
+                  <Badge tone={(summary.operations?.backupHealth?.failedBackups ?? 0) === 0 ? 'success' : 'error'}>
+                    {(summary.operations?.backupHealth?.failedBackups ?? 0) === 0 ? 'ACTIVE' : 'ATTENTION'}
                   </Badge>
                 </div>
                 <div className="telemetry-tile-body">

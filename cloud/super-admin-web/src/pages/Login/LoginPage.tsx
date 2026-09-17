@@ -26,23 +26,11 @@ export function LoginPage() {
     }
   }, [user, navigate]);
 
-  const handleQuickDemoAdmin = () => {
-    setEmail('superadmin@jamanvaar.app');
-    setPassword('admin1234');
-    setError(null);
-  };
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      setError('Please enter both your email address and password.');
-      return;
-    }
-
+  async function submitLogin(loginEmail: string, loginPassword: string) {
     setError(null);
     setSubmitting(true);
     try {
-      await login(email.trim(), password);
+      await login(loginEmail.trim(), loginPassword);
       navigate('/', { replace: true });
     } catch (err) {
       if (err instanceof ApiError) {
@@ -55,6 +43,25 @@ export function LoginPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  // Was auto-filling the form and stopping — the button looked like it did
+  // nothing, since the real submit still required a second manual click.
+  // Now goes through the same real login() call the form itself uses, with
+  // the seeded demo platform admin's actual credentials (prisma/seed.ts).
+  const handleQuickDemoAdmin = () => {
+    setEmail('superadmin@jamanvaar.app');
+    setPassword('admin1234');
+    void submitLogin('superadmin@jamanvaar.app', 'admin1234');
+  };
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter both your email address and password.');
+      return;
+    }
+    await submitLogin(email, password);
   }
 
   return (

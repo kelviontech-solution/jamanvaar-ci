@@ -122,6 +122,7 @@ export function ApplicationsPage() {
 
   const totalFleetDevices = apps.reduce((sum, a) => sum + a.totalDevices, 0);
   const totalOnlineDevices = apps.reduce((sum, a) => sum + a.onlineDevices, 0);
+  const fleetSyncRate = totalFleetDevices > 0 ? Math.round((totalOnlineDevices / totalFleetDevices) * 100) : null;
 
   return (
     <div>
@@ -182,14 +183,18 @@ export function ApplicationsPage() {
 
         <Card className="stat-tile">
           <div className="stat-tile-top">
-            <div className="stat-label">Operational Parity</div>
+            <div className="stat-label">Fleet Sync Rate</div>
             <div className="stat-tile-icon stat-tile-icon-amber">
               <ShieldCheck className="w-5 h-5" />
             </div>
           </div>
           <div>
-            <div className="stat-value" style={{ color: '#059669' }}>100%</div>
-            <div className="stat-sub">Zero Cloud Downtime Risk</div>
+            <div className="stat-value" style={{ color: fleetSyncRate !== null && fleetSyncRate < 100 ? '#B45309' : '#059669' }}>
+              {fleetSyncRate !== null ? `${fleetSyncRate}%` : '—'}
+            </div>
+            <div className="stat-sub">
+              {totalFleetDevices > 0 ? `${totalOnlineDevices} of ${totalFleetDevices} Terminals Online` : 'No Terminals Registered Yet'}
+            </div>
           </div>
         </Card>
       </div>
