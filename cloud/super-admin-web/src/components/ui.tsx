@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, AlertCircle } from 'lucide-react';
 import './ui.css';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -104,8 +104,8 @@ export function ErrorState({
 }) {
   return (
     <div className="empty-state" style={{ borderColor: 'rgba(239, 68, 68, 0.2)', background: '#fffcfc' }}>
-      <div className="empty-state-icon-box" style={{ background: '#fef2f2', color: '#dc2626', fontWeight: 800 }}>
-        !
+      <div className="empty-state-icon-box" style={{ background: '#fef2f2', color: '#dc2626' }}>
+        <AlertCircle className="w-6 h-6" />
       </div>
       <h3 style={{ color: '#991b1b' }}>Unable to load data</h3>
       <p style={{ color: '#7f1d1d' }}>{message}</p>

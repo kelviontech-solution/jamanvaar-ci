@@ -24,6 +24,7 @@
 
   --jv-bg: #faf8f5;
   --jv-bg-muted: #f4efe6;
+  --jv-ivory: #fbf9f5; /* == jaman-ivory, used for EmptyState icon-box background to match packages/ui */
   --jv-surface: #ffffff;
   --jv-surface-subtle: #fcfaf7;
   --jv-surface-card: #ffffff;

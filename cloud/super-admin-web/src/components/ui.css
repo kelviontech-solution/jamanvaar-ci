@@ -301,10 +301,10 @@
   color: var(--jv-text-muted);
 }
 .empty-state-icon-box {
-  width: 52px;
-  height: 52px;
-  border-radius: var(--jv-radius-lg);
-  background: var(--jv-bg-muted);
+  width: 64px;
+  height: 64px;
+  border-radius: var(--jv-radius-xl);
+  background: var(--jv-ivory);
   border: 1px solid var(--jv-border);
   display: flex;
   align-items: center;
@@ -315,7 +315,7 @@
 .empty-state h3 {
   margin: 0;
   color: var(--jv-primary);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
