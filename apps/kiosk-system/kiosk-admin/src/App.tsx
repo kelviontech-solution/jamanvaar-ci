@@ -58,7 +58,7 @@ import {
 import { DeviceHealthService, EBillService, KdsMeshService, NetworkStatusService, PaymentService, PrinterService, VoiceService } from '@jamanvaar/api';
 import { AdminChatbotEngine, MenuBuilderService, ReportGeneratorService } from '@jamanvaar/business';
 import { FOOD_IMAGE_LIBRARY, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
-import { SyncOutboxEngine } from '@jamanvaar/sync';
+import { SyncOutboxEngine, lanMeshSync } from '@jamanvaar/sync';
 import {
   connectDeviceStep1,
   connectDeviceStep2,
@@ -603,8 +603,8 @@ export default function AdminApp() {
               status: 'CONNECTED',
               mode: h.mode || '100% OFFLINE_ON_PREMISE',
               database: h.database || 'CONNECTED',
-              activeKiosks: onlineCount || 1,
-              totalKiosks: (h.kiosks || []).length || 1
+              activeKiosks: onlineCount,
+              totalKiosks: (h.kiosks || []).length
             });
           }
         })
@@ -621,6 +621,36 @@ export default function AdminApp() {
       clearInterval(interval);
     };
   }, [orderSoundEnabled]);
+
+  // Real Kiosk Terminal Fleet: join the LAN mesh and mirror actually-connected
+  // KIOSK_USER devices into db.kiosks, instead of the fixed fake fleet this
+  // screen used to show regardless of what devices were really activated
+  // (QA audit BUG-004).
+  useEffect(() => {
+    lanMeshSync.registerDevice('KIOSK_ADMIN', 'KIOSK-ADMIN-01', 'Kiosk Admin Console');
+
+    const syncFleetFromMesh = () => {
+      const kioskPeers = lanMeshSync.getConnectedPeers().filter((p) => p.role === 'KIOSK_USER');
+      kioskPeers.forEach((peer) =>
+        KioskRepository.upsertFromHeartbeat({
+          deviceId: peer.deviceId,
+          name: peer.name,
+          appVersion: peer.appVersion,
+          lastHeartbeat: peer.lastHeartbeat
+        })
+      );
+      KioskRepository.markStaleOffline(new Set(kioskPeers.map((p) => p.deviceId)));
+    };
+
+    syncFleetFromMesh();
+    const fleetInterval = setInterval(syncFleetFromMesh, 6000);
+    const unsubMesh = lanMeshSync.onAny(() => syncFleetFromMesh());
+
+    return () => {
+      clearInterval(fleetInterval);
+      unsubMesh();
+    };
+  }, []);
 
   // Keyboard Shortcuts (Ctrl + K, Ctrl + S, Escape) (Sections 199-200)
   useEffect(() => {
@@ -668,6 +698,18 @@ export default function AdminApp() {
   const serviceRequests = ServiceRequestRepository.getAll();
   const auditLogs = AuditRepository.getAll();
   const feedbacks = FeedbackRepository.getAll();
+  // Both KPI cards below used to be permanently hardcoded ("4.9 / 5.0",
+  // "98%") regardless of real feedback/order data — computed for real here.
+  const avgRating = feedbacks.length > 0 ? (feedbacks.reduce((sum, fb) => sum + fb.rating, 0) / feedbacks.length).toFixed(1) : null;
+  const ordersWithReadyTiming = orders.filter(
+    (o) => (o.orderStatus === 'READY' || o.orderStatus === 'SERVED' || o.orderStatus === 'COMPLETED') && o.timeline?.some((t) => t.status === 'READY')
+  );
+  const onTimeOrders = ordersWithReadyTiming.filter((o) => {
+    const readyEntry = o.timeline!.find((t) => t.status === 'READY')!;
+    const elapsedMin = (new Date(readyEntry.timestamp).getTime() - new Date(o.createdAt).getTime()) / 60000;
+    return elapsedMin <= (o.estimatedWaitMinutes || 15);
+  }).length;
+  const serviceSpeedScore = ordersWithReadyTiming.length > 0 ? Math.round((onTimeOrders / ordersWithReadyTiming.length) * 100) : null;
   const license = LicenseRepository.getLicense();
   const receiptRecords = ReceiptRepository.getAllRecords();
   const syncStats = SyncOutboxEngine.getSyncStats();
@@ -1562,7 +1604,7 @@ export default function AdminApp() {
           {/* Bottom Sidebar Footer */}
           <div className="pt-4 border-t border-[#EBE6DD] mt-4 text-center">
             <div className="flex items-center justify-center gap-1 text-[11px] font-bold text-[#0B253A]">
-              <span>JAMANVAAR POS</span>
+              <span>JAMANVAAR Kiosk Admin</span>
               <span className="text-[#E66817]">v1.0.0</span>
             </div>
             <p className="text-[10px] text-[#8C9BAE]">Kelviontech Systems</p>
@@ -1592,14 +1634,12 @@ export default function AdminApp() {
                   value={formatINR(todayRevenue)}
                   subtitle="Gross revenue"
                   icon={<TrendingUp className="w-5 h-5" />}
-                  trend={{ value: '14.2%', isPositive: true }}
                 />
                 <KpiCard
                   title="Orders"
                   value={todayOrders}
                   subtitle="Total tickets"
                   icon={<ShoppingBag className="w-5 h-5" />}
-                  trend={{ value: '8 orders', isPositive: true }}
                 />
                 <KpiCard
                   title="Avg. Order Value"
@@ -1756,6 +1796,11 @@ export default function AdminApp() {
                   <span className="text-xs text-[#8C9BAE] font-medium">Real-time Heartbeat</span>
                 </div>
 
+                {kiosks.length === 0 && (
+                  <div className="text-center py-8 text-sm text-[#8C9BAE]">
+                    No Kiosk terminals connected yet — a device appears here automatically once it's activated and joins this restaurant's network.
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {kiosks.map((k) => (
                     <div
@@ -1768,7 +1813,7 @@ export default function AdminApp() {
                           <StatusBadge status={k.status} type="kiosk" />
                         </div>
                         <p className="text-xs text-[#4A5568] mt-1">{k.locationDescription}</p>
-                        <p className="text-[10px] text-[#8C9BAE] font-mono mt-0.5">IP: {k.ipAddress} • v{k.appVersion}</p>
+                        <p className="text-[10px] text-[#8C9BAE] font-mono mt-0.5">v{k.appVersion}</p>
                       </div>
 
                       <div className="flex flex-col gap-1">
@@ -1776,6 +1821,11 @@ export default function AdminApp() {
                           onClick={() => {
                             const newStatus = k.status === 'ONLINE' ? 'MAINTENANCE' : 'ONLINE';
                             KioskRepository.updateKioskStatus(k.id, newStatus, newStatus === 'MAINTENANCE');
+                            lanMeshSync.broadcast('KIOSK_LOCKDOWN_COMMAND', {
+                              kioskId: k.id,
+                              isLocked: newStatus === 'MAINTENANCE',
+                              status: newStatus
+                            });
                             showToast(`${k.name} set to ${newStatus}`);
                           }}
                           className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white border border-[#EBE6DD] hover:bg-slate-50 text-[#0B253A]"
@@ -2280,60 +2330,6 @@ export default function AdminApp() {
                   >
                     <RefreshCw className="w-3.5 h-3.5 text-[#E66817]" />
                     <span>Sync ({orders.length})</span>
-                  </button>
-
-                  {/* Quick Sim Order */}
-                  <button
-                    onClick={() => {
-                      const sampleItem = menuItems[0] || { id: 'item-pt-1', name: 'Paneer Tikka (Tandoori)', price: 280, sku: 'PT-01' };
-                      const sampleItem2 = menuItems[1] || { id: 'item-bn', name: 'Butter Naan', price: 60, sku: 'BN-01' };
-                      const ord = OrderRepository.createOrder({
-                        kioskId: 'KIOSK-01',
-                        orderType: 'DINE_IN',
-                        tableNumber: String(Math.floor(1 + Math.random() * 12)),
-                        guestCount: 2,
-                        items: [
-                          {
-                            id: `it-${Date.now()}-1`,
-                            orderId: '',
-                            menuItemId: sampleItem.id,
-                            name: sampleItem.name,
-                            sku: sampleItem.sku,
-                            quantity: 2,
-                            unitPrice: sampleItem.price,
-                            modifiers: [],
-                            totalPrice: sampleItem.price * 2,
-                            kitchenStatus: 'PENDING'
-                          },
-                          {
-                            id: `it-${Date.now()}-2`,
-                            orderId: '',
-                            menuItemId: sampleItem2.id,
-                            name: sampleItem2.name,
-                            sku: sampleItem2.sku,
-                            quantity: 3,
-                            unitPrice: sampleItem2.price,
-                            modifiers: [],
-                            totalPrice: sampleItem2.price * 3,
-                            kitchenStatus: 'PENDING'
-                          }
-                        ],
-                        subtotal: sampleItem.price * 2 + sampleItem2.price * 3,
-                        cgstAmount: Math.round((sampleItem.price * 2 + sampleItem2.price * 3) * 0.025),
-                        sgstAmount: Math.round((sampleItem.price * 2 + sampleItem2.price * 3) * 0.025),
-                        taxAmount: Math.round((sampleItem.price * 2 + sampleItem2.price * 3) * 0.05),
-                        totalAmount: Math.round((sampleItem.price * 2 + sampleItem2.price * 3) * 1.05),
-                        paymentMethod: 'UPI_QR',
-                        paymentStatus: 'SUCCESS',
-                        orderStatus: 'NEW'
-                      });
-                      if (orderSoundEnabled) playOrderArrivalChime();
-                      setNewOrderArrivalAlert(ord);
-                      showToast(`⚡ Created live customer order #${ord.tokenNumber} (${ord.orderNumber})!`);
-                    }}
-                    className="px-3.5 py-2 rounded-xl bg-[#0B253A] hover:bg-[#163650] text-white text-xs font-bold shadow-md shadow-[#0B253A]/20 active:scale-95 transition-all flex items-center gap-1.5"
-                  >
-                    <span>⚡ Sim Kiosk Order</span>
                   </button>
 
                   {/* Open Customer Kiosk Link */}
@@ -2906,6 +2902,13 @@ export default function AdminApp() {
                 </p>
               </div>
 
+              {kiosks.length === 0 && (
+                <EmptyState
+                  title="No Kiosk Terminals Yet"
+                  description="A terminal appears here the moment it's activated with a real activation code and joins this restaurant's network — nothing is pre-populated."
+                />
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {kiosks.map((k) => (
                   <div key={k.id} className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
@@ -2932,8 +2935,10 @@ export default function AdminApp() {
                         <div className="font-semibold text-[#0B253A]">{k.idleTimeoutSeconds} seconds</div>
                       </div>
                       <div>
-                        <span className="text-[#8C9BAE]">IP Address:</span>
-                        <div className="font-semibold text-[#0B253A] font-mono">{k.ipAddress}</div>
+                        <span className="text-[#8C9BAE]">Last Seen:</span>
+                        <div className="font-semibold text-[#0B253A] font-mono">
+                          {k.lastHeartbeat ? formatTime(k.lastHeartbeat) : '—'}
+                        </div>
                       </div>
                       <div>
                         <span className="text-[#8C9BAE]">Version:</span>
@@ -2947,7 +2952,14 @@ export default function AdminApp() {
                         size="sm"
                         leftIcon={k.isLocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                         onClick={() => {
-                          KioskRepository.updateKioskStatus(k.id, k.isLocked ? 'ONLINE' : 'LOCKED', !k.isLocked);
+                          const nextLocked = !k.isLocked;
+                          const nextStatus = nextLocked ? 'LOCKED' : 'ONLINE';
+                          KioskRepository.updateKioskStatus(k.id, nextStatus, nextLocked);
+                          lanMeshSync.broadcast('KIOSK_LOCKDOWN_COMMAND', {
+                            kioskId: k.id,
+                            isLocked: nextLocked,
+                            status: nextStatus
+                          });
                           showToast(`${k.name} lock state toggled!`);
                         }}
                       >
@@ -2958,10 +2970,13 @@ export default function AdminApp() {
                         variant="secondary"
                         size="sm"
                         onClick={() => {
-                          KioskRepository.updateKioskStatus(
-                            k.id,
-                            k.status === 'MAINTENANCE' ? 'ONLINE' : 'MAINTENANCE'
-                          );
+                          const nextStatus = k.status === 'MAINTENANCE' ? 'ONLINE' : 'MAINTENANCE';
+                          KioskRepository.updateKioskStatus(k.id, nextStatus);
+                          lanMeshSync.broadcast('KIOSK_LOCKDOWN_COMMAND', {
+                            kioskId: k.id,
+                            isLocked: nextStatus === 'MAINTENANCE',
+                            status: nextStatus
+                          });
                           showToast(`${k.name} maintenance status toggled!`);
                         }}
                       >
@@ -3393,43 +3408,55 @@ export default function AdminApp() {
                   </div>
                 </div>
 
-                {/* Payment Gateway Card */}
+                {/* Payment Gateway Card — was a fully fictional VPA/terminal
+                    card (a fake UPI VPA, a made-up "PineLabs / Mosambee
+                    Native HAL" protocol, and a "self-test" button that only
+                    played a success sound) with no backing data model at
+                    all. The real connection — actually wired to
+                    cloud/api, managed in Settings — is summarized here instead. */}
                 <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-sm space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-2xl bg-[#FBF9F5] border border-[#EBE6DD] flex items-center justify-center text-[#E66817]">
                       <QrCode className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-[#0B253A]">Payment Terminal Gateway</h3>
-                      <p className="text-xs text-[#4A5568]">UPI Dynamic QR & Card POS Integration</p>
+                      <h3 className="text-lg font-bold text-[#0B253A]">Payment Gateway Connection</h3>
+                      <p className="text-xs text-[#4A5568]">Cashfree settlement account for kiosk payments</p>
                     </div>
                   </div>
 
-                  <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD] text-xs space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-[#8C9BAE]">UPI VPA:</span>
-                      <span className="font-bold text-[#0B253A] font-mono">jamanvaar@icici</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#8C9BAE]">Card POS Protocol:</span>
-                      <span className="font-bold text-[#0B253A]">PineLabs / Mosambee Native HAL</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#8C9BAE]">Idempotency:</span>
-                      <span className="font-bold text-emerald-600">STRICT UUIDv4 ENFORCED</span>
-                    </div>
+                  <div className="p-4 bg-[#FBF9F5] rounded-xl border border-[#EBE6DD] text-xs">
+                    {paymentConnectionLoading ? (
+                      <span className="text-[#8C9BAE]">Loading connection status…</span>
+                    ) : paymentConnection ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-[#8C9BAE]">Status:</span>
+                        <span
+                          className={`font-bold px-2.5 py-1 rounded-full ${
+                            paymentConnection.status === 'ACTIVE'
+                              ? 'bg-green-100 text-green-700'
+                              : paymentConnection.status === 'PENDING_VERIFICATION'
+                                ? 'bg-amber-100 text-amber-700'
+                                : paymentConnection.status === 'SUSPENDED' || paymentConnection.status === 'DISCONNECTED'
+                                  ? 'bg-rose-100 text-rose-700'
+                                  : 'bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          {paymentConnection.status.replace('_', ' ')}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-[#8C9BAE]">Not connected yet — set up in Settings → Payment Gateway.</span>
+                    )}
                   </div>
 
                   <Button
                     variant="primary"
                     size="sm"
                     className="w-full"
-                    onClick={() => {
-                      SoundService.playSuccess();
-                      showToast('Payment Terminal Self-Test PASSED (Zero Latency)');
-                    }}
+                    onClick={() => setActiveTab('SETTINGS')}
                   >
-                    Run Payment Terminal Test
+                    Manage in Settings
                   </Button>
                 </div>
               </div>
@@ -3524,14 +3551,14 @@ export default function AdminApp() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <KpiCard
                   title="Average Rating"
-                  value="4.9 / 5.0"
+                  value={avgRating !== null ? `${avgRating} / 5.0` : 'No ratings yet'}
                   subtitle="Based on kiosk submissions"
                   icon={<Star className="w-5 h-5 text-amber-500 fill-amber-500" />}
                 />
                 <KpiCard
                   title="Service Speed Score"
-                  value="98%"
-                  subtitle="Orders ready on target"
+                  value={serviceSpeedScore !== null ? `${serviceSpeedScore}%` : 'No data yet'}
+                  subtitle="Orders ready within estimate"
                   icon={<Clock className="w-5 h-5" />}
                 />
                 <KpiCard
