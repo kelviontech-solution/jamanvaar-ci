@@ -69,6 +69,7 @@ export const PosHeader: React.FC = () => {
   const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
   const [isBusinessDayPanelOpen, setIsBusinessDayPanelOpen] = useState(false);
   const [isCloseDayModalOpen, setIsCloseDayModalOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // Refs for click outside handling
   const profileRef = useRef<HTMLDivElement>(null);
@@ -417,6 +418,36 @@ export const PosHeader: React.FC = () => {
             </span>
           )}
         </button>
+
+        {/* Quick Help — the icon this button uses sat imported but unused
+            for a while; this is a real touch-only orientation popover for a
+            new cashier, not keyboard shortcuts (POS is touch-first and
+            tests/pos_touch_first_no_shortcuts_ui.test.ts enforces that no
+            shortcut hints appear anywhere in this file). */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setIsHelpOpen((v) => !v)}
+            className="w-8 h-8 rounded-xl bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer shrink-0"
+            title="Quick Help"
+          >
+            <HelpCircle className="w-4 h-4" />
+          </button>
+          {isHelpOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setIsHelpOpen(false)} />
+              <div className="absolute right-0 mt-2 w-72 bg-white border border-jaman-border rounded-2xl shadow-xl p-4 z-50 text-xs text-jaman-navy space-y-2.5">
+                <h3 className="font-black text-sm text-jaman-navy">Quick Help</h3>
+                <ul className="space-y-2 text-[#4A5568]">
+                  <li>• Tap a dish to add it. Dishes with options show a <strong>Customize</strong> button first.</li>
+                  <li>• <strong>Hold Order</strong> parks a bill — find it again from the <strong>Held Carts</strong> indicator in the sidebar.</li>
+                  <li>• <strong>Send KOT</strong> fires the ticket to the kitchen. <strong>Instant Bill</strong> skips that for quick takeaway sales.</li>
+                  <li>• Use the search bar above to jump straight to a table, bill, or customer.</li>
+                </ul>
+              </div>
+            </>
+          )}
+        </div>
 
         {/* JAMAN AI Button — hidden when this restaurant has opted out via
             Restaurant Admin's "Show JAMAN AI Assistant" setting. Previously
