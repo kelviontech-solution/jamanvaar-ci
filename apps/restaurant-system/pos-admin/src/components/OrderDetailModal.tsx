@@ -96,11 +96,11 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title={`Order #${order.orderNumber}`} maxWidth="2xl">
       <div className="space-y-5 py-1">
         {/* Header Summary Banner */}
-        <div className="p-4 bg-[#0B253A] text-white rounded-2xl flex flex-wrap items-center justify-between gap-3">
+        <div className="p-4 bg-jaman-navy text-white rounded-2xl flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-black font-mono">{order.orderNumber}</span>
-              <span className="bg-[#E66817] text-white font-black text-xs px-2.5 py-0.5 rounded-full">
+              <span className="bg-jaman-saffron text-white font-black text-xs px-2.5 py-0.5 rounded-full">
                 TOKEN #{order.tokenNumber}
               </span>
             </div>
@@ -122,20 +122,20 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
         {/* Customer & Staff Information */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          <div className="p-3 bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl space-y-1">
+          <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-xl space-y-1">
             <span className="text-slate-400 font-bold block text-[10px] uppercase">GUEST INFORMATION</span>
-            <div className="font-bold text-[#0B253A] flex items-center justify-between">
+            <div className="font-bold text-jaman-navy flex items-center justify-between">
               <span>{order.customerName || 'Walk-in Guest'}</span>
               {order.customerPhone && <span className="font-mono text-slate-600 font-normal">{order.customerPhone}</span>}
             </div>
             {order.tableNumber && (
-              <span className="text-[11px] text-[#E66817] font-bold block">
+              <span className="text-[11px] text-jaman-saffron font-bold block">
                 Table #{order.tableNumber} ({order.guestCount || 4} Guests)
               </span>
             )}
           </div>
 
-          <div className="p-3 bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl space-y-1">
+          <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-xl space-y-1">
             <span className="text-slate-400 font-bold block text-[10px] uppercase">SERVICE STAFF</span>
             <div className="text-slate-700 font-bold flex items-center justify-between">
               <span>Cashier: <strong>{order.cashierName || 'Amit Dave'}</strong></span>
@@ -150,11 +150,11 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
         {/* Items List */}
         <div className="space-y-2">
           <h4 className="font-bold text-xs text-slate-500 uppercase tracking-wider">Ordered Items ({order.items.length})</h4>
-          <div className="border border-[#EBE6DD] rounded-2xl overflow-hidden divide-y divide-slate-100 text-xs">
+          <div className="border border-jaman-border rounded-2xl overflow-hidden divide-y divide-slate-100 text-xs">
             {order.items.map((it, idx) => (
               <div key={idx} className="p-3 bg-white flex items-center justify-between">
                 <div>
-                  <span className="font-bold text-[#0B253A]">{it.quantity}x {it.name}</span>
+                  <span className="font-bold text-jaman-navy">{it.quantity}x {it.name}</span>
                   {it.modifiers && it.modifiers.length > 0 && (
                     <span className="text-[11px] text-slate-400 block">
                       + {it.modifiers.map((m: any) => m.optionName || m.name).join(', ')}
@@ -166,7 +166,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                     </span>
                   )}
                 </div>
-                <span className="font-mono font-bold text-[#0B253A]">{formatINR(it.totalPrice)}</span>
+                <span className="font-mono font-bold text-jaman-navy">{formatINR(it.totalPrice)}</span>
               </div>
             ))}
           </div>
@@ -174,7 +174,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
         {/* Financial Breakup & Split Payment Allocation */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          <div className="p-4 bg-[#FBF9F5] border border-[#EBE6DD] rounded-2xl space-y-1.5">
+          <div className="p-4 bg-jaman-ivory border border-jaman-border rounded-2xl space-y-1.5">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">BILL BREAKUP</span>
             <div className="flex justify-between text-slate-600">
               <span>Subtotal</span>
@@ -201,13 +201,13 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               <span>SGST (2.5%)</span>
               <span className="font-mono">{formatINR(order.sgstAmount || 0)}</span>
             </div>
-            <div className="pt-2 border-t border-slate-200 flex justify-between font-black text-sm text-[#0B253A]">
+            <div className="pt-2 border-t border-slate-200 flex justify-between font-black text-sm text-jaman-navy">
               <span>Total Payable</span>
               <span className="font-mono text-emerald-700">{formatINR(order.totalAmount)}</span>
             </div>
           </div>
 
-          <div className="p-4 bg-[#FBF9F5] border border-[#EBE6DD] rounded-2xl space-y-2">
+          <div className="p-4 bg-jaman-ivory border border-jaman-border rounded-2xl space-y-2">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">PAYMENT SETTLEMENT</span>
             <div className="space-y-1 text-xs">
               <div className="flex items-center justify-between font-bold">
@@ -236,9 +236,9 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
         </div>
 
         {/* Order Service Timeline */}
-        <div className="p-4 bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl space-y-2.5">
-          <span className="text-xs font-black uppercase tracking-wider text-[#0B253A] flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-[#E66817]" />
+        <div className="p-4 bg-jaman-cream border border-jaman-border rounded-2xl space-y-2.5">
+          <span className="text-xs font-black uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-jaman-saffron" />
             <span>ORDER SERVICE TIMELINE</span>
           </span>
 
@@ -249,7 +249,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </div>
               <div className="flex-1 flex items-center justify-between">
                 <div>
-                  <strong className="text-[#0B253A] block">Order Created ({order.orderType})</strong>
+                  <strong className="text-jaman-navy block">Order Created ({order.orderType})</strong>
                   <span className="text-[10px] text-slate-400">Token #{order.tokenNumber} initialized</span>
                 </div>
                 <span className="font-mono text-slate-500 font-bold">{formatTime(order.createdAt)}</span>
@@ -257,12 +257,12 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             </div>
 
             <div className="flex items-start gap-3 relative pl-6">
-              <div className="w-4 h-4 rounded-full bg-[#E66817] text-white flex items-center justify-center font-bold text-[8px] absolute left-0 top-0.5">
+              <div className="w-4 h-4 rounded-full bg-jaman-saffron text-white flex items-center justify-center font-bold text-[8px] absolute left-0 top-0.5">
                 ✓
               </div>
               <div className="flex-1 flex items-center justify-between">
                 <div>
-                  <strong className="text-[#0B253A] block">KOT Dispatched to Kitchen Stations</strong>
+                  <strong className="text-jaman-navy block">KOT Dispatched to Kitchen Stations</strong>
                   <span className="text-[10px] text-slate-400">Tandoor & Main Kitchen active</span>
                 </div>
                 <span className="font-mono text-slate-500 font-bold">
@@ -277,7 +277,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </div>
               <div className="flex-1 flex items-center justify-between">
                 <div>
-                  <strong className="text-[#0B253A] block">Payment Received & Bill Settled</strong>
+                  <strong className="text-jaman-navy block">Payment Received & Bill Settled</strong>
                   <span className="text-[10px] text-slate-400">{order.paymentMethod} verified</span>
                 </div>
                 <span className="font-mono text-slate-500 font-bold">{formatTime(order.createdAt)}</span>
@@ -297,7 +297,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 onClick={() => handleAdvanceStatus(st)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   order.orderStatus === st
-                    ? 'bg-[#0B253A] text-white shadow-xs'
+                    ? 'bg-jaman-navy text-white shadow-xs'
                     : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 disabled:opacity-40'
                 }`}
               >
@@ -396,7 +396,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </Button>
               <button
                 onClick={handlePrint}
-                className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-xs"
+                className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-xs"
               >
                 <Printer className="w-4 h-4" />
                 <span>Reprint Receipt</span>

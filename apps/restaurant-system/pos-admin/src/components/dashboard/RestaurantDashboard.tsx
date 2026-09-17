@@ -102,11 +102,11 @@ export const RestaurantDashboard: React.FC<RestaurantDashboardProps> = ({
       {summary.ordersCount === 0 && (
         <div className="bg-white border border-[#E6DEC9] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#FFF4ED] text-[#E66817] flex items-center justify-center shrink-0 border border-[#FDBA74]/40">
+            <div className="w-10 h-10 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center shrink-0 border border-[#FDBA74]/40">
               <span className="text-lg">☀️</span>
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-black text-[#0B253A]">No sales recorded yet for {dateRange.label.toLowerCase()}</h4>
+              <h4 className="text-xs sm:text-sm font-black text-jaman-navy">No sales recorded yet for {dateRange.label.toLowerCase()}</h4>
               <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
                 Your live revenue velocity curve, top ranking dishes, and collections will automatically populate here as orders are placed at POS terminals, captain handhelds, or table QR codes.
               </p>
@@ -115,7 +115,7 @@ export const RestaurantDashboard: React.FC<RestaurantDashboardProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('TABLES')}
-            className="self-start sm:self-auto shrink-0 px-3.5 py-1.5 rounded-xl bg-[#0B253A] text-white text-xs font-bold hover:bg-[#1E3A4C] transition-all shadow-2xs cursor-pointer"
+            className="self-start sm:self-auto shrink-0 px-3.5 py-1.5 rounded-xl bg-jaman-navy text-white text-xs font-bold hover:bg-jaman-darkBorder transition-all shadow-2xs cursor-pointer"
           >
             Check Dining Floor →
           </button>

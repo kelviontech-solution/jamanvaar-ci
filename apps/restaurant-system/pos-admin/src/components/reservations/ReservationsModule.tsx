@@ -93,8 +93,8 @@ export const ReservationsModule: React.FC<ReservationsModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">Table Reservations</h1>
-            <span className="bg-orange-50 text-[#E66817] font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-orange-200/70">
+            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">Table Reservations</h1>
+            <span className="bg-orange-50 text-jaman-saffron font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-orange-200/70">
               {todayCount} TODAY
             </span>
           </div>
@@ -105,7 +105,7 @@ export const ReservationsModule: React.FC<ReservationsModuleProps> = ({
             setReservationToEdit(null);
             setIsModalOpen(true);
           }}
-          className="px-3.5 py-2 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
+          className="px-3.5 py-2 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>New Reservation</span>
@@ -114,47 +114,47 @@ export const ReservationsModule: React.FC<ReservationsModuleProps> = ({
 
       {/* KPI strip */}
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Today's Bookings</span>
-          <div className="text-2xl font-black text-[#0B253A] font-mono">{todayCount}</div>
+          <div className="text-2xl font-black text-jaman-navy font-mono">{todayCount}</div>
         </div>
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Upcoming Confirmed</span>
           <div className="text-2xl font-black text-blue-700 font-mono">{upcomingCount}</div>
         </div>
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">No-Shows (All Time)</span>
           <div className="text-2xl font-black text-rose-700 font-mono">{noShowCount}</div>
         </div>
       </div>
 
       {/* Date selector + list */}
-      <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-2xs">
-        <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-2xs">
+        <div className="p-4 bg-jaman-cream border-b border-jaman-border flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <CalendarClock className="w-4 h-4 text-[#E66817]" />
-            <span className="font-extrabold text-sm text-[#0B253A]">Bookings for</span>
+            <CalendarClock className="w-4 h-4 text-jaman-saffron" />
+            <span className="font-extrabold text-sm text-jaman-navy">Bookings for</span>
           </div>
           <input
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+            className="bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
           />
         </div>
 
         {dayReservations.length === 0 ? (
           <div className="py-14 text-center px-4 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-[#E66817] flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-jaman-saffron flex items-center justify-center mx-auto">
               <CalendarClock className="w-6 h-6" />
             </div>
-            <h4 className="font-extrabold text-[#0B253A] text-sm">No Reservations This Day</h4>
+            <h4 className="font-extrabold text-jaman-navy text-sm">No Reservations This Day</h4>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
               Bookings for {new Date(selectedDate).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })} will appear here as they're taken.
             </p>
             <button
               onClick={() => { setReservationToEdit(null); setIsModalOpen(true); }}
-              className="px-4 py-2 bg-[#E66817] text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
+              className="px-4 py-2 bg-jaman-saffron text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
             >
               + Take a Reservation
             </button>
@@ -166,13 +166,13 @@ export const ReservationsModule: React.FC<ReservationsModuleProps> = ({
               return (
                 <div key={res.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:bg-[#FDFBF7] transition-colors">
                   <div className="w-16 shrink-0 text-center">
-                    <div className="font-mono font-black text-sm text-[#0B253A]">
+                    <div className="font-mono font-black text-sm text-jaman-navy">
                       {new Date(res.reservationTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-extrabold text-sm text-[#0B253A]">{res.customerName}</span>
+                      <span className="font-extrabold text-sm text-jaman-navy">{res.customerName}</span>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${meta.className}`}>{meta.label}</span>
                     </div>
                     <div className="flex items-center gap-3 text-[11px] text-slate-500 mt-0.5 flex-wrap">

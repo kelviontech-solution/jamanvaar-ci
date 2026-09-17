@@ -91,7 +91,7 @@ export const TableModal: React.FC<TableModalProps> = ({
               value={tableNumber}
               onChange={(e) => setTableNumber(e.target.value)}
               placeholder="e.g. 15"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
           <div>
@@ -103,7 +103,7 @@ export const TableModal: React.FC<TableModalProps> = ({
               required
               value={capacity}
               onChange={(e) => setCapacity(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
         </div>
@@ -114,7 +114,7 @@ export const TableModal: React.FC<TableModalProps> = ({
             <select
               value={zone}
               onChange={(e) => setZone(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             >
               <option value="Main Dining Hall">Main Dining Hall</option>
               <option value="AC Family Section">AC Family Section</option>
@@ -127,7 +127,7 @@ export const TableModal: React.FC<TableModalProps> = ({
             <select
               value={floor}
               onChange={(e) => setFloor(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             >
               <option value="1">Floor 1 (Ground)</option>
               <option value="2">Floor 2 (First)</option>
@@ -141,7 +141,7 @@ export const TableModal: React.FC<TableModalProps> = ({
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as TableStatus)}
-            className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
           >
             <option value="AVAILABLE">🟢 AVAILABLE (Vacant)</option>
             <option value="OCCUPIED">🟠 OCCUPIED (Seated)</option>
@@ -162,7 +162,7 @@ export const TableModal: React.FC<TableModalProps> = ({
           </Button>
           <button
             type="submit"
-            className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
           >
             {tableToEdit ? 'Save Changes' : 'Create Table'}
           </button>

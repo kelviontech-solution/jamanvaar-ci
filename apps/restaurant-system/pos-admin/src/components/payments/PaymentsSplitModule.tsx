@@ -40,7 +40,7 @@ export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
               Payments & Split Tenders Ledger
             </h1>
             <span className="bg-emerald-50 text-emerald-800 font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-emerald-200/70">
@@ -55,15 +55,15 @@ export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
 
       {/* 4 Financial Tender Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-black uppercase text-slate-500 block">TOTAL COLLECTIONS</span>
-          <div className="text-2xl font-black text-[#0B253A] font-mono">
+          <div className="text-2xl font-black text-jaman-navy font-mono">
             {formatINR(dashPeriodReport.summary.netSales)}
           </div>
           <span className="text-[10px] text-slate-500 font-bold block">All Payment Modes Combined</span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-black uppercase text-slate-500 block">CASH IN DRAWER</span>
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -79,7 +79,7 @@ export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
           </span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-black uppercase text-slate-500 block">UPI / BHARAT QR</span>
             <span className="w-2 h-2 rounded-full bg-blue-500"></span>
@@ -95,7 +95,7 @@ export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
           </span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-black uppercase text-slate-500 block">CARD SWIPE EDC</span>
             <span className="w-2 h-2 rounded-full bg-purple-500"></span>
@@ -108,10 +108,10 @@ export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
       </div>
 
       {/* Split Payment Operational Feature Card */}
-      <div className="p-5 bg-gradient-to-r from-[#0B253A] to-[#173A56] rounded-3xl text-white shadow-md space-y-3">
+      <div className="p-5 bg-gradient-to-r from-jaman-navy to-[#173A56] rounded-3xl text-white shadow-md space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-[#E66817] flex items-center justify-center text-white shadow-sm">
+            <div className="w-9 h-9 rounded-2xl bg-jaman-saffron flex items-center justify-center text-white shadow-sm">
               <CreditCard className="w-5 h-5" />
             </div>
             <div>
@@ -147,16 +147,16 @@ export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
       </div>
 
       {/* Transactions Ledger Table */}
-      <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-xs">
-        <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex items-center justify-between">
-          <span className="font-black text-xs sm:text-sm text-[#0B253A]">
+      <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-xs">
+        <div className="p-4 bg-jaman-cream border-b border-jaman-border flex items-center justify-between">
+          <span className="font-black text-xs sm:text-sm text-jaman-navy">
             Completed Payment Transactions ({settledOrders.length})
           </span>
           <span className="text-xs text-slate-400 font-semibold">Real-Time Sync</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-slate-500 uppercase font-black text-[11px] tracking-wider">
+            <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-black text-[11px] tracking-wider">
               <tr>
                 <th className="p-4">Order / Invoice</th>
                 <th className="p-4">Table / Type</th>
@@ -170,7 +170,7 @@ export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
             <tbody className="divide-y divide-slate-100 font-medium">
               {settledOrders.map((ord: Order) => (
                 <tr key={ord.id} className="hover:bg-[#FDFBF7] transition-colors">
-                  <td className="p-4 font-mono font-black text-sm text-[#0B253A]">
+                  <td className="p-4 font-mono font-black text-sm text-jaman-navy">
                     #{ord.orderNumber}
                     <span className="text-[10px] text-slate-400 block font-normal">Token: {ord.tokenNumber}</span>
                   </td>
@@ -208,7 +208,7 @@ export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
                   <td className="p-4 text-right">
                     <button
                       onClick={() => onSelectOrderDetail(ord)}
-                      className="px-3 py-1.5 bg-[#FAF7F2] hover:bg-slate-100 text-[#0B253A] border border-[#EBE6DD] font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                      className="px-3 py-1.5 bg-jaman-cream hover:bg-slate-100 text-jaman-navy border border-jaman-border font-bold rounded-xl text-xs transition-colors cursor-pointer"
                     >
                       View Bill →
                     </button>

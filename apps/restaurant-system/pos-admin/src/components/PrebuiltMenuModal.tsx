@@ -94,7 +94,7 @@ export const PrebuiltMenuModal: React.FC<PrebuiltMenuModalProps> = ({
           </p>
           <button
             onClick={handleSelectAll}
-            className="text-xs font-bold text-[#E66817] hover:underline"
+            className="text-xs font-bold text-jaman-saffron hover:underline"
           >
             {selectedTemplateIds.length === PREBUILT_MENU_TEMPLATES.length ? 'Deselect All' : `Select All ${PREBUILT_MENU_TEMPLATES.length}`}
           </button>
@@ -109,13 +109,13 @@ export const PrebuiltMenuModal: React.FC<PrebuiltMenuModalProps> = ({
                 onClick={() => handleToggleTemplate(tpl.id)}
                 className={`p-3 rounded-2xl border-2 cursor-pointer transition-all ${
                   isSelected
-                    ? 'border-[#E66817] bg-[#FFF4ED]'
+                    ? 'border-jaman-saffron bg-[#FFF4ED]'
                     : 'border-slate-200 bg-white hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-xs text-[#0B253A] block">{tpl.name}</span>
-                  {isSelected && <span className="text-xs text-[#E66817] font-black">✓</span>}
+                  <span className="font-extrabold text-xs text-jaman-navy block">{tpl.name}</span>
+                  {isSelected && <span className="text-xs text-jaman-saffron font-black">✓</span>}
                 </div>
                 <span className="text-[10px] text-slate-400 block mt-0.5">
                   {tpl.approxItemCount || 20} dishes • {tpl.cuisine}
@@ -157,7 +157,7 @@ export const PrebuiltMenuModal: React.FC<PrebuiltMenuModalProps> = ({
           <button
             disabled={selectedTemplateIds.length === 0}
             onClick={handleImport}
-            className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] disabled:opacity-40 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-40 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
           >
             Import Selected ({selectedTemplateIds.length} Cuisines)
           </button>

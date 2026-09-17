@@ -183,7 +183,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Paneer Butter Masala"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             />
           </div>
           <div>
@@ -195,7 +195,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="e.g. 260"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
         </div>
@@ -209,7 +209,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
               value={sku}
               onChange={(e) => setSku(e.target.value)}
               placeholder="e.g. PBM-01"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
           <div>
@@ -217,7 +217,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             >
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -233,7 +233,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
             <select
               value={kitchenStation}
               onChange={(e) => setKitchenStation(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             >
               <option value="Main Kitchen">Main Kitchen</option>
               <option value="Tandoor Section">Tandoor Section</option>
@@ -247,7 +247,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
             <select
               value={dietaryType}
               onChange={(e) => setDietaryType(e.target.value as DietaryType)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             >
               <option value="VEG">🟢 Veg</option>
               <option value="JAIN">🟡 Jain</option>
@@ -260,7 +260,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
             <select
               value={spiceLevel}
               onChange={(e) => setSpiceLevel(e.target.value as SpiceLevel)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             >
               <option value="NONE">Mild / Non-Spicy</option>
               <option value="MILD">Mild</option>
@@ -279,15 +279,15 @@ export const ItemModal: React.FC<ItemModalProps> = ({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="e.g. Rich tomato cashew gravy with cottage cheese cubes & aromatic spices"
-            className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#E66817]"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-jaman-saffron"
           />
         </div>
 
         {/* Customization & Modifier Groups Selector */}
-        <div className="p-3 bg-[#FBF9F5] border border-[#EBE6DD] rounded-2xl space-y-2">
+        <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-2xl space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5 text-[#E66817]" />
+              <Sliders className="w-3.5 h-3.5 text-jaman-saffron" />
               <span>Customization & Modifier Groups</span>
             </span>
             <span className="text-[10px] font-bold text-slate-400 bg-white px-2 py-0.5 rounded-full border border-slate-200">
@@ -311,8 +311,8 @@ export const ItemModal: React.FC<ItemModalProps> = ({
                   }}
                   className={`p-2.5 rounded-xl border transition-all flex items-center justify-between cursor-pointer ${
                     isChecked
-                      ? 'bg-[#FFF7ED] border-[#E66817] shadow-2xs'
-                      : 'bg-white border-[#EBE6DD] hover:border-slate-300'
+                      ? 'bg-[#FFF7ED] border-jaman-saffron shadow-2xs'
+                      : 'bg-white border-jaman-border hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
@@ -320,11 +320,11 @@ export const ItemModal: React.FC<ItemModalProps> = ({
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => {}}
-                      className="w-4 h-4 rounded text-[#E66817] focus:ring-[#E66817] cursor-pointer"
+                      className="w-4 h-4 rounded text-jaman-saffron focus:ring-jaman-saffron cursor-pointer"
                     />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-xs text-[#0B253A] truncate">{group.name}</span>
+                        <span className="font-bold text-xs text-jaman-navy truncate">{group.name}</span>
                         {group.isRequired && (
                           <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-rose-50 text-rose-600 border border-rose-200">
                             Required
@@ -337,7 +337,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
                     </div>
                   </div>
                   <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
-                    isChecked ? 'bg-[#E66817] text-white' : 'bg-slate-100 text-slate-500'
+                    isChecked ? 'bg-jaman-saffron text-white' : 'bg-slate-100 text-slate-500'
                   }`}>
                     {isChecked ? '✓ Active' : '+ Add'}
                   </span>
@@ -348,13 +348,13 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         </div>
 
         {/* Image Preview & Upload */}
-        <div className="p-3 bg-[#FBF9F5] border border-[#EBE6DD] rounded-2xl space-y-2">
+        <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-2xl space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-600">Photo & Visual Asset</span>
             <button
               type="button"
               onClick={() => setIsLibraryOpen(!isLibraryOpen)}
-              className="text-xs font-bold text-[#E66817] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-jaman-saffron hover:underline flex items-center gap-1"
             >
               <ImageIcon className="w-3.5 h-3.5" />
               <span>{isLibraryOpen ? 'Close Library' : 'Pick from Image Library'}</span>
@@ -378,14 +378,14 @@ export const ItemModal: React.FC<ItemModalProps> = ({
                   const f = e.target.files?.[0];
                   if (f) handleDeviceImageUpload(f);
                 }}
-                className="text-xs text-slate-600 file:mr-2 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0B253A] file:text-white"
+                className="text-xs text-slate-600 file:mr-2 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-jaman-navy file:text-white"
               />
               <input
                 type="text"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="Or paste direct image URL..."
-                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-2.5 py-1 text-[11px] font-mono"
+                className="w-full bg-white border border-jaman-border rounded-xl px-2.5 py-1 text-[11px] font-mono"
               />
             </div>
           </div>
@@ -403,7 +403,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
                     setImageUrl(libImg.url);
                     setIsLibraryOpen(false);
                   }}
-                  className="w-full h-12 rounded-lg object-cover cursor-pointer hover:ring-2 hover:ring-[#E66817] transition-all"
+                  className="w-full h-12 rounded-lg object-cover cursor-pointer hover:ring-2 hover:ring-jaman-saffron transition-all"
                 />
               ))}
             </div>
@@ -445,7 +445,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
           </Button>
           <button
             type="submit"
-            className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
           >
             {itemToEdit ? 'Save Changes' : 'Create Dish'}
           </button>

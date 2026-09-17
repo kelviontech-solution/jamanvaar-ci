@@ -75,11 +75,11 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           <div className="flex items-center gap-2 min-w-0">
             <span
               title={restaurantName || 'JAMANVAAR RESTAURANT'}
-              className="text-xs sm:text-[13px] font-extrabold text-[#0B253A] tracking-tight truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px]"
+              className="text-xs sm:text-[13px] font-extrabold text-jaman-navy tracking-tight truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px]"
             >
               {restaurantName || 'JAMANVAAR RESTAURANT'}
             </span>
-            <span className="shrink-0 px-1.5 py-0.5 rounded-md text-[9px] font-mono font-bold tracking-wider uppercase bg-[#0B253A]/[0.05] text-[#0B253A] border border-[#0B253A]/15 shadow-2xs">
+            <span className="shrink-0 px-1.5 py-0.5 rounded-md text-[9px] font-mono font-bold tracking-wider uppercase bg-jaman-navy/[0.05] text-jaman-navy border border-jaman-navy/15 shadow-2xs">
               ADMIN
             </span>
           </div>
@@ -88,7 +88,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
               type="button"
               onClick={onOpenBranchDirectory}
               title="View all branches for this restaurant"
-              className="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-slate-500 hover:text-[#E66817] truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px] leading-tight mt-0.5 cursor-pointer transition-colors"
+              className="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-slate-500 hover:text-jaman-saffron truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px] leading-tight mt-0.5 cursor-pointer transition-colors"
             >
               <Building2 className="w-3 h-3 shrink-0" />
               <span className="truncate">{outletName || 'Ahmedabad Flagship Store'}</span>
@@ -119,15 +119,15 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           }}
           aria-label="Open global search"
         >
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-hover:text-[#E66817] transition-colors" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-hover:text-jaman-saffron transition-colors" />
           <input
             type="text"
             readOnly
             placeholder="Search orders, invoices, dishes, tables..."
             value={globalSearch}
-            className="w-full h-10 bg-white/90 hover:bg-white border border-[#EBE6DD] group-hover:border-[#D8D1C3] focus:border-[#E66817] focus:bg-white rounded-xl pl-10 pr-14 text-xs font-medium text-[#0B253A] placeholder:text-slate-400 focus:outline-none cursor-pointer transition-all shadow-2xs"
+            className="w-full h-10 bg-white/90 hover:bg-white border border-jaman-border group-hover:border-[#D8D1C3] focus:border-jaman-saffron focus:bg-white rounded-xl pl-10 pr-14 text-xs font-medium text-jaman-navy placeholder:text-slate-400 focus:outline-none cursor-pointer transition-all shadow-2xs"
           />
-          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400 border border-[#EBE6DD] bg-[#FAF8F5] px-1.5 py-0.5 rounded shadow-2xs pointer-events-none">
+          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400 border border-jaman-border bg-[#FAF8F5] px-1.5 py-0.5 rounded shadow-2xs pointer-events-none">
             Ctrl+K
           </kbd>
         </div>
@@ -139,7 +139,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         <button
           type="button"
           onClick={onOpenGlobalSearch}
-          className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white hover:bg-[#FAF8F5] text-slate-600 border border-[#EBE6DD] transition-colors shadow-2xs cursor-pointer"
+          className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white hover:bg-[#FAF8F5] text-slate-600 border border-jaman-border transition-colors shadow-2xs cursor-pointer"
           title="Global Search"
           aria-label="Open search"
         >
@@ -147,7 +147,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         </button>
 
         {/* 3A. Consolidated Operational Context Block */}
-        <div className="hidden xl:flex items-center gap-2.5 bg-white border border-[#EBE6DD] px-3.5 py-1.5 rounded-xl text-xs select-none h-10 shadow-2xs">
+        <div className="hidden xl:flex items-center gap-2.5 bg-white border border-jaman-border px-3.5 py-1.5 rounded-xl text-xs select-none h-10 shadow-2xs">
           {/* Status Dot + Terminal */}
           <div className="flex items-center gap-1.5 font-bold text-emerald-800 text-[11px] tracking-wide shrink-0">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -167,7 +167,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           <span className="w-px h-4 bg-[#E2D9C8]" aria-hidden="true" />
 
           {/* Opening Float */}
-          <span className="text-[#0B253A] font-mono font-bold text-[11px] shrink-0">
+          <span className="text-jaman-navy font-mono font-bold text-[11px] shrink-0">
             Float: {formatINR(activeShift?.openingCash || 2000)}
           </span>
         </div>
@@ -178,7 +178,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           <button
             type="button"
             onClick={onOpenEodModal}
-            className="h-10 flex items-center gap-1.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-[#E66817] border border-[#FDBA74]/50 px-3 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs cursor-pointer"
+            className="h-10 flex items-center gap-1.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-jaman-saffron border border-[#FDBA74]/50 px-3 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs cursor-pointer"
             title="End of Day Financial Z-Report"
           >
             <Receipt className="w-3.5 h-3.5 shrink-0" />
@@ -198,15 +198,15 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         </div>
 
         {/* 3C. Utilities Group (Assistant, Notifications, Local-First, Logout) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 pl-2 border-l border-[#EBE6DD]">
+        <div className="flex items-center gap-1.5 sm:gap-2 pl-2 border-l border-jaman-border">
           {/* JAMAN AI Assistant */}
           <button
             type="button"
             onClick={onOpenAssistant}
-            className="h-10 flex items-center gap-1.5 bg-white hover:bg-[#FAF8F5] text-[#0B253A] border border-[#EBE6DD] px-3 rounded-xl text-xs font-bold shadow-2xs transition-all active:scale-95 cursor-pointer"
+            className="h-10 flex items-center gap-1.5 bg-white hover:bg-[#FAF8F5] text-jaman-navy border border-jaman-border px-3 rounded-xl text-xs font-bold shadow-2xs transition-all active:scale-95 cursor-pointer"
             title="JAMAN AI Operations Assistant"
           >
-            <Bot className="w-4 h-4 text-[#E66817] shrink-0" />
+            <Bot className="w-4 h-4 text-jaman-saffron shrink-0" />
             <span className="hidden lg:inline">Assistant</span>
           </button>
 
@@ -214,7 +214,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           <button
             type="button"
             onClick={onOpenNotifDrawer}
-            className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white hover:bg-[#FAF8F5] text-slate-600 hover:text-[#0B253A] border border-[#EBE6DD] transition-colors shadow-2xs cursor-pointer"
+            className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white hover:bg-[#FAF8F5] text-slate-600 hover:text-jaman-navy border border-jaman-border transition-colors shadow-2xs cursor-pointer"
             title="Notifications & System Events"
             aria-label="Notifications"
           >
@@ -240,7 +240,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
             type="button"
             onClick={onAdminLogout}
             title="Sign out of Restaurant Admin"
-            className="h-10 flex items-center gap-1.5 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-[#EBE6DD] hover:border-rose-200 px-3 rounded-xl text-xs font-semibold transition-all active:scale-95 shadow-2xs cursor-pointer"
+            className="h-10 flex items-center gap-1.5 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-jaman-border hover:border-rose-200 px-3 rounded-xl text-xs font-semibold transition-all active:scale-95 shadow-2xs cursor-pointer"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             <span className="hidden lg:inline">Logout</span>

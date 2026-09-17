@@ -46,7 +46,7 @@ export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = (
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-[#EBE6DD] shadow-2xs p-5 relative">
+    <div className="bg-white rounded-2xl border border-jaman-border shadow-2xs p-5 relative">
       <button
         onClick={dismiss}
         title="Dismiss checklist"
@@ -56,18 +56,18 @@ export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = (
       </button>
 
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-8 h-8 rounded-xl bg-[#FFF4ED] text-[#E66817] flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center shrink-0">
           <Rocket className="w-4 h-4" />
         </div>
         <div>
-          <h3 className="text-sm font-black text-[#0B253A]">Get Your Restaurant Ready</h3>
+          <h3 className="text-sm font-black text-jaman-navy">Get Your Restaurant Ready</h3>
           <p className="text-[11px] text-slate-500">{doneCount} of {items.length} steps complete</p>
         </div>
       </div>
 
       <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mb-4">
         <div
-          className="h-full bg-[#E66817] rounded-full transition-all"
+          className="h-full bg-jaman-saffron rounded-full transition-all"
           style={{ width: `${(doneCount / items.length) * 100}%` }}
         />
       </div>
@@ -82,7 +82,7 @@ export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = (
             className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-colors ${
               item.done
                 ? 'bg-emerald-50 text-emerald-800 cursor-default'
-                : 'bg-[#FAF7F2] hover:bg-[#F4EFE6] text-[#0B253A] cursor-pointer'
+                : 'bg-jaman-cream hover:bg-[#F4EFE6] text-jaman-navy cursor-pointer'
             }`}
           >
             {item.done ? (

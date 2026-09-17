@@ -58,16 +58,16 @@ export const RiderModal: React.FC<RiderModalProps> = ({ isOpen, onClose, riderTo
         )}
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Rider Name *</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]" />
+          <input value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron" />
         </div>
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Phone *</label>
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]" />
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Vehicle</label>
-            <select value={vehicleType} onChange={(e) => setVehicleType(e.target.value as DeliveryRider['vehicleType'])} className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold">
+            <select value={vehicleType} onChange={(e) => setVehicleType(e.target.value as DeliveryRider['vehicleType'])} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold">
               <option value="BIKE">Motorbike</option>
               <option value="SCOOTER">Scooter</option>
               <option value="BICYCLE">Bicycle</option>
@@ -77,7 +77,7 @@ export const RiderModal: React.FC<RiderModalProps> = ({ isOpen, onClose, riderTo
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Vehicle No. (optional)</label>
-            <input value={vehicleNumber} onChange={(e) => setVehicleNumber(e.target.value)} className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-[#E66817]" />
+            <input value={vehicleNumber} onChange={(e) => setVehicleNumber(e.target.value)} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-jaman-saffron" />
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">

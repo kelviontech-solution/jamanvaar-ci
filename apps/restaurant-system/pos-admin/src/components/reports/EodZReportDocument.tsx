@@ -85,15 +85,15 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
       {/* ========================================================================= */}
       {/* SCREEN ACTION BAR & CONTROLS (Hidden during print) */}
       {/* ========================================================================= */}
-      <div className="no-print bg-white p-4 rounded-3xl border border-[#EBE6DD] shadow-xs space-y-3">
+      <div className="no-print bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#0B253A] text-white flex items-center justify-center shadow-xs">
-              <FileText className="w-5 h-5 text-[#E66817]" />
+            <div className="w-10 h-10 rounded-2xl bg-jaman-navy text-white flex items-center justify-center shadow-xs">
+              <FileText className="w-5 h-5 text-jaman-saffron" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-black text-lg text-[#0B253A]">
+                <h2 className="font-black text-lg text-jaman-navy">
                   End of Day (EOD) Z-Report Statement
                 </h2>
                 <span
@@ -113,13 +113,13 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
           {/* Paper Mode & Action Buttons */}
           <div className="flex flex-wrap items-center gap-2">
             {/* Format Switcher */}
-            <div className="bg-[#FAF7F2] p-1 rounded-2xl border border-[#EBE6DD] flex items-center gap-1">
+            <div className="bg-jaman-cream p-1 rounded-2xl border border-jaman-border flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => setPrintPaperSize('A4')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   printPaperSize === 'A4'
-                    ? 'bg-[#0B253A] text-white shadow-xs'
+                    ? 'bg-jaman-navy text-white shadow-xs'
                     : 'text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -130,7 +130,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                 onClick={() => setPrintPaperSize('80MM')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   printPaperSize === '80MM'
-                    ? 'bg-[#0B253A] text-white shadow-xs'
+                    ? 'bg-jaman-navy text-white shadow-xs'
                     : 'text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -141,7 +141,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
             <button
               type="button"
               onClick={handlePrint}
-              className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-black rounded-xl shadow-xs flex items-center gap-1.5 min-h-[40px]"
+              className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-black rounded-xl shadow-xs flex items-center gap-1.5 min-h-[40px]"
             >
               <Printer className="w-4 h-4" />
               <span>Print {printPaperSize} Statement</span>
@@ -151,7 +151,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
               <button
                 type="button"
                 onClick={handleLockAndClose}
-                className="px-4 py-2 bg-[#0B253A] hover:bg-[#1E3A4C] text-white text-xs font-black rounded-xl shadow-xs flex items-center gap-1.5 min-h-[40px]"
+                className="px-4 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white text-xs font-black rounded-xl shadow-xs flex items-center gap-1.5 min-h-[40px]"
               >
                 <Lock className="w-3.5 h-3.5 text-amber-400" />
                 <span>Lock & Close Day</span>
@@ -181,8 +181,8 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                 onClick={() => setSelectedDate(dateKey)}
                 className={`px-3 py-1 rounded-xl text-xs font-bold transition-all shrink-0 ${
                   selectedDate === dateKey
-                    ? 'bg-[#0B253A] text-white shadow-xs'
-                    : 'bg-[#FAF7F2] text-slate-700 hover:bg-slate-200 border border-[#EBE6DD]'
+                    ? 'bg-jaman-navy text-white shadow-xs'
+                    : 'bg-jaman-cream text-slate-700 hover:bg-slate-200 border border-jaman-border'
                 }`}
               >
                 {idx === 0 ? 'Today' : idx === 1 ? 'Yesterday' : dateKey}
@@ -196,7 +196,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-2.5 py-1 text-xs font-bold font-mono text-[#0B253A]"
+              className="bg-jaman-cream border border-jaman-border rounded-xl px-2.5 py-1 text-xs font-bold font-mono text-jaman-navy"
             />
           </div>
         </div>
@@ -212,7 +212,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
           <div className="space-y-4 print-avoid-break">
             
             {/* Section 1: REPORT HEADER (Source from Settings) */}
-            <div className="border-b-2 border-[#0B253A] pb-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="border-b-2 border-jaman-navy pb-3 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-3 text-left">
                 {report.branding.logoUrl && (
                   <img
@@ -225,7 +225,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                   />
                 )}
                 <div>
-                  <h1 className="text-xl font-black text-[#0B253A] tracking-tight uppercase">
+                  <h1 className="text-xl font-black text-jaman-navy tracking-tight uppercase">
                     {report.branding.restaurantName}
                   </h1>
                   <span className="text-[11px] font-bold text-slate-600 block">
@@ -240,7 +240,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
               {/* Legal Tax & Contact Credentials */}
               <div className="text-right text-[10px] text-slate-600 space-y-0.5 font-mono">
                 <div><strong>{report.branding.address}</strong>, {report.branding.city}, {report.branding.state} {report.branding.pincode}</div>
-                <div>GSTIN: <strong className="text-[#0B253A]">{report.branding.gstin}</strong> • FSSAI: <strong className="text-[#0B253A]">{report.branding.fssaiNumber}</strong></div>
+                <div>GSTIN: <strong className="text-jaman-navy">{report.branding.gstin}</strong> • FSSAI: <strong className="text-jaman-navy">{report.branding.fssaiNumber}</strong></div>
                 {report.branding.msmeNumber && <div>MSME: <strong>{report.branding.msmeNumber}</strong></div>}
                 <div>Phone: {report.branding.phone} • Email: {report.branding.email}</div>
               </div>
@@ -248,11 +248,11 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
 
             {/* Section 2: REPORT TITLE & META STRIP */}
             <div className="text-center py-1.5 border-b border-slate-200 space-y-0.5">
-              <h2 className="text-base font-black text-[#0B253A] tracking-wider uppercase underline underline-offset-4">
+              <h2 className="text-base font-black text-jaman-navy tracking-wider uppercase underline underline-offset-4">
                 END OF DAY (EOD) Z-REPORT
               </h2>
               <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] font-bold text-slate-700 pt-0.5">
-                <span>Business Date: <strong className="text-[#E66817] font-mono">{report.displayDate}</strong></span>
+                <span>Business Date: <strong className="text-jaman-saffron font-mono">{report.displayDate}</strong></span>
                 <span>•</span>
                 <span>Shift: <strong>{report.shiftName}</strong></span>
                 <span>•</span>
@@ -263,18 +263,18 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
             </div>
 
             {/* Section 3: SHIFT INFORMATION CARD */}
-            <div className="bg-[#FAF7F2] p-3 rounded-2xl border border-slate-300 grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs">
+            <div className="bg-jaman-cream p-3 rounded-2xl border border-slate-300 grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs">
               <div>
                 <span className="text-[9px] uppercase font-bold text-slate-500 block">Cashier</span>
-                <strong className="text-[#0B253A] truncate block">{report.cashierName}</strong>
+                <strong className="text-jaman-navy truncate block">{report.cashierName}</strong>
               </div>
               <div>
                 <span className="text-[9px] uppercase font-bold text-slate-500 block">POS Terminal</span>
-                <strong className="font-mono text-[#0B253A] block">{report.terminalId}</strong>
+                <strong className="font-mono text-jaman-navy block">{report.terminalId}</strong>
               </div>
               <div>
                 <span className="text-[9px] uppercase font-bold text-slate-500 block">Opening Float</span>
-                <strong className="font-mono text-[#0B253A] block">{formatINR(report.openingFloat)}</strong>
+                <strong className="font-mono text-jaman-navy block">{formatINR(report.openingFloat)}</strong>
               </div>
               <div>
                 <span className="text-[9px] uppercase font-bold text-slate-500 block">Closing Float</span>
@@ -286,7 +286,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
               </div>
               <div>
                 <span className="text-[9px] uppercase font-bold text-slate-500 block">Orders Settled</span>
-                <strong className="font-mono text-[#E66817] text-sm block">{report.ordersSettled}</strong>
+                <strong className="font-mono text-jaman-saffron text-sm block">{report.ordersSettled}</strong>
               </div>
             </div>
 
@@ -294,7 +294,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
             <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center">
               <div className="p-2.5 bg-white border border-slate-300 rounded-xl">
                 <span className="text-[9px] font-black uppercase text-slate-500 block">GROSS REVENUE</span>
-                <span className="text-sm font-black font-mono text-[#0B253A] block mt-0.5">
+                <span className="text-sm font-black font-mono text-jaman-navy block mt-0.5">
                   {formatINR(report.grossRevenue)}
                 </span>
               </div>
@@ -308,28 +308,28 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
 
               <div className="p-2.5 bg-white border border-slate-300 rounded-xl">
                 <span className="text-[9px] font-black uppercase text-slate-500 block">ORDERS</span>
-                <span className="text-sm font-black font-mono text-[#0B253A] block mt-0.5">
+                <span className="text-sm font-black font-mono text-jaman-navy block mt-0.5">
                   {report.ordersSettled}
                 </span>
               </div>
 
               <div className="p-2.5 bg-white border border-slate-300 rounded-xl">
                 <span className="text-[9px] font-black uppercase text-slate-500 block">AVERAGE BILL</span>
-                <span className="text-sm font-black font-mono text-[#0B253A] block mt-0.5">
+                <span className="text-sm font-black font-mono text-jaman-navy block mt-0.5">
                   {formatINR(report.avgBillValue)}
                 </span>
               </div>
 
               <div className="p-2.5 bg-white border border-slate-300 rounded-xl">
                 <span className="text-[9px] font-black uppercase text-slate-500 block">GUESTS SERVED</span>
-                <span className="text-sm font-black font-mono text-[#0B253A] block mt-0.5">
+                <span className="text-sm font-black font-mono text-jaman-navy block mt-0.5">
                   {report.customersServed}
                 </span>
               </div>
 
               <div className="p-2.5 bg-white border border-slate-300 rounded-xl">
                 <span className="text-[9px] font-black uppercase text-slate-500 block">TABLES SERVED</span>
-                <span className="text-sm font-black font-mono text-[#0B253A] block mt-0.5">
+                <span className="text-sm font-black font-mono text-jaman-navy block mt-0.5">
                   {report.tablesServed}
                 </span>
               </div>
@@ -340,7 +340,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
               
               {/* Sales Breakdown */}
               <div className="border border-slate-300 rounded-xl overflow-hidden print-avoid-break">
-                <div className="bg-[#0B253A] text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
+                <div className="bg-jaman-navy text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
                   5. Department Sales Breakdown
                 </div>
                 <div className="p-2.5 divide-y divide-slate-100 text-xs space-y-1">
@@ -360,7 +360,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                     <span>Other Delicacies</span>
                     <span className="font-mono font-bold">{formatINR(report.salesBreakdown.otherSales)}</span>
                   </div>
-                  <div className="flex justify-between pt-1 border-t border-slate-300 font-black text-[#0B253A]">
+                  <div className="flex justify-between pt-1 border-t border-slate-300 font-black text-jaman-navy">
                     <span>Total Gross Sales</span>
                     <span className="font-mono">{formatINR(report.salesBreakdown.grossSales)}</span>
                   </div>
@@ -369,7 +369,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
 
               {/* Discounts & Refunds */}
               <div className="border border-slate-300 rounded-xl overflow-hidden print-avoid-break">
-                <div className="bg-[#0B253A] text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
+                <div className="bg-jaman-navy text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
                   6. Discounts & Refunds Statement
                 </div>
                 <div className="p-2.5 divide-y divide-slate-100 text-xs space-y-1">
@@ -400,36 +400,36 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
 
             {/* Section 7: GST TAX SUMMARY TABLE */}
             <div className="border border-slate-300 rounded-xl overflow-hidden print-avoid-break">
-              <div className="bg-[#0B253A] text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider flex items-center justify-between">
+              <div className="bg-jaman-navy text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider flex items-center justify-between">
                 <span>7. Statutory GST Tax Accounting Summary</span>
                 <span className="text-[9px] font-mono text-amber-300">GST 5% (2.5% CGST + 2.5% SGST)</span>
               </div>
               <div className="p-2.5 grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs text-center">
-                <div className="p-1.5 bg-[#FAF7F2] rounded-lg border border-slate-200">
+                <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-200">
                   <span className="text-[9px] text-slate-500 font-bold block uppercase">Taxable Value</span>
-                  <span className="font-mono font-black text-[#0B253A] text-xs block mt-0.5">
+                  <span className="font-mono font-black text-jaman-navy text-xs block mt-0.5">
                     {formatINR(report.gstSummary.taxableValue)}
                   </span>
                 </div>
-                <div className="p-1.5 bg-[#FAF7F2] rounded-lg border border-slate-200">
+                <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-200">
                   <span className="text-[9px] text-slate-500 font-bold block uppercase">CGST (2.5%)</span>
                   <span className="font-mono font-bold text-slate-800 text-xs block mt-0.5">
                     {formatINR(report.gstSummary.cgstAmount)}
                   </span>
                 </div>
-                <div className="p-1.5 bg-[#FAF7F2] rounded-lg border border-slate-200">
+                <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-200">
                   <span className="text-[9px] text-slate-500 font-bold block uppercase">SGST (2.5%)</span>
                   <span className="font-mono font-bold text-slate-800 text-xs block mt-0.5">
                     {formatINR(report.gstSummary.sgstAmount)}
                   </span>
                 </div>
                 <div className="p-1.5 bg-orange-50 rounded-lg border border-orange-200">
-                  <span className="text-[9px] text-[#E66817] font-bold block uppercase">Total GST (5%)</span>
-                  <span className="font-mono font-black text-[#E66817] text-xs block mt-0.5">
+                  <span className="text-[9px] text-jaman-saffron font-bold block uppercase">Total GST (5%)</span>
+                  <span className="font-mono font-black text-jaman-saffron text-xs block mt-0.5">
                     {formatINR(report.gstSummary.totalTax)}
                   </span>
                 </div>
-                <div className="p-1.5 bg-[#FAF7F2] rounded-lg border border-slate-200">
+                <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-200">
                   <span className="text-[9px] text-slate-500 font-bold block uppercase">Round Off</span>
                   <span className="font-mono font-bold text-slate-700 text-xs block mt-0.5">
                     {formatINR(report.gstSummary.roundOff)}
@@ -449,11 +449,11 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
               
               {/* Payment Settlement Table */}
               <div className="sm:col-span-2 border border-slate-300 rounded-xl overflow-hidden">
-                <div className="bg-[#0B253A] text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
+                <div className="bg-jaman-navy text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
                   8. Payment Settlement by Tender Type
                 </div>
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#FAF7F2] border-b border-slate-200 font-black text-slate-600">
+                  <thead className="bg-jaman-cream border-b border-slate-200 font-black text-slate-600">
                     <tr>
                       <th className="p-2">Method</th>
                       <th className="p-2 text-center">Orders</th>
@@ -481,7 +481,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                       <td className="p-1.5 text-center font-mono">{report.paymentSettlement.wallet.count + report.paymentSettlement.houseAccount.count}</td>
                       <td className="p-1.5 text-right font-mono font-bold">{formatINR(report.paymentSettlement.wallet.amount + report.paymentSettlement.houseAccount.amount)}</td>
                     </tr>
-                    <tr className="bg-[#FAF7F2] font-black text-[#0B253A]">
+                    <tr className="bg-jaman-cream font-black text-jaman-navy">
                       <td className="p-1.5">TOTAL SETTLED</td>
                       <td className="p-1.5 text-center font-mono">{report.ordersSettled}</td>
                       <td className="p-1.5 text-right font-mono text-emerald-800 text-sm">
@@ -494,19 +494,19 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
 
               {/* Split Payment Distribution */}
               <div className="border border-slate-300 rounded-xl overflow-hidden">
-                <div className="bg-[#0B253A] text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
+                <div className="bg-jaman-navy text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
                   9. Split Payment Matrix
                 </div>
                 <div className="p-2 space-y-1 text-xs">
-                  <div className="p-1.5 bg-[#FAF7F2] rounded-lg flex items-center justify-between font-bold">
+                  <div className="p-1.5 bg-jaman-cream rounded-lg flex items-center justify-between font-bold">
                     <span>Cash + UPI</span>
                     <span className="font-mono text-slate-700">{report.splitSummary.cashUpiCount} Bills</span>
                   </div>
-                  <div className="p-1.5 bg-[#FAF7F2] rounded-lg flex items-center justify-between font-bold">
+                  <div className="p-1.5 bg-jaman-cream rounded-lg flex items-center justify-between font-bold">
                     <span>Cash + Card</span>
                     <span className="font-mono text-slate-700">{report.splitSummary.cashCardCount} Bills</span>
                   </div>
-                  <div className="p-1.5 bg-[#FAF7F2] rounded-lg flex items-center justify-between font-bold">
+                  <div className="p-1.5 bg-jaman-cream rounded-lg flex items-center justify-between font-bold">
                     <span>UPI + Card</span>
                     <span className="font-mono text-slate-700">{report.splitSummary.upiCardCount} Bills</span>
                   </div>
@@ -521,7 +521,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
 
             {/* Section 10: CASH DRAWER RECONCILIATION */}
             <div className="border border-slate-400 rounded-xl overflow-hidden print-avoid-break">
-              <div className="bg-[#0B253A] text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider flex items-center justify-between">
+              <div className="bg-jaman-navy text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider flex items-center justify-between">
                 <span>10. Cash Drawer Accounting Reconciliation</span>
                 <span
                   className={`px-2 py-0.5 rounded text-[9px] font-black ${
@@ -532,9 +532,9 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                 </span>
               </div>
               <div className="p-2.5 grid grid-cols-2 sm:grid-cols-7 gap-2 text-xs text-center font-mono">
-                <div className="p-1.5 bg-[#FAF7F2] rounded-lg border border-slate-200">
+                <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-200">
                   <span className="text-[8px] text-slate-500 font-bold block uppercase">Float</span>
-                  <span className="font-bold text-[#0B253A] block mt-0.5">{formatINR(report.cashDrawer.openingFloat)}</span>
+                  <span className="font-bold text-jaman-navy block mt-0.5">{formatINR(report.cashDrawer.openingFloat)}</span>
                 </div>
                 <div className="p-1.5 bg-emerald-50 rounded-lg border border-emerald-200">
                   <span className="text-[8px] text-emerald-800 font-bold block uppercase">+ Sales</span>
@@ -548,13 +548,13 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                   <span className="text-[8px] text-rose-800 font-bold block uppercase">- Paid Out</span>
                   <span className="font-bold text-rose-950 block mt-0.5">-{formatINR(report.cashDrawer.cashPaidOut)}</span>
                 </div>
-                <div className="p-1.5 bg-[#FAF7F2] rounded-lg border border-slate-300">
+                <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-300">
                   <span className="text-[8px] text-slate-600 font-bold block uppercase">= Expected</span>
-                  <span className="font-black text-[#0B253A] block mt-0.5">{formatINR(report.cashDrawer.expectedDrawer)}</span>
+                  <span className="font-black text-jaman-navy block mt-0.5">{formatINR(report.cashDrawer.expectedDrawer)}</span>
                 </div>
-                <div className="p-1.5 bg-[#FAF7F2] rounded-lg border border-slate-300">
+                <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-300">
                   <span className="text-[8px] text-slate-600 font-bold block uppercase">Actual</span>
-                  <span className="font-black text-[#0B253A] block mt-0.5">{formatINR(report.cashDrawer.actualDrawer)}</span>
+                  <span className="font-black text-jaman-navy block mt-0.5">{formatINR(report.cashDrawer.actualDrawer)}</span>
                 </div>
                 <div className={`p-1.5 rounded-lg border ${report.cashDrawer.isBalanced ? 'bg-emerald-100 border-emerald-300 text-emerald-950' : 'bg-rose-100 border-rose-300 text-rose-950'}`}>
                   <span className="text-[8px] font-black block uppercase">Diff</span>
@@ -576,27 +576,27 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
 
             {/* Section 11: ORDER TYPE SUMMARY */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center print-avoid-break">
-              <div className="p-2 bg-[#FAF7F2] border border-slate-300 rounded-xl">
+              <div className="p-2 bg-jaman-cream border border-slate-300 rounded-xl">
                 <span className="text-[9px] font-black uppercase text-slate-500 block">Dine-In Orders</span>
-                <span className="text-base font-black font-mono text-[#0B253A] block mt-0.5">
+                <span className="text-base font-black font-mono text-jaman-navy block mt-0.5">
                   {report.orderTypeSummary.dineIn}
                 </span>
               </div>
-              <div className="p-2 bg-[#FAF7F2] border border-slate-300 rounded-xl">
+              <div className="p-2 bg-jaman-cream border border-slate-300 rounded-xl">
                 <span className="text-[9px] font-black uppercase text-slate-500 block">Takeaway Orders</span>
-                <span className="text-base font-black font-mono text-[#0B253A] block mt-0.5">
+                <span className="text-base font-black font-mono text-jaman-navy block mt-0.5">
                   {report.orderTypeSummary.takeaway}
                 </span>
               </div>
-              <div className="p-2 bg-[#FAF7F2] border border-slate-300 rounded-xl">
+              <div className="p-2 bg-jaman-cream border border-slate-300 rounded-xl">
                 <span className="text-[9px] font-black uppercase text-slate-500 block">Delivery Orders</span>
-                <span className="text-base font-black font-mono text-[#0B253A] block mt-0.5">
+                <span className="text-base font-black font-mono text-jaman-navy block mt-0.5">
                   {report.orderTypeSummary.delivery}
                 </span>
               </div>
-              <div className="p-2 bg-[#FAF7F2] border border-slate-300 rounded-xl">
+              <div className="p-2 bg-jaman-cream border border-slate-300 rounded-xl">
                 <span className="text-[9px] font-black uppercase text-slate-500 block">Token Orders</span>
-                <span className="text-base font-black font-mono text-[#0B253A] block mt-0.5">
+                <span className="text-base font-black font-mono text-jaman-navy block mt-0.5">
                   {report.orderTypeSummary.token}
                 </span>
               </div>
@@ -607,11 +607,11 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
               
               {/* Top 10 Selling Dishes */}
               <div className="border border-slate-300 rounded-xl overflow-hidden">
-                <div className="bg-[#0B253A] text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
+                <div className="bg-jaman-navy text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
                   12. Top 10 Selling Dishes Today
                 </div>
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#FAF7F2] border-b border-slate-200 font-bold text-slate-600">
+                  <thead className="bg-jaman-cream border-b border-slate-200 font-bold text-slate-600">
                     <tr>
                       <th className="p-1.5 text-center w-6">#</th>
                       <th className="p-1.5">Dish Name</th>
@@ -623,7 +623,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                     {report.topSellingItems.map((it) => (
                       <tr key={it.rank} className="hover:bg-slate-50">
                         <td className="p-1.5 text-center font-bold text-slate-400">{it.rank}</td>
-                        <td className="p-1.5 font-bold text-[#0B253A]">{it.name}</td>
+                        <td className="p-1.5 font-bold text-jaman-navy">{it.name}</td>
                         <td className="p-1.5 text-center font-mono font-bold">{it.quantity}</td>
                         <td className="p-1.5 text-right font-mono font-bold">{formatINR(it.revenue)}</td>
                       </tr>
@@ -637,13 +637,13 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                 
                 {/* Categories */}
                 <div className="border border-slate-300 rounded-xl overflow-hidden">
-                  <div className="bg-[#0B253A] text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
+                  <div className="bg-jaman-navy text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
                     13. Menu Category Sales Contribution
                   </div>
                   <div className="p-2 space-y-1 text-xs">
                     {report.topCategories.map((c, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-1 rounded bg-[#FAF7F2] font-bold">
-                        <span className="text-[#0B253A]">{c.name}</span>
+                      <div key={idx} className="flex items-center justify-between p-1 rounded bg-jaman-cream font-bold">
+                        <span className="text-jaman-navy">{c.name}</span>
                         <span className="font-mono text-slate-700">{formatINR(c.revenue)}</span>
                       </div>
                     ))}
@@ -652,7 +652,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
 
                 {/* Captain & Cashier Performance */}
                 <div className="border border-slate-300 rounded-xl overflow-hidden">
-                  <div className="bg-[#0B253A] text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
+                  <div className="bg-jaman-navy text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider">
                     14 & 15. Staff Performance Summary
                   </div>
                   <div className="p-2 space-y-1.5 text-xs">
@@ -689,12 +689,12 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
             {/* Section 16 & 17: TABLE UTILIZATION & INVENTORY ALERTS */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 print-avoid-break">
               <div className="border border-slate-300 rounded-xl p-2.5 space-y-1.5">
-                <span className="font-black text-[11px] uppercase tracking-wider text-[#0B253A] block">
+                <span className="font-black text-[11px] uppercase tracking-wider text-jaman-navy block">
                   16. Table Utilization & Turnover
                 </span>
                 <div className="flex flex-wrap gap-1.5 text-xs font-mono">
                   {report.tableUtilization.topTables.map((tbl, idx) => (
-                    <span key={idx} className="bg-[#FAF7F2] border border-slate-200 px-2 py-0.5 rounded font-bold text-[11px]">
+                    <span key={idx} className="bg-jaman-cream border border-slate-200 px-2 py-0.5 rounded font-bold text-[11px]">
                       {tbl.tableNumber}: {formatINR(tbl.revenue)}
                     </span>
                   ))}
@@ -721,7 +721,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
 
             {/* Section 18: MANAGER CLOSING NOTES */}
             <div className="border border-slate-300 rounded-xl p-3 space-y-1.5 print-avoid-break">
-              <span className="font-black text-[11px] uppercase tracking-wider text-[#0B253A] block">
+              <span className="font-black text-[11px] uppercase tracking-wider text-jaman-navy block">
                 18. Manager Operational Notes & End of Day Observations
               </span>
               <div className="no-print">
@@ -731,10 +731,10 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                   disabled={isLocked}
                   placeholder="Enter shift notes, discrepancies, or maintenance remarks..."
                   rows={2}
-                  className="w-full bg-[#FAF7F2] border border-slate-300 rounded-xl p-2 text-xs font-semibold focus:outline-none"
+                  className="w-full bg-jaman-cream border border-slate-300 rounded-xl p-2 text-xs font-semibold focus:outline-none"
                 />
               </div>
-              <p className="hidden print:block text-xs font-medium text-slate-800 bg-[#FAF7F2] p-2 rounded-lg border border-slate-200 italic">
+              <p className="hidden print:block text-xs font-medium text-slate-800 bg-jaman-cream p-2 rounded-lg border border-slate-200 italic">
                 "{managerNotes}"
               </p>
             </div>
@@ -749,7 +749,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                   <div className="border-b border-slate-400 pb-1 font-mono text-[10px] text-slate-400">
                     ____________________
                   </div>
-                  <strong className="block text-[#0B253A] text-[11px]">Cashier Signature</strong>
+                  <strong className="block text-jaman-navy text-[11px]">Cashier Signature</strong>
                   <span className="text-[9px] text-slate-500 block truncate">{report.cashierName}</span>
                 </div>
 
@@ -757,7 +757,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                   <div className="border-b border-slate-400 pb-1 font-mono text-[10px] text-slate-400">
                     ____________________
                   </div>
-                  <strong className="block text-[#0B253A] text-[11px]">Manager Signature</strong>
+                  <strong className="block text-jaman-navy text-[11px]">Manager Signature</strong>
                   <span className="text-[9px] text-slate-500 block truncate">{report.branding.managerName || 'Pooja Shah'}</span>
                 </div>
 
@@ -765,7 +765,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                   <div className="border-b border-slate-400 pb-1 font-mono text-[10px] text-slate-400">
                     ____________________
                   </div>
-                  <strong className="block text-[#0B253A] text-[11px]">Owner Signature</strong>
+                  <strong className="block text-jaman-navy text-[11px]">Owner Signature</strong>
                   <span className="text-[9px] text-slate-500 block truncate">{report.branding.ownerName || 'Ramesh Patel'}</span>
                 </div>
 
@@ -773,7 +773,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                   <div className="border-b border-slate-400 pb-1 font-mono text-[10px] text-slate-400">
                     ____________________
                   </div>
-                  <strong className="block text-[#0B253A] text-[11px]">Closing Date & Stamp</strong>
+                  <strong className="block text-jaman-navy text-[11px]">Closing Date & Stamp</strong>
                   <span className="text-[9px] text-slate-500 font-mono block">{report.displayDate}</span>
                 </div>
               </div>

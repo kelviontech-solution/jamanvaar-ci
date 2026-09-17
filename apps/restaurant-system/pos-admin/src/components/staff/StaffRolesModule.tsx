@@ -120,7 +120,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
               Staff & Role-Based Access (RBAC)
             </h1>
             <span className="bg-emerald-50 text-emerald-800 font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-emerald-200/70">
@@ -133,7 +133,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
         </div>
         <button
           onClick={() => onOpenStaffModal(null)}
-          className="px-3.5 py-2 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+          className="px-3.5 py-2 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Add Employee</span>
@@ -142,28 +142,28 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
 
       {/* Staff Summary Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-black uppercase text-slate-500">TOTAL TEAM</span>
-          <div className="text-2xl font-black text-[#0B253A] font-mono">{users.length} Active</div>
+          <div className="text-2xl font-black text-jaman-navy font-mono">{users.length} Active</div>
           <span className="text-[10px] text-slate-400 font-medium">Registered Staff Accounts</span>
         </div>
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-black uppercase text-slate-500">OWNERS & MANAGERS</span>
-          <div className="text-2xl font-black text-[#0B253A] font-mono">
+          <div className="text-2xl font-black text-jaman-navy font-mono">
             {users.filter((u) => (u.roleId || '').includes('OWNER') || (u.roleId || '').includes('MANAGER')).length || 1}
           </div>
           <span className="text-[10px] text-slate-400 font-medium">Full System Authority</span>
         </div>
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-black uppercase text-slate-500">CASHIERS</span>
-          <div className="text-2xl font-black text-[#0B253A] font-mono">
+          <div className="text-2xl font-black text-jaman-navy font-mono">
             {users.filter((u) => (u.roleId || '').includes('CASHIER')).length || 1}
           </div>
           <span className="text-[10px] text-slate-400 font-medium">POS Register Terminal</span>
         </div>
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-black uppercase text-slate-500">CAPTAINS & SERVICE</span>
-          <div className="text-2xl font-black text-[#0B253A] font-mono">
+          <div className="text-2xl font-black text-jaman-navy font-mono">
             {users.filter((u) => (u.roleId || '').includes('CAPTAIN') || (u.roleId || '').includes('WAITER')).length || 1}
           </div>
           <span className="text-[10px] text-slate-400 font-medium">Floor Order Taking</span>
@@ -175,19 +175,19 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
         {users.map((usr: User) => (
           <div
             key={usr.id}
-            className="p-5 bg-white rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-3 hover:shadow-xs transition-all"
+            className="p-5 bg-white rounded-2xl border border-jaman-border shadow-2xs space-y-3 hover:shadow-xs transition-all"
           >
             <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-[#FFF4ED] text-[#E66817] flex items-center justify-center font-black text-sm border border-[#FDBA74]/40">
+              <div className="w-10 h-10 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center font-black text-sm border border-[#FDBA74]/40">
                 {usr.fullName[0]}
               </div>
-              <span className="bg-[#FAF7F2] text-[#0B253A] font-black text-[10px] px-2.5 py-1 rounded-lg uppercase tracking-wider border border-[#EBE6DD]">
+              <span className="bg-jaman-cream text-jaman-navy font-black text-[10px] px-2.5 py-1 rounded-lg uppercase tracking-wider border border-jaman-border">
                 {usr.roleId || 'STAFF'}
               </span>
             </div>
 
             <div>
-              <h4 className="font-extrabold text-sm text-[#0B253A]">{usr.fullName}</h4>
+              <h4 className="font-extrabold text-sm text-jaman-navy">{usr.fullName}</h4>
               <span className="text-xs text-slate-400 font-medium">
                 @{usr.username} • {usr.phone}
               </span>
@@ -201,7 +201,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => onOpenStaffModal(usr)}
-                  className="p-1.5 text-[#E66817] hover:bg-[#FFF4ED] rounded-lg transition-colors cursor-pointer"
+                  className="p-1.5 text-jaman-saffron hover:bg-[#FFF4ED] rounded-lg transition-colors cursor-pointer"
                   title="Edit Staff"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
@@ -222,22 +222,22 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
       {/* Schedule & Attendance — previously nonexistent: StaffRepository only
           managed login accounts, with no concept of a work roster or whether
           someone actually showed up. */}
-      <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-2xs">
-        <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-2xs">
+        <div className="p-4 bg-jaman-cream border-b border-jaman-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-[#E66817]" />
-            <span className="font-extrabold text-sm text-[#0B253A]">Schedule & Attendance</span>
+            <Calendar className="w-4 h-4 text-jaman-saffron" />
+            <span className="font-extrabold text-sm text-jaman-navy">Schedule & Attendance</span>
           </div>
           <div className="flex items-center gap-2">
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+              className="bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
             />
             <button
               onClick={() => { setShiftToEdit(null); setIsShiftModalOpen(true); }}
-              className="px-3 py-1.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Schedule Shift</span>
@@ -252,17 +252,17 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
               Shifts on {new Date(selectedDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
             </h4>
             {schedulesForDay.length === 0 ? (
-              <div className="p-4 bg-[#FAF7F2] rounded-xl text-center text-xs text-slate-400">
+              <div className="p-4 bg-jaman-cream rounded-xl text-center text-xs text-slate-400">
                 No shifts scheduled for this day.
               </div>
             ) : (
               <div className="space-y-1.5">
                 {schedulesForDay.map((shift) => (
-                  <div key={shift.id} className="p-2.5 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl flex items-center justify-between gap-2">
+                  <div key={shift.id} className="p-2.5 bg-jaman-cream border border-jaman-border rounded-xl flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <Clock className="w-3.5 h-3.5 text-[#E66817] shrink-0" />
+                      <Clock className="w-3.5 h-3.5 text-jaman-saffron shrink-0" />
                       <div className="min-w-0">
-                        <div className="font-bold text-xs text-[#0B253A] truncate">{shift.userName}</div>
+                        <div className="font-bold text-xs text-jaman-navy truncate">{shift.userName}</div>
                         <div className="text-[10px] text-slate-500 font-mono">
                           {shift.startTime}–{shift.endTime}{shift.roleLabel ? ` · ${shift.roleLabel}` : ''}
                         </div>
@@ -271,7 +271,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => { setShiftToEdit(shift); setIsShiftModalOpen(true); }}
-                        className="p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-[#E66817] cursor-pointer"
+                        className="p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-jaman-saffron cursor-pointer"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
@@ -296,9 +296,9 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
                 const status = attendanceStatusFor(usr.id);
                 const attRecord = attendanceForDay.find((a) => a.userId === usr.id);
                 return (
-                  <div key={usr.id} className="p-2.5 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl flex items-center justify-between gap-2">
+                  <div key={usr.id} className="p-2.5 bg-jaman-cream border border-jaman-border rounded-xl flex items-center justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="font-bold text-xs text-[#0B253A] truncate">{usr.fullName}</div>
+                      <div className="font-bold text-xs text-jaman-navy truncate">{usr.fullName}</div>
                       <div className="text-[10px] text-slate-500">
                         {attRecord?.clockInAt
                           ? `In ${new Date(attRecord.clockInAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}${attRecord.clockOutAt ? ` · Out ${new Date(attRecord.clockOutAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` : ''}`
@@ -327,7 +327,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
                       <select
                         value={status || ''}
                         onChange={(e) => handleMarkAttendance(usr, e.target.value as AttendanceStatus)}
-                        className="bg-white border border-[#EBE6DD] rounded-lg px-1.5 py-1 text-[10px] font-bold cursor-pointer"
+                        className="bg-white border border-jaman-border rounded-lg px-1.5 py-1 text-[10px] font-bold cursor-pointer"
                       >
                         <option value="" disabled>Mark…</option>
                         <option value="PRESENT">Present</option>
@@ -346,15 +346,15 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
 
       {/* Delivery Riders — previously a DELIVERY order had an orderType and
           nothing else: no roster, no assignment, no dispatch tracking. */}
-      <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-2xs">
-        <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex items-center justify-between">
+      <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-2xs">
+        <div className="p-4 bg-jaman-cream border-b border-jaman-border flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Bike className="w-4 h-4 text-[#E66817]" />
-            <span className="font-extrabold text-sm text-[#0B253A]">Delivery Riders ({riders.length})</span>
+            <Bike className="w-4 h-4 text-jaman-saffron" />
+            <span className="font-extrabold text-sm text-jaman-navy">Delivery Riders ({riders.length})</span>
           </div>
           <button
             onClick={() => { setRiderToEdit(null); setIsRiderModalOpen(true); }}
-            className="px-3 py-1.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
+            className="px-3 py-1.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Rider</span>
@@ -367,9 +367,9 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
         ) : (
           <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {riders.map((rider) => (
-              <div key={rider.id} className="p-3 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl flex items-center justify-between gap-2">
+              <div key={rider.id} className="p-3 bg-jaman-cream border border-jaman-border rounded-xl flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="font-bold text-xs text-[#0B253A] truncate">{rider.name}</div>
+                  <div className="font-bold text-xs text-jaman-navy truncate">{rider.name}</div>
                   <div className="text-[10px] text-slate-500">{rider.phone} · {rider.vehicleType.replace('_', ' ')}{rider.vehicleNumber ? ` · ${rider.vehicleNumber}` : ''}</div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
@@ -379,7 +379,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
                   >
                     {rider.isActive ? 'Active' : 'Inactive'}
                   </button>
-                  <button onClick={() => { setRiderToEdit(rider); setIsRiderModalOpen(true); }} className="p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-[#E66817] cursor-pointer">
+                  <button onClick={() => { setRiderToEdit(rider); setIsRiderModalOpen(true); }} className="p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-jaman-saffron cursor-pointer">
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={() => handleDeleteRider(rider)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-600 cursor-pointer">

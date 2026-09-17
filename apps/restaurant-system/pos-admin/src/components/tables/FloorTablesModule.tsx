@@ -75,7 +75,7 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
               Floor Plan & Table Layout
             </h1>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300/60">
@@ -90,15 +90,15 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
           {onNavigateToQr && (
             <button
               onClick={() => onNavigateToQr()}
-              className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-[#EBE6DD] text-[#0B253A] font-bold text-xs flex items-center gap-2 shadow-2xs cursor-pointer transition-colors"
+              className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy font-bold text-xs flex items-center gap-2 shadow-2xs cursor-pointer transition-colors"
             >
-              <QrCode className="w-4 h-4 text-[#E66817]" />
+              <QrCode className="w-4 h-4 text-jaman-saffron" />
               <span>Table QR Standees</span>
             </button>
           )}
           <button
             onClick={() => onOpenTableModal(null)}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#E66817] to-[#F27E2B] hover:from-[#EA580C] hover:to-[#E66817] text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-orange-500/25 active:scale-95 transition-all cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-jaman-saffron to-[#F27E2B] hover:from-[#EA580C] hover:to-jaman-saffron text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-orange-500/25 active:scale-95 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Dining Table</span>
@@ -108,13 +108,13 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
 
       {/* 4 Tables KPI Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Tables</span>
-          <div className="text-2xl font-black text-[#0B253A] font-mono">{tables.length} Tables</div>
+          <div className="text-2xl font-black text-jaman-navy font-mono">{tables.length} Tables</div>
           <span className="text-[10px] text-slate-500 font-bold block">Configured in Layout</span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Seating Capacity</span>
           <div className="text-2xl font-black text-blue-700 font-mono">
             {tables.reduce((acc, t) => acc + (t.capacity || 4), 0)} Guests
@@ -124,14 +124,14 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
 
         <div
           className={`p-4 rounded-2xl border shadow-xs space-y-1 ${
-            occupiedTablesCount > 0 ? 'bg-orange-50/70 border-orange-200' : 'bg-white border-[#EBE6DD]'
+            occupiedTablesCount > 0 ? 'bg-orange-50/70 border-orange-200' : 'bg-white border-jaman-border'
           }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Live Occupancy</span>
-            {occupiedTablesCount > 0 && <span className="w-2 h-2 rounded-full bg-[#E66817] animate-pulse"></span>}
+            {occupiedTablesCount > 0 && <span className="w-2 h-2 rounded-full bg-jaman-saffron animate-pulse"></span>}
           </div>
-          <div className="text-2xl font-black text-[#E66817] font-mono">
+          <div className="text-2xl font-black text-jaman-saffron font-mono">
             {occupiedTablesCount} Busy{' '}
             <span className="text-xs text-slate-500 font-normal">
               ({Math.round((occupiedTablesCount / (tables.length || 1)) * 100)}%)
@@ -142,7 +142,7 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
           </span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Vacant Tables</span>
           <div className="text-2xl font-black text-emerald-700 font-mono">
             {tables.filter((t) => t.status === 'AVAILABLE').length} Vacant
@@ -152,7 +152,7 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
       </div>
 
       {/* Area / Zone Filter Strip */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 bg-white p-2 rounded-2xl border border-[#EBE6DD] shadow-2xs">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 bg-white p-2 rounded-2xl border border-jaman-border shadow-2xs">
         {[
           { id: 'ALL', label: 'All Floor Sections' },
           { id: 'Main Dining Hall', label: '🍽️ Main Dining Hall' },
@@ -167,7 +167,7 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
               onClick={() => setTableZoneFilter(z.id)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
                 tableZoneFilter === z.id
-                  ? 'bg-[#0B253A] text-white shadow-xs'
+                  ? 'bg-jaman-navy text-white shadow-xs'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0]'
               }`}
             >
@@ -186,17 +186,17 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
 
       {/* Tables Matrix */}
       {filteredTables.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-[#EBE6DD] shadow-2xs space-y-3 max-w-lg mx-auto my-6">
+        <div className="bg-white rounded-3xl p-12 text-center border border-jaman-border shadow-2xs space-y-3 max-w-lg mx-auto my-6">
           <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
             <Grid className="w-6 h-6" />
           </div>
-          <h3 className="font-black text-base text-[#0B253A]">No Tables in this Floor Section</h3>
+          <h3 className="font-black text-base text-jaman-navy">No Tables in this Floor Section</h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
             There are no tables assigned to the selected dining section. Click below to add a table:
           </p>
           <button
             onClick={() => onOpenTableModal(null)}
-            className="px-4 py-2 bg-[#E66817] text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
+            className="px-4 py-2 bg-jaman-saffron text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
           >
             + Add Dining Table
           </button>
@@ -219,8 +219,8 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
             };
             if (tbl.status === 'OCCUPIED') {
               statusBadge = {
-                bg: 'bg-orange-50 text-[#E66817] border-orange-200',
-                dot: 'bg-[#E66817] animate-pulse',
+                bg: 'bg-orange-50 text-jaman-saffron border-orange-200',
+                dot: 'bg-jaman-saffron animate-pulse',
                 label: 'Occupied'
               };
             } else if (tbl.status === 'RESERVED') {
@@ -243,17 +243,17 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
                 className={`bg-white rounded-2xl border transition-all flex flex-col justify-between space-y-3 p-4 select-none ${
                   tbl.status === 'OCCUPIED'
                     ? 'border-[#FDBA74] shadow-xs'
-                    : 'border-[#EBE6DD] hover:border-slate-300 shadow-2xs'
+                    : 'border-jaman-border hover:border-slate-300 shadow-2xs'
                 }`}
               >
                 {/* Table Header */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-[#0B253A] text-white flex items-center justify-center font-mono font-black text-sm shadow-2xs">
+                    <div className="w-10 h-10 rounded-xl bg-jaman-navy text-white flex items-center justify-center font-mono font-black text-sm shadow-2xs">
                       T{tbl.tableNumber}
                     </div>
                     <div>
-                      <span className="font-black text-sm text-[#0B253A] block leading-tight">
+                      <span className="font-black text-sm text-jaman-navy block leading-tight">
                         Table {tbl.tableNumber}
                       </span>
                       <span className="text-[10px] text-slate-400 font-medium block">
@@ -281,7 +281,7 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
                       <button
                         onClick={() => onNavigateToQr(tbl.tableNumber)}
                         title={`Generate / Print QR Standee for Table ${tbl.tableNumber}`}
-                        className="p-1 hover:bg-[#FFF4ED] text-[#E66817] rounded-md transition-colors cursor-pointer"
+                        className="p-1 hover:bg-[#FFF4ED] text-jaman-saffron rounded-md transition-colors cursor-pointer"
                       >
                         <QrCode className="w-3.5 h-3.5" />
                       </button>
@@ -293,7 +293,7 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
                 {tbl.status === 'OCCUPIED' && activeOrder ? (
                   <div className="p-2.5 bg-[#FFF9F5] rounded-xl border border-orange-200/70 shadow-2xs space-y-1">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-[#0B253A] font-mono">#{activeOrder.orderNumber}</span>
+                      <span className="font-bold text-jaman-navy font-mono">#{activeOrder.orderNumber}</span>
                       <span className="font-black text-emerald-800 font-mono">
                         {formatINR(activeOrder.totalAmount)}
                       </span>
@@ -303,14 +303,14 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
                       <button
                         type="button"
                         onClick={() => onSelectOrderDetail(activeOrder)}
-                        className="text-[#E66817] font-bold hover:underline cursor-pointer"
+                        className="text-jaman-saffron font-bold hover:underline cursor-pointer"
                       >
                         View Bill →
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="py-2 px-2.5 rounded-xl bg-[#FAF7F2] text-[10px] text-slate-400 font-medium">
+                  <div className="py-2 px-2.5 rounded-xl bg-jaman-cream text-[10px] text-slate-400 font-medium">
                     {tbl.status === 'AVAILABLE' ? '✓ Ready for seating' : `Status: ${tbl.status}`}
                   </div>
                 )}
@@ -323,7 +323,7 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
                       TableRepository.updateTableStatus(tbl.id, e.target.value as any);
                       showToast(`Table ${tbl.tableNumber} status set to ${e.target.value}`);
                     }}
-                    className="text-[11px] font-bold bg-[#FAF7F2] hover:bg-[#F4EFE6] text-[#0B253A] border border-[#EBE6DD] rounded-lg px-2 py-1 focus:outline-none cursor-pointer flex-1"
+                    className="text-[11px] font-bold bg-jaman-cream hover:bg-[#F4EFE6] text-jaman-navy border border-jaman-border rounded-lg px-2 py-1 focus:outline-none cursor-pointer flex-1"
                   >
                     <option value="AVAILABLE">🟢 Available</option>
                     <option value="OCCUPIED">🟠 Occupied</option>
@@ -334,7 +334,7 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => onOpenTableModal(tbl)}
-                      className="p-1.5 hover:bg-[#FAF7F2] rounded-lg text-slate-500 hover:text-[#E66817] transition-colors cursor-pointer"
+                      className="p-1.5 hover:bg-jaman-cream rounded-lg text-slate-500 hover:text-jaman-saffron transition-colors cursor-pointer"
                       title="Edit Table Details"
                     >
                       <Edit2 className="w-3.5 h-3.5" />

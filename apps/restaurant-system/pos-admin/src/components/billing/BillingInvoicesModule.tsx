@@ -374,7 +374,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
               Billing & Invoices
             </h1>
             <span className="bg-emerald-50 text-emerald-800 font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-emerald-200/70">
@@ -389,13 +389,13 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
         {/* Action Controls */}
         <div className="flex flex-wrap items-center gap-2">
           {/* View Mode Toggle */}
-          <div className="bg-white p-1 rounded-xl border border-[#EBE6DD] flex items-center shadow-2xs">
+          <div className="bg-white p-1 rounded-xl border border-jaman-border flex items-center shadow-2xs">
             <button
               onClick={() => setViewMode('FLAT')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 viewMode === 'FLAT'
-                  ? 'bg-[#0B253A] text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-[#FAF7F2]'
+                  ? 'bg-jaman-navy text-white shadow-xs'
+                  : 'text-slate-600 hover:bg-jaman-cream'
               }`}
             >
               📄 Flat Ledger
@@ -404,8 +404,8 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               onClick={() => setViewMode('DAY_GROUPED')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 viewMode === 'DAY_GROUPED'
-                  ? 'bg-[#0B253A] text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-[#FAF7F2]'
+                  ? 'bg-jaman-navy text-white shadow-xs'
+                  : 'text-slate-600 hover:bg-jaman-cream'
               }`}
             >
               🗓️ Day-by-Day
@@ -423,7 +423,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
           <button
             onClick={handleExportCsv}
-            className="px-3.5 py-2 rounded-xl bg-white border border-[#EBE6DD] hover:bg-[#FAF7F2] text-[#0B253A] text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all"
+            className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border hover:bg-jaman-cream text-jaman-navy text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
             <span>Export CSV</span>
@@ -431,16 +431,16 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
           <button
             onClick={handleExportJson}
-            className="px-3.5 py-2 rounded-xl bg-[#0B253A] hover:bg-[#1E3A4C] text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all"
+            className="px-3.5 py-2 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all"
           >
-            <Download className="w-3.5 h-3.5 text-[#E66817]" />
+            <Download className="w-3.5 h-3.5 text-jaman-saffron" />
             <span>Export JSON</span>
           </button>
         </div>
       </div>
 
       {/* 2. DATE SELECTOR BAR */}
-      <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-[#EBE6DD] shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-jaman-border shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-1.5 overflow-x-auto">
           <span className="text-slate-400 font-bold uppercase text-[10px] mr-1">Date Scope:</span>
           {[
@@ -460,8 +460,8 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               }}
               className={`px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap ${
                 datePreset === preset.id
-                  ? 'bg-[#0B253A] text-white shadow-xs'
-                  : 'bg-[#FAF7F2] hover:bg-[#F4EFE6] text-slate-700'
+                  ? 'bg-jaman-navy text-white shadow-xs'
+                  : 'bg-jaman-cream hover:bg-[#F4EFE6] text-slate-700'
               }`}
             >
               {preset.label}
@@ -475,20 +475,20 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               type="date"
               value={customStartDate}
               onChange={(e) => setCustomStartDate(e.target.value)}
-              className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-2.5 py-1 text-xs font-bold text-[#0B253A]"
+              className="bg-jaman-cream border border-jaman-border rounded-xl px-2.5 py-1 text-xs font-bold text-jaman-navy"
             />
             <span className="text-slate-400">to</span>
             <input
               type="date"
               value={customEndDate}
               onChange={(e) => setCustomEndDate(e.target.value)}
-              className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-2.5 py-1 text-xs font-bold text-[#0B253A]"
+              className="bg-jaman-cream border border-jaman-border rounded-xl px-2.5 py-1 text-xs font-bold text-jaman-navy"
             />
           </div>
         )}
 
         <div className="text-[11px] font-bold text-slate-500">
-          Showing: <strong className="text-[#0B253A] font-mono">{dateLabel}</strong> ({summaryMetrics.totalOrders} Invoices)
+          Showing: <strong className="text-jaman-navy font-mono">{dateLabel}</strong> ({summaryMetrics.totalOrders} Invoices)
         </div>
       </div>
 
@@ -506,20 +506,20 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
           }}
           className={`lg:col-span-2 card-metric-premium flex flex-col justify-between cursor-pointer group select-none relative overflow-hidden ${
             paymentFilter === 'ALL' && !refundOnlyFilter
-              ? 'ring-2 ring-[#0B253A]/20 bg-[#FFFBF8]'
-              : 'hover:border-[#0B253A]/40'
+              ? 'ring-2 ring-jaman-navy/20 bg-[#FFFBF8]'
+              : 'hover:border-jaman-navy/40'
           }`}
         >
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E66817] via-[#F59E0B] to-[#E66817]/40" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-jaman-saffron via-[#F59E0B] to-jaman-saffron/40" />
 
           <div>
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">TOTAL NET SALES</span>
-              <div className="w-8 h-8 rounded-xl bg-[#FFF4ED] text-[#E66817] flex items-center justify-center border border-[#FDBA74]/30">
+              <div className="w-8 h-8 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center border border-[#FDBA74]/30">
                 <DollarSign className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-[#0B253A] font-mono mt-2">
+            <div className="text-2xl sm:text-3xl font-black text-jaman-navy font-mono mt-2">
               {formatINR(summaryMetrics.netSales)}
             </div>
           </div>
@@ -637,7 +637,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
       </div>
 
       {/* Order Type Mix Quick Strip */}
-      <div className="bg-white p-3 rounded-2xl border border-[#EBE6DD] shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="bg-white p-3 rounded-2xl border border-jaman-border shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2 text-slate-500 text-[11px] font-bold overflow-x-auto">
           <span className="uppercase text-[10px] text-slate-400">Order Mix:</span>
           <button
@@ -646,7 +646,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               setCurrentPage(1);
             }}
             className={`px-2.5 py-1 rounded-lg transition-all ${
-              orderTypeFilter === 'DINE_IN' ? 'bg-[#0B253A] text-white font-black' : 'bg-[#FAF7F2] hover:bg-slate-100 text-slate-700'
+              orderTypeFilter === 'DINE_IN' ? 'bg-jaman-navy text-white font-black' : 'bg-jaman-cream hover:bg-slate-100 text-slate-700'
             }`}
           >
             🍽️ Dine-in: <span className="font-mono">{formatINR(summaryMetrics.dineInSales)}</span> ({summaryMetrics.dineInCount})
@@ -657,7 +657,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               setCurrentPage(1);
             }}
             className={`px-2.5 py-1 rounded-lg transition-all ${
-              orderTypeFilter === 'TAKEAWAY' ? 'bg-[#0B253A] text-white font-black' : 'bg-[#FAF7F2] hover:bg-slate-100 text-slate-700'
+              orderTypeFilter === 'TAKEAWAY' ? 'bg-jaman-navy text-white font-black' : 'bg-jaman-cream hover:bg-slate-100 text-slate-700'
             }`}
           >
             🛍️ Takeaway: <span className="font-mono">{formatINR(summaryMetrics.takeawaySales)}</span> ({summaryMetrics.takeawayCount})
@@ -668,7 +668,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               setCurrentPage(1);
             }}
             className={`px-2.5 py-1 rounded-lg transition-all ${
-              orderTypeFilter === 'DELIVERY' ? 'bg-[#0B253A] text-white font-black' : 'bg-[#FAF7F2] hover:bg-slate-100 text-slate-700'
+              orderTypeFilter === 'DELIVERY' ? 'bg-jaman-navy text-white font-black' : 'bg-jaman-cream hover:bg-slate-100 text-slate-700'
             }`}
           >
             🛵 Delivery: <span className="font-mono">{formatINR(summaryMetrics.deliverySales)}</span> ({summaryMetrics.deliveryCount})
@@ -679,7 +679,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               setCurrentPage(1);
             }}
             className={`px-2.5 py-1 rounded-lg transition-all ${
-              orderTypeFilter === 'TOKEN' ? 'bg-[#0B253A] text-white font-black' : 'bg-[#FAF7F2] hover:bg-slate-100 text-slate-700'
+              orderTypeFilter === 'TOKEN' ? 'bg-jaman-navy text-white font-black' : 'bg-jaman-cream hover:bg-slate-100 text-slate-700'
             }`}
           >
             ⚡ Quick Token: <span className="font-mono">{formatINR(summaryMetrics.tokenSales)}</span> ({summaryMetrics.tokenCount})
@@ -694,7 +694,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               setRefundOnlyFilter(false);
               setCurrentPage(1);
             }}
-            className="text-[11px] font-bold text-[#E66817] hover:underline"
+            className="text-[11px] font-bold text-jaman-saffron hover:underline"
           >
             Clear Segment Filters ×
           </button>
@@ -702,7 +702,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
       </div>
 
       {/* 5. SEARCH & SECONDARY DROPDOWN FILTERS */}
-      <div className="bg-white p-4 rounded-3xl border border-[#EBE6DD] shadow-xs space-y-3">
+      <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-3">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-3">
           
           {/* Primary Search Input */}
@@ -716,7 +716,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 setCurrentPage(1);
               }}
               placeholder="Search invoice, order, token, customer, phone, cashier, captain, table..."
-              className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl pl-9 pr-4 py-2 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-9 pr-4 py-2 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
             />
             {searchQuery && (
               <button
@@ -737,7 +737,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-[#0B253A]"
+              className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-jaman-navy"
             >
               <option value="ALL">All Statuses</option>
               <option value="COMPLETED">Completed</option>
@@ -755,7 +755,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 setCashierFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-[#0B253A]"
+              className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-jaman-navy"
             >
               <option value="ALL">All Cashiers</option>
               {uniqueCashiers.map((c) => (
@@ -770,7 +770,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 setCaptainFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-[#0B253A]"
+              className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-jaman-navy"
             >
               <option value="ALL">All Captains</option>
               {uniqueCaptains.map((c) => (
@@ -842,7 +842,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
             <button
               onClick={handleClearAllFilters}
-              className="text-[#E66817] font-black hover:underline text-[11px] ml-2"
+              className="text-jaman-saffron font-black hover:underline text-[11px] ml-2"
             >
               Clear All Filters
             </button>
@@ -854,17 +854,17 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
       {/* 6. COMPLETE ORDER LEDGER TABLE / DAY GROUPED VIEW */}
       {/* ========================================================================= */}
       {filteredOrders.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-[#EBE6DD] space-y-3">
+        <div className="bg-white rounded-3xl p-12 text-center border border-jaman-border space-y-3">
           <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
             <Receipt className="w-6 h-6" />
           </div>
-          <h3 className="font-black text-base text-[#0B253A]">No Invoices or Orders Found</h3>
+          <h3 className="font-black text-base text-jaman-navy">No Invoices or Orders Found</h3>
           <p className="text-xs text-slate-500 max-w-md mx-auto">
             No transaction records matched the selected date scope, tender filters, or search criteria.
           </p>
           <button
             onClick={handleClearAllFilters}
-            className="px-4 py-2 bg-[#0B253A] text-white text-xs font-bold rounded-xl shadow-xs"
+            className="px-4 py-2 bg-jaman-navy text-white text-xs font-bold rounded-xl shadow-xs"
           >
             Clear Filters & Show All Records
           </button>
@@ -873,10 +873,10 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
         /* DAY GROUPED LEDGER VIEW */
         <div className="space-y-4">
           {dayGroupedLedger.map((grp) => (
-            <div key={grp.dateKey} className="bg-white rounded-3xl border border-[#EBE6DD] overflow-hidden shadow-xs">
-              <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div key={grp.dateKey} className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-xs">
+              <div className="p-4 bg-jaman-cream border-b border-jaman-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h3 className="font-black text-base text-[#0B253A] uppercase">{grp.displayDate}</h3>
+                  <h3 className="font-black text-base text-jaman-navy uppercase">{grp.displayDate}</h3>
                   <span className="text-xs text-slate-500 font-medium">
                     {grp.orders.length} Orders • Gross: {formatINR(grp.summary.grossSales)} • Tax: {formatINR(grp.summary.tax)}
                   </span>
@@ -893,7 +893,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               {/* Day Orders Table */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-slate-500 uppercase font-bold">
+                  <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-bold">
                     <tr>
                       <th className="p-3">Order / Token</th>
                       <th className="p-3">Time</th>
@@ -909,9 +909,9 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                   <tbody className="divide-y divide-slate-100">
                     {grp.orders.map((ord) => (
                       <tr key={ord.id} className="hover:bg-amber-50/30 transition-colors">
-                        <td className="p-3 font-bold font-mono text-[#0B253A]">
+                        <td className="p-3 font-bold font-mono text-jaman-navy">
                           <div>#{ord.orderNumber}</div>
-                          <span className="text-[10px] font-bold text-[#E66817]">Token #{ord.tokenNumber}</span>
+                          <span className="text-[10px] font-bold text-jaman-saffron">Token #{ord.tokenNumber}</span>
                         </td>
                         <td className="p-3 text-slate-500 font-mono">{formatTime(ord.createdAt)}</td>
                         <td className="p-3">
@@ -919,7 +919,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                           {ord.tableNumber && <span className="text-[10px] text-slate-400">Table {ord.tableNumber}</span>}
                         </td>
                         <td className="p-3">
-                          <span className="font-bold text-[#0B253A] block">{ord.customerName || 'Walk-in'}</span>
+                          <span className="font-bold text-jaman-navy block">{ord.customerName || 'Walk-in'}</span>
                           <span className="text-[10px] text-slate-400 font-mono">{ord.customerPhone}</span>
                         </td>
                         <td className="p-3 text-slate-600 font-semibold">{ord.items.length} items</td>
@@ -947,7 +947,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                         <td className="p-3 text-right">
                           <button
                             onClick={() => setSelectedOrder(ord)}
-                            className="px-2.5 py-1 bg-[#FBF9F5] border border-slate-300 hover:bg-[#FFF4ED] hover:border-[#E66817] text-[#0B253A] font-bold rounded-lg text-xs"
+                            className="px-2.5 py-1 bg-jaman-ivory border border-slate-300 hover:bg-[#FFF4ED] hover:border-jaman-saffron text-jaman-navy font-bold rounded-lg text-xs"
                           >
                             Details
                           </button>
@@ -962,10 +962,10 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
         </div>
       ) : (
         /* FLAT COMPLETE INVOICE LEDGER TABLE */
-        <div className="bg-white rounded-3xl border border-[#EBE6DD] overflow-hidden shadow-xs">
+        <div className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-slate-500 uppercase font-bold sticky top-0 z-10">
+              <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-bold sticky top-0 z-10">
                 <tr>
                   <th className="p-3.5">Invoice #</th>
                   <th className="p-3.5">Token</th>
@@ -989,12 +989,12 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                     className="hover:bg-amber-50/40 cursor-pointer transition-colors"
                     onClick={() => setSelectedOrder(ord)}
                   >
-                    <td className="p-3.5 font-bold font-mono text-[#0B253A]">
+                    <td className="p-3.5 font-bold font-mono text-jaman-navy">
                       <div>#{ord.orderNumber}</div>
                       <span className="text-[10px] text-slate-400">INV-{(ord as any).invoiceNumber || ord.orderNumber}</span>
                     </td>
                     <td className="p-3.5">
-                      <span className="bg-[#FFF4ED] text-[#E66817] font-black text-xs px-2 py-0.5 rounded font-mono">
+                      <span className="bg-[#FFF4ED] text-jaman-saffron font-black text-xs px-2 py-0.5 rounded font-mono">
                         #{ord.tokenNumber}
                       </span>
                     </td>
@@ -1005,11 +1005,11 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                     <td className="p-3.5 font-bold">
                       <div>{ord.orderType}</div>
                       {ord.tableNumber && (
-                        <span className="text-[10px] font-mono text-[#E66817]">Table {ord.tableNumber}</span>
+                        <span className="text-[10px] font-mono text-jaman-saffron">Table {ord.tableNumber}</span>
                       )}
                     </td>
                     <td className="p-3.5">
-                      <span className="font-bold text-[#0B253A] block">{ord.customerName || 'Walk-in'}</span>
+                      <span className="font-bold text-jaman-navy block">{ord.customerName || 'Walk-in'}</span>
                       <span className="text-[10px] text-slate-400 font-mono">{ord.customerPhone}</span>
                     </td>
                     <td className="p-3.5 text-[11px] text-slate-600">
@@ -1020,14 +1020,14 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                       {ord.items.length} dishes
                     </td>
                     <td className="p-3.5 font-mono">₹{ord.subtotal}</td>
-                    <td className="p-3.5 font-mono text-[#E66817]">₹{ord.taxAmount}</td>
+                    <td className="p-3.5 font-mono text-jaman-saffron">₹{ord.taxAmount}</td>
                     <td className="p-3.5 font-mono font-black text-emerald-700 text-sm">
                       {formatINR(ord.totalAmount)}
                     </td>
                     <td className="p-3.5">
                       {ord.paymentMethod === 'SPLIT' ? (
                         <div className="space-y-0.5 font-mono text-[10px]">
-                          <span className="px-1.5 py-0.2 rounded font-black bg-orange-100 text-[#E66817] block">
+                          <span className="px-1.5 py-0.2 rounded font-black bg-orange-100 text-jaman-saffron block">
                             🔀 SPLIT PAYMENT
                           </span>
                           <span className="text-slate-500 block">Cash + UPI</span>
@@ -1058,13 +1058,13 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                         <button
                           onClick={() => handlePrintBill(ord)}
                           title="Print Receipt"
-                          className="p-1.5 bg-[#FAF7F2] hover:bg-[#FFF4ED] border border-slate-300 text-[#0B253A] rounded-lg"
+                          className="p-1.5 bg-jaman-cream hover:bg-[#FFF4ED] border border-slate-300 text-jaman-navy rounded-lg"
                         >
-                          <Printer className="w-3.5 h-3.5 text-[#E66817]" />
+                          <Printer className="w-3.5 h-3.5 text-jaman-saffron" />
                         </button>
                         <button
                           onClick={() => setSelectedOrder(ord)}
-                          className="px-2.5 py-1 bg-[#0B253A] hover:bg-[#1E3A4C] text-white font-bold rounded-lg text-xs"
+                          className="px-2.5 py-1 bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold rounded-lg text-xs"
                         >
                           View
                         </button>
@@ -1077,9 +1077,9 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
           </div>
 
           {/* Pagination Controls */}
-          <div className="p-4 bg-[#FAF7F2] border-t border-[#EBE6DD] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="p-4 bg-jaman-cream border-t border-jaman-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="text-slate-500 font-bold">
-              Showing <strong className="text-[#0B253A]">{(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filteredOrders.length)}</strong> of <strong className="text-[#0B253A]">{filteredOrders.length}</strong> invoices
+              Showing <strong className="text-jaman-navy">{(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filteredOrders.length)}</strong> of <strong className="text-jaman-navy">{filteredOrders.length}</strong> invoices
             </div>
 
             <div className="flex items-center gap-3">
@@ -1094,8 +1094,8 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                     }}
                     className={`px-2.5 py-1 rounded-lg font-bold font-mono ${
                       pageSize === sz
-                        ? 'bg-[#0B253A] text-white'
-                        : 'bg-white border border-[#EBE6DD] text-slate-700 hover:bg-slate-100'
+                        ? 'bg-jaman-navy text-white'
+                        : 'bg-white border border-jaman-border text-slate-700 hover:bg-slate-100'
                     }`}
                   >
                     {sz}
@@ -1107,7 +1107,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="px-3 py-1 bg-white border border-[#EBE6DD] rounded-lg font-bold disabled:opacity-40"
+                  className="px-3 py-1 bg-white border border-jaman-border rounded-lg font-bold disabled:opacity-40"
                 >
                   Prev
                 </button>
@@ -1117,7 +1117,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 <button
                   disabled={currentPage >= totalPages}
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  className="px-3 py-1 bg-white border border-[#EBE6DD] rounded-lg font-bold disabled:opacity-40"
+                  className="px-3 py-1 bg-white border border-jaman-border rounded-lg font-bold disabled:opacity-40"
                 >
                   Next
                 </button>
@@ -1136,15 +1136,15 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
           <div className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95">
             
             {/* Modal Header */}
-            <div className="p-4 sm:p-5 bg-[#0B253A] text-white flex items-center justify-between">
+            <div className="p-4 sm:p-5 bg-jaman-navy text-white flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center">
-                  <Receipt className="w-5 h-5 text-[#E66817]" />
+                  <Receipt className="w-5 h-5 text-jaman-saffron" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-black text-lg">Invoice #{selectedOrder.orderNumber}</h3>
-                    <span className="bg-[#E66817] text-white font-mono font-black text-xs px-2 py-0.5 rounded">
+                    <span className="bg-jaman-saffron text-white font-mono font-black text-xs px-2 py-0.5 rounded">
                       Token #{selectedOrder.tokenNumber}
                     </span>
                   </div>
@@ -1166,22 +1166,22 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
             <div className="flex-1 overflow-y-auto p-5 space-y-5 text-xs">
               
               {/* Order Meta Strip */}
-              <div className="bg-[#FAF7F2] p-3.5 rounded-2xl border border-slate-300 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-jaman-cream p-3.5 rounded-2xl border border-slate-300 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold block uppercase">Customer</span>
-                  <strong className="text-[#0B253A] block">{selectedOrder.customerName || 'Walk-in Guest'}</strong>
+                  <strong className="text-jaman-navy block">{selectedOrder.customerName || 'Walk-in Guest'}</strong>
                   <span className="font-mono text-[10px] text-slate-500">{selectedOrder.customerPhone || 'Counter'}</span>
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold block uppercase">Dining Section</span>
-                  <strong className="text-[#0B253A] block">
+                  <strong className="text-jaman-navy block">
                     {selectedOrder.tableNumber ? `Table ${selectedOrder.tableNumber}` : 'Quick Takeaway'}
                   </strong>
                   <span className="text-[10px] text-slate-500">{selectedOrder.orderType}</span>
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold block uppercase">Staff</span>
-                  <strong className="text-[#0B253A] block">Cashier: {selectedOrder.cashierName || 'Amit Dave'}</strong>
+                  <strong className="text-jaman-navy block">Cashier: {selectedOrder.cashierName || 'Amit Dave'}</strong>
                   <span className="text-[10px] text-slate-500">Captain: {selectedOrder.captainName || 'Rahul Sharma'}</span>
                 </div>
                 <div>
@@ -1203,7 +1203,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               {/* Items Table */}
               <div className="border border-slate-300 rounded-2xl overflow-hidden">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#FAF7F2] border-b border-slate-300 font-black text-slate-600">
+                  <thead className="bg-jaman-cream border-b border-slate-300 font-black text-slate-600">
                     <tr>
                       <th className="p-2.5">Item Description</th>
                       <th className="p-2.5 text-center">Qty</th>
@@ -1216,15 +1216,15 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                     {selectedOrder.items.map((it, idx) => (
                       <tr key={idx}>
                         <td className="p-2.5">
-                          <strong className="text-[#0B253A] block">{it.name}</strong>
+                          <strong className="text-jaman-navy block">{it.name}</strong>
                           {it.specialInstructions && (
                             <span className="text-[10px] text-rose-700 italic">Note: {it.specialInstructions}</span>
                           )}
                         </td>
                         <td className="p-2.5 text-center font-mono font-bold">{it.quantity}</td>
                         <td className="p-2.5 text-right font-mono">₹{it.unitPrice}</td>
-                        <td className="p-2.5 text-right font-mono text-[#E66817]">₹{Math.round((it.totalPrice || it.unitPrice * it.quantity) * 0.05)}</td>
-                        <td className="p-2.5 text-right font-mono font-bold text-[#0B253A]">
+                        <td className="p-2.5 text-right font-mono text-jaman-saffron">₹{Math.round((it.totalPrice || it.unitPrice * it.quantity) * 0.05)}</td>
+                        <td className="p-2.5 text-right font-mono font-bold text-jaman-navy">
                           ₹{it.totalPrice || it.unitPrice * it.quantity}
                         </td>
                       </tr>
@@ -1237,7 +1237,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 
                 {/* Left: Split Payment & Settlement Allocation */}
-                <div className="bg-[#FAF7F2] p-4 rounded-2xl border border-slate-300 space-y-2">
+                <div className="bg-jaman-cream p-4 rounded-2xl border border-slate-300 space-y-2">
                   <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
                     PAYMENT SETTLEMENT BREAKDOWN:
                   </span>
@@ -1276,7 +1276,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 </div>
 
                 {/* Right: Statutory Total Breakdown */}
-                <div className="bg-[#FAF7F2] p-4 rounded-2xl border border-slate-300 space-y-1.5 text-xs font-mono">
+                <div className="bg-jaman-cream p-4 rounded-2xl border border-slate-300 space-y-1.5 text-xs font-mono">
                   <div className="flex justify-between font-semibold">
                     <span>Subtotal (Net Items):</span>
                     <span>₹{selectedOrder.subtotal}</span>
@@ -1293,7 +1293,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                     <span>SGST (2.5%):</span>
                     <span>₹{Math.round((selectedOrder.taxAmount || 0) / 2)}</span>
                   </div>
-                  <div className="flex justify-between font-black text-[#0B253A] text-sm pt-2 border-t border-slate-300">
+                  <div className="flex justify-between font-black text-jaman-navy text-sm pt-2 border-t border-slate-300">
                     <span>GRAND TOTAL:</span>
                     <span className="text-emerald-800">{formatINR(selectedOrder.totalAmount)}</span>
                   </div>
@@ -1304,7 +1304,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
             </div>
 
             {/* Modal Actions Footer */}
-            <div className="p-4 bg-[#FAF7F2] border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+            <div className="p-4 bg-jaman-cream border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 {selectedOrder.orderStatus !== 'REFUNDED' && (
                   <button
@@ -1331,15 +1331,15 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                     showToast(`Reprinting Receipt for #${selectedOrder.orderNumber}...`);
                     printThermalReceipt(selectedOrder, '80mm', ReceiptRepository.getConfig());
                   }}
-                  className="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-[#0B253A] font-bold text-xs rounded-xl flex items-center gap-1.5"
+                  className="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-jaman-navy font-bold text-xs rounded-xl flex items-center gap-1.5"
                 >
-                  <Printer className="w-3.5 h-3.5 text-[#E66817]" />
+                  <Printer className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Reprint Receipt</span>
                 </button>
 
                 <button
                   onClick={() => setSelectedOrder(null)}
-                  className="px-4 py-2 bg-[#0B253A] hover:bg-[#1E3A4C] text-white font-bold text-xs rounded-xl"
+                  className="px-4 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold text-xs rounded-xl"
                 >
                   Done
                 </button>
@@ -1356,7 +1356,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
           <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border space-y-4 animate-in fade-in zoom-in-95">
             <div className="flex items-center gap-3 text-amber-600">
               <AlertTriangle className="w-6 h-6" />
-              <h3 className="font-black text-base text-[#0B253A]">Process Invoice Refund</h3>
+              <h3 className="font-black text-base text-jaman-navy">Process Invoice Refund</h3>
             </div>
             <p className="text-xs text-slate-600">
               Are you sure you want to refund Invoice <strong>#{selectedOrder.orderNumber}</strong> for total amount of <strong className="text-emerald-700">{formatINR(selectedOrder.totalAmount)}</strong>?
@@ -1367,7 +1367,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 type="text"
                 value={refundReason}
                 onChange={(e) => setRefundReason(e.target.value)}
-                className="w-full bg-[#FAF7F2] border border-slate-300 rounded-xl p-2.5 text-xs font-bold"
+                className="w-full bg-jaman-cream border border-slate-300 rounded-xl p-2.5 text-xs font-bold"
               />
             </div>
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
@@ -1394,7 +1394,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
           <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border space-y-4 animate-in fade-in zoom-in-95">
             <div className="flex items-center gap-3 text-rose-600">
               <Ban className="w-6 h-6" />
-              <h3 className="font-black text-base text-[#0B253A]">Void / Cancel Order</h3>
+              <h3 className="font-black text-base text-jaman-navy">Void / Cancel Order</h3>
             </div>
             <p className="text-xs text-slate-600">
               Are you sure you want to void Order <strong>#{selectedOrder.orderNumber}</strong>? This action will mark the bill cancelled and record an audit log.
@@ -1405,7 +1405,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 type="text"
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
-                className="w-full bg-[#FAF7F2] border border-slate-300 rounded-xl p-2.5 text-xs font-bold"
+                className="w-full bg-jaman-cream border border-slate-300 rounded-xl p-2.5 text-xs font-bold"
               />
             </div>
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">

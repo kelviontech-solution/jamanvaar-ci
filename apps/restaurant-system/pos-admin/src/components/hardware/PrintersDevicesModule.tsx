@@ -67,7 +67,7 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
               Printers & Peripheral Devices
             </h1>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
@@ -80,7 +80,7 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
         </div>
         <button
           onClick={() => onOpenPrinterModal(null)}
-          className="px-4 py-2.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs flex items-center gap-2 shadow-sm shadow-[#E66817]/25 active:scale-95 transition-all cursor-pointer"
+          className="px-4 py-2.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs flex items-center gap-2 shadow-sm shadow-jaman-saffron/25 active:scale-95 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Configure Printer</span>
@@ -89,58 +89,58 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
 
       {/* 4 Peripheral Device Status Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">POS Counter PC</span>
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           </div>
-          <div className="text-base font-extrabold text-[#0B253A]">Counter Terminal</div>
+          <div className="text-base font-extrabold text-jaman-navy">Counter Terminal</div>
           <span className="text-[10px] text-emerald-600 font-bold block">✓ Localhost Active</span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Receipt Printers</span>
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
           </div>
-          <div className="text-base font-extrabold text-[#0B253A]">Thermal 80mm ESC/POS</div>
+          <div className="text-base font-extrabold text-jaman-navy">Thermal 80mm ESC/POS</div>
           <span className="text-[10px] text-slate-500 font-bold block">{configuredPrinters.length} Configured</span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Cash Drawer</span>
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
           </div>
-          <div className="text-base font-extrabold text-[#0B253A]">RJ11 Kick Solenoid</div>
+          <div className="text-base font-extrabold text-jaman-navy">RJ11 Kick Solenoid</div>
           <span className="text-[10px] text-slate-500 font-bold block">Auto-Open on Bill</span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">LAN Mesh Bridge</span>
             <span className="w-2 h-2 rounded-full bg-indigo-500" />
           </div>
-          <div className="text-base font-extrabold text-[#0B253A]">Multi-Device Sync</div>
+          <div className="text-base font-extrabold text-jaman-navy">Multi-Device Sync</div>
           <span className="text-[10px] text-indigo-600 font-bold block">Port 5178 Listening</span>
         </div>
       </div>
 
       {/* Configured Printers List */}
       {configuredPrinters.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 border border-[#EBE6DD] text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#E66817] flex items-center justify-center mx-auto">
+        <div className="bg-white rounded-2xl p-12 border border-jaman-border text-center space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-jaman-saffron flex items-center justify-center mx-auto">
             <Printer className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="font-extrabold text-[#0B253A] text-base">No Thermal Printers Configured</h3>
+            <h3 className="font-extrabold text-jaman-navy text-base">No Thermal Printers Configured</h3>
             <p className="text-xs text-slate-400 max-w-sm mx-auto mt-0.5">
               Connect your 80mm or 58mm ESC/POS receipt or kitchen KOT printer via LAN Ethernet, USB, or Bluetooth.
             </p>
           </div>
           <button
             onClick={() => onOpenPrinterModal(null)}
-            className="px-4 py-2 rounded-xl bg-[#E66817] text-white font-bold text-xs shadow-xs cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-jaman-saffron text-white font-bold text-xs shadow-xs cursor-pointer"
           >
             + Configure First Printer
           </button>
@@ -148,14 +148,14 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {configuredPrinters.map((prn) => (
-            <div key={prn.id} className="bg-white rounded-2xl p-5 border border-[#EBE6DD] shadow-2xs space-y-4">
+            <div key={prn.id} className="bg-white rounded-2xl p-5 border border-jaman-border shadow-2xs space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#FFF4ED] text-[#E66817] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center">
                     <Printer className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-sm text-[#0B253A]">{prn.name}</h4>
+                    <h4 className="font-extrabold text-sm text-jaman-navy">{prn.name}</h4>
                     <span className="text-xs text-slate-400">
                       {prn.interfaceType} • {prn.paperSize}
                     </span>
@@ -171,7 +171,7 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => onOpenPrinterModal(prn)}
-                    className="text-[#E66817] font-bold hover:underline cursor-pointer"
+                    className="text-jaman-saffron font-bold hover:underline cursor-pointer"
                   >
                     Edit Config
                   </button>
@@ -189,7 +189,7 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
                     showToast(`Test print dispatched to ${prn.name}`);
                     window.print();
                   }}
-                  className="px-3 py-1.5 bg-[#0B253A] hover:bg-[#1E3A4C] text-white font-bold rounded-xl transition-colors cursor-pointer"
+                  className="px-3 py-1.5 bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold rounded-xl transition-colors cursor-pointer"
                 >
                   ⚡ Run Test Print
                 </button>
@@ -200,7 +200,7 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
       )}
 
       {/* LAN SYNC BRIDGE & MULTI-MACHINE CONNECTION CONSOLE */}
-      <div className="bg-white rounded-2xl p-6 border border-[#EBE6DD] shadow-2xs space-y-5">
+      <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-2xs space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
@@ -208,7 +208,7 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-black text-base text-[#0B253A]">LAN Sync Bridge & Cross-Machine Pairing</h3>
+                <h3 className="font-black text-base text-jaman-navy">LAN Sync Bridge & Cross-Machine Pairing</h3>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-100 text-indigo-800">
                   MULTI-DEVICE SYNC
                 </span>
@@ -232,7 +232,7 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
                 }
               }}
               disabled={isSyncingNow}
-              className="px-3.5 py-2 bg-[#0B253A] hover:bg-[#1E3A4C] text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-2xs disabled:opacity-50 transition-all cursor-pointer"
+              className="px-3.5 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-2xs disabled:opacity-50 transition-all cursor-pointer"
             >
               <RotateCw className={`w-3.5 h-3.5 ${isSyncingNow ? 'animate-spin' : ''}`} />
               <span>{isSyncingNow ? 'Syncing...' : '⚡ Force Sync Now'}</span>
@@ -252,20 +252,20 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
                 value={syncServerInput}
                 onChange={(e) => setSyncServerInput(e.target.value)}
                 placeholder="e.g. http://192.168.1.100:5178 or http://localhost:5178"
-                className="flex-1 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="flex-1 bg-jaman-cream border border-jaman-border rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
               <button
                 onClick={() => {
                   db.setSyncServerUrl(syncServerInput);
                   showToast(`Sync Host Server updated to: ${syncServerInput}`);
                 }}
-                className="px-4 py-2.5 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-2xs transition-colors cursor-pointer"
+                className="px-4 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-2xs transition-colors cursor-pointer"
               >
                 Save & Connect
               </button>
             </div>
             <span className="text-[11px] text-slate-400 block">
-              Tip: If this is the Main Counter PC, leave as <code className="text-[#0B253A] font-bold">http://localhost:5178</code>. On other laptops/tablets, enter the Main PC's LAN IP.
+              Tip: If this is the Main Counter PC, leave as <code className="text-jaman-navy font-bold">http://localhost:5178</code>. On other laptops/tablets, enter the Main PC's LAN IP.
             </span>
           </div>
 
@@ -284,9 +284,9 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
                     showToast(`Connection failed: ${res.error}`);
                   }
                 }}
-                className="w-full px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[#0B253A] font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-jaman-navy font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
-                <Radio className="w-3.5 h-3.5 text-[#E66817]" />
+                <Radio className="w-3.5 h-3.5 text-jaman-saffron" />
                 <span>Test Ping & Latency</span>
               </button>
             </div>

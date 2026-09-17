@@ -59,10 +59,10 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
 
   if (!loggedIn) {
     return (
-      <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-2xs">
+      <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-2xs">
         <div className="flex items-center gap-2 mb-1">
-          <KeyRound className="w-4 h-4 text-[#E66817]" />
-          <h3 className="text-sm font-bold text-[#0B253A]">Device &amp; Staff Logins</h3>
+          <KeyRound className="w-4 h-4 text-jaman-saffron" />
+          <h3 className="text-sm font-bold text-jaman-navy">Device &amp; Staff Logins</h3>
         </div>
         <p className="text-[11px] text-slate-500">Sign in to JAMANVAAR Cloud above to manage logins for Captain and other apps.</p>
       </div>
@@ -107,16 +107,16 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
   }
 
   return (
-    <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-2xs space-y-3">
+    <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-2xs space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <KeyRound className="w-4 h-4 text-[#E66817]" />
-          <h3 className="text-sm font-bold text-[#0B253A]">Device &amp; Staff Logins</h3>
+          <KeyRound className="w-4 h-4 text-jaman-saffron" />
+          <h3 className="text-sm font-bold text-jaman-navy">Device &amp; Staff Logins</h3>
         </div>
         <button
           type="button"
           onClick={() => setFormOpen((v) => !v)}
-          className="px-3.5 py-2 rounded-xl bg-[#0B253A] hover:bg-[#1E3A4C] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+          className="px-3.5 py-2 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Generate Login</span>
@@ -135,15 +135,15 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
           </div>
           <div className="flex items-center gap-2 text-xs font-mono">
             <span className="text-slate-500">Email:</span>
-            <span className="font-bold text-[#0B253A]">{justCreated.email}</span>
-            <button type="button" onClick={() => copy(justCreated.email, 'email')} className="text-slate-400 hover:text-[#0B253A] cursor-pointer">
+            <span className="font-bold text-jaman-navy">{justCreated.email}</span>
+            <button type="button" onClick={() => copy(justCreated.email, 'email')} className="text-slate-400 hover:text-jaman-navy cursor-pointer">
               {copiedField === 'email' ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
             </button>
           </div>
           <div className="flex items-center gap-2 text-xs font-mono">
             <span className="text-slate-500">Password:</span>
-            <span className="font-bold text-[#0B253A]">{justCreated.password}</span>
-            <button type="button" onClick={() => copy(justCreated.password, 'password')} className="text-slate-400 hover:text-[#0B253A] cursor-pointer">
+            <span className="font-bold text-jaman-navy">{justCreated.password}</span>
+            <button type="button" onClick={() => copy(justCreated.password, 'password')} className="text-slate-400 hover:text-jaman-navy cursor-pointer">
               {copiedField === 'password' ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
             </button>
           </div>
@@ -154,7 +154,7 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
       )}
 
       {formOpen && (
-        <form onSubmit={handleCreate} className="p-3.5 bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl space-y-2.5">
+        <form onSubmit={handleCreate} className="p-3.5 bg-jaman-cream border border-jaman-border rounded-2xl space-y-2.5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
               <label className="text-[11px] font-bold text-slate-600 block mb-1">Full Name / Device Label *</label>
@@ -164,7 +164,7 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="e.g. Captain Tablet 1"
                 required
-                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-semibold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
             <div>
@@ -175,7 +175,7 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="captain1@yourrestaurant.com"
                 required
-                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-semibold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
             <div>
@@ -183,7 +183,7 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value as 'MANAGER' | 'STAFF')}
-                className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-semibold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               >
                 <option value="STAFF">Staff (Captain, waiter, cashier)</option>
                 <option value="MANAGER">Manager</option>
@@ -196,12 +196,12 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
                   type="text"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-mono font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
                 <button
                   type="button"
                   onClick={() => setPassword(randomPassword())}
-                  className="text-[10px] font-bold text-slate-500 hover:text-[#0B253A] underline cursor-pointer shrink-0"
+                  className="text-[10px] font-bold text-slate-500 hover:text-jaman-navy underline cursor-pointer shrink-0"
                 >
                   Regenerate
                 </button>
@@ -210,13 +210,13 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
           </div>
           {formError && <div className="form-error">{formError}</div>}
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={() => setFormOpen(false)} className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-[#0B253A] cursor-pointer">
+            <button type="button" onClick={() => setFormOpen(false)} className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-jaman-navy cursor-pointer">
               Cancel
             </button>
             <button
               type="submit"
               disabled={busy}
-              className="px-4 py-2 rounded-xl bg-[#E66817] hover:bg-[#EA580C] disabled:opacity-40 text-white font-bold text-xs cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-40 text-white font-bold text-xs cursor-pointer"
             >
               {busy ? 'Creating…' : 'Create Login'}
             </button>
@@ -227,15 +227,15 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
       {loadError && <div className="form-error">{loadError}</div>}
 
       {users && (
-        <div className="divide-y divide-slate-100 border border-[#EBE6DD] rounded-2xl overflow-hidden">
+        <div className="divide-y divide-slate-100 border border-jaman-border rounded-2xl overflow-hidden">
           {users.map((u) => (
             <div key={u.id} className="flex items-center justify-between px-3.5 py-2.5 bg-white">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 rounded-full bg-[#FFF4ED] text-[#E66817] flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-full bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center shrink-0">
                   <UserRound className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-xs font-bold text-[#0B253A] truncate">{u.fullName}</div>
+                  <div className="text-xs font-bold text-jaman-navy truncate">{u.fullName}</div>
                   <div className="text-[10px] text-slate-500 font-mono truncate">{u.email}</div>
                 </div>
               </div>

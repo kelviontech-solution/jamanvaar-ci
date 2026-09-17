@@ -46,18 +46,18 @@ export const PrimaryMetricsGrid: React.FC<PrimaryMetricsGridProps> = ({
           three supporting metrics below, instead of four identically-sized
           cards competing for the same amount of attention. */}
       <div className="dash-hero-card rounded-2xl p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 relative overflow-hidden group">
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#E66817] via-[#F59E0B] to-[#E66817]/40" />
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-jaman-saffron via-[#F59E0B] to-jaman-saffron/40" />
 
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#FFF4ED] text-[#E66817] flex items-center justify-center border border-[#FDBA74]/30">
+            <div className="w-9 h-9 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center border border-[#FDBA74]/30">
               <DollarSign className="w-4.5 h-4.5" />
             </div>
             <span className="text-xs font-bold text-[#8C9BAE] uppercase tracking-wider">
               {periodLabel} Net Sales
             </span>
           </div>
-          <div className="mt-3 text-4xl sm:text-[46px] font-black text-[#0B253A] font-mono tracking-tight leading-none">
+          <div className="mt-3 text-4xl sm:text-[46px] font-black text-jaman-navy font-mono tracking-tight leading-none">
             {formatINR(netSales)}
           </div>
         </div>
@@ -75,14 +75,14 @@ export const PrimaryMetricsGrid: React.FC<PrimaryMetricsGridProps> = ({
           around the primary figure rather than competing with it. */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Completed Orders */}
-        <div className="rounded-xl p-4 bg-white border border-[#EBE6DD] flex flex-col justify-between">
+        <div className="rounded-xl p-4 bg-white border border-jaman-border flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-[#8C9BAE] uppercase tracking-wider">
               Completed Orders
             </span>
-            <ShoppingBag className="w-3.5 h-3.5 text-[#0B253A]/50" />
+            <ShoppingBag className="w-3.5 h-3.5 text-jaman-navy/50" />
           </div>
-          <div className="mt-2 text-xl font-black text-[#0B253A] font-mono tracking-tight leading-none">
+          <div className="mt-2 text-xl font-black text-jaman-navy font-mono tracking-tight leading-none">
             {ordersCount}
           </div>
           <div className="mt-2 text-[11px] text-[#5A6878] font-medium truncate">
@@ -91,28 +91,28 @@ export const PrimaryMetricsGrid: React.FC<PrimaryMetricsGridProps> = ({
         </div>
 
         {/* Average Order Value */}
-        <div className="rounded-xl p-4 bg-white border border-[#EBE6DD] flex flex-col justify-between">
+        <div className="rounded-xl p-4 bg-white border border-jaman-border flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-[#8C9BAE] uppercase tracking-wider">
               Average Order (AOV)
             </span>
             <TrendingUp className="w-3.5 h-3.5 text-blue-600/70" />
           </div>
-          <div className="mt-2 text-xl font-black text-[#0B253A] font-mono tracking-tight leading-none">
+          <div className="mt-2 text-xl font-black text-jaman-navy font-mono tracking-tight leading-none">
             {formatINR(avgOrderValue)}
           </div>
           <div className="mt-2 text-[11px] text-[#5A6878] font-medium">Net sales ÷ orders</div>
         </div>
 
         {/* Collections */}
-        <div className="rounded-xl p-4 bg-white border border-[#EBE6DD] flex flex-col justify-between">
+        <div className="rounded-xl p-4 bg-white border border-jaman-border flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-[#8C9BAE] uppercase tracking-wider">
               Total Collections
             </span>
             <CreditCard className="w-3.5 h-3.5 text-emerald-600/70" />
           </div>
-          <div className="mt-2 text-xl font-black text-[#0B253A] font-mono tracking-tight leading-none">
+          <div className="mt-2 text-xl font-black text-jaman-navy font-mono tracking-tight leading-none">
             {formatINR(totalCollections)}
           </div>
           <div className="mt-2 text-[11px] text-[#5A6878] font-medium truncate">

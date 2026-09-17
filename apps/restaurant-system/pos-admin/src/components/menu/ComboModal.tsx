@@ -26,7 +26,7 @@ function ItemPicker({
   return (
     <div>
       <label className="block text-xs font-bold text-slate-600 mb-1">{label}</label>
-      <div className="max-h-32 overflow-y-auto border border-[#EBE6DD] rounded-xl bg-[#FBF9F5] p-2 space-y-1">
+      <div className="max-h-32 overflow-y-auto border border-jaman-border rounded-xl bg-jaman-ivory p-2 space-y-1">
         {items.length === 0 ? (
           <p className="text-[11px] text-slate-400 px-1 py-1">No dishes available — add menu items first.</p>
         ) : (
@@ -40,7 +40,7 @@ function ItemPicker({
                 checked={selectedIds.includes(item.id)}
                 onChange={() => onToggle(item.id)}
               />
-              <span className="font-semibold text-[#0B253A]">{item.name}</span>
+              <span className="font-semibold text-jaman-navy">{item.name}</span>
               <span className="text-slate-400 font-mono ml-auto">₹{item.price}</span>
             </label>
           ))
@@ -182,7 +182,7 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Family Feast Combo"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             />
           </div>
           <div>
@@ -192,7 +192,7 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g. 2 mains, a side, and a drink"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             />
           </div>
         </div>
@@ -206,7 +206,7 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
               value={basePrice}
               onChange={(e) => setBasePrice(e.target.value)}
               placeholder="e.g. 449"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
           <div>
@@ -217,7 +217,7 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
               value={originalPrice}
               onChange={(e) => setOriginalPrice(e.target.value)}
               placeholder="e.g. 550"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
         </div>

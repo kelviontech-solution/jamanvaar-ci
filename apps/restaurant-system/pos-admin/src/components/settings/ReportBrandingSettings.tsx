@@ -106,7 +106,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A]">
+          <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">
             Report Branding & Legal Profile
           </h1>
           <p className="text-xs text-[#4A5568] mt-0.5">
@@ -116,7 +116,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
 
         <button
           type="submit"
-          className="px-6 py-2.5 bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs rounded-xl shadow-xs flex items-center gap-2 min-h-[44px]"
+          className="px-6 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs rounded-xl shadow-xs flex items-center gap-2 min-h-[44px]"
         >
           <CheckCircle2 className="w-4 h-4" />
           <span>Save Changes</span>
@@ -126,9 +126,9 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
       {/* App Preferences — layered on top of the platform-wide JAMAN AI
           entitlement toggle in Super Admin, which only controls whether the
           feature exists at all; this is the per-restaurant opt-out. */}
-      <div className="bg-white p-5 rounded-3xl border border-[#EBE6DD] shadow-2xs flex items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-3xl border border-jaman-border shadow-2xs flex items-center justify-between gap-4">
         <div>
-          <span className="text-sm font-black text-[#0B253A] block">Show JAMAN AI Assistant</span>
+          <span className="text-sm font-black text-jaman-navy block">Show JAMAN AI Assistant</span>
           <span className="text-xs text-slate-500">
             Displays the floating JAMAN AI button on POS, Captain and this Admin console. Turning this off hides it for every staff member at this restaurant.
           </span>
@@ -140,12 +140,12 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
             onChange={(e) => setShowJamanAI(e.target.checked)}
             className="sr-only peer"
           />
-          <div className="w-11 h-6 bg-slate-200 peer-checked:bg-[#E66817] rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5" />
+          <div className="w-11 h-6 bg-slate-200 peer-checked:bg-jaman-saffron rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5" />
         </label>
       </div>
 
       {/* Live Preview Card */}
-      <div className="bg-[#FAF7F2] p-5 rounded-3xl border border-slate-300 shadow-2xs space-y-3">
+      <div className="bg-jaman-cream p-5 rounded-3xl border border-slate-300 shadow-2xs space-y-3">
         <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
           LIVE DOCUMENT HEADER PREVIEW:
         </span>
@@ -162,7 +162,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
               />
             )}
             <div>
-              <h3 className="font-black text-sm text-[#0B253A] uppercase">{name}</h3>
+              <h3 className="font-black text-sm text-jaman-navy uppercase">{name}</h3>
               <span className="text-[10px] text-slate-500 font-bold block">{legalName}</span>
               <span className="text-[10px] text-slate-400 italic block">{tagline}</span>
             </div>
@@ -177,12 +177,12 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
       </div>
 
       {/* Main Settings Grid */}
-      <div className="bg-white p-6 rounded-3xl border border-[#EBE6DD] shadow-xs space-y-6 text-xs">
+      <div className="bg-white p-6 rounded-3xl border border-jaman-border shadow-xs space-y-6 text-xs">
         
         {/* 1. Identity & Trade Names */}
         <div className="space-y-3">
-          <h3 className="font-black text-sm text-[#0B253A] flex items-center gap-2 border-b border-slate-100 pb-2">
-            <Building className="w-4 h-4 text-[#E66817]" />
+          <h3 className="font-black text-sm text-jaman-navy flex items-center gap-2 border-b border-slate-100 pb-2">
+            <Building className="w-4 h-4 text-jaman-saffron" />
             <span>1. Restaurant Identity & Trade Names</span>
           </h3>
 
@@ -197,7 +197,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. JAMANVAAR RESTAURANT"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
               <span className="text-[10px] text-slate-400 mt-0.5 block">Used in customer apps, bills & headings</span>
             </div>
@@ -212,7 +212,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={legalName}
                 onChange={(e) => setLegalName(e.target.value)}
                 placeholder="e.g. JAMANVAAR FOODS & HOSPITALITY PRIVATE LIMITED"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
               <span className="text-[10px] text-slate-400 mt-0.5 block">Used on GST Invoices & official EOD Reports</span>
             </div>
@@ -226,7 +226,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={tagline}
                 onChange={(e) => setTagline(e.target.value)}
                 placeholder="e.g. Authentic Indian Cuisine & Seamless Dining by KELVIONTECH"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-semibold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-semibold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
 
@@ -240,7 +240,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                   value={logoUrl}
                   onChange={(e) => setLogoUrl(e.target.value)}
                   placeholder="/jamanvaar.png.png"
-                  className="flex-1 bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-mono text-xs font-semibold focus:outline-none focus:border-[#E66817]"
+                  className="flex-1 bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-mono text-xs font-semibold focus:outline-none focus:border-jaman-saffron"
                 />
                 <button
                   type="button"
@@ -256,7 +256,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
 
         {/* 2. Tax & Legal Regulatory Numbers */}
         <div className="space-y-3">
-          <h3 className="font-black text-sm text-[#0B253A] flex items-center gap-2 border-b border-slate-100 pb-2">
+          <h3 className="font-black text-sm text-jaman-navy flex items-center gap-2 border-b border-slate-100 pb-2">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>2. Statutory Tax & Regulatory Credentials</span>
           </h3>
@@ -272,7 +272,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={gstin}
                 onChange={(e) => setGstin(e.target.value.toUpperCase())}
                 placeholder="24ABCDE1234F1Z5"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-mono font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
 
@@ -286,7 +286,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={fssaiNumber}
                 onChange={(e) => setFssaiNumber(e.target.value)}
                 placeholder="10722001000452"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-mono font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
 
@@ -299,7 +299,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={msmeNumber}
                 onChange={(e) => setMsmeNumber(e.target.value)}
                 placeholder="UDYAM-GJ-01-0012345"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-mono font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
           </div>
@@ -307,7 +307,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
 
         {/* 3. Address & Physical Location */}
         <div className="space-y-3">
-          <h3 className="font-black text-sm text-[#0B253A] flex items-center gap-2 border-b border-slate-100 pb-2">
+          <h3 className="font-black text-sm text-jaman-navy flex items-center gap-2 border-b border-slate-100 pb-2">
             <Building className="w-4 h-4 text-blue-600" />
             <span>3. Address & Geographical Location</span>
           </h3>
@@ -321,7 +321,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Sindhu Bhavan Road, Bodakdev"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
 
@@ -333,7 +333,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="Ahmedabad"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
 
@@ -346,7 +346,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                   value={state}
                   onChange={(e) => setState(e.target.value)}
                   placeholder="Gujarat"
-                  className="w-2/3 bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2.5 font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-2/3 bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2.5 font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
                 <input
                   type="text"
@@ -354,7 +354,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
                   placeholder="380054"
-                  className="w-1/3 bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-2 py-2.5 font-mono font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-1/3 bg-jaman-ivory border border-jaman-border rounded-xl px-2 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
               </div>
             </div>
@@ -363,7 +363,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
 
         {/* 4. Contact & Online Details */}
         <div className="space-y-3">
-          <h3 className="font-black text-sm text-[#0B253A] flex items-center gap-2 border-b border-slate-100 pb-2">
+          <h3 className="font-black text-sm text-jaman-navy flex items-center gap-2 border-b border-slate-100 pb-2">
             <Phone className="w-4 h-4 text-purple-600" />
             <span>4. Contact Channels & Website</span>
           </h3>
@@ -377,7 +377,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+91 79 4890 1234"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-mono font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
 
@@ -389,7 +389,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="hello@jamanvaar.com"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
 
@@ -400,7 +400,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 placeholder="https://jamanvaar.com"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-semibold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-semibold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
           </div>
@@ -408,7 +408,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
 
         {/* 5. Authorizing Officials & Footer Message */}
         <div className="space-y-3">
-          <h3 className="font-black text-sm text-[#0B253A] flex items-center gap-2 border-b border-slate-100 pb-2">
+          <h3 className="font-black text-sm text-jaman-navy flex items-center gap-2 border-b border-slate-100 pb-2">
             <User className="w-4 h-4 text-amber-600" />
             <span>5. Signatories & Printed Statement Footer</span>
           </h3>
@@ -421,7 +421,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={ownerName}
                 onChange={(e) => setOwnerName(e.target.value)}
                 placeholder="Ramesh Patel"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
 
@@ -432,7 +432,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={managerName}
                 onChange={(e) => setManagerName(e.target.value)}
                 placeholder="Pooja Shah"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
 
@@ -443,7 +443,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={footerText}
                 onChange={(e) => setFooterText(e.target.value)}
                 placeholder="Official Daily Closing Statement • Powered by JAMANVAAR by KELVIONTECH"
-                className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3.5 py-2.5 font-semibold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-semibold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
           </div>
@@ -453,7 +453,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
         <div className="pt-4 border-t border-slate-100 flex justify-end">
           <button
             type="submit"
-            className="px-8 py-3 bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs rounded-2xl shadow-xs transition-all flex items-center gap-2 min-h-[44px]"
+            className="px-8 py-3 bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs rounded-2xl shadow-xs transition-all flex items-center gap-2 min-h-[44px]"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>Save & Apply Across All Reports</span>

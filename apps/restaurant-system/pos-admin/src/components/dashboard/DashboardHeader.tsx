@@ -43,10 +43,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       {/* Title & Operational Mission Subtitle */}
       <div>
         <div className="flex items-center gap-2.5">
-          <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
             Restaurant Operations
           </h1>
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFF4ED] text-[#E66817] border border-[#FDBA74]/50">
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74]/50">
             <Sparkles className="w-3 h-3" />
             Live Command Center
           </span>
@@ -55,7 +55,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           Monitor today's sales, orders, cash flow, and restaurant activity.
           {dateRangeLabel && (
             <span className="ml-2 text-slate-400 font-normal">
-              • Showing: <span className="font-semibold text-[#0B253A]">{dateRangeLabel}</span>
+              • Showing: <span className="font-semibold text-jaman-navy">{dateRangeLabel}</span>
             </span>
           )}
         </p>
@@ -64,7 +64,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       {/* Right Controls: Period Selector & Quick Refresh */}
       <div className="flex items-center gap-2 self-start md:self-auto shrink-0 flex-wrap sm:flex-nowrap">
         {/* Segmented Filter Pills */}
-        <div className="inline-flex items-center bg-white p-1 rounded-2xl border border-[#EBE6DD] shadow-xs overflow-x-auto max-w-full">
+        <div className="inline-flex items-center bg-white p-1 rounded-2xl border border-jaman-border shadow-xs overflow-x-auto max-w-full">
           {PERIODS.map((period) => {
             const isSelected = currentFilter === period;
             return (
@@ -74,8 +74,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => onFilterChange(period)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                   isSelected
-                    ? 'bg-[#0B253A] text-white shadow-xs'
-                    : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-[#0B253A]'
+                    ? 'bg-jaman-navy text-white shadow-xs'
+                    : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
                 }`}
               >
                 {PERIOD_LABELS[period]}
@@ -90,9 +90,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             type="button"
             onClick={handleRefresh}
             title="Refresh dashboard metrics"
-            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-[#FAF7F2] text-[#0B253A] border border-[#EBE6DD] rounded-xl text-xs font-bold shadow-xs hover:border-[#D8D1C3] transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-jaman-cream text-jaman-navy border border-jaman-border rounded-xl text-xs font-bold shadow-xs hover:border-[#D8D1C3] transition-all cursor-pointer active:scale-95"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-[#E66817] ${isSpinning ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-jaman-saffron ${isSpinning ? 'animate-spin' : ''}`} />
             <span className="hidden lg:inline">Refresh</span>
           </button>
         )}

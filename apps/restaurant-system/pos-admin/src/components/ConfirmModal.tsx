@@ -28,7 +28,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       <div className="space-y-4 py-2">
         <div className="flex items-start gap-3 p-3.5 bg-rose-50 border border-rose-200 rounded-2xl">
           <AlertTriangle className={`w-5 h-5 shrink-0 ${isDanger ? 'text-rose-600' : 'text-amber-600'}`} />
-          <p className="text-xs font-semibold text-[#0B253A] leading-relaxed whitespace-pre-line">
+          <p className="text-xs font-semibold text-jaman-navy leading-relaxed whitespace-pre-line">
             {message}
           </p>
         </div>
@@ -43,7 +43,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
               onClose();
             }}
             className={`px-4 py-2 rounded-xl text-xs font-bold text-white transition-all shadow-xs active:scale-95 ${
-              isDanger ? 'bg-rose-600 hover:bg-rose-700' : 'bg-[#E66817] hover:bg-[#EA580C]'
+              isDanger ? 'bg-rose-600 hover:bg-rose-700' : 'bg-jaman-saffron hover:bg-[#EA580C]'
             }`}
           >
             {confirmText}

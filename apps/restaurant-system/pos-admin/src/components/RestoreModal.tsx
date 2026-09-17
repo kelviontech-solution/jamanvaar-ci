@@ -90,10 +90,10 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
         </div>
 
         {/* File Picker */}
-        <div className="p-6 border-2 border-dashed border-slate-300 rounded-2xl text-center space-y-3 bg-[#FBF9F5]">
+        <div className="p-6 border-2 border-dashed border-slate-300 rounded-2xl text-center space-y-3 bg-jaman-ivory">
           <Upload className="w-8 h-8 text-slate-400 mx-auto" />
           <div>
-            <label className="cursor-pointer px-4 py-2 bg-[#0B253A] hover:bg-[#1E3A4C] text-white text-xs font-bold rounded-xl shadow-xs inline-block transition-all">
+            <label className="cursor-pointer px-4 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white text-xs font-bold rounded-xl shadow-xs inline-block transition-all">
               Choose JSON Backup File
               <input type="file" accept=".json" onChange={handleFileUpload} className="hidden" />
             </label>
@@ -113,27 +113,27 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
 
         {/* Preview Summary */}
         {parsedData && (
-          <div className="p-4 bg-white border border-[#EBE6DD] rounded-2xl space-y-2">
-            <h4 className="font-bold text-xs text-[#0B253A] flex items-center gap-1.5">
+          <div className="p-4 bg-white border border-jaman-border rounded-2xl space-y-2">
+            <h4 className="font-bold text-xs text-jaman-navy flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <span>Snapshot Contents Validated:</span>
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-              <div className="p-2 bg-[#FBF9F5] rounded-lg">
+              <div className="p-2 bg-jaman-ivory rounded-lg">
                 <span className="text-slate-400 block text-[10px]">Menu Dishes</span>
-                <span className="font-mono font-bold text-[#0B253A]">{parsedData.menuItems?.length || 0}</span>
+                <span className="font-mono font-bold text-jaman-navy">{parsedData.menuItems?.length || 0}</span>
               </div>
-              <div className="p-2 bg-[#FBF9F5] rounded-lg">
+              <div className="p-2 bg-jaman-ivory rounded-lg">
                 <span className="text-slate-400 block text-[10px]">Categories</span>
-                <span className="font-mono font-bold text-[#0B253A]">{parsedData.categories?.length || 0}</span>
+                <span className="font-mono font-bold text-jaman-navy">{parsedData.categories?.length || 0}</span>
               </div>
-              <div className="p-2 bg-[#FBF9F5] rounded-lg">
+              <div className="p-2 bg-jaman-ivory rounded-lg">
                 <span className="text-slate-400 block text-[10px]">Orders Ledger</span>
-                <span className="font-mono font-bold text-[#0B253A]">{parsedData.orders?.length || 0}</span>
+                <span className="font-mono font-bold text-jaman-navy">{parsedData.orders?.length || 0}</span>
               </div>
-              <div className="p-2 bg-[#FBF9F5] rounded-lg">
+              <div className="p-2 bg-jaman-ivory rounded-lg">
                 <span className="text-slate-400 block text-[10px]">Inventory Items</span>
-                <span className="font-mono font-bold text-[#0B253A]">{parsedData.inventoryItems?.length || 0}</span>
+                <span className="font-mono font-bold text-jaman-navy">{parsedData.inventoryItems?.length || 0}</span>
               </div>
             </div>
           </div>

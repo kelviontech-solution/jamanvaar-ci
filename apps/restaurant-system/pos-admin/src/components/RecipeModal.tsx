@@ -124,7 +124,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
             disabled={!!recipeToEdit}
             value={menuItemId}
             onChange={(e) => setMenuItemId(e.target.value)}
-            className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817] disabled:opacity-70"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron disabled:opacity-70"
           >
             {menuItems.map((m) => (
               <option key={m.id} value={m.id}>
@@ -141,7 +141,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
             <button
               type="button"
               onClick={handleAddIngredient}
-              className="px-2.5 py-1 bg-[#FFF4ED] border border-[#FDBA74] text-[#E66817] font-bold text-xs rounded-lg flex items-center gap-1 hover:bg-[#FFE8D6]"
+              className="px-2.5 py-1 bg-[#FFF4ED] border border-[#FDBA74] text-jaman-saffron font-bold text-xs rounded-lg flex items-center gap-1 hover:bg-[#FFE8D6]"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Raw Ingredient</span>
@@ -155,12 +155,12 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
           ) : (
             <div className="space-y-2 max-h-52 overflow-y-auto">
               {ingredients.map((ing, idx) => (
-                <div key={idx} className="p-2.5 bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl flex items-center gap-2">
+                <div key={idx} className="p-2.5 bg-jaman-ivory border border-jaman-border rounded-xl flex items-center gap-2">
                   <div className="flex-1">
                     <select
                       value={ing.inventoryItemId}
                       onChange={(e) => handleIngredientChange(idx, 'inventoryItemId', e.target.value)}
-                      className="w-full bg-white border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs font-bold"
+                      className="w-full bg-white border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-bold"
                     >
                       {inventoryItems.map((inv) => (
                         <option key={inv.id} value={inv.id}>
@@ -176,7 +176,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
                       required
                       value={ing.quantityPerPortion}
                       onChange={(e) => handleIngredientChange(idx, 'quantityPerPortion', e.target.value)}
-                      className="w-full bg-white border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs font-bold font-mono text-right"
+                      className="w-full bg-white border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-bold font-mono text-right"
                     />
                     <span className="text-xs font-semibold text-slate-500">{ing.unit}</span>
                   </div>
@@ -202,7 +202,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
             </div>
             <div>
               <span className="text-emerald-800 font-bold">Dish Selling Price:</span>
-              <span className="font-mono font-black text-[#0B253A] ml-2">₹{selectedDish.price}</span>
+              <span className="font-mono font-black text-jaman-navy ml-2">₹{selectedDish.price}</span>
             </div>
           </div>
         )}
@@ -220,7 +220,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
           <button
             type="submit"
             disabled={ingredients.length === 0}
-            className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50"
+            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50"
           >
             Save Recipe Formula
           </button>

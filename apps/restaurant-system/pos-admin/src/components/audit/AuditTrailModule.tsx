@@ -46,7 +46,7 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
               Security & Operational Audit Trail
             </h1>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-slate-100 text-slate-700 border border-slate-200">
@@ -58,18 +58,18 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-white border border-[#EBE6DD] text-[#0B253A] shadow-2xs">
+          <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-white border border-jaman-border text-jaman-navy shadow-2xs">
             {filteredAuditLogs.length} Events Recorded
           </span>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-2xs space-y-0">
+      <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-2xs space-y-0">
         {/* Search & Category Filter Toolbar */}
-        <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="p-4 bg-jaman-cream border-b border-jaman-border flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-[#E66817]" />
-            <span className="font-extrabold text-sm text-[#0B253A]">
+            <ShieldCheck className="w-4 h-4 text-jaman-saffron" />
+            <span className="font-extrabold text-sm text-jaman-navy">
               Audit Trail Events ({filteredAuditLogs.length})
             </span>
           </div>
@@ -83,7 +83,7 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
                 value={auditSearch}
                 onChange={(e) => setAuditSearch(e.target.value)}
                 placeholder="Search user, action, details..."
-                className="w-full bg-white border border-[#EBE6DD] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-white border border-jaman-border rounded-xl pl-8 pr-3 py-1.5 text-xs text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
               />
               {auditSearch && (
                 <button
@@ -99,7 +99,7 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
             <select
               value={auditCategoryFilter}
               onChange={(e) => setAuditCategoryFilter(e.target.value)}
-              className="bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+              className="bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron cursor-pointer"
             >
               <option value="ALL">All Categories</option>
               {auditCategories.map((c) => (
@@ -115,7 +115,7 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
                   setAuditSearch('');
                   setAuditCategoryFilter('ALL');
                 }}
-                className="text-xs text-[#E66817] font-bold hover:underline cursor-pointer"
+                className="text-xs text-jaman-saffron font-bold hover:underline cursor-pointer"
               >
                 Clear
               </button>
@@ -129,7 +129,7 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-extrabold text-[#0B253A] text-sm">No Audit Trail Events Found</h4>
+              <h4 className="font-extrabold text-jaman-navy text-sm">No Audit Trail Events Found</h4>
               <p className="text-xs text-slate-400 max-w-sm mx-auto mt-0.5">
                 {auditSearch || auditCategoryFilter !== 'ALL'
                   ? 'No events match the current search or category filter.'
@@ -151,7 +151,7 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-slate-500 uppercase font-black text-[11px] tracking-wider">
+              <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-black text-[11px] tracking-wider">
                 <tr>
                   <th className="p-4">Timestamp</th>
                   <th className="p-4">Operator</th>
@@ -166,14 +166,14 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
                     <td className="p-4 text-slate-500 font-mono text-[11px] whitespace-nowrap">
                       {formatTime(log.timestamp)}
                     </td>
-                    <td className="p-4 font-bold text-[#0B253A]">
+                    <td className="p-4 font-bold text-jaman-navy">
                       <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-mono">
                         @{log.username}
                       </span>
                     </td>
-                    <td className="p-4 font-mono font-black text-[#E66817] text-xs">{log.action}</td>
+                    <td className="p-4 font-mono font-black text-jaman-saffron text-xs">{log.action}</td>
                     <td className="p-4">
-                      <span className="px-2.5 py-0.5 rounded-full bg-[#FAF7F2] border border-[#EBE6DD] text-[10px] font-bold text-slate-600">
+                      <span className="px-2.5 py-0.5 rounded-full bg-jaman-cream border border-jaman-border text-[10px] font-bold text-slate-600">
                         {log.category}
                       </span>
                     </td>

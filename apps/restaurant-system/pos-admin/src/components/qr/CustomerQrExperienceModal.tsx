@@ -54,7 +54,7 @@ export const CustomerQrExperienceModal: React.FC<CustomerQrExperienceModalProps>
         {/* Top Control Bar */}
         <div className="bg-[#0B1522] border-b border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-[#E66817]/20 border border-[#E66817]/40 flex items-center justify-center text-[#E66817]">
+            <div className="w-8 h-8 rounded-xl bg-jaman-saffron/20 border border-jaman-saffron/40 flex items-center justify-center text-jaman-saffron">
               <Smartphone className="w-4 h-4" />
             </div>
             <div>
@@ -80,7 +80,7 @@ export const CustomerQrExperienceModal: React.FC<CustomerQrExperienceModalProps>
               <select
                 value={selectedTableNumber}
                 onChange={(e) => setSelectedTableNumber(e.target.value)}
-                className="bg-transparent text-xs font-black text-[#E66817] focus:outline-none cursor-pointer"
+                className="bg-transparent text-xs font-black text-jaman-saffron focus:outline-none cursor-pointer"
               >
                 {tables.length === 0 ? (
                   <option value="" className="bg-[#121B28] text-white">
@@ -103,7 +103,7 @@ export const CustomerQrExperienceModal: React.FC<CustomerQrExperienceModalProps>
                   key={w}
                   onClick={() => setDeviceWidth(w)}
                   className={`px-2 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                    deviceWidth === w ? 'bg-[#E66817] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    deviceWidth === w ? 'bg-jaman-saffron text-white shadow-xs' : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   {w}px
@@ -116,7 +116,7 @@ export const CustomerQrExperienceModal: React.FC<CustomerQrExperienceModalProps>
               href={tableGuestUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-1.5 bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-black px-3 py-1.5 rounded-xl transition-all shadow-xs cursor-pointer"
+              className="flex items-center gap-1.5 bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-black px-3 py-1.5 rounded-xl transition-all shadow-xs cursor-pointer"
               title="Open full guest web application in a new browser tab"
             >
               <ExternalLink className="w-3.5 h-3.5" />
@@ -137,7 +137,7 @@ export const CustomerQrExperienceModal: React.FC<CustomerQrExperienceModalProps>
         <div className="flex-1 overflow-y-auto bg-[#070D14] flex items-center justify-center p-3 sm:p-6">
           <div
             style={{ width: `${deviceWidth}px` }}
-            className="h-[760px] max-h-[82vh] bg-[#FAF7F2] text-[#0B253A] rounded-[42px] border-[10px] border-slate-900 shadow-2xl flex flex-col overflow-hidden relative"
+            className="h-[760px] max-h-[82vh] bg-jaman-cream text-jaman-navy rounded-[42px] border-[10px] border-slate-900 shadow-2xl flex flex-col overflow-hidden relative"
           >
             {/* Phone Notch / Dynamic Island */}
             <div className="h-6 bg-slate-900 flex items-center justify-center shrink-0">

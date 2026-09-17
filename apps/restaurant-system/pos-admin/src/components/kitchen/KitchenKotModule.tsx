@@ -114,10 +114,10 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
               Kitchen Display & KOT Station Queue
             </h1>
-            <span className="bg-orange-100 text-[#E66817] font-black text-xs px-2.5 py-0.5 rounded-full border border-orange-200">
+            <span className="bg-orange-100 text-jaman-saffron font-black text-xs px-2.5 py-0.5 rounded-full border border-orange-200">
               LIVE KOT RADAR
             </span>
           </div>
@@ -130,12 +130,12 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
 
       {/* 4 Summary KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Cooking Now</span>
-            <span className="w-2.5 h-2.5 rounded-full bg-[#E66817] animate-pulse"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-jaman-saffron animate-pulse"></span>
           </div>
-          <div className="text-2xl font-black text-[#E66817] font-mono">
+          <div className="text-2xl font-black text-jaman-saffron font-mono">
             {stats.active} Tickets
           </div>
           <span className="text-[10px] text-slate-500 font-bold block">
@@ -153,9 +153,9 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
           </span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-1">
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Served Today</span>
-          <div className="text-2xl font-black text-[#0B253A] font-mono">
+          <div className="text-2xl font-black text-jaman-navy font-mono">
             {stats.served} Tickets
           </div>
           <span className="text-[10px] text-slate-500 font-bold block">
@@ -163,7 +163,7 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
           </span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-xs space-y-1">
+        <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-1">
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Avg Cook Time</span>
           <div className="text-2xl font-black text-blue-700 font-mono">
             14 Min
@@ -175,7 +175,7 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
       </div>
 
       {/* Filter Toolbar */}
-      <div className="bg-white p-3 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-3">
+      <div className="bg-white p-3 rounded-2xl border border-jaman-border shadow-2xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           
           {/* Station Filters */}
@@ -192,7 +192,7 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
                 onClick={() => setStationFilter(st.id)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                   stationFilter === st.id
-                    ? 'bg-[#0B253A] text-white shadow-xs'
+                    ? 'bg-jaman-navy text-white shadow-xs'
                     : 'text-slate-600 hover:bg-[#F8F6F0]'
                 }`}
               >
@@ -209,7 +209,7 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search KOT, table, dish..."
-              className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl pl-8 pr-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-8 pr-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
             />
           </div>
         </div>
@@ -228,8 +228,8 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
               onClick={() => setStatusFilter(st.id)}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                 statusFilter === st.id
-                  ? 'bg-[#E66817] text-white shadow-2xs'
-                  : 'bg-[#FAF7F2] text-slate-700 hover:bg-slate-200'
+                  ? 'bg-jaman-saffron text-white shadow-2xs'
+                  : 'bg-jaman-cream text-slate-700 hover:bg-slate-200'
               }`}
             >
               {st.label}
@@ -240,12 +240,12 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
 
       {/* KOT Cards Grid */}
       {filteredKots.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-[#EBE6DD] shadow-2xs space-y-3 max-w-lg mx-auto my-6">
+        <div className="bg-white rounded-3xl p-12 text-center border border-jaman-border shadow-2xs space-y-3 max-w-lg mx-auto my-6">
           <div className="w-14 h-14 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto border border-emerald-200/60 shadow-xs">
             <ChefHat className="w-7 h-7" />
           </div>
           <div className="space-y-1">
-            <h3 className="font-black text-base text-[#0B253A]">Your Kitchen is Clear</h3>
+            <h3 className="font-black text-base text-jaman-navy">Your Kitchen is Clear</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               No active KOT tickets are waiting right now for the selected station or status.
             </p>
@@ -270,23 +270,23 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
                     ? 'border-rose-400 ring-2 ring-rose-200'
                     : isWarning
                     ? 'border-amber-400'
-                    : 'border-[#EBE6DD] hover:border-slate-300'
+                    : 'border-jaman-border hover:border-slate-300'
                 }`}
               >
                 {/* KOT Card Top Header */}
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <div className="flex items-center gap-2.5">
                     <div className={`w-9 h-9 rounded-2xl flex items-center justify-center font-black text-xs font-mono ${
-                      kot.tableNumber ? 'bg-[#0B253A] text-white' : 'bg-purple-700 text-white'
+                      kot.tableNumber ? 'bg-jaman-navy text-white' : 'bg-purple-700 text-white'
                     }`}>
                       {kot.tableNumber ? `T-${kot.tableNumber}` : `#${kot.tokenNumber}`}
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono font-black text-sm text-[#0B253A]">{kot.kotNumber}</span>
+                        <span className="font-mono font-black text-sm text-jaman-navy">{kot.kotNumber}</span>
                         <span className="text-[10px] font-bold text-slate-400">#{kot.tokenNumber}</span>
                       </div>
-                      <span className="text-[10px] font-bold text-[#E66817] block uppercase">
+                      <span className="text-[10px] font-bold text-jaman-saffron block uppercase">
                         {kot.station || 'Main Kitchen'}
                       </span>
                     </div>
@@ -323,9 +323,9 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
                 <div className="space-y-2 text-xs divide-y divide-slate-100">
                   {kot.items.map((it, idx) => (
                     <div key={idx} className="pt-1.5 space-y-1">
-                      <div className="flex items-center justify-between font-black text-sm text-[#0B253A]">
+                      <div className="flex items-center justify-between font-black text-sm text-jaman-navy">
                         <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-lg bg-[#FAF7F2] border border-[#EBE6DD] flex items-center justify-center font-mono text-xs text-[#E66817]">
+                          <span className="w-6 h-6 rounded-lg bg-jaman-cream border border-jaman-border flex items-center justify-center font-mono text-xs text-jaman-saffron">
                             {it.quantity}x
                           </span>
                           <span>{it.name}</span>
@@ -393,9 +393,9 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
                       showToast(`Printing KOT #${kot.kotNumber || kot.id.slice(-6)} ticket...`);
                       printThermalKotTicket(kot, '80mm');
                     }}
-                    className="px-3 py-2 bg-[#FAF7F2] hover:bg-[#FFF4ED] border border-[#EBE6DD] text-[#0B253A] font-bold text-xs rounded-xl flex items-center gap-1 transition-colors"
+                    className="px-3 py-2 bg-jaman-cream hover:bg-[#FFF4ED] border border-jaman-border text-jaman-navy font-bold text-xs rounded-xl flex items-center gap-1 transition-colors"
                   >
-                    <Printer className="w-3.5 h-3.5 text-[#E66817]" />
+                    <Printer className="w-3.5 h-3.5 text-jaman-saffron" />
                     <span>Print</span>
                   </button>
                 </div>

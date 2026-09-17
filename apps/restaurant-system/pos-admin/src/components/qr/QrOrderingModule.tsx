@@ -508,17 +508,17 @@ export const QrOrderingModule: React.FC = () => {
   // Render Plan Locked Screen if restaurant is on 5K CORE plan
   if (!isAllowed) {
     return (
-      <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] overflow-y-auto select-none p-6">
+      <div className="flex-1 flex flex-col h-full bg-jaman-cream overflow-y-auto select-none p-6">
         <div className="max-w-4xl mx-auto w-full space-y-6">
           {/* Top Status Strip */}
-          <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+          <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
                 <Lock className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-black text-[#0B253A]">QR Table Ordering — Locked Module</h2>
+                  <h2 className="text-sm font-black text-jaman-navy">QR Table Ordering — Locked Module</h2>
                   <span className="text-[10px] font-black bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
                     Current: JAMANVAAR CORE (₹5,000/mo)
                   </span>
@@ -535,10 +535,10 @@ export const QrOrderingModule: React.FC = () => {
           </div>
 
           {/* Hero Explanatory Card */}
-          <div className="bg-gradient-to-br from-[#0B253A] to-[#123959] text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-[#E66817]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="bg-gradient-to-br from-jaman-navy to-[#123959] text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-jaman-saffron/10 rounded-full blur-3xl pointer-events-none" />
             <div className="relative z-10 space-y-4">
-              <div className="inline-flex items-center gap-2 bg-[#E66817]/20 border border-[#E66817]/40 text-amber-300 px-3 py-1 rounded-full text-xs font-black tracking-wide uppercase">
+              <div className="inline-flex items-center gap-2 bg-jaman-saffron/20 border border-jaman-saffron/40 text-amber-300 px-3 py-1 rounded-full text-xs font-black tracking-wide uppercase">
                 <ShieldAlert className="w-3.5 h-3.5" />
                 <span>Super Admin Allotment Required</span>
               </div>
@@ -580,10 +580,10 @@ export const QrOrderingModule: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-black tracking-wider uppercase text-slate-400 block">Current Activated Plan</span>
-                  <h3 className="text-lg font-black text-[#0B253A]">JAMANVAAR CORE</h3>
+                  <h3 className="text-lg font-black text-jaman-navy">JAMANVAAR CORE</h3>
                 </div>
                 <div className="text-right">
-                  <span className="text-lg font-black text-[#0B253A]">₹5,000</span>
+                  <span className="text-lg font-black text-jaman-navy">₹5,000</span>
                   <span className="text-[10px] text-slate-400 block font-bold">per month</span>
                 </div>
               </div>
@@ -622,24 +622,24 @@ export const QrOrderingModule: React.FC = () => {
             </div>
 
             {/* PRO Plan Card */}
-            <div className="bg-gradient-to-b from-amber-50/50 to-white border-2 border-[#E66817] rounded-3xl p-6 space-y-4 shadow-md relative">
-              <div className="absolute -top-3 right-6 bg-[#E66817] text-white text-[10px] font-black px-3 py-0.5 rounded-full tracking-wider uppercase shadow-xs">
+            <div className="bg-gradient-to-b from-amber-50/50 to-white border-2 border-jaman-saffron rounded-3xl p-6 space-y-4 shadow-md relative">
+              <div className="absolute -top-3 right-6 bg-jaman-saffron text-white text-[10px] font-black px-3 py-0.5 rounded-full tracking-wider uppercase shadow-xs">
                 QR Entitled Plan
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-black tracking-wider uppercase text-[#E66817] block">Required Plan</span>
-                  <h3 className="text-lg font-black text-[#0B253A]">JAMANVAAR PRO</h3>
+                  <span className="text-[10px] font-black tracking-wider uppercase text-jaman-saffron block">Required Plan</span>
+                  <h3 className="text-lg font-black text-jaman-navy">JAMANVAAR PRO</h3>
                 </div>
                 <div className="text-right">
-                  <span className="text-lg font-black text-[#E66817]">₹7,000</span>
+                  <span className="text-lg font-black text-jaman-saffron">₹7,000</span>
                   <span className="text-[10px] text-slate-400 block font-bold">per month</span>
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-xl bg-amber-100/60 border border-amber-300 text-xs font-bold text-[#0B253A] flex items-center gap-2">
-                <Crown className="w-4 h-4 text-[#E66817] shrink-0" />
+              <div className="p-2.5 rounded-xl bg-amber-100/60 border border-amber-300 text-xs font-bold text-jaman-navy flex items-center gap-2">
+                <Crown className="w-4 h-4 text-jaman-saffron shrink-0" />
                 <span>Includes full QR Table Ordering & Standees</span>
               </div>
 
@@ -648,24 +648,24 @@ export const QrOrderingModule: React.FC = () => {
                   <Check className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Everything in JAMANVAAR CORE</span>
                 </li>
-                <li className="flex items-center gap-2 font-bold text-[#0B253A]">
-                  <Check className="w-3.5 h-3.5 text-[#E66817]" />
+                <li className="flex items-center gap-2 font-bold text-jaman-navy">
+                  <Check className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Public Mobile Guest Self-Ordering App</span>
                 </li>
-                <li className="flex items-center gap-2 font-bold text-[#0B253A]">
-                  <Check className="w-3.5 h-3.5 text-[#E66817]" />
+                <li className="flex items-center gap-2 font-bold text-jaman-navy">
+                  <Check className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Super Admin Deterministic Table Security Tokens</span>
                 </li>
-                <li className="flex items-center gap-2 font-bold text-[#0B253A]">
-                  <Check className="w-3.5 h-3.5 text-[#E66817]" />
+                <li className="flex items-center gap-2 font-bold text-jaman-navy">
+                  <Check className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Acrylic Tent Card Standee Designer & Printing</span>
                 </li>
-                <li className="flex items-center gap-2 font-bold text-[#0B253A]">
-                  <Check className="w-3.5 h-3.5 text-[#E66817]" />
+                <li className="flex items-center gap-2 font-bold text-jaman-navy">
+                  <Check className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Real-Time POS Queue & Automated KDS Dispatch</span>
                 </li>
-                <li className="flex items-center gap-2 font-bold text-[#0B253A]">
-                  <Check className="w-3.5 h-3.5 text-[#E66817]" />
+                <li className="flex items-center gap-2 font-bold text-jaman-navy">
+                  <Check className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Wireless Captain App for Waiters</span>
                 </li>
               </ul>
@@ -673,32 +673,32 @@ export const QrOrderingModule: React.FC = () => {
           </div>
 
           {/* Super Admin Allotment Workflow Banner */}
-          <div className="bg-white border border-[#EBE6DD] rounded-3xl p-6 shadow-2xs space-y-4">
-            <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider flex items-center gap-2">
-              <Radio className="w-4 h-4 text-[#E66817]" />
+          <div className="bg-white border border-jaman-border rounded-3xl p-6 shadow-2xs space-y-4">
+            <h3 className="text-xs font-black text-jaman-navy uppercase tracking-wider flex items-center gap-2">
+              <Radio className="w-4 h-4 text-jaman-saffron" />
               <span>Super Admin Allotment & Provisioning Workflow</span>
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
-                <span className="w-6 h-6 rounded-full bg-[#0B253A] text-white text-xs font-black flex items-center justify-center">1</span>
-                <h4 className="text-xs font-black text-[#0B253A]">Plan Allotment</h4>
+              <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
+                <span className="w-6 h-6 rounded-full bg-jaman-navy text-white text-xs font-black flex items-center justify-center">1</span>
+                <h4 className="text-xs font-black text-jaman-navy">Plan Allotment</h4>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
                   Super Admin allots the ₹7,000 PRO plan to this restaurant in the Super Admin Platform Control Center.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
-                <span className="w-6 h-6 rounded-full bg-[#E66817] text-white text-xs font-black flex items-center justify-center">2</span>
-                <h4 className="text-xs font-black text-[#0B253A]">QR Token Generation</h4>
+              <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
+                <span className="w-6 h-6 rounded-full bg-jaman-saffron text-white text-xs font-black flex items-center justify-center">2</span>
+                <h4 className="text-xs font-black text-jaman-navy">QR Token Generation</h4>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
                   Super Admin generates and provisions deterministic, tamper-proof QR table tokens. Restaurant Admin cannot forge or generate tokens.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
+              <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
                 <span className="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-black flex items-center justify-center">3</span>
-                <h4 className="text-xs font-black text-[#0B253A]">Print & Fulfill</h4>
+                <h4 className="text-xs font-black text-jaman-navy">Print & Fulfill</h4>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
                   Restaurant Admin unlocks access to preview and print standees, view guest cart activity, and fulfill live orders.
                 </p>
@@ -717,16 +717,16 @@ export const QrOrderingModule: React.FC = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAF7F2] overflow-hidden select-none">
+    <div className="flex-1 flex flex-col h-full bg-jaman-cream overflow-hidden select-none">
       {/* Top Section Navigation Header */}
-      <div className="bg-white border-b border-[#EBE6DD] px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-2xs">
+      <div className="bg-white border-b border-jaman-border px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-2xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-[#FFF4ED] border border-[#FED7AA] flex items-center justify-center text-[#E66817] shadow-xs">
+          <div className="w-10 h-10 rounded-2xl bg-[#FFF4ED] border border-[#FED7AA] flex items-center justify-center text-jaman-saffron shadow-xs">
             <QrCode className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-xl font-extrabold text-[#0B253A] tracking-tight">
+              <h1 className="text-lg sm:text-xl font-extrabold text-jaman-navy tracking-tight">
                 Digital Ordering & QR Suite
               </h1>
               <span
@@ -743,7 +743,7 @@ export const QrOrderingModule: React.FC = () => {
                 />
                 {qrSettings.isQrOrderingActive ? 'QR Active' : 'QR Paused'}
               </span>
-              <span className="text-[10px] font-black bg-[#FAF7F2] text-[#0B253A] border border-[#EBE6DD] px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-black bg-jaman-cream text-jaman-navy border border-jaman-border px-2 py-0.5 rounded-full">
                 {PLAN_DEFINITIONS[qrEntitlement.tier]?.name || qrEntitlement.tier} (
                 {formatINR(PLAN_DEFINITIONS[qrEntitlement.tier]?.price || 0)}/mo)
               </span>
@@ -758,7 +758,7 @@ export const QrOrderingModule: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleOpenCustomerPreview()}
-            className="bg-[#E66817] hover:bg-[#EA580C] text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 shadow-md shadow-[#E66817]/25 transition-all active:scale-95 cursor-pointer"
+            className="bg-jaman-saffron hover:bg-[#EA580C] text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 shadow-md shadow-jaman-saffron/25 transition-all active:scale-95 cursor-pointer"
           >
             <Smartphone className="w-4 h-4" />
             <span>📱 Open Live QR Ordering</span>
@@ -767,12 +767,12 @@ export const QrOrderingModule: React.FC = () => {
       </div>
 
       {/* Sub-Navigation Tabs Strip */}
-      <div className="bg-white border-b border-[#EBE6DD] px-5 flex items-center gap-1 overflow-x-auto shrink-0 scrollbar-none">
+      <div className="bg-white border-b border-jaman-border px-5 flex items-center gap-1 overflow-x-auto shrink-0 scrollbar-none">
         {[
           { id: 'OVERVIEW', label: 'Overview', icon: Zap },
           { id: 'TABLES', label: 'Tables & QR', icon: Grid },
           { id: 'MENU', label: 'Digital Menu', icon: UtensilsCrossed },
-          { id: 'ORDERS', label: 'Live QR Orders', icon: ShoppingBag, badge: allQrOrders.filter(o => o.orderStatus === 'CONFIRMED' || o.orderStatus === 'PREPARING' || o.orderStatus === 'NEW').length || undefined, badgeColor: 'bg-[#E66817]' },
+          { id: 'ORDERS', label: 'Live QR Orders', icon: ShoppingBag, badge: allQrOrders.filter(o => o.orderStatus === 'CONFIRMED' || o.orderStatus === 'PREPARING' || o.orderStatus === 'NEW').length || undefined, badgeColor: 'bg-jaman-saffron' },
           { id: 'ANALYTICS', label: 'QR Analytics', icon: TrendingUp },
           { id: 'SETTINGS', label: 'QR Settings', icon: Settings }
         ].map((tab) => {
@@ -785,8 +785,8 @@ export const QrOrderingModule: React.FC = () => {
               onClick={() => setActiveSubTab(tab.id as QrAdminSubTab)}
               className={`px-4 py-3 text-xs font-extrabold flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? 'border-[#E66817] text-[#E66817] bg-amber-50/40'
-                  : 'border-transparent text-slate-600 hover:text-[#0B253A] hover:bg-slate-50'
+                  ? 'border-jaman-saffron text-jaman-saffron bg-amber-50/40'
+                  : 'border-transparent text-slate-600 hover:text-jaman-navy hover:bg-slate-50'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -813,7 +813,7 @@ export const QrOrderingModule: React.FC = () => {
         {activeSubTab === 'OVERVIEW' && (
           <div className="space-y-6 max-w-7xl mx-auto">
             {/* Hero Banner */}
-            <div className="bg-gradient-to-r from-[#0B253A] via-[#123959] to-[#0B253A] rounded-3xl p-6 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="bg-gradient-to-r from-jaman-navy via-[#123959] to-jaman-navy rounded-3xl p-6 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2 max-w-2xl">
                 <span className="text-[10px] font-black tracking-widest uppercase bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 rounded-full inline-block">
                   TABLE QR ORDERING SYSTEM
@@ -829,7 +829,7 @@ export const QrOrderingModule: React.FC = () => {
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={() => handleOpenCustomerPreview()}
-                  className="bg-[#E66817] hover:bg-[#EA580C] text-white px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg shadow-[#E66817]/30 transition-all active:scale-95 cursor-pointer"
+                  className="bg-jaman-saffron hover:bg-[#EA580C] text-white px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg shadow-jaman-saffron/30 transition-all active:scale-95 cursor-pointer"
                 >
                   <Smartphone className="w-4 h-4" />
                   <span>Launch Live Guest Preview</span>
@@ -846,12 +846,12 @@ export const QrOrderingModule: React.FC = () => {
 
             {/* Live KPI Metric Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-1">
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-1">
                 <div className="flex items-center justify-between text-slate-500">
                   <span className="text-[11px] font-extrabold uppercase tracking-wider">Active Table QR</span>
                   <Grid className="w-4 h-4 text-emerald-600" />
                 </div>
-                <div className="font-mono font-black text-2xl text-[#0B253A]">
+                <div className="font-mono font-black text-2xl text-jaman-navy">
                   {qrStats.activeTablesCount} / {tables.length}
                 </div>
                 {tablesWithoutQr.length > 0 ? (
@@ -868,18 +868,18 @@ export const QrOrderingModule: React.FC = () => {
                 )}
               </div>
 
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-1">
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-1">
                 <div className="flex items-center justify-between text-slate-500">
                   <span className="text-[11px] font-extrabold uppercase tracking-wider">Today&apos;s QR Orders</span>
-                  <ShoppingBag className="w-4 h-4 text-[#E66817]" />
+                  <ShoppingBag className="w-4 h-4 text-jaman-saffron" />
                 </div>
-                <div className="font-mono font-black text-2xl text-[#0B253A]">{qrStats.totalOrders} Orders</div>
+                <div className="font-mono font-black text-2xl text-jaman-navy">{qrStats.totalOrders} Orders</div>
                 <p className="text-[10px] text-slate-500 font-bold">
-                  Revenue: <span className="font-mono text-[#0B253A] font-black">{formatINR(qrStats.totalRevenue)}</span>
+                  Revenue: <span className="font-mono text-jaman-navy font-black">{formatINR(qrStats.totalRevenue)}</span>
                 </p>
               </div>
 
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-1">
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-1">
                 <div className="flex items-center justify-between text-slate-500">
                   <span className="text-[11px] font-extrabold uppercase tracking-wider">Pending in Kitchen</span>
                   <Flame className="w-4 h-4 text-amber-500" />
@@ -888,12 +888,12 @@ export const QrOrderingModule: React.FC = () => {
                 <p className="text-[10px] text-slate-500 font-bold">In preparation / scheduled</p>
               </div>
 
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-1">
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-1">
                 <div className="flex items-center justify-between text-slate-500">
                   <span className="text-[11px] font-extrabold uppercase tracking-wider">Top Table Demand</span>
                   <TrendingUp className="w-4 h-4 text-purple-600" />
                 </div>
-                <div className="font-black text-base text-[#0B253A] truncate">
+                <div className="font-black text-base text-jaman-navy truncate">
                   {hasQrOrderData ? qrStats.topTable : 'No data yet'}
                 </div>
                 <p className="text-[10px] text-purple-700 font-bold">
@@ -903,10 +903,10 @@ export const QrOrderingModule: React.FC = () => {
             </div>
 
             {/* Integration Status Strip (Part 30 Compliant) */}
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-3">
+            <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider flex items-center gap-2">
-                  <Radio className="w-4 h-4 text-[#E66817]" />
+                <h3 className="text-xs font-black text-jaman-navy uppercase tracking-wider flex items-center gap-2">
+                  <Radio className="w-4 h-4 text-jaman-saffron" />
                   <span>QR Ecosystem Real-Time Service Status</span>
                 </h3>
                 <span className="text-[10px] font-bold text-slate-400">Local Mesh Architecture</span>
@@ -950,50 +950,50 @@ export const QrOrderingModule: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left 4 cols: Quick Actions */}
               <div className="lg:col-span-4 space-y-4">
-                <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-3">
-                  <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">Quick Actions</h3>
+                <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-3">
+                  <h3 className="text-xs font-black text-jaman-navy uppercase tracking-wider">Quick Actions</h3>
 
                   <div className="space-y-2">
                     <button
                       onClick={() => setActiveSubTab('TABLES')}
-                      className="w-full p-3 rounded-xl bg-[#FAF7F2] hover:bg-amber-50 border border-[#EBE6DD] hover:border-[#FED7AA] flex items-center justify-between transition-all cursor-pointer group"
+                      className="w-full p-3 rounded-xl bg-jaman-cream hover:bg-amber-50 border border-jaman-border hover:border-[#FED7AA] flex items-center justify-between transition-all cursor-pointer group"
                     >
                       <div className="flex items-center gap-2.5">
-                        <Grid className="w-4 h-4 text-[#E66817]" />
-                        <span className="text-xs font-black text-[#0B253A]">Manage Table QR Codes</span>
+                        <Grid className="w-4 h-4 text-jaman-saffron" />
+                        <span className="text-xs font-black text-jaman-navy">Manage Table QR Codes</span>
                       </div>
                       <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-1 transition-transform" />
                     </button>
 
                     <button
                       onClick={() => setActiveSubTab('MENU')}
-                      className="w-full p-3 rounded-xl bg-[#FAF7F2] hover:bg-amber-50 border border-[#EBE6DD] hover:border-[#FED7AA] flex items-center justify-between transition-all cursor-pointer group"
+                      className="w-full p-3 rounded-xl bg-jaman-cream hover:bg-amber-50 border border-jaman-border hover:border-[#FED7AA] flex items-center justify-between transition-all cursor-pointer group"
                     >
                       <div className="flex items-center gap-2.5">
-                        <UtensilsCrossed className="w-4 h-4 text-[#E66817]" />
-                        <span className="text-xs font-black text-[#0B253A]">Digital Menu Customizer</span>
+                        <UtensilsCrossed className="w-4 h-4 text-jaman-saffron" />
+                        <span className="text-xs font-black text-jaman-navy">Digital Menu Customizer</span>
                       </div>
                       <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-1 transition-transform" />
                     </button>
 
                     <button
                       onClick={() => setActiveSubTab('ORDERS')}
-                      className="w-full p-3 rounded-xl bg-[#FAF7F2] hover:bg-amber-50 border border-[#EBE6DD] hover:border-[#FED7AA] flex items-center justify-between transition-all cursor-pointer group"
+                      className="w-full p-3 rounded-xl bg-jaman-cream hover:bg-amber-50 border border-jaman-border hover:border-[#FED7AA] flex items-center justify-between transition-all cursor-pointer group"
                     >
                       <div className="flex items-center gap-2.5">
-                        <ShoppingBag className="w-4 h-4 text-[#E66817]" />
-                        <span className="text-xs font-black text-[#0B253A]">Live QR Orders Queue</span>
+                        <ShoppingBag className="w-4 h-4 text-jaman-saffron" />
+                        <span className="text-xs font-black text-jaman-navy">Live QR Orders Queue</span>
                       </div>
                       <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-1 transition-transform" />
                     </button>
 
                     <button
                       onClick={() => setActiveSubTab('SETTINGS')}
-                      className="w-full p-3 rounded-xl bg-[#FAF7F2] hover:bg-amber-50 border border-[#EBE6DD] hover:border-[#FED7AA] flex items-center justify-between transition-all cursor-pointer group"
+                      className="w-full p-3 rounded-xl bg-jaman-cream hover:bg-amber-50 border border-jaman-border hover:border-[#FED7AA] flex items-center justify-between transition-all cursor-pointer group"
                     >
                       <div className="flex items-center gap-2.5">
-                        <Settings className="w-4 h-4 text-[#E66817]" />
-                        <span className="text-xs font-black text-[#0B253A]">QR Ordering Controls</span>
+                        <Settings className="w-4 h-4 text-jaman-saffron" />
+                        <span className="text-xs font-black text-jaman-navy">QR Ordering Controls</span>
                       </div>
                       <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-1 transition-transform" />
                     </button>
@@ -1001,14 +1001,14 @@ export const QrOrderingModule: React.FC = () => {
                 </div>
 
                 {/* Popular Dish Metric */}
-                <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-2">
+                <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-2">
                   <span className="text-[10px] font-black uppercase text-slate-400">Most Ordered Delicacy</span>
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-amber-50 border border-[#FED7AA] flex items-center justify-center text-[#E66817] shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-amber-50 border border-[#FED7AA] flex items-center justify-center text-jaman-saffron shrink-0">
                       <UtensilsCrossed className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-extrabold text-xs text-[#0B253A] truncate">
+                      <h4 className="font-extrabold text-xs text-jaman-navy truncate">
                         {hasQrOrderData ? qrStats.topDish : 'No QR orders yet'}
                       </h4>
                       <p className="text-[11px] text-slate-500">
@@ -1022,17 +1022,17 @@ export const QrOrderingModule: React.FC = () => {
               </div>
 
               {/* Right 8 cols: Recent QR Orders Feed */}
-              <div className="lg:col-span-8 bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+              <div className="lg:col-span-8 bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+                    <h3 className="text-xs font-black text-jaman-navy uppercase tracking-wider">
                       Recent Live Table Orders
                     </h3>
                     <p className="text-[11px] text-slate-500">Orders arriving from restaurant table QR scans</p>
                   </div>
                   <button
                     onClick={() => setActiveSubTab('ORDERS')}
-                    className="text-xs font-black text-[#E66817] hover:underline flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-black text-jaman-saffron hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <span>View All ({allQrOrders.length})</span>
                     <ArrowRight className="w-3 h-3" />
@@ -1043,7 +1043,7 @@ export const QrOrderingModule: React.FC = () => {
                   {allQrOrders.length === 0 && (
                     <div className="py-10 text-center space-y-2">
                       <ShoppingBag className="w-9 h-9 text-slate-300 mx-auto stroke-1" />
-                      <h4 className="text-xs font-black text-[#0B253A]">No table QR orders yet</h4>
+                      <h4 className="text-xs font-black text-jaman-navy">No table QR orders yet</h4>
                       <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
                         Orders placed by guests scanning a table QR code appear here instantly, and route
                         straight to POS billing and the kitchen KOT queue.
@@ -1053,7 +1053,7 @@ export const QrOrderingModule: React.FC = () => {
                   {allQrOrders.slice(0, 5).map((order) => (
                     <div
                       key={order.id}
-                      className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#FAF7F2] px-2 rounded-xl transition-colors cursor-pointer"
+                      className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-jaman-cream px-2 rounded-xl transition-colors cursor-pointer"
                       onClick={() => {
                         setSelectedOrder(order);
                         setActiveSubTab('ORDERS');
@@ -1061,10 +1061,10 @@ export const QrOrderingModule: React.FC = () => {
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-black text-xs text-[#0B253A]">
+                          <span className="font-mono font-black text-xs text-jaman-navy">
                             #{order.orderNumber}
                           </span>
-                          <span className="text-[10px] font-black bg-[#E66817] text-white px-1.5 py-0.2 rounded font-mono">
+                          <span className="text-[10px] font-black bg-jaman-saffron text-white px-1.5 py-0.2 rounded font-mono">
                             Token #{order.tokenNumber}
                           </span>
                           <span className="text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full">
@@ -1091,7 +1091,7 @@ export const QrOrderingModule: React.FC = () => {
 
                       <div className="flex items-center gap-3 self-end sm:self-center">
                         <div className="text-right">
-                          <div className="font-mono font-black text-sm text-[#0B253A]">
+                          <div className="font-mono font-black text-sm text-jaman-navy">
                             {formatINR(order.totalAmount)}
                           </div>
                           <span
@@ -1136,10 +1136,10 @@ export const QrOrderingModule: React.FC = () => {
         {activeSubTab === 'TABLES' && (
           <div className="space-y-4 max-w-7xl mx-auto">
             {/* Action Bar matching Image 5 layout */}
-            <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-5 rounded-3xl border border-[#EBE6DD] shadow-2xs">
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-5 rounded-3xl border border-jaman-border shadow-2xs">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-base font-black text-[#0B253A]">Tables & QR</h2>
+                  <h2 className="text-base font-black text-jaman-navy">Tables & QR</h2>
                   <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-200">
                     {tables.filter((t) => t.qrStatus !== 'DISABLED').length} / {tables.length} Active
                   </span>
@@ -1153,7 +1153,7 @@ export const QrOrderingModule: React.FC = () => {
                 <button
                   onClick={handleSelectAllTables}
                   disabled={tables.length === 0}
-                  className="bg-[#FAF7F2] hover:bg-slate-100 text-[#0B253A] border border-[#EBE6DD] px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="bg-jaman-cream hover:bg-slate-100 text-jaman-navy border border-jaman-border px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {selectedTableNumbers.length === tables.length && tables.length > 0
                     ? 'Deselect All'
@@ -1162,16 +1162,16 @@ export const QrOrderingModule: React.FC = () => {
 
                 <button
                   onClick={handleOpenBatchDesigner}
-                  className="bg-[#0B253A] hover:bg-[#123959] text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                  className="bg-jaman-navy hover:bg-[#123959] text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
                 >
-                  <Printer className="w-3.5 h-3.5 text-[#E66817]" />
+                  <Printer className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Batch Print Standees</span>
                 </button>
 
                 {/* Primary [+ Add Table] button matching Image 5 */}
                 <button
                   onClick={() => setIsAddTableOpen(true)}
-                  className="bg-[#0B253A] hover:bg-[#123959] text-white px-5 py-2 rounded-full text-xs font-black flex items-center gap-1.5 shadow-md shadow-[#0B253A]/20 transition-all cursor-pointer"
+                  className="bg-jaman-navy hover:bg-[#123959] text-white px-5 py-2 rounded-full text-xs font-black flex items-center gap-1.5 shadow-md shadow-jaman-navy/20 transition-all cursor-pointer"
                 >
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <Plus className="w-3.5 h-3.5" />
@@ -1181,7 +1181,7 @@ export const QrOrderingModule: React.FC = () => {
             </div>
 
             {/* Filter and Search Strip */}
-            <div className="bg-white p-3.5 rounded-2xl border border-[#EBE6DD] shadow-2xs flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-white p-3.5 rounded-2xl border border-jaman-border shadow-2xs flex flex-wrap items-center justify-between gap-3">
               <div className="relative flex-1 min-w-[220px] max-w-md">
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -1189,7 +1189,7 @@ export const QrOrderingModule: React.FC = () => {
                   value={tableSearch}
                   onChange={(e) => setTableSearch(e.target.value)}
                   placeholder="Search table number, dining zone..."
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
               </div>
 
@@ -1197,7 +1197,7 @@ export const QrOrderingModule: React.FC = () => {
                 <select
                   value={tableZoneFilter}
                   onChange={(e) => setTableZoneFilter(e.target.value)}
-                  className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+                  className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron cursor-pointer"
                 >
                   <option value="ALL">All Dining Areas ({distinctZones.length})</option>
                   {distinctZones.map((z) => (
@@ -1210,7 +1210,7 @@ export const QrOrderingModule: React.FC = () => {
                 <select
                   value={tableStatusFilter}
                   onChange={(e) => setTableStatusFilter(e.target.value)}
-                  className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+                  className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron cursor-pointer"
                 >
                   <option value="ALL">All QR Statuses</option>
                   <option value="ACTIVE">● Active QR Only</option>
@@ -1223,10 +1223,10 @@ export const QrOrderingModule: React.FC = () => {
             {selectedTableNumbers.length > 0 && (
               <div className="bg-amber-50 border border-amber-300 p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 animate-in fade-in">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-lg bg-[#E66817] text-white text-xs font-black flex items-center justify-center">
+                  <span className="w-6 h-6 rounded-lg bg-jaman-saffron text-white text-xs font-black flex items-center justify-center">
                     {selectedTableNumbers.length}
                   </span>
-                  <span className="text-xs font-black text-[#0B253A]">
+                  <span className="text-xs font-black text-jaman-navy">
                     {selectedTableNumbers.length} {selectedTableNumbers.length === 1 ? 'Table' : 'Tables'} Selected
                   </span>
                 </div>
@@ -1262,7 +1262,7 @@ export const QrOrderingModule: React.FC = () => {
                       setDesignerTable(first || tables[0] || null);
                       setIsCardDesignerOpen(true);
                     }}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-black flex items-center gap-1 cursor-pointer shadow-sm"
+                    className="px-3.5 py-1.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-black flex items-center gap-1 cursor-pointer shadow-sm"
                   >
                     <Printer className="w-3.5 h-3.5" />
                     <span>Print Selected Standees</span>
@@ -1273,18 +1273,18 @@ export const QrOrderingModule: React.FC = () => {
 
             {/* Empty states: no tables at all vs. none matching the current filters */}
             {tables.length === 0 && (
-              <div className="bg-white border border-[#EBE6DD] rounded-3xl p-12 text-center space-y-3 shadow-2xs">
-                <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] border border-[#FED7AA] flex items-center justify-center text-[#E66817] mx-auto">
+              <div className="bg-white border border-jaman-border rounded-3xl p-12 text-center space-y-3 shadow-2xs">
+                <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] border border-[#FED7AA] flex items-center justify-center text-jaman-saffron mx-auto">
                   <Grid className="w-7 h-7" />
                 </div>
-                <h3 className="text-sm font-black text-[#0B253A]">No tables configured yet</h3>
+                <h3 className="text-sm font-black text-jaman-navy">No tables configured yet</h3>
                 <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
                   Add your dining tables to generate secure QR codes, print tent-card standees, and start
                   accepting guest self-orders straight into POS and the kitchen.
                 </p>
                 <button
                   onClick={() => setIsAddTableOpen(true)}
-                  className="mt-1 px-5 py-2.5 rounded-full bg-[#0B253A] hover:bg-[#123959] text-white text-xs font-black inline-flex items-center gap-1.5 shadow-md cursor-pointer"
+                  className="mt-1 px-5 py-2.5 rounded-full bg-jaman-navy hover:bg-[#123959] text-white text-xs font-black inline-flex items-center gap-1.5 shadow-md cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Your First Table</span>
@@ -1293,9 +1293,9 @@ export const QrOrderingModule: React.FC = () => {
             )}
 
             {tables.length > 0 && filteredTables.length === 0 && (
-              <div className="bg-white border border-[#EBE6DD] rounded-3xl p-10 text-center space-y-3 shadow-2xs">
+              <div className="bg-white border border-jaman-border rounded-3xl p-10 text-center space-y-3 shadow-2xs">
                 <Search className="w-9 h-9 text-slate-300 mx-auto stroke-1" />
-                <h3 className="text-sm font-black text-[#0B253A]">No tables match these filters</h3>
+                <h3 className="text-sm font-black text-jaman-navy">No tables match these filters</h3>
                 <p className="text-xs text-slate-500">
                   {tables.length} table{tables.length === 1 ? '' : 's'} exist. Try clearing the search or zone
                   and status filters.
@@ -1306,7 +1306,7 @@ export const QrOrderingModule: React.FC = () => {
                     setTableZoneFilter('ALL');
                     setTableStatusFilter('ALL');
                   }}
-                  className="px-4 py-2 rounded-xl border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-black text-[#0B253A] cursor-pointer"
+                  className="px-4 py-2 rounded-xl border border-jaman-border hover:bg-jaman-cream text-xs font-black text-jaman-navy cursor-pointer"
                 >
                   Clear Filters
                 </button>
@@ -1331,7 +1331,7 @@ export const QrOrderingModule: React.FC = () => {
                   <div
                     key={table.id}
                     className={`bg-white border rounded-2xl p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-3 group ${
-                      isSelected ? 'border-[#E66817] ring-1 ring-[#E66817]' : 'border-[#EBE6DD]'
+                      isSelected ? 'border-jaman-saffron ring-1 ring-jaman-saffron' : 'border-jaman-border'
                     }`}
                   >
                     {/* Top Section matching Image 5: Icon + Table Name + Zone & Seats + Active Badge */}
@@ -1341,7 +1341,7 @@ export const QrOrderingModule: React.FC = () => {
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => handleToggleTableSelect(table.tableNumber)}
-                          className="accent-[#E66817] w-4 h-4 rounded cursor-pointer"
+                          className="accent-jaman-saffron w-4 h-4 rounded cursor-pointer"
                         />
 
                         {/* QR Icon with subtle rounded background */}
@@ -1351,7 +1351,7 @@ export const QrOrderingModule: React.FC = () => {
 
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <h3 className="text-base font-black text-[#0B253A]">
+                            <h3 className="text-base font-black text-jaman-navy">
                               Table {table.tableNumber}
                             </h3>
                           </div>
@@ -1411,14 +1411,14 @@ export const QrOrderingModule: React.FC = () => {
                     </div>
 
                     {/* Operational Stats Mini Strip */}
-                    <div className="bg-[#FAF7F2] px-3 py-2 rounded-xl border border-[#EBE6DD] flex items-center justify-between text-xs">
+                    <div className="bg-jaman-cream px-3 py-2 rounded-xl border border-jaman-border flex items-center justify-between text-xs">
                       <div className="flex items-center gap-1.5 text-slate-600">
                         <span className="font-bold">Today:</span>
-                        <span className="font-mono font-black text-[#0B253A]">{ordersToday} orders</span>
+                        <span className="font-mono font-black text-jaman-navy">{ordersToday} orders</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-slate-600">
                         <span className="font-bold">Revenue:</span>
-                        <span className="font-mono font-black text-[#E66817]">{formatINR(revenueToday)}</span>
+                        <span className="font-mono font-black text-jaman-saffron">{formatINR(revenueToday)}</span>
                       </div>
                     </div>
 
@@ -1430,12 +1430,12 @@ export const QrOrderingModule: React.FC = () => {
                       <div className="flex items-center justify-between gap-2 pt-0.5 flex-wrap">
                         <div className="flex items-center gap-1.5">
                           <span className="text-xs text-slate-500 font-medium">
-                            QR code: <span className="font-mono font-bold text-[#0B253A]">{shortCode}</span>
+                            QR code: <span className="font-mono font-bold text-jaman-navy">{shortCode}</span>
                           </span>
 
                           <button
                             onClick={() => handleCopyQrLink(table)}
-                            className="p-1 text-slate-400 hover:text-[#E66817] transition-colors"
+                            className="p-1 text-slate-400 hover:text-jaman-saffron transition-colors"
                             title="Copy QR Order Link"
                           >
                             <Copy className="w-3.5 h-3.5" />
@@ -1453,14 +1453,14 @@ export const QrOrderingModule: React.FC = () => {
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => handleOpenCustomerPreview(table.tableNumber)}
-                            className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-black text-[#0B253A] transition-colors cursor-pointer"
+                            className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-black text-jaman-navy transition-colors cursor-pointer"
                           >
                             View
                           </button>
 
                           <button
                             onClick={() => handleDownloadQrSvg(table)}
-                            className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-black text-[#0B253A] flex items-center gap-1 transition-colors cursor-pointer"
+                            className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-black text-jaman-navy flex items-center gap-1 transition-colors cursor-pointer"
                             title="Download Vector QR SVG"
                           >
                             <Download className="w-3 h-3 text-slate-500" />
@@ -1472,9 +1472,9 @@ export const QrOrderingModule: React.FC = () => {
                               setBatchDesignerMode(false);
                               handleOpenDesigner(table);
                             }}
-                            className="px-3.5 py-1.5 rounded-xl bg-[#0B253A] hover:bg-[#123959] text-white text-xs font-black flex items-center gap-1 transition-colors cursor-pointer shadow-xs"
+                            className="px-3.5 py-1.5 rounded-xl bg-jaman-navy hover:bg-[#123959] text-white text-xs font-black flex items-center gap-1 transition-colors cursor-pointer shadow-xs"
                           >
-                            <Printer className="w-3 h-3 text-[#E66817]" />
+                            <Printer className="w-3 h-3 text-jaman-saffron" />
                             <span>Print</span>
                           </button>
                         </div>
@@ -1487,7 +1487,7 @@ export const QrOrderingModule: React.FC = () => {
                         </span>
                         <button
                           onClick={() => handleGenerateQr(table)}
-                          className="px-3.5 py-1.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white text-xs font-black flex items-center gap-1 transition-colors cursor-pointer shadow-xs"
+                          className="px-3.5 py-1.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-black flex items-center gap-1 transition-colors cursor-pointer shadow-xs"
                         >
                           <QrCode className="w-3 h-3" />
                           <span>Generate QR</span>
@@ -1507,9 +1507,9 @@ export const QrOrderingModule: React.FC = () => {
         {activeSubTab === 'MENU' && (
           <div className="space-y-6 max-w-7xl mx-auto">
             {/* Header / Filter Toolbar */}
-            <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="text-sm font-black text-[#0B253A]">Canonical Digital Menu Controls</h2>
+                <h2 className="text-sm font-black text-jaman-navy">Canonical Digital Menu Controls</h2>
                 <p className="text-xs text-slate-500">
                   Shared canonical menu data across POS, POS Admin, QR Ordering, and Kiosk. Changes reflect in real time.
                 </p>
@@ -1523,14 +1523,14 @@ export const QrOrderingModule: React.FC = () => {
                     value={menuSearch}
                     onChange={(e) => setMenuSearch(e.target.value)}
                     placeholder="Search dishes..."
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-8 pr-3 py-1.5 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                 </div>
 
                 <select
                   value={menuCategoryFilter}
                   onChange={(e) => setMenuCategoryFilter(e.target.value)}
-                  className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+                  className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron cursor-pointer"
                 >
                   <option value="ALL">All Categories ({categories.length})</option>
                   {categories.map((c) => (
@@ -1542,7 +1542,7 @@ export const QrOrderingModule: React.FC = () => {
 
                 <button
                   onClick={() => handleOpenCustomerPreview()}
-                  className="bg-[#E66817] hover:bg-[#EA580C] text-white px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                  className="bg-jaman-saffron hover:bg-[#EA580C] text-white px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
                 >
                   <Eye className="w-3.5 h-3.5" />
                   <span>Preview Guest Menu</span>
@@ -1551,9 +1551,9 @@ export const QrOrderingModule: React.FC = () => {
             </div>
 
             {filteredMenuItems.length === 0 && (
-              <div className="bg-white border border-[#EBE6DD] rounded-3xl p-10 text-center space-y-3 shadow-2xs">
+              <div className="bg-white border border-jaman-border rounded-3xl p-10 text-center space-y-3 shadow-2xs">
                 <UtensilsCrossed className="w-9 h-9 text-slate-300 mx-auto stroke-1" />
-                <h3 className="text-sm font-black text-[#0B253A]">
+                <h3 className="text-sm font-black text-jaman-navy">
                   {menuItems.length === 0 ? 'No dishes on the canonical menu' : 'No dishes match this search'}
                 </h3>
                 <p className="text-xs text-slate-500 max-w-md mx-auto">
@@ -1567,7 +1567,7 @@ export const QrOrderingModule: React.FC = () => {
                       setMenuSearch('');
                       setMenuCategoryFilter('ALL');
                     }}
-                    className="px-4 py-2 rounded-xl border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-black text-[#0B253A] cursor-pointer"
+                    className="px-4 py-2 rounded-xl border border-jaman-border hover:bg-jaman-cream text-xs font-black text-jaman-navy cursor-pointer"
                   >
                     Clear Filters
                   </button>
@@ -1581,7 +1581,7 @@ export const QrOrderingModule: React.FC = () => {
                 .map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white border border-[#EBE6DD] rounded-2xl p-3.5 shadow-2xs flex flex-col justify-between space-y-3 hover:border-[#E66817]/40 transition-all"
+                    className="bg-white border border-jaman-border rounded-2xl p-3.5 shadow-2xs flex flex-col justify-between space-y-3 hover:border-jaman-saffron/40 transition-all"
                   >
                     <div className="flex gap-3">
                       <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
@@ -1596,8 +1596,8 @@ export const QrOrderingModule: React.FC = () => {
 
                       <div className="flex-1 min-w-0">
                         <span className="text-[10px] font-mono font-bold text-slate-400">{item.sku}</span>
-                        <h4 className="font-extrabold text-xs text-[#0B253A] truncate">{item.name}</h4>
-                        <span className="font-mono font-black text-xs text-[#E66817] block">
+                        <h4 className="font-extrabold text-xs text-jaman-navy truncate">{item.name}</h4>
+                        <span className="font-mono font-black text-xs text-jaman-saffron block">
                           {formatINR(item.price)}
                         </span>
                       </div>
@@ -1663,9 +1663,9 @@ export const QrOrderingModule: React.FC = () => {
 
                       <button
                         onClick={() => handleOpenDishConfig(item)}
-                        className="py-1.5 px-2 rounded-xl border border-slate-200 hover:bg-[#FAF7F2] text-xs font-black text-slate-700 flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                        className="py-1.5 px-2 rounded-xl border border-slate-200 hover:bg-jaman-cream text-xs font-black text-slate-700 flex items-center justify-center gap-1 transition-colors cursor-pointer"
                       >
-                        <Edit2 className="w-3 h-3 text-[#E66817]" />
+                        <Edit2 className="w-3 h-3 text-jaman-saffron" />
                         <span>Configure</span>
                       </button>
                     </div>
@@ -1681,7 +1681,7 @@ export const QrOrderingModule: React.FC = () => {
         {activeSubTab === 'ORDERS' && (
           <div className="space-y-4 max-w-7xl mx-auto">
             {/* Filter Toolbar */}
-            <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs flex flex-wrap items-center justify-between gap-3">
               <div className="relative min-w-[200px] flex-1 max-w-xs">
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                 <input
@@ -1689,12 +1689,12 @@ export const QrOrderingModule: React.FC = () => {
                   value={ordersSearch}
                   onChange={(e) => setOrdersSearch(e.target.value)}
                   placeholder="Search QR order #, token, table..."
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-8 pr-3 py-1.5 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
               </div>
 
               {/* Status Filter Pills */}
-              <div className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-xl border border-[#EBE6DD] overflow-x-auto">
+              <div className="flex items-center gap-1 bg-jaman-cream p-1 rounded-xl border border-jaman-border overflow-x-auto">
                 {['ALL', 'NEW', 'ACCEPTED', 'PREPARING', 'READY', 'SERVED', 'COMPLETED', 'CANCELLED'].map(
                   (st) => {
                     const count =
@@ -1707,8 +1707,8 @@ export const QrOrderingModule: React.FC = () => {
                         onClick={() => setOrdersStatusFilter(st)}
                         className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                           ordersStatusFilter === st
-                            ? 'bg-[#E66817] text-white shadow-xs font-black'
-                            : 'text-slate-600 hover:text-[#0B253A]'
+                            ? 'bg-jaman-saffron text-white shadow-xs font-black'
+                            : 'text-slate-600 hover:text-jaman-navy'
                         }`}
                       >
                         {st} <span className="font-mono opacity-70">{count}</span>
@@ -1722,7 +1722,7 @@ export const QrOrderingModule: React.FC = () => {
               <select
                 value={ordersTableFilter}
                 onChange={(e) => setOrdersTableFilter(e.target.value)}
-                className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+                className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron cursor-pointer"
               >
                 <option value="ALL">All Tables</option>
                 {tables.map((t) => (
@@ -1736,17 +1736,17 @@ export const QrOrderingModule: React.FC = () => {
             {/* Orders Split: Left List, Right Detail Pane */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
               {/* Orders List */}
-              <div className="lg:col-span-6 xl:col-span-5 bg-white border border-[#EBE6DD] rounded-2xl overflow-y-auto max-h-[70vh] shadow-2xs divide-y divide-slate-100">
+              <div className="lg:col-span-6 xl:col-span-5 bg-white border border-jaman-border rounded-2xl overflow-y-auto max-h-[70vh] shadow-2xs divide-y divide-slate-100">
                 {filteredQrOrders.length === 0 ? (
                   <div className="p-8 text-center space-y-2">
                     <ShoppingBag className="w-10 h-10 text-slate-300 mx-auto" />
-                    <h4 className="text-xs font-black text-[#0B253A]">No QR Orders Found</h4>
+                    <h4 className="text-xs font-black text-jaman-navy">No QR Orders Found</h4>
                     <p className="text-[11px] text-slate-500">
                       Place a new live QR table order to see it appear in real-time.
                     </p>
                     <button
                       onClick={() => handleOpenCustomerPreview()}
-                      className="px-4 py-2 bg-[#E66817] text-white text-xs font-black rounded-xl shadow-xs cursor-pointer"
+                      className="px-4 py-2 bg-jaman-saffron text-white text-xs font-black rounded-xl shadow-xs cursor-pointer"
                     >
                       Open Live QR Ordering
                     </button>
@@ -1759,15 +1759,15 @@ export const QrOrderingModule: React.FC = () => {
                         key={order.id}
                         onClick={() => setSelectedOrder(order)}
                         className={`p-4 flex flex-col justify-between gap-2 cursor-pointer transition-colors ${
-                          isSelected ? 'bg-amber-50/70 border-l-4 border-l-[#E66817]' : 'hover:bg-[#FAF7F2]'
+                          isSelected ? 'bg-amber-50/70 border-l-4 border-l-jaman-saffron' : 'hover:bg-jaman-cream'
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-black text-sm text-[#0B253A]">
+                            <span className="font-mono font-black text-sm text-jaman-navy">
                               #{order.orderNumber}
                             </span>
-                            <span className="text-[10px] font-black bg-[#E66817] text-white px-2 py-0.5 rounded font-mono">
+                            <span className="text-[10px] font-black bg-jaman-saffron text-white px-2 py-0.5 rounded font-mono">
                               #T-{order.tokenNumber}
                             </span>
                             <span className="text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full">
@@ -1775,7 +1775,7 @@ export const QrOrderingModule: React.FC = () => {
                             </span>
                           </div>
 
-                          <span className="font-mono font-black text-sm text-[#0B253A]">
+                          <span className="font-mono font-black text-sm text-jaman-navy">
                             {formatINR(order.totalAmount)}
                           </span>
                         </div>
@@ -1814,17 +1814,17 @@ export const QrOrderingModule: React.FC = () => {
               </div>
 
               {/* Order Detail & Kitchen Routing Action Pane */}
-              <div className="lg:col-span-6 xl:col-span-7 bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs overflow-y-auto max-h-[70vh]">
+              <div className="lg:col-span-6 xl:col-span-7 bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs overflow-y-auto max-h-[70vh]">
                 {selectedOrder ? (
                   <div className="space-y-4">
                     {/* Header */}
                     <div className="flex items-start justify-between pb-3 border-b border-slate-100">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-base font-black text-[#0B253A]">
+                          <h3 className="text-base font-black text-jaman-navy">
                             QR Order #{selectedOrder.orderNumber}
                           </h3>
-                          <span className="text-xs font-black bg-[#E66817] text-white px-2 py-0.5 rounded-md font-mono">
+                          <span className="text-xs font-black bg-jaman-saffron text-white px-2 py-0.5 rounded-md font-mono">
                             Token #{selectedOrder.tokenNumber}
                           </span>
                         </div>
@@ -1837,7 +1837,7 @@ export const QrOrderingModule: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleOpenCustomerPreview(selectedOrder.tableNumber || tables[0]?.tableNumber || '', selectedOrder.id)}
-                          className="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-[#E66817] border border-[#FED7AA] text-xs font-bold flex items-center gap-1 cursor-pointer"
+                          className="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-jaman-saffron border border-[#FED7AA] text-xs font-bold flex items-center gap-1 cursor-pointer"
                         >
                           <Smartphone className="w-3.5 h-3.5" />
                           <span>Guest Tracker</span>
@@ -1853,10 +1853,10 @@ export const QrOrderingModule: React.FC = () => {
                     )}
 
                     {/* Kitchen Routing Breakdown (Part 11) */}
-                    <div className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl p-3 space-y-1.5">
-                      <div className="flex items-center justify-between text-xs font-black text-[#0B253A]">
+                    <div className="bg-jaman-cream border border-jaman-border rounded-xl p-3 space-y-1.5">
+                      <div className="flex items-center justify-between text-xs font-black text-jaman-navy">
                         <span className="flex items-center gap-1.5">
-                          <ChefHat className="w-4 h-4 text-[#E66817]" />
+                          <ChefHat className="w-4 h-4 text-jaman-saffron" />
                           <span>Kitchen Station Routing Dispatch</span>
                         </span>
                         <span className="text-[10px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
@@ -1879,12 +1879,12 @@ export const QrOrderingModule: React.FC = () => {
 
                     {/* Items List */}
                     <div className="space-y-2">
-                      <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">Ordered Dishes</h4>
+                      <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider">Ordered Dishes</h4>
                       <div className="divide-y divide-slate-100 border border-slate-100 rounded-xl p-3">
                         {selectedOrder.items.map((it) => (
                           <div key={it.id} className="py-2 first:pt-0 last:pb-0 flex items-start justify-between">
                             <div>
-                              <div className="font-extrabold text-xs text-[#0B253A]">
+                              <div className="font-extrabold text-xs text-jaman-navy">
                                 {it.quantity} × {it.name}
                               </div>
                               {it.modifiers && it.modifiers.length > 0 && (
@@ -1898,7 +1898,7 @@ export const QrOrderingModule: React.FC = () => {
                                 </p>
                               )}
                             </div>
-                            <span className="font-mono font-black text-xs text-[#0B253A]">
+                            <span className="font-mono font-black text-xs text-jaman-navy">
                               {formatINR(it.totalPrice)}
                             </span>
                           </div>
@@ -1907,7 +1907,7 @@ export const QrOrderingModule: React.FC = () => {
                     </div>
 
                     {/* Pricing Summary */}
-                    <div className="bg-[#FAF7F2] rounded-xl p-3 space-y-1 text-xs">
+                    <div className="bg-jaman-cream rounded-xl p-3 space-y-1 text-xs">
                       <div className="flex justify-between text-slate-500">
                         <span>Subtotal</span>
                         <span className="font-mono">{formatINR(selectedOrder.subtotal)}</span>
@@ -1916,9 +1916,9 @@ export const QrOrderingModule: React.FC = () => {
                         <span>GST (5%)</span>
                         <span className="font-mono">{formatINR(selectedOrder.taxAmount)}</span>
                       </div>
-                      <div className="pt-2 border-t border-slate-200 flex justify-between font-extrabold text-sm text-[#0B253A]">
+                      <div className="pt-2 border-t border-slate-200 flex justify-between font-extrabold text-sm text-jaman-navy">
                         <span>Total Amount</span>
-                        <span className="font-mono text-[#E66817]">{formatINR(selectedOrder.totalAmount)}</span>
+                        <span className="font-mono text-jaman-saffron">{formatINR(selectedOrder.totalAmount)}</span>
                       </div>
                     </div>
 
@@ -1932,7 +1932,7 @@ export const QrOrderingModule: React.FC = () => {
                         {selectedOrder.orderStatus === 'NEW' && (
                           <button
                             onClick={() => handleAdvanceOrderStatus(selectedOrder.id, 'ACCEPTED')}
-                            className="px-3.5 py-2 rounded-xl bg-[#0B253A] text-white text-xs font-black hover:bg-[#123959] transition-all cursor-pointer"
+                            className="px-3.5 py-2 rounded-xl bg-jaman-navy text-white text-xs font-black hover:bg-[#123959] transition-all cursor-pointer"
                           >
                             Accept Order
                           </button>
@@ -1941,7 +1941,7 @@ export const QrOrderingModule: React.FC = () => {
                         {(selectedOrder.orderStatus === 'NEW' || selectedOrder.orderStatus === 'ACCEPTED') && (
                           <button
                             onClick={() => handleAdvanceOrderStatus(selectedOrder.id, 'PREPARING')}
-                            className="px-3.5 py-2 rounded-xl bg-[#E66817] text-white text-xs font-black hover:bg-[#EA580C] shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+                            className="px-3.5 py-2 rounded-xl bg-jaman-saffron text-white text-xs font-black hover:bg-[#EA580C] shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
                           >
                             <Flame className="w-3.5 h-3.5" />
                             <span>Send to Kitchen (KOT)</span>
@@ -2012,15 +2012,15 @@ export const QrOrderingModule: React.FC = () => {
         {activeSubTab === 'ANALYTICS' && (
           <div className="space-y-6 max-w-7xl mx-auto">
             {/* Filter Toolbar */}
-            <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="text-sm font-black text-[#0B253A]">QR Table Ordering Performance Reports</h2>
+                <h2 className="text-sm font-black text-jaman-navy">QR Table Ordering Performance Reports</h2>
                 <p className="text-xs text-slate-500">
                   Analyze self-ordering adoption, guest spend, and busiest tables across dining zones.
                 </p>
               </div>
 
-              <div className="flex items-center gap-1.5 bg-[#FAF7F2] p-1 rounded-xl border border-[#EBE6DD]">
+              <div className="flex items-center gap-1.5 bg-jaman-cream p-1 rounded-xl border border-jaman-border">
                 {[
                   { id: 'TODAY', label: 'Today' },
                   { id: 'YESTERDAY', label: 'Yesterday' },
@@ -2033,8 +2033,8 @@ export const QrOrderingModule: React.FC = () => {
                     onClick={() => setAnalyticsDateRange(range.id)}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       analyticsDateRange === range.id
-                        ? 'bg-[#0B253A] text-white shadow-xs font-black'
-                        : 'text-slate-600 hover:text-[#0B253A]'
+                        ? 'bg-jaman-navy text-white shadow-xs font-black'
+                        : 'text-slate-600 hover:text-jaman-navy'
                     }`}
                   >
                     {range.label}
@@ -2045,27 +2045,27 @@ export const QrOrderingModule: React.FC = () => {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-1">
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-1">
                 <span className="text-[11px] font-extrabold uppercase text-slate-500">QR Table Orders</span>
-                <div className="font-mono font-black text-2xl text-[#0B253A]">{qrStats.totalOrders}</div>
+                <div className="font-mono font-black text-2xl text-jaman-navy">{qrStats.totalOrders}</div>
                 <p className="text-[10px] text-slate-500">Total table orders received</p>
               </div>
 
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-1">
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-1">
                 <span className="text-[11px] font-extrabold uppercase text-slate-500">QR Gross Revenue</span>
-                <div className="font-mono font-black text-2xl text-[#E66817]">{formatINR(qrStats.totalRevenue)}</div>
+                <div className="font-mono font-black text-2xl text-jaman-saffron">{formatINR(qrStats.totalRevenue)}</div>
                 <p className="text-[10px] text-slate-500">Billed & settled QR revenue</p>
               </div>
 
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-1">
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-1">
                 <span className="text-[11px] font-extrabold uppercase text-slate-500">Average QR Ticket</span>
-                <div className="font-mono font-black text-2xl text-[#0B253A]">{formatINR(qrStats.avgOrderValue)}</div>
+                <div className="font-mono font-black text-2xl text-jaman-navy">{formatINR(qrStats.avgOrderValue)}</div>
                 <p className="text-[10px] text-slate-500">Average spend per table order</p>
               </div>
 
-              <div className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-2xs space-y-1">
+              <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs space-y-1">
                 <span className="text-[11px] font-extrabold uppercase text-slate-500">Top Revenue Table</span>
-                <div className="font-black text-base text-[#0B253A] truncate">
+                <div className="font-black text-base text-jaman-navy truncate">
                   {hasQrOrderData ? qrStats.topTable : 'No data'}
                 </div>
                 <p className="text-[10px] text-slate-500">
@@ -2075,9 +2075,9 @@ export const QrOrderingModule: React.FC = () => {
             </div>
 
             {/* Table-by-Table Performance Grid */}
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
+            <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+                <h3 className="text-xs font-black text-jaman-navy uppercase tracking-wider">
                   Table-by-Table QR Performance Breakdown
                 </h3>
                 <span className="text-[10px] font-bold text-slate-400">
@@ -2089,7 +2089,7 @@ export const QrOrderingModule: React.FC = () => {
               {!hasQrOrderData ? (
                 <div className="py-12 text-center space-y-3">
                   <TrendingUp className="w-10 h-10 text-slate-300 mx-auto stroke-1" />
-                  <h4 className="text-sm font-black text-[#0B253A]">
+                  <h4 className="text-sm font-black text-jaman-navy">
                     No QR orders in the selected period
                   </h4>
                   <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
@@ -2099,7 +2099,7 @@ export const QrOrderingModule: React.FC = () => {
                   {analyticsDateRange !== 'ALL' && (
                     <button
                       onClick={() => setAnalyticsDateRange('ALL')}
-                      className="px-4 py-2 rounded-xl border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-black text-[#0B253A] cursor-pointer"
+                      className="px-4 py-2 rounded-xl border border-jaman-border hover:bg-jaman-cream text-xs font-black text-jaman-navy cursor-pointer"
                     >
                       View All Time
                     </button>
@@ -2109,7 +2109,7 @@ export const QrOrderingModule: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-[#EBE6DD] text-slate-400 font-black uppercase text-[10px]">
+                    <tr className="border-b border-jaman-border text-slate-400 font-black uppercase text-[10px]">
                       <th className="pb-2">Table #</th>
                       <th className="pb-2">Dining Zone</th>
                       <th className="pb-2 text-center">Orders Count</th>
@@ -2126,13 +2126,13 @@ export const QrOrderingModule: React.FC = () => {
                       .map((tbl) => {
                       const avg = tbl.orderCount > 0 ? Math.round(tbl.revenue / tbl.orderCount) : 0;
                       return (
-                        <tr key={tbl.tableNumber} className="hover:bg-[#FAF7F2] transition-colors">
-                          <td className="py-2.5 font-black text-[#0B253A]">Table {tbl.tableNumber}</td>
+                        <tr key={tbl.tableNumber} className="hover:bg-jaman-cream transition-colors">
+                          <td className="py-2.5 font-black text-jaman-navy">Table {tbl.tableNumber}</td>
                           <td className="py-2.5 text-slate-600">{tbl.zone}</td>
-                          <td className="py-2.5 text-center font-mono font-bold text-[#0B253A]">
+                          <td className="py-2.5 text-center font-mono font-bold text-jaman-navy">
                             {tbl.orderCount}
                           </td>
-                          <td className="py-2.5 text-right font-mono font-black text-[#E66817]">
+                          <td className="py-2.5 text-right font-mono font-black text-jaman-saffron">
                             {formatINR(tbl.revenue)}
                           </td>
                           <td className="py-2.5 text-right font-mono text-slate-600">{formatINR(avg)}</td>
@@ -2140,7 +2140,7 @@ export const QrOrderingModule: React.FC = () => {
                           <td className="py-2.5 text-center">
                             <button
                               onClick={() => handleOpenCustomerPreview(tbl.tableNumber)}
-                              className="px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-[#E66817] text-[10px] font-black cursor-pointer"
+                              className="px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-jaman-saffron text-[10px] font-black cursor-pointer"
                             >
                               Open Guest View
                             </button>
@@ -2162,9 +2162,9 @@ export const QrOrderingModule: React.FC = () => {
         {activeSubTab === 'SETTINGS' && (
           <div className="space-y-6 max-w-4xl mx-auto">
             {/* Header */}
-            <div className="bg-white p-5 rounded-2xl border border-[#EBE6DD] shadow-2xs flex items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-jaman-border shadow-2xs flex items-center justify-between">
               <div>
-                <h2 className="text-sm font-black text-[#0B253A]">QR Table Ordering Configuration</h2>
+                <h2 className="text-sm font-black text-jaman-navy">QR Table Ordering Configuration</h2>
                 <p className="text-xs text-slate-500">
                   Configure customer self-ordering permissions, order limits, and automated kitchen dispatch rules.
                 </p>
@@ -2179,147 +2179,147 @@ export const QrOrderingModule: React.FC = () => {
             </div>
 
             {/* Granular Feature Toggles */}
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
-              <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+            <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
+              <h3 className="text-xs font-black text-jaman-navy uppercase tracking-wider">
                 Feature Switches & Automation
               </h3>
 
               <div className="divide-y divide-slate-100">
                 <div className="py-3 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-black text-[#0B253A] block">QR Ordering System</span>
+                    <span className="text-xs font-black text-jaman-navy block">QR Ordering System</span>
                     <span className="text-[11px] text-slate-500">Enable or disable guest table QR ordering globally</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={qrSettings.isQrOrderingActive}
                     onChange={(e) => handleSaveSettings({ isQrOrderingActive: e.target.checked })}
-                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                    className="w-5 h-5 text-jaman-saffron rounded cursor-pointer accent-jaman-saffron"
                   />
                 </div>
 
                 <div className="py-3 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-black text-[#0B253A] block">Allow Customer Ordering</span>
+                    <span className="text-xs font-black text-jaman-navy block">Allow Customer Ordering</span>
                     <span className="text-[11px] text-slate-500">Permit guests to place orders directly without staff intervention</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={qrSettings.allowCustomerOrdering}
                     onChange={(e) => handleSaveSettings({ allowCustomerOrdering: e.target.checked })}
-                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                    className="w-5 h-5 text-jaman-saffron rounded cursor-pointer accent-jaman-saffron"
                   />
                 </div>
 
                 <div className="py-3 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-black text-[#0B253A] block">Allow Dish Modifications</span>
+                    <span className="text-xs font-black text-jaman-navy block">Allow Dish Modifications</span>
                     <span className="text-[11px] text-slate-500">Permit guests to select spice levels and paid add-ons</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={qrSettings.allowCustomerModifications}
                     onChange={(e) => handleSaveSettings({ allowCustomerModifications: e.target.checked })}
-                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                    className="w-5 h-5 text-jaman-saffron rounded cursor-pointer accent-jaman-saffron"
                   />
                 </div>
 
                 <div className="py-3 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-black text-[#0B253A] block">Special Cooking Instructions</span>
+                    <span className="text-xs font-black text-jaman-navy block">Special Cooking Instructions</span>
                     <span className="text-[11px] text-slate-500">Allow guests to write custom notes for chefs (&ldquo;no onion&rdquo;, etc.)</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={qrSettings.allowSpecialInstructions}
                     onChange={(e) => handleSaveSettings({ allowSpecialInstructions: e.target.checked })}
-                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                    className="w-5 h-5 text-jaman-saffron rounded cursor-pointer accent-jaman-saffron"
                   />
                 </div>
 
                 <div className="py-3 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-black text-[#0B253A] block">Auto-Dispatch to Kitchen (KOT)</span>
+                    <span className="text-xs font-black text-jaman-navy block">Auto-Dispatch to Kitchen (KOT)</span>
                     <span className="text-[11px] text-slate-500">Automatically send accepted QR orders to kitchen routing stations</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={qrSettings.autoSendToKitchen}
                     onChange={(e) => handleSaveSettings({ autoSendToKitchen: e.target.checked })}
-                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                    className="w-5 h-5 text-jaman-saffron rounded cursor-pointer accent-jaman-saffron"
                   />
                 </div>
 
                 <div className="py-3 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-black text-[#0B253A] block">Live Order Status Timeline</span>
+                    <span className="text-xs font-black text-jaman-navy block">Live Order Status Timeline</span>
                     <span className="text-[11px] text-slate-500">Show real-time cooking and preparation updates to the guest</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={qrSettings.showOrderStatusTimeline}
                     onChange={(e) => handleSaveSettings({ showOrderStatusTimeline: e.target.checked })}
-                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                    className="w-5 h-5 text-jaman-saffron rounded cursor-pointer accent-jaman-saffron"
                   />
                 </div>
 
                 <div className="py-3 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-black text-[#0B253A] block">Audio Chime on New QR Order</span>
+                    <span className="text-xs font-black text-jaman-navy block">Audio Chime on New QR Order</span>
                     <span className="text-[11px] text-slate-500">Play pleasant notification sound at POS when table order arrives</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={qrSettings.enableNotificationSound}
                     onChange={(e) => handleSaveSettings({ enableNotificationSound: e.target.checked })}
-                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                    className="w-5 h-5 text-jaman-saffron rounded cursor-pointer accent-jaman-saffron"
                   />
                 </div>
 
                 <div className="py-3 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-black text-[#0B253A] block">Repeat / Add-On Ordering</span>
+                    <span className="text-xs font-black text-jaman-navy block">Repeat / Add-On Ordering</span>
                     <span className="text-[11px] text-slate-500">Let a table place further rounds without rescanning the QR code</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={qrSettings.allowRepeatOrdering}
                     onChange={(e) => handleSaveSettings({ allowRepeatOrdering: e.target.checked })}
-                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                    className="w-5 h-5 text-jaman-saffron rounded cursor-pointer accent-jaman-saffron"
                   />
                 </div>
 
                 <div className="py-3 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-black text-[#0B253A] block">Require Waiter Approval</span>
+                    <span className="text-xs font-black text-jaman-navy block">Require Waiter Approval</span>
                     <span className="text-[11px] text-slate-500">Hold guest orders for captain confirmation before kitchen dispatch</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={qrSettings.requireWaiterApproval}
                     onChange={(e) => handleSaveSettings({ requireWaiterApproval: e.target.checked })}
-                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                    className="w-5 h-5 text-jaman-saffron rounded cursor-pointer accent-jaman-saffron"
                   />
                 </div>
 
                 <div className="py-3 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-black text-[#0B253A] block">Guest Self-Cancellation</span>
+                    <span className="text-xs font-black text-jaman-navy block">Guest Self-Cancellation</span>
                     <span className="text-[11px] text-slate-500">Allow guests to cancel their own order before the kitchen starts</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={qrSettings.allowCustomerCancellation}
                     onChange={(e) => handleSaveSettings({ allowCustomerCancellation: e.target.checked })}
-                    className="w-5 h-5 text-[#E66817] rounded cursor-pointer accent-[#E66817]"
+                    className="w-5 h-5 text-jaman-saffron rounded cursor-pointer accent-jaman-saffron"
                   />
                 </div>
               </div>
             </div>
 
             {/* Guest-Facing Presentation */}
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
-              <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+            <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
+              <h3 className="text-xs font-black text-jaman-navy uppercase tracking-wider">
                 Guest-Facing Presentation
               </h3>
 
@@ -2332,7 +2332,7 @@ export const QrOrderingModule: React.FC = () => {
                       tableQrTemplate: e.target.value as QrOrderingSettings['tableQrTemplate']
                     })
                   }
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron cursor-pointer"
                 >
                   <option value="SIGNATURE">JAMANVAAR Royal Signature</option>
                   <option value="ELEGANT">Deep Navy Imperial</option>
@@ -2354,14 +2354,14 @@ export const QrOrderingModule: React.FC = () => {
                   }}
                   rows={2}
                   placeholder="Shown at the top of the guest digital menu"
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl p-2.5 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl p-2.5 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
               </div>
             </div>
 
             {/* Min / Max Order Limits */}
-            <div className="bg-white border border-[#EBE6DD] rounded-2xl p-5 shadow-2xs space-y-4">
-              <h3 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">Order Value Limits</h3>
+            <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">
+              <h3 className="text-xs font-black text-jaman-navy uppercase tracking-wider">Order Value Limits</h3>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
@@ -2378,7 +2378,7 @@ export const QrOrderingModule: React.FC = () => {
                         handleSaveSettings({ minOrderValue: next });
                       }
                     }}
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-mono font-black text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-black text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                   <p className="text-[10px] text-slate-400">0 disables the minimum.</p>
                 </div>
@@ -2397,7 +2397,7 @@ export const QrOrderingModule: React.FC = () => {
                         handleSaveSettings({ maxOrderValue: next });
                       }
                     }}
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-mono font-black text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-black text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                   <p className="text-[10px] text-slate-400">0 disables the cap.</p>
                 </div>
@@ -2441,7 +2441,7 @@ export const QrOrderingModule: React.FC = () => {
 
       {/* Toast Notification */}
       {toastMsg && (
-        <div className="fixed bottom-5 right-5 z-50 bg-[#0B253A] text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-amber-400/30 text-xs font-bold animate-in fade-in slide-in-from-bottom-2">
+        <div className="fixed bottom-5 right-5 z-50 bg-jaman-navy text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-amber-400/30 text-xs font-bold animate-in fade-in slide-in-from-bottom-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{toastMsg}</span>
         </div>
@@ -2450,14 +2450,14 @@ export const QrOrderingModule: React.FC = () => {
       {/* Add Table Modal */}
       {isAddTableOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-[#EBE6DD] space-y-4 animate-in zoom-in-95">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-jaman-border space-y-4 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-[#E66817]">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-jaman-saffron">
                   <Plus className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-[#0B253A]">Add New Restaurant Table</h3>
+                  <h3 className="text-sm font-black text-jaman-navy">Add New Restaurant Table</h3>
                   <p className="text-[11px] text-slate-500">Creates table record with secure QR code</p>
                 </div>
               </div>
@@ -2471,7 +2471,7 @@ export const QrOrderingModule: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-[#0B253A]">Table Number / Name *</label>
+                <label className="text-xs font-bold text-jaman-navy">Table Number / Name *</label>
                 <input
                   type="text"
                   value={newTableNumber}
@@ -2480,7 +2480,7 @@ export const QrOrderingModule: React.FC = () => {
                     setAddTableError(null);
                   }}
                   placeholder="e.g. 12, T-14, VIP-1"
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-black text-sm text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-black text-sm text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   autoFocus
                 />
                 {addTableError && (
@@ -2489,14 +2489,14 @@ export const QrOrderingModule: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-[#0B253A]">Dining Area / Zone</label>
+                <label className="text-xs font-bold text-jaman-navy">Dining Area / Zone</label>
                 <input
                   type="text"
                   list="jv-qr-zone-options"
                   value={newTableZone}
                   onChange={(e) => setNewTableZone(e.target.value)}
                   placeholder="Main Dining Hall"
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
                 <datalist id="jv-qr-zone-options">
                   {distinctZones.map((z) => (
@@ -2512,26 +2512,26 @@ export const QrOrderingModule: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#0B253A]">Seat Capacity</label>
+                  <label className="text-xs font-bold text-jaman-navy">Seat Capacity</label>
                   <input
                     type="number"
                     min="1"
                     max="50"
                     value={newTableCapacity}
                     onChange={(e) => setNewTableCapacity(parseInt(e.target.value, 10) || 1)}
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#0B253A]">Floor</label>
+                  <label className="text-xs font-bold text-jaman-navy">Floor</label>
                   <input
                     type="number"
                     min="0"
                     max="10"
                     value={newTableFloor}
                     onChange={(e) => setNewTableFloor(parseInt(e.target.value, 10) || 1)}
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                 </div>
               </div>
@@ -2550,7 +2550,7 @@ export const QrOrderingModule: React.FC = () => {
               </button>
               <button
                 onClick={handleSaveAddTable}
-                className="px-4 py-2 rounded-xl bg-[#0B253A] hover:bg-[#123959] text-white text-xs font-black"
+                className="px-4 py-2 rounded-xl bg-jaman-navy hover:bg-[#123959] text-white text-xs font-black"
               >
                 Create Table & QR
               </button>
@@ -2562,14 +2562,14 @@ export const QrOrderingModule: React.FC = () => {
       {/* Edit Table Modal */}
       {editingTable && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-[#EBE6DD] space-y-4 animate-in zoom-in-95">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-jaman-border space-y-4 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
                   <Edit2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-[#0B253A]">Edit Table {editingTable.tableNumber}</h3>
+                  <h3 className="text-sm font-black text-jaman-navy">Edit Table {editingTable.tableNumber}</h3>
                   <p className="text-[11px] text-slate-500">Update dining area and seat capacity</p>
                 </div>
               </div>
@@ -2583,24 +2583,24 @@ export const QrOrderingModule: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-[#0B253A]">Dining Area / Zone</label>
+                <label className="text-xs font-bold text-jaman-navy">Dining Area / Zone</label>
                 <input
                   type="text"
                   value={editZone}
                   onChange={(e) => setEditZone(e.target.value)}
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-[#0B253A]">Seat Capacity</label>
+                <label className="text-xs font-bold text-jaman-navy">Seat Capacity</label>
                 <input
                   type="number"
                   min="1"
                   max="50"
                   value={editCapacity}
                   onChange={(e) => setEditCapacity(parseInt(e.target.value, 10) || 1)}
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 font-bold text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
               </div>
             </div>
@@ -2614,7 +2614,7 @@ export const QrOrderingModule: React.FC = () => {
               </button>
               <button
                 onClick={handleSaveEditTable}
-                className="px-4 py-2 rounded-xl bg-[#0B253A] hover:bg-[#123959] text-white text-xs font-black"
+                className="px-4 py-2 rounded-xl bg-jaman-navy hover:bg-[#123959] text-white text-xs font-black"
               >
                 Save Changes
               </button>

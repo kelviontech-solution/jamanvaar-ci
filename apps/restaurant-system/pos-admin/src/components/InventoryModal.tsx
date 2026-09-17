@@ -106,7 +106,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Fresh Malai Paneer"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             />
           </div>
           <div>
@@ -116,7 +116,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
               value={sku}
               onChange={(e) => setSku(e.target.value)}
               placeholder="e.g. RAW-PAN-01"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
         </div>
@@ -127,7 +127,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             >
               <option value="Dairy">Dairy & Cheese</option>
               <option value="Grains & Pulses">Grains & Pulses</option>
@@ -142,7 +142,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
             <select
               value={unit}
               onChange={(e) => setUnit(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             >
               <option value="kg">kg (Kilograms)</option>
               <option value="g">g (Grams)</option>
@@ -163,7 +163,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
               required
               value={currentStock}
               onChange={(e) => setCurrentStock(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
           <div>
@@ -174,7 +174,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
               required
               value={minStockLevel}
               onChange={(e) => setMinStockLevel(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
           <div>
@@ -185,7 +185,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
               required
               value={costPerUnit}
               onChange={(e) => setCostPerUnit(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
         </div>
@@ -197,7 +197,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
             value={supplierName}
             onChange={(e) => setSupplierName(e.target.value)}
             placeholder="e.g. Amul Dairy Direct / Metro Wholesale"
-            className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
           />
         </div>
 
@@ -213,7 +213,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
           </Button>
           <button
             type="submit"
-            className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
           >
             {itemToEdit ? 'Save Changes' : 'Create Inventory Item'}
           </button>

@@ -85,7 +85,7 @@ export const PrinterModal: React.FC<PrinterModalProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Counter Bill Thermal 80mm"
-            className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
           />
         </div>
 
@@ -95,7 +95,7 @@ export const PrinterModal: React.FC<PrinterModalProps> = ({
             <select
               value={interfaceType}
               onChange={(e) => setInterfaceType(e.target.value as any)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             >
               <option value="USB">USB Cable</option>
               <option value="NETWORK_LAN">Ethernet / Network LAN</option>
@@ -111,7 +111,7 @@ export const PrinterModal: React.FC<PrinterModalProps> = ({
               value={port}
               onChange={(e) => setPort(e.target.value)}
               placeholder="e.g. USB001 or 192.168.1.200"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
         </div>
@@ -124,7 +124,7 @@ export const PrinterModal: React.FC<PrinterModalProps> = ({
               onClick={() => setPaperSize('80mm')}
               className={`p-3 rounded-2xl border-2 text-center transition-all ${
                 paperSize === '80mm'
-                  ? 'border-[#E66817] bg-[#FFF4ED] text-[#0B253A] font-black'
+                  ? 'border-jaman-saffron bg-[#FFF4ED] text-jaman-navy font-black'
                   : 'border-slate-200 bg-white text-slate-600 font-bold'
               }`}
             >
@@ -136,7 +136,7 @@ export const PrinterModal: React.FC<PrinterModalProps> = ({
               onClick={() => setPaperSize('58mm')}
               className={`p-3 rounded-2xl border-2 text-center transition-all ${
                 paperSize === '58mm'
-                  ? 'border-[#E66817] bg-[#FFF4ED] text-[#0B253A] font-black'
+                  ? 'border-jaman-saffron bg-[#FFF4ED] text-jaman-navy font-black'
                   : 'border-slate-200 bg-white text-slate-600 font-bold'
               }`}
             >
@@ -170,7 +170,7 @@ export const PrinterModal: React.FC<PrinterModalProps> = ({
           </Button>
           <button
             type="submit"
-            className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
           >
             {printerToEdit ? 'Save Printer' : 'Register Printer'}
           </button>

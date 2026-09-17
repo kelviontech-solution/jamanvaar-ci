@@ -270,11 +270,11 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-[#0B253A] text-white flex items-center justify-center shadow-xs">
-                  <ShoppingBag className="w-5 h-5 text-[#E66817]" />
+                <div className="w-10 h-10 rounded-2xl bg-jaman-navy text-white flex items-center justify-center shadow-xs">
+                  <ShoppingBag className="w-5 h-5 text-jaman-saffron" />
                 </div>
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
                     Orders & Order History
                   </h1>
                   <p className="text-xs text-[#4A5568] mt-0.5">
@@ -294,8 +294,8 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 }}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] shadow-xs flex items-center gap-1.5 ${
                   filterPreset === 'TODAY'
-                    ? 'bg-[#E66817] text-white'
-                    : 'bg-white border border-[#EBE6DD] text-[#0B253A] hover:bg-slate-50'
+                    ? 'bg-jaman-saffron text-white'
+                    : 'bg-white border border-jaman-border text-jaman-navy hover:bg-slate-50'
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5" />
@@ -305,7 +305,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               <button
                 type="button"
                 onClick={handleExportAllDaysCsv}
-                className="px-4 py-2 bg-white border border-[#EBE6DD] text-[#0B253A] hover:bg-slate-50 text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 min-h-[40px]"
+                className="px-4 py-2 bg-white border border-jaman-border text-jaman-navy hover:bg-slate-50 text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 min-h-[40px]"
               >
                 <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
                 <span>Export CSV</span>
@@ -314,7 +314,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="px-3.5 py-2 bg-white border border-[#EBE6DD] text-[#0B253A] hover:bg-slate-50 text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 min-h-[40px]"
+                className="px-3.5 py-2 bg-white border border-jaman-border text-jaman-navy hover:bg-slate-50 text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 min-h-[40px]"
               >
                 <Printer className="w-4 h-4 text-slate-600" />
                 <span>Print Report</span>
@@ -323,7 +323,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           </div>
 
           {/* Search Bar & Date Filter Presets Ribbon */}
-          <div className="bg-white p-4 rounded-3xl border border-[#EBE6DD] shadow-xs space-y-3">
+          <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-3">
             {/* Search across Days */}
             <div className="relative">
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -332,7 +332,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 value={daysSearchQuery}
                 onChange={(e) => setDaysSearchQuery(e.target.value)}
                 placeholder="Search orders, bill no., token, customer, table, cashier, or dish name..."
-                className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] min-h-[44px]"
+                className="w-full bg-jaman-cream border border-jaman-border rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron min-h-[44px]"
               />
             </div>
 
@@ -357,8 +357,8 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                   }}
                   className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all shrink-0 min-h-[38px] ${
                     filterPreset === preset.id
-                      ? 'bg-[#0B253A] text-white shadow-xs'
-                      : 'bg-[#FAF7F2] text-slate-600 hover:bg-slate-200 border border-[#EBE6DD]'
+                      ? 'bg-jaman-navy text-white shadow-xs'
+                      : 'bg-jaman-cream text-slate-600 hover:bg-slate-200 border border-jaman-border'
                   }`}
                 >
                   {preset.label}
@@ -368,14 +368,14 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
 
             {/* Custom Date Pickers Drawer */}
             {isCustomDateOpen && filterPreset === 'CUSTOM' && (
-              <div className="p-3 bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl flex flex-wrap items-center gap-3 text-xs font-bold text-[#0B253A]">
+              <div className="p-3 bg-jaman-cream border border-jaman-border rounded-2xl flex flex-wrap items-center gap-3 text-xs font-bold text-jaman-navy">
                 <div className="flex items-center gap-2">
                   <span className="text-slate-500">From:</span>
                   <input
                     type="date"
                     value={customStartDate}
                     onChange={(e) => setCustomStartDate(e.target.value)}
-                    className="bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold"
+                    className="bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold"
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -384,12 +384,12 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                     type="date"
                     value={customEndDate}
                     onChange={(e) => setCustomEndDate(e.target.value)}
-                    className="bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold"
+                    className="bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold"
                   />
                 </div>
                 <button
                   onClick={() => setIsCustomDateOpen(false)}
-                  className="px-3 py-1.5 bg-[#0B253A] text-white rounded-xl text-xs font-bold"
+                  className="px-3 py-1.5 bg-jaman-navy text-white rounded-xl text-xs font-bold"
                 >
                   Apply Range
                 </button>
@@ -405,14 +405,14 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 onClick={() => handleSelectDay(day.dateKey)}
                 className={`bg-white rounded-3xl border-2 transition-all p-5 shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between space-y-4 group ${
                   day.isToday
-                    ? 'border-[#E66817] ring-2 ring-[#E66817]/15 bg-gradient-to-b from-orange-50/20 to-white'
-                    : 'border-[#EBE6DD] hover:border-[#0B253A]'
+                    ? 'border-jaman-saffron ring-2 ring-jaman-saffron/15 bg-gradient-to-b from-orange-50/20 to-white'
+                    : 'border-jaman-border hover:border-jaman-navy'
                 }`}
               >
                 {/* Card Top: Date, Day of Week & Status */}
                 <div className="flex items-start justify-between border-b border-slate-100 pb-3">
                   <div>
-                    <h3 className="font-black text-sm text-[#0B253A] uppercase tracking-wide">
+                    <h3 className="font-black text-sm text-jaman-navy uppercase tracking-wide">
                       {day.formattedDate}
                     </h3>
                     <span className="text-xs text-slate-500 font-semibold">{day.dayOfWeek}</span>
@@ -434,12 +434,12 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                   <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
                     TOTAL SALES
                   </span>
-                  <div className="text-2xl sm:text-3xl font-black text-[#0B253A] font-mono tracking-tight">
+                  <div className="text-2xl sm:text-3xl font-black text-jaman-navy font-mono tracking-tight">
                     {formatINR(day.totalSales)}
                   </div>
                   <div className="flex items-center gap-3 text-xs text-slate-600 font-bold pt-1">
-                    <span className="flex items-center gap-1 text-[#0B253A]">
-                      <ShoppingBag className="w-3.5 h-3.5 text-[#E66817]" />
+                    <span className="flex items-center gap-1 text-jaman-navy">
+                      <ShoppingBag className="w-3.5 h-3.5 text-jaman-saffron" />
                       <span>{day.orderCount} Orders</span>
                     </span>
                     <span>•</span>
@@ -450,7 +450,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 </div>
 
                 {/* Payment Breakdown Chips */}
-                <div className="p-3 bg-[#FAF7F2] rounded-2xl border border-[#EBE6DD] space-y-1.5 text-xs">
+                <div className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border space-y-1.5 text-xs">
                   <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
                     PAYMENT ALLOCATION:
                   </span>
@@ -488,8 +488,8 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                     }}
                     className={`w-full py-3 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-1.5 shadow-xs min-h-[44px] ${
                       day.isToday
-                        ? 'bg-[#E66817] hover:bg-[#EA580C] text-white'
-                        : 'bg-[#0B253A] hover:bg-[#1E3A4C] text-white'
+                        ? 'bg-jaman-saffron hover:bg-[#EA580C] text-white'
+                        : 'bg-jaman-navy hover:bg-jaman-darkBorder text-white'
                     }`}
                   >
                     <span>VIEW {day.orderCount} ORDERS →</span>
@@ -500,12 +500,12 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           </div>
 
           {filteredDaySummaries.length === 0 && (
-            <div className="text-center py-16 bg-white rounded-3xl border border-[#EBE6DD] shadow-2xs space-y-4 max-w-xl mx-auto my-6 p-6">
-              <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-[#E66817] mx-auto flex items-center justify-center border border-[#FDBA74]/40 shadow-xs">
+            <div className="text-center py-16 bg-white rounded-3xl border border-jaman-border shadow-2xs space-y-4 max-w-xl mx-auto my-6 p-6">
+              <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffron mx-auto flex items-center justify-center border border-[#FDBA74]/40 shadow-xs">
                 <ShoppingBag className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-black text-base text-[#0B253A]">No Orders Found</h3>
+                <h3 className="font-black text-base text-jaman-navy">No Orders Found</h3>
                 <p className="text-xs text-slate-500 max-w-md mx-auto">
                   There are no customer orders matching the selected date period or search query.
                 </p>
@@ -517,7 +517,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                     setFilterPreset('TODAY');
                     setDaysSearchQuery('');
                   }}
-                  className="px-4 py-2 rounded-xl bg-[#0B253A] hover:bg-[#1E3A4C] text-white text-xs font-bold transition-all shadow-xs"
+                  className="px-4 py-2 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white text-xs font-bold transition-all shadow-xs"
                 >
                   View Today's Orders
                 </button>
@@ -525,7 +525,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                   <button
                     type="button"
                     onClick={() => setDaysSearchQuery('')}
-                    className="px-4 py-2 rounded-xl bg-white border border-[#EBE6DD] text-slate-700 hover:bg-[#FAF7F2] text-xs font-bold transition-all shadow-xs"
+                    className="px-4 py-2 rounded-xl bg-white border border-jaman-border text-slate-700 hover:bg-jaman-cream text-xs font-bold transition-all shadow-xs"
                   >
                     Clear Search
                   </button>
@@ -544,19 +544,19 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
         <div className="space-y-6 animate-in fade-in duration-200">
           
           {/* Top Drill-Down Header & Navigation */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-[#EBE6DD] shadow-xs">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-jaman-border shadow-xs">
             <div className="space-y-1">
               <button
                 type="button"
                 onClick={() => setViewLevel('DAYS_LIST')}
-                className="inline-flex items-center gap-1.5 text-xs font-black text-[#E66817] hover:underline mb-1"
+                className="inline-flex items-center gap-1.5 text-xs font-black text-jaman-saffron hover:underline mb-1"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Back to Order History (All Days)</span>
               </button>
 
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl sm:text-3xl font-black text-[#0B253A] uppercase tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-black text-jaman-navy uppercase tracking-tight">
                   {currentDaySummary.formattedDate}
                 </h2>
                 <span className="text-xs font-bold text-slate-500">({currentDaySummary.dayOfWeek})</span>
@@ -573,7 +573,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               <button
                 type="button"
                 onClick={handlePrevDay}
-                className="px-3 py-2 bg-[#FAF7F2] hover:bg-slate-200 border border-[#EBE6DD] rounded-xl text-xs font-bold flex items-center gap-1 min-h-[40px]"
+                className="px-3 py-2 bg-jaman-cream hover:bg-slate-200 border border-jaman-border rounded-xl text-xs font-bold flex items-center gap-1 min-h-[40px]"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 <span>Previous Day</span>
@@ -585,7 +585,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                   const todayKey = DayOrdersService.getBusinessDateKey(new Date(), 6);
                   setSelectedDayKey(todayKey);
                 }}
-                className="px-3.5 py-2 bg-[#0B253A] text-white rounded-xl text-xs font-bold min-h-[40px]"
+                className="px-3.5 py-2 bg-jaman-navy text-white rounded-xl text-xs font-bold min-h-[40px]"
               >
                 Today
               </button>
@@ -594,7 +594,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 type="button"
                 onClick={handleNextDay}
                 disabled={currentDaySummary.isToday}
-                className="px-3 py-2 bg-[#FAF7F2] hover:bg-slate-200 disabled:opacity-40 border border-[#EBE6DD] rounded-xl text-xs font-bold flex items-center gap-1 min-h-[40px]"
+                className="px-3 py-2 bg-jaman-cream hover:bg-slate-200 disabled:opacity-40 border border-jaman-border rounded-xl text-xs font-bold flex items-center gap-1 min-h-[40px]"
               >
                 <span>Next Day</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -613,21 +613,21 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
 
           {/* Daily Reconciled Financials & Metrics Ribbon */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs">
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
               <span className="text-[10px] font-black uppercase text-slate-400 block">GROSS SALES</span>
-              <span className="text-xl font-black font-mono text-[#0B253A]">
+              <span className="text-xl font-black font-mono text-jaman-navy">
                 {formatINR(currentDaySummary.grossSales)}
               </span>
             </div>
 
-            <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs">
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
               <span className="text-[10px] font-black uppercase text-rose-500 block">DISCOUNTS GIVEN</span>
               <span className="text-xl font-black font-mono text-rose-600">
                 -{formatINR(currentDaySummary.discounts)}
               </span>
             </div>
 
-            <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs">
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
               <span className="text-[10px] font-black uppercase text-amber-500 block">REFUNDS ISSUED</span>
               <span className="text-xl font-black font-mono text-amber-600">
                 -{formatINR(currentDaySummary.refunds)}
@@ -641,9 +641,9 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               </span>
             </div>
 
-            <div className="bg-white p-4 rounded-2xl border border-[#EBE6DD] shadow-2xs col-span-2 sm:col-span-1">
-              <span className="text-[10px] font-black uppercase text-[#E66817] block">GST TAX (5%)</span>
-              <span className="text-xl font-black font-mono text-[#E66817]">
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs col-span-2 sm:col-span-1">
+              <span className="text-[10px] font-black uppercase text-jaman-saffron block">GST TAX (5%)</span>
+              <span className="text-xl font-black font-mono text-jaman-saffron">
                 {formatINR(currentDaySummary.tax)}
               </span>
             </div>
@@ -653,15 +653,15 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             
             {/* 1. Top Selling Items for this Day */}
-            <div className="bg-white p-4 rounded-3xl border border-[#EBE6DD] shadow-xs space-y-2.5">
-              <span className="text-xs font-black uppercase tracking-wider text-[#0B253A] flex items-center gap-1.5">
-                <Flame className="w-4 h-4 text-[#E66817]" />
+            <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-2.5">
+              <span className="text-xs font-black uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
+                <Flame className="w-4 h-4 text-jaman-saffron" />
                 <span>Top Selling Dishes ({currentDaySummary.topItems.length})</span>
               </span>
               <div className="space-y-1.5 text-xs">
                 {currentDaySummary.topItems.slice(0, 4).map((it, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-[#FAF7F2] font-bold">
-                    <span className="text-[#0B253A] truncate">{idx + 1}. {it.name}</span>
+                  <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-jaman-cream font-bold">
+                    <span className="text-jaman-navy truncate">{idx + 1}. {it.name}</span>
                     <span className="font-mono text-slate-600 shrink-0">{it.quantity} sold ({formatINR(it.revenue)})</span>
                   </div>
                 ))}
@@ -669,15 +669,15 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
             </div>
 
             {/* 2. Cashier Performance */}
-            <div className="bg-white p-4 rounded-3xl border border-[#EBE6DD] shadow-xs space-y-2.5">
-              <span className="text-xs font-black uppercase tracking-wider text-[#0B253A] flex items-center gap-1.5">
+            <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-2.5">
+              <span className="text-xs font-black uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-blue-600" />
                 <span>Cashier Performance</span>
               </span>
               <div className="space-y-1.5 text-xs">
                 {currentDaySummary.cashierBreakdown.map((c, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-[#FAF7F2] font-bold">
-                    <span className="text-[#0B253A]">{c.name}</span>
+                  <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-jaman-cream font-bold">
+                    <span className="text-jaman-navy">{c.name}</span>
                     <span className="font-mono text-slate-600">{c.ordersCount} orders • {formatINR(c.sales)}</span>
                   </div>
                 ))}
@@ -685,15 +685,15 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
             </div>
 
             {/* 3. Captain Performance & Tables */}
-            <div className="bg-white p-4 rounded-3xl border border-[#EBE6DD] shadow-xs space-y-2.5">
-              <span className="text-xs font-black uppercase tracking-wider text-[#0B253A] flex items-center gap-1.5">
+            <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-2.5">
+              <span className="text-xs font-black uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
                 <UserCheck className="w-4 h-4 text-purple-600" />
                 <span>Captain & Floor Floor Activity</span>
               </span>
               <div className="space-y-1.5 text-xs">
                 {currentDaySummary.captainBreakdown.map((capt, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-[#FAF7F2] font-bold">
-                    <span className="text-[#0B253A]">{capt.name}</span>
+                  <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-jaman-cream font-bold">
+                    <span className="text-jaman-navy">{capt.name}</span>
                     <span className="font-mono text-slate-600">{capt.ordersCount} orders • {formatINR(capt.sales)}</span>
                   </div>
                 ))}
@@ -706,7 +706,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           </div>
 
           {/* Search, Multi-Filters & Sorting Bar for this Day */}
-          <div className="bg-white p-4 rounded-3xl border border-[#EBE6DD] shadow-xs space-y-3">
+          <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-3">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="relative flex-1">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -715,7 +715,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                   value={drillSearchQuery}
                   onChange={(e) => setDrillSearchQuery(e.target.value)}
                   placeholder={`Search ${currentDaySummary.orderCount} orders on this day...`}
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl pl-10 pr-4 py-2 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] min-h-[40px]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-10 pr-4 py-2 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron min-h-[40px]"
                 />
               </div>
 
@@ -724,7 +724,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 <select
                   value={drillTypeFilter}
                   onChange={(e) => setDrillTypeFilter(e.target.value)}
-                  className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A]"
+                  className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy"
                 >
                   <option value="ALL">All Types</option>
                   <option value="DINE">Dine-In</option>
@@ -736,7 +736,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 <select
                   value={drillStatusFilter}
                   onChange={(e) => setDrillStatusFilter(e.target.value)}
-                  className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A]"
+                  className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy"
                 >
                   <option value="ALL">All Statuses</option>
                   <option value="COMPLETED">Completed</option>
@@ -749,7 +749,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 <select
                   value={drillPaymentFilter}
                   onChange={(e) => setDrillPaymentFilter(e.target.value)}
-                  className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A]"
+                  className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy"
                 >
                   <option value="ALL">All Payments</option>
                   <option value="CASH">Cash</option>
@@ -761,7 +761,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 <select
                   value={drillSortOrder}
                   onChange={(e) => setDrillSortOrder(e.target.value as any)}
-                  className="bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold text-[#0B253A]"
+                  className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy"
                 >
                   <option value="NEWEST">Newest First</option>
                   <option value="OLDEST">Oldest First</option>
@@ -773,10 +773,10 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           </div>
 
           {/* Daily Orders Table (Full Desktop Table) */}
-          <div className="bg-white rounded-3xl border border-[#EBE6DD] overflow-hidden shadow-xs">
+          <div className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-slate-500 uppercase font-black">
+                <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-black">
                   <tr>
                     <th className="p-3.5">Order #</th>
                     <th className="p-3.5">Token</th>
@@ -795,9 +795,9 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 <tbody className="divide-y divide-slate-100">
                   {paginatedOrders.map((ord) => (
                     <tr key={ord.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="p-3.5 font-bold font-mono text-[#0B253A]">{ord.orderNumber}</td>
+                      <td className="p-3.5 font-bold font-mono text-jaman-navy">{ord.orderNumber}</td>
                       <td className="p-3.5">
-                        <span className="bg-[#FFF4ED] text-[#E66817] font-black text-xs px-2 py-0.5 rounded font-mono">
+                        <span className="bg-[#FFF4ED] text-jaman-saffron font-black text-xs px-2 py-0.5 rounded font-mono">
                           #{ord.tokenNumber}
                         </span>
                       </td>
@@ -809,13 +809,13 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                         {ord.tableNumber ? `Table ${ord.tableNumber}` : '—'}
                       </td>
                       <td className="p-3.5">
-                        <span className="font-bold text-[#0B253A] block">{ord.customerName || 'Walk-in'}</span>
+                        <span className="font-bold text-jaman-navy block">{ord.customerName || 'Walk-in'}</span>
                         {ord.customerPhone && (
                           <span className="text-[10px] text-slate-400 font-mono">{ord.customerPhone}</span>
                         )}
                       </td>
                       <td className="p-3.5 font-semibold text-slate-600">{ord.items.length} items</td>
-                      <td className="p-3.5 font-mono font-black text-[#0B253A] text-sm">
+                      <td className="p-3.5 font-mono font-black text-jaman-navy text-sm">
                         {formatINR(ord.totalAmount)}
                       </td>
                       <td className="p-3.5">
@@ -844,7 +844,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                           <button
                             type="button"
                             onClick={() => setSelectedOrder(ord)}
-                            className="px-3 py-1.5 bg-[#FAF7F2] border border-slate-300 hover:bg-[#0B253A] hover:text-white text-[#0B253A] font-bold rounded-lg text-xs transition-all min-h-[32px]"
+                            className="px-3 py-1.5 bg-jaman-cream border border-slate-300 hover:bg-jaman-navy hover:text-white text-jaman-navy font-bold rounded-lg text-xs transition-all min-h-[32px]"
                           >
                             VIEW
                           </button>
@@ -876,7 +876,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
             </div>
 
             {/* Pagination Toolbar */}
-            <div className="p-4 bg-[#F8F6F0] border-t border-[#EBE6DD] flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="p-4 bg-[#F8F6F0] border-t border-jaman-border flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="text-slate-600 font-bold">
                 Showing {paginatedOrders.length} of {drillFilteredOrders.length} orders
               </div>
@@ -890,7 +890,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                       setPageSize(Number(e.target.value));
                       setCurrentPage(1);
                     }}
-                    className="bg-white border border-[#EBE6DD] rounded-lg px-2 py-1 font-bold text-xs"
+                    className="bg-white border border-jaman-border rounded-lg px-2 py-1 font-bold text-xs"
                   >
                     <option value={10}>10</option>
                     <option value={25}>25</option>
@@ -903,7 +903,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                   <button
                     disabled={currentPage <= 1}
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    className="px-2.5 py-1 rounded bg-white border border-[#EBE6DD] disabled:opacity-40 font-bold text-xs"
+                    className="px-2.5 py-1 rounded bg-white border border-jaman-border disabled:opacity-40 font-bold text-xs"
                   >
                     Prev
                   </button>
@@ -913,7 +913,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                   <button
                     disabled={currentPage >= totalPages}
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    className="px-2.5 py-1 rounded bg-white border border-[#EBE6DD] disabled:opacity-40 font-bold text-xs"
+                    className="px-2.5 py-1 rounded bg-white border border-jaman-border disabled:opacity-40 font-bold text-xs"
                   >
                     Next
                   </button>
@@ -948,7 +948,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-black text-sm text-[#0B253A]">Print Thermal Bill</h3>
+              <h3 className="font-black text-sm text-jaman-navy">Print Thermal Bill</h3>
               <button onClick={() => setIsReceiptModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                 ✕
               </button>
@@ -969,7 +969,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               <button
                 type="button"
                 onClick={() => printThermalReceipt(receiptOrder, '80mm', ReceiptRepository.getConfig())}
-                className="flex-1 py-2.5 bg-[#E66817] hover:bg-[#EA580C] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs min-h-[44px]"
+                className="flex-1 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs min-h-[44px]"
               >
                 <Printer className="w-4 h-4" />
                 <span>Print Bill</span>

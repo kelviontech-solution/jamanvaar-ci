@@ -47,9 +47,9 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+      <div className="bg-jaman-cream border border-jaman-border w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         {/* Header */}
-        <div className="p-5 bg-white border-b border-[#EBE6DD] flex items-center justify-between shrink-0">
+        <div className="p-5 bg-white border-b border-jaman-border flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-white shadow-xs ${
               recon.isReconciled ? 'bg-emerald-600' : 'bg-amber-600'
@@ -58,7 +58,7 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-black text-base text-[#0B253A]">
+                <h3 className="font-black text-base text-jaman-navy">
                   Financial Data Consistency & Reconciliation Engine
                 </h3>
                 <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
@@ -83,7 +83,7 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-[#0B253A] rounded-xl hover:bg-slate-100"
+              className="p-1.5 text-slate-400 hover:text-jaman-navy rounded-xl hover:bg-slate-100"
             >
               <X className="w-5 h-5" />
             </button>
@@ -93,7 +93,7 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
         {/* Body */}
         <div className="p-6 overflow-y-auto space-y-6 text-xs">
           {/* Preset Buttons */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 bg-white p-2 rounded-2xl border border-[#EBE6DD]">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 bg-white p-2 rounded-2xl border border-jaman-border">
             {(['TODAY', 'YESTERDAY', '7_DAYS', '30_DAYS', 'THIS_MONTH', 'THIS_YEAR', 'ALL'] as CentralDatePreset[]).map(
               (p) => (
                 <button
@@ -101,7 +101,7 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
                   onClick={() => setSelectedPreset(p)}
                   className={`px-3.5 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap ${
                     selectedPreset === p
-                      ? 'bg-[#0B253A] text-white shadow-xs'
+                      ? 'bg-jaman-navy text-white shadow-xs'
                       : 'text-slate-600 hover:bg-slate-100'
                   }`}
                 >
@@ -142,33 +142,33 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
               Cross-Module Verification Matrix
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+              <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs space-y-1">
                 <span className="text-[10px] text-slate-400 uppercase font-bold block">POS & Admin Dashboards</span>
-                <strong className="text-lg font-mono font-black text-[#0B253A] block">
+                <strong className="text-lg font-mono font-black text-jaman-navy block">
                   {formatINR(recon.sources.dashboardSales)}
                 </strong>
                 <span className="text-[10px] text-emerald-700 font-bold block">✓ Matches Central Truth</span>
               </div>
 
-              <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+              <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs space-y-1">
                 <span className="text-[10px] text-slate-400 uppercase font-bold block">Bills & Invoices Ledger</span>
-                <strong className="text-lg font-mono font-black text-[#0B253A] block">
+                <strong className="text-lg font-mono font-black text-jaman-navy block">
                   {formatINR(recon.sources.billsSales)}
                 </strong>
                 <span className="text-[10px] text-emerald-700 font-bold block">✓ Matches Central Truth</span>
               </div>
 
-              <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+              <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs space-y-1">
                 <span className="text-[10px] text-slate-400 uppercase font-bold block">Reports & Analytics Engine</span>
-                <strong className="text-lg font-mono font-black text-[#0B253A] block">
+                <strong className="text-lg font-mono font-black text-jaman-navy block">
                   {formatINR(recon.sources.reportsSales)}
                 </strong>
                 <span className="text-[10px] text-emerald-700 font-bold block">✓ Matches Central Truth</span>
               </div>
 
-              <div className="p-3.5 bg-white rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+              <div className="p-3.5 bg-white rounded-2xl border border-jaman-border shadow-2xs space-y-1">
                 <span className="text-[10px] text-slate-400 uppercase font-bold block">Payment Tenders Sum</span>
-                <strong className="text-lg font-mono font-black text-[#0B253A] block">
+                <strong className="text-lg font-mono font-black text-jaman-navy block">
                   {formatINR(recon.sources.paymentSales)}
                 </strong>
                 <span className="text-[10px] text-emerald-700 font-bold block">✓ 100% Settled</span>
@@ -177,8 +177,8 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
           </div>
 
           {/* Complete Financial Itemization Breakdown */}
-          <div className="bg-white rounded-3xl border border-[#EBE6DD] overflow-hidden shadow-2xs">
-            <div className="p-3.5 bg-[#FAF7F2] border-b border-[#EBE6DD] font-extrabold text-xs text-[#0B253A] flex justify-between items-center">
+          <div className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-2xs">
+            <div className="p-3.5 bg-jaman-cream border-b border-jaman-border font-extrabold text-xs text-jaman-navy flex justify-between items-center">
               <span>Financial Itemization Breakdown</span>
               <span className="font-mono text-[11px] text-slate-500 font-bold">
                 {recon.completedOrdersCount} Valid Transactions
@@ -188,7 +188,7 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
             <div className="divide-y divide-slate-100">
               <div className="p-3 flex justify-between items-center">
                 <span className="font-bold text-slate-700">Gross Sales (Item Subtotals before discounts & taxes)</span>
-                <strong className="font-mono text-sm text-[#0B253A]">{formatINR(recon.grossSales)}</strong>
+                <strong className="font-mono text-sm text-jaman-navy">{formatINR(recon.grossSales)}</strong>
               </div>
 
               <div className="p-3 flex justify-between items-center">
@@ -198,16 +198,16 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
 
               <div className="p-3 flex justify-between items-center">
                 <span className="font-bold text-slate-700">Taxable Sales (Gross - Discounts)</span>
-                <strong className="font-mono text-sm text-[#0B253A]">{formatINR(recon.taxableSales)}</strong>
+                <strong className="font-mono text-sm text-jaman-navy">{formatINR(recon.taxableSales)}</strong>
               </div>
 
               <div className="p-3 flex justify-between items-center">
                 <span className="font-bold text-slate-700">GST (CGST 2.5% + SGST 2.5% = 5% Food Service GST)</span>
-                <strong className="font-mono text-sm text-[#E66817]">+{formatINR(recon.gstTotal)}</strong>
+                <strong className="font-mono text-sm text-jaman-saffron">+{formatINR(recon.gstTotal)}</strong>
               </div>
 
               <div className="p-3 bg-slate-50 flex justify-between items-center">
-                <span className="font-black text-[#0B253A]">Net Sales (Total Invoiced Amount)</span>
+                <span className="font-black text-jaman-navy">Net Sales (Total Invoiced Amount)</span>
                 <strong className="font-mono text-base font-black text-emerald-700">{formatINR(recon.netSales)}</strong>
               </div>
 
@@ -224,7 +224,7 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
           </div>
 
           {/* Tender Settlement Breakdown */}
-          <div className="bg-white p-4 rounded-3xl border border-[#EBE6DD] shadow-2xs space-y-3">
+          <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-2xs space-y-3">
             <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400">
               Payment Channels Settlement Breakdown
             </h4>
@@ -253,7 +253,7 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
 
               <div className="p-3 rounded-2xl bg-slate-100 border border-slate-200">
                 <span className="text-[10px] text-slate-600 font-bold block">Total Channel Settlements</span>
-                <strong className="text-base font-mono font-black text-[#0B253A] block mt-0.5">
+                <strong className="text-base font-mono font-black text-jaman-navy block mt-0.5">
                   {formatINR(recon.paymentBreakdown.total)}
                 </strong>
               </div>
@@ -262,13 +262,13 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-white border-t border-[#EBE6DD] flex items-center justify-between shrink-0 text-xs">
+        <div className="p-4 bg-white border-t border-jaman-border flex items-center justify-between shrink-0 text-xs">
           <span className="text-slate-400 font-medium">
-            Timezone standard: <strong className="text-[#0B253A]">Asia/Kolkata (IST)</strong> • Single Source of Truth
+            Timezone standard: <strong className="text-jaman-navy">Asia/Kolkata (IST)</strong> • Single Source of Truth
           </span>
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-[#0B253A] hover:bg-[#1E3A4C] text-white font-bold rounded-xl shadow-xs"
+            className="px-5 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold rounded-xl shadow-xs"
           >
             Close Audit
           </button>

@@ -86,7 +86,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
           </div>
           <div className="text-center">
             <div className="text-xs text-slate-500">Sending "{sendQueue.campaign.name}"</div>
-            <div className="text-lg font-black text-[#0B253A]">{sendQueue.index + 1} of {sendQueue.phones.length}</div>
+            <div className="text-lg font-black text-jaman-navy">{sendQueue.index + 1} of {sendQueue.phones.length}</div>
             <div className="text-xs text-slate-500 mt-1">
               Next: {CustomerRepository.getByPhone(sendQueue.phones[sendQueue.index])?.name || sendQueue.phones[sendQueue.index]}
             </div>
@@ -106,7 +106,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Diwali VIP Offer"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             />
           </div>
           <div>
@@ -115,7 +115,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
               rows={3}
               value={messageTemplate}
               onChange={(e) => setMessageTemplate(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-jaman-saffron"
             />
           </div>
 
@@ -127,7 +127,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
                 <select
                   value={filter.minTierId || ''}
                   onChange={(e) => setFilter((f) => ({ ...f, minTierId: e.target.value || undefined }))}
-                  className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs font-bold"
+                  className="w-full bg-jaman-ivory border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-bold"
                 >
                   <option value="">Any tier</option>
                   {tiers.map((t) => <option key={t.id} value={t.id}>{t.name}+</option>)}
@@ -140,7 +140,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
                   value={filter.minLifetimeSpend ?? ''}
                   onChange={(e) => setFilter((f) => ({ ...f, minLifetimeSpend: e.target.value ? Number(e.target.value) : undefined }))}
                   placeholder="Any"
-                  className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs font-mono"
+                  className="w-full bg-jaman-ivory border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-mono"
                 />
               </div>
               <div>
@@ -150,7 +150,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
                   value={filter.inactiveForDays ?? ''}
                   onChange={(e) => setFilter((f) => ({ ...f, inactiveForDays: e.target.value ? Number(e.target.value) : undefined }))}
                   placeholder="Any"
-                  className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs font-mono"
+                  className="w-full bg-jaman-ivory border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-mono"
                 />
               </div>
               <div className="flex items-end pb-1.5">
@@ -164,8 +164,8 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
                 </label>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 text-xs font-bold text-[#0B253A] bg-[#FFF4ED] border border-[#FDBA74] rounded-lg px-2.5 py-1.5 w-fit">
-              <UsersIcon className="w-3.5 h-3.5 text-[#E66817]" />
+            <div className="flex items-center gap-1.5 text-xs font-bold text-jaman-navy bg-[#FFF4ED] border border-[#FDBA74] rounded-lg px-2.5 py-1.5 w-fit">
+              <UsersIcon className="w-3.5 h-3.5 text-jaman-saffron" />
               {matchCount} customer{matchCount === 1 ? '' : 's'} match this segment
             </div>
           </div>
@@ -180,14 +180,14 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
           <div className="flex justify-end">
             <button
               onClick={() => setCreating(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0B253A] hover:bg-[#1E3A4C] text-white text-xs font-bold rounded-lg cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-jaman-navy hover:bg-jaman-darkBorder text-white text-xs font-bold rounded-lg cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" /> New Campaign
             </button>
           </div>
 
           {campaigns.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-400 bg-[#FAF7F2] rounded-xl">
+            <div className="p-8 text-center text-xs text-slate-400 bg-jaman-cream rounded-xl">
               No campaigns yet. Create one to target a real customer segment instead of messaging one guest at a time.
             </div>
           ) : (
@@ -195,9 +195,9 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
               {campaigns.map((c) => {
                 const matches = MarketingRepository.getMatchingCustomers(c.segmentFilter).length;
                 return (
-                  <div key={c.id} className="p-3 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl flex items-center justify-between gap-2">
+                  <div key={c.id} className="p-3 bg-jaman-cream border border-jaman-border rounded-xl flex items-center justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="font-bold text-xs text-[#0B253A] truncate">{c.name}</div>
+                      <div className="font-bold text-xs text-jaman-navy truncate">{c.name}</div>
                       <div className="text-[10px] text-slate-500 truncate">
                         {matches} in segment · {c.sentToPhones.length} sent · {c.status}
                       </div>

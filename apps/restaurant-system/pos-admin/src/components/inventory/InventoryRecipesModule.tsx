@@ -117,7 +117,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
               Inventory & Recipe Bill of Materials (BOM)
             </h1>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
@@ -131,14 +131,14 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => onOpenRecipeModal(null)}
-            className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-[#EBE6DD] text-[#0B253A] font-bold text-xs flex items-center gap-2 shadow-2xs active:scale-95 transition-all cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy font-bold text-xs flex items-center gap-2 shadow-2xs active:scale-95 transition-all cursor-pointer"
           >
-            <Sliders className="w-4 h-4 text-[#E66817]" />
+            <Sliders className="w-4 h-4 text-jaman-saffron" />
             <span>Create Recipe Formula</span>
           </button>
           <button
             onClick={() => onOpenInventoryModal(null)}
-            className="px-4 py-2.5 rounded-xl bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs flex items-center gap-2 shadow-sm shadow-[#E66817]/25 active:scale-95 transition-all cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs flex items-center gap-2 shadow-sm shadow-jaman-saffron/25 active:scale-95 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Stock Item</span>
@@ -148,13 +148,13 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
 
       {/* 4 Inventory KPI Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4.5 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4.5 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Raw Ingredients</span>
-          <div className="text-2xl font-black text-[#0B253A] font-mono">{inventoryItems.length} Items</div>
+          <div className="text-2xl font-black text-jaman-navy font-mono">{inventoryItems.length} Items</div>
           <span className="text-[10px] text-slate-500 font-bold block">In Warehouse Master</span>
         </div>
 
-        <div className="bg-white p-4.5 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4.5 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Stock Valuation</span>
           <div className="text-2xl font-black text-emerald-700 font-mono">
             {formatINR(
@@ -166,14 +166,14 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
 
         <div
           className={`p-4.5 rounded-2xl border shadow-2xs space-y-1 ${
-            lowStockCount > 0 ? 'bg-amber-50/70 border-amber-200' : 'bg-white border-[#EBE6DD]'
+            lowStockCount > 0 ? 'bg-amber-50/70 border-amber-200' : 'bg-white border-jaman-border'
           }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Low Stock Alerts</span>
             {lowStockCount > 0 && <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>}
           </div>
-          <div className={`text-2xl font-black font-mono ${lowStockCount > 0 ? 'text-amber-800' : 'text-[#0B253A]'}`}>
+          <div className={`text-2xl font-black font-mono ${lowStockCount > 0 ? 'text-amber-800' : 'text-jaman-navy'}`}>
             {lowStockCount} Critical
           </div>
           <span className={`text-[10px] font-bold block ${lowStockCount > 0 ? 'text-amber-700' : 'text-slate-400'}`}>
@@ -181,20 +181,20 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
           </span>
         </div>
 
-        <div className="bg-white p-4.5 rounded-2xl border border-[#EBE6DD] shadow-2xs space-y-1">
+        <div className="bg-white p-4.5 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">BOM Dish Formulas</span>
-          <div className="text-2xl font-black text-[#0B253A] font-mono">{recipes.length} Formulas</div>
+          <div className="text-2xl font-black text-jaman-navy font-mono">{recipes.length} Formulas</div>
           <span className="text-[10px] text-blue-700 font-bold block">Auto-Deduct on Order Sale</span>
         </div>
       </div>
 
       {/* Raw Stock Items Section */}
-      <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-2xs space-y-0">
+      <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-2xs space-y-0">
         {/* Search & Filter Toolbar */}
-        <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="p-4 bg-jaman-cream border-b border-jaman-border flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Package className="w-4 h-4 text-[#E66817]" />
-            <span className="font-extrabold text-sm text-[#0B253A]">
+            <Package className="w-4 h-4 text-jaman-saffron" />
+            <span className="font-extrabold text-sm text-jaman-navy">
               Raw Warehouse Ingredients ({filteredInventoryItems.length})
             </span>
           </div>
@@ -208,7 +208,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
                 value={inventorySearch}
                 onChange={(e) => setInventorySearch(e.target.value)}
                 placeholder="Search ingredient or SKU..."
-                className="w-full bg-white border border-[#EBE6DD] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-white border border-jaman-border rounded-xl pl-8 pr-3 py-1.5 text-xs text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
               />
               {inventorySearch && (
                 <button
@@ -224,7 +224,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
             <select
               value={inventoryCategoryFilter}
               onChange={(e) => setInventoryCategoryFilter(e.target.value)}
-              className="bg-white border border-[#EBE6DD] rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+              className="bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron cursor-pointer"
             >
               <option value="ALL">All Categories</option>
               {inventoryCategories.map((cat) => (
@@ -240,7 +240,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
                   setInventorySearch('');
                   setInventoryCategoryFilter('ALL');
                 }}
-                className="text-xs text-[#E66817] font-bold hover:underline cursor-pointer"
+                className="text-xs text-jaman-saffron font-bold hover:underline cursor-pointer"
               >
                 Clear
               </button>
@@ -250,11 +250,11 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
 
         {filteredInventoryItems.length === 0 ? (
           <div className="py-14 text-center px-4 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#E66817] flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-jaman-saffron flex items-center justify-center mx-auto">
               <Package className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-extrabold text-[#0B253A] text-sm">
+              <h4 className="font-extrabold text-jaman-navy text-sm">
                 {inventorySearch || inventoryCategoryFilter !== 'ALL'
                   ? 'No ingredients match your filters'
                   : 'No Raw Ingredients Recorded'}
@@ -278,7 +278,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
             ) : (
               <button
                 onClick={() => onOpenInventoryModal(null)}
-                className="px-4 py-2 rounded-xl bg-[#E66817] text-white font-bold text-xs shadow-xs cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-jaman-saffron text-white font-bold text-xs shadow-xs cursor-pointer"
               >
                 + Add First Ingredient
               </button>
@@ -287,7 +287,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-slate-500 uppercase font-black text-[11px] tracking-wider">
+              <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-black text-[11px] tracking-wider">
                 <tr>
                   <th className="p-4">Item Name</th>
                   <th className="p-4">Category</th>
@@ -302,7 +302,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
                 {filteredInventoryItems.map((stock: InventoryItem) => (
                   <tr key={stock.id} className="hover:bg-[#FDFBF7] transition-colors">
                     <td className="p-4">
-                      <span className="font-extrabold text-[#0B253A] block text-sm">{stock.name}</span>
+                      <span className="font-extrabold text-jaman-navy block text-sm">{stock.name}</span>
                       <span className="text-[10px] text-slate-400 font-mono block">{stock.sku}</span>
                     </td>
                     <td className="p-4">
@@ -310,7 +310,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
                         {stock.category}
                       </span>
                     </td>
-                    <td className="p-4 font-mono font-black text-sm text-[#0B253A]">
+                    <td className="p-4 font-mono font-black text-sm text-jaman-navy">
                       {stock.currentStock} <span className="text-xs text-slate-500 font-normal">{stock.unit}</span>
                     </td>
                     <td className="p-4 text-slate-500 font-mono">
@@ -341,7 +341,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => onOpenStockAdjustModal(stock)}
-                          className="px-3 py-1.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-[#E66817] border border-[#FDBA74] font-bold rounded-xl text-xs transition-all active:scale-95 shadow-2xs cursor-pointer"
+                          className="px-3 py-1.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-jaman-saffron border border-[#FDBA74] font-bold rounded-xl text-xs transition-all active:scale-95 shadow-2xs cursor-pointer"
                         >
                           Adjust Stock
                         </button>
@@ -377,11 +377,11 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
       </div>
 
       {/* Linked BOM Recipes Section */}
-      <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-2xs">
-        <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex items-center justify-between">
+      <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-2xs">
+        <div className="p-4 bg-jaman-cream border-b border-jaman-border flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-[#0B253A]" />
-            <span className="font-extrabold text-sm text-[#0B253A]">
+            <Sliders className="w-4 h-4 text-jaman-navy" />
+            <span className="font-extrabold text-sm text-jaman-navy">
               Configured Dish Recipe Formulas ({recipes.length})
             </span>
           </div>
@@ -390,13 +390,13 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
         {recipes.length === 0 ? (
           <div className="py-12 text-center px-4 space-y-2">
             <Sliders className="w-8 h-8 text-slate-300 mx-auto" />
-            <h4 className="font-extrabold text-[#0B253A] text-sm">No Recipe Formulas Configured</h4>
+            <h4 className="font-extrabold text-jaman-navy text-sm">No Recipe Formulas Configured</h4>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
               Link raw ingredients to menu dishes to automatically deduct inventory whenever an order is placed.
             </p>
             <button
               onClick={() => onOpenRecipeModal(null)}
-              className="mt-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#EBE6DD] text-[#0B253A] font-bold text-xs hover:bg-slate-50 cursor-pointer"
+              className="mt-2 px-3.5 py-1.5 rounded-xl bg-white border border-jaman-border text-jaman-navy font-bold text-xs hover:bg-slate-50 cursor-pointer"
             >
               + Create Recipe Formula
             </button>
@@ -404,7 +404,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-slate-500 uppercase font-black text-[11px] tracking-wider">
+              <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-black text-[11px] tracking-wider">
                 <tr>
                   <th className="p-4">Menu Dish</th>
                   <th className="p-4">Ingredients Breakdown</th>
@@ -414,16 +414,16 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
               <tbody className="divide-y divide-slate-100 font-medium">
                 {recipes.map((rec: Recipe) => (
                   <tr key={rec.id} className="hover:bg-[#FDFBF7] transition-colors">
-                    <td className="p-4 font-black text-[#0B253A] text-sm">{rec.menuItemName}</td>
+                    <td className="p-4 font-black text-jaman-navy text-sm">{rec.menuItemName}</td>
                     <td className="p-4 text-slate-600">
                       <div className="flex flex-wrap gap-1.5">
                         {rec.ingredients.map((ing, idx) => (
                           <span
                             key={idx}
-                            className="inline-flex items-center px-2 py-0.5 rounded-lg bg-[#FAF7F2] border border-[#EBE6DD] text-[11px] font-bold text-slate-700"
+                            className="inline-flex items-center px-2 py-0.5 rounded-lg bg-jaman-cream border border-jaman-border text-[11px] font-bold text-slate-700"
                           >
                             {ing.inventoryItemName}{' '}
-                            <span className="text-[#E66817] font-mono ml-1">
+                            <span className="text-jaman-saffron font-mono ml-1">
                               ({ing.quantityPerPortion} {ing.unit})
                             </span>
                           </span>
@@ -434,7 +434,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => onOpenRecipeModal(rec)}
-                          className="p-1.5 text-slate-400 hover:text-[#E66817] hover:bg-orange-50 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-slate-400 hover:text-jaman-saffron hover:bg-orange-50 rounded-lg transition-colors cursor-pointer"
                           title="Edit Recipe"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -457,11 +457,11 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
       </div>
 
       {/* Recent Wastage Log */}
-      <div className="bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-2xs">
-        <div className="p-4 bg-[#FAF7F2] border-b border-[#EBE6DD] flex items-center justify-between">
+      <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-2xs">
+        <div className="p-4 bg-jaman-cream border-b border-jaman-border flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Trash className="w-4 h-4 text-rose-600" />
-            <span className="font-extrabold text-sm text-[#0B253A]">Recent Wastage Log</span>
+            <span className="font-extrabold text-sm text-jaman-navy">Recent Wastage Log</span>
           </div>
           <span className="text-xs text-slate-400 font-semibold">Last {recentWastage.length} of {db.stockMovements.filter((m) => m.type === 'WASTE' || m.type === 'SPOILAGE').length} entries</span>
         </div>
@@ -472,7 +472,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F6F0] border-b border-[#EBE6DD] text-slate-500 uppercase font-black text-[11px] tracking-wider">
+              <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-black text-[11px] tracking-wider">
                 <tr>
                   <th className="p-4">Item</th>
                   <th className="p-4">Reason</th>
@@ -485,13 +485,13 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
               <tbody className="divide-y divide-slate-100 font-medium">
                 {recentWastage.map((m) => (
                   <tr key={m.id} className="hover:bg-[#FDFBF7] transition-colors">
-                    <td className="p-4 font-bold text-[#0B253A]">{m.itemName}</td>
+                    <td className="p-4 font-bold text-jaman-navy">{m.itemName}</td>
                     <td className="p-4 text-slate-600">{m.reason}</td>
                     <td className="p-4 font-mono text-rose-700">{m.quantityDelta} {m.unit}</td>
                     <td className="p-4 font-mono font-bold text-rose-700">₹{(m.costImpact ?? 0).toFixed(2)}</td>
                     <td className="p-4">
                       {m.photoUrl ? (
-                        <img src={m.photoUrl} alt="Wastage evidence" className="w-10 h-10 object-cover rounded-lg border border-[#EBE6DD]" />
+                        <img src={m.photoUrl} alt="Wastage evidence" className="w-10 h-10 object-cover rounded-lg border border-jaman-border" />
                       ) : (
                         <span className="text-slate-300">—</span>
                       )}

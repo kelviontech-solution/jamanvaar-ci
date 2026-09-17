@@ -405,36 +405,36 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   // ========================================================================
   if (!verification.isValid) {
     return (
-      <div className="min-h-screen bg-[#FAF7F2] text-[#0B253A] flex flex-col justify-between items-center p-6 font-sans">
+      <div className="min-h-screen bg-jaman-cream text-jaman-navy flex flex-col justify-between items-center p-6 font-sans">
         <div className="w-full max-w-md pt-8 text-center space-y-6">
           {/* Logo */}
           <div className="flex flex-col items-center gap-2">
-            <div className="w-14 h-14 rounded-2xl bg-[#0B253A] text-white flex items-center justify-center font-black text-2xl shadow-lg border border-amber-400/40">
+            <div className="w-14 h-14 rounded-2xl bg-jaman-navy text-white flex items-center justify-center font-black text-2xl shadow-lg border border-amber-400/40">
               J
             </div>
-            <h1 className="text-xl font-black tracking-wider text-[#0B253A] uppercase">JAMANVAAR</h1>
+            <h1 className="text-xl font-black tracking-wider text-jaman-navy uppercase">JAMANVAAR</h1>
             <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">{restaurant.name}</p>
           </div>
 
           {/* Error Card */}
           <div className="bg-white border border-[#FED7AA] rounded-3xl p-6 shadow-xl space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-[#E66817] mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-jaman-saffron mx-auto">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="space-y-1.5">
-              <h2 className="text-base font-black text-[#0B253A]">Table QR Code Unavailable</h2>
+              <h2 className="text-base font-black text-jaman-navy">Table QR Code Unavailable</h2>
               <p className="text-xs text-slate-600 leading-relaxed">
                 {verification.reason || 'This table QR is currently inactive or has been rotated.'}
               </p>
             </div>
 
-            <div className="bg-[#FAF7F2] p-3 rounded-2xl border border-[#EBE6DD] text-xs font-mono font-bold text-slate-500">
+            <div className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border text-xs font-mono font-bold text-slate-500">
               Table Reference: Table {tableNumber}
             </div>
 
             <button
               onClick={() => handleRequestService('Assistance with QR Code')}
-              className="w-full py-3 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider shadow-md transition-all cursor-pointer"
+              className="w-full py-3 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider shadow-md transition-all cursor-pointer"
             >
               {serviceRequested ? '✓ Staff Notified!' : 'Call Table Staff for Help'}
             </button>
@@ -464,11 +464,11 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
     const activeStep = currentIdx !== -1 ? currentIdx : 0;
 
     return (
-      <div className="min-h-screen bg-[#FAF7F2] text-[#0B253A] flex flex-col font-sans max-w-md mx-auto shadow-2xl border-x border-[#EBE6DD]">
+      <div className="min-h-screen bg-jaman-cream text-jaman-navy flex flex-col font-sans max-w-md mx-auto shadow-2xl border-x border-jaman-border">
         {/* Top Header */}
-        <div className="bg-[#0B253A] text-white p-4 sticky top-0 z-30 shadow-md flex items-center justify-between">
+        <div className="bg-jaman-navy text-white p-4 sticky top-0 z-30 shadow-md flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#E66817] flex items-center justify-center font-black text-sm">
+            <div className="w-8 h-8 rounded-xl bg-jaman-saffron flex items-center justify-center font-black text-sm">
               J
             </div>
             <div>
@@ -489,13 +489,13 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
         {/* Tracking Body */}
         <div className="flex-1 p-4 space-y-4 overflow-y-auto">
           {/* Order Summary Hero Card */}
-          <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-sm space-y-3">
+          <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm space-y-3">
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">ORDER CONFIRMED</span>
-                <h3 className="text-xl font-black font-mono text-[#0B253A]">#{trackedOrder.orderNumber}</h3>
+                <h3 className="text-xl font-black font-mono text-jaman-navy">#{trackedOrder.orderNumber}</h3>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-xs font-black bg-[#E66817] text-white px-2 py-0.5 rounded-md font-mono">
+                  <span className="text-xs font-black bg-jaman-saffron text-white px-2 py-0.5 rounded-md font-mono">
                     Token #{trackedOrder.tokenNumber}
                   </span>
                   <span className="text-xs font-bold text-slate-500">
@@ -506,7 +506,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
 
               <div className="text-right">
                 <span className="text-xs font-bold text-slate-400 uppercase block">Amount</span>
-                <span className="text-lg font-black font-mono text-[#E66817]">{formatINR(trackedOrder.totalAmount)}</span>
+                <span className="text-lg font-black font-mono text-jaman-saffron">{formatINR(trackedOrder.totalAmount)}</span>
                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded block mt-0.5">
                   {trackedOrder.paymentMethod} • {trackedOrder.paymentStatus}
                 </span>
@@ -517,10 +517,10 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             {trackedOrder.estimatedWaitMinutes ? (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 text-amber-900 font-bold">
-                  <Clock className="w-4 h-4 text-[#E66817]" />
+                  <Clock className="w-4 h-4 text-jaman-saffron" />
                   <span>Estimated Wait Time:</span>
                 </div>
-                <span className="font-black text-[#E66817] font-mono text-sm">
+                <span className="font-black text-jaman-saffron font-mono text-sm">
                   ~{trackedOrder.estimatedWaitMinutes} mins
                 </span>
               </div>
@@ -528,9 +528,9 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
           </div>
 
           {/* Live Timeline Stepper */}
-          <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-sm space-y-4">
-            <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-[#E66817]" />
+          <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm space-y-4">
+            <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider flex items-center gap-2">
+              <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />
               <span>Live Kitchen & Service Timeline</span>
             </h4>
 
@@ -554,7 +554,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                     <div
                       className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 z-10 transition-all ${
                         isCurrent
-                          ? 'bg-[#E66817] text-white ring-4 ring-orange-100 animate-pulse'
+                          ? 'bg-jaman-saffron text-white ring-4 ring-orange-100 animate-pulse'
                           : isPassed
                           ? 'bg-emerald-600 text-white'
                           : 'bg-slate-100 text-slate-400 border border-slate-300'
@@ -572,13 +572,13 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                       <div className="flex items-center justify-between">
                         <h5
                           className={`text-xs font-black ${
-                            isCurrent ? 'text-[#E66817]' : isPassed ? 'text-[#0B253A]' : 'text-slate-400'
+                            isCurrent ? 'text-jaman-saffron' : isPassed ? 'text-jaman-navy' : 'text-slate-400'
                           }`}
                         >
                           {step.label}
                         </h5>
                         {isCurrent && (
-                          <span className="text-[10px] font-black bg-orange-100 text-[#E66817] px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-black bg-orange-100 text-jaman-saffron px-2 py-0.5 rounded-full">
                             IN PROGRESS
                           </span>
                         )}
@@ -592,8 +592,8 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
           </div>
 
           {/* Ordered Dishes List */}
-          <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-sm space-y-3">
-            <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+          <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm space-y-3">
+            <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider">
               Dishes in this Order ({trackedOrder.items.length})
             </h4>
 
@@ -601,8 +601,8 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
               {trackedOrder.items.map((item) => (
                 <div key={item.id} className="py-2.5 flex items-center justify-between text-xs">
                   <div className="space-y-0.5">
-                    <div className="flex items-center gap-1.5 font-black text-[#0B253A]">
-                      <span className="font-mono text-[#E66817]">{item.quantity}×</span>
+                    <div className="flex items-center gap-1.5 font-black text-jaman-navy">
+                      <span className="font-mono text-jaman-saffron">{item.quantity}×</span>
                       <span>{item.name}</span>
                     </div>
                     {item.modifiers && item.modifiers.length > 0 && (
@@ -626,13 +626,13 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
           <div className="grid grid-cols-2 gap-2 pt-2">
             <button
               onClick={() => handleRequestService('Water')}
-              className="py-3 px-3 rounded-2xl bg-white border border-[#EBE6DD] hover:bg-slate-50 font-bold text-xs text-slate-700 flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+              className="py-3 px-3 rounded-2xl bg-white border border-jaman-border hover:bg-slate-50 font-bold text-xs text-slate-700 flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
             >
               <span>💧 Request Water</span>
             </button>
             <button
               onClick={() => handleRequestService('Cutlery / Napkins')}
-              className="py-3 px-3 rounded-2xl bg-white border border-[#EBE6DD] hover:bg-slate-50 font-bold text-xs text-slate-700 flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+              className="py-3 px-3 rounded-2xl bg-white border border-jaman-border hover:bg-slate-50 font-bold text-xs text-slate-700 flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
             >
               <span>🍴 Request Cutlery</span>
             </button>
@@ -646,12 +646,12 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
         </div>
 
         {/* Bottom Bar: Add more dishes */}
-        <div className="p-4 bg-white border-t border-[#EBE6DD] sticky bottom-0 z-30">
+        <div className="p-4 bg-white border-t border-jaman-border sticky bottom-0 z-30">
           <button
             onClick={() => setViewState('MENU')}
-            className="w-full py-3.5 rounded-2xl bg-[#0B253A] hover:bg-[#123959] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
+            className="w-full py-3.5 rounded-2xl bg-jaman-navy hover:bg-[#123959] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-[#E66817]" />
+            <Plus className="w-4 h-4 text-jaman-saffron" />
             <span>Order More Delicacies for Table {tableNumber}</span>
           </button>
         </div>
@@ -664,9 +664,9 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   // ========================================================================
   if (viewState === 'CART') {
     return (
-      <div className="min-h-screen bg-[#FAF7F2] text-[#0B253A] flex flex-col font-sans max-w-md mx-auto shadow-2xl border-x border-[#EBE6DD]">
+      <div className="min-h-screen bg-jaman-cream text-jaman-navy flex flex-col font-sans max-w-md mx-auto shadow-2xl border-x border-jaman-border">
         {/* Cart Top Bar */}
-        <div className="bg-white border-b border-[#EBE6DD] p-4 sticky top-0 z-30 flex items-center justify-between">
+        <div className="bg-white border-b border-jaman-border p-4 sticky top-0 z-30 flex items-center justify-between">
           <button
             onClick={() => setViewState('MENU')}
             className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
@@ -674,7 +674,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div className="text-center">
-            <h2 className="text-sm font-black text-[#0B253A]">Your Table Order</h2>
+            <h2 className="text-sm font-black text-jaman-navy">Your Table Order</h2>
             <p className="text-[11px] text-slate-500 font-bold">Table {tableNumber} • {totalItemCount} Items</p>
           </div>
           <div className="w-8" />
@@ -694,13 +694,13 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
               <div className="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center text-slate-400 mx-auto">
                 <ShoppingBag className="w-8 h-8" />
               </div>
-              <h3 className="text-base font-black text-[#0B253A]">Your cart is empty</h3>
+              <h3 className="text-base font-black text-jaman-navy">Your cart is empty</h3>
               <p className="text-xs text-slate-500 max-w-xs mx-auto">
                 Explore our authentic menu and select dishes to self-order from your table.
               </p>
               <button
                 onClick={() => setViewState('MENU')}
-                className="mt-2 px-5 py-2.5 rounded-2xl bg-[#E66817] text-white font-bold text-xs cursor-pointer"
+                className="mt-2 px-5 py-2.5 rounded-2xl bg-jaman-saffron text-white font-bold text-xs cursor-pointer"
               >
                 Browse Menu
               </button>
@@ -708,7 +708,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
           ) : (
             <div className="space-y-4">
               {/* Items Card */}
-              <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] shadow-sm divide-y divide-slate-100">
+              <div className="bg-white rounded-3xl p-4 border border-jaman-border shadow-sm divide-y divide-slate-100">
                 {cartItems.map((item) => (
                   <div key={item.cartId} className="py-3 flex items-start justify-between gap-3">
                     <div className="space-y-1 flex-1">
@@ -722,7 +722,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
                           </span>
                         )}
-                        <h4 className="text-xs font-black text-[#0B253A]">{item.menuItem.name}</h4>
+                        <h4 className="text-xs font-black text-jaman-navy">{item.menuItem.name}</h4>
                       </div>
 
                       {item.selectedModifiers && item.selectedModifiers.length > 0 && (
@@ -738,14 +738,14 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                       )}
 
                       <div className="pl-5 pt-0.5">
-                        <span className="font-mono font-black text-xs text-[#E66817]">
+                        <span className="font-mono font-black text-xs text-jaman-saffron">
                           {formatINR(item.totalPrice)}
                         </span>
                       </div>
                     </div>
 
                     {/* Stepper */}
-                    <div className="flex items-center gap-2 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-2 py-1 shrink-0">
+                    <div className="flex items-center gap-2 bg-jaman-cream border border-jaman-border rounded-xl px-2 py-1 shrink-0">
                       <button
                         onClick={() => handleUpdateCartQty(item.cartId, -1)}
                         className="w-5 h-5 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-200 cursor-pointer"
@@ -755,7 +755,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                       <span className="text-xs font-black font-mono w-4 text-center">{item.quantity}</span>
                       <button
                         onClick={() => handleUpdateCartQty(item.cartId, 1)}
-                        className="w-5 h-5 rounded-lg flex items-center justify-center text-[#E66817] hover:bg-orange-100 cursor-pointer"
+                        className="w-5 h-5 rounded-lg flex items-center justify-center text-jaman-saffron hover:bg-orange-100 cursor-pointer"
                       >
                         <Plus className="w-3 h-3" />
                       </button>
@@ -765,8 +765,8 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
               </div>
 
               {/* Bill Summary Card */}
-              <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] shadow-sm space-y-2.5">
-                <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">Bill Breakdown</h4>
+              <div className="bg-white rounded-3xl p-4 border border-jaman-border shadow-sm space-y-2.5">
+                <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider">Bill Breakdown</h4>
 
                 <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between text-slate-600">
@@ -781,16 +781,16 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                     <span>SGST (2.5%)</span>
                     <span className="font-mono">{formatINR(cartSgst)}</span>
                   </div>
-                  <div className="pt-2 border-t border-slate-100 flex justify-between font-black text-sm text-[#0B253A]">
+                  <div className="pt-2 border-t border-slate-100 flex justify-between font-black text-sm text-jaman-navy">
                     <span>Grand Total</span>
-                    <span className="font-mono text-[#E66817]">{formatINR(cartTotal)}</span>
+                    <span className="font-mono text-jaman-saffron">{formatINR(cartTotal)}</span>
                   </div>
                 </div>
               </div>
 
               {/* Guest Details & Payment Mode */}
-              <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] shadow-sm space-y-3">
-                <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">Guest & Payment</h4>
+              <div className="bg-white rounded-3xl p-4 border border-jaman-border shadow-sm space-y-3">
+                <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider">Guest & Payment</h4>
 
                 <div className="space-y-2">
                   <input
@@ -798,14 +798,14 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
                     placeholder="Your Name (Optional)"
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                   <input
                     type="tel"
                     value={guestPhone}
                     onChange={(e) => setGuestPhone(e.target.value)}
                     placeholder="Phone Number for Digital Bill (Optional)"
-                    className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                    className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                   />
                 </div>
 
@@ -825,8 +825,8 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                           onClick={() => setPaymentMode(mode.id as any)}
                           className={`p-2.5 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1 ${
                             isSel
-                              ? 'bg-amber-50 border-[#E66817] text-[#E66817] font-black'
-                              : 'border-[#EBE6DD] bg-[#FAF7F2] text-slate-600 font-bold'
+                              ? 'bg-amber-50 border-jaman-saffron text-jaman-saffron font-black'
+                              : 'border-jaman-border bg-jaman-cream text-slate-600 font-bold'
                           }`}
                         >
                           <Icon className="w-4 h-4" />
@@ -843,7 +843,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
 
         {/* Bottom Place Order Bar */}
         {cartItems.length > 0 && (
-          <div className="p-4 bg-white border-t border-[#EBE6DD] sticky bottom-0 z-30 space-y-2">
+          <div className="p-4 bg-white border-t border-jaman-border sticky bottom-0 z-30 space-y-2">
             {orderValueBlockReason && (
               <p className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-center">
                 {orderValueBlockReason}
@@ -852,7 +852,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             <button
               onClick={handlePlaceOrder}
               disabled={isPlacingOrder || Boolean(orderValueBlockReason)}
-              className="w-full py-4 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-between px-5 shadow-lg shadow-orange-500/25 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
+              className="w-full py-4 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-between px-5 shadow-lg shadow-orange-500/25 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
             >
               <span>{isPlacingOrder ? 'Sending to Kitchen...' : 'Place Order Now'}</span>
               <div className="flex items-center gap-2">
@@ -878,22 +878,22 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
     const canAddToCart = unmetRequiredGroups.length === 0;
 
     return (
-      <div className="min-h-screen bg-[#FAF7F2] text-[#0B253A] flex flex-col font-sans max-w-md mx-auto shadow-2xl border-x border-[#EBE6DD]">
+      <div className="min-h-screen bg-jaman-cream text-jaman-navy flex flex-col font-sans max-w-md mx-auto shadow-2xl border-x border-jaman-border">
         {/* Customizer Top Bar */}
-        <div className="bg-white border-b border-[#EBE6DD] p-4 sticky top-0 z-30 flex items-center justify-between">
+        <div className="bg-white border-b border-jaman-border p-4 sticky top-0 z-30 flex items-center justify-between">
           <button
             onClick={() => setViewState('MENU')}
             className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <h2 className="text-sm font-black text-[#0B253A]">Customize Dish</h2>
+          <h2 className="text-sm font-black text-jaman-navy">Customize Dish</h2>
           <div className="w-8" />
         </div>
 
         <div className="flex-1 p-4 space-y-4 overflow-y-auto">
           {/* Dish Header */}
-          <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] flex items-center gap-3">
+          <div className="bg-white rounded-3xl p-4 border border-jaman-border flex items-center gap-3">
             <div className="w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
               {customizingItem.imageUrl ? (
                 <img src={customizingItem.imageUrl} alt={customizingItem.name} className="w-full h-full object-cover" />
@@ -904,9 +904,9 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-black text-[#0B253A] truncate">{customizingItem.name}</h3>
+              <h3 className="text-sm font-black text-jaman-navy truncate">{customizingItem.name}</h3>
               <p className="text-[11px] text-slate-500 line-clamp-1">{customizingItem.description}</p>
-              <span className="font-mono font-black text-xs text-[#E66817] mt-0.5 block">
+              <span className="font-mono font-black text-xs text-jaman-saffron mt-0.5 block">
                 {formatINR(customizingItem.price)}
               </span>
             </div>
@@ -914,7 +914,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
 
           {/* Real modifier groups configured for this dish in the canonical catalog */}
           {activeModifierGroups.length === 0 ? (
-            <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] text-center space-y-1">
+            <div className="bg-white rounded-3xl p-4 border border-jaman-border text-center space-y-1">
               <Info className="w-5 h-5 text-slate-300 mx-auto" />
               <p className="text-[11px] text-slate-500 font-medium">
                 {qrSettings.allowCustomerModifications
@@ -929,10 +929,10 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
               const isUnmet = unmetRequiredGroups.some((g) => g.id === group.id);
 
               return (
-                <div key={group.id} className="bg-white rounded-3xl p-4 border border-[#EBE6DD] space-y-2.5">
+                <div key={group.id} className="bg-white rounded-3xl p-4 border border-jaman-border space-y-2.5">
                   <div className="flex items-start justify-between gap-2">
-                    <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider flex items-center gap-1.5">
-                      <Flame className="w-3.5 h-3.5 text-[#E66817]" />
+                    <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider flex items-center gap-1.5">
+                      <Flame className="w-3.5 h-3.5 text-jaman-saffron" />
                       <span>{group.name}</span>
                     </h4>
                     <span
@@ -961,8 +961,8 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                           }
                           className={`w-full py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center justify-between gap-2 text-left ${
                             isSelected
-                              ? 'bg-amber-50 border-[#E66817] text-[#E66817]'
-                              : 'border-[#EBE6DD] bg-[#FAF7F2] text-slate-700 hover:border-[#FED7AA]'
+                              ? 'bg-amber-50 border-jaman-saffron text-jaman-saffron'
+                              : 'border-jaman-border bg-jaman-cream text-slate-700 hover:border-[#FED7AA]'
                           }`}
                         >
                           <span className="truncate">{opt.name}</span>
@@ -981,8 +981,8 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
 
           {/* Cooking Instructions */}
           {qrSettings.allowSpecialInstructions && (
-            <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] space-y-2">
-              <h4 className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+            <div className="bg-white rounded-3xl p-4 border border-jaman-border space-y-2">
+              <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider">
                 Special Cooking Instructions
               </h4>
               <textarea
@@ -990,15 +990,15 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                 onChange={(e) => setSpecialNote(e.target.value)}
                 placeholder="e.g., Less spicy, no onion-garlic, extra crispy naan..."
                 rows={2}
-                className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl p-2.5 text-xs text-[#0B253A] focus:outline-none focus:border-[#E66817]"
+                className="w-full bg-jaman-cream border border-jaman-border rounded-xl p-2.5 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
               />
             </div>
           )}
 
           {/* Quantity Selector */}
-          <div className="bg-white rounded-3xl p-4 border border-[#EBE6DD] flex items-center justify-between">
-            <span className="text-xs font-black text-[#0B253A] uppercase tracking-wider">Quantity</span>
-            <div className="flex items-center gap-3 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-1.5">
+          <div className="bg-white rounded-3xl p-4 border border-jaman-border flex items-center justify-between">
+            <span className="text-xs font-black text-jaman-navy uppercase tracking-wider">Quantity</span>
+            <div className="flex items-center gap-3 bg-jaman-cream border border-jaman-border rounded-xl px-3 py-1.5">
               <button
                 onClick={() => setItemQuantity((q) => Math.max(1, q - 1))}
                 className="w-6 h-6 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-200 cursor-pointer"
@@ -1008,7 +1008,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
               <span className="text-sm font-black font-mono w-6 text-center">{itemQuantity}</span>
               <button
                 onClick={() => setItemQuantity((q) => q + 1)}
-                className="w-6 h-6 rounded-lg flex items-center justify-center text-[#E66817] hover:bg-orange-100 cursor-pointer"
+                className="w-6 h-6 rounded-lg flex items-center justify-center text-jaman-saffron hover:bg-orange-100 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
               </button>
@@ -1017,7 +1017,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
         </div>
 
         {/* Bottom Add to Cart Button */}
-        <div className="p-4 bg-white border-t border-[#EBE6DD] sticky bottom-0 z-30 space-y-2">
+        <div className="p-4 bg-white border-t border-jaman-border sticky bottom-0 z-30 space-y-2">
           {!canAddToCart && (
             <p className="text-[11px] font-bold text-rose-600 text-center">
               Please choose {unmetRequiredGroups.map((g) => g.name).join(', ')} to continue.
@@ -1026,7 +1026,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
           <button
             onClick={handleAddCustomizedToCart}
             disabled={!canAddToCart}
-            className="w-full py-4 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-between px-5 shadow-lg transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-between px-5 shadow-lg transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span>Add to Cart</span>
             <span className="font-mono text-sm">{formatINR(totalCustomPrice)}</span>
@@ -1040,12 +1040,12 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   // VIEW: MAIN CANONICAL DIGITAL MENU (Mobile Hospitality View)
   // ========================================================================
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-[#0B253A] flex flex-col font-sans max-w-md mx-auto shadow-2xl border-x border-[#EBE6DD] relative select-none">
+    <div className="min-h-screen bg-jaman-cream text-jaman-navy flex flex-col font-sans max-w-md mx-auto shadow-2xl border-x border-jaman-border relative select-none">
       {/* Top Hospitality Header */}
-      <header className="bg-[#0B253A] text-white p-4 sticky top-0 z-30 shadow-md space-y-3">
+      <header className="bg-jaman-navy text-white p-4 sticky top-0 z-30 shadow-md space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#E66817] to-amber-600 flex items-center justify-center font-black text-white text-base shadow-md border border-amber-300/30">
+            <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-jaman-saffron to-amber-600 flex items-center justify-center font-black text-white text-base shadow-md border border-amber-300/30">
               J
             </div>
             <div>
@@ -1055,7 +1055,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black bg-[#E66817] text-white px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+            <span className="text-[10px] font-black bg-jaman-saffron text-white px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
               <span>📍 Table {tableNumber}</span>
             </span>
             {activeTrackedOrderId && (
@@ -1077,7 +1077,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search delicacies, rotis, desserts..."
-            className="w-full bg-[#122B42] border border-[#1A3A58] focus:border-[#E66817] rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-400 focus:outline-none transition-colors"
+            className="w-full bg-[#122B42] border border-[#1A3A58] focus:border-jaman-saffron rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-400 focus:outline-none transition-colors"
           />
           {searchQuery && (
             <button
@@ -1101,7 +1101,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
               onClick={() => setDietaryFilter(flt.id as any)}
               className={`px-3 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
                 dietaryFilter === flt.id
-                  ? 'bg-[#E66817] text-white'
+                  ? 'bg-jaman-saffron text-white'
                   : 'bg-[#122B42] text-slate-300 hover:bg-[#1A3A58]'
               }`}
             >
@@ -1112,12 +1112,12 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
       </header>
 
       {/* Category Tabs Strip */}
-      <div className="bg-white border-b border-[#EBE6DD] px-3 py-2 flex items-center gap-1.5 overflow-x-auto sticky top-[138px] z-20 shadow-2xs scrollbar-none">
+      <div className="bg-white border-b border-jaman-border px-3 py-2 flex items-center gap-1.5 overflow-x-auto sticky top-[138px] z-20 shadow-2xs scrollbar-none">
         <button
           onClick={() => setActiveCategory('ALL')}
           className={`px-3 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition-all cursor-pointer ${
             activeCategory === 'ALL'
-              ? 'bg-[#0B253A] text-white'
+              ? 'bg-jaman-navy text-white'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
@@ -1129,7 +1129,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             onClick={() => setActiveCategory(c.id)}
             className={`px-3 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition-all cursor-pointer ${
               activeCategory === c.id
-                ? 'bg-[#0B253A] text-white'
+                ? 'bg-jaman-navy text-white'
                 : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
@@ -1153,7 +1153,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             return (
               <div
                 key={item.id}
-                className="bg-white rounded-3xl p-3.5 border border-[#EBE6DD] shadow-2xs flex gap-3 hover:border-[#FED7AA] transition-all"
+                className="bg-white rounded-3xl p-3.5 border border-jaman-border shadow-2xs flex gap-3 hover:border-[#FED7AA] transition-all"
               >
                 {/* Image */}
                 <div className="w-20 h-20 rounded-2xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200 relative">
@@ -1183,7 +1183,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                 <div className="flex-1 min-w-0 flex flex-col justify-between">
                   <div className="space-y-1">
                     <div className="flex items-start justify-between gap-1">
-                      <h3 className="text-xs font-black text-[#0B253A] leading-snug">{item.name}</h3>
+                      <h3 className="text-xs font-black text-jaman-navy leading-snug">{item.name}</h3>
                     </div>
                     {item.description && (
                       <p className="text-[11px] text-slate-500 line-clamp-2 leading-tight">
@@ -1192,14 +1192,14 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                     )}
                     {item.spiceLevel && item.spiceLevel !== 'NONE' && (
                       <div className="flex items-center gap-1 text-[10px] font-bold text-amber-700">
-                        <Flame className="w-3 h-3 text-[#E66817]" />
+                        <Flame className="w-3 h-3 text-jaman-saffron" />
                         <span>{item.spiceLevel}</span>
                       </div>
                     )}
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
-                    <span className="font-mono font-black text-sm text-[#0B253A]">
+                    <span className="font-mono font-black text-sm text-jaman-navy">
                       {formatINR(item.price)}
                     </span>
 
@@ -1208,16 +1208,16 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                       <div className="flex items-center gap-1.5 bg-[#FFF4ED] border border-[#FED7AA] rounded-xl px-2 py-1">
                         <button
                           onClick={() => handleUpdateCartQty(inCart.cartId, -1)}
-                          className="w-5 h-5 rounded-lg flex items-center justify-center text-[#E66817] hover:bg-orange-100 cursor-pointer"
+                          className="w-5 h-5 rounded-lg flex items-center justify-center text-jaman-saffron hover:bg-orange-100 cursor-pointer"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="text-xs font-black font-mono w-4 text-center text-[#0B253A]">
+                        <span className="text-xs font-black font-mono w-4 text-center text-jaman-navy">
                           {inCart.quantity}
                         </span>
                         <button
                           onClick={() => handleUpdateCartQty(inCart.cartId, 1)}
-                          className="w-5 h-5 rounded-lg flex items-center justify-center text-[#E66817] hover:bg-orange-100 cursor-pointer"
+                          className="w-5 h-5 rounded-lg flex items-center justify-center text-jaman-saffron hover:bg-orange-100 cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
@@ -1225,7 +1225,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                     ) : (
                       <button
                         onClick={() => handleOpenCustomize(item)}
-                        className="bg-[#FFF4ED] hover:bg-[#E66817] text-[#E66817] hover:text-white border border-[#E66817]/40 px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+                        className="bg-[#FFF4ED] hover:bg-jaman-saffron text-jaman-saffron hover:text-white border border-jaman-saffron/40 px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1 cursor-pointer active:scale-95"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>ADD</span>
@@ -1244,10 +1244,10 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
         <div className="fixed bottom-3 left-3 right-3 max-w-[420px] mx-auto z-40 animate-in slide-in-from-bottom-3">
           <button
             onClick={() => setViewState('CART')}
-            className="w-full py-3.5 px-4 rounded-2xl bg-[#0B253A] hover:bg-[#123959] text-white flex items-center justify-between shadow-2xl border border-white/10 transition-all cursor-pointer active:scale-98"
+            className="w-full py-3.5 px-4 rounded-2xl bg-jaman-navy hover:bg-[#123959] text-white flex items-center justify-between shadow-2xl border border-white/10 transition-all cursor-pointer active:scale-98"
           >
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-xl bg-[#E66817] flex items-center justify-center font-black text-xs text-white">
+              <div className="w-7 h-7 rounded-xl bg-jaman-saffron flex items-center justify-center font-black text-xs text-white">
                 {totalItemCount}
               </div>
               <div className="text-left">

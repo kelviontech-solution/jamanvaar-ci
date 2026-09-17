@@ -56,14 +56,14 @@ export const BranchDirectoryModal: React.FC<BranchDirectoryModalProps> = ({ isOp
         {!loading && !error && branches.length > 0 && (
           <div className="space-y-2">
             {branches.map((b) => (
-              <div key={b.id} className="flex items-center justify-between p-3 bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl">
+              <div key={b.id} className="flex items-center justify-between p-3 bg-jaman-ivory border border-jaman-border rounded-xl">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-[#FFF4ED] text-[#E66817] flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center shrink-0">
                     <Building2 className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-sm text-[#0B253A] truncate">{b.name}</span>
+                      <span className="font-bold text-sm text-jaman-navy truncate">{b.name}</span>
                       <span className="text-[10px] font-mono text-slate-400">{b.code}</span>
                     </div>
                     {b.address && <div className="text-[11px] text-slate-500 truncate">{b.address}</div>}

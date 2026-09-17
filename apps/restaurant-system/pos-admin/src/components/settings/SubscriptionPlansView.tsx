@@ -336,7 +336,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       {/* Plan Comparison Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
             JAMANVAAR Software Plans
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
@@ -344,10 +344,10 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-black text-[#E66817] bg-[#FFF4ED] border border-[#FDBA74] px-3.5 py-1 rounded-xl w-fit shadow-2xs">
+          <span className="text-[11px] font-black text-jaman-saffron bg-[#FFF4ED] border border-[#FDBA74] px-3.5 py-1 rounded-xl w-fit shadow-2xs">
             Active Plan: {currentLicense.planName || 'JAMANVAAR CORE'} ({currentTier})
           </span>
-          <span className="text-[11px] font-bold text-slate-500 bg-[#FAF7F2] border border-[#EBE6DD] px-3 py-1 rounded-xl w-fit">
+          <span className="text-[11px] font-bold text-slate-500 bg-jaman-cream border border-jaman-border px-3 py-1 rounded-xl w-fit">
             Lifetime License • No Monthly Commissions • 100% Offline-First
           </span>
         </div>
@@ -367,8 +367,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             onClick={() => setActiveSubTab(tab.id)}
             className={`px-4 py-2.5 text-xs font-black tracking-tight rounded-t-xl transition-colors cursor-pointer border-b-2 -mb-px ${
               activeSubTab === tab.id
-                ? 'text-[#E66817] border-[#E66817]'
-                : 'text-slate-500 border-transparent hover:text-[#0B253A] hover:border-slate-300'
+                ? 'text-jaman-saffron border-jaman-saffron'
+                : 'text-slate-500 border-transparent hover:text-jaman-navy hover:border-slate-300'
             }`}
           >
             {tab.label}
@@ -379,12 +379,12 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       {activeSubTab === 'MY_PLAN' && (
       <>
       {/* CLOUD SUBSCRIPTION STATUS — additive, optional; everything below keeps working offline regardless */}
-      <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-2xs space-y-3">
+      <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-2xs space-y-3">
         {!cloudConnected ? (
           <form onSubmit={handleConnectSubmit} className="space-y-2">
             <div className="flex items-center gap-2">
-              <KeyRound className="w-4 h-4 text-[#E66817]" />
-              <h3 className="text-sm font-bold text-[#0B253A]">Connect to JAMANVAAR Cloud</h3>
+              <KeyRound className="w-4 h-4 text-jaman-saffron" />
+              <h3 className="text-sm font-bold text-jaman-navy">Connect to JAMANVAAR Cloud</h3>
             </div>
             <p className="text-[11px] text-slate-500">
               Enter the activation code from Super Admin to see this restaurant's real, live subscription plan here.
@@ -396,12 +396,12 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 value={activationCodeInput}
                 onChange={(e) => setActivationCodeInput(e.target.value)}
                 placeholder="JMV-XXXX-XXXX-XXXX"
-                className="w-full sm:flex-1 bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl px-4 py-2.5 text-xs font-mono font-bold text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
+                className="w-full sm:flex-1 bg-jaman-cream border border-jaman-border rounded-2xl px-4 py-2.5 text-xs font-mono font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
               />
               <button
                 type="submit"
                 disabled={cloudBusy || !activationCodeInput.trim()}
-                className="w-full sm:w-auto px-6 py-2.5 bg-[#0B253A] hover:bg-[#1E3A4C] disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2.5 bg-jaman-navy hover:bg-jaman-darkBorder disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
               >
                 {cloudBusy ? 'Connecting…' : 'Connect'}
               </button>
@@ -412,15 +412,15 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <KeyRound className="w-4 h-4 text-[#E66817]" />
-                <h3 className="text-sm font-bold text-[#0B253A]">
+                <KeyRound className="w-4 h-4 text-jaman-saffron" />
+                <h3 className="text-sm font-bold text-jaman-navy">
                   {cloudMode === 'set-password' ? 'Set your owner password' : 'Log in to JAMANVAAR Cloud'}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setCloudMode(cloudMode === 'login' ? 'set-password' : 'login')}
-                className="text-[10px] font-bold text-slate-500 hover:text-[#0B253A] underline cursor-pointer"
+                className="text-[10px] font-bold text-slate-500 hover:text-jaman-navy underline cursor-pointer"
               >
                 {cloudMode === 'set-password' ? 'Already have a password? Log in' : 'First time? Set your password'}
               </button>
@@ -471,7 +471,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 <button
                   type="submit"
                   disabled={cloudBusy}
-                  className="w-full sm:w-auto px-6 py-2.5 bg-[#0B253A] hover:bg-[#1E3A4C] disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-2.5 bg-jaman-navy hover:bg-jaman-darkBorder disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
                 >
                   {cloudBusy ? 'Please wait…' : cloudMode === 'set-password' ? 'Set password & log in' : 'Log in'}
                 </button>
@@ -484,7 +484,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span className="text-sm font-black text-[#0B253A]">
+                <span className="text-sm font-black text-jaman-navy">
                   Cloud-Synced Plan: {cloudData?.planName ?? '—'} {cloudData?.planTier ? `(${cloudData.planTier})` : ''}
                 </span>
               </div>
@@ -499,7 +499,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             <button
               type="button"
               onClick={refreshCloudEntitlements}
-              className="text-[11px] font-bold text-slate-500 hover:text-[#0B253A] underline cursor-pointer shrink-0"
+              className="text-[11px] font-bold text-slate-500 hover:text-jaman-navy underline cursor-pointer shrink-0"
             >
               Refresh
             </button>
@@ -520,8 +520,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         <div
           className={`lg:col-span-5 bg-white rounded-3xl p-5 sm:p-6 border flex flex-col justify-between transition-all select-none ${
             currentTier === 'CORE'
-              ? 'border-[#0B253A] shadow-md ring-2 ring-[#0B253A]/10'
-              : 'border-[#EBE6DD] shadow-2xs hover:border-slate-300'
+              ? 'border-jaman-navy shadow-md ring-2 ring-jaman-navy/10'
+              : 'border-jaman-border shadow-2xs hover:border-slate-300'
           }`}
         >
           <div className="space-y-4">
@@ -531,19 +531,19 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 <span className="text-[10px] font-black tracking-wider uppercase text-slate-400 block">
                   FOUNDATION EDITION
                 </span>
-                <h2 className="text-xl sm:text-2xl font-black text-[#0B253A]">JAMANVAAR CORE</h2>
+                <h2 className="text-xl sm:text-2xl font-black text-jaman-navy">JAMANVAAR CORE</h2>
                 <span className="text-xs text-slate-600 font-bold block mt-0.5">
                   POS + Complete Restaurant Management
                 </span>
               </div>
               <div className="text-right shrink-0">
-                <span className="text-2xl sm:text-3xl font-black text-[#0B253A] font-mono">₹5,000</span>
+                <span className="text-2xl sm:text-3xl font-black text-jaman-navy font-mono">₹5,000</span>
                 <span className="text-[10px] text-slate-400 block">per license</span>
               </div>
             </div>
 
             {/* Positioning Tagline */}
-            <p className="text-xs text-slate-600 leading-relaxed bg-[#FAF7F2] p-3 rounded-2xl border border-[#EBE6DD]">
+            <p className="text-xs text-slate-600 leading-relaxed bg-jaman-cream p-3 rounded-2xl border border-jaman-border">
               Complete offline-first restaurant POS for billing, payments, tables, kitchen operations, inventory and daily restaurant management.
             </p>
 
@@ -556,7 +556,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAllCoreFeatures(!showAllCoreFeatures)}
-                  className="text-[10px] font-bold text-slate-500 hover:text-[#0B253A] underline cursor-pointer"
+                  className="text-[10px] font-bold text-slate-500 hover:text-jaman-navy underline cursor-pointer"
                 >
                   {showAllCoreFeatures ? 'Collapse All' : 'Expand All'}
                 </button>
@@ -566,11 +566,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 const isExpanded = expandedCoreCategory === group.id || showAllCoreFeatures;
 
                 return (
-                  <div key={group.id} className="border border-[#EBE6DD] rounded-2xl overflow-hidden bg-white shadow-2xs">
+                  <div key={group.id} className="border border-jaman-border rounded-2xl overflow-hidden bg-white shadow-2xs">
                     <button
                       type="button"
                       onClick={() => setExpandedCoreCategory(expandedCoreCategory === group.id ? null : group.id)}
-                      className="w-full px-3.5 py-2.5 bg-[#FAF7F2] hover:bg-slate-100 flex items-center justify-between font-bold text-xs text-[#0B253A] cursor-pointer transition-colors"
+                      className="w-full px-3.5 py-2.5 bg-jaman-cream hover:bg-slate-100 flex items-center justify-between font-bold text-xs text-jaman-navy cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-emerald-600 shrink-0 stroke-[2.5]" />
@@ -584,7 +584,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                       </div>
                     </button>
                     {isExpanded && (
-                      <div className="p-3 text-[11px] text-slate-700 bg-white border-t border-[#EBE6DD]">
+                      <div className="p-3 text-[11px] text-slate-700 bg-white border-t border-jaman-border">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1.5">
                           {group.features.map((feat, fIdx) => (
                             <div key={fIdx} className="flex items-start gap-1.5 leading-snug">
@@ -628,12 +628,12 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         <div
           className={`lg:col-span-7 bg-gradient-to-b from-[#FFFDFB] via-white to-[#FFFDFB] rounded-3xl p-5 sm:p-7 border-2 flex flex-col justify-between transition-all select-none relative shadow-xl ${
             currentTier === 'PRO'
-              ? 'border-[#E66817] ring-4 ring-[#E66817]/20 shadow-2xl'
-              : 'border-[#FDBA74] hover:border-[#E66817]'
+              ? 'border-jaman-saffron ring-4 ring-jaman-saffron/20 shadow-2xl'
+              : 'border-[#FDBA74] hover:border-jaman-saffron'
           }`}
         >
           {/* Recommended Flagship Ribbon */}
-          <div className="absolute -top-3.5 right-6 bg-gradient-to-r from-[#E66817] to-[#EA580C] text-white text-[11px] font-black px-4 py-1 rounded-full shadow-lg uppercase tracking-wider flex items-center gap-1.5">
+          <div className="absolute -top-3.5 right-6 bg-gradient-to-r from-jaman-saffron to-[#EA580C] text-white text-[11px] font-black px-4 py-1 rounded-full shadow-lg uppercase tracking-wider flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 animate-pulse" />
             <span>RECOMMENDED • BEST VALUE</span>
           </div>
@@ -642,10 +642,10 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 border-b border-amber-200/60 pb-4">
               <div>
-                <span className="text-[10px] font-black tracking-widest uppercase text-[#E66817] block">
+                <span className="text-[10px] font-black tracking-widest uppercase text-jaman-saffron block">
                   FLAGSHIP CONNECTED RESTAURANT ECOSYSTEM
                 </span>
-                <h2 className="text-2xl sm:text-3xl font-black text-[#0B253A] flex items-center gap-2">
+                <h2 className="text-2xl sm:text-3xl font-black text-jaman-navy flex items-center gap-2">
                   <span>JAMANVAAR PRO</span>
                 </h2>
                 <span className="text-xs text-slate-700 font-bold block mt-0.5">
@@ -655,7 +655,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
 
               <div className="text-left sm:text-right shrink-0">
                 <div className="flex items-baseline gap-1 sm:justify-end">
-                  <span className="text-3xl sm:text-4xl font-black text-[#0B253A] font-mono">₹7,000</span>
+                  <span className="text-3xl sm:text-4xl font-black text-jaman-navy font-mono">₹7,000</span>
                 </div>
                 <span className="text-[10px] text-slate-400 block font-sans">per license</span>
               </div>
@@ -673,12 +673,12 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 <span>✓ EVERYTHING IN CORE IS INCLUDED ({CORE_FEATURE_COUNT} Base Features)</span>
               </div>
 
-              <div className="p-2.5 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 rounded-xl border border-amber-300 text-xs text-[#0B253A] flex items-center justify-between gap-2 font-black">
-                <div className="flex items-center gap-1.5 text-[#E66817]">
-                  <Sparkles className="w-4 h-4 text-[#E66817] shrink-0" />
+              <div className="p-2.5 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 rounded-xl border border-amber-300 text-xs text-jaman-navy flex items-center justify-between gap-2 font-black">
+                <div className="flex items-center gap-1.5 text-jaman-saffron">
+                  <Sparkles className="w-4 h-4 text-jaman-saffron shrink-0" />
                   <span>⭐ ONLY ₹2,000 MORE THAN CORE</span>
                 </div>
-                <span className="text-[11px] font-bold text-[#E66817] bg-white px-2.5 py-0.5 rounded-full shadow-2xs border border-amber-200">
+                <span className="text-[11px] font-bold text-jaman-saffron bg-white px-2.5 py-0.5 rounded-full shadow-2xs border border-amber-200">
                   ⭐ RECOMMENDED • BEST VALUE
                 </span>
               </div>
@@ -687,13 +687,13 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             {/* PRO Feature Modules Accordion */}
             <div className="space-y-2.5 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase text-[#E66817] tracking-wider block">
+                <span className="text-[10px] font-black uppercase text-jaman-saffron tracking-wider block">
                   ⭐ PRO CONNECTED MODULES ({PRO_FEATURE_COUNT} EXCLUSIVE CAPABILITIES):
                 </span>
                 <button
                   type="button"
                   onClick={() => setShowAllProFeatures(!showAllProFeatures)}
-                  className="text-[10px] font-bold text-[#E66817] hover:text-[#EA580C] underline cursor-pointer"
+                  className="text-[10px] font-bold text-jaman-saffron hover:text-[#EA580C] underline cursor-pointer"
                 >
                   {showAllProFeatures ? 'Collapse All PRO' : 'Expand All PRO'}
                 </button>
@@ -708,7 +708,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                     key={group.id}
                     className={`rounded-2xl overflow-hidden bg-white shadow-2xs transition-all ${
                       group.isFlagship
-                        ? 'border-2 border-[#E66817]/60 ring-2 ring-[#E66817]/10'
+                        ? 'border-2 border-jaman-saffron/60 ring-2 ring-jaman-saffron/10'
                         : 'border border-amber-200/80'
                     }`}
                   >
@@ -717,21 +717,21 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                       onClick={() => setExpandedProCategory(expandedProCategory === group.id ? null : group.id)}
                       className={`w-full px-3.5 py-3 flex items-center justify-between font-black text-xs cursor-pointer transition-colors ${
                         group.isFlagship
-                          ? 'bg-gradient-to-r from-[#FFF7F0] to-[#FFFDF9] hover:bg-amber-50 text-[#0B253A]'
-                          : 'bg-[#FFFDFB] hover:bg-amber-50/50 text-[#0B253A]'
+                          ? 'bg-gradient-to-r from-[#FFF7F0] to-[#FFFDF9] hover:bg-amber-50 text-jaman-navy'
+                          : 'bg-[#FFFDFB] hover:bg-amber-50/50 text-jaman-navy'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 text-left">
-                        <div className="w-6 h-6 rounded-lg bg-orange-100 text-[#E66817] flex items-center justify-center shrink-0">
+                        <div className="w-6 h-6 rounded-lg bg-orange-100 text-jaman-saffron flex items-center justify-center shrink-0">
                           <Icon className="w-3.5 h-3.5" />
                         </div>
                         <span className="tracking-tight">{group.title}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-slate-400 shrink-0">
-                        <span className="text-[10px] font-mono font-bold text-[#E66817] bg-[#FFF4EB] border border-[#FED7AA] px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-mono font-bold text-jaman-saffron bg-[#FFF4EB] border border-[#FED7AA] px-2 py-0.5 rounded-full">
                           {group.features.length} features
                         </span>
-                        {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-[#E66817]" /> : <ChevronDown className="w-3.5 h-3.5 text-[#E66817]" />}
+                        {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-jaman-saffron" /> : <ChevronDown className="w-3.5 h-3.5 text-jaman-saffron" />}
                       </div>
                     </button>
 
@@ -740,7 +740,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1.5">
                           {group.features.map((feat, fIdx) => (
                             <div key={fIdx} className="flex items-start gap-1.5 leading-snug">
-                              <Check className="w-3.5 h-3.5 text-[#E66817] shrink-0 mt-0.5 stroke-[2.5]" />
+                              <Check className="w-3.5 h-3.5 text-jaman-saffron shrink-0 mt-0.5 stroke-[2.5]" />
                               <span className="font-medium text-slate-700">{feat}</span>
                             </div>
                           ))}
@@ -753,7 +753,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             </div>
 
             {/* PRO VALUE SUMMARY BANNER */}
-            <div className="p-4 bg-gradient-to-br from-[#0B253A] to-[#1E3A4C] text-white rounded-2xl shadow-md space-y-3">
+            <div className="p-4 bg-gradient-to-br from-jaman-navy to-jaman-darkBorder text-white rounded-2xl shadow-md space-y-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
                 <strong className="text-xs font-black tracking-wide text-amber-200">
@@ -785,8 +785,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
 
           {/* Card Bottom / Primary CTA */}
           <div className="pt-5 border-t border-amber-200/80 mt-4 space-y-2">
-            <div className="text-[10px] font-black tracking-wider uppercase text-[#E66817] text-center flex items-center justify-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-[#E66817]" />
+            <div className="text-[10px] font-black tracking-wider uppercase text-jaman-saffron text-center flex items-center justify-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />
               <span>RUN + CONNECT + GROW YOUR RESTAURANT</span>
             </div>
 
@@ -799,7 +799,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               <div className="space-y-1 text-center">
                 <button
                   onClick={() => handleActivatePlan('PRO')}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#E66817] via-[#EA580C] to-[#E66817] hover:from-[#EA580C] hover:to-[#C2410C] text-white font-black text-sm uppercase tracking-wider shadow-xl shadow-[#E66817]/30 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-jaman-saffron via-[#EA580C] to-jaman-saffron hover:from-[#EA580C] hover:to-[#C2410C] text-white font-black text-sm uppercase tracking-wider shadow-xl shadow-jaman-saffron/30 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>CHOOSE JAMANVAAR PRO — ₹7,000 →</span>
@@ -814,20 +814,20 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       </div>
 
       {/* SECTION 2: WHY RESTAURANTS UPGRADE TO PRO (4 Pillars) */}
-      <div className="bg-white rounded-3xl p-6 border border-[#EBE6DD] shadow-2xs space-y-4">
+      <div className="bg-white rounded-3xl p-6 border border-jaman-border shadow-2xs space-y-4">
         <div>
-          <span className="text-[10px] font-black uppercase text-[#E66817] tracking-widest block">
+          <span className="text-[10px] font-black uppercase text-jaman-saffron tracking-widest block">
             COMMERCIAL ADVANTAGE
           </span>
-          <h3 className="text-base font-black text-[#0B253A]">Why Restaurants Upgrade to JAMANVAAR PRO</h3>
+          <h3 className="text-base font-black text-jaman-navy">Why Restaurants Upgrade to JAMANVAAR PRO</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
-            <div className="w-8 h-8 rounded-xl bg-orange-100 text-[#E66817] flex items-center justify-center font-black text-xs">
+          <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
+            <div className="w-8 h-8 rounded-xl bg-orange-100 text-jaman-saffron flex items-center justify-center font-black text-xs">
               01
             </div>
-            <strong className="text-xs font-black text-[#0B253A] block">
+            <strong className="text-xs font-black text-jaman-navy block">
               📱 SERVE FROM THE TABLE
             </strong>
             <p className="text-[11px] text-slate-600 leading-relaxed">
@@ -835,11 +835,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
+          <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
             <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-xs">
               02
             </div>
-            <strong className="text-xs font-black text-[#0B253A] block">
+            <strong className="text-xs font-black text-jaman-navy block">
               📲 LET CUSTOMERS ORDER
             </strong>
             <p className="text-[11px] text-slate-600 leading-relaxed">
@@ -847,11 +847,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
+          <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
             <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-black text-xs">
               03
             </div>
-            <strong className="text-xs font-black text-[#0B253A] block">
+            <strong className="text-xs font-black text-jaman-navy block">
               ⚡ CONNECT FLOOR & KITCHEN
             </strong>
             <p className="text-[11px] text-slate-600 leading-relaxed">
@@ -859,11 +859,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EBE6DD] space-y-1.5">
+          <div className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1.5">
             <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-black text-xs">
               04
             </div>
-            <strong className="text-xs font-black text-[#0B253A] block">
+            <strong className="text-xs font-black text-jaman-navy block">
               📊 RUN WITH INTELLIGENCE
             </strong>
             <p className="text-[11px] text-slate-600 leading-relaxed">
@@ -874,10 +874,10 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       </div>
 
       {/* SECTION 3: CORE vs PRO SIDE-BY-SIDE MATRIX */}
-      <div className="bg-white rounded-3xl p-6 border border-[#EBE6DD] shadow-2xs space-y-3">
+      <div className="bg-white rounded-3xl p-6 border border-jaman-border shadow-2xs space-y-3">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
-            <h3 className="text-sm font-black text-[#0B253A]">CORE vs PRO — Feature Comparison Matrix</h3>
+            <h3 className="text-sm font-black text-jaman-navy">CORE vs PRO — Feature Comparison Matrix</h3>
             <span className="text-[11px] text-slate-500">Every feature is backed by production-grade offline-first code.</span>
           </div>
           <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">OFFICIAL FEATURE MATRIX</span>
@@ -886,10 +886,10 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-[#EBE6DD] text-slate-400 font-bold text-[10px] uppercase">
+              <tr className="border-b border-jaman-border text-slate-400 font-bold text-[10px] uppercase">
                 <th className="py-2.5 px-3">Software Capability</th>
                 <th className="py-2.5 px-3 text-center w-36">CORE (₹5,000)</th>
-                <th className="py-2.5 px-3 text-center w-48 bg-amber-50/60 text-[#E66817]">PRO (₹7,000)</th>
+                <th className="py-2.5 px-3 text-center w-48 bg-amber-50/60 text-jaman-saffron">PRO (₹7,000)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -913,9 +913,9 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 { cap: 'Connected Multi-Device Health Monitoring', core: 'Basic', pro: '✓ Live 6-Node Mesh' }
               ].map((row, idx) => (
                 <tr key={idx} className="hover:bg-slate-50/80">
-                  <td className="py-2.5 px-3 font-bold text-[#0B253A]">{row.cap}</td>
+                  <td className="py-2.5 px-3 font-bold text-jaman-navy">{row.cap}</td>
                   <td className="py-2.5 px-3 text-center text-slate-700 font-mono text-[11px]">{row.core}</td>
-                  <td className="py-2.5 px-3 text-center font-bold text-[#E66817] bg-amber-50/30 font-mono text-[11px]">
+                  <td className="py-2.5 px-3 text-center font-bold text-jaman-saffron bg-amber-50/30 font-mono text-[11px]">
                     {row.pro}
                   </td>
                 </tr>
@@ -930,37 +930,37 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       {activeSubTab === 'BILLING_INVOICES' && (
         <div className="space-y-4">
           {!cloudLoggedIn ? (
-            <div className="bg-white rounded-3xl p-8 border border-[#EBE6DD] shadow-2xs text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#E66817] flex items-center justify-center mx-auto">
+            <div className="bg-white rounded-3xl p-8 border border-jaman-border shadow-2xs text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-jaman-saffron flex items-center justify-center mx-auto">
                 <Receipt className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-black text-[#0B253A]">Cloud Subscription Login Required</h3>
+              <h3 className="text-base font-black text-jaman-navy">Cloud Subscription Login Required</h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
                 To view statutory GST 18% invoices, download official payment receipts, and make subscription renewal payments, please sign in to your restaurant cloud account.
               </p>
               <button
                 type="button"
                 onClick={() => setActiveSubTab('MY_PLAN')}
-                className="px-5 py-2 bg-[#E66817] hover:bg-[#d45b10] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                className="px-5 py-2 bg-jaman-saffron hover:bg-[#d45b10] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer"
               >
                 Go to Cloud Account Login
               </button>
             </div>
           ) : loadingBilling ? (
-            <div className="bg-white rounded-3xl p-12 border border-[#EBE6DD] shadow-2xs text-center text-xs text-slate-500 font-bold">
+            <div className="bg-white rounded-3xl p-12 border border-jaman-border shadow-2xs text-center text-xs text-slate-500 font-bold">
               Loading subscription billing history and invoices…
             </div>
           ) : (
             <>
               {/* Top Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-2xs flex flex-col justify-between">
+                <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-2xs flex flex-col justify-between">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
                     <span>Current Subscription</span>
-                    <Building2 className="w-4 h-4 text-[#E66817]" />
+                    <Building2 className="w-4 h-4 text-jaman-saffron" />
                   </div>
                   <div className="mt-3">
-                    <div className="text-lg font-black text-[#0B253A]">
+                    <div className="text-lg font-black text-jaman-navy">
                       {billingSummary?.subscription?.planName || 'JAMANVAAR SaaS'}
                     </div>
                     <div className="flex items-center gap-2 mt-1">
@@ -980,13 +980,13 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                   </div>
                 </div>
 
-                <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-2xs flex flex-col justify-between">
+                <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-2xs flex flex-col justify-between">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
                     <span>Renewal Countdown</span>
                     <Clock className="w-4 h-4 text-blue-600" />
                   </div>
                   <div className="mt-3">
-                    <div className="text-lg font-black text-[#0B253A]">
+                    <div className="text-lg font-black text-jaman-navy">
                       {billingSummary?.subscription?.daysRemaining !== undefined
                         ? `Renews in ${billingSummary.subscription.daysRemaining} days`
                         : 'Active Lifetime'}
@@ -1002,7 +1002,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                   </div>
                 </div>
 
-                <div className="bg-white rounded-3xl p-5 border border-[#EBE6DD] shadow-2xs flex flex-col justify-between">
+                <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-2xs flex flex-col justify-between">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
                     <span>Account Balance</span>
                     <CreditCard className="w-4 h-4 text-emerald-600" />
@@ -1019,10 +1019,10 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               </div>
 
               {/* Invoices List Table */}
-              <div className="bg-white rounded-3xl p-6 border border-[#EBE6DD] shadow-2xs space-y-4">
+              <div className="bg-white rounded-3xl p-6 border border-jaman-border shadow-2xs space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div>
-                    <h3 className="text-sm font-black text-[#0B253A]">Statutory Tax Invoices & Receipts</h3>
+                    <h3 className="text-sm font-black text-jaman-navy">Statutory Tax Invoices & Receipts</h3>
                     <span className="text-[11px] text-slate-500">
                       GST-compliant commercial tax invoices issued by KELVIONTECH PRIVATE LIMITED.
                     </span>
@@ -1030,7 +1030,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                   <button
                     type="button"
                     onClick={loadTenantBilling}
-                    className="text-xs font-bold text-[#E66817] hover:underline cursor-pointer"
+                    className="text-xs font-bold text-jaman-saffron hover:underline cursor-pointer"
                   >
                     Refresh Records
                   </button>
@@ -1044,7 +1044,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="border-b border-[#EBE6DD] text-slate-400 font-bold text-[10px] uppercase">
+                        <tr className="border-b border-jaman-border text-slate-400 font-bold text-[10px] uppercase">
                           <th className="py-2.5 px-3">Invoice #</th>
                           <th className="py-2.5 px-3">Plan / Description</th>
                           <th className="py-2.5 px-3">Billing Period</th>
@@ -1060,16 +1060,16 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                           const hasPayments = inv.payments && inv.payments.length > 0;
                           return (
                             <tr key={inv.id} className="hover:bg-slate-50/80">
-                              <td className="py-3 px-3 font-mono font-bold text-[#0B253A]">
+                              <td className="py-3 px-3 font-mono font-bold text-jaman-navy">
                                 {inv.invoiceNumber}
                               </td>
-                              <td className="py-3 px-3 font-medium text-[#0B253A]">
+                              <td className="py-3 px-3 font-medium text-jaman-navy">
                                 {inv.plan?.name || 'JAMANVAAR License'}
                               </td>
                               <td className="py-3 px-3 text-slate-500 text-[11px]">
                                 {new Date(inv.billingPeriodStart).toLocaleDateString('en-IN')} – {new Date(inv.billingPeriodEnd).toLocaleDateString('en-IN')}
                               </td>
-                              <td className="py-3 px-3 text-right font-mono font-bold text-[#0B253A]">
+                              <td className="py-3 px-3 text-right font-mono font-bold text-jaman-navy">
                                 ₹{(inv.totalAmount / 100).toFixed(2)}
                                 <div className="text-[10px] text-slate-400 font-normal">
                                   ₹{(inv.amount / 100).toFixed(2)} + GST
@@ -1098,7 +1098,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                                         setPayModalInvoice(inv);
                                         setPayReference('');
                                       }}
-                                      className="px-3 py-1 bg-[#E66817] hover:bg-[#d45b10] text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer shadow-2xs"
+                                      className="px-3 py-1 bg-jaman-saffron hover:bg-[#d45b10] text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer shadow-2xs"
                                     >
                                       Pay Now
                                     </button>
@@ -1149,7 +1149,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 animate-fadeIn">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-base font-black text-[#0B253A]">Pay Invoice</h3>
+                <h3 className="text-base font-black text-jaman-navy">Pay Invoice</h3>
                 <span className="text-xs text-slate-400 font-mono">{payModalInvoice.invoiceNumber}</span>
               </div>
               <button
@@ -1164,12 +1164,12 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             <div className="bg-amber-50/60 border border-amber-200/80 rounded-2xl p-4 flex items-center justify-between">
               <div>
                 <div className="text-[11px] font-bold text-slate-500">Total Payable Amount</div>
-                <div className="text-2xl font-black text-[#0B253A] font-mono mt-0.5">
+                <div className="text-2xl font-black text-jaman-navy font-mono mt-0.5">
                   ₹{(payModalInvoice.totalAmount / 100).toFixed(2)}
                 </div>
                 <div className="text-[10px] text-slate-500">Includes 18% statutory GST</div>
               </div>
-              <span className="text-[10px] font-bold bg-amber-100 text-[#E66817] px-2.5 py-1 rounded-full">
+              <span className="text-[10px] font-bold bg-amber-100 text-jaman-saffron px-2.5 py-1 rounded-full">
                 {payModalInvoice.plan?.name || 'SaaS Renewal'}
               </span>
             </div>
@@ -1185,7 +1185,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                       onClick={() => setPayMethod(m)}
                       className={`py-2 px-2 text-center text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                         payMethod === m
-                          ? 'border-[#E66817] bg-amber-50/60 text-[#E66817]'
+                          ? 'border-jaman-saffron bg-amber-50/60 text-jaman-saffron'
                           : 'border-slate-200 text-slate-600 hover:border-slate-300'
                       }`}
                     >
@@ -1197,8 +1197,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
 
               {payMethod === 'UPI' && (
                 <div className="bg-slate-50 rounded-2xl p-3 text-xs text-slate-600 space-y-1.5 border border-slate-200">
-                  <div className="font-bold text-[#0B253A]">Pay using UPI:</div>
-                  <div className="font-mono text-[11px] text-[#E66817] bg-white p-2 rounded-lg border border-slate-200 font-bold text-center">
+                  <div className="font-bold text-jaman-navy">Pay using UPI:</div>
+                  <div className="font-mono text-[11px] text-jaman-saffron bg-white p-2 rounded-lg border border-slate-200 font-bold text-center">
                     kelviontech@hdfcbank
                   </div>
                   <div className="text-[10px] text-slate-500 text-center">
@@ -1226,7 +1226,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                   placeholder="e.g. UPI-928472938472 or NEFT-HDFC2349"
                   value={payReference}
                   onChange={(e) => setPayReference(e.target.value)}
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3.5 py-2 text-xs font-mono text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3.5 py-2 text-xs font-mono text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
                 />
               </div>
 
@@ -1242,7 +1242,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 <button
                   type="submit"
                   disabled={processingPayment}
-                  className="px-5 py-2 bg-[#E66817] hover:bg-[#d45b10] disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer shadow-xs"
+                  className="px-5 py-2 bg-jaman-saffron hover:bg-[#d45b10] disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer shadow-xs"
                 >
                   {processingPayment ? 'Processing Payment…' : 'Confirm & Renew Subscription'}
                 </button>
@@ -1260,7 +1260,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           <div className="bg-white rounded-3xl p-6 max-w-2xl w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-base font-black text-[#0B253A]">Statutory Tax Invoice</h3>
+                <h3 className="text-base font-black text-jaman-navy">Statutory Tax Invoice</h3>
                 <span className="text-xs text-slate-400 font-mono">{tenantViewInvoice.invoiceNumber}</span>
               </div>
               <div className="flex items-center gap-2">
@@ -1286,7 +1286,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             <div className="p-4 border border-slate-200 rounded-2xl text-xs text-slate-700 space-y-4">
               <div className="flex justify-between items-start border-b border-slate-200 pb-3">
                 <div>
-                  <div className="text-lg font-black text-[#0B253A]">JAMANVAAR</div>
+                  <div className="text-lg font-black text-jaman-navy">JAMANVAAR</div>
                   <div className="text-[11px] font-bold text-slate-500">KELVIONTECH PRIVATE LIMITED</div>
                   <div className="text-[10px] text-slate-400 mt-0.5">
                     Plot 42, Science City Road, Ahmedabad, Gujarat 380060<br />
@@ -1294,8 +1294,8 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs font-bold text-[#E66817] uppercase">TAX INVOICE</div>
-                  <div className="font-mono font-bold text-sm text-[#0B253A] mt-1">{tenantViewInvoice.invoiceNumber}</div>
+                  <div className="text-xs font-bold text-jaman-saffron uppercase">TAX INVOICE</div>
+                  <div className="font-mono font-bold text-sm text-jaman-navy mt-1">{tenantViewInvoice.invoiceNumber}</div>
                   <div className="text-[10px] text-slate-500 mt-0.5">
                     Date: {new Date(tenantViewInvoice.dueDate).toLocaleDateString('en-IN')}
                   </div>
@@ -1305,7 +1305,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-xl">
                 <div>
                   <div className="text-[10px] font-bold text-slate-400 uppercase">BILLED TO:</div>
-                  <div className="font-bold text-[#0B253A] text-xs mt-0.5">{tenantViewInvoice.restaurant?.name}</div>
+                  <div className="font-bold text-jaman-navy text-xs mt-0.5">{tenantViewInvoice.restaurant?.name}</div>
                   <div className="text-[10px] text-slate-500">{tenantViewInvoice.restaurant?.city || 'India'}</div>
                   {tenantViewInvoice.restaurant?.gstin && (
                     <div className="text-[10px] font-mono text-slate-600 mt-0.5">
@@ -1315,7 +1315,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 </div>
                 <div>
                   <div className="text-[10px] font-bold text-slate-400 uppercase">BILLING PERIOD:</div>
-                  <div className="font-medium text-[#0B253A] text-xs mt-0.5">
+                  <div className="font-medium text-jaman-navy text-xs mt-0.5">
                     {new Date(tenantViewInvoice.billingPeriodStart).toLocaleDateString('en-IN')} – {new Date(tenantViewInvoice.billingPeriodEnd).toLocaleDateString('en-IN')}
                   </div>
                   <div className="text-[10px] text-slate-500 mt-0.5">
@@ -1350,7 +1350,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                   <span>Goods and Services Tax (GST 18%):</span>
                   <span>₹{(tenantViewInvoice.taxAmount / 100).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-[#0B253A] font-black text-sm border-t border-slate-200 pt-1.5 mt-1">
+                <div className="flex justify-between text-jaman-navy font-black text-sm border-t border-slate-200 pt-1.5 mt-1">
                   <span>Total Payable:</span>
                   <span>₹{(tenantViewInvoice.totalAmount / 100).toFixed(2)}</span>
                 </div>
@@ -1368,7 +1368,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
           <div className="bg-white rounded-3xl p-6 max-w-2xl w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-base font-black text-[#0B253A]">Official Payment Receipt</h3>
+                <h3 className="text-base font-black text-jaman-navy">Official Payment Receipt</h3>
                 <span className="text-xs text-emerald-600 font-mono font-bold">{tenantReceiptData.receiptNumber}</span>
               </div>
               <div className="flex items-center gap-2">
@@ -1393,7 +1393,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             <div className="p-4 border border-slate-200 rounded-2xl text-xs text-slate-700 space-y-4">
               <div className="flex justify-between items-start border-b border-slate-200 pb-3">
                 <div>
-                  <div className="text-lg font-black text-[#0B253A]">JAMANVAAR</div>
+                  <div className="text-lg font-black text-jaman-navy">JAMANVAAR</div>
                   <div className="text-[11px] font-bold text-slate-500">KELVIONTECH PRIVATE LIMITED</div>
                   <div className="text-[10px] text-slate-400 mt-0.5">
                     GSTIN: 24AAACK7890F1ZT | SAC: 997331
@@ -1401,7 +1401,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
                 </div>
                 <div className="text-right">
                   <div className="text-xs font-bold text-emerald-600 uppercase">PAYMENT SETTLED</div>
-                  <div className="font-mono font-bold text-sm text-[#0B253A] mt-1">{tenantReceiptData.receiptNumber}</div>
+                  <div className="font-mono font-bold text-sm text-jaman-navy mt-1">{tenantReceiptData.receiptNumber}</div>
                   <div className="text-[10px] text-slate-500 mt-0.5">
                     Date: {new Date(tenantReceiptData.paymentDate).toLocaleDateString('en-IN')}
                   </div>
@@ -1411,12 +1411,12 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               <div className="grid grid-cols-2 gap-4 bg-emerald-50/50 border border-emerald-100 p-3 rounded-xl">
                 <div>
                   <div className="text-[10px] font-bold text-slate-400 uppercase">RECEIVED FROM:</div>
-                  <div className="font-bold text-[#0B253A] text-xs mt-0.5">{tenantReceiptData.receivedFrom.restaurantName}</div>
+                  <div className="font-bold text-jaman-navy text-xs mt-0.5">{tenantReceiptData.receivedFrom.restaurantName}</div>
                   <div className="text-[10px] text-slate-500">{tenantReceiptData.receivedFrom.city || 'India'}</div>
                 </div>
                 <div>
                   <div className="text-[10px] font-bold text-slate-400 uppercase">RECONCILIATION DETAILS:</div>
-                  <div className="font-medium text-[#0B253A] text-xs mt-0.5">
+                  <div className="font-medium text-jaman-navy text-xs mt-0.5">
                     Against Invoice: <span className="font-mono font-bold">{tenantReceiptData.invoiceNumber}</span>
                   </div>
                   <div className="text-[10px] text-slate-500 mt-0.5">
@@ -1447,11 +1447,11 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       {activeSubTab === 'ACTIVATE_OFFLINE' && (
       <>
       {/* SECTION 4: OFFLINE LICENSE CERTIFICATE ACTIVATION */}
-      <div className="bg-white border border-[#EBE6DD] rounded-3xl p-6 shadow-2xs space-y-3">
+      <div className="bg-white border border-jaman-border rounded-3xl p-6 shadow-2xs space-y-3">
         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-          <KeyRound className="w-5 h-5 text-[#E66817]" />
+          <KeyRound className="w-5 h-5 text-jaman-saffron" />
           <div>
-            <h3 className="text-sm font-bold text-[#0B253A]">Offline License Certificate</h3>
+            <h3 className="text-sm font-bold text-jaman-navy">Offline License Certificate</h3>
             <p className="text-[11px] text-slate-500">
               For restaurants without a live cloud connection: ask Super Admin to generate a signed License
               Certificate for this restaurant and paste it here. It is cryptographically verified — a
@@ -1466,13 +1466,13 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             value={dealerKeyInput}
             onChange={(e) => setDealerKeyInput(e.target.value)}
             placeholder="Paste the License Certificate from Super Admin..."
-            className="w-full sm:flex-1 bg-[#FAF7F2] border border-[#EBE6DD] rounded-2xl px-4 py-2.5 text-xs font-mono font-bold text-[#0B253A] placeholder:text-slate-400 focus:outline-none focus:border-[#E66817]"
+            className="w-full sm:flex-1 bg-jaman-cream border border-jaman-border rounded-2xl px-4 py-2.5 text-xs font-mono font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
           />
 
           <button
             onClick={handleApplyCertificate}
             disabled={!dealerKeyInput.trim()}
-            className="w-full sm:w-auto px-6 py-2.5 bg-[#0B253A] hover:bg-[#1E3A4C] disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
+            className="w-full sm:w-auto px-6 py-2.5 bg-jaman-navy hover:bg-jaman-darkBorder disabled:opacity-40 text-white font-bold text-xs rounded-2xl transition-colors shrink-0 shadow-xs cursor-pointer"
           >
             Verify & Apply Certificate
           </button>

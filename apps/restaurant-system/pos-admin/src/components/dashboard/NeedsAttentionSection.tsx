@@ -49,7 +49,7 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
     <section aria-label="Operational Needs Attention" className="space-y-3 pt-2">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm sm:text-base font-extrabold text-[#0B253A] tracking-tight flex items-center gap-2">
+          <h2 className="text-sm sm:text-base font-extrabold text-jaman-navy tracking-tight flex items-center gap-2">
             <span>Needs Attention & Quick Triage</span>
           </h2>
           <p className="text-xs text-[#5A6878]">
@@ -64,7 +64,7 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
           <div>
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-[#E66817]" />
+                <Flame className="w-3.5 h-3.5 text-jaman-saffron" />
                 Kitchen Line
               </span>
               {pendingKotsCount > 0 ? (
@@ -79,7 +79,7 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
             </div>
 
             <div className="mt-2.5">
-              <h4 className="font-bold text-sm text-[#0B253A]">
+              <h4 className="font-bold text-sm text-jaman-navy">
                 {pendingKotsCount > 0 ? `${pendingKotsCount} Tickets In Preparation` : 'Kitchen Queue Idle'}
               </h4>
               <p className="text-xs text-slate-500 mt-1">
@@ -93,7 +93,7 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
           <button
             type="button"
             onClick={onNavigateToKitchen}
-            className="mt-3.5 pt-2.5 border-t border-slate-100 w-full flex items-center justify-between text-xs font-bold text-[#E66817] hover:text-[#C5530E] cursor-pointer group"
+            className="mt-3.5 pt-2.5 border-t border-slate-100 w-full flex items-center justify-between text-xs font-bold text-jaman-saffron hover:text-[#C5530E] cursor-pointer group"
           >
             <span>Open Kitchen KDS</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -120,7 +120,7 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
             </div>
 
             <div className="mt-2.5">
-              <h4 className="font-bold text-sm text-[#0B253A]">
+              <h4 className="font-bold text-sm text-jaman-navy">
                 {lowStockCount > 0 ? `${lowStockCount} Items Below Threshold` : 'Inventory Well Stocked'}
               </h4>
               <p className="text-xs text-slate-500 mt-1">
@@ -134,7 +134,7 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
           <button
             type="button"
             onClick={onNavigateToInventory}
-            className="mt-3.5 pt-2.5 border-t border-slate-100 w-full flex items-center justify-between text-xs font-bold text-[#0B253A] hover:text-rose-700 cursor-pointer group"
+            className="mt-3.5 pt-2.5 border-t border-slate-100 w-full flex items-center justify-between text-xs font-bold text-jaman-navy hover:text-rose-700 cursor-pointer group"
           >
             <span>Review Inventory</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -155,7 +155,7 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
             </div>
 
             <div className="mt-2.5">
-              <h4 className="font-bold text-sm text-[#0B253A]">
+              <h4 className="font-bold text-sm text-jaman-navy">
                 {tablesTotalCount - occupiedTablesCount} Tables Available
               </h4>
               <p className="text-xs text-slate-500 mt-1">
@@ -196,7 +196,7 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
             </div>
 
             <div className="mt-2.5">
-              <h4 className="font-bold text-sm text-[#0B253A]">
+              <h4 className="font-bold text-sm text-jaman-navy">
                 {activeShift?.cashierName || 'Cashier'} • Float ₹{activeShift?.openingCash || 2000}
               </h4>
               <p className="text-xs text-slate-500 mt-1">

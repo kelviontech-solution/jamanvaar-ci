@@ -104,7 +104,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             value={name}
             onChange={(e) => handleNameChange(e.target.value)}
             placeholder="e.g. Starters & Appetizers"
-            className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
           />
         </div>
 
@@ -116,7 +116,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
               placeholder="e.g. starters-appetizers"
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
           <div>
@@ -124,7 +124,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             <select
               value={iconName}
               onChange={(e) => setIconName(e.target.value)}
-              className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#E66817]"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             >
               <option value="UtensilsCrossed">🍽️ Utensils</option>
               <option value="Flame">🔥 Tandoor / Grill</option>
@@ -142,7 +142,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="e.g. Authentic charcoal cooked appetizers"
-            className="w-full bg-[#FBF9F5] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#E66817]"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-jaman-saffron"
           />
         </div>
 
@@ -170,7 +170,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           </Button>
           <button
             type="submit"
-            className="px-4 py-2 bg-[#E66817] hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
           >
             {categoryToEdit ? 'Save Changes' : 'Create Category'}
           </button>

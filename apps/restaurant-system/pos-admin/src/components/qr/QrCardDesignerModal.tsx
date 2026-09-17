@@ -165,11 +165,11 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
         }
       `}</style>
 
-      <div className="bg-[#FAF7F2] border border-[#EBE6DD] w-full max-w-5xl max-h-[94vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden text-[#0B253A]">
+      <div className="bg-jaman-cream border border-jaman-border w-full max-w-5xl max-h-[94vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden text-jaman-navy">
         {/* Modal Top Header */}
-        <div className="bg-[#0B253A] text-white px-6 py-4 flex items-center justify-between shrink-0 shadow-md">
+        <div className="bg-jaman-navy text-white px-6 py-4 flex items-center justify-between shrink-0 shadow-md">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#E66817]/20 border border-[#E66817]/40 flex items-center justify-center text-[#E66817]">
+            <div className="w-10 h-10 rounded-2xl bg-jaman-saffron/20 border border-jaman-saffron/40 flex items-center justify-center text-jaman-saffron">
               <QrCode className="w-5 h-5" />
             </div>
             <div>
@@ -177,7 +177,7 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                 <h2 className="text-base font-black tracking-wide">
                   {isBatchMode ? 'Batch Table QR Standee Print Suite' : 'Restaurant Table QR Standee Designer'}
                 </h2>
-                <span className="text-[10px] font-black bg-[#E66817] text-white px-2 py-0.5 rounded-full uppercase">
+                <span className="text-[10px] font-black bg-jaman-saffron text-white px-2 py-0.5 rounded-full uppercase">
                   100% CAMERA SCANNABLE
                 </span>
               </div>
@@ -192,7 +192,7 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
               onClick={() => setIsBatchMode((b) => !b)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 isBatchMode
-                  ? 'bg-amber-400 text-[#0B253A] font-black'
+                  ? 'bg-amber-400 text-jaman-navy font-black'
                   : 'bg-white/10 hover:bg-white/20 text-white'
               }`}
             >
@@ -211,17 +211,17 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
         {/* Modal Body: Controls Left, Live Standee Preview Right */}
         <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
           {/* Left Config Panel */}
-          <div className="md:col-span-5 border-r border-[#EBE6DD] bg-white p-5 overflow-y-auto space-y-5">
+          <div className="md:col-span-5 border-r border-jaman-border bg-white p-5 overflow-y-auto space-y-5">
             {/* Table Selection / Batch Selection */}
             {!isBatchMode ? (
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+                <label className="text-xs font-black text-jaman-navy uppercase tracking-wider">
                   Select Dining Table
                 </label>
                 <select
                   value={tableNumber}
                   onChange={(e) => setTableNumber(e.target.value)}
-                  className="w-full bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl px-3 py-2 text-xs font-black text-[#0B253A] focus:outline-none focus:border-[#E66817] cursor-pointer"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-black text-jaman-navy focus:outline-none focus:border-jaman-saffron cursor-pointer"
                 >
                   {tables.length === 0 ? (
                     <option value="">No tables configured yet</option>
@@ -237,7 +237,7 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
             ) : (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-black text-[#0B253A] uppercase tracking-wider">
+                  <label className="text-xs font-black text-jaman-navy uppercase tracking-wider">
                     Select Tables for Sheet
                   </label>
                   <button
@@ -248,14 +248,14 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                         setSelectedBatchTables(tables.map((t) => t.tableNumber));
                       }
                     }}
-                    className="text-[11px] font-bold text-[#E66817] hover:underline cursor-pointer"
+                    className="text-[11px] font-bold text-jaman-saffron hover:underline cursor-pointer"
                   >
                     {selectedBatchTables.length === tables.length && tables.length > 0
                       ? 'Deselect All'
                       : `Select All (${tables.length})`}
                   </button>
                 </div>
-                <div className="grid grid-cols-3 gap-1.5 max-h-40 overflow-y-auto p-1 bg-[#FAF7F2] rounded-xl border border-[#EBE6DD]">
+                <div className="grid grid-cols-3 gap-1.5 max-h-40 overflow-y-auto p-1 bg-jaman-cream rounded-xl border border-jaman-border">
                   {tables.map((t) => {
                     const isChecked = selectedBatchTables.includes(t.tableNumber);
                     return (
@@ -277,7 +277,7 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                               setSelectedBatchTables((prev) => prev.filter((x) => x !== t.tableNumber));
                             }
                           }}
-                          className="accent-[#E66817] rounded"
+                          className="accent-jaman-saffron rounded"
                         />
                         <span>T-{t.tableNumber}</span>
                       </label>
@@ -289,9 +289,9 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
 
             {/* Template Selector */}
             <div className="space-y-2">
-              <label className="text-xs font-black text-[#0B253A] uppercase tracking-wider flex items-center justify-between">
+              <label className="text-xs font-black text-jaman-navy uppercase tracking-wider flex items-center justify-between">
                 <span>Design Theme</span>
-                <span className="text-[10px] font-bold text-[#E66817]">Hospitality Styling</span>
+                <span className="text-[10px] font-bold text-jaman-saffron">Hospitality Styling</span>
               </label>
               <div className="grid grid-cols-1 gap-2">
                 {[
@@ -305,15 +305,15 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                     onClick={() => setActiveTemplate(tpl.id as QrTemplateType)}
                     className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
                       activeTemplate === tpl.id
-                        ? 'bg-amber-50/80 border-[#E66817] shadow-xs ring-1 ring-[#E66817]'
-                        : 'border-[#EBE6DD] hover:bg-[#FAF7F2]'
+                        ? 'bg-amber-50/80 border-jaman-saffron shadow-xs ring-1 ring-jaman-saffron'
+                        : 'border-jaman-border hover:bg-jaman-cream'
                     }`}
                   >
                     <div>
-                      <h4 className="text-xs font-black text-[#0B253A]">{tpl.name}</h4>
+                      <h4 className="text-xs font-black text-jaman-navy">{tpl.name}</h4>
                       <p className="text-[10px] text-slate-500">{tpl.desc}</p>
                     </div>
-                    {activeTemplate === tpl.id && <Check className="w-4 h-4 text-[#E66817]" />}
+                    {activeTemplate === tpl.id && <Check className="w-4 h-4 text-jaman-saffron" />}
                   </button>
                 ))}
               </div>
@@ -332,7 +332,7 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                 </div>
                 <button
                   onClick={() => handleIssueMissingTokens(batchPrintList)}
-                  className="w-full py-2 rounded-xl bg-[#0B253A] hover:bg-[#123959] text-white text-xs font-black transition-colors cursor-pointer"
+                  className="w-full py-2 rounded-xl bg-jaman-navy hover:bg-[#123959] text-white text-xs font-black transition-colors cursor-pointer"
                 >
                   Issue Secure QR {tablesMissingTokens.length === 1 ? 'Token' : 'Tokens'} Now
                 </button>
@@ -340,19 +340,19 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
             )}
 
             {/* Public Link & Copy */}
-            <div className="bg-[#FAF7F2] p-3.5 rounded-2xl border border-[#EBE6DD] space-y-2 text-xs">
+            <div className="bg-jaman-cream p-3.5 rounded-2xl border border-jaman-border space-y-2 text-xs">
               <span className="text-[10px] font-black uppercase text-slate-400">Scannable Destination URL</span>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   readOnly
                   value={currentQrLink || 'No QR token issued for this table yet'}
-                  className="flex-1 bg-white border border-[#EBE6DD] rounded-xl px-2.5 py-1.5 text-[11px] font-mono text-slate-600 truncate"
+                  className="flex-1 bg-white border border-jaman-border rounded-xl px-2.5 py-1.5 text-[11px] font-mono text-slate-600 truncate"
                 />
                 <button
                   onClick={handleCopyLink}
                   disabled={!currentQrLink}
-                  className="p-1.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded-xl bg-white border border-jaman-border hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Copy Guest Link"
                 >
                   {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
@@ -370,7 +370,7 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
               <button
                 onClick={handlePrint}
                 disabled={batchPrintList.length === 0 || tablesMissingTokens.length > 0}
-                className="w-full py-3 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-orange-500/25 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full py-3 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-orange-500/25 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Printer className="w-4 h-4" />
                 <span>
@@ -386,9 +386,9 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                 <button
                   onClick={() => handleDownloadSvg(currentTable)}
                   disabled={!currentTable}
-                  className="py-2.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="py-2.5 rounded-xl bg-white border border-jaman-border hover:bg-jaman-cream text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <Download className="w-3.5 h-3.5 text-[#E66817]" />
+                  <Download className="w-3.5 h-3.5 text-jaman-saffron" />
                   <span>Download SVG</span>
                 </button>
 
@@ -397,13 +397,13 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                     href={currentQrLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="py-2.5 rounded-xl bg-white border border-[#EBE6DD] hover:bg-[#FAF7F2] text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center"
+                    className="py-2.5 rounded-xl bg-white border border-jaman-border hover:bg-jaman-cream text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center"
                   >
-                    <ExternalLink className="w-3.5 h-3.5 text-[#E66817]" />
+                    <ExternalLink className="w-3.5 h-3.5 text-jaman-saffron" />
                     <span>Open URL</span>
                   </a>
                 ) : (
-                  <span className="py-2.5 rounded-xl bg-slate-50 border border-[#EBE6DD] text-xs font-bold text-slate-400 flex items-center justify-center gap-1.5 text-center">
+                  <span className="py-2.5 rounded-xl bg-slate-50 border border-jaman-border text-xs font-bold text-slate-400 flex items-center justify-center gap-1.5 text-center">
                     <ExternalLink className="w-3.5 h-3.5" />
                     <span>Open URL</span>
                   </span>
@@ -418,7 +418,7 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
             {batchPrintList.length === 0 && (
               <div className="text-center space-y-2 max-w-xs">
                 <QrCode className="w-10 h-10 text-slate-400 mx-auto stroke-1" />
-                <h4 className="text-sm font-black text-[#0B253A]">No tables to print</h4>
+                <h4 className="text-sm font-black text-jaman-navy">No tables to print</h4>
                 <p className="text-xs text-slate-500">
                   Add restaurant tables in the Tables &amp; QR tab, then return here to design and print their
                   standees.
@@ -445,9 +445,9 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                       activeTemplate === 'SIGNATURE'
                         ? 'bg-gradient-to-b from-[#FFF8F2] to-white border-[#FED7AA]'
                         : activeTemplate === 'ELEGANT'
-                        ? 'bg-[#0B253A] text-white border-amber-400/40'
+                        ? 'bg-jaman-navy text-white border-amber-400/40'
                         : activeTemplate === 'MODERN'
-                        ? 'bg-white text-[#0B253A] border-slate-300'
+                        ? 'bg-white text-jaman-navy border-slate-300'
                         : 'bg-white text-slate-900 border-slate-900'
                     }`}
                   >
@@ -456,22 +456,22 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                       <div
                         className={`inline-flex items-center justify-center w-10 h-10 rounded-2xl font-black text-sm mb-1 ${
                           activeTemplate === 'ELEGANT'
-                            ? 'bg-[#E66817] text-white'
-                            : 'bg-[#0B253A] text-white'
+                            ? 'bg-jaman-saffron text-white'
+                            : 'bg-jaman-navy text-white'
                         }`}
                       >
                         J
                       </div>
                       <h3
                         className={`text-base font-black tracking-widest uppercase ${
-                          activeTemplate === 'ELEGANT' ? 'text-white' : 'text-[#0B253A]'
+                          activeTemplate === 'ELEGANT' ? 'text-white' : 'text-jaman-navy'
                         }`}
                       >
                         JAMANVAAR
                       </h3>
                       <p
                         className={`text-[9px] font-extrabold tracking-widest uppercase ${
-                          activeTemplate === 'ELEGANT' ? 'text-amber-300' : 'text-[#E66817]'
+                          activeTemplate === 'ELEGANT' ? 'text-amber-300' : 'text-jaman-saffron'
                         }`}
                       >
                         {outlet.name}
@@ -483,7 +483,7 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                       className={`mt-3 mb-2 px-6 py-1.5 rounded-2xl border ${
                         activeTemplate === 'ELEGANT'
                           ? 'bg-amber-400/10 border-amber-400/40 text-amber-300'
-                          : 'bg-[#FFF4ED] border-[#FED7AA] text-[#E66817]'
+                          : 'bg-[#FFF4ED] border-[#FED7AA] text-jaman-saffron'
                       }`}
                     >
                       <span className="text-[10px] font-black tracking-widest uppercase block">DINING TABLE</span>
@@ -512,7 +512,7 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
                     <div className="space-y-1 mt-1">
                       <p
                         className={`text-xs font-black tracking-tight ${
-                          activeTemplate === 'ELEGANT' ? 'text-white' : 'text-[#0B253A]'
+                          activeTemplate === 'ELEGANT' ? 'text-white' : 'text-jaman-navy'
                         }`}
                       >
                         Scan to View Menu & Order

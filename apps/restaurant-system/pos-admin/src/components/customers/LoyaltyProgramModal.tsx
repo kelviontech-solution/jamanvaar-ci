@@ -89,24 +89,24 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
       <div className="space-y-6 py-1">
         {/* Tiers */}
         <div className="space-y-2">
-          <h4 className="font-black text-xs text-[#0B253A] uppercase tracking-wide">Spend Tiers</h4>
+          <h4 className="font-black text-xs text-jaman-navy uppercase tracking-wide">Spend Tiers</h4>
           <div className="space-y-1.5">
             {tiers.map((tier) => (
-              <div key={tier.id} className="p-3 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl">
+              <div key={tier.id} className="p-3 bg-jaman-cream border border-jaman-border rounded-xl">
                 {editingTierId === tier.id ? (
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       value={tierDraft.name}
                       onChange={(e) => setTierDraft((d) => ({ ...d, name: e.target.value }))}
                       placeholder="Tier name"
-                      className="bg-white border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs font-bold"
+                      className="bg-white border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-bold"
                     />
                     <input
                       type="number"
                       value={tierDraft.minLifetimeSpend}
                       onChange={(e) => setTierDraft((d) => ({ ...d, minLifetimeSpend: e.target.value }))}
                       placeholder="Min lifetime spend (₹)"
-                      className="bg-white border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs font-mono"
+                      className="bg-white border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-mono"
                     />
                     <input
                       type="number"
@@ -114,13 +114,13 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
                       value={tierDraft.pointsMultiplier}
                       onChange={(e) => setTierDraft((d) => ({ ...d, pointsMultiplier: e.target.value }))}
                       placeholder="Points multiplier"
-                      className="bg-white border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs font-mono"
+                      className="bg-white border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-mono"
                     />
                     <input
                       value={tierDraft.perks}
                       onChange={(e) => setTierDraft((d) => ({ ...d, perks: e.target.value }))}
                       placeholder="Perks, comma separated"
-                      className="bg-white border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs"
+                      className="bg-white border border-jaman-border rounded-lg px-2 py-1.5 text-xs"
                     />
                     <div className="col-span-2 flex justify-end gap-2">
                       <Button variant="ghost" size="sm" onClick={() => setEditingTierId(null)}>Cancel</Button>
@@ -141,7 +141,7 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
                       </span>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
-                      <button onClick={() => startEditTier(tier)} className="p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-[#E66817] cursor-pointer">
+                      <button onClick={() => startEditTier(tier)} className="p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-jaman-saffron cursor-pointer">
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => removeTier(tier)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-600 cursor-pointer">
@@ -157,12 +157,12 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
 
         {/* Rewards Catalog */}
         <div className="space-y-2">
-          <h4 className="font-black text-xs text-[#0B253A] uppercase tracking-wide">Rewards Catalog</h4>
+          <h4 className="font-black text-xs text-jaman-navy uppercase tracking-wide">Rewards Catalog</h4>
           <div className="space-y-1.5">
             {rewards.map((reward) => (
-              <div key={reward.id} className="p-3 bg-[#FAF7F2] border border-[#EBE6DD] rounded-xl flex items-center justify-between gap-2">
+              <div key={reward.id} className="p-3 bg-jaman-cream border border-jaman-border rounded-xl flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="font-bold text-xs text-[#0B253A] truncate">{reward.name} — {reward.pointsCost} pts</div>
+                  <div className="font-bold text-xs text-jaman-navy truncate">{reward.name} — {reward.pointsCost} pts</div>
                   <div className="text-[10px] text-slate-500 truncate">{reward.description}</div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
@@ -182,29 +182,29 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
             ))}
           </div>
 
-          <div className="p-3 bg-white border border-dashed border-[#EBE6DD] rounded-xl grid grid-cols-1 sm:grid-cols-4 gap-2">
+          <div className="p-3 bg-white border border-dashed border-jaman-border rounded-xl grid grid-cols-1 sm:grid-cols-4 gap-2">
             <input
               value={newReward.name}
               onChange={(e) => setNewReward((d) => ({ ...d, name: e.target.value }))}
               placeholder="Reward name"
-              className="bg-[#FBF9F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs font-bold sm:col-span-1"
+              className="bg-jaman-ivory border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-bold sm:col-span-1"
             />
             <input
               value={newReward.description}
               onChange={(e) => setNewReward((d) => ({ ...d, description: e.target.value }))}
               placeholder="Description"
-              className="bg-[#FBF9F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs sm:col-span-2"
+              className="bg-jaman-ivory border border-jaman-border rounded-lg px-2 py-1.5 text-xs sm:col-span-2"
             />
             <input
               type="number"
               value={newReward.pointsCost}
               onChange={(e) => setNewReward((d) => ({ ...d, pointsCost: e.target.value }))}
               placeholder="Points"
-              className="bg-[#FBF9F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs font-mono"
+              className="bg-jaman-ivory border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-mono"
             />
             <button
               onClick={addReward}
-              className="sm:col-span-4 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#0B253A] hover:bg-[#1E3A4C] text-white text-xs font-bold rounded-lg cursor-pointer"
+              className="sm:col-span-4 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-jaman-navy hover:bg-jaman-darkBorder text-white text-xs font-bold rounded-lg cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" /> Add Reward
             </button>
