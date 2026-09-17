@@ -1417,7 +1417,7 @@ export default function KioskUserApp() {
           would otherwise duplicate, and reads cleaner as a distraction-free
           first screen. */}
       {step !== 'LANGUAGE_SELECT' && step !== 'WELCOME' && (
-      <header className="h-20 sm:h-24 bg-white border-b border-jaman-border px-6 flex items-center justify-between gap-2 shadow-sm sticky top-0 z-30">
+      <header className="min-h-20 sm:min-h-24 bg-white border-b border-jaman-border px-6 py-2 flex flex-wrap items-center justify-between gap-2 shadow-sm sticky top-0 z-30">
         {/* Left: Real JAMANVAAR Brand Identity */}
         <div className="flex items-center gap-4">
           {(
@@ -1449,7 +1449,7 @@ export default function KioskUserApp() {
             this read like a demo/dealer-review overlay rather than a
             dedicated self-service machine. They're all still one tap away
             in the "More" menu — nothing was removed, only decluttered. */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 max-w-full">
           {/* Customer Loyalty Profile — shown only once actually logged in;
               the login prompt itself moved into "More" below. */}
           {loggedInAccount && (
@@ -1931,7 +1931,11 @@ export default function KioskUserApp() {
             // its content — combined with min-width:0 + overflow-hidden on
             // every track below, this is what stops the cart's own min-w
             // floor from ever forcing the row wider than the viewport.
-            gridTemplateColumns: cartItems.length > 0 ? '10fr 60fr 30fr' : '10fr 90fr 0fr',
+            // The category rail's 10fr computes to ~39px on a phone-width
+            // kiosk (10% of ~390px), too narrow for its icon+label buttons
+            // — minmax(72px, 10fr) gives it a real floor at any viewport
+            // while keeping the proportional 10/90 split on larger screens.
+            gridTemplateColumns: cartItems.length > 0 ? 'minmax(72px, 10fr) minmax(0, 60fr) minmax(0, 30fr)' : 'minmax(72px, 10fr) minmax(0, 90fr) 0fr',
             boxSizing: 'border-box'
           }}
         >
@@ -2020,7 +2024,7 @@ export default function KioskUserApp() {
                 />
               </div>
 
-              <div className="flex items-center gap-1.5 shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none max-w-[55vw] sm:max-w-none">
                 <button
                   onClick={() => {
                     SoundService.playTap();
