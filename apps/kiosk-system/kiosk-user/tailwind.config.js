@@ -10,10 +10,15 @@ export default {
       colors: {
         jaman: {
           navy: '#0B253A',
+          deepNavy: '#0B2B39',
           saffron: '#E66817',
+          orange: '#F97316',
           ivory: '#FBF9F5',
+          cream: '#FAF7F2',
           teal: '#00A99D',
-          border: '#EBE6DD'
+          darkTeal: '#0D9488',
+          border: '#EBE6DD',
+          darkBorder: '#1E3A4C'
         }
       }
     },
