@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
+import { Logger } from '@nestjs/common';
 import { json, raw, urlencoded } from 'express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
@@ -29,6 +30,20 @@ async function bootstrap() {
     })
   );
   app.use(cookieParser());
+
+  // NestJS's default Logger only prints bootstrap events (module init, route
+  // mapping) once at startup — it never logs individual requests. Without
+  // this, the terminal stays silent while the app is actually being used,
+  // making it impossible to verify which APIs fired from the UI.
+  const httpLogger = new Logger('HTTP');
+  app.use((req: import('express').Request, res: import('express').Response, next: () => void) => {
+    const start = Date.now();
+    res.on('finish', () => {
+      httpLogger.log(`${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - start}ms`);
+    });
+    next();
+  });
+
   const allowedOrigins = (
     config.get<string>('CORS_ALLOWED_ORIGINS') ??
       'http://localhost:5180,http://localhost:5176,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5177,http://localhost:5179'
