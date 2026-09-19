@@ -2,7 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { ApiError } from '../../api/client';
-import { Zap, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 // Direct component imports avoid pulling @jamanvaar/ui barrel which pulls local sync singletons
 import { JAMANVAARStartup } from '../../../../../packages/ui/src/JAMANVAARStartup';
 import { JamanvaarAuthLayout } from '../../../../../packages/ui/src/JamanvaarAuthLayout';
@@ -11,7 +11,7 @@ import './login.css';
 export function LoginPage() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('superadmin@jamanvaar.app');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -44,16 +44,6 @@ export function LoginPage() {
       setSubmitting(false);
     }
   }
-
-  // Was auto-filling the form and stopping — the button looked like it did
-  // nothing, since the real submit still required a second manual click.
-  // Now goes through the same real login() call the form itself uses, with
-  // the seeded demo platform admin's actual credentials (prisma/seed.ts).
-  const handleQuickDemoAdmin = () => {
-    setEmail('superadmin@jamanvaar.app');
-    setPassword('admin1234');
-    void submitLogin('superadmin@jamanvaar.app', 'admin1234');
-  };
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -88,15 +78,6 @@ export function LoginPage() {
         footerNote="Enterprise Grade Security • 99.99% Uptime SLA • Automated Backups"
         className="jamanvaar-superadmin-login"
       >
-        <button
-          type="button"
-          onClick={handleQuickDemoAdmin}
-          className="w-full py-2.5 px-4 rounded-xl bg-[#FFF7ED] hover:bg-[#FFEEDD] border border-[#FDBA74] text-[#E66817] font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-2xs active:scale-[0.98] cursor-pointer"
-        >
-          <Zap className="w-4 h-4 text-[#E66817] fill-[#E66817]" />
-          <span>QUICK DEMO LOGIN — Super Admin (@superadmin)</span>
-        </button>
-
         <form onSubmit={handleSubmit} className="space-y-3.5 pt-2 text-left">
           <div>
             <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
@@ -135,7 +116,7 @@ export function LoginPage() {
                   setPassword(e.target.value);
                   setError(null);
                 }}
-                placeholder="Enter password (demo: admin)"
+                placeholder="Enter your password"
                 autoComplete="current-password"
                 required
                 className="w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors"
