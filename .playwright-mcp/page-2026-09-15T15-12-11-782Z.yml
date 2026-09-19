@@ -1,0 +1,540 @@
+- generic [ref=f1e766]:
+  - banner [ref=f1e767]:
+    - generic [ref=f1e768]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f1e770]
+      - generic [ref=f1e772]:
+        - generic [ref=f1e773]:
+          - generic "QA FULL AUDIT RESTAURANT" [ref=f1e774]
+          - generic [ref=f1e775]: ADMIN
+        - button "Ahmedabad Flagship Store" [ref=f1e776] [cursor=pointer]
+    - button "Open global search" [ref=f1e783] [cursor=pointer]:
+      - textbox "Search orders, invoices, dishes, tables..." [ref=f1e787]
+      - generic: Ctrl+K
+    - generic [ref=f1e788]:
+      - generic [ref=f1e789]:
+        - button "EOD Report" [ref=f1e790] [cursor=pointer]
+        - button "Reconciliation" [ref=f1e795] [cursor=pointer]
+      - generic [ref=f1e801]:
+        - button "JAMAN AI Operations Assistant" [ref=f1e802] [cursor=pointer]
+        - button "Notifications" [ref=f1e806] [cursor=pointer]
+        - button "Sign out of Restaurant Admin" [ref=f1e810] [cursor=pointer]
+  - generic [ref=f1e814]:
+    - complementary [ref=f1e815]:
+      - generic [ref=f1e816]:
+        - generic [ref=f1e817]:
+          - button "OPERATIONS" [ref=f1e818] [cursor=pointer]
+          - navigation [ref=f1e822]:
+            - button "Dashboard" [ref=f1e823] [cursor=pointer]
+            - button "Billing / Invoices" [ref=f1e832] [cursor=pointer]
+            - button "Orders" [ref=f1e837] [cursor=pointer]
+            - button "Live Orders / KDS 3" [ref=f1e843] [cursor=pointer]:
+              - generic [ref=f1e844]: Live Orders / KDS
+              - generic [ref=f1e848]: "3"
+            - button "Floor / Tables" [ref=f1e850] [cursor=pointer]
+            - button "Reservations" [ref=f1e855] [cursor=pointer]
+            - button "Kitchen / KOT" [ref=f1e862] [cursor=pointer]
+        - generic [ref=f1e867]:
+          - button "DIGITAL ORDERING" [ref=f1e868] [cursor=pointer]
+          - navigation [ref=f1e872]:
+            - button "QR Table Ordering PRO" [ref=f1e873] [cursor=pointer]:
+              - generic [ref=f1e874]: QR Table Ordering
+              - generic [ref=f1e882]: PRO
+        - generic [ref=f1e884]:
+          - button "MENU & INVENTORY" [ref=f1e885] [cursor=pointer]
+          - navigation [ref=f1e889]:
+            - button "Menu & Categories" [ref=f1e890] [cursor=pointer]
+            - button "Inventory & Recipes 2" [ref=f1e898] [cursor=pointer]:
+              - generic [ref=f1e899]: Inventory & Recipes
+              - generic [ref=f1e905]: "2"
+        - generic [ref=f1e907]:
+          - button "PEOPLE & CASH" [ref=f1e908] [cursor=pointer]
+          - navigation [ref=f1e912]:
+            - button "Customers CRM" [ref=f1e913] [cursor=pointer]
+            - button "Staff & Roles (RBAC)" [ref=f1e918] [cursor=pointer]
+            - button "Payments & Split" [ref=f1e926] [cursor=pointer]
+            - button "Shift & Cash Drawer" [ref=f1e931] [cursor=pointer]
+        - generic [ref=f1e939]:
+          - button "ANALYTICS & SYSTEM" [ref=f1e940] [cursor=pointer]
+          - navigation [ref=f1e944]:
+            - button "Reports & Analytics" [ref=f1e945] [cursor=pointer]
+            - button "Printers & Devices" [ref=f1e951] [cursor=pointer]
+            - button "Restaurant Settings" [ref=f1e958] [cursor=pointer]
+            - button "Subscription Plans" [ref=f1e964] [cursor=pointer]
+            - button "Audit Trail Logs" [ref=f1e970] [cursor=pointer]
+            - button "Backup & Restore" [ref=f1e976] [cursor=pointer]
+    - main [ref=f1e983]:
+      - generic [ref=f1e2195]:
+        - generic [ref=f1e2196]:
+          - generic [ref=f1e2197]:
+            - button "Back to Order History (All Days)" [ref=f1e2198] [cursor=pointer]
+            - generic [ref=f1e2202]:
+              - heading "15 SEPTEMBER 2026" [level=2] [ref=f1e2203]
+              - generic [ref=f1e2204]: (Tuesday)
+              - generic [ref=f1e2205]: ● TODAY LIVE
+          - generic [ref=f1e2206]:
+            - button "Previous Day" [ref=f1e2207] [cursor=pointer]
+            - button "Today" [ref=f1e2211] [cursor=pointer]
+            - button "Next Day" [disabled] [ref=f1e2212]
+            - button "Export Day CSV" [ref=f1e2216] [cursor=pointer]
+        - generic [ref=f1e2221]:
+          - generic [ref=f1e2222]:
+            - generic [ref=f1e2223]: GROSS SALES
+            - text: ₹14370
+          - generic [ref=f1e2224]:
+            - generic [ref=f1e2225]: DISCOUNTS GIVEN
+            - generic [ref=f1e2226]: "-₹200"
+          - generic [ref=f1e2227]:
+            - generic [ref=f1e2228]: REFUNDS ISSUED
+            - generic [ref=f1e2229]: "-₹0"
+          - generic [ref=f1e2230]:
+            - generic [ref=f1e2231]: NET TOTAL SALES
+            - text: ₹14882
+          - generic [ref=f1e2232]:
+            - generic [ref=f1e2233]: GST TAX (5%)
+            - text: ₹709
+        - generic [ref=f1e2234]:
+          - generic [ref=f1e2235]:
+            - generic [ref=f1e2236]: Top Selling Dishes (10)
+            - generic [ref=f1e2240]:
+              - generic [ref=f1e2241]:
+                - generic [ref=f1e2242]: 1. Paneer Tikka (Tandoori)
+                - generic [ref=f1e2243]: 12 sold (₹3080)
+              - generic [ref=f1e2244]:
+                - generic [ref=f1e2245]: 2. Butter Naan
+                - generic [ref=f1e2246]: 12 sold (₹720)
+              - generic [ref=f1e2247]:
+                - generic [ref=f1e2248]: 3. Cold Coffee with Ice Cream
+                - generic [ref=f1e2249]: 9 sold (₹1080)
+              - generic [ref=f1e2250]:
+                - generic [ref=f1e2251]: 4. Gujarati Heritage Thali
+                - generic [ref=f1e2252]: 8 sold (₹2240)
+          - generic [ref=f1e2253]:
+            - generic [ref=f1e2254]: Cashier Performance
+            - generic [ref=f1e2261]:
+              - generic [ref=f1e2262]:
+                - generic [ref=f1e2263]: Amit Dave
+                - generic [ref=f1e2264]: 11 orders • ₹8391
+              - generic [ref=f1e2265]:
+                - generic [ref=f1e2266]: Ramesh Shah
+                - generic [ref=f1e2267]: 5 orders • ₹3319
+              - generic [ref=f1e2268]:
+                - generic [ref=f1e2269]: Priya Patel
+                - generic [ref=f1e2270]: 4 orders • ₹3172
+          - generic [ref=f1e2271]:
+            - generic [ref=f1e2272]: Captain & Floor Floor Activity
+            - generic [ref=f1e2278]:
+              - generic [ref=f1e2279]:
+                - generic [ref=f1e2280]: Rahul Sharma
+                - generic [ref=f1e2281]: 11 orders • ₹8391
+              - generic [ref=f1e2282]:
+                - generic [ref=f1e2283]: Vikram Mehta
+                - generic [ref=f1e2284]: 5 orders • ₹3319
+              - generic [ref=f1e2285]:
+                - generic [ref=f1e2286]: Suresh Kumar
+                - generic [ref=f1e2287]: 4 orders • ₹3172
+        - generic [ref=f1e2289]:
+          - textbox "Search 20 orders on this day..." [ref=f1e2294]
+          - generic [ref=f1e2295]:
+            - combobox [ref=f1e2296]:
+              - option "All Types" [selected]
+              - option "Dine-In"
+              - option "Takeaway"
+              - option "Delivery"
+              - option "Token"
+            - combobox [ref=f1e2297]:
+              - option "All Statuses" [selected]
+              - option "Completed"
+              - option "Preparing"
+              - option "Ready"
+              - option "Cancelled"
+              - option "Refunded"
+            - combobox [ref=f1e2298]:
+              - option "All Payments" [selected]
+              - option "Cash"
+              - option "UPI QR"
+              - option "Card / EDC"
+              - option "Split"
+            - combobox [ref=f1e2299]:
+              - option "Newest First" [selected]
+              - option "Oldest First"
+              - option "Highest Value"
+              - option "Lowest Value"
+        - generic [ref=f1e2300]:
+          - table [ref=f1e2302]:
+            - rowgroup [ref=f1e2303]:
+              - row [ref=f1e2304]:
+                - 'columnheader "Order #" [ref=f1e2305]'
+                - columnheader "Token" [ref=f1e2306]
+                - columnheader "Time" [ref=f1e2307]
+                - columnheader "Type" [ref=f1e2308]
+                - columnheader "Table" [ref=f1e2309]
+                - columnheader "Customer" [ref=f1e2310]
+                - columnheader "Items" [ref=f1e2311]
+                - columnheader "Total Amount" [ref=f1e2312]
+                - columnheader "Payment" [ref=f1e2313]
+                - columnheader "Cashier" [ref=f1e2314]
+                - columnheader "Status" [ref=f1e2315]
+                - columnheader "Actions" [ref=f1e2316]
+            - rowgroup [ref=f1e2317]:
+              - row [ref=f1e2318]:
+                - cell "ORD-9914" [ref=f1e2319]
+                - cell "#114" [ref=f1e2320]
+                - cell "09:31 pm" [ref=f1e2322]
+                - cell "DELIVERY" [ref=f1e2323]
+                - cell "—" [ref=f1e2324]
+                - cell "Dr. Neha Shah 9822334455" [ref=f1e2325]:
+                  - generic [ref=f1e2326]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "2 items" [ref=f1e2327]
+                - cell "₹588" [ref=f1e2328]
+                - cell "CASH" [ref=f1e2329]
+                - cell "Ramesh Shah" [ref=f1e2330]
+                - cell "COMPLETED" [ref=f1e2331]
+                - cell [ref=f1e2332]:
+                  - generic [ref=f1e2333]:
+                    - button "VIEW" [ref=f1e2334] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2335] [cursor=pointer]
+              - row [ref=f1e2340]:
+                - cell "QR-1039" [ref=f1e2341]
+                - cell "#1039" [ref=f1e2342]
+                - cell "08:31 pm" [ref=f1e2344]
+                - cell "QR_TABLE" [ref=f1e2345]
+                - cell "Table 12" [ref=f1e2346]
+                - cell "Guest (Table 12)" [ref=f1e2347]
+                - cell "2 items" [ref=f1e2349]
+                - cell "₹609" [ref=f1e2350]
+                - cell "CASH" [ref=f1e2351]
+                - cell "Amit Dave" [ref=f1e2352]
+                - cell "NEW" [ref=f1e2353]
+                - cell [ref=f1e2354]:
+                  - generic [ref=f1e2355]:
+                    - button "VIEW" [ref=f1e2356] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2357] [cursor=pointer]
+              - row [ref=f1e2362]:
+                - cell "QR-1037" [ref=f1e2363]
+                - cell "#1037" [ref=f1e2364]
+                - cell "08:27 pm" [ref=f1e2366]
+                - cell "QR_TABLE" [ref=f1e2367]
+                - cell "Table 3" [ref=f1e2368]
+                - cell "Guest (Table 3)" [ref=f1e2369]
+                - cell "2 items" [ref=f1e2371]
+                - cell "₹399" [ref=f1e2372]
+                - cell "UPI" [ref=f1e2373]
+                - cell "Amit Dave" [ref=f1e2374]
+                - cell "ACCEPTED" [ref=f1e2375]
+                - cell [ref=f1e2376]:
+                  - generic [ref=f1e2377]:
+                    - button "VIEW" [ref=f1e2378] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2379] [cursor=pointer]
+              - row [ref=f1e2384]:
+                - cell "ORD-9913" [ref=f1e2385]
+                - cell "#113" [ref=f1e2386]
+                - cell "08:24 pm" [ref=f1e2388]
+                - cell "TAKEAWAY" [ref=f1e2389]
+                - cell "—" [ref=f1e2390]
+                - cell "Ramesh Patel 9876543210" [ref=f1e2391]:
+                  - generic [ref=f1e2392]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "3 items" [ref=f1e2393]
+                - cell "₹683" [ref=f1e2394]
+                - cell "UPI_QR" [ref=f1e2395]
+                - cell "Amit Dave" [ref=f1e2396]
+                - cell "COMPLETED" [ref=f1e2397]
+                - cell [ref=f1e2398]:
+                  - generic [ref=f1e2399]:
+                    - button "VIEW" [ref=f1e2400] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2401] [cursor=pointer]
+              - row [ref=f1e2406]:
+                - cell "QR-1042" [ref=f1e2407]
+                - cell "#1042" [ref=f1e2408]
+                - cell "08:20 pm" [ref=f1e2410]
+                - cell "QR_TABLE" [ref=f1e2411]
+                - cell "Table 12" [ref=f1e2412]
+                - cell "Guest (Table 12)" [ref=f1e2413]
+                - cell "3 items" [ref=f1e2415]
+                - cell "₹924" [ref=f1e2416]
+                - cell "UPI" [ref=f1e2417]
+                - cell "Amit Dave" [ref=f1e2418]
+                - cell "PREPARING" [ref=f1e2419]
+                - cell [ref=f1e2420]:
+                  - generic [ref=f1e2421]:
+                    - button "VIEW" [ref=f1e2422] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2423] [cursor=pointer]
+              - row [ref=f1e2428]:
+                - cell "QR-1040" [ref=f1e2429]
+                - cell "#1040" [ref=f1e2430]
+                - cell "08:13 pm" [ref=f1e2432]
+                - cell "QR_TABLE" [ref=f1e2433]
+                - cell "Table 1" [ref=f1e2434]
+                - cell "Guest (Table 1)" [ref=f1e2435]
+                - cell "2 items" [ref=f1e2437]
+                - cell "₹714" [ref=f1e2438]
+                - cell "UPI" [ref=f1e2439]
+                - cell "Amit Dave" [ref=f1e2440]
+                - cell "READY" [ref=f1e2441]
+                - cell [ref=f1e2442]:
+                  - generic [ref=f1e2443]:
+                    - button "VIEW" [ref=f1e2444] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2445] [cursor=pointer]
+              - row [ref=f1e2450]:
+                - cell "QR-1041" [ref=f1e2451]
+                - cell "#1041" [ref=f1e2452]
+                - cell "07:50 pm" [ref=f1e2454]
+                - cell "QR_TABLE" [ref=f1e2455]
+                - cell "Table 5" [ref=f1e2456]
+                - cell "Guest (Table 5)" [ref=f1e2457]
+                - cell "3 items" [ref=f1e2459]
+                - cell "₹546" [ref=f1e2460]
+                - cell "CASH" [ref=f1e2461]
+                - cell "Amit Dave" [ref=f1e2462]
+                - cell "COMPLETED" [ref=f1e2463]
+                - cell [ref=f1e2464]:
+                  - generic [ref=f1e2465]:
+                    - button "VIEW" [ref=f1e2466] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2467] [cursor=pointer]
+              - row [ref=f1e2472]:
+                - cell "QR-1038" [ref=f1e2473]
+                - cell "#1038" [ref=f1e2474]
+                - cell "07:45 pm" [ref=f1e2476]
+                - cell "QR_TABLE" [ref=f1e2477]
+                - cell "Table 8" [ref=f1e2478]
+                - cell "Guest (Table 8)" [ref=f1e2479]
+                - cell "3 items" [ref=f1e2481]
+                - cell "₹1302" [ref=f1e2482]
+                - cell "CARD" [ref=f1e2483]
+                - cell "Amit Dave" [ref=f1e2484]
+                - cell "SERVED" [ref=f1e2485]
+                - cell [ref=f1e2486]:
+                  - generic [ref=f1e2487]:
+                    - button "VIEW" [ref=f1e2488] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2489] [cursor=pointer]
+              - row [ref=f1e2494]:
+                - cell "ORD-9912" [ref=f1e2495]
+                - cell "#112" [ref=f1e2496]
+                - cell "07:17 pm" [ref=f1e2498]
+                - cell "DINE_IN" [ref=f1e2499]
+                - cell "Table 12" [ref=f1e2500]
+                - cell "Walk-in Guest" [ref=f1e2501]
+                - cell "2 items" [ref=f1e2503]
+                - cell "₹840" [ref=f1e2504]
+                - cell "SPLIT" [ref=f1e2505]
+                - cell "Priya Patel" [ref=f1e2506]
+                - cell "COMPLETED" [ref=f1e2507]
+                - cell [ref=f1e2508]:
+                  - generic [ref=f1e2509]:
+                    - button "VIEW" [ref=f1e2510] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2511] [cursor=pointer]
+              - row [ref=f1e2516]:
+                - cell "ORD-9911" [ref=f1e2517]
+                - cell "#111" [ref=f1e2518]
+                - cell "07:10 pm" [ref=f1e2520]
+                - cell "DINE_IN" [ref=f1e2521]
+                - cell "Table 11" [ref=f1e2522]
+                - cell "Sanjay Mehta 9833445566" [ref=f1e2523]:
+                  - generic [ref=f1e2524]: Sanjay Mehta
+                  - text: "9833445566"
+                - cell "3 items" [ref=f1e2525]
+                - cell "₹872" [ref=f1e2526]
+                - cell "CARD_TERMINAL" [ref=f1e2527]
+                - cell "Ramesh Shah" [ref=f1e2528]
+                - cell "COMPLETED" [ref=f1e2529]
+                - cell [ref=f1e2530]:
+                  - generic [ref=f1e2531]:
+                    - button "VIEW" [ref=f1e2532] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2533] [cursor=pointer]
+              - row [ref=f1e2538]:
+                - cell "ORD-9910" [ref=f1e2539]
+                - cell "#110" [ref=f1e2540]
+                - cell "06:03 pm" [ref=f1e2542]
+                - cell "TOKEN" [ref=f1e2543]
+                - cell "—" [ref=f1e2544]
+                - cell "Priya Joshi 9811223344" [ref=f1e2545]:
+                  - generic [ref=f1e2546]: Priya Joshi
+                  - text: "9811223344"
+                - cell "2 items" [ref=f1e2547]
+                - cell "₹714" [ref=f1e2548]
+                - cell "CASH" [ref=f1e2549]
+                - cell "Amit Dave" [ref=f1e2550]
+                - cell "COMPLETED" [ref=f1e2551]
+                - cell [ref=f1e2552]:
+                  - generic [ref=f1e2553]:
+                    - button "VIEW" [ref=f1e2554] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2555] [cursor=pointer]
+              - row [ref=f1e2560]:
+                - cell "ORD-9909" [ref=f1e2561]
+                - cell "#109" [ref=f1e2562]
+                - cell "05:56 pm" [ref=f1e2564]
+                - cell "DELIVERY" [ref=f1e2565]
+                - cell "—" [ref=f1e2566]
+                - cell "Amit Verma 9899001122" [ref=f1e2567]:
+                  - generic [ref=f1e2568]: Amit Verma
+                  - text: "9899001122"
+                - cell "3 items" [ref=f1e2569]
+                - cell "₹872" [ref=f1e2570]
+                - cell "UPI_QR" [ref=f1e2571]
+                - cell "Priya Patel" [ref=f1e2572]
+                - cell "COMPLETED" [ref=f1e2573]
+                - cell [ref=f1e2574]:
+                  - generic [ref=f1e2575]:
+                    - button "VIEW" [ref=f1e2576] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2577] [cursor=pointer]
+              - row [ref=f1e2582]:
+                - cell "ORD-9908" [ref=f1e2583]
+                - cell "#108" [ref=f1e2584]
+                - cell "05:49 pm" [ref=f1e2586]
+                - cell "TAKEAWAY" [ref=f1e2587]
+                - cell "—" [ref=f1e2588]
+                - cell "Dr. Neha Shah 9822334455" [ref=f1e2589]:
+                  - generic [ref=f1e2590]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "2 items" [ref=f1e2591]
+                - cell "₹462" [ref=f1e2592]
+                - cell "SPLIT" [ref=f1e2593]
+                - cell "Ramesh Shah" [ref=f1e2594]
+                - cell "COMPLETED" [ref=f1e2595]
+                - cell [ref=f1e2596]:
+                  - generic [ref=f1e2597]:
+                    - button "VIEW" [ref=f1e2598] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2599] [cursor=pointer]
+              - row [ref=f1e2604]:
+                - cell "ORD-9907" [ref=f1e2605]
+                - cell "#107" [ref=f1e2606]
+                - cell "04:42 pm" [ref=f1e2608]
+                - cell "DINE_IN" [ref=f1e2609]
+                - cell "Table 7" [ref=f1e2610]
+                - cell "Ramesh Patel 9876543210" [ref=f1e2611]:
+                  - generic [ref=f1e2612]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "3 items" [ref=f1e2613]
+                - cell "₹788" [ref=f1e2614]
+                - cell "CARD_TERMINAL" [ref=f1e2615]
+                - cell "Amit Dave" [ref=f1e2616]
+                - cell "COMPLETED" [ref=f1e2617]
+                - cell [ref=f1e2618]:
+                  - generic [ref=f1e2619]:
+                    - button "VIEW" [ref=f1e2620] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2621] [cursor=pointer]
+              - row [ref=f1e2626]:
+                - cell "ORD-9906" [ref=f1e2627]
+                - cell "#106" [ref=f1e2628]
+                - cell "03:35 pm" [ref=f1e2630]
+                - cell "DINE_IN" [ref=f1e2631]
+                - cell "Table 6" [ref=f1e2632]
+                - cell "Walk-in Guest" [ref=f1e2633]
+                - cell "2 items" [ref=f1e2635]
+                - cell "₹588" [ref=f1e2636]
+                - cell "CASH" [ref=f1e2637]
+                - cell "Priya Patel" [ref=f1e2638]
+                - cell "COMPLETED" [ref=f1e2639]
+                - cell [ref=f1e2640]:
+                  - generic [ref=f1e2641]:
+                    - button "VIEW" [ref=f1e2642] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2643] [cursor=pointer]
+              - row [ref=f1e2648]:
+                - cell "ORD-9905" [ref=f1e2649]
+                - cell "#105" [ref=f1e2650]
+                - cell "02:28 pm" [ref=f1e2652]
+                - cell "TOKEN" [ref=f1e2653]
+                - cell "—" [ref=f1e2654]
+                - cell "Sanjay Mehta 9833445566" [ref=f1e2655]:
+                  - generic [ref=f1e2656]: Sanjay Mehta
+                  - text: "9833445566"
+                - cell "3 items" [ref=f1e2657]
+                - cell "₹683" [ref=f1e2658]
+                - cell "UPI_QR" [ref=f1e2659]
+                - cell "Ramesh Shah" [ref=f1e2660]
+                - cell "COMPLETED" [ref=f1e2661]
+                - cell [ref=f1e2662]:
+                  - generic [ref=f1e2663]:
+                    - button "VIEW" [ref=f1e2664] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2665] [cursor=pointer]
+              - row [ref=f1e2670]:
+                - cell "ORD-9904" [ref=f1e2671]
+                - cell "#104" [ref=f1e2672]
+                - cell "02:21 pm" [ref=f1e2674]
+                - cell "DELIVERY" [ref=f1e2675]
+                - cell "—" [ref=f1e2676]
+                - cell "Priya Joshi 9811223344" [ref=f1e2677]:
+                  - generic [ref=f1e2678]: Priya Joshi
+                  - text: "9811223344"
+                - cell "2 items" [ref=f1e2679]
+                - cell "₹840" [ref=f1e2680]
+                - cell "SPLIT" [ref=f1e2681]
+                - cell "Amit Dave" [ref=f1e2682]
+                - cell "COMPLETED" [ref=f1e2683]
+                - cell [ref=f1e2684]:
+                  - generic [ref=f1e2685]:
+                    - button "VIEW" [ref=f1e2686] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2687] [cursor=pointer]
+              - row [ref=f1e2692]:
+                - cell "ORD-9903" [ref=f1e2693]
+                - cell "#103" [ref=f1e2694]
+                - cell "01:14 pm" [ref=f1e2696]
+                - cell "TAKEAWAY" [ref=f1e2697]
+                - cell "—" [ref=f1e2698]
+                - cell "Amit Verma 9899001122" [ref=f1e2699]:
+                  - generic [ref=f1e2700]: Amit Verma
+                  - text: "9899001122"
+                - cell "3 items" [ref=f1e2701]
+                - cell "₹872" [ref=f1e2702]
+                - cell "CARD_TERMINAL" [ref=f1e2703]
+                - cell "Priya Patel" [ref=f1e2704]
+                - cell "COMPLETED" [ref=f1e2705]
+                - cell [ref=f1e2706]:
+                  - generic [ref=f1e2707]:
+                    - button "VIEW" [ref=f1e2708] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2709] [cursor=pointer]
+              - row [ref=f1e2714]:
+                - cell "ORD-9902" [ref=f1e2715]
+                - cell "#102" [ref=f1e2716]
+                - cell "12:07 pm" [ref=f1e2718]
+                - cell "DINE_IN" [ref=f1e2719]
+                - cell "Table 2" [ref=f1e2720]
+                - cell "Dr. Neha Shah 9822334455" [ref=f1e2721]:
+                  - generic [ref=f1e2722]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "2 items" [ref=f1e2723]
+                - cell "₹714" [ref=f1e2724]
+                - cell "CASH" [ref=f1e2725]
+                - cell "Ramesh Shah" [ref=f1e2726]
+                - cell "COMPLETED" [ref=f1e2727]
+                - cell [ref=f1e2728]:
+                  - generic [ref=f1e2729]:
+                    - button "VIEW" [ref=f1e2730] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2731] [cursor=pointer]
+              - row [ref=f1e2736]:
+                - cell "ORD-9901" [ref=f1e2737]
+                - cell "#101" [ref=f1e2738]
+                - cell "12:00 pm" [ref=f1e2740]
+                - cell "DINE_IN" [ref=f1e2741]
+                - cell "Table 1" [ref=f1e2742]
+                - cell "Ramesh Patel 9876543210" [ref=f1e2743]:
+                  - generic [ref=f1e2744]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "3 items" [ref=f1e2745]
+                - cell "₹872" [ref=f1e2746]
+                - cell "UPI_QR" [ref=f1e2747]
+                - cell "Amit Dave" [ref=f1e2748]
+                - cell "COMPLETED" [ref=f1e2749]
+                - cell [ref=f1e2750]:
+                  - generic [ref=f1e2751]:
+                    - button "VIEW" [ref=f1e2752] [cursor=pointer]
+                    - button "Print Thermal Bill" [ref=f1e2753] [cursor=pointer]
+          - generic [ref=f1e2758]:
+            - generic [ref=f1e2759]: Showing 20 of 20 orders
+            - generic [ref=f1e2760]:
+              - generic [ref=f1e2761]:
+                - generic [ref=f1e2762]: "Rows:"
+                - combobox [ref=f1e2763]:
+                  - option "10"
+                  - option "25" [selected]
+                  - option "50"
+                  - option "All"
+              - generic [ref=f1e2764]:
+                - button "Prev" [disabled] [ref=f1e2765]
+                - generic [ref=f1e2766]: 1 / 1
+                - button "Next" [disabled] [ref=f1e2767]
+  - button "Open JAMAN AI Restaurant Intelligence" [ref=f1e1348] [cursor=pointer]:
+    - generic [ref=f1e1354]:
+      - generic [ref=f1e1355]: JAMAN AI
+      - generic [ref=f1e1356]: ACTIVE

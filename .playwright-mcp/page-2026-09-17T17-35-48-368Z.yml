@@ -1,0 +1,300 @@
+- generic [ref=f26e190]:
+  - banner [ref=f26e191]:
+    - generic [ref=f26e192]:
+      - generic [ref=f26e193]:
+        - generic [ref=f26e194]:
+          - img "JAMANVAAR by KELVIONTECH"
+        - generic [ref=f26e196]:
+          - generic [ref=f26e197]:
+            - generic [ref=f26e198]: POS TERMINAL
+            - generic [ref=f26e200]: My Restaurant
+          - paragraph [ref=f26e201]:
+            - generic [ref=f26e202]: Ahmedabad Flagship Store
+            - generic [aria-hidden] [ref=f26e203]: •
+            - generic [ref=f26e204]: POS-01
+      - button "Start fresh order" [ref=f26e206] [cursor=pointer]
+    - button "Search dishes, SKU, tables, bills, customers..." [ref=f26e212] [cursor=pointer]
+    - generic [ref=f26e218]:
+      - button "Notifications & System Events" [ref=f26e219] [cursor=pointer]
+      - button "Open JAMAN AI Assistant" [ref=f26e223] [cursor=pointer]:
+        - generic [ref=f26e226]: "10"
+      - button "A" [ref=f26e228] [cursor=pointer]
+  - generic [ref=f26e233]:
+    - generic [ref=f26e237]:
+      - generic [ref=f26e238]:
+        - strong [ref=f26e239]: "Unfinished Order Detected:"
+        - text: Found auto-saved session with
+        - strong [ref=f26e240]: 1 items
+        - text: (₹63) (DINE_IN).
+      - generic [ref=f26e241]: Last saved at 10:35:08 PM
+    - generic [ref=f26e242]:
+      - button "Restore Order" [ref=f26e243] [cursor=pointer]
+      - button "Discard" [ref=f26e248] [cursor=pointer]
+  - generic [ref=f26e253]:
+    - complementary [ref=f26e254]:
+      - navigation [ref=f26e255]:
+        - button [ref=f26e256] [cursor=pointer]
+        - button "1" [ref=f26e262] [cursor=pointer]
+        - button [ref=f26e269] [cursor=pointer]
+        - button [ref=f26e273] [cursor=pointer]
+        - button "8" [ref=f26e277] [cursor=pointer]
+        - button [ref=f26e281] [cursor=pointer]
+        - button [ref=f26e287] [cursor=pointer]
+        - button [ref=f26e291] [cursor=pointer]
+        - button [ref=f26e294] [cursor=pointer]
+        - button [ref=f26e297] [cursor=pointer]
+        - button [ref=f26e302] [cursor=pointer]
+        - button "JAMAN AI Assistant (Voice & Conversational POS Actions)" [ref=f26e307] [cursor=pointer]
+      - generic [ref=f26e310]:
+        - button "Print Queue" [ref=f26e311] [cursor=pointer]
+        - generic [ref=f26e317] [cursor=pointer]: "2"
+    - main [ref=f26e322]:
+      - generic [ref=f26e323]:
+        - generic [ref=f26e324]:
+          - generic [ref=f26e325]:
+            - generic:
+              - button "ALL MENU 13" [ref=f26e326] [cursor=pointer]:
+                - generic [ref=f26e329]: ALL MENU
+                - generic [ref=f26e330]: "13"
+              - button "STARTERS 4" [ref=f26e331] [cursor=pointer]:
+                - generic [ref=f26e332]: STARTERS
+                - generic [ref=f26e333]: "4"
+              - button "TANDOOR & KEBAB 1" [ref=f26e334] [cursor=pointer]:
+                - generic [ref=f26e335]: TANDOOR & KEBAB
+                - generic [ref=f26e336]: "1"
+              - button "MAIN COURSE 3" [ref=f26e337] [cursor=pointer]:
+                - generic [ref=f26e338]: MAIN COURSE
+                - generic [ref=f26e339]: "3"
+              - button "NAAN & ROTI 2" [ref=f26e340] [cursor=pointer]:
+                - generic [ref=f26e341]: NAAN & ROTI
+                - generic [ref=f26e342]: "2"
+              - button "BIRYANI & RICE 1" [ref=f26e343] [cursor=pointer]:
+                - generic [ref=f26e344]: BIRYANI & RICE
+                - generic [ref=f26e345]: "1"
+              - button "BEVERAGES 2" [ref=f26e346] [cursor=pointer]:
+                - generic [ref=f26e347]: BEVERAGES
+                - generic [ref=f26e348]: "2"
+            - button "Scroll categories right" [ref=f26e349] [cursor=pointer]
+          - generic:
+            - generic [ref=f26e352]:
+              - button "🍽️ All" [ref=f26e353] [cursor=pointer]:
+                - generic [ref=f26e354]: 🍽️
+                - generic [ref=f26e355]: All
+              - button "🟢 Veg" [ref=f26e356] [cursor=pointer]:
+                - generic [ref=f26e357]: 🟢
+                - generic [ref=f26e358]: Veg
+              - button "🌾 Jain" [ref=f26e359] [cursor=pointer]:
+                - generic [ref=f26e360]: 🌾
+                - generic [ref=f26e361]: Jain
+              - button "🍗 Non-Veg" [ref=f26e362] [cursor=pointer]:
+                - generic [ref=f26e363]: 🍗
+                - generic [ref=f26e364]: Non-Veg
+            - button "Open Menu Manager & Prebuilt Starter Library (30 Types)" [ref=f26e366] [cursor=pointer]
+          - generic [ref=f26e370]:
+            - generic:
+              - generic [ref=f26e371] [cursor=pointer]:
+                - generic: Kitchen
+                - generic:
+                  - img "Hara Bhara Kebab (6 Pcs)" [ref=f26e380]
+                  - generic:
+                    - heading "Hara Bhara Kebab (6 Pcs)" [level=3]
+                    - generic: "SKU: HBK-01"
+                - generic:
+                  - generic [ref=f26e381]: ₹220
+                  - generic [ref=f26e383]:
+                    - button "MOD" [ref=f26e384]
+                    - button "1-Tap Add to Order" [ref=f26e387]
+              - generic [ref=f26e389] [cursor=pointer]:
+                - generic: Kitchen
+                - generic:
+                  - img "Crispy Corn Salt & Pepper" [ref=f26e398]
+                  - generic:
+                    - heading "Crispy Corn Salt & Pepper" [level=3]
+                    - generic: "SKU: CC-02"
+                - generic:
+                  - generic [ref=f26e399]: ₹240
+                  - generic [ref=f26e401]:
+                    - button "MOD" [ref=f26e402]
+                    - button "1-Tap Add to Order" [ref=f26e405]
+              - generic [ref=f26e407] [cursor=pointer]:
+                - generic: Kitchen
+                - generic:
+                  - img "Cheese Corn Cigar Rolls (5 Pcs)" [ref=f26e416]
+                  - generic:
+                    - heading "Cheese Corn Cigar Rolls (5 Pcs)" [level=3]
+                    - generic: "SKU: CCR-03"
+                - generic:
+                  - generic [ref=f26e417]: ₹210
+                  - generic [ref=f26e419]:
+                    - button "MOD" [ref=f26e420]
+                    - button "1-Tap Add to Order" [ref=f26e423]
+              - generic [ref=f26e425] [cursor=pointer]:
+                - generic: Tandoor
+                - generic:
+                  - img "Paneer Tikka (Tandoori Angaar)" [ref=f26e434]
+                  - generic:
+                    - heading "Paneer Tikka (Tandoori Angaar)" [level=3]
+                    - generic: "SKU: PT-04"
+                - generic:
+                  - generic [ref=f26e435]: ₹260
+                  - generic [ref=f26e437]:
+                    - button "MOD" [ref=f26e438]
+                    - button "1-Tap Add to Order" [ref=f26e441]
+              - generic [ref=f26e443] [cursor=pointer]:
+                - generic: Curry Station
+                - generic:
+                  - img "Dal Makhani (Slow Cooked)" [ref=f26e452]
+                  - generic:
+                    - heading "Dal Makhani (Slow Cooked)" [level=3]
+                    - generic: "SKU: DM-05"
+                - generic:
+                  - generic [ref=f26e453]: ₹195
+                  - generic [ref=f26e455]:
+                    - button "MOD" [ref=f26e456]
+                    - button "1-Tap Add to Order" [ref=f26e459]
+              - generic [ref=f26e461] [cursor=pointer]:
+                - generic: Curry Station
+                - generic:
+                  - img "Paneer Butter Masala" [ref=f26e470]
+                  - generic:
+                    - heading "Paneer Butter Masala" [level=3]
+                    - generic: "SKU: PBM-06"
+                - generic:
+                  - generic [ref=f26e471]: ₹250
+                  - generic [ref=f26e473]:
+                    - button "MOD" [ref=f26e474]
+                    - button "1-Tap Add to Order" [ref=f26e477]
+              - generic [ref=f26e479] [cursor=pointer]:
+                - generic: Tandoor
+                - generic:
+                  - img "Butter Naan (Tandoori)" [ref=f26e485]
+                  - generic:
+                    - heading "Butter Naan (Tandoori)" [level=3]
+                    - generic: "SKU: BN-07"
+                - generic:
+                  - generic [ref=f26e486]: ₹60
+                  - button "1-Tap Add to Order" [ref=f26e489]
+              - generic [ref=f26e491] [cursor=pointer]:
+                - generic: Tandoor
+                - generic:
+                  - img "Garlic Butter Naan" [ref=f26e497]
+                  - generic:
+                    - heading "Garlic Butter Naan" [level=3]
+                    - generic: "SKU: GN-08"
+                - generic:
+                  - generic [ref=f26e498]: ₹75
+                  - button "1-Tap Add to Order" [ref=f26e501]
+              - generic [ref=f26e503] [cursor=pointer]:
+                - generic: Biryani Station
+                - generic:
+                  - img "Royal Veg Handi Dum Biryani" [ref=f26e512]
+                  - generic:
+                    - heading "Royal Veg Handi Dum Biryani" [level=3]
+                    - generic: "SKU: VGB-09"
+                - generic:
+                  - generic [ref=f26e513]: ₹240
+                  - generic [ref=f26e515]:
+                    - button "MOD" [ref=f26e516]
+                    - button "1-Tap Add to Order" [ref=f26e519]
+              - generic [ref=f26e521] [cursor=pointer]:
+                - generic: Beverages
+                - generic:
+                  - img "Cold Coffee with Vanilla Ice Cream" [ref=f26e527]
+                  - generic:
+                    - heading "Cold Coffee with Vanilla Ice Cream" [level=3]
+                    - generic: "SKU: CC-10"
+                - generic:
+                  - generic [ref=f26e528]: ₹120
+                  - button "1-Tap Add to Order" [ref=f26e531]
+              - generic [ref=f26e533] [cursor=pointer]:
+                - generic: Dessert Station
+                - generic:
+                  - img "Shahi Gulab Jamun (2 Pcs)" [ref=f26e539]
+                  - generic:
+                    - heading "Shahi Gulab Jamun (2 Pcs)" [level=3]
+                    - generic: "SKU: GJ-11"
+                - generic:
+                  - generic [ref=f26e540]: ₹80
+                  - button "1-Tap Add to Order" [ref=f26e543]
+              - generic [ref=f26e545] [cursor=pointer]:
+                - generic: Curry Station
+                - generic:
+                  - img "Authentic Gujarati Special Thali" [ref=f26e554]
+                  - generic:
+                    - heading "Authentic Gujarati Special Thali" [level=3]
+                    - generic: "SKU: THL-12"
+                - generic:
+                  - generic [ref=f26e555]: ₹280
+                  - generic [ref=f26e557]:
+                    - button "MOD" [ref=f26e558]
+                    - button "1-Tap Add to Order" [ref=f26e561]
+              - generic [ref=f26e563] [cursor=pointer]:
+                - generic: Main Kitchen
+                - generic:
+                  - img "QA AUDIT TEST DISH" [ref=f26e569]
+                  - generic:
+                    - heading "QA AUDIT TEST DISH" [level=3]
+                    - generic: "SKU: SKU-691"
+                - generic:
+                  - generic [ref=f26e570]: ₹199
+                  - generic [ref=f26e572]:
+                    - button "MOD" [ref=f26e573]
+                    - button "1-Tap Add to Order" [ref=f26e576]
+        - generic [ref=f26e578]:
+          - generic [ref=f26e579]:
+            - generic [ref=f26e581]:
+              - generic [ref=f26e582]: New Order — Unsaved
+              - generic [ref=f26e583]: • Amit Dave (Lead Cashier)
+            - generic [ref=f26e584]:
+              - button "🍽️ Dine-In" [ref=f26e585] [cursor=pointer]:
+                - generic [ref=f26e586]: 🍽️
+                - generic [ref=f26e587]: Dine-In
+              - button "🛍️ Takeaway" [ref=f26e588] [cursor=pointer]:
+                - generic [ref=f26e589]: 🛍️
+                - generic [ref=f26e590]: Takeaway
+              - button "🛵 Delivery" [ref=f26e591] [cursor=pointer]:
+                - generic [ref=f26e592]: 🛵
+                - generic [ref=f26e593]: Delivery
+              - button "🎫 Token" [ref=f26e594] [cursor=pointer]:
+                - generic [ref=f26e595]: 🎫
+                - generic [ref=f26e596]: Token
+            - button "Select Table" [ref=f26e598] [cursor=pointer]
+            - generic [ref=f26e605]:
+              - button "Attach Customer" [ref=f26e606] [cursor=pointer]
+              - button "Chef Notes" [ref=f26e611] [cursor=pointer]
+          - generic [ref=f26e616]:
+            - img "JAMANVAAR" [ref=f26e618]
+            - generic [ref=f26e619]:
+              - heading "Billing Counter Ready" [level=4] [ref=f26e620]
+              - paragraph [ref=f26e621]: Tap any dish from the menu to add it to this order.
+            - button "↻ Repeat Last Order" [ref=f26e622] [cursor=pointer]
+          - generic [ref=f26e627]:
+            - generic [ref=f26e628]:
+              - button "Discount" [disabled] [ref=f26e629] [cursor=pointer]
+              - button "Hold Order" [disabled] [ref=f26e634]
+            - generic [ref=f26e638]:
+              - generic [ref=f26e639]:
+                - generic [ref=f26e640]: Subtotal
+                - generic [ref=f26e641]: ₹0
+              - generic [ref=f26e642]:
+                - generic [ref=f26e643]: GST (CGST 2.5% + SGST 2.5%)
+                - generic [ref=f26e644]: ₹0
+              - generic [ref=f26e645]:
+                - generic [ref=f26e646]: Total Payable
+                - generic [ref=f26e647]: ₹0
+            - generic [ref=f26e648]:
+              - button "SEND KOT" [disabled] [ref=f26e649]
+              - button "PAY ₹0" [disabled] [ref=f26e653]
+            - button "⚡ Instant Bill Cash • Auto Print" [disabled] [ref=f26e657]:
+              - generic [ref=f26e662]:
+                - generic [ref=f26e663]: ⚡ Instant Bill
+                - generic [ref=f26e665]: Cash • Auto Print
+  - contentinfo [ref=f26e668]:
+    - generic [ref=f26e669]:
+      - 'button "Today Sales: ₹0" [ref=f26e670] [cursor=pointer]':
+        - generic [ref=f26e674]: "Today Sales:"
+        - strong [ref=f26e675]: ₹0
+      - 'button "Orders: 0" [ref=f26e676] [cursor=pointer]':
+        - generic [ref=f26e680]: "Orders:"
+        - strong [ref=f26e681]: "0"
+    - generic [ref=f26e682]: Local Engine Active

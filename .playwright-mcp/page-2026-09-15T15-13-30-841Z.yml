@@ -1,0 +1,290 @@
+- generic [ref=e9]:
+  - banner [ref=e110]:
+    - generic [ref=e111]:
+      - button [ref=e112] [cursor=pointer]
+      - generic [ref=e115]:
+        - generic [ref=e116]:
+          - img "JAMANVAAR by KELVIONTECH"
+        - generic [ref=e118]: CUSTOMER KIOSK
+    - generic [ref=e122]:
+      - button "Need Help?" [ref=e123] [cursor=pointer]
+      - button "Call Staff" [ref=e127] [cursor=pointer]
+      - generic [ref=e132]:
+        - button "EN" [ref=e133] [cursor=pointer]
+        - button "हिन्दी" [ref=e134] [cursor=pointer]
+        - button "ગુજરાતી" [ref=e135] [cursor=pointer]
+      - button "More options" [ref=e137] [cursor=pointer]
+      - button "Cart 1 ₹63" [ref=e532] [cursor=pointer]:
+        - generic [ref=e212]: Cart
+        - generic [ref=e213]: "1"
+        - generic [ref=e214]: ₹63
+  - generic [ref=e215]:
+    - generic [ref=e216]:
+      - button "All Menu" [ref=e217] [cursor=pointer]
+      - button "🔥 Combos & Deals" [ref=e222] [cursor=pointer]:
+        - generic [ref=e223]: 🔥
+        - generic [ref=e224]: Combos & Deals
+      - button "Starters & Quick Bites" [ref=e225] [cursor=pointer]
+      - button "Tandoor & Kebabs" [ref=e231] [cursor=pointer]
+      - button "Main Course (Curries)" [ref=e237] [cursor=pointer]
+      - button "Naan, Roti & Breads" [ref=e246] [cursor=pointer]
+      - button "Biryani & Rice Bowls" [ref=e259] [cursor=pointer]
+      - button "Beverages & Desserts" [ref=e269] [cursor=pointer]
+    - generic [ref=e277]:
+      - generic [ref=e278]:
+        - textbox "Search dish (e.g. Paneer, Biryani, Cold Coffee...)" [ref=e283]
+        - generic [ref=e284]:
+          - button "All Menu" [ref=e285] [cursor=pointer]
+          - button "Pure Veg" [ref=e286] [cursor=pointer]
+          - button "🌱 Pure Jain" [ref=e288] [cursor=pointer]
+      - generic [ref=e290]:
+        - generic [ref=e292]:
+          - button "Royal Veg Biryani Feast ₹449 · Save ₹111" [ref=e293] [cursor=pointer]:
+            - generic [ref=e294]:
+              - generic [ref=e295]: Royal Veg Biryani Feast
+              - generic [ref=e296]: ₹449 · Save ₹111
+          - button "Gujarati Heritage Thali ₹280 · Chef Signature" [ref=e297] [cursor=pointer]:
+            - generic [ref=e298]:
+              - generic [ref=e299]: Gujarati Heritage Thali
+              - generic [ref=e300]: ₹280 · Chef Signature
+          - button "Cold Coffee with Ice Cream ₹120 · Beverage Offer" [ref=e301] [cursor=pointer]:
+            - generic [ref=e302]:
+              - generic [ref=e303]: Cold Coffee with Ice Cream
+              - generic [ref=e304]: ₹120 · Beverage Offer
+        - generic [ref=e305]:
+          - heading "All Dishes & Specialities" [level=2] [ref=e307]
+          - generic [ref=e309]:
+            - generic [ref=e310]:
+              - img "Royal Veg Biryani Feast Combo" [ref=e311]
+              - generic [ref=e312]:
+                - generic [ref=e313]:
+                  - generic [ref=e314]:
+                    - generic "Pure Veg" [ref=e315]
+                    - heading "Royal Veg Biryani Feast Combo" [level=4] [ref=e317]
+                  - paragraph [ref=e318]: Royal Veg Handi Dum Biryani + Boondi Raita + Chilled Cold Coffee + 2 pcs Shahi Gulab Jamun
+                - generic [ref=e319]:
+                  - generic [ref=e320]:
+                    - generic [ref=e321]:
+                      - text: ₹449
+                      - generic [ref=e322]: ₹560
+                    - generic [ref=e323]: Save ₹111
+                  - button "Add Combo to Cart" [ref=e324] [cursor=pointer]
+            - generic [ref=e326]:
+              - img "Maharaja Paneer Thali Combo" [ref=e327]
+              - generic [ref=e328]:
+                - generic [ref=e329]:
+                  - generic [ref=e330]:
+                    - generic "Pure Veg" [ref=e331]
+                    - heading "Maharaja Paneer Thali Combo" [level=4] [ref=e333]
+                  - paragraph [ref=e334]: Paneer Butter Masala + 2x Butter Naan + Dal Makhani + Cold Coffee with Ice Cream
+                - generic [ref=e335]:
+                  - generic [ref=e336]:
+                    - generic [ref=e337]:
+                      - text: ₹429
+                      - generic [ref=e338]: ₹530
+                    - generic [ref=e339]: Save ₹101
+                  - button "Add Combo to Cart" [ref=e340] [cursor=pointer]
+          - generic [ref=e343]:
+            - generic [ref=e344] [cursor=pointer]:
+              - img "Hara Bhara Kebab (6 Pcs)" [ref=e346]
+              - generic [ref=e347]:
+                - generic [ref=e348]:
+                  - generic [ref=e349]:
+                    - generic "Pure Veg" [ref=e350]
+                    - heading "Hara Bhara Kebab (6 Pcs)" [level=3] [ref=e352]
+                  - paragraph [ref=e353]: Crispy spinach, green pea and paneer patties served with fresh mint chutney.
+                - generic [ref=e354]:
+                  - generic [ref=e355]: ₹220
+                  - generic [ref=e356]:
+                    - button "Customize" [ref=e357]
+                    - button "Add to Cart" [ref=e358]
+            - generic [ref=e360] [cursor=pointer]:
+              - img "Crispy Corn Salt & Pepper" [ref=e362]
+              - generic [ref=e363]:
+                - generic [ref=e364]:
+                  - generic [ref=e365]:
+                    - generic "Pure Veg" [ref=e366]
+                    - heading "Crispy Corn Salt & Pepper" [level=3] [ref=e368]
+                  - paragraph [ref=e369]: Golden fried sweet corn tossed with bell peppers, green chillies & aromatic herbs.
+                - generic [ref=e370]:
+                  - generic [ref=e371]: ₹240
+                  - generic [ref=e372]:
+                    - button "Customize" [ref=e373]
+                    - button "Add to Cart" [ref=e374]
+            - generic [ref=e376] [cursor=pointer]:
+              - img "Cheese Corn Cigar Rolls (5 Pcs)" [ref=e378]
+              - generic [ref=e379]:
+                - generic [ref=e380]:
+                  - generic [ref=e381]:
+                    - generic "Pure Veg" [ref=e382]
+                    - heading "Cheese Corn Cigar Rolls (5 Pcs)" [level=3] [ref=e384]
+                  - paragraph [ref=e385]: Golden crispy rolls filled with melted mozzarella, sweet corn and herbs served with sweet chilli dip.
+                - generic [ref=e386]:
+                  - generic [ref=e387]: ₹210
+                  - generic [ref=e388]:
+                    - button "Customize" [ref=e389]
+                    - button "Add to Cart" [ref=e390]
+            - generic [ref=e392] [cursor=pointer]:
+              - img "Paneer Tikka (Tandoori Angaar)" [ref=e394]
+              - generic [ref=e395]:
+                - generic [ref=e396]:
+                  - generic [ref=e397]:
+                    - generic "Pure Veg" [ref=e398]
+                    - heading "Paneer Tikka (Tandoori Angaar)" [level=3] [ref=e400]
+                  - paragraph [ref=e401]: Fresh malai cottage cheese cubes marinated in spiced curd and grilled over charcoal embers.
+                - generic [ref=e402]:
+                  - generic [ref=e403]: ₹260
+                  - generic [ref=e404]:
+                    - button "Customize" [ref=e405]
+                    - button "Add to Cart" [ref=e406]
+            - generic [ref=e408] [cursor=pointer]:
+              - img "Dal Makhani (Slow Cooked)" [ref=e410]
+              - generic [ref=e411]:
+                - generic [ref=e412]:
+                  - generic [ref=e413]:
+                    - generic "Pure Veg" [ref=e414]
+                    - heading "Dal Makhani (Slow Cooked)" [level=3] [ref=e416]
+                  - paragraph [ref=e417]: Slow-cooked black urad lentils simmered overnight with butter, tomatoes and fresh cream.
+                - generic [ref=e418]:
+                  - generic [ref=e419]: ₹195
+                  - generic [ref=e420]:
+                    - button "Customize" [ref=e421]
+                    - button "Add to Cart" [ref=e422]
+            - generic [ref=e424] [cursor=pointer]:
+              - img "Paneer Butter Masala" [ref=e426]
+              - generic [ref=e427]:
+                - generic [ref=e428]:
+                  - generic [ref=e429]:
+                    - generic "Pure Veg" [ref=e430]
+                    - heading "Paneer Butter Masala" [level=3] [ref=e432]
+                  - paragraph [ref=e433]: Soft cottage cheese simmered in a luscious makhani gravy enriched with butter and cream.
+                - generic [ref=e434]:
+                  - generic [ref=e435]: ₹250
+                  - generic [ref=e436]:
+                    - button "Customize" [ref=e437]
+                    - button "Add to Cart" [ref=e438]
+            - generic [ref=e440] [cursor=pointer]:
+              - img "Butter Naan (Tandoori)" [ref=e442]
+              - generic [ref=e443]:
+                - generic [ref=e444]:
+                  - generic [ref=e445]:
+                    - generic "Pure Veg" [ref=e446]
+                    - heading "Butter Naan (Tandoori)" [level=3] [ref=e448]
+                  - paragraph [ref=e449]: Traditional clay-tandoor baked leavened bread brushed with melted pure Amul butter.
+                - generic [ref=e450]:
+                  - generic [ref=e451]: ₹60
+                  - button "Add to Cart" [active] [ref=e453]
+            - generic [ref=e455] [cursor=pointer]:
+              - img "Garlic Butter Naan" [ref=e457]
+              - generic [ref=e458]:
+                - generic [ref=e459]:
+                  - generic [ref=e460]:
+                    - generic "Pure Veg" [ref=e461]
+                    - heading "Garlic Butter Naan" [level=3] [ref=e463]
+                  - paragraph [ref=e464]: Fluffy tandoori bread generously garnished with minced roasted garlic, fresh coriander and butter.
+                - generic [ref=e465]:
+                  - generic [ref=e466]: ₹75
+                  - button "Add to Cart" [ref=e468]
+            - generic [ref=e470] [cursor=pointer]:
+              - img "Royal Veg Handi Dum Biryani" [ref=e472]
+              - generic [ref=e473]:
+                - generic [ref=e474]:
+                  - generic [ref=e475]:
+                    - generic "Pure Veg" [ref=e476]
+                    - heading "Royal Veg Handi Dum Biryani" [level=3] [ref=e478]
+                  - paragraph [ref=e479]: Farm fresh seasonal vegetables and paneer simmered in rich saffron infused basmati rice.
+                - generic [ref=e480]:
+                  - generic [ref=e481]: ₹240
+                  - generic [ref=e482]:
+                    - button "Customize" [ref=e483]
+                    - button "Add to Cart" [ref=e484]
+            - generic [ref=e486] [cursor=pointer]:
+              - img "Cold Coffee with Vanilla Ice Cream" [ref=e488]
+              - generic [ref=e489]:
+                - generic [ref=e490]:
+                  - generic [ref=e491]:
+                    - generic "Pure Veg" [ref=e492]
+                    - heading "Cold Coffee with Vanilla Ice Cream" [level=3] [ref=e494]
+                  - paragraph [ref=e495]: Rich blended espresso with chilled milk and a velvety scoop of vanilla ice cream.
+                - generic [ref=e496]:
+                  - generic [ref=e497]: ₹120
+                  - button "Add to Cart" [ref=e499]
+            - generic [ref=e501] [cursor=pointer]:
+              - img "Shahi Gulab Jamun (2 Pcs)" [ref=e503]
+              - generic [ref=e504]:
+                - generic [ref=e505]:
+                  - generic [ref=e506]:
+                    - generic "Pure Veg" [ref=e507]
+                    - heading "Shahi Gulab Jamun (2 Pcs)" [level=3] [ref=e509]
+                  - paragraph [ref=e510]: Warm, soft khoya dumplings soaked in fragrant green cardamom and saffron syrup.
+                - generic [ref=e511]:
+                  - generic [ref=e512]: ₹80
+                  - button "Add to Cart" [ref=e514]
+            - generic [ref=e516] [cursor=pointer]:
+              - img "Authentic Gujarati Special Thali" [ref=e518]
+              - generic [ref=e519]:
+                - generic [ref=e520]:
+                  - generic [ref=e521]:
+                    - generic "Pure Veg" [ref=e522]
+                    - heading "Authentic Gujarati Special Thali" [level=3] [ref=e524]
+                  - paragraph [ref=e525]: 2 Veg Sabzi, Gujarati Kadhi, Dal, 4 Phulka Roti, Jeera Rice, Farsan, Sweet, Pickle & Masala Chhas.
+                - generic [ref=e526]:
+                  - generic [ref=e527]: ₹280
+                  - generic [ref=e528]:
+                    - button "Customize" [ref=e529]
+                    - button "Add to Cart" [ref=e530]
+    - generic [ref=e533]:
+      - generic [ref=e534]:
+        - heading "Order Summary 1 Clear All" [level=2]:
+          - generic [ref=e535]:
+            - text: Order Summary
+            - generic [ref=e539]: "1"
+          - button "Clear All" [ref=e540] [cursor=pointer]
+      - generic [ref=e544]:
+        - generic:
+          - generic:
+            - generic:
+              - generic [ref=e545]:
+                - heading "Butter Naan (Tandoori)" [level=4]
+                - generic: ₹60
+              - button [ref=e546] [cursor=pointer]
+            - generic [ref=e550]:
+              - button [ref=e551] [cursor=pointer]
+              - generic [ref=e553]: "1"
+              - button [ref=e554] [cursor=pointer]
+        - generic:
+          - generic [ref=e556]: Add-ons (Suggested)
+          - generic:
+            - generic [ref=e561]:
+              - generic [ref=e562]:
+                - generic:
+                  - heading "Hara Bhara Kebab (6 Pcs)" [level=5]
+                  - generic: ₹220
+              - button "Add" [ref=e563] [cursor=pointer]
+            - generic [ref=e564]:
+              - generic [ref=e565]:
+                - generic:
+                  - heading "Crispy Corn Salt & Pepper" [level=5]
+                  - generic: ₹240
+              - button "Add" [ref=e566] [cursor=pointer]
+            - generic [ref=e567]:
+              - generic [ref=e568]:
+                - generic:
+                  - heading "Cheese Corn Cigar Rolls (5 Pcs)" [level=5]
+                  - generic: ₹210
+              - button "Add" [ref=e569] [cursor=pointer]
+      - generic [ref=e570]:
+        - generic:
+          - generic:
+            - generic [ref=e571]: Subtotal
+            - generic [ref=e572]: ₹60
+          - generic:
+            - generic [ref=e573]: CGST (2.5%)
+            - generic [ref=e574]: ₹2
+          - generic:
+            - generic [ref=e575]: SGST (2.5%)
+            - generic [ref=e576]: ₹2
+          - generic:
+            - generic [ref=e577]: Total Payable
+            - generic [ref=e578]: ₹63
+        - button "Proceed to Payment" [ref=e579] [cursor=pointer]

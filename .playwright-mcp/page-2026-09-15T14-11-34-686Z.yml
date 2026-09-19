@@ -1,0 +1,83 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - img "JAMANVAAR by Kelviontech" [ref=e7]
+      - generic [ref=e8]:
+        - generic [ref=e11]:
+          - text: "Local Core:"
+          - strong [ref=e12]: Connected
+        - button [ref=e13] [cursor=pointer]:
+          - generic [ref=e18]:
+            - text: "Network:"
+            - strong [ref=e19]: Online
+        - generic [ref=e20]: Tue, 15 Sept 2026
+    - main [ref=e24]:
+      - generic [ref=e25]:
+        - img "JAMANVAAR by Kelviontech" [ref=e28]
+        - generic [ref=e29]:
+          - heading "Self-Ordering Fleet. Zero Touch Errors." [level=1] [ref=e30]:
+            - text: Self-Ordering Fleet.
+            - generic [ref=e31]: Zero Touch Errors.
+          - paragraph [ref=e32]: Centralized terminal command, automatic catalog sync, real-time peripheral diagnostics and upsell recommendation tuning.
+        - generic [ref=e33]:
+          - generic [ref=e34]: Fast Billing
+          - generic [ref=e39]: Instant KOT
+          - generic [ref=e46]: Table Management
+          - generic [ref=e52]: Offline First
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - img "Tandoori Naan" [ref=e59]
+            - generic [ref=e60]: Tandoori Breads
+          - generic [ref=e61]:
+            - img "Paneer Butter Masala" [ref=e62]
+            - generic [ref=e63]: Royal Curries
+          - generic [ref=e64]:
+            - img "Tandoori Angaar" [ref=e65]
+            - generic [ref=e66]: Tandoor Starters
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - generic [ref=e72]: Welcome to
+              - generic [ref=e73]: KIOSK ADMIN
+            - heading "Kiosk Management" [level=2] [ref=e75]
+            - paragraph [ref=e76]: Connect this terminal to your restaurant before signing in.
+          - generic [ref=e78]:
+            - generic [ref=e79]:
+              - heading "Connect this Terminal" [level=2] [ref=e80]
+              - paragraph [ref=e81]: One-time setup — enter the Restaurant ID and login the restaurant owner generated for this terminal.
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - generic [ref=e84]: Restaurant ID *
+                - textbox "From your restaurant's admin dashboard" [ref=e85]
+              - generic [ref=e86]:
+                - generic [ref=e87]: Login Email *
+                - textbox [ref=e88]
+              - generic [ref=e89]:
+                - generic [ref=e90]: Password *
+                - textbox [ref=e91]
+              - button "Continue" [ref=e92] [cursor=pointer]
+        - generic [ref=e96]:
+          - generic [ref=e97]: Role-Based Security
+          - generic [ref=e102]: •
+          - generic [ref=e103]: Instant Offline Boot
+          - generic [ref=e107]: •
+          - generic [ref=e108]: 100% Secure
+    - contentinfo [ref=e112]: © 2026 JAMANVAAR by KELVIONTECH — All rights reserved.
+  - region "JAMANVAAR Startup" [ref=e113]:
+    - generic [ref=e114]:
+      - generic [ref=e115]: KELVIONTECH ENTERPRISE
+      - generic [ref=e118]: Local Engine Active
+    - generic [ref=e124]:
+      - generic [ref=e125]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=e127]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=e128]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=e134]
+      - paragraph [ref=e136]: Hardware & Self-Ordering Fleet Control
+      - generic [ref=e137]: KIOSK MANAGEMENT
+      - generic [ref=e142]:
+        - generic [ref=e143]: Core Engine Ready
+        - generic [ref=e145]: •
+        - generic [ref=e146]: Database Initialized
+        - generic [ref=e148]: •
+        - generic [ref=e149]: Local-First Mode

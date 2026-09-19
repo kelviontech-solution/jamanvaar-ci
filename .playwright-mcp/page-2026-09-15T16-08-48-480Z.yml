@@ -1,0 +1,106 @@
+- generic [ref=f5e3]:
+  - banner [ref=f5e4]:
+    - generic [ref=f5e5]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f5e7]
+      - generic [ref=f5e9]:
+        - generic [ref=f5e10]:
+          - generic "QA FULL AUDIT RESTAURANT" [ref=f5e11]
+          - generic [ref=f5e12]: ADMIN
+        - button "Ahmedabad Flagship Store" [ref=f5e13] [cursor=pointer]
+    - button "Open global search" [ref=f5e20] [cursor=pointer]:
+      - textbox "Search orders, invoices, dishes, tables..." [ref=f5e24]
+      - generic: Ctrl+K
+    - generic [ref=f5e25]:
+      - generic [ref=f5e26]:
+        - button "EOD Report" [ref=f5e27] [cursor=pointer]
+        - button "Reconciliation" [ref=f5e32] [cursor=pointer]
+      - generic [ref=f5e38]:
+        - button "JAMAN AI Operations Assistant" [ref=f5e39] [cursor=pointer]
+        - button "Notifications" [ref=f5e43] [cursor=pointer]
+        - button "Sign out of Restaurant Admin" [ref=f5e47] [cursor=pointer]
+  - generic [ref=f5e51]:
+    - complementary [ref=f5e52]:
+      - generic [ref=f5e53]:
+        - generic [ref=f5e54]:
+          - button "OPERATIONS" [ref=f5e55] [cursor=pointer]
+          - navigation [ref=f5e59]:
+            - button "Dashboard" [ref=f5e60] [cursor=pointer]
+            - button "Billing / Invoices" [ref=f5e69] [cursor=pointer]
+            - button "Orders" [ref=f5e74] [cursor=pointer]
+            - button "Live Orders / KDS 3" [ref=f5e80] [cursor=pointer]:
+              - generic [ref=f5e81]: Live Orders / KDS
+              - generic [ref=f5e85]: "3"
+            - button "Floor / Tables" [ref=f5e87] [cursor=pointer]
+            - button "Reservations" [active] [ref=f5e92] [cursor=pointer]
+            - button "Kitchen / KOT" [ref=f5e99] [cursor=pointer]
+        - generic [ref=f5e104]:
+          - button "DIGITAL ORDERING" [ref=f5e105] [cursor=pointer]
+          - navigation [ref=f5e109]:
+            - button "QR Table Ordering PRO" [ref=f5e110] [cursor=pointer]:
+              - generic [ref=f5e111]: QR Table Ordering
+              - generic [ref=f5e119]: PRO
+        - generic [ref=f5e121]:
+          - button "MENU & INVENTORY" [ref=f5e122] [cursor=pointer]
+          - navigation [ref=f5e126]:
+            - button "Menu & Categories" [ref=f5e127] [cursor=pointer]
+            - button "Inventory & Recipes 2" [ref=f5e135] [cursor=pointer]:
+              - generic [ref=f5e136]: Inventory & Recipes
+              - generic [ref=f5e142]: "2"
+        - generic [ref=f5e144]:
+          - button "PEOPLE & CASH" [ref=f5e145] [cursor=pointer]
+          - navigation [ref=f5e149]:
+            - button "Customers CRM" [ref=f5e150] [cursor=pointer]
+            - button "Staff & Roles (RBAC)" [ref=f5e155] [cursor=pointer]
+            - button "Payments & Split" [ref=f5e163] [cursor=pointer]
+            - button "Shift & Cash Drawer" [ref=f5e168] [cursor=pointer]
+        - generic [ref=f5e176]:
+          - button "ANALYTICS & SYSTEM" [ref=f5e177] [cursor=pointer]
+          - navigation [ref=f5e181]:
+            - button "Reports & Analytics" [ref=f5e182] [cursor=pointer]
+            - button "Printers & Devices" [ref=f5e188] [cursor=pointer]
+            - button "Restaurant Settings" [ref=f5e195] [cursor=pointer]
+            - button "Subscription Plans" [ref=f5e201] [cursor=pointer]
+            - button "Audit Trail Logs" [ref=f5e207] [cursor=pointer]
+            - button "Backup & Restore" [ref=f5e213] [cursor=pointer]
+    - main [ref=f5e220]:
+      - generic [ref=f5e952]:
+        - generic [ref=f5e953]:
+          - generic [ref=f5e954]:
+            - generic [ref=f5e955]:
+              - heading "Table Reservations" [level=1] [ref=f5e956]
+              - generic [ref=f5e957]: 1 TODAY
+            - paragraph [ref=f5e958]: Take bookings ahead of time and track table demand by time slot.
+          - button "New Reservation" [ref=f5e959] [cursor=pointer]
+        - generic [ref=f5e962]:
+          - generic [ref=f5e963]:
+            - generic [ref=f5e964]: Today's Bookings
+            - generic [ref=f5e965]: "1"
+          - generic [ref=f5e966]:
+            - generic [ref=f5e967]: Upcoming Confirmed
+            - generic [ref=f5e968]: "1"
+          - generic [ref=f5e969]:
+            - generic [ref=f5e970]: No-Shows (All Time)
+            - generic [ref=f5e971]: "0"
+        - generic [ref=f5e972]:
+          - generic [ref=f5e973]:
+            - generic [ref=f5e974]: Bookings for
+            - textbox [ref=f5e980]: 2026-09-15
+          - generic [ref=f5e982]:
+            - generic [ref=f5e983]: 10:35 pm
+            - generic [ref=f5e985]:
+              - generic [ref=f5e986]:
+                - generic [ref=f5e987]: Ketan Sheth
+                - generic [ref=f5e988]: Confirmed
+              - generic [ref=f5e989]:
+                - generic [ref=f5e990]: "9825012345"
+                - generic [ref=f5e993]: 6 guests
+                - generic [ref=f5e999]: Table 16
+                - generic [ref=f5e1000]: AC section, Family celebration
+            - generic [ref=f5e1003]:
+              - button "Seat" [ref=f5e1004] [cursor=pointer]
+              - button "No-Show" [ref=f5e1008] [cursor=pointer]
+              - button "Cancel" [ref=f5e1014] [cursor=pointer]
+  - button "Open JAMAN AI Restaurant Intelligence" [ref=f5e827] [cursor=pointer]:
+    - generic [ref=f5e833]:
+      - generic [ref=f5e834]: JAMAN AI
+      - generic [ref=f5e835]: ACTIVE

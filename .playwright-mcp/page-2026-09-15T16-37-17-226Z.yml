@@ -1,0 +1,262 @@
+- generic [ref=f27e2]:
+  - generic [ref=f27e3]:
+    - banner [ref=f27e4]:
+      - generic [ref=f27e5]:
+        - generic [ref=f27e6]:
+          - generic [ref=f27e7]:
+            - img "JAMANVAAR by KELVIONTECH"
+          - generic [ref=f27e9]:
+            - generic [ref=f27e10]:
+              - generic [ref=f27e11]: KIOSK ADMIN
+              - generic [ref=f27e13]: My Restaurant
+            - paragraph [ref=f27e14]:
+              - generic [ref=f27e15]: Ahmedabad Flagship Store
+        - generic [ref=f27e16]:
+          - button "Control POS" [ref=f27e17] [cursor=pointer]
+          - button "KDS Kitchen (2)" [ref=f27e18] [cursor=pointer]
+          - button "Kiosk Terminals (1/3)" [ref=f27e19] [cursor=pointer]
+      - generic [ref=f27e20]:
+        - button "Sound ON" [ref=f27e21] [cursor=pointer]
+        - button "JAMANVAAR Assistant" [ref=f27e27] [cursor=pointer]
+        - button "ONLINE (18ms)" [ref=f27e32] [cursor=pointer]
+        - generic [ref=f27e35]:
+          - generic [ref=f27e36]: M
+          - generic [ref=f27e37]:
+            - generic [ref=f27e38]: Manager
+            - generic [ref=f27e39]: KIOSK ADMIN
+          - button "Logout" [ref=f27e40] [cursor=pointer]
+    - generic [ref=f27e45]:
+      - complementary [ref=f27e46]:
+        - navigation [ref=f27e47]:
+          - button "Dashboard" [ref=f27e48] [cursor=pointer]
+          - button "Menu Management" [ref=f27e55] [cursor=pointer]
+          - button "Combos & Meal Deals" [ref=f27e62] [cursor=pointer]
+          - button "Orders & KDS 🔴 1 NEW" [ref=f27e68] [cursor=pointer]:
+            - generic [ref=f27e69]: Orders & KDS
+            - generic [ref=f27e73]: 🔴 1 NEW
+          - button "Table Layout" [ref=f27e75] [cursor=pointer]
+          - button "Kiosk Terminals" [ref=f27e79] [cursor=pointer]
+          - button "Offers & Coupons" [ref=f27e86] [cursor=pointer]
+          - button "Receipt & E-Bill" [ref=f27e91] [cursor=pointer]
+          - button "Hardware & Diagnostics" [ref=f27e95] [cursor=pointer]
+          - button "Customer Feedback" [ref=f27e101] [cursor=pointer]
+          - button "Reports & Export" [ref=f27e105] [cursor=pointer]
+          - button "Staff & Roles" [ref=f27e110] [cursor=pointer]
+          - button "Sync Center" [ref=f27e117] [cursor=pointer]
+          - button "Audit Activity Logs" [ref=f27e125] [cursor=pointer]
+          - button "License & Entitlement" [ref=f27e129] [cursor=pointer]
+          - button "Settings & Backup" [ref=f27e134] [cursor=pointer]
+        - generic [ref=f27e139]:
+          - generic [ref=f27e140]:
+            - generic [ref=f27e141]: JAMANVAAR POS
+            - generic [ref=f27e142]: v1.0.0
+          - paragraph [ref=f27e143]: Kelviontech Systems
+      - main [ref=f27e144]:
+        - generic [ref=f27e145]:
+          - generic [ref=f27e147]:
+            - heading "Restaurant Operations Overview" [level=1] [ref=f27e148]
+            - paragraph [ref=f27e149]: Live telemetry, sales summary and terminal health for Ahmedabad Flagship.
+          - generic [ref=f27e150]:
+            - generic [ref=f27e152]:
+              - paragraph [ref=f27e153]: Today's Sales
+              - generic [ref=f27e154]: ₹53504
+              - paragraph [ref=f27e155]: Gross revenue
+              - generic [ref=f27e156]: ↑ 14.2%
+            - generic [ref=f27e162]:
+              - paragraph [ref=f27e163]: Orders
+              - generic [ref=f27e164]: "83"
+              - paragraph [ref=f27e165]: Total tickets
+              - generic [ref=f27e166]: ↑ 8 orders
+            - generic [ref=f27e172]:
+              - paragraph [ref=f27e173]: Avg. Order Value
+              - generic [ref=f27e174]: ₹645
+              - paragraph [ref=f27e175]: Per customer cart
+            - generic [ref=f27e183]:
+              - paragraph [ref=f27e184]: Pending KOT
+              - generic [ref=f27e185]: "2"
+              - paragraph [ref=f27e186]: Kitchen preparing
+            - generic [ref=f27e191]:
+              - paragraph [ref=f27e192]: Table Occupancy
+              - generic [ref=f27e193]: 0%
+              - paragraph [ref=f27e194]: 0 of 12 tables
+          - generic [ref=f27e198]:
+            - generic [ref=f27e199]:
+              - generic [ref=f27e200]:
+                - generic [ref=f27e201]:
+                  - heading "Hourly Sales Velocity & Dining Rush" [level=2] [ref=f27e206]
+                  - paragraph [ref=f27e207]: Live order velocity throughout the day • Lunch (1-3 PM) & Dinner (7-10 PM)
+                - generic [ref=f27e208]: "Peak: 7 PM"
+              - generic [ref=f27e211]:
+                - generic [ref=f27e212]:
+                  - generic: "9 AM: ₹0"
+                  - generic [ref=f27e214]: 9 AM
+                - generic [ref=f27e215]:
+                  - generic: "10 AM: ₹0"
+                  - generic [ref=f27e217]: 10 AM
+                - generic [ref=f27e218]:
+                  - generic: "11 AM: ₹0"
+                  - generic [ref=f27e220]: 11 AM
+                - generic [ref=f27e221]:
+                  - generic: "12 PM: ₹1586"
+                  - generic [ref=f27e224]: 12 PM
+                - generic [ref=f27e225]:
+                  - generic: "1 PM: ₹872"
+                  - generic [ref=f27e228]: 1 PM
+                - generic [ref=f27e229]:
+                  - generic: "2 PM: ₹1523"
+                  - generic [ref=f27e232]: 2 PM
+                - generic [ref=f27e233]:
+                  - generic: "3 PM: ₹588"
+                  - generic [ref=f27e236]: 3 PM
+                - generic [ref=f27e237]:
+                  - generic: "5 PM: ₹1334"
+                  - generic [ref=f27e240]: 5 PM
+                - generic [ref=f27e241]:
+                  - generic: "6 PM: ₹2562"
+                  - generic [ref=f27e244]: 6 PM
+                - generic [ref=f27e245]:
+                  - generic: "7 PM: ₹3749"
+                  - generic [ref=f27e248]: 7 PM
+                - generic [ref=f27e249]:
+                  - generic: "8 PM: ₹683"
+                  - generic [ref=f27e252]: 8 PM
+                - generic [ref=f27e253]:
+                  - generic: "9 PM: ₹588"
+                  - generic [ref=f27e256]: 9 PM
+                - generic [ref=f27e257]:
+                  - generic: "10 PM: ₹0"
+                  - generic [ref=f27e259]: 10 PM
+              - generic [ref=f27e260]:
+                - generic [ref=f27e261]:
+                  - strong [ref=f27e264]: Peak Rush Hours
+                  - generic [ref=f27e265]: Standard Hours
+                - generic [ref=f27e268]: "Total Day Revenue: ₹53504"
+            - generic [ref=f27e269]:
+              - generic [ref=f27e270]:
+                - generic [ref=f27e271]:
+                  - heading "Payment Channels" [level=2] [ref=f27e275]
+                  - generic [ref=f27e276]: Real-time Split
+                - generic [ref=f27e277]:
+                  - generic [ref=f27e279]:
+                    - generic [ref=f27e280]: UPI Dynamic QR
+                    - generic [ref=f27e288]: 32% (₹16904)
+                  - generic [ref=f27e292]:
+                    - generic [ref=f27e293]: Card EDC Terminal
+                    - generic [ref=f27e297]: 26% (₹13878)
+                  - generic [ref=f27e301]:
+                    - generic [ref=f27e302]: Cash at Counter
+                    - generic [ref=f27e309]: 23% (₹12390)
+              - generic [ref=f27e312]:
+                - generic [ref=f27e313]: "Settlement Status:"
+                - generic [ref=f27e314]: ✓ Instant UPI Direct Bank
+          - generic [ref=f27e315]:
+            - generic [ref=f27e316]:
+              - heading "Active Kiosk Hardware Matrix" [level=2] [ref=f27e323]
+              - generic [ref=f27e324]: Real-time Heartbeat
+            - generic [ref=f27e325]:
+              - generic [ref=f27e326]:
+                - generic [ref=f27e327]:
+                  - generic [ref=f27e328]:
+                    - generic [ref=f27e329]: "Main Lobby Kiosk #1"
+                    - generic [ref=f27e330]: MAINTENANCE
+                  - paragraph [ref=f27e332]: Ground Floor Entry
+                  - paragraph [ref=f27e333]: "IP: 192.168.1.101 • v1.0.0"
+                - button "Activate" [ref=f27e335] [cursor=pointer]
+              - generic [ref=f27e336]:
+                - generic [ref=f27e337]:
+                  - generic [ref=f27e338]:
+                    - generic [ref=f27e339]: "Dining Area Kiosk #2"
+                    - generic [ref=f27e340]: ONLINE
+                  - paragraph [ref=f27e342]: Main Dining Hall Central
+                  - paragraph [ref=f27e343]: "IP: 192.168.1.102 • v1.0.0"
+                - button "Set Maint." [ref=f27e345] [cursor=pointer]
+              - generic [ref=f27e346]:
+                - generic [ref=f27e347]:
+                  - generic [ref=f27e348]:
+                    - generic [ref=f27e349]: "Express Takeaway Kiosk #3"
+                    - generic [ref=f27e350]: OFFLINE
+                  - paragraph [ref=f27e352]: Takeaway Counter Wing
+                  - paragraph [ref=f27e353]: "IP: 192.168.1.103 • v1.0.0"
+                - button "Activate" [ref=f27e355] [cursor=pointer]
+          - generic [ref=f27e356]:
+            - generic [ref=f27e357]:
+              - heading "Recent Order Stream" [level=2] [ref=f27e361]
+              - button "View Full KDS Board" [ref=f27e362] [cursor=pointer]
+            - generic [ref=f27e364]:
+              - generic [ref=f27e365]:
+                - generic [ref=f27e366]:
+                  - generic [ref=f27e367]:
+                    - generic [ref=f27e368]: ORD-9914
+                    - generic [ref=f27e369]: "TOKEN #114"
+                    - generic [ref=f27e370]: DELIVERY
+                    - generic [ref=f27e371]: COMPLETED
+                  - paragraph [ref=f27e373]: 2x Cold Coffee with Ice Cream, 2x Crispy Corn Salt & Pepper
+                - generic [ref=f27e374]:
+                  - generic [ref=f27e375]: ₹588
+                  - button "Advance Status" [ref=f27e376] [cursor=pointer]
+              - generic [ref=f27e378]:
+                - generic [ref=f27e379]:
+                  - generic [ref=f27e380]:
+                    - generic [ref=f27e381]: ORD-9913
+                    - generic [ref=f27e382]: "TOKEN #113"
+                    - generic [ref=f27e383]: TAKEAWAY
+                    - generic [ref=f27e384]: COMPLETED
+                  - paragraph [ref=f27e386]: 1x Gujarati Heritage Thali, 2x Shahi Gulab Jamun (2 pcs), 1x Paneer Tikka (Tandoori)
+                - generic [ref=f27e387]:
+                  - generic [ref=f27e388]: ₹683
+                  - button "Advance Status" [ref=f27e389] [cursor=pointer]
+              - generic [ref=f27e391]:
+                - generic [ref=f27e392]:
+                  - generic [ref=f27e393]:
+                    - generic [ref=f27e394]: QR-1039
+                    - generic [ref=f27e395]: "TOKEN #1039"
+                    - generic [ref=f27e396]: QR_TABLE (T-12)
+                    - generic [ref=f27e397]: NEW
+                  - paragraph [ref=f27e399]: 2x Paneer Tikka (Tandoori), 1x Butter Naan
+                - generic [ref=f27e400]:
+                  - generic [ref=f27e401]: ₹609
+                  - button "Advance Status" [ref=f27e402] [cursor=pointer]
+              - generic [ref=f27e404]:
+                - generic [ref=f27e405]:
+                  - generic [ref=f27e406]:
+                    - generic [ref=f27e407]: QR-1037
+                    - generic [ref=f27e408]: "TOKEN #1037"
+                    - generic [ref=f27e409]: QR_TABLE (T-3)
+                    - generic [ref=f27e410]: ACCEPTED
+                  - paragraph [ref=f27e412]: 1x Dal Makhani Shahi, 2x Garlic Butter Naan
+                - generic [ref=f27e413]:
+                  - generic [ref=f27e414]: ₹399
+                  - button "Advance Status" [ref=f27e415] [cursor=pointer]
+              - generic [ref=f27e417]:
+                - generic [ref=f27e418]:
+                  - generic [ref=f27e419]:
+                    - generic [ref=f27e420]: QR-1042
+                    - generic [ref=f27e421]: "TOKEN #1042"
+                    - generic [ref=f27e422]: QR_TABLE (T-12)
+                    - generic [ref=f27e423]: PREPARING
+                  - paragraph [ref=f27e425]: 2x Paneer Tikka (Tandoori), 2x Butter Naan, 1x Royal Veg Handi Dum Biryani
+                - generic [ref=f27e426]:
+                  - generic [ref=f27e427]: ₹924
+                  - button "Advance Status" [ref=f27e428] [cursor=pointer]
+    - generic [ref=f27e430]:
+      - generic [ref=f27e431] [cursor=pointer]:
+        - generic [ref=f27e434]: Operations Intelligence • Ask AI
+        - generic [ref=f27e435]: 24x7
+      - button "JAMANVAAR Operations Assistant" [ref=f27e436] [cursor=pointer]
+  - region "JAMANVAAR Startup" [ref=f27e442]:
+    - generic [ref=f27e443]:
+      - generic [ref=f27e444]: KELVIONTECH ENTERPRISE
+      - generic [ref=f27e447]: Local Engine Active
+    - generic [ref=f27e453]:
+      - generic [ref=f27e454]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=f27e456]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=f27e457]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f27e463]
+      - paragraph [ref=f27e465]: Hardware & Self-Ordering Fleet Control
+      - generic [ref=f27e466]: KIOSK MANAGEMENT
+      - generic [ref=f27e471]:
+        - generic [ref=f27e472]: Core Engine Ready
+        - generic [ref=f27e474]: •
+        - generic [ref=f27e475]: Database Initialized
+        - generic [ref=f27e477]: •
+        - generic [ref=f27e478]: Local-First Mode

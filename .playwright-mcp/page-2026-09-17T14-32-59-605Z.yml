@@ -1,0 +1,33 @@
+- generic [ref=f21e2]:
+  - generic [ref=f21e4]:
+    - generic [ref=f21e8]:
+      - img "JAMANVAAR by Kelviontech" [ref=f21e11]
+      - generic [ref=f21e12]: Authentic Indian Heritage Flavors • Freshly Prepared
+      - generic [ref=f21e16]:
+        - heading "Welcome to My Restaurant" [level=1] [ref=f21e17]:
+          - generic [ref=f21e18]: Welcome to
+          - generic [ref=f21e19]: My Restaurant
+        - paragraph [ref=f21e20]: Authentic Flavors, Seamless Dining
+      - generic [ref=f21e21]:
+        - button "Start Order" [ref=f21e22] [cursor=pointer]
+        - paragraph [ref=f21e26]: Touch screen to begin your order
+    - contentinfo [ref=f21e28]:
+      - generic [ref=f21e29]: Terminal e1538d9d-5901-47d5-9980-099ac2880404
+      - button "Staff Mode" [ref=f21e30] [cursor=pointer]
+  - region "JAMANVAAR Startup" [ref=f21e35]:
+    - generic [ref=f21e36]:
+      - generic [ref=f21e37]: KELVIONTECH ENTERPRISE
+      - generic [ref=f21e40]: Local Engine Active
+    - generic [ref=f21e46]:
+      - generic [ref=f21e47]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=f21e49]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=f21e50]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f21e56]
+      - paragraph [ref=f21e58]: Customer Self-Ordering Experience
+      - generic [ref=f21e59]: SELF-ORDER KIOSK
+      - generic [ref=f21e64]:
+        - generic [ref=f21e65]: Core Engine Ready
+        - generic [ref=f21e67]: •
+        - generic [ref=f21e68]: Database Initialized
+        - generic [ref=f21e70]: •
+        - generic [ref=f21e71]: Local-First Mode

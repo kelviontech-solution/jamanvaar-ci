@@ -1,0 +1,217 @@
+- generic [ref=e200]:
+  - banner [ref=e201]:
+    - generic [ref=e202]:
+      - generic [ref=e203]:
+        - generic [ref=e204]:
+          - img "JAMANVAAR by KELVIONTECH"
+        - generic [ref=e206]:
+          - generic [ref=e207]:
+            - generic [ref=e208]: POS TERMINAL
+            - generic [ref=e210]: My Restaurant
+          - paragraph [ref=e211]:
+            - generic [ref=e212]: Ahmedabad Flagship Store
+            - generic [aria-hidden] [ref=e213]: •
+            - generic [ref=e214]: POS-01
+      - button "+ New Order" [ref=e216] [cursor=pointer]
+    - button "Search dishes, SKU, tables, bills, customers..." [ref=e223] [cursor=pointer]
+    - generic [ref=e229]:
+      - button "Notifications & System Events" [ref=e230] [cursor=pointer]
+      - button "Open JAMAN AI Assistant" [ref=e234] [cursor=pointer]:
+        - generic [ref=e237]: JAMAN AI
+        - generic [ref=e238]: "2"
+      - button "A" [ref=e240] [cursor=pointer]
+  - generic [ref=e245]:
+    - complementary [ref=e246]:
+      - navigation [ref=e247]:
+        - button [ref=e248] [cursor=pointer]
+        - button [ref=e254] [cursor=pointer]
+        - button "2" [ref=e260] [cursor=pointer]
+        - button [ref=e265] [cursor=pointer]
+        - button "3" [ref=e269] [cursor=pointer]
+        - button [ref=e273] [cursor=pointer]
+        - button [ref=e279] [cursor=pointer]
+        - button [ref=e283] [cursor=pointer]
+        - button [ref=e286] [cursor=pointer]
+        - button [ref=e289] [cursor=pointer]
+        - button [ref=e294] [cursor=pointer]
+        - button "JAMAN AI Assistant (Voice & Conversational POS Actions)" [ref=e299] [cursor=pointer]
+      - button "Print Queue" [ref=e303] [cursor=pointer]
+    - main [ref=e309]:
+      - generic [ref=e830]:
+        - generic [ref=e831]:
+          - generic [ref=e832]:
+            - heading "Floor Plan & Dining Tables" [level=1] [ref=e833]
+            - paragraph [ref=e840]: Monitor real-time table occupancy, orders and billing.
+          - button "Manage Tables" [ref=e841] [cursor=pointer]
+        - generic [ref=e846]:
+          - button "All 12" [ref=e847] [cursor=pointer]
+          - button "Available 12" [ref=e849] [cursor=pointer]
+          - button "Occupied 0" [ref=e851] [cursor=pointer]
+          - button "Billing 0" [ref=e853] [cursor=pointer]
+          - button "Reserved 0" [ref=e856] [cursor=pointer]
+        - generic [ref=e859]:
+          - generic [ref=e860]: "Zone:"
+          - button "All Zones" [ref=e861] [cursor=pointer]
+          - button "AC Balcony" [ref=e862] [cursor=pointer]
+          - button "Family Section" [ref=e863] [cursor=pointer]
+          - button "Main Hall" [ref=e864] [cursor=pointer]
+        - generic [ref=e866]:
+          - generic [ref=e867] [cursor=pointer]:
+            - generic [ref=e868]:
+              - generic [ref=e869]:
+                - generic [ref=e870]: Main Hall
+                - generic [ref=e871]:
+                  - heading "T-1" [level=3] [ref=e872]
+                  - generic "QR ordering active for this table" [ref=e873]: QR
+              - generic [ref=e881]: Available
+            - generic [ref=e882]:
+              - generic [ref=e883]: 2 Seater
+              - generic [ref=e890]: Vacant & Ready
+            - button "+ Open Table" [ref=e896]
+          - generic [ref=e897] [cursor=pointer]:
+            - generic [ref=e898]:
+              - generic [ref=e899]:
+                - generic [ref=e900]: Main Hall
+                - generic [ref=e901]:
+                  - heading "T-2" [level=3] [ref=e902]
+                  - generic "QR ordering active for this table" [ref=e903]: QR
+              - generic [ref=e911]: Available
+            - generic [ref=e912]:
+              - generic [ref=e913]: 2 Seater
+              - generic [ref=e920]: Vacant & Ready
+            - button "+ Open Table" [ref=e926]
+          - generic [ref=e927] [cursor=pointer]:
+            - generic [ref=e928]:
+              - generic [ref=e929]:
+                - generic [ref=e930]: Main Hall
+                - generic [ref=e931]:
+                  - heading "T-3" [level=3] [ref=e932]
+                  - generic "QR ordering active for this table" [ref=e933]: QR
+              - generic [ref=e941]: Available
+            - generic [ref=e942]:
+              - generic [ref=e943]: 4 Seater
+              - generic [ref=e950]: Vacant & Ready
+            - button "+ Open Table" [ref=e956]
+          - generic [ref=e957] [cursor=pointer]:
+            - generic [ref=e958]:
+              - generic [ref=e959]:
+                - generic [ref=e960]: Main Hall
+                - generic [ref=e961]:
+                  - heading "T-4" [level=3] [ref=e962]
+                  - generic "QR ordering active for this table" [ref=e963]: QR
+              - generic [ref=e971]: Available
+            - generic [ref=e972]:
+              - generic [ref=e973]: 4 Seater
+              - generic [ref=e980]: Vacant & Ready
+            - button "+ Open Table" [ref=e986]
+          - generic [ref=e987] [cursor=pointer]:
+            - generic [ref=e988]:
+              - generic [ref=e989]:
+                - generic [ref=e990]: Main Hall
+                - generic [ref=e991]:
+                  - heading "T-5" [level=3] [ref=e992]
+                  - generic "QR ordering active for this table" [ref=e993]: QR
+              - generic [ref=e1001]: Available
+            - generic [ref=e1002]:
+              - generic [ref=e1003]: 4 Seater
+              - generic [ref=e1010]: Vacant & Ready
+            - button "+ Open Table" [ref=e1016]
+          - generic [ref=e1017] [cursor=pointer]:
+            - generic [ref=e1018]:
+              - generic [ref=e1019]:
+                - generic [ref=e1020]: Family Section
+                - generic [ref=e1021]:
+                  - heading "T-6" [level=3] [ref=e1022]
+                  - generic "QR ordering active for this table" [ref=e1023]: QR
+              - generic [ref=e1031]: Available
+            - generic [ref=e1032]:
+              - generic [ref=e1033]: 6 Seater
+              - generic [ref=e1040]: Vacant & Ready
+            - button "+ Open Table" [ref=e1046]
+          - generic [ref=e1047] [cursor=pointer]:
+            - generic [ref=e1048]:
+              - generic [ref=e1049]:
+                - generic [ref=e1050]: Family Section
+                - generic [ref=e1051]:
+                  - heading "T-7" [level=3] [ref=e1052]
+                  - generic "QR ordering active for this table" [ref=e1053]: QR
+              - generic [ref=e1061]: Available
+            - generic [ref=e1062]:
+              - generic [ref=e1063]: 6 Seater
+              - generic [ref=e1070]: Vacant & Ready
+            - button "+ Open Table" [ref=e1076]
+          - generic [ref=e1077] [cursor=pointer]:
+            - generic [ref=e1078]:
+              - generic [ref=e1079]:
+                - generic [ref=e1080]: Family Section
+                - generic [ref=e1081]:
+                  - heading "T-8" [level=3] [ref=e1082]
+                  - generic "QR ordering active for this table" [ref=e1083]: QR
+              - generic [ref=e1091]: Available
+            - generic [ref=e1092]:
+              - generic [ref=e1093]: 8 Seater
+              - generic [ref=e1100]: Vacant & Ready
+            - button "+ Open Table" [ref=e1106]
+          - generic [ref=e1107] [cursor=pointer]:
+            - generic [ref=e1108]:
+              - generic [ref=e1109]:
+                - generic [ref=e1110]: AC Balcony
+                - generic [ref=e1111]:
+                  - heading "T-9" [level=3] [ref=e1112]
+                  - generic "QR ordering active for this table" [ref=e1113]: QR
+              - generic [ref=e1121]: Available
+            - generic [ref=e1122]:
+              - generic [ref=e1123]: 4 Seater
+              - generic [ref=e1130]: Vacant & Ready
+            - button "+ Open Table" [ref=e1136]
+          - generic [ref=e1137] [cursor=pointer]:
+            - generic [ref=e1138]:
+              - generic [ref=e1139]:
+                - generic [ref=e1140]: AC Balcony
+                - generic [ref=e1141]:
+                  - heading "T-10" [level=3] [ref=e1142]
+                  - generic "QR ordering active for this table" [ref=e1143]: QR
+              - generic [ref=e1151]: Available
+            - generic [ref=e1152]:
+              - generic [ref=e1153]: 4 Seater
+              - generic [ref=e1160]: Vacant & Ready
+            - button "+ Open Table" [ref=e1166]
+          - generic [ref=e1167] [cursor=pointer]:
+            - generic [ref=e1168]:
+              - generic [ref=e1169]:
+                - generic [ref=e1170]: AC Balcony
+                - generic [ref=e1171]:
+                  - heading "T-11" [level=3] [ref=e1172]
+                  - generic "QR ordering active for this table" [ref=e1173]: QR
+              - generic [ref=e1181]: Available
+            - generic [ref=e1182]:
+              - generic [ref=e1183]: 4 Seater
+              - generic [ref=e1190]: Vacant & Ready
+            - button "+ Open Table" [ref=e1196]
+          - generic [ref=e1197] [cursor=pointer]:
+            - generic [ref=e1198]:
+              - generic [ref=e1199]:
+                - generic [ref=e1200]: AC Balcony
+                - generic [ref=e1201]:
+                  - heading "T-12" [level=3] [ref=e1202]
+                  - generic "QR ordering active for this table" [ref=e1203]: QR
+              - generic [ref=e1211]: Available
+            - generic [ref=e1212]:
+              - generic [ref=e1213]: 4 Seater
+              - generic [ref=e1220]: Vacant & Ready
+            - button "+ Open Table" [ref=e1226]
+  - contentinfo [ref=e741]:
+    - generic [ref=e742]:
+      - 'button "Today Sales: ₹14882" [ref=e743] [cursor=pointer]':
+        - generic [ref=e747]: "Today Sales:"
+        - strong [ref=e748]: ₹14882
+      - 'button "Orders: 20" [ref=e749] [cursor=pointer]':
+        - generic [ref=e753]: "Orders:"
+        - strong [ref=e754]: "20"
+      - generic [ref=e755]:
+        - generic [ref=e759]: "AOV:"
+        - strong [ref=e760]: ₹744
+      - 'button "Tables: 0% (0/12)" [ref=e761] [cursor=pointer]':
+        - generic [ref=e767]: "Tables:"
+        - strong [ref=e768]: 0% (0/12)
+    - generic [ref=e769]: Local Engine Active

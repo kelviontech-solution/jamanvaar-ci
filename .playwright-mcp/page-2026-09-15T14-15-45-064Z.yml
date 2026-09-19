@@ -1,0 +1,85 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - img "JAMANVAAR by Kelviontech" [ref=e7]
+      - generic [ref=e8]:
+        - generic [ref=e11]:
+          - text: "Local Core:"
+          - strong [ref=e12]: Connected
+        - button [ref=e13] [cursor=pointer]:
+          - generic [ref=e18]:
+            - text: "Network:"
+            - strong [ref=e19]: Online
+        - generic [ref=e20]: Tue, 15 Sept 2026
+    - main [ref=e24]:
+      - generic [ref=e25]:
+        - img "JAMANVAAR by Kelviontech" [ref=e28]
+        - generic [ref=e29]:
+          - heading "Restaurant Control. Live Intelligence." [level=1] [ref=e30]:
+            - text: Restaurant Control.
+            - generic [ref=e31]: Live Intelligence.
+          - paragraph [ref=e32]: Centralized management suite for sales analytics, live KOT dispatch, recipe costing and team permissions.
+        - generic [ref=e33]:
+          - generic [ref=e34]: Restaurant Management
+          - generic [ref=e39]: Reports & Analytics
+          - generic [ref=e46]: Menu Management
+          - generic [ref=e52]: Inventory & Staff
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - img "Tandoori Naan" [ref=e59]
+            - generic [ref=e60]: Tandoori Breads
+          - generic [ref=e61]:
+            - img "Paneer Butter Masala" [ref=e62]
+            - generic [ref=e63]: Royal Curries
+          - generic [ref=e64]:
+            - img "Tandoori Angaar" [ref=e65]
+            - generic [ref=e66]: Tandoor Starters
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - generic [ref=e72]: Welcome to
+              - generic [ref=e73]: RESTAURANT ADMIN
+            - heading "JAMANVAAR" [level=2] [ref=e75]
+            - paragraph [ref=e76]: Restaurant Operations SaaS
+          - generic [ref=e77]:
+            - button "QUICK DEMO LOGIN — Restaurant Admin (@admin)" [ref=e78] [cursor=pointer]
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - generic [ref=e84]: Username or Email *
+                - textbox "e.g. admin or owner@jamanvaar.com" [ref=e85]: admin
+              - generic [ref=e86]:
+                - generic [ref=e87]:
+                  - generic [ref=e88]: Password *
+                  - button "Show Password" [ref=e89] [cursor=pointer]
+                - 'textbox "Enter admin password (demo: admin123)" [ref=e91]'
+              - generic [ref=e92]:
+                - generic [ref=e93] [cursor=pointer]:
+                  - checkbox "Remember this device" [checked] [ref=e94]
+                  - generic [ref=e95]: Remember this device
+                - generic [ref=e96]: "PIN: admin / admin123"
+              - button "Sign In to Admin" [ref=e97] [cursor=pointer]
+        - generic [ref=e98]:
+          - generic [ref=e99]: Role-Based Security
+          - generic [ref=e104]: •
+          - generic [ref=e105]: Instant Offline Boot
+          - generic [ref=e109]: •
+          - generic [ref=e110]: 100% Secure
+    - contentinfo [ref=e114]: © 2026 JAMANVAAR by KELVIONTECH — All rights reserved.
+  - region "JAMANVAAR Startup" [ref=e115]:
+    - generic [ref=e116]:
+      - generic [ref=e117]: KELVIONTECH ENTERPRISE
+      - generic [ref=e120]: Local Engine Active
+    - generic [ref=e126]:
+      - generic [ref=e127]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=e129]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=e130]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=e136]
+      - paragraph [ref=e138]: Restaurant Operations Platform
+      - generic [ref=e139]: RESTAURANT ADMIN
+      - generic [ref=e144]:
+        - generic [ref=e145]: Core Engine Ready
+        - generic [ref=e147]: •
+        - generic [ref=e148]: Database Initialized
+        - generic [ref=e150]: •
+        - generic [ref=e151]: Local-First Mode

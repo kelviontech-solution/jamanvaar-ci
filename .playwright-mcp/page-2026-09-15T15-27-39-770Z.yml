@@ -1,0 +1,388 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - link [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img "JAMANVAAR" [ref=e7]
+      - generic [ref=e8]:
+        - generic [ref=e9]: PLATFORM CONTROL
+        - generic [ref=e10]: SUPER ADMIN
+    - navigation [ref=e11]:
+      - generic [ref=e12]:
+        - button "Platform Control Center" [expanded] [ref=e13] [cursor=pointer]
+        - link "Executive Dashboard" [ref=e18] [cursor=pointer]:
+          - /url: /
+      - generic [ref=e26]:
+        - button "Business Management" [expanded] [ref=e27] [cursor=pointer]
+        - generic [ref=e31]:
+          - link "Restaurants" [ref=e32] [cursor=pointer]:
+            - /url: /restaurants
+          - link "Restaurant Owners" [ref=e40] [cursor=pointer]:
+            - /url: /owners
+          - link "Branches" [ref=e48] [cursor=pointer]:
+            - /url: /branches
+          - link "Subscriptions" [ref=e55] [cursor=pointer]:
+            - /url: /subscriptions
+          - link "Invoices & Billing" [ref=e63] [cursor=pointer]:
+            - /url: /billing
+      - generic [ref=e68]:
+        - button "SaaS Management" [expanded] [ref=e69] [cursor=pointer]
+        - generic [ref=e73]:
+          - link "Plans & Entitlements" [ref=e74] [cursor=pointer]:
+            - /url: /plans
+          - link "QR Ordering Suite" [ref=e81] [cursor=pointer]:
+            - /url: /qr-ordering
+          - link "JAMAN AI Engine" [ref=e90] [cursor=pointer]:
+            - /url: /ai-assistant
+          - link "Master Menu Catalog" [ref=e95] [cursor=pointer]:
+            - /url: /catalog
+          - link "Activation Keys" [ref=e101] [cursor=pointer]:
+            - /url: /activation-keys
+          - link "Payment Gateways" [ref=e107] [cursor=pointer]:
+            - /url: /payment-connections
+          - link "Applications & Releases" [ref=e112] [cursor=pointer]:
+            - /url: /applications
+      - generic [ref=e119]:
+        - button "Operations & MDM" [expanded] [ref=e120] [cursor=pointer]
+        - generic [ref=e124]:
+          - link "Device Fleet / MDM" [ref=e125] [cursor=pointer]:
+            - /url: /devices
+          - link "Sync & Conflict Monitor" [ref=e130] [cursor=pointer]:
+            - /url: /sync-monitor
+          - link "Backups & Recovery" [ref=e135] [cursor=pointer]:
+            - /url: /backups
+          - link "System Telemetry" [ref=e142] [cursor=pointer]:
+            - /url: /system-health
+          - link "Staging Sandboxes" [ref=e148] [cursor=pointer]:
+            - /url: /sandboxes
+      - generic [ref=e161]:
+        - button "Security & Reports" [expanded] [ref=e162] [cursor=pointer]
+        - generic [ref=e166]:
+          - link "Reports & Analytics" [ref=e167] [cursor=pointer]:
+            - /url: /reports
+          - link "Audit Logs" [ref=e172] [cursor=pointer]:
+            - /url: /audit-logs
+          - link "Emergency Offline Policy" [ref=e178] [cursor=pointer]:
+            - /url: /offline-policy
+          - link "Platform Team" [ref=e183] [cursor=pointer]:
+            - /url: /team
+          - link "Support Tickets" [ref=e189] [cursor=pointer]:
+            - /url: /tickets
+          - link "Diagnostics & Support" [ref=e194] [cursor=pointer]:
+            - /url: /support
+          - link "Platform Settings" [ref=e204] [cursor=pointer]:
+            - /url: /settings/platform
+      - generic [ref=e208]:
+        - button "Account" [expanded] [ref=e209] [cursor=pointer]
+        - link "My Profile" [ref=e214] [cursor=pointer]:
+          - /url: /profile
+    - generic [ref=e229]:
+      - generic [ref=e230]:
+        - generic [ref=e232]: Platform Online
+        - link "View System Health" [ref=e233] [cursor=pointer]:
+          - /url: /system-health
+      - generic [ref=e238]: JAMANVAAR Cloud v1.4.0
+  - generic [ref=e239]:
+    - banner [ref=e240]:
+      - generic [ref=e241]:
+        - button "Toggle Navigation Menu" [ref=e242] [cursor=pointer]
+        - generic [ref=e244]:
+          - generic [ref=e245]: JAMANVAAR PLATFORM
+          - generic [ref=e246]: Control Center
+      - generic [ref=e248]:
+        - textbox "Search restaurants, owners, devices, activation keys…" [ref=e249]
+        - generic: Ctrl+K
+      - generic [ref=e250]:
+        - generic "Database reachable, API responding" [ref=e251]: PLATFORM ONLINE
+        - button "Notifications" [ref=e255] [cursor=pointer]
+        - button "Toggle dark mode" [ref=e260] [cursor=pointer]
+        - generic [ref=e264]:
+          - link "J" [ref=e265] [cursor=pointer]:
+            - /url: /profile
+          - generic [ref=e267]:
+            - generic [ref=e268]: JAMANVAAR Super Admin
+            - generic [ref=e269]: Platform Owner
+          - button "Logout" [ref=e270] [cursor=pointer]
+    - main [ref=e275]:
+      - generic [ref=e276]:
+        - generic [ref=e277]:
+          - generic [ref=e278]:
+            - heading "Restaurants" [level=1] [ref=e279]
+            - paragraph [ref=e280]: Manage every restaurant tenant, branch, subscription, and connected device from one place.
+          - generic [ref=e281]:
+            - button "Export CSV" [ref=e282] [cursor=pointer]
+            - button "+ Quick create" [ref=e287] [cursor=pointer]
+            - button "Onboard Restaurant" [ref=e288] [cursor=pointer]
+        - generic [ref=e291]:
+          - textbox "Search name, owner, city, ID…" [ref=e296]
+          - generic [ref=e297]:
+            - button "All 9" [ref=e298] [cursor=pointer]:
+              - generic [ref=e299]: All
+              - generic [ref=e300]: "9"
+            - button "Active 9" [ref=e301] [cursor=pointer]:
+              - generic [ref=e302]: Active
+              - generic [ref=e303]: "9"
+            - button "Suspended 0" [ref=e304] [cursor=pointer]:
+              - generic [ref=e305]: Suspended
+              - generic [ref=e306]: "0"
+            - button "Trial 0" [ref=e307] [cursor=pointer]:
+              - generic [ref=e308]: Trial
+              - generic [ref=e309]: "0"
+            - button "No Plan" [ref=e310] [cursor=pointer]
+          - combobox [ref=e312]:
+            - option "All SaaS Tiers" [selected]
+            - option "CORE (₹5,000)"
+            - option "PRO (₹7,000)"
+            - option "ENTERPRISE"
+            - option "No Plan"
+          - combobox [ref=e313]:
+            - option "Recently Onboarded" [selected]
+            - option "Name (A → Z)"
+            - option "Name (Z → A)"
+            - option "Most Branches"
+            - option "Most Devices"
+            - option "Subscription Status"
+          - generic [ref=e314]:
+            - button "Cards" [ref=e315] [cursor=pointer]
+            - button "Table" [ref=e322] [cursor=pointer]
+          - generic [ref=e325]: 9 of 9
+        - generic [ref=e326]:
+          - 'button "Select restaurant #0338b9 ACTIVE QF QA FULL AUDIT RESTAURANT QA Full Audit Hospitality Pvt. Ltd. JAMANVAAR PRO Branches 1 Terminals 4 Ahmedabad, Gujarat QA Audit Owner qafullaudit@qa.test Manage Restaurant Sept 2026" [ref=e327] [cursor=pointer]':
+            - generic [ref=e328]:
+              - generic [ref=e329]:
+                - checkbox "Select restaurant" [ref=e330]
+                - generic "Click to copy ID" [ref=e331]: "#0338b9"
+              - generic [ref=e332]:
+                - generic [ref=e333]: ACTIVE
+                - button "More actions" [ref=e336]
+            - generic [ref=e341]:
+              - generic [ref=e342]: QF
+              - generic [ref=e343]:
+                - paragraph [ref=e344]: QA FULL AUDIT RESTAURANT
+                - paragraph [ref=e345]: QA Full Audit Hospitality Pvt. Ltd.
+                - generic [ref=e346]: JAMANVAAR PRO
+            - generic [ref=e348]:
+              - generic [ref=e349]:
+                - generic [ref=e350]: Branches
+                - generic [ref=e355]: "1"
+              - generic [ref=e356]:
+                - generic [ref=e357]: Terminals
+                - generic [ref=e360]: "4"
+            - generic [ref=e361]:
+              - generic [ref=e362]: Ahmedabad, Gujarat
+              - generic [ref=e367]: QA Audit Owner
+              - generic [ref=e372]: qafullaudit@qa.test
+            - generic [ref=e377]:
+              - generic [ref=e378]: Manage Restaurant
+              - generic [ref=e387]: Sept 2026
+          - 'button "Select restaurant #d210d7 ACTIVE D dadddddd ddddddddddd JAMANVAAR PRO Branches 1 Terminals 2 Ahmedabad, Gujarat adadd ommaheri1122@gmail.com Manage Restaurant Sept 2026" [ref=e388] [cursor=pointer]':
+            - generic [ref=e389]:
+              - generic [ref=e390]:
+                - checkbox "Select restaurant" [ref=e391]
+                - generic "Click to copy ID" [ref=e392]: "#d210d7"
+              - generic [ref=e393]:
+                - generic [ref=e394]: ACTIVE
+                - button "More actions" [ref=e397]
+            - generic [ref=e402]:
+              - generic [ref=e403]: D
+              - generic [ref=e404]:
+                - paragraph [ref=e405]: dadddddd
+                - paragraph [ref=e406]: ddddddddddd
+                - generic [ref=e407]: JAMANVAAR PRO
+            - generic [ref=e409]:
+              - generic [ref=e410]:
+                - generic [ref=e411]: Branches
+                - generic [ref=e416]: "1"
+              - generic [ref=e417]:
+                - generic [ref=e418]: Terminals
+                - generic [ref=e421]: "2"
+            - generic [ref=e422]:
+              - generic [ref=e423]: Ahmedabad, Gujarat
+              - generic [ref=e428]: adadd
+              - generic [ref=e433]: ommaheri1122@gmail.com
+            - generic [ref=e438]:
+              - generic [ref=e439]: Manage Restaurant
+              - generic [ref=e448]: Sept 2026
+          - 'button "Select restaurant #ca1a71 ACTIVE TO TEST Other Refund Restaurant 1789099083925 No Plan Assigned Branches 1 Terminals 0 Other Owner other-refund-owner-1789099083925@test.example.com Manage Restaurant Sept 2026" [ref=e449] [cursor=pointer]':
+            - generic [ref=e450]:
+              - generic [ref=e451]:
+                - checkbox "Select restaurant" [ref=e452]
+                - generic "Click to copy ID" [ref=e453]: "#ca1a71"
+              - generic [ref=e454]:
+                - generic [ref=e455]: ACTIVE
+                - button "More actions" [ref=e458]
+            - generic [ref=e463]:
+              - generic [ref=e464]: TO
+              - generic [ref=e465]:
+                - paragraph [ref=e466]: TEST Other Refund Restaurant 1789099083925
+                - generic [ref=e467]: No Plan Assigned
+            - generic [ref=e469]:
+              - generic [ref=e470]:
+                - generic [ref=e471]: Branches
+                - generic [ref=e476]: "1"
+              - generic [ref=e477]:
+                - generic [ref=e478]: Terminals
+                - generic [ref=e481]: "0"
+            - generic [ref=e482]:
+              - generic [ref=e483]: Other Owner
+              - generic [ref=e488]: other-refund-owner-1789099083925@test.example.com
+            - generic [ref=e493]:
+              - generic [ref=e494]: Manage Restaurant
+              - generic [ref=e503]: Sept 2026
+          - 'button "Select restaurant #67c783 ACTIVE TO TEST Other Refund Restaurant 1789099054264 No Plan Assigned Branches 1 Terminals 0 Other Owner other-refund-owner-1789099054264@test.example.com Manage Restaurant Sept 2026" [ref=e504] [cursor=pointer]':
+            - generic [ref=e505]:
+              - generic [ref=e506]:
+                - checkbox "Select restaurant" [ref=e507]
+                - generic "Click to copy ID" [ref=e508]: "#67c783"
+              - generic [ref=e509]:
+                - generic [ref=e510]: ACTIVE
+                - button "More actions" [ref=e513]
+            - generic [ref=e518]:
+              - generic [ref=e519]: TO
+              - generic [ref=e520]:
+                - paragraph [ref=e521]: TEST Other Refund Restaurant 1789099054264
+                - generic [ref=e522]: No Plan Assigned
+            - generic [ref=e524]:
+              - generic [ref=e525]:
+                - generic [ref=e526]: Branches
+                - generic [ref=e531]: "1"
+              - generic [ref=e532]:
+                - generic [ref=e533]: Terminals
+                - generic [ref=e536]: "0"
+            - generic [ref=e537]:
+              - generic [ref=e538]: Other Owner
+              - generic [ref=e543]: other-refund-owner-1789099054264@test.example.com
+            - generic [ref=e548]:
+              - generic [ref=e549]: Manage Restaurant
+              - generic [ref=e558]: Sept 2026
+          - 'button "Select restaurant #2a66fa ACTIVE TP TEST Pay Connection reconnect 1789056034479 No Plan Assigned Branches 1 Terminals 0 Scoped Owner payconn-reconnect-1789056034478@test.example.com Manage Restaurant Sept 2026" [ref=e559] [cursor=pointer]':
+            - generic [ref=e560]:
+              - generic [ref=e561]:
+                - checkbox "Select restaurant" [ref=e562]
+                - generic "Click to copy ID" [ref=e563]: "#2a66fa"
+              - generic [ref=e564]:
+                - generic [ref=e565]: ACTIVE
+                - button "More actions" [ref=e568]
+            - generic [ref=e573]:
+              - generic [ref=e574]: TP
+              - generic [ref=e575]:
+                - paragraph [ref=e576]: TEST Pay Connection reconnect 1789056034479
+                - generic [ref=e577]: No Plan Assigned
+            - generic [ref=e579]:
+              - generic [ref=e580]:
+                - generic [ref=e581]: Branches
+                - generic [ref=e586]: "1"
+              - generic [ref=e587]:
+                - generic [ref=e588]: Terminals
+                - generic [ref=e591]: "0"
+            - generic [ref=e592]:
+              - generic [ref=e593]: Scoped Owner
+              - generic [ref=e598]: payconn-reconnect-1789056034478@test.example.com
+            - generic [ref=e603]:
+              - generic [ref=e604]: Manage Restaurant
+              - generic [ref=e613]: Sept 2026
+          - 'button "Select restaurant #f00748 ACTIVE TP TEST Pay Connection approve-fail 1789056034176 No Plan Assigned Branches 1 Terminals 0 Scoped Owner payconn-approve-fail-1789056034175@test.example.com Manage Restaurant Sept 2026" [ref=e614] [cursor=pointer]':
+            - generic [ref=e615]:
+              - generic [ref=e616]:
+                - checkbox "Select restaurant" [ref=e617]
+                - generic "Click to copy ID" [ref=e618]: "#f00748"
+              - generic [ref=e619]:
+                - generic [ref=e620]: ACTIVE
+                - button "More actions" [ref=e623]
+            - generic [ref=e628]:
+              - generic [ref=e629]: TP
+              - generic [ref=e630]:
+                - paragraph [ref=e631]: TEST Pay Connection approve-fail 1789056034176
+                - generic [ref=e632]: No Plan Assigned
+            - generic [ref=e634]:
+              - generic [ref=e635]:
+                - generic [ref=e636]: Branches
+                - generic [ref=e641]: "1"
+              - generic [ref=e642]:
+                - generic [ref=e643]: Terminals
+                - generic [ref=e646]: "0"
+            - generic [ref=e647]:
+              - generic [ref=e648]: Scoped Owner
+              - generic [ref=e653]: payconn-approve-fail-1789056034175@test.example.com
+            - generic [ref=e658]:
+              - generic [ref=e659]: Manage Restaurant
+              - generic [ref=e668]: Sept 2026
+          - 'button "Select restaurant #111111 ACTIVE J— JAMANVAAR — Demo Restaurant JAMANVAAR CORE Branches 1 Terminals 0 Ahmedabad, Gujarat Demo Owner owner@demo.jamanvaar.app Manage Restaurant Sept 2026" [ref=e669] [cursor=pointer]':
+            - generic [ref=e670]:
+              - generic [ref=e671]:
+                - checkbox "Select restaurant" [ref=e672]
+                - generic "Click to copy ID" [ref=e673]: "#111111"
+              - generic [ref=e674]:
+                - generic [ref=e675]: ACTIVE
+                - button "More actions" [ref=e678]
+            - generic [ref=e683]:
+              - generic [ref=e684]: J—
+              - generic [ref=e685]:
+                - paragraph [ref=e686]: JAMANVAAR — Demo Restaurant
+                - generic [ref=e687]: JAMANVAAR CORE
+            - generic [ref=e689]:
+              - generic [ref=e690]:
+                - generic [ref=e691]: Branches
+                - generic [ref=e696]: "1"
+              - generic [ref=e697]:
+                - generic [ref=e698]: Terminals
+                - generic [ref=e701]: "0"
+            - generic [ref=e702]:
+              - generic [ref=e703]: Ahmedabad, Gujarat
+              - generic [ref=e708]: Demo Owner
+              - generic [ref=e713]: owner@demo.jamanvaar.app
+            - generic [ref=e718]:
+              - generic [ref=e719]: Manage Restaurant
+              - generic [ref=e728]: Sept 2026
+          - 'button "Select restaurant #d839c2 ACTIVE TP TEST Pay Orders Restaurant 1789016074694 No Plan Assigned Branches 1 Terminals 0 Pay Orders Owner pay-orders-owner-1789016074694@test.example.com Manage Restaurant Sept 2026" [ref=e729] [cursor=pointer]':
+            - generic [ref=e730]:
+              - generic [ref=e731]:
+                - checkbox "Select restaurant" [ref=e732]
+                - generic "Click to copy ID" [ref=e733]: "#d839c2"
+              - generic [ref=e734]:
+                - generic [ref=e735]: ACTIVE
+                - button "More actions" [ref=e738]
+            - generic [ref=e743]:
+              - generic [ref=e744]: TP
+              - generic [ref=e745]:
+                - paragraph [ref=e746]: TEST Pay Orders Restaurant 1789016074694
+                - generic [ref=e747]: No Plan Assigned
+            - generic [ref=e749]:
+              - generic [ref=e750]:
+                - generic [ref=e751]: Branches
+                - generic [ref=e756]: "1"
+              - generic [ref=e757]:
+                - generic [ref=e758]: Terminals
+                - generic [ref=e761]: "0"
+            - generic [ref=e762]:
+              - generic [ref=e763]: Pay Orders Owner
+              - generic [ref=e768]: pay-orders-owner-1789016074694@test.example.com
+            - generic [ref=e773]:
+              - generic [ref=e774]: Manage Restaurant
+              - generic [ref=e783]: Sept 2026
+          - 'button "Select restaurant #9ace1d ACTIVE TO TEST Other Pay Orders Restaurant 1789016017684 TEST Pay Orders Plan 1789016016965 · PRO Branches 1 Terminals 0 Other Owner pay-orders-other-owner-1789016017683@test.example.com Manage Restaurant Sept 2026" [ref=e784] [cursor=pointer]':
+            - generic [ref=e785]:
+              - generic [ref=e786]:
+                - checkbox "Select restaurant" [ref=e787]
+                - generic "Click to copy ID" [ref=e788]: "#9ace1d"
+              - generic [ref=e789]:
+                - generic [ref=e790]: ACTIVE
+                - button "More actions" [ref=e793]
+            - generic [ref=e798]:
+              - generic [ref=e799]: TO
+              - generic [ref=e800]:
+                - paragraph [ref=e801]: TEST Other Pay Orders Restaurant 1789016017684
+                - generic [ref=e802]: TEST Pay Orders Plan 1789016016965 · PRO
+            - generic [ref=e804]:
+              - generic [ref=e805]:
+                - generic [ref=e806]: Branches
+                - generic [ref=e811]: "1"
+              - generic [ref=e812]:
+                - generic [ref=e813]: Terminals
+                - generic [ref=e816]: "0"
+            - generic [ref=e817]:
+              - generic [ref=e818]: Other Owner
+              - generic [ref=e823]: pay-orders-other-owner-1789016017683@test.example.com
+            - generic [ref=e828]:
+              - generic [ref=e829]: Manage Restaurant
+              - generic [ref=e838]: Sept 2026

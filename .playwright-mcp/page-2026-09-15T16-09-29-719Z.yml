@@ -1,0 +1,263 @@
+- generic [ref=f5e3]:
+  - banner [ref=f5e4]:
+    - generic [ref=f5e5]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f5e7]
+      - generic [ref=f5e9]:
+        - generic [ref=f5e10]:
+          - generic "QA FULL AUDIT RESTAURANT" [ref=f5e11]
+          - generic [ref=f5e12]: ADMIN
+        - button "Ahmedabad Flagship Store" [ref=f5e13] [cursor=pointer]
+    - button "Open global search" [ref=f5e20] [cursor=pointer]:
+      - textbox "Search orders, invoices, dishes, tables..." [ref=f5e24]
+      - generic: Ctrl+K
+    - generic [ref=f5e25]:
+      - generic [ref=f5e26]:
+        - button "EOD Report" [ref=f5e27] [cursor=pointer]
+        - button "Reconciliation" [ref=f5e32] [cursor=pointer]
+      - generic [ref=f5e38]:
+        - button "JAMAN AI Operations Assistant" [ref=f5e39] [cursor=pointer]
+        - button "Notifications" [ref=f5e43] [cursor=pointer]
+        - button "Sign out of Restaurant Admin" [ref=f5e47] [cursor=pointer]
+  - generic [ref=f5e51]:
+    - complementary [ref=f5e52]:
+      - generic [ref=f5e53]:
+        - generic [ref=f5e54]:
+          - button "OPERATIONS" [ref=f5e55] [cursor=pointer]
+          - navigation [ref=f5e59]:
+            - button "Dashboard" [ref=f5e60] [cursor=pointer]
+            - button "Billing / Invoices" [ref=f5e69] [cursor=pointer]
+            - button "Orders" [ref=f5e74] [cursor=pointer]
+            - button "Live Orders / KDS 3" [ref=f5e80] [cursor=pointer]:
+              - generic [ref=f5e81]: Live Orders / KDS
+              - generic [ref=f5e85]: "3"
+            - button "Floor / Tables" [ref=f5e87] [cursor=pointer]
+            - button "Reservations" [ref=f5e92] [cursor=pointer]
+            - button "Kitchen / KOT" [ref=f5e99] [cursor=pointer]
+        - generic [ref=f5e104]:
+          - button "DIGITAL ORDERING" [ref=f5e105] [cursor=pointer]
+          - navigation [ref=f5e109]:
+            - button "QR Table Ordering PRO" [ref=f5e110] [cursor=pointer]:
+              - generic [ref=f5e111]: QR Table Ordering
+              - generic [ref=f5e119]: PRO
+        - generic [ref=f5e121]:
+          - button "MENU & INVENTORY" [ref=f5e122] [cursor=pointer]
+          - navigation [ref=f5e126]:
+            - button "Menu & Categories" [ref=f5e127] [cursor=pointer]
+            - button "Inventory & Recipes 2" [active] [ref=f5e135] [cursor=pointer]:
+              - generic [ref=f5e136]: Inventory & Recipes
+              - generic [ref=f5e142]: "2"
+        - generic [ref=f5e144]:
+          - button "PEOPLE & CASH" [ref=f5e145] [cursor=pointer]
+          - navigation [ref=f5e149]:
+            - button "Customers CRM" [ref=f5e150] [cursor=pointer]
+            - button "Staff & Roles (RBAC)" [ref=f5e155] [cursor=pointer]
+            - button "Payments & Split" [ref=f5e163] [cursor=pointer]
+            - button "Shift & Cash Drawer" [ref=f5e168] [cursor=pointer]
+        - generic [ref=f5e176]:
+          - button "ANALYTICS & SYSTEM" [ref=f5e177] [cursor=pointer]
+          - navigation [ref=f5e181]:
+            - button "Reports & Analytics" [ref=f5e182] [cursor=pointer]
+            - button "Printers & Devices" [ref=f5e188] [cursor=pointer]
+            - button "Restaurant Settings" [ref=f5e195] [cursor=pointer]
+            - button "Subscription Plans" [ref=f5e201] [cursor=pointer]
+            - button "Audit Trail Logs" [ref=f5e207] [cursor=pointer]
+            - button "Backup & Restore" [ref=f5e213] [cursor=pointer]
+    - main [ref=f5e220]:
+      - generic [ref=f5e1020]:
+        - generic [ref=f5e1021]:
+          - generic [ref=f5e1022]:
+            - generic [ref=f5e1023]:
+              - heading "Inventory & Recipe Bill of Materials (BOM)" [level=1] [ref=f5e1024]
+              - generic [ref=f5e1025]: LIVE TRACKING
+            - paragraph [ref=f5e1026]: Track raw stock levels, set minimum reorder thresholds, and automate ingredient deductions upon POS/Kiosk sales.
+          - generic [ref=f5e1027]:
+            - button "Create Recipe Formula" [ref=f5e1028] [cursor=pointer]
+            - button "Add Stock Item" [ref=f5e1031] [cursor=pointer]
+        - generic [ref=f5e1034]:
+          - generic [ref=f5e1035]:
+            - generic [ref=f5e1036]: Raw Ingredients
+            - generic [ref=f5e1037]: 6 Items
+            - generic [ref=f5e1038]: In Warehouse Master
+          - generic [ref=f5e1039]:
+            - generic [ref=f5e1040]: Stock Valuation
+            - generic [ref=f5e1041]: ₹26409
+            - generic [ref=f5e1042]: ✓ Weighted Unit Cost
+          - generic [ref=f5e1043]:
+            - generic [ref=f5e1044]: Low Stock Alerts
+            - generic [ref=f5e1047]: 2 Critical
+            - generic [ref=f5e1048]: Action Required Below Min Level
+          - generic [ref=f5e1049]:
+            - generic [ref=f5e1050]: BOM Dish Formulas
+            - generic [ref=f5e1051]: 2 Formulas
+            - generic [ref=f5e1052]: Auto-Deduct on Order Sale
+        - generic [ref=f5e1053]:
+          - generic [ref=f5e1054]:
+            - generic [ref=f5e1055]: Raw Warehouse Ingredients (6)
+            - generic [ref=f5e1061]:
+              - textbox "Search ingredient or SKU..." [ref=f5e1066]
+              - combobox [ref=f5e1067] [cursor=pointer]:
+                - option "All Categories" [selected]
+                - option "Dairy"
+                - option "Grains & Pulses"
+                - option "Beverage Raw"
+          - table [ref=f5e1069]:
+            - rowgroup [ref=f5e1070]:
+              - row [ref=f5e1071]:
+                - columnheader "Item Name" [ref=f5e1072]
+                - columnheader "Category" [ref=f5e1073]
+                - columnheader "Current Stock" [ref=f5e1074]
+                - columnheader "Min Threshold" [ref=f5e1075]
+                - columnheader "Cost / Unit" [ref=f5e1076]
+                - columnheader "Status" [ref=f5e1077]
+                - columnheader "Actions" [ref=f5e1078]
+            - rowgroup [ref=f5e1079]:
+              - row [ref=f5e1080]:
+                - cell "Fresh Malai Paneer RAW-PAN-01" [ref=f5e1081]:
+                  - generic [ref=f5e1082]: Fresh Malai Paneer
+                  - generic [ref=f5e1083]: RAW-PAN-01
+                - cell "Dairy" [ref=f5e1084]
+                - cell "18.5 kg" [ref=f5e1085]
+                - cell "5 kg" [ref=f5e1086]
+                - cell "₹340 /kg" [ref=f5e1087]:
+                  - text: ₹340
+                  - generic [ref=f5e1088]: /kg
+                - cell "IN STOCK" [ref=f5e1089]
+                - cell [ref=f5e1092]:
+                  - generic [ref=f5e1093]:
+                    - button "Adjust Stock" [ref=f5e1094] [cursor=pointer]
+                    - button "Log Wastage" [ref=f5e1095] [cursor=pointer]
+                    - button "Edit Item" [ref=f5e1099] [cursor=pointer]
+                    - button "Delete Item" [ref=f5e1102] [cursor=pointer]
+              - row [ref=f5e1106]:
+                - cell "Amul Salted Table Butter RAW-BUT-01" [ref=f5e1107]:
+                  - generic [ref=f5e1108]: Amul Salted Table Butter
+                  - generic [ref=f5e1109]: RAW-BUT-01
+                - cell "Dairy" [ref=f5e1110]
+                - cell "4.2 kg" [ref=f5e1111]
+                - cell "5 kg" [ref=f5e1112]
+                - cell "₹520 /kg" [ref=f5e1113]:
+                  - text: ₹520
+                  - generic [ref=f5e1114]: /kg
+                - cell "LOW STOCK" [ref=f5e1115]
+                - cell [ref=f5e1118]:
+                  - generic [ref=f5e1119]:
+                    - button "Adjust Stock" [ref=f5e1120] [cursor=pointer]
+                    - button "Log Wastage" [ref=f5e1121] [cursor=pointer]
+                    - button "Edit Item" [ref=f5e1125] [cursor=pointer]
+                    - button "Delete Item" [ref=f5e1128] [cursor=pointer]
+              - row [ref=f5e1132]:
+                - cell "Royal Basmati Biryani Rice RAW-RIC-01" [ref=f5e1133]:
+                  - generic [ref=f5e1134]: Royal Basmati Biryani Rice
+                  - generic [ref=f5e1135]: RAW-RIC-01
+                - cell "Grains & Pulses" [ref=f5e1136]
+                - cell "65 kg" [ref=f5e1137]
+                - cell "15 kg" [ref=f5e1138]
+                - cell "₹140 /kg" [ref=f5e1139]:
+                  - text: ₹140
+                  - generic [ref=f5e1140]: /kg
+                - cell "IN STOCK" [ref=f5e1141]
+                - cell [ref=f5e1144]:
+                  - generic [ref=f5e1145]:
+                    - button "Adjust Stock" [ref=f5e1146] [cursor=pointer]
+                    - button "Log Wastage" [ref=f5e1147] [cursor=pointer]
+                    - button "Edit Item" [ref=f5e1151] [cursor=pointer]
+                    - button "Delete Item" [ref=f5e1154] [cursor=pointer]
+              - row [ref=f5e1158]:
+                - cell "Mozzarella Diced Pizza Cheese RAW-CHE-01" [ref=f5e1159]:
+                  - generic [ref=f5e1160]: Mozzarella Diced Pizza Cheese
+                  - generic [ref=f5e1161]: RAW-CHE-01
+                - cell "Dairy" [ref=f5e1162]
+                - cell "12 kg" [ref=f5e1163]
+                - cell "4 kg" [ref=f5e1164]
+                - cell "₹480 /kg" [ref=f5e1165]:
+                  - text: ₹480
+                  - generic [ref=f5e1166]: /kg
+                - cell "IN STOCK" [ref=f5e1167]
+                - cell [ref=f5e1170]:
+                  - generic [ref=f5e1171]:
+                    - button "Adjust Stock" [ref=f5e1172] [cursor=pointer]
+                    - button "Log Wastage" [ref=f5e1173] [cursor=pointer]
+                    - button "Edit Item" [ref=f5e1177] [cursor=pointer]
+                    - button "Delete Item" [ref=f5e1180] [cursor=pointer]
+              - row [ref=f5e1184]:
+                - cell "Refined Maida (Naan Flour) RAW-MAI-01" [ref=f5e1185]:
+                  - generic [ref=f5e1186]: Refined Maida (Naan Flour)
+                  - generic [ref=f5e1187]: RAW-MAI-01
+                - cell "Grains & Pulses" [ref=f5e1188]
+                - cell "40 kg" [ref=f5e1189]
+                - cell "10 kg" [ref=f5e1190]
+                - cell "₹45 /kg" [ref=f5e1191]:
+                  - text: ₹45
+                  - generic [ref=f5e1192]: /kg
+                - cell "IN STOCK" [ref=f5e1193]
+                - cell [ref=f5e1196]:
+                  - generic [ref=f5e1197]:
+                    - button "Adjust Stock" [ref=f5e1198] [cursor=pointer]
+                    - button "Log Wastage" [ref=f5e1199] [cursor=pointer]
+                    - button "Edit Item" [ref=f5e1203] [cursor=pointer]
+                    - button "Delete Item" [ref=f5e1206] [cursor=pointer]
+              - row [ref=f5e1210]:
+                - cell "Arabica Roasted Coffee Beans RAW-COF-01" [ref=f5e1211]:
+                  - generic [ref=f5e1212]: Arabica Roasted Coffee Beans
+                  - generic [ref=f5e1213]: RAW-COF-01
+                - cell "Beverage Raw" [ref=f5e1214]
+                - cell "1.5 kg" [ref=f5e1215]
+                - cell "2 kg" [ref=f5e1216]
+                - cell "₹850 /kg" [ref=f5e1217]:
+                  - text: ₹850
+                  - generic [ref=f5e1218]: /kg
+                - cell "LOW STOCK" [ref=f5e1219]
+                - cell [ref=f5e1222]:
+                  - generic [ref=f5e1223]:
+                    - button "Adjust Stock" [ref=f5e1224] [cursor=pointer]
+                    - button "Log Wastage" [ref=f5e1225] [cursor=pointer]
+                    - button "Edit Item" [ref=f5e1229] [cursor=pointer]
+                    - button "Delete Item" [ref=f5e1232] [cursor=pointer]
+        - generic [ref=f5e1236]:
+          - generic [ref=f5e1237]:
+            - generic [ref=f5e1238]: Configured Dish Recipe Formulas (2)
+            - generic [ref=f5e1241]: Automatic Ingredient Consumption
+          - table [ref=f5e1243]:
+            - rowgroup [ref=f5e1244]:
+              - row [ref=f5e1245]:
+                - columnheader "Menu Dish" [ref=f5e1246]
+                - columnheader "Ingredients Breakdown" [ref=f5e1247]
+                - columnheader "Actions" [ref=f5e1248]
+            - rowgroup [ref=f5e1249]:
+              - row [ref=f5e1250]:
+                - cell "Paneer Tikka (Tandoori)" [ref=f5e1251]
+                - cell "Fresh Malai Paneer (0.2 kg) Amul Salted Table Butter (0.03 kg)" [ref=f5e1252]:
+                  - generic [ref=f5e1253]:
+                    - generic [ref=f5e1254]:
+                      - text: Fresh Malai Paneer
+                      - generic [ref=f5e1255]: (0.2 kg)
+                    - generic [ref=f5e1256]:
+                      - text: Amul Salted Table Butter
+                      - generic [ref=f5e1257]: (0.03 kg)
+                - cell [ref=f5e1258]:
+                  - generic [ref=f5e1259]:
+                    - button "Edit Recipe" [ref=f5e1260] [cursor=pointer]
+                    - button "Delete Recipe" [ref=f5e1263] [cursor=pointer]
+              - row [ref=f5e1267]:
+                - cell "Butter Naan" [ref=f5e1268]
+                - cell "Refined Maida (Naan Flour) (0.1 kg) Amul Salted Table Butter (0.02 kg)" [ref=f5e1269]:
+                  - generic [ref=f5e1270]:
+                    - generic [ref=f5e1271]:
+                      - text: Refined Maida (Naan Flour)
+                      - generic [ref=f5e1272]: (0.1 kg)
+                    - generic [ref=f5e1273]:
+                      - text: Amul Salted Table Butter
+                      - generic [ref=f5e1274]: (0.02 kg)
+                - cell [ref=f5e1275]:
+                  - generic [ref=f5e1276]:
+                    - button "Edit Recipe" [ref=f5e1277] [cursor=pointer]
+                    - button "Delete Recipe" [ref=f5e1280] [cursor=pointer]
+        - generic [ref=f5e1284]:
+          - generic [ref=f5e1285]:
+            - generic [ref=f5e1286]: Recent Wastage Log
+            - generic [ref=f5e1291]: Last 0 of 0 entries
+          - paragraph [ref=f5e1293]: No wastage logged yet. Use "Log Wastage" on an ingredient to record spoilage, prep trim, or breakage.
+  - button "Open JAMAN AI Restaurant Intelligence" [ref=f5e827] [cursor=pointer]:
+    - generic [ref=f5e833]:
+      - generic [ref=f5e834]: JAMAN AI
+      - generic [ref=f5e835]: ACTIVE

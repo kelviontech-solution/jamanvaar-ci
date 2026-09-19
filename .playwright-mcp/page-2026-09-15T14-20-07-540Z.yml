@@ -1,0 +1,148 @@
+- generic [ref=e176]:
+  - banner [ref=e177]:
+    - generic [ref=e179]:
+      - generic [ref=e180]:
+        - img "JAMANVAAR by KELVIONTECH"
+      - generic [ref=e182]: KITCHEN DISPLAY (KDS)
+    - generic [ref=e186]:
+      - button "🍽 All" [ref=e187] [cursor=pointer]
+      - button "🍳 Main" [ref=e188] [cursor=pointer]
+      - button "🔥 Tandoor" [ref=e189] [cursor=pointer]
+      - button "☕ Beverage" [ref=e190] [cursor=pointer]
+      - button "🍨 Dessert" [ref=e191] [cursor=pointer]
+    - generic [ref=e192]:
+      - generic [ref=e193]:
+        - generic [ref=e195]: KDS LIVE
+        - generic [ref=e196]: "|"
+        - generic [ref=e197]: 07:50:07 PM
+      - generic [ref=e198]:
+        - generic [ref=e201]: "3"
+        - generic [ref=e202]: Cooking
+      - generic [ref=e203]:
+        - generic [ref=e207]: "1"
+        - generic [ref=e208]: Ready
+      - button "Switch kitchen station or logout" [ref=e209] [cursor=pointer]
+  - generic [ref=e214]:
+    - button "ACTIVE TICKETS 4" [ref=e215] [cursor=pointer]:
+      - generic [ref=e216]: ACTIVE TICKETS
+      - generic [ref=e217]: "4"
+    - button "🔥 COOKING 3" [ref=e218] [cursor=pointer]:
+      - generic [ref=e219]: 🔥 COOKING
+      - generic [ref=e220]: "3"
+    - button "🔔 FOOD READY 1" [ref=e221] [cursor=pointer]:
+      - generic [ref=e222]: 🔔 FOOD READY
+      - generic [ref=e223]: "1"
+    - button "✓ SERVED 0" [ref=e224] [cursor=pointer]:
+      - generic [ref=e225]: ✓ SERVED
+      - generic [ref=e226]: "0"
+  - main [ref=e227]:
+    - generic [ref=e228]:
+      - generic [ref=e229]:
+        - generic [ref=e231]:
+          - generic [ref=e232]:
+            - generic [ref=e233]:
+              - generic [ref=e234]:
+                - generic [ref=e235]: "#101"
+                - generic [ref=e236]: KOT-01
+              - generic [ref=e237]:
+                - generic [ref=e238]: Table 3
+                - generic [ref=e239]: •
+                - generic [ref=e240]: DINE_IN
+            - generic [ref=e241]: 08:15
+          - generic [ref=e246]:
+            - generic [ref=e248]:
+              - generic [ref=e249]: 2×
+              - generic [ref=e250]:
+                - generic [ref=e251]: Paneer Tikka (Tandoori)
+                - generic [ref=e252]: • Extra Cheese
+                - generic [ref=e254]: Less Spicy, Extra Chutney
+            - generic [ref=e259]:
+              - generic [ref=e260]: 1×
+              - generic [ref=e261]: Dal Makhani (Maa Ki Dal)
+        - generic [ref=e263]:
+          - generic [ref=e264]:
+            - generic [ref=e265]:
+              - text: "Captain:"
+              - strong [ref=e266]: Amit Dave
+            - generic [ref=e267]: "#t-101"
+          - button "MARK FOOD READY" [ref=e268] [cursor=pointer]
+      - generic [ref=e273]:
+        - generic [ref=e275]:
+          - generic [ref=e276]:
+            - generic [ref=e277]:
+              - generic [ref=e278]:
+                - generic [ref=e279]: "#101"
+                - generic [ref=e280]: KOT-02
+              - generic [ref=e281]:
+                - generic [ref=e282]: Table 3
+                - generic [ref=e283]: •
+                - generic [ref=e284]: DINE_IN
+            - generic [ref=e285]: 07:15
+          - generic [ref=e290]:
+            - generic [ref=e292]:
+              - generic [ref=e293]: 3×
+              - generic [ref=e294]:
+                - generic [ref=e295]: Butter Naan
+                - generic [ref=e296]: Crispy, Extra Butter
+            - generic [ref=e301]:
+              - generic [ref=e302]: 2×
+              - generic [ref=e303]: Garlic Butter Naan
+        - generic [ref=e305]:
+          - generic [ref=e306]:
+            - generic [ref=e307]:
+              - text: "Captain:"
+              - strong [ref=e308]: Amit Dave
+            - generic [ref=e309]: "#t-102"
+          - button "MARK FOOD READY" [ref=e310] [cursor=pointer]
+      - generic [ref=e315]:
+        - generic [ref=e317]:
+          - generic [ref=e318]:
+            - generic [ref=e319]:
+              - generic [ref=e320]:
+                - generic [ref=e321]: "#102"
+                - generic [ref=e322]: KOT-03
+              - generic [ref=e323]:
+                - generic [ref=e324]: Table 1
+                - generic [ref=e325]: •
+                - generic [ref=e326]: DINE_IN
+            - generic [ref=e327]: 12:15
+          - generic [ref=e332]:
+            - generic [ref=e334]:
+              - generic [ref=e335]: 2×
+              - generic [ref=e336]:
+                - generic [ref=e337]: Royal Mango Lassi
+                - generic [ref=e338]: Chilled, Less Sweet
+            - generic [ref=e343]:
+              - generic [ref=e344]: 2×
+              - generic [ref=e345]: Special Masala Chai
+        - generic [ref=e347]:
+          - generic [ref=e348]:
+            - generic [ref=e349]:
+              - text: "Captain:"
+              - strong [ref=e350]: Amit Dave
+            - generic [ref=e351]: "#t-103"
+          - button "MARK SERVED ✓" [ref=e352] [cursor=pointer]
+      - generic [ref=e357]:
+        - generic [ref=e359]:
+          - generic [ref=e360]:
+            - generic [ref=e361]:
+              - generic [ref=e362]:
+                - generic [ref=e363]: "#104"
+                - generic [ref=e364]: KOT-04
+              - generic [ref=e365]:
+                - generic [ref=e366]: Takeaway
+                - generic [ref=e367]: •
+                - generic [ref=e368]: TAKEAWAY
+            - generic [ref=e369]: 03:15
+          - generic [ref=e376]:
+            - generic [ref=e377]: 2×
+            - generic [ref=e378]:
+              - generic [ref=e379]: Gulab Jamun with Rabdi (2 Pcs)
+              - generic [ref=e380]: Pack in warm container
+        - generic [ref=e384]:
+          - generic [ref=e385]:
+            - generic [ref=e386]:
+              - text: "Captain:"
+              - strong [ref=e387]: Amit Dave
+            - generic [ref=e388]: "#t-104"
+          - button "MARK FOOD READY" [ref=e389] [cursor=pointer]

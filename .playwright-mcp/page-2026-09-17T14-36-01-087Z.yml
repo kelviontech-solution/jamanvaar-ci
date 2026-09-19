@@ -1,0 +1,59 @@
+- generic [ref=f23e3]:
+  - banner [ref=f23e104]:
+    - generic [ref=f23e105]:
+      - button [ref=f23e106] [cursor=pointer]
+      - generic [ref=f23e109]:
+        - generic [ref=f23e110]:
+          - img "JAMANVAAR by KELVIONTECH"
+        - generic [ref=f23e112]: CUSTOMER KIOSK
+    - generic [ref=f23e116]:
+      - button [ref=f23e117] [cursor=pointer]
+      - button [ref=f23e120] [cursor=pointer]
+      - generic [ref=f23e124]:
+        - button "EN" [ref=f23e125] [cursor=pointer]
+        - button "हिन्दी" [ref=f23e126] [cursor=pointer]
+        - button "ગુજરાતી" [ref=f23e127] [cursor=pointer]
+      - button "More options" [ref=f23e129] [cursor=pointer]
+  - generic [ref=f23e156]:
+    - generic [ref=f23e157]:
+      - heading "Select Your Table" [level=2] [ref=f23e158]
+      - paragraph [ref=f23e159]: Tap the table number where you are seated.
+    - generic [ref=f23e160]:
+      - button "1 Main Hall" [ref=f23e161] [cursor=pointer]:
+        - generic [ref=f23e162]: "1"
+        - generic [ref=f23e163]: Main Hall
+      - button "2 Main Hall" [ref=f23e164] [cursor=pointer]:
+        - generic [ref=f23e165]: "2"
+        - generic [ref=f23e166]: Main Hall
+      - button "3 Main Hall" [ref=f23e167] [cursor=pointer]:
+        - generic [ref=f23e168]: "3"
+        - generic [ref=f23e169]: Main Hall
+      - button "4 Main Hall" [ref=f23e170] [cursor=pointer]:
+        - generic [ref=f23e171]: "4"
+        - generic [ref=f23e172]: Main Hall
+      - button "5 Main Hall" [ref=f23e173] [cursor=pointer]:
+        - generic [ref=f23e174]: "5"
+        - generic [ref=f23e175]: Main Hall
+      - button "6 Family Section" [ref=f23e176] [cursor=pointer]:
+        - generic [ref=f23e177]: "6"
+        - generic [ref=f23e178]: Family Section
+      - button "7 Family Section" [ref=f23e179] [cursor=pointer]:
+        - generic [ref=f23e180]: "7"
+        - generic [ref=f23e181]: Family Section
+      - button "8 Family Section" [ref=f23e182] [cursor=pointer]:
+        - generic [ref=f23e183]: "8"
+        - generic [ref=f23e184]: Family Section
+      - button "9 AC Balcony" [ref=f23e185] [cursor=pointer]:
+        - generic [ref=f23e186]: "9"
+        - generic [ref=f23e187]: AC Balcony
+      - button "10 AC Balcony" [ref=f23e188] [cursor=pointer]:
+        - generic [ref=f23e189]: "10"
+        - generic [ref=f23e190]: AC Balcony
+      - button "11 AC Balcony" [ref=f23e191] [cursor=pointer]:
+        - generic [ref=f23e192]: "11"
+        - generic [ref=f23e193]: AC Balcony
+      - button "12 AC Balcony" [ref=f23e194] [cursor=pointer]:
+        - generic [ref=f23e195]: "12"
+        - generic [ref=f23e196]: AC Balcony
+    - button "Skip Table Selection (Pick up at counter)" [ref=f23e198] [cursor=pointer]
+  - button "JAMANVAAR Food Assistant" [ref=f23e99] [cursor=pointer]

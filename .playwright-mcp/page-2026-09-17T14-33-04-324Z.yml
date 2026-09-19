@@ -1,0 +1,19 @@
+- generic [ref=f21e3]:
+  - generic [ref=f21e75]:
+    - button [ref=f21e78] [cursor=pointer]
+    - img "JAMANVAAR by Kelviontech" [ref=f21e83]
+    - generic [ref=f21e84]:
+      - heading "Choose your language" [level=1] [ref=f21e85]
+      - paragraph [ref=f21e86]: भाषा चुनें • ભાષા પસંદ કરો
+    - generic [ref=f21e87]:
+      - button "English English" [ref=f21e88] [cursor=pointer]:
+        - generic [ref=f21e89]: English
+        - generic [ref=f21e90]: English
+      - button "हिन्दी Hindi" [ref=f21e91] [cursor=pointer]:
+        - generic [ref=f21e92]: हिन्दी
+        - generic [ref=f21e93]: Hindi
+      - button "ગુજરાતી Gujarati" [ref=f21e94] [cursor=pointer]:
+        - generic [ref=f21e95]: ગુજરાતી
+        - generic [ref=f21e96]: Gujarati
+    - paragraph [ref=f21e97]: You can change this anytime from the header
+  - button "JAMANVAAR Food Assistant" [ref=f21e99] [cursor=pointer]

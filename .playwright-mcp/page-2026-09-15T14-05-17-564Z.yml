@@ -1,0 +1,85 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - img "JAMANVAAR by Kelviontech" [ref=e7]
+      - generic [ref=e8]:
+        - generic [ref=e11]:
+          - text: "Cloud API:"
+          - strong [ref=e12]: Connected (Port 4000)
+        - button [ref=e13] [cursor=pointer]:
+          - generic [ref=e18]:
+            - text: "Network:"
+            - strong [ref=e19]: Online
+        - generic [ref=e20]: Tue, 15 Sept 2026
+    - main [ref=e24]:
+      - generic [ref=e25]:
+        - img "JAMANVAAR by Kelviontech" [ref=e28]
+        - generic [ref=e29]:
+          - heading "Platform Control. Unified Cloud Engine." [level=1] [ref=e30]:
+            - text: Platform Control.
+            - generic [ref=e31]: Unified Cloud Engine.
+          - paragraph [ref=e32]: Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.
+        - generic [ref=e33]:
+          - generic [ref=e34]: Tenant Fleet Control
+          - generic [ref=e39]: License Provisioning
+          - generic [ref=e44]: Enterprise Analytics
+          - generic [ref=e51]: Role-Based Security
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - img "Tandoori Naan" [ref=e59]
+            - generic [ref=e60]: Tandoori Breads
+          - generic [ref=e61]:
+            - img "Paneer Butter Masala" [ref=e62]
+            - generic [ref=e63]: Royal Curries
+          - generic [ref=e64]:
+            - img "Tandoori Angaar" [ref=e65]
+            - generic [ref=e66]: Tandoor Starters
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - generic [ref=e72]: Welcome to
+              - generic [ref=e73]: SUPER ADMIN
+            - heading "JAMANVAAR" [level=2] [ref=e75]
+            - paragraph [ref=e76]: Enterprise Platform Control & SaaS Management
+          - generic [ref=e77]:
+            - button "QUICK DEMO LOGIN — Super Admin (@superadmin)" [ref=e78] [cursor=pointer]
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - generic [ref=e84]: Super Admin Email *
+                - textbox "e.g. superadmin@jamanvaar.app" [ref=e85]: superadmin@jamanvaar.app
+              - generic [ref=e86]:
+                - generic [ref=e87]:
+                  - generic [ref=e88]: Password *
+                  - button "Show Password" [ref=e89] [cursor=pointer]
+                - 'textbox "Enter password (demo: admin)" [ref=e91]'
+              - generic [ref=e92]:
+                - generic [ref=e93] [cursor=pointer]:
+                  - checkbox "Remember session" [checked] [ref=e94]
+                  - generic [ref=e95]: Remember session
+                - generic [ref=e96]: Port 4000 • Live Cloud API
+              - button "Sign In to Platform Control" [ref=e97] [cursor=pointer]
+        - generic [ref=e99]:
+          - generic [ref=e100]: Role-Based Security
+          - generic [ref=e105]: •
+          - generic [ref=e106]: Instant Offline Boot
+          - generic [ref=e110]: •
+          - generic [ref=e111]: 100% Secure
+    - contentinfo [ref=e115]: © 2026 JAMANVAAR by KELVIONTECH — All rights reserved.
+  - region "JAMANVAAR Startup" [ref=e116]:
+    - generic [ref=e117]:
+      - generic [ref=e118]: KELVIONTECH ENTERPRISE
+      - generic [ref=e121]: Cloud Control Active
+    - generic [ref=e127]:
+      - generic [ref=e128]: ENTERPRISE MULTI-TENANT CLOUD CONTROL
+      - generic [ref=e130]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=e131]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=e137]
+      - paragraph [ref=e139]: JAMANVAAR Cloud Platform Control
+      - generic [ref=e140]: SUPER ADMIN
+      - generic [ref=e145]:
+        - generic [ref=e146]: Core Engine Ready
+        - generic [ref=e148]: •
+        - generic [ref=e149]: Cloud Database Connected
+        - generic [ref=e151]: •
+        - generic [ref=e152]: Multi-Tenant Active

@@ -1,0 +1,336 @@
+- generic [ref=f37e3]:
+  - banner [ref=f37e4]:
+    - generic [ref=f37e5]:
+      - generic [ref=f37e6]:
+        - generic [ref=f37e7]:
+          - img "JAMANVAAR by KELVIONTECH"
+        - generic [ref=f37e9]:
+          - generic [ref=f37e10]:
+            - generic [ref=f37e11]: KIOSK ADMIN
+            - generic [ref=f37e13]: My Restaurant
+          - paragraph [ref=f37e14]:
+            - generic [ref=f37e15]: Ahmedabad Flagship Store
+      - generic [ref=f37e16]:
+        - button "Control POS" [ref=f37e17] [cursor=pointer]
+        - button "KDS Kitchen (2)" [ref=f37e18] [cursor=pointer]
+        - button "Kiosk Terminals (1/3)" [ref=f37e19] [cursor=pointer]
+    - generic [ref=f37e20]:
+      - button "Sound ON" [ref=f37e21] [cursor=pointer]
+      - button "JAMANVAAR Assistant" [ref=f37e27] [cursor=pointer]
+      - button "ONLINE (18ms)" [ref=f37e32] [cursor=pointer]
+      - generic [ref=f37e35]:
+        - generic [ref=f37e36]: M
+        - generic [ref=f37e37]:
+          - generic [ref=f37e38]: Manager
+          - generic [ref=f37e39]: KIOSK ADMIN
+        - button "Logout" [ref=f37e40] [cursor=pointer]
+  - generic [ref=f37e45]:
+    - complementary [ref=f37e46]:
+      - navigation [ref=f37e47]:
+        - button "Dashboard" [ref=f37e48] [cursor=pointer]
+        - button "Menu Management" [active] [ref=f37e55] [cursor=pointer]
+        - button "Combos & Meal Deals" [ref=f37e62] [cursor=pointer]
+        - button "Orders & KDS 🔴 1 NEW" [ref=f37e68] [cursor=pointer]:
+          - generic [ref=f37e69]: Orders & KDS
+          - generic [ref=f37e73]: 🔴 1 NEW
+        - button "Table Layout" [ref=f37e75] [cursor=pointer]
+        - button "Kiosk Terminals" [ref=f37e79] [cursor=pointer]
+        - button "Offers & Coupons" [ref=f37e86] [cursor=pointer]
+        - button "Receipt & E-Bill" [ref=f37e91] [cursor=pointer]
+        - button "Hardware & Diagnostics" [ref=f37e95] [cursor=pointer]
+        - button "Customer Feedback" [ref=f37e101] [cursor=pointer]
+        - button "Reports & Export" [ref=f37e105] [cursor=pointer]
+        - button "Staff & Roles" [ref=f37e110] [cursor=pointer]
+        - button "Sync Center" [ref=f37e117] [cursor=pointer]
+        - button "Audit Activity Logs" [ref=f37e125] [cursor=pointer]
+        - button "License & Entitlement" [ref=f37e129] [cursor=pointer]
+        - button "Settings & Backup" [ref=f37e134] [cursor=pointer]
+      - generic [ref=f37e139]:
+        - generic [ref=f37e140]:
+          - generic [ref=f37e141]: JAMANVAAR POS
+          - generic [ref=f37e142]: v1.0.0
+        - paragraph [ref=f37e143]: Kelviontech Systems
+    - main [ref=f37e144]:
+      - generic [ref=f37e482]:
+        - generic [ref=f37e483]:
+          - generic [ref=f37e484]:
+            - generic [ref=f37e485]:
+              - heading "Menu & Catalog Builder" [level=1] [ref=f37e486]
+              - generic [ref=f37e487]: ● LIVE (v1.0-initial)
+            - paragraph [ref=f37e488]: 6 Categories • 12 Dishes • 2 Combos
+          - generic "Click to view and fix missing data" [ref=f37e489] [cursor=pointer]:
+            - generic [ref=f37e490]:
+              - generic [ref=f37e491]: Completeness
+              - generic [ref=f37e492]: 100% Ready
+          - generic [ref=f37e495]:
+            - button "🍽️ Load Prebuilt Menu" [ref=f37e496] [cursor=pointer]
+            - button "⚡ Bulk Price" [ref=f37e498] [cursor=pointer]
+            - button "🖼️ Image Hub" [ref=f37e500] [cursor=pointer]
+            - button "👁️ Preview Kiosk" [ref=f37e502] [cursor=pointer]
+            - button "📥 / 📤 Backup" [ref=f37e504] [cursor=pointer]
+            - button "🚀 Publish" [ref=f37e506] [cursor=pointer]
+            - button "+ Category" [ref=f37e508] [cursor=pointer]
+            - button "+ Add Menu Dish" [ref=f37e510] [cursor=pointer]
+        - generic [ref=f37e514]:
+          - textbox "Search dish name, SKU, or tags..." [ref=f37e519]
+          - generic [ref=f37e520]:
+            - button "All Dietary" [ref=f37e521] [cursor=pointer]
+            - button "VEG" [ref=f37e522] [cursor=pointer]
+            - button "NON VEG" [ref=f37e523] [cursor=pointer]
+            - button "JAIN" [ref=f37e524] [cursor=pointer]
+        - generic [ref=f37e525]:
+          - generic [ref=f37e526]:
+            - button "All Categories (12)" [ref=f37e527] [cursor=pointer]
+            - button "Starters & Quick Bites" [ref=f37e528] [cursor=pointer]
+            - button "Tandoor & Kebabs" [ref=f37e532] [cursor=pointer]
+            - button "Main Course (Curries)" [ref=f37e536] [cursor=pointer]
+            - button "Naan, Roti & Breads" [ref=f37e543] [cursor=pointer]
+            - button "Biryani & Rice Bowls" [ref=f37e554] [cursor=pointer]
+            - button "Beverages & Desserts" [ref=f37e562] [cursor=pointer]
+          - button "+ Add Menu Dish" [ref=f37e568] [cursor=pointer]
+        - generic [ref=f37e572]:
+          - generic [ref=f37e573]:
+            - generic [ref=f37e574] [cursor=pointer]:
+              - generic [ref=f37e575]:
+                - img "Hara Bhara Kebab (6 Pcs)" [ref=f37e576]
+                - generic [ref=f37e577]: HBK-01
+                - generic [ref=f37e580]: Kitchen
+              - generic [ref=f37e581]:
+                - generic [ref=f37e582]:
+                  - generic [ref=f37e583]:
+                    - generic "Pure Veg" [ref=f37e584]
+                    - heading "Hara Bhara Kebab (6 Pcs)" [level=3] [ref=f37e586]
+                  - paragraph [ref=f37e587]: Crispy spinach, green pea and paneer patties served with fresh mint chutney.
+                - generic [ref=f37e588]:
+                  - generic [ref=f37e589]: ₹220
+                  - button "Add to Cart" [ref=f37e591]
+            - generic [ref=f37e593]:
+              - button "● Available" [ref=f37e594] [cursor=pointer]
+              - generic [ref=f37e595]:
+                - button "🖼️ Photo" [ref=f37e596] [cursor=pointer]
+                - button "Delete" [ref=f37e597] [cursor=pointer]
+          - generic [ref=f37e598]:
+            - generic [ref=f37e599] [cursor=pointer]:
+              - generic [ref=f37e600]:
+                - img "Crispy Corn Salt & Pepper" [ref=f37e601]
+                - generic [ref=f37e602]: CC-02
+                - generic [ref=f37e605]: Kitchen
+              - generic [ref=f37e606]:
+                - generic [ref=f37e607]:
+                  - generic [ref=f37e608]:
+                    - generic "Pure Veg" [ref=f37e609]
+                    - heading "Crispy Corn Salt & Pepper" [level=3] [ref=f37e611]
+                  - paragraph [ref=f37e612]: Golden fried sweet corn tossed with bell peppers, green chillies & aromatic herbs.
+                - generic [ref=f37e613]:
+                  - generic [ref=f37e614]: ₹240
+                  - button "Add to Cart" [ref=f37e616]
+            - generic [ref=f37e618]:
+              - button "● Available" [ref=f37e619] [cursor=pointer]
+              - generic [ref=f37e620]:
+                - button "🖼️ Photo" [ref=f37e621] [cursor=pointer]
+                - button "Delete" [ref=f37e622] [cursor=pointer]
+          - generic [ref=f37e623]:
+            - generic [ref=f37e624] [cursor=pointer]:
+              - generic [ref=f37e625]:
+                - img "Cheese Corn Cigar Rolls (5 Pcs)" [ref=f37e626]
+                - generic [ref=f37e627]: CCR-03
+                - generic [ref=f37e630]: Kitchen
+              - generic [ref=f37e631]:
+                - generic [ref=f37e632]:
+                  - generic [ref=f37e633]:
+                    - generic "Pure Veg" [ref=f37e634]
+                    - heading "Cheese Corn Cigar Rolls (5 Pcs)" [level=3] [ref=f37e636]
+                  - paragraph [ref=f37e637]: Golden crispy rolls filled with melted mozzarella, sweet corn and herbs served with sweet chilli dip.
+                - generic [ref=f37e638]:
+                  - generic [ref=f37e639]: ₹210
+                  - button "Add to Cart" [ref=f37e641]
+            - generic [ref=f37e643]:
+              - button "● Available" [ref=f37e644] [cursor=pointer]
+              - generic [ref=f37e645]:
+                - button "🖼️ Photo" [ref=f37e646] [cursor=pointer]
+                - button "Delete" [ref=f37e647] [cursor=pointer]
+          - generic [ref=f37e648]:
+            - generic [ref=f37e649] [cursor=pointer]:
+              - generic [ref=f37e650]:
+                - img "Paneer Tikka (Tandoori Angaar)" [ref=f37e651]
+                - generic [ref=f37e652]: PT-04
+                - generic [ref=f37e655]: Tandoor
+              - generic [ref=f37e656]:
+                - generic [ref=f37e657]:
+                  - generic [ref=f37e658]:
+                    - generic "Pure Veg" [ref=f37e659]
+                    - heading "Paneer Tikka (Tandoori Angaar)" [level=3] [ref=f37e661]
+                  - paragraph [ref=f37e662]: Fresh malai cottage cheese cubes marinated in spiced curd and grilled over charcoal embers.
+                - generic [ref=f37e663]:
+                  - generic [ref=f37e664]: ₹260
+                  - button "Add to Cart" [ref=f37e666]
+            - generic [ref=f37e668]:
+              - button "● Available" [ref=f37e669] [cursor=pointer]
+              - generic [ref=f37e670]:
+                - button "🖼️ Photo" [ref=f37e671] [cursor=pointer]
+                - button "Delete" [ref=f37e672] [cursor=pointer]
+          - generic [ref=f37e673]:
+            - generic [ref=f37e674] [cursor=pointer]:
+              - generic [ref=f37e675]:
+                - img "Dal Makhani (Slow Cooked)" [ref=f37e676]
+                - generic [ref=f37e677]: DM-05
+                - generic [ref=f37e680]: Curry Station
+              - generic [ref=f37e681]:
+                - generic [ref=f37e682]:
+                  - generic [ref=f37e683]:
+                    - generic "Pure Veg" [ref=f37e684]
+                    - heading "Dal Makhani (Slow Cooked)" [level=3] [ref=f37e686]
+                  - paragraph [ref=f37e687]: Slow-cooked black urad lentils simmered overnight with butter, tomatoes and fresh cream.
+                - generic [ref=f37e688]:
+                  - generic [ref=f37e689]: ₹195
+                  - button "Add to Cart" [ref=f37e691]
+            - generic [ref=f37e693]:
+              - button "● Available" [ref=f37e694] [cursor=pointer]
+              - generic [ref=f37e695]:
+                - button "🖼️ Photo" [ref=f37e696] [cursor=pointer]
+                - button "Delete" [ref=f37e697] [cursor=pointer]
+          - generic [ref=f37e698]:
+            - generic [ref=f37e699] [cursor=pointer]:
+              - generic [ref=f37e700]:
+                - img "Paneer Butter Masala" [ref=f37e701]
+                - generic [ref=f37e702]: PBM-06
+                - generic [ref=f37e705]: Curry Station
+              - generic [ref=f37e706]:
+                - generic [ref=f37e707]:
+                  - generic [ref=f37e708]:
+                    - generic "Pure Veg" [ref=f37e709]
+                    - heading "Paneer Butter Masala" [level=3] [ref=f37e711]
+                  - paragraph [ref=f37e712]: Soft cottage cheese simmered in a luscious makhani gravy enriched with butter and cream.
+                - generic [ref=f37e713]:
+                  - generic [ref=f37e714]: ₹250
+                  - button "Add to Cart" [ref=f37e716]
+            - generic [ref=f37e718]:
+              - button "● Available" [ref=f37e719] [cursor=pointer]
+              - generic [ref=f37e720]:
+                - button "🖼️ Photo" [ref=f37e721] [cursor=pointer]
+                - button "Delete" [ref=f37e722] [cursor=pointer]
+          - generic [ref=f37e723]:
+            - generic [ref=f37e724] [cursor=pointer]:
+              - generic [ref=f37e725]:
+                - img "Butter Naan (Tandoori)" [ref=f37e726]
+                - generic [ref=f37e727]: BN-07
+                - generic [ref=f37e730]: Tandoor
+              - generic [ref=f37e731]:
+                - generic [ref=f37e732]:
+                  - generic [ref=f37e733]:
+                    - generic "Pure Veg" [ref=f37e734]
+                    - heading "Butter Naan (Tandoori)" [level=3] [ref=f37e736]
+                  - paragraph [ref=f37e737]: Traditional clay-tandoor baked leavened bread brushed with melted pure Amul butter.
+                - generic [ref=f37e738]:
+                  - generic [ref=f37e739]: ₹60
+                  - button "Add to Cart" [ref=f37e741]
+            - generic [ref=f37e743]:
+              - button "○ 86 Sold Out" [ref=f37e744] [cursor=pointer]
+              - generic [ref=f37e745]:
+                - button "🖼️ Photo" [ref=f37e746] [cursor=pointer]
+                - button "Delete" [ref=f37e747] [cursor=pointer]
+          - generic [ref=f37e748]:
+            - generic [ref=f37e749] [cursor=pointer]:
+              - generic [ref=f37e750]:
+                - img "Garlic Butter Naan" [ref=f37e751]
+                - generic [ref=f37e752]: GN-08
+                - generic [ref=f37e755]: Tandoor
+              - generic [ref=f37e756]:
+                - generic [ref=f37e757]:
+                  - generic [ref=f37e758]:
+                    - generic "Pure Veg" [ref=f37e759]
+                    - heading "Garlic Butter Naan" [level=3] [ref=f37e761]
+                  - paragraph [ref=f37e762]: Fluffy tandoori bread generously garnished with minced roasted garlic, fresh coriander and butter.
+                - generic [ref=f37e763]:
+                  - generic [ref=f37e764]: ₹75
+                  - button "Add to Cart" [ref=f37e766]
+            - generic [ref=f37e768]:
+              - button "● Available" [ref=f37e769] [cursor=pointer]
+              - generic [ref=f37e770]:
+                - button "🖼️ Photo" [ref=f37e771] [cursor=pointer]
+                - button "Delete" [ref=f37e772] [cursor=pointer]
+          - generic [ref=f37e773]:
+            - generic [ref=f37e774] [cursor=pointer]:
+              - generic [ref=f37e775]:
+                - img "Royal Veg Handi Dum Biryani" [ref=f37e776]
+                - generic [ref=f37e777]: VGB-09
+                - generic [ref=f37e780]: Biryani Station
+              - generic [ref=f37e781]:
+                - generic [ref=f37e782]:
+                  - generic [ref=f37e783]:
+                    - generic "Pure Veg" [ref=f37e784]
+                    - heading "Royal Veg Handi Dum Biryani" [level=3] [ref=f37e786]
+                  - paragraph [ref=f37e787]: Farm fresh seasonal vegetables and paneer simmered in rich saffron infused basmati rice.
+                - generic [ref=f37e788]:
+                  - generic [ref=f37e789]: ₹240
+                  - button "Add to Cart" [ref=f37e791]
+            - generic [ref=f37e793]:
+              - button "● Available" [ref=f37e794] [cursor=pointer]
+              - generic [ref=f37e795]:
+                - button "🖼️ Photo" [ref=f37e796] [cursor=pointer]
+                - button "Delete" [ref=f37e797] [cursor=pointer]
+          - generic [ref=f37e798]:
+            - generic [ref=f37e799] [cursor=pointer]:
+              - generic [ref=f37e800]:
+                - img "Cold Coffee with Vanilla Ice Cream" [ref=f37e801]
+                - generic [ref=f37e802]: CC-10
+                - generic [ref=f37e805]: Beverages
+              - generic [ref=f37e806]:
+                - generic [ref=f37e807]:
+                  - generic [ref=f37e808]:
+                    - generic "Pure Veg" [ref=f37e809]
+                    - heading "Cold Coffee with Vanilla Ice Cream" [level=3] [ref=f37e811]
+                  - paragraph [ref=f37e812]: Rich blended espresso with chilled milk and a velvety scoop of vanilla ice cream.
+                - generic [ref=f37e813]:
+                  - generic [ref=f37e814]: ₹120
+                  - button "Add to Cart" [ref=f37e816]
+            - generic [ref=f37e818]:
+              - button "● Available" [ref=f37e819] [cursor=pointer]
+              - generic [ref=f37e820]:
+                - button "🖼️ Photo" [ref=f37e821] [cursor=pointer]
+                - button "Delete" [ref=f37e822] [cursor=pointer]
+          - generic [ref=f37e823]:
+            - generic [ref=f37e824] [cursor=pointer]:
+              - generic [ref=f37e825]:
+                - img "Shahi Gulab Jamun (2 Pcs)" [ref=f37e826]
+                - generic [ref=f37e827]: GJ-11
+                - generic [ref=f37e830]: Dessert Station
+              - generic [ref=f37e831]:
+                - generic [ref=f37e832]:
+                  - generic [ref=f37e833]:
+                    - generic "Pure Veg" [ref=f37e834]
+                    - heading "Shahi Gulab Jamun (2 Pcs)" [level=3] [ref=f37e836]
+                  - paragraph [ref=f37e837]: Warm, soft khoya dumplings soaked in fragrant green cardamom and saffron syrup.
+                - generic [ref=f37e838]:
+                  - generic [ref=f37e839]: ₹80
+                  - button "Add to Cart" [ref=f37e841]
+            - generic [ref=f37e843]:
+              - button "● Available" [ref=f37e844] [cursor=pointer]
+              - generic [ref=f37e845]:
+                - button "🖼️ Photo" [ref=f37e846] [cursor=pointer]
+                - button "Delete" [ref=f37e847] [cursor=pointer]
+          - generic [ref=f37e848]:
+            - generic [ref=f37e849] [cursor=pointer]:
+              - generic [ref=f37e850]:
+                - img "Authentic Gujarati Special Thali" [ref=f37e851]
+                - generic [ref=f37e852]: THL-12
+                - generic [ref=f37e855]: Curry Station
+              - generic [ref=f37e856]:
+                - generic [ref=f37e857]:
+                  - generic [ref=f37e858]:
+                    - generic "Pure Veg" [ref=f37e859]
+                    - heading "Authentic Gujarati Special Thali" [level=3] [ref=f37e861]
+                  - paragraph [ref=f37e862]: 2 Veg Sabzi, Gujarati Kadhi, Dal, 4 Phulka Roti, Jeera Rice, Farsan, Sweet, Pickle & Masala Chhas.
+                - generic [ref=f37e863]:
+                  - generic [ref=f37e864]: ₹280
+                  - button "Add to Cart" [ref=f37e866]
+            - generic [ref=f37e868]:
+              - button "● Available" [ref=f37e869] [cursor=pointer]
+              - generic [ref=f37e870]:
+                - button "🖼️ Photo" [ref=f37e871] [cursor=pointer]
+                - button "Delete" [ref=f37e872] [cursor=pointer]
+  - generic [ref=f37e430]:
+    - generic [ref=f37e431] [cursor=pointer]:
+      - generic [ref=f37e434]: Operations Intelligence • Ask AI
+      - generic [ref=f37e435]: 24x7
+    - button "JAMANVAAR Operations Assistant" [ref=f37e436] [cursor=pointer]

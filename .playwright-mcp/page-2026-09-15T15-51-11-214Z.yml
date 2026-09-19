@@ -1,0 +1,121 @@
+- generic [ref=f1e3]:
+  - generic [ref=f1e611]: 🖨️ Receipt automatically printed on JAMANVAAR Thermal 80mm (Counter)
+  - banner [ref=f1e104]:
+    - generic [ref=f1e105]:
+      - button [ref=f1e106] [cursor=pointer]
+      - generic [ref=f1e109]:
+        - generic [ref=f1e110]:
+          - img "JAMANVAAR by KELVIONTECH"
+        - generic [ref=f1e112]: CUSTOMER KIOSK
+    - generic [ref=f1e116]:
+      - button "Need Help?" [ref=f1e117] [cursor=pointer]
+      - button "Call Staff" [ref=f1e121] [cursor=pointer]
+      - generic [ref=f1e126]:
+        - button "EN" [ref=f1e127] [cursor=pointer]
+        - button "हिन्दी" [ref=f1e128] [cursor=pointer]
+        - button "ગુજરાતી" [ref=f1e129] [cursor=pointer]
+      - button "More options" [ref=f1e131] [cursor=pointer]
+  - generic [ref=f1e616]:
+    - generic [ref=f1e617]:
+      - heading "Order Confirmed!" [level=2] [ref=f1e622]
+      - paragraph [ref=f1e623]: ORD-25564067 • TAKEAWAY
+      - generic [ref=f1e624]: Order Sent to Kitchen (KDS) ✓
+    - generic [ref=f1e627]:
+      - generic [ref=f1e628]:
+        - generic [ref=f1e629]:
+          - text: TOKEN
+          - generic [ref=f1e630]: "#1044"
+          - generic [ref=f1e631]:
+            - text: "Estimated Prep Time:"
+            - generic [ref=f1e632]: 15 Minutes
+          - generic [ref=f1e633]:
+            - text: "Pickup at:"
+            - strong [ref=f1e634]: Counter 1
+        - generic [ref=f1e635]:
+          - heading "Digital Delivery & E-Bill Options" [level=4] [ref=f1e636]
+          - generic [ref=f1e637]:
+            - button "Print Receipt" [ref=f1e638] [cursor=pointer]
+            - button "WhatsApp E-Bill" [ref=f1e644] [cursor=pointer]
+            - button "SMS Receipt" [ref=f1e648] [cursor=pointer]
+            - button "QR Invoice" [ref=f1e652] [cursor=pointer]
+        - generic [ref=f1e660]:
+          - heading "How was your ordering experience?" [level=4] [ref=f1e661]
+          - generic [ref=f1e662]:
+            - button [ref=f1e663] [cursor=pointer]
+            - button [ref=f1e666] [cursor=pointer]
+            - button [ref=f1e669] [cursor=pointer]
+            - button [ref=f1e672] [cursor=pointer]
+            - button [ref=f1e675] [cursor=pointer]
+          - button "Submit Rating" [ref=f1e678] [cursor=pointer]
+        - generic [ref=f1e680]:
+          - button "Track Order" [ref=f1e681] [cursor=pointer]
+          - button "← Place New Order" [ref=f1e683] [cursor=pointer]
+      - generic [ref=f1e685]:
+        - generic [ref=f1e686]:
+          - heading "Receipt" [level=4] [ref=f1e687]
+          - generic [ref=f1e689]:
+            - generic [ref=f1e690]:
+              - img "JAMANVAAR" [ref=f1e692]
+              - generic [ref=f1e693]:
+                - heading "JAMANVAAR" [level=2] [ref=f1e694]
+                - generic [ref=f1e695]: BY KELVIONTECH
+                - generic [ref=f1e696]: JAMANVAAR Restaurant
+                - paragraph [ref=f1e697]: Sindhu Bhavan Road, Bodakdev, Ahmedabad, Gujarat 380054
+                - paragraph [ref=f1e698]: "Phone: +91 79 4890 1234"
+              - generic [ref=f1e699]:
+                - generic [ref=f1e700]: "GSTIN: 24AAAAA0000A1Z5"
+                - generic [ref=f1e701]: "• FSSAI: 10722001000452"
+            - generic [ref=f1e702]:
+              - generic [ref=f1e703]:
+                - generic [ref=f1e704]: TAX INVOICE / RECEIPT
+                - generic [ref=f1e705]: "TOKEN #1044"
+              - generic [ref=f1e706]:
+                - generic [ref=f1e707]: "Invoice No:"
+                - generic [ref=f1e708]: ORD-25564067
+              - generic [ref=f1e709]:
+                - generic [ref=f1e710]: "Order Type:"
+                - generic [ref=f1e711]: TAKEAWAY
+              - generic [ref=f1e712]:
+                - generic [ref=f1e713]: "Date: 15 Sept 2026"
+                - generic [ref=f1e714]: "Time: 09:20 pm"
+              - generic [ref=f1e715]:
+                - generic [ref=f1e716]: "POS: e1538d9d-5901-47d5-9980-099ac2880404"
+                - generic [ref=f1e717]: "Cashier: Amit Dave"
+            - generic [ref=f1e718]:
+              - generic [ref=f1e719]:
+                - generic [ref=f1e720]: ITEM
+                - generic [ref=f1e721]: QTY
+                - generic [ref=f1e722]: AMT
+              - generic [ref=f1e725]:
+                - generic [ref=f1e726]: Garlic Butter Naan
+                - generic [ref=f1e727]: "1"
+                - generic [ref=f1e728]: ₹75
+            - generic [ref=f1e729]:
+              - generic [ref=f1e730]:
+                - generic [ref=f1e731]: Subtotal
+                - generic [ref=f1e732]: ₹75
+              - generic [ref=f1e733]:
+                - generic [ref=f1e734]: CGST (2.5%)
+                - generic [ref=f1e735]: ₹1.88
+              - generic [ref=f1e736]:
+                - generic [ref=f1e737]: SGST (2.5%)
+                - generic [ref=f1e738]: ₹1.88
+              - generic [ref=f1e739]:
+                - generic [ref=f1e740]: Round Off
+                - generic [ref=f1e741]: +₹0.24
+              - generic [ref=f1e742]:
+                - generic [ref=f1e743]: TOTAL
+                - generic [ref=f1e744]: ₹79
+            - generic [ref=f1e745]:
+              - generic [ref=f1e746]: "PAID VIA:"
+              - generic [ref=f1e747]: UPI
+            - generic [ref=f1e748]:
+              - generic [ref=f1e749]: Thank you for dining at JAMANVAAR! Please visit again.
+              - generic [ref=f1e750]: Freshly Prepared • Zero Preservatives • Pure Heritage Taste
+              - generic [ref=f1e751]: Scan for E-Bill & Feedback
+              - generic [ref=f1e760]:
+                - text: Powered by JAMANVAAR
+                - generic [ref=f1e761]: BY KELVIONTECH
+        - generic [ref=f1e762]:
+          - heading "Kitchen Order Ticket (KOT)" [level=4] [ref=f1e763]
+          - generic [ref=f1e764]: "*** KITCHEN ORDER TICKET *** STATION: [ TANDOOR ] ======================================== KOT #: KOT-06 TYPE: FIRST ORDER #: ORD-25564067 TOKEN: #1044 TYPE: TAKEAWAY TIME: 09:21 PM SERVER / POS: Kiosk Self-Order ---------------------------------------- ITEM NAME QTY ---------------------------------------- Garlic Butter Naan x1 ========================================"

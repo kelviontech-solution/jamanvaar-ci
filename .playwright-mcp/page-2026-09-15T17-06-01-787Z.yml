@@ -1,0 +1,268 @@
+- generic [ref=f38e3]:
+  - banner [ref=f38e4]:
+    - generic [ref=f38e5]:
+      - generic [ref=f38e6]:
+        - generic [ref=f38e7]:
+          - img "JAMANVAAR by KELVIONTECH"
+        - generic [ref=f38e9]:
+          - generic [ref=f38e10]:
+            - generic [ref=f38e11]: POS TERMINAL
+            - generic [ref=f38e13]: My Restaurant
+          - paragraph [ref=f38e14]:
+            - generic [ref=f38e15]: Ahmedabad Flagship Store
+            - generic [aria-hidden] [ref=f38e16]: •
+            - generic [ref=f38e17]: POS-01
+      - button "+ New Order" [ref=f38e19] [cursor=pointer]
+    - button "Search dishes, SKU, tables, bills, customers..." [ref=f38e26] [cursor=pointer]
+    - generic [ref=f38e32]:
+      - button "Notifications & System Events" [ref=f38e33] [cursor=pointer]
+      - button "Open JAMAN AI Assistant" [ref=f38e37] [cursor=pointer]:
+        - generic [ref=f38e40]: JAMAN AI
+        - generic [ref=f38e41]: "8"
+      - button "A" [ref=f38e43] [cursor=pointer]
+  - generic [ref=f38e68]:
+    - complementary [ref=f38e69]:
+      - navigation [ref=f38e70]:
+        - button [ref=f38e71] [cursor=pointer]
+        - button "1" [ref=f38e77] [cursor=pointer]
+        - button "7" [ref=f38e699] [cursor=pointer]
+        - button [ref=f38e89] [cursor=pointer]
+        - button "8" [active] [ref=f38e700] [cursor=pointer]
+        - button [ref=f38e97] [cursor=pointer]
+        - button [ref=f38e103] [cursor=pointer]
+        - button [ref=f38e107] [cursor=pointer]
+        - button [ref=f38e110] [cursor=pointer]
+        - button [ref=f38e113] [cursor=pointer]
+        - button [ref=f38e118] [cursor=pointer]
+        - button "JAMAN AI Assistant (Voice & Conversational POS Actions)" [ref=f38e123] [cursor=pointer]
+      - generic [ref=f38e126]:
+        - button "Print Queue" [ref=f38e127] [cursor=pointer]
+        - generic [ref=f38e133] [cursor=pointer]: "2"
+    - main [ref=f38e138]:
+      - generic [ref=f38e709]:
+        - generic [ref=f38e710]:
+          - generic [ref=f38e711]:
+            - heading "Kitchen Orders & KOT Tickets" [level=1] [ref=f38e712]
+            - paragraph [ref=f38e716]: Real-time kitchen station routing (Main Kitchen, Tandoor, Bar, Dessert) synchronized with KDS.
+          - generic [ref=f38e717]: KDS Connected • Live Sync
+        - generic [ref=f38e721]:
+          - generic [ref=f38e722]:
+            - button "All Stations" [ref=f38e723] [cursor=pointer]
+            - button "Tandoor" [ref=f38e724] [cursor=pointer]
+            - button "Beverages" [ref=f38e725] [cursor=pointer]
+            - button "Curry Station" [ref=f38e726] [cursor=pointer]
+            - button "Main Kitchen" [ref=f38e727] [cursor=pointer]
+            - button "Bar" [ref=f38e728] [cursor=pointer]
+            - button "Dessert" [ref=f38e729] [cursor=pointer]
+          - generic [ref=f38e730]:
+            - button "In Progress" [ref=f38e731] [cursor=pointer]
+            - button "Ready for Service" [ref=f38e732] [cursor=pointer]
+            - button "Completed" [ref=f38e733] [cursor=pointer]
+        - generic [ref=f38e735]:
+          - generic [ref=f38e736]:
+            - generic [ref=f38e737]:
+              - generic [ref=f38e738]:
+                - generic [ref=f38e739]:
+                  - generic [ref=f38e740]: KOT-09
+                  - generic [ref=f38e741]: FIRST
+                - generic [ref=f38e742]:
+                  - generic [ref=f38e743]: Tandoor
+                  - generic [ref=f38e744]: •
+                  - generic [ref=f38e745]: 10:35 PM
+              - generic [ref=f38e746]:
+                - text: "Token #1049"
+                - generic [ref=f38e747]: DINE_IN
+            - generic [ref=f38e750]:
+              - generic [ref=f38e751]: Butter Naan (Tandoori)
+              - generic [ref=f38e752]: ×1
+            - generic [ref=f38e753]:
+              - button "Reprint" [ref=f38e754] [cursor=pointer]
+              - button "Mark Ready" [ref=f38e760] [cursor=pointer]
+          - generic [ref=f38e764]:
+            - generic [ref=f38e765]:
+              - generic [ref=f38e766]:
+                - generic [ref=f38e767]:
+                  - generic [ref=f38e768]: KOT-08
+                  - generic [ref=f38e769]: FIRST
+                - generic [ref=f38e770]:
+                  - generic [ref=f38e771]: Tandoor
+                  - generic [ref=f38e772]: •
+                  - generic [ref=f38e773]: 10:35 PM
+              - generic [ref=f38e774]:
+                - text: "Token #1048"
+                - generic [ref=f38e775]: DINE_IN
+            - generic [ref=f38e778]:
+              - generic [ref=f38e779]: Butter Naan (Tandoori)
+              - generic [ref=f38e780]: ×1
+            - generic [ref=f38e781]:
+              - button "Reprint" [ref=f38e782] [cursor=pointer]
+              - button "Mark Ready" [ref=f38e788] [cursor=pointer]
+          - generic [ref=f38e792]:
+            - generic [ref=f38e793]:
+              - generic [ref=f38e794]:
+                - generic [ref=f38e795]:
+                  - generic [ref=f38e796]: KOT-07
+                  - generic [ref=f38e797]: FIRST
+                - generic [ref=f38e798]:
+                  - generic [ref=f38e799]: Beverages
+                  - generic [ref=f38e800]: •
+                  - generic [ref=f38e801]: 10:12 PM
+              - generic [ref=f38e802]:
+                - text: "Token #1047"
+                - generic [ref=f38e803]: DINE_IN
+            - generic [ref=f38e806]:
+              - generic [ref=f38e807]: Cold Coffee with Vanilla Ice Cream
+              - generic [ref=f38e808]: ×1
+            - generic [ref=f38e809]:
+              - button "Reprint" [ref=f38e810] [cursor=pointer]
+              - button "Mark Ready" [ref=f38e816] [cursor=pointer]
+          - generic [ref=f38e820]:
+            - generic [ref=f38e821]:
+              - generic [ref=f38e822]:
+                - generic [ref=f38e823]:
+                  - generic [ref=f38e824]: KOT-06
+                  - generic [ref=f38e825]: FIRST
+                - generic [ref=f38e826]:
+                  - generic [ref=f38e827]: Curry Station
+                  - generic [ref=f38e828]: •
+                  - generic [ref=f38e829]: 10:03 PM
+              - generic [ref=f38e830]:
+                - text: "Token #1045"
+                - generic [ref=f38e831]: DINE_IN
+            - generic [ref=f38e834]:
+              - generic [ref=f38e835]: Dal Makhani (Slow Cooked)
+              - generic [ref=f38e836]: ×1
+            - generic [ref=f38e837]:
+              - button "Reprint" [ref=f38e838] [cursor=pointer]
+              - button "Mark Ready" [ref=f38e844] [cursor=pointer]
+          - generic [ref=f38e848]:
+            - generic [ref=f38e849]:
+              - generic [ref=f38e850]:
+                - generic [ref=f38e851]:
+                  - generic [ref=f38e852]: KOT-05
+                  - generic [ref=f38e853]: FIRST
+                - generic [ref=f38e854]:
+                  - generic [ref=f38e855]: Tandoor
+                  - generic [ref=f38e856]: •
+                  - generic [ref=f38e857]: 07:49 PM
+              - generic [ref=f38e858]:
+                - text: T-1
+                - generic [ref=f38e859]: DINE_IN
+            - generic [ref=f38e862]:
+              - generic [ref=f38e863]: Paneer Tikka (Tandoori Angaar)
+              - generic [ref=f38e864]: ×1
+            - generic [ref=f38e865]:
+              - button "Reprint" [ref=f38e866] [cursor=pointer]
+              - button "Mark Ready" [ref=f38e872] [cursor=pointer]
+          - generic [ref=f38e876]:
+            - generic [ref=f38e877]:
+              - generic [ref=f38e878]:
+                - generic [ref=f38e879]:
+                  - generic [ref=f38e880]: KOT-01
+                  - generic [ref=f38e881]: FIRST
+                - generic [ref=f38e882]:
+                  - generic [ref=f38e883]: Main Kitchen
+                  - generic [ref=f38e884]: •
+                  - generic [ref=f38e885]: 07:39 PM
+              - generic [ref=f38e886]:
+                - text: T-3
+                - generic [ref=f38e887]: DINE_IN
+            - generic [ref=f38e888]:
+              - generic [ref=f38e889]:
+                - generic [ref=f38e890]:
+                  - generic [ref=f38e891]: Paneer Tikka (Tandoori)
+                  - generic [ref=f38e892]: ×2
+                - generic [ref=f38e893]: + Extra Cheese
+                - generic [ref=f38e894]: "Note: Less Spicy, Extra Chutney"
+              - generic [ref=f38e896]:
+                - generic [ref=f38e897]: Dal Makhani (Maa Ki Dal)
+                - generic [ref=f38e898]: ×1
+            - generic [ref=f38e899]:
+              - button "Reprint" [ref=f38e900] [cursor=pointer]
+              - button "Mark Ready" [ref=f38e906] [cursor=pointer]
+          - generic [ref=f38e910]:
+            - generic [ref=f38e911]:
+              - generic [ref=f38e912]:
+                - generic [ref=f38e913]:
+                  - generic [ref=f38e914]: KOT-02
+                  - generic [ref=f38e915]: FIRST
+                - generic [ref=f38e916]:
+                  - generic [ref=f38e917]: Tandoor
+                  - generic [ref=f38e918]: •
+                  - generic [ref=f38e919]: 07:40 PM
+              - generic [ref=f38e920]:
+                - text: T-3
+                - generic [ref=f38e921]: DINE_IN
+            - generic [ref=f38e922]:
+              - generic [ref=f38e923]:
+                - generic [ref=f38e924]:
+                  - generic [ref=f38e925]: Butter Naan
+                  - generic [ref=f38e926]: ×3
+                - generic [ref=f38e927]: "Note: Crispy, Extra Butter"
+              - generic [ref=f38e929]:
+                - generic [ref=f38e930]: Garlic Butter Naan
+                - generic [ref=f38e931]: ×2
+            - generic [ref=f38e932]:
+              - button "Reprint" [ref=f38e933] [cursor=pointer]
+              - button "Mark Ready" [ref=f38e939] [cursor=pointer]
+          - generic [ref=f38e943]:
+            - generic [ref=f38e944]:
+              - generic [ref=f38e945]:
+                - generic [ref=f38e946]:
+                  - generic [ref=f38e947]: KOT-03
+                  - generic [ref=f38e948]: FIRST
+                - generic [ref=f38e949]:
+                  - generic [ref=f38e950]: Bar
+                  - generic [ref=f38e951]: •
+                  - generic [ref=f38e952]: 07:35 PM
+              - generic [ref=f38e953]:
+                - text: T-1
+                - generic [ref=f38e954]: DINE_IN
+            - generic [ref=f38e955]:
+              - generic [ref=f38e956]:
+                - generic [ref=f38e957]:
+                  - generic [ref=f38e958]: Royal Mango Lassi
+                  - generic [ref=f38e959]: ×2
+                - generic [ref=f38e960]: "Note: Chilled, Less Sweet"
+              - generic [ref=f38e962]:
+                - generic [ref=f38e963]: Special Masala Chai
+                - generic [ref=f38e964]: ×2
+            - generic [ref=f38e965]:
+              - button "Reprint" [ref=f38e966] [cursor=pointer]
+              - button "Mark Served" [ref=f38e972] [cursor=pointer]
+          - generic [ref=f38e977]:
+            - generic [ref=f38e978]:
+              - generic [ref=f38e979]:
+                - generic [ref=f38e980]:
+                  - generic [ref=f38e981]: KOT-04
+                  - generic [ref=f38e982]: FIRST
+                - generic [ref=f38e983]:
+                  - generic [ref=f38e984]: Dessert
+                  - generic [ref=f38e985]: •
+                  - generic [ref=f38e986]: 07:44 PM
+              - generic [ref=f38e987]:
+                - text: "Token #104"
+                - generic [ref=f38e988]: TAKEAWAY
+            - generic [ref=f38e990]:
+              - generic [ref=f38e991]:
+                - generic [ref=f38e992]: Gulab Jamun with Rabdi (2 Pcs)
+                - generic [ref=f38e993]: ×2
+              - generic [ref=f38e994]: "Note: Pack in warm container"
+            - generic [ref=f38e995]:
+              - button "Reprint" [ref=f38e996] [cursor=pointer]
+              - button "Mark Ready" [ref=f38e1002] [cursor=pointer]
+  - contentinfo [ref=f38e570]:
+    - generic [ref=f38e571]:
+      - 'button "Today Sales: ₹15874" [ref=f38e706] [cursor=pointer]':
+        - generic [ref=f38e576]: "Today Sales:"
+        - strong [ref=f38e577]: ₹15874
+      - 'button "Orders: 27" [ref=f38e707] [cursor=pointer]':
+        - generic [ref=f38e582]: "Orders:"
+        - strong [ref=f38e583]: "27"
+      - generic [ref=f38e584]:
+        - generic [ref=f38e588]: "AOV:"
+        - strong [ref=f38e589]: ₹588
+      - 'button "Tables: 8% (1/12)" [ref=f38e590] [cursor=pointer]':
+        - generic [ref=f38e596]: "Tables:"
+        - strong [ref=f38e597]: 8% (1/12)
+    - generic [ref=f38e598]: Local Engine Active

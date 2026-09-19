@@ -1,0 +1,61 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - img "JAMANVAAR by Kelviontech" [ref=e7]
+    - generic [ref=e8]:
+      - generic [ref=e11]:
+        - text: "Local Core:"
+        - strong [ref=e12]: Connected
+      - button [ref=e13] [cursor=pointer]:
+        - generic [ref=e18]:
+          - text: "Network:"
+          - strong [ref=e19]: Online
+      - generic [ref=e20]: Tue, 15 Sept 2026
+  - main [ref=e24]:
+    - generic [ref=e25]:
+      - img "JAMANVAAR by Kelviontech" [ref=e28]
+      - generic [ref=e29]:
+        - heading "Self-Ordering Fleet. Zero Touch Errors." [level=1] [ref=e30]:
+          - text: Self-Ordering Fleet.
+          - generic [ref=e31]: Zero Touch Errors.
+        - paragraph [ref=e32]: Centralized terminal command, automatic catalog sync, real-time peripheral diagnostics and upsell recommendation tuning.
+      - generic [ref=e33]:
+        - generic [ref=e34]: Terminal Fleet
+        - generic [ref=e39]: Catalog Engine
+        - generic [ref=e46]: Mesh Sync
+        - generic [ref=e52]: Upsell Rules
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - img "Tandoori Naan" [ref=e59]
+          - generic [ref=e60]: Tandoori Breads
+        - generic [ref=e61]:
+          - img "Paneer Butter Masala" [ref=e62]
+          - generic [ref=e63]: Royal Curries
+        - generic [ref=e64]:
+          - img "Tandoori Angaar" [ref=e65]
+          - generic [ref=e66]: Tandoor Starters
+    - generic [ref=e67]:
+      - generic [ref=e68]:
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - generic [ref=e72]: Welcome to
+            - generic [ref=e73]: KIOSK ADMIN
+          - heading "Kiosk Management" [level=2] [ref=e75]
+          - paragraph [ref=e76]: Sign in with your administrator credentials to manage terminals & self-ordering catalogs.
+        - generic [ref=e164]:
+          - generic [ref=e165]:
+            - generic [ref=e166]: Email *
+            - textbox "owner@yourrestaurant.com" [ref=e167]
+          - generic [ref=e168]:
+            - generic [ref=e169]:
+              - generic [ref=e170]: Password *
+              - button "Show Password" [ref=e171] [cursor=pointer]
+            - textbox "Enter your password" [ref=e173]
+          - paragraph [ref=e174]: Owners and managers only. Contact your Restaurant Admin if you need access.
+          - button "Sign In" [ref=e175] [cursor=pointer]
+      - generic [ref=e96]:
+        - generic [ref=e97]: Role-Based Security
+        - generic [ref=e102]: •
+        - generic [ref=e103]: Instant Offline Boot
+        - generic [ref=e107]: •
+        - generic [ref=e108]: 100% Secure
+  - contentinfo [ref=e112]: © 2026 JAMANVAAR by KELVIONTECH — All rights reserved.

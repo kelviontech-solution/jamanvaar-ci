@@ -1,0 +1,142 @@
+- generic [ref=f5e3]:
+  - banner [ref=f5e4]:
+    - generic [ref=f5e5]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f5e7]
+      - generic [ref=f5e9]:
+        - generic [ref=f5e10]:
+          - generic "QA FULL AUDIT RESTAURANT" [ref=f5e11]
+          - generic [ref=f5e12]: ADMIN
+        - button "Ahmedabad Flagship Store" [ref=f5e13] [cursor=pointer]
+    - button "Open global search" [ref=f5e20] [cursor=pointer]:
+      - textbox "Search orders, invoices, dishes, tables..." [ref=f5e24]
+      - generic: Ctrl+K
+    - generic [ref=f5e25]:
+      - generic [ref=f5e26]:
+        - button "EOD Report" [ref=f5e27] [cursor=pointer]
+        - button "Reconciliation" [ref=f5e32] [cursor=pointer]
+      - generic [ref=f5e38]:
+        - button "JAMAN AI Operations Assistant" [ref=f5e39] [cursor=pointer]
+        - button "Notifications" [ref=f5e43] [cursor=pointer]
+        - button "Sign out of Restaurant Admin" [ref=f5e47] [cursor=pointer]
+  - generic [ref=f5e51]:
+    - complementary [ref=f5e52]:
+      - generic [ref=f5e53]:
+        - generic [ref=f5e54]:
+          - button "OPERATIONS" [ref=f5e55] [cursor=pointer]
+          - navigation [ref=f5e59]:
+            - button "Dashboard" [ref=f5e60] [cursor=pointer]
+            - button "Billing / Invoices" [ref=f5e69] [cursor=pointer]
+            - button "Orders" [ref=f5e74] [cursor=pointer]
+            - button "Live Orders / KDS 3" [ref=f5e80] [cursor=pointer]:
+              - generic [ref=f5e81]: Live Orders / KDS
+              - generic [ref=f5e85]: "3"
+            - button "Floor / Tables" [ref=f5e87] [cursor=pointer]
+            - button "Reservations" [ref=f5e92] [cursor=pointer]
+            - button "Kitchen / KOT" [ref=f5e99] [cursor=pointer]
+        - generic [ref=f5e104]:
+          - button "DIGITAL ORDERING" [ref=f5e105] [cursor=pointer]
+          - navigation [ref=f5e109]:
+            - button "QR Table Ordering PRO" [ref=f5e110] [cursor=pointer]:
+              - generic [ref=f5e111]: QR Table Ordering
+              - generic [ref=f5e119]: PRO
+        - generic [ref=f5e121]:
+          - button "MENU & INVENTORY" [ref=f5e122] [cursor=pointer]
+          - navigation [ref=f5e126]:
+            - button "Menu & Categories" [ref=f5e127] [cursor=pointer]
+            - button "Inventory & Recipes 2" [ref=f5e135] [cursor=pointer]:
+              - generic [ref=f5e136]: Inventory & Recipes
+              - generic [ref=f5e142]: "2"
+        - generic [ref=f5e144]:
+          - button "PEOPLE & CASH" [ref=f5e145] [cursor=pointer]
+          - navigation [ref=f5e149]:
+            - button "Customers CRM" [ref=f5e150] [cursor=pointer]
+            - button "Staff & Roles (RBAC)" [ref=f5e155] [cursor=pointer]
+            - button "Payments & Split" [ref=f5e163] [cursor=pointer]
+            - button "Shift & Cash Drawer" [active] [ref=f5e168] [cursor=pointer]
+        - generic [ref=f5e176]:
+          - button "ANALYTICS & SYSTEM" [ref=f5e177] [cursor=pointer]
+          - navigation [ref=f5e181]:
+            - button "Reports & Analytics" [ref=f5e182] [cursor=pointer]
+            - button "Printers & Devices" [ref=f5e188] [cursor=pointer]
+            - button "Restaurant Settings" [ref=f5e195] [cursor=pointer]
+            - button "Subscription Plans" [ref=f5e201] [cursor=pointer]
+            - button "Audit Trail Logs" [ref=f5e207] [cursor=pointer]
+            - button "Backup & Restore" [ref=f5e213] [cursor=pointer]
+    - main [ref=f5e220]:
+      - generic [ref=f5e2725]:
+        - generic [ref=f5e2726]:
+          - generic [ref=f5e2727]:
+            - generic [ref=f5e2728]:
+              - heading "Shift & Cash Drawer Ledger" [level=1] [ref=f5e2729]
+              - generic [ref=f5e2730]: REGISTER RECONCILIATION
+            - paragraph [ref=f5e2731]: Audit opening cash, cash drops, payouts, and cash count variance in real time.
+          - generic [ref=f5e2732]:
+            - button "Generate Official EOD Z-Report" [ref=f5e2733] [cursor=pointer]
+            - button "Record Cash Movement" [ref=f5e2738] [cursor=pointer]
+        - generic [ref=f5e2745]:
+          - generic [ref=f5e2746]:
+            - generic [ref=f5e2754]:
+              - generic [ref=f5e2755]:
+                - generic [ref=f5e2756]: Active Register Shift
+                - generic [ref=f5e2757]: OPEN & RECORDING
+              - heading "Amit Dave (Lead Cashier)" [level=3] [ref=f5e2759]
+              - generic [ref=f5e2760]: "Terminal: POS-01 • Opened at 09:00 am"
+            - generic [ref=f5e2761]:
+              - button "Add Drop / Payout" [ref=f5e2762] [cursor=pointer]
+              - button "Print Slip" [ref=f5e2769] [cursor=pointer]
+          - generic [ref=f5e2775]:
+            - generic [ref=f5e2776]:
+              - generic [ref=f5e2777]: Opening Float
+              - generic [ref=f5e2778]: ₹2000
+              - generic [ref=f5e2779]: Starting Till Reserve
+            - generic [ref=f5e2780]:
+              - generic [ref=f5e2781]: Cash Sales Today
+              - generic [ref=f5e2782]: ₹0
+              - generic [ref=f5e2783]: Physical In-Drawer Cash
+            - generic [ref=f5e2784]:
+              - generic [ref=f5e2785]: Expected in Drawer
+              - generic [ref=f5e2786]: ₹2000
+              - generic [ref=f5e2787]: Opening Float + Cash Sales
+            - generic [ref=f5e2788]:
+              - generic [ref=f5e2789]: Digital Non-Cash Volume
+              - generic [ref=f5e2790]: ₹0
+              - generic [ref=f5e2791]: UPI QR + Card Swipe
+          - generic [ref=f5e2792]:
+            - generic [ref=f5e2797]:
+              - generic [ref=f5e2798]: Drawer Register Verified & In Balance
+              - text: All recorded cash sales match expected drawer balance. No unexplained cash shortages recorded.
+            - button "Close Shift & Reconcile" [ref=f5e2799] [cursor=pointer]
+        - generic [ref=f5e2800]:
+          - generic [ref=f5e2801]:
+            - generic [ref=f5e2802]: Register Shift Audit History (2)
+            - generic [ref=f5e2803]: Local SQLite Ledger
+          - table [ref=f5e2805]:
+            - rowgroup [ref=f5e2806]:
+              - row [ref=f5e2807]:
+                - columnheader "Cashier Name" [ref=f5e2808]
+                - columnheader "Shift Status" [ref=f5e2809]
+                - columnheader "Opened At" [ref=f5e2810]
+                - columnheader "Opening Float" [ref=f5e2811]
+                - columnheader "Expected Cash" [ref=f5e2812]
+                - columnheader "Actions" [ref=f5e2813]
+            - rowgroup [ref=f5e2814]:
+              - row [ref=f5e2815]:
+                - cell "Amit Dave (Lead Cashier)" [ref=f5e2816]
+                - cell "OPEN" [ref=f5e2817]
+                - cell "09:00 am" [ref=f5e2820]
+                - cell "₹2000" [ref=f5e2821]
+                - cell "₹2000" [ref=f5e2822]
+                - cell [ref=f5e2823]:
+                  - button "View Z-Report" [ref=f5e2824] [cursor=pointer]
+              - row [ref=f5e2825]:
+                - cell "Amit Dave (Lead Cashier)" [ref=f5e2826]
+                - cell "CLOSED" [ref=f5e2827]
+                - cell "09:00 am" [ref=f5e2830]
+                - cell "₹2000" [ref=f5e2831]
+                - cell "₹2000" [ref=f5e2832]
+                - cell [ref=f5e2833]:
+                  - button "View Z-Report" [ref=f5e2834] [cursor=pointer]
+  - button "Open JAMAN AI Restaurant Intelligence" [ref=f5e827] [cursor=pointer]:
+    - generic [ref=f5e833]:
+      - generic [ref=f5e834]: JAMAN AI
+      - generic [ref=f5e835]: ACTIVE

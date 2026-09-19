@@ -1,0 +1,255 @@
+- generic [ref=f5e3]:
+  - banner [ref=f5e4]:
+    - generic [ref=f5e5]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f5e7]
+      - generic [ref=f5e9]:
+        - generic [ref=f5e10]:
+          - generic "QA FULL AUDIT RESTAURANT" [ref=f5e11]
+          - generic [ref=f5e12]: ADMIN
+        - button "Ahmedabad Flagship Store" [ref=f5e13] [cursor=pointer]
+    - button "Open global search" [ref=f5e20] [cursor=pointer]:
+      - textbox "Search orders, invoices, dishes, tables..." [ref=f5e24]
+      - generic: Ctrl+K
+    - generic [ref=f5e25]:
+      - generic [ref=f5e26]:
+        - button "EOD Report" [ref=f5e27] [cursor=pointer]
+        - button "Reconciliation" [ref=f5e32] [cursor=pointer]
+      - generic [ref=f5e38]:
+        - button "JAMAN AI Operations Assistant" [ref=f5e39] [cursor=pointer]
+        - button "Notifications" [ref=f5e43] [cursor=pointer]
+        - button "Sign out of Restaurant Admin" [ref=f5e47] [cursor=pointer]
+  - generic [ref=f5e51]:
+    - complementary [ref=f5e52]:
+      - generic [ref=f5e53]:
+        - generic [ref=f5e54]:
+          - button "OPERATIONS" [ref=f5e55] [cursor=pointer]
+          - navigation [ref=f5e59]:
+            - button "Dashboard" [ref=f5e60] [cursor=pointer]
+            - button "Billing / Invoices" [ref=f5e69] [cursor=pointer]
+            - button "Orders" [ref=f5e74] [cursor=pointer]
+            - button "Live Orders / KDS 3" [ref=f5e80] [cursor=pointer]:
+              - generic [ref=f5e81]: Live Orders / KDS
+              - generic [ref=f5e85]: "3"
+            - button "Floor / Tables" [ref=f5e87] [cursor=pointer]
+            - button "Reservations" [ref=f5e92] [cursor=pointer]
+            - button "Kitchen / KOT" [ref=f5e99] [cursor=pointer]
+        - generic [ref=f5e104]:
+          - button "DIGITAL ORDERING" [ref=f5e105] [cursor=pointer]
+          - navigation [ref=f5e109]:
+            - button "QR Table Ordering PRO" [ref=f5e110] [cursor=pointer]:
+              - generic [ref=f5e111]: QR Table Ordering
+              - generic [ref=f5e119]: PRO
+        - generic [ref=f5e121]:
+          - button "MENU & INVENTORY" [ref=f5e122] [cursor=pointer]
+          - navigation [ref=f5e126]:
+            - button "Menu & Categories" [ref=f5e127] [cursor=pointer]
+            - button "Inventory & Recipes 2" [ref=f5e135] [cursor=pointer]:
+              - generic [ref=f5e136]: Inventory & Recipes
+              - generic [ref=f5e142]: "2"
+        - generic [ref=f5e144]:
+          - button "PEOPLE & CASH" [ref=f5e145] [cursor=pointer]
+          - navigation [ref=f5e149]:
+            - button "Customers CRM" [ref=f5e150] [cursor=pointer]
+            - button "Staff & Roles (RBAC)" [ref=f5e155] [cursor=pointer]
+            - button "Payments & Split" [ref=f5e163] [cursor=pointer]
+            - button "Shift & Cash Drawer" [ref=f5e168] [cursor=pointer]
+        - generic [ref=f5e176]:
+          - button "ANALYTICS & SYSTEM" [ref=f5e177] [cursor=pointer]
+          - navigation [ref=f5e181]:
+            - button "Reports & Analytics" [active] [ref=f5e182] [cursor=pointer]
+            - button "Printers & Devices" [ref=f5e188] [cursor=pointer]
+            - button "Restaurant Settings" [ref=f5e195] [cursor=pointer]
+            - button "Subscription Plans" [ref=f5e201] [cursor=pointer]
+            - button "Audit Trail Logs" [ref=f5e207] [cursor=pointer]
+            - button "Backup & Restore" [ref=f5e213] [cursor=pointer]
+    - main [ref=f5e220]:
+      - generic [ref=f5e2836]:
+        - generic [ref=f5e2837]:
+          - generic [ref=f5e2838]:
+            - generic [ref=f5e2839]:
+              - generic [ref=f5e2840]:
+                - heading "Reports & Analytics" [level=1] [ref=f5e2841]
+                - generic [ref=f5e2842]: ● LIVE RECONCILED
+              - paragraph [ref=f5e2843]: Understand sales, operations, payments, customers and restaurant performance.
+            - generic [ref=f5e2844]:
+              - button "Report Design" [ref=f5e2845] [cursor=pointer]
+              - button "Preview Report" [ref=f5e2853] [cursor=pointer]
+              - button "Print Report" [ref=f5e2858] [cursor=pointer]
+              - button "Download PDF" [ref=f5e2864] [cursor=pointer]
+              - button "Export CSV" [ref=f5e2869] [cursor=pointer]
+          - generic [ref=f5e2874]:
+            - generic [ref=f5e2875]:
+              - button "Today" [ref=f5e2876] [cursor=pointer]
+              - button "Yesterday" [ref=f5e2877] [cursor=pointer]
+              - button "Last 7 Days" [ref=f5e2878] [cursor=pointer]
+              - button "Last 30 Days" [ref=f5e2879] [cursor=pointer]
+              - button "This Month" [ref=f5e2880] [cursor=pointer]
+              - button "Last Month" [ref=f5e2881] [cursor=pointer]
+              - button "This Year" [ref=f5e2882] [cursor=pointer]
+              - button "Custom Range" [ref=f5e2883] [cursor=pointer]
+            - generic [ref=f5e2884]:
+              - generic [ref=f5e2885] [cursor=pointer]:
+                - checkbox "Compare With:" [checked] [ref=f5e2886]
+                - generic [ref=f5e2887]: "Compare With:"
+              - combobox [ref=f5e2888]:
+                - option "Previous Period" [selected]
+                - option "Previous Day"
+                - option "Previous Week"
+                - option "Previous Month"
+                - option "Previous Year"
+              - button "Filters" [ref=f5e2889] [cursor=pointer]
+        - generic [ref=f5e2893]:
+          - generic [ref=f5e2894]:
+            - generic [ref=f5e2895]:
+              - heading "Performance at a Glance • Today (15 Sept 2026)" [level=3] [ref=f5e2896]
+              - paragraph [ref=f5e2897]: 20 completed transactions reconciled across billing and kitchen counters.
+            - generic [ref=f5e2898]: vs. Previous Period (14 Sept 2026 - 14 Sept 2026)
+          - generic [ref=f5e2899]:
+            - generic [ref=f5e2900]:
+              - generic [ref=f5e2901]: Gross Sales
+              - generic [ref=f5e2902]: ₹14370
+              - generic [ref=f5e2903]: +18.2%
+            - generic [ref=f5e2908]:
+              - generic [ref=f5e2909]: Discounts
+              - generic [ref=f5e2910]: "-₹200"
+              - generic [ref=f5e2911]: Promotions
+            - generic [ref=f5e2912]:
+              - generic [ref=f5e2913]: GST Tax (5%)
+              - generic [ref=f5e2914]: ₹709
+              - generic [ref=f5e2915]: CGST + SGST
+            - generic [ref=f5e2916]:
+              - generic [ref=f5e2917]: Net Collected
+              - generic [ref=f5e2918]: ₹14882
+              - generic [ref=f5e2919]: +19%
+            - generic [ref=f5e2924]:
+              - generic [ref=f5e2925]: Total Orders
+              - generic [ref=f5e2926]: "20"
+              - generic [ref=f5e2927]: +17.6%
+            - generic [ref=f5e2932]:
+              - generic [ref=f5e2933]: Average Ticket
+              - generic [ref=f5e2934]: ₹744
+              - generic [ref=f5e2935]: Avg per bill
+        - generic [ref=f5e2936]:
+          - generic [ref=f5e2937]:
+            - generic [ref=f5e2938]:
+              - generic [ref=f5e2939]: Report Categories
+              - generic [ref=f5e2940]:
+                - button "Sales" [ref=f5e2941] [cursor=pointer]
+                - button "Menu" [ref=f5e2945] [cursor=pointer]
+                - button "Financial" [ref=f5e2950] [cursor=pointer]
+                - button "Operations" [ref=f5e2954] [cursor=pointer]
+                - button "Customers" [ref=f5e2959] [cursor=pointer]
+                - button "Inventory" [ref=f5e2966] [cursor=pointer]
+            - textbox "Search reports (e.g. GST, Sales, Cash, Dish)..." [ref=f5e2976]
+            - generic [ref=f5e2977]:
+              - generic [ref=f5e2978]: Favorite Reports
+              - generic [ref=f5e2982]:
+                - button "★ Daily Sales" [ref=f5e2983] [cursor=pointer]
+                - button "★ Top Selling Dishes" [ref=f5e2984] [cursor=pointer]
+                - button "★ Taxes / GST Report" [ref=f5e2985] [cursor=pointer]
+                - button "★ EOD Settlement (Z-Report)" [ref=f5e2986] [cursor=pointer]
+                - button "★ Kitchen Prep Time" [ref=f5e2987] [cursor=pointer]
+            - generic [ref=f5e2988]:
+              - generic [ref=f5e2989]: SALES Reports (11)
+              - generic [ref=f5e2990] [cursor=pointer]:
+                - generic [ref=f5e2995]:
+                  - generic [ref=f5e2996]:
+                    - heading "Daily Sales" [level=4] [ref=f5e2997]
+                    - generic [ref=f5e2998]: HOT
+                  - paragraph [ref=f5e2999]: Today’s itemized sales, discounts, and net collection
+                - button "Remove from favorites" [ref=f5e3000]
+              - generic [ref=f5e3003] [cursor=pointer]:
+                - generic [ref=f5e3008]:
+                  - heading "Sales Summary" [level=4] [ref=f5e3010]
+                  - paragraph [ref=f5e3011]: High-level aggregated sales KPI comparison
+                - button "Add to favorites" [ref=f5e3012]
+              - generic [ref=f5e3015] [cursor=pointer]:
+                - generic [ref=f5e3020]:
+                  - generic [ref=f5e3021]:
+                    - heading "Day-by-Day Sales" [level=4] [ref=f5e3022]
+                    - generic [ref=f5e3023]: HOT
+                  - paragraph [ref=f5e3024]: Consecutive daily sales ledger and day-over-day tracking
+                - button "Add to favorites" [ref=f5e3025]
+              - generic [ref=f5e3028] [cursor=pointer]:
+                - generic [ref=f5e3033]:
+                  - heading "Monthly Sales" [level=4] [ref=f5e3035]
+                  - paragraph [ref=f5e3036]: Month-over-month revenue analysis and seasonal trends
+                - button "Add to favorites" [ref=f5e3037]
+              - generic [ref=f5e3040] [cursor=pointer]:
+                - generic [ref=f5e3046]:
+                  - heading "Yearly Sales" [level=4] [ref=f5e3048]
+                  - paragraph [ref=f5e3049]: Annual fiscal revenue statement and tax totals
+                - button "Add to favorites" [ref=f5e3050]
+              - generic [ref=f5e3053] [cursor=pointer]:
+                - generic [ref=f5e3059]:
+                  - generic [ref=f5e3060]:
+                    - heading "Hourly Sales" [level=4] [ref=f5e3061]
+                    - generic [ref=f5e3062]: HOT
+                  - paragraph [ref=f5e3063]: Peak dining rush hours and hourly revenue distribution
+                - button "Add to favorites" [ref=f5e3064]
+              - generic [ref=f5e3067] [cursor=pointer]:
+                - generic [ref=f5e3073]:
+                  - heading "Sales by Order Type" [level=4] [ref=f5e3075]
+                  - paragraph [ref=f5e3076]: Dine-In, Takeaway, Delivery, and Token breakdown
+                - button "Add to favorites" [ref=f5e3077]
+              - generic [ref=f5e3080] [cursor=pointer]:
+                - generic [ref=f5e3085]:
+                  - heading "Sales by Payment Method" [level=4] [ref=f5e3087]
+                  - paragraph [ref=f5e3088]: Cash, UPI BharatQR, and Card POS breakdown
+                - button "Add to favorites" [ref=f5e3089]
+              - generic [ref=f5e3092] [cursor=pointer]:
+                - generic [ref=f5e3098]:
+                  - heading "Sales by Table" [level=4] [ref=f5e3100]
+                  - paragraph [ref=f5e3101]: Table-wise revenue and occupancy performance
+                - button "Add to favorites" [ref=f5e3102]
+              - generic [ref=f5e3105] [cursor=pointer]:
+                - generic [ref=f5e3113]:
+                  - heading "Sales by Captain" [level=4] [ref=f5e3115]
+                  - paragraph [ref=f5e3116]: Captain order volume and revenue generation
+                - button "Add to favorites" [ref=f5e3117]
+              - generic [ref=f5e3120] [cursor=pointer]:
+                - generic [ref=f5e3128]:
+                  - heading "Sales by Cashier" [level=4] [ref=f5e3130]
+                  - paragraph [ref=f5e3131]: Cashier-wise billing transactions and cash drawer intake
+                - button "Add to favorites" [ref=f5e3132]
+          - generic [ref=f5e3135]:
+            - generic [ref=f5e3136]:
+              - generic [ref=f5e3137]:
+                - generic [ref=f5e3138]:
+                  - generic [ref=f5e3139]: SALES
+                  - heading "Daily Sales" [level=2] [ref=f5e3140]
+                - paragraph [ref=f5e3141]: Today’s itemized sales, discounts, and net collection
+              - button "Full Document Preview" [ref=f5e3143] [cursor=pointer]
+            - generic [ref=f5e3148]:
+              - generic [ref=f5e3149]:
+                - heading "Consecutive Daily Sales Ledger" [level=3] [ref=f5e3150]
+                - generic [ref=f5e3151]: 1 Days Audited
+              - table [ref=f5e3153]:
+                - rowgroup [ref=f5e3154]:
+                  - row [ref=f5e3155]:
+                    - columnheader "Date" [ref=f5e3156]
+                    - columnheader "Orders" [ref=f5e3157]
+                    - columnheader "Gross" [ref=f5e3158]
+                    - columnheader "Discount" [ref=f5e3159]
+                    - columnheader "GST (5%)" [ref=f5e3160]
+                    - columnheader "Net Sales" [ref=f5e3161]
+                    - columnheader "Cash" [ref=f5e3162]
+                    - columnheader "UPI" [ref=f5e3163]
+                    - columnheader "Card" [ref=f5e3164]
+                    - columnheader "AOV" [ref=f5e3165]
+                - rowgroup [ref=f5e3166]:
+                  - row [ref=f5e3167]:
+                    - cell "15 Sept 2026" [ref=f5e3168]
+                    - cell "20" [ref=f5e3169]
+                    - cell "₹14370" [ref=f5e3170]
+                    - cell "-₹200" [ref=f5e3171]
+                    - cell "₹708.5" [ref=f5e3172]
+                    - cell "₹14882" [ref=f5e3173]
+                    - cell "₹3759" [ref=f5e3174]
+                    - cell "₹2037" [ref=f5e3175]
+                    - cell "₹1302" [ref=f5e3176]
+                    - cell "₹744" [ref=f5e3177]
+  - button "Open JAMAN AI Restaurant Intelligence" [ref=f5e827] [cursor=pointer]:
+    - generic [ref=f5e833]:
+      - generic [ref=f5e834]: JAMAN AI
+      - generic [ref=f5e835]: ACTIVE

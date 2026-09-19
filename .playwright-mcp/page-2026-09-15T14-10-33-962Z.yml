@@ -1,0 +1,848 @@
+- generic [ref=e164]:
+  - complementary [ref=e165]:
+    - generic [ref=e166]:
+      - link [ref=e167] [cursor=pointer]:
+        - /url: /
+        - img "JAMANVAAR" [ref=e168]
+      - generic [ref=e169]:
+        - generic [ref=e170]: PLATFORM CONTROL
+        - generic [ref=e171]: SUPER ADMIN
+    - navigation [ref=e172]:
+      - generic [ref=e173]:
+        - button "Platform Control Center" [expanded] [ref=e174] [cursor=pointer]
+        - link "Executive Dashboard" [ref=e179] [cursor=pointer]:
+          - /url: /
+      - generic [ref=e187]:
+        - button "Business Management" [expanded] [ref=e188] [cursor=pointer]
+        - generic [ref=e192]:
+          - link "Restaurants" [ref=e193] [cursor=pointer]:
+            - /url: /restaurants
+          - link "Restaurant Owners" [ref=e201] [cursor=pointer]:
+            - /url: /owners
+          - link "Branches" [ref=e209] [cursor=pointer]:
+            - /url: /branches
+          - link "Subscriptions" [ref=e216] [cursor=pointer]:
+            - /url: /subscriptions
+          - link "Invoices & Billing" [ref=e224] [cursor=pointer]:
+            - /url: /billing
+      - generic [ref=e229]:
+        - button "SaaS Management" [expanded] [ref=e230] [cursor=pointer]
+        - generic [ref=e234]:
+          - link "Plans & Entitlements" [ref=e235] [cursor=pointer]:
+            - /url: /plans
+          - link "QR Ordering Suite" [ref=e242] [cursor=pointer]:
+            - /url: /qr-ordering
+          - link "JAMAN AI Engine" [ref=e251] [cursor=pointer]:
+            - /url: /ai-assistant
+          - link "Master Menu Catalog" [ref=e256] [cursor=pointer]:
+            - /url: /catalog
+          - link "Activation Keys" [ref=e262] [cursor=pointer]:
+            - /url: /activation-keys
+          - link "Payment Gateways" [ref=e268] [cursor=pointer]:
+            - /url: /payment-connections
+          - link "Applications & Releases" [ref=e273] [cursor=pointer]:
+            - /url: /applications
+      - generic [ref=e280]:
+        - button "Operations & MDM" [expanded] [ref=e281] [cursor=pointer]
+        - generic [ref=e285]:
+          - link "Device Fleet / MDM" [ref=e286] [cursor=pointer]:
+            - /url: /devices
+          - link "Sync & Conflict Monitor" [ref=e291] [cursor=pointer]:
+            - /url: /sync-monitor
+          - link "Backups & Recovery" [ref=e296] [cursor=pointer]:
+            - /url: /backups
+          - link "System Telemetry" [ref=e303] [cursor=pointer]:
+            - /url: /system-health
+          - link "Staging Sandboxes" [ref=e309] [cursor=pointer]:
+            - /url: /sandboxes
+      - generic [ref=e322]:
+        - button "Security & Reports" [expanded] [ref=e323] [cursor=pointer]
+        - generic [ref=e327]:
+          - link "Reports & Analytics" [ref=e328] [cursor=pointer]:
+            - /url: /reports
+          - link "Audit Logs" [ref=e333] [cursor=pointer]:
+            - /url: /audit-logs
+          - link "Emergency Offline Policy" [ref=e339] [cursor=pointer]:
+            - /url: /offline-policy
+          - link "Platform Team" [ref=e344] [cursor=pointer]:
+            - /url: /team
+          - link "Support Tickets" [ref=e350] [cursor=pointer]:
+            - /url: /tickets
+          - link "Diagnostics & Support" [ref=e355] [cursor=pointer]:
+            - /url: /support
+          - link "Platform Settings" [ref=e365] [cursor=pointer]:
+            - /url: /settings/platform
+      - generic [ref=e369]:
+        - button "Account" [expanded] [ref=e370] [cursor=pointer]
+        - link "My Profile" [ref=e375] [cursor=pointer]:
+          - /url: /profile
+    - generic [ref=e390]:
+      - generic [ref=e391]:
+        - generic [ref=e393]: Platform Online
+        - link "View System Health" [ref=e394] [cursor=pointer]:
+          - /url: /system-health
+      - generic [ref=e399]: JAMANVAAR Cloud v1.4.0
+  - generic [ref=e400]:
+    - banner [ref=e401]:
+      - generic [ref=e402]:
+        - button "Toggle Navigation Menu" [ref=e403] [cursor=pointer]
+        - generic [ref=e405]:
+          - generic [ref=e406]: JAMANVAAR PLATFORM
+          - generic [ref=e407]: Control Center
+      - generic [ref=e409]:
+        - textbox "Search restaurants, owners, devices, activation keys…" [ref=e410]
+        - generic: Ctrl+K
+      - generic [ref=e411]:
+        - generic "Database reachable, API responding" [ref=e412]: PLATFORM ONLINE
+        - button "Notifications" [ref=e416] [cursor=pointer]
+        - button "Toggle dark mode" [ref=e421] [cursor=pointer]
+        - generic [ref=e425]:
+          - link "J" [ref=e426] [cursor=pointer]:
+            - /url: /profile
+          - generic [ref=e428]:
+            - generic [ref=e429]: JAMANVAAR Super Admin
+            - generic [ref=e430]: Platform Owner
+          - button "Logout" [ref=e431] [cursor=pointer]
+    - main [ref=e436]:
+      - generic [ref=e787]:
+        - generic [ref=e788]:
+          - generic [ref=e789]:
+            - heading "Onboard New Restaurant" [level=1] [ref=e790]
+            - paragraph [ref=e791]: "Commercial SaaS onboarding workflow: register organization, allocate plan, generate owner credentials, and issue device activation keys."
+          - button "← Back to Restaurants" [ref=e792] [cursor=pointer]
+        - generic [ref=e793]:
+          - generic [ref=e794]: 1. Restaurant Details
+          - generic [ref=e795]: 2. Owner Credentials
+          - generic [ref=e796]: 3. Plan & Commercials
+          - generic [ref=e797]: 4. Branches & Limits
+          - generic [ref=e798]: 5. Device Provisioning
+          - generic [ref=e799]: 6. Review & Launch
+          - generic [ref=e800]: 7. Welcome Kit
+        - generic [ref=e888]:
+          - generic [ref=e889]: Select Subscription Plan Tier & Commercial Terms
+          - paragraph [ref=e893]: The assigned plan dictates which applications and entitlements the restaurant can execute.
+          - generic [ref=e894]:
+            - generic [ref=e895] [cursor=pointer]:
+              - generic [ref=e896]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e897]: TEST Pay Orders Plan 1789016016965
+              - generic [ref=e898]:
+                - text: ₹7,000
+                - generic [ref=e899]: / month
+              - generic [ref=e900]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e901]:
+                - listitem [ref=e902]:
+                  - generic [ref=e905]: Up to 3 Physical Branch
+                - listitem [ref=e906]:
+                  - generic [ref=e909]: Up to 20 Registered Devices
+                - listitem [ref=e910]:
+                  - generic [ref=e913]: Offline Local POS Billing Engine
+                - listitem [ref=e914]:
+                  - generic [ref=e917]: Captain Wireless Waiter App
+                - listitem [ref=e918]:
+                  - generic [ref=e921]: QR Table Ordering & Standees
+                - listitem [ref=e922]:
+                  - generic [ref=e925]: Self-Order Kiosk App
+                - listitem [ref=e926]:
+                  - generic [ref=e929]: Kiosk Admin Dashboard
+            - generic [ref=e930] [cursor=pointer]:
+              - generic [ref=e931]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e932]: TEST Pay Orders Plan 1789016074787
+              - generic [ref=e933]:
+                - text: ₹7,000
+                - generic [ref=e934]: / month
+              - generic [ref=e935]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e936]:
+                - listitem [ref=e937]:
+                  - generic [ref=e940]: Up to 3 Physical Branch
+                - listitem [ref=e941]:
+                  - generic [ref=e944]: Up to 20 Registered Devices
+                - listitem [ref=e945]:
+                  - generic [ref=e948]: Offline Local POS Billing Engine
+                - listitem [ref=e949]:
+                  - generic [ref=e952]: Captain Wireless Waiter App
+                - listitem [ref=e953]:
+                  - generic [ref=e956]: QR Table Ordering & Standees
+                - listitem [ref=e957]:
+                  - generic [ref=e960]: Self-Order Kiosk App
+                - listitem [ref=e961]:
+                  - generic [ref=e964]: Kiosk Admin Dashboard
+            - generic [ref=e965] [cursor=pointer]:
+              - generic [ref=e966]: JAMANVAAR CORE
+              - generic [ref=e967]:
+                - text: ₹5,000
+                - generic [ref=e968]: / month
+              - generic [ref=e969]: "Foundation Edition: POS + Complete Restaurant Management (10 modules, 183 base features)"
+              - list [ref=e970]:
+                - listitem [ref=e971]:
+                  - generic [ref=e974]: Up to 1 Physical Branch
+                - listitem [ref=e975]:
+                  - generic [ref=e978]: Up to 5 Registered Devices
+                - listitem [ref=e979]:
+                  - generic [ref=e982]: Offline Local POS Billing Engine
+                - listitem [ref=e983]:
+                  - generic [ref=e984]: ✕
+                  - generic [ref=e985]: Captain Wireless Waiter App
+                - listitem [ref=e986]:
+                  - generic [ref=e987]: ✕
+                  - generic [ref=e988]: QR Table Ordering & Standees
+                - listitem [ref=e989]:
+                  - generic [ref=e990]: ✕
+                  - generic [ref=e991]: Self-Order Kiosk App
+                - listitem [ref=e992]:
+                  - generic [ref=e993]: ✕
+                  - generic [ref=e994]: Kiosk Admin Dashboard
+            - generic [ref=e995] [cursor=pointer]:
+              - generic [ref=e996]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e997]: JAMANVAAR PRO
+              - generic [ref=e998]:
+                - text: ₹7,000
+                - generic [ref=e999]: / month
+              - generic [ref=e1000]: "Flagship Edition: Everything in Core + Wireless Captain, QR Table Ordering, Mesh Sync & AI (364 features total)"
+              - list [ref=e1001]:
+                - listitem [ref=e1002]:
+                  - generic [ref=e1005]: Up to 5 Physical Branch
+                - listitem [ref=e1006]:
+                  - generic [ref=e1009]: Up to 20 Registered Devices
+                - listitem [ref=e1010]:
+                  - generic [ref=e1013]: Offline Local POS Billing Engine
+                - listitem [ref=e1014]:
+                  - generic [ref=e1017]: Captain Wireless Waiter App
+                - listitem [ref=e1018]:
+                  - generic [ref=e1021]: QR Table Ordering & Standees
+                - listitem [ref=e1022]:
+                  - generic [ref=e1025]: Self-Order Kiosk App
+                - listitem [ref=e1026]:
+                  - generic [ref=e1029]: Kiosk Admin Dashboard
+            - generic [ref=e1030] [cursor=pointer]:
+              - generic [ref=e1031]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1032]: TEST Refund Plan 1789099192964
+              - generic [ref=e1033]:
+                - text: ₹7,000
+                - generic [ref=e1034]: / month
+              - generic [ref=e1035]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1036]:
+                - listitem [ref=e1037]:
+                  - generic [ref=e1040]: Up to 3 Physical Branch
+                - listitem [ref=e1041]:
+                  - generic [ref=e1044]: Up to 20 Registered Devices
+                - listitem [ref=e1045]:
+                  - generic [ref=e1048]: Offline Local POS Billing Engine
+                - listitem [ref=e1049]:
+                  - generic [ref=e1052]: Captain Wireless Waiter App
+                - listitem [ref=e1053]:
+                  - generic [ref=e1056]: QR Table Ordering & Standees
+                - listitem [ref=e1057]:
+                  - generic [ref=e1060]: Self-Order Kiosk App
+                - listitem [ref=e1061]:
+                  - generic [ref=e1064]: Kiosk Admin Dashboard
+            - generic [ref=e1065] [cursor=pointer]:
+              - generic [ref=e1066]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1067]: TEST Refund Plan 1789099348089
+              - generic [ref=e1068]:
+                - text: ₹7,000
+                - generic [ref=e1069]: / month
+              - generic [ref=e1070]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1071]:
+                - listitem [ref=e1072]:
+                  - generic [ref=e1075]: Up to 3 Physical Branch
+                - listitem [ref=e1076]:
+                  - generic [ref=e1079]: Up to 20 Registered Devices
+                - listitem [ref=e1080]:
+                  - generic [ref=e1083]: Offline Local POS Billing Engine
+                - listitem [ref=e1084]:
+                  - generic [ref=e1087]: Captain Wireless Waiter App
+                - listitem [ref=e1088]:
+                  - generic [ref=e1091]: QR Table Ordering & Standees
+                - listitem [ref=e1092]:
+                  - generic [ref=e1095]: Self-Order Kiosk App
+                - listitem [ref=e1096]:
+                  - generic [ref=e1099]: Kiosk Admin Dashboard
+            - generic [ref=e1100] [cursor=pointer]:
+              - generic [ref=e1101]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1102]: TEST Refund Plan 1789099567641
+              - generic [ref=e1103]:
+                - text: ₹7,000
+                - generic [ref=e1104]: / month
+              - generic [ref=e1105]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1106]:
+                - listitem [ref=e1107]:
+                  - generic [ref=e1110]: Up to 3 Physical Branch
+                - listitem [ref=e1111]:
+                  - generic [ref=e1114]: Up to 20 Registered Devices
+                - listitem [ref=e1115]:
+                  - generic [ref=e1118]: Offline Local POS Billing Engine
+                - listitem [ref=e1119]:
+                  - generic [ref=e1122]: Captain Wireless Waiter App
+                - listitem [ref=e1123]:
+                  - generic [ref=e1126]: QR Table Ordering & Standees
+                - listitem [ref=e1127]:
+                  - generic [ref=e1130]: Self-Order Kiosk App
+                - listitem [ref=e1131]:
+                  - generic [ref=e1134]: Kiosk Admin Dashboard
+            - generic [ref=e1135] [cursor=pointer]:
+              - generic [ref=e1136]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1137]: TEST Platpay Plan 1789168939561
+              - generic [ref=e1138]:
+                - text: ₹7,000
+                - generic [ref=e1139]: / month
+              - generic [ref=e1140]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1141]:
+                - listitem [ref=e1142]:
+                  - generic [ref=e1145]: Up to 3 Physical Branch
+                - listitem [ref=e1146]:
+                  - generic [ref=e1149]: Up to 20 Registered Devices
+                - listitem [ref=e1150]:
+                  - generic [ref=e1153]: Offline Local POS Billing Engine
+                - listitem [ref=e1154]:
+                  - generic [ref=e1157]: Captain Wireless Waiter App
+                - listitem [ref=e1158]:
+                  - generic [ref=e1161]: QR Table Ordering & Standees
+                - listitem [ref=e1162]:
+                  - generic [ref=e1165]: Self-Order Kiosk App
+                - listitem [ref=e1166]:
+                  - generic [ref=e1169]: Kiosk Admin Dashboard
+            - generic [ref=e1170] [cursor=pointer]:
+              - generic [ref=e1171]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1172]: TEST Platpay Plan 1789168989539
+              - generic [ref=e1173]:
+                - text: ₹7,000
+                - generic [ref=e1174]: / month
+              - generic [ref=e1175]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1176]:
+                - listitem [ref=e1177]:
+                  - generic [ref=e1180]: Up to 3 Physical Branch
+                - listitem [ref=e1181]:
+                  - generic [ref=e1184]: Up to 20 Registered Devices
+                - listitem [ref=e1185]:
+                  - generic [ref=e1188]: Offline Local POS Billing Engine
+                - listitem [ref=e1189]:
+                  - generic [ref=e1192]: Captain Wireless Waiter App
+                - listitem [ref=e1193]:
+                  - generic [ref=e1196]: QR Table Ordering & Standees
+                - listitem [ref=e1197]:
+                  - generic [ref=e1200]: Self-Order Kiosk App
+                - listitem [ref=e1201]:
+                  - generic [ref=e1204]: Kiosk Admin Dashboard
+            - generic [ref=e1205] [cursor=pointer]:
+              - generic [ref=e1206]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1207]: TEST Refund Plan 1789169026974
+              - generic [ref=e1208]:
+                - text: ₹7,000
+                - generic [ref=e1209]: / month
+              - generic [ref=e1210]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1211]:
+                - listitem [ref=e1212]:
+                  - generic [ref=e1215]: Up to 3 Physical Branch
+                - listitem [ref=e1216]:
+                  - generic [ref=e1219]: Up to 20 Registered Devices
+                - listitem [ref=e1220]:
+                  - generic [ref=e1223]: Offline Local POS Billing Engine
+                - listitem [ref=e1224]:
+                  - generic [ref=e1227]: Captain Wireless Waiter App
+                - listitem [ref=e1228]:
+                  - generic [ref=e1231]: QR Table Ordering & Standees
+                - listitem [ref=e1232]:
+                  - generic [ref=e1235]: Self-Order Kiosk App
+                - listitem [ref=e1236]:
+                  - generic [ref=e1239]: Kiosk Admin Dashboard
+            - generic [ref=e1240] [cursor=pointer]:
+              - generic [ref=e1241]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1242]: TEST Platpay Plan 1789169048169
+              - generic [ref=e1243]:
+                - text: ₹7,000
+                - generic [ref=e1244]: / month
+              - generic [ref=e1245]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1246]:
+                - listitem [ref=e1247]:
+                  - generic [ref=e1250]: Up to 3 Physical Branch
+                - listitem [ref=e1251]:
+                  - generic [ref=e1254]: Up to 20 Registered Devices
+                - listitem [ref=e1255]:
+                  - generic [ref=e1258]: Offline Local POS Billing Engine
+                - listitem [ref=e1259]:
+                  - generic [ref=e1262]: Captain Wireless Waiter App
+                - listitem [ref=e1263]:
+                  - generic [ref=e1266]: QR Table Ordering & Standees
+                - listitem [ref=e1267]:
+                  - generic [ref=e1270]: Self-Order Kiosk App
+                - listitem [ref=e1271]:
+                  - generic [ref=e1274]: Kiosk Admin Dashboard
+            - generic [ref=e1275] [cursor=pointer]:
+              - generic [ref=e1276]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1277]: MANUAL VERIFY Plan 1789169439583
+              - generic [ref=e1278]:
+                - text: ₹7,000
+                - generic [ref=e1279]: / month
+              - generic [ref=e1280]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1281]:
+                - listitem [ref=e1282]:
+                  - generic [ref=e1285]: Up to 3 Physical Branch
+                - listitem [ref=e1286]:
+                  - generic [ref=e1289]: Up to 20 Registered Devices
+                - listitem [ref=e1290]:
+                  - generic [ref=e1293]: Offline Local POS Billing Engine
+                - listitem [ref=e1294]:
+                  - generic [ref=e1297]: Captain Wireless Waiter App
+                - listitem [ref=e1298]:
+                  - generic [ref=e1301]: QR Table Ordering & Standees
+                - listitem [ref=e1302]:
+                  - generic [ref=e1305]: Self-Order Kiosk App
+                - listitem [ref=e1306]:
+                  - generic [ref=e1309]: Kiosk Admin Dashboard
+            - generic [ref=e1310] [cursor=pointer]:
+              - generic [ref=e1311]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1312]: TEST Refund Plan 1789169595459
+              - generic [ref=e1313]:
+                - text: ₹7,000
+                - generic [ref=e1314]: / month
+              - generic [ref=e1315]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1316]:
+                - listitem [ref=e1317]:
+                  - generic [ref=e1320]: Up to 3 Physical Branch
+                - listitem [ref=e1321]:
+                  - generic [ref=e1324]: Up to 20 Registered Devices
+                - listitem [ref=e1325]:
+                  - generic [ref=e1328]: Offline Local POS Billing Engine
+                - listitem [ref=e1329]:
+                  - generic [ref=e1332]: Captain Wireless Waiter App
+                - listitem [ref=e1333]:
+                  - generic [ref=e1336]: QR Table Ordering & Standees
+                - listitem [ref=e1337]:
+                  - generic [ref=e1340]: Self-Order Kiosk App
+                - listitem [ref=e1341]:
+                  - generic [ref=e1344]: Kiosk Admin Dashboard
+            - generic [ref=e1345] [cursor=pointer]:
+              - generic [ref=e1346]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1347]: TEST Platpay Plan 1789169598066
+              - generic [ref=e1348]:
+                - text: ₹7,000
+                - generic [ref=e1349]: / month
+              - generic [ref=e1350]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1351]:
+                - listitem [ref=e1352]:
+                  - generic [ref=e1355]: Up to 3 Physical Branch
+                - listitem [ref=e1356]:
+                  - generic [ref=e1359]: Up to 20 Registered Devices
+                - listitem [ref=e1360]:
+                  - generic [ref=e1363]: Offline Local POS Billing Engine
+                - listitem [ref=e1364]:
+                  - generic [ref=e1367]: Captain Wireless Waiter App
+                - listitem [ref=e1368]:
+                  - generic [ref=e1371]: QR Table Ordering & Standees
+                - listitem [ref=e1372]:
+                  - generic [ref=e1375]: Self-Order Kiosk App
+                - listitem [ref=e1376]:
+                  - generic [ref=e1379]: Kiosk Admin Dashboard
+            - generic [ref=e1380] [cursor=pointer]:
+              - generic [ref=e1381]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1382]: TEST Refund Plan 1789171383844
+              - generic [ref=e1383]:
+                - text: ₹7,000
+                - generic [ref=e1384]: / month
+              - generic [ref=e1385]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1386]:
+                - listitem [ref=e1387]:
+                  - generic [ref=e1390]: Up to 3 Physical Branch
+                - listitem [ref=e1391]:
+                  - generic [ref=e1394]: Up to 20 Registered Devices
+                - listitem [ref=e1395]:
+                  - generic [ref=e1398]: Offline Local POS Billing Engine
+                - listitem [ref=e1399]:
+                  - generic [ref=e1402]: Captain Wireless Waiter App
+                - listitem [ref=e1403]:
+                  - generic [ref=e1406]: QR Table Ordering & Standees
+                - listitem [ref=e1407]:
+                  - generic [ref=e1410]: Self-Order Kiosk App
+                - listitem [ref=e1411]:
+                  - generic [ref=e1414]: Kiosk Admin Dashboard
+            - generic [ref=e1415] [cursor=pointer]:
+              - generic [ref=e1416]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1417]: TEST Platpay Plan 1789171397395
+              - generic [ref=e1418]:
+                - text: ₹7,000
+                - generic [ref=e1419]: / month
+              - generic [ref=e1420]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1421]:
+                - listitem [ref=e1422]:
+                  - generic [ref=e1425]: Up to 3 Physical Branch
+                - listitem [ref=e1426]:
+                  - generic [ref=e1429]: Up to 20 Registered Devices
+                - listitem [ref=e1430]:
+                  - generic [ref=e1433]: Offline Local POS Billing Engine
+                - listitem [ref=e1434]:
+                  - generic [ref=e1437]: Captain Wireless Waiter App
+                - listitem [ref=e1438]:
+                  - generic [ref=e1441]: QR Table Ordering & Standees
+                - listitem [ref=e1442]:
+                  - generic [ref=e1445]: Self-Order Kiosk App
+                - listitem [ref=e1446]:
+                  - generic [ref=e1449]: Kiosk Admin Dashboard
+            - generic [ref=e1450] [cursor=pointer]:
+              - generic [ref=e1451]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1452]: TEST Receipts Plan 1789171554386
+              - generic [ref=e1453]:
+                - text: ₹7,000
+                - generic [ref=e1454]: / month
+              - generic [ref=e1455]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1456]:
+                - listitem [ref=e1457]:
+                  - generic [ref=e1460]: Up to 3 Physical Branch
+                - listitem [ref=e1461]:
+                  - generic [ref=e1464]: Up to 20 Registered Devices
+                - listitem [ref=e1465]:
+                  - generic [ref=e1468]: Offline Local POS Billing Engine
+                - listitem [ref=e1469]:
+                  - generic [ref=e1472]: Captain Wireless Waiter App
+                - listitem [ref=e1473]:
+                  - generic [ref=e1476]: QR Table Ordering & Standees
+                - listitem [ref=e1477]:
+                  - generic [ref=e1480]: Self-Order Kiosk App
+                - listitem [ref=e1481]:
+                  - generic [ref=e1484]: Kiosk Admin Dashboard
+            - generic [ref=e1485] [cursor=pointer]:
+              - generic [ref=e1486]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1487]: TEST Receipts Plan 1789171589985
+              - generic [ref=e1488]:
+                - text: ₹7,000
+                - generic [ref=e1489]: / month
+              - generic [ref=e1490]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1491]:
+                - listitem [ref=e1492]:
+                  - generic [ref=e1495]: Up to 3 Physical Branch
+                - listitem [ref=e1496]:
+                  - generic [ref=e1499]: Up to 20 Registered Devices
+                - listitem [ref=e1500]:
+                  - generic [ref=e1503]: Offline Local POS Billing Engine
+                - listitem [ref=e1504]:
+                  - generic [ref=e1507]: Captain Wireless Waiter App
+                - listitem [ref=e1508]:
+                  - generic [ref=e1511]: QR Table Ordering & Standees
+                - listitem [ref=e1512]:
+                  - generic [ref=e1515]: Self-Order Kiosk App
+                - listitem [ref=e1516]:
+                  - generic [ref=e1519]: Kiosk Admin Dashboard
+            - generic [ref=e1520] [cursor=pointer]:
+              - generic [ref=e1521]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1522]: TEST Platpay Plan 1789171600141
+              - generic [ref=e1523]:
+                - text: ₹7,000
+                - generic [ref=e1524]: / month
+              - generic [ref=e1525]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1526]:
+                - listitem [ref=e1527]:
+                  - generic [ref=e1530]: Up to 3 Physical Branch
+                - listitem [ref=e1531]:
+                  - generic [ref=e1534]: Up to 20 Registered Devices
+                - listitem [ref=e1535]:
+                  - generic [ref=e1538]: Offline Local POS Billing Engine
+                - listitem [ref=e1539]:
+                  - generic [ref=e1542]: Captain Wireless Waiter App
+                - listitem [ref=e1543]:
+                  - generic [ref=e1546]: QR Table Ordering & Standees
+                - listitem [ref=e1547]:
+                  - generic [ref=e1550]: Self-Order Kiosk App
+                - listitem [ref=e1551]:
+                  - generic [ref=e1554]: Kiosk Admin Dashboard
+            - generic [ref=e1555] [cursor=pointer]:
+              - generic [ref=e1556]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1557]: TEST Refund Plan 1789171602582
+              - generic [ref=e1558]:
+                - text: ₹7,000
+                - generic [ref=e1559]: / month
+              - generic [ref=e1560]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1561]:
+                - listitem [ref=e1562]:
+                  - generic [ref=e1565]: Up to 3 Physical Branch
+                - listitem [ref=e1566]:
+                  - generic [ref=e1569]: Up to 20 Registered Devices
+                - listitem [ref=e1570]:
+                  - generic [ref=e1573]: Offline Local POS Billing Engine
+                - listitem [ref=e1574]:
+                  - generic [ref=e1577]: Captain Wireless Waiter App
+                - listitem [ref=e1578]:
+                  - generic [ref=e1581]: QR Table Ordering & Standees
+                - listitem [ref=e1582]:
+                  - generic [ref=e1585]: Self-Order Kiosk App
+                - listitem [ref=e1586]:
+                  - generic [ref=e1589]: Kiosk Admin Dashboard
+            - generic [ref=e1590] [cursor=pointer]:
+              - generic [ref=e1591]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1592]: TEST Platpay Plan 1789172148575
+              - generic [ref=e1593]:
+                - text: ₹7,000
+                - generic [ref=e1594]: / month
+              - generic [ref=e1595]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1596]:
+                - listitem [ref=e1597]:
+                  - generic [ref=e1600]: Up to 3 Physical Branch
+                - listitem [ref=e1601]:
+                  - generic [ref=e1604]: Up to 20 Registered Devices
+                - listitem [ref=e1605]:
+                  - generic [ref=e1608]: Offline Local POS Billing Engine
+                - listitem [ref=e1609]:
+                  - generic [ref=e1612]: Captain Wireless Waiter App
+                - listitem [ref=e1613]:
+                  - generic [ref=e1616]: QR Table Ordering & Standees
+                - listitem [ref=e1617]:
+                  - generic [ref=e1620]: Self-Order Kiosk App
+                - listitem [ref=e1621]:
+                  - generic [ref=e1624]: Kiosk Admin Dashboard
+            - generic [ref=e1625] [cursor=pointer]:
+              - generic [ref=e1626]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1627]: TEST Refund Plan 1789172151032
+              - generic [ref=e1628]:
+                - text: ₹7,000
+                - generic [ref=e1629]: / month
+              - generic [ref=e1630]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1631]:
+                - listitem [ref=e1632]:
+                  - generic [ref=e1635]: Up to 3 Physical Branch
+                - listitem [ref=e1636]:
+                  - generic [ref=e1639]: Up to 20 Registered Devices
+                - listitem [ref=e1640]:
+                  - generic [ref=e1643]: Offline Local POS Billing Engine
+                - listitem [ref=e1644]:
+                  - generic [ref=e1647]: Captain Wireless Waiter App
+                - listitem [ref=e1648]:
+                  - generic [ref=e1651]: QR Table Ordering & Standees
+                - listitem [ref=e1652]:
+                  - generic [ref=e1655]: Self-Order Kiosk App
+                - listitem [ref=e1656]:
+                  - generic [ref=e1659]: Kiosk Admin Dashboard
+            - generic [ref=e1660] [cursor=pointer]:
+              - generic [ref=e1661]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1662]: TEST Receipts Plan 1789172155900
+              - generic [ref=e1663]:
+                - text: ₹7,000
+                - generic [ref=e1664]: / month
+              - generic [ref=e1665]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1666]:
+                - listitem [ref=e1667]:
+                  - generic [ref=e1670]: Up to 3 Physical Branch
+                - listitem [ref=e1671]:
+                  - generic [ref=e1674]: Up to 20 Registered Devices
+                - listitem [ref=e1675]:
+                  - generic [ref=e1678]: Offline Local POS Billing Engine
+                - listitem [ref=e1679]:
+                  - generic [ref=e1682]: Captain Wireless Waiter App
+                - listitem [ref=e1683]:
+                  - generic [ref=e1686]: QR Table Ordering & Standees
+                - listitem [ref=e1687]:
+                  - generic [ref=e1690]: Self-Order Kiosk App
+                - listitem [ref=e1691]:
+                  - generic [ref=e1694]: Kiosk Admin Dashboard
+            - generic [ref=e1695] [cursor=pointer]:
+              - generic [ref=e1696]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1697]: TEST Platpay Plan 1789172270817
+              - generic [ref=e1698]:
+                - text: ₹7,000
+                - generic [ref=e1699]: / month
+              - generic [ref=e1700]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1701]:
+                - listitem [ref=e1702]:
+                  - generic [ref=e1705]: Up to 3 Physical Branch
+                - listitem [ref=e1706]:
+                  - generic [ref=e1709]: Up to 20 Registered Devices
+                - listitem [ref=e1710]:
+                  - generic [ref=e1713]: Offline Local POS Billing Engine
+                - listitem [ref=e1714]:
+                  - generic [ref=e1717]: Captain Wireless Waiter App
+                - listitem [ref=e1718]:
+                  - generic [ref=e1721]: QR Table Ordering & Standees
+                - listitem [ref=e1722]:
+                  - generic [ref=e1725]: Self-Order Kiosk App
+                - listitem [ref=e1726]:
+                  - generic [ref=e1729]: Kiosk Admin Dashboard
+            - generic [ref=e1730] [cursor=pointer]:
+              - generic [ref=e1731]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1732]: TEST Refund Plan 1789172278022
+              - generic [ref=e1733]:
+                - text: ₹7,000
+                - generic [ref=e1734]: / month
+              - generic [ref=e1735]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1736]:
+                - listitem [ref=e1737]:
+                  - generic [ref=e1740]: Up to 3 Physical Branch
+                - listitem [ref=e1741]:
+                  - generic [ref=e1744]: Up to 20 Registered Devices
+                - listitem [ref=e1745]:
+                  - generic [ref=e1748]: Offline Local POS Billing Engine
+                - listitem [ref=e1749]:
+                  - generic [ref=e1752]: Captain Wireless Waiter App
+                - listitem [ref=e1753]:
+                  - generic [ref=e1756]: QR Table Ordering & Standees
+                - listitem [ref=e1757]:
+                  - generic [ref=e1760]: Self-Order Kiosk App
+                - listitem [ref=e1761]:
+                  - generic [ref=e1764]: Kiosk Admin Dashboard
+            - generic [ref=e1765] [cursor=pointer]:
+              - generic [ref=e1766]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1767]: TEST Receipts Plan 1789172285367
+              - generic [ref=e1768]:
+                - text: ₹7,000
+                - generic [ref=e1769]: / month
+              - generic [ref=e1770]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1771]:
+                - listitem [ref=e1772]:
+                  - generic [ref=e1775]: Up to 3 Physical Branch
+                - listitem [ref=e1776]:
+                  - generic [ref=e1779]: Up to 20 Registered Devices
+                - listitem [ref=e1780]:
+                  - generic [ref=e1783]: Offline Local POS Billing Engine
+                - listitem [ref=e1784]:
+                  - generic [ref=e1787]: Captain Wireless Waiter App
+                - listitem [ref=e1788]:
+                  - generic [ref=e1791]: QR Table Ordering & Standees
+                - listitem [ref=e1792]:
+                  - generic [ref=e1795]: Self-Order Kiosk App
+                - listitem [ref=e1796]:
+                  - generic [ref=e1799]: Kiosk Admin Dashboard
+            - generic [ref=e1800] [cursor=pointer]:
+              - generic [ref=e1801]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1802]: TEST Refund Plan 1789174549739
+              - generic [ref=e1803]:
+                - text: ₹7,000
+                - generic [ref=e1804]: / month
+              - generic [ref=e1805]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1806]:
+                - listitem [ref=e1807]:
+                  - generic [ref=e1810]: Up to 3 Physical Branch
+                - listitem [ref=e1811]:
+                  - generic [ref=e1814]: Up to 20 Registered Devices
+                - listitem [ref=e1815]:
+                  - generic [ref=e1818]: Offline Local POS Billing Engine
+                - listitem [ref=e1819]:
+                  - generic [ref=e1822]: Captain Wireless Waiter App
+                - listitem [ref=e1823]:
+                  - generic [ref=e1826]: QR Table Ordering & Standees
+                - listitem [ref=e1827]:
+                  - generic [ref=e1830]: Self-Order Kiosk App
+                - listitem [ref=e1831]:
+                  - generic [ref=e1834]: Kiosk Admin Dashboard
+            - generic [ref=e1835] [cursor=pointer]:
+              - generic [ref=e1836]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1837]: TEST Platpay Plan 1789174552199
+              - generic [ref=e1838]:
+                - text: ₹7,000
+                - generic [ref=e1839]: / month
+              - generic [ref=e1840]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1841]:
+                - listitem [ref=e1842]:
+                  - generic [ref=e1845]: Up to 3 Physical Branch
+                - listitem [ref=e1846]:
+                  - generic [ref=e1849]: Up to 20 Registered Devices
+                - listitem [ref=e1850]:
+                  - generic [ref=e1853]: Offline Local POS Billing Engine
+                - listitem [ref=e1854]:
+                  - generic [ref=e1857]: Captain Wireless Waiter App
+                - listitem [ref=e1858]:
+                  - generic [ref=e1861]: QR Table Ordering & Standees
+                - listitem [ref=e1862]:
+                  - generic [ref=e1865]: Self-Order Kiosk App
+                - listitem [ref=e1866]:
+                  - generic [ref=e1869]: Kiosk Admin Dashboard
+            - generic [ref=e1870] [cursor=pointer]:
+              - generic [ref=e1871]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1872]: TEST Receipts Plan 1789174559637
+              - generic [ref=e1873]:
+                - text: ₹7,000
+                - generic [ref=e1874]: / month
+              - generic [ref=e1875]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1876]:
+                - listitem [ref=e1877]:
+                  - generic [ref=e1880]: Up to 3 Physical Branch
+                - listitem [ref=e1881]:
+                  - generic [ref=e1884]: Up to 20 Registered Devices
+                - listitem [ref=e1885]:
+                  - generic [ref=e1888]: Offline Local POS Billing Engine
+                - listitem [ref=e1889]:
+                  - generic [ref=e1892]: Captain Wireless Waiter App
+                - listitem [ref=e1893]:
+                  - generic [ref=e1896]: QR Table Ordering & Standees
+                - listitem [ref=e1897]:
+                  - generic [ref=e1900]: Self-Order Kiosk App
+                - listitem [ref=e1901]:
+                  - generic [ref=e1904]: Kiosk Admin Dashboard
+            - generic [ref=e1905] [cursor=pointer]:
+              - generic [ref=e1906]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1907]: TEST Receipts Plan 1789174738451
+              - generic [ref=e1908]:
+                - text: ₹7,000
+                - generic [ref=e1909]: / month
+              - generic [ref=e1910]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1911]:
+                - listitem [ref=e1912]:
+                  - generic [ref=e1915]: Up to 3 Physical Branch
+                - listitem [ref=e1916]:
+                  - generic [ref=e1919]: Up to 20 Registered Devices
+                - listitem [ref=e1920]:
+                  - generic [ref=e1923]: Offline Local POS Billing Engine
+                - listitem [ref=e1924]:
+                  - generic [ref=e1927]: Captain Wireless Waiter App
+                - listitem [ref=e1928]:
+                  - generic [ref=e1931]: QR Table Ordering & Standees
+                - listitem [ref=e1932]:
+                  - generic [ref=e1935]: Self-Order Kiosk App
+                - listitem [ref=e1936]:
+                  - generic [ref=e1939]: Kiosk Admin Dashboard
+            - generic [ref=e1940] [cursor=pointer]:
+              - generic [ref=e1941]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1942]: TEST Refund Plan 1789174740875
+              - generic [ref=e1943]:
+                - text: ₹7,000
+                - generic [ref=e1944]: / month
+              - generic [ref=e1945]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1946]:
+                - listitem [ref=e1947]:
+                  - generic [ref=e1950]: Up to 3 Physical Branch
+                - listitem [ref=e1951]:
+                  - generic [ref=e1954]: Up to 20 Registered Devices
+                - listitem [ref=e1955]:
+                  - generic [ref=e1958]: Offline Local POS Billing Engine
+                - listitem [ref=e1959]:
+                  - generic [ref=e1962]: Captain Wireless Waiter App
+                - listitem [ref=e1963]:
+                  - generic [ref=e1966]: QR Table Ordering & Standees
+                - listitem [ref=e1967]:
+                  - generic [ref=e1970]: Self-Order Kiosk App
+                - listitem [ref=e1971]:
+                  - generic [ref=e1974]: Kiosk Admin Dashboard
+            - generic [ref=e1975] [cursor=pointer]:
+              - generic [ref=e1976]: MOST POPULAR • ALL FEATURES
+              - generic [ref=e1977]: TEST Platpay Plan 1789174745760
+              - generic [ref=e1978]:
+                - text: ₹7,000
+                - generic [ref=e1979]: / month
+              - generic [ref=e1980]: Full restaurant operating system with Captain ordering, QR dining, KDS, and multi-terminal management.
+              - list [ref=e1981]:
+                - listitem [ref=e1982]:
+                  - generic [ref=e1985]: Up to 3 Physical Branch
+                - listitem [ref=e1986]:
+                  - generic [ref=e1989]: Up to 20 Registered Devices
+                - listitem [ref=e1990]:
+                  - generic [ref=e1993]: Offline Local POS Billing Engine
+                - listitem [ref=e1994]:
+                  - generic [ref=e1997]: Captain Wireless Waiter App
+                - listitem [ref=e1998]:
+                  - generic [ref=e2001]: QR Table Ordering & Standees
+                - listitem [ref=e2002]:
+                  - generic [ref=e2005]: Self-Order Kiosk App
+                - listitem [ref=e2006]:
+                  - generic [ref=e2009]: Kiosk Admin Dashboard
+          - generic [ref=e2010]:
+            - generic [ref=e2011]:
+              - generic [ref=e2012]: Subscription Status
+              - combobox [ref=e2013]:
+                - option "ACTIVE (Paid Commercial License)" [selected]
+                - option "TRIAL (Evaluation Period)"
+            - generic [ref=e2014]:
+              - generic [ref=e2015]: Initial License Validity (Days)
+              - spinbutton [ref=e2016]: "30"
+            - generic [ref=e2017]:
+              - generic [ref=e2018]: Billing Cycle
+              - combobox [ref=e2019]:
+                - option "Monthly Recurring" [selected]
+                - option "Annual Prepayment (10% Discount)"
+          - generic [ref=e2020]:
+            - button "← Back" [ref=e2021] [cursor=pointer]
+            - 'button "Next: Branches & Limits →" [ref=e2022] [cursor=pointer]'

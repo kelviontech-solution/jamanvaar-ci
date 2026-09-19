@@ -1,0 +1,1129 @@
+- generic [ref=f5e3]:
+  - banner [ref=f5e4]:
+    - generic [ref=f5e5]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f5e7]
+      - generic [ref=f5e9]:
+        - generic [ref=f5e10]:
+          - generic "QA FULL AUDIT RESTAURANT" [ref=f5e11]
+          - generic [ref=f5e12]: ADMIN
+        - button "Ahmedabad Flagship Store" [ref=f5e13] [cursor=pointer]
+    - button "Open global search" [ref=f5e20] [cursor=pointer]:
+      - textbox "Search orders, invoices, dishes, tables..." [ref=f5e24]
+      - generic: Ctrl+K
+    - generic [ref=f5e25]:
+      - generic [ref=f5e26]:
+        - button "EOD Report" [ref=f5e27] [cursor=pointer]
+        - button "Reconciliation" [ref=f5e32] [cursor=pointer]
+      - generic [ref=f5e38]:
+        - button "JAMAN AI Operations Assistant" [ref=f5e39] [cursor=pointer]
+        - button "Notifications" [ref=f5e43] [cursor=pointer]
+        - button "Sign out of Restaurant Admin" [ref=f5e47] [cursor=pointer]
+  - generic [ref=f5e51]:
+    - complementary [ref=f5e52]:
+      - generic [ref=f5e53]:
+        - generic [ref=f5e54]:
+          - button "OPERATIONS" [ref=f5e55] [cursor=pointer]
+          - navigation [ref=f5e59]:
+            - button "Dashboard" [ref=f5e60] [cursor=pointer]
+            - button "Billing / Invoices" [ref=f5e69] [cursor=pointer]
+            - button "Orders" [ref=f5e74] [cursor=pointer]
+            - button "Live Orders / KDS 3" [ref=f5e80] [cursor=pointer]:
+              - generic [ref=f5e81]: Live Orders / KDS
+              - generic [ref=f5e85]: "3"
+            - button "Floor / Tables" [ref=f5e87] [cursor=pointer]
+            - button "Reservations" [ref=f5e92] [cursor=pointer]
+            - button "Kitchen / KOT" [ref=f5e99] [cursor=pointer]
+        - generic [ref=f5e104]:
+          - button "DIGITAL ORDERING" [ref=f5e105] [cursor=pointer]
+          - navigation [ref=f5e109]:
+            - button "QR Table Ordering PRO" [ref=f5e110] [cursor=pointer]:
+              - generic [ref=f5e111]: QR Table Ordering
+              - generic [ref=f5e119]: PRO
+        - generic [ref=f5e121]:
+          - button "MENU & INVENTORY" [ref=f5e122] [cursor=pointer]
+          - navigation [ref=f5e126]:
+            - button "Menu & Categories" [ref=f5e127] [cursor=pointer]
+            - button "Inventory & Recipes 2" [ref=f5e135] [cursor=pointer]:
+              - generic [ref=f5e136]: Inventory & Recipes
+              - generic [ref=f5e142]: "2"
+        - generic [ref=f5e144]:
+          - button "PEOPLE & CASH" [ref=f5e145] [cursor=pointer]
+          - navigation [ref=f5e149]:
+            - button "Customers CRM" [ref=f5e150] [cursor=pointer]
+            - button "Staff & Roles (RBAC)" [ref=f5e155] [cursor=pointer]
+            - button "Payments & Split" [active] [ref=f5e163] [cursor=pointer]
+            - button "Shift & Cash Drawer" [ref=f5e168] [cursor=pointer]
+        - generic [ref=f5e176]:
+          - button "ANALYTICS & SYSTEM" [ref=f5e177] [cursor=pointer]
+          - navigation [ref=f5e181]:
+            - button "Reports & Analytics" [ref=f5e182] [cursor=pointer]
+            - button "Printers & Devices" [ref=f5e188] [cursor=pointer]
+            - button "Restaurant Settings" [ref=f5e195] [cursor=pointer]
+            - button "Subscription Plans" [ref=f5e201] [cursor=pointer]
+            - button "Audit Trail Logs" [ref=f5e207] [cursor=pointer]
+            - button "Backup & Restore" [ref=f5e213] [cursor=pointer]
+    - main [ref=f5e220]:
+      - generic [ref=f5e1687]:
+        - generic [ref=f5e1689]:
+          - generic [ref=f5e1690]:
+            - heading "Payments & Split Tenders Ledger" [level=1] [ref=f5e1691]
+            - generic [ref=f5e1692]: MULTI-TENDER AUDIT
+          - paragraph [ref=f5e1693]: Breakdown of Cash, UPI Bharat QR, Card Swipe EDC, and Split-Tender reconciliations across all cashier counters.
+        - generic [ref=f5e1694]:
+          - generic [ref=f5e1695]:
+            - generic [ref=f5e1696]: TOTAL COLLECTIONS
+            - generic [ref=f5e1697]: ₹0
+            - generic [ref=f5e1698]: All Payment Modes Combined
+          - generic [ref=f5e1699]:
+            - generic [ref=f5e1700]: CASH IN DRAWER
+            - generic [ref=f5e1703]: ₹0
+            - generic [ref=f5e1704]: 0% of Total Volume
+          - generic [ref=f5e1705]:
+            - generic [ref=f5e1706]: UPI / BHARAT QR
+            - generic [ref=f5e1709]: ₹0
+            - generic [ref=f5e1710]: 0% Digital QR Volume
+          - generic [ref=f5e1711]:
+            - generic [ref=f5e1712]: CARD SWIPE EDC
+            - generic [ref=f5e1715]: ₹0
+            - generic [ref=f5e1716]: Bank EDC Settlements
+        - generic [ref=f5e1717]:
+          - generic [ref=f5e1718]:
+            - generic [ref=f5e1723]:
+              - heading "Understanding Split Multi-Tender Payments" [level=3] [ref=f5e1724]
+              - paragraph [ref=f5e1725]: How JAMANVAAR POS handles split payment allocations seamlessly
+            - generic [ref=f5e1726]: Smart Settlement Active
+          - generic [ref=f5e1727]:
+            - generic [ref=f5e1728]:
+              - generic [ref=f5e1729]: 1. Flexible Allocation
+              - paragraph [ref=f5e1730]: For any bill (e.g. ₹756), the cashier can allocate part of the amount to Cash (e.g. ₹500) and the remaining balance to UPI QR (e.g. ₹256).
+            - generic [ref=f5e1731]:
+              - generic [ref=f5e1732]: 2. Exact Cash Drawer Math
+              - paragraph [ref=f5e1733]: The Cash portion is strictly recorded in the Cash Drawer Shift Ledger, preventing float discrepancies during end-of-day reconciliation.
+            - generic [ref=f5e1734]:
+              - generic [ref=f5e1735]: 3. Itemized Tax Receipt
+              - paragraph [ref=f5e1736]: "The printed 80mm/58mm thermal receipt and WhatsApp e-Bill itemize the breakdown clearly: Cash: ₹500 | UPI: ₹256."
+        - generic [ref=f5e1737]:
+          - generic [ref=f5e1738]:
+            - generic [ref=f5e1739]: Completed Payment Transactions (72)
+            - generic [ref=f5e1740]: Real-Time Sync
+          - table [ref=f5e1742]:
+            - rowgroup [ref=f5e1743]:
+              - row [ref=f5e1744]:
+                - columnheader "Order / Invoice" [ref=f5e1745]
+                - columnheader "Table / Type" [ref=f5e1746]
+                - columnheader "Customer" [ref=f5e1747]
+                - columnheader "Total Settled" [ref=f5e1748]
+                - columnheader "Payment Method" [ref=f5e1749]
+                - columnheader "Timestamp" [ref=f5e1750]
+                - columnheader "Receipt" [ref=f5e1751]
+            - rowgroup [ref=f5e1752]:
+              - row [ref=f5e1753]:
+                - 'cell "#ORD-9914 Token: 114" [ref=f5e1754]':
+                  - text: "#ORD-9914"
+                  - generic [ref=f5e1755]: "Token: 114"
+                - cell "DELIVERY" [ref=f5e1756]
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e1758]:
+                  - generic [ref=f5e1759]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹588" [ref=f5e1760]
+                - cell "CASH" [ref=f5e1761]
+                - cell "09:31 PM" [ref=f5e1763]
+                - cell [ref=f5e1764]:
+                  - button "View Bill →" [ref=f5e1765] [cursor=pointer]
+              - row [ref=f5e1766]:
+                - 'cell "#QR-1037 Token: 1037" [ref=f5e1767]':
+                  - text: "#QR-1037"
+                  - generic [ref=f5e1768]: "Token: 1037"
+                - cell "QR_TABLE Table 3" [ref=f5e1769]:
+                  - generic [ref=f5e1770]: QR_TABLE
+                  - generic [ref=f5e1771]: Table 3
+                - cell "Guest (Table 3) Counter" [ref=f5e1772]:
+                  - generic [ref=f5e1773]: Guest (Table 3)
+                  - text: Counter
+                - cell "₹399" [ref=f5e1774]
+                - cell "UPI" [ref=f5e1775]
+                - cell "08:27 PM" [ref=f5e1777]
+                - cell [ref=f5e1778]:
+                  - button "View Bill →" [ref=f5e1779] [cursor=pointer]
+              - row [ref=f5e1780]:
+                - 'cell "#ORD-9913 Token: 113" [ref=f5e1781]':
+                  - text: "#ORD-9913"
+                  - generic [ref=f5e1782]: "Token: 113"
+                - cell "TAKEAWAY" [ref=f5e1783]
+                - cell "Ramesh Patel 9876543210" [ref=f5e1785]:
+                  - generic [ref=f5e1786]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹683" [ref=f5e1787]
+                - cell "UPI QR" [ref=f5e1788]
+                - cell "08:24 PM" [ref=f5e1790]
+                - cell [ref=f5e1791]:
+                  - button "View Bill →" [ref=f5e1792] [cursor=pointer]
+              - row [ref=f5e1793]:
+                - 'cell "#QR-1042 Token: 1042" [ref=f5e1794]':
+                  - text: "#QR-1042"
+                  - generic [ref=f5e1795]: "Token: 1042"
+                - cell "QR_TABLE Table 12" [ref=f5e1796]:
+                  - generic [ref=f5e1797]: QR_TABLE
+                  - generic [ref=f5e1798]: Table 12
+                - cell "Guest (Table 12) Counter" [ref=f5e1799]:
+                  - generic [ref=f5e1800]: Guest (Table 12)
+                  - text: Counter
+                - cell "₹924" [ref=f5e1801]
+                - cell "UPI" [ref=f5e1802]
+                - cell "08:20 PM" [ref=f5e1804]
+                - cell [ref=f5e1805]:
+                  - button "View Bill →" [ref=f5e1806] [cursor=pointer]
+              - row [ref=f5e1807]:
+                - 'cell "#QR-1040 Token: 1040" [ref=f5e1808]':
+                  - text: "#QR-1040"
+                  - generic [ref=f5e1809]: "Token: 1040"
+                - cell "QR_TABLE Table 1" [ref=f5e1810]:
+                  - generic [ref=f5e1811]: QR_TABLE
+                  - generic [ref=f5e1812]: Table 1
+                - cell "Guest (Table 1) Counter" [ref=f5e1813]:
+                  - generic [ref=f5e1814]: Guest (Table 1)
+                  - text: Counter
+                - cell "₹714" [ref=f5e1815]
+                - cell "UPI" [ref=f5e1816]
+                - cell "08:13 PM" [ref=f5e1818]
+                - cell [ref=f5e1819]:
+                  - button "View Bill →" [ref=f5e1820] [cursor=pointer]
+              - row [ref=f5e1821]:
+                - 'cell "#QR-1041 Token: 1041" [ref=f5e1822]':
+                  - text: "#QR-1041"
+                  - generic [ref=f5e1823]: "Token: 1041"
+                - cell "QR_TABLE Table 5" [ref=f5e1824]:
+                  - generic [ref=f5e1825]: QR_TABLE
+                  - generic [ref=f5e1826]: Table 5
+                - cell "Guest (Table 5) Counter" [ref=f5e1827]:
+                  - generic [ref=f5e1828]: Guest (Table 5)
+                  - text: Counter
+                - cell "₹546" [ref=f5e1829]
+                - cell "CASH" [ref=f5e1830]
+                - cell "07:50 PM" [ref=f5e1832]
+                - cell [ref=f5e1833]:
+                  - button "View Bill →" [ref=f5e1834] [cursor=pointer]
+              - row [ref=f5e1835]:
+                - 'cell "#QR-1038 Token: 1038" [ref=f5e1836]':
+                  - text: "#QR-1038"
+                  - generic [ref=f5e1837]: "Token: 1038"
+                - cell "QR_TABLE Table 8" [ref=f5e1838]:
+                  - generic [ref=f5e1839]: QR_TABLE
+                  - generic [ref=f5e1840]: Table 8
+                - cell "Guest (Table 8) Counter" [ref=f5e1841]:
+                  - generic [ref=f5e1842]: Guest (Table 8)
+                  - text: Counter
+                - cell "₹1302" [ref=f5e1843]
+                - cell "CARD" [ref=f5e1844]
+                - cell "07:45 PM" [ref=f5e1846]
+                - cell [ref=f5e1847]:
+                  - button "View Bill →" [ref=f5e1848] [cursor=pointer]
+              - row [ref=f5e1849]:
+                - 'cell "#ORD-9912 Token: 112" [ref=f5e1850]':
+                  - text: "#ORD-9912"
+                  - generic [ref=f5e1851]: "Token: 112"
+                - cell "DINE_IN Table 12" [ref=f5e1852]:
+                  - generic [ref=f5e1853]: DINE_IN
+                  - generic [ref=f5e1854]: Table 12
+                - cell "Walk-in Guest Counter" [ref=f5e1855]:
+                  - generic [ref=f5e1856]: Walk-in Guest
+                  - text: Counter
+                - cell "₹840" [ref=f5e1857]
+                - cell "SPLIT" [ref=f5e1858]
+                - cell "07:17 PM" [ref=f5e1860]
+                - cell [ref=f5e1861]:
+                  - button "View Bill →" [ref=f5e1862] [cursor=pointer]
+              - row [ref=f5e1863]:
+                - 'cell "#ORD-9911 Token: 111" [ref=f5e1864]':
+                  - text: "#ORD-9911"
+                  - generic [ref=f5e1865]: "Token: 111"
+                - cell "DINE_IN Table 11" [ref=f5e1866]:
+                  - generic [ref=f5e1867]: DINE_IN
+                  - generic [ref=f5e1868]: Table 11
+                - cell "Sanjay Mehta 9833445566" [ref=f5e1869]:
+                  - generic [ref=f5e1870]: Sanjay Mehta
+                  - text: "9833445566"
+                - cell "₹872" [ref=f5e1871]
+                - cell "CARD TERMINAL" [ref=f5e1872]
+                - cell "07:10 PM" [ref=f5e1874]
+                - cell [ref=f5e1875]:
+                  - button "View Bill →" [ref=f5e1876] [cursor=pointer]
+              - row [ref=f5e1877]:
+                - 'cell "#ORD-9910 Token: 110" [ref=f5e1878]':
+                  - text: "#ORD-9910"
+                  - generic [ref=f5e1879]: "Token: 110"
+                - cell "TOKEN" [ref=f5e1880]
+                - cell "Priya Joshi 9811223344" [ref=f5e1882]:
+                  - generic [ref=f5e1883]: Priya Joshi
+                  - text: "9811223344"
+                - cell "₹714" [ref=f5e1884]
+                - cell "CASH" [ref=f5e1885]
+                - cell "06:03 PM" [ref=f5e1887]
+                - cell [ref=f5e1888]:
+                  - button "View Bill →" [ref=f5e1889] [cursor=pointer]
+              - row [ref=f5e1890]:
+                - 'cell "#ORD-9909 Token: 109" [ref=f5e1891]':
+                  - text: "#ORD-9909"
+                  - generic [ref=f5e1892]: "Token: 109"
+                - cell "DELIVERY" [ref=f5e1893]
+                - cell "Amit Verma 9899001122" [ref=f5e1895]:
+                  - generic [ref=f5e1896]: Amit Verma
+                  - text: "9899001122"
+                - cell "₹872" [ref=f5e1897]
+                - cell "UPI QR" [ref=f5e1898]
+                - cell "05:56 PM" [ref=f5e1900]
+                - cell [ref=f5e1901]:
+                  - button "View Bill →" [ref=f5e1902] [cursor=pointer]
+              - row [ref=f5e1903]:
+                - 'cell "#ORD-9908 Token: 108" [ref=f5e1904]':
+                  - text: "#ORD-9908"
+                  - generic [ref=f5e1905]: "Token: 108"
+                - cell "TAKEAWAY" [ref=f5e1906]
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e1908]:
+                  - generic [ref=f5e1909]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹462" [ref=f5e1910]
+                - cell "SPLIT" [ref=f5e1911]
+                - cell "05:49 PM" [ref=f5e1913]
+                - cell [ref=f5e1914]:
+                  - button "View Bill →" [ref=f5e1915] [cursor=pointer]
+              - row [ref=f5e1916]:
+                - 'cell "#ORD-9907 Token: 107" [ref=f5e1917]':
+                  - text: "#ORD-9907"
+                  - generic [ref=f5e1918]: "Token: 107"
+                - cell "DINE_IN Table 7" [ref=f5e1919]:
+                  - generic [ref=f5e1920]: DINE_IN
+                  - generic [ref=f5e1921]: Table 7
+                - cell "Ramesh Patel 9876543210" [ref=f5e1922]:
+                  - generic [ref=f5e1923]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹788" [ref=f5e1924]
+                - cell "CARD TERMINAL" [ref=f5e1925]
+                - cell "04:42 PM" [ref=f5e1927]
+                - cell [ref=f5e1928]:
+                  - button "View Bill →" [ref=f5e1929] [cursor=pointer]
+              - row [ref=f5e1930]:
+                - 'cell "#ORD-9906 Token: 106" [ref=f5e1931]':
+                  - text: "#ORD-9906"
+                  - generic [ref=f5e1932]: "Token: 106"
+                - cell "DINE_IN Table 6" [ref=f5e1933]:
+                  - generic [ref=f5e1934]: DINE_IN
+                  - generic [ref=f5e1935]: Table 6
+                - cell "Walk-in Guest Counter" [ref=f5e1936]:
+                  - generic [ref=f5e1937]: Walk-in Guest
+                  - text: Counter
+                - cell "₹588" [ref=f5e1938]
+                - cell "CASH" [ref=f5e1939]
+                - cell "03:35 PM" [ref=f5e1941]
+                - cell [ref=f5e1942]:
+                  - button "View Bill →" [ref=f5e1943] [cursor=pointer]
+              - row [ref=f5e1944]:
+                - 'cell "#ORD-9905 Token: 105" [ref=f5e1945]':
+                  - text: "#ORD-9905"
+                  - generic [ref=f5e1946]: "Token: 105"
+                - cell "TOKEN" [ref=f5e1947]
+                - cell "Sanjay Mehta 9833445566" [ref=f5e1949]:
+                  - generic [ref=f5e1950]: Sanjay Mehta
+                  - text: "9833445566"
+                - cell "₹683" [ref=f5e1951]
+                - cell "UPI QR" [ref=f5e1952]
+                - cell "02:28 PM" [ref=f5e1954]
+                - cell [ref=f5e1955]:
+                  - button "View Bill →" [ref=f5e1956] [cursor=pointer]
+              - row [ref=f5e1957]:
+                - 'cell "#ORD-9904 Token: 104" [ref=f5e1958]':
+                  - text: "#ORD-9904"
+                  - generic [ref=f5e1959]: "Token: 104"
+                - cell "DELIVERY" [ref=f5e1960]
+                - cell "Priya Joshi 9811223344" [ref=f5e1962]:
+                  - generic [ref=f5e1963]: Priya Joshi
+                  - text: "9811223344"
+                - cell "₹840" [ref=f5e1964]
+                - cell "SPLIT" [ref=f5e1965]
+                - cell "02:21 PM" [ref=f5e1967]
+                - cell [ref=f5e1968]:
+                  - button "View Bill →" [ref=f5e1969] [cursor=pointer]
+              - row [ref=f5e1970]:
+                - 'cell "#ORD-9903 Token: 103" [ref=f5e1971]':
+                  - text: "#ORD-9903"
+                  - generic [ref=f5e1972]: "Token: 103"
+                - cell "TAKEAWAY" [ref=f5e1973]
+                - cell "Amit Verma 9899001122" [ref=f5e1975]:
+                  - generic [ref=f5e1976]: Amit Verma
+                  - text: "9899001122"
+                - cell "₹872" [ref=f5e1977]
+                - cell "CARD TERMINAL" [ref=f5e1978]
+                - cell "01:14 PM" [ref=f5e1980]
+                - cell [ref=f5e1981]:
+                  - button "View Bill →" [ref=f5e1982] [cursor=pointer]
+              - row [ref=f5e1983]:
+                - 'cell "#ORD-9902 Token: 102" [ref=f5e1984]':
+                  - text: "#ORD-9902"
+                  - generic [ref=f5e1985]: "Token: 102"
+                - cell "DINE_IN Table 2" [ref=f5e1986]:
+                  - generic [ref=f5e1987]: DINE_IN
+                  - generic [ref=f5e1988]: Table 2
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e1989]:
+                  - generic [ref=f5e1990]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹714" [ref=f5e1991]
+                - cell "CASH" [ref=f5e1992]
+                - cell "12:07 PM" [ref=f5e1994]
+                - cell [ref=f5e1995]:
+                  - button "View Bill →" [ref=f5e1996] [cursor=pointer]
+              - row [ref=f5e1997]:
+                - 'cell "#ORD-9901 Token: 101" [ref=f5e1998]':
+                  - text: "#ORD-9901"
+                  - generic [ref=f5e1999]: "Token: 101"
+                - cell "DINE_IN Table 1" [ref=f5e2000]:
+                  - generic [ref=f5e2001]: DINE_IN
+                  - generic [ref=f5e2002]: Table 1
+                - cell "Ramesh Patel 9876543210" [ref=f5e2003]:
+                  - generic [ref=f5e2004]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹872" [ref=f5e2005]
+                - cell "UPI QR" [ref=f5e2006]
+                - cell "12:00 PM" [ref=f5e2008]
+                - cell [ref=f5e2009]:
+                  - button "View Bill →" [ref=f5e2010] [cursor=pointer]
+              - row [ref=f5e2011]:
+                - 'cell "#ORD-9930 Token: 130" [ref=f5e2012]':
+                  - text: "#ORD-9930"
+                  - generic [ref=f5e2013]: "Token: 130"
+                - cell "DINE_IN Table 4" [ref=f5e2014]:
+                  - generic [ref=f5e2015]: DINE_IN
+                  - generic [ref=f5e2016]: Table 4
+                - cell "Priya Joshi 9811223344" [ref=f5e2017]:
+                  - generic [ref=f5e2018]: Priya Joshi
+                  - text: "9811223344"
+                - cell "₹462" [ref=f5e2019]
+                - cell "SPLIT" [ref=f5e2020]
+                - cell "08:45 PM" [ref=f5e2022]
+                - cell [ref=f5e2023]:
+                  - button "View Bill →" [ref=f5e2024] [cursor=pointer]
+              - row [ref=f5e2025]:
+                - 'cell "#ORD-9929 Token: 129" [ref=f5e2026]':
+                  - text: "#ORD-9929"
+                  - generic [ref=f5e2027]: "Token: 129"
+                - cell "TOKEN" [ref=f5e2028]
+                - cell "Amit Verma 9899001122" [ref=f5e2030]:
+                  - generic [ref=f5e2031]: Amit Verma
+                  - text: "9899001122"
+                - cell "₹788" [ref=f5e2032]
+                - cell "CARD TERMINAL" [ref=f5e2033]
+                - cell "07:38 PM" [ref=f5e2035]
+                - cell [ref=f5e2036]:
+                  - button "View Bill →" [ref=f5e2037] [cursor=pointer]
+              - row [ref=f5e2038]:
+                - 'cell "#ORD-9928 Token: 128" [ref=f5e2039]':
+                  - text: "#ORD-9928"
+                  - generic [ref=f5e2040]: "Token: 128"
+                - cell "DELIVERY" [ref=f5e2041]
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e2043]:
+                  - generic [ref=f5e2044]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹588" [ref=f5e2045]
+                - cell "CASH" [ref=f5e2046]
+                - cell "07:31 PM" [ref=f5e2048]
+                - cell [ref=f5e2049]:
+                  - button "View Bill →" [ref=f5e2050] [cursor=pointer]
+              - row [ref=f5e2051]:
+                - 'cell "#ORD-9927 Token: 127" [ref=f5e2052]':
+                  - text: "#ORD-9927"
+                  - generic [ref=f5e2053]: "Token: 127"
+                - cell "TAKEAWAY" [ref=f5e2054]
+                - cell "Ramesh Patel 9876543210" [ref=f5e2056]:
+                  - generic [ref=f5e2057]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹683" [ref=f5e2058]
+                - cell "UPI QR" [ref=f5e2059]
+                - cell "06:24 PM" [ref=f5e2061]
+                - cell [ref=f5e2062]:
+                  - button "View Bill →" [ref=f5e2063] [cursor=pointer]
+              - row [ref=f5e2064]:
+                - 'cell "#ORD-9926 Token: 126" [ref=f5e2065]':
+                  - text: "#ORD-9926"
+                  - generic [ref=f5e2066]: "Token: 126"
+                - cell "DINE_IN Table 12" [ref=f5e2067]:
+                  - generic [ref=f5e2068]: DINE_IN
+                  - generic [ref=f5e2069]: Table 12
+                - cell "Walk-in Guest Counter" [ref=f5e2070]:
+                  - generic [ref=f5e2071]: Walk-in Guest
+                  - text: Counter
+                - cell "₹840" [ref=f5e2072]
+                - cell "SPLIT" [ref=f5e2073]
+                - cell "06:17 PM" [ref=f5e2075]
+                - cell [ref=f5e2076]:
+                  - button "View Bill →" [ref=f5e2077] [cursor=pointer]
+              - row [ref=f5e2078]:
+                - 'cell "#ORD-9925 Token: 125" [ref=f5e2079]':
+                  - text: "#ORD-9925"
+                  - generic [ref=f5e2080]: "Token: 125"
+                - cell "DINE_IN Table 11" [ref=f5e2081]:
+                  - generic [ref=f5e2082]: DINE_IN
+                  - generic [ref=f5e2083]: Table 11
+                - cell "Sanjay Mehta 9833445566" [ref=f5e2084]:
+                  - generic [ref=f5e2085]: Sanjay Mehta
+                  - text: "9833445566"
+                - cell "₹872" [ref=f5e2086]
+                - cell "CARD TERMINAL" [ref=f5e2087]
+                - cell "05:10 PM" [ref=f5e2089]
+                - cell [ref=f5e2090]:
+                  - button "View Bill →" [ref=f5e2091] [cursor=pointer]
+              - row [ref=f5e2092]:
+                - 'cell "#ORD-9924 Token: 124" [ref=f5e2093]':
+                  - text: "#ORD-9924"
+                  - generic [ref=f5e2094]: "Token: 124"
+                - cell "TOKEN" [ref=f5e2095]
+                - cell "Priya Joshi 9811223344" [ref=f5e2097]:
+                  - generic [ref=f5e2098]: Priya Joshi
+                  - text: "9811223344"
+                - cell "₹714" [ref=f5e2099]
+                - cell "CASH" [ref=f5e2100]
+                - cell "05:03 PM" [ref=f5e2102]
+                - cell [ref=f5e2103]:
+                  - button "View Bill →" [ref=f5e2104] [cursor=pointer]
+              - row [ref=f5e2105]:
+                - 'cell "#ORD-9923 Token: 123" [ref=f5e2106]':
+                  - text: "#ORD-9923"
+                  - generic [ref=f5e2107]: "Token: 123"
+                - cell "DELIVERY" [ref=f5e2108]
+                - cell "Amit Verma 9899001122" [ref=f5e2110]:
+                  - generic [ref=f5e2111]: Amit Verma
+                  - text: "9899001122"
+                - cell "₹872" [ref=f5e2112]
+                - cell "UPI QR" [ref=f5e2113]
+                - cell "04:56 PM" [ref=f5e2115]
+                - cell [ref=f5e2116]:
+                  - button "View Bill →" [ref=f5e2117] [cursor=pointer]
+              - row [ref=f5e2118]:
+                - 'cell "#ORD-9922 Token: 122" [ref=f5e2119]':
+                  - text: "#ORD-9922"
+                  - generic [ref=f5e2120]: "Token: 122"
+                - cell "TAKEAWAY" [ref=f5e2121]
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e2123]:
+                  - generic [ref=f5e2124]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹462" [ref=f5e2125]
+                - cell "SPLIT" [ref=f5e2126]
+                - cell "03:49 PM" [ref=f5e2128]
+                - cell [ref=f5e2129]:
+                  - button "View Bill →" [ref=f5e2130] [cursor=pointer]
+              - row [ref=f5e2131]:
+                - 'cell "#ORD-9921 Token: 121" [ref=f5e2132]':
+                  - text: "#ORD-9921"
+                  - generic [ref=f5e2133]: "Token: 121"
+                - cell "DINE_IN Table 7" [ref=f5e2134]:
+                  - generic [ref=f5e2135]: DINE_IN
+                  - generic [ref=f5e2136]: Table 7
+                - cell "Ramesh Patel 9876543210" [ref=f5e2137]:
+                  - generic [ref=f5e2138]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹788" [ref=f5e2139]
+                - cell "CARD TERMINAL" [ref=f5e2140]
+                - cell "03:42 PM" [ref=f5e2142]
+                - cell [ref=f5e2143]:
+                  - button "View Bill →" [ref=f5e2144] [cursor=pointer]
+              - row [ref=f5e2145]:
+                - 'cell "#ORD-9920 Token: 120" [ref=f5e2146]':
+                  - text: "#ORD-9920"
+                  - generic [ref=f5e2147]: "Token: 120"
+                - cell "DINE_IN Table 6" [ref=f5e2148]:
+                  - generic [ref=f5e2149]: DINE_IN
+                  - generic [ref=f5e2150]: Table 6
+                - cell "Walk-in Guest Counter" [ref=f5e2151]:
+                  - generic [ref=f5e2152]: Walk-in Guest
+                  - text: Counter
+                - cell "₹588" [ref=f5e2153]
+                - cell "CASH" [ref=f5e2154]
+                - cell "02:35 PM" [ref=f5e2156]
+                - cell [ref=f5e2157]:
+                  - button "View Bill →" [ref=f5e2158] [cursor=pointer]
+              - row [ref=f5e2159]:
+                - 'cell "#ORD-9919 Token: 119" [ref=f5e2160]':
+                  - text: "#ORD-9919"
+                  - generic [ref=f5e2161]: "Token: 119"
+                - cell "TOKEN" [ref=f5e2162]
+                - cell "Sanjay Mehta 9833445566" [ref=f5e2164]:
+                  - generic [ref=f5e2165]: Sanjay Mehta
+                  - text: "9833445566"
+                - cell "₹683" [ref=f5e2166]
+                - cell "UPI QR" [ref=f5e2167]
+                - cell "02:28 PM" [ref=f5e2169]
+                - cell [ref=f5e2170]:
+                  - button "View Bill →" [ref=f5e2171] [cursor=pointer]
+              - row [ref=f5e2172]:
+                - 'cell "#ORD-9918 Token: 118" [ref=f5e2173]':
+                  - text: "#ORD-9918"
+                  - generic [ref=f5e2174]: "Token: 118"
+                - cell "DELIVERY" [ref=f5e2175]
+                - cell "Priya Joshi 9811223344" [ref=f5e2177]:
+                  - generic [ref=f5e2178]: Priya Joshi
+                  - text: "9811223344"
+                - cell "₹840" [ref=f5e2179]
+                - cell "SPLIT" [ref=f5e2180]
+                - cell "01:21 PM" [ref=f5e2182]
+                - cell [ref=f5e2183]:
+                  - button "View Bill →" [ref=f5e2184] [cursor=pointer]
+              - row [ref=f5e2185]:
+                - 'cell "#ORD-9917 Token: 117" [ref=f5e2186]':
+                  - text: "#ORD-9917"
+                  - generic [ref=f5e2187]: "Token: 117"
+                - cell "TAKEAWAY" [ref=f5e2188]
+                - cell "Amit Verma 9899001122" [ref=f5e2190]:
+                  - generic [ref=f5e2191]: Amit Verma
+                  - text: "9899001122"
+                - cell "₹872" [ref=f5e2192]
+                - cell "CARD TERMINAL" [ref=f5e2193]
+                - cell "01:14 PM" [ref=f5e2195]
+                - cell [ref=f5e2196]:
+                  - button "View Bill →" [ref=f5e2197] [cursor=pointer]
+              - row [ref=f5e2198]:
+                - 'cell "#ORD-9916 Token: 116" [ref=f5e2199]':
+                  - text: "#ORD-9916"
+                  - generic [ref=f5e2200]: "Token: 116"
+                - cell "DINE_IN Table 2" [ref=f5e2201]:
+                  - generic [ref=f5e2202]: DINE_IN
+                  - generic [ref=f5e2203]: Table 2
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e2204]:
+                  - generic [ref=f5e2205]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹714" [ref=f5e2206]
+                - cell "CASH" [ref=f5e2207]
+                - cell "12:07 PM" [ref=f5e2209]
+                - cell [ref=f5e2210]:
+                  - button "View Bill →" [ref=f5e2211] [cursor=pointer]
+              - row [ref=f5e2212]:
+                - 'cell "#ORD-9915 Token: 115" [ref=f5e2213]':
+                  - text: "#ORD-9915"
+                  - generic [ref=f5e2214]: "Token: 115"
+                - cell "DINE_IN Table 1" [ref=f5e2215]:
+                  - generic [ref=f5e2216]: DINE_IN
+                  - generic [ref=f5e2217]: Table 1
+                - cell "Ramesh Patel 9876543210" [ref=f5e2218]:
+                  - generic [ref=f5e2219]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹872" [ref=f5e2220]
+                - cell "UPI QR" [ref=f5e2221]
+                - cell "12:00 PM" [ref=f5e2223]
+                - cell [ref=f5e2224]:
+                  - button "View Bill →" [ref=f5e2225] [cursor=pointer]
+              - row [ref=f5e2226]:
+                - 'cell "#ORD-9945 Token: 145" [ref=f5e2227]':
+                  - text: "#ORD-9945"
+                  - generic [ref=f5e2228]: "Token: 145"
+                - cell "TAKEAWAY" [ref=f5e2229]
+                - cell "Ramesh Patel 9876543210" [ref=f5e2231]:
+                  - generic [ref=f5e2232]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹683" [ref=f5e2233]
+                - cell "UPI QR" [ref=f5e2234]
+                - cell "08:24 PM" [ref=f5e2236]
+                - cell [ref=f5e2237]:
+                  - button "View Bill →" [ref=f5e2238] [cursor=pointer]
+              - row [ref=f5e2239]:
+                - 'cell "#ORD-9944 Token: 144" [ref=f5e2240]':
+                  - text: "#ORD-9944"
+                  - generic [ref=f5e2241]: "Token: 144"
+                - cell "DINE_IN Table 12" [ref=f5e2242]:
+                  - generic [ref=f5e2243]: DINE_IN
+                  - generic [ref=f5e2244]: Table 12
+                - cell "Walk-in Guest Counter" [ref=f5e2245]:
+                  - generic [ref=f5e2246]: Walk-in Guest
+                  - text: Counter
+                - cell "₹840" [ref=f5e2247]
+                - cell "SPLIT" [ref=f5e2248]
+                - cell "07:17 PM" [ref=f5e2250]
+                - cell [ref=f5e2251]:
+                  - button "View Bill →" [ref=f5e2252] [cursor=pointer]
+              - row [ref=f5e2253]:
+                - 'cell "#ORD-9943 Token: 143" [ref=f5e2254]':
+                  - text: "#ORD-9943"
+                  - generic [ref=f5e2255]: "Token: 143"
+                - cell "DINE_IN Table 11" [ref=f5e2256]:
+                  - generic [ref=f5e2257]: DINE_IN
+                  - generic [ref=f5e2258]: Table 11
+                - cell "Sanjay Mehta 9833445566" [ref=f5e2259]:
+                  - generic [ref=f5e2260]: Sanjay Mehta
+                  - text: "9833445566"
+                - cell "₹872" [ref=f5e2261]
+                - cell "CARD TERMINAL" [ref=f5e2262]
+                - cell "06:10 PM" [ref=f5e2264]
+                - cell [ref=f5e2265]:
+                  - button "View Bill →" [ref=f5e2266] [cursor=pointer]
+              - row [ref=f5e2267]:
+                - 'cell "#ORD-9942 Token: 142" [ref=f5e2268]':
+                  - text: "#ORD-9942"
+                  - generic [ref=f5e2269]: "Token: 142"
+                - cell "TOKEN" [ref=f5e2270]
+                - cell "Priya Joshi 9811223344" [ref=f5e2272]:
+                  - generic [ref=f5e2273]: Priya Joshi
+                  - text: "9811223344"
+                - cell "₹714" [ref=f5e2274]
+                - cell "CASH" [ref=f5e2275]
+                - cell "06:03 PM" [ref=f5e2277]
+                - cell [ref=f5e2278]:
+                  - button "View Bill →" [ref=f5e2279] [cursor=pointer]
+              - row [ref=f5e2280]:
+                - 'cell "#ORD-9941 Token: 141" [ref=f5e2281]':
+                  - text: "#ORD-9941"
+                  - generic [ref=f5e2282]: "Token: 141"
+                - cell "DELIVERY" [ref=f5e2283]
+                - cell "Amit Verma 9899001122" [ref=f5e2285]:
+                  - generic [ref=f5e2286]: Amit Verma
+                  - text: "9899001122"
+                - cell "₹872" [ref=f5e2287]
+                - cell "UPI QR" [ref=f5e2288]
+                - cell "05:56 PM" [ref=f5e2290]
+                - cell [ref=f5e2291]:
+                  - button "View Bill →" [ref=f5e2292] [cursor=pointer]
+              - row [ref=f5e2293]:
+                - 'cell "#ORD-9940 Token: 140" [ref=f5e2294]':
+                  - text: "#ORD-9940"
+                  - generic [ref=f5e2295]: "Token: 140"
+                - cell "TAKEAWAY" [ref=f5e2296]
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e2298]:
+                  - generic [ref=f5e2299]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹462" [ref=f5e2300]
+                - cell "SPLIT" [ref=f5e2301]
+                - cell "04:49 PM" [ref=f5e2303]
+                - cell [ref=f5e2304]:
+                  - button "View Bill →" [ref=f5e2305] [cursor=pointer]
+              - row [ref=f5e2306]:
+                - 'cell "#ORD-9939 Token: 139" [ref=f5e2307]':
+                  - text: "#ORD-9939"
+                  - generic [ref=f5e2308]: "Token: 139"
+                - cell "DINE_IN Table 7" [ref=f5e2309]:
+                  - generic [ref=f5e2310]: DINE_IN
+                  - generic [ref=f5e2311]: Table 7
+                - cell "Ramesh Patel 9876543210" [ref=f5e2312]:
+                  - generic [ref=f5e2313]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹788" [ref=f5e2314]
+                - cell "CARD TERMINAL" [ref=f5e2315]
+                - cell "04:42 PM" [ref=f5e2317]
+                - cell [ref=f5e2318]:
+                  - button "View Bill →" [ref=f5e2319] [cursor=pointer]
+              - row [ref=f5e2320]:
+                - 'cell "#ORD-9938 Token: 138" [ref=f5e2321]':
+                  - text: "#ORD-9938"
+                  - generic [ref=f5e2322]: "Token: 138"
+                - cell "DINE_IN Table 6" [ref=f5e2323]:
+                  - generic [ref=f5e2324]: DINE_IN
+                  - generic [ref=f5e2325]: Table 6
+                - cell "Walk-in Guest Counter" [ref=f5e2326]:
+                  - generic [ref=f5e2327]: Walk-in Guest
+                  - text: Counter
+                - cell "₹588" [ref=f5e2328]
+                - cell "CASH" [ref=f5e2329]
+                - cell "03:35 PM" [ref=f5e2331]
+                - cell [ref=f5e2332]:
+                  - button "View Bill →" [ref=f5e2333] [cursor=pointer]
+              - row [ref=f5e2334]:
+                - 'cell "#ORD-9937 Token: 137" [ref=f5e2335]':
+                  - text: "#ORD-9937"
+                  - generic [ref=f5e2336]: "Token: 137"
+                - cell "TOKEN" [ref=f5e2337]
+                - cell "Sanjay Mehta 9833445566" [ref=f5e2339]:
+                  - generic [ref=f5e2340]: Sanjay Mehta
+                  - text: "9833445566"
+                - cell "₹683" [ref=f5e2341]
+                - cell "UPI QR" [ref=f5e2342]
+                - cell "02:28 PM" [ref=f5e2344]
+                - cell [ref=f5e2345]:
+                  - button "View Bill →" [ref=f5e2346] [cursor=pointer]
+              - row [ref=f5e2347]:
+                - 'cell "#ORD-9936 Token: 136" [ref=f5e2348]':
+                  - text: "#ORD-9936"
+                  - generic [ref=f5e2349]: "Token: 136"
+                - cell "DELIVERY" [ref=f5e2350]
+                - cell "Priya Joshi 9811223344" [ref=f5e2352]:
+                  - generic [ref=f5e2353]: Priya Joshi
+                  - text: "9811223344"
+                - cell "₹840" [ref=f5e2354]
+                - cell "SPLIT" [ref=f5e2355]
+                - cell "02:21 PM" [ref=f5e2357]
+                - cell [ref=f5e2358]:
+                  - button "View Bill →" [ref=f5e2359] [cursor=pointer]
+              - row [ref=f5e2360]:
+                - 'cell "#ORD-9935 Token: 135" [ref=f5e2361]':
+                  - text: "#ORD-9935"
+                  - generic [ref=f5e2362]: "Token: 135"
+                - cell "TAKEAWAY" [ref=f5e2363]
+                - cell "Amit Verma 9899001122" [ref=f5e2365]:
+                  - generic [ref=f5e2366]: Amit Verma
+                  - text: "9899001122"
+                - cell "₹872" [ref=f5e2367]
+                - cell "CARD TERMINAL" [ref=f5e2368]
+                - cell "01:14 PM" [ref=f5e2370]
+                - cell [ref=f5e2371]:
+                  - button "View Bill →" [ref=f5e2372] [cursor=pointer]
+              - row [ref=f5e2373]:
+                - 'cell "#ORD-9934 Token: 134" [ref=f5e2374]':
+                  - text: "#ORD-9934"
+                  - generic [ref=f5e2375]: "Token: 134"
+                - cell "DINE_IN Table 2" [ref=f5e2376]:
+                  - generic [ref=f5e2377]: DINE_IN
+                  - generic [ref=f5e2378]: Table 2
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e2379]:
+                  - generic [ref=f5e2380]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹714" [ref=f5e2381]
+                - cell "CASH" [ref=f5e2382]
+                - cell "12:07 PM" [ref=f5e2384]
+                - cell [ref=f5e2385]:
+                  - button "View Bill →" [ref=f5e2386] [cursor=pointer]
+              - row [ref=f5e2387]:
+                - 'cell "#ORD-9933 Token: 133" [ref=f5e2388]':
+                  - text: "#ORD-9933"
+                  - generic [ref=f5e2389]: "Token: 133"
+                - cell "DINE_IN Table 1" [ref=f5e2390]:
+                  - generic [ref=f5e2391]: DINE_IN
+                  - generic [ref=f5e2392]: Table 1
+                - cell "Ramesh Patel 9876543210" [ref=f5e2393]:
+                  - generic [ref=f5e2394]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹872" [ref=f5e2395]
+                - cell "UPI QR" [ref=f5e2396]
+                - cell "12:00 PM" [ref=f5e2398]
+                - cell [ref=f5e2399]:
+                  - button "View Bill →" [ref=f5e2400] [cursor=pointer]
+              - row [ref=f5e2401]:
+                - 'cell "#ORD-9957 Token: 157" [ref=f5e2402]':
+                  - text: "#ORD-9957"
+                  - generic [ref=f5e2403]: "Token: 157"
+                - cell "TOKEN" [ref=f5e2404]
+                - cell "Priya Joshi 9811223344" [ref=f5e2406]:
+                  - generic [ref=f5e2407]: Priya Joshi
+                  - text: "9811223344"
+                - cell "₹714" [ref=f5e2408]
+                - cell "CASH" [ref=f5e2409]
+                - cell "07:03 PM" [ref=f5e2411]
+                - cell [ref=f5e2412]:
+                  - button "View Bill →" [ref=f5e2413] [cursor=pointer]
+              - row [ref=f5e2414]:
+                - 'cell "#ORD-9956 Token: 156" [ref=f5e2415]':
+                  - text: "#ORD-9956"
+                  - generic [ref=f5e2416]: "Token: 156"
+                - cell "DELIVERY" [ref=f5e2417]
+                - cell "Amit Verma 9899001122" [ref=f5e2419]:
+                  - generic [ref=f5e2420]: Amit Verma
+                  - text: "9899001122"
+                - cell "₹872" [ref=f5e2421]
+                - cell "UPI QR" [ref=f5e2422]
+                - cell "06:56 PM" [ref=f5e2424]
+                - cell [ref=f5e2425]:
+                  - button "View Bill →" [ref=f5e2426] [cursor=pointer]
+              - row [ref=f5e2427]:
+                - 'cell "#ORD-9955 Token: 155" [ref=f5e2428]':
+                  - text: "#ORD-9955"
+                  - generic [ref=f5e2429]: "Token: 155"
+                - cell "TAKEAWAY" [ref=f5e2430]
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e2432]:
+                  - generic [ref=f5e2433]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹462" [ref=f5e2434]
+                - cell "SPLIT" [ref=f5e2435]
+                - cell "05:49 PM" [ref=f5e2437]
+                - cell [ref=f5e2438]:
+                  - button "View Bill →" [ref=f5e2439] [cursor=pointer]
+              - row [ref=f5e2440]:
+                - 'cell "#ORD-9954 Token: 154" [ref=f5e2441]':
+                  - text: "#ORD-9954"
+                  - generic [ref=f5e2442]: "Token: 154"
+                - cell "DINE_IN Table 7" [ref=f5e2443]:
+                  - generic [ref=f5e2444]: DINE_IN
+                  - generic [ref=f5e2445]: Table 7
+                - cell "Ramesh Patel 9876543210" [ref=f5e2446]:
+                  - generic [ref=f5e2447]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹788" [ref=f5e2448]
+                - cell "CARD TERMINAL" [ref=f5e2449]
+                - cell "05:42 PM" [ref=f5e2451]
+                - cell [ref=f5e2452]:
+                  - button "View Bill →" [ref=f5e2453] [cursor=pointer]
+              - row [ref=f5e2454]:
+                - 'cell "#ORD-9953 Token: 153" [ref=f5e2455]':
+                  - text: "#ORD-9953"
+                  - generic [ref=f5e2456]: "Token: 153"
+                - cell "DINE_IN Table 6" [ref=f5e2457]:
+                  - generic [ref=f5e2458]: DINE_IN
+                  - generic [ref=f5e2459]: Table 6
+                - cell "Walk-in Guest Counter" [ref=f5e2460]:
+                  - generic [ref=f5e2461]: Walk-in Guest
+                  - text: Counter
+                - cell "₹588" [ref=f5e2462]
+                - cell "CASH" [ref=f5e2463]
+                - cell "04:35 PM" [ref=f5e2465]
+                - cell [ref=f5e2466]:
+                  - button "View Bill →" [ref=f5e2467] [cursor=pointer]
+              - row [ref=f5e2468]:
+                - 'cell "#ORD-9952 Token: 152" [ref=f5e2469]':
+                  - text: "#ORD-9952"
+                  - generic [ref=f5e2470]: "Token: 152"
+                - cell "TOKEN" [ref=f5e2471]
+                - cell "Sanjay Mehta 9833445566" [ref=f5e2473]:
+                  - generic [ref=f5e2474]: Sanjay Mehta
+                  - text: "9833445566"
+                - cell "₹683" [ref=f5e2475]
+                - cell "UPI QR" [ref=f5e2476]
+                - cell "03:28 PM" [ref=f5e2478]
+                - cell [ref=f5e2479]:
+                  - button "View Bill →" [ref=f5e2480] [cursor=pointer]
+              - row [ref=f5e2481]:
+                - 'cell "#ORD-9951 Token: 151" [ref=f5e2482]':
+                  - text: "#ORD-9951"
+                  - generic [ref=f5e2483]: "Token: 151"
+                - cell "DELIVERY" [ref=f5e2484]
+                - cell "Priya Joshi 9811223344" [ref=f5e2486]:
+                  - generic [ref=f5e2487]: Priya Joshi
+                  - text: "9811223344"
+                - cell "₹840" [ref=f5e2488]
+                - cell "SPLIT" [ref=f5e2489]
+                - cell "02:21 PM" [ref=f5e2491]
+                - cell [ref=f5e2492]:
+                  - button "View Bill →" [ref=f5e2493] [cursor=pointer]
+              - row [ref=f5e2494]:
+                - 'cell "#ORD-9950 Token: 150" [ref=f5e2495]':
+                  - text: "#ORD-9950"
+                  - generic [ref=f5e2496]: "Token: 150"
+                - cell "TAKEAWAY" [ref=f5e2497]
+                - cell "Amit Verma 9899001122" [ref=f5e2499]:
+                  - generic [ref=f5e2500]: Amit Verma
+                  - text: "9899001122"
+                - cell "₹872" [ref=f5e2501]
+                - cell "CARD TERMINAL" [ref=f5e2502]
+                - cell "01:14 PM" [ref=f5e2504]
+                - cell [ref=f5e2505]:
+                  - button "View Bill →" [ref=f5e2506] [cursor=pointer]
+              - row [ref=f5e2507]:
+                - 'cell "#ORD-9949 Token: 149" [ref=f5e2508]':
+                  - text: "#ORD-9949"
+                  - generic [ref=f5e2509]: "Token: 149"
+                - cell "DINE_IN Table 2" [ref=f5e2510]:
+                  - generic [ref=f5e2511]: DINE_IN
+                  - generic [ref=f5e2512]: Table 2
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e2513]:
+                  - generic [ref=f5e2514]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹714" [ref=f5e2515]
+                - cell "CASH" [ref=f5e2516]
+                - cell "12:07 PM" [ref=f5e2518]
+                - cell [ref=f5e2519]:
+                  - button "View Bill →" [ref=f5e2520] [cursor=pointer]
+              - row [ref=f5e2521]:
+                - 'cell "#ORD-9948 Token: 148" [ref=f5e2522]':
+                  - text: "#ORD-9948"
+                  - generic [ref=f5e2523]: "Token: 148"
+                - cell "DINE_IN Table 1" [ref=f5e2524]:
+                  - generic [ref=f5e2525]: DINE_IN
+                  - generic [ref=f5e2526]: Table 1
+                - cell "Ramesh Patel 9876543210" [ref=f5e2527]:
+                  - generic [ref=f5e2528]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹872" [ref=f5e2529]
+                - cell "UPI QR" [ref=f5e2530]
+                - cell "12:00 PM" [ref=f5e2532]
+                - cell [ref=f5e2533]:
+                  - button "View Bill →" [ref=f5e2534] [cursor=pointer]
+              - row [ref=f5e2535]:
+                - 'cell "#ORD-9967 Token: 167" [ref=f5e2536]':
+                  - text: "#ORD-9967"
+                  - generic [ref=f5e2537]: "Token: 167"
+                - cell "TAKEAWAY" [ref=f5e2538]
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e2540]:
+                  - generic [ref=f5e2541]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹462" [ref=f5e2542]
+                - cell "SPLIT" [ref=f5e2543]
+                - cell "07:49 PM" [ref=f5e2545]
+                - cell [ref=f5e2546]:
+                  - button "View Bill →" [ref=f5e2547] [cursor=pointer]
+              - row [ref=f5e2548]:
+                - 'cell "#ORD-9966 Token: 166" [ref=f5e2549]':
+                  - text: "#ORD-9966"
+                  - generic [ref=f5e2550]: "Token: 166"
+                - cell "DINE_IN Table 7" [ref=f5e2551]:
+                  - generic [ref=f5e2552]: DINE_IN
+                  - generic [ref=f5e2553]: Table 7
+                - cell "Ramesh Patel 9876543210" [ref=f5e2554]:
+                  - generic [ref=f5e2555]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹788" [ref=f5e2556]
+                - cell "CARD TERMINAL" [ref=f5e2557]
+                - cell "06:42 PM" [ref=f5e2559]
+                - cell [ref=f5e2560]:
+                  - button "View Bill →" [ref=f5e2561] [cursor=pointer]
+              - row [ref=f5e2562]:
+                - 'cell "#ORD-9965 Token: 165" [ref=f5e2563]':
+                  - text: "#ORD-9965"
+                  - generic [ref=f5e2564]: "Token: 165"
+                - cell "DINE_IN Table 6" [ref=f5e2565]:
+                  - generic [ref=f5e2566]: DINE_IN
+                  - generic [ref=f5e2567]: Table 6
+                - cell "Walk-in Guest Counter" [ref=f5e2568]:
+                  - generic [ref=f5e2569]: Walk-in Guest
+                  - text: Counter
+                - cell "₹588" [ref=f5e2570]
+                - cell "CASH" [ref=f5e2571]
+                - cell "05:35 PM" [ref=f5e2573]
+                - cell [ref=f5e2574]:
+                  - button "View Bill →" [ref=f5e2575] [cursor=pointer]
+              - row [ref=f5e2576]:
+                - 'cell "#ORD-9964 Token: 164" [ref=f5e2577]':
+                  - text: "#ORD-9964"
+                  - generic [ref=f5e2578]: "Token: 164"
+                - cell "TOKEN" [ref=f5e2579]
+                - cell "Sanjay Mehta 9833445566" [ref=f5e2581]:
+                  - generic [ref=f5e2582]: Sanjay Mehta
+                  - text: "9833445566"
+                - cell "₹683" [ref=f5e2583]
+                - cell "UPI QR" [ref=f5e2584]
+                - cell "04:28 PM" [ref=f5e2586]
+                - cell [ref=f5e2587]:
+                  - button "View Bill →" [ref=f5e2588] [cursor=pointer]
+              - row [ref=f5e2589]:
+                - 'cell "#ORD-9963 Token: 163" [ref=f5e2590]':
+                  - text: "#ORD-9963"
+                  - generic [ref=f5e2591]: "Token: 163"
+                - cell "DELIVERY" [ref=f5e2592]
+                - cell "Priya Joshi 9811223344" [ref=f5e2594]:
+                  - generic [ref=f5e2595]: Priya Joshi
+                  - text: "9811223344"
+                - cell "₹840" [ref=f5e2596]
+                - cell "SPLIT" [ref=f5e2597]
+                - cell "03:21 PM" [ref=f5e2599]
+                - cell [ref=f5e2600]:
+                  - button "View Bill →" [ref=f5e2601] [cursor=pointer]
+              - row [ref=f5e2602]:
+                - 'cell "#ORD-9962 Token: 162" [ref=f5e2603]':
+                  - text: "#ORD-9962"
+                  - generic [ref=f5e2604]: "Token: 162"
+                - cell "TAKEAWAY" [ref=f5e2605]
+                - cell "Amit Verma 9899001122" [ref=f5e2607]:
+                  - generic [ref=f5e2608]: Amit Verma
+                  - text: "9899001122"
+                - cell "₹872" [ref=f5e2609]
+                - cell "CARD TERMINAL" [ref=f5e2610]
+                - cell "02:14 PM" [ref=f5e2612]
+                - cell [ref=f5e2613]:
+                  - button "View Bill →" [ref=f5e2614] [cursor=pointer]
+              - row [ref=f5e2615]:
+                - 'cell "#ORD-9961 Token: 161" [ref=f5e2616]':
+                  - text: "#ORD-9961"
+                  - generic [ref=f5e2617]: "Token: 161"
+                - cell "DINE_IN Table 2" [ref=f5e2618]:
+                  - generic [ref=f5e2619]: DINE_IN
+                  - generic [ref=f5e2620]: Table 2
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e2621]:
+                  - generic [ref=f5e2622]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹714" [ref=f5e2623]
+                - cell "CASH" [ref=f5e2624]
+                - cell "01:07 PM" [ref=f5e2626]
+                - cell [ref=f5e2627]:
+                  - button "View Bill →" [ref=f5e2628] [cursor=pointer]
+              - row [ref=f5e2629]:
+                - 'cell "#ORD-9960 Token: 160" [ref=f5e2630]':
+                  - text: "#ORD-9960"
+                  - generic [ref=f5e2631]: "Token: 160"
+                - cell "DINE_IN Table 1" [ref=f5e2632]:
+                  - generic [ref=f5e2633]: DINE_IN
+                  - generic [ref=f5e2634]: Table 1
+                - cell "Ramesh Patel 9876543210" [ref=f5e2635]:
+                  - generic [ref=f5e2636]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹872" [ref=f5e2637]
+                - cell "UPI QR" [ref=f5e2638]
+                - cell "12:00 PM" [ref=f5e2640]
+                - cell [ref=f5e2641]:
+                  - button "View Bill →" [ref=f5e2642] [cursor=pointer]
+              - row [ref=f5e2643]:
+                - 'cell "#ORD-9975 Token: 175" [ref=f5e2644]':
+                  - text: "#ORD-9975"
+                  - generic [ref=f5e2645]: "Token: 175"
+                - cell "DINE_IN Table 6" [ref=f5e2646]:
+                  - generic [ref=f5e2647]: DINE_IN
+                  - generic [ref=f5e2648]: Table 6
+                - cell "Walk-in Guest Counter" [ref=f5e2649]:
+                  - generic [ref=f5e2650]: Walk-in Guest
+                  - text: Counter
+                - cell "₹588" [ref=f5e2651]
+                - cell "CASH" [ref=f5e2652]
+                - cell "06:35 PM" [ref=f5e2654]
+                - cell [ref=f5e2655]:
+                  - button "View Bill →" [ref=f5e2656] [cursor=pointer]
+              - row [ref=f5e2657]:
+                - 'cell "#ORD-9974 Token: 174" [ref=f5e2658]':
+                  - text: "#ORD-9974"
+                  - generic [ref=f5e2659]: "Token: 174"
+                - cell "TOKEN" [ref=f5e2660]
+                - cell "Sanjay Mehta 9833445566" [ref=f5e2662]:
+                  - generic [ref=f5e2663]: Sanjay Mehta
+                  - text: "9833445566"
+                - cell "₹683" [ref=f5e2664]
+                - cell "UPI QR" [ref=f5e2665]
+                - cell "05:28 PM" [ref=f5e2667]
+                - cell [ref=f5e2668]:
+                  - button "View Bill →" [ref=f5e2669] [cursor=pointer]
+              - row [ref=f5e2670]:
+                - 'cell "#ORD-9973 Token: 173" [ref=f5e2671]':
+                  - text: "#ORD-9973"
+                  - generic [ref=f5e2672]: "Token: 173"
+                - cell "DELIVERY" [ref=f5e2673]
+                - cell "Priya Joshi 9811223344" [ref=f5e2675]:
+                  - generic [ref=f5e2676]: Priya Joshi
+                  - text: "9811223344"
+                - cell "₹840" [ref=f5e2677]
+                - cell "SPLIT" [ref=f5e2678]
+                - cell "03:21 PM" [ref=f5e2680]
+                - cell [ref=f5e2681]:
+                  - button "View Bill →" [ref=f5e2682] [cursor=pointer]
+              - row [ref=f5e2683]:
+                - 'cell "#ORD-9972 Token: 172" [ref=f5e2684]':
+                  - text: "#ORD-9972"
+                  - generic [ref=f5e2685]: "Token: 172"
+                - cell "TAKEAWAY" [ref=f5e2686]
+                - cell "Amit Verma 9899001122" [ref=f5e2688]:
+                  - generic [ref=f5e2689]: Amit Verma
+                  - text: "9899001122"
+                - cell "₹872" [ref=f5e2690]
+                - cell "CARD TERMINAL" [ref=f5e2691]
+                - cell "02:14 PM" [ref=f5e2693]
+                - cell [ref=f5e2694]:
+                  - button "View Bill →" [ref=f5e2695] [cursor=pointer]
+              - row [ref=f5e2696]:
+                - 'cell "#ORD-9971 Token: 171" [ref=f5e2697]':
+                  - text: "#ORD-9971"
+                  - generic [ref=f5e2698]: "Token: 171"
+                - cell "DINE_IN Table 2" [ref=f5e2699]:
+                  - generic [ref=f5e2700]: DINE_IN
+                  - generic [ref=f5e2701]: Table 2
+                - cell "Dr. Neha Shah 9822334455" [ref=f5e2702]:
+                  - generic [ref=f5e2703]: Dr. Neha Shah
+                  - text: "9822334455"
+                - cell "₹714" [ref=f5e2704]
+                - cell "CASH" [ref=f5e2705]
+                - cell "01:07 PM" [ref=f5e2707]
+                - cell [ref=f5e2708]:
+                  - button "View Bill →" [ref=f5e2709] [cursor=pointer]
+              - row [ref=f5e2710]:
+                - 'cell "#ORD-9970 Token: 170" [ref=f5e2711]':
+                  - text: "#ORD-9970"
+                  - generic [ref=f5e2712]: "Token: 170"
+                - cell "DINE_IN Table 1" [ref=f5e2713]:
+                  - generic [ref=f5e2714]: DINE_IN
+                  - generic [ref=f5e2715]: Table 1
+                - cell "Ramesh Patel 9876543210" [ref=f5e2716]:
+                  - generic [ref=f5e2717]: Ramesh Patel
+                  - text: "9876543210"
+                - cell "₹872" [ref=f5e2718]
+                - cell "UPI QR" [ref=f5e2719]
+                - cell "12:00 PM" [ref=f5e2721]
+                - cell [ref=f5e2722]:
+                  - button "View Bill →" [ref=f5e2723] [cursor=pointer]
+  - button "Open JAMAN AI Restaurant Intelligence" [ref=f5e827] [cursor=pointer]:
+    - generic [ref=f5e833]:
+      - generic [ref=f5e834]: JAMAN AI
+      - generic [ref=f5e835]: ACTIVE

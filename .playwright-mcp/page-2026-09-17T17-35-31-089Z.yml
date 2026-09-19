@@ -1,0 +1,106 @@
+- generic [ref=f26e2]:
+  - generic [ref=f26e3]:
+    - banner [ref=f26e4]:
+      - img "JAMANVAAR by Kelviontech" [ref=f26e7]
+      - generic [ref=f26e8]:
+        - generic [ref=f26e11]:
+          - text: "Local Core:"
+          - strong [ref=f26e12]: Connected
+        - button [ref=f26e13] [cursor=pointer]:
+          - generic [ref=f26e18]:
+            - text: "Network:"
+            - strong [ref=f26e19]: Online
+    - main [ref=f26e20]:
+      - generic [ref=f26e21]:
+        - img "JAMANVAAR by Kelviontech" [ref=f26e24]
+        - generic [ref=f26e25]:
+          - heading "Smart Billing. Better Dining." [level=1] [ref=f26e26]:
+            - text: Smart Billing.
+            - generic [ref=f26e27]: Better Dining.
+          - paragraph [ref=f26e28]: Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.
+        - generic [ref=f26e29]:
+          - generic [ref=f26e30]: Fast Billing
+          - generic [ref=f26e35]: Instant KOT
+          - generic [ref=f26e42]: Table Management
+          - generic [ref=f26e48]: Offline First
+        - generic [ref=f26e53]:
+          - generic [ref=f26e54]:
+            - img "Tandoori Naan" [ref=f26e55]
+            - generic [ref=f26e56]: Tandoori Breads
+          - generic [ref=f26e57]:
+            - img "Paneer Butter Masala" [ref=f26e58]
+            - generic [ref=f26e59]: Royal Curries
+          - generic [ref=f26e60]:
+            - img "Tandoori Angaar" [ref=f26e61]
+            - generic [ref=f26e62]: Tandoor Starters
+      - generic [ref=f26e63]:
+        - generic [ref=f26e64]:
+          - generic [ref=f26e66]:
+            - generic [ref=f26e67]:
+              - generic [ref=f26e68]: Welcome to
+              - generic [ref=f26e69]: POS TERMINAL
+            - heading "POS Counter" [level=2] [ref=f26e71]
+            - paragraph [ref=f26e72]: Enter your 4-digit staff PIN to continue
+          - generic [ref=f26e73]:
+            - 'button "QUICK DEMO LOGIN — Cashier Session (PIN: 1111)" [ref=f26e74] [cursor=pointer]'
+            - generic [ref=f26e78]:
+              - generic [ref=f26e79]: Select Staff Profile
+              - generic [ref=f26e80]:
+                - button "R Ramesh Patel (Owner) super admin" [ref=f26e81] [cursor=pointer]:
+                  - generic [ref=f26e82]: R
+                  - generic [ref=f26e83]:
+                    - generic [ref=f26e84]: Ramesh Patel (Owner)
+                    - generic [ref=f26e85]: super admin
+                - button "P Pooja Shah (Floor Manager) manager" [ref=f26e86] [cursor=pointer]:
+                  - generic [ref=f26e87]: P
+                  - generic [ref=f26e88]:
+                    - generic [ref=f26e89]: Pooja Shah (Floor Manager)
+                    - generic [ref=f26e90]: manager
+                - button "A Amit Dave (Lead Cashier) cashier" [ref=f26e91] [cursor=pointer]:
+                  - generic [ref=f26e92]: A
+                  - generic [ref=f26e93]:
+                    - generic [ref=f26e94]: Amit Dave (Lead Cashier)
+                    - generic [ref=f26e95]: cashier
+                - button "R Rahul Sharma (Captain) captain" [ref=f26e99] [cursor=pointer]:
+                  - generic [ref=f26e100]: R
+                  - generic [ref=f26e101]:
+                    - generic [ref=f26e102]: Rahul Sharma (Captain)
+                    - generic [ref=f26e103]: captain
+            - generic [ref=f26e110]:
+              - button "1" [ref=f26e111] [cursor=pointer]
+              - button "2" [ref=f26e112] [cursor=pointer]
+              - button "3" [ref=f26e113] [cursor=pointer]
+              - button "4" [ref=f26e114] [cursor=pointer]
+              - button "5" [ref=f26e115] [cursor=pointer]
+              - button "6" [ref=f26e116] [cursor=pointer]
+              - button "7" [ref=f26e117] [cursor=pointer]
+              - button "8" [ref=f26e118] [cursor=pointer]
+              - button "9" [ref=f26e119] [cursor=pointer]
+              - button "C" [ref=f26e120] [cursor=pointer]
+              - button "0" [ref=f26e121] [cursor=pointer]
+              - button [ref=f26e122] [cursor=pointer]
+            - button "UNLOCK TERMINAL" [disabled] [ref=f26e128]
+        - generic [ref=f26e133]:
+          - generic [ref=f26e134]: Role-Based Security
+          - generic [ref=f26e139]: •
+          - generic [ref=f26e140]: Instant Offline Boot
+          - generic [ref=f26e144]: •
+          - generic [ref=f26e145]: 100% Secure
+    - contentinfo [ref=f26e149]: © 2026 JAMANVAAR by KELVIONTECH — All rights reserved.
+  - region "JAMANVAAR Startup" [ref=f26e150]:
+    - generic [ref=f26e151]:
+      - generic [ref=f26e152]: KELVIONTECH ENTERPRISE
+      - generic [ref=f26e155]: Local Engine Active
+    - generic [ref=f26e161]:
+      - generic [ref=f26e162]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=f26e164]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=f26e165]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f26e171]
+      - paragraph [ref=f26e173]: Restaurant Operations Platform
+      - generic [ref=f26e174]: POS TERMINAL
+      - generic [ref=f26e179]:
+        - generic [ref=f26e180]: Core Engine Ready
+        - generic [ref=f26e182]: •
+        - generic [ref=f26e183]: Database Initialized
+        - generic [ref=f26e185]: •
+        - generic [ref=f26e186]: Local-First Mode

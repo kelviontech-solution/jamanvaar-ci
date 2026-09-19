@@ -1,0 +1,148 @@
+- generic [ref=f31e3]:
+  - banner [ref=f31e4]:
+    - generic [ref=f31e6]:
+      - generic [ref=f31e7]:
+        - img "JAMANVAAR by KELVIONTECH"
+      - generic [ref=f31e9]: KITCHEN DISPLAY (KDS)
+    - generic [ref=f31e13]:
+      - button "🍽 All" [ref=f31e14] [cursor=pointer]
+      - button "🍳 Main" [ref=f31e15] [cursor=pointer]
+      - button "🔥 Tandoor" [ref=f31e16] [cursor=pointer]
+      - button "☕ Beverage" [ref=f31e17] [cursor=pointer]
+      - button "🍨 Dessert" [ref=f31e18] [cursor=pointer]
+    - generic [ref=f31e19]:
+      - generic [ref=f31e20]:
+        - generic [ref=f31e22]: KDS LIVE
+        - generic [ref=f31e23]: "|"
+        - generic [ref=f31e24]: 10:13:44 PM
+      - generic [ref=f31e25]:
+        - generic [ref=f31e28]: "1"
+        - generic [ref=f31e29]: Cooking
+      - generic [ref=f31e30]:
+        - generic [ref=f31e34]: "3"
+        - generic [ref=f31e35]: Ready
+      - button "Switch kitchen station or logout" [ref=f31e36] [cursor=pointer]
+  - generic [ref=f31e41]:
+    - button "ACTIVE TICKETS 4" [ref=f31e42] [cursor=pointer]:
+      - generic [ref=f31e43]: ACTIVE TICKETS
+      - generic [ref=f31e44]: "4"
+    - button "🔥 COOKING 1" [ref=f31e257] [cursor=pointer]:
+      - generic [ref=f31e46]: 🔥 COOKING
+      - generic [ref=f31e47]: "1"
+    - button "🔔 FOOD READY 3" [ref=f31e258] [cursor=pointer]:
+      - generic [ref=f31e49]: 🔔 FOOD READY
+      - generic [ref=f31e50]: "3"
+    - button "✓ SERVED 0" [ref=f31e51] [cursor=pointer]:
+      - generic [ref=f31e52]: ✓ SERVED
+      - generic [ref=f31e53]: "0"
+  - main [ref=f31e54]:
+    - generic [ref=f31e55]:
+      - generic [ref=f31e56]:
+        - generic [ref=f31e58]:
+          - generic [ref=f31e59]:
+            - generic [ref=f31e60]:
+              - generic [ref=f31e61]:
+                - generic [ref=f31e62]: "#101"
+                - generic [ref=f31e63]: KOT-01
+              - generic [ref=f31e64]:
+                - generic [ref=f31e65]: Table 3
+                - generic [ref=f31e66]: •
+                - generic [ref=f31e67]: DINE_IN
+            - generic [ref=f31e68]: "Delayed: 97m"
+          - generic [ref=f31e72]:
+            - generic [ref=f31e74]:
+              - generic [ref=f31e75]: 2×
+              - generic [ref=f31e76]:
+                - generic [ref=f31e77]: Paneer Tikka (Tandoori)
+                - generic [ref=f31e78]: • Extra Cheese
+                - generic [ref=f31e80]: Less Spicy, Extra Chutney
+            - generic [ref=f31e85]:
+              - generic [ref=f31e86]: 1×
+              - generic [ref=f31e87]: Dal Makhani (Maa Ki Dal)
+        - generic [ref=f31e89]:
+          - generic [ref=f31e90]:
+            - generic [ref=f31e91]:
+              - text: "Captain:"
+              - strong [ref=f31e92]: Amit Dave
+            - generic [ref=f31e93]: "#t-101"
+          - button "MARK SERVED ✓" [ref=f31e94] [cursor=pointer]
+      - generic [ref=f31e99]:
+        - generic [ref=f31e101]:
+          - generic [ref=f31e102]:
+            - generic [ref=f31e103]:
+              - generic [ref=f31e104]:
+                - generic [ref=f31e105]: "#101"
+                - generic [ref=f31e106]: KOT-02
+              - generic [ref=f31e107]:
+                - generic [ref=f31e108]: Table 3
+                - generic [ref=f31e109]: •
+                - generic [ref=f31e110]: DINE_IN
+            - generic [ref=f31e111]: "Delayed: 96m"
+          - generic [ref=f31e115]:
+            - generic [ref=f31e117]:
+              - generic [ref=f31e118]: 3×
+              - generic [ref=f31e119]:
+                - generic [ref=f31e120]: Butter Naan
+                - generic [ref=f31e121]: Crispy, Extra Butter
+            - generic [ref=f31e126]:
+              - generic [ref=f31e127]: 2×
+              - generic [ref=f31e128]: Garlic Butter Naan
+        - generic [ref=f31e130]:
+          - generic [ref=f31e131]:
+            - generic [ref=f31e132]:
+              - text: "Captain:"
+              - strong [ref=f31e133]: Amit Dave
+            - generic [ref=f31e134]: "#t-102"
+          - button "MARK SERVED ✓" [ref=f31e259] [cursor=pointer]
+      - generic [ref=f31e140]:
+        - generic [ref=f31e142]:
+          - generic [ref=f31e143]:
+            - generic [ref=f31e144]:
+              - generic [ref=f31e145]:
+                - generic [ref=f31e146]: "#102"
+                - generic [ref=f31e147]: KOT-03
+              - generic [ref=f31e148]:
+                - generic [ref=f31e149]: Table 1
+                - generic [ref=f31e150]: •
+                - generic [ref=f31e151]: DINE_IN
+            - generic [ref=f31e152]: "Delayed: 101m"
+          - generic [ref=f31e156]:
+            - generic [ref=f31e158]:
+              - generic [ref=f31e159]: 2×
+              - generic [ref=f31e160]:
+                - generic [ref=f31e161]: Royal Mango Lassi
+                - generic [ref=f31e162]: Chilled, Less Sweet
+            - generic [ref=f31e167]:
+              - generic [ref=f31e168]: 2×
+              - generic [ref=f31e169]: Special Masala Chai
+        - generic [ref=f31e171]:
+          - generic [ref=f31e172]:
+            - generic [ref=f31e173]:
+              - text: "Captain:"
+              - strong [ref=f31e174]: Amit Dave
+            - generic [ref=f31e175]: "#t-103"
+          - button "MARK SERVED ✓" [ref=f31e176] [cursor=pointer]
+      - generic [ref=f31e181]:
+        - generic [ref=f31e183]:
+          - generic [ref=f31e184]:
+            - generic [ref=f31e185]:
+              - generic [ref=f31e186]:
+                - generic [ref=f31e187]: "#104"
+                - generic [ref=f31e188]: KOT-04
+              - generic [ref=f31e189]:
+                - generic [ref=f31e190]: Takeaway
+                - generic [ref=f31e191]: •
+                - generic [ref=f31e192]: TAKEAWAY
+            - generic [ref=f31e193]: "Delayed: 92m"
+          - generic [ref=f31e199]:
+            - generic [ref=f31e200]: 2×
+            - generic [ref=f31e201]:
+              - generic [ref=f31e202]: Gulab Jamun with Rabdi (2 Pcs)
+              - generic [ref=f31e203]: Pack in warm container
+        - generic [ref=f31e207]:
+          - generic [ref=f31e208]:
+            - generic [ref=f31e209]:
+              - text: "Captain:"
+              - strong [ref=f31e210]: Amit Dave
+            - generic [ref=f31e211]: "#t-104"
+          - button "MARK FOOD READY" [ref=f31e212] [cursor=pointer]

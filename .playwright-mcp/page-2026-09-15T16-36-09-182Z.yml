@@ -1,0 +1,321 @@
+- generic [ref=f26e2]:
+  - generic [ref=f26e3]:
+    - banner [ref=f26e4]:
+      - generic [ref=f26e5]:
+        - img "JAMANVAAR by KELVIONTECH" [ref=f26e7]
+        - generic [ref=f26e9]:
+          - generic [ref=f26e10]:
+            - generic "QA FULL AUDIT RESTAURANT" [ref=f26e11]
+            - generic [ref=f26e12]: ADMIN
+          - button "Ahmedabad Flagship Store" [ref=f26e13] [cursor=pointer]
+      - button "Open global search" [ref=f26e20] [cursor=pointer]:
+        - textbox "Search orders, invoices, dishes, tables..." [ref=f26e24]
+        - generic: Ctrl+K
+      - generic [ref=f26e25]:
+        - generic [ref=f26e26]:
+          - button "EOD Report" [ref=f26e27] [cursor=pointer]
+          - button "Reconciliation" [ref=f26e32] [cursor=pointer]
+        - generic [ref=f26e38]:
+          - button "JAMAN AI Operations Assistant" [ref=f26e39] [cursor=pointer]
+          - button "Notifications" [ref=f26e43] [cursor=pointer]
+          - button "Sign out of Restaurant Admin" [ref=f26e47] [cursor=pointer]
+    - generic [ref=f26e51]:
+      - complementary [ref=f26e52]:
+        - generic [ref=f26e53]:
+          - generic [ref=f26e54]:
+            - button "OPERATIONS" [ref=f26e55] [cursor=pointer]
+            - navigation [ref=f26e59]:
+              - button "Dashboard" [ref=f26e60] [cursor=pointer]
+              - button "Billing / Invoices" [ref=f26e69] [cursor=pointer]
+              - button "Orders" [ref=f26e74] [cursor=pointer]
+              - button "Live Orders / KDS 2" [ref=f26e80] [cursor=pointer]:
+                - generic [ref=f26e81]: Live Orders / KDS
+                - generic [ref=f26e85]: "2"
+              - button "Floor / Tables" [ref=f26e87] [cursor=pointer]
+              - button "Reservations" [ref=f26e92] [cursor=pointer]
+              - button "Kitchen / KOT" [ref=f26e99] [cursor=pointer]
+          - generic [ref=f26e104]:
+            - button "DIGITAL ORDERING" [ref=f26e105] [cursor=pointer]
+            - navigation [ref=f26e109]:
+              - button "QR Table Ordering PRO" [ref=f26e110] [cursor=pointer]:
+                - generic [ref=f26e111]: QR Table Ordering
+                - generic [ref=f26e119]: PRO
+          - generic [ref=f26e121]:
+            - button "MENU & INVENTORY" [ref=f26e122] [cursor=pointer]
+            - navigation [ref=f26e126]:
+              - button "Menu & Categories" [ref=f26e127] [cursor=pointer]
+              - button "Inventory & Recipes 2" [ref=f26e135] [cursor=pointer]:
+                - generic [ref=f26e136]: Inventory & Recipes
+                - generic [ref=f26e142]: "2"
+          - generic [ref=f26e144]:
+            - button "PEOPLE & CASH" [ref=f26e145] [cursor=pointer]
+            - navigation [ref=f26e149]:
+              - button "Customers CRM" [ref=f26e150] [cursor=pointer]
+              - button "Staff & Roles (RBAC)" [ref=f26e155] [cursor=pointer]
+              - button "Payments & Split" [ref=f26e163] [cursor=pointer]
+              - button "Shift & Cash Drawer" [ref=f26e168] [cursor=pointer]
+          - generic [ref=f26e176]:
+            - button "ANALYTICS & SYSTEM" [ref=f26e177] [cursor=pointer]
+            - navigation [ref=f26e181]:
+              - button "Reports & Analytics" [ref=f26e182] [cursor=pointer]
+              - button "Printers & Devices" [ref=f26e188] [cursor=pointer]
+              - button "Restaurant Settings" [ref=f26e195] [cursor=pointer]
+              - button "Subscription Plans" [ref=f26e201] [cursor=pointer]
+              - button "Audit Trail Logs" [ref=f26e207] [cursor=pointer]
+              - button "Backup & Restore" [ref=f26e213] [cursor=pointer]
+      - main [ref=f26e220]:
+        - generic [ref=f26e221]:
+          - generic [ref=f26e222]:
+            - generic [ref=f26e223]:
+              - generic [ref=f26e224]:
+                - heading "Restaurant Operations" [level=1] [ref=f26e225]
+                - generic [ref=f26e226]: Live Command Center
+              - paragraph [ref=f26e229]:
+                - text: Monitor today's sales, orders, cash flow, and restaurant activity.
+                - generic [ref=f26e230]: "• Showing: Today (15 Sept 2026)"
+            - generic [ref=f26e231]:
+              - generic [ref=f26e232]:
+                - button "Today" [ref=f26e233] [cursor=pointer]
+                - button "Yesterday" [ref=f26e234] [cursor=pointer]
+                - button "7 Days" [ref=f26e235] [cursor=pointer]
+                - button "30 Days" [ref=f26e236] [cursor=pointer]
+                - button "This Month" [ref=f26e237] [cursor=pointer]
+                - button "This Year" [ref=f26e238] [cursor=pointer]
+              - button "Refresh dashboard metrics" [ref=f26e239] [cursor=pointer]
+          - region "Primary Business Overview" [ref=f26e245]:
+            - generic [ref=f26e246]:
+              - generic [ref=f26e248]:
+                - generic [ref=f26e249]: Today (15 Sept 2026) Net Sales
+                - generic [ref=f26e254]: ₹14882
+              - generic [ref=f26e255]: Reconciled Single Source
+            - generic [ref=f26e261]:
+              - generic [ref=f26e262]:
+                - generic [ref=f26e263]: Completed Orders
+                - generic [ref=f26e268]: "20"
+                - generic [ref=f26e269]: 6 dine-in • 3 takeaway
+              - generic [ref=f26e270]:
+                - generic [ref=f26e271]: Average Order (AOV)
+                - generic [ref=f26e276]: ₹744
+                - generic [ref=f26e277]: Net sales ÷ orders
+              - generic [ref=f26e278]:
+                - generic [ref=f26e279]: Total Collections
+                - generic [ref=f26e283]: ₹14882
+                - generic [ref=f26e284]:
+                  - text: Cash
+                  - strong [ref=f26e285]: ₹4830
+                  - text: • UPI
+                  - strong [ref=f26e286]: ₹6218
+          - region "Operational Snapshot" [ref=f26e287]:
+            - generic [ref=f26e289]:
+              - heading "Operational Snapshot" [level=2] [ref=f26e290]
+              - paragraph [ref=f26e292]: Real-time kitchen velocity, floor capacity, and operational health
+            - generic [ref=f26e293]:
+              - generic [ref=f26e294] [cursor=pointer]:
+                - generic [ref=f26e295]:
+                  - generic [ref=f26e296]: Live KOT Queue
+                  - generic [ref=f26e301]:
+                    - generic [ref=f26e302]: "2"
+                    - generic [ref=f26e303]: Tickets active
+                - generic [ref=f26e304]:
+                  - generic [ref=f26e305]: In Kitchen
+                  - generic [ref=f26e306]: Open Kitchen
+              - generic [ref=f26e309] [cursor=pointer]:
+                - generic [ref=f26e310]:
+                  - generic [ref=f26e311]:
+                    - generic [ref=f26e312]: Dining Occupancy
+                    - generic [ref=f26e315]: 0% load
+                  - generic [ref=f26e316]:
+                    - generic [ref=f26e317]:
+                      - text: "0"
+                      - generic [ref=f26e318]: / 12
+                    - generic [ref=f26e319]: Tables
+                - generic [ref=f26e321]:
+                  - generic [ref=f26e322]: Floor status
+                  - generic [ref=f26e323]: View Floor
+              - generic [ref=f26e326] [cursor=pointer]:
+                - generic [ref=f26e327]:
+                  - generic [ref=f26e328]:
+                    - generic [ref=f26e329]: Low Stock Alert
+                    - generic [ref=f26e332]: Needs PO
+                  - generic [ref=f26e333]:
+                    - generic [ref=f26e334]: "2"
+                    - generic [ref=f26e335]: Items low
+                - generic [ref=f26e336]:
+                  - generic [ref=f26e337]: Below threshold
+                  - generic [ref=f26e338]: Review Inventory
+              - generic [ref=f26e341]:
+                - generic [ref=f26e342]:
+                  - generic [ref=f26e343]: GST Tax Collected (5%)
+                  - generic [ref=f26e348]: ₹709
+                - generic [ref=f26e350]:
+                  - generic [ref=f26e351]: CGST ₹354
+                  - generic [ref=f26e352]: SGST ₹355
+              - generic [ref=f26e353]:
+                - generic [ref=f26e354]:
+                  - generic [ref=f26e355]: Discounts Given
+                  - generic [ref=f26e361]: "-₹200"
+                - generic [ref=f26e363]:
+                  - generic [ref=f26e364]: Coupons & bill cuts
+                  - generic [ref=f26e365]: Promotions
+          - region "Sales Analytics and Product Performance" [ref=f26e366]:
+            - generic [ref=f26e367]:
+              - generic [ref=f26e369]:
+                - generic [ref=f26e370]:
+                  - generic [ref=f26e371]:
+                    - heading "Hourly Sales Velocity" [level=3] [ref=f26e375]
+                    - paragraph [ref=f26e376]: Track revenue movement throughout operating hours
+                  - generic [ref=f26e377]: "Peak: 7 PM – Next Hour"
+                - generic [ref=f26e381]:
+                  - generic [ref=f26e382]:
+                    - generic [ref=f26e383] [cursor=pointer]
+                    - generic [ref=f26e385] [cursor=pointer]
+                    - generic [ref=f26e387] [cursor=pointer]
+                    - generic [ref=f26e389] [cursor=pointer]
+                    - generic [ref=f26e391] [cursor=pointer]
+                    - generic [ref=f26e393] [cursor=pointer]
+                    - generic [ref=f26e395] [cursor=pointer]
+                    - generic [ref=f26e397] [cursor=pointer]
+                    - generic [ref=f26e399] [cursor=pointer]
+                    - generic [ref=f26e401] [cursor=pointer]
+                    - generic [ref=f26e403] [cursor=pointer]
+                    - generic [ref=f26e405] [cursor=pointer]
+                    - generic [ref=f26e407] [cursor=pointer]
+                    - generic [ref=f26e409] [cursor=pointer]
+                    - generic [ref=f26e411] [cursor=pointer]
+                  - generic [ref=f26e413]:
+                    - generic [ref=f26e414]: 9AM
+                    - generic [ref=f26e416]: 10AM
+                    - generic [ref=f26e418]: 11AM
+                    - generic [ref=f26e420]: 12PM
+                    - generic [ref=f26e422]: 1PM
+                    - generic [ref=f26e424]: 2PM
+                    - generic [ref=f26e426]: 3PM
+                    - generic [ref=f26e428]: 4PM
+                    - generic [ref=f26e430]: 5PM
+                    - generic [ref=f26e432]: 6PM
+                    - generic [ref=f26e434]: 7PM
+                    - generic [ref=f26e436]: 8PM
+                    - generic [ref=f26e438]: 9PM
+                    - generic [ref=f26e440]: 10PM
+                    - generic [ref=f26e442]: 11PM
+                - generic [ref=f26e444]:
+                  - generic [ref=f26e445]:
+                    - text: "Total Today:"
+                    - strong [ref=f26e446]: ₹14273
+                  - generic [ref=f26e447]: "Active Operating Window: 9:00 AM – 11:00 PM"
+              - generic [ref=f26e449]:
+                - generic [ref=f26e450]:
+                  - generic [ref=f26e451]:
+                    - generic [ref=f26e452]:
+                      - heading "Top Dishes" [level=3] [ref=f26e460]
+                      - paragraph [ref=f26e461]: Highest volume items ordered
+                    - generic [ref=f26e462]: Top 5
+                  - generic [ref=f26e463]:
+                    - generic [ref=f26e464]:
+                      - generic [ref=f26e465]:
+                        - generic [ref=f26e466]: "#1"
+                        - generic [ref=f26e467]:
+                          - paragraph [ref=f26e468]: Gujarati Heritage Thali
+                          - paragraph [ref=f26e469]: 41 servings ordered
+                      - generic [ref=f26e470]:
+                        - generic [ref=f26e471]: ₹11480
+                        - text: Revenue
+                    - generic [ref=f26e472]:
+                      - generic [ref=f26e473]:
+                        - generic [ref=f26e474]: "#2"
+                        - generic [ref=f26e475]:
+                          - paragraph [ref=f26e476]: Dal Makhani
+                          - paragraph [ref=f26e477]: 41 servings ordered
+                      - generic [ref=f26e478]:
+                        - generic [ref=f26e479]: ₹7380
+                        - text: Revenue
+                    - generic [ref=f26e480]:
+                      - generic [ref=f26e481]:
+                        - generic [ref=f26e482]: "#3"
+                        - generic [ref=f26e483]:
+                          - paragraph [ref=f26e484]: Royal Veg Dum Biryani
+                          - paragraph [ref=f26e485]: 38 servings ordered
+                      - generic [ref=f26e486]:
+                        - generic [ref=f26e487]: ₹10640
+                        - text: Revenue
+                    - generic [ref=f26e488]:
+                      - generic [ref=f26e489]:
+                        - generic [ref=f26e490]: "#4"
+                        - generic [ref=f26e491]:
+                          - paragraph [ref=f26e492]: Cold Coffee with Ice Cream
+                          - paragraph [ref=f26e493]: 37 servings ordered
+                      - generic [ref=f26e494]:
+                        - generic [ref=f26e495]: ₹4440
+                        - text: Revenue
+                    - generic [ref=f26e496]:
+                      - generic [ref=f26e497]:
+                        - generic [ref=f26e498]: "#5"
+                        - generic [ref=f26e499]:
+                          - paragraph [ref=f26e500]: Shahi Gulab Jamun (2 pcs)
+                          - paragraph [ref=f26e501]: 35 servings ordered
+                      - generic [ref=f26e502]:
+                        - generic [ref=f26e503]: ₹3150
+                        - text: Revenue
+                - button "View All Ranked Dishes" [ref=f26e505] [cursor=pointer]
+          - region "Operational Needs Attention" [ref=f26e509]:
+            - generic [ref=f26e511]:
+              - heading "Needs Attention & Quick Triage" [level=2] [ref=f26e512]
+              - paragraph [ref=f26e514]: Direct operational shortcuts and alerts requiring manager intervention
+            - generic [ref=f26e515]:
+              - generic [ref=f26e516]:
+                - generic [ref=f26e517]:
+                  - generic [ref=f26e518]:
+                    - generic [ref=f26e519]: Kitchen Line
+                    - generic [ref=f26e522]: Action Required
+                  - generic [ref=f26e523]:
+                    - heading "2 Tickets In Preparation" [level=4] [ref=f26e524]
+                    - paragraph [ref=f26e525]: Active orders being cooked on KDS display.
+                - button "Open Kitchen KDS" [ref=f26e526] [cursor=pointer]
+              - generic [ref=f26e530]:
+                - generic [ref=f26e531]:
+                  - generic [ref=f26e532]:
+                    - generic [ref=f26e533]: Raw Materials
+                    - generic [ref=f26e538]: Restock Now
+                  - generic [ref=f26e539]:
+                    - heading "2 Items Below Threshold" [level=4] [ref=f26e540]
+                    - paragraph [ref=f26e541]: Ingredients have breached minimum safe buffers.
+                - button "Review Inventory" [ref=f26e542] [cursor=pointer]
+              - generic [ref=f26e546]:
+                - generic [ref=f26e547]:
+                  - generic [ref=f26e548]:
+                    - generic [ref=f26e549]: Dining Floor
+                    - generic [ref=f26e552]: 0 / 12 Occupied
+                  - generic [ref=f26e553]:
+                    - heading "12 Tables Available" [level=4] [ref=f26e554]
+                    - paragraph [ref=f26e555]: Floor ready for seating walk-ins and reservations.
+                - button "Manage Floor & Tables" [ref=f26e556] [cursor=pointer]
+              - generic [ref=f26e560]:
+                - generic [ref=f26e561]:
+                  - generic [ref=f26e562]:
+                    - generic [ref=f26e563]: Shift Drawer
+                    - generic [ref=f26e569]: 100% Reconciled
+                  - generic [ref=f26e570]:
+                    - heading "Amit Dave (Lead Cashier) • Float ₹2000" [level=4] [ref=f26e571]
+                    - paragraph [ref=f26e572]: Active cash drawer register. Single-source audit verified.
+                - button "Run Financial Audit" [ref=f26e573] [cursor=pointer]
+    - button "Open JAMAN AI Restaurant Intelligence" [ref=f26e577] [cursor=pointer]:
+      - generic [ref=f26e583]:
+        - generic [ref=f26e584]: JAMAN AI
+        - generic [ref=f26e585]: ACTIVE
+  - region "JAMANVAAR Startup" [ref=f26e586]:
+    - generic [ref=f26e587]:
+      - generic [ref=f26e588]: KELVIONTECH ENTERPRISE
+      - generic [ref=f26e591]: Local Engine Active
+    - generic [ref=f26e597]:
+      - generic [ref=f26e598]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=f26e600]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=f26e601]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f26e607]
+      - paragraph [ref=f26e609]: Restaurant Operations Platform
+      - generic [ref=f26e610]: RESTAURANT ADMIN
+      - generic [ref=f26e615]:
+        - generic [ref=f26e616]: Core Engine Ready
+        - generic [ref=f26e618]: •
+        - generic [ref=f26e619]: Database Initialized
+        - generic [ref=f26e621]: •
+        - generic [ref=f26e622]: Local-First Mode

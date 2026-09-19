@@ -1,0 +1,376 @@
+- generic [ref=f5e3]:
+  - banner [ref=f5e4]:
+    - generic [ref=f5e5]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f5e7]
+      - generic [ref=f5e9]:
+        - generic [ref=f5e10]:
+          - generic "QA FULL AUDIT RESTAURANT" [ref=f5e11]
+          - generic [ref=f5e12]: ADMIN
+        - button "Ahmedabad Flagship Store" [ref=f5e13] [cursor=pointer]
+    - button "Open global search" [ref=f5e20] [cursor=pointer]:
+      - textbox "Search orders, invoices, dishes, tables..." [ref=f5e24]
+      - generic: Ctrl+K
+    - generic [ref=f5e25]:
+      - generic [ref=f5e26]:
+        - button "EOD Report" [ref=f5e27] [cursor=pointer]
+        - button "Reconciliation" [ref=f5e32] [cursor=pointer]
+      - generic [ref=f5e38]:
+        - button "JAMAN AI Operations Assistant" [ref=f5e39] [cursor=pointer]
+        - button "Notifications" [ref=f5e43] [cursor=pointer]
+        - button "Sign out of Restaurant Admin" [ref=f5e47] [cursor=pointer]
+  - generic [ref=f5e51]:
+    - complementary [ref=f5e52]:
+      - generic [ref=f5e53]:
+        - generic [ref=f5e54]:
+          - button "OPERATIONS" [ref=f5e55] [cursor=pointer]
+          - navigation [ref=f5e59]:
+            - button "Dashboard" [ref=f5e60] [cursor=pointer]
+            - button "Billing / Invoices" [ref=f5e69] [cursor=pointer]
+            - button "Orders" [ref=f5e74] [cursor=pointer]
+            - button "Live Orders / KDS 3" [ref=f5e80] [cursor=pointer]:
+              - generic [ref=f5e81]: Live Orders / KDS
+              - generic [ref=f5e85]: "3"
+            - button "Floor / Tables" [ref=f5e87] [cursor=pointer]
+            - button "Reservations" [ref=f5e92] [cursor=pointer]
+            - button "Kitchen / KOT" [ref=f5e99] [cursor=pointer]
+        - generic [ref=f5e104]:
+          - button "DIGITAL ORDERING" [ref=f5e105] [cursor=pointer]
+          - navigation [ref=f5e109]:
+            - button "QR Table Ordering PRO" [ref=f5e110] [cursor=pointer]:
+              - generic [ref=f5e111]: QR Table Ordering
+              - generic [ref=f5e119]: PRO
+        - generic [ref=f5e121]:
+          - button "MENU & INVENTORY" [ref=f5e122] [cursor=pointer]
+          - navigation [ref=f5e126]:
+            - button "Menu & Categories" [ref=f5e127] [cursor=pointer]
+            - button "Inventory & Recipes 2" [ref=f5e135] [cursor=pointer]:
+              - generic [ref=f5e136]: Inventory & Recipes
+              - generic [ref=f5e142]: "2"
+        - generic [ref=f5e144]:
+          - button "PEOPLE & CASH" [ref=f5e145] [cursor=pointer]
+          - navigation [ref=f5e149]:
+            - button "Customers CRM" [active] [ref=f5e150] [cursor=pointer]
+            - button "Staff & Roles (RBAC)" [ref=f5e155] [cursor=pointer]
+            - button "Payments & Split" [ref=f5e163] [cursor=pointer]
+            - button "Shift & Cash Drawer" [ref=f5e168] [cursor=pointer]
+        - generic [ref=f5e176]:
+          - button "ANALYTICS & SYSTEM" [ref=f5e177] [cursor=pointer]
+          - navigation [ref=f5e181]:
+            - button "Reports & Analytics" [ref=f5e182] [cursor=pointer]
+            - button "Printers & Devices" [ref=f5e188] [cursor=pointer]
+            - button "Restaurant Settings" [ref=f5e195] [cursor=pointer]
+            - button "Subscription Plans" [ref=f5e201] [cursor=pointer]
+            - button "Audit Trail Logs" [ref=f5e207] [cursor=pointer]
+            - button "Backup & Restore" [ref=f5e213] [cursor=pointer]
+    - main [ref=f5e220]:
+      - generic [ref=f5e1295]:
+        - generic [ref=f5e1296]:
+          - generic [ref=f5e1297]:
+            - generic [ref=f5e1298]:
+              - heading "Customer Relationship Management (CRM)" [level=1] [ref=f5e1299]
+              - generic [ref=f5e1300]: LOYALTY & 360 INTELLIGENCE
+            - paragraph [ref=f5e1301]: Guest directory, dining spend matrices, loyalty reward point pools, dietary preferences, and automated WhatsApp engagement.
+          - generic [ref=f5e1302]:
+            - button "Export CRM CSV (8)" [ref=f5e1303] [cursor=pointer]
+            - button "Loyalty Program" [ref=f5e1308] [cursor=pointer]
+            - button "Marketing Campaigns" [ref=f5e1313] [cursor=pointer]
+            - button "Register New Customer" [ref=f5e1318] [cursor=pointer]
+        - generic [ref=f5e1321]:
+          - generic [ref=f5e1322]:
+            - generic [ref=f5e1323]: TOTAL GUESTS
+            - generic [ref=f5e1330]: 8 Profiles
+            - generic [ref=f5e1331]: 5 VIPs & High Spenders
+          - generic [ref=f5e1332]:
+            - generic [ref=f5e1333]: LIFETIME SPEND
+            - generic [ref=f5e1337]: ₹69188
+            - generic [ref=f5e1338]: Avg ₹8649 per Registered Guest
+          - generic [ref=f5e1339]:
+            - generic [ref=f5e1340]: LOYALTY REWARDS
+            - generic [ref=f5e1345]: ⭐ 1680 Pts
+            - generic [ref=f5e1346]: ₹1680 Total Redeemable Value
+          - generic [ref=f5e1347]:
+            - generic [ref=f5e1348]: VIP ELITE TIER
+            - generic [ref=f5e1352]: 5 VIP Guests
+            - generic [ref=f5e1353]: Highest dining frequency & ticket size
+        - generic [ref=f5e1354]:
+          - generic [ref=f5e1355]:
+            - generic [ref=f5e1356]: "Dining Segments:"
+            - button "All Guests" [ref=f5e1357] [cursor=pointer]
+            - button "⭐ VIP High Spenders" [ref=f5e1358] [cursor=pointer]
+            - button "🔁 Frequent Regulars" [ref=f5e1359] [cursor=pointer]
+            - button "✨ New Guests" [ref=f5e1360] [cursor=pointer]
+            - button "💤 Inactive (30+ Days)" [ref=f5e1361] [cursor=pointer]
+            - button "🎂 Celebrations This Month" [ref=f5e1362] [cursor=pointer]
+          - generic [ref=f5e1363]:
+            - text: "Showing:"
+            - strong [ref=f5e1364]: "8"
+            - text: matching profiles
+        - generic [ref=f5e1365]:
+          - textbox "Search by customer name, phone number, email, address, tags, notes..." [ref=f5e1370]
+          - generic [ref=f5e1371]:
+            - combobox [ref=f5e1372]:
+              - option "All Tags" [selected]
+              - option "⭐ VIP Only"
+              - option "Regular Guests"
+              - option "Corporate Clients"
+              - option "Family Diners"
+              - option "Vegan Guests"
+              - option "Strict Jain"
+            - combobox [ref=f5e1373]:
+              - 'option "Sort by: Highest Spend" [selected]'
+              - 'option "Sort by: Most Visits"'
+              - 'option "Sort by: Loyalty Points"'
+              - 'option "Sort by: Recently Visited"'
+              - 'option "Sort by: Name (A-Z)"'
+        - table [ref=f5e1376]:
+          - rowgroup [ref=f5e1377]:
+            - row [ref=f5e1378]:
+              - columnheader "Customer & Contacts" [ref=f5e1379]
+              - columnheader "Tags / Profile" [ref=f5e1380]
+              - columnheader "Visits" [ref=f5e1381]
+              - columnheader "Lifetime Spend" [ref=f5e1382]
+              - columnheader "Avg Order" [ref=f5e1383]
+              - columnheader "Loyalty Points" [ref=f5e1384]
+              - columnheader "Last Visit" [ref=f5e1385]
+              - columnheader "Actions" [ref=f5e1386]
+          - rowgroup [ref=f5e1387]:
+            - row [ref=f5e1388] [cursor=pointer]:
+              - cell "⭐ Sanjay Mehta VIP 📞 9833445566 ✉️ sanjay.mehta@investments.co" [ref=f5e1389]:
+                - generic [ref=f5e1390]:
+                  - generic [ref=f5e1391]: ⭐
+                  - generic [ref=f5e1392]:
+                    - generic [ref=f5e1393]:
+                      - strong [ref=f5e1394]: Sanjay Mehta
+                      - generic [ref=f5e1395]: VIP
+                    - generic [ref=f5e1396]:
+                      - generic [ref=f5e1397]: 📞 9833445566
+                      - generic [ref=f5e1398]: ✉️ sanjay.mehta@investments.co
+              - cell "VIP FAMILY \"Loves Royal Dum Biryani. Family weekend regular.\"" [ref=f5e1399]:
+                - generic [ref=f5e1400]:
+                  - generic [ref=f5e1401]: VIP
+                  - generic [ref=f5e1402]: FAMILY
+                - paragraph [ref=f5e1403]: "\"Loves Royal Dum Biryani. Family weekend regular.\""
+              - cell "11" [ref=f5e1404]
+              - cell "₹18720" [ref=f5e1405]
+              - cell "₹1702" [ref=f5e1406]
+              - cell "Gold ⭐ 490 +50" [ref=f5e1407]:
+                - generic [ref=f5e1408]:
+                  - generic "Gold tier — 1.5x points" [ref=f5e1409]: Gold
+                  - generic [ref=f5e1410]: ⭐ 490
+                  - button "+50" [ref=f5e1411]
+              - cell "15 Sept 2026" [ref=f5e1412]
+              - cell [ref=f5e1413]:
+                - generic [ref=f5e1414]:
+                  - button "Send WhatsApp Greeting" [ref=f5e1415]
+                  - button "Edit Customer Profile" [ref=f5e1418]
+                  - button "Delete Profile" [ref=f5e1421]
+                  - button "360" [ref=f5e1425]
+            - row [ref=f5e1426] [cursor=pointer]:
+              - cell "⭐ Ramesh Patel VIP 📞 9876543210 ✉️ ramesh.patel@gmail.com" [ref=f5e1427]:
+                - generic [ref=f5e1428]:
+                  - generic [ref=f5e1429]: ⭐
+                  - generic [ref=f5e1430]:
+                    - generic [ref=f5e1431]:
+                      - strong [ref=f5e1432]: Ramesh Patel
+                      - generic [ref=f5e1433]: VIP
+                    - generic [ref=f5e1434]:
+                      - generic [ref=f5e1435]: 📞 9876543210
+                      - generic [ref=f5e1436]: ✉️ ramesh.patel@gmail.com
+              - cell "VIP FAMILY \"Prefers mild spices and table near window. VIP regular guest.\"" [ref=f5e1437]:
+                - generic [ref=f5e1438]:
+                  - generic [ref=f5e1439]: VIP
+                  - generic [ref=f5e1440]: FAMILY
+                - paragraph [ref=f5e1441]: "\"Prefers mild spices and table near window. VIP regular guest.\""
+              - cell "15" [ref=f5e1442]
+              - cell "₹14850" [ref=f5e1443]
+              - cell "₹990" [ref=f5e1444]
+              - cell "Silver ⭐ 340 +50" [ref=f5e1445]:
+                - generic [ref=f5e1446]:
+                  - generic "Silver tier — 1.25x points" [ref=f5e1447]: Silver
+                  - generic [ref=f5e1448]: ⭐ 340
+                  - button "+50" [ref=f5e1449]
+              - cell "15 Sept 2026" [ref=f5e1450]
+              - cell [ref=f5e1451]:
+                - generic [ref=f5e1452]:
+                  - button "Send WhatsApp Greeting" [ref=f5e1453]
+                  - button "Edit Customer Profile" [ref=f5e1456]
+                  - button "Delete Profile" [ref=f5e1459]
+                  - button "360" [ref=f5e1463]
+            - row [ref=f5e1464] [cursor=pointer]:
+              - cell "⭐ Amit Verma VIP 📞 9899001122 ✉️ amit.verma@techcorp.in" [ref=f5e1465]:
+                - generic [ref=f5e1466]:
+                  - generic [ref=f5e1467]: ⭐
+                  - generic [ref=f5e1468]:
+                    - generic [ref=f5e1469]:
+                      - strong [ref=f5e1470]: Amit Verma
+                      - generic [ref=f5e1471]: VIP
+                    - generic [ref=f5e1472]:
+                      - generic [ref=f5e1473]: 📞 9899001122
+                      - generic [ref=f5e1474]: ✉️ amit.verma@techcorp.in
+              - cell "CORPORATE REGULAR \"Corporate client. Always requests GST invoice with company details.\"" [ref=f5e1475]:
+                - generic [ref=f5e1476]:
+                  - generic [ref=f5e1477]: CORPORATE
+                  - generic [ref=f5e1478]: REGULAR
+                - paragraph [ref=f5e1479]: "\"Corporate client. Always requests GST invoice with company details.\""
+              - cell "13" [ref=f5e1480]
+              - cell "₹10380" [ref=f5e1481]
+              - cell "₹798" [ref=f5e1482]
+              - cell "Silver ⭐ 180 +50" [ref=f5e1483]:
+                - generic [ref=f5e1484]:
+                  - generic "Silver tier — 1.25x points" [ref=f5e1485]: Silver
+                  - generic [ref=f5e1486]: ⭐ 180
+                  - button "+50" [ref=f5e1487]
+              - cell "15 Sept 2026" [ref=f5e1488]
+              - cell [ref=f5e1489]:
+                - generic [ref=f5e1490]:
+                  - button "Send WhatsApp Greeting" [ref=f5e1491]
+                  - button "Edit Customer Profile" [ref=f5e1494]
+                  - button "Delete Profile" [ref=f5e1497]
+                  - button "360" [ref=f5e1501]
+            - row [ref=f5e1502] [cursor=pointer]:
+              - cell "⭐ Dr. Neha Shah VIP 📞 9822334455 ✉️ dr.neha.shah@apollo.org" [ref=f5e1503]:
+                - generic [ref=f5e1504]:
+                  - generic [ref=f5e1505]: ⭐
+                  - generic [ref=f5e1506]:
+                    - generic [ref=f5e1507]:
+                      - strong [ref=f5e1508]: Dr. Neha Shah
+                      - generic [ref=f5e1509]: VIP
+                    - generic [ref=f5e1510]:
+                      - generic [ref=f5e1511]: 📞 9822334455
+                      - generic [ref=f5e1512]: ✉️ dr.neha.shah@apollo.org
+              - cell "VIP JAIN \"Strict Jain preparation only (no onion, no garlic).\"" [ref=f5e1513]:
+                - generic [ref=f5e1514]:
+                  - generic [ref=f5e1515]: VIP
+                  - generic [ref=f5e1516]: JAIN
+                - paragraph [ref=f5e1517]: "\"Strict Jain preparation only (no onion, no garlic).\""
+              - cell "15" [ref=f5e1518]
+              - cell "₹9240" [ref=f5e1519]
+              - cell "₹616" [ref=f5e1520]
+              - cell "Silver ⭐ 260 +50" [ref=f5e1521]:
+                - generic [ref=f5e1522]:
+                  - generic "Silver tier — 1.25x points" [ref=f5e1523]: Silver
+                  - generic [ref=f5e1524]: ⭐ 260
+                  - button "+50" [ref=f5e1525]
+              - cell "15 Sept 2026" [ref=f5e1526]
+              - cell [ref=f5e1527]:
+                - generic [ref=f5e1528]:
+                  - button "Send WhatsApp Greeting" [ref=f5e1529]
+                  - button "Edit Customer Profile" [ref=f5e1532]
+                  - button "Delete Profile" [ref=f5e1535]
+                  - button "360" [ref=f5e1539]
+            - row [ref=f5e1540] [cursor=pointer]:
+              - cell "⭐ Priya Joshi VIP 📞 9811223344 ✉️ priya.joshi@designstudio.com" [ref=f5e1541]:
+                - generic [ref=f5e1542]:
+                  - generic [ref=f5e1543]: ⭐
+                  - generic [ref=f5e1544]:
+                    - generic [ref=f5e1545]:
+                      - strong [ref=f5e1546]: Priya Joshi
+                      - generic [ref=f5e1547]: VIP
+                    - generic [ref=f5e1548]:
+                      - generic [ref=f5e1549]: 📞 9811223344
+                      - generic [ref=f5e1550]: ✉️ priya.joshi@designstudio.com
+              - cell "REGULAR VEGAN \"Vegan preference. Loves fresh mint beverages and tandoori starters.\"" [ref=f5e1551]:
+                - generic [ref=f5e1552]:
+                  - generic [ref=f5e1553]: REGULAR
+                  - generic [ref=f5e1554]: VEGAN
+                - paragraph [ref=f5e1555]: "\"Vegan preference. Loves fresh mint beverages and tandoori starters.\""
+              - cell "12" [ref=f5e1556]
+              - cell "₹8358" [ref=f5e1557]
+              - cell "₹697" [ref=f5e1558]
+              - cell "Bronze ⭐ 150 +50" [ref=f5e1559]:
+                - generic [ref=f5e1560]:
+                  - generic "Bronze tier — 1x points" [ref=f5e1561]: Bronze
+                  - generic [ref=f5e1562]: ⭐ 150
+                  - button "+50" [ref=f5e1563]
+              - cell "15 Sept 2026" [ref=f5e1564]
+              - cell [ref=f5e1565]:
+                - generic [ref=f5e1566]:
+                  - button "Send WhatsApp Greeting" [ref=f5e1567]
+                  - button "Edit Customer Profile" [ref=f5e1570]
+                  - button "Delete Profile" [ref=f5e1573]
+                  - button "360" [ref=f5e1577]
+            - row [ref=f5e1578] [cursor=pointer]:
+              - cell "K Kavita Reddy 📞 9844556677 ✉️ kavita.reddy@gmail.com" [ref=f5e1579]:
+                - generic [ref=f5e1580]:
+                  - generic [ref=f5e1581]: K
+                  - generic [ref=f5e1582]:
+                    - strong [ref=f5e1584]: Kavita Reddy
+                    - generic [ref=f5e1585]:
+                      - generic [ref=f5e1586]: 📞 9844556677
+                      - generic [ref=f5e1587]: ✉️ kavita.reddy@gmail.com
+              - cell "REGULAR \"Enjoys desserts and starters.\"" [ref=f5e1588]:
+                - generic [ref=f5e1589]: REGULAR
+                - paragraph [ref=f5e1591]: "\"Enjoys desserts and starters.\""
+              - cell "3" [ref=f5e1592]
+              - cell "₹3150" [ref=f5e1593]
+              - cell "₹1050" [ref=f5e1594]
+              - cell "Bronze ⭐ 90 +50" [ref=f5e1595]:
+                - generic [ref=f5e1596]:
+                  - generic "Bronze tier — 1x points" [ref=f5e1597]: Bronze
+                  - generic [ref=f5e1598]: ⭐ 90
+                  - button "+50" [ref=f5e1599]
+              - cell "08 Sept 2026" [ref=f5e1600]
+              - cell [ref=f5e1601]:
+                - generic [ref=f5e1602]:
+                  - button "Send WhatsApp Greeting" [ref=f5e1603]
+                  - button "Edit Customer Profile" [ref=f5e1606]
+                  - button "Delete Profile" [ref=f5e1609]
+                  - button "360" [ref=f5e1613]
+            - row [ref=f5e1614] [cursor=pointer]:
+              - cell "A Ananya Desai 📞 9866778899 ✉️ ananya.desai@outlook.com" [ref=f5e1615]:
+                - generic [ref=f5e1616]:
+                  - generic [ref=f5e1617]: A
+                  - generic [ref=f5e1618]:
+                    - strong [ref=f5e1620]: Ananya Desai
+                    - generic [ref=f5e1621]:
+                      - generic [ref=f5e1622]: 📞 9866778899
+                      - generic [ref=f5e1623]: ✉️ ananya.desai@outlook.com
+              - cell "REGULAR \"College group regular for Cold Coffee & Starters.\"" [ref=f5e1624]:
+                - generic [ref=f5e1625]: REGULAR
+                - paragraph [ref=f5e1627]: "\"College group regular for Cold Coffee & Starters.\""
+              - cell "3" [ref=f5e1628]
+              - cell "₹2850" [ref=f5e1629]
+              - cell "₹950" [ref=f5e1630]
+              - cell "Bronze ⭐ 110 +50" [ref=f5e1631]:
+                - generic [ref=f5e1632]:
+                  - generic "Bronze tier — 1x points" [ref=f5e1633]: Bronze
+                  - generic [ref=f5e1634]: ⭐ 110
+                  - button "+50" [ref=f5e1635]
+              - cell "25 Aug 2026" [ref=f5e1636]
+              - cell [ref=f5e1637]:
+                - generic [ref=f5e1638]:
+                  - button "Send WhatsApp Greeting" [ref=f5e1639]
+                  - button "Edit Customer Profile" [ref=f5e1642]
+                  - button "Delete Profile" [ref=f5e1645]
+                  - button "360" [ref=f5e1649]
+            - row [ref=f5e1650] [cursor=pointer]:
+              - cell "R Rajesh Gupta 📞 9855667788 ✉️ rajesh.gupta@consulting.in" [ref=f5e1651]:
+                - generic [ref=f5e1652]:
+                  - generic [ref=f5e1653]: R
+                  - generic [ref=f5e1654]:
+                    - strong [ref=f5e1656]: Rajesh Gupta
+                    - generic [ref=f5e1657]:
+                      - generic [ref=f5e1658]: 📞 9855667788
+                      - generic [ref=f5e1659]: ✉️ rajesh.gupta@consulting.in
+              - cell "CORPORATE \"Quick counter takeaway guest.\"" [ref=f5e1660]:
+                - generic [ref=f5e1661]: CORPORATE
+                - paragraph [ref=f5e1663]: "\"Quick counter takeaway guest.\""
+              - cell "2" [ref=f5e1664]
+              - cell "₹1640" [ref=f5e1665]
+              - cell "₹820" [ref=f5e1666]
+              - cell "Bronze ⭐ 60 +50" [ref=f5e1667]:
+                - generic [ref=f5e1668]:
+                  - generic "Bronze tier — 1x points" [ref=f5e1669]: Bronze
+                  - generic [ref=f5e1670]: ⭐ 60
+                  - button "+50" [ref=f5e1671]
+              - cell "01 Sept 2026" [ref=f5e1672]
+              - cell [ref=f5e1673]:
+                - generic [ref=f5e1674]:
+                  - button "Send WhatsApp Greeting" [ref=f5e1675]
+                  - button "Edit Customer Profile" [ref=f5e1678]
+                  - button "Delete Profile" [ref=f5e1681]
+                  - button "360" [ref=f5e1685]
+  - button "Open JAMAN AI Restaurant Intelligence" [ref=f5e827] [cursor=pointer]:
+    - generic [ref=f5e833]:
+      - generic [ref=f5e834]: JAMAN AI
+      - generic [ref=f5e835]: ACTIVE

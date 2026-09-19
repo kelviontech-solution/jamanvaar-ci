@@ -1,0 +1,185 @@
+- generic [ref=e164]:
+  - complementary [ref=e165]:
+    - generic [ref=e166]:
+      - link [ref=e167] [cursor=pointer]:
+        - /url: /
+        - img "JAMANVAAR" [ref=e168]
+      - generic [ref=e169]:
+        - generic [ref=e170]: PLATFORM CONTROL
+        - generic [ref=e171]: SUPER ADMIN
+    - navigation [ref=e172]:
+      - generic [ref=e173]:
+        - button "Platform Control Center" [expanded] [ref=e174] [cursor=pointer]
+        - link "Executive Dashboard" [ref=e179] [cursor=pointer]:
+          - /url: /
+      - generic [ref=e187]:
+        - button "Business Management" [expanded] [ref=e188] [cursor=pointer]
+        - generic [ref=e192]:
+          - link "Restaurants" [ref=e193] [cursor=pointer]:
+            - /url: /restaurants
+          - link "Restaurant Owners" [ref=e201] [cursor=pointer]:
+            - /url: /owners
+          - link "Branches" [ref=e209] [cursor=pointer]:
+            - /url: /branches
+          - link "Subscriptions" [ref=e216] [cursor=pointer]:
+            - /url: /subscriptions
+          - link "Invoices & Billing" [ref=e224] [cursor=pointer]:
+            - /url: /billing
+      - generic [ref=e229]:
+        - button "SaaS Management" [expanded] [ref=e230] [cursor=pointer]
+        - generic [ref=e234]:
+          - link "Plans & Entitlements" [ref=e235] [cursor=pointer]:
+            - /url: /plans
+          - link "QR Ordering Suite" [ref=e242] [cursor=pointer]:
+            - /url: /qr-ordering
+          - link "JAMAN AI Engine" [ref=e251] [cursor=pointer]:
+            - /url: /ai-assistant
+          - link "Master Menu Catalog" [ref=e256] [cursor=pointer]:
+            - /url: /catalog
+          - link "Activation Keys" [ref=e262] [cursor=pointer]:
+            - /url: /activation-keys
+          - link "Payment Gateways" [ref=e268] [cursor=pointer]:
+            - /url: /payment-connections
+          - link "Applications & Releases" [ref=e273] [cursor=pointer]:
+            - /url: /applications
+      - generic [ref=e280]:
+        - button "Operations & MDM" [expanded] [ref=e281] [cursor=pointer]
+        - generic [ref=e285]:
+          - link "Device Fleet / MDM" [ref=e286] [cursor=pointer]:
+            - /url: /devices
+          - link "Sync & Conflict Monitor" [ref=e291] [cursor=pointer]:
+            - /url: /sync-monitor
+          - link "Backups & Recovery" [ref=e296] [cursor=pointer]:
+            - /url: /backups
+          - link "System Telemetry" [ref=e303] [cursor=pointer]:
+            - /url: /system-health
+          - link "Staging Sandboxes" [ref=e309] [cursor=pointer]:
+            - /url: /sandboxes
+      - generic [ref=e322]:
+        - button "Security & Reports" [expanded] [ref=e323] [cursor=pointer]
+        - generic [ref=e327]:
+          - link "Reports & Analytics" [ref=e328] [cursor=pointer]:
+            - /url: /reports
+          - link "Audit Logs" [ref=e333] [cursor=pointer]:
+            - /url: /audit-logs
+          - link "Emergency Offline Policy" [ref=e339] [cursor=pointer]:
+            - /url: /offline-policy
+          - link "Platform Team" [ref=e344] [cursor=pointer]:
+            - /url: /team
+          - link "Support Tickets" [ref=e350] [cursor=pointer]:
+            - /url: /tickets
+          - link "Diagnostics & Support" [ref=e355] [cursor=pointer]:
+            - /url: /support
+          - link "Platform Settings" [ref=e365] [cursor=pointer]:
+            - /url: /settings/platform
+      - generic [ref=e369]:
+        - button "Account" [expanded] [ref=e370] [cursor=pointer]
+        - link "My Profile" [ref=e375] [cursor=pointer]:
+          - /url: /profile
+    - generic [ref=e390]:
+      - generic [ref=e391]:
+        - generic [ref=e393]: Platform Online
+        - link "View System Health" [ref=e394] [cursor=pointer]:
+          - /url: /system-health
+      - generic [ref=e399]: JAMANVAAR Cloud v1.4.0
+  - generic [ref=e400]:
+    - banner [ref=e401]:
+      - generic [ref=e402]:
+        - button "Toggle Navigation Menu" [ref=e403] [cursor=pointer]
+        - generic [ref=e405]:
+          - generic [ref=e406]: JAMANVAAR PLATFORM
+          - generic [ref=e407]: Control Center
+      - generic [ref=e409]:
+        - textbox "Search restaurants, owners, devices, activation keys…" [ref=e410]
+        - generic: Ctrl+K
+      - generic [ref=e411]:
+        - generic "Database reachable, API responding" [ref=e412]: PLATFORM ONLINE
+        - button "Notifications" [ref=e416] [cursor=pointer]
+        - button "Toggle dark mode" [ref=e421] [cursor=pointer]
+        - generic [ref=e425]:
+          - link "J" [ref=e426] [cursor=pointer]:
+            - /url: /profile
+          - generic [ref=e428]:
+            - generic [ref=e429]: JAMANVAAR Super Admin
+            - generic [ref=e430]: Platform Owner
+          - button "Logout" [ref=e431] [cursor=pointer]
+    - main [ref=e436]:
+      - generic [ref=e787]:
+        - generic [ref=e788]:
+          - generic [ref=e789]:
+            - heading "Onboard New Restaurant" [level=1] [ref=e790]
+            - paragraph [ref=e791]: "Commercial SaaS onboarding workflow: register organization, allocate plan, generate owner credentials, and issue device activation keys."
+          - button "← Back to Restaurants" [ref=e792] [cursor=pointer]
+        - generic [ref=e793]:
+          - generic [ref=e794]: 1. Restaurant Details
+          - generic [ref=e795]: 2. Owner Credentials
+          - generic [ref=e796]: 3. Plan & Commercials
+          - generic [ref=e797]: 4. Branches & Limits
+          - generic [ref=e798]: 5. Device Provisioning
+          - generic [ref=e799]: 6. Review & Launch
+          - generic [ref=e800]: 7. Welcome Kit
+        - generic [ref=e2025]:
+          - generic [ref=e2026]: Initial Branch & Hardware Quotas
+          - paragraph [ref=e2032]: Configure initial branch deployment settings and maximum device thresholds permitted by the plan.
+          - generic [ref=e2033]:
+            - generic [ref=e2034]:
+              - generic [ref=e2035]: Primary Branch Name *
+              - textbox [ref=e2036]: Main Dining & Kitchen
+            - generic [ref=e2037]:
+              - generic [ref=e2038]: Branch Identifier Code *
+              - textbox [ref=e2039]: MAIN
+            - generic [ref=e2040]:
+              - generic [ref=e2041]: "Branch Limit (Plan Maximum: 5)"
+              - spinbutton [ref=e2042]: "5"
+          - generic [ref=e2044]:
+            - generic [ref=e2045]: "Max Registered Devices (Plan Maximum: 20)"
+            - spinbutton [ref=e2046]: "20"
+          - generic [ref=e2047]:
+            - generic [ref=e2048]: Applications to Provision
+            - paragraph [ref=e2049]: Pre-selected from JAMANVAAR PRO's tier — uncheck anything this restaurant shouldn't have, or enable one the plan doesn't normally include.
+            - generic [ref=e2050]:
+              - generic [ref=e2051] [cursor=pointer]:
+                - checkbox "POS" [checked] [ref=e2052]
+                - text: POS
+              - generic [ref=e2053] [cursor=pointer]:
+                - checkbox "Restaurant Admin" [checked] [ref=e2054]
+                - text: Restaurant Admin
+              - generic [ref=e2055] [cursor=pointer]:
+                - checkbox "Captain App" [checked] [ref=e2056]
+                - text: Captain App
+              - generic [ref=e2057] [cursor=pointer]:
+                - checkbox "Kitchen Display (KDS)" [checked] [ref=e2058]
+                - text: Kitchen Display (KDS)
+              - generic [ref=e2059] [cursor=pointer]:
+                - checkbox "Self-Ordering Kiosk" [checked] [ref=e2060]
+                - text: Self-Ordering Kiosk
+              - generic [ref=e2061] [cursor=pointer]:
+                - checkbox "Kiosk Admin" [checked] [ref=e2062]
+                - text: Kiosk Admin
+          - generic [ref=e2063]:
+            - generic [ref=e2064]: "Plan Feature Entitlements (JAMANVAAR PRO):"
+            - generic [ref=e2065]:
+              - generic [ref=e2066]: Captain App
+              - generic [ref=e2069]: POS Terminal
+              - generic [ref=e2072]: POS Assistant (JAMAN AI)
+              - generic [ref=e2075]: KOT / KDS Routing
+              - generic [ref=e2078]: Menu Management
+              - generic [ref=e2081]: Offline Billing
+              - generic [ref=e2084]: Self-Order Kiosk & Kiosk Admin
+              - generic [ref=e2087]: Discounts & GST
+              - generic [ref=e2090]: QR Table Ordering & Standees
+              - generic [ref=e2093]: Receipt Printing
+              - generic [ref=e2096]: Restaurant Admin
+              - generic [ref=e2099]: Table Management
+              - generic [ref=e2102]: Food Customization
+              - generic [ref=e2105]: Customer Management
+              - generic [ref=e2108]: Sales & GST Reports
+              - generic [ref=e2111]: Shift & Cash Drawer
+              - generic [ref=e2114]: Inventory Management
+              - generic [ref=e2117]: Multi-Payment Tenders
+              - generic [ref=e2120]: Advanced Captain Reports
+              - generic [ref=e2123]: Advanced Service Workflow
+              - generic [ref=e2126]: Dine-in / Takeaway / Delivery / Token
+          - generic [ref=e2129]:
+            - button "← Back" [ref=e2130] [cursor=pointer]
+            - 'button "Next: Device Provisioning →" [ref=e2131] [cursor=pointer]'

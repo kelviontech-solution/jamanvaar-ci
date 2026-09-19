@@ -1,0 +1,116 @@
+- generic [ref=f1e766]:
+  - banner [ref=f1e767]:
+    - generic [ref=f1e768]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f1e770]
+      - generic [ref=f1e772]:
+        - generic [ref=f1e773]:
+          - generic "QA FULL AUDIT RESTAURANT" [ref=f1e774]
+          - generic [ref=f1e775]: ADMIN
+        - button "Ahmedabad Flagship Store" [ref=f1e776] [cursor=pointer]
+    - button "Open global search" [ref=f1e783] [cursor=pointer]:
+      - textbox "Search orders, invoices, dishes, tables..." [ref=f1e787]
+      - generic: Ctrl+K
+    - generic [ref=f1e788]:
+      - generic [ref=f1e789]:
+        - button "EOD Report" [ref=f1e790] [cursor=pointer]
+        - button "Reconciliation" [ref=f1e795] [cursor=pointer]
+      - generic [ref=f1e801]:
+        - button "JAMAN AI Operations Assistant" [ref=f1e802] [cursor=pointer]
+        - button "Notifications" [ref=f1e806] [cursor=pointer]
+        - button "Sign out of Restaurant Admin" [ref=f1e810] [cursor=pointer]
+  - generic [ref=f1e814]:
+    - complementary [ref=f1e815]:
+      - generic [ref=f1e816]:
+        - generic [ref=f1e817]:
+          - button "OPERATIONS" [ref=f1e818] [cursor=pointer]
+          - navigation [ref=f1e822]:
+            - button "Dashboard" [ref=f1e823] [cursor=pointer]
+            - button "Billing / Invoices" [ref=f1e832] [cursor=pointer]
+            - button "Orders" [active] [ref=f1e837] [cursor=pointer]
+            - button "Live Orders / KDS 3" [ref=f1e843] [cursor=pointer]:
+              - generic [ref=f1e844]: Live Orders / KDS
+              - generic [ref=f1e848]: "3"
+            - button "Floor / Tables" [ref=f1e850] [cursor=pointer]
+            - button "Reservations" [ref=f1e855] [cursor=pointer]
+            - button "Kitchen / KOT" [ref=f1e862] [cursor=pointer]
+        - generic [ref=f1e867]:
+          - button "DIGITAL ORDERING" [ref=f1e868] [cursor=pointer]
+          - navigation [ref=f1e872]:
+            - button "QR Table Ordering PRO" [ref=f1e873] [cursor=pointer]:
+              - generic [ref=f1e874]: QR Table Ordering
+              - generic [ref=f1e882]: PRO
+        - generic [ref=f1e884]:
+          - button "MENU & INVENTORY" [ref=f1e885] [cursor=pointer]
+          - navigation [ref=f1e889]:
+            - button "Menu & Categories" [ref=f1e890] [cursor=pointer]
+            - button "Inventory & Recipes 2" [ref=f1e898] [cursor=pointer]:
+              - generic [ref=f1e899]: Inventory & Recipes
+              - generic [ref=f1e905]: "2"
+        - generic [ref=f1e907]:
+          - button "PEOPLE & CASH" [ref=f1e908] [cursor=pointer]
+          - navigation [ref=f1e912]:
+            - button "Customers CRM" [ref=f1e913] [cursor=pointer]
+            - button "Staff & Roles (RBAC)" [ref=f1e918] [cursor=pointer]
+            - button "Payments & Split" [ref=f1e926] [cursor=pointer]
+            - button "Shift & Cash Drawer" [ref=f1e931] [cursor=pointer]
+        - generic [ref=f1e939]:
+          - button "ANALYTICS & SYSTEM" [ref=f1e940] [cursor=pointer]
+          - navigation [ref=f1e944]:
+            - button "Reports & Analytics" [ref=f1e945] [cursor=pointer]
+            - button "Printers & Devices" [ref=f1e951] [cursor=pointer]
+            - button "Restaurant Settings" [ref=f1e958] [cursor=pointer]
+            - button "Subscription Plans" [ref=f1e964] [cursor=pointer]
+            - button "Audit Trail Logs" [ref=f1e970] [cursor=pointer]
+            - button "Backup & Restore" [ref=f1e976] [cursor=pointer]
+    - main [ref=f1e983]:
+      - generic [ref=f1e2120]:
+        - generic [ref=f1e2121]:
+          - generic [ref=f1e2128]:
+            - heading "Orders & Order History" [level=1] [ref=f1e2129]
+            - paragraph [ref=f1e2130]: View daily sales, orders, payments and complete order history.
+          - generic [ref=f1e2131]:
+            - button "Today" [ref=f1e2132] [cursor=pointer]
+            - button "Export CSV" [ref=f1e2136] [cursor=pointer]
+            - button "Print Report" [ref=f1e2141] [cursor=pointer]
+        - generic [ref=f1e2147]:
+          - textbox "Search orders, bill no., token, customer, table, cashier, or dish name..." [ref=f1e2152]
+          - generic [ref=f1e2153]:
+            - button "TODAY" [ref=f1e2154] [cursor=pointer]
+            - button "YESTERDAY" [ref=f1e2155] [cursor=pointer]
+            - button "LAST 7 DAYS" [ref=f1e2156] [cursor=pointer]
+            - button "LAST 30 DAYS" [ref=f1e2157] [cursor=pointer]
+            - button "THIS MONTH" [ref=f1e2158] [cursor=pointer]
+            - button "THIS YEAR" [ref=f1e2159] [cursor=pointer]
+            - button "CUSTOM RANGE" [ref=f1e2160] [cursor=pointer]
+        - generic [ref=f1e2162] [cursor=pointer]:
+          - generic [ref=f1e2163]:
+            - generic [ref=f1e2164]:
+              - heading "15 SEPTEMBER 2026" [level=3] [ref=f1e2165]
+              - text: Tuesday
+            - generic [ref=f1e2166]: ● LIVE TODAY
+          - generic [ref=f1e2167]:
+            - generic [ref=f1e2168]: TOTAL SALES
+            - generic [ref=f1e2169]: ₹14882
+            - generic [ref=f1e2170]:
+              - generic [ref=f1e2171]: 20 Orders
+              - generic [ref=f1e2176]: •
+              - generic [ref=f1e2177]: ₹744 AOV
+          - generic [ref=f1e2178]:
+            - generic [ref=f1e2179]: "PAYMENT ALLOCATION:"
+            - generic [ref=f1e2180]:
+              - generic [ref=f1e2181]: 💵 ₹3759
+              - generic [ref=f1e2182]: 📱 UPI ₹5147
+              - generic [ref=f1e2183]: 💳 Card ₹3834
+          - generic [ref=f1e2184]:
+            - generic [ref=f1e2185]: "Dine-In: 6"
+            - generic [ref=f1e2186]: •
+            - generic [ref=f1e2187]: "Takeaway: 3"
+            - generic [ref=f1e2188]: •
+            - generic [ref=f1e2189]: "Delivery: 3"
+            - generic [ref=f1e2190]: •
+            - generic [ref=f1e2191]: "Token: 8"
+          - button "VIEW 20 ORDERS →" [ref=f1e2193]
+  - button "Open JAMAN AI Restaurant Intelligence" [ref=f1e1348] [cursor=pointer]:
+    - generic [ref=f1e1354]:
+      - generic [ref=f1e1355]: JAMAN AI
+      - generic [ref=f1e1356]: ACTIVE

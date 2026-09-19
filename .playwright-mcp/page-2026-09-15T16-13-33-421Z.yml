@@ -1,0 +1,200 @@
+- generic [ref=f5e3]:
+  - banner [ref=f5e4]:
+    - generic [ref=f5e5]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f5e7]
+      - generic [ref=f5e9]:
+        - generic [ref=f5e10]:
+          - generic "QA FULL AUDIT RESTAURANT" [ref=f5e11]
+          - generic [ref=f5e12]: ADMIN
+        - button "Ahmedabad Flagship Store" [ref=f5e13] [cursor=pointer]
+    - button "Open global search" [ref=f5e20] [cursor=pointer]:
+      - textbox "Search orders, invoices, dishes, tables..." [ref=f5e24]
+      - generic: Ctrl+K
+    - generic [ref=f5e25]:
+      - generic [ref=f5e26]:
+        - button "EOD Report" [ref=f5e27] [cursor=pointer]
+        - button "Reconciliation" [ref=f5e32] [cursor=pointer]
+      - generic [ref=f5e38]:
+        - button "JAMAN AI Operations Assistant" [ref=f5e39] [cursor=pointer]
+        - button "Notifications" [ref=f5e43] [cursor=pointer]
+        - button "Sign out of Restaurant Admin" [ref=f5e47] [cursor=pointer]
+  - generic [ref=f5e51]:
+    - complementary [ref=f5e52]:
+      - generic [ref=f5e53]:
+        - generic [ref=f5e54]:
+          - button "OPERATIONS" [ref=f5e55] [cursor=pointer]
+          - navigation [ref=f5e59]:
+            - button "Dashboard" [ref=f5e60] [cursor=pointer]
+            - button "Billing / Invoices" [ref=f5e69] [cursor=pointer]
+            - button "Orders" [ref=f5e74] [cursor=pointer]
+            - button "Live Orders / KDS 3" [ref=f5e80] [cursor=pointer]:
+              - generic [ref=f5e81]: Live Orders / KDS
+              - generic [ref=f5e85]: "3"
+            - button "Floor / Tables" [ref=f5e87] [cursor=pointer]
+            - button "Reservations" [ref=f5e92] [cursor=pointer]
+            - button "Kitchen / KOT" [ref=f5e99] [cursor=pointer]
+        - generic [ref=f5e104]:
+          - button "DIGITAL ORDERING" [ref=f5e105] [cursor=pointer]
+          - navigation [ref=f5e109]:
+            - button "QR Table Ordering PRO" [ref=f5e110] [cursor=pointer]:
+              - generic [ref=f5e111]: QR Table Ordering
+              - generic [ref=f5e119]: PRO
+        - generic [ref=f5e121]:
+          - button "MENU & INVENTORY" [ref=f5e122] [cursor=pointer]
+          - navigation [ref=f5e126]:
+            - button "Menu & Categories" [ref=f5e127] [cursor=pointer]
+            - button "Inventory & Recipes 2" [ref=f5e135] [cursor=pointer]:
+              - generic [ref=f5e136]: Inventory & Recipes
+              - generic [ref=f5e142]: "2"
+        - generic [ref=f5e144]:
+          - button "PEOPLE & CASH" [ref=f5e145] [cursor=pointer]
+          - navigation [ref=f5e149]:
+            - button "Customers CRM" [ref=f5e150] [cursor=pointer]
+            - button "Staff & Roles (RBAC)" [ref=f5e155] [cursor=pointer]
+            - button "Payments & Split" [ref=f5e163] [cursor=pointer]
+            - button "Shift & Cash Drawer" [ref=f5e168] [cursor=pointer]
+        - generic [ref=f5e176]:
+          - button "ANALYTICS & SYSTEM" [ref=f5e177] [cursor=pointer]
+          - navigation [ref=f5e181]:
+            - button "Reports & Analytics" [ref=f5e182] [cursor=pointer]
+            - button "Printers & Devices" [active] [ref=f5e188] [cursor=pointer]
+            - button "Restaurant Settings" [ref=f5e195] [cursor=pointer]
+            - button "Subscription Plans" [ref=f5e201] [cursor=pointer]
+            - button "Audit Trail Logs" [ref=f5e207] [cursor=pointer]
+            - button "Backup & Restore" [ref=f5e213] [cursor=pointer]
+    - main [ref=f5e220]:
+      - generic [ref=f5e3179]:
+        - generic [ref=f5e3180]:
+          - generic [ref=f5e3181]:
+            - generic [ref=f5e3182]:
+              - heading "Printers & Peripheral Devices" [level=1] [ref=f5e3183]
+              - generic [ref=f5e3184]: ESC/POS HARDWARE
+            - paragraph [ref=f5e3185]: Configure ESC/POS thermal printers (80mm/58mm), KOT station routing, and run test prints.
+          - button "Configure Printer" [ref=f5e3186] [cursor=pointer]
+        - generic [ref=f5e3189]:
+          - generic [ref=f5e3190]:
+            - generic [ref=f5e3191]: POS Counter PC
+            - generic [ref=f5e3194]: Counter Terminal
+            - generic [ref=f5e3195]: ✓ Localhost Active
+          - generic [ref=f5e3196]:
+            - generic [ref=f5e3197]: Receipt Printers
+            - generic [ref=f5e3200]: Thermal 80mm ESC/POS
+            - generic [ref=f5e3201]: 7 Configured
+          - generic [ref=f5e3202]:
+            - generic [ref=f5e3203]: Cash Drawer
+            - generic [ref=f5e3206]: RJ11 Kick Solenoid
+            - generic [ref=f5e3207]: Auto-Open on Bill
+          - generic [ref=f5e3208]:
+            - generic [ref=f5e3209]: LAN Mesh Bridge
+            - generic [ref=f5e3212]: Multi-Device Sync
+            - generic [ref=f5e3213]: Port 5178 Listening
+        - generic [ref=f5e3214]:
+          - generic [ref=f5e3215]:
+            - generic [ref=f5e3216]:
+              - generic [ref=f5e3223]:
+                - heading "JAMANVAAR Thermal 80mm (Counter)" [level=4] [ref=f5e3224]
+                - generic [ref=f5e3225]: USB • 80mm
+              - generic [ref=f5e3226]: READY
+            - generic [ref=f5e3228]:
+              - generic [ref=f5e3229]:
+                - button "Edit Config" [ref=f5e3230] [cursor=pointer]
+                - generic [ref=f5e3231]: "|"
+                - button "Delete" [ref=f5e3232] [cursor=pointer]
+              - button "⚡ Run Test Print" [ref=f5e3233] [cursor=pointer]
+          - generic [ref=f5e3234]:
+            - generic [ref=f5e3235]:
+              - generic [ref=f5e3242]:
+                - heading "Kitchen Main Thermal 80mm" [level=4] [ref=f5e3243]
+                - generic [ref=f5e3244]: NETWORK_LAN • 80mm
+              - generic [ref=f5e3245]: READY
+            - generic [ref=f5e3247]:
+              - generic [ref=f5e3248]:
+                - button "Edit Config" [ref=f5e3249] [cursor=pointer]
+                - generic [ref=f5e3250]: "|"
+                - button "Delete" [ref=f5e3251] [cursor=pointer]
+              - button "⚡ Run Test Print" [ref=f5e3252] [cursor=pointer]
+          - generic [ref=f5e3253]:
+            - generic [ref=f5e3254]:
+              - generic [ref=f5e3261]:
+                - heading "Tandoor Station Thermal 80mm" [level=4] [ref=f5e3262]
+                - generic [ref=f5e3263]: NETWORK_LAN • 80mm
+              - generic [ref=f5e3264]: READY
+            - generic [ref=f5e3266]:
+              - generic [ref=f5e3267]:
+                - button "Edit Config" [ref=f5e3268] [cursor=pointer]
+                - generic [ref=f5e3269]: "|"
+                - button "Delete" [ref=f5e3270] [cursor=pointer]
+              - button "⚡ Run Test Print" [ref=f5e3271] [cursor=pointer]
+          - generic [ref=f5e3272]:
+            - generic [ref=f5e3273]:
+              - generic [ref=f5e3280]:
+                - heading "Beverages & Bar Thermal 80mm" [level=4] [ref=f5e3281]
+                - generic [ref=f5e3282]: NETWORK_LAN • 80mm
+              - generic [ref=f5e3283]: READY
+            - generic [ref=f5e3285]:
+              - generic [ref=f5e3286]:
+                - button "Edit Config" [ref=f5e3287] [cursor=pointer]
+                - generic [ref=f5e3288]: "|"
+                - button "Delete" [ref=f5e3289] [cursor=pointer]
+              - button "⚡ Run Test Print" [ref=f5e3290] [cursor=pointer]
+          - generic [ref=f5e3291]:
+            - generic [ref=f5e3292]:
+              - generic [ref=f5e3299]:
+                - heading "Dessert Counter Thermal 80mm" [level=4] [ref=f5e3300]
+                - generic [ref=f5e3301]: NETWORK_LAN • 80mm
+              - generic [ref=f5e3302]: READY
+            - generic [ref=f5e3304]:
+              - generic [ref=f5e3305]:
+                - button "Edit Config" [ref=f5e3306] [cursor=pointer]
+                - generic [ref=f5e3307]: "|"
+                - button "Delete" [ref=f5e3308] [cursor=pointer]
+              - button "⚡ Run Test Print" [ref=f5e3309] [cursor=pointer]
+          - generic [ref=f5e3310]:
+            - generic [ref=f5e3311]:
+              - generic [ref=f5e3318]:
+                - heading "Admin Reports Thermal 80mm" [level=4] [ref=f5e3319]
+                - generic [ref=f5e3320]: WINDOWS_DRIVER • 80mm
+              - generic [ref=f5e3321]: READY
+            - generic [ref=f5e3323]:
+              - generic [ref=f5e3324]:
+                - button "Edit Config" [ref=f5e3325] [cursor=pointer]
+                - generic [ref=f5e3326]: "|"
+                - button "Delete" [ref=f5e3327] [cursor=pointer]
+              - button "⚡ Run Test Print" [ref=f5e3328] [cursor=pointer]
+          - generic [ref=f5e3329]:
+            - generic [ref=f5e3330]:
+              - generic [ref=f5e3337]:
+                - heading "JAMANVAAR Compact 58mm Thermal" [level=4] [ref=f5e3338]
+                - generic [ref=f5e3339]: SERIAL • 58mm
+              - generic [ref=f5e3340]: READY
+            - generic [ref=f5e3342]:
+              - generic [ref=f5e3343]:
+                - button "Edit Config" [ref=f5e3344] [cursor=pointer]
+                - generic [ref=f5e3345]: "|"
+                - button "Delete" [ref=f5e3346] [cursor=pointer]
+              - button "⚡ Run Test Print" [ref=f5e3347] [cursor=pointer]
+        - generic [ref=f5e3348]:
+          - generic [ref=f5e3349]:
+            - generic [ref=f5e3356]:
+              - generic [ref=f5e3357]:
+                - heading "LAN Sync Bridge & Cross-Machine Pairing" [level=3] [ref=f5e3358]
+                - generic [ref=f5e3359]: MULTI-DEVICE SYNC
+              - paragraph [ref=f5e3360]: Synchronize POS Counter PCs, Admin Laptops, Captain APKs, and Kitchen KDS screens over the local Wi-Fi / LAN network.
+            - button "⚡ Force Sync Now" [ref=f5e3362] [cursor=pointer]
+          - generic [ref=f5e3367]:
+            - generic [ref=f5e3368]:
+              - generic [ref=f5e3369]: "Main POS Counter Server Address (LAN Host IP:Port):"
+              - generic [ref=f5e3370]:
+                - textbox "e.g. http://192.168.1.100:5178 or http://localhost:5178" [ref=f5e3371]: http://localhost:5178
+                - button "Save & Connect" [ref=f5e3372] [cursor=pointer]
+              - generic [ref=f5e3373]:
+                - text: "Tip: If this is the Main Counter PC, leave as"
+                - code [ref=f5e3374]: http://localhost:5178
+                - text: . On other laptops/tablets, enter the Main PC's LAN IP.
+            - generic [ref=f5e3375]:
+              - generic [ref=f5e3376]: "Connection Health & Latency:"
+              - button "Test Ping & Latency" [ref=f5e3378] [cursor=pointer]
+  - button "Open JAMAN AI Restaurant Intelligence" [ref=f5e827] [cursor=pointer]:
+    - generic [ref=f5e833]:
+      - generic [ref=f5e834]: JAMAN AI
+      - generic [ref=f5e835]: ACTIVE

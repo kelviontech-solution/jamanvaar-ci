@@ -1,0 +1,30 @@
+- generic [ref=f23e3]:
+  - banner [ref=f23e104]:
+    - generic [ref=f23e105]:
+      - button [ref=f23e106] [cursor=pointer]
+      - generic [ref=f23e109]:
+        - generic [ref=f23e110]:
+          - img "JAMANVAAR by KELVIONTECH"
+        - generic [ref=f23e112]: CUSTOMER KIOSK
+    - generic [ref=f23e116]:
+      - button [ref=f23e117] [cursor=pointer]
+      - button [ref=f23e120] [cursor=pointer]
+      - generic [ref=f23e124]:
+        - button "EN" [ref=f23e125] [cursor=pointer]
+        - button "हिन्दी" [ref=f23e126] [cursor=pointer]
+        - button "ગુજરાતી" [ref=f23e127] [cursor=pointer]
+      - button "More options" [ref=f23e129] [cursor=pointer]
+  - generic [ref=f23e133]:
+    - generic [ref=f23e134]:
+      - heading "How would you like to enjoy your meal?" [level=2] [ref=f23e135]
+      - paragraph [ref=f23e136]: Select whether you are dining in our restaurant or packing your feast for takeaway.
+    - generic [ref=f23e137]:
+      - button [ref=f23e138] [cursor=pointer]:
+        - generic [ref=f23e145]:
+          - heading "Dine-In" [level=3] [ref=f23e146]
+          - paragraph [ref=f23e147]: Enjoy your meal freshly served at your table
+      - button [ref=f23e148] [cursor=pointer]:
+        - generic [ref=f23e153]:
+          - heading "Takeaway" [level=3] [ref=f23e154]
+          - paragraph [ref=f23e155]: Pick up fresh packed food at Counter 1
+  - button "JAMANVAAR Food Assistant" [ref=f23e99] [cursor=pointer]

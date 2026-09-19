@@ -1,0 +1,381 @@
+- generic [ref=e179]:
+  - banner [ref=e180]:
+    - generic [ref=e181]:
+      - generic [ref=e182]:
+        - generic [ref=e183]:
+          - generic [ref=e184]:
+            - img "JAMANVAAR by KELVIONTECH"
+          - generic [ref=e187]:
+            - generic [ref=e188]: CAPTAIN APP
+            - generic [ref=e190]: JAMANVAAR
+        - generic [ref=e192]:
+          - generic [ref=e193]: R
+          - generic [ref=e194]: Rahul Sharma (Captain)
+          - generic [ref=e195]: •
+          - generic [ref=e196]: Main Dining Floor
+      - generic [ref=e197]:
+        - button "LOCAL + SYNCED" [ref=e199] [cursor=pointer]
+        - button "Send Msg" [ref=e204] [cursor=pointer]
+        - button "Floor Notifications & Alerts" [ref=e208] [cursor=pointer]
+        - button "R" [ref=e213] [cursor=pointer]
+  - generic [ref=e218]:
+    - generic [ref=e219]: "Priority Actions:"
+    - button "Food Ready (0)" [ref=e223] [cursor=pointer]
+    - button "Bills (0)" [ref=e227] [cursor=pointer]
+    - button "Delayed KOTs (4)" [ref=e543] [cursor=pointer]
+    - button "Diner Requests (0)" [ref=e236] [cursor=pointer]
+    - button "Messages (0)" [ref=e241] [cursor=pointer]
+  - navigation [ref=e245]:
+    - generic [ref=e246]:
+      - generic [ref=e247]:
+        - button "My Tables 12" [ref=e248] [cursor=pointer]:
+          - generic [ref=e254]: My Tables
+          - generic [ref=e255]: "12"
+        - button "Active Orders 1" [ref=e576] [cursor=pointer]:
+          - generic [ref=e260]: Active Orders
+          - generic [ref=e577]: "1"
+        - button "Food Ready" [ref=e261] [cursor=pointer]
+        - button "Messages" [ref=e265] [cursor=pointer]
+      - button "More Options" [ref=e269] [cursor=pointer]
+  - main [ref=e275]:
+    - generic [ref=e276]:
+      - generic [ref=e277]:
+        - button "My Assigned 7 Tables" [ref=e278] [cursor=pointer]:
+          - generic [ref=e279]: My Assigned
+          - generic [ref=e280]:
+            - generic [ref=e281]: "7"
+            - generic [ref=e282]: Tables
+        - button "Seated / Dining 1 Active" [ref=e578] [cursor=pointer]:
+          - generic [ref=e284]: Seated / Dining
+          - generic [ref=e285]:
+            - generic [ref=e286]: "1"
+            - generic [ref=e287]: Active
+        - button "Food Ready 0 Deliver" [ref=e288] [cursor=pointer]:
+          - generic [ref=e289]: Food Ready
+          - generic [ref=e290]:
+            - generic [ref=e291]: "0"
+            - generic [ref=e292]: Deliver
+        - button "Bill Requested 0 Billing" [ref=e293] [cursor=pointer]:
+          - generic [ref=e294]: Bill Requested
+          - generic [ref=e295]:
+            - generic [ref=e296]: "0"
+            - generic [ref=e297]: Billing
+        - button "Available Tables 11 of 12" [ref=e579] [cursor=pointer]:
+          - generic [ref=e299]: Available Tables
+          - generic [ref=e300]:
+            - generic [ref=e301]: "11"
+            - generic [ref=e302]: of 12
+      - generic [ref=e303]:
+        - generic [ref=e304]:
+          - generic [ref=e305]:
+            - generic [ref=e306]: "Zone:"
+            - button "All Sections" [ref=e307] [cursor=pointer]
+            - button "Main Dining Hall" [ref=e308] [cursor=pointer]
+            - button "AC Balcony" [ref=e309] [cursor=pointer]
+            - button "Family Zone" [ref=e310] [cursor=pointer]
+          - textbox "Search table, order, dish..." [ref=e315]
+        - generic [ref=e316]:
+          - generic [ref=e317]: "Filter:"
+          - button "All Floor Tables" [ref=e318] [cursor=pointer]
+          - button "My Assigned Tables" [ref=e319] [cursor=pointer]
+          - button "Seated & Dining" [ref=e320] [cursor=pointer]
+          - button "Food Ready" [ref=e321] [cursor=pointer]
+          - button "Bill Requested" [ref=e322] [cursor=pointer]
+          - button "Reset" [ref=e323] [cursor=pointer]
+      - generic [ref=e328]:
+        - generic [ref=e329]:
+          - generic [ref=e330]:
+            - generic [ref=e331]:
+              - generic [ref=e332]: TABLE 1
+              - generic [ref=e334]:
+                - generic [ref=e335]: Main Hall
+                - generic [ref=e336]: •
+                - generic [ref=e337]: 2 Seats
+            - generic [ref=e338]: AVAILABLE
+          - generic [ref=e339]:
+            - generic [ref=e340]:
+              - generic [ref=e341]: 2 Guests
+              - generic [ref=e348]:
+                - generic [ref=e349]: Order Value
+                - text: —
+            - generic [ref=e350]: Table ready for seating
+          - button "OPEN TABLE" [ref=e356] [cursor=pointer]
+        - generic [ref=e359]:
+          - generic [ref=e360]:
+            - generic [ref=e361]:
+              - generic [ref=e362]: TABLE 2
+              - generic [ref=e364]:
+                - generic [ref=e365]: Main Hall
+                - generic [ref=e366]: •
+                - generic [ref=e367]: 2 Seats
+            - generic [ref=e368]: OCCUPIED
+          - generic [ref=e369]:
+            - generic [ref=e370]:
+              - generic [ref=e371]: 2 Guests
+              - generic [ref=e378]:
+                - generic [ref=e379]: Order Value
+                - text: —
+            - generic [ref=e380]: Table ready for seating
+          - generic [ref=e580]:
+            - button "TAKE ORDER" [ref=e581] [cursor=pointer]
+            - button "REQUEST BILL" [ref=e588] [cursor=pointer]
+        - generic [ref=e389]:
+          - generic [ref=e390]:
+            - generic [ref=e391]:
+              - generic [ref=e392]: TABLE 3
+              - generic [ref=e394]:
+                - generic [ref=e395]: Main Hall
+                - generic [ref=e396]: •
+                - generic [ref=e397]: 4 Seats
+            - generic [ref=e398]: AVAILABLE
+          - generic [ref=e399]:
+            - generic [ref=e400]:
+              - generic [ref=e401]: 2 Guests
+              - generic [ref=e408]:
+                - generic [ref=e409]: Order Value
+                - text: —
+            - generic [ref=e410]: Table ready for seating
+          - button "OPEN TABLE" [ref=e416] [cursor=pointer]
+        - generic [ref=e419]:
+          - generic [ref=e420]:
+            - generic [ref=e421]:
+              - generic [ref=e422]: TABLE 4
+              - generic [ref=e424]:
+                - generic [ref=e425]: Main Hall
+                - generic [ref=e426]: •
+                - generic [ref=e427]: 4 Seats
+            - generic [ref=e428]: AVAILABLE
+          - generic [ref=e429]:
+            - generic [ref=e430]:
+              - generic [ref=e431]: 2 Guests
+              - generic [ref=e438]:
+                - generic [ref=e439]: Order Value
+                - text: —
+            - generic [ref=e440]: Table ready for seating
+          - button "OPEN TABLE" [ref=e446] [cursor=pointer]
+        - generic [ref=e449]:
+          - generic [ref=e450]:
+            - generic [ref=e451]:
+              - generic [ref=e452]: TABLE 5
+              - generic [ref=e454]:
+                - generic [ref=e455]: Main Hall
+                - generic [ref=e456]: •
+                - generic [ref=e457]: 4 Seats
+            - generic [ref=e458]: AVAILABLE
+          - generic [ref=e459]:
+            - generic [ref=e460]:
+              - generic [ref=e461]: 2 Guests
+              - generic [ref=e468]:
+                - generic [ref=e469]: Order Value
+                - text: —
+            - generic [ref=e470]: Table ready for seating
+          - button "OPEN TABLE" [ref=e476] [cursor=pointer]
+        - generic [ref=e479]:
+          - generic [ref=e480]:
+            - generic [ref=e481]:
+              - generic [ref=e482]: TABLE 6
+              - generic [ref=e484]:
+                - generic [ref=e485]: Family Section
+                - generic [ref=e486]: •
+                - generic [ref=e487]: 6 Seats
+            - generic [ref=e488]: AVAILABLE
+          - generic [ref=e489]:
+            - generic [ref=e490]:
+              - generic [ref=e491]: 2 Guests
+              - generic [ref=e498]:
+                - generic [ref=e499]: Order Value
+                - text: —
+            - generic [ref=e500]: Table ready for seating
+          - button "OPEN TABLE" [ref=e506] [cursor=pointer]
+        - generic [ref=e509]:
+          - generic [ref=e510]:
+            - generic [ref=e511]:
+              - generic [ref=e512]: TABLE 12
+              - generic [ref=e514]:
+                - generic [ref=e515]: AC Balcony
+                - generic [ref=e516]: •
+                - generic [ref=e517]: 4 Seats
+            - generic [ref=e518]: AVAILABLE
+          - generic [ref=e519]:
+            - generic [ref=e520]:
+              - generic [ref=e521]: 2 Guests
+              - generic [ref=e528]:
+                - generic [ref=e529]: Order Value
+                - text: —
+            - generic [ref=e530]: Table ready for seating
+          - button "OPEN TABLE" [ref=e536] [cursor=pointer]
+  - button "Open JAMAN AI Floor Intelligence Assistant" [ref=e539] [cursor=pointer]:
+    - generic [ref=e542]: JAMAN AI
+  - generic [ref=e594]:
+    - generic [ref=e595]:
+      - generic [ref=e596]:
+        - generic [ref=e597]: "2"
+        - generic [ref=e598]:
+          - generic [ref=e599]:
+            - heading "TABLE 2" [level=2] [ref=e600]
+            - generic [ref=e601]: OCCUPIED
+          - paragraph [ref=e602]: Main Hall • 2 Guests • Captain Rahul Sharma (Captain)
+      - generic [ref=e603]:
+        - button "Kitchen Note" [ref=e604] [cursor=pointer]
+        - button "Request Bill" [ref=e608] [cursor=pointer]
+        - button [ref=e613] [cursor=pointer]
+    - generic [ref=e618]:
+      - generic [ref=e619]:
+        - generic [ref=e620]: "1"
+        - text: Order Taken
+      - generic [ref=e621]: ➔
+      - generic [ref=e622]:
+        - generic [ref=e623]: "2"
+        - text: KOT Sent
+      - generic [ref=e624]: ➔
+      - generic [ref=e625]:
+        - generic [ref=e626]: "3"
+        - text: Cooking
+      - generic [ref=e627]: ➔
+      - generic [ref=e628]:
+        - generic [ref=e629]: "4"
+        - text: Food Ready
+      - generic [ref=e630]: ➔
+      - generic [ref=e631]:
+        - generic [ref=e632]: "5"
+        - text: Served
+      - generic [ref=e633]: ➔
+      - generic [ref=e634]:
+        - generic [ref=e635]: "6"
+        - text: Bill Requested
+    - generic [ref=e636]:
+      - generic [ref=e637]:
+        - button "Current Order & Bill (1)" [ref=e874] [cursor=pointer]
+        - button "Take Order / Menu Catalog" [ref=e639] [cursor=pointer]
+      - generic [ref=e875]: ⚡ 1 new items ready to fire
+    - generic [ref=e643]:
+      - generic [ref=e644]:
+        - generic [ref=e681]:
+          - textbox "Search dish or SKU..." [ref=e686]
+          - generic [ref=e687]:
+            - button "All" [ref=e688] [cursor=pointer]
+            - button "🟢 Veg" [ref=e689] [cursor=pointer]
+            - button "🔴 Non-Veg" [ref=e690] [cursor=pointer]
+        - generic [ref=e645]:
+          - button "All Dishes (12)" [ref=e691] [cursor=pointer]
+          - button "Starters & Quick Bites" [ref=e692] [cursor=pointer]
+          - button "Tandoor & Kebabs" [ref=e693] [cursor=pointer]
+          - button "Main Course (Curries)" [ref=e694] [cursor=pointer]
+          - button "Naan, Roti & Breads" [ref=e695] [cursor=pointer]
+          - button "Biryani & Rice Bowls" [ref=e696] [cursor=pointer]
+          - button "Beverages & Desserts" [ref=e697] [cursor=pointer]
+        - generic [ref=e698]:
+          - generic [ref=e699] [cursor=pointer]:
+            - img "Hara Bhara Kebab (6 Pcs)" [ref=e701]
+            - generic [ref=e703]:
+              - heading "Hara Bhara Kebab (6 Pcs)" [level=4] [ref=e704]
+              - generic [ref=e705]: Kitchen
+            - generic [ref=e706]:
+              - generic [ref=e707]: ₹220
+              - generic [ref=e708]: +
+          - generic [ref=e709] [cursor=pointer]:
+            - img "Crispy Corn Salt & Pepper" [ref=e711]
+            - generic [ref=e713]:
+              - heading "Crispy Corn Salt & Pepper" [level=4] [ref=e714]
+              - generic [ref=e715]: Kitchen
+            - generic [ref=e716]:
+              - generic [ref=e717]: ₹240
+              - generic [ref=e718]: +
+          - generic [ref=e719] [cursor=pointer]:
+            - img "Cheese Corn Cigar Rolls (5 Pcs)" [ref=e721]
+            - generic [ref=e723]:
+              - heading "Cheese Corn Cigar Rolls (5 Pcs)" [level=4] [ref=e724]
+              - generic [ref=e725]: Kitchen
+            - generic [ref=e726]:
+              - generic [ref=e727]: ₹210
+              - generic [ref=e728]: +
+          - generic [ref=e729] [cursor=pointer]:
+            - img "Paneer Tikka (Tandoori Angaar)" [ref=e731]
+            - generic [ref=e733]:
+              - heading "Paneer Tikka (Tandoori Angaar)" [level=4] [ref=e734]
+              - generic [ref=e735]: Tandoor
+            - generic [ref=e736]:
+              - generic [ref=e737]: ₹260
+              - generic [ref=e738]: +
+          - generic [ref=e739] [cursor=pointer]:
+            - img "Dal Makhani (Slow Cooked)" [ref=e741]
+            - generic [ref=e743]:
+              - heading "Dal Makhani (Slow Cooked)" [level=4] [ref=e744]
+              - generic [ref=e745]: Curry Station
+            - generic [ref=e746]:
+              - generic [ref=e747]: ₹195
+              - generic [ref=e748]: +
+          - generic [ref=e749] [cursor=pointer]:
+            - img "Paneer Butter Masala" [ref=e751]
+            - generic [ref=e753]:
+              - heading "Paneer Butter Masala" [level=4] [ref=e754]
+              - generic [ref=e755]: Curry Station
+            - generic [ref=e756]:
+              - generic [ref=e757]: ₹250
+              - generic [ref=e758]: +
+          - generic [ref=e759] [cursor=pointer]:
+            - img "Butter Naan (Tandoori)" [ref=e761]
+            - generic [ref=e763]:
+              - heading "Butter Naan (Tandoori)" [level=4] [ref=e764]
+              - generic [ref=e765]: Tandoor
+            - generic [ref=e766]:
+              - generic [ref=e767]: ₹60
+              - generic [ref=e768]: +
+          - generic [ref=e769] [cursor=pointer]:
+            - img "Garlic Butter Naan" [ref=e771]
+            - generic [ref=e773]:
+              - heading "Garlic Butter Naan" [level=4] [ref=e774]
+              - generic [ref=e775]: Tandoor
+            - generic [ref=e776]:
+              - generic [ref=e777]: ₹75
+              - generic [ref=e778]: +
+          - generic [ref=e779] [cursor=pointer]:
+            - img "Royal Veg Handi Dum Biryani" [ref=e781]
+            - generic [ref=e783]:
+              - heading "Royal Veg Handi Dum Biryani" [level=4] [ref=e784]
+              - generic [ref=e785]: Biryani Station
+            - generic [ref=e786]:
+              - generic [ref=e787]: ₹240
+              - generic [ref=e788]: +
+          - generic [ref=e789] [cursor=pointer]:
+            - img "Cold Coffee with Vanilla Ice Cream" [ref=e791]
+            - generic [ref=e793]:
+              - heading "Cold Coffee with Vanilla Ice Cream" [level=4] [ref=e794]
+              - generic [ref=e795]: Beverages
+            - generic [ref=e796]:
+              - generic [ref=e797]: ₹120
+              - generic [ref=e798]: +
+          - generic [ref=e799] [cursor=pointer]:
+            - img "Shahi Gulab Jamun (2 Pcs)" [ref=e801]
+            - generic [ref=e803]:
+              - heading "Shahi Gulab Jamun (2 Pcs)" [level=4] [ref=e804]
+              - generic [ref=e805]: Dessert Station
+            - generic [ref=e806]:
+              - generic [ref=e807]: ₹80
+              - generic [ref=e808]: +
+          - generic [ref=e809] [cursor=pointer]:
+            - img "Authentic Gujarati Special Thali" [ref=e811]
+            - generic [ref=e813]:
+              - heading "Authentic Gujarati Special Thali" [level=4] [ref=e814]
+              - generic [ref=e815]: Curry Station
+            - generic [ref=e816]:
+              - generic [ref=e817]: ₹280
+              - generic [ref=e818]: +
+      - generic [ref=e659]:
+        - generic [ref=e660]:
+          - generic [ref=e819]:
+            - generic [ref=e820]: Live Cart (1)
+            - button "View Full Order" [ref=e821] [cursor=pointer]
+          - generic [ref=e876]:
+            - generic [ref=e877]:
+              - generic [ref=e878]: Dal Makhani (Slow Cooked)
+              - generic [ref=e879]: ₹195 × 1
+            - generic [ref=e880]:
+              - button "-" [ref=e881] [cursor=pointer]
+              - generic [ref=e882]: "1"
+              - button "+" [ref=e883] [cursor=pointer]
+        - generic [ref=e672]:
+          - generic [ref=e822]:
+            - generic [ref=e823]: "Total:"
+            - generic [ref=e824]: ₹205
+          - button "FIRE KOT (1)" [ref=e884] [cursor=pointer]
