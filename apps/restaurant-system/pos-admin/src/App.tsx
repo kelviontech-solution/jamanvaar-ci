@@ -9,8 +9,10 @@ import {
   RestaurantIdentityRepository,
   StaffRepository
 } from '@jamanvaar/database';
+import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
+import type { CloudRestaurantProfile } from './cloud/cloudClient';
 import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, reportQrUsage, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken } from './cloud/cloudClient';
-import { EntitySyncEngine, SyncOutboxEngine, syncDiningTables, syncServiceMessages } from '@jamanvaar/sync';
+import { EntitySyncEngine, SyncOutboxEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers } from '@jamanvaar/sync';
 import {
   Category,
   DiningTable,
@@ -189,7 +191,8 @@ export default function PosAdminApp() {
   const [isOnline, setIsOnline] = useState(true);
 
   // Two-phase auth state: 'LOGIN' (enter email + password) or 'ACTIVATION_REQUIRED' (enter JMV key)
-  const [authScreenState, setAuthScreenState] = useState<'LOGIN' | 'ACTIVATION_REQUIRED'>('LOGIN');
+  const [passwordResetNotice, setPasswordResetNotice] = useState(false);
+  const [authScreenState, setAuthScreenState] = useState<'LOGIN' | 'ACTIVATION_REQUIRED' | 'FORGOT'>('LOGIN');
   const [activationSessionToken, setActivationSessionToken] = useState('');
   const [activationKeyInput, setActivationKeyInput] = useState('');
   const [activationBusy, setActivationBusy] = useState(false);
@@ -205,7 +208,7 @@ export default function PosAdminApp() {
 
   const completeLogin = (
     user: { id: string; fullName: string; role: string; restaurantId: string },
-    restaurant?: { id: string; name: string }
+    restaurant?: CloudRestaurantProfile
   ) => {
     setIsAdminLoggedIn(true);
     setAuthError('');
@@ -214,10 +217,10 @@ export default function PosAdminApp() {
     setCloudConnected(true);
 
     if (restaurant) {
-      db.restaurant.id = restaurant.id;
-      db.restaurant.name = restaurant.name;
       // BUG-110: the header kept showing the demo branch "Ahmedabad Flagship Store".
       RestaurantIdentityRepository.adoptBranch(restaurant.id, restaurant.name);
+      // BUG-158: and the legal details (GSTIN, address, phone, FSSAI) stayed the demo install's, printing on bills.
+      RestaurantIdentityRepository.syncProfile(restaurant);
     }
 
     SessionPersistence.save('admin', {
@@ -449,42 +452,8 @@ export default function PosAdminApp() {
       void syncServiceMessages('POS_ADMIN');
     }, 4000);
 
-    const syncMenu = async () => {
-      await EntitySyncEngine.pushSnapshot(
-        'MENU_ITEM',
-        db.menuItems.map((m) => ({ externalId: m.id, payload: m as unknown as Record<string, unknown> }))
-      );
-      await EntitySyncEngine.catchUp('MENU_ITEM', (remote) => {
-        const incoming = remote.payload as unknown as MenuItem;
-        if (!incoming || !incoming.id) return;
-        const idx = db.menuItems.findIndex((m) => m.id === incoming.id);
-        if (idx >= 0) {
-          db.menuItems[idx] = { ...db.menuItems[idx], ...incoming };
-        } else {
-          db.menuItems.push(incoming);
-        }
-      });
-      db.notify();
-    };
 
     // BUG-016: same gap as POS — categories were never synced, only dishes.
-    const syncCategories = async () => {
-      await EntitySyncEngine.pushSnapshot(
-        'MENU_CATEGORY',
-        db.categories.map((c) => ({ externalId: c.id, payload: c as unknown as Record<string, unknown> }))
-      );
-      await EntitySyncEngine.catchUp('MENU_CATEGORY', (remote) => {
-        const incoming = remote.payload as unknown as Category;
-        if (!incoming || !incoming.id) return;
-        const idx = db.categories.findIndex((c) => c.id === incoming.id);
-        if (idx >= 0) {
-          db.categories[idx] = { ...db.categories[idx], ...incoming };
-        } else {
-          db.categories.push(incoming);
-        }
-      });
-      db.notify();
-    };
 
     // BUG-019/034/035: staff PINs created here previously worked only on this one device — nothing
     // synced them to POS, Captain, KDS or Kiosk, despite the create/reset screen's own promise that
@@ -495,13 +464,13 @@ export default function PosAdminApp() {
       await EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
     };
 
-    void syncMenu();
-    void syncCategories();
+    void syncMenuCatalog({ push: true });
+    void syncCustomers({ push: true }); // BUG-159: guests registered at the counter show up in the CRM
     void syncStaff();
     void reportDeviceHeartbeat();
     const interval = setInterval(() => {
-      void syncMenu();
-      void syncCategories();
+      void syncMenuCatalog({ push: true });
+      void syncCustomers({ push: true });
       void syncStaff();
       void reportDeviceHeartbeat();
     }, 15000);
@@ -586,7 +555,19 @@ export default function PosAdminApp() {
           ]}
           footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
         >
-          {authScreenState === 'LOGIN' ? (
+          {authScreenState === 'FORGOT' ? (
+            <ForgotPasswordPanel
+              defaultEmail={authUsername}
+              onBack={() => setAuthScreenState('LOGIN')}
+              onDone={(email) => {
+                setAuthUsername(email);
+                setAuthPassword('');
+                setAuthScreenState('LOGIN');
+                setAuthError('');
+                setPasswordResetNotice(true);
+              }}
+            />
+          ) : authScreenState === 'LOGIN' ? (
             <>
               <form onSubmit={handleAdminLogin} className="space-y-3.5 pt-2">
                 <div>
@@ -630,6 +611,12 @@ export default function PosAdminApp() {
                   </div>
                 </div>
 
+                {passwordResetNotice && !authError && (
+                  <div className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3.5 py-2 rounded-xl text-center" role="status">
+                    Your password was changed. Sign in with the new one.
+                  </div>
+                )}
+
                 {authError && (
                   <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
                     <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
@@ -647,6 +634,17 @@ export default function PosAdminApp() {
                     />
                     <span>Remember this device</span>
                   </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthError('');
+                      setPasswordResetNotice(false);
+                      setAuthScreenState('FORGOT');
+                    }}
+                    className="font-bold text-jaman-saffron hover:underline cursor-pointer"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
 
                 <button

@@ -223,6 +223,8 @@ export interface Category {
   isActive: boolean;
   itemCount?: number;
   translations?: Record<string, { name: string; description?: string }>;
+  /** When this category was last changed on any device (cross-device sync: the newer change wins). */
+  updatedAt?: string;
 }
 
 export interface ModifierOption {
@@ -287,6 +289,8 @@ export interface MenuItem {
   imageLicense?: string;
   imageApproved?: boolean;
   translations?: Record<string, { name: string; description?: string }>;
+  /** When this dish was last changed on any device (cross-device sync: the newer change wins). */
+  updatedAt?: string;
 }
 
 export interface ComboItemSlot {
@@ -352,6 +356,8 @@ export interface Coupon {
   validFrom: string;
   validUntil: string;
   isActive: boolean;
+  /** When this coupon was last changed on any device (cross-device sync: the newer change wins). */
+  updatedAt?: string;
 }
 
 export interface DiningTable {
@@ -796,6 +802,7 @@ export interface CustomerFeedback {
   tags: string[]; // 'Food Quality', 'Speed', 'Cleanliness', 'Packaging'
   comments?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface CustomerAccount {
@@ -814,6 +821,8 @@ export interface CustomerAccount {
   totalSpend?: number;
   createdAt?: string;
   lastVisitAt?: string;
+  /** When this profile was last changed on any device (cross-device sync: the newer change wins). */
+  updatedAt?: string;
 }
 
 /**
@@ -946,6 +955,8 @@ export interface ComboDeal {
   imageUrl?: string;
   isAvailable: boolean;
   featured?: boolean;
+  /** When this combo was last changed on any device (cross-device sync: the newer change wins). */
+  updatedAt?: string;
 }
 
 export interface RecommendationRule {

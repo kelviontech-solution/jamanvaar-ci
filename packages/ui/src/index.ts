@@ -25,3 +25,4 @@ export * from './DeviceGateOverlay';
 export * from './PlatformNoticeBanner';
 export * from './useAiAccess';
 export * from './printElement';
+export * from './ScreenErrorBoundary';

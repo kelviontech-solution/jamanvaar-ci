@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { usePosStore } from "../../store/posStore";
 import { db, OrderRepository } from "@jamanvaar/database";
 import { DiningTable } from "@jamanvaar/types";
+import { formatINR } from "@jamanvaar/utils";
 import { sound, EmptyState } from "@jamanvaar/ui";
 import { PosTableDrawer } from "./PosTableDrawer";
 import {
@@ -153,7 +154,7 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
           <div className="pt-1.5 border-t border-slate-100 flex items-baseline justify-between">
             <span className="text-[10px] text-slate-400">Order:</span>
             <span className="font-mono font-extrabold text-sm text-jaman-navy">
-              Rs.{activeOrder.totalAmount ?? 0}
+              {formatINR(activeOrder.totalAmount ?? 0)}
             </span>
           </div>
         )}

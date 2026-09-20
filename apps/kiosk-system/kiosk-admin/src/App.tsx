@@ -9,6 +9,7 @@ import {
   FeedbackRepository,
   KioskDisplaySettingsRepository,
   KioskRepository,
+  StaffRepository,
   LicenseRepository,
   MenuRepository,
   OrderRepository,
@@ -53,6 +54,7 @@ import {
   ProductCard,
   StatusBadge,
   ThermalReceiptView,
+  ScreenErrorBoundary,
   JAMANVAARStartup,
   VirtualKeyboard,
   ActivationWelcomeScreen,
@@ -61,7 +63,7 @@ import {
 import { DeviceHealthService, EBillService, KdsMeshService, NetworkStatusService, PaymentService, PrinterService, VoiceService } from '@jamanvaar/api';
 import { AdminChatbotEngine, MenuBuilderService, ReportGeneratorService } from '@jamanvaar/business';
 import { FOOD_IMAGE_LIBRARY, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
-import { SyncOutboxEngine, lanMeshSync } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncPromotions, syncFeedback, syncServiceMessages, publishCatalogNow, syncDiningTables } from '@jamanvaar/sync';
 import {
   connectDeviceStep1,
   connectDeviceStep2,
@@ -77,6 +79,13 @@ import {
   getPaymentConnection,
   submitPaymentConnection,
   syncMenuToCloud,
+  pushOrderSync,
+  pullOrderSync,
+  pushEntitySync,
+  pullEntitySync,
+  fetchCloudKiosks,
+  getDeviceTokenForSync,
+  refreshLicenseFromCloud,
   type PaymentConnectionFields,
   type PaymentConnectionStatus
 } from './cloud/cloudClient';
@@ -169,6 +178,30 @@ type AdminTab =
   | 'LICENSE'
   | 'SETTINGS';
 
+/** What the Receipt preview shows before any real order exists (BUG-135): it used to crash on `orders[0]`. */
+const SAMPLE_RECEIPT_ORDER = {
+  id: 'sample-order',
+  orderNumber: 'SAMPLE-0001',
+  tokenNumber: '101',
+  orderType: 'TAKEAWAY',
+  items: [
+    { id: 'sample-1', orderId: 'sample-order', menuItemId: 'sample-1', name: 'Sample dish', quantity: 2, unitPrice: 100, modifiers: [], totalPrice: 200 },
+    { id: 'sample-2', orderId: 'sample-order', menuItemId: 'sample-2', name: 'Sample drink', quantity: 1, unitPrice: 60, modifiers: [], totalPrice: 60 }
+  ],
+  subtotal: 260,
+  discountAmount: 0,
+  cgstAmount: 6.5,
+  sgstAmount: 6.5,
+  taxAmount: 13,
+  roundOffAmount: 0,
+  totalAmount: 273,
+  paymentMethod: 'CASH_AT_COUNTER',
+  paymentStatus: 'PENDING',
+  orderStatus: 'CONFIRMED',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+} as unknown as Order;
+
 export default function AdminApp() {
   const [activeTab, setActiveTab] = useState<AdminTab>('DASHBOARD');
   // The nav sidebar used to always render at its full 256px desktop width,
@@ -227,7 +260,7 @@ export default function AdminApp() {
     setConnectError('');
     setConnectBusy(true);
     try {
-      await connectDeviceStep2(connectActivationSessionToken, connectActivationKey, connectRestaurantId, connectEmail);
+      await connectDeviceStep2(connectActivationSessionToken, connectActivationKey, connectRestaurantId, connectEmail, connectRestaurantName);
       setDeviceConnected(true);
       setShowActivationWelcome(true);
     } catch (err) {
@@ -640,6 +673,61 @@ export default function AdminApp() {
   // KIOSK_USER devices into db.kiosks, instead of the fixed fake fleet this
   // screen used to show regardless of what devices were really activated
   // (QA audit BUG-004).
+  // Kiosks that the cloud reports as really online, so the LAN-mesh fleet refresh below does not mark them offline.
+  const cloudOnlineKioskIds = React.useRef<Set<string>>(new Set());
+
+  // Cloud sync for this console (BUG-130/132/133/136/137/138). It used to sync nothing but a price table, so
+  // menu, combos and coupons edited here never reached the self-order kiosk, and orders, ratings, help requests
+  // and the list of kiosks never reached this console.
+  useEffect(() => {
+    if (!deviceConnected || !getDeviceTokenForSync()) return;
+    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
+
+    const refreshKiosks = async () => {
+      try {
+        const kiosks = await fetchCloudKiosks();
+        const online = new Set<string>();
+        kiosks.forEach((k) => {
+          const reachable = k.health === 'online' || k.health === 'degraded';
+          if (reachable) online.add(k.id);
+          KioskRepository.upsertFromHeartbeat({
+            deviceId: k.id,
+            name: k.name,
+            appVersion: k.appVersion ?? '',
+            lastHeartbeat: k.lastSeenAt ?? new Date(0).toISOString()
+          });
+          KioskRepository.updateKioskStatus(k.id, k.isLocked ? 'LOCKED' : reachable ? 'ONLINE' : 'OFFLINE', k.isLocked);
+        });
+        cloudOnlineKioskIds.current = online;
+        void refreshLicenseFromCloud(kiosks.length);
+      } catch {
+        // Offline: keep what was last known.
+      }
+    };
+
+    const tick = async () => {
+      void SyncOutboxEngine.processOutbox();
+      void SyncOutboxEngine.catchUpFromCloud();
+      void syncMenuCatalog({ push: true });
+      void syncPromotions({ pushCombos: true, pushCoupons: true });
+      void syncFeedback({ push: false });
+      // Staff created in Restaurant Admin sign in here too, and the floor plan is shared (BUG-158: the staff list
+      // was empty and the tables were the demo ones).
+      void EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
+      void syncDiningTables();
+      void refreshKiosks();
+      // A guest's "call staff" request at a kiosk becomes a service request in this console.
+      const inbound = await syncServiceMessages('KIOSK_ADMIN');
+      inbound
+        .filter((m) => m.kind === 'CALL_STAFF')
+        .forEach((m) => ServiceRequestRepository.create({ id: m.id, kioskId: m.senderName, tableNumber: m.tableNumber, type: 'CALL_STAFF', notes: m.presetText }));
+    };
+    void tick();
+    const id = setInterval(() => void tick(), 8000);
+    return () => clearInterval(id);
+  }, [deviceConnected]);
+
   useEffect(() => {
     lanMeshSync.registerDevice('KIOSK_ADMIN', 'KIOSK-ADMIN-01', 'Kiosk Admin Console');
 
@@ -653,7 +741,8 @@ export default function AdminApp() {
           lastHeartbeat: peer.lastHeartbeat
         })
       );
-      KioskRepository.markStaleOffline(new Set(kioskPeers.map((p) => p.deviceId)));
+      // A kiosk reachable through the cloud is just as present as one on this LAN (BUG-132).
+      KioskRepository.markStaleOffline(new Set([...kioskPeers.map((p) => p.deviceId), ...cloudOnlineKioskIds.current]));
     };
 
     syncFleetFromMesh();
@@ -794,7 +883,7 @@ export default function AdminApp() {
   const prepCount = orders.filter((o) => o.orderStatus === 'PREPARING').length;
   const readyCount = orders.filter((o) => o.orderStatus === 'READY').length;
   const completedCount = orders.filter((o) => o.orderStatus === 'COMPLETED' || o.orderStatus === 'COLLECTED').length;
-  const pendingKOT = orders.filter((o) => o.orderStatus === 'PREPARING' || o.orderStatus === 'CONFIRMED' || o.orderStatus === 'NEW').length;
+  const pendingKOT = orders.filter((o) => o.orderStatus === 'PREPARING' || o.orderStatus === 'CONFIRMED' || o.orderStatus === 'NEW').length; // READY orders are waiting for pickup, not for the kitchen
   const occupiedTables = tables.filter((t) => t.status === 'OCCUPIED').length;
   const tableOccupancyPercent = tables.length > 0 ? Math.round((occupiedTables / tables.length) * 100) : 0;
 
@@ -970,8 +1059,7 @@ export default function AdminApp() {
       isActive: true
     };
 
-    db.coupons.push(cpn);
-    db.notify();
+    CouponRepository.createCoupon(cpn);
 
     AuditRepository.log({
       username: 'admin',
@@ -1051,10 +1139,13 @@ export default function AdminApp() {
                       type="text"
                       value={connectRestaurantId}
                       onChange={(e) => setConnectRestaurantId(e.target.value)}
-                      placeholder="From your restaurant's admin dashboard"
+                      placeholder="Paste the ID, e.g. 7385361b-c19e-4431-beb4-135bb9b3c6db"
                       required
                       className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                     />
+                    <p className="text-[11px] text-slate-500 mt-1.5">
+                    Find it in Super Admin: Restaurants, open the restaurant, Restaurant ID (with a Copy button). The owner can also copy it in Restaurant Admin under Subscription Plans, Device &amp; Staff Logins.
+                  </p>
                   </div>
                   <div>
                     <label className="text-xs font-bold text-slate-700 block mb-1.5">Login Email *</label>
@@ -1673,6 +1764,7 @@ export default function AdminApp() {
 
         {/* MAIN CONTENT AREA */}
         <main className="flex-1 bg-jaman-ivory p-6 overflow-y-auto">
+          <ScreenErrorBoundary resetKey={activeTab}>
           {/* TAB 1: DASHBOARD */}
           {activeTab === 'DASHBOARD' && (
             <div className="space-y-6">
@@ -2186,12 +2278,8 @@ export default function AdminApp() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {filteredMenuItems.map((item) => (
                     <div key={item.id} className="relative group">
-                      <ProductCard
-                        item={item}
-                        onAdd={(it) => {
-                          showToast(`Item selected: ${it.name}`);
-                        }}
-                      />
+                      {/* A catalog editor lists dishes; nothing here places an order, so no "+ add to cart" button (BUG-129). */}
+                      <ProductCard item={item} />
                       <div className="mt-2 flex items-center justify-between px-1 gap-1">
                         <button
                           onClick={() => {
@@ -3096,12 +3184,7 @@ export default function AdminApp() {
                     <button
                       onClick={() => {
                         if (!confirm(`Delete coupon ${c.code}? This cannot be undone.`)) return;
-                        const cIdx = db.coupons.findIndex((item) => item.id === c.id);
-                        if (cIdx !== -1) {
-                          db.coupons.splice(cIdx, 1);
-                          db.notify();
-                          showToast(`Removed coupon ${c.code}`);
-                        }
+                        if (CouponRepository.deleteCoupon(c.id)) showToast(`Removed coupon ${c.code}`);
                       }}
                       className="mt-4 text-xs font-semibold text-rose-600 hover:text-rose-800 self-end"
                     >
@@ -3269,8 +3352,13 @@ export default function AdminApp() {
                       Live Receipt Preview ({receiptForm.paperSize})
                     </h3>
                     <div className="flex justify-center">
+                      {orders.length === 0 && (
+                        <p className="mb-3 w-full text-center text-[11px] font-semibold text-slate-500">
+                          Sample receipt: a real order appears here once a guest has ordered.
+                        </p>
+                      )}
                       <ThermalReceiptView
-                        order={orders[0]}
+                        order={orders[0] ?? SAMPLE_RECEIPT_ORDER}
                         config={receiptForm}
                         onPrint={async () => {
                           const res = await PrinterService.printTestSlip();
@@ -3333,6 +3421,10 @@ export default function AdminApp() {
                   <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Hardware Diagnostics & Monitoring</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Manage ESC/POS thermal printers, payment terminals, touch calibration, and hardware diagnostic self-tests.
+                  </p>
+                  <p className="text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mt-2 max-w-2xl">
+                    Printers and kitchen routing set on this screen apply to the hardware attached to this console. Each self-order kiosk keeps
+                    its own printer setup on that kiosk, because a printer is connected to one particular machine.
                   </p>
                 </div>
                 <Button
@@ -4046,13 +4138,13 @@ export default function AdminApp() {
                   <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
                     <span className="text-xs text-[#8C9BAE] font-semibold">Valid Until:</span>
                     <div className="text-base font-black text-jaman-navy mt-1">
-                      {formatDate(license.validUntil)}
+                      {license.validUntil ? formatDate(license.validUntil) : 'Sign in to see it'}
                     </div>
                   </div>
                   <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
                     <span className="text-xs text-[#8C9BAE] font-semibold">License Key:</span>
                     <div className="text-xs font-mono font-bold text-jaman-navy mt-1 truncate">
-                      {license.licenseKey}
+                      {license.licenseKey || 'Managed by JAMANVAAR Cloud'}
                     </div>
                   </div>
                 </div>
@@ -4592,6 +4684,7 @@ export default function AdminApp() {
               </div>
             </div>
           )}
+          </ScreenErrorBoundary>
         </main>
       </div>
 
@@ -6551,7 +6644,7 @@ export default function AdminApp() {
           <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-1">
             <h4 className="font-bold text-xs text-emerald-900">Ready for Live Production Deployment</h4>
             <p className="text-[11px] text-emerald-700">
-              Publishing will create a version snapshot and immediately sync the active menu to all touch kiosk terminals.
+              Publishing saves a version snapshot and sends the menu, combos and coupons to the cloud, from where every self-order kiosk of this restaurant receives them within seconds.
             </p>
           </div>
 
@@ -6588,12 +6681,18 @@ export default function AdminApp() {
             <Button
               variant="accent"
               className="font-bold shadow-md bg-jaman-navy text-white"
-              onClick={() => {
+              onClick={async () => {
                 try {
                   const snap = MenuBuilderService.publishMenu('Admin POS', publishNotes);
-                  showToast(`✓ Published ${snap.versionTag} to all Customer Kiosks!`);
                   setIsPublishModalOpen(false);
                   setPublishNotes('');
+                  // "Published" is only said once the cloud really has it (BUG-138).
+                  const result = await publishCatalogNow();
+                  showToast(
+                    result.delivered
+                      ? `✓ Published ${snap.versionTag}. Every Customer Kiosk of this restaurant will receive it within seconds.`
+                      : `Saved ${snap.versionTag}, but it could not be sent to the cloud yet (${result.pending} change${result.pending === 1 ? '' : 's'} waiting). It will be sent automatically once this console is online.`
+                  );
                 } catch (err: any) {
                   alert(err.message || 'Publish failed');
                 }

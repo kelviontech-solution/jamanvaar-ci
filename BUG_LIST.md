@@ -51,6 +51,23 @@ Legend: 🔴 not fixed · 🟡 partly fixed / needs a decision or runtime check 
 | 124 A table order rung up at the counter said 'POS: CLOUD-SYNC' | 🟢 | `ThermalReceiptView` omits the line for cloud-sourced orders; `receipt_identity.test.ts` |
 | 125 Every restaurant's receipt thanked guests on behalf of JAMANVAAR | 🟢 | Activation replaces the demo thank-you and footer (a footer the restaurant wrote is kept); `outlet_identity_adoption.test.ts` |
 | 126 Small Captain layout defects (KOT label, clipped card buttons) | 🟢 | Tickets read 'KOT-02'; card buttons wrap instead of clipping |
+| 127 The Restaurant ID that Kiosk Admin and Captain ask for cannot be found | 🟢 | Super Admin now shows a labelled Restaurant ID with a Copy button in the restaurant's profile card and at the top of the Hardware & Terminal Activation Keys panel (with a line saying Kiosk Admin and Captain ask for it together with the owner's login); Restaurant Admin shows it with a Copy button beside the device logins it creates (Subscription Plans, Device & Staff Logins); the Kiosk Admin and Captain connect screens replaced the vague hint with where to find it. Checked by typecheck and `restaurant_id_visibility.test.ts`; not looked at visually in a running browser |
+| 128 Super Admin cannot delete an activation key, or bring a revoked key back | 🔴 | Logged, not fixed yet (waiting for the go-ahead). Revoke is one way and there is no delete |
+| 129 The round "+" on each Kiosk Admin dish card does nothing useful | 🔴 | Logged, not fixed yet |
+| 130 Kiosk Admin's own menu and combos never reach the self-order Kiosk | 🔴 | Logged, not fixed yet |
+| 131 Kiosk Admin never adopts the real restaurant name/branch | 🔴 | Logged, not fixed yet |
+| 132 Kiosk orders never reach Kiosk Admin's Orders & KDS / Kiosk Terminals | 🔴 | Logged, not fixed yet |
+| 133 Coupons made in Kiosk Admin never reach the self-order Kiosk | 🔴 | Logged, not fixed yet |
+| 134 Cash-at-Counter kiosk orders are recorded and printed as paid via UPI | 🔴 | Logged, not fixed yet |
+| 135 Kiosk Admin's Receipt & E-Bill screen crashes to a blank page | 🔴 | Logged, not fixed yet |
+| 136 Kiosk Admin's Hardware/Reports/Feedback screens read data that never arrives | 🔴 | Logged, not fixed yet |
+| 137 "Call Staff" on the self-order Kiosk falsely confirms a team member was notified | 🔴 | Logged, not fixed yet |
+| 138 Kiosk Admin's "Publish" claims to sync to all Customer Kiosks but does not | 🔴 | Logged, not fixed yet |
+| 139 "+ Category" works locally, same disconnection as BUG-130; Settings gear on self-order Kiosk needs clarification | 🟡 | Logged; see notes, one part needs the owner to confirm what they saw |
+| 140 Every terminal but KDS is locked out by a mandatory update wall out of the box | 🔴 | Logged, not fixed yet |
+| 141 Kiosk Admin's update-download link opens the Captain app; no app's download link is real | 🔴 | Logged, not fixed yet |
+| 142 No forgot-password / reset flow for a restaurant admin | 🔴 | Logged, not fixed yet |
+| 143 Update-required lock screen flickers on and off instead of staying locked | 🔴 | Logged, not fixed yet |
 | 038 Paid order never queued | 🟢 | Paid orders start `SAVED_LOCALLY` and are flushed; paid status re-sent (`order_sync_flagging`) |
 | 039 Totals disagree | 🟢 | Tender totals use one source (`getOrderTenders`); CGST + SGST now always add up to the bill's tax via one shared `splitTax`/`splitTaxPaise` (81 becomes 41+40, never 41+41), the invented "2.38% of sales" tax is gone, and labels say what the number is ("Total Billed (incl. GST)" etc.) — `tax_split_consistency` |
 | 040 Fake 50/50 split | 🟢 | Real per-line tenders end to end (`split_payment_tenders`) |
@@ -1758,9 +1775,192 @@ With BUG-019/034/035 marked "code done, not yet verified", the real API and all 
 - **Found:** Live: tickets read 'KOT #-02'; the 'VIEW ORDER' and 'REQUEST BILL' buttons on a table card were cut to 'VIEW O…' and 'REQUE…'.
 - **Expected:** Readable labels.
 
+## BUG-127 — The Restaurant ID that Kiosk Admin and Captain ask for cannot be found 🔴
+
+- **App:** Super Admin (`RestaurantDetailPage.tsx`), Restaurant Admin (`CloudDeviceLoginsPanel.tsx`), Kiosk Admin and Captain (connect screens)
+- **Reported:** "I can't find the Restaurant ID to log into the Kiosk panel."
+- **Cause (confirmed by reading and the screenshots):** the connect screens of Kiosk Admin and Captain require the Restaurant ID, but the only place it appeared was 11-pixel grey text at the end of the restaurant page's subtitle in Super Admin ("... ID: 7385361b-..."), with no label and no copy button. The activation-keys panel, where a terminal is being set up, does not mention it. Restaurant Admin does not show it anywhere. The connect screens only said "From your restaurant's admin dashboard", which points at nothing.
+- **Expected:** the ID is shown clearly, with a copy button, where the person setting a terminal up already is, and the connect screens say where to find it.
+
+## BUG-128 — Super Admin cannot delete an activation key, or bring a revoked key back 🟡
+
+- **App:** Super Admin (`RestaurantDetailPage.tsx` key cards, `ActivationKeysListPage.tsx`) and cloud API (`activation-keys`)
+- **Reported:** "Super admin can't delete keys he created. New keys are created and working, but Super Admin should be able to delete keys, and also revoke a key and then activate that key again."
+- **Confirmed by reading:**
+  - The API has only `PATCH /activation-keys/:id/revoke` and `POST /activation-keys/bulk-revoke`. There is **no delete** endpoint and **no way to re-activate** a revoked key (the status only moves ACTIVE → REDEEMED / REVOKED / EXPIRED, never back).
+  - The restaurant page's key cards (your screenshot) show only a **Copy** button, no actions at all. The activation keys page offers **Copy** and **Revoke** (only while a key can still be revoked), and its confirmation dialog says "This cannot be undone".
+  - Revoked and expired keys therefore stay on the restaurant page for ever: the screenshot shows three revoked cards next to the one usable key.
+  - Revoking a key that is **in use** (Redeemed) also revokes its terminal and that terminal's sign-in tokens (`revoke` in `activation-keys.service.ts`). Devices have no "restore" either (only `PATCH /devices/:id/revoke`). So one wrong click on a live terminal's key cannot be undone.
+- **Not confirmed / choices to make when this is built (my recommendation in brackets):**
+  - Which keys may be deleted. [Any key that is not in use: Available, Revoked or Expired. A Redeemed key is the record of a registered terminal, so it must be revoked first, and the delete is written to the audit log with the key's code.]
+  - What "activate again" means for each case. [An unused revoked key becomes Available again, with a new expiry if it has lapsed. A revoked key that had been redeemed brings its terminal back too (device active again; the terminal signs in again), so a mistaken revoke is fully undone.]
+  - Who may do it. [The same platform roles that can generate and revoke keys; check `common/rbac/access.ts`.]
+  - Bulk delete and bulk re-activate on the keys page. [Yes, matching the existing bulk revoke.]
+- **Expected:** on both the restaurant page and the activation keys page, each key has Revoke, Activate again (for revoked keys) and Delete (for keys that are not in use), each with a clear confirmation that says what will happen and audited; a deleted key disappears and its code can no longer be redeemed.
+
+## BUG-129 — The round "+" on each dish card in Kiosk Admin's Menu & Catalog Builder does nothing useful 🟡
+
+- **App:** Kiosk Admin (`App.tsx`, the `ProductCard` component from `@jamanvaar/ui`)
+- **Reported:** "in kiosk admin management what does even this + sign do? it has no impact anything"
+- **Confirmed live:** clicked it on "Hara Bhara Kebab (6 Pcs)" — nothing changed on the page except a toast reading "Item selected: Hara Bhara Kebab (6 Pcs)", which disappears after a couple of seconds. No cart, no order, no effect on the dish itself.
+- **Cause (confirmed by reading):** `ProductCard` is the shared "add this dish to an order" card used on real ordering screens (the customer kiosk, POS) — its `+` calls `onAdd(item)`, meant to add a line to a cart. The Menu & Catalog Builder reuses the same component to *list* dishes for editing, and passes it `onAdd: (it) => showToast(`Item selected: ${it.name}`)` — a placeholder that was never replaced with anything, because "add to order" isn't a meaningful action on a catalog-management screen in the first place.
+- **Expected:** either the button is removed from this screen (nothing here should mean "place an order"), or, if the intent was "quick preview" or "select this dish", it does that instead of a no-op toast.
+
+## BUG-130 — Menu items and combos created in Kiosk Admin never reach the self-order Kiosk (or anywhere else) 🔴
+
+- **App:** Kiosk Admin ("Menu & Catalog Builder", "Combos & Meal Deals"), Kiosk User, cloud API
+- **Reported:** "i added the combo here but it didn't appear on self ordering KIOSK, which should have because i have activated both by same restaurant KEYS"
+- **Confirmed live:** created a restaurant, activated a real Kiosk Admin and a real Kiosk terminal against it with their own separate keys. Created a combo ("Live Verify Combo") in Kiosk Admin. After waiting for a sync tick and opening the self-order flow on Kiosk, it had **0 menu items and 0 combos** — not just the new combo missing, the whole catalog was empty, even though Kiosk Admin's own screen showed "6 Categories • 12 Dishes • 2 Combos".
+- **Cause (confirmed by reading):**
+  - Kiosk Admin's "Menu & Catalog Builder" and "Combos & Meal Deals" write only to Kiosk Admin's own local-first database. It never calls the generic cross-device sync bridge (`EntitySyncEngine`) for `MENU_ITEM` or `MENU_CATEGORY` at all — no push, no pull. (Contrast with Restaurant Admin, POS, Captain and Kiosk User, which all push/pull `MENU_ITEM`/`MENU_CATEGORY` through that bridge.)
+  - The one cloud call Kiosk Admin does make for its menu, `syncMenuToCloud` → `POST /api/v1/tenant/menu-sync`, writes into a completely separate table (`MenuSnapshotItem`) whose own comment says what it's for: "Trusted price source for PaymentsService's cart validation." Nothing reads that table to build a displayed menu anywhere.
+  - There is no `COMBO` entity type in the sync bridge at all (`SYNCABLE_ENTITY_TYPES` in `cloud/api/.../push-entity-sync.dto.ts` has no combo type), so a combo has no path to any other device regardless of which screen created it.
+  - The menu the self-order Kiosk actually shows comes only from Restaurant Admin, via the real sync bridge — so Kiosk Admin's whole "Menu & Catalog Builder" is a second, disconnected menu-editing surface that looks like it's editing the live catalog but isn't.
+- **Expected:** a dish or combo added, edited or removed in Kiosk Admin reaches the self-order Kiosk (and ideally Restaurant Admin/POS too) the same way Restaurant Admin's edits do, and combos get a real cross-device sync path of their own.
+
+## BUG-131 — Kiosk Admin never adopts the real restaurant name/branch after activation 🟡
+
+- **App:** Kiosk Admin (`App.tsx`)
+- **Found while investigating BUG-130, not separately reported.**
+- **Confirmed live:** activated a real Kiosk Admin console against "Kiosk Verify Diner". Its own header still read "JAMANVAAR RESTAURANT — Ahmedabad Flagship Store" (the demo identity) throughout.
+- **Cause (confirmed by reading):** `RestaurantIdentityRepository` (used by POS, POS Admin, KDS, Captain and Kiosk User to adopt the real restaurant's name/branch at activation — see BUG-021/BUG-110) is never imported or called anywhere in Kiosk Admin's `App.tsx` or `cloud/cloudClient.ts`.
+- **Expected:** Kiosk Admin shows the real restaurant's name and branch after activation, the same as every other terminal.
+
+## BUG-132 — Orders placed on the self-order Kiosk never reach Kiosk Admin's own "Orders & KDS" screen or its "Kiosk Terminals" fleet view 🔴
+
+- **App:** Kiosk Admin (`App.tsx`), Kiosk User, cloud API
+- **Reported:** "i placed the order in self ordering KIOSK but it didnt show up in KDS nor in KIOSK admin, which shouldnt happen."
+- **Confirmed live:** created a restaurant, loaded a real 135-dish menu through Restaurant Admin, and activated a real Kiosk Admin, a real self-order Kiosk and a real standalone KDS terminal against it, each with its own key. Placed a real order on the self-order Kiosk (Paneer Tikka Angara, Takeaway, Cash at Counter).
+  - The **standalone KDS app** (the real Kitchen Display terminal, same app used by POS/Captain) received the order correctly: 1 order, 1 KOT, `PREPARING`, routed to "Main Kitchen" — so the cloud order-sync path itself works when a real KDS terminal is present.
+  - **Kiosk Admin's own "Orders & KDS" page** ("Authoritative on-premise order management synced with Customer Touch Kiosks") stayed at **0 orders**. Its **"Kiosk Terminals" fleet page** said **"No Kiosk Terminals Yet"**, even though a real Kiosk was activated against the same restaurant and had just placed an order through it.
+- **Cause (confirmed by reading):** Kiosk Admin's `cloud/cloudClient.ts` has **no `pushOrderSync`/`pullOrderSync` functions at all**, and `SyncOutboxEngine.configureTransport(...)` — the call every other app (POS, Captain, KDS, Restaurant Admin) makes to wire itself into the real cloud order-sync — is **never called** in Kiosk Admin's `App.tsx`. Only `SyncOutboxEngine.getSyncStats()` (reads local counts) and `.processOutbox()` (push, but with no transport ever configured, so it has nothing to push to) are used. Instead, "Orders & KDS" depends on a local-network relay service on port 5178 ("Local Realtime Active (:5178)", shown as "LOCAL SERVICE: DISCONNECTED" in the header) — a same-machine/same-LAN mechanism (`tooling/local-runtime/sync_server.cjs`), not the cloud device-token sync the rest of the system uses. "Kiosk Terminals" likewise does not read the real device registry (the one Super Admin's "Registered Terminals" count comes from); it only knows about terminals reachable through that same local relay or `lanMeshSync`.
+- **Expected:** Kiosk Admin's own Orders & KDS view and Kiosk Terminals fleet view show real orders and real terminals for the restaurant, the same way the standalone KDS app and Super Admin do, regardless of LAN topology.
+
+## BUG-133 — Coupons created in Kiosk Admin never reach the self-order Kiosk 🔴
+
+- **App:** Kiosk Admin ("Offers & Coupons"), Kiosk User, cloud API
+- **Reported:** "these coupons are not visible or accessible from self ordering KIOSK which should not happen."
+- **Confirmed live:** on the same live setup as BUG-132, the self-order Kiosk's local coupon list was **empty** (`[]`) right after activation, while Kiosk Admin showed three active coupons (WELCOME50, FEAST20, FLAT100) for the same restaurant.
+- **Cause (confirmed by reading):** coupons created in Kiosk Admin are written only to Kiosk Admin's own local `db.coupons`. There is no `COUPON` entity type in the cross-device sync bridge at all (same gap already found for combos in BUG-130), so a coupon has no path to any other device. The self-order Kiosk's checkout genuinely does support redeeming a coupon (`CouponRepository.getByCode`, minimum-order check, `incrementUsage` on redeem) — the redemption logic works, the coupon just never arrives.
+- **Related, not separately confirmed:** the "Times Used: 42 / 18 / 9" figures shown next to each coupon in Kiosk Admin's screenshot look like static seed numbers rather than real counts — since redemption (and `incrementUsage`) can only ever happen on the Kiosk that has the coupon, which per this bug is never the real self-order Kiosk, those usage counts likely can never reflect real activity either.
+- **Expected:** a coupon created in Kiosk Admin (or Restaurant Admin) is redeemable on the self-order Kiosk, and its usage count reflects real redemptions.
+
+## BUG-134 — Choosing "Cash at Counter" on the self-order Kiosk is recorded and printed as paid via UPI 🔴
+
+- **App:** Kiosk User (`App.tsx`)
+- **Found while investigating BUG-132/133, not separately reported.**
+- **Confirmed live:** on the checkout screen, chose "Cash at Counter" (not UPI), saw the "Pay at Pickup Counter — You will receive your token now" panel and tapped "Confirm & Get Token." The resulting order — and its printed/on-screen receipt ("PAID VIA: UPI") — recorded `paymentMethod: "UPI"`.
+- **Cause (confirmed by reading):** `handleProceedToPayment` creates the real order the moment "Proceed to Payment" is tapped, **before** the payment-method screen is even shown, using `paymentMethod: effectiveMethod` where `effectiveMethod = networkState === 'OFFLINE' ? 'CASH_AT_COUNTER' : paymentMethod` — and at that point `paymentMethod` is still whatever the component's state defaults to (`'UPI'`), since the user hasn't chosen yet. Selecting "Cash at Counter" afterward only calls `setPaymentMethod('CASH_AT_COUNTER')`, which changes local UI state, not the order already saved. `handleGetToken` (the "Confirm & Get Token" handler) fetches that same order and proceeds to confirmation without ever updating its `paymentMethod` field. The bug only fails to trigger when the kiosk is offline, because `handleProceedToPayment` special-cases that: `networkState === 'OFFLINE' && paymentMethod === 'UPI'` forces `CASH_AT_COUNTER` before the order is created.
+- **Expected:** the order's payment method reflects what the guest actually chose on the payment screen; a receipt for a cash order says "PAID VIA: CASH_AT_COUNTER" (or similar), never UPI.
+
+## BUG-135 — Kiosk Admin's "Receipt & E-Bill" screen crashes to a blank page 🔴
+
+- **App:** Kiosk Admin (`App.tsx`), `ThermalReceiptView` (`@jamanvaar/ui`)
+- **Reported:** "screen goes blank after i click receipt and bills in KIOSK admin" (with a screenshot showing a fully blank white page at `localhost:5173`).
+- **Cause (confirmed by reading):** the Receipt & E-Bill tab renders a live preview with `<ThermalReceiptView order={orders[0]} config={receiptForm} .../>`, where `orders = OrderRepository.getAllOrders()` — Kiosk Admin's own local order list. `ThermalReceiptView`'s `order` prop is required and is used unconditionally from the very first line of its render (`order.tokenNumber`, then `order.orderNumber`, `order.createdAt`, `order.items`, ...) with no null check anywhere.
+  - Per **BUG-132**, Kiosk Admin's local order list is always empty — no order placed on the self-order Kiosk ever reaches it. So `orders[0]` is `undefined`, and `ThermalReceiptView` throws (`Cannot read properties of undefined (reading 'tokenNumber')`) the instant the tab renders. With no error boundary around it, the whole page unmounts — a blank screen, exactly as reported.
+  - This will reproduce on **any** restaurant that hasn't rung up an order through this exact Kiosk Admin terminal's own local history — which, per BUG-132, is every restaurant, always, since nothing ever populates it.
+- **Expected:** the Receipt & E-Bill preview handles having no order yet (a sample/placeholder receipt, or a clear "place an order to see a live preview" message) instead of crashing the page.
+
+## BUG-136 — Kiosk Admin's Hardware & Diagnostics, Reports & Export and Customer Feedback screens all read data that can never arrive 🟡
+
+- **App:** Kiosk Admin (`App.tsx`)
+- **Reported:** "hardware and diagnostics, reports and export and customer feedback is not working as it KIOSK admin and self ordering KIOSK is not connected" — the user's own diagnosis, which matches what the code shows.
+- **Confirmed by reading (same root cause as BUG-130/132/133, three more places it shows up):**
+  - **Reports & Export** ("Export real transaction records, item sales, and tax metrics") reads `OrderRepository.getAllOrders()` — Kiosk Admin's own local, always-empty order list (BUG-132). Every report this screen can produce is therefore empty for a restaurant whose real business happens on the self-order Kiosk.
+  - **Customer Feedback** ("Real-time ratings ... submitted via kiosks") reads `FeedbackRepository.getAll()` → local `db.feedbacks`. The self-order Kiosk's "How was your ordering experience? Submit Rating" screen does call `FeedbackRepository.submit(...)` — real feedback is genuinely collected — but it is written to the Kiosk's own local `db.feedbacks`, which (there is no `CustomerFeedback` entity in the cross-device sync bridge either) never reaches Kiosk Admin. Always "No ratings yet."
+  - **Hardware & Diagnostics**' printer and "Kitchen Printer Routing" configuration is stored in Kiosk Admin's own local `db.configuredPrinters`. Since Kiosk Admin and the self-order Kiosk are separate devices with separate local-first databases (same pattern as everywhere else in this investigation), assigning a station's kitchen tickets to a printer here has no effect on the actual terminal that would need to print them — the self-order Kiosk has its own, independent printer configuration.
+- **Expected:** these three screens reflect what is actually happening on the restaurant's self-order Kiosk(s) — real orders and sales in Reports & Export, real ratings in Customer Feedback, and printer/routing settings that actually govern what the Kiosk terminal prints.
+
+## BUG-137 — "Call Staff" on the self-order Kiosk tells the guest a team member is coming, but nobody is ever notified 🔴
+
+- **App:** Kiosk User (`App.tsx`), Kiosk Admin
+- **Reported:** "call staff is not working in self ordering KIOSK" (with a screenshot of the "Staff Assistance Requested — Team Member Notified — A team member has been notified and is heading to your kiosk/table" confirmation).
+- **Confirmed by reading:** `handleCallStaff` calls `ServiceRequestRepository.create({ type: 'CALL_STAFF', ... })`, which only pushes the request into this Kiosk's own local `db.serviceRequests` array (`db.notify()`, no network call of any kind) — and then unconditionally shows the "Team Member Notified" modal regardless of whether any real staff member could possibly have seen it. `ServiceRequestRepository` is read by exactly one other screen in the whole codebase — Kiosk Admin — which reads its **own** local `db.serviceRequests`. Kiosk Admin and the self-order Kiosk are different browser origins (ports 5173 vs 5174) with separate local-first storage, so even that reader can never see a request raised on the actual guest-facing Kiosk. No POS, Captain or Restaurant Admin screen reads `ServiceRequestRepository` at all.
+- **Expected:** a real staff member (on whichever device is meant to receive it — Kiosk Admin at minimum) is actually notified before the guest is told one is on the way; the confirmation should not be shown, or should say something honest, if delivery could not be confirmed.
+
+## BUG-138 — Kiosk Admin's "Publish" claims to sync the menu to all Customer Kiosks, but does not 🔴
+
+- **App:** Kiosk Admin (`App.tsx`), `packages/business/src/menu_builder.ts`
+- **Found while investigating BUG-139/"+Category", not separately reported.**
+- **Confirmed by reading:** the Publish dialog's own copy says "Publishing will create a version snapshot and **immediately sync the active menu to all touch kiosk terminals**," its button reads "Confirm & Publish to Kiosk," and on success it shows "✓ Published v_._ **to all Customer Kiosks**!" What it actually calls, `MenuBuilderService.publishMenu(...)`, only builds an in-memory version-history snapshot (a deep copy of the current categories/items/combos) and pushes it onto a local `menuVersions` array, then `db.notify()` — there is no network call in it at all. Per **BUG-130**, nothing in Kiosk Admin's Menu & Catalog Builder reaches the self-order Kiosk regardless.
+- **Expected:** either "Publish" really does push the menu to every Kiosk terminal (once BUG-130 is fixed), or, until then, its wording does not claim something that does not happen — this is a stronger, more explicit false-success message than most of the "disconnected" screens already logged, since it actively tells the owner the sync just happened.
+
+## BUG-139 — "+ Category" and the rest of Menu Management work locally but never reach the self-order Kiosk; the Settings gear on the self-order Kiosk needs the owner to double-check 🟡
+
+- **App:** Kiosk Admin, Kiosk User
+- **Reported:** "add category is also not working" and "setting button does nothing in self ordering KIOSK."
+- **"+ Category" — confirmed live:** opened the dialog, typed a name, submitted. It worked exactly as designed: a toast confirmed it, the category was saved (`jamanvaar_db_categories` gained the new entry), the header count went from "6 Categories" to "7 Categories," and the new category appeared as a selectable pill in the category bar. This is **not a separate defect** — it is the same root cause as **BUG-130**: the category is real and useful *inside Kiosk Admin*, but (like every other menu edit made there) never reaches the actual self-order Kiosk, so from the owner's point of view nothing changes where it matters. Recorded here for completeness rather than as a new root cause.
+- **Settings gear on the self-order Kiosk (the ⚙ next to Call Staff/language) — could not reproduce "does nothing":** live-tested on the exact "Live Kitchen Tracking" screen from the screenshot — tapping it opened a real dropdown with working entries (network online/offline simulate, "Larger text & higher contrast," "Order on Phone," "Loyalty / Login"). One real mismatch I did notice: a gear icon conventionally means "device/kiosk settings," but this menu is a "More options" grab-bag (accessibility, a staff network-diagnostic toggle, phone handoff, loyalty login) with nothing that resembles kiosk configuration — someone expecting real settings there could reasonably experience that as "does nothing useful." **This needs the owner to say more** — what exactly happened when it was tapped (nothing visibly opened? opened but a specific option failed? expected something else entirely, like display/sound/printer settings that don't exist here?) — before this can be pinned down as a concrete defect versus a naming/expectations mismatch.
+
+## BUG-140 — Every terminal except KDS is locked out by a mandatory "Update required" wall on a stock, freshly seeded database 🔴
+
+- **App:** cloud API seed data (`cloud/api/prisma/seed.ts`), every terminal (POS, Restaurant Admin, Captain, Kiosk, Kiosk Admin)
+- **Reported:** "update is coming in all apps and ... clicking it isn't doing [anything] and cannot go to login page there's something wrong."
+- **Confirmed by reading and by querying the actual database:** every real app's `package.json` version is **1.0.0** — none of the six client apps has ever had its version number bumped. But `prisma/seed.ts`'s `appReleases` block seeds each app as if a much later version were already the current stable release, with a **minimum supported version already above 1.0.0**:
+
+  | App | Real version (`package.json`) | Seeded "current" version | Seeded minimum | Locked? |
+  |---|---|---|---|---|
+  | POS | 1.0.0 | 2.4.0 | 2.0.0 | **Yes** |
+  | RESTAURANT_ADMIN | 1.0.0 | 2.4.0 | 2.0.0 | **Yes** |
+  | CAPTAIN | 1.0.0 | 2.1.0 | 2.0.0 | **Yes** |
+  | KDS | 1.0.0 | 2.0.0 | 1.8.0 | **Yes** (seeded — see note) |
+  | KIOSK | 1.0.0 | 1.8.0 | 1.5.0 | **Yes** |
+  | KIOSK_ADMIN | 1.0.0 | 1.8.0 | 1.5.0 | **Yes** |
+
+  The server's own version-comparison logic (`cloud/api/src/common/version.ts`) is correct (a real numeric, segment-by-segment comparison, not a string bug) — this is purely a **seed-data mismatch**, not a comparison defect. Since every real terminal reports `1.0.0` and every seeded minimum is higher, every terminal is told its update is `mandatory`, which `DeviceGate`/`DeviceGateOverlay` turns into the full-screen "Update required" lock — before the person can reach sign-in or activation, exactly as in your screenshot and your report of not being able to reach the login page.
+  - **Disclosure:** the live database I've been testing against currently shows KDS at minimum `0.0.1` rather than the seed's own `1.8.0` — a leftover from an earlier live-verification session of mine that I did not fully restore, which is why KDS did not also show this lock when you tested. That one discrepancy is mine; the other five apps' lock is the genuine, stock, seeded behavior and would reproduce on any fresh database.
+- **Expected:** a freshly seeded/onboarded system is usable out of the box — the seeded "current version" and "minimum supported version" should either match the real `1.0.0` app builds, or the release/version story should be decided deliberately (e.g., seed nothing until a real release process exists) rather than assuming a version history that was never built.
+
+## BUG-141 — Kiosk Admin's "Download the update" link opens the Captain app instead of a real download; none of the six apps' download links point at anything real 🔴
+
+- **App:** cloud API seed data (`cloud/api/prisma/seed.ts`)
+- **Reported:** "after clicking on download the update it leads to this page, i think which is not standard" (with a screenshot showing Captain's "Connect this Tablet" screen at `localhost:5177` opening after tapping Kiosk Admin's "Download the update").
+- **Confirmed by reading the seed data:** each app's `downloadUrl` is:
+  - POS → `/releases/jamanvaar-pos-setup-2.4.0.exe`
+  - RESTAURANT_ADMIN → **`http://localhost:5176`** (Restaurant Admin's own dev address)
+  - CAPTAIN → `/releases/jamanvaar-captain-v2.1.0.apk`
+  - KDS → `/releases/jamanvaar-kds-v2.0.0.apk`
+  - KIOSK → `/releases/jamanvaar-kiosk-v1.8.0.exe`
+  - KIOSK_ADMIN → **`http://localhost:5177`** (**Captain's** dev address — this is exactly the page in your screenshot)
+  - None of the `/releases/...` paths correspond to any real file or route anywhere in `cloud/api` (confirmed — there is no static `/releases` handler at all), so tapping "Download the update" on POS, Captain, KDS or Kiosk would 404 or fall through to that app's own page; tapping it on Kiosk Admin or Restaurant Admin instead opens a real, unrelated running app on a hard-coded local port.
+- **Expected:** a real, working download link (or, until real installers/download infrastructure exists, no link at all, or an honest "contact support" message) — never another app's own local address.
+
+## (Confirms BUG-128) — Super Admin should be able to delete a restaurant's activation keys
+
+- **Reported again, with a screenshot:** Super Admin → Restaurants → a restaurant's own page, its 8 activation keys (several Redeemed, two Revoked), each with only a Copy button.
+- This is the same gap already logged as **BUG-128** ("Super Admin cannot delete an activation key, or bring a revoked key back") — no code has changed since then, so it still applies exactly as described there, including the recommendation that a revoked key can be brought back (with its terminal, if it had one) as well as deleted once it is no longer in use. No new entry created; see BUG-128 for the full write-up.
+
+## BUG-142 — A restaurant admin who forgets their password has no way to reset it 🔴
+
+- **App:** Restaurant Admin (`pos-admin`), cloud API (`tenant-auth`)
+- **Reported:** "the password also should be [changed] in [the restaurant] admin[,] means if [a] restaurant admin want[s] to change [their] password [because] he ha[s] forgot [it, he should be able to] change it with [the] help of email — he puts [his] email and gets [an] OTP, like that flow."
+- **Confirmed by reading:** the only password-setting endpoint in `tenant-auth` is the **one-time initial activation** flow (`set-initial-password`, for a brand-new PENDING_ACTIVATION account) — its own comment says outright "Not a general 'forgot password' flow." There is no forgot-password, reset-by-email, or OTP endpoint anywhere in `tenant-auth`, and Restaurant Admin's sign-in screen has no "Forgot password?" link at all — nothing to click, and nothing on the server to build it against yet.
+- **Expected:** a restaurant admin (owner or staff with a login) who forgets their password can request a reset by email, receive a one-time code or link, and set a new password without needing the platform team to intervene.
+
+## BUG-143 — The "Update required" lock screen pops up and disappears repeatedly instead of staying locked 🔴
+
+- **App:** every terminal (`packages/sync/src/device_gate.ts`)
+- **Reported:** "after publish[ing an] update[,] this screen keep[s] popping up and disappearing automatically in restaurant admin and even in other modules."
+- **Cause (confirmed by reading):** `DeviceGate.observe()` runs on the response of **every** cloud call an app makes through `gatedFetch` (not just the heartbeat that actually decides whether an update is mandatory) — loading a dashboard, fetching orders, anything. On any ordinary successful response it calls `reportSuccess()`, which **unconditionally sets `locked: false`**:
+
+    ```ts
+    static reportSuccess(): void {
+      this.set({ locked: false, lastCheckInAt: new Date().toISOString(), ...this.remembered() });
+    }
+    ```
+
+    This clears the lock screen the instant *any* unrelated request succeeds — even while the real reason it was locked (a mandatory update the terminal has not installed) is still true. Then the next heartbeat tick runs `applyHeartbeat`, sees `body.update?.mandatory` is still `true`, and calls `lock('UPDATE_REQUIRED', ...)` again, showing the screen again. With heartbeats and ordinary API calls both happening on their own intervals, the two keep undoing each other — the exact "pops up and disappears automatically" your screenshot shows, and it happens on any screen ("other modules") because `gatedFetch`/`observe` is used broadly, not just by the heartbeat call.
+  - This is the same mechanism behind **BUG-140** (the lock itself is real and reproducible on a stock database) — this is a second, independent defect in *how* that lock is displayed once it exists.
+- **Expected:** only a fresh heartbeat answer that no longer reports the update as mandatory (or a real new install) should clear an `UPDATE_REQUIRED` lock — an unrelated successful API call proves the device credential and subscription are fine, but proves nothing about whether the required update was installed, and should not clear that specific lock reason.
+
 ---
 
 ## Notes
 
 - Bugs are added in the order the owner reports them.
 - "Likely cause" entries come from reading the code. Confirm them before fixing.
+
+## Fix status of BUG-128 to BUG-143
+
+Fixed, with a note per bug, in `BUG_CHECKLIST.md`. Not fully closed: BUG-136 (printers stay per machine) and BUG-139 (the Settings gear needs a description from the owner).

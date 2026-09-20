@@ -32,6 +32,9 @@ export interface EntitySyncTransport {
   pull(entityType: string, since?: string): Promise<{ entities: CloudSyncedEntity[]; serverTime: string }>;
 }
 
+/** The server returns at most this many records per pull (see cloud/api entity-sync). */
+const CATCH_UP_PAGE_SIZE = 500;
+
 function safeGet(key: string): string | null {
   try {
     return localStorage.getItem(key);
@@ -70,12 +73,18 @@ export class EntitySyncEngine {
   public static async catchUp(entityType: string, onEntity: (entity: CloudSyncedEntity) => void): Promise<{ pulled: number }> {
     if (!this.transport) return { pulled: 0 };
     const cursorKey = `jamanvaar_entity_sync_cursor_${entityType}`;
-    const since = safeGet(cursorKey) ?? undefined;
+    // A device that has never pulled asks for everything, not just the last day: devices no longer re-upload
+    // unchanged records every tick (BUG-149), so a menu untouched for a week must still reach a new terminal.
+    const since = safeGet(cursorKey) ?? new Date(0).toISOString();
 
     try {
       const { entities, serverTime } = await this.transport.pull(entityType, since);
       entities.forEach(onEntity);
-      safeSet(cursorKey, serverTime);
+      // A full page means there may be more: continue from the last record received, not from "now", so
+      // nothing beyond the page limit is skipped.
+      const last = entities[entities.length - 1];
+      const nextCursor = entities.length >= CATCH_UP_PAGE_SIZE && last?.updatedAt ? last.updatedAt : serverTime;
+      safeSet(cursorKey, nextCursor);
       return { pulled: entities.length };
     } catch {
       return { pulled: 0 };

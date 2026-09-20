@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { PaymentMethod, PaymentSplit } from '@jamanvaar/types';
+import { OrderRepository } from '@jamanvaar/database';
 import { formatINR, generateUUID } from '@jamanvaar/utils';
 import { sound } from '@jamanvaar/ui';
 import { PosDiscountModal } from '../cart/PosDiscountModal';
@@ -77,6 +78,7 @@ export const PosPaymentModal: React.FC = () => {
     setIsPaymentOpen,
     cart,
     selectedTable,
+    runningOrderId,
     selectedCustomer,
     completePayment,
     isDiscountModalOpen,
@@ -430,6 +432,10 @@ export const PosPaymentModal: React.FC = () => {
 
   if (!isPaymentOpen) return null;
 
+  // An order that was already sent to the kitchen is saved: name it, instead of calling it new (BUG-154).
+  const savedOrderId = runningOrderId || selectedTable?.currentOrderId || null;
+  const savedOrder = savedOrderId ? OrderRepository.getOrderById(savedOrderId) : undefined;
+
   return (
     <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 select-none animate-in fade-in duration-150 font-sans">
       <div className="bg-white border border-jaman-border rounded-3xl max-w-4xl w-full max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">
@@ -442,7 +448,7 @@ export const PosPaymentModal: React.FC = () => {
                 PAYMENT & SETTLEMENT
               </span>
               <span className="text-xs text-slate-500 font-mono font-bold uppercase">
-                New Order — Not Yet Saved
+                {savedOrder ? `Order ${savedOrder.orderNumber} · Token #${savedOrder.tokenNumber}` : 'New Order — Not Yet Saved'}
               </span>
             </div>
             <div className="flex items-baseline gap-3 mt-1">

@@ -97,7 +97,7 @@ export const PosOrdersView: React.FC = () => {
   const sessionStats = useMemo(() => {
     const total = scopedOrders.length;
     const completed = scopedOrders.filter((o) => o.orderStatus === 'COMPLETED').length;
-    const active = scopedOrders.filter((o) => o.orderStatus === 'PREPARING' || o.orderStatus === 'CONFIRMED' || o.orderStatus === 'NEW').length;
+    const active = scopedOrders.filter((o) => o.orderStatus === 'PREPARING' || o.orderStatus === 'READY' || o.orderStatus === 'CONFIRMED' || o.orderStatus === 'NEW').length;
     const totalSales = scopedOrders
       .filter((o) => o.orderStatus === 'COMPLETED')
       .reduce((sum, o) => sum + o.totalAmount, 0);

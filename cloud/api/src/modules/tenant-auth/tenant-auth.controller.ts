@@ -22,6 +22,8 @@ import { TenantAuthService } from './tenant-auth.service';
 import {
   createTenantStaffUserSchema,
   setInitialPasswordSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
   setTenantUserStatusSchema,
   tenantChangePasswordSchema,
   tenantLoginSchema,
@@ -63,6 +65,24 @@ export class TenantAuthController {
     @Body() body: { restaurantId: string; email: string; activationToken: string; newPassword: string }
   ) {
     await this.authService.setInitialPassword(body.restaurantId, body.email, body.activationToken, body.newPassword);
+    return { success: true };
+  }
+
+  /** "Forgot password", step 1 (BUG-142). Always the same answer, so it cannot be used to find out who has an account. */
+  @Post('forgot-password')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(forgotPasswordSchema))
+  async forgotPassword(@Body() body: { restaurantId: string; email: string }) {
+    await this.authService.requestPasswordReset(body.restaurantId, body.email);
+    return { success: true, message: 'If that email belongs to an account, a 6-digit code has been sent to it.' };
+  }
+
+  /** "Forgot password", step 2: the emailed code and the new password. */
+  @Post('reset-password')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(resetPasswordSchema))
+  async resetPassword(@Body() body: { restaurantId: string; email: string; otp: string; newPassword: string }) {
+    await this.authService.resetPassword(body.restaurantId, body.email, body.otp, body.newPassword);
     return { success: true };
   }
 

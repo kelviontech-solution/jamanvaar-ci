@@ -177,6 +177,8 @@ interface CaptainState {
     billsRequested: number;
   };
   // Actions
+  /** Why the last sign-in was refused, in words for the person at the keypad (BUG-147). Null when there is nothing to say. */
+  loginError: string | null;
   login: (pin: string) => boolean;
   logout: () => void;
   setActiveTab: (tab: 'TABLES' | 'ORDERS' | 'FOOD_READY' | 'KOTS' | 'MESSAGES' | 'CUSTOMERS' | 'SHIFT') => void;
@@ -218,6 +220,8 @@ interface CaptainState {
 
   // Food Ready & Bill Actions
   markItemServed: (foodReadyId: string) => void;
+  /** The waiter delivered everything the kitchen finished for one table (BUG-148). Returns how many dishes were marked served. */
+  serveReadyForTable: (tableNumber: string) => number;
   markEntireKotServed: (kotId: string) => void;
   requestBill: (tableNumber: string) => boolean;
 
@@ -312,11 +316,16 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   foodReadyItems: [],
   notifications: [],
 
+  loginError: null,
+
   login: (pin: string) => {
     // Centralised, hashed PIN verification (BUG-005/006/009/011) — same path as POS/KDS/Kiosk.
     const candidate = StaffRepository.verifyPin(pin)?.user;
     // A PIN for a role that does not work the floor is refused (BUG-118).
     const matchedUser = candidate && StaffRepository.canUseTerminal(candidate.roleId, 'CAPTAIN') ? candidate : undefined;
+    // A correct PIN on the wrong screen is not a typo: say so, the way POS does (BUG-147).
+    const deniedMessage = candidate && !matchedUser ? StaffRepository.terminalDeniedMessage(candidate.roleId, 'CAPTAIN') : null;
+    set({ loginError: deniedMessage });
 
     if (matchedUser) {
       const captainProfile = profileFromUser(matchedUser);
@@ -890,6 +899,12 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       foodReadyId,
       dishName: targetItem.dishName
     });
+  },
+
+  serveReadyForTable: (tableNumber) => {
+    const waiting = get().foodReadyItems.filter((it) => it.tableNumber === tableNumber && !it.isServed);
+    waiting.forEach((it) => get().markItemServed(it.id));
+    return waiting.reduce((n, it) => n + (it.quantity || 1), 0);
   },
 
   markEntireKotServed: (kotId) => {

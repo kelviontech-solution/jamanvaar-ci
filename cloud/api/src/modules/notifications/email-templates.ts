@@ -83,3 +83,19 @@ export function resendInviteEmail(params: {
     `
   };
 }
+
+export function passwordResetOtpEmail(params: { fullName: string; otp: string; minutesValid: number }): { subject: string; html: string } {
+  return {
+    subject: 'Your JAMANVAAR password reset code',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #0b253a;">
+        <h2 style="color: #0b253a;">Reset your password</h2>
+        <p>Hi ${params.fullName}, use this code to choose a new password for your JAMANVAAR account:</p>
+        <p style="text-align: center; margin: 24px 0;">
+          <span style="font-family: monospace; font-size: 32px; letter-spacing: 8px; font-weight: bold; background: #FFF4ED; border: 1px solid #FDBA74; border-radius: 10px; padding: 12px 20px; display: inline-block;">${params.otp}</span>
+        </p>
+        <p style="color: #7a8b9e; font-size: 13px;">The code works once and expires in ${params.minutesValid} minutes. If you did not ask to reset your password, ignore this email &mdash; your password has not changed.</p>
+      </div>
+    `
+  };
+}

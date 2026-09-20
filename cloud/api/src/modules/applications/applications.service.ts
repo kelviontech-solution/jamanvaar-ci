@@ -26,7 +26,7 @@ export const APP_CATALOG: AppMetadata[] = [
     deviceType: 'POS',
     entitlementAppCode: 'POS',
     description: '100% offline-first billing terminal, ESC/POS printing, token routing, and GST invoices.',
-    defaultPort: 5173
+    defaultPort: 5175
   },
   {
     code: 'RESTAURANT_ADMIN',
@@ -44,7 +44,7 @@ export const APP_CATALOG: AppMetadata[] = [
     deviceType: 'CAPTAIN',
     entitlementAppCode: 'CAPTAIN',
     description: 'Wireless table ordering, instant course firing, food ready alerts, and waiter metrics.',
-    defaultPort: 5174
+    defaultPort: 5177
   },
   {
     code: 'KDS',
@@ -53,7 +53,7 @@ export const APP_CATALOG: AppMetadata[] = [
     deviceType: 'KDS',
     entitlementAppCode: 'KDS',
     description: 'Multi-station prep routing, order queue timing, cook alert cards, and bump bar support.',
-    defaultPort: 5175
+    defaultPort: 5179
   },
   {
     code: 'KIOSK',
@@ -62,7 +62,7 @@ export const APP_CATALOG: AppMetadata[] = [
     deviceType: 'KIOSK',
     entitlementAppCode: 'KIOSK',
     description: 'Visual digital catalog, custom modifiers, UPI BharatQR display, and self-checkout.',
-    defaultPort: 5178
+    defaultPort: 5174
   },
   {
     code: 'KIOSK_ADMIN',
@@ -76,7 +76,7 @@ export const APP_CATALOG: AppMetadata[] = [
     deviceType: 'KIOSK_ADMIN',
     entitlementAppCode: 'KIOSK_ADMIN',
     description: 'Kiosk device fleet management, menu/branch assignment, availability, and order monitoring.',
-    defaultPort: 5177
+    defaultPort: 5173
   }
 ];
 

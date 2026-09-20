@@ -10,7 +10,7 @@ import {
   useAiAccess
 } from '@jamanvaar/ui';
 import { isDeviceConnected, connectDevice, activateCaptainDevice, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
-import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog } from '@jamanvaar/sync';
 
 // Captain Modular Layout & Views
 import { CaptainHeader } from './components/layout/CaptainHeader';
@@ -44,10 +44,12 @@ export const App: React.FC = () => {
   const {
     isLoggedIn,
     authStatus,
+    loginError,
     activeTab,
     selectedTable,
     isTableWorkspaceOpen,
     login,
+    serveReadyForTable,
     setActiveTab,
     setTableFilter,
     openTableWorkspace,
@@ -130,34 +132,8 @@ export const App: React.FC = () => {
     // Captain never edits the menu — only pulls whatever POS/Restaurant
     // Admin have pushed, so a Captain tablet with its own cleared/fresh
     // storage still gets the real menu instead of the local seed fallback.
-    const syncMenu = async () => {
-      await EntitySyncEngine.catchUp('MENU_ITEM', (remote) => {
-        const incoming = remote.payload as unknown as MenuItem;
-        if (!incoming || !incoming.id) return;
-        const idx = captainDb.menuItems.findIndex((m) => m.id === incoming.id);
-        if (idx >= 0) {
-          captainDb.menuItems[idx] = { ...captainDb.menuItems[idx], ...incoming };
-        } else {
-          captainDb.menuItems.push(incoming);
-        }
-      });
-      captainDb.notify();
-    };
 
     // Captain never edits categories either — pull only, same as menu items.
-    const syncCategories = async () => {
-      await EntitySyncEngine.catchUp('MENU_CATEGORY', (remote) => {
-        const incoming = remote.payload as unknown as Category;
-        if (!incoming || !incoming.id) return;
-        const idx = captainDb.categories.findIndex((c) => c.id === incoming.id);
-        if (idx >= 0) {
-          captainDb.categories[idx] = { ...captainDb.categories[idx], ...incoming };
-        } else {
-          captainDb.categories.push(incoming);
-        }
-      });
-      captainDb.notify();
-    };
 
     // BUG-019/034/035: a staff PIN issued in Restaurant Admin used to work only on the device that
     // created it — Captain never pulled staff records, despite the create/reset screen's own promise
@@ -168,8 +144,7 @@ export const App: React.FC = () => {
 
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
-    void syncMenu();
-    void syncCategories();
+    void syncMenuCatalog({ push: false });
     void syncStaff();
     void syncDiningTables();
     void reportHeartbeat();
@@ -185,8 +160,7 @@ export const App: React.FC = () => {
       });
     }, 4000);
     const interval = setInterval(() => {
-      void syncMenu();
-      void syncCategories();
+      void syncMenuCatalog({ push: false });
       void syncStaff();
       void reportHeartbeat();
     }, 15000);
@@ -283,6 +257,12 @@ export const App: React.FC = () => {
   // Open table workspace directly
   const handleOpenWorkspaceFromTable = (table: DiningTable) => {
     openTableWorkspace(table);
+  };
+
+  // The green "DELIVER FOOD" button on a table card: the waiter is taking the finished dishes to the table, so
+  // they are marked served (BUG-148). It used to just open the table, so a ready table could never be cleared.
+  const handleDeliverFood = (table: DiningTable) => {
+    serveReadyForTable(table.tableNumber);
   };
 
   const handleOpenWorkspaceFromNumber = (tableNumber: string) => {
@@ -385,10 +365,13 @@ export const App: React.FC = () => {
                   type="text"
                   value={connectRestaurantId}
                   onChange={(e) => setConnectRestaurantId(e.target.value)}
-                  placeholder="From your restaurant's admin dashboard"
+                  placeholder="Paste the ID, e.g. 7385361b-c19e-4431-beb4-135bb9b3c6db"
                   required
                   className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                 />
+                <p className="text-[11px] text-slate-500 mt-1.5">
+                    Find it in Super Admin: Restaurants, open the restaurant, Restaurant ID (with a Copy button). The owner can also copy it in Restaurant Admin under Subscription Plans, Device &amp; Staff Logins.
+                  </p>
               </div>
               <div>
                 <label className="text-xs font-bold text-slate-700 block mb-1.5">Login Email *</label>
@@ -496,7 +479,7 @@ export const App: React.FC = () => {
                 {pinError && (
                   <p className="text-xs font-bold text-rose-600 mt-2 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
-                    Invalid staff PIN code. Please enter your authorized 4-digit PIN.
+                    {loginError ?? 'Invalid staff PIN code. Please enter your authorized 4-digit PIN.'}
                   </p>
                 )}
               </div>
@@ -607,7 +590,7 @@ export const App: React.FC = () => {
             <CaptainFloorView
               onOpenGuestModal={handleOpenGuestModal}
               onOpenWorkspace={handleOpenWorkspaceFromTable}
-              onDeliverFood={handleOpenWorkspaceFromTable}
+              onDeliverFood={handleDeliverFood}
             />
           )}
 

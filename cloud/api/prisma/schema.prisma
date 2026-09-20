@@ -210,6 +210,13 @@ model User {
   // once a password is successfully set.
   activationTokenHash      String?
   activationTokenExpiresAt DateTime?
+  // "Forgot password" (BUG-142): a one-time code emailed to the user. Only its hash is stored; it expires
+  // quickly, is single-use, and is dropped after too many wrong guesses. `passwordResetSentAt` limits how
+  // often a new one can be requested.
+  passwordResetHash        String?
+  passwordResetExpiresAt   DateTime?
+  passwordResetSentAt      DateTime?
+  passwordResetAttempts    Int               @default(0)
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 

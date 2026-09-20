@@ -68,3 +68,18 @@ export const setTenantUserStatusSchema = z.object({
   status: z.enum(['ACTIVE', 'DISABLED'])
 });
 export type SetTenantUserStatusDto = z.infer<typeof setTenantUserStatusSchema>;
+
+// "Forgot password" (BUG-142): ask for a one-time code by email, then use it to choose a new password.
+export const forgotPasswordSchema = z.object({
+  restaurantId: z.string().uuid(),
+  email: z.string().trim().toLowerCase().email()
+});
+export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+  restaurantId: z.string().uuid(),
+  email: z.string().trim().toLowerCase().email(),
+  otp: z.string().trim().regex(/^\d{6}$/, 'The code is 6 digits'),
+  newPassword: z.string().min(8, 'Password must be at least 8 characters')
+});
+export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;

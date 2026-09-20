@@ -3,7 +3,7 @@ import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, 
 import { usePosStore } from './store/posStore';
 import { db, CustomerRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
 import type { MenuItem, Category } from '@jamanvaar/types';
-import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers } from '@jamanvaar/sync';
 import { sound } from '@jamanvaar/ui';
 import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
@@ -131,23 +131,9 @@ export const App: React.FC = () => {
     SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
     EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
 
-    // CRM has no per-record dirty flag the way Order.syncStatus does (see
-    // entity_sync.ts), so this pushes the restaurant's full current customer
-    // list each tick — proportionate for CRM list sizes, not a delta sync.
-    const syncCrm = async () => {
-      await EntitySyncEngine.pushSnapshot(
-        'CUSTOMER',
-        db.customerAccounts.map((c) => ({ externalId: c.phone, payload: c as unknown as Record<string, unknown> }))
-      );
-      await EntitySyncEngine.catchUp('CUSTOMER', (remote) => {
-        CustomerRepository.createCustomer({
-          phone: remote.externalId,
-          name: (remote.payload.name as string) || 'Valued Guest',
-          loyaltyPoints: (remote.payload.loyaltyPoints as number) ?? 0,
-          tags: remote.payload.tags as string[] | undefined
-        });
-      });
-    };
+    // Guests registered here reach Restaurant Admin's CRM and back (BUG-159): only what changed is sent, and the
+    // newer change wins, so a stale copy cannot overwrite loyalty points changed elsewhere.
+    const syncCrm = () => syncCustomers({ push: true });
 
     // Database-layer gap: the menu previously lived only in this device's
     // own browser storage — clearing it, or a brand-new terminal, meant
@@ -155,43 +141,9 @@ export const App: React.FC = () => {
     // real one. Every device now pushes its full current menu and merges
     // in whatever other devices have pushed, so the menu has a real,
     // durable copy in Postgres instead of existing on exactly one screen.
-    const syncMenu = async () => {
-      await EntitySyncEngine.pushSnapshot(
-        'MENU_ITEM',
-        db.menuItems.map((m) => ({ externalId: m.id, payload: m as unknown as Record<string, unknown> }))
-      );
-      await EntitySyncEngine.catchUp('MENU_ITEM', (remote) => {
-        const incoming = remote.payload as unknown as MenuItem;
-        if (!incoming || !incoming.id) return;
-        const idx = db.menuItems.findIndex((m) => m.id === incoming.id);
-        if (idx >= 0) {
-          db.menuItems[idx] = { ...db.menuItems[idx], ...incoming };
-        } else {
-          db.menuItems.push(incoming);
-        }
-      });
-      db.notify();
-    };
 
     // BUG-016: MENU_CATEGORY was defined in the entity-sync bridge's DTO but no app
     // ever actually used it, so categories never synced (even though the dishes did).
-    const syncCategories = async () => {
-      await EntitySyncEngine.pushSnapshot(
-        'MENU_CATEGORY',
-        db.categories.map((c) => ({ externalId: c.id, payload: c as unknown as Record<string, unknown> }))
-      );
-      await EntitySyncEngine.catchUp('MENU_CATEGORY', (remote) => {
-        const incoming = remote.payload as unknown as Category;
-        if (!incoming || !incoming.id) return;
-        const idx = db.categories.findIndex((c) => c.id === incoming.id);
-        if (idx >= 0) {
-          db.categories[idx] = { ...db.categories[idx], ...incoming };
-        } else {
-          db.categories.push(incoming);
-        }
-      });
-      db.notify();
-    };
 
     // BUG-019/034/035: a staff PIN issued in Restaurant Admin used to work only on the device that
     // created it — nothing synced staff records here, despite the create/reset screen's own promise
@@ -204,8 +156,7 @@ export const App: React.FC = () => {
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
     void syncCrm();
-    void syncMenu();
-    void syncCategories();
+    void syncMenuCatalog({ push: true });
     void syncStaff();
     void syncDiningTables();
     void reportHeartbeat();
@@ -221,8 +172,7 @@ export const App: React.FC = () => {
     }, 4000);
     const interval = setInterval(() => {
       void syncCrm();
-      void syncMenu();
-      void syncCategories();
+      void syncMenuCatalog({ push: true });
       void syncStaff();
       void reportHeartbeat();
     }, 15000);

@@ -6,9 +6,10 @@ import { pageOf, parsePaging } from '../../common/paging';
 import { ts } from '../../common/sql';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
-import { GenerateActivationKeyDto, RedeemActivationKeyDto } from './dto/activation-key.dto';
+import { GenerateActivationKeyDto, ReactivateKeyDto, RedeemActivationKeyDto } from './dto/activation-key.dto';
 import { generateOpaqueToken, hashOpaqueToken } from '../../common/security/token.util';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
+import { onlyActiveBranchId } from '../tenant-auth/tenant-auth.service';
 
 /** JMV-XXXX-XXXX-XXXX — human-relayable but drawn from a cryptographically random 96-bit value, not a counter or a guessable pattern. */
 function generateCode(): string {
@@ -297,7 +298,8 @@ export class ActivationKeysService {
           type: dto.deviceType,
           appVersion: dto.appVersion,
           // BUG-048: the terminal belongs to the branch (and carries the name) its key was issued for.
-          branchId: key.branchId,
+          // With one active branch there is no doubt which one (BUG-155).
+          branchId: key.branchId ?? (await onlyActiveBranchId(tx, key.restaurantId)),
           name: key.label,
           status: 'ACTIVE',
           activatedAt: new Date(),
@@ -373,5 +375,125 @@ export class ActivationKeysService {
 
       return updated;
     });
+  }
+
+  /** A lapsed key that is brought back gets this many days, unless the operator chose a date. */
+  private static readonly REACTIVATED_KEY_DAYS = 30;
+
+  /**
+   * Brings a revoked key back (BUG-128). An unused key becomes available again (with a new expiry when the old one
+   * has passed). A key that had been redeemed brings its terminal back too - the device is active again and signs
+   * in again - so a mistaken revoke is fully undone; that terminal takes a device seat, so the plan limit applies.
+   */
+  async reactivate(id: string, actor: PlatformUser, dto: ReactivateKeyDto = {}) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const existing = await tx.activationKey.findUnique({ where: { id } });
+      if (!existing) throw new NotFoundException('Activation key not found');
+      if (existing.status !== 'REVOKED') throw new ConflictException('Only a revoked activation key can be activated again');
+
+      const now = new Date();
+      let restoredDeviceId: string | null = null;
+      let data: Prisma.ActivationKeyUpdateInput;
+
+      if (existing.redeemedByDeviceId) {
+        const device = await tx.device.findUnique({ where: { id: existing.redeemedByDeviceId } });
+        if (device && device.status === 'REVOKED') {
+          const subscription = await tx.subscription.findFirst({
+            where: { restaurantId: existing.restaurantId, status: { in: ['ACTIVE', 'TRIAL'] } },
+            orderBy: { createdAt: 'desc' },
+            include: { plan: { select: { maxDevices: true } } }
+          });
+          if (subscription) {
+            const seats = await tx.device.count({ where: { restaurantId: existing.restaurantId, status: { not: 'REVOKED' } } });
+            if (seats >= subscription.plan.maxDevices) {
+              throw new ConflictException(
+                `This restaurant's plan allows ${subscription.plan.maxDevices} device${subscription.plan.maxDevices === 1 ? '' : 's'}, and that limit has been reached. Revoke an unused device or upgrade the plan to bring this terminal back.`
+              );
+            }
+          }
+          await tx.device.update({ where: { id: device.id }, data: { status: 'ACTIVE' } });
+          restoredDeviceId = device.id;
+        }
+        // It was in use: it goes back to being the record of that terminal, not a fresh key.
+        data = { status: 'REDEEMED' };
+      } else {
+        const expiresAt = dto.expiresAt ?? (existing.expiresAt > now ? existing.expiresAt : new Date(now.getTime() + ActivationKeysService.REACTIVATED_KEY_DAYS * 86_400_000));
+        if (expiresAt <= now) throw new BadRequestException('Choose an expiry date in the future');
+        data = { status: 'ACTIVE', expiresAt };
+      }
+
+      const updated = await tx.activationKey.update({ where: { id }, data, include: { restaurant: { select: { id: true, name: true } } } });
+
+      await this.audit.log(
+        {
+          actorType: 'PLATFORM',
+          actorId: actor.id,
+          restaurantId: existing.restaurantId,
+          action: 'ACTIVATION_KEY_REACTIVATED',
+          category: 'ACTIVATION',
+          details: { activationKeyId: id, code: existing.code, restoredDeviceId, expiresAt: updated.expiresAt.toISOString() }
+        },
+        tx
+      );
+      return updated;
+    });
+  }
+
+  /**
+   * Deletes a key that is not in use (BUG-128): available, revoked or expired. A redeemed key is the record of a
+   * registered terminal, so it must be revoked first. The delete is audited with the key's code, and the code can
+   * no longer be redeemed.
+   */
+  async remove(id: string, actor: PlatformUser) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const existing = await tx.activationKey.findUnique({ where: { id } });
+      if (!existing) throw new NotFoundException('Activation key not found');
+      if (existing.status === 'REDEEMED') throw new ConflictException('This key is in use by a terminal. Revoke it first, then it can be deleted.');
+
+      await tx.activationKey.delete({ where: { id } });
+      await this.audit.log(
+        {
+          actorType: 'PLATFORM',
+          actorId: actor.id,
+          restaurantId: existing.restaurantId,
+          action: 'ACTIVATION_KEY_DELETED',
+          category: 'ACTIVATION',
+          details: { activationKeyId: id, code: existing.code, previousStatus: existing.status, label: existing.label ?? null }
+        },
+        tx
+      );
+      return { deleted: true, id };
+    });
+  }
+
+  /** One call for many keys; a key that cannot be deleted (in use) is skipped, not fatal. */
+  async bulkRemove(ids: string[], actor: PlatformUser) {
+    let deleted = 0;
+    let skipped = 0;
+    for (const id of ids) {
+      try {
+        await this.remove(id, actor);
+        deleted++;
+      } catch (err) {
+        if (err instanceof ConflictException || err instanceof NotFoundException) skipped++;
+        else throw err;
+      }
+    }
+    return { deleted, skipped };
+  }
+
+  async bulkReactivate(ids: string[], actor: PlatformUser) {
+    let reactivated = 0;
+    let skipped = 0;
+    for (const id of ids) {
+      try {
+        await this.reactivate(id, actor);
+        reactivated++;
+      } catch (err) {
+        if (err instanceof ConflictException || err instanceof NotFoundException || err instanceof BadRequestException) skipped++;
+        else throw err;
+      }
+    }
+    return { reactivated, skipped };
   }
 }

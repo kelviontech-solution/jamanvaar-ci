@@ -136,4 +136,29 @@ describe('DeviceGate', () => {
     await DeviceGate.observe(json(200, {}));
     expect(calls).toBe(before);
   });
+
+  // BUG-143: an unrelated successful call used to clear a mandatory-update lock, and the next heartbeat
+  // locked it again, so the screen popped up and vanished on its own.
+  it('a mandatory-update lock is NOT cleared by an unrelated successful call (BUG-143)', async () => {
+    DeviceGate.applyHeartbeat({ ok: true, locked: false, update: { latestVersion: '2.0.0', mandatory: true, downloadUrl: null, releaseNotes: null } as never });
+    expect(DeviceGate.getState()).toMatchObject({ locked: true, code: 'UPDATE_REQUIRED' });
+    await DeviceGate.observe(json(200, { ok: true }));
+    expect(DeviceGate.getState()).toMatchObject({ locked: true, code: 'UPDATE_REQUIRED' });
+  });
+
+  it('a mandatory-update lock is cleared only by a heartbeat that no longer asks for it (BUG-143)', () => {
+    DeviceGate.applyHeartbeat({ ok: true, locked: false, update: { latestVersion: '2.0.0', mandatory: true, downloadUrl: null, releaseNotes: null } as never });
+    expect(DeviceGate.getState().locked).toBe(true);
+    DeviceGate.applyHeartbeat({ ok: true, locked: false, update: null });
+    expect(DeviceGate.getState().locked).toBe(false);
+  });
+
+  // BUG-145: the cloud refuses an unknown/inactive device credential with INVALID_DEVICE_CREDENTIAL, which
+  // was not a lock code, so the terminal kept showing stale data with no sign that it had lost the cloud.
+  it('a refused device credential locks the terminal with a re-activate message (BUG-145)', async () => {
+    await DeviceGate.observe(json(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'Invalid device credential.' }));
+    const s = DeviceGate.getState();
+    expect(s).toMatchObject({ locked: true, code: 'INVALID_DEVICE_CREDENTIAL' });
+    expect(s.message).toMatch(/re-?activate/i);
+  });
 });

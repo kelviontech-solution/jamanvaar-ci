@@ -17,6 +17,7 @@ const TITLES: Record<DeviceGateCode, string> = {
   APP_DISABLED: 'App not enabled',
   BRANCH_INACTIVE: 'Branch deactivated',
   DEVICE_LOCKED: 'Terminal locked',
+  INVALID_DEVICE_CREDENTIAL: 'Device not recognised',
   UPDATE_REQUIRED: 'Update required',
   OFFLINE_LIMIT: 'Check-in required'
 };

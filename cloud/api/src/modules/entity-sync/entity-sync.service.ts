@@ -6,8 +6,12 @@ import { EntitySyncEventDto, SyncableEntityType } from './dto/push-entity-sync.d
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000;
 const CATCH_UP_MAX_ROWS = 500;
 
-/** Entity types edited from several devices at once: a push older than what is stored is ignored. */
-const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['DINING_TABLE']);
+/**
+ * Entity types edited from several devices at once: a push older than what is stored is ignored. The menu is
+ * in here too (BUG-149): a device holding an old copy of a dish, or a dish someone deleted, must not overwrite
+ * the newer edit or bring the deleted record back.
+ */
+const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'COMBO', 'COUPON', 'CUSTOMER']);
 
 function changedAt(payload: unknown): number {
   const value = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).updatedAt : undefined;

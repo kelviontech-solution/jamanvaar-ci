@@ -170,62 +170,33 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
   const demo = shouldSeedDemoData(process.env) ? await seedDemoTenant(tx, corePlan) : null;
 
   // Seed AppRelease Catalog for all 6 JAMANVAAR client applications
+  // BUG-140 / BUG-141: every client app is built as 1.0.0 (package.json), so the seeded "current" release is
+  // 1.0.0 with a minimum of 1.0.0 - a fresh database must not tell a terminal it is already out of date. The
+  // seed used to invent later versions (2.4.0 ...) with a minimum above 1.0.0, which locked every terminal
+  // behind a mandatory "Update required" wall, and download links pointing at files that do not exist (or at
+  // another app's dev address). No download link is seeded: until real installers are published from the
+  // Applications page, a terminal simply shows no download button.
   const appReleases = [
-    {
-      appCode: 'POS',
-      version: '2.4.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '2.0.0',
-      supportedPlatforms: ['windows', 'electron'],
-      releaseNotes: 'Offline-first counter billing, fast token orders, multi-payment tenders, KOT routing, ESC/POS thermal printing.',
-      downloadUrl: '/releases/jamanvaar-pos-setup-2.4.0.exe'
-    },
-    {
-      appCode: 'RESTAURANT_ADMIN',
-      version: '2.4.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '2.0.0',
-      supportedPlatforms: ['web'],
-      releaseNotes: 'Restaurant back-office portal, menu management, floor layouts, staff roles, statutory reports, cloud sync.',
-      downloadUrl: 'http://localhost:5176'
-    },
-    {
-      appCode: 'CAPTAIN',
-      version: '2.1.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '2.0.0',
-      supportedPlatforms: ['android', 'web'],
-      releaseNotes: 'Wireless table-side waiter ordering, instant course firing, kitchen ready alerts, tip tracking.',
-      downloadUrl: '/releases/jamanvaar-captain-v2.1.0.apk'
-    },
-    {
-      appCode: 'KDS',
-      version: '2.0.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '1.8.0',
-      supportedPlatforms: ['web', 'android'],
-      releaseNotes: 'Multi-station kitchen routing, cook time color alerts, bump bar support, course synchronization.',
-      downloadUrl: '/releases/jamanvaar-kds-v2.0.0.apk'
-    },
-    {
-      appCode: 'KIOSK',
-      version: '1.8.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '1.5.0',
-      supportedPlatforms: ['windows', 'android'],
-      releaseNotes: 'Self-ordering guest kiosk, dynamic combos, custom modifiers, UPI BharatQR display, auto-idle reset.',
-      downloadUrl: '/releases/jamanvaar-kiosk-v1.8.0.exe'
-    },
-    {
-      appCode: 'KIOSK_ADMIN',
-      version: '1.8.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '1.5.0',
-      supportedPlatforms: ['web'],
-      releaseNotes: 'Kiosk terminal administration, station lock, screen branding, peripheral hardware configuration.',
-      downloadUrl: 'http://localhost:5177'
-    }
+    { appCode: 'POS', supportedPlatforms: ['windows', 'web'], releaseNotes: 'Offline-first counter billing, fast token orders, multi-payment tenders, KOT routing, ESC/POS thermal printing.' },
+    { appCode: 'RESTAURANT_ADMIN', supportedPlatforms: ['web', 'windows'], releaseNotes: 'Restaurant back-office portal, menu management, floor layouts, staff roles, statutory reports, cloud sync.' },
+    { appCode: 'CAPTAIN', supportedPlatforms: ['android', 'web'], releaseNotes: 'Wireless table-side waiter ordering, instant course firing, kitchen ready alerts, tip tracking.' },
+    { appCode: 'KDS', supportedPlatforms: ['web', 'android'], releaseNotes: 'Multi-station kitchen routing, cook time color alerts, bump bar support, course synchronization.' },
+    { appCode: 'KIOSK', supportedPlatforms: ['windows', 'android'], releaseNotes: 'Self-ordering guest kiosk, dynamic combos, custom modifiers, UPI BharatQR display, auto-idle reset.' },
+    { appCode: 'KIOSK_ADMIN', supportedPlatforms: ['web', 'windows'], releaseNotes: 'Kiosk terminal administration, station lock, screen branding, peripheral hardware configuration.' }
+  ].map((r) => ({ ...r, version: '1.0.0', channel: 'STABLE' as const, minSupportedVersion: '1.0.0', downloadUrl: null as string | null }));
+
+  // Databases seeded before this fix hold the invented releases; remove exactly those (and only those).
+  const inventedReleases: Array<[string, string]> = [
+    ['POS', '2.4.0'],
+    ['RESTAURANT_ADMIN', '2.4.0'],
+    ['CAPTAIN', '2.1.0'],
+    ['KDS', '2.0.0'],
+    ['KIOSK', '1.8.0'],
+    ['KIOSK_ADMIN', '1.8.0']
   ];
+  for (const [appCode, version] of inventedReleases) {
+    await tx.appRelease.deleteMany({ where: { appCode, version } });
+  }
 
   for (const rel of appReleases) {
     await tx.appRelease.upsert({

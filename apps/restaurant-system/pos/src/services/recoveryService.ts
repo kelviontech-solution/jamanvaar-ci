@@ -22,6 +22,12 @@ export class PosRecoveryService {
         this.clearDraft();
         return;
       }
+      // Everything in the cart is already with the kitchen: the order is saved, so there is nothing unfinished
+      // to offer back after a reload - restoring it would let the same dishes be sent twice (BUG-154).
+      if (session.cart.items.every((ci) => (ci.kotSentQty || 0) >= ci.quantity)) {
+        this.clearDraft();
+        return;
+      }
 
       const draft: DraftCartSession = {
         id: `draft-${Date.now()}`,

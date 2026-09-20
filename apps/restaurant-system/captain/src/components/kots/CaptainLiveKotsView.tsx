@@ -115,7 +115,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
                         </span>
                       </div>
                       <span className="text-xs text-slate-500 font-bold block mt-0.5">
-                        Order #{kot.orderNumber?.slice(-4) || '—'}
+                        Token #{kot.tokenNumber || '—'}
                       </span>
                     </div>
 

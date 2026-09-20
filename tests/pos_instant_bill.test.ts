@@ -60,4 +60,21 @@ describe('JAMANVAAR POS — ⚡ Instant Bill / Fast-Track Counter Billing Mode',
     expect(db.restaurant?.instantBillConfig?.autoPrint).toBe(false);
     expect(db.restaurant?.instantBillConfig?.sendKotBeforeBill).toBe(true);
   });
+
+  // BUG-153: the sale was saved as DINE_IN with no table and no cashier, and under a different guest name.
+  it('4. is a takeaway sale by the signed-in cashier, like a normal counter order (BUG-153)', async () => {
+    usePosStore.setState({ currentUser: { id: 'u1', fullName: 'Priya Cashier', roleId: 'role-cashier' } as never, orderType: 'DINE_IN', selectedTable: null });
+    usePosStore.getState().addItemToCart(db.menuItems[0], [], '', 1);
+    const settled = await usePosStore.getState().executeInstantBill('CASH');
+    expect(settled?.orderType).toBe('TAKEAWAY');
+    expect(settled?.cashierName).toBe('Priya Cashier');
+    expect(settled?.customerName).not.toBe('Walk-in Guest');
+  });
+
+  it('5. keeps a type the cashier chose on purpose', async () => {
+    usePosStore.setState({ orderType: 'DELIVERY', selectedTable: null });
+    usePosStore.getState().addItemToCart(db.menuItems[0], [], '', 1);
+    const settled = await usePosStore.getState().executeInstantBill('CASH');
+    expect(settled?.orderType).toBe('DELIVERY');
+  });
 });

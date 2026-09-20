@@ -1,5 +1,5 @@
 import { assertSessionStillAllowed } from '../../common/security/session-state';
-import { randomBytes, createHash } from 'crypto';
+import { randomBytes, createHash, randomInt, timingSafeEqual } from 'crypto';
 import {
   BadRequestException,
   ConflictException,
@@ -19,6 +19,14 @@ import { hashOpaqueToken, generateOpaqueToken } from '../../common/security/toke
 import { CreateTenantStaffUserDto, TenantLoginDto, ActivateDeviceDto } from './dto/login.dto';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { AppCode } from '@prisma/client';
+import { EmailService } from '../notifications/email.service';
+import { passwordResetOtpEmail } from '../notifications/email-templates';
+
+/** A restaurant with a single active branch has an obvious answer for which branch a new terminal belongs to. */
+export async function onlyActiveBranchId(tx: { branch: { findMany: (args: any) => Promise<Array<{ id: string }>> } }, restaurantId: string): Promise<string | null> {
+  const branches = await tx.branch.findMany({ where: { restaurantId, status: 'ACTIVE' }, select: { id: true }, take: 2 });
+  return branches.length === 1 ? branches[0].id : null;
+}
 
 export const TENANT_JWT_ISSUER = 'jamanvaar-tenant';
 export const TENANT_JWT_AUDIENCE = 'jamanvaar-tenant';
@@ -38,6 +46,26 @@ export interface TenantLoginResult {
   user: Pick<User, 'id' | 'restaurantId' | 'branchId' | 'email' | 'fullName' | 'role' | 'status'>;
 }
 
+/**
+ * What a terminal learns about its restaurant when it signs in (BUG-158): the real name and the legal details the
+ * platform holds. Without them a new restaurant's Restaurant Admin kept showing the demo install's GSTIN, address
+ * and phone, which could be printed on a legal tax invoice.
+ */
+export interface RestaurantProfile {
+  id: string;
+  name: string;
+  legalName?: string | null;
+  gstin?: string | null;
+  fssaiNumber?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+}
+
+export function restaurantProfile(r: RestaurantProfile): RestaurantProfile {
+  return { id: r.id, name: r.name, legalName: r.legalName ?? null, gstin: r.gstin ?? null, fssaiNumber: r.fssaiNumber ?? null, address: r.address ?? null, city: r.city ?? null, state: r.state ?? null };
+}
+
 export interface TenantLoginSuccess {
   status: 'LOGIN_SUCCESS';
   requiresActivation: false;
@@ -45,7 +73,7 @@ export interface TenantLoginSuccess {
   refreshToken: string;
   refreshTokenExpiresAt: Date;
   user: TenantLoginResult['user'];
-  restaurant: { id: string; name: string };
+  restaurant: RestaurantProfile;
   deviceId?: string;
   deviceToken?: string;
 }
@@ -54,7 +82,7 @@ export interface TenantActivationRequired {
   status: 'ACTIVATION_REQUIRED';
   requiresActivation: true;
   activationSessionToken: string;
-  restaurant: { id: string; name: string };
+  restaurant: RestaurantProfile;
   user: { id: string; email: string; fullName: string };
   message: string;
 }
@@ -84,7 +112,8 @@ export class TenantAuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly audit: AuditService,
-    private readonly appEntitlements: ApplicationEntitlementsService
+    private readonly appEntitlements: ApplicationEntitlementsService,
+    private readonly email: EmailService
   ) {}
 
   private signAccessToken(user: User, deviceId?: string): string {
@@ -227,7 +256,7 @@ export class TenantAuthService {
         },
         include: {
           restaurant: {
-            select: { id: true, name: true, status: true, deletedAt: true }
+            select: { id: true, name: true, status: true, deletedAt: true, legalName: true, gstin: true, fssaiNumber: true, address: true, city: true, state: true }
           }
         }
       });
@@ -311,10 +340,7 @@ export class TenantAuthService {
         refreshToken,
         refreshTokenExpiresAt: expiresAt,
         user: publicUser(matchedUser),
-        restaurant: {
-          id: matchedUser.restaurant.id,
-          name: matchedUser.restaurant.name
-        },
+        restaurant: restaurantProfile(matchedUser.restaurant),
         deviceId: activeDevice.id
       };
     }
@@ -336,10 +362,7 @@ export class TenantAuthService {
         status: 'ACTIVATION_REQUIRED',
         requiresActivation: true,
         activationSessionToken,
-        restaurant: {
-          id: matchedUser.restaurant.id,
-          name: matchedUser.restaurant.name
-        },
+        restaurant: restaurantProfile(matchedUser.restaurant),
         user: {
           id: matchedUser.id,
           email: matchedUser.email,
@@ -369,10 +392,7 @@ export class TenantAuthService {
       refreshToken,
       refreshTokenExpiresAt: expiresAt,
       user: publicUser(matchedUser),
-      restaurant: {
-        id: matchedUser.restaurant.id,
-        name: matchedUser.restaurant.name
-      }
+      restaurant: restaurantProfile(matchedUser.restaurant)
     };
   }
 
@@ -443,11 +463,17 @@ export class TenantAuthService {
       const deviceToken = generateOpaqueToken();
 
       // Create or activate the device record
+      // The terminal belongs to the branch its key was issued for, and carries the name the key was given
+      // (BUG-155): this path used to leave both empty, so Restaurant Admin, Captain and Kiosk Admin showed as
+      // "Unnamed terminal" with "No branch assigned", and a deactivated branch could never lock them.
+      const branchId = key.branchId ?? (await onlyActiveBranchId(tx, key.restaurantId));
       const device = await tx.device.create({
         data: {
           restaurantId: key.restaurantId,
           type: dto.deviceType,
           appVersion: dto.appVersion,
+          branchId,
+          name: key.label ?? dto.deviceName ?? null,
           status: 'ACTIVE',
           activatedAt: new Date(),
           lastSeenAt: new Date(),
@@ -509,10 +535,7 @@ export class TenantAuthService {
         refreshToken: token,
         refreshTokenExpiresAt: expiresAt,
         user: publicUser(user),
-        restaurant: {
-          id: key.restaurant.id,
-          name: key.restaurant.name
-        },
+        restaurant: restaurantProfile(key.restaurant),
         deviceId: device.id,
         deviceToken
       };
@@ -592,11 +615,13 @@ export class TenantAuthService {
       });
 
       if (!subscription) {
-        return { subscriptionStatus: null, planName: null, planTier: null, entitlements: null, limits: null };
+        return { subscriptionStatus: null, expiresAt: null, planName: null, planTier: null, entitlements: null, limits: null };
       }
 
       return {
         subscriptionStatus: subscription.status,
+        // When the current subscription ends (BUG-158: a console showed a made-up "valid until" date).
+        expiresAt: subscription.expiresAt,
         planName: subscription.plan.name,
         planTier: subscription.plan.tier,
         entitlements: subscription.plan.entitlements,
@@ -769,5 +794,91 @@ export class TenantAuthService {
         tx
       );
     });
+  }
+
+  /** How long a reset code works, how many wrong guesses it survives, and the wait before another can be requested. */
+  private static readonly RESET_CODE_MINUTES = 15;
+  private static readonly RESET_MAX_ATTEMPTS = 5;
+  private static readonly RESET_RESEND_SECONDS = 60;
+
+  /**
+   * "Forgot password" step 1 (BUG-142). Emails a 6-digit one-time code to an active user. It always answers the
+   * same way, whether or not the address belongs to a user, so it cannot be used to find out who has an account.
+   * Only a hash of the code is stored; asking again within a minute is ignored.
+   */
+  async requestPasswordReset(restaurantId: string, email: string): Promise<void> {
+    const found = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      const user = await tx.user.findFirst({ where: { restaurantId, email } });
+      if (!user || user.status !== TenantUserStatus.ACTIVE || !user.passwordHash) return null;
+      const now = new Date();
+      if (user.passwordResetSentAt && now.getTime() - user.passwordResetSentAt.getTime() < TenantAuthService.RESET_RESEND_SECONDS * 1000) return null;
+
+      const otp = String(randomInt(0, 1_000_000)).padStart(6, '0');
+      await tx.user.update({
+        where: { id: user.id },
+        data: {
+          passwordResetHash: hashOpaqueToken(otp),
+          passwordResetExpiresAt: new Date(now.getTime() + TenantAuthService.RESET_CODE_MINUTES * 60_000),
+          passwordResetSentAt: now,
+          passwordResetAttempts: 0
+        }
+      });
+      await this.audit.log(
+        { actorType: 'TENANT', actorId: user.id, restaurantId, action: 'TENANT_PASSWORD_RESET_REQUESTED', category: 'AUTH', details: { email: user.email } },
+        tx
+      );
+      return { user, otp };
+    });
+    if (!found) return;
+
+    try {
+      const mail = passwordResetOtpEmail({ fullName: found.user.fullName, otp: found.otp, minutesValid: TenantAuthService.RESET_CODE_MINUTES });
+      await this.email.send(found.user.email, mail.subject, mail.html);
+    } catch {
+      // A mail server problem must not reveal anything to the caller; the code simply never arrives and they can ask again.
+    }
+  }
+
+  /**
+   * "Forgot password" step 2 (BUG-142): the code plus a new password. A wrong, expired or already-used code all
+   * get the same answer; after too many wrong guesses the code is dropped and a new one must be requested. A
+   * successful reset signs the user out everywhere.
+   */
+  async resetPassword(restaurantId: string, email: string, otp: string, newPassword: string): Promise<void> {
+    // The wrong-guess count and the dropped code must be saved even though the request fails, so the checks run in
+    // a transaction that returns the outcome, and the refusal is thrown only after it has committed.
+    const outcome = await this.prisma.runAsTenant(restaurantId, async (tx): Promise<'ok' | 'invalid'> => {
+      const user = await tx.user.findFirst({ where: { restaurantId, email } });
+      if (!user || user.status !== TenantUserStatus.ACTIVE || !user.passwordResetHash || !user.passwordResetExpiresAt) return 'invalid';
+      if (user.passwordResetExpiresAt < new Date() || user.passwordResetAttempts >= TenantAuthService.RESET_MAX_ATTEMPTS) {
+        await tx.user.update({ where: { id: user.id }, data: { passwordResetHash: null, passwordResetExpiresAt: null } });
+        return 'invalid';
+      }
+
+      const given = Buffer.from(hashOpaqueToken(otp));
+      const stored = Buffer.from(user.passwordResetHash);
+      if (given.length !== stored.length || !timingSafeEqual(given, stored)) {
+        await tx.user.update({ where: { id: user.id }, data: { passwordResetAttempts: { increment: 1 } } });
+        return 'invalid';
+      }
+
+      await tx.user.update({
+        where: { id: user.id },
+        data: {
+          passwordHash: await bcrypt.hash(newPassword, 10),
+          passwordResetHash: null,
+          passwordResetExpiresAt: null,
+          passwordResetAttempts: 0
+        }
+      });
+      // Whoever knew the old password (or had a stolen session) is signed out.
+      await tx.tenantRefreshToken.updateMany({ where: { userId: user.id, revokedAt: null }, data: { revokedAt: new Date() } });
+      await this.audit.log(
+        { actorType: 'TENANT', actorId: user.id, restaurantId, action: 'TENANT_PASSWORD_RESET', category: 'AUTH', details: { email: user.email } },
+        tx
+      );
+      return 'ok';
+    });
+    if (outcome !== 'ok') throw new BadRequestException('That code is not valid or has expired. Ask for a new one.');
   }
 }

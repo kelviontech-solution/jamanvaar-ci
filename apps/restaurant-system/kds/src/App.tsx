@@ -31,6 +31,12 @@ import {
   RefreshCw
 } from 'lucide-react';
 
+/** Who took the order: a table order from the Captain app is the waiter's, anything else was rung up by a cashier (BUG-157). */
+function kotTakenByLabel(kot: KOTRecord): string {
+  const order = db.orders.find((o) => o.id === kot.orderId);
+  return order?.source_type === 'CAPTAIN' || order?.captainName ? 'Captain' : 'Cashier';
+}
+
 export const App: React.FC = () => {
   const [kots, setKots] = useState<KOTRecord[]>(kdsDb.kots);
 
@@ -226,6 +232,8 @@ export const App: React.FC = () => {
   }, []);
 
   const [kdsPinError, setKdsPinError] = useState(false);
+  // Set when the PIN is right but the person's role cannot use the kitchen screen (BUG-147).
+  const [kdsPinDenied, setKdsPinDenied] = useState<string | null>(null);
 
   // Same fix as Captain's SEC-006: authenticate against real db.users
   // records instead of accepting any 4-digit sequence. Previously this
@@ -240,6 +248,8 @@ export const App: React.FC = () => {
         const candidate = StaffRepository.verifyPin(next)?.user;
         // A PIN for a role that does not work the kitchen screen is refused (BUG-118).
         const matchedUser = candidate && StaffRepository.canUseTerminal(candidate.roleId, 'KDS') ? candidate : undefined;
+
+        setKdsPinDenied(candidate && !matchedUser ? StaffRepository.terminalDeniedMessage(candidate.roleId, 'KDS') : null);
 
         if (matchedUser) {
           setKdsPinError(false);
@@ -490,7 +500,7 @@ export const App: React.FC = () => {
             {kdsPinError && (
               <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
                 <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>Incorrect PIN. Please try again.</span>
+                <span>{kdsPinDenied ?? 'Incorrect PIN. Please try again.'}</span>
               </div>
             )}
 
@@ -771,7 +781,7 @@ export const App: React.FC = () => {
                   {/* Card Footer & Large Touch Action Button (48px height) */}
                   <div className="p-4 sm:p-5 bg-jaman-cream border-t border-jaman-border space-y-3">
                     <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
-                      <span>{kot.cashierName ? <>Captain: <strong className="text-jaman-navy">{kot.cashierName}</strong></> : null}</span>
+                      <span>{kot.cashierName ? <>{kotTakenByLabel(kot)}: <strong className="text-jaman-navy">{kot.cashierName}</strong></> : null}</span>
                       <span className="font-mono text-slate-400">#{kot.id.slice(-5)}</span>
                     </div>
 

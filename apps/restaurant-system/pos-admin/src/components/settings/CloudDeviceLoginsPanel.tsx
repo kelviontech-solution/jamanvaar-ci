@@ -6,6 +6,7 @@ import {
   fetchCloudLogins,
   createCloudLogin,
   setCloudLoginStatus,
+  getStoredRestaurantId,
   CloudApiError,
   type CloudTenantUser
 } from '../../cloud/cloudClient';
@@ -122,6 +123,21 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
           <span>Generate Login</span>
         </button>
       </div>
+      {getStoredRestaurantId() && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl bg-jaman-cream border border-jaman-border px-3 py-2 text-xs">
+          <span className="font-bold text-jaman-navy">Restaurant ID</span>
+          <code className="font-mono text-[11px] text-slate-700 break-all">{getStoredRestaurantId()}</code>
+          <button
+            type="button"
+            onClick={() => copy(getStoredRestaurantId() as string, 'restaurantId')}
+            className="ml-auto px-2.5 py-1 rounded-lg bg-white border border-jaman-border text-[11px] font-bold text-jaman-navy flex items-center gap-1 cursor-pointer"
+          >
+            {copiedField === 'restaurantId' ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+            <span>{copiedField === 'restaurantId' ? 'Copied' : 'Copy ID'}</span>
+          </button>
+          <span className="w-full text-[10px] text-slate-500">Kiosk Admin and Captain ask for this ID together with a login created below.</span>
+        </div>
+      )}
       <p className="text-[11px] text-slate-500">
         Create an id + password for the Captain app or another POS terminal — no activation code needed, just this
         login. Visible to Super Admin under this restaurant's Owner &amp; Users tab too.

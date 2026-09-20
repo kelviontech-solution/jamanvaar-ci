@@ -73,7 +73,7 @@ export const PosTableDrawer: React.FC<PosTableDrawerProps> = ({ table, onClose }
     TableRepository.updateTableStatus(table.id, 'AVAILABLE');
     if (table.currentOrderId) {
       const ord = OrderRepository.getOrderById(table.currentOrderId);
-      if (ord && ord.orderStatus === 'PREPARING') {
+      if (ord && (ord.orderStatus === 'PREPARING' || ord.orderStatus === 'READY')) {
         OrderRepository.updateOrderStatus(ord.id, 'COMPLETED', 'Table Vacated');
       }
     }

@@ -216,6 +216,30 @@ export class DevicesService {
    * that path now — the device identifies itself via its own long-lived
    * credential, never a caller-supplied device id.
    */
+  async listKiosksForRestaurant(restaurantId: string) {
+    const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.device.findMany({
+        where: { restaurantId, type: 'KIOSK', status: { not: 'REVOKED' } },
+        select: { id: true, name: true, status: true, lastSeenAt: true, appVersion: true, isLocked: true, lockReason: true, branch: { select: { name: true } } },
+        orderBy: { createdAt: 'asc' }
+      })
+    );
+    const now = new Date();
+    return {
+      kiosks: rows.map((d) => ({
+        id: d.id,
+        name: d.name ?? 'Kiosk',
+        appVersion: d.appVersion,
+        lastSeenAt: d.lastSeenAt,
+        health: deviceHealth(d, now),
+        isLocked: d.isLocked,
+        lockReason: d.lockReason,
+        branchName: d.branch?.name ?? null
+      })),
+      serverTime: now.toISOString()
+    };
+  }
+
   async reportHeartbeat(device: Device, dto: HeartbeatDto) {
     const updated = await this.prisma.runAsTenant(device.restaurantId, (tx) =>
       tx.device.update({

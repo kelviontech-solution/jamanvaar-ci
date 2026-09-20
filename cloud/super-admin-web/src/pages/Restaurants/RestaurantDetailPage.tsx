@@ -413,18 +413,69 @@ export function RestaurantDetailPage() {
     });
   }
 
-  function handleRevokeActivationKey(keyId: string, code: string) {
+  // Activation key actions (BUG-128): revoke, activate again, delete - each says what will happen.
+  function handleRevokeActivationKey(keyId: string, code: string, inUse = false) {
     if (!restaurant) return;
     setConfirmAction({
       title: `Revoke Activation Key "${code}"?`,
-      message: 'This unused activation key will be permanently invalidated and cannot be redeemed on any device.',
+      message: inUse
+        ? 'This key is in use. Revoking it also revokes the terminal that used it, and that terminal stops working. You can bring both back with "Activate again".'
+        : 'This key can no longer be used to activate a terminal. You can bring it back with "Activate again", or delete it.',
       tone: 'danger',
       action: async () => {
-        await api.delete(`/api/v1/activation-keys/${keyId}`);
+        await api.patch(`/api/v1/activation-keys/${keyId}/revoke`);
         showToast('Activation key revoked');
         load();
       }
     });
+  }
+
+  function handleReactivateActivationKey(keyId: string, code: string, hadTerminal: boolean) {
+    if (!restaurant) return;
+    setConfirmAction({
+      title: `Activate Key "${code}" Again?`,
+      message: hadTerminal
+        ? 'This key had been used by a terminal. That terminal is switched back on and signs in again, exactly as before the revoke.'
+        : 'The key becomes available to activate a terminal again. If its expiry date has passed it gets 30 more days.',
+      tone: 'primary',
+      action: async () => {
+        await api.patch(`/api/v1/activation-keys/${keyId}/reactivate`, {});
+        showToast('Activation key activated again');
+        load();
+      }
+    });
+  }
+
+  function handleDeleteActivationKey(keyId: string, code: string) {
+    if (!restaurant) return;
+    setConfirmAction({
+      title: `Delete Activation Key "${code}"?`,
+      message: 'The key is permanently removed and its code can never be redeemed. This is recorded in the audit log. It cannot be undone.',
+      tone: 'danger',
+      action: async () => {
+        await api.delete(`/api/v1/activation-keys/${keyId}`);
+        showToast('Activation key deleted');
+        load();
+      }
+    });
+  }
+
+  /** Revoke / Activate again / Delete for one key: what is offered depends on what state the key is in. */
+  function renderKeyActions(k: { id: string; status: string; code?: string | null; codeLast4?: string | null; redeemedAt?: string | null }) {
+    const label = k.code ?? `•••• ${k.codeLast4 ?? ''}`;
+    return (
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        {(k.status === 'ACTIVE' || k.status === 'REDEEMED') && (
+          <Button size="sm" variant="danger" onClick={() => handleRevokeActivationKey(k.id, label, k.status === 'REDEEMED')}>Revoke</Button>
+        )}
+        {k.status === 'REVOKED' && (
+          <Button size="sm" variant="primary" onClick={() => handleReactivateActivationKey(k.id, label, !!k.redeemedAt)}>Activate again</Button>
+        )}
+        {k.status !== 'REDEEMED' && (
+          <Button size="sm" variant="ghost" onClick={() => handleDeleteActivationKey(k.id, label)}>Delete</Button>
+        )}
+      </div>
+    );
   }
 
   function handleRevokeDevice(deviceId: string, type: string) {
@@ -693,6 +744,11 @@ export function RestaurantDetailPage() {
             <Card className="detail-card">
               <div className="detail-card-title">Commercial &amp; Legal Profile</div>
               <dl className="detail-list">
+                <dt>Restaurant ID</dt>
+                <dd>
+                  <span className="mono" style={{ fontSize: 12, wordBreak: 'break-all' }}>{restaurant.id}</span>{' '}
+                  <CopyButton text={restaurant.id} label="Copy ID" title="Copy the Restaurant ID" />
+                </dd>
                 <dt>Legal Name</dt>
                 <dd>{restaurant.legalName || '—'}</dd>
                 <dt>GSTIN</dt>
@@ -749,8 +805,14 @@ export function RestaurantDetailPage() {
                     {restaurant.activationKeys.filter((k) => k.status === 'ACTIVE').length} Available to Redeem
                   </Badge>
                 </div>
+                <div style={{ margin: '8px 0 0 0', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 13, color: '#0B253A' }}>
+                  <strong>Restaurant ID</strong>
+                  <code className="mono" style={{ fontSize: 12, background: '#fff', border: '1px solid #FDBA74', borderRadius: 8, padding: '3px 8px', wordBreak: 'break-all' }}>{restaurant.id}</code>
+                  <CopyButton text={restaurant.id} label="Copy ID" title="Copy the Restaurant ID" />
+                </div>
                 <p style={{ margin: '6px 0 0 0', fontSize: 13, color: '#64748b' }}>
-                  Relay these keys to the restaurant owner. On first login at <strong>Restaurant Admin ({RESTAURANT_ADMIN_URL})</strong>, <strong>POS</strong>, or <strong>Captain</strong>, entering this key registers and binds the device.
+                  <strong>Kiosk Admin</strong> and <strong>Captain</strong> ask for this Restaurant ID together with the restaurant owner's login before they take a key.
+                  {' '}Relay these keys to the restaurant owner. On first login at <strong>Restaurant Admin ({RESTAURANT_ADMIN_URL})</strong>, <strong>POS</strong>, or <strong>Captain</strong>, entering this key registers and binds the device.
                   {restaurant.activationKeys.some((k) => k.allowedDeviceType === 'KIOSK_ADMIN') && (
                     <>
                       {' '}
@@ -819,6 +881,8 @@ export function RestaurantDetailPage() {
                           </span>
                         )}
                       </div>
+
+                      {renderKeyActions(k)}
                     </div>
                   );
                 })}
@@ -1300,16 +1364,12 @@ export function RestaurantDetailPage() {
                       <td><Badge tone={statusTone(k.status)} pulse={k.status === 'ACTIVE'}>{k.status}</Badge></td>
                       <td>{new Date(k.expiresAt).toLocaleDateString('en-IN')}</td>
                       <td>
-                        {k.status === 'ACTIVE' && (
-                          <Button size="sm" variant="danger" onClick={() => handleRevokeActivationKey(k.id, k.code ?? `•••• ${k.codeLast4 ?? ''}`)}>
-                            Revoke
-                          </Button>
-                        )}
                         {k.status === 'REDEEMED' && (
-                          <span style={{ fontSize: 11, color: '#16a34a', fontWeight: 600 }}>
+                          <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 600, marginBottom: 4 }}>
                             ✓ Redeemed {k.redeemedAt ? new Date(k.redeemedAt).toLocaleDateString('en-IN') : ''}
-                          </span>
+                          </div>
                         )}
+                        {renderKeyActions(k)}
                       </td>
                     </tr>
                   ))}

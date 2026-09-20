@@ -45,6 +45,10 @@ describe('Captain service workflow', () => {
       const cook = StaffRepository.createUser({ username: 'chefji', fullName: 'Chef Ji', roleId: 'role-chef' });
       expect(store().login(cook.issuedPin)).toBe(false);
       expect(store().isLoggedIn).toBe(false);
+      // BUG-147: the screen says why, instead of "incorrect PIN"; a plain typo says nothing special.
+      expect(store().loginError).toMatch(/Chef.*can't open the Captain app/);
+      expect(store().login('0000')).toBe(false);
+      expect(store().loginError).toBeNull();
     });
 
     it('nobody is pre-assigned tables: the default view is every table', () => {
@@ -226,6 +230,26 @@ describe('Captain service workflow', () => {
       expect(store().foodReadyItems).toEqual([]);
       expect(kots.every((k) => db.kots.find((x) => x.id === k.id)!.status === 'SERVED')).toBe(true);
       expect(store().shiftStats.foodServed).toBeGreaterThan(0);
+    });
+
+    it('delivering a table serves every dish the kitchen finished for it in one tap, and leaves other tables alone (BUG-148)', () => {
+      signIn();
+      store().openTable('1', 2);
+      addDish(0, 1);
+      addDish(1, 2);
+      store().sendKOT();
+      const order = OrderRepository.getOrderById(table('1').currentOrderId!)!;
+      order.items.forEach((i) => { i.kitchenStatus = 'READY'; });
+      KOTRepository.reconcileWithOrders();
+      store().refreshState();
+      expect(store().foodReadyItems.length).toBeGreaterThan(0);
+
+      expect(store().serveReadyForTable('2')).toBe(0);
+      expect(store().foodReadyItems.length).toBeGreaterThan(0);
+
+      expect(store().serveReadyForTable('1')).toBeGreaterThan(0);
+      expect(store().foodReadyItems).toEqual([]);
+      expect(OrderRepository.getOrderById(table('1').currentOrderId!)!.items.every((i) => i.kitchenStatus === 'SERVED')).toBe(true);
     });
 
     it('a ticket served as a whole is cleared in one tap', () => {

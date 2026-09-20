@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Monitor } from 'lucide-react';
-import { CloudApiError, fetchDisplayScale, isCloudConnected, isCloudLoggedIn, saveDisplayScale } from '../../cloud/cloudClient';
+import { CloudApiError, cloudSetupHint, fetchDisplayScale, isCloudConnected, isCloudLoggedIn, saveDisplayScale } from '../../cloud/cloudClient';
 
 const MIN = 70;
 const MAX = 150;
@@ -44,7 +44,7 @@ export const TerminalDisplaySettings: React.FC<{ showToast: (msg: string) => voi
         <h3 className="font-bold text-sm text-jaman-navy">Terminal screen size</h3>
       </div>
       {!ready ? (
-        <p className="text-xs text-slate-500">Connect this device to JAMANVAAR Cloud (Settings, Subscription Plan) to set a screen size for all your terminals.</p>
+        <p className="text-xs text-slate-500">{cloudSetupHint()} You need it to set a screen size for all your terminals.</p>
       ) : (
         <>
           <p className="text-xs text-slate-500">The size POS, KDS, Captain and Kiosk screens open at. Someone at a terminal can still pick a different size for that screen.</p>

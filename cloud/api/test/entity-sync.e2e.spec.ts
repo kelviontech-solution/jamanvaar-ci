@@ -223,4 +223,68 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
       expect(pull.body.entities[0].payload).toMatchObject({ deleted: true });
     });
   });
+
+  /**
+   * BUG-149/130/133/136: a menu edit or deletion on one device never reached the others, because every
+   * device re-uploaded its whole (stale) list, and Kiosk Admin's combos, coupons and the guests' ratings had
+   * no sync path at all. The menu and promotions now follow "the newest change wins".
+   */
+  describe('MENU_ITEM / COMBO / COUPON / CUSTOMER_FEEDBACK (BUG-149/130/133/136)', () => {
+    let kioskToken: string;
+    const dish = (over: Record<string, unknown>) => ({
+      externalId: 'dish-1',
+      payload: { id: 'dish-1', name: 'Hara Bhara Kebab', price: 220, updatedAt: '2026-09-20T10:00:00.000Z', ...over }
+    });
+
+    beforeAll(async () => {
+      const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+      const redeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: 'KIOSK' });
+      kioskToken = redeem.body.deviceToken as string;
+    });
+
+    it('a stale copy of a dish does not undo a newer edit, and a newer edit replaces it', async () => {
+      await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).send({ events: [dish({ price: 230, updatedAt: '2026-09-20T10:30:00.000Z' })] });
+      // A device that never heard about the edit uploads its old copy.
+      await authed('post', '/api/v1/entity-sync/MENU_ITEM', kioskToken).send({ events: [dish({ price: 220, updatedAt: '2026-09-20T10:00:00.000Z' })] });
+
+      let pull = await authed('get', '/api/v1/entity-sync/MENU_ITEM', posToken);
+      const row = pull.body.entities.find((e: { externalId: string }) => e.externalId === 'dish-1');
+      expect(row.payload).toMatchObject({ price: 230 });
+
+      await authed('post', '/api/v1/entity-sync/MENU_ITEM', kioskToken).send({ events: [dish({ price: 240, updatedAt: '2026-09-20T11:00:00.000Z' })] });
+      pull = await authed('get', '/api/v1/entity-sync/MENU_ITEM', posToken);
+      expect(pull.body.entities.find((e: { externalId: string }) => e.externalId === 'dish-1').payload).toMatchObject({ price: 240 });
+    });
+
+    it('a deleted dish stays deleted: an older re-upload of it is ignored', async () => {
+      await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).send({ events: [{ externalId: 'dish-2', payload: { id: 'dish-2', deleted: true, updatedAt: '2026-09-20T12:00:00.000Z' } }] });
+      await authed('post', '/api/v1/entity-sync/MENU_ITEM', kioskToken).send({ events: [dish({ externalId: 'dish-2' } as never)].map((e) => ({ externalId: 'dish-2', payload: { ...e.payload, id: 'dish-2', updatedAt: '2026-09-20T09:00:00.000Z' } })) });
+
+      const pull = await authed('get', '/api/v1/entity-sync/MENU_ITEM', kioskToken);
+      expect(pull.body.entities.find((e: { externalId: string }) => e.externalId === 'dish-2').payload).toMatchObject({ deleted: true });
+    });
+
+    it('combos, coupons and guest ratings travel between devices of the same restaurant', async () => {
+      await authed('post', '/api/v1/entity-sync/COMBO', posToken).send({ events: [{ externalId: 'combo-1', payload: { id: 'combo-1', name: 'Thali Combo', updatedAt: '2026-09-20T10:00:00.000Z' } }] });
+      await authed('post', '/api/v1/entity-sync/COUPON', posToken).send({ events: [{ externalId: 'cpn-1', payload: { id: 'cpn-1', code: 'WELCOME50', usageCount: 0, updatedAt: '2026-09-20T10:00:00.000Z' } }] });
+      await authed('post', '/api/v1/entity-sync/CUSTOMER_FEEDBACK', kioskToken).send({ events: [{ externalId: 'fb-1', payload: { id: 'fb-1', rating: 5, kioskId: 'K1', createdAt: '2026-09-20T10:00:00.000Z' } }] });
+
+      expect((await authed('get', '/api/v1/entity-sync/COMBO', kioskToken)).body.entities[0].payload).toMatchObject({ name: 'Thali Combo' });
+      expect((await authed('get', '/api/v1/entity-sync/COUPON', kioskToken)).body.entities[0].payload).toMatchObject({ code: 'WELCOME50' });
+      expect((await authed('get', '/api/v1/entity-sync/CUSTOMER_FEEDBACK', posToken)).body.entities[0].payload).toMatchObject({ rating: 5 });
+
+      // A redemption counted on the kiosk (newer) wins over the older copy, and an older copy cannot undo it.
+      await authed('post', '/api/v1/entity-sync/COUPON', kioskToken).send({ events: [{ externalId: 'cpn-1', payload: { id: 'cpn-1', code: 'WELCOME50', usageCount: 3, updatedAt: '2026-09-20T11:00:00.000Z' } }] });
+      await authed('post', '/api/v1/entity-sync/COUPON', posToken).send({ events: [{ externalId: 'cpn-1', payload: { id: 'cpn-1', code: 'WELCOME50', usageCount: 0, updatedAt: '2026-09-20T10:00:00.000Z' } }] });
+      expect((await authed('get', '/api/v1/entity-sync/COUPON', posToken)).body.entities[0].payload).toMatchObject({ usageCount: 3 });
+    });
+
+    it('a device lists the kiosks of its own restaurant in the fleet list, with their health (BUG-132)', async () => {
+      const res = await authed('get', '/api/v1/devices/me/kiosks', posToken);
+      expect(res.status, JSON.stringify(res.body)).toBe(200);
+      expect(res.body.kiosks.length).toBeGreaterThanOrEqual(1);
+      expect(res.body.kiosks[0]).toHaveProperty('health');
+      expect(res.body.kiosks.every((k: { id: string }) => typeof k.id === 'string')).toBe(true);
+    });
+  });
 });

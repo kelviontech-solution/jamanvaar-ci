@@ -9,6 +9,7 @@ import {
   fetchSupportTickets,
   isCloudConnected,
   isCloudLoggedIn,
+  cloudSetupHint,
   replyToSupportTicket,
   CloudApiError,
   type CloudBranch,
@@ -97,7 +98,7 @@ export const SupportTicketsModule: React.FC<Props> = ({ showToast }) => {
       <div className="max-w-3xl mx-auto space-y-3">
         <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">Help & Support</h1>
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
-          Support tickets go to the JAMANVAAR team over the internet. Connect this device to JAMANVAAR Cloud (Settings → Subscription Plan) and sign in to raise or follow a ticket.
+          Support tickets go to the JAMANVAAR team over the internet. {cloudSetupHint()}
         </div>
       </div>
     );

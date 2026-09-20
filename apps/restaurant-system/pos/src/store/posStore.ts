@@ -1129,6 +1129,9 @@ export const usePosStore = create<PosState>((set, get) => {
         runningOrderId: order.id,
         cart: { ...linkedCart, items: linkedItems.map((ci) => ({ ...ci, kotSentQty: ci.quantity })) }
       });
+      // The earlier auto-saved draft still holds these dishes as unsent; the order is saved now, so a reload must not
+      // offer to restore them (and send them to the kitchen a second time) (BUG-154).
+      PosRecoveryService.clearDraft();
 
       // Push to the cloud right away so KDS / Restaurant Admin see it in seconds.
       SyncOutboxEngine.flush();
@@ -1538,9 +1541,15 @@ export const usePosStore = create<PosState>((set, get) => {
           kitchenStatus: 'PREPARING' as const
         }));
 
+        // A quick counter sale with no table is takeaway (the setting's default), not a dine-in with no table
+        // (BUG-153): the cart's order type is DINE_IN by default, so only a type the cashier deliberately
+        // chose (takeaway, delivery ...) overrides the setting.
+        const cashierChoseType = state.orderType && state.orderType !== 'DINE_IN';
         const resolvedOrderType = state.selectedTable
           ? 'DINE_IN'
-          : (state.orderType || cfg.defaultOrderType || 'TAKEAWAY');
+          : cashierChoseType
+          ? state.orderType
+          : (cfg.defaultOrderType || 'TAKEAWAY');
 
         // 1. Create order in Database
         const order = OrderRepository.createOrder({
@@ -1549,7 +1558,8 @@ export const usePosStore = create<PosState>((set, get) => {
           tableNumber: state.selectedTable?.tableNumber,
           guestCount: state.guestCount,
           customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone,
-          customerName: state.selectedCustomer?.name || state.deliveryDetails.name || 'Walk-in Guest',
+          cashierName: state.currentUser?.fullName,
+          customerName: state.selectedCustomer?.name || state.deliveryDetails.name,
           items: orderItems,
           subtotal: state.cart.subtotal,
           discountAmount: state.cart.discountAmount,

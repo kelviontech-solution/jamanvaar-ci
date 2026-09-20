@@ -21,6 +21,8 @@
  */
 
 import { DeviceGate, PlatformNotice, type PlatformNoticeData, sendHeartbeat } from '@jamanvaar/sync';
+import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, EntitySyncEvent, EntitySyncPushResult, CloudSyncedEntity } from '@jamanvaar/sync';
+import { db, LicenseRepository, MenuRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -139,7 +141,8 @@ export async function connectDeviceStep2(
   activationSessionToken: string,
   activationKey: string,
   restaurantId: string,
-  ownerLabel: string
+  ownerLabel: string,
+  restaurantName?: string
 ): Promise<void> {
   const res = await fetch(`${API_BASE}/api/v1/tenant-auth/activate-device`, {
     method: 'POST',
@@ -161,9 +164,27 @@ export async function connectDeviceStep2(
   persistConnection(restaurantId, ownerLabel);
   try {
     if (data?.deviceToken) localStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken);
+    DeviceGate.reportSuccess(); // a fresh activation starts unlocked
   } catch {
     // Storage unavailable — the device is still activated server-side, this terminal just won't remember its own token across reloads.
   }
+
+  // Bind this console to the real restaurant, like every other terminal does at activation (BUG-131): it kept
+  // showing the demo "JAMANVAAR RESTAURANT - Ahmedabad Flagship Store", and the demo menu, combos, coupons
+  // (with their made-up usage counts) and tables, as if they were the restaurant's own.
+  if (restaurantName) RestaurantIdentityRepository.adopt(restaurantId.trim(), { name: restaurantName });
+  MenuRepository.startFreshMenu();
+  RestaurantIdentityRepository.startFreshOperations();
+}
+
+/**
+ * A console that was connected before it adopted the restaurant's identity (or whose local data was reset)
+ * still holds the demo name: give it the real one the first time it signs in (BUG-131).
+ */
+function adoptRestaurantIdentity(restaurantId: string, restaurantName: unknown): void {
+  if (typeof restaurantName !== 'string' || !restaurantName) return;
+  if (db.restaurant.id === restaurantId.trim() && db.restaurant.name === restaurantName) return;
+  RestaurantIdentityRepository.adopt(restaurantId.trim(), { name: restaurantName });
 }
 
 function persistConnection(restaurantId: string, label: string): void {
@@ -304,6 +325,7 @@ export async function staffLogin(restaurantId: string, email: string, password: 
   }
 
   tenantAccessToken = data.accessToken;
+  adoptRestaurantIdentity(restaurantId, data.restaurant?.name);
   const user: StaffUser = { fullName: data.user.fullName, role: data.user.role };
   persistTenantSession(data.refreshToken, user);
   startSilentRefresh();
@@ -662,4 +684,106 @@ export function startDeviceHeartbeat(intervalMs = 15_000): void {
   };
   beat();
   setInterval(beat, intervalMs);
+}
+
+// --- Device sync bridge (BUG-130/132/133/136/137) ---
+// Kiosk Admin used to make one cloud call for its menu (a price table for payments) and nothing else, so
+// what was edited here never reached the self-order kiosk and what the kiosk sold never reached this console.
+// It now syncs like every other terminal: with its own device credential, through the same order and entity
+// endpoints.
+
+export function getDeviceTokenForSync(): string | null {
+  return getDeviceToken();
+}
+
+function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const token = getDeviceToken();
+  if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
+  return DeviceGate.gatedFetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
+  });
+}
+
+async function jsonOrThrow<T>(res: Response, what: string): Promise<T> {
+  const data = await parseJsonResponse(res);
+  if (!res.ok) throw new CloudApiError(data?.message ?? `${what} failed (${res.status})`, res.status);
+  return data as T;
+}
+
+export async function pushOrderSync(events: OrderSyncPushEvent[]): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
+  return jsonOrThrow(await deviceFetch('/api/v1/orders/sync', { method: 'POST', body: JSON.stringify({ events }) }), 'Order sync push');
+}
+
+export async function pullOrderSync(since?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string }> {
+  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+  return jsonOrThrow(await deviceFetch(`/api/v1/orders/sync${query}`), 'Order sync pull');
+}
+
+export async function pushEntitySync(entityType: string, events: EntitySyncEvent[]): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
+  return jsonOrThrow(await deviceFetch(`/api/v1/entity-sync/${entityType}`, { method: 'POST', body: JSON.stringify({ events }) }), 'Entity sync push');
+}
+
+export async function pullEntitySync(entityType: string, since?: string): Promise<{ entities: CloudSyncedEntity[]; serverTime: string }> {
+  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+  return jsonOrThrow(await deviceFetch(`/api/v1/entity-sync/${entityType}${query}`), 'Entity sync pull');
+}
+
+export interface CloudKiosk {
+  id: string;
+  name: string;
+  appVersion: string | null;
+  lastSeenAt: string | null;
+  health: 'online' | 'degraded' | 'offline' | 'revoked' | 'pending' | 'never_seen';
+  isLocked: boolean;
+  lockReason: string | null;
+  branchName: string | null;
+}
+
+/** The self-order kiosks this restaurant has really activated (BUG-132). */
+export async function fetchCloudKiosks(): Promise<CloudKiosk[]> {
+  const data = await jsonOrThrow<{ kiosks: CloudKiosk[] }>(await deviceFetch('/api/v1/devices/me/kiosks'), 'Kiosk list');
+  return data.kiosks;
+}
+
+/**
+ * The real plan, kiosk allowance and end date for this restaurant (BUG-158). The License & Entitlement screen
+ * showed a made-up key ("JAMAN-PRO-2026-AHM-8842-X"), a made-up end date and "2 / 5" kiosks whatever the
+ * restaurant had bought. Needs the owner's signed-in session; offline or signed out it keeps what it last knew.
+ */
+let lastLicenseRefreshAt = 0;
+
+export async function refreshLicenseFromCloud(activeKiosks: number): Promise<void> {
+  if (!getTenantAccessToken()) return;
+  // The plan changes rarely; the kiosk count is cheap to keep current, the request is not worth repeating every few seconds.
+  if (Date.now() - lastLicenseRefreshAt < 5 * 60_000) {
+    if (db.license.activeDevicesCount !== activeKiosks) LicenseRepository.updateLicense({ activeDevicesCount: activeKiosks });
+    return;
+  }
+  lastLicenseRefreshAt = Date.now();
+  try {
+    const res = await tenantFetch('/api/v1/tenant/me/entitlements', { method: 'GET' });
+    if (!res.ok) return;
+    const data = (await res.json()) as {
+      subscriptionStatus: 'TRIAL' | 'ACTIVE' | 'PAST_DUE' | 'SUSPENDED' | 'EXPIRED' | null;
+      expiresAt?: string | null;
+      planName: string | null;
+      planTier: string | null;
+      limits: { maxDevices: number } | null;
+    };
+    const eligible = data.subscriptionStatus === 'ACTIVE' || data.subscriptionStatus === 'TRIAL';
+    LicenseRepository.updateLicense({
+      planName: data.planName ?? 'No active plan',
+      tier: data.planTier === 'PRO' ? 'PRO' : 'CORE',
+      status: eligible ? (data.subscriptionStatus === 'TRIAL' ? 'TRIAL' : 'ACTIVE') : data.subscriptionStatus === 'SUSPENDED' ? 'SUSPENDED' : 'EXPIRED',
+      // The seeded demo key is not this restaurant's: there is no key to show.
+      licenseKey: '',
+      allowedDevicesCount: data.limits?.maxDevices ?? 0,
+      activeDevicesCount: activeKiosks,
+      validUntil: data.expiresAt ?? '',
+      restaurantId: getConnectedRestaurantId() ?? db.restaurant.id
+    });
+  } catch {
+    // Offline: keep what was last known.
+  }
 }

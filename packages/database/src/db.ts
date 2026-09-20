@@ -577,6 +577,15 @@ export class JamanvaarDatabase {
   // after the first 401 instead of looping indefinitely.
   private serverSyncUnauthorized = false;
   private serverSyncPollTimer: ReturnType<typeof setInterval> | null = null;
+  /** True once the local relay has refused this browser (it needs a pairing no screen performs yet). */
+  public isLocalCoreUnauthorized(): boolean {
+    return this.serverSyncUnauthorized;
+  }
+
+  public markLocalCoreUnauthorized(): void {
+    this.serverSyncUnauthorized = true;
+  }
+
   private listeners: Set<() => void> = new Set();
   private broadcastChannel: BroadcastChannel | null = null;
   public getSyncServerUrl(): string {

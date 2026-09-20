@@ -60,6 +60,11 @@ export function ActivationKeysListPage() {
   const restaurants = usePagedList<RestaurantKeyRow>('/api/v1/activation-keys/by-restaurant', { q }, 25, view === 'RESTAURANTS');
 
   const [confirmTarget, setConfirmTarget] = useState<ActivationKey | null>(null);
+  const [confirmKind, setConfirmKind] = useState<'revoke' | 'reactivate' | 'delete'>('revoke');
+  const openConfirm = (k: ActivationKey, kind: 'revoke' | 'reactivate' | 'delete') => {
+    setConfirmKind(kind);
+    setConfirmTarget(k);
+  };
   const [actionPending, setActionPending] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkPending, setBulkPending] = useState(false);
@@ -85,17 +90,29 @@ export function ActivationKeysListPage() {
   };
   const codeText = (k: ActivationKey) => k.code ?? `•••• ${k.codeLast4 ?? ''}`;
   const revocable = (k: ActivationKey) => k.lifecycle === 'AVAILABLE' || k.lifecycle === 'REDEEMED';
+  // BUG-128: a revoked key can be brought back; a key that is not in use can be deleted.
+  const reactivatable = (k: ActivationKey) => k.lifecycle === 'REVOKED';
+  const deletable = (k: ActivationKey) => k.lifecycle !== 'REDEEMED';
 
-  async function handleExecuteRevoke() {
+  async function handleExecuteConfirmed() {
     if (!confirmTarget) return;
     setActionPending(true);
     try {
-      await api.patch(`/api/v1/activation-keys/${confirmTarget.id}/revoke`);
-      showToast(`Activation key ${codeText(confirmTarget)} revoked`);
+      const target = confirmTarget;
+      if (confirmKind === 'revoke') {
+        await api.patch(`/api/v1/activation-keys/${target.id}/revoke`);
+        showToast(`Activation key ${codeText(target)} revoked`);
+      } else if (confirmKind === 'reactivate') {
+        await api.patch(`/api/v1/activation-keys/${target.id}/reactivate`, {});
+        showToast(`Activation key ${codeText(target)} activated again`);
+      } else {
+        await api.delete(`/api/v1/activation-keys/${target.id}`);
+        showToast(`Activation key ${codeText(target)} deleted`);
+      }
       setConfirmTarget(null);
       reload();
     } catch (err) {
-      showToast(err instanceof ApiError ? err.message : 'Revoke failed');
+      showToast(err instanceof ApiError ? err.message : 'The action failed');
     } finally {
       setActionPending(false);
     }
@@ -125,7 +142,7 @@ export function ActivationKeysListPage() {
     }
     const redeemed = keys.items.filter((k) => ids.includes(k.id) && k.lifecycle === 'REDEEMED').length;
     const extra = redeemed ? ` ${redeemed} of them are already in use: revoking those also revokes their terminals.` : '';
-    if (!window.confirm(`Revoke ${ids.length} activation key(s)?${extra} This cannot be undone.`)) return;
+    if (!window.confirm(`Revoke ${ids.length} activation key(s)?${extra} A revoked key can be brought back with Activate again.`)) return;
     setBulkPending(true);
     try {
       // One request for the whole selection.
@@ -135,6 +152,51 @@ export function ActivationKeysListPage() {
       reload();
     } catch (err) {
       showToast(err instanceof ApiError ? err.message : 'Bulk revoke failed');
+    } finally {
+      setBulkPending(false);
+    }
+  }
+
+  async function handleBulkReactivate() {
+    const ids = Array.from(selectedIds).filter((id) => {
+      const k = keys.items.find((key) => key.id === id);
+      return k && reactivatable(k);
+    });
+    if (ids.length === 0) {
+      showToast('None of the selected keys are revoked, so there is nothing to activate again');
+      return;
+    }
+    setBulkPending(true);
+    try {
+      const res = await api.post<{ reactivated: number; skipped: number }>('/api/v1/activation-keys/bulk-reactivate', { ids });
+      showToast(res.skipped ? `${res.reactivated} activated again, ${res.skipped} skipped` : `${res.reactivated} activation key(s) activated again`);
+      setSelectedIds(new Set());
+      reload();
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : 'Bulk activate failed');
+    } finally {
+      setBulkPending(false);
+    }
+  }
+
+  async function handleBulkDelete() {
+    const ids = Array.from(selectedIds).filter((id) => {
+      const k = keys.items.find((key) => key.id === id);
+      return k && deletable(k);
+    });
+    if (ids.length === 0) {
+      showToast('None of the selected keys can be deleted (keys in use must be revoked first)');
+      return;
+    }
+    if (!window.confirm(`Delete ${ids.length} activation key(s)? Their codes can never be redeemed again. This is recorded in the audit log and cannot be undone.`)) return;
+    setBulkPending(true);
+    try {
+      const res = await api.post<{ deleted: number; skipped: number }>('/api/v1/activation-keys/bulk-delete', { ids });
+      showToast(res.skipped ? `${res.deleted} deleted, ${res.skipped} skipped` : `${res.deleted} activation key(s) deleted`);
+      setSelectedIds(new Set());
+      reload();
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : 'Bulk delete failed');
     } finally {
       setBulkPending(false);
     }
@@ -284,6 +346,12 @@ export function ActivationKeysListPage() {
           <Button size="sm" variant="danger" disabled={bulkPending} onClick={handleBulkRevoke}>
             Revoke Selected
           </Button>
+          <Button size="sm" variant="primary" disabled={bulkPending} onClick={handleBulkReactivate}>
+            Activate Selected Again
+          </Button>
+          <Button size="sm" variant="ghost" disabled={bulkPending} onClick={handleBulkDelete}>
+            Delete Selected
+          </Button>
         </BulkActionsBar>
       )}
 
@@ -387,7 +455,13 @@ export function ActivationKeysListPage() {
                             />
                           )}
                           {revocable(k) && (
-                            <Button size="sm" variant="danger" onClick={() => setConfirmTarget(k)}>Revoke</Button>
+                            <Button size="sm" variant="danger" onClick={() => openConfirm(k, 'revoke')}>Revoke</Button>
+                          )}
+                          {reactivatable(k) && (
+                            <Button size="sm" variant="primary" onClick={() => openConfirm(k, 'reactivate')}>Activate again</Button>
+                          )}
+                          {deletable(k) && (
+                            <Button size="sm" variant="ghost" onClick={() => openConfirm(k, 'delete')}>Delete</Button>
                           )}
                         </div>
                       </td>
@@ -418,15 +492,20 @@ export function ActivationKeysListPage() {
       {confirmTarget && (
         <ConfirmModal
           isOpen={true}
-          title="Revoke Activation Key?"
+          title={confirmKind === 'revoke' ? 'Revoke Activation Key?' : confirmKind === 'reactivate' ? 'Activate Key Again?' : 'Delete Activation Key?'}
           message={
-            confirmTarget.lifecycle === 'REDEEMED'
-              ? `Key ${codeText(confirmTarget)} is already in use. Revoking it also revokes the terminal that used it, and that terminal stops working.`
-              : `Revoking activation key ${codeText(confirmTarget)} permanently invalidates it. It can never be used to activate a terminal.`
+            confirmKind === 'revoke'
+              ? confirmTarget.lifecycle === 'REDEEMED'
+                ? `Key ${codeText(confirmTarget)} is already in use. Revoking it also revokes the terminal that used it, and that terminal stops working. You can bring both back with Activate again.`
+                : `Revoking activation key ${codeText(confirmTarget)} means it can no longer activate a terminal. You can bring it back with Activate again, or delete it.`
+              : confirmKind === 'reactivate'
+              ? `Key ${codeText(confirmTarget)} becomes usable again. If a terminal had used it, that terminal is switched back on and signs in again. A key whose expiry has passed gets 30 more days.`
+              : `Key ${codeText(confirmTarget)} is permanently removed and its code can never be redeemed. This is recorded in the audit log and cannot be undone.`
           }
-          tone="danger"
+          tone={confirmKind === 'reactivate' ? 'primary' : 'danger'}
+          confirmLabel={confirmKind === 'revoke' ? 'Revoke' : confirmKind === 'reactivate' ? 'Activate again' : 'Delete'}
           isPending={actionPending}
-          onConfirm={handleExecuteRevoke}
+          onConfirm={handleExecuteConfirmed}
           onClose={() => setConfirmTarget(null)}
         />
       )}

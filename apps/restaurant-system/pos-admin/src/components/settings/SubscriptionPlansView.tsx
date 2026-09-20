@@ -349,7 +349,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             Active Plan: {currentLicense.planName || 'JAMANVAAR CORE'} ({currentTier})
           </span>
           <span className="text-[11px] font-bold text-slate-500 bg-jaman-cream border border-jaman-border px-3 py-1 rounded-xl w-fit">
-            Lifetime License • No Monthly Commissions • 100% Offline-First
+            Monthly subscription • No commissions on your sales • Works offline
           </span>
         </div>
       </div>

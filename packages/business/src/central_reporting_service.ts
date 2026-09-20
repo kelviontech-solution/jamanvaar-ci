@@ -1,5 +1,5 @@
 import { Order, PaymentMethod, OrderType, OrderStatus } from '@jamanvaar/types';
-import { db, BusinessDayAccountingService , getOrderTenders } from '@jamanvaar/database';
+import { db, BusinessDayAccountingService , getOrderTenders, isUnpaidOpenOrder } from '@jamanvaar/database';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 
 export type CentralDatePreset =
@@ -346,6 +346,9 @@ export class CentralReportingService {
         cancelledAmount += orderTotal;
         return;
       }
+
+      // Sent to the kitchen / pay-at-counter but not paid yet: not a sale and not collected money (BUG-151/161).
+      if (isUnpaidOpenOrder(o)) return;
 
       completedOrdersCount++;
 

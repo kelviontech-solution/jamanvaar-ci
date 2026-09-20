@@ -18,11 +18,13 @@ describe('Activation keys and fleet lists (BUG-060/067/069/048)', () => {
   let token: string;
   let restaurantId: string;
   let otherRestaurantId: string;
+  // The key lifecycle tests (delete / activate again) use their own restaurant so they do not disturb the counts above.
+  let lifecycleRestaurantId: string;
   let branchId: string;
   let planId: string;
 
   const auth = (r: request.Test) => r.set('Authorization', `Bearer ${token}`);
-  const api = (method: 'get' | 'post' | 'patch', url: string) => auth(request(app.getHttpServer())[method](url));
+  const api = (method: 'get' | 'post' | 'patch' | 'delete', url: string) => auth(request(app.getHttpServer())[method](url));
   const inDays = (d: number) => new Date(Date.now() + d * 86400_000).toISOString();
 
   async function makeKey(extra: Record<string, unknown> = {}, rid = restaurantId) {
@@ -43,24 +45,88 @@ describe('Activation keys and fleet lists (BUG-060/067/069/048)', () => {
       (await api('post', '/api/v1/restaurants').send({ name: `TEST Fleet ${label} ${stamp}`, ownerName: `Owner ${label}`, ownerEmail: `fleet-${label}-${stamp}@example.com` })).body.restaurant.id as string;
     restaurantId = await mk('a');
     otherRestaurantId = await mk('b');
+    lifecycleRestaurantId = await mk('c');
     branchId = (await api('post', '/api/v1/branches').send({ restaurantId, name: 'Fleet Branch', code: 'FB' })).body.id;
 
     planId = (await api('post', '/api/v1/plans').send({
       tier: 'PRO', name: `TEST Fleet Plan ${stamp}`, priceMonthly: 700000, maxBranches: 5, maxDevices: 50, maxUsers: 20, entitlements: { posTerminal: true }
     })).body.id;
-    for (const rid of [restaurantId, otherRestaurantId]) {
+    for (const rid of [restaurantId, otherRestaurantId, lifecycleRestaurantId]) {
       await api('post', '/api/v1/subscriptions').send({ restaurantId: rid, planId, status: 'ACTIVE', expiresAt: inDays(30) });
     }
   }, 60_000);
 
   afterAll(async () => {
-    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: { in: [restaurantId, otherRestaurantId].filter(Boolean) } } }));
+    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: { in: [restaurantId, otherRestaurantId, lifecycleRestaurantId].filter(Boolean) } } }));
     await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: planId } }));
     await prisma.platformUser.deleteMany({ where: { email } });
     await app.close();
   });
 
   describe('activation keys', () => {
+    // BUG-128: Super Admin could neither delete a key nor bring a revoked one back.
+    it('an unused key can be revoked, brought back, and deleted; its code stops working once deleted', async () => {
+      const key = await makeKey({}, lifecycleRestaurantId);
+      expect((await api('patch', `/api/v1/activation-keys/${key.id}/revoke`)).status).toBe(200);
+      expect((await redeem(key.code)).status).toBe(410); // revoked: refused
+
+      const back = await api('patch', `/api/v1/activation-keys/${key.id}/reactivate`).send({});
+      expect(back.status, JSON.stringify(back.body)).toBe(200);
+      expect(back.body.status).toBe('ACTIVE');
+
+      const del = await api('delete', `/api/v1/activation-keys/${key.id}`);
+      expect(del.status, JSON.stringify(del.body)).toBe(200);
+      expect((await redeem(key.code)).status).toBe(404); // gone
+      expect((await api('get', `/api/v1/activation-keys/${key.id}`)).status).toBe(404);
+    });
+
+    it('a revoked key whose expiry passed gets a new expiry when brought back', async () => {
+      const key = await makeKey({}, lifecycleRestaurantId);
+      await prisma.runAsPlatform((tx) => tx.activationKey.update({ where: { id: key.id }, data: { status: 'REVOKED', expiresAt: new Date(Date.now() - 86400_000) } }));
+      const back = await api('patch', `/api/v1/activation-keys/${key.id}/reactivate`).send({});
+      expect(back.status).toBe(200);
+      expect(new Date(back.body.expiresAt).getTime()).toBeGreaterThan(Date.now());
+    });
+
+    it('only a revoked key can be activated again', async () => {
+      const key = await makeKey({}, lifecycleRestaurantId);
+      expect((await api('patch', `/api/v1/activation-keys/${key.id}/reactivate`).send({})).status).toBe(409);
+    });
+
+    it('a key in use cannot be deleted until it is revoked', async () => {
+      const key = await makeKey({}, lifecycleRestaurantId);
+      expect((await redeem(key.code)).status).toBe(201);
+      expect((await api('delete', `/api/v1/activation-keys/${key.id}`)).status).toBe(409);
+      expect((await api('patch', `/api/v1/activation-keys/${key.id}/revoke`)).status).toBe(200);
+      expect((await api('delete', `/api/v1/activation-keys/${key.id}`)).status).toBe(200);
+    });
+
+    it('reviving a revoked key that had a terminal switches that terminal back on', async () => {
+      const key = await makeKey({}, lifecycleRestaurantId);
+      const red = await redeem(key.code);
+      const deviceId = red.body.device.id as string;
+      await api('patch', `/api/v1/activation-keys/${key.id}/revoke`);
+      expect((await prisma.runAsPlatform((tx) => tx.device.findUniqueOrThrow({ where: { id: deviceId } }))).status).toBe('REVOKED');
+
+      const back = await api('patch', `/api/v1/activation-keys/${key.id}/reactivate`).send({});
+      expect(back.status, JSON.stringify(back.body)).toBe(200);
+      expect(back.body.status).toBe('REDEEMED');
+      expect((await prisma.runAsPlatform((tx) => tx.device.findUniqueOrThrow({ where: { id: deviceId } }))).status).toBe('ACTIVE');
+    });
+
+    it('bulk delete skips keys in use and bulk reactivate skips keys that are not revoked', async () => {
+      const spare = await makeKey({}, lifecycleRestaurantId);
+      const used = await makeKey({}, lifecycleRestaurantId);
+      await redeem(used.code);
+      const del = await api('post', '/api/v1/activation-keys/bulk-delete').send({ ids: [spare.id, used.id] });
+      expect(del.status, JSON.stringify(del.body)).toBe(201);
+      expect(del.body).toEqual({ deleted: 1, skipped: 1 });
+
+      const another = await makeKey({}, lifecycleRestaurantId);
+      const re = await api('post', '/api/v1/activation-keys/bulk-reactivate').send({ ids: [another.id] });
+      expect(re.body).toEqual({ reactivated: 0, skipped: 1 });
+    });
+
     it('can be issued for a branch with a label and batch, and redeeming binds the device to them', async () => {
       const key = await makeKey({ branchId, label: 'Counter 1', batchId: 'kit-1' });
       expect(key.code).toBeTypeOf('string');

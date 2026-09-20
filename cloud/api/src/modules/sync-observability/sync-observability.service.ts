@@ -86,7 +86,10 @@ export class SyncObservabilityService {
       this.prisma.platformDb.syncEventLog.count({ where: { timestamp: { gte: oneDayAgo } } }),
       this.prisma.platformDb.syncEventLog.count({ where: { status: 'FAILED', timestamp: { gte: oneDayAgo } } }),
       this.prisma.platformDb.syncConflict.count({ where: { resolution: 'PENDING' } }),
-      this.prisma.platformDb.device.count({ where: { lastSyncAt: { gte: oneDayAgo } } })
+      // A terminal is "reporting" if it has told the platform anything in the last day: a sync, or just its
+      // heartbeat. Counting only `lastSyncAt` (which the heartbeat rarely carries) showed 0 while Device Fleet
+      // listed the same terminals as online (BUG-155).
+      this.prisma.platformDb.device.count({ where: { status: { not: 'REVOKED' }, OR: [{ lastSyncAt: { gte: oneDayAgo } }, { lastSeenAt: { gte: oneDayAgo } }] } })
     ]);
 
     const successRate = totalEvents > 0 ? Math.round(((totalEvents - failedEvents) / totalEvents) * 100) : 100;

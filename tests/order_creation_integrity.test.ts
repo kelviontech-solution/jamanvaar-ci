@@ -118,3 +118,34 @@ describe('OrderRepository.createOrder data integrity', () => {
     expect(numbers.size).toBe(200);
   });
 });
+
+/**
+ * BUG-160: the counter POS and the self-order kiosk each numbered tokens from 101 on their own, so two
+ * different orders on the same day were both "#101". A device that numbers on its own uses a prefix.
+ */
+describe('token numbers (BUG-160)', () => {
+  beforeEach(() => {
+    db.resetToDefaultSeed();
+  });
+
+  const item = () => {
+    const m = db.menuItems[0];
+    return { id: `oi-${Math.random()}`, orderId: '', menuItemId: m.id, name: m.name, sku: m.sku || 'SKU', quantity: 1, unitPrice: m.price, modifiers: [], totalPrice: m.price, kitchenStatus: 'PENDING' as const };
+  };
+
+  it('a prefixed device never hands out a token another device already used', () => {
+    const counter = OrderRepository.createOrder({ items: [item()], subtotal: db.menuItems[0].price, totalAmount: db.menuItems[0].price, source_type: 'POS' });
+    const kiosk = OrderRepository.createOrder({ items: [item()], subtotal: db.menuItems[0].price, totalAmount: db.menuItems[0].price, tokenNumber: OrderRepository.nextTokenNumber('K') });
+    expect(counter.tokenNumber).toBe('101');
+    expect(kiosk.tokenNumber).toBe('K-101');
+    expect(kiosk.tokenNumber).not.toBe(counter.tokenNumber);
+  });
+
+  it('each prefix keeps its own running count, and plain tokens ignore prefixed ones', () => {
+    const k1 = OrderRepository.createOrder({ items: [item()], subtotal: db.menuItems[0].price, totalAmount: db.menuItems[0].price, tokenNumber: OrderRepository.nextTokenNumber('K') });
+    const k2 = OrderRepository.createOrder({ items: [item()], subtotal: db.menuItems[0].price, totalAmount: db.menuItems[0].price, tokenNumber: OrderRepository.nextTokenNumber('K') });
+    const plain = OrderRepository.createOrder({ items: [item()], subtotal: db.menuItems[0].price, totalAmount: db.menuItems[0].price });
+    expect([k1.tokenNumber, k2.tokenNumber]).toEqual(['K-101', 'K-102']);
+    expect(plain.tokenNumber).toBe('101');
+  });
+});

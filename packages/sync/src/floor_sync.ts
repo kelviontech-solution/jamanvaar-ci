@@ -41,18 +41,28 @@ async function runTick(): Promise<void> {
  * theirs as notifications, already raised).
  */
 export async function syncServiceMessages(reader: ServiceMessageReader): Promise<ServiceMessage[]> {
+  await pushServiceMessages();
+
+  const inbound: ServiceMessage[] = [];
+  await EntitySyncEngine.catchUp('SERVICE_MESSAGE', (remote) => {
+    const applied = ServiceMessages.applyRemote(remote.payload, reader);
+    if (applied && (reader === 'CAPTAIN' || reader === 'KIOSK_ADMIN')) inbound.push(applied);
+  });
+  return inbound;
+}
+
+/**
+ * Sends the messages this device queued (a self-order kiosk only sends). Returns true only when everything
+ * queued has really been delivered to the cloud - a caller that tells a guest "a team member is on the way"
+ * must check this first (BUG-137).
+ */
+export async function pushServiceMessages(): Promise<boolean> {
   const records = ServiceMessages.collectSyncRecords();
   for (let i = 0; i < records.length; i += PUSH_BATCH) {
     const batch = records.slice(i, i + PUSH_BATCH);
     const result = await EntitySyncEngine.pushSnapshot('SERVICE_MESSAGE', batch);
     if (result.failed === 0 && result.processed === batch.length) ServiceMessages.markPushed(batch);
-    else break;
+    else return false;
   }
-
-  const inbound: ServiceMessage[] = [];
-  await EntitySyncEngine.catchUp('SERVICE_MESSAGE', (remote) => {
-    const applied = ServiceMessages.applyRemote(remote.payload, reader);
-    if (applied && reader === 'CAPTAIN') inbound.push(applied);
-  });
-  return inbound;
+  return true;
 }

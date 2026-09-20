@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, Req, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Req, UseGuards, UsePipes } from '@nestjs/common';
 import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { DevicesService } from './devices.service';
@@ -24,5 +24,15 @@ export class DeviceHeartbeatController {
   heartbeat(@Body() body: ReturnType<typeof heartbeatSchema.parse>, @CurrentDevice() device: Device, @Req() req: { ip?: string }) {
     // The address the server actually saw, not one the terminal claims.
     return this.devices.reportHeartbeat(device, { ...body, ipAddress: req.ip?.replace(/^::ffff:/, '') });
+  }
+
+  /**
+   * The self-order kiosks this restaurant has really activated, with their health, for Kiosk Admin's terminal
+   * list (BUG-132). It used to know only kiosks that happened to share its browser or LAN, so a real, online
+   * kiosk showed as "No Kiosk Terminals Yet".
+   */
+  @Get('kiosks')
+  kiosks(@CurrentDevice() device: Device) {
+    return this.devices.listKiosksForRestaurant(device.restaurantId);
   }
 }

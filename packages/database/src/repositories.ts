@@ -69,7 +69,8 @@ import { getOrderTenders, splitsMatchTotal } from './tender';
 import { generateOrderNumber, generateTokenNumber, generateUUID } from '@jamanvaar/utils';
 import { db } from './db';
 import { TableSync } from './table_sync';
-import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS, SEED_ROLES } from './seed';
+import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync } from './collection_sync';
+import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS, SEED_ROLES, SEED_RESTAURANT } from './seed';
 import { hashPin, verifyPinHash, generateUniquePin } from './pin';
 
 export class MenuRepository {
@@ -86,6 +87,10 @@ export class MenuRepository {
     db.categories = [];
     db.menuItems = [];
     db.modifierGroups = [];
+    // The demo menu is not this restaurant's: forget its sync bookkeeping so the next sync starts from a
+    // fresh baseline and nothing is uploaded or deleted on account of it (BUG-149).
+    MenuItemSync.reset();
+    CategorySync.reset();
     AuditRepository.log({
       action: 'MENU_CLEARED_ON_ACTIVATION',
       category: 'MENU',
@@ -132,6 +137,7 @@ export class MenuRepository {
     const idx = db.categories.findIndex((c) => c.id === id);
     if (idx === -1) return false;
     db.categories.splice(idx, 1);
+    CategorySync.recordDeletion(id);
     db.notify();
     return true;
   }
@@ -293,6 +299,7 @@ export class MenuRepository {
           const idx = db.categories.findIndex((c) => c.id === dup.id);
           if (idx !== -1) {
             db.categories.splice(idx, 1);
+            CategorySync.recordDeletion(dup.id);
             mergedCount++;
           }
         });
@@ -366,6 +373,7 @@ export class MenuRepository {
     const idx = db.menuItems.findIndex((i) => i.id === id);
     if (idx === -1) return false;
     db.menuItems.splice(idx, 1);
+    MenuItemSync.recordDeletion(id);
     db.notify();
     return true;
   }
@@ -425,6 +433,37 @@ export class MenuRepository {
   }
 }
 
+/**
+ * An order that is still open and has not been paid: sent to the kitchen, bill requested, or a self-order
+ * kiosk guest who chose "pay at the counter". It is not a sale and not collected money yet (BUG-151/161), so
+ * sales, order counts and payment totals leave it out until the payment is settled.
+ */
+export function isUnpaidOpenOrder(o: Pick<Order, 'orderStatus' | 'paymentStatus'>): boolean {
+  if (o.orderStatus === 'CANCELLED' || o.orderStatus === 'COMPLETED' || o.orderStatus === 'REFUNDED') return false;
+  return o.paymentStatus !== 'SUCCESS' && o.paymentStatus !== 'REFUNDED';
+}
+
+/**
+ * Sends an order to the local relay service on this network (port 5178), if this browser has been let in. The
+ * relay needs a one-time pairing that no screen performs yet, so every call was refused with 401 and each order
+ * action added another rejection to the log (BUG-156). Once it has refused this browser, calls stop until the
+ * connection is re-established; the cloud sync is what carries orders between devices.
+ */
+function postToLocalService(path: string, method: 'POST' | 'PATCH', body: unknown): void {
+  if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
+  if (db.isLocalCoreUnauthorized()) return;
+  const host = window.location?.hostname || 'localhost';
+  fetch(`http://${host}:5178${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+    .then((res) => {
+      if (res.status === 401) db.markLocalCoreUnauthorized();
+    })
+    .catch(() => {});
+}
+
 export class OrderRepository {
   public static getAllOrders(): Order[] {
     return [...db.orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -438,12 +477,51 @@ export class OrderRepository {
     return db.orders.find((o) => o.tokenNumber === token);
   }
 
+  /**
+   * The next token for a business day: 101, 102 ... A device that numbers on its own passes a prefix
+   * ('K' for the self-order kiosk gives K-101), so its tokens can never equal another device's (BUG-160): the
+   * kiosk and the counter each used to hand out #101 on the same day, and neither knew about the other.
+   */
+  public static nextTokenNumber(prefix: string = '', businessDayId?: string): string {
+    const dayId = businessDayId || BusinessDayRepository.getActiveBusinessDay().id;
+    const tag = prefix ? `${prefix}-` : '';
+    let highest = 100;
+    for (const o of db.orders) {
+      if (o.businessDayId !== dayId) continue;
+      const t = String(o.tokenNumber ?? '');
+      if (!t.startsWith(tag)) continue;
+      const rest = t.slice(tag.length);
+      if (!/^\d+$/.test(rest)) continue;
+      highest = Math.max(highest, parseInt(rest, 10));
+    }
+    return `${tag}${highest + 1}`;
+  }
+
   public static updateOrder(id: string, updates: Partial<Order>): Order | null {
     const idx = db.orders.findIndex((o) => o.id === id);
     if (idx === -1) return null;
     db.orders[idx] = { ...db.orders[idx], ...updates };
     db.notify();
     return db.orders[idx];
+  }
+
+  /**
+   * The guest picked how they will pay on the payment screen (BUG-134). The self-order kiosk creates the order
+   * before that screen is shown, with the default method, so the choice has to be written onto the order or
+   * a cash-at-counter order is recorded (and printed) as paid by UPI. A cash choice leaves the payment PENDING:
+   * nothing has been collected until the cashier takes the money.
+   */
+  public static choosePaymentMethod(id: string, method: PaymentMethod): Order | null {
+    const order = db.orders.find((o) => o.id === id);
+    if (!order) return null;
+    const settled = order.paymentStatus === 'SUCCESS';
+    if (settled || order.paymentMethod === method) return order;
+    return OrderRepository.updateOrder(id, {
+      paymentMethod: method,
+      paymentStatus: 'PENDING',
+      updatedAt: new Date().toISOString(),
+      syncStatus: 'SAVED_LOCALLY'
+    });
   }
 
   /**
@@ -492,19 +570,7 @@ export class OrderRepository {
     const businessDayId = orderData.businessDayId || BusinessDayRepository.getActiveBusinessDay().id;
 
     // Reset daily token counter per business day
-    const activeDayOrders = db.orders.filter((o) => o.businessDayId === businessDayId);
-    let tokenNumber = orderData.tokenNumber;
-    if (!tokenNumber) {
-      if (activeDayOrders.length === 0) {
-        tokenNumber = '101';
-      } else {
-        const highestToken = activeDayOrders.reduce((max, o) => {
-          const num = parseInt(o.tokenNumber, 10);
-          return !isNaN(num) && num > max ? num : max;
-        }, 100);
-        tokenNumber = (highestToken + 1).toString();
-      }
-    }
+    const tokenNumber = orderData.tokenNumber || OrderRepository.nextTokenNumber('', businessDayId);
     // Hard uniqueness guarantee, not just a low-probability random draw.
     let orderNumber = orderData.orderNumber;
     if (!orderNumber) {
@@ -626,15 +692,7 @@ export class OrderRepository {
 
     db.notify();
 
-    // Directly post to authoritative Local Service
-    if (typeof window !== 'undefined' && typeof fetch !== 'undefined') {
-      const host = window.location?.hostname || 'localhost';
-      fetch(`http://${host}:5178/api/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newOrder)
-      }).catch(() => {});
-    }
+    postToLocalService(`/api/orders`, 'POST', newOrder);
 
     return newOrder;
   }
@@ -674,15 +732,7 @@ export class OrderRepository {
 
     db.notify();
 
-    // Update on Local Service
-    if (typeof window !== 'undefined' && typeof fetch !== 'undefined') {
-      const host = window.location?.hostname || 'localhost';
-      fetch(`http://${host}:5178/api/orders/${id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, actor })
-      }).catch(() => {});
-    }
+    postToLocalService(`/api/orders/${id}/status`, 'PATCH', { status, actor });
 
     return order;
   }
@@ -749,15 +799,7 @@ export class OrderRepository {
 
     db.notify();
 
-    // Directly post settled order to authoritative Local Service for cross-port sync
-    if (typeof window !== 'undefined' && typeof fetch !== 'undefined') {
-      const host = window.location?.hostname || 'localhost';
-      fetch(`http://${host}:5178/api/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(order)
-      }).catch(() => {});
-    }
+    postToLocalService(`/api/orders`, 'POST', order);
 
     return order;
   }
@@ -802,14 +844,7 @@ export class OrderRepository {
 
     db.notify();
 
-    if (typeof window !== 'undefined' && typeof fetch !== 'undefined') {
-      const host = window.location?.hostname || 'localhost';
-      fetch(`http://${host}:5178/api/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(order)
-      }).catch(() => {});
-    }
+    postToLocalService(`/api/orders`, 'POST', order);
 
     AuditRepository.log({
       action: 'ORDER_VOID',
@@ -1161,6 +1196,21 @@ export class CouponRepository {
       db.notify();
     }
   }
+
+  public static createCoupon(coupon: Coupon): Coupon {
+    db.coupons.push(coupon);
+    db.notify();
+    return coupon;
+  }
+
+  public static deleteCoupon(id: string): boolean {
+    const idx = db.coupons.findIndex((c) => c.id === id);
+    if (idx === -1) return false;
+    db.coupons.splice(idx, 1);
+    CouponSync.recordDeletion(id); // so the deletion reaches the kiosks instead of the coupon coming back (BUG-133)
+    db.notify();
+    return true;
+  }
 }
 
 export class KioskRepository {
@@ -1396,6 +1446,7 @@ export class CustomerRepository {
     if (idx === -1) return false;
     const name = db.customerAccounts[idx].name;
     db.customerAccounts.splice(idx, 1);
+    CustomerSync.recordDeletion(phone);
     AuditRepository.log({
       action: 'CUSTOMER_DELETED',
       category: 'CUSTOMER',
@@ -1836,6 +1887,7 @@ export class ComboRepository {
     const idx = db.combos.findIndex((c) => c.id === id);
     if (idx !== -1) {
       db.combos.splice(idx, 1);
+      ComboSync.recordDeletion(id); // so the deletion reaches the kiosks (BUG-130)
       db.notify();
       return true;
     }
@@ -1861,6 +1913,9 @@ export class RestaurantIdentityRepository {
     db.offers = [];
     db.tables = [];
     db.floorPlanStartedEmpty = true;
+    // The demo combos and coupons were never this restaurant's: nothing about them is uploaded or deleted.
+    ComboSync.reset();
+    CouponSync.reset();
     AuditRepository.log({
       action: 'DEMO_OPERATIONS_CLEARED_ON_ACTIVATION',
       category: 'SETTINGS',
@@ -1878,6 +1933,52 @@ export class RestaurantIdentityRepository {
   public static adoptBranch(restaurantId: string, name: string): void {
     if (db.outlet.restaurantId === restaurantId) return;
     db.outlet = { ...db.outlet, restaurantId, name, code: '', address: '', city: '', phone: '' };
+    db.notify();
+  }
+
+  /**
+   * Restaurant Admin at sign-in (BUG-158): takes the profile the platform holds for this restaurant. A detail is
+   * replaced when it is blank or still the demo install's value (or when the restaurant itself changed); a detail
+   * the owner has entered by hand is never overwritten. A detail the platform has none of stays blank, so a demo
+   * GSTIN, address or phone can never be printed on a tax invoice.
+   */
+  public static syncProfile(profile: {
+    id: string;
+    name: string;
+    legalName?: string | null;
+    gstin?: string | null;
+    fssaiNumber?: string | null;
+    address?: string | null;
+    city?: string | null;
+    state?: string | null;
+    phone?: string | null;
+  }): void {
+    const r = db.restaurant;
+    const restaurantChanged = r.id !== profile.id;
+    r.id = profile.id;
+    if (profile.name) r.name = profile.name;
+
+    const fields: Array<'legalName' | 'gstin' | 'fssaiNumber' | 'address' | 'city' | 'state' | 'phone'> = ['legalName', 'gstin', 'fssaiNumber', 'address', 'city', 'state', 'phone'];
+    for (const f of fields) {
+      const current = r[f] ?? '';
+      const isDemo = current !== '' && current === (SEED_RESTAURANT[f] ?? '');
+      if (restaurantChanged || current === '' || isDemo) r[f] = profile[f] ?? '';
+    }
+    // Demo-only fields that have no platform counterpart: never leave another business's values behind.
+    for (const f of ['email', 'website', 'tagline', 'msmeNumber', 'pincode', 'ownerName', 'managerName', 'footerText'] as const) {
+      const current = r[f] ?? '';
+      if (restaurantChanged ? current !== '' : current !== '' && current === (SEED_RESTAURANT[f] ?? '')) r[f] = '';
+    }
+
+    db.outlet = { ...db.outlet, restaurantId: profile.id, address: r.address ?? '', city: r.city ?? '', state: r.state ?? '', phone: r.phone ?? '' };
+    db.receiptConfig = {
+      ...db.receiptConfig,
+      restaurantName: r.name,
+      address: r.address ?? '',
+      phone: r.phone ?? '',
+      gstin: r.gstin ?? '',
+      fssaiNumber: r.fssaiNumber ?? ''
+    };
     db.notify();
   }
 
@@ -2171,6 +2272,22 @@ export class ShiftRepository {
 
 const KOT_STATUS_RANK: Record<KOTRecord['status'], number> = { PENDING: 0, ACCEPTED: 1, PREPARING: 1, READY: 2, SERVED: 3, CANCELLED: 4 };
 
+const PRE_READY_ORDER_STATUSES: ReadonlyArray<OrderStatus> = ['NEW', 'DRAFT', 'CREATED', 'ACCEPTED', 'CONFIRMED', 'ACKNOWLEDGED', 'KITCHEN_ACCEPTED', 'PREPARING'];
+
+/**
+ * The order's own status follows the kitchen (BUG-152): once every dish on an open order is ready (or already
+ * served) the order reads READY instead of staying PREPARING until it is paid, and it goes back to PREPARING
+ * if a new round of dishes is added. Paid, cancelled and refunded orders are never touched.
+ */
+function followKitchenStage(order: Order): void {
+  const status = order.orderStatus;
+  const lines = order.items;
+  if (lines.length === 0) return;
+  const allReady = lines.every((i) => i.kitchenStatus === 'READY' || i.kitchenStatus === 'SERVED');
+  if (allReady && PRE_READY_ORDER_STATUSES.includes(status)) order.orderStatus = 'READY';
+  else if (!allReady && status === 'READY') order.orderStatus = 'PREPARING';
+}
+
 export class KOTRepository {
   public static getAllKOTs(): KOTRecord[] {
     return [...db.kots].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -2275,6 +2392,7 @@ export class KOTRepository {
           oi.kitchenStatus = status as OrderItem['kitchenStatus'];
         }
       });
+      followKitchenStage(order);
       order.updatedAt = new Date().toISOString();
       order.syncStatus = 'SAVED_LOCALLY';
     }
@@ -2366,6 +2484,7 @@ export class KOTRepository {
       order.items.forEach((oi) => {
         if (oi.menuItemId === item.menuItemId) oi.kitchenStatus = 'SERVED';
       });
+      followKitchenStage(order);
       order.updatedAt = new Date().toISOString();
       order.syncStatus = 'SAVED_LOCALLY';
     }
@@ -3517,6 +3636,8 @@ export class BusinessDayRepository {
         cancelledOrderCount++;
         return;
       }
+      // Sent to the kitchen but not paid yet: not a sale, not collected money (BUG-151/161).
+      if (isUnpaidOpenOrder(o)) return;
       if (o.orderStatus === 'REFUNDED') {
         refundedOrderCount++;
       }

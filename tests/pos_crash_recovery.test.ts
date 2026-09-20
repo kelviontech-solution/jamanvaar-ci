@@ -78,4 +78,24 @@ describe('POS Crash Recovery & Auto-Save Tests', () => {
     PosRecoveryService.clearDraft();
     expect(PosRecoveryService.loadDraft()).toBeNull();
   });
+
+  // BUG-154: after Send KOT the auto-saved draft offered to "restore" dishes already in the kitchen.
+  it('does not offer to restore a cart whose dishes were all already sent to the kitchen', () => {
+    const line = (kotSentQty: number) => ({
+      cartItemId: 'ci-1', menuItemId: 'm1', item: { id: 'm1', name: 'Paneer Tikka', price: 240 }, quantity: 2, unitPrice: 240,
+      selectedModifiers: [], itemTotal: 480, kotSentQty
+    });
+    const save = (kotSentQty: number) =>
+      PosRecoveryService.saveDraft({
+        terminalId: 'POS-01', orderType: 'DINE_IN', selectedTable: null, selectedCustomer: null, guestCount: 2,
+        cart: { items: [line(kotSentQty)], subtotal: 480, discountAmount: 0, cgstAmount: 12, sgstAmount: 12, taxAmount: 24, serviceChargeAmount: 0, tipAmount: 0, roundOffAmount: 0, totalPayable: 504 } as never,
+        billDiscountPercent: 0, billDiscountFlat: 0
+      });
+
+    save(2);
+    expect(PosRecoveryService.loadDraft()).toBeNull();
+
+    save(1); // one of the two is still unsent: that is genuinely unfinished
+    expect(PosRecoveryService.loadDraft()).not.toBeNull();
+  });
 });

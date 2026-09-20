@@ -32,8 +32,22 @@ export class CloudApiError extends Error {
   }
 }
 
+/** The restaurant as the platform holds it (BUG-158): the real name and the legal details. */
+export interface CloudRestaurantProfile {
+  id: string;
+  name: string;
+  legalName?: string | null;
+  gstin?: string | null;
+  fssaiNumber?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+}
+
 export interface CloudEntitlementsResponse {
   subscriptionStatus: 'TRIAL' | 'ACTIVE' | 'PAST_DUE' | 'SUSPENDED' | 'EXPIRED' | null;
+  /** When the current subscription ends. */
+  expiresAt?: string | null;
   planName: string | null;
   planTier: PlanTier | 'ENTERPRISE' | null;
   entitlements: PlanEntitlements | null;
@@ -47,6 +61,11 @@ interface CachedEntitlements {
 
 let accessToken: string | null = null;
 let refreshInFlight: Promise<boolean> | null = null;
+
+/** The restaurant this console is connected to (shown so the owner can give it to Kiosk Admin or Captain). */
+export function getStoredRestaurantId(): string | null {
+  return getRestaurantId();
+}
 
 function getRestaurantId(): string | null {
   try {
@@ -199,14 +218,14 @@ export async function redeemActivationCode(code: string, appVersion?: string): P
 export interface CloudAuthSuccess {
   requiresActivation: false;
   user: { id: string; fullName: string; role: string; restaurantId: string; email: string };
-  restaurant: { id: string; name: string };
+  restaurant: CloudRestaurantProfile;
   deviceId?: string;
 }
 
 export interface CloudAuthActivationRequired {
   requiresActivation: true;
   activationSessionToken: string;
-  restaurant: { id: string; name: string };
+  restaurant: CloudRestaurantProfile;
   user: { id: string; fullName: string; email: string };
   message: string;
 }
@@ -231,7 +250,7 @@ export async function cloudLogin(
         requiresActivation: false;
         accessToken: string;
         user: { id: string; fullName: string; role: string; restaurantId: string; email: string };
-        restaurant: { id: string; name: string };
+        restaurant: CloudRestaurantProfile;
         deviceId?: string;
         deviceToken?: string;
       }
@@ -239,7 +258,7 @@ export async function cloudLogin(
         status: 'ACTIVATION_REQUIRED';
         requiresActivation: true;
         activationSessionToken: string;
-        restaurant: { id: string; name: string };
+        restaurant: CloudRestaurantProfile;
         user: { id: string; fullName: string; email: string };
         message: string;
       }
@@ -286,7 +305,7 @@ export async function cloudActivateDevice(
   activationKey: string
 ): Promise<{
   user: { id: string; fullName: string; role: string; restaurantId: string; email: string };
-  restaurant: { id: string; name: string };
+  restaurant: CloudRestaurantProfile;
   deviceId: string;
 }> {
   const result = await request<{
@@ -294,7 +313,7 @@ export async function cloudActivateDevice(
     requiresActivation: false;
     accessToken: string;
     user: { id: string; fullName: string; role: string; restaurantId: string; email: string };
-    restaurant: { id: string; name: string };
+    restaurant: CloudRestaurantProfile;
     deviceId: string;
     deviceToken: string;
   }>('/api/v1/tenant-auth/activate-device', {
@@ -336,8 +355,32 @@ export async function cloudSetInitialPassword(email: string, activationToken: st
   });
 }
 
+/** "Forgot password" step 1 (BUG-142): asks the cloud to email a 6-digit code. It always succeeds for the caller, so it reveals nothing about who has an account. */
+export async function cloudRequestPasswordReset(email: string): Promise<void> {
+  const restaurantId = getRestaurantId();
+  if (!restaurantId) throw new CloudApiError('This terminal is not connected to a restaurant yet', 400);
+  await request('/api/v1/tenant-auth/forgot-password', { method: 'POST', body: { restaurantId, email }, skipAuthRetry: true });
+}
+
+/** "Forgot password" step 2: the emailed code and the new password. */
+export async function cloudResetPassword(email: string, otp: string, newPassword: string): Promise<void> {
+  const restaurantId = getRestaurantId();
+  if (!restaurantId) throw new CloudApiError('This terminal is not connected to a restaurant yet', 400);
+  await request('/api/v1/tenant-auth/reset-password', { method: 'POST', body: { restaurantId, email, otp, newPassword }, skipAuthRetry: true });
+}
+
 export function cloudLogout() {
   accessToken = null;
+}
+
+/**
+ * What to tell someone whose screen needs the cloud (BUG-163). "Connect this device" was shown even on a terminal
+ * that is already activated and signed in, because the cloud session lives in memory and is gone after a reload.
+ * Say the thing that is actually missing.
+ */
+export function cloudSetupHint(): string {
+  if (!isCloudConnected()) return 'This device is not connected to JAMANVAAR Cloud yet. Connect it with an activation key in Settings, Subscription Plan.';
+  return 'This device is connected to JAMANVAAR Cloud, but your cloud session has ended (it does not survive a reload). Sign out and sign in again with your owner login to continue.';
 }
 
 export function isCloudLoggedIn(): boolean {

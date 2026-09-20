@@ -27,3 +27,13 @@ export type RedeemActivationKeyDto = z.infer<typeof redeemActivationKeySchema>;
 export const bulkRevokeKeysSchema = z.object({
   ids: z.array(z.string().uuid()).min(1, 'Choose at least one key').max(200)
 });
+
+export const bulkKeysSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1, 'Choose at least one key').max(200)
+});
+
+/** Bringing a key back: an optional new expiry when the old one has passed (default 30 days from now). */
+export const reactivateKeySchema = z.object({
+  expiresAt: z.coerce.date().optional()
+});
+export type ReactivateKeyDto = z.infer<typeof reactivateKeySchema>;

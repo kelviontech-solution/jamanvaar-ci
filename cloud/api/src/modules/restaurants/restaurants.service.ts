@@ -266,9 +266,12 @@ export class RestaurantsService {
       this.entitySync.catchUpForRestaurant(id, 'MENU_ITEM', new Date(0).toISOString())
     ]);
 
+    // A deleted dish or category stays in the store as a tombstone so it cannot come back; it is not part of the menu.
+    const live = <E extends { payload: unknown }>(rows: E[]) => rows.filter((r) => !(r.payload && typeof r.payload === 'object' && (r.payload as Record<string, unknown>).deleted === true));
+
     return {
-      categories: categories.entities,
-      items: items.entities,
+      categories: live(categories.entities),
+      items: live(items.entities),
       selfUploadEnabled: restaurant.selfMenuUploadEnabled
     };
   }
@@ -277,9 +280,13 @@ export class RestaurantsService {
     const restaurant = await this.prisma.runAsPlatform((tx) => tx.restaurant.findFirst({ where: { id, deletedAt: null } }));
     if (!restaurant) throw new NotFoundException('Restaurant not found');
 
+    // An import is a deliberate edit made now: stamp it so it is newer than what terminals last wrote (BUG-149),
+    // otherwise a terminal's older copy of a dish would win over the imported one.
+    const stampedAt = new Date().toISOString();
+    const stamp = <E extends { payload: Record<string, unknown> }>(events: E[]) => events.map((e) => ({ ...e, payload: { ...e.payload, updatedAt: stampedAt } }));
     const [categoryResult, itemResult] = await Promise.all([
-      this.entitySync.pushEventsForRestaurant(id, 'MENU_CATEGORY', dto.categories),
-      this.entitySync.pushEventsForRestaurant(id, 'MENU_ITEM', dto.items)
+      this.entitySync.pushEventsForRestaurant(id, 'MENU_CATEGORY', stamp(dto.categories)),
+      this.entitySync.pushEventsForRestaurant(id, 'MENU_ITEM', stamp(dto.items))
     ]);
 
     await this.audit.log({

@@ -188,3 +188,43 @@ describe('Order catch-up updates this device\'s tickets (BUG-098/113)', () => {
     SyncOutboxEngine.configureTransport(null);
   });
 });
+
+describe('The order status follows the kitchen (BUG-152)', () => {
+  const item = (menuItemId: string, name: string, kitchenStatus: OrderItem['kitchenStatus'] = 'PREPARING') => ({
+    id: `oi-${menuItemId}`, orderId: '', menuItemId, name, sku: menuItemId, quantity: 1, unitPrice: 100, totalPrice: 100, modifiers: [], kitchenStatus
+  });
+  const seedOrder = (items: ReturnType<typeof item>[], orderStatus: Order['orderStatus'] = 'PREPARING') =>
+    OrderRepository.createOrder({ orderType: 'DINE_IN', tableNumber: '1', items, subtotal: 200, taxAmount: 10, totalAmount: 210, paymentMethod: 'CASH', paymentStatus: 'PENDING', orderStatus });
+  const kotFor = (order: Order, menuItemIds: string[]): KOTRecord =>
+    KOTRepository.generateKOT({
+      orderId: order.id, orderNumber: order.orderNumber, tokenNumber: order.tokenNumber, tableNumber: '1', orderType: 'DINE_IN', cashierName: 'Ravi',
+      items: menuItemIds.map((id) => ({ id: `ki-${id}`, menuItemId: id, name: id, quantity: 1, modifiers: [], kitchenStation: 'Main Kitchen', status: 'PREPARING' as const }))
+    })[0];
+
+  beforeEach(() => {
+    db.resetToDefaultSeed();
+    db.kots.length = 0;
+  });
+
+  it('the order reads READY once the kitchen has finished every dish, and PREPARING again for a new round', () => {
+    const order = seedOrder([item('a', 'A'), item('b', 'B')]);
+    const kot = kotFor(order, ['a', 'b']);
+    expect(OrderRepository.getOrderById(order.id)!.orderStatus).toBe('PREPARING');
+
+    KOTRepository.updateKOTStatus(kot.id, 'READY');
+    expect(OrderRepository.getOrderById(order.id)!.orderStatus).toBe('READY');
+
+    // an add-on round: a new dish is still cooking, so the order is not "ready" any more
+    const live = OrderRepository.getOrderById(order.id)!;
+    live.items.push(item('c', 'C', 'PENDING'));
+    KOTRepository.updateKOTStatus(kot.id, 'READY');
+    expect(OrderRepository.getOrderById(order.id)!.orderStatus).toBe('PREPARING');
+  });
+
+  it('never moves a paid or cancelled order back to READY', () => {
+    const order = seedOrder([item('a', 'A')], 'COMPLETED');
+    const kot = kotFor(order, ['a']);
+    KOTRepository.updateKOTStatus(kot.id, 'READY');
+    expect(OrderRepository.getOrderById(order.id)!.orderStatus).toBe('COMPLETED');
+  });
+});

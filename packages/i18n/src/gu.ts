@@ -22,7 +22,7 @@ export const gu = {
   bannerThaliTitle: 'ગુજરાતી હેરિટેજ થાળી',
   bannerThaliSub: '12 પ્રમાણિક વ્યંજનોની ખાસ ગુજરાતી થાળી',
   bannerThaliCta: '+ થાળી ઉમેરો @ ₹280 ➔',
-  bannerCoffeeTag: '☕ બેવરેજ ઓફર',
+  bannerCoffeeTag: '☕ કોલ્ડ બેવરેજ',
   bannerCoffeeTitle: 'કોલ્ડ કોફી વિથ આઇસક્રીમ',
   bannerCoffeeSub: 'મલાઈદાર આઇસક્રીમ સ્કૂપ • 100% અરેબિકા',
   bannerCoffeeCta: '+ કોફી ઉમેરો @ ₹120 ➔',

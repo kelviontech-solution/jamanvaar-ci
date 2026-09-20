@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Category, MenuItem, ComboDeal } from '@jamanvaar/types';
 import { db, MenuRepository, ComboRepository, AuditRepository, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
 import { MenuBuilderService } from '@jamanvaar/business';
@@ -125,7 +125,10 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
   const [isComboModalOpen, setIsComboModalOpen] = useState(false);
   const [comboToEdit, setComboToEdit] = useState<ComboDeal | null>(null);
 
-  const filteredMenuItems = useMemo(() => {
+  // Not memoised on `menuItems`: that is the database's own array, edited in place (Load Default Items, Save,
+  // Delete, a sync), so its identity never changes and a memo keyed on it kept showing the old list (BUG-146/150).
+  // Filtering a few hundred dishes on each render is cheap.
+  const filteredMenuItems = (() => {
     return menuItems.filter((item) => {
       const matchesSearch =
         !menuSearch ||
@@ -143,7 +146,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
 
       return matchesSearch && matchesCat && matchesDiet;
     });
-  }, [menuItems, menuSearch, selectedCategoryFilter, dietaryFilter]);
+  })();
 
   const handleDuplicateDish = (dish: MenuItem) => {
     MenuRepository.createMenuItem({

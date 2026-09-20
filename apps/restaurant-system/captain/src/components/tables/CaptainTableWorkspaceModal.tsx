@@ -54,7 +54,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
     clearCart,
     sendKOT,
     requestBill,
-    repeatPreviousOrder
+    repeatPreviousOrder,
+    serveReadyForTable
   } = useCaptainStore();
 
   // A freshly-opened table with nothing ordered yet should land straight on
@@ -279,7 +280,19 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                   return state === 'SERVED' ? (
                                     <span className="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded">✓ Served</span>
                                   ) : state === 'READY' ? (
-                                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-1.5 py-0.2 rounded">🔔 Ready to serve</span>
+                                    <>
+                                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-1.5 py-0.2 rounded">🔔 Ready to serve</span>
+                                      {table && (
+                                        <button
+                                          type="button"
+                                          onClick={() => serveReadyForTable(table.tableNumber)}
+                                          className="text-[10px] font-black text-white bg-emerald-600 hover:bg-emerald-700 px-2 py-0.5 rounded cursor-pointer"
+                                          title="Mark the ready dishes on this table as delivered"
+                                        >
+                                          Mark served
+                                        </button>
+                                      )}
+                                    </>
                                   ) : (
                                     <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded">🔥 In Kitchen</span>
                                   );

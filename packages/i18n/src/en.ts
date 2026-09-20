@@ -27,7 +27,7 @@ export const en = {
   bannerThaliTitle: 'Gujarati Heritage Thali',
   bannerThaliSub: '12 Authentic Items Special Gujarati Feast',
   bannerThaliCta: '+ Add Thali @ ₹280 ➔',
-  bannerCoffeeTag: '☕ Beverage Offer',
+  bannerCoffeeTag: '☕ Cold Beverage',
   bannerCoffeeTitle: 'Cold Coffee with Ice Cream',
   bannerCoffeeSub: 'Velvety Ice Cream Scoop • 100% Arabica',
   bannerCoffeeCta: '+ Add Coffee @ ₹120 ➔',

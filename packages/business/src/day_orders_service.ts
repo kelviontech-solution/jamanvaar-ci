@@ -1,4 +1,5 @@
 import { Order, OrderStatus } from '@jamanvaar/types';
+import { isUnpaidOpenOrder } from '@jamanvaar/database';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 
 export interface DaySummary {
@@ -196,6 +197,10 @@ export class DayOrdersService {
         activeOrders++;
       }
 
+      // Still open and unpaid (in the kitchen, bill requested, pay-at-counter): listed as an order, but it is
+      // not a sale and not collected money until it is settled (BUG-151/161).
+      if (isUnpaidOpenOrder(o)) return;
+
       // Reconciled accounting sums
       totalSales += o.totalAmount;
       grossSales += o.subtotal || o.totalAmount;
@@ -269,7 +274,7 @@ export class DayOrdersService {
     });
 
     const netSales = Math.max(0, totalSales - refunds);
-    const validOrdersCount = completedOrders + activeOrders + refundedOrders;
+    const validOrdersCount = completedOrders + refundedOrders;
     const avgOrderValue = validOrdersCount > 0 ? Math.round(totalSales / validOrdersCount) : 0;
 
     // Top ranked items sorted by quantity

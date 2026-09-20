@@ -1,3 +1,4 @@
+import { db } from '@jamanvaar/database';
 import React, { useState, useEffect } from 'react';
 import { JamanvaarLogo, JamanvaarAppBadge, AppIdentity } from './JamanvaarBrand';
 import {
@@ -128,12 +129,17 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
         <div className="flex items-center gap-2.5 sm:gap-3 text-xs font-bold ml-auto">
           {/* Local Core / Cloud API Status Badge */}
           <div className="flex items-center gap-2 bg-white border border-[#EBE6DD] px-3.5 py-1.5 rounded-full shadow-2xs">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+            {/* The local relay needs a pairing no screen performs yet; once it refuses this browser, say so instead of "Connected" (BUG-156). */}
+            <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${appIdentity !== 'SUPER_ADMIN' && db.isLocalCoreUnauthorized() ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
             <span className="text-slate-600">
               {appIdentity === 'SUPER_ADMIN' ? 'Cloud API: ' : 'Local Core: '}
-              <strong className="text-emerald-700 font-extrabold">
-                {appIdentity === 'SUPER_ADMIN' ? 'Connected (Port 4000)' : 'Connected'}
-              </strong>
+              {appIdentity !== 'SUPER_ADMIN' && db.isLocalCoreUnauthorized() ? (
+                <strong className="text-amber-700 font-extrabold">Not paired (cloud sync in use)</strong>
+              ) : (
+                <strong className="text-emerald-700 font-extrabold">
+                  {appIdentity === 'SUPER_ADMIN' ? 'Connected (Port 4000)' : 'Connected'}
+                </strong>
+              )}
             </span>
           </div>
 

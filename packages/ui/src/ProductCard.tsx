@@ -8,7 +8,8 @@ import { sound } from './SoundManager';
 
 export interface ProductCardProps {
   item: MenuItem;
-  onAdd: (item: MenuItem) => void;
+  /** Adds the dish to an order. Leave out on a screen that only lists dishes (a catalog editor): no + button is shown. */
+  onAdd?: (item: MenuItem) => void;
   onSelectDetails?: (item: MenuItem) => void;
   /**
    * When provided, a secondary "Customize" button renders to the left of
@@ -132,6 +133,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 Customize
               </button>
             )}
+            {onAdd && (
             <button
               type="button"
               onClick={(e) => {
@@ -144,6 +146,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             >
               <Plus className="w-5 h-5 stroke-[2.5]" />
             </button>
+            )}
           </div>
         </div>
       </div>

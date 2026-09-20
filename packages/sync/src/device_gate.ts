@@ -23,6 +23,7 @@ export type DeviceGateCode =
   | 'APP_DISABLED'
   | 'BRANCH_INACTIVE'
   | 'DEVICE_LOCKED'
+  | 'INVALID_DEVICE_CREDENTIAL'
   | 'UPDATE_REQUIRED'
   | 'OFFLINE_LIMIT';
 
@@ -48,7 +49,10 @@ const CLOUD_LOCK_CODES: DeviceGateCode[] = [
   'SUBSCRIPTION_INACTIVE',
   'APP_DISABLED',
   'BRANCH_INACTIVE',
-  'DEVICE_LOCKED'
+  'DEVICE_LOCKED',
+  // BUG-145: the cloud does not recognise this terminal's credential at all (device removed, database restored,
+  // token corrupted). Every call fails until it is activated again, so it must not pretend to be live.
+  'INVALID_DEVICE_CREDENTIAL'
 ];
 
 const STORAGE_KEY = 'jamanvaar_device_gate_v1';
@@ -83,6 +87,7 @@ const MESSAGES: Record<DeviceGateCode, string> = {
   APP_DISABLED: 'This application is not enabled for your restaurant. Please contact your platform administrator.',
   BRANCH_INACTIVE: 'This branch has been deactivated. Please contact your platform administrator.',
   DEVICE_LOCKED: 'This terminal has been locked by your platform administrator.',
+  INVALID_DEVICE_CREDENTIAL: "This terminal's sign-in with JAMANVAAR is no longer valid, so it cannot sync. Please re-activate it with a new activation key, or contact your platform administrator.",
   UPDATE_REQUIRED: 'A required update must be installed before this terminal can be used.',
   OFFLINE_LIMIT: 'This terminal has been offline for too long. Connect to the internet so it can check in with JAMANVAAR.'
 };
@@ -139,8 +144,18 @@ export class DeviceGate {
     });
   }
 
-  /** A successful cloud response: the terminal is allowed. Clears any lock and records the check-in. */
-  static reportSuccess(): void {
+  /**
+   * A successful cloud response: the terminal is allowed. Clears any lock and records the check-in.
+   * A mandatory-update lock is the exception (BUG-143): an ordinary call succeeding proves the credential
+   * and subscription are fine but says nothing about whether the update was installed, so only a heartbeat
+   * that no longer asks for the update (`releaseUpdateLock`) may clear it - otherwise every unrelated
+   * request would clear the lock and the next heartbeat would raise it again, so it flickered.
+   */
+  static reportSuccess(opts: { releaseUpdateLock?: boolean } = {}): void {
+    if (this.state.locked && this.state.code === 'UPDATE_REQUIRED' && !opts.releaseUpdateLock) {
+      this.set({ ...this.state, lastCheckInAt: new Date().toISOString() });
+      return;
+    }
     this.set({ locked: false, lastCheckInAt: new Date().toISOString(), ...this.remembered() });
   }
 
@@ -197,7 +212,8 @@ export class DeviceGate {
     try {
       const body = (await res.clone().json()) as { code?: string; message?: string; reason?: string };
       if (body && CLOUD_LOCK_CODES.includes(body.code as DeviceGateCode)) {
-        this.lock(body.code as DeviceGateCode, body.message, body.reason);
+        // The server's wording for a rejected credential is a bare 'Invalid device credential.'; ours says what to do.
+        this.lock(body.code as DeviceGateCode, body.code === 'INVALID_DEVICE_CREDENTIAL' ? undefined : body.message, body.reason);
       }
     } catch {
       // Not JSON: an ordinary error, not a platform decision.
@@ -218,8 +234,9 @@ export class DeviceGate {
       // A mandatory update is not a suggestion: the terminal cannot be used until it is installed.
       this.lock('UPDATE_REQUIRED', undefined, `Update to version ${body.update.latestVersion} to continue.${body.update.downloadUrl ? ` Download: ${body.update.downloadUrl}` : ''}`);
     } else {
-      // The heartbeat passed every cloud check (device, restaurant, subscription, app), so any lock is stale.
-      this.reportSuccess();
+      // The heartbeat passed every cloud check (device, restaurant, subscription, app) and no longer asks for an
+      // update, so any lock is stale.
+      this.reportSuccess({ releaseUpdateLock: true });
     }
   }
 

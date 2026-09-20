@@ -46,4 +46,9 @@ describe('DeviceGateOverlay', () => {
     await DeviceGate.observe(new Response('{}', { status: 200 }));
     expect(render()).toBe('');
   });
+
+  it('names a rejected device credential instead of showing nothing (BUG-145)', async () => {
+    await DeviceGate.observe(refusal(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'Invalid device credential.' }));
+    expect(render()).toContain('Device not recognised');
+  });
 });

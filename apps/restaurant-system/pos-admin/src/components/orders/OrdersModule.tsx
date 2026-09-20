@@ -6,7 +6,7 @@ import {
   DaySummary,
   DateFilterPreset
 } from '@jamanvaar/business';
-import { db, OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
+import { db, OrderRepository, AuditRepository, ReceiptRepository, isUnpaidOpenOrder } from '@jamanvaar/database';
 import {
   Search,
   Calendar,
@@ -638,7 +638,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
             </div>
 
             <div className="bg-white p-4 rounded-2xl border border-emerald-200 bg-emerald-50/40 shadow-2xs">
-              <span className="text-[10px] font-black uppercase text-emerald-800 block">NET TOTAL SALES</span>
+              <span className="text-[10px] font-black uppercase text-emerald-800 block">TOTAL BILLED (INCL. GST)</span>
               <span className="text-xl font-black font-mono text-emerald-950">
                 {formatINR(currentDaySummary.netSales)}
               </span>
@@ -823,7 +823,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                       </td>
                       <td className="p-3.5">
                         <span className="px-2 py-0.5 rounded font-bold text-[10px] uppercase bg-slate-100 text-slate-700">
-                          {ord.paymentMethod}
+                          {isUnpaidOpenOrder(ord) ? 'Unpaid' : ord.paymentMethod}
                         </span>
                       </td>
                       <td className="p-3.5 text-slate-600 font-semibold">{ord.cashierName || ord.captainName || '—'}</td>

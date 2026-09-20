@@ -8,9 +8,9 @@ import { NotificationRepository } from './repositories';
  * cloud entity sync, and turned into a notification on the device it is meant for.
  */
 
-export type ServiceMessageKind = 'MESSAGE' | 'BILL_REQUEST';
-export type ServiceMessageRecipient = 'KITCHEN' | 'POS' | 'MANAGER' | 'CAPTAIN' | 'ALL';
-export type ServiceMessageReader = 'POS' | 'POS_ADMIN' | 'KDS' | 'CAPTAIN';
+export type ServiceMessageKind = 'MESSAGE' | 'BILL_REQUEST' | 'CALL_STAFF';
+export type ServiceMessageRecipient = 'KITCHEN' | 'POS' | 'MANAGER' | 'CAPTAIN' | 'COUNTER' | 'ALL';
+export type ServiceMessageReader = 'POS' | 'POS_ADMIN' | 'KDS' | 'CAPTAIN' | 'KIOSK_ADMIN';
 
 export interface ServiceMessage {
   id: string;
@@ -72,6 +72,9 @@ function remember(id: string): void {
 }
 
 function isRecipientFor(reader: ServiceMessageReader, msg: ServiceMessage): boolean {
+  // A guest at a self-order kiosk asking for help (BUG-137) goes to the people who staff the counter and the
+  // kiosk console - not to the kitchen or the waiters.
+  if (msg.kind === 'CALL_STAFF') return reader === 'POS' || reader === 'POS_ADMIN' || reader === 'KIOSK_ADMIN';
   if (msg.recipient === 'ALL') return true;
   if (msg.kind === 'BILL_REQUEST') return reader === 'POS' || reader === 'POS_ADMIN';
   switch (reader) {
@@ -79,6 +82,7 @@ function isRecipientFor(reader: ServiceMessageReader, msg: ServiceMessage): bool
     case 'POS': return msg.recipient === 'POS';
     case 'POS_ADMIN': return msg.recipient === 'MANAGER';
     case 'CAPTAIN': return msg.recipient === 'CAPTAIN';
+    case 'KIOSK_ADMIN': return false;
   }
 }
 
@@ -90,7 +94,7 @@ function parse(raw: unknown): ServiceMessage | null {
   if (Number.isNaN(created)) return null;
   return {
     id: r.id,
-    kind: r.kind === 'BILL_REQUEST' ? 'BILL_REQUEST' : 'MESSAGE',
+    kind: r.kind === 'BILL_REQUEST' ? 'BILL_REQUEST' : r.kind === 'CALL_STAFF' ? 'CALL_STAFF' : 'MESSAGE',
     recipient: r.recipient as ServiceMessageRecipient,
     senderName: typeof r.senderName === 'string' && r.senderName ? r.senderName : 'Floor staff',
     presetText: r.presetText,
@@ -141,14 +145,16 @@ export class ServiceMessages {
 
     remember(msg.id);
     save();
-    if (reader === 'CAPTAIN') return msg;
+    // Captain shows it in its inbox and Kiosk Admin in its service-request list, rather than as a notification.
+    if (reader === 'CAPTAIN' || reader === 'KIOSK_ADMIN') return msg;
 
     const roles: NotificationRole[] = [reader, 'ALL'];
     const where = msg.tableNumber ? ` — Table ${msg.tableNumber}` : '';
     NotificationRepository.createNotification({
       id: `notif-${msg.id}`,
       type: msg.kind === 'BILL_REQUEST' ? 'BILL_REQUESTED' : 'MANAGER_ALERT',
-      title: msg.kind === 'BILL_REQUEST' ? `🧾 Bill requested${where}` : `💬 Message from ${msg.senderName}${where}`,
+      title:
+        msg.kind === 'BILL_REQUEST' ? `🧾 Bill requested${where}` : msg.kind === 'CALL_STAFF' ? `🙋 Guest needs help${where}` : `💬 Message from ${msg.senderName}${where}`,
       message: msg.kind === 'BILL_REQUEST' ? `${msg.senderName} asked for the bill.` : msg.customNote || msg.presetText,
       priority: 'HIGH',
       targetRoles: roles,

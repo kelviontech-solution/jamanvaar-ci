@@ -32,7 +32,7 @@ export const PosSidebar: React.FC = () => {
   const activeDay = BusinessDayRepository.getActiveBusinessDay();
   const activeOrdersCount = db.orders.filter(
     (o) =>
-      (o.orderStatus === 'PREPARING' || o.orderStatus === 'CONFIRMED' || o.orderStatus === 'NEW') &&
+      (o.orderStatus === 'PREPARING' || o.orderStatus === 'READY' || o.orderStatus === 'CONFIRMED' || o.orderStatus === 'NEW') &&
       o.businessDayId === activeDay.id
   ).length;
 

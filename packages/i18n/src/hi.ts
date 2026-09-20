@@ -22,7 +22,7 @@ export const hi = {
   bannerThaliTitle: 'गुजराती हेरिटेज थाली',
   bannerThaliSub: '12 प्रामाणिक व्यंजनों की खास गुजराती थाली',
   bannerThaliCta: '+ थाली जोड़ें @ ₹280 ➔',
-  bannerCoffeeTag: '☕ बेवरेज ऑफर',
+  bannerCoffeeTag: '☕ कोल्ड बेवरेज',
   bannerCoffeeTitle: 'कोल्ड कॉफी विथ आइसक्रीम',
   bannerCoffeeSub: 'मलाईदार आइसक्रीम स्कूप • 100% अरेबिका',
   bannerCoffeeCta: '+ कॉफी जोड़ें @ ₹120 ➔',

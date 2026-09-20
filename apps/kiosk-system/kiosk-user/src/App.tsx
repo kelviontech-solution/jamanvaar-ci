@@ -29,6 +29,7 @@ import {
   MenuRepository,
   OrderRepository,
   ReceiptRepository,
+  ServiceMessages,
   ServiceRequestRepository,
   TableRepository,
   WelcomeScreenSettingsRepository,
@@ -81,7 +82,7 @@ import {
 import { formatDate, formatINR, formatTime, generateIdempotencyKey, generateUUID, localizedDescription, localizedName, SoundService } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
 import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService } from '@jamanvaar/api';
-import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncPromotions, syncFeedback, pushServiceMessages } from '@jamanvaar/sync';
 import { APP_CONSTANTS } from '@jamanvaar/config';
 import {
   AlertCircle,
@@ -200,29 +201,6 @@ export default function KioskUserApp() {
     // BUG-016: this terminal had no menu sync at all, so a fresh or cleared kiosk fell back
     // to the local seed menu instead of the restaurant's real one. Pull-only — a customer
     // kiosk never edits the menu.
-    const syncMenu = async () => {
-      await EntitySyncEngine.catchUp('MENU_ITEM', (remote) => {
-        const incoming = remote.payload as unknown as MenuItem;
-        if (!incoming || !incoming.id) return;
-        const idx = db.menuItems.findIndex((m) => m.id === incoming.id);
-        if (idx >= 0) {
-          db.menuItems[idx] = { ...db.menuItems[idx], ...incoming };
-        } else {
-          db.menuItems.push(incoming);
-        }
-      });
-      await EntitySyncEngine.catchUp('MENU_CATEGORY', (remote) => {
-        const incoming = remote.payload as unknown as Category;
-        if (!incoming || !incoming.id) return;
-        const idx = db.categories.findIndex((c) => c.id === incoming.id);
-        if (idx >= 0) {
-          db.categories[idx] = { ...db.categories[idx], ...incoming };
-        } else {
-          db.categories.push(incoming);
-        }
-      });
-      db.notify();
-    };
 
     // BUG-019/034/035: the manager-override staff PIN used to work only on the device that created
     // it — a kiosk was never in the entity-sync loop for staff, despite the create/reset screen's own
@@ -232,7 +210,12 @@ export default function KioskUserApp() {
     };
 
     void SyncOutboxEngine.processOutbox();
-    void syncMenu();
+    void syncMenuCatalog({ push: false });
+    // BUG-130/133/136/137: combos and coupons made in Kiosk Admin arrive here; coupon redemptions, guest ratings
+    // and "call staff" requests go back.
+    void syncPromotions({ pushCombos: false, pushCoupons: true });
+    void syncFeedback({ push: true });
+    void pushServiceMessages();
     void syncStaff();
     void reportHeartbeat();
 
@@ -260,7 +243,10 @@ export default function KioskUserApp() {
 
     const interval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
-      void syncMenu();
+      void syncMenuCatalog({ push: false });
+      void syncPromotions({ pushCombos: false, pushCoupons: true });
+      void syncFeedback({ push: true });
+      void pushServiceMessages();
       void syncStaff();
       void reportHeartbeat();
     }, 15000);
@@ -957,6 +943,8 @@ export default function KioskUserApp() {
     // payment is confirmed.
     const pendingOrder = OrderRepository.createOrder({
       idempotencyKey: generateIdempotencyKey('kiosk_ord'),
+      // This kiosk numbers its own tokens, so they carry a prefix (K-101) that can never equal the counter's #101 (BUG-160).
+      tokenNumber: OrderRepository.nextTokenNumber('K'),
       kioskId,
       sessionId,
       orderType,
@@ -1165,7 +1153,8 @@ export default function KioskUserApp() {
       setIsProcessingPayment(false);
       return;
     }
-    const order = OrderRepository.getOrderById(localOrderIdForPayment);
+    // The order was created before the guest chose how to pay (default UPI): record the real choice (BUG-134).
+    const order = OrderRepository.choosePaymentMethod(localOrderIdForPayment, 'CASH_AT_COUNTER') ?? OrderRepository.getOrderById(localOrderIdForPayment);
     if (!order) {
       setIsProcessingPayment(false);
       return;
@@ -1200,6 +1189,10 @@ export default function KioskUserApp() {
   };
 
   // Staff Call Service
+  // Whether the counter really received the last "call staff" request. The guest is told a team member is on the
+  // way only when it did; otherwise they are asked to go to the counter (BUG-137).
+  const [staffCallDelivered, setStaffCallDelivered] = useState<boolean | null>(null);
+
   const handleCallStaff = () => {
     SoundService.playTap();
     resetIdleTimer();
@@ -1209,7 +1202,17 @@ export default function KioskUserApp() {
       sessionId,
       type: 'CALL_STAFF'
     });
+    // Send it to the people who staff the counter (POS, Restaurant Admin, Kiosk Admin).
+    ServiceMessages.enqueue({
+      kind: 'CALL_STAFF',
+      recipient: 'COUNTER',
+      senderName: 'Self-order kiosk',
+      presetText: selectedTable?.tableNumber ? `A guest at Table ${selectedTable.tableNumber} asked for help.` : 'A guest at the self-order kiosk asked for help.',
+      tableNumber: selectedTable?.tableNumber
+    });
+    setStaffCallDelivered(null);
     setIsStaffModalOpen(true);
+    void pushServiceMessages().then(setStaffCallDelivered);
   };
 
   // Customer Chatbot Assistant Handler
@@ -2176,7 +2179,7 @@ export default function KioskUserApp() {
                             />
                             <div>
                               <span className="block text-xs sm:text-sm font-black text-emerald-800 whitespace-nowrap">{t('bannerCoffeeTitle')}</span>
-                              <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹{coffee.price} · Beverage Offer</span>
+                              <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹{coffee.price} · Cold Beverage</span>
                             </div>
                           </button>
                         )}
@@ -3558,10 +3561,24 @@ export default function KioskUserApp() {
           <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 text-jaman-saffron flex items-center justify-center mx-auto">
             <Bell className="w-8 h-8" />
           </div>
-          <h3 className="text-xl font-bold text-jaman-navy">Team Member Notified</h3>
-          <p className="text-sm text-[#4A5568] leading-relaxed">
-            {t('staffOnTheWay')}
-          </p>
+          {staffCallDelivered === null ? (
+            <>
+              <h3 className="text-xl font-bold text-jaman-navy">Calling a team member…</h3>
+              <p className="text-sm text-[#4A5568] leading-relaxed">Please wait a moment.</p>
+            </>
+          ) : staffCallDelivered ? (
+            <>
+              <h3 className="text-xl font-bold text-jaman-navy">Team Member Notified</h3>
+              <p className="text-sm text-[#4A5568] leading-relaxed">{t('staffOnTheWay')}</p>
+            </>
+          ) : (
+            <>
+              <h3 className="text-xl font-bold text-jaman-navy">Please ask at the counter</h3>
+              <p className="text-sm text-[#4A5568] leading-relaxed">
+                We could not reach our team from this kiosk right now. Please walk to the counter and a team member will help you.
+              </p>
+            </>
+          )}
           <Button variant="accent" size="md" className="w-full" onClick={() => setIsStaffModalOpen(false)}>
             Close
           </Button>

@@ -47,7 +47,26 @@ interface RequestOptions {
   skipAuthRetry?: boolean;
 }
 
+/**
+ * After a page reload there is no access token in memory, only the refresh cookie. Sending the request anyway
+ * meant every page load produced a wasted 401 (twice: /platform/me and /platform/system-health) before the
+ * session was resumed (BUG-163). Resume the session first, then send the request with the token.
+ */
+async function resumeSessionIfNeeded(path: string): Promise<boolean> {
+  if (accessToken !== null || path.startsWith('/api/v1/platform-auth/')) return false;
+  if (!refreshInFlight) {
+    refreshInFlight = refreshAccessToken().finally(() => {
+      refreshInFlight = null;
+    });
+  }
+  await refreshInFlight;
+  return true;
+}
+
 async function rawRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  // If the session was just tried and there is none, a 401 needs no second attempt.
+  const triedResume = await resumeSessionIfNeeded(path);
+  if (triedResume) options = { ...options, skipAuthRetry: true };
   const res = await fetch(`${API_BASE}${path}`, {
     method: options.method ?? 'GET',
     credentials: 'include',
