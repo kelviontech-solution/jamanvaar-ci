@@ -1,0 +1,73 @@
+name: Tauri desktop shells build
+
+# BUG-025/026: the native printing code (packages/native/printing.rs) and the Tauri IPC commands
+# that expose it are unit-tested and were verified for real against a live Windows printer queue on
+# a developer machine, but that same machine cannot compile a full Tauri app — Windows Smart App
+# Control is Enforced there, which (by design, and only reversible by reinstalling Windows) refuses
+# to load any freshly-built, unsigned Rust proc-macro plugin DLL, so `cargo build` fails on crates as
+# unrelated to this code as `thiserror` before it ever reaches the printing module. GitHub's own
+# Windows runners have no such restriction, so this workflow is the actual, repeatable proof that
+# every desktop shell — including the new printer-detection and printing commands — really builds.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/native/**'
+      - 'apps/**/src-tauri/**'
+      - 'apps/**/src/**'
+      - 'packages/**/src/**'
+      - '.github/workflows/tauri-build.yml'
+  pull_request:
+    paths:
+      - 'packages/native/**'
+      - 'apps/**/src-tauri/**'
+      - 'apps/**/src/**'
+      - 'packages/**/src/**'
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - workspace: '@jamanvaar/pos'
+            dir: apps/restaurant-system/pos
+            name: POS
+          - workspace: '@jamanvaar/pos-admin'
+            dir: apps/restaurant-system/pos-admin
+            name: POS Admin
+          - workspace: '@jamanvaar/kiosk-admin'
+            dir: apps/kiosk-system/kiosk-admin
+            name: Kiosk Admin
+          - workspace: '@jamanvaar/kiosk-user'
+            dir: apps/kiosk-system/kiosk-user
+            name: Kiosk User
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ matrix.dir }}/src-tauri
+
+      # Installs every workspace so the frontend build (beforeBuildCommand) and cross-package
+      # imports (e.g. print_transport.ts pulling in @jamanvaar/api) resolve.
+      - run: npm ci
+
+      # Proves the frontend build that `tauri build` runs before packaging still passes.
+      - run: npm run build --workspace=${{ matrix.workspace }}
+
+      # The real check this workflow exists for: does the Rust side — including
+      # packages/native/printing.rs and the new printer-detection/printing IPC commands — actually
+      # compile and link into a working desktop shell.
+      - run: npx tauri build --no-bundle
+        working-directory: ${{ matrix.dir }}
