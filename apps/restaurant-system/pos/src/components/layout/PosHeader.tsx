@@ -169,7 +169,7 @@ export const PosHeader: React.FC = () => {
     if (cart.items.length > 0 && !window.confirm(`Discard the ${cart.items.length} item(s) in the current cart and start a new business day?`)) {
       return;
     }
-    BusinessDayRepository.openNewBusinessDay('Amit Dave (Lead Cashier)', 2000);
+    BusinessDayRepository.openNewBusinessDay(currentUser?.fullName || 'Cashier', 2000);
     setIsBusinessDayPanelOpen(false);
     clearCart();
     setActiveTab('MENU');
@@ -488,7 +488,7 @@ export const PosHeader: React.FC = () => {
             title={allSystemsOk ? 'User Profile & Session Options — All Systems OK' : 'User Profile & Session Options — Hardware needs attention'}
           >
             <div className="relative w-6 h-6 rounded-lg bg-jaman-saffron text-white flex items-center justify-center font-black text-xs">
-              {currentUser?.fullName?.charAt(0) || 'A'}
+              {currentUser?.fullName?.charAt(0) || '?'}
               <span
                 className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-white ${
                   allSystemsOk ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'
@@ -497,10 +497,10 @@ export const PosHeader: React.FC = () => {
             </div>
             <div className="hidden xl:flex flex-col text-left">
               <span className="text-xs font-bold leading-tight truncate max-w-[110px]">
-                {currentUser?.fullName || 'Amit Dave'}
+                {currentUser?.fullName || 'Staff'}
               </span>
               <span className="text-[9px] text-slate-400 uppercase font-bold tracking-tight">
-                {currentUser?.roleId?.replace('role-', '').replace('-', ' ') || 'Lead Cashier'}
+                {currentUser?.roleId?.replace('role-', '').replace('-', ' ') || 'Staff'}
               </span>
             </div>
             <ChevronDown className="w-3 h-3 text-slate-400" />
@@ -511,7 +511,7 @@ export const PosHeader: React.FC = () => {
             <div className="absolute right-0 mt-2 w-64 bg-white border border-jaman-border rounded-2xl shadow-2xl p-2 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100 space-y-1">
               <div className="p-2.5 border-b border-jaman-border bg-jaman-cream rounded-xl space-y-1">
                 <div className="flex items-center justify-between">
-                  <p className="font-black text-sm text-jaman-navy">{currentUser?.fullName || 'Amit Dave'}</p>
+                  <p className="font-black text-sm text-jaman-navy">{currentUser?.fullName || 'Staff'}</p>
                   <span className="text-[10px] font-bold bg-jaman-saffron/10 text-jaman-saffron px-1.5 py-0.5 rounded">
                     POS-01
                   </span>

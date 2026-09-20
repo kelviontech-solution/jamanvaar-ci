@@ -20,6 +20,37 @@ Legend: 🔴 not fixed · 🟡 partly fixed / needs a decision or runtime check 
 | 034 Restaurant Admin gets no orders | 🟢 | **Verified live** in a real multi-app browser session: a real POS order appeared in Restaurant Admin's Orders screen within seconds, with correct totals and GST on its dashboard |
 | 035 POS→KDS shows nothing | 🟢 | **Verified live**: a real KOT sent from a real POS terminal appeared on a separately-activated real KDS terminal of the same restaurant within the 3s poll. See BUG-095 for the one thing that did NOT sync (staff PINs) and its fix |
 | 095 Staff PIN only works on the device that created it | 🟢 | **Discovered and fixed during the BUG-019/034/035 live verification.** Staff/`User` records were the one thing never in the cross-app entity-sync bridge, and KDS had no entity-sync wiring at all. Added `STAFF_USER` as a syncable entity type (PIN hash only, never plaintext) and wired push (Restaurant Admin) / pull (POS, Captain, KDS, Kiosk User); verified live a second time — the PIN worked on KDS within one sync tick. `entity-sync.e2e`, `staff_cross_device_sync` |
+| 096 Table layout made in Restaurant Admin never reaches Captain or POS | 🟢 | Tables now sync through the cloud (`DINING_TABLE`): Restaurant Admin, POS and Captain each stamp their local changes, push what changed and apply what others changed, newest change wins, deletions travel as tombstones; the server keeps the newest copy when two devices edit the same table. Verified live: tables added in Restaurant Admin appeared on a freshly activated Captain and POS. `table_cross_device_sync`, `floor_sync_tick`, `entity-sync.e2e` |
+| 097 Table status is per device: Captain tables look vacant on POS and POS payments never free Captain tables | 🟢 | A seated table, a bill request and a freed table follow the table across devices, and a table whose order was settled anywhere is freed on the next refresh. Verified live: Captain seated Table 1 and POS showed it as Bill Requested with the order value; after POS settled it Captain's table became available. `table_cross_device_sync`, `captain_store_service` |
+| 098 Kitchen 'food ready' never reaches the waiter | 🟢 | Each device now brings its kitchen tickets in line with the order it receives (`reconcileWithOrders`), and Captain's Food Ready list is derived from ready tickets; serving a dish (or a whole ticket) is written to the order and syncs back to POS and KDS. Verified live: KDS marked a ticket ready, Captain showed 2 dishes ready within seconds, delivering them cleared the list. `kot_status_from_orders`, `captain_store_service` |
+| 099 'Send Bill Request to Counter POS' reaches nobody | 🟢 | A bill request marks the table and sends a bill-request message that POS receives as a notification. Verified live: POS showed the table as Bill Requested and a notification 'Bill requested — Table 1, Ravi Waiter asked for the bill'. Refused when the table has nothing to bill. `service_messages`, `captain_store_service`, `entity-sync.e2e` |
+| 100 Staff messages and guest requests never leave the tablet | 🟢 | Messages travel through the cloud (`SERVICE_MESSAGE`) and become notifications on the device they are for (kitchen, counter, Restaurant Admin) or inbox messages on Captain, once each. Verified live: a message to the kitchen appeared as a KDS notification. `service_messages` |
+| 101 Captain orders carry no waiter name | 🟢 | The waiter's name travels with the order to KDS, receipts and reports, and the made-up 'Cloud Sync' and 'Rahul' names are gone. Verified live: KDS ticket reads 'Captain: Ravi Waiter'; the receipt reads 'Captain: Ravi Waiter'. `captain_store_service`, `no_demo_identity_fallbacks` |
+| 102 Captain bills use a flat 5% and print a broken tax split | 🟢 | Captain prices orders with the same rules as POS (`priceOrderLines`: CGST + SGST, round-off) and sets every tax field. Verified live: the POS receipt for a Captain order shows Subtotal 860, CGST 21.50, SGST 21.50, Total 903. `captain_order_pricing` |
+| 103 A made-up cashier, 'Amit Dave', appears on real receipts and reports | 🟢 | The made-up cashier 'Amit Dave' (and 'Rahul Sharma') is removed from receipts, POS headers, close-day and shift screens, Restaurant Admin reports and stored fallbacks; only the real signed-in person's name is used, and a line with no name is left out. Guarded by `no_demo_identity_fallbacks`; verified live on a receipt |
+| 104 Tapping 'More Options' turns the Captain app into a blank white screen | 🟢 | Fixed: every hook now runs before the drawer's 'closed' return (a regression from the earlier JAMAN AI toggle change), and a test guards all Captain dialogs against the same mistake. Verified live: More Options opens. `captain_ui_guards` |
+| 105 Wrong PIN on the Captain keypad gives no feedback and jams the pad | 🟢 | The keypad and typed entry share one sign-in path, so a wrong PIN shows the error and clears. Verified live. `captain_ui_guards` |
+| 106 Captain forgets who is signed in after a reload | 🟢 | A reload restores the same real signed-in staff member (not a demo profile) while they exist and are active; logging out ends it. Verified live and by `captain_session_restore` |
+| 107 'My Assigned Tables' is the same hard-coded list for every waiter | 🟢 | No table is pre-assigned; the default view is every table and 'My Tables' means tables this waiter seated and that are still in use. Verified live. `captain_store_service`, `captain_ui_guards` |
+| 108 Zone filters on the Captain floor match nothing | 🟢 | Zone buttons come from the zones the restaurant's tables really use. Verified live. `captain_ui_guards` |
+| 109 Guest count ignores table size | 🟢 | Guest counts are limited to the table's capacity in the dialog and in the store. Verified live (a 2-seat table offers 1 and 2 only). `captain_store_service` |
+| 110 Terminals keep the demo branch after activation | 🟢 | Activation replaces the demo branch with the restaurant's own name, with no demo code, address or phone (`adopt`, and `adoptBranch` for Restaurant Admin). Verified live in Restaurant Admin and Captain. `outlet_identity_adoption` |
+| 111 Transfer and merge can overwrite a busy table and are not shared | 🟢 | Transfer only goes to a free table, merge needs both tables in use and combines the orders into one repriced bill (the second table's tickets follow), both flag the order to sync, and the dialog offers only sensible targets and explains refusals. Unit-tested (`captain_store_service`); not exercised live |
+| 112 Captain's dish options are hard-coded | 🟢 | The dish dialog shows the dish's own modifier groups with their real prices, keeps required groups required, and shows nothing invented for a dish with none. Unit-tested (`modifier_selection`); the default menu has no modifier groups, so it was not exercised live |
+| 113 A paid order's ticket stays on the kitchen screen | 🟢 | A ticket of a completed or cancelled order leaves the kitchen board when the order arrives. Verified live: after POS settled, KDS showed 0 active tickets and 1 served. `kot_status_from_orders` |
+| 114 Small Captain screen defects | 🟢 | Table cards read the running order (value and waiter), dishes show Ready and Served from the kitchen, Escape closes dialogs topmost-first, labels come from data. Verified live. `captain_ui_guards` |
+| 115 A new restaurant starts with demo combos, coupons, rewards, printers and tables | 🟢 | Activation clears the demo combos, coupons, offers and tables on every terminal; an empty floor is kept as empty on reload; Captain shows a clear 'No tables set up yet' message. Verified live: a new restaurant's Restaurant Admin showed 0 combos and 0 tables. `fresh_restaurant_operations` |
+| 116 Table dialog zones differ from the zones on existing tables | 🟢 | The table dialog offers the zones the restaurant's tables use, with a 'New zone' option, and the floor's zone strip is built from them. Verified live. `table_cross_device_sync` |
+| 117 Wrong stock photo on a default dish | 🟢 | The four default dishes that used the tropical-fish photo now use a fitting existing photo, and the wrong image files are deleted from the apps. `menu_images` |
+| 118 Any staff PIN opens any terminal (a waiter can unlock the kitchen screen and the POS) | 🟢 | Each terminal accepts the roles that work on it (owners and managers everywhere; cashier POS/Kiosk, waiter Captain, chef KDS; custom roles are never locked out); POS lists only eligible people. Verified live: KDS and Captain refused the wrong role's PIN, POS listed only the cashier. `terminal_role_access` |
+| 119 QR table-ordering links default to a localhost address | 🟡 | Not fixed: needs the owner to decide where the guest QR ordering page is hosted. Today the link uses the address saved in QR settings and falls back to localhost for local testing |
+| 120 The same table number can be created twice | 🟢 | Add/Edit Table refuses a number another table already has (`isTableNumberTaken`, ignoring the table being edited and stray spaces); `table_cross_device_sync.test.ts` |
+| 121 Terminals were refused with 429 Too Many Requests, so staff, menu and table sync silently stopped | 🟢 | Device-authenticated sync endpoints (entity sync, order sync, heartbeat, device commands, menu sync) now allow 1500 requests a minute per address (`DeviceSyncThrottle`); sign-in and every other endpoint keep 120. Verified live: POS then received its staff and tables. `device-sync-throttle.e2e` |
+| 122 The 'new version available' bar covered the top of every restaurant app | 🟢 | Both bars are now sticky, in the page flow, so the app starts below them; verified live (Send Msg reachable with the bar showing); `notice_banner_layout.test.ts` |
+| 123 Receipt tax lines showed '₹21.5' and '₹0' | 🟢 | Two decimals on CGST, SGST and round-off, with a proper split as fallback; `receipt_identity.test.ts`; verified live (₹21.50 + ₹21.50) |
+| 124 A table order rung up at the counter said 'POS: CLOUD-SYNC' | 🟢 | `ThermalReceiptView` omits the line for cloud-sourced orders; `receipt_identity.test.ts` |
+| 125 Every restaurant's receipt thanked guests on behalf of JAMANVAAR | 🟢 | Activation replaces the demo thank-you and footer (a footer the restaurant wrote is kept); `outlet_identity_adoption.test.ts` |
+| 126 Small Captain layout defects (KOT label, clipped card buttons) | 🟢 | Tickets read 'KOT-02'; card buttons wrap instead of clipping |
 | 038 Paid order never queued | 🟢 | Paid orders start `SAVED_LOCALLY` and are flushed; paid status re-sent (`order_sync_flagging`) |
 | 039 Totals disagree | 🟢 | Tender totals use one source (`getOrderTenders`); CGST + SGST now always add up to the bill's tax via one shared `splitTax`/`splitTaxPaise` (81 becomes 41+40, never 41+41), the invented "2.38% of sales" tax is gone, and labels say what the number is ("Total Billed (incl. GST)" etc.) — `tax_split_consistency` |
 | 040 Fake 50/50 split | 🟢 | Real per-line tenders end to end (`split_payment_tenders`) |
@@ -1534,6 +1565,198 @@ With BUG-019/034/035 marked "code done, not yet verified", the real API and all 
 - **Fix:** added `STAFF_USER` as a syncable entity type on the cloud bridge (payload: id, username, full name, email, phone, role id, active flag, and the PIN hash — never the plaintext PIN, and the hash is already restaurant-keyed so it is no more sensitive than the customer PII the bridge already carries). Restaurant Admin — the only place staff are created or PINs reset — pushes its staff list every sync tick, the same way it already pushes the menu; POS, Captain, KDS and Kiosk User pull and apply it (KDS gained its first entity-sync wiring of any kind in the process). Tenant isolation (one restaurant's staff never reaching another's device) is covered by the same RLS-scoped storage every other entity type already uses, and verified directly with a cross-tenant test.
 - **Verified live a second time**, after the fix, on the same running stack: PIN 7206 worked on KDS within one sync tick, and the full order flow (POS → KDS, POS → Restaurant Admin) still worked end to end.
 - **Tests:** `cloud/api/test/entity-sync.e2e.spec.ts` (push/pull round trip on a different device of the same restaurant, and cross-tenant isolation), `tests/staff_cross_device_sync.test.ts` (the shared payload/apply logic every app's sync tick uses).
+
+---
+
+## Group AA — Floor Captain & Service module, live test (BUG-096 to BUG-118)
+
+**How this was found:** the real API and Restaurant Admin, POS, KDS and Captain were run together against a fresh restaurant ("Captain Verify Bistro"), each terminal activated with its own key. A waiter PIN was issued in Restaurant Admin, then Captain was driven through sign-in, seating a table, adding dishes, firing a KOT, the kitchen marking it ready, requesting the bill, POS settling it, and sending messages. **Owner's suspicion, confirmed:** Captain is only connected to the rest of the system for the order itself (KOT reaches KDS, order reaches POS and Restaurant Admin). Everything around the order — tables, table status, food ready, bill request, payment, messages — stays on the tablet.
+
+## BUG-096 — Table layout made in Restaurant Admin never reaches Captain or POS 🔴
+
+- **App:** Restaurant Admin, Captain, POS (`packages/database`, entity-sync)
+- **Found:** Live: added Table 15 in Restaurant Admin; after 30 s Captain still had tables 1-12. Cause: there is no table sync at all. `SYNCABLE_ENTITY_TYPES` has no table type, so each device keeps its own local copy of the 12 demo tables seeded by `seed.ts`.
+- **Expected:** Tables added, edited or removed in Restaurant Admin appear on every terminal of that restaurant.
+
+## BUG-097 — Table status is per device: Captain tables look vacant on POS and POS payments never free Captain tables 🔴
+
+- **App:** Captain, POS (`captainStore.ts`, `TableRepository`)
+- **Found:** Live: Captain seated Table 1 and fired a KOT; POS floor plan showed T-1 AVAILABLE, Occupied 0. After POS settled the order, the Captain table stayed BILL_REQUESTED with the order already COMPLETED/SUCCESS. Cause: seat, bill-request and free only change the local `tables` copy; the only 'bill settled' signal is a same-browser LAN-mesh event.
+- **Expected:** Table status and its running order follow the table across devices; a settled order frees the table everywhere.
+
+## BUG-098 — Kitchen 'food ready' never reaches the waiter 🔴
+
+- **App:** Captain, KDS (`captainStore.ts` FOOD_READY listener)
+- **Found:** Live: KDS marked the ticket ready. Captain kept Food Ready (0), Live KOTs still PREPARING, dish still 'In Kitchen'. The order's item status did arrive (kitchenStatus READY) but nothing reads it. The Food Ready list is filled only by a LAN-mesh event that cannot cross devices, and 'Mark served' is local only.
+- **Expected:** A dish marked ready in the kitchen shows up on the waiter's Food Ready list within seconds, and marking it served is visible to POS and KDS.
+
+## BUG-099 — 'Send Bill Request to Counter POS' reaches nobody 🔴
+
+- **App:** Captain, POS
+- **Found:** Live: after Request Bill the Captain table turned BILL_REQUESTED but POS showed nothing (no Billing table, no notification). Cause: `requestBill` only changes the local table and broadcasts a LAN-mesh event that no app listens for.
+- **Expected:** POS shows the table as 'Billing' and raises a notification for the cashier.
+
+## BUG-100 — Staff messages and guest requests never leave the tablet 🔴
+
+- **App:** Captain, KDS, POS
+- **Found:** Live: sent a broadcast to Kitchen Stations for Table 1; KDS showed nothing. Cause: messages travel only over the same-browser LAN mesh. POS has no inbox for 'Counter POS' messages at all.
+- **Expected:** A message to the kitchen, counter or another waiter arrives on that device as a notification.
+
+## BUG-101 — Captain orders carry no waiter name 🔴
+
+- **App:** Captain, KDS, Restaurant Admin (`captainStore.ts` sendKOT, `outbox.ts`)
+- **Found:** Live: KDS ticket says 'Captain: Cloud Sync', Restaurant Admin lists 'Unassigned captain' and 'Unassigned cashier'. `sendKOT` never sets `captainName`; the cloud pull falls back to the text 'Cloud Sync'.
+- **Expected:** The waiter's name follows the order to KDS, receipts and reports.
+
+## BUG-102 — Captain bills use a flat 5% and print a broken tax split 🔴
+
+- **App:** Captain, POS receipt (`captainStore.ts`)
+- **Found:** Live: Captain total 903 for a 860 subtotal (flat 5%, no rounding). The POS receipt for that order printed Subtotal 860, CGST ₹0, SGST ₹0, Total 903. `sendKOT` hard-codes `subtotal * 0.05` and never sets CGST/SGST/round-off, unlike POS.
+- **Expected:** Captain computes tax the same way POS does (per-dish GST rate, CGST + SGST, round-off) so both show the same bill.
+
+## BUG-103 — A made-up cashier, 'Amit Dave', appears on real receipts and reports 🔴
+
+- **App:** POS, Restaurant Admin, packages (`ThermalReceiptView.tsx`, `PosHeader.tsx`, `PosCloseDayModal.tsx`, `OrdersModule.tsx`, `business_day_service.ts`...)
+- **Found:** Live: the receipt for the Captain order says 'Cashier: Amit Dave'; Restaurant Admin's Orders table shows Amit Dave as the cashier. The name is hard-coded as a fallback in about 15 places (one prints it unconditionally).
+- **Expected:** Only the real signed-in staff member's name is ever printed or reported; if there is none the line is left out.
+
+## BUG-104 — Tapping 'More Options' turns the Captain app into a blank white screen 🔴
+
+- **App:** Captain (`CaptainMoreDrawer.tsx`)
+- **Found:** Live: click More Options, page goes white; console: 'Rendered more hooks than during the previous render' at CaptainMoreDrawer. `useAiAccess()` was placed before `if (!isOpen) return null`, and `useCaptainStore()` after it. This is a regression from the earlier JAMAN AI toggle change.
+- **Expected:** The drawer opens; every hook runs on every render.
+
+## BUG-105 — Wrong PIN on the Captain keypad gives no feedback and jams the pad 🔴
+
+- **App:** Captain (`App.tsx` keypad)
+- **Found:** Live: pressing 1-2-3-4 leaves '1234' in the box with no message and the number keys stop working until Clear is pressed. The keypad path calls `login` without checking the result; only the typed-Enter path shows an error.
+- **Expected:** A wrong PIN shows 'Incorrect PIN' and clears the entry.
+
+## BUG-106 — Captain forgets who is signed in after a reload 🔴
+
+- **App:** Captain (`captainStore.ts` session restore)
+- **Found:** Live: reload returns to the PIN screen. Restore only accepts a session whose user id equals the demo profile id 'cap-1', and would then sign in as the demo captain 'Rahul Sharma'.
+- **Expected:** A reload keeps the same real staff member signed in until they log out or the session expires.
+
+## BUG-107 — 'My Assigned Tables' is the same hard-coded list for every waiter 🔴
+
+- **App:** Captain (`captainStore.ts` DEFAULT_CAPTAIN, `CaptainFloorView.tsx`)
+- **Found:** Live: a brand-new waiter opens with 'My Assigned 7' (tables 1-6 and 12) and tables 7-11 are hidden by default; the list also includes a table 14 that does not exist. There is no way to assign tables.
+- **Expected:** The default view shows every table; 'My tables' means tables this waiter opened.
+
+## BUG-108 — Zone filters on the Captain floor match nothing 🟡
+
+- **App:** Captain (`CaptainFloorView.tsx`)
+- **Found:** Live: 'Main Dining Hall' and 'Family Zone' show zero tables. The buttons are hard-coded names but the tables use 'Main Hall' and 'Family Section'.
+- **Expected:** Zone buttons come from the real table zones.
+
+## BUG-109 — Guest count ignores table size 🟡
+
+- **App:** Captain (`CaptainGuestCountModal.tsx`)
+- **Found:** Live: 8 guests were seated at a 2-seat table with no warning.
+- **Expected:** Options above the table's capacity are not offered (or need an explicit confirm).
+
+## BUG-110 — Terminals keep the demo branch after activation 🟡
+
+- **App:** Captain, POS, Restaurant Admin
+- **Found:** Live: after activating against 'Captain Verify Bistro', POS and Restaurant Admin headers still read 'Ahmedabad Flagship Store' and the local outlet is 'AHM-01, Sindhu Bhavan Road, Bodakdev, +91 98765 43210' under restaurant id 'rest-jamanvaar-main'. Activation only adopts the restaurant name.
+- **Expected:** The branch name, address and phone come from the restaurant's own branch.
+
+## BUG-111 — Transfer and merge can overwrite a busy table and are not shared 🟡
+
+- **App:** Captain (`captainStore.ts` transferTable/mergeTables)
+- **Found:** By reading the code: transfer accepts any target including an occupied one (its order pointer is overwritten and that order is orphaned); merge marks both tables occupied without combining orders; neither is synced to other devices.
+- **Expected:** Transfer only to an available table; merge combines the orders; both are synced.
+
+## BUG-112 — Captain's dish options are hard-coded 🟡
+
+- **App:** Captain (`CaptainModifierModal.tsx`)
+- **Found:** By reading the code: every dish, including drinks and desserts, offers Spice, Jain, Extra Cheese (+₹40) and Extra Butter (+₹25). The dish's real modifier groups are ignored.
+- **Expected:** The dialog shows the dish's own modifier groups and prices.
+
+## BUG-113 — A paid order's ticket stays on the kitchen screen 🟡
+
+- **App:** KDS
+- **Found:** Live: after POS settled the order, KDS still showed KOT-01 as Food Ready with 'Mark served'.
+- **Expected:** Tickets of completed or cancelled orders leave the kitchen screen.
+
+## BUG-114 — Small Captain screen defects 🟢
+
+- **App:** Captain
+- **Found:** Live: an occupied table's card shows 'ORDER VALUE —' and 'Table ready for seating'; a dish stays 'In Kitchen' after it is ready; Escape does not close dialogs; the header always says 'Main Dining Floor'; the shift screen prints a fixed 'Main Dining Hall'.
+- **Expected:** Cards show the running total and real state; Esc closes dialogs; labels come from data.
+
+## BUG-115 — A new restaurant starts with demo combos, coupons, rewards, printers and tables 🟡
+
+- **App:** Restaurant Admin, terminals (`seed.ts`)
+- **Found:** Live: fresh restaurant, empty menu, but 'Combos & Meal Deals: 2 ACTIVE' (Royal Veg Biryani Feast, Maharaja Paneer Thali, using dishes that do not exist); terminals also hold 7 demo printers, demo coupons, loyalty tiers and 12 demo tables. BUG-013/025/045 cleared only the menu, printers and inventory.
+- **Expected:** A new restaurant starts with none of these until it creates its own.
+
+## BUG-116 — Table dialog zones differ from the zones on existing tables 🟢
+
+- **App:** Restaurant Admin
+- **Found:** Live: Add Dining Table offers Main Dining Hall / AC Family Section / Garden Terrace / Banquet, while existing tables use Main Hall / Family Section / AC Balcony, so filters and floor sections split.
+- **Expected:** One list of zones, taken from the restaurant's own tables (plus 'new zone').
+
+## BUG-117 — Wrong stock photo on a default dish 🟢
+
+- **App:** Default menu (`seed.ts`)
+- **Found:** Live: 'Veg Seekh Kebab Mughlai' shows a photo of tropical fish.
+- **Expected:** Each default dish uses a fitting photo or none.
+
+## BUG-118 — Any staff PIN opens any terminal (a waiter can unlock the kitchen screen and the POS) 🟡
+
+- **App:** KDS, POS
+- **Found:** Live: the Captain/Waiter PIN unlocked KDS, and POS lists the waiter as a sign-in profile.
+- **Expected:** Each terminal accepts only the roles that use it (owner/manager everywhere).
+
+## BUG-119 — QR table-ordering links default to a localhost address 🟡
+
+- **App:** Restaurant Admin (`QrCardDesignerModal.tsx`, `CustomerQrExperienceModal.tsx`, `db.ts`)
+- **Found:** By reading the code: a table QR code points at `http://localhost:5176/?qrTable=...` unless the owner has set a public address, so a printed QR standee would not open on a guest's phone. A public address for the QR ordering page depends on where it is hosted, which is a decision for the owner.
+- **Expected:** The QR designer asks for the public ordering address before it allows printing, and never prints a localhost link.
+
+## BUG-120 — The same table number can be created twice 🟡
+
+- **App:** Restaurant Admin (`TableModal.tsx`)
+- **Found:** Live: Add Dining Table accepted number 1 while a Table 1 already existed, giving two Table 1s that Captain and POS then mixed up.
+- **Expected:** A duplicate table number is refused with a clear message.
+
+## BUG-121 — Terminals were refused with 429 Too Many Requests, so staff, menu and table sync silently stopped 🔴
+
+- **App:** Cloud API (`app.module.ts` rate limit)
+- **Found:** Live: with four terminals of one restaurant running, POS received HTTP 429 on staff, menu and table sync and never got its staff. All of a restaurant's terminals share one address behind the router, and the global limit is 120 requests a minute per address, less than a handful of terminals legitimately send.
+- **Expected:** Terminal sync endpoints allow a restaurant's whole set of terminals; everything else keeps the strict limit.
+
+## BUG-122 — The 'new version available' bar covered the top of every restaurant app 🔴
+
+- **App:** Captain, POS, KDS, Kiosk (`PlatformNoticeBanner.tsx`)
+- **Found:** Live: the blue bar was fixed over the page top, hiding the logo and the Send Msg and profile buttons and blocking taps on them until dismissed.
+- **Expected:** The bar takes its own row above the app.
+
+## BUG-123 — Receipt tax lines showed '₹21.5' and '₹0' 🟢
+
+- **App:** POS receipt preview (`ThermalReceiptView.tsx`)
+- **Found:** Live: CGST and SGST printed without a second decimal, and as ₹0 when an order carried no split.
+- **Expected:** Two decimals always; a missing split is worked out from the tax.
+
+## BUG-124 — A table order rung up at the counter said 'POS: CLOUD-SYNC' 🟢
+
+- **App:** POS receipt preview
+- **Found:** Live: an order that arrived from Captain printed its internal source label as the terminal name.
+- **Expected:** The terminal line is left out when the order was not rung up here.
+
+## BUG-125 — Every restaurant's receipt thanked guests on behalf of JAMANVAAR 🟡
+
+- **App:** POS receipts (`db.ts` demo receipt config)
+- **Found:** Live: 'Thank you for dining at JAMANVAAR! Please visit again.' and 'Freshly Prepared • Zero Preservatives • Pure Heritage Taste' on a receipt for another restaurant.
+- **Expected:** The footer names the restaurant, or says nothing, until the owner writes their own.
+
+## BUG-126 — Small Captain layout defects (KOT label, clipped card buttons) 🟢
+
+- **App:** Captain
+- **Found:** Live: tickets read 'KOT #-02'; the 'VIEW ORDER' and 'REQUEST BILL' buttons on a table card were cut to 'VIEW O…' and 'REQUE…'.
+- **Expected:** Readable labels.
 
 ---
 

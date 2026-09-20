@@ -47,13 +47,13 @@ export const CaptainShiftStatsView: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl sm:text-2xl font-black">{currentCaptain?.name || 'Rahul Sharma'}</h2>
+              <h2 className="text-xl sm:text-2xl font-black">{currentCaptain?.name || 'Staff'}</h2>
               <span className="bg-emerald-500/20 text-emerald-300 text-xs font-black px-2.5 py-0.5 rounded-full border border-emerald-500/30">
                 ACTIVE SHIFT
               </span>
             </div>
             <p className="text-xs text-slate-300 font-medium mt-0.5">
-              Floor Captain • Main Dining Hall • Terminal CAPTAIN-01
+              Floor Captain • Terminal CAPTAIN-01
             </p>
           </div>
         </div>

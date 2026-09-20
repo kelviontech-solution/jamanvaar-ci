@@ -18,7 +18,11 @@ export const TableModal: React.FC<TableModalProps> = ({
 }) => {
   const [tableNumber, setTableNumber] = useState('');
   const [capacity, setCapacity] = useState('4');
-  const [zone, setZone] = useState('Main Dining Hall');
+  const zones = TableRepository.getZones();
+  const defaultZone = zones[0] || 'Main Hall';
+  const [zone, setZone] = useState(defaultZone);
+  // The zone list is the restaurant's own (BUG-116); "New zone" lets it add one.
+  const [addingZone, setAddingZone] = useState(false);
   const [floor, setFloor] = useState('1');
   const [status, setStatus] = useState<TableStatus>('AVAILABLE');
   const [isActive, setIsActive] = useState(true);
@@ -28,14 +32,16 @@ export const TableModal: React.FC<TableModalProps> = ({
     if (tableToEdit) {
       setTableNumber(tableToEdit.tableNumber);
       setCapacity(tableToEdit.capacity.toString());
-      setZone(tableToEdit.zone || 'Main Dining Hall');
+      setZone(tableToEdit.zone || defaultZone);
+      setAddingZone(false);
       setFloor((tableToEdit.floor || 1).toString());
       setStatus(tableToEdit.status);
       setIsActive(tableToEdit.isActive ?? true);
     } else {
       setTableNumber('');
       setCapacity('4');
-      setZone('Main Dining Hall');
+      setZone(defaultZone);
+      setAddingZone(zones.length === 0);
       setFloor('1');
       setStatus('AVAILABLE');
       setIsActive(true);
@@ -45,6 +51,14 @@ export const TableModal: React.FC<TableModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+    if (!zone.trim()) {
+      setFormError('Choose a zone, or enter a name for a new one.');
+      return;
+    }
+    if (tableNumber && TableRepository.isTableNumberTaken(tableNumber, tableToEdit?.id)) {
+      setFormError(`Table ${tableNumber.trim()} already exists. Choose a different number.`);
+      return;
+    }
     if (!tableNumber) {
       setFormError('Table number is required.');
       return;
@@ -111,16 +125,33 @@ export const TableModal: React.FC<TableModalProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Dining Zone / Section</label>
-            <select
-              value={zone}
-              onChange={(e) => setZone(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
-            >
-              <option value="Main Dining Hall">Main Dining Hall</option>
-              <option value="AC Family Section">AC Family Section</option>
-              <option value="Garden Terrace">Garden Terrace</option>
-              <option value="Banquet / Private">Banquet / Private Room</option>
-            </select>
+            {addingZone ? (
+              <input
+                type="text"
+                value={zone}
+                onChange={(e) => setZone(e.target.value)}
+                placeholder="e.g. Garden Terrace"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              />
+            ) : (
+              <select
+                value={zones.includes(zone) ? zone : '__new__'}
+                onChange={(e) => {
+                  if (e.target.value === '__new__') {
+                    setAddingZone(true);
+                    setZone('');
+                  } else {
+                    setZone(e.target.value);
+                  }
+                }}
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              >
+                {zones.map((z) => (
+                  <option key={z} value={z}>{z}</option>
+                ))}
+                <option value="__new__">＋ New zone…</option>
+              </select>
+            )}
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Floor Level</label>

@@ -6,10 +6,11 @@ import {
   MenuRepository,
   NotificationRepository,
   QrOrderingRepository,
+  RestaurantIdentityRepository,
   StaffRepository
 } from '@jamanvaar/database';
 import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, reportQrUsage, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken } from './cloud/cloudClient';
-import { EntitySyncEngine, SyncOutboxEngine } from '@jamanvaar/sync';
+import { EntitySyncEngine, SyncOutboxEngine, syncDiningTables, syncServiceMessages } from '@jamanvaar/sync';
 import {
   Category,
   DiningTable,
@@ -215,6 +216,8 @@ export default function PosAdminApp() {
     if (restaurant) {
       db.restaurant.id = restaurant.id;
       db.restaurant.name = restaurant.name;
+      // BUG-110: the header kept showing the demo branch "Ahmedabad Flagship Store".
+      RestaurantIdentityRepository.adoptBranch(restaurant.id, restaurant.name);
     }
 
     SessionPersistence.save('admin', {
@@ -437,9 +440,13 @@ export default function PosAdminApp() {
     SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
+    void syncDiningTables();
     const orderInterval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
       void SyncOutboxEngine.catchUpFromCloud();
+      // BUG-096/097: the floor plan built here, and each table's live state, are shared with POS and Captain.
+      void syncDiningTables();
+      void syncServiceMessages('POS_ADMIN');
     }, 4000);
 
     const syncMenu = async () => {

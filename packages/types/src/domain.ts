@@ -373,6 +373,11 @@ export interface DiningTable {
   status: TableStatus;
   currentOrderId?: string;
   isActive: boolean;
+  /** Who seated the table (the waiter's staff id and name) — drives Captain's "My tables". */
+  openedById?: string;
+  openedByName?: string;
+  /** Time of the last change to the table's layout or state, used to decide which device's version wins when tables sync. */
+  updatedAt?: string;
 }
 
 export interface SelectedModifier {

@@ -293,7 +293,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                     </p>
                     <p className="flex items-center sm:justify-end gap-1 text-[10px]">
                       <UserCheck className="w-3 h-3 text-slate-400" />
-                      <span>Verified by: Lead Cashier (Amit Dave)</span>
+                      <span>Verified by: ____________________</span>
                     </p>
                   </div>
                 </div>

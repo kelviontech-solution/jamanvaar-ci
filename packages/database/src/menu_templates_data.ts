@@ -71,7 +71,7 @@ export const PREBUILT_MENU_TEMPLATES_ALL: MenuTemplate[] = [
           { name: 'Paneer Tikka Angara', sku: 'NI-001', description: 'Fresh cottage cheese cubes marinated in Kashmiri chilli-yogurt masala, roasted in clay oven with bell peppers', suggestedPrice: 280, dietaryType: 'VEG', spiceLevel: 'SPICY', prepTimeMinutes: 15, isPopular: true, kitchenStation: 'Tandoor', tags: ['BESTSELLER', 'TANDOORI'], imageUrl: '/assets/menu/north-indian/paneer-tikka.jpg' },
           { name: 'Hara Bhara Kebab (6 Pcs)', sku: 'NI-002', description: 'Crisp spinach, green pea and potato patties stuffed with spiced cashews and herbs', suggestedPrice: 220, dietaryType: 'VEG', spiceLevel: 'MILD', prepTimeMinutes: 12, isPopular: true, kitchenStation: 'Tandoor', tags: ['CHEF_SPECIAL'], imageUrl: '/assets/menu/north-indian/hara-bhara-kebab.jpg' },
           { name: 'Tandoori Stuffed Mushroom', sku: 'NI-003', description: 'Button mushrooms filled with spiced processed cheese and herbs, charred in tandoor', suggestedPrice: 260, dietaryType: 'VEG', spiceLevel: 'MEDIUM', prepTimeMinutes: 14, kitchenStation: 'Tandoor', imageUrl: '/assets/menu/north-indian/tandoori-mushroom.jpg' },
-          { name: 'Veg Seekh Kebab Mughlai', sku: 'NI-004', description: 'Minced mixed vegetables and cottage cheese skewered and roasted with aromatic garam masala', suggestedPrice: 240, dietaryType: 'VEG', spiceLevel: 'MEDIUM', prepTimeMinutes: 14, kitchenStation: 'Tandoor', imageUrl: '/assets/menu/north-indian/seekh-kebab.jpg' }
+          { name: 'Veg Seekh Kebab Mughlai', sku: 'NI-004', description: 'Minced mixed vegetables and cottage cheese skewered and roasted with aromatic garam masala', suggestedPrice: 240, dietaryType: 'VEG', spiceLevel: 'MEDIUM', prepTimeMinutes: 14, kitchenStation: 'Tandoor', imageUrl: '/assets/menu/north-indian/hara-bhara-kebab.jpg' }
         ]
       },
       {
@@ -358,7 +358,7 @@ export const PREBUILT_MENU_TEMPLATES_ALL: MenuTemplate[] = [
         imageUrl: '/assets/menu/common/fallback-dish.svg',
         items: [
           { name: 'Amritsari Paneer Tikka', sku: 'PUN-001', description: 'Thick spiced cottage cheese slabs infused with ajwain and mustard oil, charred in clay oven', suggestedPrice: 280, dietaryType: 'VEG', spiceLevel: 'SPICY', prepTimeMinutes: 14, isPopular: true, kitchenStation: 'Tandoor', imageUrl: '/assets/menu/north-indian/paneer-tikka.jpg' },
-          { name: 'Dhaba Dahi Kebab (6 Pcs)', sku: 'PUN-002', description: 'Crispy fried hung curd and paneer patties with cardamom and mint', suggestedPrice: 240, dietaryType: 'VEG', spiceLevel: 'MILD', prepTimeMinutes: 12, kitchenStation: 'Tandoor', imageUrl: '/assets/menu/north-indian/seekh-kebab.jpg' }
+          { name: 'Dhaba Dahi Kebab (6 Pcs)', sku: 'PUN-002', description: 'Crispy fried hung curd and paneer patties with cardamom and mint', suggestedPrice: 240, dietaryType: 'VEG', spiceLevel: 'MILD', prepTimeMinutes: 12, kitchenStation: 'Tandoor', imageUrl: '/assets/menu/north-indian/hara-bhara-kebab.jpg' }
         ]
       },
       {
@@ -409,7 +409,7 @@ export const PREBUILT_MENU_TEMPLATES_ALL: MenuTemplate[] = [
         description: 'Delicate melt-in-mouth Awadhi kebabs',
         imageUrl: '/assets/menu/common/fallback-dish.svg',
         items: [
-          { name: 'Veg Galouti Kebab (4 Pcs)', sku: 'MUG-001', description: 'Melt-in-mouth smoked yam and lentil patties flavored with potli masala, served over mini ulta tawa paratha', suggestedPrice: 270, dietaryType: 'VEG', spiceLevel: 'MEDIUM', prepTimeMinutes: 14, isPopular: true, kitchenStation: 'Tandoor', tags: ['CHEF_SPECIAL'], imageUrl: '/assets/menu/north-indian/seekh-kebab.jpg' },
+          { name: 'Veg Galouti Kebab (4 Pcs)', sku: 'MUG-001', description: 'Melt-in-mouth smoked yam and lentil patties flavored with potli masala, served over mini ulta tawa paratha', suggestedPrice: 270, dietaryType: 'VEG', spiceLevel: 'MEDIUM', prepTimeMinutes: 14, isPopular: true, kitchenStation: 'Tandoor', tags: ['CHEF_SPECIAL'], imageUrl: '/assets/menu/north-indian/hara-bhara-kebab.jpg' },
           { name: 'Paneer Pasanda Tikka', sku: 'MUG-002', description: 'Layered cottage cheese stuffed with mint, nuts and khoya, glazed in tandoor', suggestedPrice: 300, dietaryType: 'VEG', spiceLevel: 'MILD', prepTimeMinutes: 15, kitchenStation: 'Tandoor', imageUrl: '/assets/menu/north-indian/paneer-butter-masala.jpg' }
         ]
       },
@@ -661,7 +661,7 @@ export const PREBUILT_MENU_TEMPLATES_ALL: MenuTemplate[] = [
         description: 'Generous sharing portions for family tables',
         imageUrl: '/assets/menu/common/fallback-dish.svg',
         items: [
-          { name: 'Grand Tandoori Veg Kebab Platter', sku: 'FAM-001', description: 'Assortment of Paneer Tikka, Hara Bhara Kebab, Stuffed Mushrooms and Veg Seekh (16 Pcs)', suggestedPrice: 580, dietaryType: 'VEG', spiceLevel: 'MEDIUM', prepTimeMinutes: 18, isPopular: true, kitchenStation: 'Tandoor', tags: ['FAMILY_PLATTER'], imageUrl: '/assets/menu/north-indian/seekh-kebab.jpg' }
+          { name: 'Grand Tandoori Veg Kebab Platter', sku: 'FAM-001', description: 'Assortment of Paneer Tikka, Hara Bhara Kebab, Stuffed Mushrooms and Veg Seekh (16 Pcs)', suggestedPrice: 580, dietaryType: 'VEG', spiceLevel: 'MEDIUM', prepTimeMinutes: 18, isPopular: true, kitchenStation: 'Tandoor', tags: ['FAMILY_PLATTER'], imageUrl: '/assets/menu/north-indian/paneer-tikka.jpg' }
         ]
       }
     ]

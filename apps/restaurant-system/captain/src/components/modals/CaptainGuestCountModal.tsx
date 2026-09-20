@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useEscapeToClose } from '../useEscapeToClose';
+import { guestCountOptions } from '../../store/captainStore';
 import { DiningTable } from '@jamanvaar/types';
 import { Users, X, ArrowRight, Plus, Minus } from 'lucide-react';
 
@@ -15,9 +17,18 @@ export const CaptainGuestCountModal: React.FC<CaptainGuestCountModalProps> = ({
   onClose,
   onConfirm
 }) => {
-  const [guests, setGuests] = useState(table?.currentGuests || 2);
+  useEscapeToClose(isOpen, onClose);
+  const capacity = Math.max(1, table?.capacity || 4);
+  const [guests, setGuests] = useState(Math.min(2, capacity));
+
+  // Each table starts from its own size, not whatever the previous table used (BUG-109).
+  useEffect(() => {
+    if (isOpen && table) setGuests(Math.min(table.currentGuests || 2, capacity));
+  }, [isOpen, table?.id, capacity]);
 
   if (!isOpen || !table) return null;
+  const maxGuests = guestCountOptions(capacity).length;
+  const presets = [1, 2, 4, 6, 8].filter((p) => p < maxGuests).concat(maxGuests);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
@@ -62,7 +73,7 @@ export const CaptainGuestCountModal: React.FC<CaptainGuestCountModalProps> = ({
             </div>
             <button
               type="button"
-              onClick={() => setGuests((g) => Math.min(20, g + 1))}
+              onClick={() => setGuests((g) => Math.min(maxGuests, g + 1))}
               className="w-12 h-12 rounded-2xl bg-white border border-jaman-border text-jaman-navy font-black text-lg flex items-center justify-center shadow-xs active:scale-95 transition-all hover:bg-slate-50 cursor-pointer"
             >
               <Plus className="w-5 h-5" />
@@ -71,7 +82,7 @@ export const CaptainGuestCountModal: React.FC<CaptainGuestCountModalProps> = ({
 
           {/* Quick presets */}
           <div className="flex items-center justify-center gap-1.5 pt-1">
-            {[1, 2, 4, 6, 8].map((preset) => (
+            {presets.map((preset) => (
               <button
                 key={preset}
                 type="button"

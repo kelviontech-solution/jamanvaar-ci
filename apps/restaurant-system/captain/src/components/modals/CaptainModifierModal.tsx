@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useEscapeToClose } from '../useEscapeToClose';
 import { MenuItem, SelectedModifier } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
-import { X, Plus, Minus, Check, Flame, Sparkles } from 'lucide-react';
+import { captainDb } from '@jamanvaar/database';
+import {
+  resolveModifierGroups,
+  defaultModifierSelection,
+  selectionToModifiers,
+  missingRequiredGroups,
+  type ModifierSelection
+} from '@jamanvaar/business';
+import { X, Plus, Minus, Check } from 'lucide-react';
 
 interface CaptainModifierModalProps {
   item: MenuItem | null;
@@ -22,63 +31,43 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
   onClose,
   onConfirm
 }) => {
-  if (!isOpen || !item) return null;
-
+  useEscapeToClose(isOpen, onClose);
   const [quantity, setQuantity] = useState(1);
-  const [spice, setSpice] = useState<'MILD' | 'MEDIUM' | 'SPICY'>('MEDIUM');
-  const [isJain, setIsJain] = useState(false);
-  const [extraCheese, setExtraCheese] = useState(false);
-  const [extraButter, setExtraButter] = useState(false);
   const [notes, setNotes] = useState('');
   const [course, setCourse] = useState<'COURSE_1' | 'COURSE_2' | 'COURSE_3'>('COURSE_1');
+  const [selection, setSelection] = useState<ModifierSelection>({});
 
-  // Compute total price
-  let modExtra = 0;
-  if (extraCheese) modExtra += 40;
-  if (extraButter) modExtra += 25;
-  const unitPrice = item.price + modExtra;
+  // The dish's own options (BUG-112) — none are invented for a dish that has none.
+  const groups = useMemo(() => (item ? resolveModifierGroups(item, captainDb.modifierGroups) : []), [item?.id]);
+
+  useEffect(() => {
+    if (isOpen && item) {
+      setQuantity(1);
+      setNotes('');
+      setCourse('COURSE_1');
+      setSelection(defaultModifierSelection(groups));
+    }
+  }, [isOpen, item?.id]);
+
+  if (!isOpen || !item) return null;
+
+  const modifiers = selectionToModifiers(groups, selection);
+  const unitPrice = item.price + modifiers.reduce((sum, m) => sum + m.priceDelta, 0);
   const totalPrice = unitPrice * quantity;
+  const missing = missingRequiredGroups(groups, selection);
+
+  const toggle = (groupId: string, optionId: string, max: number) =>
+    setSelection((prev) => {
+      const current = prev[groupId] ?? [];
+      if (max <= 1) return { ...prev, [groupId]: [optionId] };
+      if (current.includes(optionId)) return { ...prev, [groupId]: current.filter((id) => id !== optionId) };
+      if (current.length >= max) return prev;
+      return { ...prev, [groupId]: [...current, optionId] };
+    });
 
   const handleAdd = () => {
-    const selectedMods: SelectedModifier[] = [];
-    if (spice !== 'MEDIUM') {
-      selectedMods.push({
-        groupId: 'mod-spice',
-        groupName: 'Spice Level',
-        optionId: `spice-${spice.toLowerCase()}`,
-        optionName: spice === 'MILD' ? 'Less Spicy' : 'Extra Spicy',
-        priceDelta: 0
-      });
-    }
-    if (isJain) {
-      selectedMods.push({
-        groupId: 'mod-prep',
-        groupName: 'Diet Preparation',
-        optionId: 'prep-jain',
-        optionName: 'Jain (No Onion No Garlic)',
-        priceDelta: 0
-      });
-    }
-    if (extraCheese) {
-      selectedMods.push({
-        groupId: 'mod-extras',
-        groupName: 'Extras',
-        optionId: 'extra-cheese',
-        optionName: 'Extra Cheese',
-        priceDelta: 40
-      });
-    }
-    if (extraButter) {
-      selectedMods.push({
-        groupId: 'mod-extras',
-        groupName: 'Extras',
-        optionId: 'extra-butter',
-        optionName: 'Extra Butter',
-        priceDelta: 25
-      });
-    }
-
-    onConfirm(item, selectedMods, notes, course, quantity);
+    if (missing.length > 0) return;
+    onConfirm(item, modifiers, notes, course, quantity);
   };
 
   return (
@@ -104,75 +93,37 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
           </button>
         </div>
 
-        {/* Spice Level */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-            Spice Level
-          </label>
-          <div className="grid grid-cols-3 gap-2">
-            {(['MILD', 'MEDIUM', 'SPICY'] as const).map((lvl) => (
-              <button
-                key={lvl}
-                type="button"
-                onClick={() => setSpice(lvl)}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  spice === lvl
-                    ? 'bg-jaman-navy text-white shadow-xs'
-                    : 'bg-jaman-cream text-slate-600 hover:bg-slate-100 border border-jaman-border'
-                }`}
-              >
-                {lvl === 'MILD' ? '🌿 Mild' : lvl === 'MEDIUM' ? '🌶️ Regular' : '🔥 Extra Spicy'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Dietary & Add-ons */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-            Dietary & Add-ons
-          </label>
-          <div className="space-y-1.5">
-            <button
-              type="button"
-              onClick={() => setIsJain(!isJain)}
-              className={`w-full p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
-                isJain
-                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
-                  : 'bg-jaman-cream border-jaman-border text-slate-600'
-              }`}
-            >
-              <span>Jain (No Onion, No Garlic)</span>
-              {isJain && <Check className="w-4 h-4 text-emerald-600" />}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setExtraCheese(!extraCheese)}
-              className={`w-full p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
-                extraCheese
-                  ? 'bg-amber-50 border-amber-300 text-amber-800'
-                  : 'bg-jaman-cream border-jaman-border text-slate-600'
-              }`}
-            >
-              <span>Extra Cheese (+₹40)</span>
-              {extraCheese && <Check className="w-4 h-4 text-amber-600" />}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setExtraButter(!extraButter)}
-              className={`w-full p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
-                extraButter
-                  ? 'bg-amber-50 border-amber-300 text-amber-800'
-                  : 'bg-jaman-cream border-jaman-border text-slate-600'
-              }`}
-            >
-              <span>Extra Butter (+₹25)</span>
-              {extraButter && <Check className="w-4 h-4 text-amber-600" />}
-            </button>
-          </div>
-        </div>
+        {/* The dish's own modifier groups */}
+        {groups.map((g) => {
+          const max = Math.max(1, g.maxSelections);
+          const chosen = selection[g.id] ?? [];
+          return (
+            <div key={g.id} className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                <span>{g.name}{g.isRequired ? ' *' : ''}</span>
+                {max > 1 && <span className="text-[10px] normal-case font-semibold text-slate-400">choose up to {max}</span>}
+              </label>
+              <div className="space-y-1.5">
+                {g.options.map((o) => {
+                  const on = chosen.includes(o.id);
+                  return (
+                    <button
+                      key={o.id}
+                      type="button"
+                      onClick={() => toggle(g.id, o.id, max)}
+                      className={`w-full p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
+                        on ? 'bg-amber-50 border-amber-300 text-amber-800' : 'bg-jaman-cream border-jaman-border text-slate-600'
+                      }`}
+                    >
+                      <span>{o.name}{o.priceDelta ? ` (+${formatINR(o.priceDelta)})` : ''}</span>
+                      {on && <Check className="w-4 h-4 text-amber-600" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
 
         {/* Serving Course */}
         <div className="space-y-1.5">
@@ -238,7 +189,9 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
           <button
             type="button"
             onClick={handleAdd}
-            className="flex-1 py-3 px-4 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm shadow-md shadow-jaman-saffron/20 transition-all active:scale-98 cursor-pointer flex items-center justify-between"
+            disabled={missing.length > 0}
+            title={missing.length > 0 ? `Choose: ${missing.join(', ')}` : undefined}
+            className="flex-1 disabled:opacity-50 py-3 px-4 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm shadow-md shadow-jaman-saffron/20 transition-all active:scale-98 cursor-pointer flex items-center justify-between"
           >
             <span>Add to Order</span>
             <span className="font-mono">{formatINR(totalPrice)}</span>

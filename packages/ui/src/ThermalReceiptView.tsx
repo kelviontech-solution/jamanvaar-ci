@@ -100,8 +100,8 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
           </div>
 
           <div className="flex justify-between text-[#718096] text-[10px]">
-            <span>POS: {order.kioskId || 'POS-01'}</span>
-            <span>Cashier: Amit Dave</span>
+            <span>{order.kioskId !== 'CLOUD-SYNC' ? `POS: ${order.kioskId || 'POS-01'}` : ''}</span>
+            <span>{order.cashierName ? `Cashier: ${order.cashierName}` : order.captainName ? `Captain: ${order.captainName}` : ''}</span>
           </div>
 
           {order.customerName && (
@@ -168,18 +168,18 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
 
           <div className="flex justify-between text-[#718096] text-[10px]">
             <span>CGST (2.5%)</span>
-            <span>₹{order.cgstAmount ?? 0}</span>
+            <span>₹{(order.cgstAmount ?? splitTax(order.taxAmount || 0).cgst).toFixed(2)}</span>
           </div>
 
           <div className="flex justify-between text-[#718096] text-[10px]">
             <span>SGST (2.5%)</span>
-            <span>₹{order.sgstAmount ?? 0}</span>
+            <span>₹{(order.sgstAmount ?? splitTax(order.taxAmount || 0).sgst).toFixed(2)}</span>
           </div>
 
           {order.roundOffAmount !== undefined && order.roundOffAmount !== 0 && (
             <div className="flex justify-between text-[#718096] text-[10px]">
               <span>Round Off</span>
-              <span>{order.roundOffAmount > 0 ? `+₹${order.roundOffAmount}` : `-₹${Math.abs(order.roundOffAmount)}`}</span>
+              <span>{order.roundOffAmount > 0 ? `+₹${order.roundOffAmount.toFixed(2)}` : `-₹${Math.abs(order.roundOffAmount).toFixed(2)}`}</span>
             </div>
           )}
 
@@ -348,7 +348,7 @@ export function printThermalReceipt(
         <div class="row"><span>Date & Time:</span><span>${new Date(order.createdAt).toLocaleDateString()} ${new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></div>
         <div class="row"><span>Order Type:</span><span class="bold">${order.orderType}${order.tableNumber ? ` (TABLE ${order.tableNumber})` : ''}</span></div>
         ${order.customerName ? `<div class="row"><span>Customer:</span><span>${order.customerName} (${order.customerPhone || ''})</span></div>` : ''}
-        ${order.cashierName ? `<div class="row"><span>Cashier:</span><span>${order.cashierName}</span></div>` : ''}
+        ${order.cashierName ? `<div class="row"><span>Cashier:</span><span>${order.cashierName}</span></div>` : order.captainName ? `<div class="row"><span>Captain:</span><span>${order.captainName}</span></div>` : ''}
 
         <div class="divider"></div>
 

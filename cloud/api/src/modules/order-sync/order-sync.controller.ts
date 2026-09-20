@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
+import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { OrderSyncService } from './order-sync.service';
 import { pushOrderSyncSchema, PushOrderSyncDto } from './dto/push-order-sync.dto';
@@ -10,6 +11,7 @@ import { CurrentDevice } from '../../common/decorators/current-device.decorator'
 // pull here — unlike payments' Kiosk-only gate, order sync is deliberately
 // open to every terminal type since all of them both create and consume
 // order state (POS creates, KDS reads, Captain reads+updates).
+@DeviceSyncThrottle()
 @Controller('api/v1/orders/sync')
 @UseGuards(DeviceAuthGuard)
 export class OrderSyncController {

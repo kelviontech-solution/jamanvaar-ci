@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore } from '../../store/captainStore';
 import { DiningTable } from '@jamanvaar/types';
 import { X, ArrowRight, GitMerge, RotateCcw, Check } from 'lucide-react';
@@ -14,22 +15,30 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
   isOpen,
   onClose
 }) => {
-  if (!isOpen || !currentTable) return null;
-
+  useEscapeToClose(isOpen, onClose);
   const { tables, transferTable, mergeTables } = useCaptainStore();
 
   const [mode, setMode] = useState<'TRANSFER' | 'MERGE'>('TRANSFER');
   const [targetTableNumber, setTargetTableNumber] = useState<string>('');
+  const [error, setError] = useState('');
 
-  const otherTables = tables.filter((t) => t.tableNumber !== currentTable.tableNumber);
+  if (!isOpen || !currentTable) return null;
+
+  // Only tables that make sense for the action (BUG-111): a transfer needs a free table, a merge
+  // needs a table that is in use.
+  const isFree = (t: (typeof tables)[number]) => t.status === 'AVAILABLE' && !t.currentOrderId;
+  const otherTables = tables.filter((t) => t.tableNumber !== currentTable.tableNumber && (mode === 'TRANSFER' ? isFree(t) : !isFree(t)));
 
   const handleAction = () => {
     if (!targetTableNumber) return;
-    if (mode === 'TRANSFER') {
-      transferTable(currentTable.tableNumber, targetTableNumber);
-    } else {
-      mergeTables(currentTable.tableNumber, targetTableNumber);
+    const ok = mode === 'TRANSFER'
+      ? transferTable(currentTable.tableNumber, targetTableNumber)
+      : mergeTables(currentTable.tableNumber, targetTableNumber);
+    if (!ok) {
+      setError(mode === 'TRANSFER' ? 'That table is no longer free.' : 'These tables cannot be merged (both need to be in use, and this one needs an order).');
+      return;
     }
+    setError('');
     onClose();
   };
 
@@ -59,6 +68,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
             onClick={() => {
               setMode('TRANSFER');
               setTargetTableNumber('');
+              setError('');
             }}
             className={`py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
               mode === 'TRANSFER' ? 'bg-jaman-navy text-white shadow-xs' : 'text-slate-600 hover:text-jaman-navy'
@@ -71,6 +81,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
             onClick={() => {
               setMode('MERGE');
               setTargetTableNumber('');
+              setError('');
             }}
             className={`py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
               mode === 'MERGE' ? 'bg-jaman-navy text-white shadow-xs' : 'text-slate-600 hover:text-jaman-navy'
@@ -118,6 +129,13 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
             })}
           </div>
         </div>
+
+        {otherTables.length === 0 && (
+          <p className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+            {mode === 'TRANSFER' ? 'No free table to move to right now.' : 'No other table is in use to merge with.'}
+          </p>
+        )}
+        {error && <p className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">{error}</p>}
 
         {/* Action Buttons */}
         <div className="pt-2 grid grid-cols-2 gap-2">

@@ -18,10 +18,13 @@ import {
   TableRepository,
   AuditRepository,
   db,
-  StaffRepository
+  StaffRepository,
+  ServiceMessages,
+  type ServiceMessage
 } from '@jamanvaar/database';
+import type { User } from '@jamanvaar/types';
 import { lanMeshSync } from '@jamanvaar/sync';
-import { SessionPersistence, AuthStatus } from '@jamanvaar/business';
+import { SessionPersistence, AuthStatus, priceOrderLines } from '@jamanvaar/business';
 
 export interface CartItemEntry {
   id: string;
@@ -60,29 +63,49 @@ export interface CustomerRequest {
   isResolved: boolean;
 }
 
-const DEFAULT_CAPTAIN: CaptainProfile = {
-  id: 'cap-1',
-  employeeId: 'EMP-CAP-01',
-  name: 'Rahul Sharma',
-  pin: '1234',
-  role: 'CAPTAIN',
-  assignedTableIds: ['t-1', 't-2', 't-3', 't-4', 't-5', 't-6', 't-12', 't-14'],
-  assignedTableNumbers: ['1', '2', '3', '4', '5', '6', '12', '14'],
-  activeShiftId: 'shift-cap-today',
-  permissions: {
-    CAN_REQUEST_BILL: true,
-    CAN_VIEW_BILL: true,
-    CAN_PRINT_BILL: false,
-    CAN_ACCEPT_CASH: false,
-    CAN_ACCEPT_UPI: false,
-    CAN_ACCEPT_CARD: false,
-    CAN_SETTLE_ORDER: false,
-    CAN_APPLY_DISCOUNT: false,
-    CAN_VOID_ITEM: false,
-    CAN_TRANSFER_TABLE: true,
-    CAN_MERGE_TABLE: true
-  }
+const CAPTAIN_PERMISSIONS: CaptainProfile['permissions'] = {
+  CAN_REQUEST_BILL: true,
+  CAN_VIEW_BILL: true,
+  CAN_PRINT_BILL: false,
+  CAN_ACCEPT_CASH: false,
+  CAN_ACCEPT_UPI: false,
+  CAN_ACCEPT_CARD: false,
+  CAN_SETTLE_ORDER: false,
+  CAN_APPLY_DISCOUNT: false,
+  CAN_VOID_ITEM: false,
+  CAN_TRANSFER_TABLE: true,
+  CAN_MERGE_TABLE: true
 };
+
+/** The signed-in waiter, built from their real staff record (never a made-up profile). */
+function profileFromUser(user: User): CaptainProfile {
+  return {
+    id: user.id,
+    employeeId: user.username,
+    name: user.fullName,
+    pin: '',
+    role: 'CAPTAIN',
+    // Tables are not pre-assigned to a waiter: every table is open to everyone, and "my tables"
+    // means the tables this waiter seated.
+    assignedTableIds: [],
+    assignedTableNumbers: [],
+    activeShiftId: '',
+    permissions: CAPTAIN_PERMISSIONS
+  };
+}
+
+/** Guest counts a table can actually seat. */
+export function guestCountOptions(capacity: number): number[] {
+  const max = Math.max(1, Math.min(Math.floor(capacity) || 1, 12));
+  return Array.from({ length: max }, (_, i) => i + 1);
+}
+
+/** Tables this waiter seated. */
+export function selectMyTables(tables: DiningTable[], captain: CaptainProfile | null): DiningTable[] {
+  if (!captain) return [];
+  // A table freed at the counter can still carry the waiter's name; it is only "mine" while it is in use.
+  return tables.filter((t) => !!t.openedById && t.openedById === captain.id && (t.status !== 'AVAILABLE' || !!t.currentOrderId));
+}
 
 export const PRESET_MESSAGES = [
   'Customer waiting for order',
@@ -205,6 +228,8 @@ interface CaptainState {
     customNote?: string,
     tableNumber?: string
   ) => void;
+  /** Messages delivered from other devices (manager, counter...) — shown in the inbox once. */
+  receiveMessages: (incoming: ServiceMessage[]) => void;
   acknowledgeMessage: (id: string) => void;
   resolveMessage: (id: string) => void;
   addCustomerRequest: (
@@ -221,14 +246,16 @@ interface CaptainState {
   refreshState: () => void;
 }
 
+/** The first refresh after opening the app only loads what is already ready, without announcing it. */
+let readyListPrimed = false;
+
 export const useCaptainStore = create<CaptainState>((set, get) => {
   // Restore persisted captain session on store init
   const savedSession = SessionPersistence.load('captain');
-  // Captain app uses a fixed profile pool; match by userId
-  const restoredCaptain = savedSession ? DEFAULT_CAPTAIN : null; // single captain in demo DB
-  const initialAuthStatus: AuthStatus = restoredCaptain && savedSession?.userId === DEFAULT_CAPTAIN.id
-    ? 'AUTHENTICATED'
-    : 'UNAUTHENTICATED';
+  // A reload keeps the same real staff member signed in (BUG-106) — as long as that person still exists and is active.
+  const savedUser = savedSession ? db.users.find((u) => u.id === savedSession.userId && u.isActive !== false) : undefined;
+  const restoredCaptain = savedUser ? profileFromUser(savedUser) : null;
+  const initialAuthStatus: AuthStatus = restoredCaptain ? 'AUTHENTICATED' : 'UNAUTHENTICATED';
 
   return {
   currentCaptain: restoredCaptain,
@@ -239,7 +266,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   tables: captainDb.tables,
   selectedTable: null,
   selectedTableOrder: null,
-  tableFilter: 'MY_TABLES',
+  tableFilter: 'ALL_TABLES',
   selectedZone: 'ALL',
   guestCount: 2,
   attachedCustomer: null,
@@ -287,15 +314,12 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
   login: (pin: string) => {
     // Centralised, hashed PIN verification (BUG-005/006/009/011) — same path as POS/KDS/Kiosk.
-    const matchedUser = StaffRepository.verifyPin(pin)?.user;
+    const candidate = StaffRepository.verifyPin(pin)?.user;
+    // A PIN for a role that does not work the floor is refused (BUG-118).
+    const matchedUser = candidate && StaffRepository.canUseTerminal(candidate.roleId, 'CAPTAIN') ? candidate : undefined;
 
     if (matchedUser) {
-      const captainProfile: CaptainProfile = {
-        ...DEFAULT_CAPTAIN,
-        id: matchedUser.id,
-        name: matchedUser.fullName,
-        pin
-      };
+      const captainProfile = profileFromUser(matchedUser);
       const startTime = new Date().toISOString();
       SessionPersistence.save('captain', {
         userId: matchedUser.id,
@@ -419,8 +443,13 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   openTable: (tableNumber, guests = 2) => {
     const tbl = captainDb.tables.find((t) => t.tableNumber === tableNumber);
     if (tbl) {
+      const captain = get().currentCaptain;
       tbl.status = 'OCCUPIED';
-      tbl.currentGuests = guests;
+      tbl.currentGuests = Math.max(1, Math.min(guests, tbl.capacity || guests));
+      if (!tbl.openedById) {
+        tbl.openedById = captain?.id;
+        tbl.openedByName = captain?.name;
+      }
       captainDb.notify();
     }
 
@@ -465,22 +494,32 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     const from = captainDb.tables.find((t) => t.tableNumber === fromTable);
     const to = captainDb.tables.find((t) => t.tableNumber === toTable);
 
-    if (!from || !to) return false;
+    if (!from || !to || from.id === to.id) return false;
+    // Nothing to move from an empty table, and never onto a table that is already in use (BUG-111).
+    if (from.status === 'AVAILABLE' && !from.currentOrderId) return false;
+    if (to.status !== 'AVAILABLE' || to.currentOrderId) return false;
 
     const guestCount = from.currentGuests || 2;
     to.status = from.status;
     to.currentGuests = from.currentGuests;
     to.currentOrderId = from.currentOrderId;
+    to.openedById = from.openedById || get().currentCaptain?.id;
+    to.openedByName = from.openedByName || get().currentCaptain?.name;
 
     from.status = 'AVAILABLE';
     from.currentGuests = undefined;
     from.currentOrderId = undefined;
+    from.openedById = undefined;
+    from.openedByName = undefined;
 
     if (to.currentOrderId) {
       const ord = captainDb.orders.find((o) => o.id === to.currentOrderId);
       if (ord) {
         ord.tableNumber = toTable;
         ord.tableId = to.id;
+        ord.updatedAt = new Date().toISOString();
+        ord.syncStatus = 'SAVED_LOCALLY';
+        captainDb.kots.filter((k) => k.orderId === ord.id).forEach((k) => { k.tableNumber = toTable; });
       }
     }
 
@@ -507,12 +546,35 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     const prim = captainDb.tables.find((t) => t.tableNumber === primaryTable);
     const sec = captainDb.tables.find((t) => t.tableNumber === secondaryTable);
 
-    if (!prim || !sec) return false;
+    if (!prim || !sec || prim.id === sec.id) return false;
+    // Both tables must be in use, and the one being kept must have an order to add to (BUG-111).
+    const primaryOrder = prim.currentOrderId ? captainDb.orders.find((o) => o.id === prim.currentOrderId) : undefined;
+    if (!primaryOrder) return false;
+    if (sec.status === 'AVAILABLE' && !sec.currentOrderId) return false;
+
+    const secondaryOrder = sec.currentOrderId && sec.currentOrderId !== primaryOrder.id
+      ? captainDb.orders.find((o) => o.id === sec.currentOrderId)
+      : undefined;
+
+    if (secondaryOrder) {
+      primaryOrder.items = [...primaryOrder.items, ...secondaryOrder.items.map((it) => ({ ...it, orderId: primaryOrder.id }))];
+      const priced = priceOrderLines(primaryOrder.items.map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity })));
+      Object.assign(primaryOrder, priced, { updatedAt: new Date().toISOString(), syncStatus: 'SAVED_LOCALLY' as const });
+
+      // The second table's dishes are still being cooked: their tickets now belong to the merged order.
+      captainDb.kots.filter((k) => k.orderId === secondaryOrder.id).forEach((k) => {
+        k.orderId = primaryOrder.id;
+        k.orderNumber = primaryOrder.orderNumber;
+      });
+      secondaryOrder.orderStatus = 'CANCELLED';
+      secondaryOrder.updatedAt = new Date().toISOString();
+      secondaryOrder.syncStatus = 'SAVED_LOCALLY';
+    }
 
     prim.status = 'OCCUPIED';
     prim.currentGuests = (prim.currentGuests || 2) + (sec.currentGuests || 2);
     sec.status = 'OCCUPIED';
-    sec.currentOrderId = prim.currentOrderId;
+    sec.currentOrderId = primaryOrder.id;
 
     captainDb.notify();
     get().selectTable(prim);
@@ -540,6 +602,8 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     tbl.status = 'AVAILABLE';
     tbl.currentGuests = undefined;
     tbl.currentOrderId = undefined;
+    tbl.openedById = undefined;
+    tbl.openedByName = undefined;
     captainDb.notify();
 
     if (get().selectedTable?.tableNumber === tableNumber) {
@@ -666,8 +730,11 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     const unFiredItems = state.cartItems.filter((ci) => !ci.isFired);
     if (unFiredItems.length === 0) return null;
 
+    // A ticket must say which table it is for: never guess one (used to default to table 1).
     const table = state.selectedTable;
-    const tableNumber = table?.tableNumber || '1';
+    if (!table) return null;
+    const tableNumber = table.tableNumber;
+    const captain = state.currentCaptain;
 
     // 1. Create or Update Order in Database
     let order = state.selectedTableOrder;
@@ -686,18 +753,17 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
         kitchenStatus: 'PREPARING' as const
       }));
 
-      const subtotal = state.cartItems.reduce((sum, ci) => sum + ci.totalPrice, 0);
-      const tax = Math.round(subtotal * 0.05 * 100) / 100;
+      // Same pricing rules as POS (CGST + SGST, round-off), so both show the same bill (BUG-102).
+      const priced = priceOrderLines(orderItems.map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity })));
 
       order = OrderRepository.createOrder({
         orderType: 'DINE_IN',
-        tableId: table?.id,
+        tableId: table.id,
         tableNumber,
         guestCount: state.guestCount,
+        captainName: captain?.name,
         items: orderItems,
-        subtotal,
-        taxAmount: tax,
-        totalAmount: subtotal + tax,
+        ...priced,
         paymentMethod: 'CASH',
         paymentStatus: 'PENDING',
         orderStatus: 'PREPARING',
@@ -705,9 +771,11 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
         syncStatus: 'SAVED_LOCALLY'
       });
 
-      if (table) {
-        table.currentOrderId = order.id;
-        table.status = 'OCCUPIED';
+      table.currentOrderId = order.id;
+      table.status = 'OCCUPIED';
+      if (!table.openedById) {
+        table.openedById = captain?.id;
+        table.openedByName = captain?.name;
       }
     } else {
       const newItems = unFiredItems.map((ci, idx) => ({
@@ -725,9 +793,8 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       }));
 
       order.items = [...(order.items || []), ...newItems];
-      order.subtotal = order.items.reduce((s, it) => s + it.totalPrice, 0);
-      order.taxAmount = Math.round(order.subtotal * 0.05 * 100) / 100;
-      order.totalAmount = order.subtotal + order.taxAmount;
+      Object.assign(order, priceOrderLines(order.items.map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity }))));
+      order.captainName = order.captainName || captain?.name;
       order.orderStatus = 'PREPARING';
       order.updatedAt = new Date().toISOString();
       // Without this, adding items to an already-existing table order from
@@ -755,7 +822,8 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       tableNumber,
       orderType: 'DINE_IN',
       items: kotItems,
-      cashierName: state.currentCaptain?.name || 'Captain'
+      cashierName: captain?.name || '',
+      serverName: captain?.name
     });
 
     // 3. Mark cart items as fired
@@ -798,44 +866,44 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   markItemServed: (foodReadyId) => {
     const st = get();
     const targetItem = st.foodReadyItems.find((it) => it.id === foodReadyId);
-    const updated = st.foodReadyItems.filter((it) => it.id !== foodReadyId);
+    if (!targetItem) return;
 
-    set({
-      foodReadyItems: updated,
+    // The waiter took the dish to the table: record it on the order so POS and KDS see it too.
+    KOTRepository.markItemServed(targetItem.kotId, targetItem.itemId);
+    get().refreshState();
+    set((s2) => ({
       shiftStats: {
-        ...st.shiftStats,
-        foodServed: st.shiftStats.foodServed + (targetItem?.quantity || 1)
+        ...s2.shiftStats,
+        foodServed: s2.shiftStats.foodServed + (targetItem.quantity || 1)
       }
-    });
+    }));
 
     AuditRepository.log({
       action: 'FOOD_SERVED',
       category: 'ORDER',
-      details: `Dish "${targetItem?.dishName}" served to Table #${targetItem?.tableNumber} by ${st.currentCaptain?.name}`,
+      details: `Dish "${targetItem.dishName}" served to Table #${targetItem.tableNumber} by ${st.currentCaptain?.name}`,
       username: st.currentCaptain?.name || 'Captain'
     });
 
-    if (targetItem) {
-      lanMeshSync.broadcast('ORDER_SERVED', {
-        tableNumber: targetItem.tableNumber,
-        foodReadyId,
-        dishName: targetItem.dishName
-      });
-    }
+    lanMeshSync.broadcast('ORDER_SERVED', {
+      tableNumber: targetItem.tableNumber,
+      foodReadyId,
+      dishName: targetItem.dishName
+    });
   },
 
   markEntireKotServed: (kotId) => {
     const st = get();
     const matchingItems = st.foodReadyItems.filter((it) => it.kotId === kotId);
-    const updated = st.foodReadyItems.filter((it) => it.kotId !== kotId);
 
-    set({
-      foodReadyItems: updated,
+    KOTRepository.markKotServed(kotId);
+    get().refreshState();
+    set((s2) => ({
       shiftStats: {
-        ...st.shiftStats,
-        foodServed: st.shiftStats.foodServed + matchingItems.length
+        ...s2.shiftStats,
+        foodServed: s2.shiftStats.foodServed + matchingItems.reduce((n, it) => n + (it.quantity || 1), 0)
       }
-    });
+    }));
 
     AuditRepository.log({
       action: 'KOT_SERVED',
@@ -845,17 +913,18 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     });
 
     lanMeshSync.broadcast('ORDER_SERVED', {
-      tableNumber: st.selectedTable?.tableNumber,
+      tableNumber: matchingItems[0]?.tableNumber,
       kotId
     });
   },
 
   requestBill: (tableNumber) => {
     const tbl = captainDb.tables.find((t) => t.tableNumber === tableNumber);
-    if (tbl) {
-      tbl.status = 'BILL_REQUESTED';
-      captainDb.notify();
-    }
+    // There must be an order to bill. The table state travels to POS with the table sync, where the
+    // counter sees it as "Billing" (BUG-099).
+    if (!tbl || !tbl.currentOrderId || !captainDb.orders.some((o) => o.id === tbl.currentOrderId)) return false;
+    tbl.status = 'BILL_REQUESTED';
+    captainDb.notify();
 
     set((s) => ({
       shiftStats: {
@@ -871,6 +940,13 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       username: get().currentCaptain?.name || 'Captain'
     });
 
+    ServiceMessages.enqueue({
+      kind: 'BILL_REQUEST',
+      recipient: 'POS',
+      senderName: get().currentCaptain?.name || 'Staff',
+      presetText: 'Bill requested',
+      tableNumber
+    });
     lanMeshSync.broadcast('BILL_REQUESTED', {
       tableNumber,
       captainName: get().currentCaptain?.name || 'Captain'
@@ -883,7 +959,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   sendMessage: (recipient, presetText, customNote = '', tableNumber) => {
     const newMsg: InternalMessage = {
       id: `msg-${Date.now()}`,
-      senderName: `${get().currentCaptain?.name || 'Rahul Sharma'} (Captain)`,
+      senderName: `${get().currentCaptain?.name || 'Staff'} (Captain)`,
       senderRole: 'CAPTAIN',
       recipient,
       tableNumber,
@@ -906,7 +982,54 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       username: get().currentCaptain?.name || 'Captain'
     });
 
+    // Deliver to the other devices through the cloud (BUG-100); the LAN broadcast below only ever
+    // reached tabs of the same browser.
+    if (recipient !== 'CAPTAIN') {
+      ServiceMessages.enqueue({
+        kind: 'MESSAGE',
+        recipient,
+        senderName: get().currentCaptain?.name || 'Staff',
+        presetText,
+        customNote: customNote || undefined,
+        tableNumber
+      });
+    }
     lanMeshSync.broadcast('INTERNAL_MESSAGE_SENT', newMsg);
+  },
+
+  receiveMessages: (incoming) => {
+    const known = new Set(get().messages.map((m) => m.id));
+    const fresh = incoming.filter((m) => !known.has(m.id));
+    if (fresh.length === 0) return;
+    set((s) => ({
+      messages: [
+        ...fresh.map((m): InternalMessage => ({
+          id: m.id,
+          senderName: m.senderName,
+          senderRole: 'MANAGER',
+          recipient: 'CAPTAIN',
+          tableNumber: m.tableNumber,
+          presetText: m.presetText,
+          customNote: m.customNote,
+          status: 'DELIVERED',
+          createdAt: m.createdAt,
+          updatedAt: m.createdAt
+        })),
+        ...s.messages
+      ],
+      notifications: [
+        ...fresh.map((m): CaptainNotification => ({
+          id: `notif-${m.id}`,
+          type: 'MANAGER_MESSAGE',
+          title: `💬 ${m.senderName}${m.tableNumber ? ` — Table ${m.tableNumber}` : ''}`,
+          message: m.customNote || m.presetText,
+          tableNumber: m.tableNumber,
+          timestamp: m.createdAt,
+          isRead: false
+        })),
+        ...s.notifications
+      ]
+    }));
   },
 
   acknowledgeMessage: (id) => {
@@ -978,12 +1101,37 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   },
 
   refreshState: () => {
-    set({
+    // Bring this device's view in line with the orders it holds: tickets follow their order, and a
+    // table whose order was settled at the counter is freed (BUG-097/098).
+    TableRepository.releaseSettledTables();
+    KOTRepository.reconcileWithOrders();
+
+    const foodReady = KOTRepository.getFoodReadyItems();
+    const previous = new Set(get().foodReadyItems.map((f) => f.id));
+    const fresh = readyListPrimed ? foodReady.filter((f) => !previous.has(f.id)) : [];
+    readyListPrimed = true;
+
+    set((s) => ({
       tables: [...captainDb.tables],
       categories: [...captainDb.categories],
       menuItems: [...captainDb.menuItems],
-      kots: [...captainDb.kots]
-    });
+      kots: [...captainDb.kots],
+      foodReadyItems: foodReady,
+      notifications: fresh.length === 0
+        ? s.notifications
+        : [
+            ...fresh.map((f): CaptainNotification => ({
+              id: `notif-${f.id}`,
+              type: 'FOOD_READY',
+              title: `🔥 Food Ready for Table #${f.tableNumber}`,
+              message: `${f.dishName} prepared and ready for pickup!`,
+              tableNumber: f.tableNumber,
+              timestamp: new Date().toISOString(),
+              isRead: false
+            })),
+            ...s.notifications
+          ]
+    }));
   }
   }; // end return
 }); // end create
@@ -994,46 +1142,6 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 if (typeof window !== 'undefined') {
   lanMeshSync.registerDevice('CAPTAIN', 'CAPTAIN-01', 'Captain Mobile App');
   lanMeshSync.setAttachedDatabase(captainDb);
-
-  // 1. Food Ready Notification from KDS
-  lanMeshSync.on('FOOD_READY', (event) => {
-    const { tableNumber, items, dishName, kotNumber, orderId } = event.payload || {};
-    const store = useCaptainStore.getState();
-
-    const newNotification: CaptainNotification = {
-      id: `notif-${Date.now()}`,
-      type: 'FOOD_READY',
-      title: `🔥 Food Ready for Table #${tableNumber || 'Floor'}`,
-      message: `${dishName || (items && items[0]?.name) || 'Kitchen items'} prepared and ready for pickup!`,
-      tableNumber: tableNumber ? `${tableNumber}` : undefined,
-      timestamp: new Date().toISOString(),
-      isRead: false
-    };
-
-    const newFoodReadyItem: FoodReadyItem = {
-      id: `fr-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
-      kotId: event.payload?.kotId || `kot-${Date.now()}`,
-      kotNumber: kotNumber || 'KOT',
-      orderId: orderId || '',
-      orderNumber: event.payload?.orderNumber || '',
-      tableNumber: `${tableNumber || 'Floor'}`,
-      itemId: event.payload?.itemId || '',
-      dishName: dishName || (items && items[0]?.name) || 'Dish',
-      quantity: event.payload?.quantity || (items && items[0]?.quantity) || 1,
-      modifiers: event.payload?.modifiers || [],
-      station: event.payload?.station || 'Kitchen',
-      readyAt: new Date().toISOString(),
-      elapsedSeconds: 0,
-      isServed: false
-    };
-
-    useCaptainStore.setState({
-      foodReadyItems: [newFoodReadyItem, ...store.foodReadyItems],
-      notifications: [newNotification, ...store.notifications]
-    });
-
-    store.refreshState();
-  });
 
   // 2. Bill Settled at POS Counter
   lanMeshSync.on('BILL_SETTLED', (event) => {

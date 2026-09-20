@@ -1176,8 +1176,8 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold block uppercase">Staff</span>
-                  <strong className="text-jaman-navy block">Cashier: {selectedOrder.cashierName || 'Amit Dave'}</strong>
-                  <span className="text-[10px] text-slate-500">Captain: {selectedOrder.captainName || 'Rahul Sharma'}</span>
+                  <strong className="text-jaman-navy block">{selectedOrder.cashierName ? `Cashier: ${selectedOrder.cashierName}` : 'Cashier: —'}</strong>
+                  <span className="text-[10px] text-slate-500">Captain: {selectedOrder.captainName || '—'}</span>
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold block uppercase">Current Status</span>

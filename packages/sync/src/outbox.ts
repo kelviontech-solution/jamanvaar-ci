@@ -344,7 +344,8 @@ function ensureKotsForOrder(order: Order): void {
         'Main Kitchen',
       status: it.kitchenStatus || 'PENDING'
     })),
-    cashierName: order.cashierName || 'Cloud Sync',
+    cashierName: order.captainName || order.cashierName || '',
+    serverName: order.captainName,
     orderNotes: order.customerNotes
   });
 }
@@ -527,6 +528,9 @@ export class SyncOutboxEngine {
           // The day may not exist on this device yet; its totals build up when it does.
         }
       });
+      // Kitchen tickets are per device: bring them in line with the order state just received, so a
+      // dish the kitchen finished shows as ready here and a settled order's ticket clears (BUG-098/113).
+      KOTRepository.reconcileWithOrders();
       safeSet(CATCH_UP_CURSOR_KEY, serverTime);
       if (pulled > 0) db.notify();
     } catch {

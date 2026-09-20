@@ -8,7 +8,7 @@
  */
 
 import { DeviceGate, sendHeartbeat } from '@jamanvaar/sync';
-import { MenuRepository, PrinterRepository } from '@jamanvaar/database';
+import { MenuRepository, PrinterRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -86,6 +86,7 @@ export async function activateKioskDevice(code: string): Promise<ActivationResta
     localStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken);
     DeviceGate.reportSuccess(); // a fresh activation starts unlocked
     MenuRepository.startFreshMenu(); // BUG-013: a real restaurant starts with no menu until one is uploaded
+    RestaurantIdentityRepository.startFreshOperations(); // BUG-115: ...and no demo combos, coupons, offers or tables
     PrinterRepository.startFresh(); // BUG-025: ...and no printers until real ones are added
   } catch {
     // Storage unavailable — activation succeeded server-side, but this

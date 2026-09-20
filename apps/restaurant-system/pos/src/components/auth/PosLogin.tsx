@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePosStore } from '../../store/posStore';
-import { db } from '@jamanvaar/database';
+import { db, StaffRepository } from '@jamanvaar/database';
 import { JamanvaarAuthLayout } from '@jamanvaar/ui';
 import {
   Unlock,
@@ -11,7 +11,8 @@ import {
 
 export const PosLogin: React.FC = () => {
   const { loginWithPin, isOnline, toggleNetworkStatus } = usePosStore();
-  const activeStaff = db.users.filter((u) => u.isActive);
+  // Only the people who work the counter are offered (BUG-118); a waiter's or chef's PIN is refused.
+  const activeStaff = db.users.filter((u) => u.isActive && StaffRepository.canUseTerminal(u.roleId, 'POS'));
   const [selectedUser, setSelectedUser] = useState<(typeof db.users)[0] | null>(activeStaff[0] || null);
   const [pin, setPin] = useState('');
   const [errorMessage, setErrorMessage] = useState('');

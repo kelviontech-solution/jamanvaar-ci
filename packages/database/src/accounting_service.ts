@@ -81,7 +81,7 @@ export class BusinessDayAccountingService {
           displayDate: getBusinessDayDisplayDate(new Date()),
           status: 'OPEN',
           openedAt: nowIso,
-          openedBy: 'Amit Dave (Lead Cashier)',
+          openedBy: 'System',
           openingCash: 2000,
           grossSales: 0,
           discounts: 0,

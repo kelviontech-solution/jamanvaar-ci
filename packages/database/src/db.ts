@@ -88,10 +88,13 @@ export class JamanvaarDatabase {
   public categories: Category[] = [...SEED_CATEGORIES];
   public modifierGroups: ModifierGroup[] = [...SEED_MODIFIER_GROUPS];
   public menuItems: MenuItem[] = [...SEED_MENU_ITEMS];
-  public tables: DiningTable[] = [...SEED_TABLES];
+  public tables: DiningTable[] = SEED_TABLES.map((t) => ({ ...t }));
   public qrSettings: QrOrderingSettings = { ...DEFAULT_QR_SETTINGS };
   public kioskDisplaySettings: KioskDisplaySettings = { ...DEFAULT_KIOSK_DISPLAY_SETTINGS };
   public welcomeScreenSettings: WelcomeScreenSettings = { ...DEFAULT_WELCOME_SCREEN_SETTINGS };
+  /** Set when the floor plan was deliberately started empty (a real restaurant), so an empty list is not mistaken for missing data on reload. */
+  public floorPlanStartedEmpty = false;
+
   public coupons: Coupon[] = [...SEED_COUPONS];
   public offers: Offer[] = [...SEED_OFFERS];
   public taxGroups: TaxGroup[] = [...SEED_TAX_GROUPS];
@@ -979,6 +982,7 @@ export class JamanvaarDatabase {
       put('print_jobs', this.printJobs);
       put('orders', this.orders);
       put('tables', this.tables);
+      put('floor_plan_started_empty', this.floorPlanStartedEmpty);
       put('coupons', this.coupons);
       put('kiosks', this.kiosks);
       put('service_requests', this.serviceRequests);
@@ -1158,21 +1162,23 @@ export class JamanvaarDatabase {
         this.orders = generateSeedOrders();
       }
 
+      this.floorPlanStartedEmpty = localStorage.getItem(`${p}floor_plan_started_empty`) === 'true';
       const storedTables = localStorage.getItem(`${p}tables`);
       if (storedTables) {
         try {
           const parsedTables = JSON.parse(storedTables);
-          // Only use stored tables if non-empty; fall back to seed if empty array was persisted
-          if (Array.isArray(parsedTables) && parsedTables.length > 0) {
+          // Only use stored tables if non-empty — unless the restaurant deliberately started with no
+          // tables (BUG-115); otherwise fall back to the seed if an empty array was persisted.
+          if (Array.isArray(parsedTables) && (parsedTables.length > 0 || this.floorPlanStartedEmpty)) {
             this.tables = parsedTables;
           } else {
-            this.tables = [...SEED_TABLES];
+            this.tables = SEED_TABLES.map((t) => ({ ...t }));
           }
         } catch {
-          this.tables = [...SEED_TABLES];
+          this.tables = SEED_TABLES.map((t) => ({ ...t }));
         }
       } else {
-        this.tables = [...SEED_TABLES];
+        this.tables = SEED_TABLES.map((t) => ({ ...t }));
       }
 
       // Guarantee all tables have valid, persistent qrToken, qrShortCode, and qrCodeUrl
@@ -1418,7 +1424,8 @@ export class JamanvaarDatabase {
     this.categories = [...SEED_CATEGORIES];
     this.modifierGroups = [...SEED_MODIFIER_GROUPS];
     this.menuItems = [...SEED_MENU_ITEMS];
-    this.tables = [...SEED_TABLES];
+    this.tables = SEED_TABLES.map((t) => ({ ...t }));
+    this.floorPlanStartedEmpty = false;
     this.coupons = [...SEED_COUPONS];
     this.offers = [...SEED_OFFERS];
     this.taxGroups = [...SEED_TAX_GROUPS];

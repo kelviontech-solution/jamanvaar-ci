@@ -1,4 +1,5 @@
 import { Body, Controller, Patch, Req, UseGuards, UsePipes } from '@nestjs/common';
+import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { DevicesService } from './devices.service';
 import { heartbeatSchema } from './dto/heartbeat.dto';
@@ -12,6 +13,7 @@ import { CurrentDevice } from '../../common/decorators/current-device.decorator'
  * Super Admin, and can only ever update its OWN row (there is no :id param;
  * the device is identified entirely by the credential DeviceAuthGuard verified).
  */
+@DeviceSyncThrottle()
 @Controller('api/v1/devices/me')
 @UseGuards(DeviceAuthGuard)
 export class DeviceHeartbeatController {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEscapeToClose } from '../useEscapeToClose';
 import { useAiAccess } from '@jamanvaar/ui';
 import { useCaptainStore } from '../../store/captainStore';
 import { captainDb } from '@jamanvaar/database';
@@ -31,9 +32,10 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
   onSelectTab,
   onOpenAiAssistant
 }) => {
+  // Every hook runs on every render, before any early return (BUG-104: a hook after the
+  // "closed" return made the whole app go blank the moment the drawer was opened).
+  useEscapeToClose(isOpen, onClose);
   const ai = useAiAccess();
-  if (!isOpen) return null;
-
   const {
     currentCaptain,
     kots,
@@ -41,6 +43,7 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
     notifications,
     logout
   } = useCaptainStore();
+  if (!isOpen) return null;
 
   const pendingRequestsCount = customerRequests.filter((cr) => !cr.isResolved).length;
   const unreadNotifsCount = notifications.filter((n) => !n.isRead).length;
@@ -81,8 +84,8 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
               {currentCaptain?.name?.charAt(0) || 'R'}
             </div>
             <div>
-              <h3 className="font-extrabold text-sm">{currentCaptain?.name || 'Rahul Sharma'}</h3>
-              <p className="text-[11px] text-slate-300 font-medium">Floor Captain • Main Dining</p>
+              <h3 className="font-extrabold text-sm">{currentCaptain?.name || 'Staff'}</h3>
+              <p className="text-[11px] text-slate-300 font-medium">Floor Captain</p>
             </div>
           </div>
           <button

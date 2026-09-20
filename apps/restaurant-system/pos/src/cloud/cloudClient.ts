@@ -84,6 +84,7 @@ export async function activatePosDevice(code: string): Promise<void> {
     localStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken);
     DeviceGate.reportSuccess(); // a fresh activation starts unlocked
     MenuRepository.startFreshMenu(); // BUG-013: a real restaurant starts with no menu until one is uploaded
+    RestaurantIdentityRepository.startFreshOperations(); // BUG-115: ...and no demo combos, coupons, offers or tables
     PrinterRepository.startFresh(); // BUG-025: ...and no printers until real ones are added
     InventoryRepository.startFresh(); // BUG-045: ...and no demo ingredients/stock
   } catch {

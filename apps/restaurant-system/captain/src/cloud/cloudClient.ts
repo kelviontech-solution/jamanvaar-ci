@@ -82,6 +82,7 @@ function persistConnection(restaurantId: string, label: string, deviceId?: strin
     if (deviceToken) localStorage.setItem(DEVICE_TOKEN_KEY, deviceToken);
     DeviceGate.reportSuccess(); // a fresh activation starts unlocked
     MenuRepository.startFreshMenu(); // BUG-013: a real restaurant starts with no menu until one is uploaded
+    RestaurantIdentityRepository.startFreshOperations(); // BUG-115: ...and no demo combos, coupons, offers or tables
     // BUG-021: this device used to keep showing the seeded "JAMANVAAR RESTAURANT" placeholder
     // forever, even after activating against a real restaurant with a different name.
     RestaurantIdentityRepository.adopt(restaurantId, { name: restaurantName });

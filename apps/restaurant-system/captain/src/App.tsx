@@ -10,7 +10,7 @@ import {
   useAiAccess
 } from '@jamanvaar/ui';
 import { isDeviceConnected, connectDevice, activateCaptainDevice, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
-import { SyncOutboxEngine, EntitySyncEngine } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages } from '@jamanvaar/sync';
 
 // Captain Modular Layout & Views
 import { CaptainHeader } from './components/layout/CaptainHeader';
@@ -171,11 +171,18 @@ export const App: React.FC = () => {
     void syncMenu();
     void syncCategories();
     void syncStaff();
+    void syncDiningTables();
     void reportHeartbeat();
 
     const orderInterval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
       void SyncOutboxEngine.catchUpFromCloud();
+      // BUG-096/097: table layout and status are shared with Restaurant Admin and POS.
+      void syncDiningTables();
+      // BUG-099/100: deliver this tablet's bill requests and messages, and show what others sent.
+      void syncServiceMessages('CAPTAIN').then((inbound) => {
+        if (inbound.length > 0) useCaptainStore.getState().receiveMessages(inbound);
+      });
     }, 4000);
     const interval = setInterval(() => {
       void syncMenu();
@@ -245,18 +252,18 @@ export const App: React.FC = () => {
   }
 
   // Handle Login PIN submission
+  // One path for typed and keypad entry, so a wrong PIN always shows the error and clears the
+  // entry (BUG-105: the keypad path used to ignore the result and jam at four digits).
+  const attemptLogin = (candidate: string) => {
+    const ok = login(candidate);
+    setPinError(!ok);
+    setPinInput('');
+  };
+
   const handlePinSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!pinInput.trim()) return;
-
-    const ok = login(pinInput);
-    if (!ok) {
-      setPinError(true);
-      setPinInput('');
-    } else {
-      setPinError(false);
-      setPinInput('');
-    }
+    attemptLogin(pinInput);
   };
 
   // Seating guest modal handlers
@@ -506,7 +513,7 @@ export const App: React.FC = () => {
                         const next = pinInput + num;
                         setPinInput(next);
                         if (next.length === 4) {
-                          setTimeout(() => login(next), 50);
+                          setTimeout(() => attemptLogin(next), 50);
                         }
                       }
                     }}
@@ -533,7 +540,7 @@ export const App: React.FC = () => {
                       const next = pinInput + '0';
                       setPinInput(next);
                       if (next.length === 4) {
-                        setTimeout(() => login(next), 50);
+                        setTimeout(() => attemptLogin(next), 50);
                       }
                     }
                   }}

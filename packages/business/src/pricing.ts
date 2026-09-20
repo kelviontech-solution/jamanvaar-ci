@@ -179,3 +179,31 @@ export function calculateCart(options: CalculateCartOptions): Cart {
     totalPayable: roundedTotal
   };
 }
+
+export interface PricedOrder {
+  subtotal: number;
+  cgstAmount: number;
+  sgstAmount: number;
+  taxAmount: number;
+  roundOffAmount: number;
+  totalAmount: number;
+}
+
+/**
+ * Prices a dine-in order from its lines (unit price already includes any extras) using the same
+ * rules as the POS cart, so a table order taken on Captain and the same dishes rung up at the counter
+ * come to the same bill — CGST + SGST, then round-off to a whole rupee.
+ */
+export function priceOrderLines(lines: { unitPrice: number; quantity: number }[]): PricedOrder {
+  const cart = calculateCart({
+    items: lines.map((l) => ({ item: { price: l.unitPrice }, quantity: l.quantity, selectedModifiers: [] }) as unknown as CartItem)
+  });
+  return {
+    subtotal: cart.subtotal,
+    cgstAmount: cart.cgstAmount,
+    sgstAmount: cart.sgstAmount,
+    taxAmount: cart.taxAmount,
+    roundOffAmount: cart.roundOffAmount,
+    totalAmount: cart.totalPayable
+  };
+}

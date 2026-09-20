@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore, PRESET_MESSAGES } from '../../store/captainStore';
 import { Send, X, MessageSquare, ChefHat, Server, UserCheck } from 'lucide-react';
 
@@ -13,14 +14,19 @@ export const CaptainQuickMessageModal: React.FC<CaptainQuickMessageModalProps> =
   onClose,
   defaultTableNumber = ''
 }) => {
-  if (!isOpen) return null;
-
+  useEscapeToClose(isOpen, onClose);
   const { sendMessage } = useCaptainStore();
 
   const [recipient, setRecipient] = useState<'KITCHEN' | 'POS' | 'MANAGER' | 'ALL'>('KITCHEN');
   const [preset, setPreset] = useState(PRESET_MESSAGES[0]);
   const [customNote, setCustomNote] = useState('');
   const [tableNumber, setTableNumber] = useState(defaultTableNumber);
+  // The dialog opens for a specific table each time; without this it kept the table typed last time.
+  useEffect(() => {
+    if (isOpen) setTableNumber(defaultTableNumber);
+  }, [isOpen, defaultTableNumber]);
+
+  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

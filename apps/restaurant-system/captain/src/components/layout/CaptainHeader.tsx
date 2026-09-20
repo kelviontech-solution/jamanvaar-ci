@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { BrandHeader } from '@jamanvaar/ui';
 import { lanMeshSync, type MeshPeerInfo } from '@jamanvaar/sync';
-import { useCaptainStore } from '../../store/captainStore';
+import { useCaptainStore, selectMyTables } from '../../store/captainStore';
+import { captainDb } from '@jamanvaar/database';
 import {
   MessageSquare,
   LogOut,
@@ -68,11 +69,11 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
           {/* Captain Name & Assigned Zone Lockup */}
           <div className="hidden sm:flex items-center gap-2 bg-jaman-cream border border-jaman-border px-3 py-1 rounded-full text-xs font-bold text-jaman-navy">
             <div className="w-5 h-5 rounded-full bg-jaman-saffron text-white flex items-center justify-center text-[10px] font-black">
-              {currentCaptain?.name?.charAt(0) || 'R'}
+              {currentCaptain?.name?.charAt(0) || '?'}
             </div>
-            <span className="font-extrabold">{currentCaptain?.name || 'Rahul Sharma'}</span>
+            <span className="font-extrabold">{currentCaptain?.name || 'Staff'}</span>
             <span className="text-slate-300">•</span>
-            <span className="text-slate-500 font-semibold">Main Dining Floor</span>
+            <span className="text-slate-500 font-semibold">{captainDb.restaurant?.name || 'Floor'}</span>
           </div>
         </div>
 
@@ -186,7 +187,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
               className="flex items-center gap-1.5 bg-jaman-cream hover:bg-[#F5F0E8] border border-jaman-border px-2 py-1 rounded-xl transition-colors shadow-2xs text-jaman-navy cursor-pointer"
             >
               <div className="w-6 h-6 rounded-lg bg-jaman-saffron text-white flex items-center justify-center font-black text-xs">
-                {currentCaptain?.name?.charAt(0) || 'R'}
+                {currentCaptain?.name?.charAt(0) || '?'}
               </div>
               <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>
@@ -197,8 +198,8 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                 onMouseLeave={() => setIsProfileOpen(false)}
               >
                 <div className="p-2.5 border-b border-jaman-border mb-1 bg-jaman-cream rounded-xl">
-                  <p className="font-extrabold text-sm text-jaman-navy">{currentCaptain?.name || 'Rahul Sharma'}</p>
-                  <p className="text-[11px] text-slate-500 font-medium">Floor Captain • Main Dining</p>
+                  <p className="font-extrabold text-sm text-jaman-navy">{currentCaptain?.name || 'Staff'}</p>
+                  <p className="text-[11px] text-slate-500 font-medium">Floor Captain • {captainDb.restaurant?.name || 'Floor'}</p>
                 </div>
 
                 <div className="p-2 space-y-1 text-slate-600 font-medium border-b border-slate-100 mb-1">
@@ -207,8 +208,8 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                     <span className="font-bold text-emerald-700">ACTIVE</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Assigned Tables:</span>
-                    <span className="font-bold text-jaman-navy">{(currentCaptain?.assignedTableNumbers || []).join(', ') || 'None'}</span>
+                    <span>My Tables:</span>
+                    <span className="font-bold text-jaman-navy">{selectMyTables(captainDb.tables, currentCaptain).map((t) => t.tableNumber).join(', ') || 'None'}</span>
                   </div>
                 </div>
 

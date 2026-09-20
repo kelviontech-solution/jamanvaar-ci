@@ -14,7 +14,7 @@ import type { PlanEntitlements, PlanTier } from '@jamanvaar/types';
  */
 
 import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData } from '@jamanvaar/sync';
-import { MenuRepository, PrinterRepository, InventoryRepository } from '@jamanvaar/database';
+import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -86,6 +86,7 @@ export function saveDeviceRegistration(deviceId: string, deviceToken: string, re
     localStorage.setItem(DEVICE_TOKEN_KEY, deviceToken);
     DeviceGate.reportSuccess(); // a fresh activation starts unlocked
     MenuRepository.startFreshMenu(); // BUG-013: a real restaurant starts with no menu until one is uploaded
+    RestaurantIdentityRepository.startFreshOperations(); // BUG-115: ...and no demo combos, coupons, offers or tables
     PrinterRepository.startFresh(); // BUG-025: ...and no printers until real ones are added
     InventoryRepository.startFresh(); // BUG-045: ...and no demo ingredients/stock
     localStorage.setItem(RESTAURANT_ID_KEY, restaurantId);

@@ -1,4 +1,5 @@
 import { Body, Controller, ForbiddenException, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { MenuSyncService } from './menu-sync.service';
 import { menuSyncSchema, MenuSyncDto } from './dto/menu-sync.dto';
@@ -6,6 +7,7 @@ import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
 import { CurrentDevice } from '../../common/decorators/current-device.decorator';
 
+@DeviceSyncThrottle()
 @Controller('api/v1/tenant/menu-sync')
 @UseGuards(DeviceAuthGuard)
 export class MenuSyncController {

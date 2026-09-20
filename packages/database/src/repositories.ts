@@ -62,11 +62,13 @@ import {
   WelcomeScreenSettings,
   SyncEvent,
   User,
-  WaitlistEntry
+  WaitlistEntry,
+  FoodReadyItem
 } from '@jamanvaar/types';
 import { getOrderTenders, splitsMatchTotal } from './tender';
 import { generateOrderNumber, generateTokenNumber, generateUUID } from '@jamanvaar/utils';
 import { db } from './db';
+import { TableSync } from './table_sync';
 import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS, SEED_ROLES } from './seed';
 import { hashPin, verifyPinHash, generateUniquePin } from './pin';
 
@@ -1039,13 +1041,29 @@ export class TableRepository {
     return db.tables.find((t) => t.id === id);
   }
 
+  /** True when another table already has this number (BUG-120: the same number could be created twice). */
+  public static isTableNumberTaken(tableNumber: string, exceptTableId?: string): boolean {
+    const wanted = tableNumber.trim();
+    return db.tables.some((t) => t.tableNumber === wanted && t.id !== exceptTableId);
+  }
+
+  /** The dining zones this restaurant's tables use, each once, in floor-plan order (BUG-116). */
+  public static getZones(): string[] {
+    const zones: string[] = [];
+    for (const t of db.tables) {
+      const zone = (t.zone || '').trim();
+      if (zone && !zones.includes(zone)) zones.push(zone);
+    }
+    return zones;
+  }
+
   public static createTable(tableData: Partial<DiningTable>): DiningTable {
     const newTable: DiningTable = {
       id: tableData.id || `tbl-${Date.now()}`,
       outletId: tableData.outletId || db.outlet.id,
       tableNumber: tableData.tableNumber || `${db.tables.length + 1}`,
       capacity: tableData.capacity || 4,
-      zone: tableData.zone || 'Main Dining Hall',
+      zone: tableData.zone || TableRepository.getZones()[0] || 'Main Hall',
       floor: tableData.floor || 1,
       status: tableData.status || 'AVAILABLE',
       isActive: tableData.isActive ?? true
@@ -1086,11 +1104,36 @@ export class TableRepository {
     return tbl;
   }
 
+  /**
+   * Frees every table whose running order has already been completed or cancelled — typically
+   * settled at the POS counter, so this device only learns of it through order sync. Without it a
+   * waiter's table stayed "bill requested" for ever after the guest had paid (BUG-097). A table
+   * whose order has not reached this device yet is left alone.
+   */
+  public static releaseSettledTables(): number {
+    let released = 0;
+    for (const table of db.tables) {
+      if (!table.currentOrderId) continue;
+      const order = db.orders.find((o) => o.id === table.currentOrderId);
+      if (!order || (order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCELLED')) continue;
+      table.status = 'AVAILABLE';
+      table.currentOrderId = undefined;
+      table.currentGuests = undefined;
+      table.openedById = undefined;
+      table.openedByName = undefined;
+      released += 1;
+    }
+    if (released > 0) db.notify();
+    return released;
+  }
+
   public static deleteTable(id: string): boolean {
     const idx = db.tables.findIndex((t) => t.id === id);
     if (idx === -1) return false;
     const num = db.tables[idx].tableNumber;
+    const deletedId = db.tables[idx].id;
     db.tables.splice(idx, 1);
+    TableSync.recordDeletion(deletedId);
     AuditRepository.log({
       action: 'TABLE_DELETED',
       category: 'SETTINGS',
@@ -1807,6 +1850,37 @@ export class ComboRepository {
  * printing it on tax invoices.
  */
 export class RestaurantIdentityRepository {
+  /**
+   * A real restaurant starts with none of the demo install's operations data (BUG-115): combos built
+   * from dishes it does not have, demo coupon codes that would give real discounts, and a twelve-table
+   * floor that is not its own. Called on first activation next to the menu/printer/inventory clears.
+   */
+  public static startFreshOperations(): void {
+    db.combos = [];
+    db.coupons = [];
+    db.offers = [];
+    db.tables = [];
+    db.floorPlanStartedEmpty = true;
+    AuditRepository.log({
+      action: 'DEMO_OPERATIONS_CLEARED_ON_ACTIVATION',
+      category: 'SETTINGS',
+      details: 'Demo combos, coupons, offers and tables cleared on first device activation.',
+      username: 'System'
+    });
+    db.notify();
+  }
+
+  /**
+   * For screens that only learn the restaurant's id and name (Restaurant Admin at sign-in): replaces
+   * the demo branch once for this restaurant, and never touches the legal details already saved, or
+   * a branch name the owner has since changed (BUG-110).
+   */
+  public static adoptBranch(restaurantId: string, name: string): void {
+    if (db.outlet.restaurantId === restaurantId) return;
+    db.outlet = { ...db.outlet, restaurantId, name, code: '', address: '', city: '', phone: '' };
+    db.notify();
+  }
+
   public static adopt(
     restaurantId: string,
     identity: { name?: string; gstin?: string | null; address?: string | null; phone?: string | null; fssaiNumber?: string | null }
@@ -1817,6 +1891,19 @@ export class RestaurantIdentityRepository {
     db.restaurant.address = identity.address || '';
     db.restaurant.phone = identity.phone || '';
     db.restaurant.fssaiNumber = identity.fssaiNumber || '';
+    // The branch is the restaurant's own too: it used to stay the demo "Ahmedabad Flagship Store"
+    // (with a demo code, address and phone) in every screen header (BUG-110). The id is kept so
+    // tables and orders that point at it stay linked.
+    db.outlet = {
+      ...db.outlet,
+      restaurantId,
+      name: db.restaurant.name,
+      code: '',
+      address: db.restaurant.address,
+      city: '',
+      phone: db.restaurant.phone
+    };
+    db.notify();
     // ReceiptRepository.getConfig falls back to receiptConfig, which is seeded with the demo
     // identity too — blank it, or a missing field would resurface the demo value.
     db.receiptConfig = {
@@ -1825,7 +1912,13 @@ export class RestaurantIdentityRepository {
       address: db.restaurant.address,
       phone: db.restaurant.phone,
       gstin: db.restaurant.gstin,
-      fssaiNumber: db.restaurant.fssaiNumber
+      fssaiNumber: db.restaurant.fssaiNumber,
+      // The demo install's footer thanked guests on behalf of the demo brand (BUG-125). A footer the
+      // restaurant wrote itself is kept.
+      thankYouMessage: /JAMANVAAR/i.test(db.receiptConfig.thankYouMessage ?? '')
+        ? `Thank you for dining at ${db.restaurant.name}! Please visit again.`
+        : db.receiptConfig.thankYouMessage,
+      footerMessage: /Heritage|JAMANVAAR/i.test(db.receiptConfig.footerMessage ?? '') ? '' : db.receiptConfig.footerMessage
     };
     db.notify();
   }
@@ -2076,6 +2169,8 @@ export class ShiftRepository {
   }
 }
 
+const KOT_STATUS_RANK: Record<KOTRecord['status'], number> = { PENDING: 0, ACCEPTED: 1, PREPARING: 1, READY: 2, SERVED: 3, CANCELLED: 4 };
+
 export class KOTRepository {
   public static getAllKOTs(): KOTRecord[] {
     return [...db.kots].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -2186,6 +2281,106 @@ export class KOTRepository {
 
     db.notify();
     return kot;
+  }
+
+  /**
+   * Kitchen tickets are kept per device, but the order they belong to is synced. When an order
+   * arrives with its dishes marked ready or served — or the whole order was completed or cancelled
+   * at another terminal — this brings this device's tickets in line (BUG-098/113). Tickets only ever
+   * move forward, so an older copy of an order cannot un-cook a dish. Returns how many changed.
+   */
+  public static reconcileWithOrders(): number {
+    let changed = 0;
+    const now = new Date().toISOString();
+    for (const kot of db.kots) {
+      if (kot.status === 'SERVED' || kot.status === 'CANCELLED') continue;
+      const order = db.orders.find((o) => o.id === kot.orderId);
+      if (!order) continue;
+
+      let next: KOTRecord['status'] | null = null;
+      if (order.orderStatus === 'CANCELLED') next = 'CANCELLED';
+      else if (order.orderStatus === 'COMPLETED' || order.orderStatus === 'REFUNDED') next = 'SERVED';
+      else {
+        const menuItemIds = new Set(kot.items.map((i) => i.menuItemId));
+        const lines = order.items.filter((oi) => menuItemIds.has(oi.menuItemId));
+        if (lines.length > 0) {
+          if (lines.every((l) => l.kitchenStatus === 'SERVED')) next = 'SERVED';
+          else if (lines.every((l) => l.kitchenStatus === 'READY' || l.kitchenStatus === 'SERVED')) next = 'READY';
+        }
+      }
+
+      if (!next || KOT_STATUS_RANK[next] <= KOT_STATUS_RANK[kot.status]) continue;
+      kot.status = next;
+      if (next === 'READY' && !kot.readyAt) kot.readyAt = now;
+      if (next === 'SERVED') {
+        if (!kot.readyAt) kot.readyAt = now;
+        if (!kot.servedAt) kot.servedAt = now;
+        kot.items.forEach((i) => { i.status = 'SERVED'; });
+      }
+      changed += 1;
+    }
+    if (changed > 0) db.notify();
+    return changed;
+  }
+
+  /** Dishes the kitchen has finished and nobody has taken to the table yet, one entry per dish. */
+  public static getFoodReadyItems(): FoodReadyItem[] {
+    const nowMs = Date.now();
+    const ready: FoodReadyItem[] = [];
+    for (const kot of db.kots) {
+      if (kot.status !== 'READY' || !kot.tableNumber) continue;
+      for (const item of kot.items) {
+        if (item.status === 'SERVED') continue;
+        const readyAt = kot.readyAt || kot.createdAt;
+        ready.push({
+          id: `${kot.id}:${item.id}`,
+          kotId: kot.id,
+          kotNumber: kot.kotNumber,
+          orderId: kot.orderId,
+          orderNumber: kot.orderNumber,
+          tableNumber: kot.tableNumber,
+          itemId: item.id,
+          dishName: item.name,
+          quantity: item.quantity,
+          modifiers: (item.modifiers || []).map((m) => m.optionName),
+          specialInstructions: item.specialInstructions,
+          station: kot.station,
+          readyAt,
+          elapsedSeconds: Math.max(0, Math.round((nowMs - new Date(readyAt).getTime()) / 1000)),
+          isServed: false
+        });
+      }
+    }
+    return ready;
+  }
+
+  /** The waiter took one dish to the table. When it was the last dish the whole ticket is served. */
+  public static markItemServed(kotId: string, kotItemId: string): boolean {
+    const kot = db.kots.find((k) => k.id === kotId);
+    const item = kot?.items.find((i) => i.id === kotItemId);
+    if (!kot || !item) return false;
+    item.status = 'SERVED';
+
+    const order = db.orders.find((o) => o.id === kot.orderId);
+    if (order) {
+      order.items.forEach((oi) => {
+        if (oi.menuItemId === item.menuItemId) oi.kitchenStatus = 'SERVED';
+      });
+      order.updatedAt = new Date().toISOString();
+      order.syncStatus = 'SAVED_LOCALLY';
+    }
+
+    if (kot.items.every((i) => i.status === 'SERVED')) KOTRepository.updateKOTStatus(kot.id, 'SERVED');
+    else db.notify();
+    return true;
+  }
+
+  public static markKotServed(kotId: string): boolean {
+    const kot = db.kots.find((k) => k.id === kotId);
+    if (!kot) return false;
+    kot.items.forEach((i) => { i.status = 'SERVED'; });
+    KOTRepository.updateKOTStatus(kot.id, 'SERVED');
+    return true;
   }
 }
 
@@ -2886,6 +3081,28 @@ export class StaffRepository {
     if (!user) return null;
     const isManager = user.roleId === 'role-manager' || user.roleId === 'role-super-admin';
     return { user, isManager };
+  }
+
+  /**
+   * Which terminals a role works on (BUG-118). Owners and managers work everywhere; the floor roles
+   * only where they do their job. A custom role the restaurant created is never locked out.
+   */
+  private static readonly TERMINAL_ROLES: Record<string, ReadonlyArray<'POS' | 'KDS' | 'CAPTAIN' | 'KIOSK'>> = {
+    'role-super-admin': ['POS', 'KDS', 'CAPTAIN', 'KIOSK'],
+    'role-manager': ['POS', 'KDS', 'CAPTAIN', 'KIOSK'],
+    'role-cashier': ['POS', 'KIOSK'],
+    'role-captain': ['CAPTAIN'],
+    'role-chef': ['KDS']
+  };
+
+  public static canUseTerminal(roleId: string | undefined, terminal: 'POS' | 'KDS' | 'CAPTAIN' | 'KIOSK'): boolean {
+    const allowed = roleId ? StaffRepository.TERMINAL_ROLES[roleId] : undefined;
+    return allowed ? allowed.includes(terminal) : true;
+  }
+
+  public static terminalDeniedMessage(roleId: string | undefined, terminal: 'POS' | 'KDS' | 'CAPTAIN' | 'KIOSK'): string {
+    const where = { POS: 'the POS counter', KDS: 'the kitchen screen', CAPTAIN: 'the Captain app', KIOSK: 'the kiosk' }[terminal];
+    return `This PIN belongs to a ${StaffRepository.getRoleName(roleId)} and can't open ${where}.`;
   }
 
   /** A role's display name for a raw id like `role-cashier` (BUG-010/011: chips showed the raw id). */

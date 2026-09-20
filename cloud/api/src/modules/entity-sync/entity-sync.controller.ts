@@ -1,4 +1,5 @@
 import { BadRequestException, Body, Controller, Get, Param, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
+import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { EntitySyncService } from './entity-sync.service';
 import { pushEntitySyncSchema, PushEntitySyncDto, SYNCABLE_ENTITY_TYPES, SyncableEntityType } from './dto/push-entity-sync.dto';
@@ -12,6 +13,7 @@ function assertSyncableEntityType(entityType: string): asserts entityType is Syn
   }
 }
 
+@DeviceSyncThrottle()
 @Controller('api/v1/entity-sync/:entityType')
 @UseGuards(DeviceAuthGuard)
 export class EntitySyncController {

@@ -30,7 +30,12 @@ const FORBIDDEN = [
   "'JAMANVAAR RESTAURANT'",
   'The Royal Dining',
   "|| 'JAMANVAAR by KELVIONTECH'",
-  'JAMANVAAR FOODS & HOSPITALITY'
+  'JAMANVAAR FOODS & HOSPITALITY',
+  // BUG-103: a made-up cashier and waiter were printed on real receipts and shown in reports.
+  'Amit Dave',
+  'Rahul Sharma',
+  "|| 'Rahul'",
+  "|| 'Cloud Sync'"
 ];
 
 const SOURCE_DIRS = ['../apps', '../packages', '../cloud/super-admin-web/src'];

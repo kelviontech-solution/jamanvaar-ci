@@ -3,6 +3,7 @@ import { BusinessDay } from '@jamanvaar/types';
 import { BusinessDayAccountingService, BusinessDaySummary } from '@jamanvaar/database';
 import { BusinessDayService } from '@jamanvaar/business';
 import { lanMeshSync } from '@jamanvaar/sync';
+import { usePosStore } from '../../store/posStore';
 import { formatINR } from '@jamanvaar/utils';
 import {
   X,
@@ -52,6 +53,9 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
   const summary: BusinessDaySummary = BusinessDayAccountingService.getBusinessDaySummary(businessDay.id);
 
   const expectedCash = summary.cash_expected;
+  // The signed-in cashier closes the day — never a made-up name (BUG-103).
+  const currentUser = usePosStore((s) => s.currentUser);
+  const closedByName = currentUser?.fullName || 'Cashier';
   const actualCash = actualCashInput !== '' ? Number(actualCashInput) : expectedCash;
   const variance = actualCash - expectedCash;
 
@@ -64,7 +68,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
         const res = BusinessDayService.closeBusinessDay({
           businessDayId: summary.business_day_id,
           actualCash,
-          closedBy: 'Amit Dave (Lead Cashier)',
+          closedBy: closedByName,
           varianceReason: variance !== 0 ? varianceReason : 'Drawer Balanced',
           forceCloseWithExceptions: true
         });
@@ -75,7 +79,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
           closedDate: res.closedDay.businessDate,
           newDayId: res.newDay.id,
           newDate: res.newDay.businessDate,
-          closedBy: 'Amit Dave (Lead Cashier)'
+          closedBy: closedByName
         });
 
         setClosedResult({ closedDay: res.closedDay, newDay: res.newDay });
@@ -466,7 +470,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 <div className="p-3 bg-slate-50 rounded-xl space-y-1 font-mono text-[11px]">
                   <div className="flex justify-between">
                     <span>Authorized Cashier:</span>
-                    <strong className="text-jaman-navy">Amit Dave (Lead Cashier)</strong>
+                    <strong className="text-jaman-navy">{closedByName}</strong>
                   </div>
                   <div className="flex justify-between">
                     <span>Closing Total Billed (incl. GST):</span>

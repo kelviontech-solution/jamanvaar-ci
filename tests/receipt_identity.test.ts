@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { db, OrderRepository, ReceiptRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 import { PosPrinterService } from '../apps/restaurant-system/pos/src/services/printerService';
 
@@ -77,5 +79,24 @@ describe('Receipts print only the restaurant\'s real details (BUG-028)', () => {
     RestaurantIdentityRepository.adopt('rest-real-1', { name: 'royal pan' });
     const text = PosPrinterService.generateReceiptText(orderWith(), '80mm');
     expect(text).toContain('CASHIER: Real Cashier');
+  });
+});
+
+/**
+ * BUG-123/124/125: the on-screen receipt printed CGST/SGST as "₹21.5" (and "₹0" when the order had no
+ * split), the counter's own receipt said "POS: CLOUD-SYNC" for a table order that came from Captain, and
+ * the demo footer "Thank you for dining at JAMANVAAR!" appeared on every restaurant's receipts.
+ */
+describe('Receipt wording and numbers (BUG-123/124/125)', () => {
+  const source = readFileSync(join(__dirname, '../packages/ui/src/ThermalReceiptView.tsx'), 'utf8');
+
+  it('tax lines always show two decimals and fall back to a proper CGST/SGST split of the tax', () => {
+    expect(source).not.toMatch(/₹\{order\.cgstAmount \?\? 0\}/);
+    expect(source).not.toMatch(/₹\{order\.sgstAmount \?\? 0\}/);
+    expect(source).toMatch(/cgstAmount \?\? splitTax\(order\.taxAmount \|\| 0\)\.cgst\)\.toFixed\(2\)/);
+  });
+
+  it('the terminal line is left out when the order arrived from the cloud rather than being rung up here', () => {
+    expect(source).toMatch(/kioskId !== 'CLOUD-SYNC'/);
   });
 });

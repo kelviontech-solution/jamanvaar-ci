@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { useCaptainStore } from '../../store/captainStore';
+import { useCaptainStore, selectMyTables } from '../../store/captainStore';
+import { captainDb } from '@jamanvaar/database';
 import { CaptainTableCard } from './CaptainTableCard';
 import { DiningTable } from '@jamanvaar/types';
 import { EmptyState } from '@jamanvaar/ui';
@@ -40,10 +41,11 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
   const activeFoodReady = foodReadyItems.filter((fr) => !fr.isServed);
 
   // Dynamic Table Summary Counts
-  const myAssignedTablesCount = useMemo(() => {
-    const assigned = currentCaptain?.assignedTableNumbers || ['1', '2', '3', '4', '5', '6', '12', '14'];
-    return tables.filter((t) => assigned.includes(t.tableNumber)).length;
-  }, [tables, currentCaptain]);
+  const myTableIds = useMemo(() => new Set(selectMyTables(tables, currentCaptain).map((t) => t.id)), [tables, currentCaptain]);
+  const myAssignedTablesCount = myTableIds.size;
+
+  // Zone buttons come from the zones the restaurant's tables actually use (BUG-108).
+  const zones = useMemo(() => ['ALL', ...Array.from(new Set(tables.map((t) => t.zone).filter(Boolean)))], [tables]);
 
   const occupiedCount = useMemo(() => {
     return tables.filter((t) => t.status === 'OCCUPIED' || t.status === 'BILLING' || !!t.currentOrderId).length;
@@ -70,8 +72,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
 
       // 2. Status filter
       if (tableFilter === 'MY_TABLES') {
-        const assigned = currentCaptain?.assignedTableNumbers || ['1', '2', '3', '4', '5', '6', '12', '14'];
-        if (!assigned.includes(t.tableNumber)) return false;
+        if (!myTableIds.has(t.id)) return false;
       } else if (tableFilter === 'OCCUPIED') {
         if (t.status !== 'OCCUPIED' && t.status !== 'BILLING' && !t.currentOrderId) return false;
       } else if (tableFilter === 'FOOD_READY') {
@@ -91,7 +92,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
 
       return true;
     });
-  }, [tables, selectedZone, tableFilter, localSearch, currentCaptain, activeFoodReady]);
+  }, [tables, selectedZone, tableFilter, localSearch, myTableIds, activeFoodReady]);
 
   return (
     <div className="space-y-4 sm:space-y-5">
@@ -107,7 +108,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
           }`}
         >
           <span className={`text-[10px] font-black uppercase tracking-wider block ${tableFilter === 'MY_TABLES' ? 'text-slate-300' : 'text-slate-400'}`}>
-            My Assigned
+            My Tables
           </span>
           <div className="flex items-baseline justify-between mt-0.5">
             <span className="text-xl sm:text-2xl font-black font-mono">{myAssignedTablesCount}</span>
@@ -198,7 +199,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
               Zone:
             </span>
-            {['ALL', 'Main Dining Hall', 'AC Balcony', 'Family Zone'].map((zone) => (
+            {zones.map((zone) => (
               <button
                 key={zone}
                 type="button"
@@ -243,7 +244,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
           </span>
           {[
             { id: 'ALL_TABLES', label: 'All Floor Tables' },
-            { id: 'MY_TABLES', label: 'My Assigned Tables' },
+            { id: 'MY_TABLES', label: 'My Tables' },
             { id: 'OCCUPIED', label: 'Seated & Dining' },
             { id: 'FOOD_READY', label: 'Food Ready' },
             { id: 'BILL_REQUESTED', label: 'Bill Requested' }
@@ -284,7 +285,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3.5 sm:gap-4 pb-16 md:pb-6">
           {filteredTables.map((table) => {
             const activeOrder = table.currentOrderId
-              ? (useCaptainStore.getState() as any).orders?.find?.((o: any) => o.id === table.currentOrderId) || null
+              ? captainDb.orders.find((o) => o.id === table.currentOrderId) || null
               : null;
 
             const readyCount = activeFoodReady.filter((fr) => fr.tableNumber === table.tableNumber).length;
@@ -295,7 +296,7 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
                 table={table}
                 activeOrder={activeOrder}
                 foodReadyCount={readyCount}
-                captainName={currentCaptain?.name || 'Rahul Sharma'}
+                captainName={table.openedByName || activeOrder?.captainName || ''}
                 onOpenTableModal={onOpenGuestModal}
                 onOpenWorkspace={onOpenWorkspace}
                 onDeliverFood={onDeliverFood}
@@ -308,16 +309,18 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
         /* ── Actionable Empty State (No Blank Voids!) ── */
         <EmptyState
           icon={<UtensilsCrossed className="w-8 h-8" />}
-          title="No tables match your current filter"
+          title={tables.length === 0 ? 'No tables set up yet' : 'No tables match your current filter'}
           description={
-            tableFilter === 'BILL_REQUESTED'
+            tables.length === 0
+              ? 'Add the restaurant’s tables in Restaurant Admin → Floor / Tables. They appear here within a few seconds.'
+              : tableFilter === 'BILL_REQUESTED'
               ? 'No tables currently have pending bill requests on this floor.'
               : tableFilter === 'FOOD_READY'
               ? 'No tables currently have ready dishes waiting in the kitchen.'
               : 'Try adjusting your zone or search criteria to view more floor tables.'
           }
-          actionText={`Show All ${tables.length} Floor Tables`}
-          onAction={() => {
+          actionText={tables.length === 0 ? undefined : `Show All ${tables.length} Floor Tables`}
+          onAction={tables.length === 0 ? undefined : () => {
             setTableFilter('ALL_TABLES');
             setSelectedZone('ALL');
             setLocalSearch('');

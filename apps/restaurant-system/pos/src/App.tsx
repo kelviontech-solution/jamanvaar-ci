@@ -3,7 +3,7 @@ import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, 
 import { usePosStore } from './store/posStore';
 import { db, CustomerRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
 import type { MenuItem, Category } from '@jamanvaar/types';
-import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages } from '@jamanvaar/sync';
 import { sound } from '@jamanvaar/ui';
 import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
@@ -207,13 +207,17 @@ export const App: React.FC = () => {
     void syncMenu();
     void syncCategories();
     void syncStaff();
+    void syncDiningTables();
     void reportHeartbeat();
 
-    // Orders and kitchen tickets are time-critical: every few seconds. The
+    // Orders, kitchen tickets and table states are time-critical: every few seconds. The
     // heavier snapshots (CRM, menu) and the heartbeat keep the slower cadence.
     const orderInterval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
       void SyncOutboxEngine.catchUpFromCloud();
+      void syncDiningTables();
+      // BUG-099/100: bill requests and messages from Captain arrive as notifications.
+      void syncServiceMessages('POS');
     }, 4000);
     const interval = setInterval(() => {
       void syncCrm();

@@ -155,12 +155,9 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
       <div className="flex items-center gap-2 overflow-x-auto pb-1 bg-white p-2 rounded-2xl border border-jaman-border shadow-2xs">
         {[
           { id: 'ALL', label: 'All Floor Sections' },
-          { id: 'Main Dining Hall', label: '🍽️ Main Dining Hall' },
-          { id: 'AC Family Section', label: '❄️ AC Family Section' },
-          { id: 'Garden Terrace', label: '🌿 Garden Terrace' },
-          { id: 'Banquet / Private', label: '👑 Banquet / VIP' }
+          ...TableRepository.getZones().map((zone) => ({ id: zone, label: zone }))
         ].map((z) => {
-          const count = z.id === 'ALL' ? tables.length : tables.filter((t) => (t.zone || 'Main Dining Hall') === z.id).length;
+          const count = z.id === 'ALL' ? tables.length : tables.filter((t) => t.zone === z.id).length;
           return (
             <button
               key={z.id}

@@ -108,7 +108,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xl font-black text-jaman-navy">
-                          KOT #{kot.kotNumber?.slice(-3) || '—'}
+                          {kot.kotNumber || 'KOT'}
                         </span>
                         <span className="bg-jaman-navy text-white text-[10px] font-black px-2 py-0.5 rounded-md">
                           TABLE {kot.tableNumber}

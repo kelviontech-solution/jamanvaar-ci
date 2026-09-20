@@ -302,8 +302,8 @@ CASH VARIANCE: Rs. ${closedDay.cashVariance}
       activeShift = {
         id: `shift-${Date.now()}`,
         posId: 'POS-01',
-        cashierId: 'usr-cashier-1',
-        cashierName: 'Amit Dave (Lead Cashier)',
+        cashierId: 'system',
+        cashierName: 'Auto-opened shift',
         openedAt: now.toISOString(),
         status: 'OPEN',
         openingCash: 2000,

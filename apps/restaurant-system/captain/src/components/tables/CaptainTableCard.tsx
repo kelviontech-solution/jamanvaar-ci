@@ -29,7 +29,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
   table,
   activeOrder,
   foodReadyCount,
-  captainName = 'Rahul Sharma',
+  captainName = '',
   onOpenTableModal,
   onOpenWorkspace,
   onDeliverFood,
@@ -120,8 +120,8 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
           <div className="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-medium text-slate-500">
             <div className="flex items-center gap-1 font-mono font-bold text-jaman-navy">
               <span>#{activeOrder.orderNumber?.slice(-4) || '—'}</span>
-              <span className="text-slate-300">•</span>
-              <span className="text-slate-600 font-sans">{captainName}</span>
+              {captainName && <span className="text-slate-300">•</span>}
+              {captainName && <span className="text-slate-600 font-sans">{captainName}</span>}
             </div>
             <div className="flex items-center gap-1 font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">
               <Clock className="w-3 h-3 text-amber-600" />
@@ -131,7 +131,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
         ) : (
           <div className="pt-1.5 border-t border-slate-100 text-[11px] text-emerald-700 font-bold flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Table ready for seating</span>
+            <span>{isAvailable ? 'Table ready for seating' : 'Order details syncing…'}</span>
           </div>
         )}
 
@@ -178,18 +178,18 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
             <button
               type="button"
               onClick={() => onOpenWorkspace(table)}
-              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-black text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-1.5 truncate"
+              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-black text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex flex-col xl:flex-row items-center justify-center gap-1 text-center leading-tight"
             >
               <UtensilsCrossed className="w-3.5 h-3.5 text-jaman-saffron" />
-              <span className="truncate">{activeOrder ? 'VIEW ORDER' : 'TAKE ORDER'}</span>
+              <span>{activeOrder ? 'VIEW ORDER' : 'TAKE ORDER'}</span>
             </button>
             <button
               type="button"
               onClick={() => onRequestBill(table.tableNumber)}
-              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 hover:border-purple-400 font-black text-xs shadow-2xs transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-1 truncate"
+              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 hover:border-purple-400 font-black text-xs shadow-2xs transition-all active:scale-98 cursor-pointer flex flex-col xl:flex-row items-center justify-center gap-1 text-center leading-tight"
             >
               <Receipt className="w-3.5 h-3.5" />
-              <span className="truncate">REQUEST BILL</span>
+              <span>REQUEST BILL</span>
             </button>
           </div>
         )}

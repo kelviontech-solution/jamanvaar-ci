@@ -170,7 +170,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
 
     // Cashier filter
     if (drillCashierFilter !== 'ALL') {
-      list = list.filter((o) => (o.cashierName || 'Amit Dave') === drillCashierFilter);
+      list = list.filter((o) => (o.cashierName || '—') === drillCashierFilter);
     }
 
     // Sorting
@@ -826,7 +826,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                           {ord.paymentMethod}
                         </span>
                       </td>
-                      <td className="p-3.5 text-slate-600 font-semibold">{ord.cashierName || 'Amit Dave'}</td>
+                      <td className="p-3.5 text-slate-600 font-semibold">{ord.cashierName || ord.captainName || '—'}</td>
                       <td className="p-3.5">
                         <span
                           className={`px-2 py-0.5 rounded font-black text-[9px] uppercase ${

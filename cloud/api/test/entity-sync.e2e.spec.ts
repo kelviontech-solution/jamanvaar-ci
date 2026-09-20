@@ -161,4 +161,66 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: otherRestaurantId } }));
     await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: otherPlan.body.id } }));
   });
+
+  /**
+   * BUG-096/097 (found in the live Captain test): the table layout made in Restaurant Admin never
+   * reached Captain or POS, and a table seated on Captain looked vacant on POS. DINING_TABLE syncs
+   * the floor plan and each table's state. Unlike the other entity types, two devices routinely edit
+   * the same record (Captain seats it, POS settles it), so the newer change must win — a device
+   * pushing a stale copy must not undo a later change.
+   */
+  describe('DINING_TABLE', () => {
+    let captainToken: string;
+    const table = (over: Record<string, unknown>) => ({
+      externalId: 'tbl-t1',
+      payload: { id: 'tbl-t1', tableNumber: '1', capacity: 4, zone: 'Main Hall', floor: 1, isActive: true, status: 'AVAILABLE', updatedAt: '2026-09-20T10:00:00.000Z', ...over }
+    });
+
+    beforeAll(async () => {
+      const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'CAPTAIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+      const redeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: 'CAPTAIN' });
+      captainToken = redeem.body.deviceToken as string;
+    });
+
+    it('a table pushed by one device is pulled by another device of the same restaurant', async () => {
+      const push = await authed('post', '/api/v1/entity-sync/DINING_TABLE', posToken).send({ events: [table({ status: 'OCCUPIED', currentOrderId: 'ord-1', updatedAt: '2026-09-20T10:05:00.000Z' })] });
+      expect(push.status).toBe(201);
+
+      const pull = await authed('get', '/api/v1/entity-sync/DINING_TABLE', captainToken);
+      expect(pull.body.entities).toHaveLength(1);
+      expect(pull.body.entities[0].payload).toMatchObject({ tableNumber: '1', status: 'OCCUPIED', currentOrderId: 'ord-1' });
+    });
+
+    it('an older copy pushed later does not undo a newer change; a newer one does replace it', async () => {
+      await authed('post', '/api/v1/entity-sync/DINING_TABLE', posToken).send({ events: [table({ status: 'BILL_REQUESTED', updatedAt: '2026-09-20T10:30:00.000Z' })] });
+
+      // A device that was offline pushes what it last knew, which is older.
+      const stale = await authed('post', '/api/v1/entity-sync/DINING_TABLE', captainToken).send({ events: [table({ status: 'OCCUPIED', updatedAt: '2026-09-20T10:10:00.000Z' })] });
+      expect(stale.status).toBe(201);
+      expect(stale.body.results[0].status).toBe('ok');
+
+      let pull = await authed('get', '/api/v1/entity-sync/DINING_TABLE', posToken);
+      expect(pull.body.entities[0].payload).toMatchObject({ status: 'BILL_REQUESTED', updatedAt: '2026-09-20T10:30:00.000Z' });
+
+      await authed('post', '/api/v1/entity-sync/DINING_TABLE', captainToken).send({ events: [table({ status: 'AVAILABLE', updatedAt: '2026-09-20T11:00:00.000Z' })] });
+      pull = await authed('get', '/api/v1/entity-sync/DINING_TABLE', posToken);
+      expect(pull.body.entities[0].payload).toMatchObject({ status: 'AVAILABLE' });
+    });
+
+    it('a staff message or bill request pushed by Captain is pulled by other devices (BUG-099/100)', async () => {
+      const msg = { id: 'svc-1', kind: 'BILL_REQUEST', recipient: 'POS', senderName: 'Ravi Waiter', presetText: 'Bill requested', tableNumber: '4', createdAt: new Date().toISOString() };
+      const push = await authed('post', '/api/v1/entity-sync/SERVICE_MESSAGE', captainToken).send({ events: [{ externalId: 'svc-1', payload: msg }] });
+      expect(push.status).toBe(201);
+
+      const pull = await authed('get', '/api/v1/entity-sync/SERVICE_MESSAGE', posToken);
+      expect(pull.body.entities).toHaveLength(1);
+      expect(pull.body.entities[0].payload).toMatchObject({ kind: 'BILL_REQUEST', tableNumber: '4' });
+    });
+
+    it('a deleted table is stored as a tombstone that other devices can pull', async () => {
+      await authed('post', '/api/v1/entity-sync/DINING_TABLE', posToken).send({ events: [{ externalId: 'tbl-t1', payload: { id: 'tbl-t1', deleted: true, updatedAt: '2026-09-20T12:00:00.000Z' } }] });
+      const pull = await authed('get', '/api/v1/entity-sync/DINING_TABLE', captainToken);
+      expect(pull.body.entities[0].payload).toMatchObject({ deleted: true });
+    });
+  });
 });

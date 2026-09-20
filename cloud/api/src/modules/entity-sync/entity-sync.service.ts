@@ -6,6 +6,15 @@ import { EntitySyncEventDto, SyncableEntityType } from './dto/push-entity-sync.d
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000;
 const CATCH_UP_MAX_ROWS = 500;
 
+/** Entity types edited from several devices at once: a push older than what is stored is ignored. */
+const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['DINING_TABLE']);
+
+function changedAt(payload: unknown): number {
+  const value = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).updatedAt : undefined;
+  const ms = typeof value === 'string' ? Date.parse(value) : NaN;
+  return Number.isNaN(ms) ? 0 : ms;
+}
+
 export interface EntitySyncPushResult {
   externalId: string;
   status: 'ok' | 'error';
@@ -52,6 +61,11 @@ export class EntitySyncService {
               }
             }
           });
+
+          if (existing && LAST_CHANGE_WINS_TYPES.has(entityType) && changedAt(evt.payload) < changedAt(existing.payload)) {
+            results.push({ externalId: evt.externalId, status: 'ok', syncVersion: existing.syncVersion });
+            continue;
+          }
 
           const saved = existing
             ? await tx.syncedEntity.update({

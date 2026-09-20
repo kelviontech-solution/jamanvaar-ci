@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device, DeviceCommandType, PlatformUser } from '@prisma/client';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
 import { CurrentDevice } from '../../common/decorators/current-device.decorator';
@@ -6,6 +7,7 @@ import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
 import { DeviceCommandsService, IssueCommandDto } from './device-commands.service';
 
+@DeviceSyncThrottle()
 @Controller('api/v1/devices')
 export class DeviceCommandsController {
   constructor(private readonly deviceCommandsService: DeviceCommandsService) {}

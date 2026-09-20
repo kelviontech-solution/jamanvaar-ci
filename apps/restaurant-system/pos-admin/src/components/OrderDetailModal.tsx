@@ -138,8 +138,8 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-xl space-y-1">
             <span className="text-slate-400 font-bold block text-[10px] uppercase">SERVICE STAFF</span>
             <div className="text-slate-700 font-bold flex items-center justify-between">
-              <span>Cashier: <strong>{order.cashierName || 'Amit Dave'}</strong></span>
-              <span>Captain: <strong>{order.captainName || (order.tableNumber ? 'Rahul Sharma' : '—')}</strong></span>
+              <span>Cashier: <strong>{order.cashierName || '—'}</strong></span>
+              <span>Captain: <strong>{order.captainName || '—'}</strong></span>
             </div>
             <span className="text-[10px] text-slate-400 block font-mono">
               Terminal: {order.kioskId || 'POS-01'}

@@ -71,6 +71,7 @@ export async function activateKdsDevice(code: string): Promise<void> {
     localStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken);
     DeviceGate.reportSuccess(); // a fresh activation starts unlocked
     MenuRepository.startFreshMenu(); // BUG-013: a real restaurant starts with no menu until one is uploaded
+    RestaurantIdentityRepository.startFreshOperations(); // BUG-115: ...and no demo combos, coupons, offers or tables
   } catch {
     // Storage unavailable — activation succeeded server-side, this terminal just won't remember it across reloads.
   }

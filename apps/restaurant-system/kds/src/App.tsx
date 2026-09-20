@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
-import { EntitySyncEngine, lanMeshSync, SyncOutboxEngine } from '@jamanvaar/sync';
+import { EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus } from '@jamanvaar/types';
 import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
 import {
@@ -84,6 +84,8 @@ export const App: React.FC = () => {
     const orderInterval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
       void SyncOutboxEngine.catchUpFromCloud();
+      // BUG-100: messages from the floor to the kitchen arrive as notifications.
+      void syncServiceMessages('KDS');
     }, 3000);
     const interval = setInterval(() => {
       void syncStaff();
@@ -235,7 +237,9 @@ export const App: React.FC = () => {
       const next = kdsPin + digit;
       setKdsPin(next);
       if (next.length === 4) {
-        const matchedUser = StaffRepository.verifyPin(next)?.user;
+        const candidate = StaffRepository.verifyPin(next)?.user;
+        // A PIN for a role that does not work the kitchen screen is refused (BUG-118).
+        const matchedUser = candidate && StaffRepository.canUseTerminal(candidate.roleId, 'KDS') ? candidate : undefined;
 
         if (matchedUser) {
           setKdsPinError(false);
@@ -767,7 +771,7 @@ export const App: React.FC = () => {
                   {/* Card Footer & Large Touch Action Button (48px height) */}
                   <div className="p-4 sm:p-5 bg-jaman-cream border-t border-jaman-border space-y-3">
                     <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
-                      <span>Captain: <strong className="text-jaman-navy">{kot.cashierName || 'Rahul'}</strong></span>
+                      <span>{kot.cashierName ? <>Captain: <strong className="text-jaman-navy">{kot.cashierName}</strong></> : null}</span>
                       <span className="font-mono text-slate-400">#{kot.id.slice(-5)}</span>
                     </div>
 

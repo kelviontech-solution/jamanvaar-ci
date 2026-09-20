@@ -1,7 +1,10 @@
 import React, { useState, useMemo } from 'react';
+import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore, CartItemEntry } from '../../store/captainStore';
 import { DiningTable, MenuItem, SelectedModifier } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
+import { priceOrderLines } from '@jamanvaar/business';
+import { captainDb } from '@jamanvaar/database';
 import { EmptyState } from '@jamanvaar/ui';
 import { CaptainModifierModal } from '../modals/CaptainModifierModal';
 import {
@@ -39,8 +42,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   onOpenTransferMerge,
   onOpenSendMessage
 }) => {
-  if (!isOpen || !table) return null;
-
+  useEscapeToClose(isOpen, onClose);
   const {
     currentCaptain,
     categories,
@@ -86,9 +88,21 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   const unFiredCartItems = cartItems.filter((ci) => !ci.isFired);
   const firedCartItems = cartItems.filter((ci) => ci.isFired);
 
-  const subtotal = cartItems.reduce((acc, ci) => acc + ci.totalPrice, 0);
-  const gst = Math.round(subtotal * 0.05 * 100) / 100;
-  const total = subtotal + gst;
+  // The same pricing rules as the order itself and POS (CGST + SGST, round-off).
+  const priced = priceOrderLines(cartItems.map((ci) => ({ unitPrice: ci.unitPrice, quantity: ci.quantity })));
+  const subtotal = priced.subtotal;
+  const gst = priced.taxAmount;
+  const roundOff = priced.roundOffAmount;
+  const total = priced.totalAmount;
+
+  // What the kitchen is doing with each dish right now, read from the running order.
+  const liveOrder = table?.currentOrderId ? captainDb.orders.find((o) => o.id === table.currentOrderId) : undefined;
+  const kitchenStateOf = (menuItemId: string): 'READY' | 'SERVED' | 'COOKING' => {
+    const lines = liveOrder?.items.filter((oi) => oi.menuItemId === menuItemId) ?? [];
+    if (lines.length > 0 && lines.every((l) => l.kitchenStatus === 'SERVED')) return 'SERVED';
+    if (lines.length > 0 && lines.every((l) => l.kitchenStatus === 'READY' || l.kitchenStatus === 'SERVED')) return 'READY';
+    return 'COOKING';
+  };
 
   // Handle Send KOT action
   const handleFireKot = () => {
@@ -99,6 +113,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
       setActiveWorkspaceTab('ORDER');
     }
   };
+
+  if (!isOpen || !table) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4">
@@ -258,9 +274,16 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                 {item.menuItem.name}
                               </span>
                               {item.isFired ? (
-                                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded">
-                                  🔥 In Kitchen
-                                </span>
+                                (() => {
+                                  const state = kitchenStateOf(item.menuItem.id);
+                                  return state === 'SERVED' ? (
+                                    <span className="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded">✓ Served</span>
+                                  ) : state === 'READY' ? (
+                                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-1.5 py-0.2 rounded">🔔 Ready to serve</span>
+                                  ) : (
+                                    <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded">🔥 In Kitchen</span>
+                                  );
+                                })()
                               ) : (
                                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded animate-pulse">
                                   ⚡ Pending Fire
@@ -347,6 +370,12 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                       <span>GST (CGST 2.5% + SGST 2.5%)</span>
                       <span className="font-mono text-jaman-navy">{formatINR(gst)}</span>
                     </div>
+                    {roundOff !== 0 && (
+                      <div className="flex justify-between">
+                        <span>Round Off</span>
+                        <span className="font-mono text-jaman-navy">{roundOff > 0 ? '+' : ''}{formatINR(roundOff)}</span>
+                      </div>
+                    )}
                     <div className="pt-2 border-t border-slate-100 flex justify-between text-sm font-black text-jaman-navy">
                       <span>Total Payable</span>
                       <span className="font-mono text-base text-jaman-navy">{formatINR(total)}</span>

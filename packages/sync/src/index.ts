@@ -8,3 +8,4 @@ export * from './app_update';
 export * from './offline_extension';
 export * from './heartbeat';
 export * from './display_scale';
+export * from './floor_sync';

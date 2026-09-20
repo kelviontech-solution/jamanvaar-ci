@@ -125,7 +125,7 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
                               {it.dishName}
                             </span>
                             <span className="text-[10px] font-bold text-slate-400">
-                              {it.station || 'Kitchen'} • KOT #{it.kotNumber?.slice(-3) || '—'}
+                              {it.station || 'Kitchen'} • {it.kotNumber || 'KOT'}
                             </span>
                           </div>
                         </div>

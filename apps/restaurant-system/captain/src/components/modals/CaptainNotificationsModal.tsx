@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore } from '../../store/captainStore';
 import {
   X,
@@ -23,13 +24,13 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
   onClose,
   onSelectTable
 }) => {
-  if (!isOpen) return null;
-
+  useEscapeToClose(isOpen, onClose);
   const {
     notifications,
     markNotificationRead,
     clearAllNotifications
   } = useCaptainStore();
+  if (!isOpen) return null;
 
   const handleNotificationClick = (notif: any) => {
     markNotificationRead(notif.id);

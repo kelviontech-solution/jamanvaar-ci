@@ -172,8 +172,8 @@ export const PosShiftAndCashView: React.FC = () => {
   const handleOpenShiftSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const openingVal = Number(openingFloatInput) || 0;
-    const cashierName = currentUser?.fullName || 'Amit Dave (Cashier)';
-    const cashierId = currentUser?.id || 'usr-cashier-01';
+    const cashierName = currentUser?.fullName || 'Cashier';
+    const cashierId = currentUser?.id || 'cashier';
 
     ShiftRepository.openShift(cashierId, cashierName, openingVal, posTerminalId, openingNotesInput.trim());
     setOpenShiftModalOpen(false);
@@ -793,7 +793,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               <div className="p-3 bg-white rounded-2xl border border-jaman-border text-xs space-y-1 text-slate-600">
                 <div className="flex justify-between">
                   <span>Assigned Cashier:</span>
-                  <strong className="text-jaman-navy">{currentUser?.fullName || 'Amit Dave (Lead Cashier)'}</strong>
+                  <strong className="text-jaman-navy">{currentUser?.fullName || '—'}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Opening Date & Time:</span>

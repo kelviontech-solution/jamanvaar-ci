@@ -444,6 +444,10 @@ export const usePosStore = create<PosState>((set, get) => {
       const result = StaffRepository.verifyPin(pin);
       const user = result?.user;
 
+      if (user && !StaffRepository.canUseTerminal(user.roleId, 'POS')) {
+        return { success: false, error: StaffRepository.terminalDeniedMessage(user.roleId, 'POS') };
+      }
+
       if (user) {
         // Persist session to localStorage (no PIN stored)
         SessionPersistence.save('pos', {
