@@ -1,0 +1,284 @@
+- generic [ref=f12e6]:
+  - complementary [ref=f12e7]:
+    - generic [ref=f12e8]:
+      - link [ref=f12e9] [cursor=pointer]:
+        - /url: /
+        - img "JAMANVAAR" [ref=f12e10]
+      - generic [ref=f12e11]:
+        - generic [ref=f12e12]: PLATFORM CONTROL
+        - generic [ref=f12e13]: SUPER ADMIN
+    - navigation [ref=f12e14]:
+      - generic [ref=f12e15]:
+        - button "Platform Control Center" [expanded] [ref=f12e16] [cursor=pointer]
+        - link "Executive Dashboard" [ref=f12e21] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f12e29]:
+        - button "Business Management" [expanded] [ref=f12e30] [cursor=pointer]
+        - generic [ref=f12e34]:
+          - link "Restaurants" [ref=f12e35] [cursor=pointer]:
+            - /url: /restaurants
+          - link "Restaurant Owners" [ref=f12e43] [cursor=pointer]:
+            - /url: /owners
+          - link "Branches" [ref=f12e51] [cursor=pointer]:
+            - /url: /branches
+          - link "Subscriptions" [ref=f12e58] [cursor=pointer]:
+            - /url: /subscriptions
+          - link "Invoices & Billing" [ref=f12e66] [cursor=pointer]:
+            - /url: /billing
+      - generic [ref=f12e71]:
+        - button "SaaS Management" [expanded] [ref=f12e72] [cursor=pointer]
+        - generic [ref=f12e76]:
+          - link "Plans & Entitlements" [ref=f12e77] [cursor=pointer]:
+            - /url: /plans
+          - link "QR Ordering Suite" [ref=f12e84] [cursor=pointer]:
+            - /url: /qr-ordering
+          - link "JAMAN AI Engine" [ref=f12e93] [cursor=pointer]:
+            - /url: /ai-assistant
+          - link "Master Menu Catalog" [ref=f12e98] [cursor=pointer]:
+            - /url: /catalog
+          - link "Activation Keys" [ref=f12e104] [cursor=pointer]:
+            - /url: /activation-keys
+          - link "Payment Gateways" [ref=f12e110] [cursor=pointer]:
+            - /url: /payment-connections
+          - link "Applications & Releases" [ref=f12e115] [cursor=pointer]:
+            - /url: /applications
+      - generic [ref=f12e122]:
+        - button "Operations & MDM" [expanded] [ref=f12e123] [cursor=pointer]
+        - generic [ref=f12e127]:
+          - link "Device Fleet / MDM" [ref=f12e128] [cursor=pointer]:
+            - /url: /devices
+          - link "Sync & Conflict Monitor" [ref=f12e133] [cursor=pointer]:
+            - /url: /sync-monitor
+          - link "Backups & Recovery" [ref=f12e138] [cursor=pointer]:
+            - /url: /backups
+          - link "System Telemetry" [ref=f12e145] [cursor=pointer]:
+            - /url: /system-health
+          - link "Staging Sandboxes" [ref=f12e151] [cursor=pointer]:
+            - /url: /sandboxes
+      - generic [ref=f12e164]:
+        - button "Security & Reports" [expanded] [ref=f12e165] [cursor=pointer]
+        - generic [ref=f12e169]:
+          - link "Reports & Analytics" [ref=f12e170] [cursor=pointer]:
+            - /url: /reports
+          - link "Audit Logs" [ref=f12e175] [cursor=pointer]:
+            - /url: /audit-logs
+          - link "Emergency Offline Policy" [ref=f12e181] [cursor=pointer]:
+            - /url: /offline-policy
+          - link "Platform Team" [ref=f12e186] [cursor=pointer]:
+            - /url: /team
+          - link "Support Tickets" [ref=f12e192] [cursor=pointer]:
+            - /url: /tickets
+          - link "Diagnostics & Support" [ref=f12e197] [cursor=pointer]:
+            - /url: /support
+          - link "Platform Settings" [ref=f12e207] [cursor=pointer]:
+            - /url: /settings/platform
+      - generic [ref=f12e211]:
+        - button "Account" [expanded] [ref=f12e212] [cursor=pointer]
+        - link "My Profile" [ref=f12e217] [cursor=pointer]:
+          - /url: /profile
+    - generic [ref=f12e232]:
+      - generic [ref=f12e233]:
+        - generic [ref=f12e235]: Platform Online
+        - link "View System Health" [ref=f12e236] [cursor=pointer]:
+          - /url: /system-health
+      - generic [ref=f12e241]: JAMANVAAR Cloud v1.4.0
+  - generic [ref=f12e242]:
+    - banner [ref=f12e243]:
+      - generic [ref=f12e245]:
+        - generic [ref=f12e246]: JAMANVAAR PLATFORM
+        - generic [ref=f12e247]: Control Center
+      - generic [ref=f12e249]:
+        - textbox "Search restaurants, owners, devices, activation keys…" [ref=f12e250]
+        - generic: Ctrl+K
+      - generic [ref=f12e251]:
+        - generic "Database reachable, API responding" [ref=f12e252]: PLATFORM ONLINE
+        - button "Notifications" [ref=f12e256] [cursor=pointer]
+        - button "Toggle dark mode" [ref=f12e260] [cursor=pointer]
+        - generic [ref=f12e264]:
+          - link "L" [ref=f12e265] [cursor=pointer]:
+            - /url: /profile
+          - generic [ref=f12e267]:
+            - generic [ref=f12e268]: Live Verify
+            - generic [ref=f12e269]: Super Admin
+          - button "Logout" [ref=f12e270] [cursor=pointer]
+    - main [ref=f12e275]:
+      - generic [ref=f12e276]:
+        - generic [ref=f12e278]:
+          - heading "Applications & Ecosystem" [level=1] [ref=f12e279]
+          - paragraph [ref=f12e280]: Central software release registry and client application distribution across POS, Restaurant Admin, Captain, KDS, and Kiosk.
+        - generic [ref=f12e281]:
+          - generic [ref=f12e282]:
+            - generic [ref=f12e283]: Client Applications
+            - generic [ref=f12e290]:
+              - generic [ref=f12e291]: "6"
+              - generic [ref=f12e292]: POS, KDS, Captain, Kiosks & Admin
+          - generic [ref=f12e293]:
+            - generic [ref=f12e294]: Registered Terminals
+            - generic [ref=f12e299]:
+              - generic [ref=f12e300]: "0"
+              - generic [ref=f12e301]: Across All Onboarded Outlets
+          - generic [ref=f12e302]:
+            - generic [ref=f12e303]: Active / Online Terminals
+            - generic [ref=f12e309]:
+              - generic [ref=f12e310]: "0"
+              - generic [ref=f12e311]: Standby / Local Mesh Mode
+          - generic [ref=f12e312]:
+            - generic [ref=f12e313]: Fleet Sync Rate
+            - generic [ref=f12e319]:
+              - generic [ref=f12e320]: —
+              - generic [ref=f12e321]: No Terminals Registered Yet
+        - generic [ref=f12e322]:
+          - generic [ref=f12e323]:
+            - generic [ref=f12e324]:
+              - generic [ref=f12e329]:
+                - generic [ref=f12e330]: Counter POS & Fast Billing
+                - generic [ref=f12e331]: Counter & Cashier
+              - generic [ref=f12e332]: v2.4.0
+            - paragraph [ref=f12e334]: 100% offline-first billing terminal, ESC/POS printing, token routing, and GST invoices.
+            - generic [ref=f12e335]:
+              - generic [ref=f12e336]:
+                - generic [ref=f12e337]: Fleet Terminals
+                - generic [ref=f12e338]: 0 Active (0 Online)
+              - generic [ref=f12e339]:
+                - generic [ref=f12e340]: Terminals on an older version
+                - generic [ref=f12e341]: "0"
+              - generic [ref=f12e342]:
+                - generic [ref=f12e343]: Release Channel
+                - generic [ref=f12e344]: STABLE
+            - generic [ref=f12e345]:
+              - generic [ref=f12e346]: WINDOWS
+              - generic [ref=f12e347]: ELECTRON
+              - generic [ref=f12e348]: PORT 5173
+            - generic [ref=f12e349]:
+              - button "Publish Version" [ref=f12e350] [cursor=pointer]
+              - link "Download / Open" [ref=f12e353] [cursor=pointer]:
+                - /url: /releases/jamanvaar-pos-setup-2.4.0.exe
+              - button "Toggle Release History" [ref=f12e358] [cursor=pointer]
+          - generic [ref=f12e361]:
+            - generic [ref=f12e362]:
+              - generic [ref=f12e367]:
+                - generic [ref=f12e368]: Restaurant Admin Portal
+                - generic [ref=f12e369]: Back-Office & Operations
+              - generic [ref=f12e370]: v2.4.0
+            - paragraph [ref=f12e372]: Complete organization administration, menu editor, floor plan, reports, and cloud sync.
+            - generic [ref=f12e373]:
+              - generic [ref=f12e374]:
+                - generic [ref=f12e375]: Fleet Terminals
+                - generic [ref=f12e376]: 0 Active (0 Online)
+              - generic [ref=f12e377]:
+                - generic [ref=f12e378]: Terminals on an older version
+                - generic [ref=f12e379]: "0"
+              - generic [ref=f12e380]:
+                - generic [ref=f12e381]: Release Channel
+                - generic [ref=f12e382]: STABLE
+            - generic [ref=f12e383]:
+              - generic [ref=f12e384]: WEB
+              - generic [ref=f12e385]: PORT 5176
+            - generic [ref=f12e386]:
+              - button "Publish Version" [ref=f12e387] [cursor=pointer]
+              - link "Download / Open" [ref=f12e390] [cursor=pointer]:
+                - /url: http://localhost:5176
+              - button "Toggle Release History" [ref=f12e395] [cursor=pointer]
+          - generic [ref=f12e398]:
+            - generic [ref=f12e399]:
+              - generic [ref=f12e404]:
+                - generic [ref=f12e405]: Captain App (Table-Side)
+                - generic [ref=f12e406]: Service & Waiters
+              - generic [ref=f12e407]: v2.1.0
+            - paragraph [ref=f12e409]: Wireless table ordering, instant course firing, food ready alerts, and waiter metrics.
+            - generic [ref=f12e410]:
+              - generic [ref=f12e411]:
+                - generic [ref=f12e412]: Fleet Terminals
+                - generic [ref=f12e413]: 0 Active (0 Online)
+              - generic [ref=f12e414]:
+                - generic [ref=f12e415]: Terminals on an older version
+                - generic [ref=f12e416]: "0"
+              - generic [ref=f12e417]:
+                - generic [ref=f12e418]: Release Channel
+                - generic [ref=f12e419]: STABLE
+            - generic [ref=f12e420]:
+              - generic [ref=f12e421]: ANDROID
+              - generic [ref=f12e422]: WEB
+              - generic [ref=f12e423]: PORT 5174
+            - generic [ref=f12e424]:
+              - button "Publish Version" [ref=f12e425] [cursor=pointer]
+              - link "Download / Open" [ref=f12e428] [cursor=pointer]:
+                - /url: /releases/jamanvaar-captain-v2.1.0.apk
+              - button "Toggle Release History" [ref=f12e433] [cursor=pointer]
+          - generic [ref=f12e436]:
+            - generic [ref=f12e437]:
+              - generic [ref=f12e442]:
+                - generic [ref=f12e443]: Kitchen Display System (KDS)
+                - generic [ref=f12e444]: Kitchen & Production
+              - generic [ref=f12e445]: v2.0.0
+            - paragraph [ref=f12e447]: Multi-station prep routing, order queue timing, cook alert cards, and bump bar support.
+            - generic [ref=f12e448]:
+              - generic [ref=f12e449]:
+                - generic [ref=f12e450]: Fleet Terminals
+                - generic [ref=f12e451]: 0 Active (0 Online)
+              - generic [ref=f12e452]:
+                - generic [ref=f12e453]: Terminals on an older version
+                - generic [ref=f12e454]: "0"
+              - generic [ref=f12e455]:
+                - generic [ref=f12e456]: Release Channel
+                - generic [ref=f12e457]: STABLE
+            - generic [ref=f12e458]:
+              - generic [ref=f12e459]: WEB
+              - generic [ref=f12e460]: ANDROID
+              - generic [ref=f12e461]: PORT 5175
+            - generic [ref=f12e462]:
+              - button "Publish Version" [ref=f12e463] [cursor=pointer]
+              - link "Download / Open" [ref=f12e466] [cursor=pointer]:
+                - /url: /releases/jamanvaar-kds-v2.0.0.apk
+              - button "Toggle Release History" [ref=f12e471] [cursor=pointer]
+          - generic [ref=f12e474]:
+            - generic [ref=f12e475]:
+              - generic [ref=f12e482]:
+                - generic [ref=f12e483]: Self-Ordering Kiosk
+                - generic [ref=f12e484]: Customer Self-Service
+              - generic [ref=f12e485]: v1.8.0
+            - paragraph [ref=f12e487]: Visual digital catalog, custom modifiers, UPI BharatQR display, and self-checkout.
+            - generic [ref=f12e488]:
+              - generic [ref=f12e489]:
+                - generic [ref=f12e490]: Fleet Terminals
+                - generic [ref=f12e491]: 0 Active (0 Online)
+              - generic [ref=f12e492]:
+                - generic [ref=f12e493]: Terminals on an older version
+                - generic [ref=f12e494]: "0"
+              - generic [ref=f12e495]:
+                - generic [ref=f12e496]: Release Channel
+                - generic [ref=f12e497]: STABLE
+            - generic [ref=f12e498]:
+              - generic [ref=f12e499]: WINDOWS
+              - generic [ref=f12e500]: ANDROID
+              - generic [ref=f12e501]: PORT 5178
+            - generic [ref=f12e502]:
+              - button "Publish Version" [ref=f12e503] [cursor=pointer]
+              - link "Download / Open" [ref=f12e506] [cursor=pointer]:
+                - /url: /releases/jamanvaar-kiosk-v1.8.0.exe
+              - button "Toggle Release History" [ref=f12e511] [cursor=pointer]
+          - generic [ref=f12e514]:
+            - generic [ref=f12e515]:
+              - generic [ref=f12e522]:
+                - generic [ref=f12e523]: Kiosk Terminal Admin
+                - generic [ref=f12e524]: Hardware & Terminal Config
+              - generic [ref=f12e525]: v1.8.0
+            - paragraph [ref=f12e527]: Kiosk device fleet management, menu/branch assignment, availability, and order monitoring.
+            - generic [ref=f12e528]:
+              - generic [ref=f12e529]:
+                - generic [ref=f12e530]: Fleet Terminals
+                - generic [ref=f12e531]: 0 Active (0 Online)
+              - generic [ref=f12e532]:
+                - generic [ref=f12e533]: Terminals on an older version
+                - generic [ref=f12e534]: "0"
+              - generic [ref=f12e535]:
+                - generic [ref=f12e536]: Release Channel
+                - generic [ref=f12e537]: STABLE
+            - generic [ref=f12e538]:
+              - generic [ref=f12e539]: WEB
+              - generic [ref=f12e540]: PORT 5177
+            - generic [ref=f12e541]:
+              - button "Publish Version" [ref=f12e542] [cursor=pointer]
+              - link "Download / Open" [ref=f12e545] [cursor=pointer]:
+                - /url: http://localhost:5177
+              - button "Toggle Release History" [ref=f12e550] [cursor=pointer]

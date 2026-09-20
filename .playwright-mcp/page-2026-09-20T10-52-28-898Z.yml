@@ -1,0 +1,178 @@
+- generic [ref=f14e2]:
+  - generic [ref=f14e172]:
+    - banner [ref=f14e173]:
+      - generic [ref=f14e174]:
+        - img "JAMANVAAR by KELVIONTECH" [ref=f14e176]
+        - generic [ref=f14e178]:
+          - generic [ref=f14e179]:
+            - generic "Full Audit Diner" [ref=f14e180]
+            - generic [ref=f14e181]: ADMIN
+          - button "Full Audit Diner" [ref=f14e182] [cursor=pointer]
+      - button "Open global search" [ref=f14e189] [cursor=pointer]:
+        - textbox "Search orders, invoices, dishes, tables..." [ref=f14e193]
+        - generic: Ctrl+K
+      - generic [ref=f14e194]:
+        - generic [ref=f14e195]: No open shift
+        - generic [ref=f14e198]:
+          - button "EOD Report" [ref=f14e199] [cursor=pointer]
+          - button "Reconciliation" [ref=f14e204] [cursor=pointer]
+        - generic [ref=f14e210]:
+          - button "Assistant" [ref=f14e211] [cursor=pointer]
+          - button "Notifications" [ref=f14e216] [cursor=pointer]
+          - generic "Operating in Local-First mesh mode" [ref=f14e220]: LOCAL-FIRST
+          - button "Logout" [ref=f14e228] [cursor=pointer]
+    - generic [ref=f14e233]:
+      - complementary [ref=f14e234]:
+        - generic [ref=f14e235]:
+          - generic [ref=f14e236]:
+            - button "OPERATIONS" [ref=f14e237] [cursor=pointer]
+            - navigation [ref=f14e241]:
+              - button "Dashboard" [ref=f14e242] [cursor=pointer]
+              - button "Billing / Invoices" [ref=f14e251] [cursor=pointer]
+              - button "Orders" [ref=f14e256] [cursor=pointer]
+              - button "Live Orders / KDS" [ref=f14e262] [cursor=pointer]
+              - button "Floor / Tables" [ref=f14e267] [cursor=pointer]
+              - button "Reservations" [ref=f14e272] [cursor=pointer]
+              - button "Kitchen / KOT" [ref=f14e279] [cursor=pointer]
+          - generic [ref=f14e284]:
+            - button "DIGITAL ORDERING" [ref=f14e285] [cursor=pointer]
+            - navigation [ref=f14e289]:
+              - button "QR Table Ordering PRO" [ref=f14e290] [cursor=pointer]:
+                - generic [ref=f14e291]: QR Table Ordering
+                - generic [ref=f14e299]: PRO
+          - generic [ref=f14e301]:
+            - button "MENU & INVENTORY" [ref=f14e302] [cursor=pointer]
+            - navigation [ref=f14e306]:
+              - button "Menu & Categories" [ref=f14e307] [cursor=pointer]
+              - button "Inventory & Recipes" [ref=f14e315] [cursor=pointer]
+              - button "Purchasing & Stock Control" [ref=f14e322] [cursor=pointer]
+          - generic [ref=f14e330]:
+            - button "PEOPLE & CASH" [ref=f14e331] [cursor=pointer]
+            - navigation [ref=f14e335]:
+              - button "Customers CRM" [ref=f14e336] [cursor=pointer]
+              - button "Staff & Roles (RBAC)" [ref=f14e341] [cursor=pointer]
+              - button "Payments & Split" [ref=f14e349] [cursor=pointer]
+              - button "Shift & Cash Drawer" [ref=f14e354] [cursor=pointer]
+          - generic [ref=f14e362]:
+            - button "ANALYTICS & SYSTEM" [ref=f14e363] [cursor=pointer]
+            - navigation [ref=f14e367]:
+              - button "Reports & Analytics" [ref=f14e368] [cursor=pointer]
+              - button "Printers & Devices" [ref=f14e374] [cursor=pointer]
+              - button "Restaurant Settings" [ref=f14e381] [cursor=pointer]
+              - button "Subscription Plans" [ref=f14e387] [cursor=pointer]
+              - button "Audit Trail Logs" [ref=f14e393] [cursor=pointer]
+              - button "Backup & Restore" [ref=f14e399] [cursor=pointer]
+              - button "Help & Support" [ref=f14e406] [cursor=pointer]
+      - main [ref=f14e416]:
+        - generic [ref=f14e749]:
+          - generic [ref=f14e750]:
+            - generic [ref=f14e751]:
+              - generic [ref=f14e752]:
+                - heading "Menu & Catalog Manager" [level=1] [ref=f14e753]
+                - generic [ref=f14e754]: 135 ITEMS
+              - paragraph [ref=f14e755]: Create, edit dishes, adjust pricing, upload device photos, and import templates.
+            - generic [ref=f14e756]:
+              - button "Add Dish" [ref=f14e757] [cursor=pointer]
+              - button "Add Category" [ref=f14e760] [cursor=pointer]
+              - button "🍕 Load 14 Templates" [ref=f14e763] [cursor=pointer]
+              - button "Load Default Items" [ref=f14e765] [cursor=pointer]
+              - button "Upload CSV" [ref=f14e770] [cursor=pointer]
+              - button "Download CSV Template" [ref=f14e775] [cursor=pointer]
+              - button "Bulk Price Adjust" [ref=f14e780] [cursor=pointer]
+          - generic [ref=f14e786]:
+            - generic [ref=f14e787]:
+              - textbox "Search dish by name, description, SKU or tag..." [ref=f14e792]
+              - generic [ref=f14e793]:
+                - button "All Diets" [ref=f14e794] [cursor=pointer]
+                - button "🟢 Veg" [ref=f14e795] [cursor=pointer]
+                - button "🔴 Non-Veg" [ref=f14e796] [cursor=pointer]
+            - generic [ref=f14e797]:
+              - button "All Categories (135)" [ref=f14e847] [cursor=pointer]
+              - button "Tandoori Starters & Kebabs 11" [ref=f14e849] [cursor=pointer]:
+                - generic [ref=f14e850]: Tandoori Starters & Kebabs
+                - generic [ref=f14e851]: "11"
+              - button "Royal Paneer Curries 28" [ref=f14e853] [cursor=pointer]:
+                - generic [ref=f14e854]: Royal Paneer Curries
+                - generic [ref=f14e855]: "28"
+              - button "Tandoori Roti & Naan Breads 12" [ref=f14e857] [cursor=pointer]:
+                - generic [ref=f14e858]: Tandoori Roti & Naan Breads
+                - generic [ref=f14e859]: "12"
+              - button "Basmati Rice & Biryani 12" [ref=f14e861] [cursor=pointer]:
+                - generic [ref=f14e862]: Basmati Rice & Biryani
+                - generic [ref=f14e863]: "12"
+              - button "Beverages & Chaas 9" [ref=f14e865] [cursor=pointer]:
+                - generic [ref=f14e866]: Beverages & Chaas
+                - generic [ref=f14e867]: "9"
+              - button "Heritage Desserts 6" [ref=f14e869] [cursor=pointer]:
+                - generic [ref=f14e870]: Heritage Desserts
+                - generic [ref=f14e871]: "6"
+              - button "Gujarati Thali Special 8" [ref=f14e873] [cursor=pointer]:
+                - generic [ref=f14e874]: Gujarati Thali Special
+                - generic [ref=f14e875]: "8"
+              - button "Fresh Farsan (Snacks) 10" [ref=f14e877] [cursor=pointer]:
+                - generic [ref=f14e878]: Fresh Farsan (Snacks)
+                - generic [ref=f14e879]: "10"
+              - button "Rotli, Bhakri & Thepla 4" [ref=f14e881] [cursor=pointer]:
+                - generic [ref=f14e882]: Rotli, Bhakri & Thepla
+                - generic [ref=f14e883]: "4"
+              - button "Signature Dosas & Crepes 10" [ref=f14e885] [cursor=pointer]:
+                - generic [ref=f14e886]: Signature Dosas & Crepes
+                - generic [ref=f14e887]: "10"
+              - button "Rotla & Accompaniments 2" [ref=f14e889] [cursor=pointer]:
+                - generic [ref=f14e890]: Rotla & Accompaniments
+                - generic [ref=f14e891]: "2"
+              - button "Quick Tiffin Plates 2" [ref=f14e893] [cursor=pointer]:
+                - generic [ref=f14e894]: Quick Tiffin Plates
+                - generic [ref=f14e895]: "2"
+              - button "Desi Chinese Favorites 2" [ref=f14e897] [cursor=pointer]:
+                - generic [ref=f14e898]: Desi Chinese Favorites
+                - generic [ref=f14e899]: "2"
+              - button "Burgers & Wraps 6" [ref=f14e901] [cursor=pointer]:
+                - generic [ref=f14e902]: Burgers & Wraps
+                - generic [ref=f14e903]: "6"
+              - button "Iced Frappes & Coolers 1" [ref=f14e905] [cursor=pointer]:
+                - generic [ref=f14e906]: Iced Frappes & Coolers
+                - generic [ref=f14e907]: "1"
+              - button "Pastries & Slices 2" [ref=f14e909] [cursor=pointer]:
+                - generic [ref=f14e910]: Pastries & Slices
+                - generic [ref=f14e911]: "2"
+              - button "Hand-Tossed Pizzas 3" [ref=f14e913] [cursor=pointer]:
+                - generic [ref=f14e914]: Hand-Tossed Pizzas
+                - generic [ref=f14e915]: "3"
+              - button "Puri & Chaat Specialties 3" [ref=f14e917] [cursor=pointer]:
+                - generic [ref=f14e918]: Puri & Chaat Specialties
+                - generic [ref=f14e919]: "3"
+              - button "Sundaes & Faloodas 2" [ref=f14e921] [cursor=pointer]:
+                - generic [ref=f14e922]: Sundaes & Faloodas
+                - generic [ref=f14e923]: "2"
+              - button "Delivery Meal Bowls 2" [ref=f14e925] [cursor=pointer]:
+                - generic [ref=f14e926]: Delivery Meal Bowls
+                - generic [ref=f14e927]: "2"
+          - generic [ref=f14e799]:
+            - heading "No Dishes Match Filters" [level=3] [ref=f14e928]
+            - paragraph [ref=f14e929]: No menu dishes found matching the current search, category, or dietary filter.
+            - generic [ref=f14e930]:
+              - button "Clear Filters" [ref=f14e931] [cursor=pointer]
+              - button "+ Add New Dish" [ref=f14e932] [cursor=pointer]
+          - generic [ref=f14e823]:
+            - generic [ref=f14e824]:
+              - generic [ref=f14e825]:
+                - generic [ref=f14e826]:
+                  - heading "Combos & Meal Deals" [level=2] [ref=f14e827]
+                  - generic [ref=f14e828]: 0 ACTIVE
+                - paragraph [ref=f14e829]: Bundle dishes into a fixed-price deal with an automatic savings badge.
+              - button "Create Combo" [ref=f14e830] [cursor=pointer]
+            - generic [ref=f14e833]:
+              - heading "No Combos Yet" [level=3] [ref=f14e839]
+              - paragraph [ref=f14e840]: Bundle popular dishes into a discounted combo to increase average order value on Kiosk and QR ordering.
+              - button "+ Create First Combo" [ref=f14e841] [cursor=pointer]
+    - button "Open JAMAN AI Restaurant Intelligence" [ref=f14e729] [cursor=pointer]:
+      - generic [ref=f14e735]:
+        - generic [ref=f14e736]: JAMAN AI
+        - generic [ref=f14e737]: ACTIVE
+  - status [ref=f14e738]:
+    - generic [ref=f14e742]:
+      - text: Version 2.4.0 is available.
+      - link "Download" [ref=f14e743] [cursor=pointer]:
+        - /url: http://localhost:5176
+    - button "Dismiss" [ref=f14e744] [cursor=pointer]

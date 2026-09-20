@@ -1,0 +1,2333 @@
+- generic [ref=f15e2]:
+  - generic [ref=f15e3]:
+    - banner [ref=f15e4]:
+      - generic [ref=f15e5]:
+        - img "JAMANVAAR by KELVIONTECH" [ref=f15e7]
+        - generic [ref=f15e9]:
+          - generic [ref=f15e10]:
+            - generic "Full Audit Diner" [ref=f15e11]
+            - generic [ref=f15e12]: ADMIN
+          - button "Full Audit Diner" [ref=f15e13] [cursor=pointer]
+      - button "Open global search" [ref=f15e20] [cursor=pointer]:
+        - textbox "Search orders, invoices, dishes, tables..." [ref=f15e24]
+        - generic: Ctrl+K
+      - generic [ref=f15e25]:
+        - generic [ref=f15e26]: No open shift
+        - generic [ref=f15e29]:
+          - button "EOD Report" [ref=f15e30] [cursor=pointer]
+          - button "Reconciliation" [ref=f15e35] [cursor=pointer]
+        - generic [ref=f15e41]:
+          - button "Assistant" [ref=f15e42] [cursor=pointer]
+          - button "Notifications" [ref=f15e47] [cursor=pointer]
+          - generic "Operating in Local-First mesh mode" [ref=f15e51]: LOCAL-FIRST
+          - button "Logout" [ref=f15e59] [cursor=pointer]
+    - generic [ref=f15e64]:
+      - complementary [ref=f15e65]:
+        - generic [ref=f15e66]:
+          - generic [ref=f15e67]:
+            - button "OPERATIONS" [ref=f15e68] [cursor=pointer]
+            - navigation [ref=f15e72]:
+              - button "Dashboard" [ref=f15e73] [cursor=pointer]
+              - button "Billing / Invoices" [ref=f15e82] [cursor=pointer]
+              - button "Orders" [ref=f15e87] [cursor=pointer]
+              - button "Live Orders / KDS" [ref=f15e93] [cursor=pointer]
+              - button "Floor / Tables" [ref=f15e98] [cursor=pointer]
+              - button "Reservations" [ref=f15e103] [cursor=pointer]
+              - button "Kitchen / KOT" [ref=f15e110] [cursor=pointer]
+          - generic [ref=f15e115]:
+            - button "DIGITAL ORDERING" [ref=f15e116] [cursor=pointer]
+            - navigation [ref=f15e120]:
+              - button "QR Table Ordering PRO" [ref=f15e121] [cursor=pointer]:
+                - generic [ref=f15e122]: QR Table Ordering
+                - generic [ref=f15e130]: PRO
+          - generic [ref=f15e132]:
+            - button "MENU & INVENTORY" [ref=f15e133] [cursor=pointer]
+            - navigation [ref=f15e137]:
+              - button "Menu & Categories" [active] [ref=f15e138] [cursor=pointer]
+              - button "Inventory & Recipes" [ref=f15e146] [cursor=pointer]
+              - button "Purchasing & Stock Control" [ref=f15e153] [cursor=pointer]
+          - generic [ref=f15e161]:
+            - button "PEOPLE & CASH" [ref=f15e162] [cursor=pointer]
+            - navigation [ref=f15e166]:
+              - button "Customers CRM" [ref=f15e167] [cursor=pointer]
+              - button "Staff & Roles (RBAC)" [ref=f15e172] [cursor=pointer]
+              - button "Payments & Split" [ref=f15e180] [cursor=pointer]
+              - button "Shift & Cash Drawer" [ref=f15e185] [cursor=pointer]
+          - generic [ref=f15e193]:
+            - button "ANALYTICS & SYSTEM" [ref=f15e194] [cursor=pointer]
+            - navigation [ref=f15e198]:
+              - button "Reports & Analytics" [ref=f15e199] [cursor=pointer]
+              - button "Printers & Devices" [ref=f15e205] [cursor=pointer]
+              - button "Restaurant Settings" [ref=f15e212] [cursor=pointer]
+              - button "Subscription Plans" [ref=f15e218] [cursor=pointer]
+              - button "Audit Trail Logs" [ref=f15e224] [cursor=pointer]
+              - button "Backup & Restore" [ref=f15e230] [cursor=pointer]
+              - button "Help & Support" [ref=f15e237] [cursor=pointer]
+      - main [ref=f15e247]:
+        - generic [ref=f15e622]:
+          - generic [ref=f15e623]:
+            - generic [ref=f15e624]:
+              - generic [ref=f15e625]:
+                - heading "Menu & Catalog Manager" [level=1] [ref=f15e626]
+                - generic [ref=f15e627]: 135 ITEMS
+              - paragraph [ref=f15e628]: Create, edit dishes, adjust pricing, upload device photos, and import templates.
+            - generic [ref=f15e629]:
+              - button "Add Dish" [ref=f15e630] [cursor=pointer]
+              - button "Add Category" [ref=f15e633] [cursor=pointer]
+              - button "🍕 Load 14 Templates" [ref=f15e636] [cursor=pointer]
+              - button "Load Default Items" [ref=f15e638] [cursor=pointer]
+              - button "Upload CSV" [ref=f15e643] [cursor=pointer]
+              - button "Download CSV Template" [ref=f15e648] [cursor=pointer]
+              - button "Bulk Price Adjust" [ref=f15e653] [cursor=pointer]
+          - generic [ref=f15e659]:
+            - generic [ref=f15e660]:
+              - textbox "Search dish by name, description, SKU or tag..." [ref=f15e665]
+              - generic [ref=f15e666]:
+                - button "All Diets" [ref=f15e667] [cursor=pointer]
+                - button "🟢 Veg" [ref=f15e668] [cursor=pointer]
+                - button "🔴 Non-Veg" [ref=f15e669] [cursor=pointer]
+            - generic [ref=f15e670]:
+              - button "All Categories (135)" [ref=f15e671] [cursor=pointer]
+              - button "Tandoori Starters & Kebabs 11" [ref=f15e673] [cursor=pointer]:
+                - generic [ref=f15e674]: Tandoori Starters & Kebabs
+                - generic [ref=f15e675]: "11"
+              - button "Royal Paneer Curries 28" [ref=f15e677] [cursor=pointer]:
+                - generic [ref=f15e678]: Royal Paneer Curries
+                - generic [ref=f15e679]: "28"
+              - button "Tandoori Roti & Naan Breads 12" [ref=f15e681] [cursor=pointer]:
+                - generic [ref=f15e682]: Tandoori Roti & Naan Breads
+                - generic [ref=f15e683]: "12"
+              - button "Basmati Rice & Biryani 12" [ref=f15e685] [cursor=pointer]:
+                - generic [ref=f15e686]: Basmati Rice & Biryani
+                - generic [ref=f15e687]: "12"
+              - button "Beverages & Chaas 9" [ref=f15e689] [cursor=pointer]:
+                - generic [ref=f15e690]: Beverages & Chaas
+                - generic [ref=f15e691]: "9"
+              - button "Heritage Desserts 6" [ref=f15e693] [cursor=pointer]:
+                - generic [ref=f15e694]: Heritage Desserts
+                - generic [ref=f15e695]: "6"
+              - button "Gujarati Thali Special 8" [ref=f15e697] [cursor=pointer]:
+                - generic [ref=f15e698]: Gujarati Thali Special
+                - generic [ref=f15e699]: "8"
+              - button "Fresh Farsan (Snacks) 10" [ref=f15e701] [cursor=pointer]:
+                - generic [ref=f15e702]: Fresh Farsan (Snacks)
+                - generic [ref=f15e703]: "10"
+              - button "Rotli, Bhakri & Thepla 4" [ref=f15e705] [cursor=pointer]:
+                - generic [ref=f15e706]: Rotli, Bhakri & Thepla
+                - generic [ref=f15e707]: "4"
+              - button "Signature Dosas & Crepes 10" [ref=f15e709] [cursor=pointer]:
+                - generic [ref=f15e710]: Signature Dosas & Crepes
+                - generic [ref=f15e711]: "10"
+              - button "Rotla & Accompaniments 2" [ref=f15e713] [cursor=pointer]:
+                - generic [ref=f15e714]: Rotla & Accompaniments
+                - generic [ref=f15e715]: "2"
+              - button "Quick Tiffin Plates 2" [ref=f15e717] [cursor=pointer]:
+                - generic [ref=f15e718]: Quick Tiffin Plates
+                - generic [ref=f15e719]: "2"
+              - button "Desi Chinese Favorites 2" [ref=f15e721] [cursor=pointer]:
+                - generic [ref=f15e722]: Desi Chinese Favorites
+                - generic [ref=f15e723]: "2"
+              - button "Burgers & Wraps 6" [ref=f15e725] [cursor=pointer]:
+                - generic [ref=f15e726]: Burgers & Wraps
+                - generic [ref=f15e727]: "6"
+              - button "Iced Frappes & Coolers 1" [ref=f15e729] [cursor=pointer]:
+                - generic [ref=f15e730]: Iced Frappes & Coolers
+                - generic [ref=f15e731]: "1"
+              - button "Pastries & Slices 2" [ref=f15e733] [cursor=pointer]:
+                - generic [ref=f15e734]: Pastries & Slices
+                - generic [ref=f15e735]: "2"
+              - button "Hand-Tossed Pizzas 3" [ref=f15e737] [cursor=pointer]:
+                - generic [ref=f15e738]: Hand-Tossed Pizzas
+                - generic [ref=f15e739]: "3"
+              - button "Puri & Chaat Specialties 3" [ref=f15e741] [cursor=pointer]:
+                - generic [ref=f15e742]: Puri & Chaat Specialties
+                - generic [ref=f15e743]: "3"
+              - button "Sundaes & Faloodas 2" [ref=f15e745] [cursor=pointer]:
+                - generic [ref=f15e746]: Sundaes & Faloodas
+                - generic [ref=f15e747]: "2"
+              - button "Delivery Meal Bowls 2" [ref=f15e749] [cursor=pointer]:
+                - generic [ref=f15e750]: Delivery Meal Bowls
+                - generic [ref=f15e751]: "2"
+          - generic [ref=f15e752]:
+            - generic [ref=f15e753]:
+              - generic [ref=f15e754]:
+                - img "Paneer Tikka Angara" [ref=f15e755]
+                - generic [ref=f15e756]: NI-001
+              - generic [ref=f15e760]:
+                - generic [ref=f15e761]:
+                  - generic [ref=f15e762]:
+                    - heading "Paneer Tikka Angara" [level=4] [ref=f15e763]
+                    - generic [ref=f15e764]: ₹280
+                  - paragraph [ref=f15e765]: Fresh cottage cheese cubes marinated in Kashmiri chilli-yogurt masala, roasted in clay oven with bell peppers
+                - generic [ref=f15e766]:
+                  - button "✓ In Stock" [ref=f15e767] [cursor=pointer]
+                  - generic [ref=f15e768]:
+                    - button "Duplicate Dish" [ref=f15e769] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e773] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e776] [cursor=pointer]
+            - generic [ref=f15e780]:
+              - generic [ref=f15e781]:
+                - img "Hara Bhara Kebab (6 Pcs)" [ref=f15e782]
+                - generic [ref=f15e783]: NI-002
+              - generic [ref=f15e787]:
+                - generic [ref=f15e788]:
+                  - generic [ref=f15e789]:
+                    - heading "Hara Bhara Kebab (6 Pcs)" [level=4] [ref=f15e790]
+                    - generic [ref=f15e791]: ₹220
+                  - paragraph [ref=f15e792]: Crisp spinach, green pea and potato patties stuffed with spiced cashews and herbs
+                - generic [ref=f15e793]:
+                  - button "✓ In Stock" [ref=f15e794] [cursor=pointer]
+                  - generic [ref=f15e795]:
+                    - button "Duplicate Dish" [ref=f15e796] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e800] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e803] [cursor=pointer]
+            - generic [ref=f15e807]:
+              - generic [ref=f15e808]:
+                - img "Tandoori Stuffed Mushroom" [ref=f15e809]
+                - generic [ref=f15e810]: NI-003
+              - generic [ref=f15e814]:
+                - generic [ref=f15e815]:
+                  - generic [ref=f15e816]:
+                    - heading "Tandoori Stuffed Mushroom" [level=4] [ref=f15e817]
+                    - generic [ref=f15e818]: ₹260
+                  - paragraph [ref=f15e819]: Button mushrooms filled with spiced processed cheese and herbs, charred in tandoor
+                - generic [ref=f15e820]:
+                  - button "✓ In Stock" [ref=f15e821] [cursor=pointer]
+                  - generic [ref=f15e822]:
+                    - button "Duplicate Dish" [ref=f15e823] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e827] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e830] [cursor=pointer]
+            - generic [ref=f15e834]:
+              - generic [ref=f15e835]:
+                - img "Veg Seekh Kebab Mughlai" [ref=f15e836]
+                - generic [ref=f15e837]: NI-004
+              - generic [ref=f15e841]:
+                - generic [ref=f15e842]:
+                  - generic [ref=f15e843]:
+                    - heading "Veg Seekh Kebab Mughlai" [level=4] [ref=f15e844]
+                    - generic [ref=f15e845]: ₹240
+                  - paragraph [ref=f15e846]: Minced mixed vegetables and cottage cheese skewered and roasted with aromatic garam masala
+                - generic [ref=f15e847]:
+                  - button "✓ In Stock" [ref=f15e848] [cursor=pointer]
+                  - generic [ref=f15e849]:
+                    - button "Duplicate Dish" [ref=f15e850] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e854] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e857] [cursor=pointer]
+            - generic [ref=f15e861]:
+              - generic [ref=f15e862]:
+                - img "Paneer Butter Masala" [ref=f15e863]
+                - generic [ref=f15e864]: NI-005
+              - generic [ref=f15e868]:
+                - generic [ref=f15e869]:
+                  - generic [ref=f15e870]:
+                    - heading "Paneer Butter Masala" [level=4] [ref=f15e871]
+                    - generic [ref=f15e872]: ₹290
+                  - paragraph [ref=f15e873]: Soft paneer cubes simmered in a rich, buttery tomato gravy infused with kasuri methi and cream
+                - generic [ref=f15e874]:
+                  - button "✓ In Stock" [ref=f15e875] [cursor=pointer]
+                  - generic [ref=f15e876]:
+                    - button "Duplicate Dish" [ref=f15e877] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e881] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e884] [cursor=pointer]
+            - generic [ref=f15e888]:
+              - generic [ref=f15e889]:
+                - img "Kadai Paneer Peshawari" [ref=f15e890]
+                - generic [ref=f15e891]: NI-006
+              - generic [ref=f15e895]:
+                - generic [ref=f15e896]:
+                  - generic [ref=f15e897]:
+                    - heading "Kadai Paneer Peshawari" [level=4] [ref=f15e898]
+                    - generic [ref=f15e899]: ₹290
+                  - paragraph [ref=f15e900]: Cottage cheese wok-tossed with freshly pounded coriander seeds, bell peppers and whole red chillies
+                - generic [ref=f15e901]:
+                  - button "✓ In Stock" [ref=f15e902] [cursor=pointer]
+                  - generic [ref=f15e903]:
+                    - button "Duplicate Dish" [ref=f15e904] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e908] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e911] [cursor=pointer]
+            - generic [ref=f15e915]:
+              - generic [ref=f15e916]:
+                - img "Shahi Paneer Nawabi" [ref=f15e917]
+                - generic [ref=f15e918]: NI-007
+              - generic [ref=f15e922]:
+                - generic [ref=f15e923]:
+                  - generic [ref=f15e924]:
+                    - heading "Shahi Paneer Nawabi" [level=4] [ref=f15e925]
+                    - generic [ref=f15e926]: ₹310
+                  - paragraph [ref=f15e927]: Royal white cashew and almond gravy with fragrant cardamom and tender paneer cubes
+                - generic [ref=f15e928]:
+                  - button "✓ In Stock" [ref=f15e929] [cursor=pointer]
+                  - generic [ref=f15e930]:
+                    - button "Duplicate Dish" [ref=f15e931] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e935] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e938] [cursor=pointer]
+            - generic [ref=f15e942]:
+              - generic [ref=f15e943]:
+                - img "Palak Paneer Lahori" [ref=f15e944]
+                - generic [ref=f15e945]: NI-008
+              - generic [ref=f15e949]:
+                - generic [ref=f15e950]:
+                  - generic [ref=f15e951]:
+                    - heading "Palak Paneer Lahori" [level=4] [ref=f15e952]
+                    - generic [ref=f15e953]: ₹270
+                  - paragraph [ref=f15e954]: Fresh spinach puree garlic tempered with spices and soft paneer cubes
+                - generic [ref=f15e955]:
+                  - button "✓ In Stock" [ref=f15e956] [cursor=pointer]
+                  - generic [ref=f15e957]:
+                    - button "Duplicate Dish" [ref=f15e958] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e962] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e965] [cursor=pointer]
+            - generic [ref=f15e969]:
+              - generic [ref=f15e970]:
+                - img "Dal Makhani Bukhara" [ref=f15e971]
+                - generic [ref=f15e972]: NI-009
+              - generic [ref=f15e976]:
+                - generic [ref=f15e977]:
+                  - generic [ref=f15e978]:
+                    - heading "Dal Makhani Bukhara" [level=4] [ref=f15e979]
+                    - generic [ref=f15e980]: ₹250
+                  - paragraph [ref=f15e981]: Whole black lentils slow-cooked overnight with white butter, cream and sun-dried fenugreek
+                - generic [ref=f15e982]:
+                  - button "✓ In Stock" [ref=f15e983] [cursor=pointer]
+                  - generic [ref=f15e984]:
+                    - button "Duplicate Dish" [ref=f15e985] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e989] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e992] [cursor=pointer]
+            - generic [ref=f15e996]:
+              - generic [ref=f15e997]:
+                - img "Yellow Dal Tadka Desi Ghee" [ref=f15e998]
+                - generic [ref=f15e999]: NI-010
+              - generic [ref=f15e1003]:
+                - generic [ref=f15e1004]:
+                  - generic [ref=f15e1005]:
+                    - heading "Yellow Dal Tadka Desi Ghee" [level=4] [ref=f15e1006]
+                    - generic [ref=f15e1007]: ₹200
+                  - paragraph [ref=f15e1008]: Yellow toor dal tempered with pure desi ghee, cumin seeds, garlic, onions and whole red chillies
+                - generic [ref=f15e1009]:
+                  - button "✓ In Stock" [ref=f15e1010] [cursor=pointer]
+                  - generic [ref=f15e1011]:
+                    - button "Duplicate Dish" [ref=f15e1012] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1016] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1019] [cursor=pointer]
+            - generic [ref=f15e1023]:
+              - generic [ref=f15e1024]:
+                - img "Malai Kofta Mughlai" [ref=f15e1025]
+                - generic [ref=f15e1026]: NI-011
+              - generic [ref=f15e1030]:
+                - generic [ref=f15e1031]:
+                  - generic [ref=f15e1032]:
+                    - heading "Malai Kofta Mughlai" [level=4] [ref=f15e1033]
+                    - generic [ref=f15e1034]: ₹320
+                  - paragraph [ref=f15e1035]: Paneer and potato dumplings stuffed with dry fruits in a velvety cashew and saffron sauce
+                - generic [ref=f15e1036]:
+                  - button "✓ In Stock" [ref=f15e1037] [cursor=pointer]
+                  - generic [ref=f15e1038]:
+                    - button "Duplicate Dish" [ref=f15e1039] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1043] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1046] [cursor=pointer]
+            - generic [ref=f15e1050]:
+              - generic [ref=f15e1051]:
+                - img "Mixed Vegetable Kolhapuri" [ref=f15e1052]
+                - generic [ref=f15e1053]: NI-012
+              - generic [ref=f15e1057]:
+                - generic [ref=f15e1058]:
+                  - generic [ref=f15e1059]:
+                    - heading "Mixed Vegetable Kolhapuri" [level=4] [ref=f15e1060]
+                    - generic [ref=f15e1061]: ₹240
+                  - paragraph [ref=f15e1062]: Seasonal vegetables cooked in a spicy, roasted coconut and red chilli Kolhapuri gravy
+                - generic [ref=f15e1063]:
+                  - button "✓ In Stock" [ref=f15e1064] [cursor=pointer]
+                  - generic [ref=f15e1065]:
+                    - button "Duplicate Dish" [ref=f15e1066] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1070] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1073] [cursor=pointer]
+            - generic [ref=f15e1077]:
+              - generic [ref=f15e1078]:
+                - img "Butter Naan" [ref=f15e1079]
+                - generic [ref=f15e1080]: NI-013
+              - generic [ref=f15e1084]:
+                - generic [ref=f15e1085]:
+                  - generic [ref=f15e1086]:
+                    - heading "Butter Naan" [level=4] [ref=f15e1087]
+                    - generic [ref=f15e1088]: ₹55
+                  - paragraph [ref=f15e1089]: Refined flour leavened flatbread brushed with molten butter from the clay tandoor
+                - generic [ref=f15e1090]:
+                  - button "✓ In Stock" [ref=f15e1091] [cursor=pointer]
+                  - generic [ref=f15e1092]:
+                    - button "Duplicate Dish" [ref=f15e1093] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1097] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1100] [cursor=pointer]
+            - generic [ref=f15e1104]:
+              - generic [ref=f15e1105]:
+                - img "Garlic Butter Naan" [ref=f15e1106]
+                - generic [ref=f15e1107]: NI-014
+              - generic [ref=f15e1111]:
+                - generic [ref=f15e1112]:
+                  - generic [ref=f15e1113]:
+                    - heading "Garlic Butter Naan" [level=4] [ref=f15e1114]
+                    - generic [ref=f15e1115]: ₹70
+                  - paragraph [ref=f15e1116]: Tandoori naan topped with roasted chopped garlic and fresh coriander leaves
+                - generic [ref=f15e1117]:
+                  - button "✓ In Stock" [ref=f15e1118] [cursor=pointer]
+                  - generic [ref=f15e1119]:
+                    - button "Duplicate Dish" [ref=f15e1120] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1124] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1127] [cursor=pointer]
+            - generic [ref=f15e1131]:
+              - generic [ref=f15e1132]:
+                - img "Tandoori Roti (Butter)" [ref=f15e1133]
+                - generic [ref=f15e1134]: NI-015
+              - generic [ref=f15e1138]:
+                - generic [ref=f15e1139]:
+                  - generic [ref=f15e1140]:
+                    - heading "Tandoori Roti (Butter)" [level=4] [ref=f15e1141]
+                    - generic [ref=f15e1142]: ₹35
+                  - paragraph [ref=f15e1143]: Whole wheat flatbread baked crisp in clay oven topped with butter
+                - generic [ref=f15e1144]:
+                  - button "✓ In Stock" [ref=f15e1145] [cursor=pointer]
+                  - generic [ref=f15e1146]:
+                    - button "Duplicate Dish" [ref=f15e1147] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1151] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1154] [cursor=pointer]
+            - generic [ref=f15e1158]:
+              - generic [ref=f15e1159]:
+                - img "Laccha Paratha" [ref=f15e1160]
+                - generic [ref=f15e1161]: NI-016
+              - generic [ref=f15e1165]:
+                - generic [ref=f15e1166]:
+                  - generic [ref=f15e1167]:
+                    - heading "Laccha Paratha" [level=4] [ref=f15e1168]
+                    - generic [ref=f15e1169]: ₹65
+                  - paragraph [ref=f15e1170]: Multi-layered crispy whole wheat paratha baked in tandoor
+                - generic [ref=f15e1171]:
+                  - button "✓ In Stock" [ref=f15e1172] [cursor=pointer]
+                  - generic [ref=f15e1173]:
+                    - button "Duplicate Dish" [ref=f15e1174] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1178] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1181] [cursor=pointer]
+            - generic [ref=f15e1185]:
+              - generic [ref=f15e1186]:
+                - img "Hyderabadi Dum Veg Biryani" [ref=f15e1187]
+                - generic [ref=f15e1188]: NI-017
+              - generic [ref=f15e1192]:
+                - generic [ref=f15e1193]:
+                  - generic [ref=f15e1194]:
+                    - heading "Hyderabadi Dum Veg Biryani" [level=4] [ref=f15e1195]
+                    - generic [ref=f15e1196]: ₹280
+                  - paragraph [ref=f15e1197]: Fragrant basmati rice layered with spiced vegetables, saffron, mint and fried onions, served with raita
+                - generic [ref=f15e1198]:
+                  - button "✓ In Stock" [ref=f15e1199] [cursor=pointer]
+                  - generic [ref=f15e1200]:
+                    - button "Duplicate Dish" [ref=f15e1201] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1205] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1208] [cursor=pointer]
+            - generic [ref=f15e1212]:
+              - generic [ref=f15e1213]:
+                - img "Jeera Rice (Desi Ghee)" [ref=f15e1214]
+                - generic [ref=f15e1215]: NI-018
+              - generic [ref=f15e1219]:
+                - generic [ref=f15e1220]:
+                  - generic [ref=f15e1221]:
+                    - heading "Jeera Rice (Desi Ghee)" [level=4] [ref=f15e1222]
+                    - generic [ref=f15e1223]: ₹170
+                  - paragraph [ref=f15e1224]: Steamed basmati rice tempered with roasted cumin seeds and desi ghee
+                - generic [ref=f15e1225]:
+                  - button "✓ In Stock" [ref=f15e1226] [cursor=pointer]
+                  - generic [ref=f15e1227]:
+                    - button "Duplicate Dish" [ref=f15e1228] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1232] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1235] [cursor=pointer]
+            - generic [ref=f15e1239]:
+              - generic [ref=f15e1240]:
+                - img "Veg Pulao Shahi" [ref=f15e1241]
+                - generic [ref=f15e1242]: NI-019
+              - generic [ref=f15e1246]:
+                - generic [ref=f15e1247]:
+                  - generic [ref=f15e1248]:
+                    - heading "Veg Pulao Shahi" [level=4] [ref=f15e1249]
+                    - generic [ref=f15e1250]: ₹190
+                  - paragraph [ref=f15e1251]: Basmati rice cooked with garden green peas, carrots, beans and mild whole spices
+                - generic [ref=f15e1252]:
+                  - button "✓ In Stock" [ref=f15e1253] [cursor=pointer]
+                  - generic [ref=f15e1254]:
+                    - button "Duplicate Dish" [ref=f15e1255] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1259] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1262] [cursor=pointer]
+            - generic [ref=f15e1266]:
+              - generic [ref=f15e1267]:
+                - img "Masala Chaas (Spiced Buttermilk)" [ref=f15e1268]
+                - generic [ref=f15e1269]: NI-020
+              - generic [ref=f15e1273]:
+                - generic [ref=f15e1274]:
+                  - generic [ref=f15e1275]:
+                    - heading "Masala Chaas (Spiced Buttermilk)" [level=4] [ref=f15e1276]
+                    - generic [ref=f15e1277]: ₹50
+                  - paragraph [ref=f15e1278]: Traditional churned yogurt drink tempered with roasted cumin, rock salt, ginger and fresh mint
+                - generic [ref=f15e1279]:
+                  - button "✓ In Stock" [ref=f15e1280] [cursor=pointer]
+                  - generic [ref=f15e1281]:
+                    - button "Duplicate Dish" [ref=f15e1282] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1286] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1289] [cursor=pointer]
+            - generic [ref=f15e1293]:
+              - generic [ref=f15e1294]:
+                - img "Punjabi Sweet Lassi (Malai Maar Ke)" [ref=f15e1295]
+                - generic [ref=f15e1296]: NI-021
+              - generic [ref=f15e1300]:
+                - generic [ref=f15e1301]:
+                  - generic [ref=f15e1302]:
+                    - heading "Punjabi Sweet Lassi (Malai Maar Ke)" [level=4] [ref=f15e1303]
+                    - generic [ref=f15e1304]: ₹90
+                  - paragraph [ref=f15e1305]: Thick creamy sweetened curd topped with clotted cream and crushed cardamom
+                - generic [ref=f15e1306]:
+                  - button "✓ In Stock" [ref=f15e1307] [cursor=pointer]
+                  - generic [ref=f15e1308]:
+                    - button "Duplicate Dish" [ref=f15e1309] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1313] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1316] [cursor=pointer]
+            - generic [ref=f15e1320]:
+              - generic [ref=f15e1321]:
+                - img "Fresh Lime Soda (Sweet & Salt)" [ref=f15e1322]
+                - generic [ref=f15e1323]: NI-022
+              - generic [ref=f15e1327]:
+                - generic [ref=f15e1328]:
+                  - generic [ref=f15e1329]:
+                    - heading "Fresh Lime Soda (Sweet & Salt)" [level=4] [ref=f15e1330]
+                    - generic [ref=f15e1331]: ₹65
+                  - paragraph [ref=f15e1332]: Fresh squeezed lime juice in carbonated soda with rock salt and sugar syrup
+                - generic [ref=f15e1333]:
+                  - button "✓ In Stock" [ref=f15e1334] [cursor=pointer]
+                  - generic [ref=f15e1335]:
+                    - button "Duplicate Dish" [ref=f15e1336] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1340] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1343] [cursor=pointer]
+            - generic [ref=f15e1347]:
+              - generic [ref=f15e1348]:
+                - img "Gulab Jamun (2 Pcs)" [ref=f15e1349]
+                - generic [ref=f15e1350]: NI-023
+              - generic [ref=f15e1354]:
+                - generic [ref=f15e1355]:
+                  - generic [ref=f15e1356]:
+                    - heading "Gulab Jamun (2 Pcs)" [level=4] [ref=f15e1357]
+                    - generic [ref=f15e1358]: ₹90
+                  - paragraph [ref=f15e1359]: Golden fried milk solid dumplings soaked in rose water and cardamom scented sugar syrup
+                - generic [ref=f15e1360]:
+                  - button "✓ In Stock" [ref=f15e1361] [cursor=pointer]
+                  - generic [ref=f15e1362]:
+                    - button "Duplicate Dish" [ref=f15e1363] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1367] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1370] [cursor=pointer]
+            - generic [ref=f15e1374]:
+              - generic [ref=f15e1375]:
+                - img "Rasmalai Kesar Pista (2 Pcs)" [ref=f15e1376]
+                - generic [ref=f15e1377]: NI-024
+              - generic [ref=f15e1381]:
+                - generic [ref=f15e1382]:
+                  - generic [ref=f15e1383]:
+                    - heading "Rasmalai Kesar Pista (2 Pcs)" [level=4] [ref=f15e1384]
+                    - generic [ref=f15e1385]: ₹120
+                  - paragraph [ref=f15e1386]: Soft spongy cottage cheese patties steeped in thickened saffron infused milk garnished with pistachios
+                - generic [ref=f15e1387]:
+                  - button "✓ In Stock" [ref=f15e1388] [cursor=pointer]
+                  - generic [ref=f15e1389]:
+                    - button "Duplicate Dish" [ref=f15e1390] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1394] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1397] [cursor=pointer]
+            - generic [ref=f15e1401]:
+              - generic [ref=f15e1402]:
+                - img "Royal Gujarati Grand Thali" [ref=f15e1403]
+                - generic [ref=f15e1404]: GUJ-001
+              - generic [ref=f15e1408]:
+                - generic [ref=f15e1409]:
+                  - generic [ref=f15e1410]:
+                    - heading "Royal Gujarati Grand Thali" [level=4] [ref=f15e1411]
+                    - generic [ref=f15e1412]: ₹299
+                  - paragraph [ref=f15e1413]: 3 Shaak, Sweet Gujarati Dal, Kadhi, 4 Phulka Rotli, Basmati Rice, Farsan, Sweet, Papad, Pickle & Chilled Chaas
+                - generic [ref=f15e1414]:
+                  - button "✓ In Stock" [ref=f15e1415] [cursor=pointer]
+                  - generic [ref=f15e1416]:
+                    - button "Duplicate Dish" [ref=f15e1417] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1421] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1424] [cursor=pointer]
+            - generic [ref=f15e1428]:
+              - generic [ref=f15e1429]:
+                - img "Deluxe Gujarati Executive Thali" [ref=f15e1430]
+                - generic [ref=f15e1431]: GUJ-002
+              - generic [ref=f15e1435]:
+                - generic [ref=f15e1436]:
+                  - generic [ref=f15e1437]:
+                    - heading "Deluxe Gujarati Executive Thali" [level=4] [ref=f15e1438]
+                    - generic [ref=f15e1439]: ₹220
+                  - paragraph [ref=f15e1440]: 2 Shaak, Gujarati Dal, Kadhi, 3 Phulkas, Rice, Farsan & Masala Chaas
+                - generic [ref=f15e1441]:
+                  - button "✓ In Stock" [ref=f15e1442] [cursor=pointer]
+                  - generic [ref=f15e1443]:
+                    - button "Duplicate Dish" [ref=f15e1444] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1448] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1451] [cursor=pointer]
+            - generic [ref=f15e1455]:
+              - generic [ref=f15e1456]:
+                - img "Surti Nylon Khaman (250g)" [ref=f15e1457]
+                - generic [ref=f15e1458]: GUJ-003
+              - generic [ref=f15e1462]:
+                - generic [ref=f15e1463]:
+                  - generic [ref=f15e1464]:
+                    - heading "Surti Nylon Khaman (250g)" [level=4] [ref=f15e1465]
+                    - generic [ref=f15e1466]: ₹90
+                  - paragraph [ref=f15e1467]: Super soft, airy steamed gram flour cakes tempered with mustard seeds, green chillies and curry leaves
+                - generic [ref=f15e1468]:
+                  - button "✓ In Stock" [ref=f15e1469] [cursor=pointer]
+                  - generic [ref=f15e1470]:
+                    - button "Duplicate Dish" [ref=f15e1471] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1475] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1478] [cursor=pointer]
+            - generic [ref=f15e1482]:
+              - generic [ref=f15e1483]:
+                - img "Khandvi with Mustard Tempering" [ref=f15e1484]
+                - generic [ref=f15e1485]: GUJ-004
+              - generic [ref=f15e1489]:
+                - generic [ref=f15e1490]:
+                  - generic [ref=f15e1491]:
+                    - heading "Khandvi with Mustard Tempering" [level=4] [ref=f15e1492]
+                    - generic [ref=f15e1493]: ₹110
+                  - paragraph [ref=f15e1494]: Silky spiced gram flour rolls garnished with fresh grated coconut and chopped coriander
+                - generic [ref=f15e1495]:
+                  - button "✓ In Stock" [ref=f15e1496] [cursor=pointer]
+                  - generic [ref=f15e1497]:
+                    - button "Duplicate Dish" [ref=f15e1498] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1502] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1505] [cursor=pointer]
+            - generic [ref=f15e1509]:
+              - generic [ref=f15e1510]:
+                - img "Methi Na Gota (Pakoda)" [ref=f15e1511]
+                - generic [ref=f15e1512]: GUJ-005
+              - generic [ref=f15e1516]:
+                - generic [ref=f15e1517]:
+                  - generic [ref=f15e1518]:
+                    - heading "Methi Na Gota (Pakoda)" [level=4] [ref=f15e1519]
+                    - generic [ref=f15e1520]: ₹100
+                  - paragraph [ref=f15e1521]: Crispy fried fenugreek and gram flour fritters served with sweet Kadhi dip
+                - generic [ref=f15e1522]:
+                  - button "✓ In Stock" [ref=f15e1523] [cursor=pointer]
+                  - generic [ref=f15e1524]:
+                    - button "Duplicate Dish" [ref=f15e1525] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1529] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1532] [cursor=pointer]
+            - generic [ref=f15e1536]:
+              - generic [ref=f15e1537]:
+                - img "Patra Steamed Rolls" [ref=f15e1538]
+                - generic [ref=f15e1539]: GUJ-006
+              - generic [ref=f15e1543]:
+                - generic [ref=f15e1544]:
+                  - generic [ref=f15e1545]:
+                    - heading "Patra Steamed Rolls" [level=4] [ref=f15e1546]
+                    - generic [ref=f15e1547]: ₹100
+                  - paragraph [ref=f15e1548]: Colocasia leaf rolls coated with spiced sweet and tangy gram flour paste
+                - generic [ref=f15e1549]:
+                  - button "✓ In Stock" [ref=f15e1550] [cursor=pointer]
+                  - generic [ref=f15e1551]:
+                    - button "Duplicate Dish" [ref=f15e1552] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1556] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1559] [cursor=pointer]
+            - generic [ref=f15e1563]:
+              - generic [ref=f15e1564]:
+                - img "Surti Undhiyu Special" [ref=f15e1565]
+                - generic [ref=f15e1566]: GUJ-007
+              - generic [ref=f15e1570]:
+                - generic [ref=f15e1571]:
+                  - generic [ref=f15e1572]:
+                    - heading "Surti Undhiyu Special" [level=4] [ref=f15e1573]
+                    - generic [ref=f15e1574]: ₹240
+                  - paragraph [ref=f15e1575]: Heritage mixed vegetable slow-cooked with fresh surti papdi, purple yam, baby eggplants and methi muthias
+                - generic [ref=f15e1576]:
+                  - button "✓ In Stock" [ref=f15e1577] [cursor=pointer]
+                  - generic [ref=f15e1578]:
+                    - button "Duplicate Dish" [ref=f15e1579] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1583] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1586] [cursor=pointer]
+            - generic [ref=f15e1590]:
+              - generic [ref=f15e1591]:
+                - img "Sev Tameta Nu Shaak" [ref=f15e1592]
+                - generic [ref=f15e1593]: GUJ-008
+              - generic [ref=f15e1597]:
+                - generic [ref=f15e1598]:
+                  - generic [ref=f15e1599]:
+                    - heading "Sev Tameta Nu Shaak" [level=4] [ref=f15e1600]
+                    - generic [ref=f15e1601]: ₹180
+                  - paragraph [ref=f15e1602]: Sweet and tangy tomato curry topped with crisp ratlami sev
+                - generic [ref=f15e1603]:
+                  - button "✓ In Stock" [ref=f15e1604] [cursor=pointer]
+                  - generic [ref=f15e1605]:
+                    - button "Duplicate Dish" [ref=f15e1606] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1610] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1613] [cursor=pointer]
+            - generic [ref=f15e1617]:
+              - generic [ref=f15e1618]:
+                - img "Ringna Bateta Nu Shaak" [ref=f15e1619]
+                - generic [ref=f15e1620]: GUJ-009
+              - generic [ref=f15e1624]:
+                - generic [ref=f15e1625]:
+                  - generic [ref=f15e1626]:
+                    - heading "Ringna Bateta Nu Shaak" [level=4] [ref=f15e1627]
+                    - generic [ref=f15e1628]: ₹170
+                  - paragraph [ref=f15e1629]: Tender eggplants and potatoes cooked in traditional Gujarati spices with a hint of jaggery
+                - generic [ref=f15e1630]:
+                  - button "✓ In Stock" [ref=f15e1631] [cursor=pointer]
+                  - generic [ref=f15e1632]:
+                    - button "Duplicate Dish" [ref=f15e1633] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1637] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1640] [cursor=pointer]
+            - generic [ref=f15e1644]:
+              - generic [ref=f15e1645]:
+                - img "Bhindanu Shaak (Okra)" [ref=f15e1646]
+                - generic [ref=f15e1647]: GUJ-010
+              - generic [ref=f15e1651]:
+                - generic [ref=f15e1652]:
+                  - generic [ref=f15e1653]:
+                    - heading "Bhindanu Shaak (Okra)" [level=4] [ref=f15e1654]
+                    - generic [ref=f15e1655]: ₹170
+                  - paragraph [ref=f15e1656]: Crisp stir-fried okra with roasted peanuts, sesame seeds and dry Gujarati spices
+                - generic [ref=f15e1657]:
+                  - button "✓ In Stock" [ref=f15e1658] [cursor=pointer]
+                  - generic [ref=f15e1659]:
+                    - button "Duplicate Dish" [ref=f15e1660] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1664] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1667] [cursor=pointer]
+            - generic [ref=f15e1671]:
+              - generic [ref=f15e1672]:
+                - img "Sweet Gujarati Toor Dal" [ref=f15e1673]
+                - generic [ref=f15e1674]: GUJ-011
+              - generic [ref=f15e1678]:
+                - generic [ref=f15e1679]:
+                  - generic [ref=f15e1680]:
+                    - heading "Sweet Gujarati Toor Dal" [level=4] [ref=f15e1681]
+                    - generic [ref=f15e1682]: ₹150
+                  - paragraph [ref=f15e1683]: Thin pigeon pea lentil soup balanced with kokum, peanuts, jaggery and mustard tempering
+                - generic [ref=f15e1684]:
+                  - button "✓ In Stock" [ref=f15e1685] [cursor=pointer]
+                  - generic [ref=f15e1686]:
+                    - button "Duplicate Dish" [ref=f15e1687] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1691] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1694] [cursor=pointer]
+            - generic [ref=f15e1698]:
+              - generic [ref=f15e1699]:
+                - img "Traditional Gujarati Kadhi" [ref=f15e1700]
+                - generic [ref=f15e1701]: GUJ-012
+              - generic [ref=f15e1705]:
+                - generic [ref=f15e1706]:
+                  - generic [ref=f15e1707]:
+                    - heading "Traditional Gujarati Kadhi" [level=4] [ref=f15e1708]
+                    - generic [ref=f15e1709]: ₹150
+                  - paragraph [ref=f15e1710]: Silky smooth yogurt and besan soup tempered with cinnamon, cloves, curry leaves and ginger
+                - generic [ref=f15e1711]:
+                  - button "✓ In Stock" [ref=f15e1712] [cursor=pointer]
+                  - generic [ref=f15e1713]:
+                    - button "Duplicate Dish" [ref=f15e1714] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1718] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1721] [cursor=pointer]
+            - generic [ref=f15e1725]:
+              - generic [ref=f15e1726]:
+                - img "Phulka Rotli (Ghee, 4 Pcs)" [ref=f15e1727]
+                - generic [ref=f15e1728]: GUJ-013
+              - generic [ref=f15e1732]:
+                - generic [ref=f15e1733]:
+                  - generic [ref=f15e1734]:
+                    - heading "Phulka Rotli (Ghee, 4 Pcs)" [level=4] [ref=f15e1735]
+                    - generic [ref=f15e1736]: ₹50
+                  - paragraph [ref=f15e1737]: Paper-thin whole wheat puffed rotlis smeared with pure desi ghee
+                - generic [ref=f15e1738]:
+                  - button "✓ In Stock" [ref=f15e1739] [cursor=pointer]
+                  - generic [ref=f15e1740]:
+                    - button "Duplicate Dish" [ref=f15e1741] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1745] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1748] [cursor=pointer]
+            - generic [ref=f15e1752]:
+              - generic [ref=f15e1753]:
+                - img "Kathiyawadi Bajra Rotla (Ghee)" [ref=f15e1754]
+                - generic [ref=f15e1755]: GUJ-014
+              - generic [ref=f15e1759]:
+                - generic [ref=f15e1760]:
+                  - generic [ref=f15e1761]:
+                    - heading "Kathiyawadi Bajra Rotla (Ghee)" [level=4] [ref=f15e1762]
+                    - generic [ref=f15e1763]: ₹45
+                  - paragraph [ref=f15e1764]: Thick hand-flattened pearl millet flatbread roasted on clay tava with white butter and jaggery
+                - generic [ref=f15e1765]:
+                  - button "✓ In Stock" [ref=f15e1766] [cursor=pointer]
+                  - generic [ref=f15e1767]:
+                    - button "Duplicate Dish" [ref=f15e1768] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1772] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1775] [cursor=pointer]
+            - generic [ref=f15e1779]:
+              - generic [ref=f15e1780]:
+                - img "Methi Thepla (4 Pcs)" [ref=f15e1781]
+                - generic [ref=f15e1782]: GUJ-015
+              - generic [ref=f15e1786]:
+                - generic [ref=f15e1787]:
+                  - generic [ref=f15e1788]:
+                    - heading "Methi Thepla (4 Pcs)" [level=4] [ref=f15e1789]
+                    - generic [ref=f15e1790]: ₹70
+                  - paragraph [ref=f15e1791]: Spiced fenugreek and whole wheat flatbreads served with sweet mango chundo
+                - generic [ref=f15e1792]:
+                  - button "✓ In Stock" [ref=f15e1793] [cursor=pointer]
+                  - generic [ref=f15e1794]:
+                    - button "Duplicate Dish" [ref=f15e1795] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1799] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1802] [cursor=pointer]
+            - generic [ref=f15e1806]:
+              - generic [ref=f15e1807]:
+                - img "Biscuit Bhakri (2 Pcs)" [ref=f15e1808]
+                - generic [ref=f15e1809]: GUJ-016
+              - generic [ref=f15e1813]:
+                - generic [ref=f15e1814]:
+                  - generic [ref=f15e1815]:
+                    - heading "Biscuit Bhakri (2 Pcs)" [level=4] [ref=f15e1816]
+                    - generic [ref=f15e1817]: ₹50
+                  - paragraph [ref=f15e1818]: Crisp golden layered wheat and semolina disc roasted with ghee
+                - generic [ref=f15e1819]:
+                  - button "✓ In Stock" [ref=f15e1820] [cursor=pointer]
+                  - generic [ref=f15e1821]:
+                    - button "Duplicate Dish" [ref=f15e1822] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1826] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1829] [cursor=pointer]
+            - generic [ref=f15e1833]:
+              - generic [ref=f15e1834]:
+                - img "Vaghareli Khichdi with Kadhi" [ref=f15e1835]
+                - generic [ref=f15e1836]: GUJ-017
+              - generic [ref=f15e1840]:
+                - generic [ref=f15e1841]:
+                  - generic [ref=f15e1842]:
+                    - heading "Vaghareli Khichdi with Kadhi" [level=4] [ref=f15e1843]
+                    - generic [ref=f15e1844]: ₹180
+                  - paragraph [ref=f15e1845]: Rice and moong dal tempered with garlic, onions, cloves and whole spices, paired with Gujarati Kadhi
+                - generic [ref=f15e1846]:
+                  - button "✓ In Stock" [ref=f15e1847] [cursor=pointer]
+                  - generic [ref=f15e1848]:
+                    - button "Duplicate Dish" [ref=f15e1849] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1853] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1856] [cursor=pointer]
+            - generic [ref=f15e1860]:
+              - generic [ref=f15e1861]:
+                - img "Steamed Surti Basmati Rice" [ref=f15e1862]
+                - generic [ref=f15e1863]: GUJ-018
+              - generic [ref=f15e1867]:
+                - generic [ref=f15e1868]:
+                  - generic [ref=f15e1869]:
+                    - heading "Steamed Surti Basmati Rice" [level=4] [ref=f15e1870]
+                    - generic [ref=f15e1871]: ₹120
+                  - paragraph [ref=f15e1872]: Fluffy steamed rice, best enjoyed with Gujarati toor dal
+                - generic [ref=f15e1873]:
+                  - button "✓ In Stock" [ref=f15e1874] [cursor=pointer]
+                  - generic [ref=f15e1875]:
+                    - button "Duplicate Dish" [ref=f15e1876] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1880] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1883] [cursor=pointer]
+            - generic [ref=f15e1887]:
+              - generic [ref=f15e1888]:
+                - img "Kesar Pista Shrikhand (150g)" [ref=f15e1889]
+                - generic [ref=f15e1890]: GUJ-019
+              - generic [ref=f15e1894]:
+                - generic [ref=f15e1895]:
+                  - generic [ref=f15e1896]:
+                    - heading "Kesar Pista Shrikhand (150g)" [level=4] [ref=f15e1897]
+                    - generic [ref=f15e1898]: ₹90
+                  - paragraph [ref=f15e1899]: Thick hung curd dessert flavoured with saffron strands, green cardamom and sliced pistachios
+                - generic [ref=f15e1900]:
+                  - button "✓ In Stock" [ref=f15e1901] [cursor=pointer]
+                  - generic [ref=f15e1902]:
+                    - button "Duplicate Dish" [ref=f15e1903] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1907] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1910] [cursor=pointer]
+            - generic [ref=f15e1914]:
+              - generic [ref=f15e1915]:
+                - img "Rich Basundi Bowl" [ref=f15e1916]
+                - generic [ref=f15e1917]: GUJ-020
+              - generic [ref=f15e1921]:
+                - generic [ref=f15e1922]:
+                  - generic [ref=f15e1923]:
+                    - heading "Rich Basundi Bowl" [level=4] [ref=f15e1924]
+                    - generic [ref=f15e1925]: ₹110
+                  - paragraph [ref=f15e1926]: Slow-simmered condensed whole milk infused with nutmeg and almonds
+                - generic [ref=f15e1927]:
+                  - button "✓ In Stock" [ref=f15e1928] [cursor=pointer]
+                  - generic [ref=f15e1929]:
+                    - button "Duplicate Dish" [ref=f15e1930] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1934] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1937] [cursor=pointer]
+            - generic [ref=f15e1941]:
+              - generic [ref=f15e1942]:
+                - img "Kathiyawadi Masala Chaas" [ref=f15e1943]
+                - generic [ref=f15e1944]: GUJ-021
+              - generic [ref=f15e1948]:
+                - generic [ref=f15e1949]:
+                  - generic [ref=f15e1950]:
+                    - heading "Kathiyawadi Masala Chaas" [level=4] [ref=f15e1951]
+                    - generic [ref=f15e1952]: ₹40
+                  - paragraph [ref=f15e1953]: Smoky spiced buttermilk tempered with roasted cumin, green chilli paste, ginger and black salt
+                - generic [ref=f15e1954]:
+                  - button "✓ In Stock" [ref=f15e1955] [cursor=pointer]
+                  - generic [ref=f15e1956]:
+                    - button "Duplicate Dish" [ref=f15e1957] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1961] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1964] [cursor=pointer]
+            - generic [ref=f15e1968]:
+              - generic [ref=f15e1969]:
+                - img "Crispy Butter Masala Dosa" [ref=f15e1970]
+                - generic [ref=f15e1971]: SI-001
+              - generic [ref=f15e1975]:
+                - generic [ref=f15e1976]:
+                  - generic [ref=f15e1977]:
+                    - heading "Crispy Butter Masala Dosa" [level=4] [ref=f15e1978]
+                    - generic [ref=f15e1979]: ₹150
+                  - paragraph [ref=f15e1980]: Crisp golden crepe roasted with pure Amul butter, filled with aromatic spiced potato and onion masala
+                - generic [ref=f15e1981]:
+                  - button "✓ In Stock" [ref=f15e1982] [cursor=pointer]
+                  - generic [ref=f15e1983]:
+                    - button "Duplicate Dish" [ref=f15e1984] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e1988] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e1991] [cursor=pointer]
+            - generic [ref=f15e1995]:
+              - generic [ref=f15e1996]:
+                - img "Mysore Masala Dosa" [ref=f15e1997]
+                - generic [ref=f15e1998]: SI-002
+              - generic [ref=f15e2002]:
+                - generic [ref=f15e2003]:
+                  - generic [ref=f15e2004]:
+                    - heading "Mysore Masala Dosa" [level=4] [ref=f15e2005]
+                    - generic [ref=f15e2006]: ₹170
+                  - paragraph [ref=f15e2007]: Spread with spicy red garlic-chilli chutney inside and filled with seasoned potato mash
+                - generic [ref=f15e2008]:
+                  - button "✓ In Stock" [ref=f15e2009] [cursor=pointer]
+                  - generic [ref=f15e2010]:
+                    - button "Duplicate Dish" [ref=f15e2011] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2015] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2018] [cursor=pointer]
+            - generic [ref=f15e2022]:
+              - generic [ref=f15e2023]:
+                - img "Cheese Burst Rava Dosa" [ref=f15e2024]
+                - generic [ref=f15e2025]: SI-003
+              - generic [ref=f15e2029]:
+                - generic [ref=f15e2030]:
+                  - generic [ref=f15e2031]:
+                    - heading "Cheese Burst Rava Dosa" [level=4] [ref=f15e2032]
+                    - generic [ref=f15e2033]: ₹190
+                  - paragraph [ref=f15e2034]: Crisp lacy semolina crepe studded with green chillies, ginger, cashews and melted cheese
+                - generic [ref=f15e2035]:
+                  - button "✓ In Stock" [ref=f15e2036] [cursor=pointer]
+                  - generic [ref=f15e2037]:
+                    - button "Duplicate Dish" [ref=f15e2038] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2042] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2045] [cursor=pointer]
+            - generic [ref=f15e2049]:
+              - generic [ref=f15e2050]:
+                - img "Paper Plain Roast Dosa" [ref=f15e2051]
+                - generic [ref=f15e2052]: SI-004
+              - generic [ref=f15e2056]:
+                - generic [ref=f15e2057]:
+                  - generic [ref=f15e2058]:
+                    - heading "Paper Plain Roast Dosa" [level=4] [ref=f15e2059]
+                    - generic [ref=f15e2060]: ₹120
+                  - paragraph [ref=f15e2061]: Extra-large ultra-thin crispy crepe roasted in ghee
+                - generic [ref=f15e2062]:
+                  - button "✓ In Stock" [ref=f15e2063] [cursor=pointer]
+                  - generic [ref=f15e2064]:
+                    - button "Duplicate Dish" [ref=f15e2065] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2069] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2072] [cursor=pointer]
+            - generic [ref=f15e2076]:
+              - generic [ref=f15e2077]:
+                - img "Steamed Ghee Podi Idli (2 Pcs)" [ref=f15e2078]
+                - generic [ref=f15e2079]: SI-005
+              - generic [ref=f15e2083]:
+                - generic [ref=f15e2084]:
+                  - generic [ref=f15e2085]:
+                    - heading "Steamed Ghee Podi Idli (2 Pcs)" [level=4] [ref=f15e2086]
+                    - generic [ref=f15e2087]: ₹120
+                  - paragraph [ref=f15e2088]: Pillow-soft steamed idlis drenched in pure desi ghee and spicy gun powder (karam podi)
+                - generic [ref=f15e2089]:
+                  - button "✓ In Stock" [ref=f15e2090] [cursor=pointer]
+                  - generic [ref=f15e2091]:
+                    - button "Duplicate Dish" [ref=f15e2092] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2096] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2099] [cursor=pointer]
+            - generic [ref=f15e2103]:
+              - generic [ref=f15e2104]:
+                - img "Crispy Medu Vada (2 Pcs)" [ref=f15e2105]
+                - generic [ref=f15e2106]: SI-006
+              - generic [ref=f15e2110]:
+                - generic [ref=f15e2111]:
+                  - generic [ref=f15e2112]:
+                    - heading "Crispy Medu Vada (2 Pcs)" [level=4] [ref=f15e2113]
+                    - generic [ref=f15e2114]: ₹110
+                  - paragraph [ref=f15e2115]: Golden crunchy black gram donuts infused with crushed black peppercorns and curry leaves
+                - generic [ref=f15e2116]:
+                  - button "✓ In Stock" [ref=f15e2117] [cursor=pointer]
+                  - generic [ref=f15e2118]:
+                    - button "Duplicate Dish" [ref=f15e2119] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2123] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2126] [cursor=pointer]
+            - generic [ref=f15e2130]:
+              - generic [ref=f15e2131]:
+                - img "Idli Vada Combo (1+1)" [ref=f15e2132]
+                - generic [ref=f15e2133]: SI-007
+              - generic [ref=f15e2137]:
+                - generic [ref=f15e2138]:
+                  - generic [ref=f15e2139]:
+                    - heading "Idli Vada Combo (1+1)" [level=4] [ref=f15e2140]
+                    - generic [ref=f15e2141]: ₹115
+                  - paragraph [ref=f15e2142]: One soft idli and one crispy medu vada served with hot sambar and fresh chutneys
+                - generic [ref=f15e2143]:
+                  - button "✓ In Stock" [ref=f15e2144] [cursor=pointer]
+                  - generic [ref=f15e2145]:
+                    - button "Duplicate Dish" [ref=f15e2146] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2150] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2153] [cursor=pointer]
+            - generic [ref=f15e2157]:
+              - generic [ref=f15e2158]:
+                - img "Onion Tomato Chilli Uttapam" [ref=f15e2159]
+                - generic [ref=f15e2160]: SI-008
+              - generic [ref=f15e2164]:
+                - generic [ref=f15e2165]:
+                  - generic [ref=f15e2166]:
+                    - heading "Onion Tomato Chilli Uttapam" [level=4] [ref=f15e2167]
+                    - generic [ref=f15e2168]: ₹150
+                  - paragraph [ref=f15e2169]: Soft pancake topped with diced red onions, juicy tomatoes, cilantro and green chillies
+                - generic [ref=f15e2170]:
+                  - button "✓ In Stock" [ref=f15e2171] [cursor=pointer]
+                  - generic [ref=f15e2172]:
+                    - button "Duplicate Dish" [ref=f15e2173] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2177] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2180] [cursor=pointer]
+            - generic [ref=f15e2184]:
+              - generic [ref=f15e2185]:
+                - img "Mixed Vegetable Cheese Uttapam" [ref=f15e2186]
+                - generic [ref=f15e2187]: SI-009
+              - generic [ref=f15e2191]:
+                - generic [ref=f15e2192]:
+                  - generic [ref=f15e2193]:
+                    - heading "Mixed Vegetable Cheese Uttapam" [level=4] [ref=f15e2194]
+                    - generic [ref=f15e2195]: ₹180
+                  - paragraph [ref=f15e2196]: Loaded with finely chopped bell peppers, carrots, sweet corn and grated mozzarella
+                - generic [ref=f15e2197]:
+                  - button "✓ In Stock" [ref=f15e2198] [cursor=pointer]
+                  - generic [ref=f15e2199]:
+                    - button "Duplicate Dish" [ref=f15e2200] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2204] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2207] [cursor=pointer]
+            - generic [ref=f15e2211]:
+              - generic [ref=f15e2212]:
+                - img "South Indian Thali Meal" [ref=f15e2213]
+                - generic [ref=f15e2214]: SI-010
+              - generic [ref=f15e2218]:
+                - generic [ref=f15e2219]:
+                  - generic [ref=f15e2220]:
+                    - heading "South Indian Thali Meal" [level=4] [ref=f15e2221]
+                    - generic [ref=f15e2222]: ₹210
+                  - paragraph [ref=f15e2223]: Rice, Sambar, Rasam, Kootu, Poriyal, Curd, Appalam, Pickle and Payasam
+                - generic [ref=f15e2224]:
+                  - button "✓ In Stock" [ref=f15e2225] [cursor=pointer]
+                  - generic [ref=f15e2226]:
+                    - button "Duplicate Dish" [ref=f15e2227] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2231] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2234] [cursor=pointer]
+            - generic [ref=f15e2238]:
+              - generic [ref=f15e2239]:
+                - img "Curd Rice with Pomegranate" [ref=f15e2240]
+                - generic [ref=f15e2241]: SI-011
+              - generic [ref=f15e2245]:
+                - generic [ref=f15e2246]:
+                  - generic [ref=f15e2247]:
+                    - heading "Curd Rice with Pomegranate" [level=4] [ref=f15e2248]
+                    - generic [ref=f15e2249]: ₹140
+                  - paragraph [ref=f15e2250]: Creamy cooled curd mixed with soft rice, tempered with mustard, ginger and curry leaves
+                - generic [ref=f15e2251]:
+                  - button "✓ In Stock" [ref=f15e2252] [cursor=pointer]
+                  - generic [ref=f15e2253]:
+                    - button "Duplicate Dish" [ref=f15e2254] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2258] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2261] [cursor=pointer]
+            - generic [ref=f15e2265]:
+              - generic [ref=f15e2266]:
+                - img "Bisi Bele Bath (Hot Lentil Rice)" [ref=f15e2267]
+                - generic [ref=f15e2268]: SI-012
+              - generic [ref=f15e2272]:
+                - generic [ref=f15e2273]:
+                  - generic [ref=f15e2274]:
+                    - heading "Bisi Bele Bath (Hot Lentil Rice)" [level=4] [ref=f15e2275]
+                    - generic [ref=f15e2276]: ₹160
+                  - paragraph [ref=f15e2277]: Karnataka specialty rice cooked with lentils, vegetables, tamarind and special aromatic spices
+                - generic [ref=f15e2278]:
+                  - button "✓ In Stock" [ref=f15e2279] [cursor=pointer]
+                  - generic [ref=f15e2280]:
+                    - button "Duplicate Dish" [ref=f15e2281] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2285] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2288] [cursor=pointer]
+            - generic [ref=f15e2292]:
+              - generic [ref=f15e2293]:
+                - img "Authentic Kumbakonam Filter Coffee" [ref=f15e2294]
+                - generic [ref=f15e2295]: SI-013
+              - generic [ref=f15e2299]:
+                - generic [ref=f15e2300]:
+                  - generic [ref=f15e2301]:
+                    - heading "Authentic Kumbakonam Filter Coffee" [level=4] [ref=f15e2302]
+                    - generic [ref=f15e2303]: ₹60
+                  - paragraph [ref=f15e2304]: Strong chicory-blended coffee decoction frothed with boiling whole milk, served in traditional dabarah set
+                - generic [ref=f15e2305]:
+                  - button "✓ In Stock" [ref=f15e2306] [cursor=pointer]
+                  - generic [ref=f15e2307]:
+                    - button "Duplicate Dish" [ref=f15e2308] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2312] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2315] [cursor=pointer]
+            - generic [ref=f15e2319]:
+              - generic [ref=f15e2320]:
+                - img "Amritsari Paneer Tikka" [ref=f15e2321]
+                - generic [ref=f15e2322]: PUN-001
+              - generic [ref=f15e2326]:
+                - generic [ref=f15e2327]:
+                  - generic [ref=f15e2328]:
+                    - heading "Amritsari Paneer Tikka" [level=4] [ref=f15e2329]
+                    - generic [ref=f15e2330]: ₹280
+                  - paragraph [ref=f15e2331]: Thick spiced cottage cheese slabs infused with ajwain and mustard oil, charred in clay oven
+                - generic [ref=f15e2332]:
+                  - button "✓ In Stock" [ref=f15e2333] [cursor=pointer]
+                  - generic [ref=f15e2334]:
+                    - button "Duplicate Dish" [ref=f15e2335] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2339] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2342] [cursor=pointer]
+            - generic [ref=f15e2346]:
+              - generic [ref=f15e2347]:
+                - img "Dhaba Dahi Kebab (6 Pcs)" [ref=f15e2348]
+                - generic [ref=f15e2349]: PUN-002
+              - generic [ref=f15e2353]:
+                - generic [ref=f15e2354]:
+                  - generic [ref=f15e2355]:
+                    - heading "Dhaba Dahi Kebab (6 Pcs)" [level=4] [ref=f15e2356]
+                    - generic [ref=f15e2357]: ₹240
+                  - paragraph [ref=f15e2358]: Crispy fried hung curd and paneer patties with cardamom and mint
+                - generic [ref=f15e2359]:
+                  - button "✓ In Stock" [ref=f15e2360] [cursor=pointer]
+                  - generic [ref=f15e2361]:
+                    - button "Duplicate Dish" [ref=f15e2362] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2366] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2369] [cursor=pointer]
+            - generic [ref=f15e2373]:
+              - generic [ref=f15e2374]:
+                - img "Pindi Chhole (Rawalpindi Style)" [ref=f15e2375]
+                - generic [ref=f15e2376]: PUN-003
+              - generic [ref=f15e2380]:
+                - generic [ref=f15e2381]:
+                  - generic [ref=f15e2382]:
+                    - heading "Pindi Chhole (Rawalpindi Style)" [level=4] [ref=f15e2383]
+                    - generic [ref=f15e2384]: ₹230
+                  - paragraph [ref=f15e2385]: Dark slow-cooked chickpeas steeped with tea leaves, anardana, dried mango and desi spices
+                - generic [ref=f15e2386]:
+                  - button "✓ In Stock" [ref=f15e2387] [cursor=pointer]
+                  - generic [ref=f15e2388]:
+                    - button "Duplicate Dish" [ref=f15e2389] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2393] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2396] [cursor=pointer]
+            - generic [ref=f15e2400]:
+              - generic [ref=f15e2401]:
+                - img "Paneer Bhurji Desi Ghee" [ref=f15e2402]
+                - generic [ref=f15e2403]: PUN-004
+              - generic [ref=f15e2407]:
+                - generic [ref=f15e2408]:
+                  - generic [ref=f15e2409]:
+                    - heading "Paneer Bhurji Desi Ghee" [level=4] [ref=f15e2410]
+                    - generic [ref=f15e2411]: ₹270
+                  - paragraph [ref=f15e2412]: Scrambled fresh cottage cheese wok-fried with onions, tomatoes, ginger and green chillies
+                - generic [ref=f15e2413]:
+                  - button "✓ In Stock" [ref=f15e2414] [cursor=pointer]
+                  - generic [ref=f15e2415]:
+                    - button "Duplicate Dish" [ref=f15e2416] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2420] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2423] [cursor=pointer]
+            - generic [ref=f15e2427]:
+              - generic [ref=f15e2428]:
+                - img "Sarson Ka Saag (Seasonal)" [ref=f15e2429]
+                - generic [ref=f15e2430]: PUN-005
+              - generic [ref=f15e2434]:
+                - generic [ref=f15e2435]:
+                  - generic [ref=f15e2436]:
+                    - heading "Sarson Ka Saag (Seasonal)" [level=4] [ref=f15e2437]
+                    - generic [ref=f15e2438]: ₹260
+                  - paragraph [ref=f15e2439]: Traditional mustard leaves cooked with bathua, spinach and desi makhan
+                - generic [ref=f15e2440]:
+                  - button "✓ In Stock" [ref=f15e2441] [cursor=pointer]
+                  - generic [ref=f15e2442]:
+                    - button "Duplicate Dish" [ref=f15e2443] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2447] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2450] [cursor=pointer]
+            - generic [ref=f15e2454]:
+              - generic [ref=f15e2455]:
+                - img "Amritsari Aloo Pyaaz Kulcha" [ref=f15e2456]
+                - generic [ref=f15e2457]: PUN-006
+              - generic [ref=f15e2461]:
+                - generic [ref=f15e2462]:
+                  - generic [ref=f15e2463]:
+                    - heading "Amritsari Aloo Pyaaz Kulcha" [level=4] [ref=f15e2464]
+                    - generic [ref=f15e2465]: ₹90
+                  - paragraph [ref=f15e2466]: Crisp flaky tandoori flatbread stuffed with spiced potatoes and onions, topped with dollop of butter
+                - generic [ref=f15e2467]:
+                  - button "✓ In Stock" [ref=f15e2468] [cursor=pointer]
+                  - generic [ref=f15e2469]:
+                    - button "Duplicate Dish" [ref=f15e2470] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2474] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2477] [cursor=pointer]
+            - generic [ref=f15e2481]:
+              - generic [ref=f15e2482]:
+                - img "Paneer Kulcha Stuffed" [ref=f15e2483]
+                - generic [ref=f15e2484]: PUN-007
+              - generic [ref=f15e2488]:
+                - generic [ref=f15e2489]:
+                  - generic [ref=f15e2490]:
+                    - heading "Paneer Kulcha Stuffed" [level=4] [ref=f15e2491]
+                    - generic [ref=f15e2492]: ₹120
+                  - paragraph [ref=f15e2493]: Leavened flatbread packed with spiced shredded paneer and fresh coriander
+                - generic [ref=f15e2494]:
+                  - button "✓ In Stock" [ref=f15e2495] [cursor=pointer]
+                  - generic [ref=f15e2496]:
+                    - button "Duplicate Dish" [ref=f15e2497] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2501] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2504] [cursor=pointer]
+            - generic [ref=f15e2508]:
+              - generic [ref=f15e2509]:
+                - img "Makki Di Roti (2 Pcs)" [ref=f15e2510]
+                - generic [ref=f15e2511]: PUN-008
+              - generic [ref=f15e2515]:
+                - generic [ref=f15e2516]:
+                  - generic [ref=f15e2517]:
+                    - heading "Makki Di Roti (2 Pcs)" [level=4] [ref=f15e2518]
+                    - generic [ref=f15e2519]: ₹60
+                  - paragraph [ref=f15e2520]: Cornmeal flatbread roasted on tava with white butter and jaggery
+                - generic [ref=f15e2521]:
+                  - button "✓ In Stock" [ref=f15e2522] [cursor=pointer]
+                  - generic [ref=f15e2523]:
+                    - button "Duplicate Dish" [ref=f15e2524] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2528] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2531] [cursor=pointer]
+            - generic [ref=f15e2535]:
+              - generic [ref=f15e2536]:
+                - img "Veg Galouti Kebab (4 Pcs)" [ref=f15e2537]
+                - generic [ref=f15e2538]: MUG-001
+              - generic [ref=f15e2542]:
+                - generic [ref=f15e2543]:
+                  - generic [ref=f15e2544]:
+                    - heading "Veg Galouti Kebab (4 Pcs)" [level=4] [ref=f15e2545]
+                    - generic [ref=f15e2546]: ₹270
+                  - paragraph [ref=f15e2547]: Melt-in-mouth smoked yam and lentil patties flavored with potli masala, served over mini ulta tawa paratha
+                - generic [ref=f15e2548]:
+                  - button "✓ In Stock" [ref=f15e2549] [cursor=pointer]
+                  - generic [ref=f15e2550]:
+                    - button "Duplicate Dish" [ref=f15e2551] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2555] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2558] [cursor=pointer]
+            - generic [ref=f15e2562]:
+              - generic [ref=f15e2563]:
+                - img "Paneer Pasanda Tikka" [ref=f15e2564]
+                - generic [ref=f15e2565]: MUG-002
+              - generic [ref=f15e2569]:
+                - generic [ref=f15e2570]:
+                  - generic [ref=f15e2571]:
+                    - heading "Paneer Pasanda Tikka" [level=4] [ref=f15e2572]
+                    - generic [ref=f15e2573]: ₹300
+                  - paragraph [ref=f15e2574]: Layered cottage cheese stuffed with mint, nuts and khoya, glazed in tandoor
+                - generic [ref=f15e2575]:
+                  - button "✓ In Stock" [ref=f15e2576] [cursor=pointer]
+                  - generic [ref=f15e2577]:
+                    - button "Duplicate Dish" [ref=f15e2578] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2582] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2585] [cursor=pointer]
+            - generic [ref=f15e2589]:
+              - generic [ref=f15e2590]:
+                - img "Navratan Korma Royal" [ref=f15e2591]
+                - generic [ref=f15e2592]: MUG-003
+              - generic [ref=f15e2596]:
+                - generic [ref=f15e2597]:
+                  - generic [ref=f15e2598]:
+                    - heading "Navratan Korma Royal" [level=4] [ref=f15e2599]
+                    - generic [ref=f15e2600]: ₹310
+                  - paragraph [ref=f15e2601]: Nine jewels of vegetables, fruits and nuts simmered in a mildly sweet cashew and khoya gravy
+                - generic [ref=f15e2602]:
+                  - button "✓ In Stock" [ref=f15e2603] [cursor=pointer]
+                  - generic [ref=f15e2604]:
+                    - button "Duplicate Dish" [ref=f15e2605] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2609] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2612] [cursor=pointer]
+            - generic [ref=f15e2616]:
+              - generic [ref=f15e2617]:
+                - img "Mughlai Paneer Lababdar" [ref=f15e2618]
+                - generic [ref=f15e2619]: MUG-004
+              - generic [ref=f15e2623]:
+                - generic [ref=f15e2624]:
+                  - generic [ref=f15e2625]:
+                    - heading "Mughlai Paneer Lababdar" [level=4] [ref=f15e2626]
+                    - generic [ref=f15e2627]: ₹320
+                  - paragraph [ref=f15e2628]: Paneer batons in a velvety tomato and melon seed gravy topped with grated cheese
+                - generic [ref=f15e2629]:
+                  - button "✓ In Stock" [ref=f15e2630] [cursor=pointer]
+                  - generic [ref=f15e2631]:
+                    - button "Duplicate Dish" [ref=f15e2632] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2636] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2639] [cursor=pointer]
+            - generic [ref=f15e2643]:
+              - generic [ref=f15e2644]:
+                - img "Khamiri Roti (2 Pcs)" [ref=f15e2645]
+                - generic [ref=f15e2646]: MUG-005
+              - generic [ref=f15e2650]:
+                - generic [ref=f15e2651]:
+                  - generic [ref=f15e2652]:
+                    - heading "Khamiri Roti (2 Pcs)" [level=4] [ref=f15e2653]
+                    - generic [ref=f15e2654]: ₹60
+                  - paragraph [ref=f15e2655]: Traditional Mughal leavened bread with a slight sourdough tang
+                - generic [ref=f15e2656]:
+                  - button "✓ In Stock" [ref=f15e2657] [cursor=pointer]
+                  - generic [ref=f15e2658]:
+                    - button "Duplicate Dish" [ref=f15e2659] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2663] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2666] [cursor=pointer]
+            - generic [ref=f15e2670]:
+              - generic [ref=f15e2671]:
+                - img "Roomali Roti" [ref=f15e2672]
+                - generic [ref=f15e2673]: MUG-006
+              - generic [ref=f15e2677]:
+                - generic [ref=f15e2678]:
+                  - generic [ref=f15e2679]:
+                    - heading "Roomali Roti" [level=4] [ref=f15e2680]
+                    - generic [ref=f15e2681]: ₹40
+                  - paragraph [ref=f15e2682]: Handkerchief-thin soft bread tossed on inverted wok
+                - generic [ref=f15e2683]:
+                  - button "✓ In Stock" [ref=f15e2684] [cursor=pointer]
+                  - generic [ref=f15e2685]:
+                    - button "Duplicate Dish" [ref=f15e2686] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2690] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2693] [cursor=pointer]
+            - generic [ref=f15e2697]:
+              - generic [ref=f15e2698]:
+                - img "Lucknowi Dum Biryani Handi" [ref=f15e2699]
+                - generic [ref=f15e2700]: MUG-007
+              - generic [ref=f15e2704]:
+                - generic [ref=f15e2705]:
+                  - generic [ref=f15e2706]:
+                    - heading "Lucknowi Dum Biryani Handi" [level=4] [ref=f15e2707]
+                    - generic [ref=f15e2708]: ₹310
+                  - paragraph [ref=f15e2709]: Scented basmati rice cooked on slow dum with royal spices and kewra essence
+                - generic [ref=f15e2710]:
+                  - button "✓ In Stock" [ref=f15e2711] [cursor=pointer]
+                  - generic [ref=f15e2712]:
+                    - button "Duplicate Dish" [ref=f15e2713] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2717] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2720] [cursor=pointer]
+            - generic [ref=f15e2724]:
+              - generic [ref=f15e2725]:
+                - img "Kathiyawadi Ringna No Olo" [ref=f15e2726]
+                - generic [ref=f15e2727]: KAT-001
+              - generic [ref=f15e2731]:
+                - generic [ref=f15e2732]:
+                  - generic [ref=f15e2733]:
+                    - heading "Kathiyawadi Ringna No Olo" [level=4] [ref=f15e2734]
+                    - generic [ref=f15e2735]: ₹200
+                  - paragraph [ref=f15e2736]: Charcoal roasted smoked eggplants mashed and cooked with garlic, green chillies, spring onions and oil
+                - generic [ref=f15e2737]:
+                  - button "✓ In Stock" [ref=f15e2738] [cursor=pointer]
+                  - generic [ref=f15e2739]:
+                    - button "Duplicate Dish" [ref=f15e2740] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2744] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2747] [cursor=pointer]
+            - generic [ref=f15e2751]:
+              - generic [ref=f15e2752]:
+                - img "Lasaniya Bateta (Garlic Potatoes)" [ref=f15e2753]
+                - generic [ref=f15e2754]: KAT-002
+              - generic [ref=f15e2758]:
+                - generic [ref=f15e2759]:
+                  - generic [ref=f15e2760]:
+                    - heading "Lasaniya Bateta (Garlic Potatoes)" [level=4] [ref=f15e2761]
+                    - generic [ref=f15e2762]: ₹180
+                  - paragraph [ref=f15e2763]: Baby potatoes simmered in a bold fiery garlic and Kashmiri chilli paste gravy
+                - generic [ref=f15e2764]:
+                  - button "✓ In Stock" [ref=f15e2765] [cursor=pointer]
+                  - generic [ref=f15e2766]:
+                    - button "Duplicate Dish" [ref=f15e2767] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2771] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2774] [cursor=pointer]
+            - generic [ref=f15e2778]:
+              - generic [ref=f15e2779]:
+                - img "Sev Dungri Nu Shaak" [ref=f15e2780]
+                - generic [ref=f15e2781]: KAT-003
+              - generic [ref=f15e2785]:
+                - generic [ref=f15e2786]:
+                  - generic [ref=f15e2787]:
+                    - heading "Sev Dungri Nu Shaak" [level=4] [ref=f15e2788]
+                    - generic [ref=f15e2789]: ₹170
+                  - paragraph [ref=f15e2790]: Caramelized onions cooked with crisp sev in a tangy rustic sauce
+                - generic [ref=f15e2791]:
+                  - button "✓ In Stock" [ref=f15e2792] [cursor=pointer]
+                  - generic [ref=f15e2793]:
+                    - button "Duplicate Dish" [ref=f15e2794] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2798] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2801] [cursor=pointer]
+            - generic [ref=f15e2805]:
+              - generic [ref=f15e2806]:
+                - img "Dahi Tikhari (Kathiyawadi Dip)" [ref=f15e2807]
+                - generic [ref=f15e2808]: KAT-004
+              - generic [ref=f15e2812]:
+                - generic [ref=f15e2813]:
+                  - generic [ref=f15e2814]:
+                    - heading "Dahi Tikhari (Kathiyawadi Dip)" [level=4] [ref=f15e2815]
+                    - generic [ref=f15e2816]: ₹130
+                  - paragraph [ref=f15e2817]: Yogurt tempered with sizzling garlic, red chilli powder and cumin in groundnut oil
+                - generic [ref=f15e2818]:
+                  - button "✓ In Stock" [ref=f15e2819] [cursor=pointer]
+                  - generic [ref=f15e2820]:
+                    - button "Duplicate Dish" [ref=f15e2821] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2825] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2828] [cursor=pointer]
+            - generic [ref=f15e2832]:
+              - generic [ref=f15e2833]:
+                - img "Kathiyawadi Bajra Rotla (White Butter)" [ref=f15e2834]
+                - generic [ref=f15e2835]: KAT-005
+              - generic [ref=f15e2839]:
+                - generic [ref=f15e2840]:
+                  - generic [ref=f15e2841]:
+                    - heading "Kathiyawadi Bajra Rotla (White Butter)" [level=4] [ref=f15e2842]
+                    - generic [ref=f15e2843]: ₹50
+                  - paragraph [ref=f15e2844]: Hand-shaped bajra flatbread roasted over slow heat with dollop of fresh churned makhan and jaggery
+                - generic [ref=f15e2845]:
+                  - button "✓ In Stock" [ref=f15e2846] [cursor=pointer]
+                  - generic [ref=f15e2847]:
+                    - button "Duplicate Dish" [ref=f15e2848] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2852] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2855] [cursor=pointer]
+            - generic [ref=f15e2859]:
+              - generic [ref=f15e2860]:
+                - img "Leelvanu Lasan Chutney" [ref=f15e2861]
+                - generic [ref=f15e2862]: KAT-006
+              - generic [ref=f15e2866]:
+                - generic [ref=f15e2867]:
+                  - generic [ref=f15e2868]:
+                    - heading "Leelvanu Lasan Chutney" [level=4] [ref=f15e2869]
+                    - generic [ref=f15e2870]: ₹40
+                  - paragraph [ref=f15e2871]: Pounded green garlic and red chilli chutney
+                - generic [ref=f15e2872]:
+                  - button "✓ In Stock" [ref=f15e2873] [cursor=pointer]
+                  - generic [ref=f15e2874]:
+                    - button "Duplicate Dish" [ref=f15e2875] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2879] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2882] [cursor=pointer]
+            - generic [ref=f15e2886]:
+              - generic [ref=f15e2887]:
+                - img "Marwari Dal Baati Churma Thali" [ref=f15e2888]
+                - generic [ref=f15e2889]: RAJ-001
+              - generic [ref=f15e2893]:
+                - generic [ref=f15e2894]:
+                  - generic [ref=f15e2895]:
+                    - heading "Marwari Dal Baati Churma Thali" [level=4] [ref=f15e2896]
+                    - generic [ref=f15e2897]: ₹320
+                  - paragraph [ref=f15e2898]: Panchmel Dal, 4 Baked Baatis drenched in desi ghee, Sweet Wheat Churma, Gatte Ki Sabzi, Garlic Chutney & Chaas
+                - generic [ref=f15e2899]:
+                  - button "✓ In Stock" [ref=f15e2900] [cursor=pointer]
+                  - generic [ref=f15e2901]:
+                    - button "Duplicate Dish" [ref=f15e2902] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2906] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2909] [cursor=pointer]
+            - generic [ref=f15e2913]:
+              - generic [ref=f15e2914]:
+                - img "Shahi Gatte Ki Sabzi" [ref=f15e2915]
+                - generic [ref=f15e2916]: RAJ-002
+              - generic [ref=f15e2920]:
+                - generic [ref=f15e2921]:
+                  - generic [ref=f15e2922]:
+                    - heading "Shahi Gatte Ki Sabzi" [level=4] [ref=f15e2923]
+                    - generic [ref=f15e2924]: ₹220
+                  - paragraph [ref=f15e2925]: Steamed gram flour dumplings simmered in a spiced tangy yogurt and mustard seed gravy
+                - generic [ref=f15e2926]:
+                  - button "✓ In Stock" [ref=f15e2927] [cursor=pointer]
+                  - generic [ref=f15e2928]:
+                    - button "Duplicate Dish" [ref=f15e2929] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2933] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2936] [cursor=pointer]
+            - generic [ref=f15e2940]:
+              - generic [ref=f15e2941]:
+                - img "Authentic Ker Sangri Special" [ref=f15e2942]
+                - generic [ref=f15e2943]: RAJ-003
+              - generic [ref=f15e2947]:
+                - generic [ref=f15e2948]:
+                  - generic [ref=f15e2949]:
+                    - heading "Authentic Ker Sangri Special" [level=4] [ref=f15e2950]
+                    - generic [ref=f15e2951]: ₹290
+                  - paragraph [ref=f15e2952]: Desert beans and wild capers cooked with red chillies, raw mango powder and mustard oil
+                - generic [ref=f15e2953]:
+                  - button "✓ In Stock" [ref=f15e2954] [cursor=pointer]
+                  - generic [ref=f15e2955]:
+                    - button "Duplicate Dish" [ref=f15e2956] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2960] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2963] [cursor=pointer]
+            - generic [ref=f15e2967]:
+              - generic [ref=f15e2968]:
+                - img "Pithod Ki Sabzi" [ref=f15e2969]
+                - generic [ref=f15e2970]: RAJ-004
+              - generic [ref=f15e2974]:
+                - generic [ref=f15e2975]:
+                  - generic [ref=f15e2976]:
+                    - heading "Pithod Ki Sabzi" [level=4] [ref=f15e2977]
+                    - generic [ref=f15e2978]: ₹210
+                  - paragraph [ref=f15e2979]: Spiced besan diamond cakes cooked in a creamy Rajasthani kadhi gravy
+                - generic [ref=f15e2980]:
+                  - button "✓ In Stock" [ref=f15e2981] [cursor=pointer]
+                  - generic [ref=f15e2982]:
+                    - button "Duplicate Dish" [ref=f15e2983] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e2987] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e2990] [cursor=pointer]
+            - generic [ref=f15e2994]:
+              - generic [ref=f15e2995]:
+                - img "Ghee Mini Podi Idli (14 Pcs)" [ref=f15e2996]
+                - generic [ref=f15e2997]: TIF-001
+              - generic [ref=f15e3001]:
+                - generic [ref=f15e3002]:
+                  - generic [ref=f15e3003]:
+                    - heading "Ghee Mini Podi Idli (14 Pcs)" [level=4] [ref=f15e3004]
+                    - generic [ref=f15e3005]: ₹110
+                  - paragraph [ref=f15e3006]: Cocktail bite-sized idlis coated in spicy podi powder and hot melted ghee
+                - generic [ref=f15e3007]:
+                  - button "✓ In Stock" [ref=f15e3008] [cursor=pointer]
+                  - generic [ref=f15e3009]:
+                    - button "Duplicate Dish" [ref=f15e3010] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3014] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3017] [cursor=pointer]
+            - generic [ref=f15e3021]:
+              - generic [ref=f15e3022]:
+                - img "Hot Ven Pongal with Ghee Cashews" [ref=f15e3023]
+                - generic [ref=f15e3024]: TIF-002
+              - generic [ref=f15e3028]:
+                - generic [ref=f15e3029]:
+                  - generic [ref=f15e3030]:
+                    - heading "Hot Ven Pongal with Ghee Cashews" [level=4] [ref=f15e3031]
+                    - generic [ref=f15e3032]: ₹100
+                  - paragraph [ref=f15e3033]: Moong dal and rice porridge cooked with cumin, pepper, ginger and fried cashews in ghee
+                - generic [ref=f15e3034]:
+                  - button "✓ In Stock" [ref=f15e3035] [cursor=pointer]
+                  - generic [ref=f15e3036]:
+                    - button "Duplicate Dish" [ref=f15e3037] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3041] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3044] [cursor=pointer]
+            - generic [ref=f15e3048]:
+              - generic [ref=f15e3049]:
+                - img "Crispy Corn Salt & Pepper" [ref=f15e3050]
+                - generic [ref=f15e3051]: PV-001
+              - generic [ref=f15e3055]:
+                - generic [ref=f15e3056]:
+                  - generic [ref=f15e3057]:
+                    - heading "Crispy Corn Salt & Pepper" [level=4] [ref=f15e3058]
+                    - generic [ref=f15e3059]: ₹210
+                  - paragraph [ref=f15e3060]: Sweet corn kernels wok-tossed with crushed black peppercorns, scallions and bell peppers
+                - generic [ref=f15e3061]:
+                  - button "✓ In Stock" [ref=f15e3062] [cursor=pointer]
+                  - generic [ref=f15e3063]:
+                    - button "Duplicate Dish" [ref=f15e3064] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3068] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3071] [cursor=pointer]
+            - generic [ref=f15e3075]:
+              - generic [ref=f15e3076]:
+                - img "Jain Paneer Tikka Satvik" [ref=f15e3077]
+                - generic [ref=f15e3078]: JAI-001
+              - generic [ref=f15e3082]:
+                - generic [ref=f15e3083]:
+                  - generic [ref=f15e3084]:
+                    - heading "Jain Paneer Tikka Satvik" [level=4] [ref=f15e3085]
+                    - generic [ref=f15e3086]: ₹280
+                  - paragraph [ref=f15e3087]: Cottage cheese marinated in pure curd, carom seeds and yellow chilli powder, roasted with capsicum
+                - generic [ref=f15e3088]:
+                  - button "✓ In Stock" [ref=f15e3089] [cursor=pointer]
+                  - generic [ref=f15e3090]:
+                    - button "Duplicate Dish" [ref=f15e3091] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3095] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3098] [cursor=pointer]
+            - generic [ref=f15e3102]:
+              - generic [ref=f15e3103]:
+                - img "Jain Raw Banana Cutlets (4 Pcs)" [ref=f15e3104]
+                - generic [ref=f15e3105]: JAI-002
+              - generic [ref=f15e3109]:
+                - generic [ref=f15e3110]:
+                  - generic [ref=f15e3111]:
+                    - heading "Jain Raw Banana Cutlets (4 Pcs)" [level=4] [ref=f15e3112]
+                    - generic [ref=f15e3113]: ₹190
+                  - paragraph [ref=f15e3114]: Steamed green plantain and green pea cutlets spiced with ginger and green chillies
+                - generic [ref=f15e3115]:
+                  - button "✓ In Stock" [ref=f15e3116] [cursor=pointer]
+                  - generic [ref=f15e3117]:
+                    - button "Duplicate Dish" [ref=f15e3118] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3122] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3125] [cursor=pointer]
+            - generic [ref=f15e3129]:
+              - generic [ref=f15e3130]:
+                - img "Jain Paneer Butter Masala" [ref=f15e3131]
+                - generic [ref=f15e3132]: JAI-003
+              - generic [ref=f15e3136]:
+                - generic [ref=f15e3137]:
+                  - generic [ref=f15e3138]:
+                    - heading "Jain Paneer Butter Masala" [level=4] [ref=f15e3139]
+                    - generic [ref=f15e3140]: ₹290
+                  - paragraph [ref=f15e3141]: Paneer in smooth tomato-cashew gravy made strictly without onion, garlic or ginger paste
+                - generic [ref=f15e3142]:
+                  - button "✓ In Stock" [ref=f15e3143] [cursor=pointer]
+                  - generic [ref=f15e3144]:
+                    - button "Duplicate Dish" [ref=f15e3145] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3149] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3152] [cursor=pointer]
+            - generic [ref=f15e3156]:
+              - generic [ref=f15e3157]:
+                - img "Jain Kela Nu Shaak (Raw Banana Curry)" [ref=f15e3158]
+                - generic [ref=f15e3159]: JAI-004
+              - generic [ref=f15e3163]:
+                - generic [ref=f15e3164]:
+                  - generic [ref=f15e3165]:
+                    - heading "Jain Kela Nu Shaak (Raw Banana Curry)" [level=4] [ref=f15e3166]
+                    - generic [ref=f15e3167]: ₹200
+                  - paragraph [ref=f15e3168]: Raw bananas cooked in sweet and tangy Gujarati style with crushed peanuts and cumin
+                - generic [ref=f15e3169]:
+                  - button "✓ In Stock" [ref=f15e3170] [cursor=pointer]
+                  - generic [ref=f15e3171]:
+                    - button "Duplicate Dish" [ref=f15e3172] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3176] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3179] [cursor=pointer]
+            - generic [ref=f15e3183]:
+              - generic [ref=f15e3184]:
+                - img "Paneer Lababdar Special" [ref=f15e3185]
+                - generic [ref=f15e3186]: MC-001
+              - generic [ref=f15e3190]:
+                - generic [ref=f15e3191]:
+                  - generic [ref=f15e3192]:
+                    - heading "Paneer Lababdar Special" [level=4] [ref=f15e3193]
+                    - generic [ref=f15e3194]: ₹290
+                  - paragraph [ref=f15e3195]: Paneer batons cooked in rich tomato and onion gravy with grated paneer garnish
+                - generic [ref=f15e3196]:
+                  - button "✓ In Stock" [ref=f15e3197] [cursor=pointer]
+                  - generic [ref=f15e3198]:
+                    - button "Duplicate Dish" [ref=f15e3199] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3203] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3206] [cursor=pointer]
+            - generic [ref=f15e3210]:
+              - generic [ref=f15e3211]:
+                - img "Grand Tandoori Veg Kebab Platter" [ref=f15e3212]
+                - generic [ref=f15e3213]: FAM-001
+              - generic [ref=f15e3217]:
+                - generic [ref=f15e3218]:
+                  - generic [ref=f15e3219]:
+                    - heading "Grand Tandoori Veg Kebab Platter" [level=4] [ref=f15e3220]
+                    - generic [ref=f15e3221]: ₹580
+                  - paragraph [ref=f15e3222]: Assortment of Paneer Tikka, Hara Bhara Kebab, Stuffed Mushrooms and Veg Seekh (16 Pcs)
+                - generic [ref=f15e3223]:
+                  - button "✓ In Stock" [ref=f15e3224] [cursor=pointer]
+                  - generic [ref=f15e3225]:
+                    - button "Duplicate Dish" [ref=f15e3226] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3230] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3233] [cursor=pointer]
+            - generic [ref=f15e3237]:
+              - generic [ref=f15e3238]:
+                - img "Maharaja Unlimited Royal Thali" [ref=f15e3239]
+                - generic [ref=f15e3240]: THL-001
+              - generic [ref=f15e3244]:
+                - generic [ref=f15e3245]:
+                  - generic [ref=f15e3246]:
+                    - heading "Maharaja Unlimited Royal Thali" [level=4] [ref=f15e3247]
+                    - generic [ref=f15e3248]: ₹380
+                  - paragraph [ref=f15e3249]: 4 Curries, 2 Dals, 4 Bread Varieties, Pulav, 2 Farsan, 2 Desserts, Raita, Papad, Chutney and Chaas
+                - generic [ref=f15e3250]:
+                  - button "✓ In Stock" [ref=f15e3251] [cursor=pointer]
+                  - generic [ref=f15e3252]:
+                    - button "Duplicate Dish" [ref=f15e3253] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3257] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3260] [cursor=pointer]
+            - generic [ref=f15e3264]:
+              - generic [ref=f15e3265]:
+                - img "Quick Business Lunch Thali" [ref=f15e3266]
+                - generic [ref=f15e3267]: THL-002
+              - generic [ref=f15e3271]:
+                - generic [ref=f15e3272]:
+                  - generic [ref=f15e3273]:
+                    - heading "Quick Business Lunch Thali" [level=4] [ref=f15e3274]
+                    - generic [ref=f15e3275]: ₹199
+                  - paragraph [ref=f15e3276]: 2 Curries, Yellow Dal, 3 Phulkas, Steamed Rice, Sweet and Chaas
+                - generic [ref=f15e3277]:
+                  - button "✓ In Stock" [ref=f15e3278] [cursor=pointer]
+                  - generic [ref=f15e3279]:
+                    - button "Duplicate Dish" [ref=f15e3280] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3284] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3287] [cursor=pointer]
+            - generic [ref=f15e3291]:
+              - generic [ref=f15e3292]:
+                - img "Veg Hakka Noodles" [ref=f15e3293]
+                - generic [ref=f15e3294]: CHI-001
+              - generic [ref=f15e3298]:
+                - generic [ref=f15e3299]:
+                  - generic [ref=f15e3300]:
+                    - heading "Veg Hakka Noodles" [level=4] [ref=f15e3301]
+                    - generic [ref=f15e3302]: ₹190
+                  - paragraph [ref=f15e3303]: Thin noodles wok tossed with shredded cabbage, bell peppers, carrots, spring onions and dark soy sauce
+                - generic [ref=f15e3304]:
+                  - button "✓ In Stock" [ref=f15e3305] [cursor=pointer]
+                  - generic [ref=f15e3306]:
+                    - button "Duplicate Dish" [ref=f15e3307] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3311] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3314] [cursor=pointer]
+            - generic [ref=f15e3318]:
+              - generic [ref=f15e3319]:
+                - img "Schezwan Fried Rice" [ref=f15e3320]
+                - generic [ref=f15e3321]: CHI-002
+              - generic [ref=f15e3325]:
+                - generic [ref=f15e3326]:
+                  - generic [ref=f15e3327]:
+                    - heading "Schezwan Fried Rice" [level=4] [ref=f15e3328]
+                    - generic [ref=f15e3329]: ₹210
+                  - paragraph [ref=f15e3330]: Basmati rice tossed with fiery Sichuan pepper sauce and diced crunchy vegetables
+                - generic [ref=f15e3331]:
+                  - button "✓ In Stock" [ref=f15e3332] [cursor=pointer]
+                  - generic [ref=f15e3333]:
+                    - button "Duplicate Dish" [ref=f15e3334] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3338] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3341] [cursor=pointer]
+            - generic [ref=f15e3345]:
+              - generic [ref=f15e3346]:
+                - img "Chilli Paneer Dry" [ref=f15e3347]
+                - generic [ref=f15e3348]: CHI-003
+              - generic [ref=f15e3352]:
+                - generic [ref=f15e3353]:
+                  - generic [ref=f15e3354]:
+                    - heading "Chilli Paneer Dry" [level=4] [ref=f15e3355]
+                    - generic [ref=f15e3356]: ₹250
+                  - paragraph [ref=f15e3357]: Crisp coated paneer cubes tossed with onion petals, green chillies, garlic and soy glaze
+                - generic [ref=f15e3358]:
+                  - button "✓ In Stock" [ref=f15e3359] [cursor=pointer]
+                  - generic [ref=f15e3360]:
+                    - button "Duplicate Dish" [ref=f15e3361] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3365] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3368] [cursor=pointer]
+            - generic [ref=f15e3372]:
+              - generic [ref=f15e3373]:
+                - img "Veg Manchurian Gravy" [ref=f15e3374]
+                - generic [ref=f15e3375]: CHI-004
+              - generic [ref=f15e3379]:
+                - generic [ref=f15e3380]:
+                  - generic [ref=f15e3381]:
+                    - heading "Veg Manchurian Gravy" [level=4] [ref=f15e3382]
+                    - generic [ref=f15e3383]: ₹220
+                  - paragraph [ref=f15e3384]: Vegetable dumplings simmered in rich garlic, coriander and soy sauce gravy
+                - generic [ref=f15e3385]:
+                  - button "✓ In Stock" [ref=f15e3386] [cursor=pointer]
+                  - generic [ref=f15e3387]:
+                    - button "Duplicate Dish" [ref=f15e3388] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3392] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3395] [cursor=pointer]
+            - generic [ref=f15e3399]:
+              - generic [ref=f15e3400]:
+                - img "Triple Schezwan Rice with Gravy" [ref=f15e3401]
+                - generic [ref=f15e3402]: IC-001
+              - generic [ref=f15e3406]:
+                - generic [ref=f15e3407]:
+                  - generic [ref=f15e3408]:
+                    - heading "Triple Schezwan Rice with Gravy" [level=4] [ref=f15e3409]
+                    - generic [ref=f15e3410]: ₹260
+                  - paragraph [ref=f15e3411]: Combo of wok rice, fried noodles, and hot Schezwan Manchurian gravy bowl
+                - generic [ref=f15e3412]:
+                  - button "✓ In Stock" [ref=f15e3413] [cursor=pointer]
+                  - generic [ref=f15e3414]:
+                    - button "Duplicate Dish" [ref=f15e3415] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3419] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3422] [cursor=pointer]
+            - generic [ref=f15e3426]:
+              - generic [ref=f15e3427]:
+                - img "Crispy Chinese Bhel" [ref=f15e3428]
+                - generic [ref=f15e3429]: IC-002
+              - generic [ref=f15e3433]:
+                - generic [ref=f15e3434]:
+                  - generic [ref=f15e3435]:
+                    - heading "Crispy Chinese Bhel" [level=4] [ref=f15e3436]
+                    - generic [ref=f15e3437]: ₹140
+                  - paragraph [ref=f15e3438]: Fried noodles tossed with cabbage, capsicum, sweet chilli and schezwan dips
+                - generic [ref=f15e3439]:
+                  - button "✓ In Stock" [ref=f15e3440] [cursor=pointer]
+                  - generic [ref=f15e3441]:
+                    - button "Duplicate Dish" [ref=f15e3442] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3446] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3449] [cursor=pointer]
+            - generic [ref=f15e3453]:
+              - generic [ref=f15e3454]:
+                - img "Crispy Veggie Supreme Burger" [ref=f15e3455]
+                - generic [ref=f15e3456]: FF-001
+              - generic [ref=f15e3460]:
+                - generic [ref=f15e3461]:
+                  - generic [ref=f15e3462]:
+                    - heading "Crispy Veggie Supreme Burger" [level=4] [ref=f15e3463]
+                    - generic [ref=f15e3464]: ₹130
+                  - paragraph [ref=f15e3465]: Crisp vegetable patty with cheese slice, iceberg lettuce and smoky mayo on a toasted sesame bun
+                - generic [ref=f15e3466]:
+                  - button "✓ In Stock" [ref=f15e3467] [cursor=pointer]
+                  - generic [ref=f15e3468]:
+                    - button "Duplicate Dish" [ref=f15e3469] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3473] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3476] [cursor=pointer]
+            - generic [ref=f15e3480]:
+              - generic [ref=f15e3481]:
+                - img "Spicy Paneer Tikka Wrap" [ref=f15e3482]
+                - generic [ref=f15e3483]: FF-002
+              - generic [ref=f15e3487]:
+                - generic [ref=f15e3488]:
+                  - generic [ref=f15e3489]:
+                    - heading "Spicy Paneer Tikka Wrap" [level=4] [ref=f15e3490]
+                    - generic [ref=f15e3491]: ₹160
+                  - paragraph [ref=f15e3492]: Grilled spiced paneer cubes rolled in a warm tortilla with mint mayo and pickled onions
+                - generic [ref=f15e3493]:
+                  - button "✓ In Stock" [ref=f15e3494] [cursor=pointer]
+                  - generic [ref=f15e3495]:
+                    - button "Duplicate Dish" [ref=f15e3496] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3500] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3503] [cursor=pointer]
+            - generic [ref=f15e3507]:
+              - generic [ref=f15e3508]:
+                - img "Peri Peri Crinkle Fries" [ref=f15e3509]
+                - generic [ref=f15e3510]: FF-003
+              - generic [ref=f15e3514]:
+                - generic [ref=f15e3515]:
+                  - generic [ref=f15e3516]:
+                    - heading "Peri Peri Crinkle Fries" [level=4] [ref=f15e3517]
+                    - generic [ref=f15e3518]: ₹120
+                  - paragraph [ref=f15e3519]: Golden potato fries shaken with fiery African peri peri spice mix
+                - generic [ref=f15e3520]:
+                  - button "✓ In Stock" [ref=f15e3521] [cursor=pointer]
+                  - generic [ref=f15e3522]:
+                    - button "Duplicate Dish" [ref=f15e3523] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3527] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3530] [cursor=pointer]
+            - generic [ref=f15e3534]:
+              - generic [ref=f15e3535]:
+                - img "Cheesy Jalapeno Poppers (6 Pcs)" [ref=f15e3536]
+                - generic [ref=f15e3537]: FF-004
+              - generic [ref=f15e3541]:
+                - generic [ref=f15e3542]:
+                  - generic [ref=f15e3543]:
+                    - heading "Cheesy Jalapeno Poppers (6 Pcs)" [level=4] [ref=f15e3544]
+                    - generic [ref=f15e3545]: ₹150
+                  - paragraph [ref=f15e3546]: Crisp golden bites filled with molten cheese and spicy jalapenos
+                - generic [ref=f15e3547]:
+                  - button "✓ In Stock" [ref=f15e3548] [cursor=pointer]
+                  - generic [ref=f15e3549]:
+                    - button "Duplicate Dish" [ref=f15e3550] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3554] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3557] [cursor=pointer]
+            - generic [ref=f15e3561]:
+              - generic [ref=f15e3562]:
+                - img "Bombay Special Grilled Sandwich" [ref=f15e3563]
+                - generic [ref=f15e3564]: BS-001
+              - generic [ref=f15e3568]:
+                - generic [ref=f15e3569]:
+                  - generic [ref=f15e3570]:
+                    - heading "Bombay Special Grilled Sandwich" [level=4] [ref=f15e3571]
+                    - generic [ref=f15e3572]: ₹160
+                  - paragraph [ref=f15e3573]: Spiced potato mash, beetroot, cucumber, tomato and processed cheese with spicy coriander chutney
+                - generic [ref=f15e3574]:
+                  - button "✓ In Stock" [ref=f15e3575] [cursor=pointer]
+                  - generic [ref=f15e3576]:
+                    - button "Duplicate Dish" [ref=f15e3577] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3581] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3584] [cursor=pointer]
+            - generic [ref=f15e3588]:
+              - generic [ref=f15e3589]:
+                - img "Paneer Makhani Cheese Toastie" [ref=f15e3590]
+                - generic [ref=f15e3591]: BS-002
+              - generic [ref=f15e3595]:
+                - generic [ref=f15e3596]:
+                  - generic [ref=f15e3597]:
+                    - heading "Paneer Makhani Cheese Toastie" [level=4] [ref=f15e3598]
+                    - generic [ref=f15e3599]: ₹180
+                  - paragraph [ref=f15e3600]: Spiced cottage cheese tossed in makhani sauce loaded with mozzarella in golden toasted bread
+                - generic [ref=f15e3601]:
+                  - button "✓ In Stock" [ref=f15e3602] [cursor=pointer]
+                  - generic [ref=f15e3603]:
+                    - button "Duplicate Dish" [ref=f15e3604] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3608] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3611] [cursor=pointer]
+            - generic [ref=f15e3615]:
+              - generic [ref=f15e3616]:
+                - img "Classic Cappuccino" [ref=f15e3617]
+                - generic [ref=f15e3618]: CAF-001
+              - generic [ref=f15e3622]:
+                - generic [ref=f15e3623]:
+                  - generic [ref=f15e3624]:
+                    - heading "Classic Cappuccino" [level=4] [ref=f15e3625]
+                    - generic [ref=f15e3626]: ₹140
+                  - paragraph [ref=f15e3627]: Rich double espresso topped with silky steamed whole milk foam and dark cocoa dust
+                - generic [ref=f15e3628]:
+                  - button "✓ In Stock" [ref=f15e3629] [cursor=pointer]
+                  - generic [ref=f15e3630]:
+                    - button "Duplicate Dish" [ref=f15e3631] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3635] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3638] [cursor=pointer]
+            - generic [ref=f15e3642]:
+              - generic [ref=f15e3643]:
+                - img "Roasted Hazelnut Latte" [ref=f15e3644]
+                - generic [ref=f15e3645]: CAF-002
+              - generic [ref=f15e3649]:
+                - generic [ref=f15e3650]:
+                  - generic [ref=f15e3651]:
+                    - heading "Roasted Hazelnut Latte" [level=4] [ref=f15e3652]
+                    - generic [ref=f15e3653]: ₹170
+                  - paragraph [ref=f15e3654]: Velvety espresso with steamed milk and aromatic roasted hazelnut syrup
+                - generic [ref=f15e3655]:
+                  - button "✓ In Stock" [ref=f15e3656] [cursor=pointer]
+                  - generic [ref=f15e3657]:
+                    - button "Duplicate Dish" [ref=f15e3658] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3662] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3665] [cursor=pointer]
+            - generic [ref=f15e3669]:
+              - generic [ref=f15e3670]:
+                - img "Caramel Brownie Frappe" [ref=f15e3671]
+                - generic [ref=f15e3672]: CAF-003
+              - generic [ref=f15e3676]:
+                - generic [ref=f15e3677]:
+                  - generic [ref=f15e3678]:
+                    - heading "Caramel Brownie Frappe" [level=4] [ref=f15e3679]
+                    - generic [ref=f15e3680]: ₹200
+                  - paragraph [ref=f15e3681]: Chilled blended espresso with chocolate brownie crumbs, caramel drizzle and whipped cream
+                - generic [ref=f15e3682]:
+                  - button "✓ In Stock" [ref=f15e3683] [cursor=pointer]
+                  - generic [ref=f15e3684]:
+                    - button "Duplicate Dish" [ref=f15e3685] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3689] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3692] [cursor=pointer]
+            - generic [ref=f15e3696]:
+              - generic [ref=f15e3697]:
+                - img "Dutch Chocolate Truffle Slice" [ref=f15e3698]
+                - generic [ref=f15e3699]: BAK-001
+              - generic [ref=f15e3703]:
+                - generic [ref=f15e3704]:
+                  - generic [ref=f15e3705]:
+                    - heading "Dutch Chocolate Truffle Slice" [level=4] [ref=f15e3706]
+                    - generic [ref=f15e3707]: ₹130
+                  - paragraph [ref=f15e3708]: Rich dark chocolate sponge layered with 55% cocoa ganache
+                - generic [ref=f15e3709]:
+                  - button "✓ In Stock" [ref=f15e3710] [cursor=pointer]
+                  - generic [ref=f15e3711]:
+                    - button "Duplicate Dish" [ref=f15e3712] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3716] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3719] [cursor=pointer]
+            - generic [ref=f15e3723]:
+              - generic [ref=f15e3724]:
+                - img "Warm Choco Lava Cake" [ref=f15e3725]
+                - generic [ref=f15e3726]: BAK-002
+              - generic [ref=f15e3730]:
+                - generic [ref=f15e3731]:
+                  - generic [ref=f15e3732]:
+                    - heading "Warm Choco Lava Cake" [level=4] [ref=f15e3733]
+                    - generic [ref=f15e3734]: ₹110
+                  - paragraph [ref=f15e3735]: Molten chocolate filled warm sponge cake dusted with icing sugar
+                - generic [ref=f15e3736]:
+                  - button "✓ In Stock" [ref=f15e3737] [cursor=pointer]
+                  - generic [ref=f15e3738]:
+                    - button "Duplicate Dish" [ref=f15e3739] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3743] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3746] [cursor=pointer]
+            - generic [ref=f15e3750]:
+              - generic [ref=f15e3751]:
+                - img "Margherita Basilico" [ref=f15e3752]
+                - generic [ref=f15e3753]: PIZ-001
+              - generic [ref=f15e3757]:
+                - generic [ref=f15e3758]:
+                  - generic [ref=f15e3759]:
+                    - heading "Margherita Basilico" [level=4] [ref=f15e3760]
+                    - generic [ref=f15e3761]: ₹240
+                  - paragraph [ref=f15e3762]: Classic 100% mozzarella cheese, fresh basil leaves and Italian herb tomato sauce
+                - generic [ref=f15e3763]:
+                  - button "✓ In Stock" [ref=f15e3764] [cursor=pointer]
+                  - generic [ref=f15e3765]:
+                    - button "Duplicate Dish" [ref=f15e3766] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3770] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3773] [cursor=pointer]
+            - generic [ref=f15e3777]:
+              - generic [ref=f15e3778]:
+                - img "Farmhouse Veggie Supreme" [ref=f15e3779]
+                - generic [ref=f15e3780]: PIZ-002
+              - generic [ref=f15e3784]:
+                - generic [ref=f15e3785]:
+                  - generic [ref=f15e3786]:
+                    - heading "Farmhouse Veggie Supreme" [level=4] [ref=f15e3787]
+                    - generic [ref=f15e3788]: ₹320
+                  - paragraph [ref=f15e3789]: Crunchy bell peppers, button mushrooms, sweet corn, red onions and diced tomatoes
+                - generic [ref=f15e3790]:
+                  - button "✓ In Stock" [ref=f15e3791] [cursor=pointer]
+                  - generic [ref=f15e3792]:
+                    - button "Duplicate Dish" [ref=f15e3793] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3797] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3800] [cursor=pointer]
+            - generic [ref=f15e3804]:
+              - generic [ref=f15e3805]:
+                - img "Paneer Tikka Makhani Pizza" [ref=f15e3806]
+                - generic [ref=f15e3807]: PIZ-003
+              - generic [ref=f15e3811]:
+                - generic [ref=f15e3812]:
+                  - generic [ref=f15e3813]:
+                    - heading "Paneer Tikka Makhani Pizza" [level=4] [ref=f15e3814]
+                    - generic [ref=f15e3815]: ₹350
+                  - paragraph [ref=f15e3816]: Tandoori marinated cottage cheese, roasted capsicum and makhani drizzle on hand-tossed crust
+                - generic [ref=f15e3817]:
+                  - button "✓ In Stock" [ref=f15e3818] [cursor=pointer]
+                  - generic [ref=f15e3819]:
+                    - button "Duplicate Dish" [ref=f15e3820] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3824] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3827] [cursor=pointer]
+            - generic [ref=f15e3831]:
+              - generic [ref=f15e3832]:
+                - img "Cheese Stuffed Garlic Breadsticks" [ref=f15e3833]
+                - generic [ref=f15e3834]: PIZ-004
+              - generic [ref=f15e3838]:
+                - generic [ref=f15e3839]:
+                  - generic [ref=f15e3840]:
+                    - heading "Cheese Stuffed Garlic Breadsticks" [level=4] [ref=f15e3841]
+                    - generic [ref=f15e3842]: ₹160
+                  - paragraph [ref=f15e3843]: Baked baguettes loaded with garlic butter, herbs and melted mozzarella
+                - generic [ref=f15e3844]:
+                  - button "✓ In Stock" [ref=f15e3845] [cursor=pointer]
+                  - generic [ref=f15e3846]:
+                    - button "Duplicate Dish" [ref=f15e3847] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3851] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3854] [cursor=pointer]
+            - generic [ref=f15e3858]:
+              - generic [ref=f15e3859]:
+                - img "Creamy Alfredo White Sauce Penne" [ref=f15e3860]
+                - generic [ref=f15e3861]: PIZ-005
+              - generic [ref=f15e3865]:
+                - generic [ref=f15e3866]:
+                  - generic [ref=f15e3867]:
+                    - heading "Creamy Alfredo White Sauce Penne" [level=4] [ref=f15e3868]
+                    - generic [ref=f15e3869]: ₹260
+                  - paragraph [ref=f15e3870]: Penne pasta tossed in rich parmesan cheese cream sauce with garlic and mushrooms
+                - generic [ref=f15e3871]:
+                  - button "✓ In Stock" [ref=f15e3872] [cursor=pointer]
+                  - generic [ref=f15e3873]:
+                    - button "Duplicate Dish" [ref=f15e3874] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3878] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3881] [cursor=pointer]
+            - generic [ref=f15e3885]:
+              - generic [ref=f15e3886]:
+                - img "Pani Puri Platter (6 Pcs)" [ref=f15e3887]
+                - generic [ref=f15e3888]: CHT-001
+              - generic [ref=f15e3892]:
+                - generic [ref=f15e3893]:
+                  - generic [ref=f15e3894]:
+                    - heading "Pani Puri Platter (6 Pcs)" [level=4] [ref=f15e3895]
+                    - generic [ref=f15e3896]: ₹70
+                  - paragraph [ref=f15e3897]: Crispy puris stuffed with spiced chickpea mash, tangy mint-coriander water and sweet date chutney
+                - generic [ref=f15e3898]:
+                  - button "✓ In Stock" [ref=f15e3899] [cursor=pointer]
+                  - generic [ref=f15e3900]:
+                    - button "Duplicate Dish" [ref=f15e3901] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3905] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3908] [cursor=pointer]
+            - generic [ref=f15e3912]:
+              - generic [ref=f15e3913]:
+                - img "Dahi Sev Batata Puri" [ref=f15e3914]
+                - generic [ref=f15e3915]: CHT-002
+              - generic [ref=f15e3919]:
+                - generic [ref=f15e3920]:
+                  - generic [ref=f15e3921]:
+                    - heading "Dahi Sev Batata Puri" [level=4] [ref=f15e3922]
+                    - generic [ref=f15e3923]: ₹110
+                  - paragraph [ref=f15e3924]: Crispy puris filled with potato mash, sweet chilled curd, sev, pomegranate and mint chutney
+                - generic [ref=f15e3925]:
+                  - button "✓ In Stock" [ref=f15e3926] [cursor=pointer]
+                  - generic [ref=f15e3927]:
+                    - button "Duplicate Dish" [ref=f15e3928] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3932] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3935] [cursor=pointer]
+            - generic [ref=f15e3939]:
+              - generic [ref=f15e3940]:
+                - img "Butter Pav Bhaji (2 Pav)" [ref=f15e3941]
+                - generic [ref=f15e3942]: CHT-003
+              - generic [ref=f15e3946]:
+                - generic [ref=f15e3947]:
+                  - generic [ref=f15e3948]:
+                    - heading "Butter Pav Bhaji (2 Pav)" [level=4] [ref=f15e3949]
+                    - generic [ref=f15e3950]: ₹150
+                  - paragraph [ref=f15e3951]: Mashed spicy mixed vegetable gravy simmered with Amul butter, served with toasted butter pav
+                - generic [ref=f15e3952]:
+                  - button "✓ In Stock" [ref=f15e3953] [cursor=pointer]
+                  - generic [ref=f15e3954]:
+                    - button "Duplicate Dish" [ref=f15e3955] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3959] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3962] [cursor=pointer]
+            - generic [ref=f15e3966]:
+              - generic [ref=f15e3967]:
+                - img "Special Punjabi Samosa (2 Pcs)" [ref=f15e3968]
+                - generic [ref=f15e3969]: SNK-001
+              - generic [ref=f15e3973]:
+                - generic [ref=f15e3974]:
+                  - generic [ref=f15e3975]:
+                    - heading "Special Punjabi Samosa (2 Pcs)" [level=4] [ref=f15e3976]
+                    - generic [ref=f15e3977]: ₹50
+                  - paragraph [ref=f15e3978]: Crisp pastry triangles stuffed with spiced potato and green peas with saunth chutney
+                - generic [ref=f15e3979]:
+                  - button "✓ In Stock" [ref=f15e3980] [cursor=pointer]
+                  - generic [ref=f15e3981]:
+                    - button "Duplicate Dish" [ref=f15e3982] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e3986] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e3989] [cursor=pointer]
+            - generic [ref=f15e3993]:
+              - generic [ref=f15e3994]:
+                - img "Mumbai Vada Pav with Chutney" [ref=f15e3995]
+                - generic [ref=f15e3996]: SNK-002
+              - generic [ref=f15e4000]:
+                - generic [ref=f15e4001]:
+                  - generic [ref=f15e4002]:
+                    - heading "Mumbai Vada Pav with Chutney" [level=4] [ref=f15e4003]
+                    - generic [ref=f15e4004]: ₹45
+                  - paragraph [ref=f15e4005]: Spiced potato batata vada in a pav with dry garlic coconut chutney and fried green chilli
+                - generic [ref=f15e4006]:
+                  - button "✓ In Stock" [ref=f15e4007] [cursor=pointer]
+                  - generic [ref=f15e4008]:
+                    - button "Duplicate Dish" [ref=f15e4009] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4013] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4016] [cursor=pointer]
+            - generic [ref=f15e4020]:
+              - generic [ref=f15e4021]:
+                - img "Paneer Dum Biryani Handi" [ref=f15e4022]
+                - generic [ref=f15e4023]: BIR-001
+              - generic [ref=f15e4027]:
+                - generic [ref=f15e4028]:
+                  - generic [ref=f15e4029]:
+                    - heading "Paneer Dum Biryani Handi" [level=4] [ref=f15e4030]
+                    - generic [ref=f15e4031]: ₹280
+                  - paragraph [ref=f15e4032]: Charred paneer cubes marinated in yogurt masala, layered with aged basmati rice and saffron
+                - generic [ref=f15e4033]:
+                  - button "✓ In Stock" [ref=f15e4034] [cursor=pointer]
+                  - generic [ref=f15e4035]:
+                    - button "Duplicate Dish" [ref=f15e4036] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4040] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4043] [cursor=pointer]
+            - generic [ref=f15e4047]:
+              - generic [ref=f15e4048]:
+                - img "Shahi Subz Dum Biryani" [ref=f15e4049]
+                - generic [ref=f15e4050]: BIR-002
+              - generic [ref=f15e4054]:
+                - generic [ref=f15e4055]:
+                  - generic [ref=f15e4056]:
+                    - heading "Shahi Subz Dum Biryani" [level=4] [ref=f15e4057]
+                    - generic [ref=f15e4058]: ₹250
+                  - paragraph [ref=f15e4059]: Medley of vegetables, mint and browned onions slow-cooked on dum, served with mirchi salan and raita
+                - generic [ref=f15e4060]:
+                  - button "✓ In Stock" [ref=f15e4061] [cursor=pointer]
+                  - generic [ref=f15e4062]:
+                    - button "Duplicate Dish" [ref=f15e4063] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4067] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4070] [cursor=pointer]
+            - generic [ref=f15e4074]:
+              - generic [ref=f15e4075]:
+                - img "Malai Soya Chaap Tandoori" [ref=f15e4076]
+                - generic [ref=f15e4077]: TAN-001
+              - generic [ref=f15e4081]:
+                - generic [ref=f15e4082]:
+                  - generic [ref=f15e4083]:
+                    - heading "Malai Soya Chaap Tandoori" [level=4] [ref=f15e4084]
+                    - generic [ref=f15e4085]: ₹260
+                  - paragraph [ref=f15e4086]: Tender soya chaap marinated in creamy cashew, cheese and green cardamom paste, roasted to perfection
+                - generic [ref=f15e4087]:
+                  - button "✓ In Stock" [ref=f15e4088] [cursor=pointer]
+                  - generic [ref=f15e4089]:
+                    - button "Duplicate Dish" [ref=f15e4090] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4094] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4097] [cursor=pointer]
+            - generic [ref=f15e4101]:
+              - generic [ref=f15e4102]:
+                - img "Tandoori Afghani Paneer Tikka" [ref=f15e4103]
+                - generic [ref=f15e4104]: TAN-002
+              - generic [ref=f15e4108]:
+                - generic [ref=f15e4109]:
+                  - generic [ref=f15e4110]:
+                    - heading "Tandoori Afghani Paneer Tikka" [level=4] [ref=f15e4111]
+                    - generic [ref=f15e4112]: ₹290
+                  - paragraph [ref=f15e4113]: Cottage cheese cubes bathed in mild white pepper cream marinade, charred with bell peppers
+                - generic [ref=f15e4114]:
+                  - button "✓ In Stock" [ref=f15e4115] [cursor=pointer]
+                  - generic [ref=f15e4116]:
+                    - button "Duplicate Dish" [ref=f15e4117] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4121] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4124] [cursor=pointer]
+            - generic [ref=f15e4128]:
+              - generic [ref=f15e4129]:
+                - img "Kaju Katli Special (250g)" [ref=f15e4130]
+                - generic [ref=f15e4131]: SWT-001
+              - generic [ref=f15e4135]:
+                - generic [ref=f15e4136]:
+                  - generic [ref=f15e4137]:
+                    - heading "Kaju Katli Special (250g)" [level=4] [ref=f15e4138]
+                    - generic [ref=f15e4139]: ₹250
+                  - paragraph [ref=f15e4140]: Diamond cut cashew nut fudge made with premium cashews and silver vark
+                - generic [ref=f15e4141]:
+                  - button "✓ In Stock" [ref=f15e4142] [cursor=pointer]
+                  - generic [ref=f15e4143]:
+                    - button "Duplicate Dish" [ref=f15e4144] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4148] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4151] [cursor=pointer]
+            - generic [ref=f15e4155]:
+              - generic [ref=f15e4156]:
+                - img "Motichoor Laddoo (250g)" [ref=f15e4157]
+                - generic [ref=f15e4158]: SWT-002
+              - generic [ref=f15e4162]:
+                - generic [ref=f15e4163]:
+                  - generic [ref=f15e4164]:
+                    - heading "Motichoor Laddoo (250g)" [level=4] [ref=f15e4165]
+                    - generic [ref=f15e4166]: ₹180
+                  - paragraph [ref=f15e4167]: Tiny gram flour pearls fried in pure desi ghee and soaked in saffron sugar syrup
+                - generic [ref=f15e4168]:
+                  - button "✓ In Stock" [ref=f15e4169] [cursor=pointer]
+                  - generic [ref=f15e4170]:
+                    - button "Duplicate Dish" [ref=f15e4171] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4175] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4178] [cursor=pointer]
+            - generic [ref=f15e4182]:
+              - generic [ref=f15e4183]:
+                - img "Fresh Mosambi (Sweet Lime) Juice" [ref=f15e4184]
+                - generic [ref=f15e4185]: JUC-001
+              - generic [ref=f15e4189]:
+                - generic [ref=f15e4190]:
+                  - generic [ref=f15e4191]:
+                    - heading "Fresh Mosambi (Sweet Lime) Juice" [level=4] [ref=f15e4192]
+                    - generic [ref=f15e4193]: ₹90
+                  - paragraph [ref=f15e4194]: Freshly squeezed sweet lime juice with a pinch of black salt
+                - generic [ref=f15e4195]:
+                  - button "✓ In Stock" [ref=f15e4196] [cursor=pointer]
+                  - generic [ref=f15e4197]:
+                    - button "Duplicate Dish" [ref=f15e4198] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4202] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4205] [cursor=pointer]
+            - generic [ref=f15e4209]:
+              - generic [ref=f15e4210]:
+                - img "Virgin Mint Mojito Cooler" [ref=f15e4211]
+                - generic [ref=f15e4212]: JUC-002
+              - generic [ref=f15e4216]:
+                - generic [ref=f15e4217]:
+                  - generic [ref=f15e4218]:
+                    - heading "Virgin Mint Mojito Cooler" [level=4] [ref=f15e4219]
+                    - generic [ref=f15e4220]: ₹110
+                  - paragraph [ref=f15e4221]: Crushed fresh mint, lime wedges, simple syrup topped with sparkling soda and ice
+                - generic [ref=f15e4222]:
+                  - button "✓ In Stock" [ref=f15e4223] [cursor=pointer]
+                  - generic [ref=f15e4224]:
+                    - button "Duplicate Dish" [ref=f15e4225] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4229] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4232] [cursor=pointer]
+            - generic [ref=f15e4236]:
+              - generic [ref=f15e4237]:
+                - img "Royal Kesar Pista Falooda" [ref=f15e4238]
+                - generic [ref=f15e4239]: ICE-001
+              - generic [ref=f15e4243]:
+                - generic [ref=f15e4244]:
+                  - generic [ref=f15e4245]:
+                    - heading "Royal Kesar Pista Falooda" [level=4] [ref=f15e4246]
+                    - generic [ref=f15e4247]: ₹160
+                  - paragraph [ref=f15e4248]: Rose syrup, basil seeds, falooda sev, chilled condensed milk topped with saffron ice cream and nuts
+                - generic [ref=f15e4249]:
+                  - button "✓ In Stock" [ref=f15e4250] [cursor=pointer]
+                  - generic [ref=f15e4251]:
+                    - button "Duplicate Dish" [ref=f15e4252] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4256] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4259] [cursor=pointer]
+            - generic [ref=f15e4263]:
+              - generic [ref=f15e4264]:
+                - img "Sizzling Chocolate Brownie Sundae" [ref=f15e4265]
+                - generic [ref=f15e4266]: ICE-002
+              - generic [ref=f15e4270]:
+                - generic [ref=f15e4271]:
+                  - generic [ref=f15e4272]:
+                    - heading "Sizzling Chocolate Brownie Sundae" [level=4] [ref=f15e4273]
+                    - generic [ref=f15e4274]: ₹190
+                  - paragraph [ref=f15e4275]: Warm dark chocolate brownie on a sizzling plate with vanilla scoop and hot fudge sauce
+                - generic [ref=f15e4276]:
+                  - button "✓ In Stock" [ref=f15e4277] [cursor=pointer]
+                  - generic [ref=f15e4278]:
+                    - button "Duplicate Dish" [ref=f15e4279] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4283] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4286] [cursor=pointer]
+            - generic [ref=f15e4290]:
+              - generic [ref=f15e4291]:
+                - img "Butter Masala Dosa Classic" [ref=f15e4292]
+                - generic [ref=f15e4293]: SN-001
+              - generic [ref=f15e4297]:
+                - generic [ref=f15e4298]:
+                  - generic [ref=f15e4299]:
+                    - heading "Butter Masala Dosa Classic" [level=4] [ref=f15e4300]
+                    - generic [ref=f15e4301]: ₹150
+                  - paragraph [ref=f15e4302]: Crisp crepe with spiced potato filling, coconut chutney and drumstick sambar
+                - generic [ref=f15e4303]:
+                  - button "✓ In Stock" [ref=f15e4304] [cursor=pointer]
+                  - generic [ref=f15e4305]:
+                    - button "Duplicate Dish" [ref=f15e4306] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4310] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4313] [cursor=pointer]
+            - generic [ref=f15e4317]:
+              - generic [ref=f15e4318]:
+                - img "Smoked Truffle Paneer Tikka" [ref=f15e4319]
+                - generic [ref=f15e4320]: FD-001
+              - generic [ref=f15e4324]:
+                - generic [ref=f15e4325]:
+                  - generic [ref=f15e4326]:
+                    - heading "Smoked Truffle Paneer Tikka" [level=4] [ref=f15e4327]
+                    - generic [ref=f15e4328]: ₹380
+                  - paragraph [ref=f15e4329]: Artisanal cottage cheese infused with black truffle oil and charcoal smoke, served with edamame dip
+                - generic [ref=f15e4330]:
+                  - button "✓ In Stock" [ref=f15e4331] [cursor=pointer]
+                  - generic [ref=f15e4332]:
+                    - button "Duplicate Dish" [ref=f15e4333] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4337] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4340] [cursor=pointer]
+            - generic [ref=f15e4344]:
+              - generic [ref=f15e4345]:
+                - img "Paneer Makhani Rice Bowl" [ref=f15e4346]
+                - generic [ref=f15e4347]: CK-001
+              - generic [ref=f15e4351]:
+                - generic [ref=f15e4352]:
+                  - generic [ref=f15e4353]:
+                    - heading "Paneer Makhani Rice Bowl" [level=4] [ref=f15e4354]
+                    - generic [ref=f15e4355]: ₹220
+                  - paragraph [ref=f15e4356]: Portion of rich paneer butter masala served over steamed jeera basmati rice in single packaging
+                - generic [ref=f15e4357]:
+                  - button "✓ In Stock" [ref=f15e4358] [cursor=pointer]
+                  - generic [ref=f15e4359]:
+                    - button "Duplicate Dish" [ref=f15e4360] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4364] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4367] [cursor=pointer]
+            - generic [ref=f15e4371]:
+              - generic [ref=f15e4372]:
+                - img "Dal Makhani with 2 Paratha Combo" [ref=f15e4373]
+                - generic [ref=f15e4374]: CK-002
+              - generic [ref=f15e4378]:
+                - generic [ref=f15e4379]:
+                  - generic [ref=f15e4380]:
+                    - heading "Dal Makhani with 2 Paratha Combo" [level=4] [ref=f15e4381]
+                    - generic [ref=f15e4382]: ₹190
+                  - paragraph [ref=f15e4383]: Creamy slow-cooked dal makhani with 2 warm parathas and pickled onion salad
+                - generic [ref=f15e4384]:
+                  - button "✓ In Stock" [ref=f15e4385] [cursor=pointer]
+                  - generic [ref=f15e4386]:
+                    - button "Duplicate Dish" [ref=f15e4387] [cursor=pointer]
+                    - button "Edit Dish" [ref=f15e4391] [cursor=pointer]
+                    - button "Delete Dish" [ref=f15e4394] [cursor=pointer]
+          - generic [ref=f15e4398]:
+            - generic [ref=f15e4399]:
+              - generic [ref=f15e4400]:
+                - generic [ref=f15e4401]:
+                  - heading "Combos & Meal Deals" [level=2] [ref=f15e4402]
+                  - generic [ref=f15e4403]: 0 ACTIVE
+                - paragraph [ref=f15e4404]: Bundle dishes into a fixed-price deal with an automatic savings badge.
+              - button "Create Combo" [ref=f15e4405] [cursor=pointer]
+            - generic [ref=f15e4408]:
+              - heading "No Combos Yet" [level=3] [ref=f15e4414]
+              - paragraph [ref=f15e4415]: Bundle popular dishes into a discounted combo to increase average order value on Kiosk and QR ordering.
+              - button "+ Create First Combo" [ref=f15e4416] [cursor=pointer]
+    - button "Open JAMAN AI Restaurant Intelligence" [ref=f15e562] [cursor=pointer]:
+      - generic [ref=f15e568]:
+        - generic [ref=f15e569]: JAMAN AI
+        - generic [ref=f15e570]: ACTIVE
+  - status [ref=f15e611]:
+    - generic [ref=f15e615]:
+      - text: Version 2.4.0 is available.
+      - link "Download" [ref=f15e616] [cursor=pointer]:
+        - /url: http://localhost:5176
+    - button "Dismiss" [ref=f15e617] [cursor=pointer]

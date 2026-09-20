@@ -1,0 +1,1585 @@
+- generic [ref=f9e2]:
+  - generic [ref=f9e212]:
+    - banner [ref=f9e213]:
+      - generic [ref=f9e214]:
+        - generic [ref=f9e215]:
+          - generic [ref=f9e216]:
+            - img "JAMANVAAR by KELVIONTECH"
+          - generic [ref=f9e218]:
+            - generic [ref=f9e219]:
+              - generic [ref=f9e220]: POS TERMINAL
+              - generic [ref=f9e222]: Full Audit Diner
+            - paragraph [ref=f9e223]:
+              - generic [ref=f9e224]: Full Audit Diner
+              - generic [aria-hidden] [ref=f9e225]: •
+              - generic [ref=f9e226]: POS-01
+        - button "+ New Order" [ref=f9e228] [cursor=pointer]
+      - button "Search dishes, SKU, tables, bills, customers..." [ref=f9e235] [cursor=pointer]
+      - generic [ref=f9e241]:
+        - button "DAY OPEN • No Shift" [ref=f9e243] [cursor=pointer]:
+          - generic [ref=f9e245]: DAY OPEN
+          - generic [ref=f9e246]: •
+          - generic [ref=f9e247]: No Shift
+        - button "Notifications & System Events" [ref=f9e250] [cursor=pointer]
+        - button "Quick Help" [ref=f9e255] [cursor=pointer]
+        - button "Open JAMAN AI Assistant" [ref=f9e259] [cursor=pointer]:
+          - generic [ref=f9e262]: JAMAN AI
+        - button "P Priya Cashier cashier" [ref=f9e264] [cursor=pointer]:
+          - generic [ref=f9e265]: P
+          - generic [ref=f9e267]:
+            - generic [ref=f9e268]: Priya Cashier
+            - generic [ref=f9e269]: cashier
+    - generic [ref=f9e272]:
+      - complementary [ref=f9e273]:
+        - navigation [ref=f9e274]:
+          - button "Billing / Menu" [ref=f9e275] [cursor=pointer]
+          - button "Floor & Tables" [ref=f9e282] [cursor=pointer]
+          - button "Live Orders" [ref=f9e289] [cursor=pointer]
+          - button "Bills & Invoices" [ref=f9e294] [cursor=pointer]
+          - button "Kitchen & KOT" [ref=f9e299] [cursor=pointer]
+          - button "Customers CRM" [ref=f9e303] [cursor=pointer]
+          - button "Shift & Cash" [ref=f9e310] [cursor=pointer]
+          - button "Day History" [ref=f9e315] [cursor=pointer]
+          - button "POS Reports" [ref=f9e319] [cursor=pointer]
+          - button "Inventory & Stock" [ref=f9e323] [cursor=pointer]
+          - button "Settings" [ref=f9e329] [cursor=pointer]
+          - button "JAMAN AI Assistant AI" [ref=f9e335] [cursor=pointer]:
+            - generic [ref=f9e338]: JAMAN AI Assistant
+            - generic [ref=f9e339]: AI
+        - generic [ref=f9e340]:
+          - button "Print Queue" [ref=f9e341] [cursor=pointer]
+          - generic [ref=f9e349]:
+            - text: "Core:"
+            - strong [ref=f9e350]: Offline First
+      - main [ref=f9e351]:
+        - generic [ref=f9e352]:
+          - generic [ref=f9e353]:
+            - generic [ref=f9e354]:
+              - generic [ref=f9e355]:
+                - button "ALL MENU 135" [ref=f9e356] [cursor=pointer]:
+                  - generic [ref=f9e359]: ALL MENU
+                  - generic [ref=f9e360]: "135"
+                - button "TANDOOR & KEBAB 11" [ref=f9e361] [cursor=pointer]:
+                  - generic [ref=f9e362]: TANDOOR & KEBAB
+                  - generic [ref=f9e363]: "11"
+                - button "MAIN COURSE 28" [ref=f9e364] [cursor=pointer]:
+                  - generic [ref=f9e365]: MAIN COURSE
+                  - generic [ref=f9e366]: "28"
+                - button "NAAN & ROTI 12" [ref=f9e367] [cursor=pointer]:
+                  - generic [ref=f9e368]: NAAN & ROTI
+                  - generic [ref=f9e369]: "12"
+                - button "BIRYANI & RICE 12" [ref=f9e370] [cursor=pointer]:
+                  - generic [ref=f9e371]: BIRYANI & RICE
+                  - generic [ref=f9e372]: "12"
+                - button "BEVERAGES 9" [ref=f9e373] [cursor=pointer]:
+                  - generic [ref=f9e374]: BEVERAGES
+                  - generic [ref=f9e375]: "9"
+                - button "DESSERTS 6" [ref=f9e376] [cursor=pointer]:
+                  - generic [ref=f9e377]: DESSERTS
+                  - generic [ref=f9e378]: "6"
+                - button "GUJARATI SPECIAL 8" [ref=f9e379] [cursor=pointer]:
+                  - generic [ref=f9e380]: GUJARATI SPECIAL
+                  - generic [ref=f9e381]: "8"
+                - button "FRESH FARSAN (SNACKS) 10" [ref=f9e382] [cursor=pointer]:
+                  - generic [ref=f9e383]: FRESH FARSAN (SNACKS)
+                  - generic [ref=f9e384]: "10"
+                - button "ROTLI, BHAKRI & THEPLA 4" [ref=f9e385] [cursor=pointer]:
+                  - generic [ref=f9e386]: ROTLI, BHAKRI & THEPLA
+                  - generic [ref=f9e387]: "4"
+                - button "SOUTH INDIAN 10" [ref=f9e388] [cursor=pointer]:
+                  - generic [ref=f9e389]: SOUTH INDIAN
+                  - generic [ref=f9e390]: "10"
+                - button "ROTLA & ACCOMPANIMENTS 2" [ref=f9e391] [cursor=pointer]:
+                  - generic [ref=f9e392]: ROTLA & ACCOMPANIMENTS
+                  - generic [ref=f9e393]: "2"
+                - button "QUICK TIFFIN PLATES 2" [ref=f9e394] [cursor=pointer]:
+                  - generic [ref=f9e395]: QUICK TIFFIN PLATES
+                  - generic [ref=f9e396]: "2"
+                - button "CHINESE & MOMOS 2" [ref=f9e397] [cursor=pointer]:
+                  - generic [ref=f9e398]: CHINESE & MOMOS
+                  - generic [ref=f9e399]: "2"
+                - button "BURGERS & SNACKS 6" [ref=f9e400] [cursor=pointer]:
+                  - generic [ref=f9e401]: BURGERS & SNACKS
+                  - generic [ref=f9e402]: "6"
+                - button "ICED FRAPPES & COOLERS 1" [ref=f9e403] [cursor=pointer]:
+                  - generic [ref=f9e404]: ICED FRAPPES & COOLERS
+                  - generic [ref=f9e405]: "1"
+                - button "PASTRIES & SLICES 2" [ref=f9e406] [cursor=pointer]:
+                  - generic [ref=f9e407]: PASTRIES & SLICES
+                  - generic [ref=f9e408]: "2"
+                - button "PIZZA & PASTA 3" [ref=f9e409] [cursor=pointer]:
+                  - generic [ref=f9e410]: PIZZA & PASTA
+                  - generic [ref=f9e411]: "3"
+                - button "CHAAT SPECIALS 3" [ref=f9e412] [cursor=pointer]:
+                  - generic [ref=f9e413]: CHAAT SPECIALS
+                  - generic [ref=f9e414]: "3"
+                - button "SUNDAES & FALOODAS 2" [ref=f9e415] [cursor=pointer]:
+                  - generic [ref=f9e416]: SUNDAES & FALOODAS
+                  - generic [ref=f9e417]: "2"
+                - button "DELIVERY MEAL BOWLS 2" [ref=f9e418] [cursor=pointer]:
+                  - generic [ref=f9e419]: DELIVERY MEAL BOWLS
+                  - generic [ref=f9e420]: "2"
+              - button "Scroll categories right" [ref=f9e421] [cursor=pointer]
+            - generic [ref=f9e424]:
+              - generic [ref=f9e425]:
+                - button "🍽️ All" [ref=f9e426] [cursor=pointer]:
+                  - generic [ref=f9e427]: 🍽️
+                  - generic [ref=f9e428]: All
+                - button "🟢 Veg" [ref=f9e429] [cursor=pointer]:
+                  - generic [ref=f9e430]: 🟢
+                  - generic [ref=f9e431]: Veg
+                - button "🌾 Jain" [ref=f9e432] [cursor=pointer]:
+                  - generic [ref=f9e433]: 🌾
+                  - generic [ref=f9e434]: Jain
+                - button "🍗 Non-Veg" [ref=f9e435] [cursor=pointer]:
+                  - generic [ref=f9e436]: 🍗
+                  - generic [ref=f9e437]: Non-Veg
+              - generic [ref=f9e438]:
+                - generic [ref=f9e439]: "QUICK:"
+                - button "Paneer Tikka Angara ₹280" [ref=f9e443] [cursor=pointer]:
+                  - generic [ref=f9e444]: Paneer Tikka Angara
+                  - generic [ref=f9e445]: ₹280
+                - button "Hara Bhara Kebab (6 Pcs) ₹220" [ref=f9e447] [cursor=pointer]:
+                  - generic [ref=f9e448]: Hara Bhara Kebab (6 Pcs)
+                  - generic [ref=f9e449]: ₹220
+                - button "Paneer Butter Masala ₹290" [ref=f9e451] [cursor=pointer]:
+                  - generic [ref=f9e452]: Paneer Butter Masala
+                  - generic [ref=f9e453]: ₹290
+                - button "Dal Makhani Bukhara ₹250" [ref=f9e455] [cursor=pointer]:
+                  - generic [ref=f9e456]: Dal Makhani Bukhara
+                  - generic [ref=f9e457]: ₹250
+                - button "Butter Naan ₹55" [ref=f9e459] [cursor=pointer]:
+                  - generic [ref=f9e460]: Butter Naan
+                  - generic [ref=f9e461]: ₹55
+              - button "Menu" [ref=f9e464] [cursor=pointer]
+            - generic [ref=f9e470]:
+              - generic [ref=f9e471] [cursor=pointer]:
+                - generic [ref=f9e472]: Tandoor
+                - generic [ref=f9e480]:
+                  - img "Paneer Tikka Angara" [ref=f9e482]
+                  - generic [ref=f9e483]:
+                    - heading "Paneer Tikka Angara" [level=3] [ref=f9e484]
+                    - generic [ref=f9e485]: "SKU: NI-001"
+                - generic [ref=f9e486]:
+                  - generic [ref=f9e487]: ₹280
+                  - button "1-Tap Add to Order" [ref=f9e490]
+              - generic [ref=f9e492] [cursor=pointer]:
+                - generic [ref=f9e493]: Tandoor
+                - generic [ref=f9e501]:
+                  - img "Hara Bhara Kebab (6 Pcs)" [ref=f9e503]
+                  - generic [ref=f9e504]:
+                    - heading "Hara Bhara Kebab (6 Pcs)" [level=3] [ref=f9e505]
+                    - generic [ref=f9e506]: "SKU: NI-002"
+                - generic [ref=f9e507]:
+                  - generic [ref=f9e508]: ₹220
+                  - button "1-Tap Add to Order" [ref=f9e511]
+              - generic [ref=f9e513] [cursor=pointer]:
+                - generic [ref=f9e514]: Tandoor
+                - generic [ref=f9e522]:
+                  - img "Tandoori Stuffed Mushroom" [ref=f9e524]
+                  - generic [ref=f9e525]:
+                    - heading "Tandoori Stuffed Mushroom" [level=3] [ref=f9e526]
+                    - generic [ref=f9e527]: "SKU: NI-003"
+                - generic [ref=f9e528]:
+                  - generic [ref=f9e529]: ₹260
+                  - button "1-Tap Add to Order" [ref=f9e532]
+              - generic [ref=f9e534] [cursor=pointer]:
+                - generic [ref=f9e535]: Tandoor
+                - generic [ref=f9e543]:
+                  - img "Veg Seekh Kebab Mughlai" [ref=f9e545]
+                  - generic [ref=f9e546]:
+                    - heading "Veg Seekh Kebab Mughlai" [level=3] [ref=f9e547]
+                    - generic [ref=f9e548]: "SKU: NI-004"
+                - generic [ref=f9e549]:
+                  - generic [ref=f9e550]: ₹240
+                  - button "1-Tap Add to Order" [ref=f9e553]
+              - generic [ref=f9e555] [cursor=pointer]:
+                - generic [ref=f9e556]: Curry Station
+                - generic [ref=f9e564]:
+                  - img "Paneer Butter Masala" [ref=f9e566]
+                  - generic [ref=f9e567]:
+                    - heading "Paneer Butter Masala" [level=3] [ref=f9e568]
+                    - generic [ref=f9e569]: "SKU: NI-005"
+                - generic [ref=f9e570]:
+                  - generic [ref=f9e571]: ₹290
+                  - button "1-Tap Add to Order" [ref=f9e574]
+              - generic [ref=f9e576] [cursor=pointer]:
+                - generic [ref=f9e577]: Curry Station
+                - generic [ref=f9e585]:
+                  - img "Kadai Paneer Peshawari" [ref=f9e587]
+                  - generic [ref=f9e588]:
+                    - heading "Kadai Paneer Peshawari" [level=3] [ref=f9e589]
+                    - generic [ref=f9e590]: "SKU: NI-006"
+                - generic [ref=f9e591]:
+                  - generic [ref=f9e592]: ₹290
+                  - button "1-Tap Add to Order" [ref=f9e595]
+              - generic [ref=f9e597] [cursor=pointer]:
+                - generic [ref=f9e598]: Curry Station
+                - generic [ref=f9e606]:
+                  - img "Shahi Paneer Nawabi" [ref=f9e608]
+                  - generic [ref=f9e609]:
+                    - heading "Shahi Paneer Nawabi" [level=3] [ref=f9e610]
+                    - generic [ref=f9e611]: "SKU: NI-007"
+                - generic [ref=f9e612]:
+                  - generic [ref=f9e613]: ₹310
+                  - button "1-Tap Add to Order" [ref=f9e616]
+              - generic [ref=f9e618] [cursor=pointer]:
+                - generic [ref=f9e619]: Curry Station
+                - generic [ref=f9e627]:
+                  - img "Palak Paneer Lahori" [ref=f9e629]
+                  - generic [ref=f9e630]:
+                    - heading "Palak Paneer Lahori" [level=3] [ref=f9e631]
+                    - generic [ref=f9e632]: "SKU: NI-008"
+                - generic [ref=f9e633]:
+                  - generic [ref=f9e634]: ₹270
+                  - button "1-Tap Add to Order" [ref=f9e637]
+              - generic [ref=f9e639] [cursor=pointer]:
+                - generic [ref=f9e640]: Curry Station
+                - generic [ref=f9e648]:
+                  - img "Dal Makhani Bukhara" [ref=f9e650]
+                  - generic [ref=f9e651]:
+                    - heading "Dal Makhani Bukhara" [level=3] [ref=f9e652]
+                    - generic [ref=f9e653]: "SKU: NI-009"
+                - generic [ref=f9e654]:
+                  - generic [ref=f9e655]: ₹250
+                  - button "1-Tap Add to Order" [ref=f9e658]
+              - generic [ref=f9e660] [cursor=pointer]:
+                - generic [ref=f9e661]: Curry Station
+                - generic [ref=f9e669]:
+                  - img "Yellow Dal Tadka Desi Ghee" [ref=f9e671]
+                  - generic [ref=f9e672]:
+                    - heading "Yellow Dal Tadka Desi Ghee" [level=3] [ref=f9e673]
+                    - generic [ref=f9e674]: "SKU: NI-010"
+                - generic [ref=f9e675]:
+                  - generic [ref=f9e676]: ₹200
+                  - button "1-Tap Add to Order" [ref=f9e679]
+              - generic [ref=f9e681] [cursor=pointer]:
+                - generic [ref=f9e682]: Curry Station
+                - generic [ref=f9e690]:
+                  - img "Malai Kofta Mughlai" [ref=f9e692]
+                  - generic [ref=f9e693]:
+                    - heading "Malai Kofta Mughlai" [level=3] [ref=f9e694]
+                    - generic [ref=f9e695]: "SKU: NI-011"
+                - generic [ref=f9e696]:
+                  - generic [ref=f9e697]: ₹320
+                  - button "1-Tap Add to Order" [ref=f9e700]
+              - generic [ref=f9e702] [cursor=pointer]:
+                - generic [ref=f9e703]: Curry Station
+                - generic [ref=f9e711]:
+                  - img "Mixed Vegetable Kolhapuri" [ref=f9e713]
+                  - generic [ref=f9e714]:
+                    - heading "Mixed Vegetable Kolhapuri" [level=3] [ref=f9e715]
+                    - generic [ref=f9e716]: "SKU: NI-012"
+                - generic [ref=f9e717]:
+                  - generic [ref=f9e718]: ₹240
+                  - button "1-Tap Add to Order" [ref=f9e721]
+              - generic [ref=f9e723] [cursor=pointer]:
+                - generic [ref=f9e724]: Tandoor
+                - generic [ref=f9e729]:
+                  - img "Butter Naan" [ref=f9e731]
+                  - generic [ref=f9e732]:
+                    - heading "Butter Naan" [level=3] [ref=f9e733]
+                    - generic [ref=f9e734]: "SKU: NI-013"
+                - generic [ref=f9e735]:
+                  - generic [ref=f9e736]: ₹55
+                  - button "1-Tap Add to Order" [ref=f9e739]
+              - generic [ref=f9e741] [cursor=pointer]:
+                - generic [ref=f9e742]: Tandoor
+                - generic [ref=f9e747]:
+                  - img "Garlic Butter Naan" [ref=f9e749]
+                  - generic [ref=f9e750]:
+                    - heading "Garlic Butter Naan" [level=3] [ref=f9e751]
+                    - generic [ref=f9e752]: "SKU: NI-014"
+                - generic [ref=f9e753]:
+                  - generic [ref=f9e754]: ₹70
+                  - button "1-Tap Add to Order" [ref=f9e757]
+              - generic [ref=f9e759] [cursor=pointer]:
+                - generic [ref=f9e760]: Tandoor
+                - generic [ref=f9e765]:
+                  - img "Tandoori Roti (Butter)" [ref=f9e767]
+                  - generic [ref=f9e768]:
+                    - heading "Tandoori Roti (Butter)" [level=3] [ref=f9e769]
+                    - generic [ref=f9e770]: "SKU: NI-015"
+                - generic [ref=f9e771]:
+                  - generic [ref=f9e772]: ₹35
+                  - button "1-Tap Add to Order" [ref=f9e775]
+              - generic [ref=f9e777] [cursor=pointer]:
+                - generic [ref=f9e778]: Tandoor
+                - generic [ref=f9e783]:
+                  - img "Laccha Paratha" [ref=f9e785]
+                  - generic [ref=f9e786]:
+                    - heading "Laccha Paratha" [level=3] [ref=f9e787]
+                    - generic [ref=f9e788]: "SKU: NI-016"
+                - generic [ref=f9e789]:
+                  - generic [ref=f9e790]: ₹65
+                  - button "1-Tap Add to Order" [ref=f9e793]
+              - generic [ref=f9e795] [cursor=pointer]:
+                - generic [ref=f9e796]: Curry Station
+                - generic [ref=f9e804]:
+                  - img "Hyderabadi Dum Veg Biryani" [ref=f9e806]
+                  - generic [ref=f9e807]:
+                    - heading "Hyderabadi Dum Veg Biryani" [level=3] [ref=f9e808]
+                    - generic [ref=f9e809]: "SKU: NI-017"
+                - generic [ref=f9e810]:
+                  - generic [ref=f9e811]: ₹280
+                  - button "1-Tap Add to Order" [ref=f9e814]
+              - generic [ref=f9e816] [cursor=pointer]:
+                - generic [ref=f9e817]: Curry Station
+                - generic [ref=f9e822]:
+                  - img "Jeera Rice (Desi Ghee)" [ref=f9e824]
+                  - generic [ref=f9e825]:
+                    - heading "Jeera Rice (Desi Ghee)" [level=3] [ref=f9e826]
+                    - generic [ref=f9e827]: "SKU: NI-018"
+                - generic [ref=f9e828]:
+                  - generic [ref=f9e829]: ₹170
+                  - button "1-Tap Add to Order" [ref=f9e832]
+              - generic [ref=f9e834] [cursor=pointer]:
+                - generic [ref=f9e835]: Curry Station
+                - generic [ref=f9e843]:
+                  - img "Veg Pulao Shahi" [ref=f9e845]
+                  - generic [ref=f9e846]:
+                    - heading "Veg Pulao Shahi" [level=3] [ref=f9e847]
+                    - generic [ref=f9e848]: "SKU: NI-019"
+                - generic [ref=f9e849]:
+                  - generic [ref=f9e850]: ₹190
+                  - button "1-Tap Add to Order" [ref=f9e853]
+              - generic [ref=f9e855] [cursor=pointer]:
+                - generic [ref=f9e856]: Beverages & Bar
+                - generic [ref=f9e864]:
+                  - img "Masala Chaas (Spiced Buttermilk)" [ref=f9e866]
+                  - generic [ref=f9e867]:
+                    - heading "Masala Chaas (Spiced Buttermilk)" [level=3] [ref=f9e868]
+                    - generic [ref=f9e869]: "SKU: NI-020"
+                - generic [ref=f9e870]:
+                  - generic [ref=f9e871]: ₹50
+                  - button "1-Tap Add to Order" [ref=f9e874]
+              - generic [ref=f9e876] [cursor=pointer]:
+                - generic [ref=f9e877]: Beverages & Bar
+                - generic [ref=f9e882]:
+                  - img "Punjabi Sweet Lassi (Malai Maar Ke)" [ref=f9e884]
+                  - generic [ref=f9e885]:
+                    - heading "Punjabi Sweet Lassi (Malai Maar Ke)" [level=3] [ref=f9e886]
+                    - generic [ref=f9e887]: "SKU: NI-021"
+                - generic [ref=f9e888]:
+                  - generic [ref=f9e889]: ₹90
+                  - button "1-Tap Add to Order" [ref=f9e892]
+              - generic [ref=f9e894] [cursor=pointer]:
+                - generic [ref=f9e895]: Beverages & Bar
+                - generic [ref=f9e900]:
+                  - img "Fresh Lime Soda (Sweet & Salt)" [ref=f9e902]
+                  - generic [ref=f9e903]:
+                    - heading "Fresh Lime Soda (Sweet & Salt)" [level=3] [ref=f9e904]
+                    - generic [ref=f9e905]: "SKU: NI-022"
+                - generic [ref=f9e906]:
+                  - generic [ref=f9e907]: ₹65
+                  - button "1-Tap Add to Order" [ref=f9e910]
+              - generic [ref=f9e912] [cursor=pointer]:
+                - generic [ref=f9e913]: Dessert Counter
+                - generic [ref=f9e918]:
+                  - img "Gulab Jamun (2 Pcs)" [ref=f9e920]
+                  - generic [ref=f9e921]:
+                    - heading "Gulab Jamun (2 Pcs)" [level=3] [ref=f9e922]
+                    - generic [ref=f9e923]: "SKU: NI-023"
+                - generic [ref=f9e924]:
+                  - generic [ref=f9e925]: ₹90
+                  - button "1-Tap Add to Order" [ref=f9e928]
+              - generic [ref=f9e930] [cursor=pointer]:
+                - generic [ref=f9e931]: Dessert Counter
+                - generic [ref=f9e936]:
+                  - img "Rasmalai Kesar Pista (2 Pcs)" [ref=f9e938]
+                  - generic [ref=f9e939]:
+                    - heading "Rasmalai Kesar Pista (2 Pcs)" [level=3] [ref=f9e940]
+                    - generic [ref=f9e941]: "SKU: NI-024"
+                - generic [ref=f9e942]:
+                  - generic [ref=f9e943]: ₹120
+                  - button "1-Tap Add to Order" [ref=f9e946]
+              - generic [ref=f9e948] [cursor=pointer]:
+                - generic [ref=f9e949]: Main Kitchen
+                - generic [ref=f9e957]:
+                  - img "Royal Gujarati Grand Thali" [ref=f9e959]
+                  - generic [ref=f9e960]:
+                    - heading "Royal Gujarati Grand Thali" [level=3] [ref=f9e961]
+                    - generic [ref=f9e962]: "SKU: GUJ-001"
+                - generic [ref=f9e963]:
+                  - generic [ref=f9e964]: ₹299
+                  - button "1-Tap Add to Order" [ref=f9e967]
+              - generic [ref=f9e969] [cursor=pointer]:
+                - generic [ref=f9e970]: Main Kitchen
+                - generic [ref=f9e978]:
+                  - img "Deluxe Gujarati Executive Thali" [ref=f9e980]
+                  - generic [ref=f9e981]:
+                    - heading "Deluxe Gujarati Executive Thali" [level=3] [ref=f9e982]
+                    - generic [ref=f9e983]: "SKU: GUJ-002"
+                - generic [ref=f9e984]:
+                  - generic [ref=f9e985]: ₹220
+                  - button "1-Tap Add to Order" [ref=f9e988]
+              - generic [ref=f9e990] [cursor=pointer]:
+                - generic [ref=f9e991]: Main Kitchen
+                - generic [ref=f9e999]:
+                  - img "Surti Nylon Khaman (250g)" [ref=f9e1001]
+                  - generic [ref=f9e1002]:
+                    - heading "Surti Nylon Khaman (250g)" [level=3] [ref=f9e1003]
+                    - generic [ref=f9e1004]: "SKU: GUJ-003"
+                - generic [ref=f9e1005]:
+                  - generic [ref=f9e1006]: ₹90
+                  - button "1-Tap Add to Order" [ref=f9e1009]
+              - generic [ref=f9e1011] [cursor=pointer]:
+                - generic [ref=f9e1012]: Main Kitchen
+                - generic [ref=f9e1020]:
+                  - img "Khandvi with Mustard Tempering" [ref=f9e1022]
+                  - generic [ref=f9e1023]:
+                    - heading "Khandvi with Mustard Tempering" [level=3] [ref=f9e1024]
+                    - generic [ref=f9e1025]: "SKU: GUJ-004"
+                - generic [ref=f9e1026]:
+                  - generic [ref=f9e1027]: ₹110
+                  - button "1-Tap Add to Order" [ref=f9e1030]
+              - generic [ref=f9e1032] [cursor=pointer]:
+                - generic [ref=f9e1033]: Main Kitchen
+                - generic [ref=f9e1041]:
+                  - img "Methi Na Gota (Pakoda)" [ref=f9e1043]
+                  - generic [ref=f9e1044]:
+                    - heading "Methi Na Gota (Pakoda)" [level=3] [ref=f9e1045]
+                    - generic [ref=f9e1046]: "SKU: GUJ-005"
+                - generic [ref=f9e1047]:
+                  - generic [ref=f9e1048]: ₹100
+                  - button "1-Tap Add to Order" [ref=f9e1051]
+              - generic [ref=f9e1053] [cursor=pointer]:
+                - generic [ref=f9e1054]: Main Kitchen
+                - generic [ref=f9e1062]:
+                  - img "Patra Steamed Rolls" [ref=f9e1064]
+                  - generic [ref=f9e1065]:
+                    - heading "Patra Steamed Rolls" [level=3] [ref=f9e1066]
+                    - generic [ref=f9e1067]: "SKU: GUJ-006"
+                - generic [ref=f9e1068]:
+                  - generic [ref=f9e1069]: ₹100
+                  - button "1-Tap Add to Order" [ref=f9e1072]
+              - generic [ref=f9e1074] [cursor=pointer]:
+                - generic [ref=f9e1075]: Curry Station
+                - generic [ref=f9e1083]:
+                  - img "Surti Undhiyu Special" [ref=f9e1085]
+                  - generic [ref=f9e1086]:
+                    - heading "Surti Undhiyu Special" [level=3] [ref=f9e1087]
+                    - generic [ref=f9e1088]: "SKU: GUJ-007"
+                - generic [ref=f9e1089]:
+                  - generic [ref=f9e1090]: ₹240
+                  - button "1-Tap Add to Order" [ref=f9e1093]
+              - generic [ref=f9e1095] [cursor=pointer]:
+                - generic [ref=f9e1096]: Curry Station
+                - generic [ref=f9e1104]:
+                  - img "Sev Tameta Nu Shaak" [ref=f9e1106]
+                  - generic [ref=f9e1107]:
+                    - heading "Sev Tameta Nu Shaak" [level=3] [ref=f9e1108]
+                    - generic [ref=f9e1109]: "SKU: GUJ-008"
+                - generic [ref=f9e1110]:
+                  - generic [ref=f9e1111]: ₹180
+                  - button "1-Tap Add to Order" [ref=f9e1114]
+              - generic [ref=f9e1116] [cursor=pointer]:
+                - generic [ref=f9e1117]: Curry Station
+                - generic [ref=f9e1125]:
+                  - img "Ringna Bateta Nu Shaak" [ref=f9e1127]
+                  - generic [ref=f9e1128]:
+                    - heading "Ringna Bateta Nu Shaak" [level=3] [ref=f9e1129]
+                    - generic [ref=f9e1130]: "SKU: GUJ-009"
+                - generic [ref=f9e1131]:
+                  - generic [ref=f9e1132]: ₹170
+                  - button "1-Tap Add to Order" [ref=f9e1135]
+              - generic [ref=f9e1137] [cursor=pointer]:
+                - generic [ref=f9e1138]: Curry Station
+                - generic [ref=f9e1146]:
+                  - img "Bhindanu Shaak (Okra)" [ref=f9e1148]
+                  - generic [ref=f9e1149]:
+                    - heading "Bhindanu Shaak (Okra)" [level=3] [ref=f9e1150]
+                    - generic [ref=f9e1151]: "SKU: GUJ-010"
+                - generic [ref=f9e1152]:
+                  - generic [ref=f9e1153]: ₹170
+                  - button "1-Tap Add to Order" [ref=f9e1156]
+              - generic [ref=f9e1158] [cursor=pointer]:
+                - generic [ref=f9e1159]: Curry Station
+                - generic [ref=f9e1167]:
+                  - img "Sweet Gujarati Toor Dal" [ref=f9e1169]
+                  - generic [ref=f9e1170]:
+                    - heading "Sweet Gujarati Toor Dal" [level=3] [ref=f9e1171]
+                    - generic [ref=f9e1172]: "SKU: GUJ-011"
+                - generic [ref=f9e1173]:
+                  - generic [ref=f9e1174]: ₹150
+                  - button "1-Tap Add to Order" [ref=f9e1177]
+              - generic [ref=f9e1179] [cursor=pointer]:
+                - generic [ref=f9e1180]: Curry Station
+                - generic [ref=f9e1188]:
+                  - img "Traditional Gujarati Kadhi" [ref=f9e1190]
+                  - generic [ref=f9e1191]:
+                    - heading "Traditional Gujarati Kadhi" [level=3] [ref=f9e1192]
+                    - generic [ref=f9e1193]: "SKU: GUJ-012"
+                - generic [ref=f9e1194]:
+                  - generic [ref=f9e1195]: ₹150
+                  - button "1-Tap Add to Order" [ref=f9e1198]
+              - generic [ref=f9e1200] [cursor=pointer]:
+                - generic [ref=f9e1201]: Main Kitchen
+                - generic [ref=f9e1206]:
+                  - img "Phulka Rotli (Ghee, 4 Pcs)" [ref=f9e1208]
+                  - generic [ref=f9e1209]:
+                    - heading "Phulka Rotli (Ghee, 4 Pcs)" [level=3] [ref=f9e1210]
+                    - generic [ref=f9e1211]: "SKU: GUJ-013"
+                - generic [ref=f9e1212]:
+                  - generic [ref=f9e1213]: ₹50
+                  - button "1-Tap Add to Order" [ref=f9e1216]
+              - generic [ref=f9e1218] [cursor=pointer]:
+                - generic [ref=f9e1219]: Main Kitchen
+                - generic [ref=f9e1224]:
+                  - img "Kathiyawadi Bajra Rotla (Ghee)" [ref=f9e1226]
+                  - generic [ref=f9e1227]:
+                    - heading "Kathiyawadi Bajra Rotla (Ghee)" [level=3] [ref=f9e1228]
+                    - generic [ref=f9e1229]: "SKU: GUJ-014"
+                - generic [ref=f9e1230]:
+                  - generic [ref=f9e1231]: ₹45
+                  - button "1-Tap Add to Order" [ref=f9e1234]
+              - generic [ref=f9e1236] [cursor=pointer]:
+                - generic [ref=f9e1237]: Main Kitchen
+                - generic [ref=f9e1245]:
+                  - img "Methi Thepla (4 Pcs)" [ref=f9e1247]
+                  - generic [ref=f9e1248]:
+                    - heading "Methi Thepla (4 Pcs)" [level=3] [ref=f9e1249]
+                    - generic [ref=f9e1250]: "SKU: GUJ-015"
+                - generic [ref=f9e1251]:
+                  - generic [ref=f9e1252]: ₹70
+                  - button "1-Tap Add to Order" [ref=f9e1255]
+              - generic [ref=f9e1257] [cursor=pointer]:
+                - generic [ref=f9e1258]: Main Kitchen
+                - generic [ref=f9e1263]:
+                  - img "Biscuit Bhakri (2 Pcs)" [ref=f9e1265]
+                  - generic [ref=f9e1266]:
+                    - heading "Biscuit Bhakri (2 Pcs)" [level=3] [ref=f9e1267]
+                    - generic [ref=f9e1268]: "SKU: GUJ-016"
+                - generic [ref=f9e1269]:
+                  - generic [ref=f9e1270]: ₹50
+                  - button "1-Tap Add to Order" [ref=f9e1273]
+              - generic [ref=f9e1275] [cursor=pointer]:
+                - generic [ref=f9e1276]: Curry Station
+                - generic [ref=f9e1284]:
+                  - img "Vaghareli Khichdi with Kadhi" [ref=f9e1286]
+                  - generic [ref=f9e1287]:
+                    - heading "Vaghareli Khichdi with Kadhi" [level=3] [ref=f9e1288]
+                    - generic [ref=f9e1289]: "SKU: GUJ-017"
+                - generic [ref=f9e1290]:
+                  - generic [ref=f9e1291]: ₹180
+                  - button "1-Tap Add to Order" [ref=f9e1294]
+              - generic [ref=f9e1296] [cursor=pointer]:
+                - generic [ref=f9e1297]: Curry Station
+                - generic [ref=f9e1302]:
+                  - img "Steamed Surti Basmati Rice" [ref=f9e1304]
+                  - generic [ref=f9e1305]:
+                    - heading "Steamed Surti Basmati Rice" [level=3] [ref=f9e1306]
+                    - generic [ref=f9e1307]: "SKU: GUJ-018"
+                - generic [ref=f9e1308]:
+                  - generic [ref=f9e1309]: ₹120
+                  - button "1-Tap Add to Order" [ref=f9e1312]
+              - generic [ref=f9e1314] [cursor=pointer]:
+                - generic [ref=f9e1315]: Dessert Counter
+                - generic [ref=f9e1320]:
+                  - img "Kesar Pista Shrikhand (150g)" [ref=f9e1322]
+                  - generic [ref=f9e1323]:
+                    - heading "Kesar Pista Shrikhand (150g)" [level=3] [ref=f9e1324]
+                    - generic [ref=f9e1325]: "SKU: GUJ-019"
+                - generic [ref=f9e1326]:
+                  - generic [ref=f9e1327]: ₹90
+                  - button "1-Tap Add to Order" [ref=f9e1330]
+              - generic [ref=f9e1332] [cursor=pointer]:
+                - generic [ref=f9e1333]: Dessert Counter
+                - generic [ref=f9e1338]:
+                  - img "Rich Basundi Bowl" [ref=f9e1340]
+                  - generic [ref=f9e1341]:
+                    - heading "Rich Basundi Bowl" [level=3] [ref=f9e1342]
+                    - generic [ref=f9e1343]: "SKU: GUJ-020"
+                - generic [ref=f9e1344]:
+                  - generic [ref=f9e1345]: ₹110
+                  - button "1-Tap Add to Order" [ref=f9e1348]
+              - generic [ref=f9e1350] [cursor=pointer]:
+                - generic [ref=f9e1351]: Beverages & Bar
+                - generic [ref=f9e1359]:
+                  - img "Kathiyawadi Masala Chaas" [ref=f9e1361]
+                  - generic [ref=f9e1362]:
+                    - heading "Kathiyawadi Masala Chaas" [level=3] [ref=f9e1363]
+                    - generic [ref=f9e1364]: "SKU: GUJ-021"
+                - generic [ref=f9e1365]:
+                  - generic [ref=f9e1366]: ₹40
+                  - button "1-Tap Add to Order" [ref=f9e1369]
+              - generic [ref=f9e1371] [cursor=pointer]:
+                - generic [ref=f9e1372]: South Indian Station
+                - generic [ref=f9e1380]:
+                  - img "Crispy Butter Masala Dosa" [ref=f9e1382]
+                  - generic [ref=f9e1383]:
+                    - heading "Crispy Butter Masala Dosa" [level=3] [ref=f9e1384]
+                    - generic [ref=f9e1385]: "SKU: SI-001"
+                - generic [ref=f9e1386]:
+                  - generic [ref=f9e1387]: ₹150
+                  - button "1-Tap Add to Order" [ref=f9e1390]
+              - generic [ref=f9e1392] [cursor=pointer]:
+                - generic [ref=f9e1393]: South Indian Station
+                - generic [ref=f9e1401]:
+                  - img "Mysore Masala Dosa" [ref=f9e1403]
+                  - generic [ref=f9e1404]:
+                    - heading "Mysore Masala Dosa" [level=3] [ref=f9e1405]
+                    - generic [ref=f9e1406]: "SKU: SI-002"
+                - generic [ref=f9e1407]:
+                  - generic [ref=f9e1408]: ₹170
+                  - button "1-Tap Add to Order" [ref=f9e1411]
+              - generic [ref=f9e1413] [cursor=pointer]:
+                - generic [ref=f9e1414]: South Indian Station
+                - generic [ref=f9e1422]:
+                  - img "Cheese Burst Rava Dosa" [ref=f9e1424]
+                  - generic [ref=f9e1425]:
+                    - heading "Cheese Burst Rava Dosa" [level=3] [ref=f9e1426]
+                    - generic [ref=f9e1427]: "SKU: SI-003"
+                - generic [ref=f9e1428]:
+                  - generic [ref=f9e1429]: ₹190
+                  - button "1-Tap Add to Order" [ref=f9e1432]
+              - generic [ref=f9e1434] [cursor=pointer]:
+                - generic [ref=f9e1435]: South Indian Station
+                - generic [ref=f9e1440]:
+                  - img "Paper Plain Roast Dosa" [ref=f9e1442]
+                  - generic [ref=f9e1443]:
+                    - heading "Paper Plain Roast Dosa" [level=3] [ref=f9e1444]
+                    - generic [ref=f9e1445]: "SKU: SI-004"
+                - generic [ref=f9e1446]:
+                  - generic [ref=f9e1447]: ₹120
+                  - button "1-Tap Add to Order" [ref=f9e1450]
+              - generic [ref=f9e1452] [cursor=pointer]:
+                - generic [ref=f9e1453]: South Indian Station
+                - generic [ref=f9e1461]:
+                  - img "Steamed Ghee Podi Idli (2 Pcs)" [ref=f9e1463]
+                  - generic [ref=f9e1464]:
+                    - heading "Steamed Ghee Podi Idli (2 Pcs)" [level=3] [ref=f9e1465]
+                    - generic [ref=f9e1466]: "SKU: SI-005"
+                - generic [ref=f9e1467]:
+                  - generic [ref=f9e1468]: ₹120
+                  - button "1-Tap Add to Order" [ref=f9e1471]
+              - generic [ref=f9e1473] [cursor=pointer]:
+                - generic [ref=f9e1474]: South Indian Station
+                - generic [ref=f9e1482]:
+                  - img "Crispy Medu Vada (2 Pcs)" [ref=f9e1484]
+                  - generic [ref=f9e1485]:
+                    - heading "Crispy Medu Vada (2 Pcs)" [level=3] [ref=f9e1486]
+                    - generic [ref=f9e1487]: "SKU: SI-006"
+                - generic [ref=f9e1488]:
+                  - generic [ref=f9e1489]: ₹110
+                  - button "1-Tap Add to Order" [ref=f9e1492]
+              - generic [ref=f9e1494] [cursor=pointer]:
+                - generic [ref=f9e1495]: South Indian Station
+                - generic [ref=f9e1503]:
+                  - img "Idli Vada Combo (1+1)" [ref=f9e1505]
+                  - generic [ref=f9e1506]:
+                    - heading "Idli Vada Combo (1+1)" [level=3] [ref=f9e1507]
+                    - generic [ref=f9e1508]: "SKU: SI-007"
+                - generic [ref=f9e1509]:
+                  - generic [ref=f9e1510]: ₹115
+                  - button "1-Tap Add to Order" [ref=f9e1513]
+              - generic [ref=f9e1515] [cursor=pointer]:
+                - generic [ref=f9e1516]: South Indian Station
+                - generic [ref=f9e1524]:
+                  - img "Onion Tomato Chilli Uttapam" [ref=f9e1526]
+                  - generic [ref=f9e1527]:
+                    - heading "Onion Tomato Chilli Uttapam" [level=3] [ref=f9e1528]
+                    - generic [ref=f9e1529]: "SKU: SI-008"
+                - generic [ref=f9e1530]:
+                  - generic [ref=f9e1531]: ₹150
+                  - button "1-Tap Add to Order" [ref=f9e1534]
+              - generic [ref=f9e1536] [cursor=pointer]:
+                - generic [ref=f9e1537]: South Indian Station
+                - generic [ref=f9e1545]:
+                  - img "Mixed Vegetable Cheese Uttapam" [ref=f9e1547]
+                  - generic [ref=f9e1548]:
+                    - heading "Mixed Vegetable Cheese Uttapam" [level=3] [ref=f9e1549]
+                    - generic [ref=f9e1550]: "SKU: SI-009"
+                - generic [ref=f9e1551]:
+                  - generic [ref=f9e1552]: ₹180
+                  - button "1-Tap Add to Order" [ref=f9e1555]
+              - generic [ref=f9e1557] [cursor=pointer]:
+                - generic [ref=f9e1558]: Main Kitchen
+                - generic [ref=f9e1566]:
+                  - img "South Indian Thali Meal" [ref=f9e1568]
+                  - generic [ref=f9e1569]:
+                    - heading "South Indian Thali Meal" [level=3] [ref=f9e1570]
+                    - generic [ref=f9e1571]: "SKU: SI-010"
+                - generic [ref=f9e1572]:
+                  - generic [ref=f9e1573]: ₹210
+                  - button "1-Tap Add to Order" [ref=f9e1576]
+              - generic [ref=f9e1578] [cursor=pointer]:
+                - generic [ref=f9e1579]: Main Kitchen
+                - generic [ref=f9e1587]:
+                  - img "Curd Rice with Pomegranate" [ref=f9e1589]
+                  - generic [ref=f9e1590]:
+                    - heading "Curd Rice with Pomegranate" [level=3] [ref=f9e1591]
+                    - generic [ref=f9e1592]: "SKU: SI-011"
+                - generic [ref=f9e1593]:
+                  - generic [ref=f9e1594]: ₹140
+                  - button "1-Tap Add to Order" [ref=f9e1597]
+              - generic [ref=f9e1599] [cursor=pointer]:
+                - generic [ref=f9e1600]: Main Kitchen
+                - generic [ref=f9e1608]:
+                  - img "Bisi Bele Bath (Hot Lentil Rice)" [ref=f9e1610]
+                  - generic [ref=f9e1611]:
+                    - heading "Bisi Bele Bath (Hot Lentil Rice)" [level=3] [ref=f9e1612]
+                    - generic [ref=f9e1613]: "SKU: SI-012"
+                - generic [ref=f9e1614]:
+                  - generic [ref=f9e1615]: ₹160
+                  - button "1-Tap Add to Order" [ref=f9e1618]
+              - generic [ref=f9e1620] [cursor=pointer]:
+                - generic [ref=f9e1621]: Beverages & Bar
+                - generic [ref=f9e1626]:
+                  - img "Authentic Kumbakonam Filter Coffee" [ref=f9e1628]
+                  - generic [ref=f9e1629]:
+                    - heading "Authentic Kumbakonam Filter Coffee" [level=3] [ref=f9e1630]
+                    - generic [ref=f9e1631]: "SKU: SI-013"
+                - generic [ref=f9e1632]:
+                  - generic [ref=f9e1633]: ₹60
+                  - button "1-Tap Add to Order" [ref=f9e1636]
+              - generic [ref=f9e1638] [cursor=pointer]:
+                - generic [ref=f9e1639]: Tandoor
+                - generic [ref=f9e1647]:
+                  - img "Amritsari Paneer Tikka" [ref=f9e1649]
+                  - generic [ref=f9e1650]:
+                    - heading "Amritsari Paneer Tikka" [level=3] [ref=f9e1651]
+                    - generic [ref=f9e1652]: "SKU: PUN-001"
+                - generic [ref=f9e1653]:
+                  - generic [ref=f9e1654]: ₹280
+                  - button "1-Tap Add to Order" [ref=f9e1657]
+              - generic [ref=f9e1659] [cursor=pointer]:
+                - generic [ref=f9e1660]: Tandoor
+                - generic [ref=f9e1668]:
+                  - img "Dhaba Dahi Kebab (6 Pcs)" [ref=f9e1670]
+                  - generic [ref=f9e1671]:
+                    - heading "Dhaba Dahi Kebab (6 Pcs)" [level=3] [ref=f9e1672]
+                    - generic [ref=f9e1673]: "SKU: PUN-002"
+                - generic [ref=f9e1674]:
+                  - generic [ref=f9e1675]: ₹240
+                  - button "1-Tap Add to Order" [ref=f9e1678]
+              - generic [ref=f9e1680] [cursor=pointer]:
+                - generic [ref=f9e1681]: Curry Station
+                - generic [ref=f9e1689]:
+                  - img "Pindi Chhole (Rawalpindi Style)" [ref=f9e1691]
+                  - generic [ref=f9e1692]:
+                    - heading "Pindi Chhole (Rawalpindi Style)" [level=3] [ref=f9e1693]
+                    - generic [ref=f9e1694]: "SKU: PUN-003"
+                - generic [ref=f9e1695]:
+                  - generic [ref=f9e1696]: ₹230
+                  - button "1-Tap Add to Order" [ref=f9e1699]
+              - generic [ref=f9e1701] [cursor=pointer]:
+                - generic [ref=f9e1702]: Curry Station
+                - generic [ref=f9e1710]:
+                  - img "Paneer Bhurji Desi Ghee" [ref=f9e1712]
+                  - generic [ref=f9e1713]:
+                    - heading "Paneer Bhurji Desi Ghee" [level=3] [ref=f9e1714]
+                    - generic [ref=f9e1715]: "SKU: PUN-004"
+                - generic [ref=f9e1716]:
+                  - generic [ref=f9e1717]: ₹270
+                  - button "1-Tap Add to Order" [ref=f9e1720]
+              - generic [ref=f9e1722] [cursor=pointer]:
+                - generic [ref=f9e1723]: Curry Station
+                - generic [ref=f9e1731]:
+                  - img "Sarson Ka Saag (Seasonal)" [ref=f9e1733]
+                  - generic [ref=f9e1734]:
+                    - heading "Sarson Ka Saag (Seasonal)" [level=3] [ref=f9e1735]
+                    - generic [ref=f9e1736]: "SKU: PUN-005"
+                - generic [ref=f9e1737]:
+                  - generic [ref=f9e1738]: ₹260
+                  - button "1-Tap Add to Order" [ref=f9e1741]
+              - generic [ref=f9e1743] [cursor=pointer]:
+                - generic [ref=f9e1744]: Tandoor
+                - generic [ref=f9e1752]:
+                  - img "Amritsari Aloo Pyaaz Kulcha" [ref=f9e1754]
+                  - generic [ref=f9e1755]:
+                    - heading "Amritsari Aloo Pyaaz Kulcha" [level=3] [ref=f9e1756]
+                    - generic [ref=f9e1757]: "SKU: PUN-006"
+                - generic [ref=f9e1758]:
+                  - generic [ref=f9e1759]: ₹90
+                  - button "1-Tap Add to Order" [ref=f9e1762]
+              - generic [ref=f9e1764] [cursor=pointer]:
+                - generic [ref=f9e1765]: Tandoor
+                - generic [ref=f9e1773]:
+                  - img "Paneer Kulcha Stuffed" [ref=f9e1775]
+                  - generic [ref=f9e1776]:
+                    - heading "Paneer Kulcha Stuffed" [level=3] [ref=f9e1777]
+                    - generic [ref=f9e1778]: "SKU: PUN-007"
+                - generic [ref=f9e1779]:
+                  - generic [ref=f9e1780]: ₹120
+                  - button "1-Tap Add to Order" [ref=f9e1783]
+              - generic [ref=f9e1785] [cursor=pointer]:
+                - generic [ref=f9e1786]: Main Kitchen
+                - generic [ref=f9e1791]:
+                  - img "Makki Di Roti (2 Pcs)" [ref=f9e1793]
+                  - generic [ref=f9e1794]:
+                    - heading "Makki Di Roti (2 Pcs)" [level=3] [ref=f9e1795]
+                    - generic [ref=f9e1796]: "SKU: PUN-008"
+                - generic [ref=f9e1797]:
+                  - generic [ref=f9e1798]: ₹60
+                  - button "1-Tap Add to Order" [ref=f9e1801]
+              - generic [ref=f9e1803] [cursor=pointer]:
+                - generic [ref=f9e1804]: Tandoor
+                - generic [ref=f9e1812]:
+                  - img "Veg Galouti Kebab (4 Pcs)" [ref=f9e1814]
+                  - generic [ref=f9e1815]:
+                    - heading "Veg Galouti Kebab (4 Pcs)" [level=3] [ref=f9e1816]
+                    - generic [ref=f9e1817]: "SKU: MUG-001"
+                - generic [ref=f9e1818]:
+                  - generic [ref=f9e1819]: ₹270
+                  - button "1-Tap Add to Order" [ref=f9e1822]
+              - generic [ref=f9e1824] [cursor=pointer]:
+                - generic [ref=f9e1825]: Tandoor
+                - generic [ref=f9e1833]:
+                  - img "Paneer Pasanda Tikka" [ref=f9e1835]
+                  - generic [ref=f9e1836]:
+                    - heading "Paneer Pasanda Tikka" [level=3] [ref=f9e1837]
+                    - generic [ref=f9e1838]: "SKU: MUG-002"
+                - generic [ref=f9e1839]:
+                  - generic [ref=f9e1840]: ₹300
+                  - button "1-Tap Add to Order" [ref=f9e1843]
+              - generic [ref=f9e1845] [cursor=pointer]:
+                - generic [ref=f9e1846]: Curry Station
+                - generic [ref=f9e1854]:
+                  - img "Navratan Korma Royal" [ref=f9e1856]
+                  - generic [ref=f9e1857]:
+                    - heading "Navratan Korma Royal" [level=3] [ref=f9e1858]
+                    - generic [ref=f9e1859]: "SKU: MUG-003"
+                - generic [ref=f9e1860]:
+                  - generic [ref=f9e1861]: ₹310
+                  - button "1-Tap Add to Order" [ref=f9e1864]
+              - generic [ref=f9e1866] [cursor=pointer]:
+                - generic [ref=f9e1867]: Curry Station
+                - generic [ref=f9e1875]:
+                  - img "Mughlai Paneer Lababdar" [ref=f9e1877]
+                  - generic [ref=f9e1878]:
+                    - heading "Mughlai Paneer Lababdar" [level=3] [ref=f9e1879]
+                    - generic [ref=f9e1880]: "SKU: MUG-004"
+                - generic [ref=f9e1881]:
+                  - generic [ref=f9e1882]: ₹320
+                  - button "1-Tap Add to Order" [ref=f9e1885]
+              - generic [ref=f9e1887] [cursor=pointer]:
+                - generic [ref=f9e1888]: Tandoor
+                - generic [ref=f9e1893]:
+                  - img "Khamiri Roti (2 Pcs)" [ref=f9e1895]
+                  - generic [ref=f9e1896]:
+                    - heading "Khamiri Roti (2 Pcs)" [level=3] [ref=f9e1897]
+                    - generic [ref=f9e1898]: "SKU: MUG-005"
+                - generic [ref=f9e1899]:
+                  - generic [ref=f9e1900]: ₹60
+                  - button "1-Tap Add to Order" [ref=f9e1903]
+              - generic [ref=f9e1905] [cursor=pointer]:
+                - generic [ref=f9e1906]: Main Kitchen
+                - generic [ref=f9e1911]:
+                  - img "Roomali Roti" [ref=f9e1913]
+                  - generic [ref=f9e1914]:
+                    - heading "Roomali Roti" [level=3] [ref=f9e1915]
+                    - generic [ref=f9e1916]: "SKU: MUG-006"
+                - generic [ref=f9e1917]:
+                  - generic [ref=f9e1918]: ₹40
+                  - button "1-Tap Add to Order" [ref=f9e1921]
+              - generic [ref=f9e1923] [cursor=pointer]:
+                - generic [ref=f9e1924]: Curry Station
+                - generic [ref=f9e1932]:
+                  - img "Lucknowi Dum Biryani Handi" [ref=f9e1934]
+                  - generic [ref=f9e1935]:
+                    - heading "Lucknowi Dum Biryani Handi" [level=3] [ref=f9e1936]
+                    - generic [ref=f9e1937]: "SKU: MUG-007"
+                - generic [ref=f9e1938]:
+                  - generic [ref=f9e1939]: ₹310
+                  - button "1-Tap Add to Order" [ref=f9e1942]
+              - generic [ref=f9e1944] [cursor=pointer]:
+                - generic [ref=f9e1945]: Curry Station
+                - generic [ref=f9e1953]:
+                  - img "Kathiyawadi Ringna No Olo" [ref=f9e1955]
+                  - generic [ref=f9e1956]:
+                    - heading "Kathiyawadi Ringna No Olo" [level=3] [ref=f9e1957]
+                    - generic [ref=f9e1958]: "SKU: KAT-001"
+                - generic [ref=f9e1959]:
+                  - generic [ref=f9e1960]: ₹200
+                  - button "1-Tap Add to Order" [ref=f9e1963]
+              - generic [ref=f9e1965] [cursor=pointer]:
+                - generic [ref=f9e1966]: Curry Station
+                - generic [ref=f9e1974]:
+                  - img "Lasaniya Bateta (Garlic Potatoes)" [ref=f9e1976]
+                  - generic [ref=f9e1977]:
+                    - heading "Lasaniya Bateta (Garlic Potatoes)" [level=3] [ref=f9e1978]
+                    - generic [ref=f9e1979]: "SKU: KAT-002"
+                - generic [ref=f9e1980]:
+                  - generic [ref=f9e1981]: ₹180
+                  - button "1-Tap Add to Order" [ref=f9e1984]
+              - generic [ref=f9e1986] [cursor=pointer]:
+                - generic [ref=f9e1987]: Curry Station
+                - generic [ref=f9e1995]:
+                  - img "Sev Dungri Nu Shaak" [ref=f9e1997]
+                  - generic [ref=f9e1998]:
+                    - heading "Sev Dungri Nu Shaak" [level=3] [ref=f9e1999]
+                    - generic [ref=f9e2000]: "SKU: KAT-003"
+                - generic [ref=f9e2001]:
+                  - generic [ref=f9e2002]: ₹170
+                  - button "1-Tap Add to Order" [ref=f9e2005]
+              - generic [ref=f9e2007] [cursor=pointer]:
+                - generic [ref=f9e2008]: Main Kitchen
+                - generic [ref=f9e2016]:
+                  - img "Dahi Tikhari (Kathiyawadi Dip)" [ref=f9e2018]
+                  - generic [ref=f9e2019]:
+                    - heading "Dahi Tikhari (Kathiyawadi Dip)" [level=3] [ref=f9e2020]
+                    - generic [ref=f9e2021]: "SKU: KAT-004"
+                - generic [ref=f9e2022]:
+                  - generic [ref=f9e2023]: ₹130
+                  - button "1-Tap Add to Order" [ref=f9e2026]
+              - generic [ref=f9e2028] [cursor=pointer]:
+                - generic [ref=f9e2029]: Main Kitchen
+                - generic [ref=f9e2034]:
+                  - img "Kathiyawadi Bajra Rotla (White Butter)" [ref=f9e2036]
+                  - generic [ref=f9e2037]:
+                    - heading "Kathiyawadi Bajra Rotla (White Butter)" [level=3] [ref=f9e2038]
+                    - generic [ref=f9e2039]: "SKU: KAT-005"
+                - generic [ref=f9e2040]:
+                  - generic [ref=f9e2041]: ₹50
+                  - button "1-Tap Add to Order" [ref=f9e2044]
+              - generic [ref=f9e2046] [cursor=pointer]:
+                - generic [ref=f9e2047]: Main Kitchen
+                - generic [ref=f9e2055]:
+                  - img "Leelvanu Lasan Chutney" [ref=f9e2057]
+                  - generic [ref=f9e2058]:
+                    - heading "Leelvanu Lasan Chutney" [level=3] [ref=f9e2059]
+                    - generic [ref=f9e2060]: "SKU: KAT-006"
+                - generic [ref=f9e2061]:
+                  - generic [ref=f9e2062]: ₹40
+                  - button "1-Tap Add to Order" [ref=f9e2065]
+              - generic [ref=f9e2067] [cursor=pointer]:
+                - generic [ref=f9e2068]: Main Kitchen
+                - generic [ref=f9e2076]:
+                  - img "Marwari Dal Baati Churma Thali" [ref=f9e2078]
+                  - generic [ref=f9e2079]:
+                    - heading "Marwari Dal Baati Churma Thali" [level=3] [ref=f9e2080]
+                    - generic [ref=f9e2081]: "SKU: RAJ-001"
+                - generic [ref=f9e2082]:
+                  - generic [ref=f9e2083]: ₹320
+                  - button "1-Tap Add to Order" [ref=f9e2086]
+              - generic [ref=f9e2088] [cursor=pointer]:
+                - generic [ref=f9e2089]: Curry Station
+                - generic [ref=f9e2097]:
+                  - img "Shahi Gatte Ki Sabzi" [ref=f9e2099]
+                  - generic [ref=f9e2100]:
+                    - heading "Shahi Gatte Ki Sabzi" [level=3] [ref=f9e2101]
+                    - generic [ref=f9e2102]: "SKU: RAJ-002"
+                - generic [ref=f9e2103]:
+                  - generic [ref=f9e2104]: ₹220
+                  - button "1-Tap Add to Order" [ref=f9e2107]
+              - generic [ref=f9e2109] [cursor=pointer]:
+                - generic [ref=f9e2110]: Curry Station
+                - generic [ref=f9e2118]:
+                  - img "Authentic Ker Sangri Special" [ref=f9e2120]
+                  - generic [ref=f9e2121]:
+                    - heading "Authentic Ker Sangri Special" [level=3] [ref=f9e2122]
+                    - generic [ref=f9e2123]: "SKU: RAJ-003"
+                - generic [ref=f9e2124]:
+                  - generic [ref=f9e2125]: ₹290
+                  - button "1-Tap Add to Order" [ref=f9e2128]
+              - generic [ref=f9e2130] [cursor=pointer]:
+                - generic [ref=f9e2131]: Curry Station
+                - generic [ref=f9e2139]:
+                  - img "Pithod Ki Sabzi" [ref=f9e2141]
+                  - generic [ref=f9e2142]:
+                    - heading "Pithod Ki Sabzi" [level=3] [ref=f9e2143]
+                    - generic [ref=f9e2144]: "SKU: RAJ-004"
+                - generic [ref=f9e2145]:
+                  - generic [ref=f9e2146]: ₹210
+                  - button "1-Tap Add to Order" [ref=f9e2149]
+              - generic [ref=f9e2151] [cursor=pointer]:
+                - generic [ref=f9e2152]: South Indian Station
+                - generic [ref=f9e2160]:
+                  - img "Ghee Mini Podi Idli (14 Pcs)" [ref=f9e2162]
+                  - generic [ref=f9e2163]:
+                    - heading "Ghee Mini Podi Idli (14 Pcs)" [level=3] [ref=f9e2164]
+                    - generic [ref=f9e2165]: "SKU: TIF-001"
+                - generic [ref=f9e2166]:
+                  - generic [ref=f9e2167]: ₹110
+                  - button "1-Tap Add to Order" [ref=f9e2170]
+              - generic [ref=f9e2172] [cursor=pointer]:
+                - generic [ref=f9e2173]: South Indian Station
+                - generic [ref=f9e2181]:
+                  - img "Hot Ven Pongal with Ghee Cashews" [ref=f9e2183]
+                  - generic [ref=f9e2184]:
+                    - heading "Hot Ven Pongal with Ghee Cashews" [level=3] [ref=f9e2185]
+                    - generic [ref=f9e2186]: "SKU: TIF-002"
+                - generic [ref=f9e2187]:
+                  - generic [ref=f9e2188]: ₹100
+                  - button "1-Tap Add to Order" [ref=f9e2191]
+              - generic [ref=f9e2193] [cursor=pointer]:
+                - generic [ref=f9e2194]: Main Kitchen
+                - generic [ref=f9e2202]:
+                  - img "Crispy Corn Salt & Pepper" [ref=f9e2204]
+                  - generic [ref=f9e2205]:
+                    - heading "Crispy Corn Salt & Pepper" [level=3] [ref=f9e2206]
+                    - generic [ref=f9e2207]: "SKU: PV-001"
+                - generic [ref=f9e2208]:
+                  - generic [ref=f9e2209]: ₹210
+                  - button "1-Tap Add to Order" [ref=f9e2212]
+              - generic [ref=f9e2214] [cursor=pointer]:
+                - generic [ref=f9e2215]:
+                  - generic [ref=f9e2216]: JAIN
+                  - generic [ref=f9e2223]: Tandoor
+                - generic [ref=f9e2224]:
+                  - img "Jain Paneer Tikka Satvik" [ref=f9e2226]
+                  - generic [ref=f9e2227]:
+                    - heading "Jain Paneer Tikka Satvik" [level=3] [ref=f9e2228]
+                    - generic [ref=f9e2229]: "SKU: JAI-001"
+                - generic [ref=f9e2230]:
+                  - generic [ref=f9e2231]: ₹280
+                  - button "1-Tap Add to Order" [ref=f9e2234]
+              - generic [ref=f9e2236] [cursor=pointer]:
+                - generic [ref=f9e2237]:
+                  - generic [ref=f9e2238]: JAIN
+                  - generic [ref=f9e2245]: Main Kitchen
+                - generic [ref=f9e2246]:
+                  - img "Jain Raw Banana Cutlets (4 Pcs)" [ref=f9e2248]
+                  - generic [ref=f9e2249]:
+                    - heading "Jain Raw Banana Cutlets (4 Pcs)" [level=3] [ref=f9e2250]
+                    - generic [ref=f9e2251]: "SKU: JAI-002"
+                - generic [ref=f9e2252]:
+                  - generic [ref=f9e2253]: ₹190
+                  - button "1-Tap Add to Order" [ref=f9e2256]
+              - generic [ref=f9e2258] [cursor=pointer]:
+                - generic [ref=f9e2259]:
+                  - generic [ref=f9e2260]: JAIN
+                  - generic [ref=f9e2267]: Curry Station
+                - generic [ref=f9e2268]:
+                  - img "Jain Paneer Butter Masala" [ref=f9e2270]
+                  - generic [ref=f9e2271]:
+                    - heading "Jain Paneer Butter Masala" [level=3] [ref=f9e2272]
+                    - generic [ref=f9e2273]: "SKU: JAI-003"
+                - generic [ref=f9e2274]:
+                  - generic [ref=f9e2275]: ₹290
+                  - button "1-Tap Add to Order" [ref=f9e2278]
+              - generic [ref=f9e2280] [cursor=pointer]:
+                - generic [ref=f9e2281]:
+                  - generic [ref=f9e2282]: JAIN
+                  - generic [ref=f9e2289]: Curry Station
+                - generic [ref=f9e2290]:
+                  - img "Jain Kela Nu Shaak (Raw Banana Curry)" [ref=f9e2292]
+                  - generic [ref=f9e2293]:
+                    - heading "Jain Kela Nu Shaak (Raw Banana Curry)" [level=3] [ref=f9e2294]
+                    - generic [ref=f9e2295]: "SKU: JAI-004"
+                - generic [ref=f9e2296]:
+                  - generic [ref=f9e2297]: ₹200
+                  - button "1-Tap Add to Order" [ref=f9e2300]
+              - generic [ref=f9e2302] [cursor=pointer]:
+                - generic [ref=f9e2303]: Curry Station
+                - generic [ref=f9e2311]:
+                  - img "Paneer Lababdar Special" [ref=f9e2313]
+                  - generic [ref=f9e2314]:
+                    - heading "Paneer Lababdar Special" [level=3] [ref=f9e2315]
+                    - generic [ref=f9e2316]: "SKU: MC-001"
+                - generic [ref=f9e2317]:
+                  - generic [ref=f9e2318]: ₹290
+                  - button "1-Tap Add to Order" [ref=f9e2321]
+              - generic [ref=f9e2323] [cursor=pointer]:
+                - generic [ref=f9e2324]: Tandoor
+                - generic [ref=f9e2332]:
+                  - img "Grand Tandoori Veg Kebab Platter" [ref=f9e2334]
+                  - generic [ref=f9e2335]:
+                    - heading "Grand Tandoori Veg Kebab Platter" [level=3] [ref=f9e2336]
+                    - generic [ref=f9e2337]: "SKU: FAM-001"
+                - generic [ref=f9e2338]:
+                  - generic [ref=f9e2339]: ₹580
+                  - button "1-Tap Add to Order" [ref=f9e2342]
+              - generic [ref=f9e2344] [cursor=pointer]:
+                - generic [ref=f9e2345]: Main Kitchen
+                - generic [ref=f9e2353]:
+                  - img "Maharaja Unlimited Royal Thali" [ref=f9e2355]
+                  - generic [ref=f9e2356]:
+                    - heading "Maharaja Unlimited Royal Thali" [level=3] [ref=f9e2357]
+                    - generic [ref=f9e2358]: "SKU: THL-001"
+                - generic [ref=f9e2359]:
+                  - generic [ref=f9e2360]: ₹380
+                  - button "1-Tap Add to Order" [ref=f9e2363]
+              - generic [ref=f9e2365] [cursor=pointer]:
+                - generic [ref=f9e2366]: Main Kitchen
+                - generic [ref=f9e2374]:
+                  - img "Quick Business Lunch Thali" [ref=f9e2376]
+                  - generic [ref=f9e2377]:
+                    - heading "Quick Business Lunch Thali" [level=3] [ref=f9e2378]
+                    - generic [ref=f9e2379]: "SKU: THL-002"
+                - generic [ref=f9e2380]:
+                  - generic [ref=f9e2381]: ₹199
+                  - button "1-Tap Add to Order" [ref=f9e2384]
+              - generic [ref=f9e2386] [cursor=pointer]:
+                - generic [ref=f9e2387]: Chinese Wok
+                - generic [ref=f9e2395]:
+                  - img "Veg Hakka Noodles" [ref=f9e2397]
+                  - generic [ref=f9e2398]:
+                    - heading "Veg Hakka Noodles" [level=3] [ref=f9e2399]
+                    - generic [ref=f9e2400]: "SKU: CHI-001"
+                - generic [ref=f9e2401]:
+                  - generic [ref=f9e2402]: ₹190
+                  - button "1-Tap Add to Order" [ref=f9e2405]
+              - generic [ref=f9e2407] [cursor=pointer]:
+                - generic [ref=f9e2408]: Chinese Wok
+                - generic [ref=f9e2416]:
+                  - img "Schezwan Fried Rice" [ref=f9e2418]
+                  - generic [ref=f9e2419]:
+                    - heading "Schezwan Fried Rice" [level=3] [ref=f9e2420]
+                    - generic [ref=f9e2421]: "SKU: CHI-002"
+                - generic [ref=f9e2422]:
+                  - generic [ref=f9e2423]: ₹210
+                  - button "1-Tap Add to Order" [ref=f9e2426]
+              - generic [ref=f9e2428] [cursor=pointer]:
+                - generic [ref=f9e2429]: Chinese Wok
+                - generic [ref=f9e2437]:
+                  - img "Chilli Paneer Dry" [ref=f9e2439]
+                  - generic [ref=f9e2440]:
+                    - heading "Chilli Paneer Dry" [level=3] [ref=f9e2441]
+                    - generic [ref=f9e2442]: "SKU: CHI-003"
+                - generic [ref=f9e2443]:
+                  - generic [ref=f9e2444]: ₹250
+                  - button "1-Tap Add to Order" [ref=f9e2447]
+              - generic [ref=f9e2449] [cursor=pointer]:
+                - generic [ref=f9e2450]: Chinese Wok
+                - generic [ref=f9e2458]:
+                  - img "Veg Manchurian Gravy" [ref=f9e2460]
+                  - generic [ref=f9e2461]:
+                    - heading "Veg Manchurian Gravy" [level=3] [ref=f9e2462]
+                    - generic [ref=f9e2463]: "SKU: CHI-004"
+                - generic [ref=f9e2464]:
+                  - generic [ref=f9e2465]: ₹220
+                  - button "1-Tap Add to Order" [ref=f9e2468]
+              - generic [ref=f9e2470] [cursor=pointer]:
+                - generic [ref=f9e2471]: Chinese Wok
+                - generic [ref=f9e2479]:
+                  - img "Triple Schezwan Rice with Gravy" [ref=f9e2481]
+                  - generic [ref=f9e2482]:
+                    - heading "Triple Schezwan Rice with Gravy" [level=3] [ref=f9e2483]
+                    - generic [ref=f9e2484]: "SKU: IC-001"
+                - generic [ref=f9e2485]:
+                  - generic [ref=f9e2486]: ₹260
+                  - button "1-Tap Add to Order" [ref=f9e2489]
+              - generic [ref=f9e2491] [cursor=pointer]:
+                - generic [ref=f9e2492]: Chinese Wok
+                - generic [ref=f9e2500]:
+                  - img "Crispy Chinese Bhel" [ref=f9e2502]
+                  - generic [ref=f9e2503]:
+                    - heading "Crispy Chinese Bhel" [level=3] [ref=f9e2504]
+                    - generic [ref=f9e2505]: "SKU: IC-002"
+                - generic [ref=f9e2506]:
+                  - generic [ref=f9e2507]: ₹140
+                  - button "1-Tap Add to Order" [ref=f9e2510]
+              - generic [ref=f9e2512] [cursor=pointer]:
+                - generic [ref=f9e2513]: Fry Station
+                - generic [ref=f9e2521]:
+                  - img "Crispy Veggie Supreme Burger" [ref=f9e2523]
+                  - generic [ref=f9e2524]:
+                    - heading "Crispy Veggie Supreme Burger" [level=3] [ref=f9e2525]
+                    - generic [ref=f9e2526]: "SKU: FF-001"
+                - generic [ref=f9e2527]:
+                  - generic [ref=f9e2528]: ₹130
+                  - button "1-Tap Add to Order" [ref=f9e2531]
+              - generic [ref=f9e2533] [cursor=pointer]:
+                - generic [ref=f9e2534]: Main Kitchen
+                - generic [ref=f9e2542]:
+                  - img "Spicy Paneer Tikka Wrap" [ref=f9e2544]
+                  - generic [ref=f9e2545]:
+                    - heading "Spicy Paneer Tikka Wrap" [level=3] [ref=f9e2546]
+                    - generic [ref=f9e2547]: "SKU: FF-002"
+                - generic [ref=f9e2548]:
+                  - generic [ref=f9e2549]: ₹160
+                  - button "1-Tap Add to Order" [ref=f9e2552]
+              - generic [ref=f9e2554] [cursor=pointer]:
+                - generic [ref=f9e2555]: Fry Station
+                - generic [ref=f9e2563]:
+                  - img "Peri Peri Crinkle Fries" [ref=f9e2565]
+                  - generic [ref=f9e2566]:
+                    - heading "Peri Peri Crinkle Fries" [level=3] [ref=f9e2567]
+                    - generic [ref=f9e2568]: "SKU: FF-003"
+                - generic [ref=f9e2569]:
+                  - generic [ref=f9e2570]: ₹120
+                  - button "1-Tap Add to Order" [ref=f9e2573]
+              - generic [ref=f9e2575] [cursor=pointer]:
+                - generic [ref=f9e2576]: Fry Station
+                - generic [ref=f9e2584]:
+                  - img "Cheesy Jalapeno Poppers (6 Pcs)" [ref=f9e2586]
+                  - generic [ref=f9e2587]:
+                    - heading "Cheesy Jalapeno Poppers (6 Pcs)" [level=3] [ref=f9e2588]
+                    - generic [ref=f9e2589]: "SKU: FF-004"
+                - generic [ref=f9e2590]:
+                  - generic [ref=f9e2591]: ₹150
+                  - button "1-Tap Add to Order" [ref=f9e2594]
+              - generic [ref=f9e2596] [cursor=pointer]:
+                - generic [ref=f9e2597]: Main Kitchen
+                - generic [ref=f9e2605]:
+                  - img "Bombay Special Grilled Sandwich" [ref=f9e2607]
+                  - generic [ref=f9e2608]:
+                    - heading "Bombay Special Grilled Sandwich" [level=3] [ref=f9e2609]
+                    - generic [ref=f9e2610]: "SKU: BS-001"
+                - generic [ref=f9e2611]:
+                  - generic [ref=f9e2612]: ₹160
+                  - button "1-Tap Add to Order" [ref=f9e2615]
+              - generic [ref=f9e2617] [cursor=pointer]:
+                - generic [ref=f9e2618]: Main Kitchen
+                - generic [ref=f9e2626]:
+                  - img "Paneer Makhani Cheese Toastie" [ref=f9e2628]
+                  - generic [ref=f9e2629]:
+                    - heading "Paneer Makhani Cheese Toastie" [level=3] [ref=f9e2630]
+                    - generic [ref=f9e2631]: "SKU: BS-002"
+                - generic [ref=f9e2632]:
+                  - generic [ref=f9e2633]: ₹180
+                  - button "1-Tap Add to Order" [ref=f9e2636]
+              - generic [ref=f9e2638] [cursor=pointer]:
+                - generic [ref=f9e2639]: Beverages & Bar
+                - generic [ref=f9e2644]:
+                  - img "Classic Cappuccino" [ref=f9e2646]
+                  - generic [ref=f9e2647]:
+                    - heading "Classic Cappuccino" [level=3] [ref=f9e2648]
+                    - generic [ref=f9e2649]: "SKU: CAF-001"
+                - generic [ref=f9e2650]:
+                  - generic [ref=f9e2651]: ₹140
+                  - button "1-Tap Add to Order" [ref=f9e2654]
+              - generic [ref=f9e2656] [cursor=pointer]:
+                - generic [ref=f9e2657]: Beverages & Bar
+                - generic [ref=f9e2662]:
+                  - img "Roasted Hazelnut Latte" [ref=f9e2664]
+                  - generic [ref=f9e2665]:
+                    - heading "Roasted Hazelnut Latte" [level=3] [ref=f9e2666]
+                    - generic [ref=f9e2667]: "SKU: CAF-002"
+                - generic [ref=f9e2668]:
+                  - generic [ref=f9e2669]: ₹170
+                  - button "1-Tap Add to Order" [ref=f9e2672]
+              - generic [ref=f9e2674] [cursor=pointer]:
+                - generic [ref=f9e2675]: Beverages & Bar
+                - generic [ref=f9e2680]:
+                  - img "Caramel Brownie Frappe" [ref=f9e2682]
+                  - generic [ref=f9e2683]:
+                    - heading "Caramel Brownie Frappe" [level=3] [ref=f9e2684]
+                    - generic [ref=f9e2685]: "SKU: CAF-003"
+                - generic [ref=f9e2686]:
+                  - generic [ref=f9e2687]: ₹200
+                  - button "1-Tap Add to Order" [ref=f9e2690]
+              - generic [ref=f9e2692] [cursor=pointer]:
+                - generic [ref=f9e2693]: Dessert Counter
+                - generic [ref=f9e2698]:
+                  - img "Dutch Chocolate Truffle Slice" [ref=f9e2700]
+                  - generic [ref=f9e2701]:
+                    - heading "Dutch Chocolate Truffle Slice" [level=3] [ref=f9e2702]
+                    - generic [ref=f9e2703]: "SKU: BAK-001"
+                - generic [ref=f9e2704]:
+                  - generic [ref=f9e2705]: ₹130
+                  - button "1-Tap Add to Order" [ref=f9e2708]
+              - generic [ref=f9e2710] [cursor=pointer]:
+                - generic [ref=f9e2711]: Dessert Counter
+                - generic [ref=f9e2716]:
+                  - img "Warm Choco Lava Cake" [ref=f9e2718]
+                  - generic [ref=f9e2719]:
+                    - heading "Warm Choco Lava Cake" [level=3] [ref=f9e2720]
+                    - generic [ref=f9e2721]: "SKU: BAK-002"
+                - generic [ref=f9e2722]:
+                  - generic [ref=f9e2723]: ₹110
+                  - button "1-Tap Add to Order" [ref=f9e2726]
+              - generic [ref=f9e2728] [cursor=pointer]:
+                - generic [ref=f9e2729]: Pizza Station
+                - generic [ref=f9e2734]:
+                  - img "Margherita Basilico" [ref=f9e2736]
+                  - generic [ref=f9e2737]:
+                    - heading "Margherita Basilico" [level=3] [ref=f9e2738]
+                    - generic [ref=f9e2739]: "SKU: PIZ-001"
+                - generic [ref=f9e2740]:
+                  - generic [ref=f9e2741]: ₹240
+                  - button "1-Tap Add to Order" [ref=f9e2744]
+              - generic [ref=f9e2746] [cursor=pointer]:
+                - generic [ref=f9e2747]: Pizza Station
+                - generic [ref=f9e2755]:
+                  - img "Farmhouse Veggie Supreme" [ref=f9e2757]
+                  - generic [ref=f9e2758]:
+                    - heading "Farmhouse Veggie Supreme" [level=3] [ref=f9e2759]
+                    - generic [ref=f9e2760]: "SKU: PIZ-002"
+                - generic [ref=f9e2761]:
+                  - generic [ref=f9e2762]: ₹320
+                  - button "1-Tap Add to Order" [ref=f9e2765]
+              - generic [ref=f9e2767] [cursor=pointer]:
+                - generic [ref=f9e2768]: Pizza Station
+                - generic [ref=f9e2776]:
+                  - img "Paneer Tikka Makhani Pizza" [ref=f9e2778]
+                  - generic [ref=f9e2779]:
+                    - heading "Paneer Tikka Makhani Pizza" [level=3] [ref=f9e2780]
+                    - generic [ref=f9e2781]: "SKU: PIZ-003"
+                - generic [ref=f9e2782]:
+                  - generic [ref=f9e2783]: ₹350
+                  - button "1-Tap Add to Order" [ref=f9e2786]
+              - generic [ref=f9e2788] [cursor=pointer]:
+                - generic [ref=f9e2789]: Pizza Station
+                - generic [ref=f9e2794]:
+                  - img "Cheese Stuffed Garlic Breadsticks" [ref=f9e2796]
+                  - generic [ref=f9e2797]:
+                    - heading "Cheese Stuffed Garlic Breadsticks" [level=3] [ref=f9e2798]
+                    - generic [ref=f9e2799]: "SKU: PIZ-004"
+                - generic [ref=f9e2800]:
+                  - generic [ref=f9e2801]: ₹160
+                  - button "1-Tap Add to Order" [ref=f9e2804]
+              - generic [ref=f9e2806] [cursor=pointer]:
+                - generic [ref=f9e2807]: Main Kitchen
+                - generic [ref=f9e2812]:
+                  - img "Creamy Alfredo White Sauce Penne" [ref=f9e2814]
+                  - generic [ref=f9e2815]:
+                    - heading "Creamy Alfredo White Sauce Penne" [level=3] [ref=f9e2816]
+                    - generic [ref=f9e2817]: "SKU: PIZ-005"
+                - generic [ref=f9e2818]:
+                  - generic [ref=f9e2819]: ₹260
+                  - button "1-Tap Add to Order" [ref=f9e2822]
+              - generic [ref=f9e2824] [cursor=pointer]:
+                - generic [ref=f9e2825]: Chaat Counter
+                - generic [ref=f9e2833]:
+                  - img "Pani Puri Platter (6 Pcs)" [ref=f9e2835]
+                  - generic [ref=f9e2836]:
+                    - heading "Pani Puri Platter (6 Pcs)" [level=3] [ref=f9e2837]
+                    - generic [ref=f9e2838]: "SKU: CHT-001"
+                - generic [ref=f9e2839]:
+                  - generic [ref=f9e2840]: ₹70
+                  - button "1-Tap Add to Order" [ref=f9e2843]
+              - generic [ref=f9e2845] [cursor=pointer]:
+                - generic [ref=f9e2846]: Chaat Counter
+                - generic [ref=f9e2854]:
+                  - img "Dahi Sev Batata Puri" [ref=f9e2856]
+                  - generic [ref=f9e2857]:
+                    - heading "Dahi Sev Batata Puri" [level=3] [ref=f9e2858]
+                    - generic [ref=f9e2859]: "SKU: CHT-002"
+                - generic [ref=f9e2860]:
+                  - generic [ref=f9e2861]: ₹110
+                  - button "1-Tap Add to Order" [ref=f9e2864]
+              - generic [ref=f9e2866] [cursor=pointer]:
+                - generic [ref=f9e2867]: Chaat Counter
+                - generic [ref=f9e2875]:
+                  - img "Butter Pav Bhaji (2 Pav)" [ref=f9e2877]
+                  - generic [ref=f9e2878]:
+                    - heading "Butter Pav Bhaji (2 Pav)" [level=3] [ref=f9e2879]
+                    - generic [ref=f9e2880]: "SKU: CHT-003"
+                - generic [ref=f9e2881]:
+                  - generic [ref=f9e2882]: ₹150
+                  - button "1-Tap Add to Order" [ref=f9e2885]
+              - generic [ref=f9e2887] [cursor=pointer]:
+                - generic [ref=f9e2888]: Main Kitchen
+                - generic [ref=f9e2896]:
+                  - img "Special Punjabi Samosa (2 Pcs)" [ref=f9e2898]
+                  - generic [ref=f9e2899]:
+                    - heading "Special Punjabi Samosa (2 Pcs)" [level=3] [ref=f9e2900]
+                    - generic [ref=f9e2901]: "SKU: SNK-001"
+                - generic [ref=f9e2902]:
+                  - generic [ref=f9e2903]: ₹50
+                  - button "1-Tap Add to Order" [ref=f9e2906]
+              - generic [ref=f9e2908] [cursor=pointer]:
+                - generic [ref=f9e2909]: Main Kitchen
+                - generic [ref=f9e2917]:
+                  - img "Mumbai Vada Pav with Chutney" [ref=f9e2919]
+                  - generic [ref=f9e2920]:
+                    - heading "Mumbai Vada Pav with Chutney" [level=3] [ref=f9e2921]
+                    - generic [ref=f9e2922]: "SKU: SNK-002"
+                - generic [ref=f9e2923]:
+                  - generic [ref=f9e2924]: ₹45
+                  - button "1-Tap Add to Order" [ref=f9e2927]
+              - generic [ref=f9e2929] [cursor=pointer]:
+                - generic [ref=f9e2930]: Curry Station
+                - generic [ref=f9e2938]:
+                  - img "Paneer Dum Biryani Handi" [ref=f9e2940]
+                  - generic [ref=f9e2941]:
+                    - heading "Paneer Dum Biryani Handi" [level=3] [ref=f9e2942]
+                    - generic [ref=f9e2943]: "SKU: BIR-001"
+                - generic [ref=f9e2944]:
+                  - generic [ref=f9e2945]: ₹280
+                  - button "1-Tap Add to Order" [ref=f9e2948]
+              - generic [ref=f9e2950] [cursor=pointer]:
+                - generic [ref=f9e2951]: Curry Station
+                - generic [ref=f9e2959]:
+                  - img "Shahi Subz Dum Biryani" [ref=f9e2961]
+                  - generic [ref=f9e2962]:
+                    - heading "Shahi Subz Dum Biryani" [level=3] [ref=f9e2963]
+                    - generic [ref=f9e2964]: "SKU: BIR-002"
+                - generic [ref=f9e2965]:
+                  - generic [ref=f9e2966]: ₹250
+                  - button "1-Tap Add to Order" [ref=f9e2969]
+              - generic [ref=f9e2971] [cursor=pointer]:
+                - generic [ref=f9e2972]: Tandoor
+                - generic [ref=f9e2980]:
+                  - img "Malai Soya Chaap Tandoori" [ref=f9e2982]
+                  - generic [ref=f9e2983]:
+                    - heading "Malai Soya Chaap Tandoori" [level=3] [ref=f9e2984]
+                    - generic [ref=f9e2985]: "SKU: TAN-001"
+                - generic [ref=f9e2986]:
+                  - generic [ref=f9e2987]: ₹260
+                  - button "1-Tap Add to Order" [ref=f9e2990]
+              - generic [ref=f9e2992] [cursor=pointer]:
+                - generic [ref=f9e2993]: Tandoor
+                - generic [ref=f9e3001]:
+                  - img "Tandoori Afghani Paneer Tikka" [ref=f9e3003]
+                  - generic [ref=f9e3004]:
+                    - heading "Tandoori Afghani Paneer Tikka" [level=3] [ref=f9e3005]
+                    - generic [ref=f9e3006]: "SKU: TAN-002"
+                - generic [ref=f9e3007]:
+                  - generic [ref=f9e3008]: ₹290
+                  - button "1-Tap Add to Order" [ref=f9e3011]
+              - generic [ref=f9e3013] [cursor=pointer]:
+                - generic [ref=f9e3014]: Dessert Counter
+                - generic [ref=f9e3019]:
+                  - img "Kaju Katli Special (250g)" [ref=f9e3021]
+                  - generic [ref=f9e3022]:
+                    - heading "Kaju Katli Special (250g)" [level=3] [ref=f9e3023]
+                    - generic [ref=f9e3024]: "SKU: SWT-001"
+                - generic [ref=f9e3025]:
+                  - generic [ref=f9e3026]: ₹250
+                  - button "1-Tap Add to Order" [ref=f9e3029]
+              - generic [ref=f9e3031] [cursor=pointer]:
+                - generic [ref=f9e3032]: Dessert Counter
+                - generic [ref=f9e3037]:
+                  - img "Motichoor Laddoo (250g)" [ref=f9e3039]
+                  - generic [ref=f9e3040]:
+                    - heading "Motichoor Laddoo (250g)" [level=3] [ref=f9e3041]
+                    - generic [ref=f9e3042]: "SKU: SWT-002"
+                - generic [ref=f9e3043]:
+                  - generic [ref=f9e3044]: ₹180
+                  - button "1-Tap Add to Order" [ref=f9e3047]
+              - generic [ref=f9e3049] [cursor=pointer]:
+                - generic [ref=f9e3050]: Beverages & Bar
+                - generic [ref=f9e3055]:
+                  - img "Fresh Mosambi (Sweet Lime) Juice" [ref=f9e3057]
+                  - generic [ref=f9e3058]:
+                    - heading "Fresh Mosambi (Sweet Lime) Juice" [level=3] [ref=f9e3059]
+                    - generic [ref=f9e3060]: "SKU: JUC-001"
+                - generic [ref=f9e3061]:
+                  - generic [ref=f9e3062]: ₹90
+                  - button "1-Tap Add to Order" [ref=f9e3065]
+              - generic [ref=f9e3067] [cursor=pointer]:
+                - generic [ref=f9e3068]: Beverages & Bar
+                - generic [ref=f9e3073]:
+                  - img "Virgin Mint Mojito Cooler" [ref=f9e3075]
+                  - generic [ref=f9e3076]:
+                    - heading "Virgin Mint Mojito Cooler" [level=3] [ref=f9e3077]
+                    - generic [ref=f9e3078]: "SKU: JUC-002"
+                - generic [ref=f9e3079]:
+                  - generic [ref=f9e3080]: ₹110
+                  - button "1-Tap Add to Order" [ref=f9e3083]
+              - generic [ref=f9e3085] [cursor=pointer]:
+                - generic [ref=f9e3086]: Dessert Counter
+                - generic [ref=f9e3091]:
+                  - img "Royal Kesar Pista Falooda" [ref=f9e3093]
+                  - generic [ref=f9e3094]:
+                    - heading "Royal Kesar Pista Falooda" [level=3] [ref=f9e3095]
+                    - generic [ref=f9e3096]: "SKU: ICE-001"
+                - generic [ref=f9e3097]:
+                  - generic [ref=f9e3098]: ₹160
+                  - button "1-Tap Add to Order" [ref=f9e3101]
+              - generic [ref=f9e3103] [cursor=pointer]:
+                - generic [ref=f9e3104]: Dessert Counter
+                - generic [ref=f9e3109]:
+                  - img "Sizzling Chocolate Brownie Sundae" [ref=f9e3111]
+                  - generic [ref=f9e3112]:
+                    - heading "Sizzling Chocolate Brownie Sundae" [level=3] [ref=f9e3113]
+                    - generic [ref=f9e3114]: "SKU: ICE-002"
+                - generic [ref=f9e3115]:
+                  - generic [ref=f9e3116]: ₹190
+                  - button "1-Tap Add to Order" [ref=f9e3119]
+              - generic [ref=f9e3121] [cursor=pointer]:
+                - generic [ref=f9e3122]: South Indian Station
+                - generic [ref=f9e3130]:
+                  - img "Butter Masala Dosa Classic" [ref=f9e3132]
+                  - generic [ref=f9e3133]:
+                    - heading "Butter Masala Dosa Classic" [level=3] [ref=f9e3134]
+                    - generic [ref=f9e3135]: "SKU: SN-001"
+                - generic [ref=f9e3136]:
+                  - generic [ref=f9e3137]: ₹150
+                  - button "1-Tap Add to Order" [ref=f9e3140]
+              - generic [ref=f9e3142] [cursor=pointer]:
+                - generic [ref=f9e3143]: Tandoor
+                - generic [ref=f9e3151]:
+                  - img "Smoked Truffle Paneer Tikka" [ref=f9e3153]
+                  - generic [ref=f9e3154]:
+                    - heading "Smoked Truffle Paneer Tikka" [level=3] [ref=f9e3155]
+                    - generic [ref=f9e3156]: "SKU: FD-001"
+                - generic [ref=f9e3157]:
+                  - generic [ref=f9e3158]: ₹380
+                  - button "1-Tap Add to Order" [ref=f9e3161]
+              - generic [ref=f9e3163] [cursor=pointer]:
+                - generic [ref=f9e3164]: Main Kitchen
+                - generic [ref=f9e3172]:
+                  - img "Paneer Makhani Rice Bowl" [ref=f9e3174]
+                  - generic [ref=f9e3175]:
+                    - heading "Paneer Makhani Rice Bowl" [level=3] [ref=f9e3176]
+                    - generic [ref=f9e3177]: "SKU: CK-001"
+                - generic [ref=f9e3178]:
+                  - generic [ref=f9e3179]: ₹220
+                  - button "1-Tap Add to Order" [ref=f9e3182]
+              - generic [ref=f9e3184] [cursor=pointer]:
+                - generic [ref=f9e3185]: Curry Station
+                - generic [ref=f9e3193]:
+                  - img "Dal Makhani with 2 Paratha Combo" [ref=f9e3195]
+                  - generic [ref=f9e3196]:
+                    - heading "Dal Makhani with 2 Paratha Combo" [level=3] [ref=f9e3197]
+                    - generic [ref=f9e3198]: "SKU: CK-002"
+                - generic [ref=f9e3199]:
+                  - generic [ref=f9e3200]: ₹190
+                  - button "1-Tap Add to Order" [ref=f9e3203]
+          - generic [ref=f9e3205]:
+            - generic [ref=f9e3206]:
+              - generic [ref=f9e3208]:
+                - generic [ref=f9e3209]: New Order — Unsaved
+                - generic [ref=f9e3210]: • Priya Cashier
+              - generic [ref=f9e3211]:
+                - button "🍽️ Dine-In" [ref=f9e3212] [cursor=pointer]:
+                  - generic [ref=f9e3213]: 🍽️
+                  - generic [ref=f9e3214]: Dine-In
+                - button "🛍️ Takeaway" [ref=f9e3215] [cursor=pointer]:
+                  - generic [ref=f9e3216]: 🛍️
+                  - generic [ref=f9e3217]: Takeaway
+                - button "🛵 Delivery" [ref=f9e3218] [cursor=pointer]:
+                  - generic [ref=f9e3219]: 🛵
+                  - generic [ref=f9e3220]: Delivery
+                - button "🎫 Token" [ref=f9e3221] [cursor=pointer]:
+                  - generic [ref=f9e3222]: 🎫
+                  - generic [ref=f9e3223]: Token
+              - button "Select Table" [ref=f9e3225] [cursor=pointer]
+              - generic [ref=f9e3232]:
+                - button "Attach Customer" [ref=f9e3233] [cursor=pointer]
+                - button "Chef Notes" [ref=f9e3238] [cursor=pointer]
+            - generic [ref=f9e3243]:
+              - img "JAMANVAAR" [ref=f9e3245]
+              - generic [ref=f9e3246]:
+                - heading "Billing Counter Ready" [level=4] [ref=f9e3247]
+                - paragraph [ref=f9e3248]: Tap any dish from the menu to add it to this order.
+            - generic [ref=f9e3249]:
+              - generic [ref=f9e3250]:
+                - button "Discount" [disabled] [ref=f9e3251] [cursor=pointer]
+                - button "Hold Order" [disabled] [ref=f9e3256]
+              - generic [ref=f9e3260]:
+                - generic [ref=f9e3261]:
+                  - generic [ref=f9e3262]: Subtotal
+                  - generic [ref=f9e3263]: ₹0
+                - generic [ref=f9e3264]:
+                  - generic [ref=f9e3265]: GST (CGST 2.5% + SGST 2.5%)
+                  - generic [ref=f9e3266]: ₹0
+                - generic [ref=f9e3267]:
+                  - generic [ref=f9e3268]: Total Payable
+                  - generic [ref=f9e3269]: ₹0
+              - generic [ref=f9e3270]:
+                - button "SEND KOT" [disabled] [ref=f9e3271]
+                - button "PAY ₹0" [disabled] [ref=f9e3275]
+              - button "⚡ Instant Bill Cash • Auto Print" [disabled] [ref=f9e3279]:
+                - generic [ref=f9e3284]:
+                  - generic [ref=f9e3285]: ⚡ Instant Bill
+                  - generic [ref=f9e3287]: Cash • Auto Print
+    - contentinfo [ref=f9e3290]:
+      - generic [ref=f9e3291]:
+        - 'button "Today Sales: ₹0" [ref=f9e3292] [cursor=pointer]':
+          - generic [ref=f9e3296]: "Today Sales:"
+          - strong [ref=f9e3297]: ₹0
+        - 'button "Orders: 0" [ref=f9e3298] [cursor=pointer]':
+          - generic [ref=f9e3302]: "Orders:"
+          - strong [ref=f9e3303]: "0"
+        - generic [ref=f9e3304]:
+          - generic [ref=f9e3308]: "AOV:"
+          - strong [ref=f9e3309]: ₹0
+        - 'button "Tables: 0% (0/1)" [ref=f9e3310] [cursor=pointer]':
+          - generic [ref=f9e3316]: "Tables:"
+          - strong [ref=f9e3317]: 0% (0/1)
+        - 'button "Pending KOT: 0" [ref=f9e3318] [cursor=pointer]':
+          - generic [ref=f9e3321]: "Pending KOT:"
+          - strong [ref=f9e3322]: "0"
+      - generic [ref=f9e3323]: Local Engine Active
+  - status [ref=f9e73]:
+    - generic [ref=f9e77]:
+      - text: Version 2.4.0 is available.
+      - link "Download" [ref=f9e78] [cursor=pointer]:
+        - /url: /releases/jamanvaar-pos-setup-2.4.0.exe
+    - button "Dismiss" [ref=f9e79] [cursor=pointer]

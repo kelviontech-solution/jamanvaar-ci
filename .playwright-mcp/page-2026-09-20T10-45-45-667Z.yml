@@ -1,0 +1,155 @@
+- generic [ref=f10e6]:
+  - complementary [ref=f10e7]:
+    - generic [ref=f10e8]:
+      - link [ref=f10e9] [cursor=pointer]:
+        - /url: /
+        - img "JAMANVAAR" [ref=f10e10]
+      - generic [ref=f10e11]:
+        - generic [ref=f10e12]: PLATFORM CONTROL
+        - generic [ref=f10e13]: SUPER ADMIN
+    - navigation [ref=f10e14]:
+      - generic [ref=f10e15]:
+        - button "Platform Control Center" [expanded] [ref=f10e16] [cursor=pointer]
+        - link "Executive Dashboard" [ref=f10e21] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f10e29]:
+        - button "Business Management" [expanded] [ref=f10e30] [cursor=pointer]
+        - generic [ref=f10e34]:
+          - link "Restaurants" [ref=f10e35] [cursor=pointer]:
+            - /url: /restaurants
+          - link "Restaurant Owners" [ref=f10e43] [cursor=pointer]:
+            - /url: /owners
+          - link "Branches" [ref=f10e51] [cursor=pointer]:
+            - /url: /branches
+          - link "Subscriptions" [ref=f10e58] [cursor=pointer]:
+            - /url: /subscriptions
+          - link "Invoices & Billing" [ref=f10e66] [cursor=pointer]:
+            - /url: /billing
+      - generic [ref=f10e71]:
+        - button "SaaS Management" [expanded] [ref=f10e72] [cursor=pointer]
+        - generic [ref=f10e76]:
+          - link "Plans & Entitlements" [ref=f10e77] [cursor=pointer]:
+            - /url: /plans
+          - link "QR Ordering Suite" [ref=f10e84] [cursor=pointer]:
+            - /url: /qr-ordering
+          - link "JAMAN AI Engine" [ref=f10e93] [cursor=pointer]:
+            - /url: /ai-assistant
+          - link "Master Menu Catalog" [ref=f10e98] [cursor=pointer]:
+            - /url: /catalog
+          - link "Activation Keys" [ref=f10e104] [cursor=pointer]:
+            - /url: /activation-keys
+          - link "Payment Gateways" [ref=f10e110] [cursor=pointer]:
+            - /url: /payment-connections
+          - link "Applications & Releases" [ref=f10e115] [cursor=pointer]:
+            - /url: /applications
+      - generic [ref=f10e122]:
+        - button "Operations & MDM" [expanded] [ref=f10e123] [cursor=pointer]
+        - generic [ref=f10e127]:
+          - link "Device Fleet / MDM" [ref=f10e128] [cursor=pointer]:
+            - /url: /devices
+          - link "Sync & Conflict Monitor" [ref=f10e133] [cursor=pointer]:
+            - /url: /sync-monitor
+          - link "Backups & Recovery" [ref=f10e138] [cursor=pointer]:
+            - /url: /backups
+          - link "System Telemetry" [ref=f10e145] [cursor=pointer]:
+            - /url: /system-health
+          - link "Staging Sandboxes" [ref=f10e151] [cursor=pointer]:
+            - /url: /sandboxes
+      - generic [ref=f10e164]:
+        - button "Security & Reports" [expanded] [ref=f10e165] [cursor=pointer]
+        - generic [ref=f10e169]:
+          - link "Reports & Analytics" [ref=f10e170] [cursor=pointer]:
+            - /url: /reports
+          - link "Audit Logs" [ref=f10e175] [cursor=pointer]:
+            - /url: /audit-logs
+          - link "Emergency Offline Policy" [ref=f10e181] [cursor=pointer]:
+            - /url: /offline-policy
+          - link "Platform Team" [ref=f10e186] [cursor=pointer]:
+            - /url: /team
+          - link "Support Tickets" [ref=f10e192] [cursor=pointer]:
+            - /url: /tickets
+          - link "Diagnostics & Support" [ref=f10e197] [cursor=pointer]:
+            - /url: /support
+          - link "Platform Settings" [ref=f10e207] [cursor=pointer]:
+            - /url: /settings/platform
+      - generic [ref=f10e211]:
+        - button "Account" [expanded] [ref=f10e212] [cursor=pointer]
+        - link "My Profile" [ref=f10e217] [cursor=pointer]:
+          - /url: /profile
+    - generic [ref=f10e232]:
+      - generic [ref=f10e233]:
+        - generic [ref=f10e235]: Platform Online
+        - link "View System Health" [ref=f10e236] [cursor=pointer]:
+          - /url: /system-health
+      - generic [ref=f10e241]: JAMANVAAR Cloud v1.4.0
+  - generic [ref=f10e242]:
+    - banner [ref=f10e243]:
+      - generic [ref=f10e245]:
+        - generic [ref=f10e246]: JAMANVAAR PLATFORM
+        - generic [ref=f10e247]: Control Center
+      - generic [ref=f10e249]:
+        - textbox "Search restaurants, owners, devices, activation keys…" [ref=f10e250]
+        - generic: Ctrl+K
+      - generic [ref=f10e251]:
+        - generic "Database reachable, API responding" [ref=f10e252]: PLATFORM ONLINE
+        - button "Notifications" [ref=f10e256] [cursor=pointer]
+        - button "Toggle dark mode" [ref=f10e260] [cursor=pointer]
+        - generic [ref=f10e264]:
+          - link "L" [ref=f10e265] [cursor=pointer]:
+            - /url: /profile
+          - generic [ref=f10e267]:
+            - generic [ref=f10e268]: Live Verify
+            - generic [ref=f10e269]: Super Admin
+          - button "Logout" [ref=f10e270] [cursor=pointer]
+    - main [ref=f10e275]:
+      - generic [ref=f10e578]:
+        - link "← Back to restaurants" [ref=f10e579] [cursor=pointer]:
+          - /url: /restaurants
+        - generic [ref=f10e580]:
+          - generic [ref=f10e581]:
+            - generic [ref=f10e582]:
+              - heading "Full Audit Diner" [level=1] [ref=f10e583]
+              - generic [ref=f10e584]: ACTIVE
+              - generic [ref=f10e586]: PRO PLAN (₹7,000)
+              - generic "Click to view activation keys" [ref=f10e588] [cursor=pointer]: 6 Active Keys
+            - paragraph [ref=f10e595]:
+              - text: "Ahmedabad, Gujarat, India • 1 Branch • 0 Registered Terminal • ID:"
+              - code [ref=f10e596]: 60f278d3-3505-4ed5-b8b7-2696779509fd
+          - generic [ref=f10e597]:
+            - button "Generate Key" [ref=f10e598] [cursor=pointer]
+            - button "Edit Restaurant" [ref=f10e603] [cursor=pointer]
+            - button "Suspend Restaurant" [ref=f10e604] [cursor=pointer]
+        - generic [ref=f10e605]:
+          - button "Overview" [ref=f10e606] [cursor=pointer]
+          - button "Owner & Users" [ref=f10e613] [cursor=pointer]
+          - button "Branches" [ref=f10e620] [cursor=pointer]
+          - button "Subscription" [ref=f10e626] [cursor=pointer]
+          - button "Applications" [ref=f10e633] [cursor=pointer]
+          - button "Plan Quotas" [ref=f10e637] [cursor=pointer]
+          - button "Feature Entitlements" [ref=f10e643] [cursor=pointer]
+          - button "Devices & Keys" [ref=f10e648] [cursor=pointer]
+          - button "Billing & Invoices" [ref=f10e652] [cursor=pointer]
+          - button "Payments" [ref=f10e657] [cursor=pointer]
+          - button "Reports & Analytics" [ref=f10e662] [cursor=pointer]
+          - button "Audit Logs" [ref=f10e666] [cursor=pointer]
+          - button "Support & Diagnostics" [ref=f10e671] [cursor=pointer]
+          - button "Backup & Recovery" [ref=f10e680] [cursor=pointer]
+          - button "Menu" [active] [ref=f10e686] [cursor=pointer]
+        - generic [ref=f10e857]:
+          - generic [ref=f10e858]:
+            - generic [ref=f10e859]:
+              - generic [ref=f10e860]: Menu (0 dishes, 0 categories)
+              - paragraph [ref=f10e861]: Upload this restaurant's menu directly, on the owner's behalf. It reaches POS, Captain, KDS and Kiosk the same way a Restaurant Admin upload does.
+            - generic [ref=f10e862]:
+              - button "Refresh" [ref=f10e863] [cursor=pointer]
+              - button "Download Template" [ref=f10e869] [cursor=pointer]
+              - button "Upload CSV" [ref=f10e874] [cursor=pointer]
+          - generic [ref=f10e879]:
+            - generic [ref=f10e880]:
+              - generic [ref=f10e881]:
+                - generic [ref=f10e882]: Restaurant Admin self-upload
+                - generic [ref=f10e883]: The restaurant admin may upload their own menu CSV from Restaurant Admin → Menu & Catalog.
+              - button "Revoke Self-Upload" [ref=f10e884] [cursor=pointer]
+            - generic [ref=f10e885]:
+              - heading "This restaurant has no menu yet" [level=3] [ref=f10e889]
+              - paragraph [ref=f10e890]: Upload a CSV to give it one — it reaches every terminal automatically.

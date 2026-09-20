@@ -1,0 +1,23 @@
+- generic [ref=f9e2]:
+  - generic [ref=f9e4]:
+    - heading "Activate This Terminal" [level=1] [ref=f9e5]
+    - paragraph [ref=f9e6]: Enter the activation code provided by JAMANVAAR to connect this Kitchen Display to your restaurant.
+    - textbox "Activation code" [active] [ref=f9e7]
+    - button "Activate" [disabled] [ref=f9e8]
+  - region "JAMANVAAR Startup" [ref=f9e9]:
+    - generic [ref=f9e10]:
+      - generic [ref=f9e11]: KELVIONTECH ENTERPRISE
+      - generic [ref=f9e14]: Local Engine Active
+    - generic [ref=f9e20]:
+      - generic [ref=f9e21]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=f9e23]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=f9e24]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f9e30]
+      - paragraph [ref=f9e32]: Kitchen Production & Expediter System
+      - generic [ref=f9e33]: KITCHEN DISPLAY (KDS)
+      - generic [ref=f9e38]:
+        - generic [ref=f9e39]: Core Engine Ready
+        - generic [ref=f9e41]: •
+        - generic [ref=f9e42]: Database Initialized
+        - generic [ref=f9e44]: •
+        - generic [ref=f9e45]: Local-First Mode

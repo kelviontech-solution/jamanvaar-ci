@@ -1,0 +1,136 @@
+- generic [ref=f11e6]:
+  - complementary [ref=f11e7]:
+    - generic [ref=f11e8]:
+      - link [ref=f11e9] [cursor=pointer]:
+        - /url: /
+        - img "JAMANVAAR" [ref=f11e10]
+      - generic [ref=f11e11]:
+        - generic [ref=f11e12]: PLATFORM CONTROL
+        - generic [ref=f11e13]: SUPER ADMIN
+    - navigation [ref=f11e14]:
+      - generic [ref=f11e15]:
+        - button "Platform Control Center" [expanded] [ref=f11e16] [cursor=pointer]
+        - link "Executive Dashboard" [ref=f11e21] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f11e29]:
+        - button "Business Management" [expanded] [ref=f11e30] [cursor=pointer]
+        - generic [ref=f11e34]:
+          - link "Restaurants" [ref=f11e35] [cursor=pointer]:
+            - /url: /restaurants
+          - link "Restaurant Owners" [ref=f11e43] [cursor=pointer]:
+            - /url: /owners
+          - link "Branches" [ref=f11e51] [cursor=pointer]:
+            - /url: /branches
+          - link "Subscriptions" [ref=f11e58] [cursor=pointer]:
+            - /url: /subscriptions
+          - link "Invoices & Billing" [ref=f11e66] [cursor=pointer]:
+            - /url: /billing
+      - generic [ref=f11e71]:
+        - button "SaaS Management" [expanded] [ref=f11e72] [cursor=pointer]
+        - generic [ref=f11e76]:
+          - link "Plans & Entitlements" [ref=f11e77] [cursor=pointer]:
+            - /url: /plans
+          - link "QR Ordering Suite" [ref=f11e84] [cursor=pointer]:
+            - /url: /qr-ordering
+          - link "JAMAN AI Engine" [ref=f11e93] [cursor=pointer]:
+            - /url: /ai-assistant
+          - link "Master Menu Catalog" [ref=f11e98] [cursor=pointer]:
+            - /url: /catalog
+          - link "Activation Keys" [ref=f11e104] [cursor=pointer]:
+            - /url: /activation-keys
+          - link "Payment Gateways" [ref=f11e110] [cursor=pointer]:
+            - /url: /payment-connections
+          - link "Applications & Releases" [ref=f11e115] [cursor=pointer]:
+            - /url: /applications
+      - generic [ref=f11e122]:
+        - button "Operations & MDM" [expanded] [ref=f11e123] [cursor=pointer]
+        - generic [ref=f11e127]:
+          - link "Device Fleet / MDM" [ref=f11e128] [cursor=pointer]:
+            - /url: /devices
+          - link "Sync & Conflict Monitor" [ref=f11e133] [cursor=pointer]:
+            - /url: /sync-monitor
+          - link "Backups & Recovery" [ref=f11e138] [cursor=pointer]:
+            - /url: /backups
+          - link "System Telemetry" [ref=f11e145] [cursor=pointer]:
+            - /url: /system-health
+          - link "Staging Sandboxes" [ref=f11e151] [cursor=pointer]:
+            - /url: /sandboxes
+      - generic [ref=f11e164]:
+        - button "Security & Reports" [expanded] [ref=f11e165] [cursor=pointer]
+        - generic [ref=f11e169]:
+          - link "Reports & Analytics" [ref=f11e170] [cursor=pointer]:
+            - /url: /reports
+          - link "Audit Logs" [ref=f11e175] [cursor=pointer]:
+            - /url: /audit-logs
+          - link "Emergency Offline Policy" [ref=f11e181] [cursor=pointer]:
+            - /url: /offline-policy
+          - link "Platform Team" [ref=f11e186] [cursor=pointer]:
+            - /url: /team
+          - link "Support Tickets" [ref=f11e192] [cursor=pointer]:
+            - /url: /tickets
+          - link "Diagnostics & Support" [ref=f11e197] [cursor=pointer]:
+            - /url: /support
+          - link "Platform Settings" [ref=f11e207] [cursor=pointer]:
+            - /url: /settings/platform
+      - generic [ref=f11e211]:
+        - button "Account" [expanded] [ref=f11e212] [cursor=pointer]
+        - link "My Profile" [ref=f11e217] [cursor=pointer]:
+          - /url: /profile
+    - generic [ref=f11e232]:
+      - generic [ref=f11e233]:
+        - generic [ref=f11e235]: Platform Online
+        - link "View System Health" [ref=f11e236] [cursor=pointer]:
+          - /url: /system-health
+      - generic [ref=f11e241]: JAMANVAAR Cloud v1.4.0
+  - generic [ref=f11e242]:
+    - banner [ref=f11e243]:
+      - generic [ref=f11e245]:
+        - generic [ref=f11e246]: JAMANVAAR PLATFORM
+        - generic [ref=f11e247]: Control Center
+      - generic [ref=f11e249]:
+        - textbox "Search restaurants, owners, devices, activation keys…" [ref=f11e250]
+        - generic: Ctrl+K
+      - generic [ref=f11e251]:
+        - generic "Database reachable, API responding" [ref=f11e252]: PLATFORM ONLINE
+        - button "Notifications" [ref=f11e256] [cursor=pointer]
+        - button "Toggle dark mode" [ref=f11e260] [cursor=pointer]
+        - generic [ref=f11e264]:
+          - link "L" [ref=f11e265] [cursor=pointer]:
+            - /url: /profile
+          - generic [ref=f11e267]:
+            - generic [ref=f11e268]: Live Verify
+            - generic [ref=f11e269]: Super Admin
+          - button "Logout" [ref=f11e270] [cursor=pointer]
+    - main [ref=f11e275]:
+      - generic [ref=f11e276]:
+        - generic [ref=f11e277]:
+          - generic [ref=f11e278]:
+            - heading "1-Click Staging Sandbox Clones" [level=1] [ref=f11e279]
+            - paragraph [ref=f11e280]: Isolated training and testing environments provisioned from production restaurant topologies without exposing secrets or customer PII.
+          - generic [ref=f11e281]:
+            - button "Refresh" [ref=f11e282] [cursor=pointer]
+            - button "Clone New Sandbox" [ref=f11e288] [cursor=pointer]
+        - generic [ref=f11e324]: Staging sandbox "Full Audit Diner Training Sandbox" provisioned successfully
+        - generic [ref=f11e290]:
+          - heading "Active Staging Sandboxes (1)" [level=3] [ref=f11e325]
+          - table [ref=f11e326]:
+            - rowgroup [ref=f11e327]:
+              - row [ref=f11e328]:
+                - columnheader "Sandbox Environment" [ref=f11e329]
+                - columnheader "Source Restaurant" [ref=f11e330]
+                - columnheader "Environment Key" [ref=f11e331]
+                - columnheader "Expiry" [ref=f11e332]
+                - columnheader "Status" [ref=f11e333]
+                - columnheader "Actions" [ref=f11e334]
+            - rowgroup [ref=f11e335]:
+              - row [ref=f11e336]:
+                - cell "Full Audit Diner Training Sandbox Isolated Sandbox" [ref=f11e337]:
+                  - strong [ref=f11e338]: Full Audit Diner Training Sandbox
+                  - generic [ref=f11e339]: Isolated Sandbox
+                - cell "Full Audit Diner" [ref=f11e340]
+                - cell [ref=f11e341]:
+                  - code [ref=f11e342]: sbx_d558c22470337bcc
+                - cell "10/4/2026" [ref=f11e343]
+                - cell "ACTIVE" [ref=f11e344]
+                - cell [ref=f11e347]:
+                  - button "Destroy" [ref=f11e348] [cursor=pointer]

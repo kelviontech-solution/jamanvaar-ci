@@ -1,0 +1,83 @@
+- generic [ref=f9e2]:
+  - generic [ref=f9e3]:
+    - banner [ref=f9e4]:
+      - generic [ref=f9e5]:
+        - generic [ref=f9e8]:
+          - text: "Local Core:"
+          - strong [ref=f9e9]: Connected
+        - button [ref=f9e10] [cursor=pointer]:
+          - generic [ref=f9e15]:
+            - text: "Network:"
+            - strong [ref=f9e16]: Online
+        - generic [ref=f9e17]: Sun, 20 Sept 2026
+    - main [ref=f9e21]:
+      - generic [ref=f9e22]:
+        - img "JAMANVAAR by Kelviontech" [ref=f9e25]
+        - generic [ref=f9e26]:
+          - heading "Touch-First Restaurant Floor Command Instant KOT" [level=1] [ref=f9e27]:
+            - text: Touch-First Restaurant Floor Command
+            - generic [ref=f9e28]: Instant KOT
+          - paragraph [ref=f9e29]: Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency.
+        - generic [ref=f9e30]:
+          - generic [ref=f9e31]: Fast Billing
+          - generic [ref=f9e36]: Instant KOT
+          - generic [ref=f9e43]: Table Management
+          - generic [ref=f9e49]: Offline First
+        - generic [ref=f9e54]:
+          - generic [ref=f9e55]:
+            - img "Tandoori Naan" [ref=f9e56]
+            - generic [ref=f9e57]: Tandoori Breads
+          - generic [ref=f9e58]:
+            - img "Paneer Butter Masala" [ref=f9e59]
+            - generic [ref=f9e60]: Royal Curries
+          - generic [ref=f9e61]:
+            - img "Tandoori Angaar" [ref=f9e62]
+            - generic [ref=f9e63]: Tandoor Starters
+      - generic [ref=f9e64]:
+        - generic [ref=f9e65]:
+          - generic [ref=f9e67]:
+            - generic [ref=f9e68]:
+              - generic [ref=f9e69]: Welcome to
+              - generic [ref=f9e70]: CAPTAIN APP
+            - heading "Floor Captain & Service" [level=2] [ref=f9e72]
+            - paragraph [ref=f9e73]: High-Speed Table Orders & Service
+          - generic [ref=f9e75]:
+            - generic [ref=f9e76]:
+              - heading "Connect this Tablet" [level=2] [ref=f9e77]
+              - paragraph [ref=f9e78]: One-time setup — enter the Restaurant ID and login the restaurant owner generated for this tablet. You won't be asked again after this.
+            - generic [ref=f9e79]:
+              - generic [ref=f9e80]:
+                - generic [ref=f9e81]: Restaurant ID *
+                - textbox "Paste the ID, e.g. 7385361b-c19e-4431-beb4-135bb9b3c6db" [ref=f9e82]
+                - paragraph [ref=f9e83]: "Find it in Super Admin: Restaurants, open the restaurant, Restaurant ID (with a Copy button). The owner can also copy it in Restaurant Admin under Subscription Plans, Device & Staff Logins."
+              - generic [ref=f9e84]:
+                - generic [ref=f9e85]: Login Email *
+                - textbox [ref=f9e86]
+              - generic [ref=f9e87]:
+                - generic [ref=f9e88]: Password *
+                - textbox [ref=f9e89]
+              - button "Connect Tablet" [ref=f9e90] [cursor=pointer]
+        - generic [ref=f9e94]:
+          - generic [ref=f9e95]: Role-Based Security
+          - generic [ref=f9e100]: •
+          - generic [ref=f9e101]: Instant Offline Boot
+          - generic [ref=f9e105]: •
+          - generic [ref=f9e106]: 100% Secure
+    - contentinfo [ref=f9e110]: © 2026 JAMANVAAR by KELVIONTECH — All rights reserved.
+  - region "JAMANVAAR Startup" [ref=f9e111]:
+    - generic [ref=f9e112]:
+      - generic [ref=f9e113]: KELVIONTECH ENTERPRISE
+      - generic [ref=f9e116]: Local Engine Active
+    - generic [ref=f9e122]:
+      - generic [ref=f9e123]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=f9e125]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=f9e126]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f9e132]
+      - paragraph [ref=f9e134]: Restaurant Operations Platform
+      - generic [ref=f9e135]: CAPTAIN
+      - generic [ref=f9e140]:
+        - generic [ref=f9e141]: Core Engine Ready
+        - generic [ref=f9e143]: •
+        - generic [ref=f9e144]: Database Initialized
+        - generic [ref=f9e146]: •
+        - generic [ref=f9e147]: Local-First Mode

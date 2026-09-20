@@ -1,0 +1,68 @@
+- generic [ref=f9e3]:
+  - banner [ref=f9e4]:
+    - generic [ref=f9e5]:
+      - generic [ref=f9e8]:
+        - text: "Local Core:"
+        - strong [ref=f9e9]: Connected
+      - button [ref=f9e10] [cursor=pointer]:
+        - generic [ref=f9e15]:
+          - text: "Network:"
+          - strong [ref=f9e16]: Online
+      - generic [ref=f9e17]: Sun, 20 Sept 2026
+  - main [ref=f9e21]:
+    - generic [ref=f9e22]:
+      - img "JAMANVAAR by Kelviontech" [ref=f9e25]
+      - generic [ref=f9e26]:
+        - heading "Self-Ordering Fleet. Zero Touch Errors." [level=1] [ref=f9e27]:
+          - text: Self-Ordering Fleet.
+          - generic [ref=f9e28]: Zero Touch Errors.
+        - paragraph [ref=f9e29]: Centralized terminal command, automatic catalog sync, real-time peripheral diagnostics and upsell recommendation tuning.
+      - generic [ref=f9e30]:
+        - generic [ref=f9e31]: Fast Billing
+        - generic [ref=f9e36]: Instant KOT
+        - generic [ref=f9e43]: Table Management
+        - generic [ref=f9e49]: Offline First
+      - generic [ref=f9e54]:
+        - generic [ref=f9e55]:
+          - img "Tandoori Naan" [ref=f9e56]
+          - generic [ref=f9e57]: Tandoori Breads
+        - generic [ref=f9e58]:
+          - img "Paneer Butter Masala" [ref=f9e59]
+          - generic [ref=f9e60]: Royal Curries
+        - generic [ref=f9e61]:
+          - img "Tandoori Angaar" [ref=f9e62]
+          - generic [ref=f9e63]: Tandoor Starters
+    - generic [ref=f9e64]:
+      - generic [ref=f9e65]:
+        - generic [ref=f9e67]:
+          - generic [ref=f9e68]:
+            - generic [ref=f9e69]: Welcome to
+            - generic [ref=f9e70]: KIOSK ADMIN
+          - heading "Kiosk Management" [level=2] [ref=f9e72]
+          - paragraph [ref=f9e73]: Connect this terminal to your restaurant before signing in.
+        - generic [ref=f9e75]:
+          - generic [ref=f9e76]:
+            - heading "Activate this Terminal" [level=2] [ref=f9e151]
+            - paragraph [ref=f9e78]:
+              - text: Signed in to
+              - strong [ref=f9e152]: Full Audit Diner
+              - text: . Enter the Kiosk Admin activation key from your Super Admin welcome kit to finish binding this terminal.
+          - generic [ref=f9e79]:
+            - generic [ref=f9e80]:
+              - generic [ref=f9e81]: Activation Key *
+              - textbox "JMV-XXXX-XXXX-XXXX" [ref=f9e153]
+              - paragraph [ref=f9e83]:
+                - text: Use the key labeled
+                - strong [ref=f9e154]: KIOSK_ADMIN
+                - text: from the Welcome Kit — it's different from the
+                - strong [ref=f9e155]: KIOSK
+                - text: key used on the customer-facing ordering screen.
+            - button "Activate Terminal" [ref=f9e156] [cursor=pointer]
+            - button "← Back" [ref=f9e160] [cursor=pointer]
+      - generic [ref=f9e94]:
+        - generic [ref=f9e95]: Role-Based Security
+        - generic [ref=f9e100]: •
+        - generic [ref=f9e101]: Instant Offline Boot
+        - generic [ref=f9e105]: •
+        - generic [ref=f9e106]: 100% Secure
+  - contentinfo [ref=f9e110]: © 2026 JAMANVAAR by KELVIONTECH — All rights reserved.

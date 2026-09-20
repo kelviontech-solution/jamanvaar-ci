@@ -1,0 +1,52 @@
+- generic [ref=f9e2]:
+  - generic [ref=f9e211]:
+    - banner [ref=f9e212]:
+      - generic [ref=f9e213]:
+        - generic [ref=f9e214]:
+          - generic [ref=f9e215]:
+            - img "JAMANVAAR by KELVIONTECH"
+          - generic [ref=f9e217]: KITCHEN DISPLAY (KDS)
+        - generic [ref=f9e221]:
+          - generic [ref=f9e222]: "Station:"
+          - generic [ref=f9e223]: ALL
+      - generic [ref=f9e224]:
+        - button "🍽 All" [ref=f9e225] [cursor=pointer]
+        - button "🍳 Main" [ref=f9e226] [cursor=pointer]
+        - button "🔥 Tandoor" [ref=f9e227] [cursor=pointer]
+        - button "☕ Beverage" [ref=f9e228] [cursor=pointer]
+        - button "🍨 Dessert" [ref=f9e229] [cursor=pointer]
+      - generic [ref=f9e230]:
+        - generic [ref=f9e231]:
+          - generic [ref=f9e233]: KDS LIVE
+          - generic [ref=f9e234]: "|"
+          - generic [ref=f9e235]: 04:29:16 PM
+        - generic [ref=f9e236]:
+          - generic [ref=f9e239]: "0"
+          - generic [ref=f9e240]: Cooking
+        - generic [ref=f9e241]:
+          - generic [ref=f9e245]: "0"
+          - generic [ref=f9e246]: Ready
+        - button "Switch Station" [ref=f9e247] [cursor=pointer]
+    - generic [ref=f9e253]:
+      - button "ACTIVE TICKETS 0" [ref=f9e254] [cursor=pointer]:
+        - generic [ref=f9e255]: ACTIVE TICKETS
+        - generic [ref=f9e256]: "0"
+      - button "🔥 COOKING 0" [ref=f9e257] [cursor=pointer]:
+        - generic [ref=f9e258]: 🔥 COOKING
+        - generic [ref=f9e259]: "0"
+      - button "🔔 FOOD READY 0" [ref=f9e260] [cursor=pointer]:
+        - generic [ref=f9e261]: 🔔 FOOD READY
+        - generic [ref=f9e262]: "0"
+      - button "✓ SERVED 0" [ref=f9e263] [cursor=pointer]:
+        - generic [ref=f9e264]: ✓ SERVED
+        - generic [ref=f9e265]: "0"
+    - main [ref=f9e266]:
+      - generic [ref=f9e269]:
+        - heading "All Kitchen Orders Cleared" [level=3] [ref=f9e273]
+        - paragraph [ref=f9e274]: No tickets currently waiting for preparation at this station. New orders sent from POS terminals or Captain tablets will appear here instantly.
+  - status [ref=f9e73]:
+    - generic [ref=f9e77]:
+      - text: Version 2.0.0 is available.
+      - link "Download" [ref=f9e78] [cursor=pointer]:
+        - /url: /releases/jamanvaar-kds-v2.0.0.apk
+    - button "Dismiss" [ref=f9e79] [cursor=pointer]

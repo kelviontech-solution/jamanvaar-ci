@@ -1,0 +1,78 @@
+- generic [ref=f9e2]:
+  - generic [ref=f9e83]:
+    - banner [ref=f9e84]:
+      - generic [ref=f9e85]:
+        - generic [ref=f9e88]:
+          - text: "Local Core:"
+          - strong [ref=f9e89]: Connected
+        - button [ref=f9e90] [cursor=pointer]:
+          - generic [ref=f9e95]:
+            - text: "Network:"
+            - strong [ref=f9e96]: Online
+        - generic [ref=f9e97]: Sun, 20 Sept 2026
+    - main [ref=f9e101]:
+      - generic [ref=f9e102]:
+        - img "JAMANVAAR by Kelviontech" [ref=f9e105]
+        - generic [ref=f9e106]:
+          - heading "Smart Billing. Better Dining." [level=1] [ref=f9e107]:
+            - text: Smart Billing.
+            - generic [ref=f9e108]: Better Dining.
+          - paragraph [ref=f9e109]: Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.
+        - generic [ref=f9e110]:
+          - generic [ref=f9e111]: Fast Billing
+          - generic [ref=f9e116]: Instant KOT
+          - generic [ref=f9e123]: Table Management
+          - generic [ref=f9e129]: Offline First
+        - generic [ref=f9e134]:
+          - generic [ref=f9e135]:
+            - img "Tandoori Naan" [ref=f9e136]
+            - generic [ref=f9e137]: Tandoori Breads
+          - generic [ref=f9e138]:
+            - img "Paneer Butter Masala" [ref=f9e139]
+            - generic [ref=f9e140]: Royal Curries
+          - generic [ref=f9e141]:
+            - img "Tandoori Angaar" [ref=f9e142]
+            - generic [ref=f9e143]: Tandoor Starters
+      - generic [ref=f9e144]:
+        - generic [ref=f9e145]:
+          - generic [ref=f9e147]:
+            - generic [ref=f9e148]:
+              - generic [ref=f9e149]: Welcome to
+              - generic [ref=f9e150]: POS TERMINAL
+            - heading "POS Counter" [level=2] [ref=f9e152]
+            - paragraph [ref=f9e153]: Enter your 4-digit staff PIN to continue
+          - generic [ref=f9e154]:
+            - generic [ref=f9e155]:
+              - generic [ref=f9e156]: Select Staff Profile
+              - button "P Priya Cashier cashier" [ref=f9e158] [cursor=pointer]:
+                - generic [ref=f9e159]: P
+                - generic [ref=f9e160]:
+                  - generic [ref=f9e161]: Priya Cashier
+                  - generic [ref=f9e162]: cashier
+            - generic [ref=f9e172]:
+              - button "1" [ref=f9e173] [cursor=pointer]
+              - button "2" [ref=f9e174] [cursor=pointer]
+              - button "3" [active] [ref=f9e175] [cursor=pointer]
+              - button "4" [ref=f9e176] [cursor=pointer]
+              - button "5" [ref=f9e177] [cursor=pointer]
+              - button "6" [ref=f9e178] [cursor=pointer]
+              - button "7" [ref=f9e179] [cursor=pointer]
+              - button "8" [ref=f9e180] [cursor=pointer]
+              - button "9" [ref=f9e181] [cursor=pointer]
+              - button "C" [ref=f9e182] [cursor=pointer]
+              - button "0" [ref=f9e183] [cursor=pointer]
+              - button [ref=f9e184] [cursor=pointer]
+            - button "UNLOCK TERMINAL" [disabled] [ref=f9e190]
+        - generic [ref=f9e195]:
+          - generic [ref=f9e196]: Role-Based Security
+          - generic [ref=f9e201]: •
+          - generic [ref=f9e202]: Instant Offline Boot
+          - generic [ref=f9e206]: •
+          - generic [ref=f9e207]: 100% Secure
+    - contentinfo [ref=f9e211]: © 2026 JAMANVAAR by KELVIONTECH — All rights reserved.
+  - status [ref=f9e73]:
+    - generic [ref=f9e77]:
+      - text: Version 2.4.0 is available.
+      - link "Download" [ref=f9e78] [cursor=pointer]:
+        - /url: /releases/jamanvaar-pos-setup-2.4.0.exe
+    - button "Dismiss" [ref=f9e79] [cursor=pointer]

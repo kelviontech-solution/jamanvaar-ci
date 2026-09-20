@@ -1,0 +1,330 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - generic [ref=e7]:
+            - generic [ref=e8]:
+              - img "JAMANVAAR by KELVIONTECH"
+            - generic [ref=e11]:
+              - generic [ref=e12]: CAPTAIN APP
+              - generic [ref=e14]: JAMANVAAR
+          - generic [ref=e16]:
+            - generic [ref=e17]: R
+            - generic [ref=e18]: Ravi Waiter
+            - generic [ref=e19]: •
+            - generic [ref=e20]: Captain Verify Bistro
+        - generic [ref=e21]:
+          - button "LOCAL + SYNCED" [ref=e23] [cursor=pointer]
+          - button "Send Msg" [ref=e28] [cursor=pointer]
+          - button "Floor Notifications & Alerts" [ref=e32] [cursor=pointer]
+          - button "R" [ref=e37] [cursor=pointer]
+    - generic [ref=e42]:
+      - generic [ref=e43]: "Priority Actions:"
+      - button "Food Ready (0)" [ref=e47] [cursor=pointer]
+      - button "Bills (0)" [ref=e51] [cursor=pointer]
+      - button "Delayed KOTs (0)" [ref=e56] [cursor=pointer]
+      - button "Diner Requests (0)" [ref=e60] [cursor=pointer]
+      - button "Messages (0)" [ref=e65] [cursor=pointer]
+    - navigation [ref=e69]:
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - button "My Tables 13" [ref=e72] [cursor=pointer]:
+            - generic [ref=e78]: My Tables
+            - generic [ref=e79]: "13"
+          - button "Active Orders" [ref=e80] [cursor=pointer]
+          - button "Food Ready" [ref=e85] [cursor=pointer]
+          - button "Messages" [ref=e89] [cursor=pointer]
+        - button "More Options" [ref=e93] [cursor=pointer]
+    - main [ref=e99]:
+      - generic [ref=e100]:
+        - generic [ref=e101]:
+          - button "My Tables 0 Tables" [ref=e102] [cursor=pointer]:
+            - generic [ref=e103]: My Tables
+            - generic [ref=e104]:
+              - generic [ref=e105]: "0"
+              - generic [ref=e106]: Tables
+          - button "Seated / Dining 0 Active" [ref=e107] [cursor=pointer]:
+            - generic [ref=e108]: Seated / Dining
+            - generic [ref=e109]:
+              - generic [ref=e110]: "0"
+              - generic [ref=e111]: Active
+          - button "Food Ready 0 Deliver" [ref=e112] [cursor=pointer]:
+            - generic [ref=e113]: Food Ready
+            - generic [ref=e114]:
+              - generic [ref=e115]: "0"
+              - generic [ref=e116]: Deliver
+          - button "Bill Requested 0 Billing" [ref=e117] [cursor=pointer]:
+            - generic [ref=e118]: Bill Requested
+            - generic [ref=e119]:
+              - generic [ref=e120]: "0"
+              - generic [ref=e121]: Billing
+          - button "Available Tables 13 of 13" [ref=e122] [cursor=pointer]:
+            - generic [ref=e123]: Available Tables
+            - generic [ref=e124]:
+              - generic [ref=e125]: "13"
+              - generic [ref=e126]: of 13
+        - generic [ref=e127]:
+          - generic [ref=e128]:
+            - generic [ref=e129]:
+              - generic [ref=e130]: "Zone:"
+              - button "All Sections" [ref=e131] [cursor=pointer]
+              - button "Main Hall" [ref=e132] [cursor=pointer]
+              - button "Family Section" [ref=e133] [cursor=pointer]
+              - button "AC Balcony" [ref=e134] [cursor=pointer]
+              - button "Garden Terrace" [ref=e135] [cursor=pointer]
+            - textbox "Search table, order, dish..." [ref=e140]
+          - generic [ref=e141]:
+            - generic [ref=e142]: "Filter:"
+            - button "All Floor Tables" [ref=e143] [cursor=pointer]
+            - button "My Tables" [ref=e144] [cursor=pointer]
+            - button "Seated & Dining" [ref=e145] [cursor=pointer]
+            - button "Food Ready" [ref=e146] [cursor=pointer]
+            - button "Bill Requested" [ref=e147] [cursor=pointer]
+        - generic [ref=e148]:
+          - generic [ref=e149]:
+            - generic [ref=e150]:
+              - generic [ref=e151]:
+                - generic [ref=e152]: TABLE 1
+                - generic [ref=e154]:
+                  - generic [ref=e155]: Main Hall
+                  - generic [ref=e156]: •
+                  - generic [ref=e157]: 2 Seats
+              - generic [ref=e158]: AVAILABLE
+            - generic [ref=e159]:
+              - generic [ref=e160]:
+                - generic [ref=e161]: 2 Guests
+                - generic [ref=e168]:
+                  - generic [ref=e169]: Order Value
+                  - text: —
+              - generic [ref=e170]: Table ready for seating
+            - button "OPEN TABLE" [ref=e176] [cursor=pointer]
+          - generic [ref=e179]:
+            - generic [ref=e180]:
+              - generic [ref=e181]:
+                - generic [ref=e182]: TABLE 2
+                - generic [ref=e184]:
+                  - generic [ref=e185]: Main Hall
+                  - generic [ref=e186]: •
+                  - generic [ref=e187]: 2 Seats
+              - generic [ref=e188]: AVAILABLE
+            - generic [ref=e189]:
+              - generic [ref=e190]:
+                - generic [ref=e191]: 2 Guests
+                - generic [ref=e198]:
+                  - generic [ref=e199]: Order Value
+                  - text: —
+              - generic [ref=e200]: Table ready for seating
+            - button "OPEN TABLE" [ref=e206] [cursor=pointer]
+          - generic [ref=e209]:
+            - generic [ref=e210]:
+              - generic [ref=e211]:
+                - generic [ref=e212]: TABLE 3
+                - generic [ref=e214]:
+                  - generic [ref=e215]: Main Hall
+                  - generic [ref=e216]: •
+                  - generic [ref=e217]: 4 Seats
+              - generic [ref=e218]: AVAILABLE
+            - generic [ref=e219]:
+              - generic [ref=e220]:
+                - generic [ref=e221]: 2 Guests
+                - generic [ref=e228]:
+                  - generic [ref=e229]: Order Value
+                  - text: —
+              - generic [ref=e230]: Table ready for seating
+            - button "OPEN TABLE" [ref=e236] [cursor=pointer]
+          - generic [ref=e239]:
+            - generic [ref=e240]:
+              - generic [ref=e241]:
+                - generic [ref=e242]: TABLE 4
+                - generic [ref=e244]:
+                  - generic [ref=e245]: Main Hall
+                  - generic [ref=e246]: •
+                  - generic [ref=e247]: 4 Seats
+              - generic [ref=e248]: AVAILABLE
+            - generic [ref=e249]:
+              - generic [ref=e250]:
+                - generic [ref=e251]: 2 Guests
+                - generic [ref=e258]:
+                  - generic [ref=e259]: Order Value
+                  - text: —
+              - generic [ref=e260]: Table ready for seating
+            - button "OPEN TABLE" [ref=e266] [cursor=pointer]
+          - generic [ref=e269]:
+            - generic [ref=e270]:
+              - generic [ref=e271]:
+                - generic [ref=e272]: TABLE 5
+                - generic [ref=e274]:
+                  - generic [ref=e275]: Main Hall
+                  - generic [ref=e276]: •
+                  - generic [ref=e277]: 4 Seats
+              - generic [ref=e278]: AVAILABLE
+            - generic [ref=e279]:
+              - generic [ref=e280]:
+                - generic [ref=e281]: 2 Guests
+                - generic [ref=e288]:
+                  - generic [ref=e289]: Order Value
+                  - text: —
+              - generic [ref=e290]: Table ready for seating
+            - button "OPEN TABLE" [ref=e296] [cursor=pointer]
+          - generic [ref=e299]:
+            - generic [ref=e300]:
+              - generic [ref=e301]:
+                - generic [ref=e302]: TABLE 6
+                - generic [ref=e304]:
+                  - generic [ref=e305]: Family Section
+                  - generic [ref=e306]: •
+                  - generic [ref=e307]: 6 Seats
+              - generic [ref=e308]: AVAILABLE
+            - generic [ref=e309]:
+              - generic [ref=e310]:
+                - generic [ref=e311]: 2 Guests
+                - generic [ref=e318]:
+                  - generic [ref=e319]: Order Value
+                  - text: —
+              - generic [ref=e320]: Table ready for seating
+            - button "OPEN TABLE" [ref=e326] [cursor=pointer]
+          - generic [ref=e329]:
+            - generic [ref=e330]:
+              - generic [ref=e331]:
+                - generic [ref=e332]: TABLE 7
+                - generic [ref=e334]:
+                  - generic [ref=e335]: Family Section
+                  - generic [ref=e336]: •
+                  - generic [ref=e337]: 6 Seats
+              - generic [ref=e338]: AVAILABLE
+            - generic [ref=e339]:
+              - generic [ref=e340]:
+                - generic [ref=e341]: 2 Guests
+                - generic [ref=e348]:
+                  - generic [ref=e349]: Order Value
+                  - text: —
+              - generic [ref=e350]: Table ready for seating
+            - button "OPEN TABLE" [ref=e356] [cursor=pointer]
+          - generic [ref=e359]:
+            - generic [ref=e360]:
+              - generic [ref=e361]:
+                - generic [ref=e362]: TABLE 8
+                - generic [ref=e364]:
+                  - generic [ref=e365]: Family Section
+                  - generic [ref=e366]: •
+                  - generic [ref=e367]: 8 Seats
+              - generic [ref=e368]: AVAILABLE
+            - generic [ref=e369]:
+              - generic [ref=e370]:
+                - generic [ref=e371]: 2 Guests
+                - generic [ref=e378]:
+                  - generic [ref=e379]: Order Value
+                  - text: —
+              - generic [ref=e380]: Table ready for seating
+            - button "OPEN TABLE" [ref=e386] [cursor=pointer]
+          - generic [ref=e389]:
+            - generic [ref=e390]:
+              - generic [ref=e391]:
+                - generic [ref=e392]: TABLE 9
+                - generic [ref=e394]:
+                  - generic [ref=e395]: AC Balcony
+                  - generic [ref=e396]: •
+                  - generic [ref=e397]: 4 Seats
+              - generic [ref=e398]: AVAILABLE
+            - generic [ref=e399]:
+              - generic [ref=e400]:
+                - generic [ref=e401]: 2 Guests
+                - generic [ref=e408]:
+                  - generic [ref=e409]: Order Value
+                  - text: —
+              - generic [ref=e410]: Table ready for seating
+            - button "OPEN TABLE" [ref=e416] [cursor=pointer]
+          - generic [ref=e419]:
+            - generic [ref=e420]:
+              - generic [ref=e421]:
+                - generic [ref=e422]: TABLE 10
+                - generic [ref=e424]:
+                  - generic [ref=e425]: AC Balcony
+                  - generic [ref=e426]: •
+                  - generic [ref=e427]: 4 Seats
+              - generic [ref=e428]: AVAILABLE
+            - generic [ref=e429]:
+              - generic [ref=e430]:
+                - generic [ref=e431]: 2 Guests
+                - generic [ref=e438]:
+                  - generic [ref=e439]: Order Value
+                  - text: —
+              - generic [ref=e440]: Table ready for seating
+            - button "OPEN TABLE" [ref=e446] [cursor=pointer]
+          - generic [ref=e449]:
+            - generic [ref=e450]:
+              - generic [ref=e451]:
+                - generic [ref=e452]: TABLE 11
+                - generic [ref=e454]:
+                  - generic [ref=e455]: AC Balcony
+                  - generic [ref=e456]: •
+                  - generic [ref=e457]: 4 Seats
+              - generic [ref=e458]: AVAILABLE
+            - generic [ref=e459]:
+              - generic [ref=e460]:
+                - generic [ref=e461]: 2 Guests
+                - generic [ref=e468]:
+                  - generic [ref=e469]: Order Value
+                  - text: —
+              - generic [ref=e470]: Table ready for seating
+            - button "OPEN TABLE" [ref=e476] [cursor=pointer]
+          - generic [ref=e479]:
+            - generic [ref=e480]:
+              - generic [ref=e481]:
+                - generic [ref=e482]: TABLE 12
+                - generic [ref=e484]:
+                  - generic [ref=e485]: AC Balcony
+                  - generic [ref=e486]: •
+                  - generic [ref=e487]: 4 Seats
+              - generic [ref=e488]: AVAILABLE
+            - generic [ref=e489]:
+              - generic [ref=e490]:
+                - generic [ref=e491]: 2 Guests
+                - generic [ref=e498]:
+                  - generic [ref=e499]: Order Value
+                  - text: —
+              - generic [ref=e500]: Table ready for seating
+            - button "OPEN TABLE" [ref=e506] [cursor=pointer]
+          - generic [ref=e509]:
+            - generic [ref=e510]:
+              - generic [ref=e511]:
+                - generic [ref=e512]: TABLE 15
+                - generic [ref=e514]:
+                  - generic [ref=e515]: Garden Terrace
+                  - generic [ref=e516]: •
+                  - generic [ref=e517]: 4 Seats
+              - generic [ref=e518]: AVAILABLE
+            - generic [ref=e519]:
+              - generic [ref=e520]:
+                - generic [ref=e521]: 2 Guests
+                - generic [ref=e528]:
+                  - generic [ref=e529]: Order Value
+                  - text: —
+              - generic [ref=e530]: Table ready for seating
+            - button "OPEN TABLE" [ref=e536] [cursor=pointer]
+    - button "Open JAMAN AI Floor Intelligence Assistant" [ref=e539] [cursor=pointer]:
+      - generic [ref=e542]: JAMAN AI
+  - region "JAMANVAAR Startup" [ref=e543]:
+    - generic [ref=e544]:
+      - generic [ref=e545]: KELVIONTECH ENTERPRISE
+      - generic [ref=e548]: Local Engine Active
+    - generic [ref=e554]:
+      - generic [ref=e555]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=e557]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=e558]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=e564]
+      - paragraph [ref=e566]: Restaurant Operations Platform
+      - generic [ref=e567]: CAPTAIN
+      - generic [ref=e572]:
+        - generic [ref=e573]: Core Engine Ready
+        - generic [ref=e575]: •
+        - generic [ref=e576]: Database Initialized
+        - generic [ref=e578]: •
+        - generic [ref=e579]: Local-First Mode
+  - status [ref=e583]:
+    - generic [ref=e587]:
+      - text: Version 2.1.0 is available.
+      - link "Download" [ref=e588] [cursor=pointer]:
+        - /url: /releases/jamanvaar-captain-v2.1.0.apk
+    - button "Dismiss" [ref=e589] [cursor=pointer]

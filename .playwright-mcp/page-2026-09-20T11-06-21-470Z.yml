@@ -1,0 +1,15 @@
+- generic [ref=f9e162]:
+  - generic [ref=f9e167]:
+    - heading "You're Connected!" [level=1] [ref=f9e168]
+    - paragraph [ref=f9e169]: This Kiosk Admin console is now activated and linked to your restaurant.
+  - list [ref=f9e170]:
+    - listitem [ref=f9e171]:
+      - generic [ref=f9e172]: "1"
+      - generic [ref=f9e173]: Sign in with your administrator credentials.
+    - listitem [ref=f9e174]:
+      - generic [ref=f9e175]: "2"
+      - generic [ref=f9e176]: Add dishes to your menu, then activate a customer-facing Kiosk terminal.
+    - listitem [ref=f9e177]:
+      - generic [ref=f9e178]: "3"
+      - generic [ref=f9e179]: The dashboard checklist below tracks the rest of first-time setup.
+  - button "Continue" [ref=f9e180] [cursor=pointer]

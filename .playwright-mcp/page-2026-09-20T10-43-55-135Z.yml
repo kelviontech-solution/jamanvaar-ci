@@ -1,0 +1,372 @@
+- generic [ref=f9e109]:
+  - complementary [ref=f9e110]:
+    - generic [ref=f9e111]:
+      - link [ref=f9e112] [cursor=pointer]:
+        - /url: /
+        - img "JAMANVAAR" [ref=f9e113]
+      - generic [ref=f9e114]:
+        - generic [ref=f9e115]: PLATFORM CONTROL
+        - generic [ref=f9e116]: SUPER ADMIN
+    - navigation [ref=f9e117]:
+      - generic [ref=f9e118]:
+        - button "Platform Control Center" [expanded] [ref=f9e119] [cursor=pointer]
+        - link "Executive Dashboard" [ref=f9e124] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f9e132]:
+        - button "Business Management" [expanded] [ref=f9e133] [cursor=pointer]
+        - generic [ref=f9e137]:
+          - link "Restaurants" [ref=f9e138] [cursor=pointer]:
+            - /url: /restaurants
+          - link "Restaurant Owners" [ref=f9e146] [cursor=pointer]:
+            - /url: /owners
+          - link "Branches" [ref=f9e154] [cursor=pointer]:
+            - /url: /branches
+          - link "Subscriptions" [ref=f9e161] [cursor=pointer]:
+            - /url: /subscriptions
+          - link "Invoices & Billing" [ref=f9e169] [cursor=pointer]:
+            - /url: /billing
+      - generic [ref=f9e174]:
+        - button "SaaS Management" [expanded] [ref=f9e175] [cursor=pointer]
+        - generic [ref=f9e179]:
+          - link "Plans & Entitlements" [ref=f9e180] [cursor=pointer]:
+            - /url: /plans
+          - link "QR Ordering Suite" [ref=f9e187] [cursor=pointer]:
+            - /url: /qr-ordering
+          - link "JAMAN AI Engine" [ref=f9e196] [cursor=pointer]:
+            - /url: /ai-assistant
+          - link "Master Menu Catalog" [ref=f9e201] [cursor=pointer]:
+            - /url: /catalog
+          - link "Activation Keys" [ref=f9e207] [cursor=pointer]:
+            - /url: /activation-keys
+          - link "Payment Gateways" [ref=f9e213] [cursor=pointer]:
+            - /url: /payment-connections
+          - link "Applications & Releases" [ref=f9e218] [cursor=pointer]:
+            - /url: /applications
+      - generic [ref=f9e225]:
+        - button "Operations & MDM" [expanded] [ref=f9e226] [cursor=pointer]
+        - generic [ref=f9e230]:
+          - link "Device Fleet / MDM" [ref=f9e231] [cursor=pointer]:
+            - /url: /devices
+          - link "Sync & Conflict Monitor" [ref=f9e236] [cursor=pointer]:
+            - /url: /sync-monitor
+          - link "Backups & Recovery" [ref=f9e241] [cursor=pointer]:
+            - /url: /backups
+          - link "System Telemetry" [ref=f9e248] [cursor=pointer]:
+            - /url: /system-health
+          - link "Staging Sandboxes" [ref=f9e254] [cursor=pointer]:
+            - /url: /sandboxes
+      - generic [ref=f9e267]:
+        - button "Security & Reports" [expanded] [ref=f9e268] [cursor=pointer]
+        - generic [ref=f9e272]:
+          - link "Reports & Analytics" [ref=f9e273] [cursor=pointer]:
+            - /url: /reports
+          - link "Audit Logs" [ref=f9e278] [cursor=pointer]:
+            - /url: /audit-logs
+          - link "Emergency Offline Policy" [ref=f9e284] [cursor=pointer]:
+            - /url: /offline-policy
+          - link "Platform Team" [ref=f9e289] [cursor=pointer]:
+            - /url: /team
+          - link "Support Tickets" [ref=f9e295] [cursor=pointer]:
+            - /url: /tickets
+          - link "Diagnostics & Support" [ref=f9e300] [cursor=pointer]:
+            - /url: /support
+          - link "Platform Settings" [ref=f9e310] [cursor=pointer]:
+            - /url: /settings/platform
+      - generic [ref=f9e314]:
+        - button "Account" [expanded] [ref=f9e315] [cursor=pointer]
+        - link "My Profile" [ref=f9e320] [cursor=pointer]:
+          - /url: /profile
+    - generic [ref=f9e335]:
+      - generic [ref=f9e336]:
+        - generic [ref=f9e338]: Platform Online
+        - link "View System Health" [ref=f9e339] [cursor=pointer]:
+          - /url: /system-health
+      - generic [ref=f9e344]: JAMANVAAR Cloud v1.4.0
+  - generic [ref=f9e345]:
+    - banner [ref=f9e346]:
+      - generic [ref=f9e348]:
+        - generic [ref=f9e349]: JAMANVAAR PLATFORM
+        - generic [ref=f9e350]: Control Center
+      - generic [ref=f9e352]:
+        - textbox "Search restaurants, owners, devices, activation keys…" [ref=f9e353]
+        - generic: Ctrl+K
+      - generic [ref=f9e354]:
+        - generic "Database reachable, API responding" [ref=f9e355]: PLATFORM ONLINE
+        - button "Notifications" [ref=f9e359] [cursor=pointer]
+        - button "Toggle dark mode" [ref=f9e363] [cursor=pointer]
+        - generic [ref=f9e367]:
+          - link "L" [ref=f9e368] [cursor=pointer]:
+            - /url: /profile
+          - generic [ref=f9e370]:
+            - generic [ref=f9e371]: Live Verify
+            - generic [ref=f9e372]: Super Admin
+          - button "Logout" [ref=f9e373] [cursor=pointer]
+    - main [ref=f9e378]:
+      - generic [ref=f9e379]:
+        - generic [ref=f9e380]:
+          - generic [ref=f9e381]:
+            - heading "Platform Control Center" [level=1] [ref=f9e382]
+            - paragraph [ref=f9e383]: Executive control plane across restaurant tenants, recurring subscriptions, device licensing, and infrastructure operations.
+          - generic [ref=f9e384]:
+            - link "Onboard Restaurant" [ref=f9e385] [cursor=pointer]:
+              - /url: /restaurants/onboard
+            - link "Billing Hub" [ref=f9e388] [cursor=pointer]:
+              - /url: /billing
+        - generic [ref=f9e390]:
+          - generic [ref=f9e391]:
+            - generic [ref=f9e392]:
+              - generic [ref=f9e393]: Platform Overview
+              - generic [ref=f9e394]: Live Financials & Scale
+            - generic [ref=f9e395]:
+              - generic [ref=f9e396]:
+                - generic [ref=f9e397]:
+                  - generic [ref=f9e398]:
+                    - generic [ref=f9e399]: MONTHLY RECURRING REVENUE
+                    - generic [ref=f9e400]: ACTIVE BILLING
+                  - link "Billing Hub" [ref=f9e402] [cursor=pointer]:
+                    - /url: /billing
+                - generic [ref=f9e407]:
+                  - generic [ref=f9e408]:
+                    - generic [ref=f9e409]: ₹
+                    - generic [ref=f9e410]: 12,000
+                  - generic [ref=f9e411]:
+                    - generic [ref=f9e412]:
+                      - text: "Annual Run Rate (ARR):"
+                      - strong [ref=f9e413]: ₹1,44,000
+                    - generic [ref=f9e414]: Calculated across all active subscriptions
+              - generic [ref=f9e415]:
+                - generic [ref=f9e416]: Total Restaurants
+                - generic [ref=f9e424]:
+                  - generic [ref=f9e425]: "2"
+                  - generic [ref=f9e426]: 2 Active
+                - link "Manage all restaurants →" [ref=f9e430] [cursor=pointer]:
+                  - /url: /restaurants
+              - generic [ref=f9e431]:
+                - generic [ref=f9e432]: Active Subscriptions
+                - generic [ref=f9e440]:
+                  - generic [ref=f9e441]: "2"
+                  - generic [ref=f9e442]: Across Core, Pro & Enterprise tiers
+                - link "View subscription plans →" [ref=f9e444] [cursor=pointer]:
+                  - /url: /subscriptions
+            - generic [ref=f9e445]:
+              - generic [ref=f9e451]:
+                - generic [ref=f9e452]: Invoice Collections & Receivables Watch
+                - generic [ref=f9e453]: "1 Pending Invoices • 0 Past Due • Outstanding Total: ₹8,260"
+              - link "View Invoices →" [ref=f9e454] [cursor=pointer]:
+                - /url: /billing
+          - generic [ref=f9e456]:
+            - generic [ref=f9e457]:
+              - generic [ref=f9e458]: Operations & Fleet Telemetry
+              - generic [ref=f9e459]: Live System Metrics
+            - generic [ref=f9e460]:
+              - generic [ref=f9e461]:
+                - generic [ref=f9e462]:
+                  - generic [ref=f9e463]: Cloud API Gateway
+                  - generic [ref=f9e464]: ● UP
+                - generic [ref=f9e466]:
+                  - generic [ref=f9e467]:
+                    - text: 100%
+                    - generic [ref=f9e468]: Healthy
+                  - generic [ref=f9e469]: "Uptime: 1m • Port 4000"
+              - generic [ref=f9e470]:
+                - generic [ref=f9e471]:
+                  - generic [ref=f9e472]: PostgreSQL Cluster
+                  - generic [ref=f9e473]: HEALTHY
+                - generic [ref=f9e475]:
+                  - generic [ref=f9e476]:
+                    - text: 1ms
+                    - generic [ref=f9e477]: Latency
+                  - generic [ref=f9e478]: 5 active pool connection(s)
+              - generic [ref=f9e479]:
+                - generic [ref=f9e480]:
+                  - generic [ref=f9e481]: Sync Engine
+                  - generic [ref=f9e482]: 100%
+                - generic [ref=f9e484]:
+                  - generic [ref=f9e485]:
+                    - text: "0"
+                    - generic [ref=f9e486]: Events (24h)
+                  - generic [ref=f9e487]: 0 unresolved conflict(s)
+              - generic [ref=f9e488]:
+                - generic [ref=f9e489]:
+                  - generic [ref=f9e490]: Backup Fleet
+                  - generic [ref=f9e491]: ACTIVE
+                - generic [ref=f9e493]:
+                  - generic [ref=f9e494]:
+                    - text: "2"
+                    - generic [ref=f9e495]: Completed
+                  - generic [ref=f9e496]: 0 failed • SHA-256 Verified
+          - generic [ref=f9e497]:
+            - generic [ref=f9e498]:
+              - generic [ref=f9e499]: Platform Trends & Analytics
+              - generic [ref=f9e500]: 6-Month Historical Data
+            - generic [ref=f9e501]:
+              - generic [ref=f9e502]:
+                - generic [ref=f9e503]:
+                  - generic [ref=f9e504]:
+                    - generic [ref=f9e505]: Restaurant Tenant Onboarding Growth
+                    - generic [ref=f9e509]: New restaurant accounts onboarded per month
+                  - generic [ref=f9e510]: +2 this month
+                - generic [ref=f9e511]:
+                  - generic [ref=f9e512]:
+                    - generic [ref=f9e513]: "0"
+                    - generic "0 restaurants onboarded in Apr" [ref=f9e514]
+                    - generic [ref=f9e515]: Apr
+                  - generic [ref=f9e516]:
+                    - generic [ref=f9e517]: "0"
+                    - generic "0 restaurants onboarded in May" [ref=f9e518]
+                    - generic [ref=f9e519]: May
+                  - generic [ref=f9e520]:
+                    - generic [ref=f9e521]: "0"
+                    - generic "0 restaurants onboarded in Jun" [ref=f9e522]
+                    - generic [ref=f9e523]: Jun
+                  - generic [ref=f9e524]:
+                    - generic [ref=f9e525]: "0"
+                    - generic "0 restaurants onboarded in Jul" [ref=f9e526]
+                    - generic [ref=f9e527]: Jul
+                  - generic [ref=f9e528]:
+                    - generic [ref=f9e529]: "0"
+                    - generic "0 restaurants onboarded in Aug" [ref=f9e530]
+                    - generic [ref=f9e531]: Aug
+                  - generic [ref=f9e532]:
+                    - generic [ref=f9e533]: "2"
+                    - generic "2 restaurants onboarded in Sept" [ref=f9e534]
+                    - generic [ref=f9e535]: Sept
+              - generic [ref=f9e536]:
+                - generic [ref=f9e537]:
+                  - generic [ref=f9e538]:
+                    - generic [ref=f9e539]: Monthly SaaS Revenue Run Rate
+                    - generic [ref=f9e542]: Monthly recurring billings from active tiers
+                  - generic [ref=f9e543]: ₹12,000
+                - generic [ref=f9e544]:
+                  - generic [ref=f9e545]:
+                    - generic [ref=f9e546]: ₹8k
+                    - generic "₹7,800 in Apr" [ref=f9e547]
+                    - generic [ref=f9e548]: Apr
+                  - generic [ref=f9e549]:
+                    - generic [ref=f9e550]: ₹9k
+                    - generic "₹8,640 in May" [ref=f9e551]
+                    - generic [ref=f9e552]: May
+                  - generic [ref=f9e553]:
+                    - generic [ref=f9e554]: ₹9k
+                    - generic "₹9,480 in Jun" [ref=f9e555]
+                    - generic [ref=f9e556]: Jun
+                  - generic [ref=f9e557]:
+                    - generic [ref=f9e558]: ₹10k
+                    - generic "₹10,320 in Jul" [ref=f9e559]
+                    - generic [ref=f9e560]: Jul
+                  - generic [ref=f9e561]:
+                    - generic [ref=f9e562]: ₹11k
+                    - generic "₹11,160 in Aug" [ref=f9e563]
+                    - generic [ref=f9e564]: Aug
+                  - generic [ref=f9e565]:
+                    - generic [ref=f9e566]: ₹6k
+                    - generic "₹5,900 in Sept" [ref=f9e567]
+                    - generic [ref=f9e568]: Sept
+            - generic [ref=f9e569]:
+              - generic [ref=f9e570]:
+                - generic [ref=f9e571]: Subscription Tier Distribution
+                - link "Manage plans →" [ref=f9e572] [cursor=pointer]:
+                  - /url: /plans
+              - generic [ref=f9e573]:
+                - generic [ref=f9e574]:
+                  - generic [ref=f9e575]: JAMANVAAR CORE
+                  - generic [ref=f9e576]: 1 active
+                - generic [ref=f9e577]:
+                  - generic [ref=f9e578]: JAMANVAAR PRO
+                  - generic [ref=f9e579]: 1 active
+          - generic [ref=f9e580]:
+            - generic [ref=f9e581]:
+              - generic [ref=f9e582]: Hardware Fleet & Activity Stream
+              - generic [ref=f9e583]: Devices & Operational Audit
+            - generic [ref=f9e584]:
+              - generic [ref=f9e585]:
+                - generic [ref=f9e586]:
+                  - generic [ref=f9e587]:
+                    - generic [ref=f9e588]: Hardware & Connected Terminals
+                    - link "View all devices" [ref=f9e592] [cursor=pointer]:
+                      - /url: /devices
+                  - generic [ref=f9e593]:
+                    - generic [ref=f9e594]:
+                      - generic [ref=f9e595]:
+                        - text: "0"
+                        - generic [ref=f9e596]: / 0
+                      - generic [ref=f9e597]: Online Active Terminals
+                    - generic [ref=f9e598]:
+                      - generic [ref=f9e599]: "2"
+                      - generic [ref=f9e600]: Total Outlets / Branches
+                  - generic [ref=f9e602]:
+                    - generic [ref=f9e603]: Terminal Fleet Connectivity
+                    - generic [ref=f9e604]: 100% Active
+                  - generic [ref=f9e607]:
+                    - link "Generate Activation Key" [ref=f9e608] [cursor=pointer]:
+                      - /url: /activation-keys
+                    - link "Master Menu Catalog" [ref=f9e613] [cursor=pointer]:
+                      - /url: /catalog
+                - generic [ref=f9e618]:
+                  - generic [ref=f9e623]:
+                    - generic [ref=f9e624]: Platform Infrastructure Cluster
+                    - generic [ref=f9e625]: API Gateway, PostgreSQL & Sync engine operational
+                  - link "Health Check" [ref=f9e626] [cursor=pointer]:
+                    - /url: /system-health
+              - generic [ref=f9e628]:
+                - generic [ref=f9e629]:
+                  - generic [ref=f9e630]: Recent Platform Activity
+                  - link "Full Audit Logs →" [ref=f9e634] [cursor=pointer]:
+                    - /url: /audit-logs
+                - generic [ref=f9e635]:
+                  - generic [ref=f9e640]:
+                    - generic [ref=f9e641]:
+                      - generic [ref=f9e642]: Platform Login
+                      - generic [ref=f9e643]: PLATFORM_LOGIN
+                    - generic [ref=f9e645]:
+                      - generic [ref=f9e646]: Platform Admin
+                      - generic [ref=f9e647]: •
+                      - generic [ref=f9e648]: 20 Sept 2026, 04:13 pm
+                  - generic [ref=f9e653]:
+                    - generic [ref=f9e654]:
+                      - generic [ref=f9e655]: Backup Created
+                      - generic [ref=f9e656]: BACKUP_CREATED
+                    - generic [ref=f9e658]:
+                      - generic [ref=f9e659]: Restaurant Tenant
+                      - generic [ref=f9e660]: •
+                      - generic [ref=f9e661]: 20 Sept 2026, 04:13 pm
+                  - generic [ref=f9e666]:
+                    - generic [ref=f9e667]:
+                      - generic [ref=f9e668]: Hardware Activation Key Issued
+                      - generic [ref=f9e669]: ACTIVATION_KEY_GENERATED
+                    - generic [ref=f9e671]:
+                      - generic [ref=f9e672]: Platform Admin
+                      - generic [ref=f9e673]: •
+                      - generic [ref=f9e674]: 20 Sept 2026, 04:12 pm
+                  - generic [ref=f9e679]:
+                    - generic [ref=f9e680]:
+                      - generic [ref=f9e681]: Hardware Activation Key Issued
+                      - generic [ref=f9e682]: ACTIVATION_KEY_GENERATED
+                    - generic [ref=f9e684]:
+                      - generic [ref=f9e685]: Platform Admin
+                      - generic [ref=f9e686]: •
+                      - generic [ref=f9e687]: 20 Sept 2026, 04:12 pm
+                  - generic [ref=f9e692]:
+                    - generic [ref=f9e693]:
+                      - generic [ref=f9e694]: Hardware Activation Key Issued
+                      - generic [ref=f9e695]: ACTIVATION_KEY_GENERATED
+                    - generic [ref=f9e697]:
+                      - generic [ref=f9e698]: Platform Admin
+                      - generic [ref=f9e699]: •
+                      - generic [ref=f9e700]: 20 Sept 2026, 04:12 pm
+                  - generic [ref=f9e705]:
+                    - generic [ref=f9e706]:
+                      - generic [ref=f9e707]: Hardware Activation Key Issued
+                      - generic [ref=f9e708]: ACTIVATION_KEY_GENERATED
+                    - generic [ref=f9e710]:
+                      - generic [ref=f9e711]: Platform Admin
+                      - generic [ref=f9e712]: •
+                      - generic [ref=f9e713]: 20 Sept 2026, 04:12 pm
+                  - generic [ref=f9e717]:
+                    - generic [ref=f9e718]:
+                      - generic [ref=f9e719]: Hardware Activation Key Issued
+                      - generic [ref=f9e720]: ACTIVATION_KEY_GENERATED
+                    - generic [ref=f9e722]:
+                      - generic [ref=f9e723]: Platform Admin
+                      - generic [ref=f9e724]: •
+                      - generic [ref=f9e725]: 20 Sept 2026, 04:12 pm

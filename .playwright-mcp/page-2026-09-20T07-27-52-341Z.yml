@@ -1,0 +1,92 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e8]:
+          - text: "Local Core:"
+          - strong [ref=e9]: Connected
+        - button [ref=e10] [cursor=pointer]:
+          - generic [ref=e15]:
+            - text: "Network:"
+            - strong [ref=e16]: Online
+        - generic [ref=e17]: Sun, 20 Sept 2026
+    - main [ref=e21]:
+      - generic [ref=e22]:
+        - img "JAMANVAAR by Kelviontech" [ref=e25]
+        - generic [ref=e26]:
+          - heading "Touch-First Restaurant Floor Command Instant KOT" [level=1] [ref=e27]:
+            - text: Touch-First Restaurant Floor Command
+            - generic [ref=e28]: Instant KOT
+          - paragraph [ref=e29]: Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency.
+        - generic [ref=e30]:
+          - generic [ref=e31]: Fast Billing
+          - generic [ref=e36]: Instant KOT
+          - generic [ref=e43]: Table Management
+          - generic [ref=e49]: Offline First
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - img "Tandoori Naan" [ref=e56]
+            - generic [ref=e57]: Tandoori Breads
+          - generic [ref=e58]:
+            - img "Paneer Butter Masala" [ref=e59]
+            - generic [ref=e60]: Royal Curries
+          - generic [ref=e61]:
+            - img "Tandoori Angaar" [ref=e62]
+            - generic [ref=e63]: Tandoor Starters
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - generic [ref=e67]:
+            - generic [ref=e68]:
+              - generic [ref=e69]: Welcome to
+              - generic [ref=e70]: CAPTAIN APP
+            - heading "Floor Captain & Service" [level=2] [ref=e72]
+            - paragraph [ref=e73]: High-Speed Table Orders & Service
+          - generic [ref=e75]:
+            - generic [ref=e76]:
+              - heading "Floor Captain Sign In" [level=2] [ref=e77]
+              - paragraph [ref=e78]: Enter your authorized 4-digit staff PIN to unlock this tablet
+            - generic [ref=e80]:
+              - generic [ref=e81]: 🔒 Registered Staff Access
+              - text: Ask your manager for your 4-digit staff PIN
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - generic [ref=e84]: Staff 4-Digit PIN
+                - textbox "• • • •" [ref=e86]
+              - generic [ref=e87]:
+                - button "1" [ref=e88] [cursor=pointer]
+                - button "2" [ref=e89] [cursor=pointer]
+                - button "3" [ref=e90] [cursor=pointer]
+                - button "4" [ref=e91] [cursor=pointer]
+                - button "5" [ref=e92] [cursor=pointer]
+                - button "6" [ref=e93] [cursor=pointer]
+                - button "7" [ref=e94] [cursor=pointer]
+                - button "8" [ref=e95] [cursor=pointer]
+                - button "9" [ref=e96] [cursor=pointer]
+                - button "Clear" [ref=e97] [cursor=pointer]
+                - button "0" [ref=e98] [cursor=pointer]
+                - button "⌫" [ref=e99] [cursor=pointer]
+              - button "Unlock Captain Terminal" [disabled] [ref=e100] [cursor=pointer]
+        - generic [ref=e104]:
+          - generic [ref=e105]: Role-Based Security
+          - generic [ref=e110]: •
+          - generic [ref=e111]: Instant Offline Boot
+          - generic [ref=e115]: •
+          - generic [ref=e116]: 100% Secure
+    - contentinfo [ref=e120]: © 2026 JAMANVAAR by KELVIONTECH — All rights reserved.
+  - region "JAMANVAAR Startup" [ref=e121]:
+    - generic [ref=e122]:
+      - generic [ref=e123]: KELVIONTECH ENTERPRISE
+      - generic [ref=e126]: Local Engine Active
+    - generic [ref=e132]:
+      - generic [ref=e133]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=e135]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=e136]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=e142]
+      - paragraph [ref=e144]: Restaurant Operations Platform
+      - generic [ref=e145]: CAPTAIN
+      - generic [ref=e150]:
+        - generic [ref=e151]: Core Engine Ready
+        - generic [ref=e153]: •
+        - generic [ref=e154]: Database Initialized
+        - generic [ref=e156]: •
+        - generic [ref=e157]: Local-First Mode

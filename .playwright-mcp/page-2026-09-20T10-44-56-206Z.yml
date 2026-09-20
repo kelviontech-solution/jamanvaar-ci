@@ -1,0 +1,201 @@
+- generic [ref=f10e6]:
+  - complementary [ref=f10e7]:
+    - generic [ref=f10e8]:
+      - link [ref=f10e9] [cursor=pointer]:
+        - /url: /
+        - img "JAMANVAAR" [ref=f10e10]
+      - generic [ref=f10e11]:
+        - generic [ref=f10e12]: PLATFORM CONTROL
+        - generic [ref=f10e13]: SUPER ADMIN
+    - navigation [ref=f10e14]:
+      - generic [ref=f10e15]:
+        - button "Platform Control Center" [expanded] [ref=f10e16] [cursor=pointer]
+        - link "Executive Dashboard" [ref=f10e21] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f10e29]:
+        - button "Business Management" [expanded] [ref=f10e30] [cursor=pointer]
+        - generic [ref=f10e34]:
+          - link "Restaurants" [ref=f10e35] [cursor=pointer]:
+            - /url: /restaurants
+          - link "Restaurant Owners" [ref=f10e43] [cursor=pointer]:
+            - /url: /owners
+          - link "Branches" [ref=f10e51] [cursor=pointer]:
+            - /url: /branches
+          - link "Subscriptions" [ref=f10e58] [cursor=pointer]:
+            - /url: /subscriptions
+          - link "Invoices & Billing" [ref=f10e66] [cursor=pointer]:
+            - /url: /billing
+      - generic [ref=f10e71]:
+        - button "SaaS Management" [expanded] [ref=f10e72] [cursor=pointer]
+        - generic [ref=f10e76]:
+          - link "Plans & Entitlements" [ref=f10e77] [cursor=pointer]:
+            - /url: /plans
+          - link "QR Ordering Suite" [ref=f10e84] [cursor=pointer]:
+            - /url: /qr-ordering
+          - link "JAMAN AI Engine" [ref=f10e93] [cursor=pointer]:
+            - /url: /ai-assistant
+          - link "Master Menu Catalog" [ref=f10e98] [cursor=pointer]:
+            - /url: /catalog
+          - link "Activation Keys" [ref=f10e104] [cursor=pointer]:
+            - /url: /activation-keys
+          - link "Payment Gateways" [ref=f10e110] [cursor=pointer]:
+            - /url: /payment-connections
+          - link "Applications & Releases" [ref=f10e115] [cursor=pointer]:
+            - /url: /applications
+      - generic [ref=f10e122]:
+        - button "Operations & MDM" [expanded] [ref=f10e123] [cursor=pointer]
+        - generic [ref=f10e127]:
+          - link "Device Fleet / MDM" [ref=f10e128] [cursor=pointer]:
+            - /url: /devices
+          - link "Sync & Conflict Monitor" [ref=f10e133] [cursor=pointer]:
+            - /url: /sync-monitor
+          - link "Backups & Recovery" [ref=f10e138] [cursor=pointer]:
+            - /url: /backups
+          - link "System Telemetry" [ref=f10e145] [cursor=pointer]:
+            - /url: /system-health
+          - link "Staging Sandboxes" [ref=f10e151] [cursor=pointer]:
+            - /url: /sandboxes
+      - generic [ref=f10e164]:
+        - button "Security & Reports" [expanded] [ref=f10e165] [cursor=pointer]
+        - generic [ref=f10e169]:
+          - link "Reports & Analytics" [ref=f10e170] [cursor=pointer]:
+            - /url: /reports
+          - link "Audit Logs" [ref=f10e175] [cursor=pointer]:
+            - /url: /audit-logs
+          - link "Emergency Offline Policy" [ref=f10e181] [cursor=pointer]:
+            - /url: /offline-policy
+          - link "Platform Team" [ref=f10e186] [cursor=pointer]:
+            - /url: /team
+          - link "Support Tickets" [ref=f10e192] [cursor=pointer]:
+            - /url: /tickets
+          - link "Diagnostics & Support" [ref=f10e197] [cursor=pointer]:
+            - /url: /support
+          - link "Platform Settings" [ref=f10e207] [cursor=pointer]:
+            - /url: /settings/platform
+      - generic [ref=f10e211]:
+        - button "Account" [expanded] [ref=f10e212] [cursor=pointer]
+        - link "My Profile" [ref=f10e217] [cursor=pointer]:
+          - /url: /profile
+    - generic [ref=f10e232]:
+      - generic [ref=f10e233]:
+        - generic [ref=f10e235]: Platform Online
+        - link "View System Health" [ref=f10e236] [cursor=pointer]:
+          - /url: /system-health
+      - generic [ref=f10e241]: JAMANVAAR Cloud v1.4.0
+  - generic [ref=f10e242]:
+    - banner [ref=f10e243]:
+      - generic [ref=f10e245]:
+        - generic [ref=f10e246]: JAMANVAAR PLATFORM
+        - generic [ref=f10e247]: Control Center
+      - generic [ref=f10e249]:
+        - textbox "Search restaurants, owners, devices, activation keys…" [ref=f10e250]
+        - generic: Ctrl+K
+      - generic [ref=f10e251]:
+        - generic "Database reachable, API responding" [ref=f10e252]: PLATFORM ONLINE
+        - button "Notifications" [ref=f10e256] [cursor=pointer]
+        - button "Toggle dark mode" [ref=f10e260] [cursor=pointer]
+        - generic [ref=f10e264]:
+          - link "L" [ref=f10e265] [cursor=pointer]:
+            - /url: /profile
+          - generic [ref=f10e267]:
+            - generic [ref=f10e268]: Live Verify
+            - generic [ref=f10e269]: Super Admin
+          - button "Logout" [ref=f10e270] [cursor=pointer]
+    - main [ref=f10e275]:
+      - generic [ref=f10e276]:
+        - generic [ref=f10e277]:
+          - generic [ref=f10e278]:
+            - heading "Restaurants" [level=1] [ref=f10e279]
+            - paragraph [ref=f10e280]: Manage every restaurant tenant, branch, subscription, and connected device from one place.
+          - generic [ref=f10e281]:
+            - button "Export CSV" [ref=f10e282] [cursor=pointer]
+            - button "+ Quick create" [ref=f10e287] [cursor=pointer]
+            - button "Onboard Restaurant" [ref=f10e288] [cursor=pointer]
+        - generic [ref=f10e291]:
+          - textbox "Search name, owner, city, ID…" [ref=f10e296]
+          - generic [ref=f10e297]:
+            - button "All 2" [ref=f10e298] [cursor=pointer]:
+              - generic [ref=f10e299]: All
+              - generic [ref=f10e300]: "2"
+            - button "Active 2" [ref=f10e301] [cursor=pointer]:
+              - generic [ref=f10e302]: Active
+              - generic [ref=f10e303]: "2"
+            - button "Suspended 0" [ref=f10e304] [cursor=pointer]:
+              - generic [ref=f10e305]: Suspended
+              - generic [ref=f10e306]: "0"
+            - button "Trial 0" [ref=f10e307] [cursor=pointer]:
+              - generic [ref=f10e308]: Trial
+              - generic [ref=f10e309]: "0"
+            - button "No Plan" [ref=f10e310] [cursor=pointer]
+          - combobox [ref=f10e312]:
+            - option "All SaaS Tiers" [selected]
+            - option "CORE (₹5,000)"
+            - option "PRO (₹7,000)"
+            - option "ENTERPRISE"
+            - option "No Plan"
+          - combobox [ref=f10e313]:
+            - option "Recently Onboarded" [selected]
+            - option "Name (A → Z)"
+            - option "Name (Z → A)"
+            - option "Most Branches"
+            - option "Most Devices"
+            - option "Subscription Status"
+          - generic [ref=f10e314]:
+            - button "Cards" [ref=f10e315] [cursor=pointer]
+            - button "Table" [ref=f10e322] [cursor=pointer]
+          - generic [ref=f10e325]: 2 of 2
+        - generic [ref=f10e326]:
+          - 'button "Select restaurant #9509fd ACTIVE FA Full Audit Diner JAMANVAAR PRO Branches 1 Terminals 0 Ahmedabad, Gujarat Audit Owner audit-owner@example.com Manage Restaurant Sept 2026" [ref=f10e488] [cursor=pointer]':
+            - generic [ref=f10e328]:
+              - generic [ref=f10e329]:
+                - checkbox "Select restaurant" [ref=f10e330]
+                - generic "Click to copy ID" [ref=f10e331]: "#9509fd"
+              - generic [ref=f10e332]:
+                - generic [ref=f10e333]: ACTIVE
+                - button "More actions" [ref=f10e336]
+            - generic [ref=f10e341]:
+              - generic [ref=f10e342]: FA
+              - generic [ref=f10e343]:
+                - paragraph [ref=f10e344]: Full Audit Diner
+                - generic [ref=f10e345]: JAMANVAAR PRO
+            - generic [ref=f10e347]:
+              - generic [ref=f10e348]:
+                - generic [ref=f10e349]: Branches
+                - generic [ref=f10e354]: "1"
+              - generic [ref=f10e355]:
+                - generic [ref=f10e356]: Terminals
+                - generic [ref=f10e359]: "0"
+            - generic [ref=f10e360]:
+              - generic [ref=f10e361]: Ahmedabad, Gujarat
+              - generic [ref=f10e366]: Audit Owner
+              - generic [ref=f10e371]: audit-owner@example.com
+            - generic [ref=f10e376]:
+              - generic [ref=f10e377]: Manage Restaurant
+              - generic [ref=f10e386]: Sept 2026
+          - 'button "Select restaurant #111111 ACTIVE J— JAMANVAAR — Demo Restaurant JAMANVAAR CORE Branches 1 Terminals 0 Ahmedabad, Gujarat Demo Owner owner@demo.jamanvaar.app Manage Restaurant Sept 2026" [ref=f10e387] [cursor=pointer]':
+            - generic [ref=f10e388]:
+              - generic [ref=f10e389]:
+                - checkbox "Select restaurant" [ref=f10e390]
+                - generic "Click to copy ID" [ref=f10e391]: "#111111"
+              - generic [ref=f10e392]:
+                - generic [ref=f10e393]: ACTIVE
+                - button "More actions" [ref=f10e396]
+            - generic [ref=f10e401]:
+              - generic [ref=f10e402]: J—
+              - generic [ref=f10e403]:
+                - paragraph [ref=f10e404]: JAMANVAAR — Demo Restaurant
+                - generic [ref=f10e405]: JAMANVAAR CORE
+            - generic [ref=f10e407]:
+              - generic [ref=f10e408]:
+                - generic [ref=f10e409]: Branches
+                - generic [ref=f10e414]: "1"
+              - generic [ref=f10e415]:
+                - generic [ref=f10e416]: Terminals
+                - generic [ref=f10e419]: "0"
+            - generic [ref=f10e420]:
+              - generic [ref=f10e421]: Ahmedabad, Gujarat
+              - generic [ref=f10e426]: Demo Owner
+              - generic [ref=f10e431]: owner@demo.jamanvaar.app
+            - generic [ref=f10e436]:
+              - generic [ref=f10e437]: Manage Restaurant
+              - generic [ref=f10e446]: Sept 2026
