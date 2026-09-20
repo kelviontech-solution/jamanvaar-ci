@@ -150,25 +150,34 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
         <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-black uppercase text-slate-500">OWNERS & MANAGERS</span>
           <div className="text-2xl font-black text-jaman-navy font-mono">
-            {users.filter((u) => (u.roleId || '').includes('OWNER') || (u.roleId || '').includes('MANAGER')).length || 1}
+            {users.filter((u) => u.roleId === 'role-super-admin' || u.roleId === 'role-manager').length}
           </div>
           <span className="text-[10px] text-slate-400 font-medium">Full System Authority</span>
         </div>
         <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-black uppercase text-slate-500">CASHIERS</span>
           <div className="text-2xl font-black text-jaman-navy font-mono">
-            {users.filter((u) => (u.roleId || '').includes('CASHIER')).length || 1}
+            {users.filter((u) => u.roleId === 'role-cashier').length}
           </div>
           <span className="text-[10px] text-slate-400 font-medium">POS Register Terminal</span>
         </div>
         <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[11px] font-black uppercase text-slate-500">CAPTAINS & SERVICE</span>
           <div className="text-2xl font-black text-jaman-navy font-mono">
-            {users.filter((u) => (u.roleId || '').includes('CAPTAIN') || (u.roleId || '').includes('WAITER')).length || 1}
+            {users.filter((u) => u.roleId === 'role-captain').length}
           </div>
           <span className="text-[10px] text-slate-400 font-medium">Floor Order Taking</span>
         </div>
       </div>
+
+      {users.length === 0 && (
+        <div className="p-8 text-center bg-white rounded-2xl border border-dashed border-jaman-border">
+          <p className="text-sm font-bold text-jaman-navy">No staff yet.</p>
+          <p className="text-xs text-slate-500 mt-1">
+            Add your first employee — creating one issues a working PIN for POS, Captain, KDS and Kiosk.
+          </p>
+        </div>
+      )}
 
       {/* Staff Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -182,14 +191,14 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
                 {usr.fullName[0]}
               </div>
               <span className="bg-jaman-cream text-jaman-navy font-black text-[10px] px-2.5 py-1 rounded-lg uppercase tracking-wider border border-jaman-border">
-                {usr.roleId || 'STAFF'}
+                {StaffRepository.getRoleName(usr.roleId)}
               </span>
             </div>
 
             <div>
               <h4 className="font-extrabold text-sm text-jaman-navy">{usr.fullName}</h4>
               <span className="text-xs text-slate-400 font-medium">
-                @{usr.username} • {usr.phone}
+                @{usr.username}{usr.phone ? ` • ${usr.phone}` : ''}
               </span>
             </div>
 

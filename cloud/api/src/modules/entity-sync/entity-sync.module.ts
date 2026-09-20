@@ -5,6 +5,7 @@ import { EntitySyncService } from './entity-sync.service';
 
 @Module({
   controllers: [EntitySyncController],
-  providers: [EntitySyncService, DeviceAuthGuard]
+  providers: [EntitySyncService, DeviceAuthGuard],
+  exports: [EntitySyncService]
 })
 export class EntitySyncModule {}

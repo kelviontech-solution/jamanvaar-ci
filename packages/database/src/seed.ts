@@ -721,67 +721,30 @@ export const SEED_ROLES: Role[] = [
     name: 'Cashier / Billing Staff',
     description: 'Front desk and counter operator handling billing, KOTs, payments, shifts and basic discounts',
     permissions: ['pos.view', 'pos.order', 'pos.discount', 'pos.shift', 'order.view', 'kiosk.view']
+  },
+  {
+    id: 'role-captain',
+    name: 'Captain / Waiter',
+    description: 'Floor staff taking dine-in orders on the Captain app and relaying them to the kitchen',
+    permissions: ['pos.view', 'pos.order', 'order.view', 'kiosk.view']
+  },
+  {
+    id: 'role-chef',
+    name: 'Kitchen Chef',
+    description: 'Kitchen Display station staff moving tickets through preparation',
+    permissions: ['order.view']
   }
 ];
 
-export const SEED_USERS: (User & { pinCode?: string })[] = [
-  {
-    id: 'usr-admin-1',
-    restaurantId: 'rest-jamanvaar-main',
-    username: 'admin',
-    fullName: 'Ramesh Patel (Owner)',
-    email: 'admin@jamanvaar.com',
-    phone: '+91 98765 00001',
-    roleId: 'role-super-admin',
-    pinCode: '9999',
-    isActive: true,
-    lastLoginAt: '2026-08-25T08:00:00.000Z',
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-08-25T08:00:00.000Z'
-  },
-  {
-    id: 'usr-mgr-1',
-    restaurantId: 'rest-jamanvaar-main',
-    username: 'manager',
-    fullName: 'Pooja Shah (Floor Manager)',
-    email: 'manager@jamanvaar.com',
-    phone: '+91 98765 00003',
-    roleId: 'role-manager',
-    pinCode: '5678',
-    isActive: true,
-    lastLoginAt: '2026-08-25T08:30:00.000Z',
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-08-25T08:30:00.000Z'
-  },
-  {
-    id: 'usr-cashier-1',
-    restaurantId: 'rest-jamanvaar-main',
-    username: 'cashier',
-    fullName: 'Amit Dave (Lead Cashier)',
-    email: 'cashier1@jamanvaar.com',
-    phone: '+91 98765 00002',
-    roleId: 'role-cashier',
-    pinCode: '1234',
-    isActive: true,
-    lastLoginAt: '2026-08-25T09:00:00.000Z',
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-08-25T09:00:00.000Z'
-  },
-  {
-    id: 'cap-1',
-    restaurantId: 'rest-jamanvaar-main',
-    username: 'captain1',
-    fullName: 'Rahul Sharma (Captain)',
-    email: 'captain1@jamanvaar.com',
-    phone: '+91 98765 00004',
-    roleId: 'role-captain',
-    pinCode: '2222',
-    isActive: true,
-    lastLoginAt: '2026-08-25T09:30:00.000Z',
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-08-25T09:30:00.000Z'
-  }
-];
+/**
+ * A fresh restaurant starts with NO staff and NO working login anywhere (BUG-005/011).
+ * The previous four seeded accounts (with plaintext PINs 9999/5678/1234/2222, real names,
+ * "@jamanvaar.com" emails) showed up on every install regardless of who the restaurant
+ * actually is, and a "Quick Demo Login" button in POS logged straight in as one of them.
+ * The owner's real staff, and their PINs, now come only from Restaurant Admin
+ * (StaffRepository.createUser / resetPin — see BUG-006).
+ */
+export const SEED_USERS: User[] = [];
 
 // Was a ~520-line generator fabricating roughly 77 fake historical orders
 // (with invented customers, cashiers, captains, tables and payment amounts
@@ -795,55 +758,11 @@ export function generateSeedOrders(): import('@jamanvaar/types').Order[] {
 }
 
 export function generateSeedShifts(): import('@jamanvaar/types').ShiftRecord[] {
-  const now = new Date();
-  
-  // Today's active shift opened in the morning
-  const todayShiftOpen = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0, 0);
-  
-  // Yesterday's closed shift
-  const yestShiftOpen = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 9, 0, 0, 0);
-  const yestShiftClose = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 30, 0, 0);
-
-  return [
-    {
-      id: 'shift-today-01',
-      posId: 'POS-01',
-      cashierId: 'usr-cashier-1',
-      cashierName: 'Amit Dave (Lead Cashier)',
-      openedAt: todayShiftOpen.toISOString(),
-      status: 'OPEN',
-      openingCash: 2000,
-      expectedCash: 2000,
-      totalCashSales: 0,
-      totalUpiSales: 0,
-      totalCardSales: 0,
-      totalSales: 0,
-      totalDiscounts: 0,
-      totalOrders: 0,
-      notes: 'Morning shift opening float ₹2,000 verified'
-    },
-    {
-      id: 'shift-yesterday-01',
-      posId: 'POS-01',
-      cashierId: 'usr-cashier-1',
-      cashierName: 'Amit Dave (Lead Cashier)',
-      openedAt: yestShiftOpen.toISOString(),
-      closedAt: yestShiftClose.toISOString(),
-      status: 'CLOSED',
-      openingCash: 2000,
-      closingCash: 2000,
-      actualCash: 2000,
-      expectedCash: 2000,
-      cashVariance: 0,
-      totalCashSales: 0,
-      totalUpiSales: 0,
-      totalCardSales: 0,
-      totalSales: 0,
-      totalDiscounts: 0,
-      totalOrders: 0,
-      notes: 'Yesterday evening closing verified'
-    }
-  ];
+  // BUG-012: this used to fabricate an OPEN "POS-01 · Amit Dave · Float ₹2,000" shift (plus a
+  // closed one for "yesterday") on every fresh install, so Restaurant Admin's header showed a
+  // shift nobody actually opened. A fresh restaurant has no open shift until a real cashier
+  // opens one.
+  return [];
 }
 
 

@@ -20,6 +20,8 @@
  * devices real and countable, which only the activation path delivers.
  */
 
+import { DeviceGate, PlatformNotice, type PlatformNoticeData, sendHeartbeat } from '@jamanvaar/sync';
+
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 
 const RESTAURANT_ID_KEY = 'jamanvaar_kiosk_admin_restaurant_id';
@@ -516,7 +518,7 @@ async function tenantFetch(path: string, init: RequestInit): Promise<Response> {
   if (!token) {
     throw new CloudApiError('Not signed in', 401);
   }
-  return fetch(`${API_BASE}${path}`, {
+  return DeviceGate.gatedFetch(`${API_BASE}${path}`, {
     ...init,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
   });
@@ -626,4 +628,38 @@ export async function syncMenuToCloud(items: MenuItem[], taxGroups: Array<{ id: 
     const data = await parseJsonResponse(res);
     throw new CloudApiError(data?.message ?? `Menu sync failed (${res.status})`, res.status);
   }
+}
+
+/**
+ * Restaurant Admin has no terminal heartbeat, so it asks for the platform announcement
+ * (maintenance etc.) itself. Offline or signed out, it keeps whatever it last knew.
+ */
+export function startPlatformNoticePolling(intervalMs = 60_000): void {
+  const poll = async () => {
+    try {
+      if (!getTenantAccessToken()) return;
+      const res = await tenantFetch('/api/v1/tenant/platform-notice', { method: 'GET' });
+      if (res.ok) PlatformNotice.apply(((await res.json()) as { notice: PlatformNoticeData | null }).notice);
+    } catch {
+      // Offline or signed out: keep the last known notice.
+    }
+  };
+  void poll();
+  setInterval(poll, intervalMs);
+}
+
+/** Kiosk Admin's own terminal heartbeat (it had none, so it always showed as never seen). */
+export function startDeviceHeartbeat(intervalMs = 15_000): void {
+  const beat = () => {
+    const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
+    if (!deviceToken) return;
+    void sendHeartbeat({
+      apiBase: API_BASE,
+      deviceToken,
+      appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0',
+      restaurantId: localStorage.getItem(RESTAURANT_ID_KEY)
+    });
+  };
+  beat();
+  setInterval(beat, intervalMs);
 }

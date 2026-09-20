@@ -83,10 +83,10 @@ export class SyncObservabilityService {
   async getSyncMetrics() {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const [totalEvents, failedEvents, pendingConflicts, devicesReporting] = await Promise.all([
-      this.prisma.syncEventLog.count({ where: { timestamp: { gte: oneDayAgo } } }),
-      this.prisma.syncEventLog.count({ where: { status: 'FAILED', timestamp: { gte: oneDayAgo } } }),
-      this.prisma.syncConflict.count({ where: { resolution: 'PENDING' } }),
-      this.prisma.device.count({ where: { lastSyncAt: { gte: oneDayAgo } } })
+      this.prisma.platformDb.syncEventLog.count({ where: { timestamp: { gte: oneDayAgo } } }),
+      this.prisma.platformDb.syncEventLog.count({ where: { status: 'FAILED', timestamp: { gte: oneDayAgo } } }),
+      this.prisma.platformDb.syncConflict.count({ where: { resolution: 'PENDING' } }),
+      this.prisma.platformDb.device.count({ where: { lastSyncAt: { gte: oneDayAgo } } })
     ]);
 
     const successRate = totalEvents > 0 ? Math.round(((totalEvents - failedEvents) / totalEvents) * 100) : 100;
@@ -118,7 +118,7 @@ export class SyncObservabilityService {
   }
 
   async recordSyncLog(dto: RecordSyncLogDto) {
-    return this.prisma.syncEventLog.create({
+    return this.prisma.platformDb.syncEventLog.create({
       data: {
         restaurantId: dto.restaurantId,
         branchId: dto.branchId,
@@ -148,7 +148,7 @@ export class SyncObservabilityService {
   }
 
   async recordConflict(dto: RecordConflictDto) {
-    return this.prisma.syncConflict.create({
+    return this.prisma.platformDb.syncConflict.create({
       data: {
         restaurantId: dto.restaurantId,
         branchId: dto.branchId,
@@ -168,10 +168,10 @@ export class SyncObservabilityService {
     strategy: 'CLOUD_WINS' | 'LOCAL_WINS' | 'MANUAL_MERGE',
     actor: PlatformUser
   ) {
-    const conflict = await this.prisma.syncConflict.findUnique({ where: { id: conflictId } });
+    const conflict = await this.prisma.platformDb.syncConflict.findUnique({ where: { id: conflictId } });
     if (!conflict) throw new NotFoundException('Sync conflict not found');
 
-    const updated = await this.prisma.syncConflict.update({
+    const updated = await this.prisma.platformDb.syncConflict.update({
       where: { id: conflictId },
       data: {
         resolution: strategy,

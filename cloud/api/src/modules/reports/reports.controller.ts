@@ -23,6 +23,11 @@ export class ReportsController {
     return this.reportsService.getRestaurants();
   }
 
+  @Get('restaurants/:id/sales')
+  getRestaurantSales(@Param('id') id: string, @Query('from') from?: string, @Query('to') to?: string) {
+    return this.reportsService.getRestaurantSales(id, { from, to });
+  }
+
   @Get('restaurants/:id')
   getRestaurantReport(@Param('id') id: string) {
     return this.reportsService.getRestaurantReport(id);

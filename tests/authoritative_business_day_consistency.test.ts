@@ -171,6 +171,8 @@ describe('Authoritative Single-Source-of-Truth Business Day & Financial Accounti
 
   it('4. Separation of Cashier Shift and Restaurant Business Day', () => {
     const activeDay = BusinessDayAccountingService.getActiveBusinessDay();
+    // A fresh restaurant has no seeded/pre-opened shift (BUG-012) — open a real one.
+    ShiftRepository.openShift('usr-test-cashier', 'Amit Dave', 2000);
     const activeShift = ShiftRepository.getActiveShift();
 
     expect(activeShift).toBeDefined();

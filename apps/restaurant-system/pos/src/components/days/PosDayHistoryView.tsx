@@ -182,7 +182,7 @@ export const PosDayHistoryView: React.FC = () => {
           {/* Active Day Live Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="bg-white/10 rounded-2xl p-3 border border-white/10">
-              <span className="text-[10px] uppercase font-bold text-slate-300 block">Total Net Revenue</span>
+              <span className="text-[10px] uppercase font-bold text-slate-300 block">Total Billed (incl. GST)</span>
               <div className="text-xl sm:text-2xl font-black font-mono text-white mt-0.5">
                 {formatINR(activeDaySummary.net_sales)}
               </div>
@@ -292,7 +292,7 @@ export const PosDayHistoryView: React.FC = () => {
                 {/* Net Sales & Orders Count */}
                 <div className="space-y-1">
                   <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-                    Total Net Revenue
+                    Total Billed (incl. GST)
                   </span>
                   <div className="text-2xl font-black font-mono text-jaman-navy">
                     {formatINR(summary.net_sales)}

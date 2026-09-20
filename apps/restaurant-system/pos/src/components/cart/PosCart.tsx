@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { OrderType } from '@jamanvaar/types';
-import { db } from '@jamanvaar/database';
+import { db, InventoryRepository } from '@jamanvaar/database';
 import { JAMANVAAR_LOGOS, sound } from '@jamanvaar/ui';
 import { PosOrderNotesModal } from './PosOrderNotesModal';
 import { PosDiscountModal } from './PosDiscountModal';
@@ -119,6 +119,20 @@ export const PosCart: React.FC = () => {
   };
 
   const hasItems = cart.items.length > 0;
+  // Running-order state: only items not yet sent to the kitchen can be sent.
+  // BUG-045: nothing warned when an ingredient was out, so the POS happily sold dishes the
+  // kitchen could not make. Soft warning only - the cashier decides.
+  const stockShortages = InventoryRepository.getShortages(cart.items.map((ci) => ({ menuItemId: ci.menuItemId, quantity: ci.quantity })));
+  const unsentCount = cart.items.reduce((n, ci) => n + Math.max(0, ci.quantity - (ci.kotSentQty || 0)), 0);
+  const hasSentItems = cart.items.some((ci) => (ci.kotSentQty || 0) > 0);
+  const canSendKot = hasItems && unsentCount > 0 && !isSendingKot;
+  const kotLabel = kotSentState
+    ? '✓ KOT SENT'
+    : hasSentItems && unsentCount === 0
+      ? '✓ SENT TO KITCHEN'
+      : hasSentItems
+        ? `SEND KOT (${unsentCount} NEW)`
+        : 'SEND KOT';
 
   // Quick favorite dishes for 1-click cart start (only available items)
   const quickFavorites = db.menuItems.filter((i) => i.isAvailable !== false).slice(0, 4);
@@ -264,6 +278,11 @@ export const PosCart: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-jaman-cream/40">
         {hasItems ? (
           <>
+            {stockShortages.length > 0 && (
+              <div role="alert" className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 text-[11px] font-bold text-amber-900">
+                Low stock: {stockShortages.map((sh) => `${sh.itemName} (need ${Math.round(sh.needed * 100) / 100} ${sh.unit}, have ${Math.round(sh.available * 100) / 100})`).join(', ')}
+              </div>
+            )}
             {cart.items.map((ci) => (
               <div
                 key={ci.cartItemId}
@@ -523,15 +542,15 @@ export const PosCart: React.FC = () => {
           <button
             type="button"
             onClick={handleSendKot}
-            disabled={!hasItems || isSendingKot}
+            disabled={!canSendKot}
             className={`min-h-[52px] px-3 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
-              hasItems && !isSendingKot
+              canSendKot
                 ? 'bg-jaman-navy hover:bg-[#133A58] text-white border-2 border-jaman-navy shadow-md shadow-jaman-navy/20 active:scale-[0.98] cursor-pointer'
                 : 'bg-slate-100/90 border border-slate-300/80 text-slate-500 cursor-not-allowed opacity-80'
             }`}
           >
-            <Flame className={`w-5 h-5 shrink-0 ${hasItems && !isSendingKot ? 'text-jaman-saffron fill-jaman-saffron' : 'text-slate-400 fill-slate-300'}`} />
-            <span className="truncate">{kotSentState ? '✓ KOT SENT' : 'SEND KOT'}</span>
+            <Flame className={`w-5 h-5 shrink-0 ${canSendKot ? 'text-jaman-saffron fill-jaman-saffron' : 'text-slate-400 fill-slate-300'}`} />
+            <span className="truncate">{kotLabel}</span>
           </button>
 
           {/* 2. PAY BILL (Payment Theme: Emerald Green / Tender Checkout) */}

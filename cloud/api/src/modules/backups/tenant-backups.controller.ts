@@ -1,4 +1,5 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { Response } from 'express';
 import { User } from '@prisma/client';
 import { BackupsService } from './backups.service';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
@@ -23,7 +24,15 @@ export class TenantBackupsController {
 
   @Get(':id/download')
   async download(@Param('id') id: string, @CurrentTenantUser() user: User) {
-    const url = await this.backups.getDownloadUrl(user.restaurantId, id);
+    const url = await this.backups.getDownloadUrl(user.restaurantId, id, `/api/v1/tenant/me/backups/${id}/file`);
     return { url };
+  }
+
+  @Get(':id/file')
+  async file(@Param('id') id: string, @CurrentTenantUser() user: User, @Res() res: Response) {
+    const { body, filename } = await this.backups.getFile(user.restaurantId, id);
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(body);
   }
 }

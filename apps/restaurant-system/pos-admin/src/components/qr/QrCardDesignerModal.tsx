@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { printElement } from '@jamanvaar/ui';
 import { DiningTable } from '@jamanvaar/types';
 import { db, QrOrderingRepository } from '@jamanvaar/database';
-import { generateQrSvg, generateQrDataUrl } from '@jamanvaar/utils';
+import { generateQrSvg, generateQrDataUrl, copyText } from '@jamanvaar/utils';
 import {
   Printer,
   Download,
@@ -57,7 +58,7 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
     return tables.find((t) => t.tableNumber === tableNumber) || tables[0];
   }, [tables, tableNumber, tick]);
 
-  const outlet = db.outlet || { name: 'Ahmedabad Flagship Store' };
+  const outlet = db.outlet || { name: '' };
 
   // Host origin for the public QR link
   const hostUrl = typeof window !== 'undefined' && window.location?.origin
@@ -76,15 +77,15 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
 
   const currentQrLink = currentTable ? getTableQrUrl(currentTable) : null;
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     if (!currentQrLink) return;
-    navigator.clipboard.writeText(currentQrLink);
+    if (!(await copyText(currentQrLink))) return;
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handlePrint = () => {
-    window.print();
+    printElement('#printable-qr-standee-container', { title: 'Table QR cards', pageSize: 'A4 portrait' });
   };
 
   /** Issues QR tokens for any table in the sheet that has none, via the repository. */

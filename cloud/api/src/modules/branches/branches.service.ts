@@ -3,6 +3,7 @@ import { PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { CreateBranchDto, UpdateBranchDto } from './dto/branch.dto';
+import { pageOf, parsePaging } from '../../common/paging';
 
 @Injectable()
 export class BranchesService {
@@ -11,14 +12,57 @@ export class BranchesService {
     private readonly audit: AuditService
   ) {}
 
-  list(restaurantId?: string) {
-    return this.prisma.runAsPlatform((tx) =>
-      tx.branch.findMany({
-        where: restaurantId ? { restaurantId } : undefined,
-        orderBy: { createdAt: 'asc' },
-        include: { restaurant: { select: { id: true, name: true } }, _count: { select: { devices: true, users: true } } }
-      })
-    );
+  /**
+   * Without `page` this is the plain array it always was. With `page` it is searched, filtered and
+   * paged in the database, with per-status counts for the whole (unfiltered by status) scope, so the
+   * browser never has to load every branch of every restaurant (BUG-047).
+   */
+  list(query: { restaurantId?: string; q?: string; status?: string; page?: unknown; pageSize?: unknown } = {}) {
+    const paging = parsePaging(query);
+    const scope = {
+      ...(query.restaurantId ? { restaurantId: query.restaurantId } : {}),
+      ...(query.q?.trim()
+        ? {
+            OR: [
+              { name: { contains: query.q.trim(), mode: 'insensitive' as const } },
+              { code: { contains: query.q.trim(), mode: 'insensitive' as const } },
+              { restaurant: { name: { contains: query.q.trim(), mode: 'insensitive' as const } } }
+            ]
+          }
+        : {})
+    };
+    const statusFilter: { status?: 'ACTIVE' | 'INACTIVE' } = query.status === 'ACTIVE' || query.status === 'INACTIVE' ? { status: query.status } : {};
+    const where = { ...scope, ...statusFilter };
+    const include = { restaurant: { select: { id: true, name: true } }, _count: { select: { devices: true, users: true } } };
+
+    return this.prisma.runAsPlatform(async (tx) => {
+      if (!paging.paged) return tx.branch.findMany({ where, orderBy: { createdAt: 'asc' }, include });
+      const [items, total, grouped] = await Promise.all([
+        tx.branch.findMany({ where, orderBy: [{ createdAt: 'asc' }, { id: 'asc' }], include, skip: paging.skip, take: paging.take }),
+        tx.branch.count({ where }),
+        tx.branch.groupBy({ by: ['status'], where: scope, _count: { _all: true } })
+      ]);
+      const statusCounts = { ACTIVE: 0, INACTIVE: 0 };
+      for (const g of grouped) statusCounts[g.status] = g._count._all;
+      return { ...pageOf(items, total, paging), statusCounts };
+    });
+  }
+
+  /** One call for many branches (was one request per branch from the browser). Already-correct ones are skipped. */
+  async bulkSetStatus(ids: string[], status: 'ACTIVE' | 'INACTIVE', actor: PlatformUser) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const targets = await tx.branch.findMany({ where: { id: { in: ids }, status: { not: status } }, select: { id: true, restaurantId: true, status: true } });
+      if (targets.length) {
+        await tx.branch.updateMany({ where: { id: { in: targets.map((t) => t.id) } }, data: { status } });
+      }
+      for (const t of targets) {
+        await this.audit.log(
+          { actorType: 'PLATFORM', actorId: actor.id, restaurantId: t.restaurantId, action: `BRANCH_${status}`, category: 'BRANCH', details: { branchId: t.id, previousStatus: t.status, bulk: true } },
+          tx
+        );
+      }
+      return { updated: targets.length, skipped: ids.length - targets.length };
+    });
   }
 
   async create(dto: CreateBranchDto, actor: PlatformUser) {

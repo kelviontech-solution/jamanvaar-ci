@@ -4,7 +4,7 @@ import { join } from 'path';
 import S3rver from 's3rver';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { BackupStorageService } from '../src/modules/backups/backup-storage.service';
@@ -21,6 +21,17 @@ import { BackupStorageService } from '../src/modules/backups/backup-storage.serv
  */
 const S3_PORT = 4569;
 const BUCKET = 'jamanvaar-test-backups';
+
+// ConfigModule validates the environment when AppModule is first imported, and cloud/api/.env defines
+// these keys (empty), so setting them later inside beforeAll is too late and the app answers 503.
+vi.hoisted(() => {
+  process.env.BACKUP_S3_ENDPOINT = 'http://localhost:4569';
+  process.env.BACKUP_S3_REGION = 'us-east-1';
+  process.env.BACKUP_S3_BUCKET = 'jamanvaar-test-backups';
+  process.env.BACKUP_S3_ACCESS_KEY_ID = 'S3RVER';
+  process.env.BACKUP_S3_SECRET_ACCESS_KEY = 'S3RVER';
+  process.env.BACKUP_S3_FORCE_PATH_STYLE = 'true';
+});
 
 describe('Real off-device backups (S3-compatible storage)', () => {
   let s3: InstanceType<typeof S3rver>;
@@ -55,14 +66,6 @@ describe('Real off-device backups (S3-compatible storage)', () => {
       configureBuckets: [{ name: BUCKET, configs: [] }]
     });
     await s3.run();
-
-    // Must be set BEFORE createTestApp() so ConfigModule picks them up.
-    process.env.BACKUP_S3_ENDPOINT = `http://localhost:${S3_PORT}`;
-    process.env.BACKUP_S3_REGION = 'us-east-1';
-    process.env.BACKUP_S3_BUCKET = BUCKET;
-    process.env.BACKUP_S3_ACCESS_KEY_ID = 'S3RVER';
-    process.env.BACKUP_S3_SECRET_ACCESS_KEY = 'S3RVER';
-    process.env.BACKUP_S3_FORCE_PATH_STYLE = 'true';
 
     app = await createTestApp();
     prisma = app.get(PrismaService);
@@ -298,5 +301,87 @@ describe('Real off-device backups (S3-compatible storage)', () => {
     expect(res.status).toBe(404);
 
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: otherRestaurantId } }));
+  });
+
+  describe('platform snapshot, verify and restore (BUG-072/073)', () => {
+    const post = (url: string, body: Record<string, unknown> = {}) => authed('post', url, platformToken).send(body);
+    const backupRow = (id: string) => prisma.runAsPlatform((tx) => tx.backup.findUniqueOrThrow({ where: { id } }));
+    let snapshotBackupId: string;
+
+    it('a Super Admin snapshot is a real export of the restaurant, without secrets', async () => {
+      await prisma.runAsPlatform((tx) => tx.branch.create({ data: { restaurantId, name: 'Snapshot Branch', code: `SNAP${Date.now() % 100000}` } }));
+
+      const res = await post(`/api/v1/platform/backups/${restaurantId}/trigger`);
+      expect(res.status).toBe(201);
+      snapshotBackupId = res.body.id;
+
+      const storage = app.get(BackupStorageService);
+      const stored = JSON.parse(await storage.downloadAndDecompress((await backupRow(snapshotBackupId)).storageKey));
+
+      expect(stored.version).toBe(1);
+      expect(stored.restaurant.id).toBe(restaurantId);
+      expect(stored.branches.map((b: { name: string }) => b.name)).toContain('Snapshot Branch');
+      expect(stored.users.length).toBeGreaterThanOrEqual(1);
+      expect(stored.subscriptions.length).toBeGreaterThanOrEqual(1);
+      expect(stored.counts).toMatchObject({ branches: stored.branches.length, users: stored.users.length });
+
+      const text = JSON.stringify(stored);
+      expect(text).not.toMatch(/passwordHash|activationTokenHash|deviceTokenHash|refreshToken|tokenHash/i);
+    });
+
+    it('verify downloads the object and recomputes the checksum', async () => {
+      const ok = await post(`/api/v1/platform/backups/${snapshotBackupId}/verify`);
+      expect(ok.status).toBe(201);
+      expect(ok.body.verificationStatus).toBe('VERIFIED');
+
+      const original = (await backupRow(snapshotBackupId)).checksumSha256;
+      await prisma.runAsPlatform((tx) => tx.backup.update({ where: { id: snapshotBackupId }, data: { checksumSha256: 'f'.repeat(64) } }));
+      const bad = await post(`/api/v1/platform/backups/${snapshotBackupId}/verify`);
+      expect(bad.body.verificationStatus).toBe('CORRUPT');
+      expect(bad.body.verificationNote).toMatch(/checksum/i);
+      await prisma.runAsPlatform((tx) => tx.backup.update({ where: { id: snapshotBackupId }, data: { checksumSha256: original } }));
+    });
+
+    it('verify reports CORRUPT when the stored object is missing, instead of trusting the database row', async () => {
+      const row = await backupRow(snapshotBackupId);
+      const ghost = await prisma.runAsPlatform((tx) =>
+        tx.backup.create({
+          data: { restaurantId, method: 'MANUAL', status: 'COMPLETED', sizeBytes: 123, storageKey: `restaurants/${restaurantId}/does-not-exist.json.gz`, checksumSha256: row.checksumSha256 }
+        })
+      );
+      const res = await post(`/api/v1/platform/backups/${ghost.id}/verify`);
+      expect(res.body.verificationStatus).toBe('CORRUPT');
+      expect(res.body.verificationNote).toMatch(/missing|not found|could not/i);
+    });
+
+    it('the restore preview reports what is actually inside the backup', async () => {
+      const res = await post(`/api/v1/platform/backups/${snapshotBackupId}/preview-restore`, { targetType: 'STAGING_PREVIEW' });
+      expect(res.status).toBe(201);
+      expect(res.body.previewSummary.counts.branches).toBeGreaterThanOrEqual(1);
+      expect(res.body.previewSummary.counts.users).toBeGreaterThanOrEqual(1);
+      expect(res.body.previewSummary.restorableInCloud).toBe(true);
+      expect(res.body.previewSummary.willRestore).toEqual({ syncedEntities: 0, syncedOrders: 0 });
+    });
+
+    it('a backup uploaded from a terminal cannot be restored by the cloud, and says so instead of claiming success', async () => {
+      const upload = await authed('post', '/api/v1/tenant/me/backups', tenantToken).send({ data: { orders: [{ id: 'local-1' }], customers: [] } });
+      expect(upload.status).toBe(201);
+      const preview = await post(`/api/v1/platform/backups/${upload.body.id}/preview-restore`, { targetType: 'PRODUCTION_RESTORE' });
+      expect(preview.body.previewSummary.restorableInCloud).toBe(false);
+      expect(preview.body.previewSummary.counts).toMatchObject({ orders: 1 });
+      const jobId = preview.body.id;
+      const before = await prisma.runAsPlatform((tx) => tx.backup.count({ where: { restaurantId } }));
+
+      expect((await post(`/api/v1/platform/backups/restore-jobs/${jobId}/confirm`, {})).status).toBe(400);
+
+      const res = await post(`/api/v1/platform/backups/restore-jobs/${jobId}/confirm`, { confirmed: true });
+      expect(res.status).toBe(501);
+      expect(res.body.message).toMatch(/Restaurant Admin/);
+
+      const job = await prisma.runAsPlatform((tx) => tx.backupRestoreJob.findUniqueOrThrow({ where: { id: jobId } }));
+      expect(job.status).not.toBe('COMPLETED');
+      // Refusing takes no safety snapshot: nothing was going to be overwritten.
+      expect(await prisma.runAsPlatform((tx) => tx.backup.count({ where: { restaurantId } }))).toBe(before);
+    });
   });
 });

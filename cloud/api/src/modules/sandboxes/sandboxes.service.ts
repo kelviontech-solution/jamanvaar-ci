@@ -111,10 +111,10 @@ export class SandboxesService {
   }
 
   async delete(id: string, actor: PlatformUser) {
-    const existing = await this.prisma.restaurantSandbox.findUnique({ where: { id } });
+    const existing = await this.prisma.platformDb.restaurantSandbox.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Sandbox not found');
 
-    await this.prisma.restaurantSandbox.delete({ where: { id } });
+    await this.prisma.platformDb.restaurantSandbox.delete({ where: { id } });
 
     await this.audit.log({
       actorType: 'PLATFORM',

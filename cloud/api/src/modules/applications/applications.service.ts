@@ -80,6 +80,9 @@ export const APP_CATALOG: AppMetadata[] = [
   }
 ];
 
+import { compareVersions } from '../../common/version';
+import { deviceHealth } from '../../common/device-health';
+
 @Injectable()
 export class ApplicationsService {
   constructor(
@@ -105,20 +108,28 @@ export class ApplicationsService {
         select: { appCode: true, restaurantId: true }
       });
 
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      const now = new Date();
 
       return APP_CATALOG.map((meta) => {
         const releases = allReleases.filter((r) => r.appCode === meta.code);
-        const latestRelease = releases[0] || null;
+        // The newest STABLE release by version number (2.10.0 is newer than 2.9.0), not by publish time.
+        const latestRelease = releases.filter((r) => r.channel === 'STABLE').sort((a, b) => compareVersions(b.version, a.version))[0] || null;
 
         const matchingDevices = meta.deviceType
           ? allDevices.filter((d) => d.type === meta.deviceType)
           : [];
 
         const activeDevices = matchingDevices.filter((d) => d.status === 'ACTIVE').length;
-        const onlineDevices = matchingDevices.filter(
-          (d) => d.status === 'ACTIVE' && d.lastSeenAt && new Date(d.lastSeenAt) > oneHourAgo
-        ).length;
+        // The same health rule as the fleet page (common/device-health.ts).
+        const health = matchingDevices.map((d) => deviceHealth(d, now));
+        const onlineDevices = health.filter((h) => h === 'online').length;
+        const degradedDevices = health.filter((h) => h === 'degraded').length;
+        const offlineDevices = health.filter((h) => h === 'offline').length;
+        const neverSeenDevices = health.filter((h) => h === 'never_seen').length;
+        // Terminals running something older than the newest stable release (or that never reported a version).
+        const behindDevices = latestRelease
+          ? matchingDevices.filter((d) => d.status === 'ACTIVE' && compareVersions(d.appVersion, latestRelease.version) < 0).length
+          : 0;
 
         const assignedRestaurantIds = new Set(
           enabledEntitlements.filter((e) => e.appCode === meta.entitlementAppCode).map((e) => e.restaurantId)
@@ -126,7 +137,8 @@ export class ApplicationsService {
 
         return {
           ...meta,
-          currentVersion: latestRelease?.version || '1.0.0',
+          // null when nothing has been published: never an invented version number.
+          currentVersion: latestRelease?.version ?? null,
           channel: latestRelease?.channel || 'STABLE',
           minSupportedVersion: latestRelease?.minSupportedVersion || null,
           supportedPlatforms: (latestRelease?.supportedPlatforms as string[]) || ['web'],
@@ -136,7 +148,10 @@ export class ApplicationsService {
           totalDevices: matchingDevices.length,
           activeDevices,
           onlineDevices,
-          offlineDevices: activeDevices - onlineDevices,
+          degradedDevices,
+          offlineDevices,
+          neverSeenDevices,
+          behindDevices,
           assignedRestaurants: assignedRestaurantIds.size,
           recentReleases: releases.slice(0, 5)
         };

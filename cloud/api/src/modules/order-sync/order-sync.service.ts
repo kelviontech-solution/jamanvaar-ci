@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Device } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
-import { OrderSyncEventDto } from './dto/push-order-sync.dto';
+import { OrderSyncEventDto, orderSyncEventSchema } from './dto/push-order-sync.dto';
 
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000; // 24h
 const CATCH_UP_MAX_ROWS = 500;
@@ -23,12 +23,35 @@ export class OrderSyncService {
    * response (the exact failure mode BUG-009 traced to) never double-creates
    * a row, it just re-applies the same state.
    */
-  async pushEvents(device: Device, events: OrderSyncEventDto[]): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
+  async pushEvents(device: Device, rawEvents: unknown[]): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
     const results: OrderSyncPushResult[] = [];
 
     await this.prisma.runAsTenant(device.restaurantId, async (tx) => {
-      for (const evt of events) {
+      for (const raw of rawEvents) {
         const startedAt = Date.now();
+        const parsed = orderSyncEventSchema.safeParse(raw);
+        if (!parsed.success) {
+          const id =
+            raw && typeof raw === 'object' && typeof (raw as { externalOrderId?: unknown }).externalOrderId === 'string'
+              ? (raw as { externalOrderId: string }).externalOrderId
+              : 'unknown';
+          const problem = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ').slice(0, 500);
+          await tx.syncEventLog.create({
+            data: {
+              restaurantId: device.restaurantId,
+              deviceId: device.id,
+              entityType: 'ORDER',
+              action: 'UPDATE',
+              status: 'FAILED',
+              latencyMs: Date.now() - startedAt,
+              payloadSize: JSON.stringify(raw ?? null).length,
+              errorMessage: `Invalid order payload: ${problem}`
+            }
+          });
+          results.push({ externalOrderId: id, status: 'error', error: `Invalid order payload: ${problem}` });
+          continue;
+        }
+        const evt: OrderSyncEventDto = parsed.data;
         try {
           const existing = await tx.syncedOrder.findUnique({
             where: { restaurantId_externalOrderId: { restaurantId: device.restaurantId, externalOrderId: evt.externalOrderId } }
@@ -47,7 +70,10 @@ export class OrderSyncService {
             taxAmount: evt.taxAmount,
             discountAmount: evt.discountAmount,
             totalAmount: evt.totalAmount,
-            notes: evt.notes
+            notes: evt.notes,
+            paymentStatus: evt.paymentStatus,
+            paymentMethod: evt.paymentMethod,
+            meta: (evt.meta ?? undefined) as any
           };
 
           const saved = existing
@@ -55,7 +81,8 @@ export class OrderSyncService {
                 where: { id: existing.id },
                 data: { ...data, syncVersion: existing.syncVersion + 1 }
               })
-            : await tx.syncedOrder.create({ data: { ...data, syncVersion: 1 } });
+            // The order belongs to the branch of the terminal that first pushed it (BUG-048).
+            : await tx.syncedOrder.create({ data: { ...data, branchId: device.branchId, syncVersion: 1 } });
 
           await tx.syncEventLog.create({
             data: {

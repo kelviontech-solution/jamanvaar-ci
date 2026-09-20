@@ -1,5 +1,6 @@
 import {
   AppNotification,
+  PaymentSplit,
   NotificationRole,
   AuditLog,
   BusinessDay,
@@ -63,11 +64,35 @@ import {
   User,
   WaitlistEntry
 } from '@jamanvaar/types';
+import { getOrderTenders, splitsMatchTotal } from './tender';
 import { generateOrderNumber, generateTokenNumber, generateUUID } from '@jamanvaar/utils';
 import { db } from './db';
-import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS } from './seed';
+import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS, SEED_ROLES } from './seed';
+import { hashPin, verifyPinHash, generateUniquePin } from './pin';
 
 export class MenuRepository {
+  /**
+   * BUG-013: called once, right when a terminal first activates against a real restaurant.
+   * Every terminal's local db starts pre-loaded with the demo seed menu (needed for local
+   * dev/testing), so a brand-new real restaurant "already had a menu without anyone loading
+   * one". Tables, tax groups, coupons and offers are deliberately left alone — the owner only
+   * asked for the menu itself; whether those should also start empty is still an open question
+   * (see BUG-013's note in BUG_LIST.md). Whatever's cleared here is naturally re-filled by the
+   * entity-sync pull once a real menu is uploaded (BUG-014/016).
+   */
+  public static startFreshMenu(): void {
+    db.categories = [];
+    db.menuItems = [];
+    db.modifierGroups = [];
+    AuditRepository.log({
+      action: 'MENU_CLEARED_ON_ACTIVATION',
+      category: 'MENU',
+      details: 'Demo seed menu cleared on first device activation — this restaurant has no menu until one is uploaded or loaded.',
+      username: 'System'
+    });
+    db.notify();
+  }
+
   public static getAllCategories(): Category[] {
     return db.categories.filter((c) => c.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
   }
@@ -505,7 +530,7 @@ export class OrderRepository {
         : (resolvedKioskId || 'Self-Order Kiosk');
 
     const newOrder: Order = {
-      id: orderData.id || `ord-${Date.now()}`,
+      id: orderData.id || `ord-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       orderNumber,
       tokenNumber,
       businessDayId,
@@ -517,6 +542,8 @@ export class OrderRepository {
       orderType: orderData.orderType || 'DINE_IN',
       tableId: orderData.tableId,
       tableNumber: orderData.tableNumber,
+      cashierName: orderData.cashierName,
+      captainName: orderData.captainName,
       guestCount: orderData.guestCount,
       customerPhone: orderData.customerPhone,
       customerName: orderData.customerName,
@@ -548,7 +575,7 @@ export class OrderRepository {
       source_type: resolvedSourceType,
       acknowledgementStage:
         orderData.acknowledgementStage ||
-        (orderData.syncStatus === 'SAVED_LOCALLY' ? 'ORDER_CREATED_LOCALLY' : 'ORDER_SENT_TO_KDS'),
+        ((orderData.syncStatus || 'SAVED_LOCALLY') === 'SAVED_LOCALLY' ? 'ORDER_CREATED_LOCALLY' : 'ORDER_SENT_TO_KDS'),
       timeline: orderData.timeline || [
         {
           status: 'NEW',
@@ -562,8 +589,12 @@ export class OrderRepository {
           timestamp: nowIso
         }
       ],
-      syncStatus: orderData.syncStatus || 'SYNCED',
-      isSynced: orderData.isSynced ?? true,
+      // A locally created order has, by definition, not reached the cloud yet.
+      // It used to default to 'SYNCED', which made the outbox (it only pushes
+      // SAVED_LOCALLY / FAILED orders) skip every order paid directly from POS.
+      // Callers that mirror an already-synced order pass 'SYNCED' explicitly.
+      syncStatus: orderData.syncStatus || 'SAVED_LOCALLY',
+      isSynced: orderData.isSynced ?? (orderData.syncStatus === 'SYNCED'),
       createdAt: nowIso,
       updatedAt: nowIso
     };
@@ -580,30 +611,15 @@ export class OrderRepository {
       }
     }
 
-    // Auto-deduct stock via recipes
-    InventoryRepository.deductForOrder(newOrder);
+    // Auto-deduct stock via recipes (idempotent per order line - see reconcileOrder)
+    InventoryRepository.reconcileOrder(newOrder);
 
     // Update active shift stats if payment is already successful (e.g. Counter instant bill / kiosk order)
     if (newOrder.paymentStatus === 'SUCCESS') {
-      const activeShift = ShiftRepository.getActiveShift();
-      if (activeShift) {
-        activeShift.totalOrders += 1;
-        activeShift.totalSales += newOrder.totalAmount;
-        activeShift.totalDiscounts += newOrder.discountAmount || 0;
-        const pMethod = newOrder.paymentMethod;
-        if (pMethod === 'CASH' || pMethod === 'CASH_AT_COUNTER') {
-          activeShift.totalCashSales += newOrder.totalAmount;
-          activeShift.expectedCash += newOrder.totalAmount;
-        } else if (pMethod === 'UPI' || pMethod === 'UPI_QR') {
-          activeShift.totalUpiSales += newOrder.totalAmount;
-        } else if (pMethod === 'CARD' || pMethod === 'CARD_TERMINAL') {
-          activeShift.totalCardSales += newOrder.totalAmount;
-        } else if (pMethod === 'SPLIT') {
-          activeShift.totalCashSales += Math.round(newOrder.totalAmount / 2);
-          activeShift.totalUpiSales += newOrder.totalAmount - Math.round(newOrder.totalAmount / 2);
-          activeShift.expectedCash += Math.round(newOrder.totalAmount / 2);
-        }
-      }
+      // getActiveShift() derives the shift totals from the orders themselves, so
+      // refreshing it is enough. Adding the amounts again here double-counted
+      // every settlement until the next read.
+      ShiftRepository.getActiveShift();
     }
 
     db.notify();
@@ -626,6 +642,7 @@ export class OrderRepository {
     if (!order) return null;
     const prevStatus = order.orderStatus;
     order.orderStatus = status;
+    if (status === 'CANCELLED' && prevStatus !== 'CANCELLED') InventoryRepository.restoreForOrder(order, 'Order cancelled');
     order.updatedAt = new Date().toISOString();
     // A locally-made status change (POS/Restaurant Admin advancing an order)
     // needs to reach the cloud mirror again — without this, only the order's
@@ -673,13 +690,21 @@ export class OrderRepository {
     paymentMethod: PaymentMethod,
     tenderedAmount?: number,
     transactionId?: string,
-    actor: string = 'Cashier'
+    actor: string = 'Cashier',
+    splits?: PaymentSplit[]
   ): Order | null {
     const order = db.orders.find((o) => o.id === id);
     if (!order) return null;
 
+    if (splits && splits.length > 0 && !splitsMatchTotal(splits, order.totalAmount)) {
+      throw new Error(`Payment lines do not add up to the bill total (₹${order.totalAmount})`);
+    }
+
     const now = new Date().toISOString();
     order.paymentMethod = paymentMethod;
+    if (splits && splits.length > 0) {
+      order.paymentSplits = splits.map((l) => ({ ...l }));
+    }
     order.paymentStatus = 'SUCCESS';
     order.orderStatus = 'COMPLETED';
     order.paymentTransactionId = transactionId || `TXN-${Date.now()}`;
@@ -688,6 +713,9 @@ export class OrderRepository {
       order.changeAmount = Math.max(0, Number((tenderedAmount - order.totalAmount).toFixed(2)));
     }
     order.updatedAt = now;
+    // The paid state must reach the cloud too, not just the KOT-time copy.
+    order.syncStatus = 'SAVED_LOCALLY';
+    order.isSynced = false;
 
     if (!order.timeline) order.timeline = [];
     order.timeline.push({
@@ -707,25 +735,8 @@ export class OrderRepository {
     }
 
     // Update Shift stats if active shift exists
-    const activeShift = ShiftRepository.getActiveShift();
-    if (activeShift) {
-      activeShift.totalOrders += 1;
-      activeShift.totalSales += order.totalAmount;
-      activeShift.totalDiscounts += order.discountAmount || 0;
-      if (paymentMethod === 'CASH' || paymentMethod === 'CASH_AT_COUNTER') {
-        activeShift.totalCashSales += order.totalAmount;
-        activeShift.expectedCash += order.totalAmount;
-      } else if (paymentMethod === 'UPI' || paymentMethod === 'UPI_QR') {
-        activeShift.totalUpiSales += order.totalAmount;
-      } else if (paymentMethod === 'CARD' || paymentMethod === 'CARD_TERMINAL') {
-        activeShift.totalCardSales += order.totalAmount;
-      } else if (paymentMethod === 'SPLIT') {
-        // Assume half cash, half UPI if split
-        activeShift.totalCashSales += Math.round(order.totalAmount / 2);
-        activeShift.totalUpiSales += order.totalAmount - Math.round(order.totalAmount / 2);
-        activeShift.expectedCash += Math.round(order.totalAmount / 2);
-      }
-    }
+    // Shift totals are derived from the orders (see getActiveShift); refresh only.
+    ShiftRepository.getActiveShift();
 
     // Automated loyalty earn — previously nothing credited points or
     // advanced totalSpend/totalVisits on an actual paid order; only a
@@ -764,6 +775,7 @@ export class OrderRepository {
     }
 
     const now = new Date().toISOString();
+    InventoryRepository.restoreForOrder(order, `Void: ${reason}`);
     order.orderStatus = 'CANCELLED';
     order.paymentStatus = 'CANCELLED';
     order.updatedAt = now;
@@ -823,6 +835,8 @@ export class OrderRepository {
 
     const now = new Date().toISOString();
     const isFullRefund = refundAmount === order.totalAmount;
+    // A full refund gives the stock back; a partial refund cannot say which items were returned, so it leaves stock alone.
+    if (refundAmount >= order.totalAmount) InventoryRepository.restoreForOrder(order, `Refund: ${reason}`);
     order.orderStatus = 'REFUNDED';
     // A partial refund settles a lesser amount back to the guest but the
     // order itself was still genuinely paid — only a full refund reverses
@@ -1786,6 +1800,37 @@ export class ComboRepository {
   }
 }
 
+/**
+ * BUG-021/028: what a terminal adopts from the cloud when it activates against a real
+ * restaurant. It REPLACES the seeded demo identity field by field — a restaurant with no
+ * GSTIN ends up with none, rather than silently keeping the seed's fake 24ABCDE1234F1Z5 and
+ * printing it on tax invoices.
+ */
+export class RestaurantIdentityRepository {
+  public static adopt(
+    restaurantId: string,
+    identity: { name?: string; gstin?: string | null; address?: string | null; phone?: string | null; fssaiNumber?: string | null }
+  ): void {
+    db.restaurant.id = restaurantId;
+    if (identity.name) db.restaurant.name = identity.name;
+    db.restaurant.gstin = identity.gstin || '';
+    db.restaurant.address = identity.address || '';
+    db.restaurant.phone = identity.phone || '';
+    db.restaurant.fssaiNumber = identity.fssaiNumber || '';
+    // ReceiptRepository.getConfig falls back to receiptConfig, which is seeded with the demo
+    // identity too — blank it, or a missing field would resurface the demo value.
+    db.receiptConfig = {
+      ...db.receiptConfig,
+      restaurantName: db.restaurant.name,
+      address: db.restaurant.address,
+      phone: db.restaurant.phone,
+      gstin: db.restaurant.gstin,
+      fssaiNumber: db.restaurant.fssaiNumber
+    };
+    db.notify();
+  }
+}
+
 export class ReceiptRepository {
   public static getConfig(): ReceiptConfig {
     // Restaurant Settings (db.restaurant) is the canonical source for
@@ -1871,20 +1916,10 @@ export class ShiftRepository {
         totalSales += o.totalAmount;
         totalDiscounts += o.discountAmount || 0;
 
-        const pm = (o.paymentMethod || '').toUpperCase();
-        if (pm === 'CASH' || pm === 'CASH_AT_COUNTER') {
-          totalCashSales += o.totalAmount;
-        } else if (pm === 'UPI' || pm === 'UPI_QR') {
-          totalUpiSales += o.totalAmount;
-        } else if (pm === 'CARD' || pm === 'CARD_TERMINAL') {
-          totalCardSales += o.totalAmount;
-        } else if (pm === 'SPLIT') {
-          const cashPortion = Math.round(o.totalAmount / 2);
-          totalCashSales += cashPortion;
-          totalUpiSales += o.totalAmount - cashPortion;
-        } else {
-          totalCashSales += o.totalAmount;
-        }
+        const tenders = getOrderTenders(o);
+        totalCashSales += tenders.cash;
+        totalUpiSales += tenders.upi;
+        totalCardSales += tenders.card;
       });
     } else if (shift.totalSales > 0 || shift.totalCashSales > 0 || shift.totalOrders > 0) {
       // Preserve shift's manually assigned / historical totals if order array is empty
@@ -2211,11 +2246,10 @@ export class HeldOrderRepository {
 }
 
 export class ManagerOverrideRepository {
-  public static verifyPin(pin: string): { success: boolean; user?: (typeof db.users)[0]; isManager: boolean } {
-    const user = (db.users as any[]).find((u) => u.pinCode === pin && u.isActive);
-    if (!user) return { success: false, isManager: false };
-    const isManager = user.roleId === 'role-manager' || user.roleId === 'role-super-admin';
-    return { success: true, user, isManager };
+  public static verifyPin(pin: string): { success: boolean; user?: User; isManager: boolean } {
+    const result = StaffRepository.verifyPin(pin);
+    if (!result) return { success: false, isManager: false };
+    return { success: true, user: result.user, isManager: result.isManager };
   }
 
   public static requestOverride(params: {
@@ -2319,12 +2353,15 @@ export class PrintQueueRepository {
       kotNumber: params.kotNumber,
       rawPayload: params.rawPayload,
       paperSize: params.paperSize || defaultPrinter?.paperSize || '80mm',
-      status: 'SUCCESS', // Virtual/browser driver marks as SUCCESS
-      attempts: 1,
+      // BUG-024: this used to be created as SUCCESS before any hardware was ever contacted,
+      // so a printer that never actually printed still looked like it had. A job is PENDING
+      // until whatever dispatches it (PosPrinterService / PrinterService) confirms a real
+      // transport delivered the bytes, via updateJobStatus.
+      status: 'PENDING',
+      attempts: 0,
       maxAttempts: 3,
       lastAttemptAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-      completedAt: new Date().toISOString()
+      createdAt: new Date().toISOString()
     };
 
     db.printJobs.unshift(job);
@@ -2344,7 +2381,7 @@ export class PrintQueueRepository {
     if (!job) return null;
     job.status = status;
     if (errorMessage) job.errorMessage = errorMessage;
-    if (status === 'SUCCESS') job.completedAt = new Date().toISOString();
+    if (status === 'SUCCESS' || status === 'PRINTED') job.completedAt = new Date().toISOString();
     job.lastAttemptAt = new Date().toISOString();
     db.notify();
     return job;
@@ -2353,10 +2390,12 @@ export class PrintQueueRepository {
   public static retryJob(id: string): PrintJob | null {
     const job = db.printJobs.find((j) => j.id === id);
     if (!job) return null;
-    job.status = 'SUCCESS';
-    job.attempts += 1;
+    // BUG-024: this used to flip the job straight to SUCCESS without sending anything, so
+    // "Retry" on a failed print told the cashier it had printed. It now only re-queues the job
+    // (PENDING); whatever dispatches it (PosPrinterService.retryJob) decides the real outcome.
+    job.status = 'PENDING';
     job.lastAttemptAt = new Date().toISOString();
-    job.completedAt = new Date().toISOString();
+    job.completedAt = undefined;
     job.errorMessage = undefined;
     AuditRepository.log({
       action: 'PRINT_RETRY',
@@ -2374,6 +2413,31 @@ export class PrintQueueRepository {
   }
 }
 
+let stockIdCounter = 0;
+/** Unique even for many records created in the same millisecond (BUG-045: they used to share `Date.now()`). */
+function uniqueStockId(prefix: string): string {
+  stockIdCounter = (stockIdCounter + 1) % 1_000_000;
+  return `${prefix}-${Date.now()}-${stockIdCounter}-${Math.random().toString(36).slice(2, 6)}`;
+}
+
+/** Convertible unit families. Returns null when the two units cannot be converted (e.g. pcs to kg). */
+const UNIT_FACTORS: Record<string, { family: 'mass' | 'volume' | 'count'; toBase: number }> = {
+  kg: { family: 'mass', toBase: 1000 }, kgs: { family: 'mass', toBase: 1000 },
+  g: { family: 'mass', toBase: 1 }, gm: { family: 'mass', toBase: 1 }, gms: { family: 'mass', toBase: 1 }, gram: { family: 'mass', toBase: 1 }, grams: { family: 'mass', toBase: 1 },
+  l: { family: 'volume', toBase: 1000 }, ltr: { family: 'volume', toBase: 1000 }, litre: { family: 'volume', toBase: 1000 }, liter: { family: 'volume', toBase: 1000 }, litres: { family: 'volume', toBase: 1000 },
+  ml: { family: 'volume', toBase: 1 },
+  pcs: { family: 'count', toBase: 1 }, pc: { family: 'count', toBase: 1 }, piece: { family: 'count', toBase: 1 }, pieces: { family: 'count', toBase: 1 }, nos: { family: 'count', toBase: 1 }
+};
+export function convertQuantity(quantity: number, fromUnit: string, toUnit: string): number | null {
+  const from = fromUnit.trim().toLowerCase();
+  const to = toUnit.trim().toLowerCase();
+  if (from === to) return quantity;
+  const a = UNIT_FACTORS[from];
+  const b = UNIT_FACTORS[to];
+  if (!a || !b || a.family !== b.family) return null;
+  return (quantity * a.toBase) / b.toBase;
+}
+
 export class InventoryRepository {
   public static getAllItems(): InventoryItem[] {
     return [...db.inventoryItems];
@@ -2385,7 +2449,7 @@ export class InventoryRepository {
 
   public static createItem(data: Omit<InventoryItem, 'id' | 'updatedAt' | 'status'> & { id?: string }): InventoryItem {
     const newItem: InventoryItem = {
-      id: data.id || `inv-${Date.now()}`,
+      id: data.id || uniqueStockId('inv'),
       name: data.name,
       sku: data.sku,
       category: data.category || 'General',
@@ -2445,7 +2509,7 @@ export class InventoryRepository {
 
   public static recordMovement(data: Omit<StockMovement, 'id' | 'timestamp'>): StockMovement {
     const movement: StockMovement = {
-      id: `sm-${Date.now()}`,
+      id: uniqueStockId('sm'),
       itemId: data.itemId,
       itemName: data.itemName,
       type: data.type,
@@ -2463,13 +2527,19 @@ export class InventoryRepository {
     db.stockMovements.unshift(movement);
 
     const item = db.inventoryItems.find((i) => i.id === data.itemId);
+    const statusBefore = item?.status;
     if (item) {
-      item.currentStock = Math.max(0, item.currentStock + data.quantityDelta);
+      // BUG-045: no Math.max(0, ...) - overselling shows up as a NEGATIVE balance (the real
+      // shortfall) instead of silently vanishing.
+      item.currentStock = item.currentStock + data.quantityDelta;
       item.status = item.currentStock <= 0 ? 'OUT_OF_STOCK' : item.currentStock <= item.minStockLevel ? 'LOW_STOCK' : 'IN_STOCK';
       if (data.type === 'RESTOCK' || data.type === 'PURCHASE') {
         item.lastRestockedAt = movement.timestamp;
       }
       item.updatedAt = movement.timestamp;
+      if (data.quantityDelta < 0) this.consumeBatches(item.id, -data.quantityDelta);
+      this.syncDishAvailability(item.id);
+      this.alertIfLow(item, statusBefore);
     }
 
     AuditRepository.log({
@@ -2483,27 +2553,206 @@ export class InventoryRepository {
     return movement;
   }
 
-  public static deductForOrder(order: Order): void {
-    if (!order.items || order.items.length === 0) return;
+  /** Sells from the batch that expires first (BUG-046); batches without a date go in the order they arrived. */
+  private static consumeBatches(itemId: string, quantity: number): void {
+    let remaining = quantity;
+    const batches = db.inventoryBatches
+      .filter((b) => b.itemId === itemId && b.quantityRemaining > 1e-9)
+      .sort((a, b) => {
+        if (a.expiryDate && b.expiryDate) return a.expiryDate.localeCompare(b.expiryDate);
+        if (a.expiryDate) return -1;
+        if (b.expiryDate) return 1;
+        return a.receivedAt.localeCompare(b.receivedAt);
+      });
+    for (const batch of batches) {
+      if (remaining <= 1e-9) break;
+      const taken = Math.min(batch.quantityRemaining, remaining);
+      batch.quantityRemaining = Math.round((batch.quantityRemaining - taken) * 1e6) / 1e6;
+      remaining -= taken;
+    }
+  }
+
+  /** Tells the manager when an item drops to low stock, and again when it runs out, but not on every sale after that. */
+  private static alertIfLow(item: InventoryItem, before: InventoryItem['status'] | undefined): void {
+    if (item.status === before) return;
+    const out = item.status === 'OUT_OF_STOCK';
+    if (!out && !(item.status === 'LOW_STOCK' && before === 'IN_STOCK')) return;
+    NotificationRepository.createNotification({
+      type: 'LOW_STOCK',
+      title: out ? `Out of stock: ${item.name}` : `Low stock: ${item.name}`,
+      message: `${item.name} is down to ${Math.round(item.currentStock * 100) / 100} ${item.unit}${out ? '' : ` (reorder level ${item.reorderLevel} ${item.unit})`}.`,
+      priority: out ? 'HIGH' : 'NORMAL',
+      targetRoles: ['POS_ADMIN'],
+      meta: { itemId: item.id }
+    });
+  }
+
+  /**
+   * BUG-043: POS showed dishes as available even when an ingredient had run out, because the two
+   * kinds of "stock" (ingredients vs dishes) were unrelated. A dish now switches itself off when
+   * any ingredient of its recipe is at or below zero, and back on when restocked - but only
+   * ever undoes its own switch-off, never one the owner made by hand.
+   */
+  private static syncDishAvailability(inventoryItemId: string): void {
+    db.recipes
+      .filter((r) => r.isActive && r.ingredients.some((ing) => ing.inventoryItemId === inventoryItemId))
+      .forEach((recipe) => {
+        const dish = db.menuItems.find((m) => m.id === recipe.menuItemId);
+        if (!dish) return;
+        const empty = recipe.ingredients
+          .map((ing) => db.inventoryItems.find((i) => i.id === ing.inventoryItemId))
+          .find((i) => i && i.currentStock <= 0);
+        this.applyAutoAvailability(dish, empty ? `Out of stock: ${empty.name}` : null);
+      });
+  }
+
+  private static applyAutoAvailability(dish: MenuItem, blockReason: string | null): void {
+    const AUTO = 'Out of stock';
+    if (blockReason) {
+      if (dish.isAvailable) {
+        dish.isAvailable = false;
+        dish.soldOutReason = blockReason;
+      }
+    } else if (!dish.isAvailable && dish.soldOutReason?.startsWith(AUTO)) {
+      dish.isAvailable = true;
+      dish.soldOutReason = undefined;
+    }
+  }
+
+  /** A dish that has its own counted stock (MenuItem.stockQuantity) goes down when sold, up on reversal, and switches off at zero. */
+  private static applyDishStockChange(menuItemId: string, delta: number): void {
+    const dish = db.menuItems.find((m) => m.id === menuItemId);
+    if (!dish || typeof dish.stockQuantity !== 'number') return;
+    dish.stockQuantity = dish.stockQuantity + delta;
+    this.applyAutoAvailability(dish, dish.stockQuantity <= 0 ? 'Out of stock' : null);
+  }
+
+  /**
+   * Brings an order's consumed stock in line with what the order contains right now: consumes
+   * only what has not been consumed yet (so calling it again, or after an add-on round, never
+   * double-deducts) and gives back anything that was reduced. BUG-044: this used to deduct the
+   * whole order every time it was created and never again.
+   */
+  public static reconcileOrder(order: Order): void {
+    if (!order.items) return;
+    const consumed = (order.stockConsumedQty = order.stockConsumedQty || {});
+    const actor = order.cashierName || order.captainName || 'System';
 
     order.items.forEach((it) => {
+      const already = consumed[it.id] || 0;
+      const delta = it.quantity - already;
+      if (delta === 0) return;
       const recipe = db.recipes.find((r) => r.menuItemId === it.menuItemId && r.isActive);
       if (recipe) {
         recipe.ingredients.forEach((ing) => {
-          const totalQty = ing.quantityPerPortion * it.quantity;
+          const stockItem = db.inventoryItems.find((i) => i.id === ing.inventoryItemId);
+          const perPortion = stockItem ? convertQuantity(ing.quantityPerPortion, ing.unit, stockItem.unit) : null;
+          if (!stockItem || perPortion === null) {
+            AuditRepository.log({
+              action: 'STOCK_UNIT_MISMATCH',
+              category: 'INVENTORY',
+              details: `Could not deduct ${ing.inventoryItemName} for ${it.name}: recipe unit "${ing.unit}" cannot be converted to stock unit "${stockItem?.unit ?? 'n/a'}" (Order #${order.orderNumber}). Stock was NOT changed.`,
+              username: actor
+            });
+            return;
+          }
+          const qty = perPortion * Math.abs(delta);
           this.recordMovement({
             itemId: ing.inventoryItemId,
             itemName: ing.inventoryItemName,
-            type: 'SALE',
-            quantityDelta: -totalQty,
-            unit: ing.unit,
+            type: delta > 0 ? 'SALE' : 'SALE_REVERSAL',
+            quantityDelta: delta > 0 ? -qty : qty,
+            unit: stockItem.unit,
             orderId: order.id,
-            reason: `Recipe auto-deduct for ${it.quantity}x ${it.name} (Order #${order.orderNumber})`,
-            performedBy: 'POS Terminal'
+            reason: `${delta > 0 ? 'Recipe deduct' : 'Recipe give-back'} for ${Math.abs(delta)}x ${it.name} (Order #${order.orderNumber})`,
+            performedBy: actor
           });
         });
       }
+      this.applyDishStockChange(it.menuItemId, -delta);
+      consumed[it.id] = it.quantity;
     });
+  }
+
+  /** Puts back everything this order consumed (void, cancel, full refund). Safe to call twice. */
+  public static restoreForOrder(order: Order, reason: string = 'Order reversed'): void {
+    const consumed = order.stockConsumedQty;
+    if (!consumed) return;
+    const actor = order.cashierName || order.captainName || 'System';
+    order.items.forEach((it) => {
+      const qtyConsumed = consumed[it.id] || 0;
+      if (qtyConsumed <= 0) return;
+      const recipe = db.recipes.find((r) => r.menuItemId === it.menuItemId && r.isActive);
+      if (recipe) {
+        recipe.ingredients.forEach((ing) => {
+          const stockItem = db.inventoryItems.find((i) => i.id === ing.inventoryItemId);
+          const perPortion = stockItem ? convertQuantity(ing.quantityPerPortion, ing.unit, stockItem.unit) : null;
+          if (!stockItem || perPortion === null) return;
+          this.recordMovement({
+            itemId: ing.inventoryItemId,
+            itemName: ing.inventoryItemName,
+            type: 'SALE_REVERSAL',
+            quantityDelta: perPortion * qtyConsumed,
+            unit: stockItem.unit,
+            orderId: order.id,
+            reason: `${reason}: ${qtyConsumed}x ${it.name} (Order #${order.orderNumber})`,
+            performedBy: actor
+          });
+        });
+      }
+      this.applyDishStockChange(it.menuItemId, qtyConsumed);
+      consumed[it.id] = 0;
+    });
+  }
+
+  /** Kept for callers that deduct a fresh order: same as reconcileOrder. */
+  public static deductForOrder(order: Order): void {
+    this.reconcileOrder(order);
+  }
+
+  /** Which ingredients would run short if these dishes were sold - lets a screen warn BEFORE selling out of stock. */
+  public static getShortages(lines: Array<{ menuItemId: string; quantity: number }>): Array<{ itemName: string; needed: number; available: number; unit: string }> {
+    const needed = new Map<string, { itemName: string; needed: number; unit: string }>();
+    lines.forEach((line) => {
+      const recipe = db.recipes.find((r) => r.menuItemId === line.menuItemId && r.isActive);
+      if (!recipe) return;
+      recipe.ingredients.forEach((ing) => {
+        const stockItem = db.inventoryItems.find((i) => i.id === ing.inventoryItemId);
+        if (!stockItem) return;
+        const perPortion = convertQuantity(ing.quantityPerPortion, ing.unit, stockItem.unit);
+        if (perPortion === null) return;
+        const prev = needed.get(stockItem.id) || { itemName: stockItem.name, needed: 0, unit: stockItem.unit };
+        prev.needed += perPortion * line.quantity;
+        needed.set(stockItem.id, prev);
+      });
+    });
+    const shortages: Array<{ itemName: string; needed: number; available: number; unit: string }> = [];
+    needed.forEach((n, id) => {
+      const available = db.inventoryItems.find((i) => i.id === id)!.currentStock;
+      if (n.needed > available + 1e-9) shortages.push({ itemName: n.itemName, needed: n.needed, available, unit: n.unit });
+    });
+    return shortages;
+  }
+
+  /**
+   * BUG-045: a fresh install shipped with seeded ingredients, prices and stock (e.g. Malai Paneer
+   * 18.5 kg at Rs 340). A real restaurant starts with none and enters its own.
+   */
+  public static startFresh(): void {
+    db.inventoryItems = [];
+    db.recipes = [];
+    db.stockMovements = [];
+    db.suppliers = [];
+    db.goodsReceipts = [];
+    db.inventoryBatches = [];
+    db.stockCounts = [];
+    AuditRepository.log({
+      action: 'INVENTORY_CLEARED_ON_ACTIVATION',
+      category: 'INVENTORY',
+      details: 'Demo seed ingredients, recipes and stock history cleared on first device activation.',
+      username: 'System'
+    });
+    db.notify();
   }
 }
 
@@ -2569,16 +2818,28 @@ export class StaffRepository {
     return db.users.find((u) => u.id === id);
   }
 
-  public static createUser(userData: Partial<User> & { username: string; fullName: string; roleId: string; email?: string }): User {
-    const newUser: User = {
+  /**
+   * Creates a staff member and issues them a real, working PIN (BUG-006: "assign PIN to
+   * staff from Restaurant Admin"). The PIN is generated here — never chosen by the caller —
+   * stored only as a hash (see pin.ts), and returned once on `issuedPin` so the screen that
+   * created the account can show/print it. It is not persisted anywhere in plaintext.
+   */
+  public static createUser(
+    userData: Partial<User> & { username: string; fullName: string; roleId: string; email?: string }
+  ): User & { issuedPin?: string } {
+    const restaurantId = userData.restaurantId || db.restaurant.id;
+    const pin = generateUniquePin(restaurantId, db.users.map((u) => (u as User & { pinHash?: string }).pinHash).filter((h): h is string => !!h));
+    const newUser: User & { pinHash: string } = {
       id: userData.id || `usr-${Date.now()}`,
-      restaurantId: userData.restaurantId || db.restaurant.id,
+      restaurantId,
       username: userData.username.toLowerCase().replace(/\s+/g, ''),
       fullName: userData.fullName,
-      email: userData.email || `${userData.username.toLowerCase()}@jamanvaar.local`,
-      phone: userData.phone || '+91 9800000000',
+      // No fake "@jamanvaar.local"/"@jamanvaar.com" default (BUG-009) — empty until the owner enters a real one.
+      email: userData.email ?? '',
+      phone: userData.phone || '',
       roleId: userData.roleId,
       isActive: userData.isActive ?? true,
+      pinHash: hashPin(pin, restaurantId),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -2590,7 +2851,47 @@ export class StaffRepository {
       username: 'Manager'
     });
     db.notify();
-    return newUser;
+    return { ...newUser, issuedPin: pin };
+  }
+
+  /** Issues a fresh PIN for an existing staff member and invalidates the old one, once. */
+  public static resetPin(id: string): (User & { issuedPin: string }) | null {
+    const idx = db.users.findIndex((u) => u.id === id);
+    if (idx === -1) return null;
+    const restaurantId = db.users[idx].restaurantId || db.restaurant.id;
+    const pin = generateUniquePin(
+      restaurantId,
+      db.users.map((u) => (u as User & { pinHash?: string }).pinHash).filter((h): h is string => !!h)
+    );
+    db.users[idx] = { ...db.users[idx], pinHash: hashPin(pin, restaurantId), updatedAt: new Date().toISOString() } as User;
+    AuditRepository.log({
+      action: 'STAFF_PIN_RESET',
+      category: 'STAFF',
+      details: `PIN reset for @${db.users[idx].username}`,
+      username: 'Manager'
+    });
+    db.notify();
+    return { ...(db.users[idx] as User), issuedPin: pin };
+  }
+
+  /**
+   * The one place every login surface (POS, Captain, KDS, Kiosk, manager override) verifies a
+   * PIN. Centralised so none of them compare a PIN to `User.pinHash` directly.
+   */
+  public static verifyPin(pin: string, restaurantId?: string): { user: User; isManager: boolean } | null {
+    const scopedRestaurantId = restaurantId || db.restaurant.id;
+    const user = (db.users as (User & { pinHash?: string })[]).find(
+      (u) => u.isActive && verifyPinHash(pin, u.restaurantId || scopedRestaurantId, u.pinHash)
+    );
+    if (!user) return null;
+    const isManager = user.roleId === 'role-manager' || user.roleId === 'role-super-admin';
+    return { user, isManager };
+  }
+
+  /** A role's display name for a raw id like `role-cashier` (BUG-010/011: chips showed the raw id). */
+  public static getRoleName(roleId: string | undefined): string {
+    if (!roleId) return 'Staff';
+    return db.roles.find((r) => r.id === roleId)?.name || SEED_ROLES.find((r) => r.id === roleId)?.name || 'Staff';
   }
 
   public static updateUser(id: string, updates: Partial<User>): User | null {
@@ -2620,6 +2921,42 @@ export class StaffRepository {
     });
     db.notify();
     return true;
+  }
+
+  /**
+   * The record shape pushed to the cloud entity-sync bridge as a STAFF_USER (BUG-019/034/035): a PIN
+   * issued here previously worked only on this one device, because staff records were never synced —
+   * unlike the menu and CRM, which already have a real cloud copy every terminal pulls. Carries the
+   * restaurant-keyed PIN hash (see pin.ts), never the plaintext PIN.
+   */
+  public static toSyncPayload(user: User): Record<string, unknown> {
+    const { id, username, fullName, email, phone, roleId, isActive, createdAt, updatedAt } = user;
+    return { id, username, fullName, email, phone, roleId, isActive, createdAt, updatedAt, pinHash: (user as User & { pinHash?: string }).pinHash };
+  }
+
+  /** Applies one STAFF_USER record pulled from the cloud: creates it locally, or updates it in place by id. */
+  public static applyRemoteUser(remote: Record<string, unknown>): void {
+    const id = remote.id;
+    const pinHash = remote.pinHash;
+    if (typeof id !== 'string' || !id || typeof pinHash !== 'string' || !pinHash) return;
+    const incoming = {
+      id,
+      restaurantId: db.restaurant.id,
+      username: typeof remote.username === 'string' ? remote.username : id,
+      fullName: typeof remote.fullName === 'string' ? remote.fullName : 'Staff',
+      email: typeof remote.email === 'string' ? remote.email : '',
+      phone: typeof remote.phone === 'string' ? remote.phone : '',
+      roleId: typeof remote.roleId === 'string' ? remote.roleId : 'role-cashier',
+      isActive: remote.isActive !== false,
+      pinHash,
+      createdAt: typeof remote.createdAt === 'string' ? remote.createdAt : new Date().toISOString(),
+      updatedAt: typeof remote.updatedAt === 'string' ? remote.updatedAt : new Date().toISOString()
+    } as User & { pinHash: string };
+
+    const idx = db.users.findIndex((u) => u.id === id);
+    if (idx >= 0) db.users[idx] = { ...db.users[idx], ...incoming };
+    else db.users.push(incoming);
+    db.notify();
   }
 
   public static getAllRoles(): Role[] {
@@ -2736,6 +3073,23 @@ export class StaffScheduleRepository {
 }
 
 export class PrinterRepository {
+  /**
+   * BUG-025: called once when a terminal first activates against a real restaurant. The local
+   * db ships with fixed demo printers (a "counter" USB printer and kitchen printers at made-up
+   * LAN addresses) that are all permanently READY - a real restaurant starts with none and adds
+   * its own, so nothing claims to be a working printer that does not exist.
+   */
+  public static startFresh(): void {
+    db.configuredPrinters = [];
+    AuditRepository.log({
+      action: 'PRINTERS_CLEARED_ON_ACTIVATION',
+      category: 'HARDWARE',
+      details: 'Demo seed printers cleared on first device activation - add the real printers for this restaurant.',
+      username: 'System'
+    });
+    db.notify();
+  }
+
   public static getAllPrinters(): PrinterDevice[] {
     return db.configuredPrinters;
   }
@@ -2958,20 +3312,11 @@ export class BusinessDayRepository {
       tax += o.taxAmount || 0;
       netSales += o.totalAmount;
 
-      const m = (o.paymentMethod || '').toUpperCase();
-      if (m === 'CASH' || m === 'CASH_AT_COUNTER') {
-        cashSales += o.totalAmount;
-      } else if (m === 'UPI' || m === 'UPI_QR') {
-        upiSales += o.totalAmount;
-      } else if (m === 'CARD' || m === 'CARD_TERMINAL') {
-        cardSales += o.totalAmount;
-      } else if (m === 'SPLIT') {
-        const cashHalf = Math.round(o.totalAmount / 2);
-        cashSales += cashHalf;
-        upiSales += o.totalAmount - cashHalf;
-      } else {
-        otherPayments += o.totalAmount;
-      }
+      const tenders = getOrderTenders(o);
+      cashSales += tenders.cash;
+      upiSales += tenders.upi;
+      cardSales += tenders.card;
+      otherPayments += tenders.wallet + tenders.houseAccount + tenders.other;
 
       if (o.orderType === 'DINE_IN') dineInCount++;
       else if (o.orderType === 'TAKEAWAY') takeawayCount++;
@@ -3839,7 +4184,7 @@ export class QrOrderingRepository {
     const subtotal = orderItems.reduce((sum, item) => sum + item.totalPrice, 0);
     const cgstAmount = Math.round(subtotal * 0.025 * 100) / 100;
     const sgstAmount = Math.round(subtotal * 0.025 * 100) / 100;
-    const taxAmount = cgstAmount + sgstAmount;
+    const taxAmount = Math.round((cgstAmount + sgstAmount) * 100) / 100;
     const totalAmount = Math.round(subtotal + taxAmount);
 
     // Order-value limits are checked here, on the authoritative total this

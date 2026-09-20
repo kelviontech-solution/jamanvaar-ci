@@ -22,10 +22,10 @@ export class PdfReportBuilder {
    */
   public static generatePdf(data: ReportFullData, design: ReportDesign = 'CLASSIC'): Uint8Array {
     const config = ReceiptRepository.getConfig();
-    const restName = config.restaurantName || 'JAMANVAAR Traditional Dining';
-    const gstin = config.gstin || '24AAACJ1234F1Z5';
-    const phone = config.phone || '+91 98765 43210';
-    const address = config.address || 'Ahmedabad Flagship Store, Gujarat';
+    // Only the restaurant's own details: a made-up GSTIN, phone or address on a report is worse than none.
+    const restName = config.restaurantName || 'Restaurant';
+    const gstinLabel = config.gstin ? `GSTIN: ${config.gstin}` : 'GSTIN: Not registered';
+    const contactLine = [config.address, config.phone ? `Tel: ${config.phone}` : ''].filter(Boolean).join(' • ');
 
     // A4 dimensions in points (72 points = 1 inch): 595.28 x 841.89
     const pageWidth = 595.28;
@@ -130,14 +130,14 @@ export class PdfReportBuilder {
     if (design === 'BRANDED') {
       drawRect(margin, curY - 65, contentWidth, 75, [0.04, 0.15, 0.23], undefined);
       drawText(restName.toUpperCase(), margin + 15, curY - 20, 16, true, [1, 1, 1]);
-      drawText(`AUTHENTIC HERITAGE DINING • GSTIN: ${gstin}`, margin + 15, curY - 35, 9, false, [0.9, 0.9, 0.9]);
-      drawText(`${address} • Tel: ${phone}`, margin + 15, curY - 48, 8, false, [0.8, 0.8, 0.8]);
+      drawText(gstinLabel, margin + 15, curY - 35, 9, false, [0.9, 0.9, 0.9]);
+      drawText(contactLine, margin + 15, curY - 48, 8, false, [0.8, 0.8, 0.8]);
       drawText('JAMANVAAR ERP', pageWidth - margin - 15, curY - 20, 10, true, [0.9, 0.4, 0.1], 'right');
       curY -= 85;
     } else if (design === 'MODERN') {
       drawRect(margin, curY - 45, contentWidth, 55, [0.95, 0.96, 0.98], [0.85, 0.88, 0.92]);
       drawText(restName, margin + 15, curY - 20, 14, true, [0.04, 0.15, 0.23]);
-      drawText(`GSTIN: ${gstin} | ${address}`, margin + 15, curY - 34, 8, false, [0.4, 0.4, 0.5]);
+      drawText([gstinLabel, config.address].filter(Boolean).join(' | '), margin + 15, curY - 34, 8, false, [0.4, 0.4, 0.5]);
       drawText('EXECUTIVE REPORT', pageWidth - margin - 15, curY - 20, 10, true, [0.9, 0.4, 0.1], 'right');
       curY -= 65;
     } else if (design === 'COMPACT') {
@@ -148,8 +148,8 @@ export class PdfReportBuilder {
     } else {
       // CLASSIC & STATEMENT
       drawText(restName.toUpperCase(), margin, curY - 12, 14, true, [0.04, 0.15, 0.23]);
-      drawText('BY KELVIONTECH • RESTAURANT OPERATIONAL AUDIT', margin, curY - 24, 8, false, [0.5, 0.5, 0.5]);
-      drawText(`${address} • GSTIN: ${gstin} • Tel: ${phone}`, margin, curY - 35, 8, false, [0.4, 0.4, 0.4]);
+      drawText('RESTAURANT OPERATIONAL REPORT', margin, curY - 24, 8, false, [0.5, 0.5, 0.5]);
+      drawText([config.address, gstinLabel, config.phone ? `Tel: ${config.phone}` : ''].filter(Boolean).join(' • '), margin, curY - 35, 8, false, [0.4, 0.4, 0.4]);
       drawLine(margin, curY - 42, pageWidth - margin, curY - 42, [0.8, 0.8, 0.8], 1);
       curY -= 55;
     }
@@ -168,7 +168,7 @@ export class PdfReportBuilder {
       { label: 'TOTAL NET SALES', value: `Rs. ${s.netSales.toLocaleString('en-IN')}`, sub: `${s.ordersCount} Orders` },
       { label: 'AVG ORDER VALUE', value: `Rs. ${s.avgOrderValue.toLocaleString('en-IN')}`, sub: 'Per Bill' },
       { label: 'CASH COLLECTED', value: `Rs. ${s.paymentBreakdown.cash.toLocaleString('en-IN')}`, sub: 'Drawer Cash' },
-      { label: 'TOTAL GST (5%)', value: `Rs. ${s.totalTax.toLocaleString('en-IN')}`, sub: `CGST + SGST` }
+      { label: 'TOTAL GST', value: `Rs. ${s.totalTax.toLocaleString('en-IN')}`, sub: `CGST + SGST` }
     ];
 
     const kpiW = (contentWidth - 30) / 4;
@@ -194,7 +194,7 @@ export class PdfReportBuilder {
       ['Discounts Granted', `- Rs. ${s.discountAmount.toLocaleString('en-IN')}`],
       ['CGST (2.5%)', `Rs. ${s.cgstAmount.toLocaleString('en-IN')}`],
       ['SGST (2.5%)', `Rs. ${s.sgstAmount.toLocaleString('en-IN')}`],
-      ['Net Collected Revenue', `Rs. ${s.netSales.toLocaleString('en-IN')}`]
+      ['Total Collected (incl. GST)', `Rs. ${s.netSales.toLocaleString('en-IN')}`]
     ];
     finRows.forEach((r, idx) => {
       const rowY = curY - 36 - idx * 17;
@@ -277,20 +277,31 @@ export class PdfReportBuilder {
     }
 
     // --- CASHIER PERFORMANCE (If available) ---
-    if (data.cashiers && data.cashiers.length > 0 && curY > margin + 90) {
+    if (data.cashiers && data.cashiers.length > 0) {
+      // Start on a fresh page when there is no room, rather than dropping the section (BUG-036).
+      if (curY <= margin + 90) newPage();
       curY -= 15;
       drawText('CASHIER COUNTER PERFORMANCE SUMMARY', margin, curY, 9, true, [0.04, 0.15, 0.23]);
       curY -= 14;
 
-      drawRect(margin, curY - 16, contentWidth, 16, [0.92, 0.94, 0.96], [0.8, 0.8, 0.8], 0.75);
-      drawText('CASHIER NAME', margin + 10, curY - 11, 7.5, true, [0.2, 0.2, 0.2]);
-      drawText('ORDERS', margin + 200, curY - 11, 7.5, true, [0.2, 0.2, 0.2], 'right');
-      drawText('CASH TENDER', margin + 300, curY - 11, 7.5, true, [0.2, 0.2, 0.2], 'right');
-      drawText('UPI / QR', margin + 400, curY - 11, 7.5, true, [0.2, 0.2, 0.2], 'right');
-      drawText('TOTAL BILLED', margin + contentWidth - 10, curY - 11, 7.5, true, [0.2, 0.2, 0.2], 'right');
-      curY -= 16;
+      const drawCashierHeader = () => {
+        drawRect(margin, curY - 16, contentWidth, 16, [0.92, 0.94, 0.96], [0.8, 0.8, 0.8], 0.75);
+        drawText('CASHIER NAME', margin + 10, curY - 11, 7.5, true, [0.2, 0.2, 0.2]);
+        drawText('ORDERS', margin + 200, curY - 11, 7.5, true, [0.2, 0.2, 0.2], 'right');
+        drawText('CASH TENDER', margin + 300, curY - 11, 7.5, true, [0.2, 0.2, 0.2], 'right');
+        drawText('UPI / QR', margin + 400, curY - 11, 7.5, true, [0.2, 0.2, 0.2], 'right');
+        drawText('TOTAL BILLED', margin + contentWidth - 10, curY - 11, 7.5, true, [0.2, 0.2, 0.2], 'right');
+        curY -= 16;
+      };
+      drawCashierHeader();
 
       data.cashiers.forEach((c) => {
+        if (curY < margin + 40) {
+          newPage();
+          drawText(`${restName} — ${data.title} (Continued)`, margin, curY - 10, 10, true, [0.04, 0.15, 0.23]);
+          curY -= 25;
+          drawCashierHeader();
+        }
         drawLine(margin, curY - 16, margin + contentWidth, curY - 16, [0.9, 0.9, 0.9], 0.5);
         drawText(c.name, margin + 10, curY - 11, 7.5, true, [0.1, 0.1, 0.1]);
         drawText(c.ordersCount.toString(), margin + 200, curY - 11, 7.5, false, [0.3, 0.3, 0.3], 'right');
@@ -331,52 +342,36 @@ export class PdfReportBuilder {
     });
 
     // --- PDF OBJECT COMPILATION ---
-    const objects: string[] = [];
-    const offsets: number[] = [];
-    let byteOffset = 0;
+    // Object numbers are fixed up front so every reference is known before anything is written:
+    //   1 catalog, 2 page tree, 3 Helvetica (/F1), 4 Helvetica-Bold (/F2),
+    //   then for page i (from 0): content stream 5 + 2i, page 6 + 2i.
+    // The text is ASCII only (see sanitize), so string length equals byte length for the /Length
+    // entries and the xref offsets below.
+    const CATALOG_ID = 1;
+    const PAGES_ID = 2;
+    const FONT1_ID = 3;
+    const FONT2_ID = 4;
+    const contentIdOf = (i: number) => 5 + 2 * i;
+    const pageIdOf = (i: number) => 6 + 2 * i;
 
-    const addObj = (content: string): number => {
-      const objNum = objects.length + 1;
-      offsets.push(byteOffset);
-      const str = `${objNum} 0 obj\n${content}\nendobj\n`;
-      objects.push(str);
-      byteOffset += str.length;
-      return objNum;
-    };
-
-    // Header
-    const header = '%PDF-1.4\n';
-    byteOffset += header.length;
-
-    // Obj 1: Catalog
-    addObj(`<< /Type /Catalog /Pages 2 0 R >>`);
-
-    // We will reserve IDs for Pages, Fonts, etc.
-    const font1Id = 3;
-    const font2Id = 4;
-    const pageObjIds: number[] = [];
-
-    // Fonts
-    addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`);
-    addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`);
-
-    // Build page objects & content streams
-    finalPageStreams.forEach((streamContent) => {
-      const streamLen = streamContent.length;
-      const contentId = addObj(`<< /Length ${streamLen} >>\nstream\n${streamContent}\nendstream`);
-      const pageId = addObj(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth.toFixed(2)} ${pageHeight.toFixed(2)}] /Contents ${contentId} 0 R /Resources << /Font << /F1 ${font1Id} 0 R /F2 ${font2Id} 0 R >> >> >>`);
-      pageObjIds.push(pageId);
+    const bodies: string[] = [
+      `<< /Type /Catalog /Pages ${PAGES_ID} 0 R >>`,
+      `<< /Type /Pages /Kids [${finalPageStreams.map((_, i) => `${pageIdOf(i)} 0 R`).join(' ')}] /Count ${finalPageStreams.length} >>`,
+      `<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`,
+      `<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`
+    ];
+    finalPageStreams.forEach((streamContent, i) => {
+      bodies.push(`<< /Length ${streamContent.length} >>\nstream\n${streamContent}\nendstream`);
+      bodies.push(
+        `<< /Type /Page /Parent ${PAGES_ID} 0 R /MediaBox [0 0 ${pageWidth.toFixed(2)} ${pageHeight.toFixed(2)}] ` +
+          `/Contents ${contentIdOf(i)} 0 R /Resources << /Font << /F1 ${FONT1_ID} 0 R /F2 ${FONT2_ID} 0 R >> >> >>`
+      );
     });
 
-    // Replace Obj 2 with Pages object
-    const pagesObjContent = `<< /Type /Pages /Kids [${pageObjIds.map((id) => `${id} 0 R`).join(' ')}] /Count ${pageObjIds.length} >>`;
-    // Re-insert Pages object at slot index 1
-    const secondObjStr = `2 0 obj\n${pagesObjContent}\nendobj\n`;
-    objects.splice(1, 0, secondObjStr);
-
-    // Recompute offsets accurately
-    byteOffset = header.length;
-    offsets.length = 0;
+    const header = '%PDF-1.4\n';
+    const objects = bodies.map((content, idx) => `${idx + 1} 0 obj\n${content}\nendobj\n`);
+    const offsets: number[] = [];
+    let byteOffset = header.length;
     objects.forEach((obj) => {
       offsets.push(byteOffset);
       byteOffset += obj.length;
@@ -389,7 +384,7 @@ export class PdfReportBuilder {
       xref += `${off.toString().padStart(10, '0')} 00000 n \n`;
     });
 
-    const trailer = `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+    const trailer = `trailer\n<< /Size ${objects.length + 1} /Root ${CATALOG_ID} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
 
     const fullPdfString = header + objects.join('') + xref + trailer;
     const encoder = new TextEncoder();

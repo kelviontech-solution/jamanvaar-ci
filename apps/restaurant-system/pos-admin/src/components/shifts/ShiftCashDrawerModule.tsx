@@ -1,4 +1,5 @@
 import React from 'react';
+import { printElement } from '@jamanvaar/ui';
 import { formatINR, formatTime } from '@jamanvaar/utils';
 import {
   Coins,
@@ -69,7 +70,7 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
 
       {/* Active Shift Workspace Card */}
       {activeShift ? (
-        <div className="bg-white rounded-2xl p-5 sm:p-6 border border-jaman-border shadow-2xs space-y-5">
+        <div data-print-doc="shift-slip" className="bg-white rounded-2xl p-5 sm:p-6 border border-jaman-border shadow-2xs space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-[#FFF4ED] border border-[#FED7AA] flex items-center justify-center text-jaman-saffron">
@@ -101,7 +102,7 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
                 <span>Add Drop / Payout</span>
               </button>
               <button
-                onClick={() => window.print()}
+                onClick={() => printElement('[data-print-doc="shift-slip"]', { title: 'Shift slip', pageSize: 'A5 portrait' })}
                 className="px-3.5 py-2 rounded-xl bg-jaman-cream hover:bg-[#F2EFE9] border border-jaman-border text-jaman-navy font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Printer className="w-3.5 h-3.5 text-slate-500" />

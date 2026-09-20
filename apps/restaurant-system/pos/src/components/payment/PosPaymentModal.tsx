@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
-import { PaymentMethod } from '@jamanvaar/types';
+import { PaymentMethod, PaymentSplit } from '@jamanvaar/types';
 import { formatINR, generateUUID } from '@jamanvaar/utils';
 import { sound } from '@jamanvaar/ui';
 import { PosDiscountModal } from '../cart/PosDiscountModal';
@@ -121,6 +121,31 @@ export const PosPaymentModal: React.FC = () => {
   // second time before React commits the isProcessing state update, which
   // would otherwise settle the same bill twice.
   const settlingRef = useRef(false);
+
+  // The modal component stays mounted while closed (it just renders null), so
+  // its state survives between bills. Without this, `isProcessing` stayed true
+  // after the first settlement (button stuck on "Processing Settlement...") and
+  // UPI/Card "verified" flags carried over to the next bill.
+  useEffect(() => {
+    if (isPaymentOpen) {
+      settlingRef.current = false;
+      setIsProcessing(false);
+      setUpiConfirmed(false);
+      setCardConfirmed(false);
+      setErrorMessage('');
+      setIsSplitMode(false);
+      setActiveChannel('CASH');
+    }
+  }, [isPaymentOpen]);
+
+  // A confirmation belongs to one specific amount - changing what is due on
+  // UPI or Card means the cashier must confirm again.
+  useEffect(() => {
+    setUpiConfirmed(false);
+  }, [allocations.UPI]);
+  useEffect(() => {
+    setCardConfirmed(false);
+  }, [allocations.CARD]);
 
   // Initialize or synchronize on modal open & payable change
   useEffect(() => {
@@ -369,10 +394,22 @@ export const PosPaymentModal: React.FC = () => {
       // persisted transaction reference used for reconciliation, not just
       // display text, so it needs genuine uniqueness guarantees.
       const txnRef = `TXN-${generateUUID().replace(/-/g, '').slice(0, 10).toUpperCase()}`;
+      const channelToSplit: Record<PaymentChannel, PaymentSplit['method']> = {
+        CASH: 'CASH',
+        UPI: 'UPI',
+        CARD: 'CARD',
+        WALLET: 'WALLET',
+        HOUSE_ACCOUNT: 'HOUSE_ACCOUNT'
+      };
+      const splits: PaymentSplit[] = activeEntries.map(([channel, amt]) => ({
+        method: channelToSplit[channel],
+        amount: Number(amt)
+      }));
       const res = completePayment(
         finalMethod,
         cashPortion > 0 ? cashReceived : undefined,
-        txnRef
+        txnRef,
+        splits
       );
 
       if (!res) {
@@ -709,6 +746,54 @@ export const PosPaymentModal: React.FC = () => {
                       <div className="p-2.5 bg-emerald-50 border border-emerald-300 rounded-xl flex items-center justify-between text-xs text-emerald-950">
                         <span className="font-bold">CHANGE TO RETURN:</span>
                         <span className="font-mono font-black text-base text-emerald-900">{formatINR(changeDue)}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Split bills: each UPI / Card portion must be confirmed here.
+                    "Mark ... Paid" used to be drawn only for single-method UPI/Card,
+                    so a split containing UPI or Card could never be settled. */}
+                {(upiPortion > 0 || cardPortion > 0) && (
+                  <div className="pt-2 border-t border-slate-200/80 space-y-2">
+                    {upiPortion > 0 && (
+                      <div className="flex items-center justify-between p-2.5 bg-blue-50 border border-blue-200 rounded-xl">
+                        <div className="flex items-center gap-2">
+                          <QrCode className="w-5 h-5 text-blue-700" />
+                          <div>
+                            <span className="text-xs font-black text-blue-950 block">UPI / Bharat QR</span>
+                            <span className="text-[11px] text-blue-800 font-mono">Amount: {formatINR(upiPortion)}</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setUpiConfirmed(true)}
+                          className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all ${
+                            upiConfirmed ? 'bg-emerald-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
+                          }`}
+                        >
+                          {upiConfirmed ? '✓ UPI Verified' : 'Mark UPI Paid'}
+                        </button>
+                      </div>
+                    )}
+                    {cardPortion > 0 && (
+                      <div className="flex items-center justify-between p-2.5 bg-indigo-50 border border-indigo-200 rounded-xl">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="w-5 h-5 text-indigo-700" />
+                          <div>
+                            <span className="text-xs font-black text-indigo-950 block">EDC Swipe Terminal</span>
+                            <span className="text-[11px] text-indigo-800 font-mono">Amount: {formatINR(cardPortion)}</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setCardConfirmed(true)}
+                          className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all ${
+                            cardConfirmed ? 'bg-emerald-600 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs'
+                          }`}
+                        >
+                          {cardConfirmed ? '✓ Card Approved' : 'Mark Card Paid'}
+                        </button>
                       </div>
                     )}
                   </div>

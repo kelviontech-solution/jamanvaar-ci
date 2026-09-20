@@ -116,7 +116,7 @@ export class BusinessDayService {
    */
   public static closeBusinessDay(options: CloseBusinessDayOptions = {}): CloseBusinessDayResult {
     const dayId = options.businessDayId || this.getActiveBusinessDay().id;
-    const closedBy = options.closedBy || 'Amit Dave (Lead Cashier)';
+    const closedBy = options.closedBy || 'Staff';
 
     // Pre-close validation
     const check = this.validatePreClose(dayId);

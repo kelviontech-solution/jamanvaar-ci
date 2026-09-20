@@ -18,6 +18,10 @@ export const changePlanSchema = z.object({
   planId: z.string().min(1)
 });
 
+export const extendSchema = z.object({
+  days: z.number().int().min(1).max(365)
+});
+
 export const renewSchema = z.object({
   expiresAt: z.coerce.date()
 });

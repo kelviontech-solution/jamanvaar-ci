@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useCaptainStore } from './store/captainStore';
-import { DiningTable, MenuItem } from '@jamanvaar/types';
-import { captainDb } from '@jamanvaar/database';
+import { DiningTable, MenuItem, Category } from '@jamanvaar/types';
+import { captainDb, StaffRepository } from '@jamanvaar/database';
 import { EntitlementService } from '@jamanvaar/business';
 import {
   JamanvaarAuthLayout,
   JAMANVAARStartup,
-  ActivationWelcomeScreen
+  ActivationWelcomeScreen,
+  useAiAccess
 } from '@jamanvaar/ui';
 import { isDeviceConnected, connectDevice, activateCaptainDevice, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
 import { SyncOutboxEngine, EntitySyncEngine } from '@jamanvaar/sync';
@@ -39,6 +40,7 @@ import {
 } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const ai = useAiAccess();
   const {
     isLoggedIn,
     authStatus,
@@ -142,19 +144,50 @@ export const App: React.FC = () => {
       captainDb.notify();
     };
 
+    // Captain never edits categories either — pull only, same as menu items.
+    const syncCategories = async () => {
+      await EntitySyncEngine.catchUp('MENU_CATEGORY', (remote) => {
+        const incoming = remote.payload as unknown as Category;
+        if (!incoming || !incoming.id) return;
+        const idx = captainDb.categories.findIndex((c) => c.id === incoming.id);
+        if (idx >= 0) {
+          captainDb.categories[idx] = { ...captainDb.categories[idx], ...incoming };
+        } else {
+          captainDb.categories.push(incoming);
+        }
+      });
+      captainDb.notify();
+    };
+
+    // BUG-019/034/035: a staff PIN issued in Restaurant Admin used to work only on the device that
+    // created it — Captain never pulled staff records, despite the create/reset screen's own promise
+    // that the PIN would work here too. Captain never edits staff either — pull only.
+    const syncStaff = async () => {
+      await EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
+    };
+
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
     void syncMenu();
+    void syncCategories();
+    void syncStaff();
     void reportHeartbeat();
 
-    const interval = setInterval(() => {
+    const orderInterval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
       void SyncOutboxEngine.catchUpFromCloud();
+    }, 4000);
+    const interval = setInterval(() => {
       void syncMenu();
+      void syncCategories();
+      void syncStaff();
       void reportHeartbeat();
     }, 15000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(orderInterval);
+      clearInterval(interval);
+    };
   }, [deviceConnected]);
 
   // Active Modals State
@@ -610,7 +643,7 @@ export const App: React.FC = () => {
 
         {/* ── Floating Branded JAMAN AI Assistant Button — hidden when this
             restaurant opted out via Restaurant Admin settings ── */}
-        {captainDb.restaurant?.showJamanAI !== false && (
+        {ai.showButton(captainDb.restaurant?.showJamanAI !== false) && (
         <button
           type="button"
           onClick={() => setIsAiAssistantOpen(true)}

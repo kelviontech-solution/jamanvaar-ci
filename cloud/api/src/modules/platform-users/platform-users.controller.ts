@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Patch, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { PlatformUsersService } from './platform-users.service';
 import { inviteTeammateSchema, updateRoleSchema, activateTeammateSchema } from './dto/platform-user.dto';
@@ -17,6 +17,12 @@ export class PlatformUsersController {
   async activate(@Body() body: ReturnType<typeof activateTeammateSchema.parse>) {
     await this.platformUsers.activate(body);
     return { success: true };
+  }
+
+  /** Public - the activation page checks its link on load (expired / already used / invalid). */
+  @Get('activation-status')
+  activationStatus(@Query('email') email: string, @Query('token') token: string) {
+    return this.platformUsers.activationStatus(email, token);
   }
 
   @Get()

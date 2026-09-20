@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Order } from '@jamanvaar/types';
-import { JAMANVAAR_LOGOS } from '@jamanvaar/ui';
+import { db } from '@jamanvaar/database';
+import { JAMANVAAR_LOGOS, printElement } from '@jamanvaar/ui';
 import { formatDate, formatTime, formatINR } from '@jamanvaar/utils';
 import {
   ReportDesignTheme,
@@ -83,7 +84,10 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
 
   // Print layout trigger
   const handlePrint = () => {
-    window.print();
+    printElement('[data-print-doc="report-preview"]', {
+      title: reportTitle,
+      pageSize: viewMode === 'THERMAL' ? '80mm auto' : 'A4 portrait'
+    });
   };
 
   // CSV trigger
@@ -244,6 +248,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
         <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center bg-[#E6E1D8] print:p-0 print:bg-white print:overflow-visible">
           {/* Document Sheet */}
           <div
+            data-print-doc="report-preview"
             className={`transition-all bg-white print:w-full print:max-w-none print:shadow-none print:border-none print:p-0 ${
               viewMode === 'A4'
                 ? 'w-full max-w-[800px] p-8 sm:p-10 rounded-3xl shadow-xl border border-[#D5CEC2]'
@@ -264,9 +269,11 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                     />
                   </div>
                   <div className="text-[11px] text-slate-500 leading-tight">
-                    <p className="font-bold text-jaman-navy">Ahmedabad Flagship Store • Branch #01</p>
-                    <p>Near Iscon Circle, SG Highway, Ahmedabad, Gujarat 380015</p>
-                    <p className="font-mono text-[10px]">GSTIN: 24AABCJ1984K1Z5 • FSSAI: 10722026000412</p>
+                    {(db.outlet?.name || db.restaurant.name) && <p className="font-bold text-jaman-navy">{db.outlet?.name || db.restaurant.name}</p>}
+                    {(db.outlet?.address || db.restaurant.address) && <p>{db.outlet?.address || db.restaurant.address}</p>}
+                    {(db.restaurant.gstin || db.restaurant.fssaiNumber) && (
+                      <p className="font-mono text-[10px]">{[db.restaurant.gstin && `GSTIN: ${db.restaurant.gstin}`, db.restaurant.fssaiNumber && `FSSAI: ${db.restaurant.fssaiNumber}`].filter(Boolean).join(' • ')}</p>
+                    )}
                   </div>
                 </div>
 

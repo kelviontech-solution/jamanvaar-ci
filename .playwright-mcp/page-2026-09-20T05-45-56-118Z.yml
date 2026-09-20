@@ -1,0 +1,23 @@
+- generic [ref=f2e2]:
+  - generic [ref=f2e4]:
+    - heading "Activate This Terminal" [level=1] [ref=f2e5]
+    - paragraph [ref=f2e6]: Enter the activation code provided by JAMANVAAR to connect this POS terminal to your restaurant.
+    - textbox "Activation code" [active] [ref=f2e7]
+    - button "Activate" [disabled] [ref=f2e8]
+  - region "JAMANVAAR Startup" [ref=f2e9]:
+    - generic [ref=f2e10]:
+      - generic [ref=f2e11]: KELVIONTECH ENTERPRISE
+      - generic [ref=f2e14]: Local Engine Active
+    - generic [ref=f2e20]:
+      - generic [ref=f2e21]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=f2e23]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=f2e24]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=f2e30]
+      - paragraph [ref=f2e32]: Restaurant Operations Platform
+      - generic [ref=f2e33]: POS TERMINAL
+      - generic [ref=f2e38]:
+        - generic [ref=f2e39]: Core Engine Ready
+        - generic [ref=f2e41]: •
+        - generic [ref=f2e42]: Database Initialized
+        - generic [ref=f2e44]: •
+        - generic [ref=f2e45]: Local-First Mode

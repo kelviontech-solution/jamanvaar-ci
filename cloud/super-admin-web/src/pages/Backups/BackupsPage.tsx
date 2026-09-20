@@ -1,3 +1,4 @@
+import { RefreshButton } from '../../components/RefreshButton';
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import {
@@ -10,7 +11,8 @@ import {
   SkeletonTable,
   EmptyState,
   ErrorState,
-  Button
+  Button,
+  Modal
 } from '../../components/ui';
 import {
   Database,
@@ -18,7 +20,6 @@ import {
   Download,
   AlertTriangle,
   CheckCircle2,
-  RefreshCw,
   Plus
 } from 'lucide-react';
 import './backups.css';
@@ -35,7 +36,7 @@ interface BackupItem {
   sizeBytes: number;
   errorMessage: string | null;
   createdAt: string;
-  verificationStatus?: 'PENDING' | 'VERIFIED' | 'FAILED' | 'CORRUPTED';
+  verificationStatus?: 'UNVERIFIED' | 'VERIFIED' | 'CORRUPT';
   sha256Checksum?: string;
 }
 
@@ -46,6 +47,12 @@ interface BackupFleetResponse {
     failed: number;
     totalBytes: number;
     storageConfigured: boolean;
+    successRatePercent?: number | null;
+    lastSuccessfulAt?: string | null;
+    storageMode?: 's3' | 'local';
+    offsite?: boolean;
+    encryptionEnabled?: boolean;
+    storageNote?: string;
   };
   backups: BackupItem[];
 }
@@ -87,7 +94,6 @@ export function BackupsPage() {
   const [restoreModalTarget, setRestoreModalTarget] = useState<any | null>(null);
   const [restorePreviewJob, setRestorePreviewJob] = useState<any | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
-  const [restoreExecuting, setRestoreExecuting] = useState(false);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -98,12 +104,32 @@ export function BackupsPage() {
     setVerifyingId(backupId);
     try {
       const res = await api.post<any>(`/api/v1/platform/backups/${backupId}/verify`, {});
-      showToast(`Backup verified: SHA-256 integrity is ${res.verificationStatus}`);
+      showToast(res.verificationStatus === 'VERIFIED' ? `Backup verified. ${res.verificationNote ?? ''}` : `Backup is CORRUPT. ${res.verificationNote ?? ''}`);
       load();
     } catch (e) {
       showToast(e instanceof ApiError ? e.message : 'Verification failed');
     } finally {
       setVerifyingId(null);
+    }
+  };
+
+  const [restoring, setRestoring] = useState(false);
+  const handleConfirmRestore = async () => {
+    if (!restorePreviewJob) return;
+    setRestoring(true);
+    try {
+      const res = await api.post<{ restored: { syncedEntities: number; syncedOrders: number } }>(
+        `/api/v1/platform/backups/restore-jobs/${restorePreviewJob.id}/confirm`,
+        { confirmed: true }
+      );
+      showToast(`Restored ${res.restored.syncedEntities} menu/data records and ${res.restored.syncedOrders} orders. A safety snapshot of the previous state was taken first.`);
+      setRestoreModalTarget(null);
+      setRestorePreviewJob(null);
+      load();
+    } catch (e) {
+      showToast(e instanceof ApiError ? e.message : 'Restore failed');
+    } finally {
+      setRestoring(false);
     }
   };
 
@@ -120,24 +146,6 @@ export function BackupsPage() {
       showToast(e instanceof ApiError ? e.message : 'Failed to generate restore preview');
     } finally {
       setPreviewLoading(false);
-    }
-  };
-
-  const handleExecuteRestore = async () => {
-    if (!restorePreviewJob) return;
-    setRestoreExecuting(true);
-    try {
-      await api.post(`/api/v1/platform/backups/restore-jobs/${restorePreviewJob.id}/confirm`, {
-        confirmed: true
-      });
-      showToast('Restore executed successfully. Safety pre-restore snapshot taken.');
-      setRestoreModalTarget(null);
-      setRestorePreviewJob(null);
-      load();
-    } catch (e) {
-      showToast(e instanceof ApiError ? e.message : 'Restore execution failed');
-    } finally {
-      setRestoreExecuting(false);
     }
   };
 
@@ -169,7 +177,21 @@ export function BackupsPage() {
     setDownloadingId(backupId);
     try {
       const res = await api.get<{ url: string }>(`/api/v1/restaurants/${restaurantId}/backups/${backupId}/download`);
-      window.open(res.url, '_blank');
+      if (res.url.startsWith('/')) {
+        // Stored encrypted or on this server's disk: the API decrypts it, so it must be fetched with our session.
+        const file = await api.download(res.url);
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(file.blob);
+        link.download = file.filename ?? `backup-${backupId.slice(0, 8)}.json`;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+          document.body.removeChild(link);
+          URL.revokeObjectURL(link.href);
+        }, 200);
+      } else {
+        window.open(res.url, '_blank');
+      }
     } catch (e) {
       showToast(e instanceof ApiError ? e.message : 'Failed to generate download link');
     } finally {
@@ -214,13 +236,7 @@ export function BackupsPage() {
         subtitle="Centralized tenant snapshot ledger, offline-first transaction sync backups, and emergency recovery downloads."
         actions={
           <div className="backups-header-actions">
-            <Button
-              variant="ghost"
-              icon={<RefreshCw className="w-4 h-4" />}
-              onClick={load}
-            >
-              Refresh
-            </Button>
+            <RefreshButton loading={loading} onRefresh={load} />
             <Button
               variant="accent"
               icon={<Plus className="w-4 h-4" />}
@@ -231,6 +247,13 @@ export function BackupsPage() {
           </div>
         }
       />
+
+      {data?.stats.storageNote && (
+        <div className={data.stats.offsite && data.stats.encryptionEnabled ? 'banner' : 'banner banner-error'} role="note" style={{ marginBottom: 12 }}>
+          <strong>Backup storage:</strong> {data.stats.storageNote}
+          {data.stats.encryptionEnabled ? ' Backups are encrypted (AES-256-GCM).' : ''}
+        </div>
+      )}
 
       {/* KPI Overview Grid */}
       <div className="backups-kpi-grid">
@@ -261,7 +284,7 @@ export function BackupsPage() {
               <div className="kpi-meta">
                 <span className="kpi-label">Storage Consumed</span>
                 <span className="kpi-value">{formatBytes(data.stats.totalBytes)}</span>
-                <span className="kpi-sub">Encrypted tenant bucket storage</span>
+                <span className="kpi-sub">Compressed (gzip) in the storage bucket</span>
               </div>
             </Card>
 
@@ -272,11 +295,11 @@ export function BackupsPage() {
               <div className="kpi-meta">
                 <span className="kpi-label">Success Rate</span>
                 <span className="kpi-value">
-                  {data.stats.total > 0
-                    ? `${Math.round((data.stats.completed / data.stats.total) * 100)}%`
-                    : '100%'}
+                  {data.stats.successRatePercent != null ? `${data.stats.successRatePercent}%` : '—'}
                 </span>
-                <span className="kpi-sub">Automated POS sync & manual</span>
+                <span className="kpi-sub">
+                  {data.stats.lastSuccessfulAt ? `Last good backup ${new Date(data.stats.lastSuccessfulAt).toLocaleString('en-IN')}` : 'No successful backup yet'}
+                </span>
               </div>
             </Card>
 
@@ -388,7 +411,7 @@ export function BackupsPage() {
                         </Badge>
                       </td>
                       <td>
-                        <Badge tone={b.verificationStatus === 'VERIFIED' ? 'success' : 'neutral'}>
+                        <Badge tone={b.verificationStatus === 'VERIFIED' ? 'success' : b.verificationStatus === 'CORRUPT' ? 'error' : 'neutral'}>
                           {b.verificationStatus ?? 'UNVERIFIED'}
                         </Badge>
                       </td>
@@ -407,7 +430,7 @@ export function BackupsPage() {
                             size="sm"
                             onClick={() => handleOpenRestorePreview(b)}
                           >
-                            Restore…
+                            Preview restore
                           </Button>
                           <Button
                             variant="ghost"
@@ -429,116 +452,123 @@ export function BackupsPage() {
         </div>
       )}
 
-      {/* Restore Safeguard Modal */}
+      {/* Restore preview: what is inside the backup. Restoring from the cloud is not available yet (BUG-073). */}
       {restoreModalTarget && (
-        <div className="modal-backdrop">
-          <div className="modal-card" style={{ maxWidth: 540 }}>
-            <div className="modal-header">
-              <h3>Restore Safeguard Workflow</h3>
-              <button
-                type="button"
-                className="modal-close-btn"
-                onClick={() => setRestoreModalTarget(null)}
-              >
-                ×
-              </button>
-            </div>
-            <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: 12, fontSize: 13, color: '#166534' }}>
-                <strong>Production Protection Guarantee:</strong> Restoring this snapshot automatically creates a fresh pre-restore backup first. You can preview the staging topology before confirming.
-              </div>
-
-              {previewLoading ? (
-                <div style={{ padding: 24, textAlign: 'center', color: '#64748b' }}>Generating Staging Restore Preview…</div>
-              ) : restorePreviewJob ? (
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12, fontSize: 13 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <span style={{ color: '#64748b' }}>Target Restaurant:</span>
-                    <strong>{restoreModalTarget.restaurantName}</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <span style={{ color: '#64748b' }}>Backup Snapshot Date:</span>
-                    <span>{new Date(restoreModalTarget.createdAt).toLocaleString()}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#64748b' }}>Snapshot Size:</span>
-                    <span>{formatBytes(restoreModalTarget.sizeBytes)}</span>
-                  </div>
-                </div>
-              ) : null}
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
-                <Button variant="ghost" onClick={() => setRestoreModalTarget(null)}>Cancel</Button>
-                <Button
-                  variant="accent"
-                  disabled={previewLoading || restoreExecuting}
-                  onClick={handleExecuteRestore}
-                >
-                  {restoreExecuting ? 'Executing Restore…' : 'Confirm Safe Restore'}
+        <Modal
+          title="Restore backup"
+          onClose={() => setRestoreModalTarget(null)}
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setRestoreModalTarget(null)}>Close</Button>
+              {restorePreviewJob?.previewSummary?.restorableInCloud && (
+                <Button variant="accent" disabled={restoring} onClick={handleConfirmRestore}>
+                  {restoring ? 'Restoring…' : 'Restore this data'}
                 </Button>
+              )}
+            </>
+          }
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {restorePreviewJob?.previewSummary?.restorableInCloud ? (
+              <div className="banner" role="note">
+                <strong>What restoring does:</strong> it first takes a fresh snapshot of the restaurant as it is now, then puts the
+                menu/data records and orders listed below back into the cloud. The restaurant&apos;s terminals pick them up on their next sync.
+                {' '}It does <strong>not</strong> touch: {(restorePreviewJob.previewSummary.notRestored as string[]).join(', ')}.
               </div>
-            </div>
+            ) : restorePreviewJob ? (
+              <div className="banner banner-error" role="note">
+                {(restorePreviewJob.previewSummary?.notRestored as string[] | undefined)?.[0] ?? 'This backup cannot be restored from the cloud.'}
+              </div>
+            ) : null}
+
+            {previewLoading ? (
+              <div className="page-loading">Reading the backup…</div>
+            ) : restorePreviewJob ? (
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12, fontSize: 13 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ color: '#64748b' }}>Restaurant:</span>
+                  <strong>{restoreModalTarget.restaurantName}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ color: '#64748b' }}>Backup taken:</span>
+                  <span>{new Date(restoreModalTarget.createdAt).toLocaleString()}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <span style={{ color: '#64748b' }}>Size (compressed):</span>
+                  <span>{formatBytes(restoreModalTarget.sizeBytes)}</span>
+                </div>
+                <div style={{ color: '#64748b', marginBottom: 4 }}>Contents</div>
+                {Object.keys(restorePreviewJob.previewSummary?.counts ?? {}).length === 0 ? (
+                  <div style={{ color: '#94a3b8' }}>No record lists found in this backup.</div>
+                ) : (
+                  Object.entries(restorePreviewJob.previewSummary.counts as Record<string, number>).map(([name, count]) => (
+                    <div key={name} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>{name}</span>
+                      <strong>{count}</strong>
+                    </div>
+                  ))
+                )}
+              </div>
+            ) : null}
           </div>
-        </div>
+        </Modal>
       )}
 
       {/* Trigger Snapshot Modal */}
       {showTriggerModal && (
-        <div className="modal-backdrop">
-          <div className="modal-card">
-            <div className="modal-header">
-              <h3>Trigger Operator Snapshot</h3>
-              <button
-                type="button"
-                className="modal-close-btn"
-                onClick={() => setShowTriggerModal(false)}
-              >
-                ×
-              </button>
-            </div>
-            <form onSubmit={handleTriggerSnapshot} className="modal-form">
-              {triggerError && <div className="modal-error-banner">{triggerError}</div>}
-              <div className="modal-field">
-                <label htmlFor="restaurant-select">Target Restaurant</label>
-                <select
-                  id="restaurant-select"
-                  value={selectedRestaurantId}
-                  onChange={(e) => setSelectedRestaurantId(e.target.value)}
-                  className="modal-select"
-                  required
-                >
-                  {restaurants.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="snapshot-warning-notice">
-                <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+        <Modal
+          title="Trigger Operator Snapshot"
+          onClose={() => setShowTriggerModal(false)}
+          footer={
+            <>
+              <Button type="button" variant="ghost" disabled={triggering} onClick={() => setShowTriggerModal(false)}>
+                Cancel
+              </Button>
+              {/* Inside the form via the `form` attribute so Enter and the button both submit it. */}
+              <Button type="submit" form="trigger-snapshot-form" variant="accent" disabled={triggering || data?.stats.storageConfigured === false}>
+                {triggering ? 'Creating Snapshot...' : 'Create Snapshot Now'}
+              </Button>
+            </>
+          }
+        >
+          <form id="trigger-snapshot-form" onSubmit={handleTriggerSnapshot} className="modal-form" style={{ padding: 0 }}>
+            {/* BUG-070/071: say so up front instead of letting the operator hit an error. */}
+            {data?.stats.storageConfigured === false && (
+              <div className="banner-error" role="alert">
+                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                 <span>
-                  This triggers an authoritative point-in-time snapshot. The encrypted payload will be
-                  uploaded to tenant storage and audited under your Super Admin credentials.
+                  Backup storage is not configured on the server, so snapshots cannot be created yet. Set the
+                  BACKUP_S3_* environment variables (bucket, region, access key, secret) and restart the API.
                 </span>
               </div>
+            )}
+            {triggerError && <div className="banner-error" role="alert">{triggerError}</div>}
+            <div className="form-field">
+              <label htmlFor="restaurant-select">Target Restaurant</label>
+              <select
+                id="restaurant-select"
+                value={selectedRestaurantId}
+                onChange={(e) => setSelectedRestaurantId(e.target.value)}
+                required
+              >
+                {restaurants.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <div className="modal-actions">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  disabled={triggering}
-                  onClick={() => setShowTriggerModal(false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" variant="accent" disabled={triggering}>
-                  {triggering ? 'Creating Snapshot...' : 'Create Snapshot Now'}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
+            <div className="snapshot-warning-notice">
+              <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+              <span>
+                This exports the restaurant's cloud-side data (restaurant, branches, staff, devices, subscriptions, synced
+                menu/orders) as a compressed snapshot, uploaded to backup storage and audited under your Super Admin
+                credentials. Passwords and device credentials are never included.
+              </span>
+            </div>
+          </form>
+        </Modal>
       )}
     </div>
   );

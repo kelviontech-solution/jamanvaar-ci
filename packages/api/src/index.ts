@@ -5,3 +5,4 @@ export * from './kds';
 export * from './services/network';
 export * from './services/ebill';
 export * from './services/voice';
+export * from './print_transport';

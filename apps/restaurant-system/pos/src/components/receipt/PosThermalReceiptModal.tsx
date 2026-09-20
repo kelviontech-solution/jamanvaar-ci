@@ -64,7 +64,7 @@ export const PosThermalReceiptModal: React.FC = () => {
 
       // Check if printer is simulated as offline/warning, or a real
       // NETWORK_LAN dispatch genuinely failed.
-      if (job.status === 'FAILED') {
+      if (job.status !== 'PRINTED') {
         setPrintStatus('FAILED');
         setErrorMessage(job.errorMessage || 'Hardware printer offline or paper out');
       } else {
@@ -77,15 +77,16 @@ export const PosThermalReceiptModal: React.FC = () => {
     }
   };
 
-  const handleRetryPrint = () => {
+  const handleRetryPrint = async () => {
     hasInteracted.current = true;
     if (activeJobId) {
-      const retried = PrintQueueRepository.retryJob(activeJobId);
-      if (retried && retried.status === 'SUCCESS') {
+      const retried = await PosPrinterService.retryJob(activeJobId);
+      if (retried && retried.status === 'PRINTED') {
         setPrintStatus('SUCCESS');
         setTimeout(() => setPrintStatus('IDLE'), 3000);
       } else {
         setPrintStatus('FAILED');
+        setErrorMessage(retried?.errorMessage || 'The printer did not accept the job');
       }
     } else {
       handlePrint();
@@ -220,7 +221,7 @@ export const PosThermalReceiptModal: React.FC = () => {
         {printStatus === 'SUCCESS' && (
           <div className="p-2.5 bg-emerald-500 text-white text-xs font-bold text-center flex items-center justify-center gap-1.5">
             <CheckCircle2 className="w-4 h-4" />
-            <span>Thermal print command dispatched to ESC/POS hardware printer ({paperWidth})!</span>
+            <span>Receipt printed ({paperWidth}).</span>
           </div>
         )}
 

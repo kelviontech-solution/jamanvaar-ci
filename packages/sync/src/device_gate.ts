@@ -1,0 +1,263 @@
+/**
+ * DeviceGate: what a terminal knows about whether the platform still allows it
+ * to run. The cloud refuses a terminal with a machine-readable `code` when its
+ * app was disabled, the device was locked or revoked, or the restaurant or
+ * subscription is no longer active (see cloud/api DeviceAuthGuard). Terminals
+ * used to ignore those refusals and open from a stored token, so none of these
+ * had any effect on screen. The gate turns them into a lock state that the app
+ * renders as a lock screen, and also locks a terminal that has not checked in
+ * for longer than its offline grace period (apps are offline-first, so a
+ * limited offline window is allowed, not unlimited).
+ */
+import { DisplayScale } from './display_scale';
+import { LICENSE_PUBLIC_KEYS, type LicensePublicKey } from '@jamanvaar/config';
+import { AppUpdate, type AppUpdateOffer } from './app_update';
+import { PlatformNotice, type PlatformNoticeData } from './platform_notice';
+import { verifyOfflineExtension } from './offline_extension';
+
+export type DeviceGateCode =
+  | 'DEVICE_REVOKED'
+  | 'RESTAURANT_SUSPENDED'
+  | 'RESTAURANT_INACTIVE'
+  | 'SUBSCRIPTION_INACTIVE'
+  | 'APP_DISABLED'
+  | 'BRANCH_INACTIVE'
+  | 'DEVICE_LOCKED'
+  | 'UPDATE_REQUIRED'
+  | 'OFFLINE_LIMIT';
+
+export interface DeviceGateState {
+  locked: boolean;
+  code?: DeviceGateCode;
+  message?: string;
+  reason?: string;
+  since?: string;
+  lastCheckInAt?: string;
+  /** Set by a verified emergency extension: the offline limit is not enforced before this time. */
+  graceUntil?: string;
+  /** Who this terminal is, remembered from its own heartbeats, so a pasted code can be checked offline. */
+  restaurantId?: string;
+  branchId?: string | null;
+  deviceId?: string | null;
+}
+
+const CLOUD_LOCK_CODES: DeviceGateCode[] = [
+  'DEVICE_REVOKED',
+  'RESTAURANT_SUSPENDED',
+  'RESTAURANT_INACTIVE',
+  'SUBSCRIPTION_INACTIVE',
+  'APP_DISABLED',
+  'BRANCH_INACTIVE',
+  'DEVICE_LOCKED'
+];
+
+const STORAGE_KEY = 'jamanvaar_device_gate_v1';
+export const DEFAULT_OFFLINE_GRACE_DAYS = 7;
+
+const memory: { value: string | null } = { value: null };
+
+function readStorage(): DeviceGateState | null {
+  try {
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : memory.value;
+    return raw ? (JSON.parse(raw) as DeviceGateState) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeStorage(state: DeviceGateState): void {
+  const raw = JSON.stringify(state);
+  try {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_KEY, raw);
+    else memory.value = raw;
+  } catch {
+    memory.value = raw;
+  }
+}
+
+const MESSAGES: Record<DeviceGateCode, string> = {
+  DEVICE_REVOKED: 'This device has been revoked. Contact your platform administrator.',
+  RESTAURANT_SUSPENDED: 'This restaurant account is suspended. Please contact your platform administrator.',
+  RESTAURANT_INACTIVE: 'This restaurant account is no longer active.',
+  SUBSCRIPTION_INACTIVE: 'This restaurant has no active subscription. Please contact your platform administrator.',
+  APP_DISABLED: 'This application is not enabled for your restaurant. Please contact your platform administrator.',
+  BRANCH_INACTIVE: 'This branch has been deactivated. Please contact your platform administrator.',
+  DEVICE_LOCKED: 'This terminal has been locked by your platform administrator.',
+  UPDATE_REQUIRED: 'A required update must be installed before this terminal can be used.',
+  OFFLINE_LIMIT: 'This terminal has been offline for too long. Connect to the internet so it can check in with JAMANVAAR.'
+};
+
+export interface HeartbeatAnswer {
+  ok?: boolean;
+  locked?: boolean;
+  lockCode?: string | null;
+  lockReason?: string | null;
+  notice?: PlatformNoticeData | null;
+  update?: AppUpdateOffer | null;
+  extension?: { payload: string; signature: string; validUntil?: string } | null;
+  /** The restaurant's default display size in percent (BUG-008). */
+  displayScalePercent?: number;
+}
+
+export class DeviceGate {
+  private static state: DeviceGateState = readStorage() ?? { locked: false };
+  private static listeners = new Set<() => void>();
+
+  static getState(): DeviceGateState {
+    return { ...this.state };
+  }
+
+  static subscribe(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  private static set(next: DeviceGateState): void {
+    this.state = next;
+    writeStorage(next);
+    this.listeners.forEach((fn) => fn());
+  }
+
+  /** Forget everything (used by tests and when a device is re-activated). */
+  static reset(): void {
+    memory.value = null;
+    this.set({ locked: false });
+  }
+
+  static setLastCheckIn(iso: string): void {
+    this.set({ ...this.state, lastCheckInAt: iso });
+  }
+
+  private static lock(code: DeviceGateCode, message?: string, reason?: string): void {
+    this.set({
+      ...this.state,
+      locked: true,
+      code,
+      message: message || MESSAGES[code],
+      reason,
+      since: this.state.locked && this.state.code === code ? this.state.since : new Date().toISOString()
+    });
+  }
+
+  /** A successful cloud response: the terminal is allowed. Clears any lock and records the check-in. */
+  static reportSuccess(): void {
+    this.set({ locked: false, lastCheckInAt: new Date().toISOString(), ...this.remembered() });
+  }
+
+  /** What survives a clear: the extension window and who this terminal is. */
+  private static remembered(): Partial<DeviceGateState> {
+    const { graceUntil, restaurantId, branchId, deviceId } = this.state;
+    return { ...(graceUntil ? { graceUntil } : {}), ...(restaurantId ? { restaurantId } : {}), ...(branchId !== undefined ? { branchId } : {}), ...(deviceId !== undefined ? { deviceId } : {}) };
+  }
+
+  private static trustedKeys: LicensePublicKey[] = LICENSE_PUBLIC_KEYS;
+
+  /** Only for tests: which public keys to trust when verifying an extension. */
+  static configureTrustedKeys(keys: LicensePublicKey[]): void {
+    this.trustedKeys = keys;
+  }
+
+  /**
+   * A signed emergency offline extension (BUG-077): verified here against the built-in public keys, so it
+   * works with no connection. While it is valid the offline limit is not enforced, and a terminal already
+   * locked for being offline is released. Returns false, changing nothing, for anything that does not
+   * verify or that was issued for another restaurant, branch or terminal.
+   */
+  static async applyExtension(
+    ext: { payload: string; signature: string; validUntil?: string } | null | undefined,
+    ctx: { restaurantId?: string; branchId?: string | null; deviceId?: string | null } = {}
+  ): Promise<boolean> {
+    if (!ext) return false;
+    const payload = await verifyOfflineExtension(ext.payload, ext.signature, { keys: this.trustedKeys });
+    if (!payload) return false;
+    // Without this terminal own restaurant we cannot tell whose extension this is.
+    if (!ctx.restaurantId || payload.restaurantId !== ctx.restaurantId) return false;
+    if (payload.branchId && payload.branchId !== ctx.branchId) return false;
+    if (payload.deviceId && payload.deviceId !== ctx.deviceId) return false;
+
+    const current = this.state.graceUntil ? new Date(this.state.graceUntil).getTime() : 0;
+    const until = Math.max(current, new Date(payload.validUntil).getTime());
+    const lifted = this.state.locked && this.state.code === 'OFFLINE_LIMIT';
+    this.set({ ...this.state, graceUntil: new Date(until).toISOString(), ...(lifted ? { locked: false, code: undefined, message: undefined, reason: undefined } : {}) });
+    return true;
+  }
+
+  /**
+   * Inspect the response of any cloud call the terminal makes. A success only
+   * proves the terminal is allowed again when the endpoint is one a locked
+   * terminal cannot reach; `/devices/me/*` stays reachable while locked, so
+   * pass `provesAllowed: false` for those.
+   */
+  static async observe(res: Response, provesAllowed: boolean = true): Promise<void> {
+    if (res.ok) {
+      if (provesAllowed) this.reportSuccess();
+      return;
+    }
+    if (res.status !== 401 && res.status !== 403) return;
+    try {
+      const body = (await res.clone().json()) as { code?: string; message?: string; reason?: string };
+      if (body && CLOUD_LOCK_CODES.includes(body.code as DeviceGateCode)) {
+        this.lock(body.code as DeviceGateCode, body.message, body.reason);
+      }
+    } catch {
+      // Not JSON: an ordinary error, not a platform decision.
+    }
+  }
+
+  /** The heartbeat answer tells a locked terminal it is locked (it may still check in while locked). */
+  static applyHeartbeat(body: HeartbeatAnswer): void {
+    // The same answer carries the platform announcement (maintenance etc.).
+    PlatformNotice.apply(body.notice);
+    // ...and the restaurant's default display size (BUG-008).
+    DisplayScale.setCloudDefault(body.displayScalePercent);
+    // ...and whether a newer version of this app exists (BUG-065).
+    AppUpdate.apply(body.update);
+    if (body.locked) {
+      this.lock(body.lockCode === 'BRANCH_INACTIVE' ? 'BRANCH_INACTIVE' : 'DEVICE_LOCKED', undefined, body.lockReason ?? undefined);
+    } else if (body.update?.mandatory) {
+      // A mandatory update is not a suggestion: the terminal cannot be used until it is installed.
+      this.lock('UPDATE_REQUIRED', undefined, `Update to version ${body.update.latestVersion} to continue.${body.update.downloadUrl ? ` Download: ${body.update.downloadUrl}` : ''}`);
+    } else {
+      // The heartbeat passed every cloud check (device, restaurant, subscription, app), so any lock is stale.
+      this.reportSuccess();
+    }
+  }
+
+  /** The heartbeat answer plus the emergency extension it may carry (verified before it is trusted). */
+  static async applyHeartbeatAsync(body: HeartbeatAnswer, ctx: { restaurantId?: string; branchId?: string | null; deviceId?: string | null } = {}): Promise<void> {
+    if (ctx.restaurantId) this.set({ ...this.state, restaurantId: ctx.restaurantId, branchId: ctx.branchId ?? null, deviceId: ctx.deviceId ?? null });
+    this.applyHeartbeat(body);
+    if (body.extension) await this.applyExtension(body.extension, ctx);
+  }
+
+  /**
+   * An extension code (`payload.signature`) an operator pastes on a locked, offline terminal. Uses the
+   * restaurant this terminal remembered from its earlier heartbeats; a terminal that never checked in
+   * has nothing to compare against, so it refuses rather than trusting any restaurant's code.
+   */
+  static async applyExtensionCode(code: string): Promise<{ ok: true } | { ok: false; reason: string }> {
+    const parts = code.trim().split('.');
+    if (parts.length !== 2 || !parts[0] || !parts[1]) return { ok: false, reason: 'That is not in the right format. Paste the whole code you were given.' };
+    const { restaurantId, branchId, deviceId } = this.state;
+    if (!restaurantId) return { ok: false, reason: 'This terminal has not been activated on the internet yet, so it cannot check whose code this is.' };
+    const ok = await this.applyExtension({ payload: parts[0], signature: parts[1] }, { restaurantId, branchId, deviceId });
+    return ok ? { ok: true } : { ok: false, reason: 'That code is not valid for this terminal (bad signature, expired, or issued for another restaurant or terminal).' };
+  }
+
+  /** Lock a terminal that has gone longer than the grace period without any successful check-in. */
+  static evaluateOffline(nowMs: number = Date.now(), graceDays: number = DEFAULT_OFFLINE_GRACE_DAYS): void {
+    const last = this.state.lastCheckInAt;
+    if (!last) return; // never checked in yet (fresh activation): nothing to compare against
+    // A verified extension covers the terminal until its end date.
+    if (this.state.graceUntil && nowMs < new Date(this.state.graceUntil).getTime()) return;
+    const ageDays = (nowMs - new Date(last).getTime()) / 86400000;
+    if (ageDays > graceDays) this.lock('OFFLINE_LIMIT');
+  }
+
+  /** fetch() that feeds every response through the gate. */
+  static async gatedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+    const res = await fetch(input, init);
+    await this.observe(res, !/\/devices\/me(\/|\?|$)/.test(String(input)));
+    return res;
+  }
+}

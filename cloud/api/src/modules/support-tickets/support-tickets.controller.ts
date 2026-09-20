@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Res, UseGuards, UsePipes } from '@nestjs/common';
+import type { Response } from 'express';
 import { PlatformUser, TicketStatus } from '@prisma/client';
 import { SupportTicketsService } from './support-tickets.service';
-import { createTicketSchema, updateTicketSchema, addCommentSchema } from './dto/ticket.dto';
+import { createTicketSchema, updateTicketSchema, addCommentSchema, attachmentSchema } from './dto/ticket.dto';
+import { sendAttachment } from './send-attachment';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
@@ -13,11 +15,29 @@ export class SupportTicketsController {
 
   @Get()
   list(
+    @CurrentPlatformUser() actor: PlatformUser,
     @Query('status') status?: TicketStatus,
     @Query('restaurantId') restaurantId?: string,
-    @Query('assignedToId') assignedToId?: string
+    @Query('assignedToId') assignedToId?: string,
+    @Query('view') view?: string,
+    @Query('search') search?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
   ) {
-    return this.tickets.list({ status, restaurantId, assignedToId });
+    return this.tickets.list(actor, {
+      status,
+      restaurantId,
+      assignedToId,
+      view,
+      search,
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined
+    });
+  }
+
+  @Get('summary')
+  summary(@CurrentPlatformUser() actor: PlatformUser) {
+    return this.tickets.summary(actor);
   }
 
   @Get(':id')
@@ -51,6 +71,21 @@ export class SupportTicketsController {
     @Body() body: ReturnType<typeof addCommentSchema.parse>,
     @CurrentPlatformUser() actor: PlatformUser
   ) {
-    return this.tickets.addComment(id, body.body, actor);
+    return this.tickets.addComment(id, body.body, actor, body.internal === true);
+  }
+
+  @Post(':id/attachments')
+  async addAttachment(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(attachmentSchema)) body: ReturnType<typeof attachmentSchema.parse>,
+    @CurrentPlatformUser() actor: PlatformUser
+  ) {
+    await this.tickets.getById(id);
+    return this.tickets.saveAttachment(id, body, { type: 'PLATFORM', name: actor.fullName });
+  }
+
+  @Get(':id/attachments/:attachmentId')
+  async downloadAttachment(@Param('id') id: string, @Param('attachmentId') attachmentId: string, @Res() res: Response) {
+    sendAttachment(res, await this.tickets.readAttachment(id, attachmentId));
   }
 }

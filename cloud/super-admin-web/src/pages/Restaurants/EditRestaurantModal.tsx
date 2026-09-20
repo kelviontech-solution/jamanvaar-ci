@@ -53,7 +53,9 @@ export function EditRestaurantModal({ restaurant, onClose, onUpdated, onSaved }:
       if (onSaved) onSaved();
       onClose();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to update restaurant');
+      // BUG-054: surface the actual reason (e.g. "GSTIN must be 15 characters...") instead of
+      // the generic "Validation failed" the API returns as the top-level message.
+      setError(err instanceof ApiError ? err.issues?.[0]?.message || err.message : 'Failed to update restaurant');
     } finally {
       setSubmitting(false);
     }

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
+import { AiConfig } from '@jamanvaar/business';
+import { reportAiQueryNow } from '../../cloud/cloudClient';
 import { useCaptainStore } from '../../store/captainStore';
 import {
   Sparkles,
@@ -23,7 +25,21 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
   onClose,
   onNavigateToTab
 }) => {
-  if (!isOpen) return null;
+  // What the platform allows this restaurant (BUG-057): OFF hides it, LOCKED shows why it does not answer.
+  const aiState = useSyncExternalStore((cb) => AiConfig.subscribe(cb), () => AiConfig.getState(), () => AiConfig.getState());
+  if (!isOpen || aiState === 'OFF') return null;
+  if (aiState === 'LOCKED') {
+    return (
+      <div role="dialog" aria-modal="true" aria-label="JAMAN AI is not enabled" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+        <div className="w-full max-w-sm space-y-3 rounded-3xl bg-white p-6 text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <Sparkles className="mx-auto h-8 w-8 text-jaman-saffron" />
+          <h2 className="text-base font-black text-jaman-navy">JAMAN AI isn&apos;t enabled for your restaurant</h2>
+          <p className="text-xs text-slate-600">Ask your JAMANVAAR account manager to switch it on. It answers floor questions from your own live tables and kitchen tickets.</p>
+          <button type="button" onClick={onClose} className="rounded-xl bg-jaman-navy px-4 py-2 text-xs font-bold text-white">Close</button>
+        </div>
+      </div>
+    );
+  }
 
   const {
     tables,
@@ -39,24 +55,33 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
   const [response, setResponse] = useState<string | null>(null);
 
   const activeFoodReady = foodReadyItems.filter((fr) => !fr.isServed);
+  // Threshold from the cloud settings (Super Admin), not a number typed into the code.
+  const delayedMinutes = AiConfig.getSettings().delayedKotMinutes;
   const billRequestedTables = tables.filter((t) => t.status === 'BILL_REQUESTED');
   const delayedKots = kots.filter((k) => {
     if (k.status === 'SERVED' || k.status === 'CANCELLED') return false;
     const elapsedMinutes = (Date.now() - new Date(k.createdAt).getTime()) / 60000;
-    return elapsedMinutes > 15;
+    return elapsedMinutes > delayedMinutes;
   });
   const pendingRequests = customerRequests.filter((cr) => !cr.isResolved);
   const occupiedTables = tables.filter((t) => t.status === 'OCCUPIED' || t.status === 'BILL_REQUESTED');
 
   const runQuery = (q: string) => {
+    if (!AiConfig.canQuery()) {
+      setActiveQuery(q);
+      setResponse("Today's JAMAN AI question limit has been reached. It resets tomorrow.");
+      return;
+    }
+    const started = performance.now();
     setActiveQuery(q);
+    queueMicrotask(() => void reportAiQueryNow(q, performance.now() - started));
     switch (q) {
       case 'ATTENTION':
         setResponse(
-          `⚡ **Attention Summary for Floor Captain ${currentCaptain?.name || 'Rahul'}**:\n\n` +
+          `⚡ **Attention Summary for Floor Captain ${currentCaptain?.name || 'there'}**:\n\n` +
           `• **Food Ready:** ${activeFoodReady.length} dishes waiting across ${new Set(activeFoodReady.map((fr) => fr.tableNumber)).size} tables.\n` +
           `• **Bill Requests:** ${billRequestedTables.length} tables (${billRequestedTables.map((t) => `Table ${t.tableNumber}`).join(', ') || 'None'}).\n` +
-          `• **Delayed KOTs:** ${delayedKots.length} tickets > 15 mins in kitchen.\n` +
+          `• **Delayed KOTs:** ${delayedKots.length} tickets > ${delayedMinutes} mins in kitchen.\n` +
           `• **Guest Requests:** ${pendingRequests.length} pending service calls.`
         );
         break;
@@ -75,9 +100,9 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
           const kotsTxt = delayedKots
             .map((k) => `• KOT #${k.kotNumber?.slice(-3)} for Table ${k.tableNumber} (${Math.round((Date.now() - new Date(k.createdAt).getTime()) / 60000)} mins elapsed)`)
             .join('\n');
-          setResponse(`🔴 **${delayedKots.length} Delayed KOTs exceeding 15 minutes:**\n\n${kotsTxt}\n\nTap 'Live KOTs' to message the chef.`);
+          setResponse(`🔴 **${delayedKots.length} Delayed KOTs exceeding ${delayedMinutes} minutes:**\n\n${kotsTxt}\n\nTap 'Live KOTs' to message the chef.`);
         } else {
-          setResponse(`✓ **All kitchen stations running smoothly!** No KOT tickets exceed 15 minutes preparation time.`);
+          setResponse(`✓ **All kitchen stations running smoothly!** No KOT tickets exceed ${delayedMinutes} minutes preparation time.`);
         }
         break;
       case 'BILLS':
@@ -143,7 +168,7 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
           {/* Intro Card */}
           <div className="p-3.5 rounded-2xl bg-white border border-jaman-border text-xs text-jaman-navy space-y-1 shadow-2xs">
             <p className="font-bold">
-              🙏 Namaste Captain {currentCaptain?.name || 'Rahul'}!
+              🙏 Namaste Captain {currentCaptain?.name || 'there'}!
             </p>
             <p className="text-slate-600">
               I am connected to your live floor tables, KDS food ready queue, and kitchen KOT tickets. Tap any quick query below for instant answers.

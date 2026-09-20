@@ -628,7 +628,7 @@ export class ReportGeneratorService {
     const activeShift = db.shifts[0] || null;
 
     return {
-      restaurantName: db.restaurant.name || 'JAMANVAAR Restaurant',
+      restaurantName: db.restaurant.name || '',
       date: formatDate(new Date()),
       generatedAt: `${formatDate(new Date())} ${formatTime(new Date())}`,
       daily,

@@ -8,6 +8,7 @@
  * once per tablet.
  */
 
+import { refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
 import type {
   OrderSyncPushEvent,
   OrderSyncPushResult,
@@ -16,6 +17,9 @@ import type {
   EntitySyncPushResult,
   CloudSyncedEntity
 } from '@jamanvaar/sync';
+
+import { DeviceGate, sendHeartbeat } from '@jamanvaar/sync';
+import { MenuRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -70,12 +74,17 @@ function getCaptainDeviceToken(): string | null {
   }
 }
 
-function persistConnection(restaurantId: string, label: string, deviceId?: string, deviceToken?: string) {
+function persistConnection(restaurantId: string, label: string, deviceId?: string, deviceToken?: string, restaurantName?: string) {
   try {
     localStorage.setItem(RESTAURANT_ID_KEY, restaurantId);
     localStorage.setItem(DEVICE_LABEL_KEY, label);
     if (deviceId) localStorage.setItem(DEVICE_ID_KEY, deviceId);
     if (deviceToken) localStorage.setItem(DEVICE_TOKEN_KEY, deviceToken);
+    DeviceGate.reportSuccess(); // a fresh activation starts unlocked
+    MenuRepository.startFreshMenu(); // BUG-013: a real restaurant starts with no menu until one is uploaded
+    // BUG-021: this device used to keep showing the seeded "JAMANVAAR RESTAURANT" placeholder
+    // forever, even after activating against a real restaurant with a different name.
+    RestaurantIdentityRepository.adopt(restaurantId, { name: restaurantName });
   } catch {
     // Storage unavailable — connection won't persist across reloads, but this run keeps working.
   }
@@ -116,7 +125,7 @@ export async function connectDevice(
     return { requiresActivation: true, activationSessionToken: data.activationSessionToken };
   }
 
-  persistConnection(data.restaurant.id, data.user?.fullName ?? email.trim(), data.deviceId, data.deviceToken);
+  persistConnection(data.restaurant.id, data.user?.fullName ?? email.trim(), data.deviceId, data.deviceToken, data.restaurant.name);
   return { requiresActivation: false };
 }
 
@@ -139,13 +148,13 @@ export async function activateCaptainDevice(activationSessionToken: string, acti
     throw new CloudApiError(data?.message ?? `Activation failed (${res.status})`, res.status);
   }
 
-  persistConnection(data.restaurant.id, data.user?.fullName ?? 'Captain Tablet', data.deviceId, data.deviceToken);
+  persistConnection(data.restaurant.id, data.user?.fullName ?? 'Captain Tablet', data.deviceId, data.deviceToken, data.restaurant.name);
 }
 
 function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const token = getCaptainDeviceToken();
   if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
-  return fetch(`${API_BASE}${path}`, {
+  return DeviceGate.gatedFetch(`${API_BASE}${path}`, {
     ...init,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
   });
@@ -204,13 +213,24 @@ export async function pullEntitySync(
 }
 
 export async function reportHeartbeat(): Promise<void> {
-  try {
-    await deviceFetch('/api/v1/devices/me/heartbeat', {
-      method: 'PATCH',
-      body: JSON.stringify({ syncStatus: 'ok', appVersion: '1.0.0' })
-    });
-  } catch {
-    // Best-effort — a missed heartbeat just means this device shows stale
-    // "last seen" in Super Admin until the next successful one.
-  }
+  const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
+  if (!deviceToken) return;
+  // The platform's decision about JAMAN AI for this restaurant rides on the heartbeat (cached 5 minutes).
+  void refreshAiConfigIfStale({ apiBase: API_BASE, deviceToken });
+  // Real version (from package.json at build time), OS and sync backlog; also applies the answer: lock,
+  // notice, update offer and any signed offline extension.
+  await sendHeartbeat({
+    apiBase: API_BASE,
+    deviceToken,
+    appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0',
+    restaurantId: localStorage.getItem(RESTAURANT_ID_KEY),
+    deviceId: localStorage.getItem(DEVICE_ID_KEY)
+  });
+}
+
+/** Tell the cloud a JAMAN AI question was answered (usage + measured latency) and honour its daily limit. */
+export async function reportAiQueryNow(intent: string, latencyMs: number): Promise<void> {
+  const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
+  if (!deviceToken) return;
+  await reportAiQuery({ apiBase: API_BASE, deviceToken, intent, latencyMs });
 }

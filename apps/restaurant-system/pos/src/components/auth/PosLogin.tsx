@@ -3,20 +3,16 @@ import { usePosStore } from '../../store/posStore';
 import { db } from '@jamanvaar/database';
 import { JamanvaarAuthLayout } from '@jamanvaar/ui';
 import {
-  Lock,
   Unlock,
-  User as UserIcon,
-  Zap,
-  CheckCircle2,
   Delete,
   ShieldAlert,
-  Sparkles,
   Check
 } from 'lucide-react';
 
 export const PosLogin: React.FC = () => {
   const { loginWithPin, isOnline, toggleNetworkStatus } = usePosStore();
-  const [selectedUser, setSelectedUser] = useState<(typeof db.users)[0] | null>(db.users[2] || db.users[0]);
+  const activeStaff = db.users.filter((u) => u.isActive);
+  const [selectedUser, setSelectedUser] = useState<(typeof db.users)[0] | null>(activeStaff[0] || null);
   const [pin, setPin] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -66,18 +62,6 @@ export const PosLogin: React.FC = () => {
     }, 200);
   };
 
-  const handleQuickDemo = () => {
-    const allUsers = db.users as ((typeof db.users)[0] & { pinCode?: string })[];
-    const cashierUser =
-      allUsers.find((u) => u.pinCode && (u.roleId === 'role-cashier' || u.roleId === 'role-lead-cashier')) ||
-      allUsers[0];
-    setSelectedUser(cashierUser);
-    if (cashierUser && cashierUser.pinCode) {
-      setPin(cashierUser.pinCode);
-      handleSubmit(cashierUser.pinCode);
-    }
-  };
-
   return (
     <JamanvaarAuthLayout
       appIdentity="POS"
@@ -96,23 +80,23 @@ export const PosLogin: React.FC = () => {
       ]}
       footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
     >
-      {/* Quick Demo Login Bar (Matching Mockup) */}
-      <button
-        type="button"
-        onClick={handleQuickDemo}
-        className="w-full py-2.5 px-4 rounded-xl bg-[#FFF7ED] hover:bg-[#FFEEDD] border border-[#FDBA74] text-jaman-saffron font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-2xs active:scale-[0.98] cursor-pointer"
-      >
-        <Zap className="w-4 h-4 text-jaman-saffron fill-jaman-saffron" />
-        <span>QUICK DEMO LOGIN — Cashier Session (PIN: 1111)</span>
-      </button>
-
-      {/* Staff Profile Cards (48-56px Touch Targets) */}
+      {/* Staff Profile Cards (48-56px Touch Targets) — every active staff member this
+          restaurant's owner/manager has actually created in Restaurant Admin, not a
+          fixed "first 4" slice and no demo shortcut (BUG-005). */}
+      {activeStaff.length === 0 ? (
+        <div className="text-center py-4 px-3 bg-[#FFF7ED] border border-[#FDBA74] rounded-xl">
+          <p className="text-xs font-bold text-jaman-navy">No staff have been set up yet.</p>
+          <p className="text-[11px] text-slate-500 mt-1">
+            Ask the restaurant owner or manager to add staff and issue PINs from Restaurant Admin → Staff &amp; Roles.
+          </p>
+        </div>
+      ) : (
       <div className="space-y-1.5 pt-1">
         <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block text-left">
           Select Staff Profile
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          {db.users.slice(0, 4).map((user, idx) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-48 overflow-y-auto pr-0.5">
+          {activeStaff.map((user, idx) => {
             const isSelected = selectedUser?.id === user.id;
             const avatarBg =
               idx === 0
@@ -161,6 +145,7 @@ export const PosLogin: React.FC = () => {
           })}
         </div>
       </div>
+      )}
 
       {/* 4-Digit PIN Indicator (○ ○ ○ ○) */}
       <div className="pt-2 flex flex-col items-center">

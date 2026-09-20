@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { printElement } from '@jamanvaar/ui';
 import { EodReport } from '@jamanvaar/types';
 import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
 import { db } from '@jamanvaar/database';
@@ -70,7 +71,11 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
   }, [selectedDate, managerNotes]);
 
   const handlePrint = () => {
-    window.print();
+    printElement('[data-print-doc="eod-z-report"]', {
+      title: `Z-Report ${report.displayDate}`,
+      pageSize: printPaperSize === 'A4' ? 'A4 portrait' : '80mm auto',
+      margin: printPaperSize === 'A4' ? '10mm' : '2mm'
+    });
   };
 
   const handleLockAndClose = () => {
@@ -206,7 +211,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
       {/* 1. OFFICIAL A4 PAPER AUDIT DOCUMENT (CLEAN 2-PAGE PAGINATION) */}
       {/* ========================================================================= */}
       {printPaperSize === 'A4' && (
-        <div className="bg-white p-6 sm:p-10 rounded-3xl border border-slate-300 shadow-sm print:border-none print:p-0 print:shadow-none font-sans text-slate-900 leading-normal text-xs space-y-5 eod-a4-document">
+        <div data-print-doc="eod-z-report" className="bg-white p-6 sm:p-10 rounded-3xl border border-slate-300 shadow-sm print:border-none print:p-0 print:shadow-none font-sans text-slate-900 leading-normal text-xs space-y-5 eod-a4-document">
           
           {/* ================= PAGE 1 ================= */}
           <div className="space-y-4 print-avoid-break">
@@ -796,7 +801,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
       {/* 2. 80MM THERMAL RECEIPT SLIP MODE */}
       {/* ========================================================================= */}
       {printPaperSize === '80MM' && (
-        <div className="bg-white p-4 max-w-[320px] mx-auto rounded-2xl border border-slate-300 shadow-md font-mono text-[11px] leading-tight text-slate-900 space-y-3 print:p-0 print:border-none print:shadow-none eod-80mm-document">
+        <div data-print-doc="eod-z-report" className="bg-white p-4 max-w-[320px] mx-auto rounded-2xl border border-slate-300 shadow-md font-mono text-[11px] leading-tight text-slate-900 space-y-3 print:p-0 print:border-none print:shadow-none eod-80mm-document">
           
           {/* Header */}
           <div className="text-center space-y-0.5 pb-2 border-b border-dashed border-slate-400">

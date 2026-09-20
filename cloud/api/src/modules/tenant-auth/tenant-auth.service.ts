@@ -1,3 +1,4 @@
+import { assertSessionStillAllowed } from '../../common/security/session-state';
 import { randomBytes, createHash } from 'crypto';
 import {
   BadRequestException,
@@ -27,6 +28,7 @@ export interface TenantAccessTokenPayload {
   restaurantId: string;
   email: string;
   impersonatedBy?: string; // PlatformUser.id — set only on a support-issued impersonation token
+  did?: string; // Device.id - the terminal this session was created on (revoking it ends the session)
 }
 
 export interface TenantLoginResult {
@@ -85,8 +87,13 @@ export class TenantAuthService {
     private readonly appEntitlements: ApplicationEntitlementsService
   ) {}
 
-  private signAccessToken(user: User): string {
-    const payload: TenantAccessTokenPayload = { sub: user.id, restaurantId: user.restaurantId, email: user.email };
+  private signAccessToken(user: User, deviceId?: string): string {
+    const payload: TenantAccessTokenPayload = {
+      sub: user.id,
+      restaurantId: user.restaurantId,
+      email: user.email,
+      ...(deviceId ? { did: deviceId } : {})
+    };
     return this.jwt.sign(payload, {
       secret: this.config.get<string>('JWT_ACCESS_SECRET'),
       issuer: TENANT_JWT_ISSUER,
@@ -132,14 +139,14 @@ export class TenantAuthService {
     };
   }
 
-  private async issueRefreshToken(userId: string, restaurantId: string): Promise<{ token: string; expiresAt: Date }> {
+  private async issueRefreshToken(userId: string, restaurantId: string, deviceId?: string): Promise<{ token: string; expiresAt: Date }> {
     const token = randomBytes(48).toString('base64url');
     const ttlDays = Number(this.config.get<string>('JWT_REFRESH_TTL_DAYS') ?? 30);
     const expiresAt = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000);
 
     await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.tenantRefreshToken.create({
-        data: { userId, restaurantId, tokenHash: hashRefreshToken(token), expiresAt }
+        data: { userId, restaurantId, tokenHash: hashRefreshToken(token), expiresAt, deviceId }
       })
     );
 
@@ -278,8 +285,8 @@ export class TenantAuthService {
 
     // Case 1: Device is registered and active -> LOGIN_SUCCESS
     if (isDeviceActive && activeDevice) {
-      const accessToken = this.signAccessToken(matchedUser);
-      const { token: refreshToken, expiresAt } = await this.issueRefreshToken(matchedUser.id, matchedUser.restaurantId);
+      const accessToken = this.signAccessToken(matchedUser, activeDevice.id);
+      const { token: refreshToken, expiresAt } = await this.issueRefreshToken(matchedUser.id, matchedUser.restaurantId, activeDevice.id);
 
       await this.prisma.runAsTenant(matchedUser.restaurantId, (tx) =>
         tx.device.update({
@@ -463,7 +470,7 @@ export class TenantAuthService {
       });
       if (!user) throw new NotFoundException('User account not found');
 
-      const accessToken = this.signAccessToken(user);
+      const accessToken = this.signAccessToken(user, device.id);
       const token = randomBytes(48).toString('base64url');
       const ttlDays = Number(this.config.get<string>('JWT_REFRESH_TTL_DAYS') ?? 30);
       const expiresAt = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000);
@@ -473,7 +480,8 @@ export class TenantAuthService {
           userId: user.id,
           restaurantId: user.restaurantId,
           tokenHash: hashRefreshToken(token),
-          expiresAt
+          expiresAt,
+          deviceId: device.id
         }
       });
 
@@ -511,6 +519,11 @@ export class TenantAuthService {
     });
   }
 
+  /** See common/security/session-state.ts - shared with the request guard. */
+  async assertSessionStillAllowed(restaurantId: string, deviceId?: string): Promise<void> {
+    return assertSessionStillAllowed(this.prisma, restaurantId, deviceId);
+  }
+
   /** Rotates the refresh token — the old one is consumed even if reused later (replay is rejected). */
   async refresh(refreshToken: string): Promise<TenantLoginResult> {
     const tokenHash = hashRefreshToken(refreshToken);
@@ -536,8 +549,12 @@ export class TenantAuthService {
       throw new UnauthorizedException('Account disabled');
     }
 
-    const accessToken = this.signAccessToken(user);
-    const { token: newRefreshToken, expiresAt } = await this.issueRefreshToken(user.id, user.restaurantId);
+    // A session must not outlive the state that allowed it: the restaurant, its
+    // subscription and the device it was created on are re-checked on every refresh.
+    await this.assertSessionStillAllowed(user.restaurantId, existing.deviceId ?? undefined);
+
+    const accessToken = this.signAccessToken(user, existing.deviceId ?? undefined);
+    const { token: newRefreshToken, expiresAt } = await this.issueRefreshToken(user.id, user.restaurantId, existing.deviceId ?? undefined);
 
     return {
       accessToken,

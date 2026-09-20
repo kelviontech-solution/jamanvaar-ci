@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository } from '@jamanvaar/database';
-import { lanMeshSync, SyncOutboxEngine } from '@jamanvaar/sync';
+import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
+import { EntitySyncEngine, lanMeshSync, SyncOutboxEngine } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus } from '@jamanvaar/types';
-import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
+import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
 import {
   JamanvaarAuthLayout,
   BrandHeader,
@@ -66,17 +66,34 @@ export const App: React.FC = () => {
       return;
     }
     SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
+
+    // BUG-019/034/035: a staff PIN issued in Restaurant Admin used to work only on the device that
+    // created it — KDS had no entity-sync wiring at all (not even for menu/CRM), so a kitchen chef's
+    // PIN never reached this screen despite the create/reset screen's own promise that it would.
+    const syncStaff = async () => {
+      await EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
+    };
+
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
+    void syncStaff();
     void reportHeartbeat();
 
-    const interval = setInterval(() => {
+    // A kitchen needs new tickets within seconds, not every 15 s.
+    const orderInterval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
       void SyncOutboxEngine.catchUpFromCloud();
+    }, 3000);
+    const interval = setInterval(() => {
+      void syncStaff();
       void reportHeartbeat();
     }, 15000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(orderInterval);
+      clearInterval(interval);
+    };
   }, [isDeviceActivated]);
 
   // KDS Authentication State — restored from persisted session
@@ -218,8 +235,7 @@ export const App: React.FC = () => {
       const next = kdsPin + digit;
       setKdsPin(next);
       if (next.length === 4) {
-        const userPool = (db.users || []) as (import('@jamanvaar/types').User & { pinCode?: string })[];
-        const matchedUser = userPool.find((u) => u.pinCode === next && u.isActive);
+        const matchedUser = StaffRepository.verifyPin(next)?.user;
 
         if (matchedUser) {
           setKdsPinError(false);
@@ -229,7 +245,7 @@ export const App: React.FC = () => {
             userId: matchedUser.id,
             fullName: matchedUser.fullName,
             roleId: matchedUser.roleId || 'KDS_STATION',
-            restaurantId: matchedUser.restaurantId || 'restaurant-main',
+            restaurantId: matchedUser.restaurantId || db.restaurant.id,
             stationId: kdsStationSelection.toLowerCase().replace(/\s+/g, '-'),
             stationName: kdsStationSelection,
             terminalId: 'KDS-01'

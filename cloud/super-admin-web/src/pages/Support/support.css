@@ -18,17 +18,17 @@
   width: 100%;
   padding: 0.85rem 1rem 0.85rem 3rem;
   font-size: 1rem;
-  background: var(--bg-card);
+  background: var(--jv-surface);
   border: 1px solid var(--jv-border);
   border-radius: 10px;
-  color: var(--text-primary);
+  color: var(--jv-text);
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .support-search-input:focus {
   border-color: var(--jv-accent);
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+  box-shadow: 0 0 0 3px rgba(230, 104, 23, 0.18);
 }
 
 .search-results-grid {
@@ -47,7 +47,7 @@
 }
 
 .result-item-card {
-  background: var(--bg-card);
+  background: var(--jv-surface);
   border: 1px solid var(--jv-border);
   border-radius: 8px;
   padding: 0.85rem;
@@ -57,7 +57,7 @@
 }
 
 .result-item-card:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--jv-surface-hover);
   border-color: var(--jv-accent);
 }
 
@@ -93,6 +93,13 @@
 }
 
 .diag-kv-value {
-  color: var(--text-primary);
+  color: var(--jv-text);
   font-weight: 500;
+}
+
+/* Two columns only where there is room (BUG-090). */
+@media (max-width: 900px) {
+  .diagnostics-panel {
+    grid-template-columns: 1fr;
+  }
 }

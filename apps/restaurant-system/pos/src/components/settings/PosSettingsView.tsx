@@ -4,8 +4,10 @@ import { db, ReceiptRepository, PrintQueueRepository, LicenseRepository } from '
 import { PLAN_DEFINITIONS, EntitlementService, applyLicenseCertificate } from '@jamanvaar/business';
 import { PlanTier, PrinterRole } from '@jamanvaar/types';
 import { PosPrinterService } from '../../services/printerService';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, slipHeader } from '@jamanvaar/utils';
 import { sound, type SoundVolume } from '@jamanvaar/ui';
+import { DisplaySizeCard } from './DisplaySizeCard';
+import { DetectedPrintersPanel } from './DetectedPrintersPanel';
 import {
   Settings,
   Printer,
@@ -119,8 +121,8 @@ export const PosSettingsView: React.FC = () => {
     setTimeout(() => {
       const res = PosPrinterService.scanForPrinters();
       setIsScanningPrinters(false);
-      setTestPrintFeedback(`✓ Hardware Scan Complete: Found ${res.totalFound} printers (USB, LAN, Serial, Windows drivers)`);
-      setTimeout(() => setTestPrintFeedback(''), 4000);
+      setTestPrintFeedback(`${res.totalFound} configured printer${res.totalFound === 1 ? '' : 's'}. ${res.note}`);
+      setTimeout(() => setTestPrintFeedback(''), 7000);
     }, 600);
   };
 
@@ -140,8 +142,7 @@ export const PosSettingsView: React.FC = () => {
     } else {
       const rawPayload = `
 ========================================
-            JAMANVAAR POS
-           BY KELVIONTECH
+${slipHeader(db.restaurant.name)}
 ----------------------------------------
 TEST PRINT TICKET
 TERMINAL: ${posTerminalId}
@@ -309,6 +310,8 @@ ESC/POS Command Engine Verified OK
           ⚠ {licenseError}
         </div>
       )}
+
+      {activeSettingsTab === 'HARDWARE' && <DisplaySizeCard />}
 
       {/* ─────────── SOUND SETTINGS CARD (always visible on HARDWARE tab) ─────────── */}
       {activeSettingsTab === 'HARDWARE' && (
@@ -524,7 +527,7 @@ ESC/POS Command Engine Verified OK
                 </div>
                 <div className="flex justify-between">
                   <span>GSTIN Number:</span>
-                  <strong className="font-mono text-jaman-navy">24AAACJ1234F1Z5</strong>
+                  <strong className="font-mono text-jaman-navy">{db.restaurant.gstin || 'Not registered'}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Default Paper Size:</span>
@@ -849,6 +852,14 @@ ESC/POS Command Engine Verified OK
               </div>
             </div>
           </div>
+
+          <DetectedPrintersPanel
+            onAdded={() => setTestPrintFeedback('')}
+            showToast={(msg) => {
+              setTestPrintFeedback(msg);
+              setTimeout(() => setTestPrintFeedback(''), 4000);
+            }}
+          />
 
           {/* Configured Printers Station */}
           <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-4">

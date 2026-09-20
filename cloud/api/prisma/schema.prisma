@@ -71,10 +71,23 @@ model PlatformRefreshToken {
   platformUser   PlatformUser @relation(fields: [platformUserId], references: [id], onDelete: Cascade)
   tokenHash      String    @unique
   expiresAt      DateTime
+  /// Set when this token is rotated (every login renewal) - not the same as the session ending.
   revokedAt      DateTime?
   createdAt      DateTime  @default(now())
+  /// One id per login. Refresh-token rotation keeps it, so the session list shows one row per login.
+  sessionId      String    @default(uuid())
+  sessionStartedAt DateTime @default(now())
+  lastUsedAt     DateTime  @default(now())
+  /// Set on every row of a session when the session is ended on purpose (revoke, logout, password change).
+  /// The request guard rejects access tokens whose session has this set, so it takes effect at once.
+  terminatedAt   DateTime?
+  userAgent      String?
+  ip             String?
+  /// Approximate place of the sign-in (see common/security/geo.ts).
+  location       String?
 
   @@index([platformUserId])
+  @@index([sessionId])
 }
 
 // ---------------------------------------------------------------------------
@@ -89,6 +102,8 @@ enum RestaurantStatus {
 }
 
 model Restaurant {
+  /// Default display size (percent) for this restaurant's terminals; each terminal can override it (BUG-008).
+  displayScalePercent Int @default(100)
   id              String           @id @default(uuid())
   name            String
   legalName       String?
@@ -102,6 +117,9 @@ model Restaurant {
   currency        String           @default("INR")
   defaultLanguage String           @default("en")
   status          RestaurantStatus @default(ACTIVE)
+  /// BUG-015: whether the Restaurant Admin may upload their own menu CSV. Super Admin can
+  /// always upload for the restaurant regardless of this flag.
+  selfMenuUploadEnabled Boolean    @default(true)
   deletedAt       DateTime?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -131,6 +149,8 @@ model Restaurant {
   menuSnapshotItems       MenuSnapshotItem[]
   syncedOrders            SyncedOrder[]
   syncedEntities          SyncedEntity[]
+  aiAccess                RestaurantAiAccess?
+  aiUsage                 AiUsageDaily[]
 }
 
 enum BranchStatus {
@@ -152,6 +172,7 @@ model Branch {
 
   users   User[]
   devices Device[]
+  activationKeys ActivationKey[]
 
   @@unique([restaurantId, code])
   @@index([restaurantId])
@@ -209,6 +230,8 @@ model TenantRefreshToken {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   restaurantId String
   tokenHash    String    @unique
+  /// The terminal this session was created on; revoking the device ends the session.
+  deviceId     String?
   expiresAt    DateTime
   revokedAt    DateTime?
   createdAt    DateTime  @default(now())
@@ -349,10 +372,19 @@ model ActivationKey {
   expiresAt          DateTime
   redeemedAt         DateTime?
   redeemedByDeviceId String?
+  /// BUG-048: the branch the terminal that redeems this key is bound to.
+  branchId           String?
+  branch             Branch?                 @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  /// Free-text name for the terminal this key is for ("Counter 1", "Kitchen wall"); becomes the device name.
+  label              String?
+  /// Keys generated together (a welcome kit) share a batch id.
+  batchId            String?
   createdAt          DateTime                @default(now())
   updatedAt          DateTime                @updatedAt
 
   @@index([restaurantId])
+  @@index([branchId])
+  @@index([batchId])
 }
 
 enum DeviceType {
@@ -463,6 +495,8 @@ enum TicketPriority {
 
 model SupportTicket {
   id           String         @id @default(uuid())
+  /// Human-quotable number (shown as TKT-000123). Auto-incrementing, never reused.
+  number       Int            @unique @default(autoincrement())
   restaurantId String? // null = platform-wide issue, not tied to one tenant
   restaurant   Restaurant?    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   subject      String
@@ -471,28 +505,80 @@ model SupportTicket {
   priority     TicketPriority @default(MEDIUM)
   assignedToId String?
   assignedTo   PlatformUser?  @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
-  createdById  String
-  createdBy    PlatformUser   @relation("SupportTicketCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  /// Set when platform staff raised it; null when the restaurant did (see source / raisedBy*).
+  createdById  String?
+  createdBy    PlatformUser?  @relation("SupportTicketCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  /// PLATFORM (staff raised it) or RESTAURANT (raised from Restaurant Admin).
+  source       String         @default("PLATFORM")
+  /// BILLING, SYNC, HARDWARE, ONBOARDING, FEATURE_REQUEST, OTHER
+  category     String         @default("OTHER")
+  raisedByUserId String?
+  raisedByName   String?
+  raisedByEmail  String?
+  branchId     String?
+  deviceId     String?
   slaDueAt     DateTime
   resolvedAt   DateTime?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
-  comments TicketComment[]
+  comments    TicketComment[]
+  events      TicketEvent[]
+  attachments TicketAttachment[]
 
   @@index([restaurantId])
   @@index([status])
   @@index([assignedToId])
+  @@index([source])
 }
 
 model TicketComment {
   id        String        @id @default(uuid())
   ticketId  String
   ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  authorId  String
-  author    PlatformUser  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    PlatformUser? @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  /// PLATFORM or RESTAURANT; for a restaurant reply authorId is null and authorName says who.
+  authorType String       @default("PLATFORM")
+  authorName String?
+  /// Internal notes are for the platform team only and never shown to the restaurant.
+  internal  Boolean       @default(false)
   body      String
   createdAt DateTime      @default(now())
+
+  @@index([ticketId])
+}
+
+/// The ticket's history: who changed what and when.
+model TicketEvent {
+  id        String        @id @default(uuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  /// CREATED, STATUS, PRIORITY, ASSIGNEE, ATTACHMENT
+  type      String
+  actorType String        @default("PLATFORM")
+  actorName String?
+  fromValue String?
+  toValue   String?
+  /// Restaurant-visible? Assignee changes are internal.
+  visibleToRestaurant Boolean @default(true)
+  createdAt DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
+}
+
+/// Small screenshots / documents, stored in the database (limited to a few per ticket and a couple of MB each).
+model TicketAttachment {
+  id         String        @id @default(uuid())
+  ticketId   String
+  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  fileName   String
+  mimeType   String
+  sizeBytes  Int
+  data       Bytes
+  uploadedByType String    @default("PLATFORM")
+  uploadedByName String?
+  createdAt  DateTime      @default(now())
 
   @@index([ticketId])
 }
@@ -552,6 +638,14 @@ model Invoice {
 
   @@index([restaurantId])
   @@index([status])
+}
+
+// Atomic gapless-per-year counters for statutory document numbers (invoices and
+// receipts). One row per "<PREFIX>-<financial year>". Never derived from a row
+// count: counts repeat after deletes and collide under concurrency.
+model InvoiceCounter {
+  key   String @id
+  value Int
 }
 
 model Payment {
@@ -645,6 +739,8 @@ model Backup {
   verificationStatus String?            @default("UNVERIFIED") // UNVERIFIED, VERIFIED, CORRUPT
   verifiedAt         DateTime?
   retentionDays      Int                @default(30)
+  /// BUG-074: true when the stored object is AES-256-GCM encrypted (see BackupStorageService).
+  encrypted          Boolean            @default(false)
   createdAt          DateTime           @default(now())
 
   restoreJobs        BackupRestoreJob[]
@@ -823,8 +919,9 @@ model OfflineExtension {
   extensionDays        Int
   reason               String
   requestedBy          String
+  ticketRef            String?
   approvedById         String
-  status               String     @default("ACTIVE") // ACTIVE, REVOKED, EXPIRED
+  status               String     @default("ACTIVE") // ACTIVE, REVOKED, EXPIRED (EXPIRED is derived from validUntil when listing)
   certificatePayload   String
   certificateSignature String
   validFrom            DateTime   @default(now())
@@ -1127,6 +1224,8 @@ model SyncedOrder {
   restaurant      Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   deviceId        String? // the device that created/last wrote this order
   device          Device?    @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  /// BUG-048: the branch of the device that first pushed this order, for per-branch sales.
+  branchId        String?
   externalOrderId String // the local app's own order id; doubles as the idempotency key
   orderType       String // DINE_IN / TAKEAWAY / DELIVERY / TOKEN_QR
   status          String
@@ -1138,6 +1237,9 @@ model SyncedOrder {
   discountAmount  Int        @default(0) // paise
   totalAmount     Int // paise
   notes           String?
+  paymentStatus   String? // PENDING / SUCCESS / ... as recorded by the device
+  paymentMethod   String? // CASH / UPI / CARD / SPLIT / ...
+  meta            Json? // order/token numbers, cashier, customer, tender lines, tax split, business day
   syncVersion     Int        @default(1) // bumped on every push; lets a puller detect it missed an update
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
@@ -1145,6 +1247,7 @@ model SyncedOrder {
   @@unique([restaurantId, externalOrderId])
   @@index([restaurantId, updatedAt])
   @@index([deviceId])
+  @@index([branchId])
 }
 
 // A generic sync mirror for domains that don't (yet) need Order's dedicated
@@ -1176,3 +1279,92 @@ model SyncedEntity {
 }
 
 
+
+// ---------------------------------------------------------------------------
+// JAMAN AI (BUG-055..058): the question catalogue, per-restaurant access and real usage live in the
+// database, not in the API process's memory. The global thresholds are a PlatformSetting ("ai.settings").
+// ---------------------------------------------------------------------------
+model AiQuestion {
+  id              String   @id
+  category        String
+  /// May contain {delayedKotMinutes} / {lowStockThreshold}, filled in from the settings when sent.
+  label           String
+  icon            String   @default("sparkles")
+  intent          String
+  minPlanTier     String   @default("PRO")
+  priorityScore   Int      @default(50)
+  isEnabled       Boolean  @default(true)
+  isCustom        Boolean  @default(false)
+  targetDomain    String?
+  calculationType String?
+  filterField     String?
+  filterValue     String?
+  displayUnit     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([category])
+}
+
+/// A per-restaurant decision about JAMAN AI. `state` null means "follow the plan".
+model RestaurantAiAccess {
+  restaurantId       String     @id
+  restaurant         Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  state              String? // ON | LOCKED | OFF
+  dailyQueryLimit    Int?
+  thresholdOverrides Json?
+  updatedAt          DateTime   @updatedAt
+}
+
+/// One row per restaurant, day and intent: real counts and measured latency.
+model AiUsageDaily {
+  id             String     @id @default(uuid())
+  restaurantId   String
+  restaurant     Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  day            DateTime   @db.Date
+  intent         String
+  queries        Int        @default(0)
+  totalLatencyMs Int        @default(0)
+
+  @@unique([restaurantId, day, intent])
+  @@index([day])
+}
+
+// ---------------------------------------------------------------------------
+// Platform notification centre (BUG-064): a real store with severity, the exact record to open, and
+// per-person read state, instead of two counters computed in the browser.
+// ---------------------------------------------------------------------------
+model PlatformNotification {
+  id           String   @id @default(uuid())
+  type         String // SUBSCRIPTION_EXPIRING, BACKUP_FAILED, INVOICE_OVERDUE, DEVICES_OFFLINE, KEYS_EXPIRING, SYNC_FAILING, RESTAURANT_SUSPENDED, TICKET_*
+  severity     String   @default("INFO") // INFO | WARNING | CRITICAL
+  title        String
+  body         String?
+  restaurantId String?
+  targetType   String?
+  targetId     String?
+  /// The in-app path that opens the exact record.
+  link         String
+  /// The same underlying event never creates two notifications.
+  dedupeKey    String   @unique
+  /// When set, only this platform user sees it (an assignment, say); otherwise the whole team does.
+  userId       String?
+  createdAt    DateTime @default(now())
+
+  reads PlatformNotificationRead[]
+
+  @@index([createdAt])
+  @@index([type])
+  @@index([restaurantId])
+  @@index([userId])
+}
+
+model PlatformNotificationRead {
+  notificationId String
+  notification   PlatformNotification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  userId         String
+  readAt         DateTime             @default(now())
+
+  @@id([notificationId, userId])
+  @@index([userId])
+}

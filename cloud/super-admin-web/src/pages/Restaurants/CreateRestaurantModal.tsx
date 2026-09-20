@@ -1,3 +1,6 @@
+import { RESTAURANT_ADMIN_URL } from '../../lib/appUrls';
+// Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
+import { copyText } from '../../../../../packages/utils/src/clipboard';
 import { useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { CreateRestaurantInput, RestaurantDetail, ActivationKey } from '../../api/types';
@@ -56,8 +59,8 @@ export function CreateRestaurantModal({
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  function handleCopy(text: string, id: string) {
-    navigator.clipboard.writeText(text);
+  async function handleCopy(text: string, id: string) {
+    if (!(await copyText(text))) return;
     setCopiedKey(id);
     setTimeout(() => setCopiedKey(null), 2500);
   }
@@ -81,7 +84,7 @@ export function CreateRestaurantModal({
           allowedDeviceType: 'ANY',
           expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
         });
-        keyResult = keyRes.code;
+        keyResult = keyRes.code ?? undefined;
       } catch (keyErr) {
         console.warn('Auto key generation error:', keyErr);
       }
@@ -180,7 +183,7 @@ export function CreateRestaurantModal({
             </div>
 
             <div style={{ fontSize: 12, color: 'var(--jv-text-secondary)', background: 'var(--jv-bg-muted)', padding: '8px 12px', borderRadius: 6, marginTop: 4 }}>
-              💡 <strong>First Login Note:</strong> On the first login at <code>http://localhost:5176</code>, the owner will enter their email & password, then enter the Activation Key. Subsequent logins will authenticate directly without prompting for the key.
+              💡 <strong>First Login Note:</strong> On the first login at <code>{RESTAURANT_ADMIN_URL}</code>, the owner will enter their email & password, then enter the Activation Key. Subsequent logins will authenticate directly without prompting for the key.
             </div>
 
             <div className="modal-actions" style={{ marginTop: 16 }}>

@@ -39,7 +39,7 @@ export class MasterCatalogService {
   ) {}
 
   async listCategories() {
-    return this.prisma.masterMenuCategory.findMany({
+    return this.prisma.platformDb.masterMenuCategory.findMany({
       where: { isActive: true },
       orderBy: { sortOrder: 'asc' },
       include: { _count: { select: { items: true } } }
@@ -47,12 +47,12 @@ export class MasterCatalogService {
   }
 
   async createCategory(dto: CreateMasterCategoryDto, actor: PlatformUser) {
-    const existing = await this.prisma.masterMenuCategory.findFirst({
+    const existing = await this.prisma.platformDb.masterMenuCategory.findFirst({
       where: { OR: [{ name: dto.name }, { slug: dto.slug }] }
     });
     if (existing) throw new ConflictException('Category with this name or slug already exists');
 
-    const category = await this.prisma.masterMenuCategory.create({
+    const category = await this.prisma.platformDb.masterMenuCategory.create({
       data: {
         name: dto.name,
         slug: dto.slug,
@@ -83,7 +83,7 @@ export class MasterCatalogService {
       ];
     }
 
-    return this.prisma.masterMenuItem.findMany({
+    return this.prisma.platformDb.masterMenuItem.findMany({
       where,
       include: {
         category: { select: { id: true, name: true } },
@@ -94,7 +94,7 @@ export class MasterCatalogService {
   }
 
   async getItemById(id: string) {
-    const item = await this.prisma.masterMenuItem.findUnique({
+    const item = await this.prisma.platformDb.masterMenuItem.findUnique({
       where: { id },
       include: {
         category: true,
@@ -108,10 +108,10 @@ export class MasterCatalogService {
   }
 
   async createItem(dto: CreateMasterItemDto, actor: PlatformUser) {
-    const category = await this.prisma.masterMenuCategory.findUnique({ where: { id: dto.categoryId } });
+    const category = await this.prisma.platformDb.masterMenuCategory.findUnique({ where: { id: dto.categoryId } });
     if (!category) throw new NotFoundException('Category not found');
 
-    const item = await this.prisma.masterMenuItem.create({
+    const item = await this.prisma.platformDb.masterMenuItem.create({
       data: {
         categoryId: dto.categoryId,
         name: dto.name,
@@ -141,10 +141,10 @@ export class MasterCatalogService {
   }
 
   async updateItem(id: string, dto: Partial<CreateMasterItemDto>, actor: PlatformUser) {
-    const existing = await this.prisma.masterMenuItem.findUnique({ where: { id } });
+    const existing = await this.prisma.platformDb.masterMenuItem.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Master dish not found');
 
-    const updated = await this.prisma.masterMenuItem.update({
+    const updated = await this.prisma.platformDb.masterMenuItem.update({
       where: { id },
       data: {
         categoryId: dto.categoryId,
@@ -175,10 +175,10 @@ export class MasterCatalogService {
   }
 
   async deleteItem(id: string, actor: PlatformUser) {
-    const existing = await this.prisma.masterMenuItem.findUnique({ where: { id } });
+    const existing = await this.prisma.platformDb.masterMenuItem.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Master dish not found');
 
-    await this.prisma.masterMenuItem.delete({ where: { id } });
+    await this.prisma.platformDb.masterMenuItem.delete({ where: { id } });
 
     await this.audit.log({
       actorType: 'PLATFORM',
@@ -192,10 +192,10 @@ export class MasterCatalogService {
   }
 
   async updateCategory(id: string, dto: Partial<CreateMasterCategoryDto & { isActive?: boolean }>, actor: PlatformUser) {
-    const existing = await this.prisma.masterMenuCategory.findUnique({ where: { id } });
+    const existing = await this.prisma.platformDb.masterMenuCategory.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Category not found');
 
-    const updated = await this.prisma.masterMenuCategory.update({
+    const updated = await this.prisma.platformDb.masterMenuCategory.update({
       where: { id },
       data: {
         name: dto.name,
@@ -218,15 +218,15 @@ export class MasterCatalogService {
   }
 
   async deleteCategory(id: string, actor: PlatformUser) {
-    const existing = await this.prisma.masterMenuCategory.findUnique({ where: { id } });
+    const existing = await this.prisma.platformDb.masterMenuCategory.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Category not found');
 
-    const itemCount = await this.prisma.masterMenuItem.count({ where: { categoryId: id } });
+    const itemCount = await this.prisma.platformDb.masterMenuItem.count({ where: { categoryId: id } });
     if (itemCount > 0) {
       throw new ConflictException(`Cannot delete category "${existing.name}" because it contains ${itemCount} master dishes.`);
     }
 
-    await this.prisma.masterMenuCategory.delete({ where: { id } });
+    await this.prisma.platformDb.masterMenuCategory.delete({ where: { id } });
 
     await this.audit.log({
       actorType: 'PLATFORM',
@@ -308,7 +308,7 @@ export class MasterCatalogService {
 
     const catMap: Record<string, string> = {};
     for (const c of defaultCategories) {
-      const upserted = await this.prisma.masterMenuCategory.upsert({
+      const upserted = await this.prisma.platformDb.masterMenuCategory.upsert({
         where: { slug: c.slug },
         update: { name: c.name, icon: c.icon, sortOrder: c.sortOrder },
         create: c
@@ -524,12 +524,12 @@ export class MasterCatalogService {
 
     for (const d of starterDishes) {
       const categoryId = catMap[d.categorySlug] || catMap['starters-tandoor'];
-      const existing = await this.prisma.masterMenuItem.findFirst({
+      const existing = await this.prisma.platformDb.masterMenuItem.findFirst({
         where: { name: d.name }
       });
 
       if (!existing) {
-        await this.prisma.masterMenuItem.create({
+        await this.prisma.platformDb.masterMenuItem.create({
           data: {
             categoryId,
             name: d.name,
@@ -548,7 +548,7 @@ export class MasterCatalogService {
         });
         createdCount++;
       } else {
-        await this.prisma.masterMenuItem.update({
+        await this.prisma.platformDb.masterMenuItem.update({
           where: { id: existing.id },
           data: {
             categoryId,
@@ -588,17 +588,17 @@ export class MasterCatalogService {
    * Syndicates a master dish to targeted restaurants without overwriting custom pricing
    */
   async syndicateItem(itemId: string, dto: SyndicateItemDto, actor: PlatformUser) {
-    const masterItem = await this.prisma.masterMenuItem.findUnique({ where: { id: itemId } });
+    const masterItem = await this.prisma.platformDb.masterMenuItem.findUnique({ where: { id: itemId } });
     if (!masterItem) throw new NotFoundException('Master dish not found');
 
     const results = [];
     for (const restaurantId of dto.restaurantIds) {
-      const existing = await this.prisma.restaurantMenuSyndication.findUnique({
+      const existing = await this.prisma.platformDb.restaurantMenuSyndication.findUnique({
         where: { restaurantId_masterItemId: { restaurantId, masterItemId: itemId } }
       });
 
       if (!existing) {
-        const syndication = await this.prisma.restaurantMenuSyndication.create({
+        const syndication = await this.prisma.platformDb.restaurantMenuSyndication.create({
           data: {
             restaurantId,
             masterItemId: itemId,
@@ -609,7 +609,7 @@ export class MasterCatalogService {
         });
         results.push({ restaurantId, action: 'CREATED', id: syndication.id });
       } else if (!existing.isCustomized && existing.autoSync) {
-        const updated = await this.prisma.restaurantMenuSyndication.update({
+        const updated = await this.prisma.platformDb.restaurantMenuSyndication.update({
           where: { id: existing.id },
           data: { lastSyncedAt: new Date(), status: 'ACTIVE' }
         });
@@ -631,7 +631,7 @@ export class MasterCatalogService {
   }
 
   async listSyndicationsForRestaurant(restaurantId: string) {
-    return this.prisma.restaurantMenuSyndication.findMany({
+    return this.prisma.platformDb.restaurantMenuSyndication.findMany({
       where: { restaurantId },
       include: { masterItem: { include: { category: true } } },
       orderBy: { updatedAt: 'desc' }

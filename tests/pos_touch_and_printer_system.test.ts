@@ -34,10 +34,15 @@ describe('JAMANVAAR POS — Touchscreen & Automatic Printer System Suite', () =>
     expect(dessertPrinter).toBeDefined();
   });
 
-  it('2. should perform active hardware scan and update printer availability statuses', () => {
+  it('2. BUG-025: a "scan" never invents READY status, and honestly says it cannot detect new hardware', () => {
+    const victim = db.configuredPrinters[0];
+    victim.status = 'OFFLINE';
     const scanResult = PosPrinterService.scanForPrinters();
-    expect(scanResult.totalFound).toBeGreaterThanOrEqual(6);
-    expect(scanResult.printers.every((p) => p.status === 'READY')).toBe(true);
+    expect(scanResult.totalFound).toBe(db.configuredPrinters.length);
+    // Previously every non-ERROR/PAPER_OUT printer was forced to READY and reported "Found N".
+    expect(victim.status).toBe('OFFLINE');
+    expect(scanResult.canDetectNewHardware).toBe(false);
+    expect(scanResult.note).toMatch(/not available|cannot detect/i);
   });
 
   it('3. should automatically route KOTs to specific station printers (Tandoor, Kitchen, Bar, Dessert)', () => {
@@ -137,7 +142,11 @@ describe('JAMANVAAR POS — Touchscreen & Automatic Printer System Suite', () =>
     const job = await PosPrinterService.printOrderReceipt(order, '80mm');
     expect(job).toBeDefined();
     expect(job.orderId).toBe(order.id);
-    expect(job.status).toBe('SUCCESS');
+    // BUG-024: the job persists and is linked to the order either way — but its status is
+    // the truth, not an assumed SUCCESS. The default receipt printer here is a real USB
+    // printer (see BUG-026); run outside the desktop app it must fail honestly, not claim it printed.
+    expect(job.status).toBe('FAILED');
+    expect(job.errorMessage).toMatch(/desktop app/i);
     expect(db.printJobs.length).toBe(1);
     expect(db.printJobs[0].id).toBe(job.id);
   });
@@ -237,7 +246,9 @@ describe('JAMANVAAR POS — Touchscreen & Automatic Printer System Suite', () =>
 
     vi.doUnmock('@tauri-apps/api/core');
     delete (globalThis as any).window.__TAURI_INTERNALS__;
-  });
+    // 20s: the first `await import('@tauri-apps/api/core')` is a cold module transform that can
+    // exceed the 5s default when the whole suite runs in parallel (it takes ~100ms alone).
+  }, 20000);
 
   it('9. should continue offline billing and receipt printing without internet connection', async () => {
     // Simulate offline network

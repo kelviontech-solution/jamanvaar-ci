@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { User, StaffShiftSchedule } from '@jamanvaar/types';
 import { Modal, Button } from '@jamanvaar/ui';
-import { StaffScheduleRepository } from '@jamanvaar/database';
+import { StaffScheduleRepository, StaffRepository } from '@jamanvaar/database';
 
 interface ScheduleShiftModalProps {
   isOpen: boolean;
@@ -109,7 +109,7 @@ export const ScheduleShiftModal: React.FC<ScheduleShiftModalProps> = ({
             className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
           >
             {users.map((u) => (
-              <option key={u.id} value={u.id}>{u.fullName} ({u.roleId})</option>
+              <option key={u.id} value={u.id}>{u.fullName} ({StaffRepository.getRoleName(u.roleId)})</option>
             ))}
           </select>
         </div>

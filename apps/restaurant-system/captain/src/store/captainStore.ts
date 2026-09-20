@@ -17,7 +17,8 @@ import {
   KOTRepository,
   TableRepository,
   AuditRepository,
-  db
+  db,
+  StaffRepository
 } from '@jamanvaar/database';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { SessionPersistence, AuthStatus } from '@jamanvaar/business';
@@ -285,23 +286,22 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   notifications: [],
 
   login: (pin: string) => {
-    // SEC-006 fix: Authenticate against database users instead of hardcoded PIN bypass
-    const userPool = (captainDb.users || db.users || []) as (import('@jamanvaar/types').User & { pinCode?: string })[];
-    const matchedUser = userPool.find((u) => u.pinCode === pin && u.isActive);
+    // Centralised, hashed PIN verification (BUG-005/006/009/011) — same path as POS/KDS/Kiosk.
+    const matchedUser = StaffRepository.verifyPin(pin)?.user;
 
     if (matchedUser) {
       const captainProfile: CaptainProfile = {
         ...DEFAULT_CAPTAIN,
         id: matchedUser.id,
         name: matchedUser.fullName,
-        pin: matchedUser.pinCode || pin
+        pin
       };
       const startTime = new Date().toISOString();
       SessionPersistence.save('captain', {
         userId: matchedUser.id,
         fullName: matchedUser.fullName,
         roleId: matchedUser.roleId || 'CAPTAIN',
-        restaurantId: matchedUser.restaurantId || 'restaurant-main',
+        restaurantId: matchedUser.restaurantId || db.restaurant.id,
         terminalId: 'CAPTAIN-01'
       });
       set({

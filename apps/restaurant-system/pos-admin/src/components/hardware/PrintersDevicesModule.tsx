@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PrinterDevice } from '@jamanvaar/types';
 import { db, PrinterRepository } from '@jamanvaar/database';
+import { PrinterService } from '@jamanvaar/api';
 import {
   Printer,
   Plus,
@@ -185,9 +186,12 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
                 </div>
 
                 <button
-                  onClick={() => {
-                    showToast(`Test print dispatched to ${prn.name}`);
-                    window.print();
+                  onClick={async () => {
+                    // BUG-027: this used to toast "dispatched" and open the browser's print
+                    // dialog for the whole web page — no slip ever went to the printer. It now
+                    // uses the real print path and reports what actually happened.
+                    const res = await PrinterService.printTestSlip(prn.id);
+                    showToast(res.success ? res.message : `Test print failed: ${res.message}`);
                   }}
                   className="px-3 py-1.5 bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold rounded-xl transition-colors cursor-pointer"
                 >

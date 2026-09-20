@@ -1,6 +1,7 @@
+import { RefreshButton } from '../../components/RefreshButton';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
-import type { Device, OfflineExtension, RestaurantListItem } from '../../api/types';
+import type { Branch, Device, OfflineExtension, RestaurantListItem } from '../../api/types';
 import {
   Badge,
   Button,
@@ -12,7 +13,6 @@ import {
   Clock,
   KeyRound,
   CheckCircle2,
-  RefreshCw,
   Plus,
   AlertTriangle,
   FileCheck2,
@@ -23,7 +23,12 @@ import '../../components/shared.css';
 export function OfflinePolicyPage() {
   const [extensions, setExtensions] = useState<OfflineExtension[]>([]);
   const [approachingExpiry, setApproachingExpiry] = useState<Device[]>([]);
+  const [lockedOffline, setLockedOffline] = useState<Device[]>([]);
+  const [policy, setPolicy] = useState<{ offlineGraceDays: number; warnAfterDays: number }>({ offlineGraceDays: 7, warnAfterDays: 4 });
   const [restaurants, setRestaurants] = useState<RestaurantListItem[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
+  // null until the check returns; only a definite "not configured" blocks issuing.
+  const [signing, setSigning] = useState<{ configured: boolean; reason?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -32,7 +37,10 @@ export function OfflinePolicyPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [targetRestaurantId, setTargetRestaurantId] = useState('');
   const [targetDays, setTargetDays] = useState('14');
+  const [targetBranchId, setTargetBranchId] = useState('');
   const [grantReason, setGrantReason] = useState('');
+  const [requestedBy, setRequestedBy] = useState('');
+  const [ticketRef, setTicketRef] = useState('');
   const [granting, setGranting] = useState(false);
 
   const showToast = (msg: string) => {
@@ -46,12 +54,20 @@ export function OfflinePolicyPage() {
     Promise.all([
       api.get<OfflineExtension[]>('/api/v1/platform/offline-policy/extensions'),
       api.get<Device[]>('/api/v1/platform/offline-policy/approaching-expiry'),
-      api.get<RestaurantListItem[]>('/api/v1/restaurants')
+      api.get<Device[]>('/api/v1/platform/offline-policy/approaching-expiry?state=locked').catch(() => [] as Device[]),
+      api.get<{ offlineGraceDays: number; warnAfterDays: number }>('/api/v1/platform/offline-policy/policy').catch(() => null),
+      api.get<RestaurantListItem[]>('/api/v1/restaurants'),
+      api.get<Branch[]>('/api/v1/branches').catch(() => [] as Branch[]),
+      api.get<{ configured: boolean; reason?: string }>('/api/v1/platform/offline-policy/signing-status').catch(() => null)
     ])
-      .then(([exts, appDevs, rests]) => {
+      .then(([exts, appDevs, lockedDevs, policyData, rests, allBranches, signingStatus]) => {
+        if (policyData) setPolicy(policyData);
+        setLockedOffline(lockedDevs);
+        setSigning(signingStatus);
         setExtensions(exts);
         setApproachingExpiry(appDevs);
         setRestaurants(rests);
+        setBranches(allBranches);
         if (rests.length > 0 && !targetRestaurantId) {
           setTargetRestaurantId(rests[0].id);
         }
@@ -63,21 +79,28 @@ export function OfflinePolicyPage() {
   useEffect(loadData, [loadData]);
 
   async function handleGrantExtension() {
-    if (!targetRestaurantId || !grantReason.trim()) return;
+    if (!targetRestaurantId || !grantReason.trim() || !requestedBy.trim()) return;
     setGranting(true);
     try {
-      await api.post('/api/v1/platform/offline-policy/grant', {
+      const granted = await api.post<OfflineExtension>('/api/v1/platform/offline-policy/grant', {
         restaurantId: targetRestaurantId,
+        branchId: targetBranchId || undefined,
         extensionDays: parseInt(targetDays, 10) || 14,
         reason: grantReason.trim(),
-        requestedBy: 'Restaurant General Manager via Support Call'
+        requestedBy: requestedBy.trim(),
+        ticketRef: ticketRef.trim() || undefined
       });
-      showToast(`Emergency offline extension granted for ${targetDays} days`);
+      showToast(
+        `Emergency offline extension granted for ${targetDays} days.${granted.warnings?.length ? ' ' + granted.warnings.join(' ') : ''}`
+      );
       setModalOpen(false);
       setGrantReason('');
+      setRequestedBy('');
+      setTicketRef('');
+      setTargetBranchId('');
       loadData();
     } catch (err) {
-      showToast(err instanceof ApiError ? err.message : 'Failed to grant extension');
+      showToast(err instanceof ApiError ? (err.issues?.map((i) => i.message).join(' ') || err.message) : 'Failed to grant extension');
     } finally {
       setGranting(false);
     }
@@ -103,10 +126,8 @@ export function OfflinePolicyPage() {
           </p>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <Button variant="ghost" onClick={loadData}>
-            <RefreshCw className="w-4 h-4 mr-1" /> Refresh
-          </Button>
-          <Button variant="accent" onClick={() => setModalOpen(true)}>
+          <RefreshButton loading={loading} onRefresh={loadData} />
+          <Button variant="accent" onClick={() => setModalOpen(true)} disabled={signing?.configured === false}>
             <Plus className="w-4 h-4 mr-1" /> Grant Emergency Extension
           </Button>
         </div>
@@ -114,17 +135,29 @@ export function OfflinePolicyPage() {
 
       {toast && <div className="floating-toast">{toast}</div>}
 
+      {signing?.configured === false && (
+        <div className="banner banner-error" role="alert" style={{ marginBottom: 16 }}>
+          <strong>Signing is not ready, so extensions cannot be issued.</strong> {signing.reason}{' '}
+          Set a P-256 private key (base64-encoded PEM) in the API environment and restart it. The matching public key must be the one built into the apps.
+        </div>
+      )}
+      {signing?.configured === true && (
+        <div className="banner" style={{ marginBottom: 16 }}>
+          <KeyRound className="w-4 h-4" style={{ display: 'inline', marginRight: 6 }} /> Signing key: ready
+        </div>
+      )}
+
       {/* Approaching Expiry Warning Section */}
       {approachingExpiry.length > 0 && (
         <div style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 12, padding: '16px 20px', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
             <AlertTriangle className="w-5 h-5 text-amber-600" />
             <strong style={{ color: '#92400e', fontSize: 14 }}>
-              {approachingExpiry.length} Terminal(s) Approaching Offline Validity Expiry (&gt; 7 Days Offline)
+              {approachingExpiry.length} terminal(s) approaching the {policy.offlineGraceDays}-day offline limit
             </strong>
           </div>
           <p style={{ margin: '0 0 12px', color: '#b45309', fontSize: 13 }}>
-            Standard offline policy requires internet connection within 7 days. These terminals will transition to restricted mode unless an emergency signed extension is granted.
+            A terminal locks itself after {policy.offlineGraceDays} days without reaching JAMANVAAR. These have been silent for {policy.warnAfterDays} days or more. Once the terminal reconnects it resets; if the outage will continue, grant an emergency extension now (it is delivered when the terminal next checks in, or entered as a code).
           </p>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {approachingExpiry.map((d) => (
@@ -149,9 +182,19 @@ export function OfflinePolicyPage() {
         </div>
       )}
 
+      {lockedOffline.length > 0 && (
+        <div className="banner banner-error" role="alert" style={{ marginBottom: 24 }}>
+          <strong>{lockedOffline.length} terminal(s) are past the {policy.offlineGraceDays}-day offline limit and locked</strong> (no extension covers them):{' '}
+          {lockedOffline.slice(0, 8).map((d) => `${d.restaurant?.name ?? 'Unknown'} (${d.name ?? d.type}, last seen ${d.lastSeenAt ? new Date(d.lastSeenAt).toLocaleDateString() : 'never'})`).join('; ')}
+          {lockedOffline.length > 8 ? ` and ${lockedOffline.length - 8} more` : ''}.
+        </div>
+      )}
+
       {/* Active Offline Extensions Table */}
       <Card>
-        <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Active Emergency Extensions ({extensions.length})</h3>
+        <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>
+          Emergency Extensions ({extensions.filter((e) => e.status === 'ACTIVE').length} active, {extensions.length} total)
+        </h3>
         {extensions.length === 0 ? (
           <div style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>
             <FileCheck2 className="w-8 h-8 mx-auto mb-2 text-slate-400" />
@@ -176,7 +219,16 @@ export function OfflinePolicyPage() {
                   <tr key={ext.id} style={{ borderBottom: '1px solid #f8fafc' }}>
                     <td style={{ padding: '14px' }}>
                       <strong style={{ color: '#0f172a' }}>{ext.restaurant?.name}</strong>
-                      <div style={{ color: '#64748b', fontSize: 11 }}>{ext.device ? `${ext.device.type} Terminal` : 'Fleet Wide'}</div>
+                      <div style={{ color: '#64748b', fontSize: 11 }}>
+                        {ext.device
+                          ? `${ext.device.type} Terminal`
+                          : ext.branchId
+                            ? `Branch: ${branches.find((b) => b.id === ext.branchId)?.name ?? 'one branch'}`
+                            : 'Fleet Wide'}
+                      </div>
+                      <div style={{ color: '#94a3b8', fontSize: 11 }}>
+                        Asked by {ext.requestedBy}{ext.ticketRef ? ` · ${ext.ticketRef}` : ''}
+                      </div>
                     </td>
                     <td style={{ padding: '14px', fontWeight: 800, color: '#0369a1' }}>
                       +{ext.extensionDays} Days
@@ -226,13 +278,62 @@ export function OfflinePolicyPage() {
               </label>
               <select
                 value={targetRestaurantId}
-                onChange={(e) => setTargetRestaurantId(e.target.value)}
+                onChange={(e) => {
+                  setTargetRestaurantId(e.target.value);
+                  setTargetBranchId('');
+                }}
                 style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
               >
                 {restaurants.map((r) => (
                   <option key={r.id} value={r.id}>{r.name} ({r.city || 'India'})</option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4 }}>Applies to</label>
+              <select
+                value={targetBranchId}
+                onChange={(e) => setTargetBranchId(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+              >
+                <option value="">Every branch of this restaurant</option>
+                {branches.filter((b) => b.restaurantId === targetRestaurantId).map((b) => (
+                  <option key={b.id} value={b.id}>{b.name} ({b.code})</option>
+                ))}
+              </select>
+            </div>
+
+            {extensions.some((e) => e.restaurantId === targetRestaurantId && e.status === 'ACTIVE') && (
+              <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: 10, fontSize: 12, color: '#92400e' }}>
+                This restaurant already has an active extension. Issuing another does not replace it: revoke the earlier one if it should no longer apply.
+              </div>
+            )}
+
+            <div>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
+                Who asked for this? *
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Asha Rao (owner), by phone"
+                value={requestedBy}
+                onChange={(e) => setRequestedBy(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
+                Support ticket reference
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. TCK-1042 (optional)"
+                value={ticketRef}
+                onChange={(e) => setTicketRef(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+              />
             </div>
 
             <div>
@@ -269,7 +370,7 @@ export function OfflinePolicyPage() {
               <Button
                 variant="accent"
                 onClick={handleGrantExtension}
-                disabled={granting || !grantReason.trim()}
+                disabled={granting || grantReason.trim().length < 5 || requestedBy.trim().length < 2}
               >
                 {granting ? 'Signing…' : 'Sign & Issue Certificate'}
               </Button>

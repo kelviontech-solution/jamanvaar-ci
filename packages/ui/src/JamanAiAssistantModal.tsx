@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useSyncExternalStore } from "react";
 import {
+  AiConfig,
   JAMAN_AI_CATEGORIES,
   JamanAiCategory,
   JamanAiQuestion,
@@ -45,7 +46,8 @@ export interface JamanAiAssistantModalProps {
   /** Active POS tab for context-aware quick action defaults */
   posContext?: string;
   onPerformAction?: (action: PosAssistantAction) => void;
-  onQueryExecuted?: (intent: string, queryText?: string) => void;
+  /** Called after each answer, with how long the terminal took to produce it (reported to the cloud as usage). */
+  onQueryExecuted?: (intent: string, queryText?: string, latencyMs?: number) => void;
 }
 
 /** Map from POS tab name to best AI category */
@@ -78,6 +80,13 @@ export const JamanAiAssistantModal: React.FC<JamanAiAssistantModalProps> = ({
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
   const [naturalQuery, setNaturalQuery] = useState("");
   const [isVisible, setIsVisible] = useState(false);
+  const [limitMessage, setLimitMessage] = useState<string | null>(null);
+  // What the cloud allows this restaurant (BUG-057): ON answers, LOCKED shows a teaser, OFF shows nothing.
+  const aiState = useSyncExternalStore(
+    (cb) => AiConfig.subscribe(cb),
+    () => AiConfig.getState(),
+    () => AiConfig.getState()
+  );
 
   // Animate slide-in / slide-out
   useEffect(() => {
@@ -116,22 +125,36 @@ export const JamanAiAssistantModal: React.FC<JamanAiAssistantModalProps> = ({
   }, [prioritizedQuestions]);
 
   const handleSelectQuestion = useCallback((q: JamanAiQuestion) => {
+    if (!AiConfig.canQuery()) {
+      setLimitMessage("Today's JAMAN AI question limit has been reached. It resets tomorrow.");
+      return;
+    }
+    setLimitMessage(null);
     setSelectedQuestionId(q.id);
+    const started = performance.now();
     const resp = PosAssistantService.executeQuery(
       q.formula ? { intent: q.intent, label: q.label, formula: q.formula } : (q.intent as any)
     );
+    const latencyMs = performance.now() - started;
     setActiveResponse(resp);
-    onQueryExecuted?.(q.intent as string, q.label);
+    onQueryExecuted?.(q.intent as string, q.label, latencyMs);
   }, [onQueryExecuted]);
 
   const handleExecuteNaturalQuery = (e: React.FormEvent) => {
     e.preventDefault();
     if (!naturalQuery.trim()) return;
+    if (!AiConfig.canQuery()) {
+      setLimitMessage("Today's JAMAN AI question limit has been reached. It resets tomorrow.");
+      return;
+    }
+    setLimitMessage(null);
+    const started = performance.now();
     const resolvedIntent = PosAssistantService.resolveIntent(naturalQuery.trim());
     const resp = PosAssistantService.executeQuery(resolvedIntent);
+    const latencyMs = performance.now() - started;
     setActiveResponse(resp);
     setSelectedQuestionId(null);
-    onQueryExecuted?.(resolvedIntent, naturalQuery.trim());
+    onQueryExecuted?.(resolvedIntent, naturalQuery.trim(), latencyMs);
     setNaturalQuery("");
   };
 
@@ -166,6 +189,49 @@ export const JamanAiAssistantModal: React.FC<JamanAiAssistantModalProps> = ({
   };
 
   if (!isOpen && !isVisible) return null;
+  // Hidden entirely when the platform has not granted it to this restaurant.
+  if (aiState === 'OFF') return null;
+
+  // LOCKED: the feature is visible so people know it exists, but it answers nothing (BUG-057).
+  if (aiState === 'LOCKED') {
+    const teaser = AiConfig.getTeaser();
+    return (
+      <>
+        <div className="fixed inset-0 z-[49] bg-black/25" onClick={onClose} aria-hidden="true" />
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="JAMAN AI is not enabled"
+          className="fixed top-0 right-0 bottom-0 z-50 flex flex-col gap-4 bg-[#FDFAF5] border-l border-[#EBE6DD] p-6 text-center"
+          style={{ width: "min(430px, 100vw)", boxShadow: "-8px 0 48px rgba(11, 37, 58, 0.20)" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button type="button" onClick={onClose} aria-label="Close" className="self-end rounded-lg p-1 text-[#4A5568] hover:bg-black/5">
+            <X className="w-5 h-5" />
+          </button>
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[#FDBA74] bg-[#FFF4ED]">
+            <Sparkles className="w-7 h-7 text-jaman-saffron" />
+          </div>
+          <h2 className="text-lg font-black text-[#0B253A]">JAMAN AI isn&apos;t enabled for your restaurant</h2>
+          <p className="text-sm text-[#4A5568]">
+            It answers questions about your own sales, kitchen, tables and stock in plain language. Ask your JAMANVAAR account
+            manager to switch it on for you.
+          </p>
+          {teaser.length > 0 && (
+            <ul className="space-y-2 text-left" aria-label="Examples of what it can answer">
+              {teaser.map((t) => (
+                <li key={t.label} className="flex items-center gap-2 rounded-xl border border-[#EBE6DD] bg-white px-3 py-2 text-sm font-semibold text-[#0B253A] opacity-70">
+                  {renderIcon(t.icon, "w-4 h-4")}
+                  <span className="flex-1">{t.label}</span>
+                  <span aria-hidden="true">🔒</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -195,6 +261,11 @@ export const JamanAiAssistantModal: React.FC<JamanAiAssistantModalProps> = ({
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {limitMessage && (
+          <div role="alert" className="shrink-0 border-b border-amber-200 bg-amber-50 px-4 py-2 text-xs font-bold text-amber-800">
+            {limitMessage}
+          </div>
+        )}
         {/* DRAWER HEADER */}
         <div className="shrink-0 bg-white border-b border-[#EBE6DD] px-4 pt-4 pb-3">
           <div className="flex items-center justify-between">

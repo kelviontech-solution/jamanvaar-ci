@@ -7,7 +7,10 @@
  * this terminal does.
  */
 
-import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder } from '@jamanvaar/sync';
+import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, EntitySyncEvent, EntitySyncPushResult, CloudSyncedEntity } from '@jamanvaar/sync';
+
+import { DeviceGate, sendHeartbeat } from '@jamanvaar/sync';
+import { MenuRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -59,8 +62,15 @@ export async function activateKdsDevice(code: string): Promise<void> {
 
   try {
     localStorage.setItem(RESTAURANT_ID_KEY, data.restaurantId);
+    // BUG-021: this device used to keep showing the seeded "JAMANVAAR RESTAURANT" placeholder
+    // forever, even after activating against a real restaurant with a different name.
+    if (data.restaurant) {
+      RestaurantIdentityRepository.adopt(data.restaurantId, data.restaurant);
+    }
     localStorage.setItem(DEVICE_ID_KEY, data.device.id);
     localStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken);
+    DeviceGate.reportSuccess(); // a fresh activation starts unlocked
+    MenuRepository.startFreshMenu(); // BUG-013: a real restaurant starts with no menu until one is uploaded
   } catch {
     // Storage unavailable — activation succeeded server-side, this terminal just won't remember it across reloads.
   }
@@ -69,7 +79,7 @@ export async function activateKdsDevice(code: string): Promise<void> {
 function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const token = getKdsDeviceToken();
   if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
-  return fetch(`${API_BASE}${path}`, {
+  return DeviceGate.gatedFetch(`${API_BASE}${path}`, {
     ...init,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
   });
@@ -99,14 +109,39 @@ export async function pullOrderSync(since?: string): Promise<{ orders: CloudSync
   return data;
 }
 
-export async function reportHeartbeat(): Promise<void> {
-  try {
-    await deviceFetch('/api/v1/devices/me/heartbeat', {
-      method: 'PATCH',
-      body: JSON.stringify({ syncStatus: 'ok', appVersion: '1.0.0' })
-    });
-  } catch {
-    // Best-effort — a missed heartbeat just means this device shows stale
-    // "last seen" in Super Admin until the next successful one.
+/** BUG-019/034/035: pulls whatever another device pushed (currently just staff, from Restaurant Admin). */
+export async function pushEntitySync(entityType: string, events: EntitySyncEvent[]): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
+  const res = await deviceFetch(`/api/v1/entity-sync/${entityType}`, {
+    method: 'POST',
+    body: JSON.stringify({ events })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Entity sync push failed (${res.status})`, res.status);
   }
+  return data;
+}
+
+export async function pullEntitySync(entityType: string, since?: string): Promise<{ entities: CloudSyncedEntity[]; serverTime: string }> {
+  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+  const res = await deviceFetch(`/api/v1/entity-sync/${entityType}${query}`);
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Entity sync pull failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
+export async function reportHeartbeat(): Promise<void> {
+  const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
+  if (!deviceToken) return;
+  // Real version (from package.json at build time), OS and sync backlog; also applies the answer: lock,
+  // notice, update offer and any signed offline extension.
+  await sendHeartbeat({
+    apiBase: API_BASE,
+    deviceToken,
+    appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0',
+    restaurantId: localStorage.getItem(RESTAURANT_ID_KEY),
+    deviceId: localStorage.getItem(DEVICE_ID_KEY)
+  });
 }

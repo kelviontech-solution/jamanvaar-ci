@@ -1,5 +1,9 @@
+import { RESTAURANT_ADMIN_URL, KIOSK_ADMIN_URL } from '../../lib/appUrls';
+import { RefreshButton } from '../../components/RefreshButton';
+import { CopyButton } from '../../components/CopyButton';
+import { RestaurantSalesPanel } from './RestaurantSalesPanel';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import type {
   AuditLogPage,
@@ -30,6 +34,7 @@ import { formatAuditEvent } from '../../lib/auditFormatter';
 import { exportRowsToCsv } from '../../lib/csvExport';
 import '../../components/shared.css';
 import './restaurants.css';
+import { parseMenuCsv, type MenuCsvEntity } from '../../lib/menuCsv';
 import { EditRestaurantModal } from './EditRestaurantModal';
 import { CreateBranchModal } from '../Branches/CreateBranchModal';
 import { GenerateActivationKeyModal } from '../ActivationKeys/GenerateActivationKeyModal';
@@ -70,7 +75,9 @@ import {
   Grid3x3,
   Power,
   PowerOff,
-  Wallet
+  Wallet,
+  Upload,
+  Utensils
 } from 'lucide-react';
 
 type Tab =
@@ -87,7 +94,8 @@ type Tab =
   | 'reports'
   | 'activity'
   | 'support'
-  | 'backups';
+  | 'backups'
+  | 'menu';
 
 const TABS: Array<{ key: Tab; label: string; icon: React.ComponentType<{ className?: string }> }> = [
   { key: 'overview', label: 'Overview', icon: Store },
@@ -107,7 +115,8 @@ const TABS: Array<{ key: Tab; label: string; icon: React.ComponentType<{ classNa
   { key: 'reports', label: 'Reports & Analytics', icon: BarChart3 },
   { key: 'activity', label: 'Audit Logs', icon: FileText },
   { key: 'support', label: 'Support & Diagnostics', icon: LifeBuoy },
-  { key: 'backups', label: 'Backup & Recovery', icon: Database }
+  { key: 'backups', label: 'Backup & Recovery', icon: Database },
+  { key: 'menu', label: 'Menu', icon: Utensils }
 ];
 
 export function formatDeviceTypeLabel(type: string): string {
@@ -159,7 +168,24 @@ export function RestaurantDetailPage() {
   const [restaurant, setRestaurant] = useState<RestaurantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>('overview');
+  // The open tab lives in the URL (?tab=backups), so a notification or a shared link lands on the exact section.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get('tab');
+  const tab: Tab = TABS.some((t) => t.key === requestedTab) ? (requestedTab as Tab) : 'overview';
+  const setTab = useCallback(
+    (next: Tab) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next === 'overview') params.delete('tab');
+          else params.set('tab', next);
+          return params;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
   const [modal, setModal] = useState<'edit' | 'branch' | 'activation' | 'subscription' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -171,6 +197,17 @@ export function RestaurantDetailPage() {
   const [paymentsPage, setPaymentsPage] = useState(1);
   const [expandedPaymentId, setExpandedPaymentId] = useState<string | null>(null);
   const [diagnostics, setDiagnostics] = useState<RestaurantDiagnostics | null>(null);
+  const [diagnosticsLoading, setDiagnosticsLoading] = useState(false);
+  const [diagnosticsError, setDiagnosticsError] = useState<string | null>(null);
+  const refreshDiagnostics = () => {
+    setDiagnosticsLoading(true);
+    setDiagnosticsError(null);
+    api
+      .get<RestaurantDiagnostics>(`/api/v1/support/diagnostics/${id}`)
+      .then(setDiagnostics)
+      .catch((err) => setDiagnosticsError(err instanceof ApiError ? err.message : 'Failed to load diagnostics'))
+      .finally(() => setDiagnosticsLoading(false));
+  };
   const [backups, setBackups] = useState<Backup[] | null>(null);
   const [reportsData, setReportsData] = useState<RestaurantReport | null>(null);
   const [reportsLoading, setReportsLoading] = useState(false);
@@ -187,6 +224,79 @@ export function RestaurantDetailPage() {
   const [verifyingBackupId, setVerifyingBackupId] = useState<string | null>(null);
   const [restoringBackupId, setRestoringBackupId] = useState<string | null>(null);
   const [restorePreview, setRestorePreview] = useState<any | null>(null);
+
+  // Menu tab state (BUG-014/015)
+  const [menu, setMenu] = useState<{ categories: Array<{ externalId: string; payload: any }>; items: Array<{ externalId: string; payload: any }>; selfUploadEnabled: boolean } | null>(null);
+  const [menuLoading, setMenuLoading] = useState(false);
+  const [menuImporting, setMenuImporting] = useState(false);
+  const [menuPermissionSaving, setMenuPermissionSaving] = useState(false);
+  const menuCsvInputRef = React.useRef<HTMLInputElement>(null);
+
+  const loadMenu = useCallback(() => {
+    if (!id) return;
+    setMenuLoading(true);
+    api
+      .get<typeof menu>(`/api/v1/restaurants/${id}/menu`)
+      .then(setMenu)
+      .catch(() => showToast('Failed to load the menu'))
+      .finally(() => setMenuLoading(false));
+  }, [id]);
+
+  const handleMenuCsvFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !id) return;
+    file.text().then((text) => {
+      const parsed = parseMenuCsv(text);
+      if (parsed.categories.length === 0 && parsed.items.length === 0) {
+        const firstErrors = parsed.errors.slice(0, 3).map((er) => 'Row ' + er.row + ': ' + er.message).join(' | ');
+        showToast('Nothing valid to import.' + (firstErrors ? ' ' + firstErrors : ''));
+        return;
+      }
+      setMenuImporting(true);
+      api
+        .post<{ categoriesImported: number; itemsImported: number }>(`/api/v1/restaurants/${id}/menu/import`, {
+          categories: parsed.categories as MenuCsvEntity[],
+          items: parsed.items as MenuCsvEntity[]
+        })
+        .then((res) => {
+          const errNote = parsed.errors.length > 0 ? (' ' + parsed.errors.length + ' row(s) were skipped.') : '';
+          showToast('Imported ' + res.itemsImported + ' dish(es) into ' + res.categoriesImported + ' categor' + (res.categoriesImported === 1 ? 'y' : 'ies') + '.' + errNote);
+          loadMenu();
+        })
+        .catch((err) => showToast(err instanceof ApiError ? err.message : 'Menu import failed'))
+        .finally(() => setMenuImporting(false));
+    });
+  };
+
+  const handleDownloadMenuCsvTemplate = () => {
+    const rows = [
+      'Category,Item Name,SKU,Price,Dietary Type,Spice Level,Description,Image URL',
+      '"Starters","Veg Spring Roll","STR-001",180,VEG,MEDIUM,"Crispy vegetable rolls",""'
+    ];
+    const csvText = rows.join(String.fromCharCode(10));
+    const blob = new Blob([csvText], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jamanvaar-menu-template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleToggleMenuPermission = () => {
+    if (!id || !menu) return;
+    const next = !menu.selfUploadEnabled;
+    setMenuPermissionSaving(true);
+    api
+      .patch<{ selfUploadEnabled: boolean }>(`/api/v1/restaurants/${id}/menu/permission`, { enabled: next })
+      .then((res) => {
+        setMenu((m) => (m ? { ...m, selfUploadEnabled: res.selfUploadEnabled } : m));
+        showToast(res.selfUploadEnabled ? 'Restaurant Admin can upload their own menu again.' : 'Restaurant Admin can no longer upload their own menu.');
+      })
+      .catch(() => showToast('Failed to change the permission'))
+      .finally(() => setMenuPermissionSaving(false));
+  };
 
   // Audit log details modal
   const [selectedLog, setSelectedLog] = useState<any | null>(null);
@@ -244,7 +354,7 @@ export function RestaurantDetailPage() {
         .catch(() => setPayments({ rows: [], total: 0, page: 1, limit: 25 }));
     }
     if (tab === 'support' && !diagnostics) {
-      api.get<RestaurantDiagnostics>(`/api/v1/support/diagnostics/${id}`).then(setDiagnostics).catch(() => {});
+      refreshDiagnostics();
     }
     if (tab === 'backups' && !backups) {
       api.get<Backup[]>(`/api/v1/restaurants/${id}/backups`).then(setBackups).catch(() => setBackups([]));
@@ -263,7 +373,10 @@ export function RestaurantDetailPage() {
         .then(setAppEntitlements)
         .catch(() => setAppEntitlements([]));
     }
-  }, [tab, id, activity, invoices, diagnostics, backups, reportsData, appEntitlements, paymentsStatusFilter, paymentsPage]);
+    if (tab === 'menu' && !menu) {
+      loadMenu();
+    }
+  }, [tab, id, activity, invoices, diagnostics, backups, reportsData, appEntitlements, menu, loadMenu, paymentsStatusFilter, paymentsPage]);
 
   async function executeConfirmedAction() {
     if (!confirmAction) return;
@@ -418,14 +531,10 @@ export function RestaurantDetailPage() {
   async function handleExtendSubscription() {
     if (!restaurant || !restaurant.subscriptions[0]) return;
     const sub = restaurant.subscriptions[0];
-    const currentExp = new Date(sub.expiresAt).getTime();
-    const newExp = new Date(Math.max(currentExp, Date.now()) + 30 * 24 * 60 * 60 * 1000).toISOString();
     setActionPending(true);
     try {
-      await api.patch(`/api/v1/subscriptions/${sub.id}`, {
-        expiresAt: newExp
-      });
-      showToast('Subscription extended by 30 days!');
+      await api.patch(`/api/v1/subscriptions/${sub.id}/extend`, { days: 30 });
+      showToast('Subscription extended by 30 days.');
       load();
     } catch (err) {
       showToast(err instanceof ApiError ? err.message : 'Failed to extend subscription');
@@ -443,7 +552,7 @@ export function RestaurantDetailPage() {
         { reason: 'Super Admin troubleshooting and audit inspection' }
       );
       showToast(`Support session minted for ${res.owner.email}. Launching console…`);
-      window.open(`http://localhost:5176?impersonationToken=${encodeURIComponent(res.accessToken)}`, '_blank');
+      window.open(`${RESTAURANT_ADMIN_URL}?impersonationToken=${encodeURIComponent(res.accessToken)}`, '_blank');
     } catch (err) {
       showToast(err instanceof ApiError ? err.message : 'Impersonation token generation failed');
     } finally {
@@ -641,12 +750,12 @@ export function RestaurantDetailPage() {
                   </Badge>
                 </div>
                 <p style={{ margin: '6px 0 0 0', fontSize: 13, color: '#64748b' }}>
-                  Relay these keys to the restaurant owner. On first login at <strong>Restaurant Admin (http://localhost:5176)</strong>, <strong>POS</strong>, or <strong>Captain</strong>, entering this key registers and binds the device.
+                  Relay these keys to the restaurant owner. On first login at <strong>Restaurant Admin ({RESTAURANT_ADMIN_URL})</strong>, <strong>POS</strong>, or <strong>Captain</strong>, entering this key registers and binds the device.
                   {restaurant.activationKeys.some((k) => k.allowedDeviceType === 'KIOSK_ADMIN') && (
                     <>
                       {' '}
                       A <strong>KIOSK_ADMIN</strong> key must instead be entered at the{' '}
-                      <strong>Kiosk Admin console (http://localhost:5173)</strong>.
+                      <strong>Kiosk Admin console ({KIOSK_ADMIN_URL})</strong>.
                     </>
                   )}
                 </p>
@@ -692,20 +801,14 @@ export function RestaurantDetailPage() {
 
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', border: '1px solid #E2E8F0', borderRadius: 8, padding: '8px 12px' }}>
                         <span className="mono" style={{ fontSize: 15, fontWeight: 800, color: '#0B253A', letterSpacing: '0.04em' }}>
-                          {k.code}
+                          {k.code ?? `•••• ${k.codeLast4 ?? ''}`}
                         </span>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            navigator.clipboard.writeText(k.code);
-                            showToast(`Copied key "${k.code}" to clipboard!`);
-                          }}
-                          style={{ padding: '2px 8px', height: 'auto', fontSize: 11 }}
-                        >
-                          <Copy className="w-3.5 h-3.5 mr-1" />
-                          Copy
-                        </Button>
+                        {k.code && (
+                          <CopyButton
+                            text={k.code}
+                            onResult={(ok) => showToast(ok ? `Copied key "${k.code}" to clipboard!` : 'Could not copy automatically. Select the key and press Ctrl+C.')}
+                          />
+                        )}
                       </div>
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#64748B' }}>
@@ -893,7 +996,7 @@ export function RestaurantDetailPage() {
 
               <div style={{ display: 'flex', gap: 8 }}>
                 <Button variant="ghost" onClick={handleExtendSubscription} disabled={actionPending || !activeSub}>
-                  Extend Trial (+30 Days)
+                  {activeSub?.status === 'TRIAL' ? 'Extend Trial (+30 Days)' : 'Extend Subscription (+30 Days)'}
                 </Button>
                 <Button variant="accent" onClick={() => setModal('subscription')}>
                   Change Plan
@@ -1183,20 +1286,14 @@ export function RestaurantDetailPage() {
                     <tr key={k.id}>
                       <td className="mono" style={{ fontWeight: 800, color: '#0B253A' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span>{k.code}</span>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              navigator.clipboard.writeText(k.code);
-                              showToast(`Copied activation key "${k.code}" to clipboard!`);
-                            }}
-                            style={{ padding: '2px 6px', height: 'auto', fontSize: 11 }}
-                            title="Copy activation code"
-                          >
-                            <Copy className="w-3.5 h-3.5 mr-1" />
-                            Copy
-                          </Button>
+                          <span>{k.code ?? `•••• ${k.codeLast4 ?? ''}`}</span>
+                          {k.code && (
+                            <CopyButton
+                              text={k.code}
+                              title="Copy activation code"
+                              onResult={(ok) => showToast(ok ? `Copied activation key "${k.code}" to clipboard!` : 'Could not copy automatically. Select the key and press Ctrl+C.')}
+                            />
+                          )}
                         </div>
                       </td>
                       <td><Badge tone="accent">{formatDeviceTypeLabel(k.allowedDeviceType)}</Badge></td>
@@ -1204,7 +1301,7 @@ export function RestaurantDetailPage() {
                       <td>{new Date(k.expiresAt).toLocaleDateString('en-IN')}</td>
                       <td>
                         {k.status === 'ACTIVE' && (
-                          <Button size="sm" variant="danger" onClick={() => handleRevokeActivationKey(k.id, k.code)}>
+                          <Button size="sm" variant="danger" onClick={() => handleRevokeActivationKey(k.id, k.code ?? `•••• ${k.codeLast4 ?? ''}`)}>
                             Revoke
                           </Button>
                         )}
@@ -1499,14 +1596,15 @@ export function RestaurantDetailPage() {
       {/* TAB 9: REPORTS & ANALYTICS */}
       {tab === 'reports' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {id && <RestaurantSalesPanel restaurantId={id} />}
           <Card style={{ padding: 22 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#0B253A' }}>
-                  Restaurant Performance &amp; SaaS Analytics
+                  Platform billing &amp; fleet
                 </h3>
                 <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
-                  Live operational and financial metrics calculated directly from PostgreSQL.
+                  What JAMANVAAR bills this restaurant (invoice totals include 18% GST; a plan's listed price does not), and the health of its terminals.
                 </p>
               </div>
               <Button
@@ -1682,18 +1780,12 @@ export function RestaurantDetailPage() {
                   Real-time terminal connectivity and tenant operational state.
                 </p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setDiagnostics(null);
-                  api.get<RestaurantDiagnostics>(`/api/v1/support/diagnostics/${id}`).then(setDiagnostics);
-                }}
-              >
-                <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                <span>Refresh Diagnostics</span>
-              </Button>
+              <RefreshButton loading={diagnosticsLoading} onRefresh={refreshDiagnostics} label="Refresh Diagnostics" />
             </div>
+
+            {diagnosticsError && (
+              <div className="form-error" style={{ marginBottom: 12 }}>{diagnosticsError}</div>
+            )}
 
             {diagnostics ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
@@ -1904,6 +1996,87 @@ export function RestaurantDetailPage() {
             </div>
           </form>
         </Modal>
+      )}
+
+      {tab === 'menu' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <Card>
+            <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
+              <div>
+                <span>Menu ({menu ? menu.items.length : 0} dishes, {menu ? menu.categories.length : 0} categories)</span>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                  Upload this restaurant's menu directly, on the owner's behalf. It reaches POS, Captain, KDS and Kiosk
+                  the same way a Restaurant Admin upload does.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <RefreshButton loading={menuLoading} onRefresh={loadMenu} />
+                <Button variant="ghost" onClick={handleDownloadMenuCsvTemplate}>
+                  <Download className="w-4 h-4 mr-1" />
+                  <span>Download Template</span>
+                </Button>
+                <input ref={menuCsvInputRef} type="file" accept=".csv,text/csv" onChange={handleMenuCsvFile} style={{ display: 'none' }} />
+                <Button variant="accent" onClick={() => menuCsvInputRef.current?.click()} disabled={menuImporting}>
+                  <Upload className="w-4 h-4 mr-1" />
+                  <span>{menuImporting ? 'Importing…' : 'Upload CSV'}</span>
+                </Button>
+              </div>
+            </div>
+
+            <div style={{ padding: '18px 22px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  padding: '14px 16px',
+                  background: '#f8fafc',
+                  borderRadius: 10,
+                  border: '1px solid #e2e8f0',
+                  marginBottom: 16
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: 13, color: '#0B253A' }}>Restaurant Admin self-upload</div>
+                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                    {menu?.selfUploadEnabled === false
+                      ? "This restaurant's own admin currently cannot upload their own menu CSV. Only Super Admin can."
+                      : 'The restaurant admin may upload their own menu CSV from Restaurant Admin → Menu & Catalog.'}
+                  </div>
+                </div>
+                <Button variant={menu?.selfUploadEnabled === false ? 'accent' : 'ghost'} onClick={handleToggleMenuPermission} disabled={!menu || menuPermissionSaving}>
+                  {menuPermissionSaving ? 'Saving…' : menu?.selfUploadEnabled === false ? 'Allow Self-Upload' : 'Revoke Self-Upload'}
+                </Button>
+              </div>
+
+              {menuLoading && !menu ? (
+                <SkeletonCard rows={4} />
+              ) : !menu || menu.items.length === 0 ? (
+                <EmptyState
+                  title="This restaurant has no menu yet"
+                  description="Upload a CSV to give it one — it reaches every terminal automatically."
+                />
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10 }}>
+                  {menu.items.slice(0, 60).map((it) => (
+                    <div key={it.externalId} style={{ padding: 12, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 10 }}>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: '#0B253A' }}>{String(it.payload.name ?? it.externalId)}</div>
+                      <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
+                        {it.payload.price != null ? '₹' + it.payload.price : ''} {it.payload.dietaryType ? '· ' + it.payload.dietaryType : ''}
+                      </div>
+                    </div>
+                  ))}
+                  {menu.items.length > 60 && (
+                    <div style={{ padding: 12, color: '#64748b', fontSize: 12, alignSelf: 'center' }}>
+                      +{menu.items.length - 60} more dish(es)
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
       )}
 
       {/* Audit Log Detail Modal */}

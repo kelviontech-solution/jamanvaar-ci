@@ -3,7 +3,7 @@ import { Order, PaymentMethod, OrderType, OrderStatus } from '@jamanvaar/types';
 import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
 import { db, AuditRepository, OrderRepository, ReceiptRepository } from '@jamanvaar/database';
 import { DayOrdersService, ReportGeneratorService, CentralReportingService } from '@jamanvaar/business';
-import { printThermalReceipt, EmptyState } from '@jamanvaar/ui';
+import { printThermalReceipt, EmptyState, printElement } from '@jamanvaar/ui';
 import {
   DollarSign,
   CreditCard,
@@ -324,15 +324,18 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
   // Handler: Export PDF
   const handleExportPdf = () => {
-    showToast(`Generating Invoices PDF Statement (${filteredOrders.length} records)...`);
-    window.print();
+    if (!printElement('[data-print-doc="invoice-statement"]', { title: 'Invoice statement', pageSize: 'A4 landscape' })) {
+      showToast('There are no invoices to print.');
+      return;
+    }
+    showToast(`Invoice statement ready (${filteredOrders.length} records). Choose Save as PDF to download it.`);
   };
 
   // Handler: Print Thermal Bill
   const handlePrintBill = (ord: Order) => {
     setSelectedOrder(ord);
     showToast(`Printing Bill for #${ord.orderNumber}...`);
-    window.print();
+    printThermalReceipt(ord, '80mm', ReceiptRepository.getConfig());
   };
 
   // Handler: Process Refund
@@ -863,7 +866,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
         />
       ) : viewMode === 'DAY_GROUPED' ? (
         /* DAY GROUPED LEDGER VIEW */
-        <div className="space-y-4">
+        <div data-print-doc="invoice-statement" className="space-y-4">
           {dayGroupedLedger.map((grp) => (
             <div key={grp.dateKey} className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-xs">
               <div className="p-4 bg-jaman-cream border-b border-jaman-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -954,7 +957,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
         </div>
       ) : (
         /* FLAT COMPLETE INVOICE LEDGER TABLE */
-        <div className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-xs">
+        <div data-print-doc="invoice-statement" className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-bold sticky top-0 z-10">
@@ -1426,15 +1429,13 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
         <div className="border-b-2 border-black pb-3 flex justify-between items-start">
           <div>
             <h1 className="text-xl font-black uppercase tracking-wide">
-              {db.restaurant?.name || 'JAMANVAAR RESTAURANT'}
+              {db.restaurant?.name || ''}
             </h1>
             <p className="text-xs text-gray-700">
-              {db.outlet?.address || db.restaurant?.address || 'Sindhu Bhavan Road, Bodakdev, Ahmedabad, Gujarat 380054'}
+              {db.outlet?.address || db.restaurant?.address || ''}
             </p>
             <div className="text-[11px] text-gray-600 font-mono mt-1">
-              <span>GSTIN: {db.restaurant?.gstin || '24ABCDE1234F1Z5'}</span> •{' '}
-              <span>FSSAI: {db.restaurant?.fssaiNumber || '1072200100452'}</span> •{' '}
-              <span>Phone: {db.restaurant?.phone || '+91 79 4890 1234'}</span>
+              {[db.restaurant?.gstin && `GSTIN: ${db.restaurant.gstin}`, db.restaurant?.fssaiNumber && `FSSAI: ${db.restaurant.fssaiNumber}`, db.restaurant?.phone && `Phone: ${db.restaurant.phone}`].filter(Boolean).join(' • ')}
             </div>
           </div>
           <div className="text-right">

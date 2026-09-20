@@ -27,11 +27,15 @@ export const PosPrintQueueModal: React.FC = () => {
 
   const jobs = PrintQueueRepository.getAllJobs();
 
-  const handleRetry = (jobId: string) => {
+  const handleRetry = async (jobId: string) => {
     sound.play('click');
-    PrintQueueRepository.retryJob(jobId);
-    setRetryFeedback(`Dispatched print retry command!`);
-    setTimeout(() => setRetryFeedback(''), 2500);
+    const job = await PosPrinterService.retryJob(jobId);
+    setRetryFeedback(
+      job?.status === 'PRINTED'
+        ? 'Printed.'
+        : `Still not printed: ${job?.errorMessage || 'the printer did not accept the job'}`
+    );
+    setTimeout(() => setRetryFeedback(''), 5000);
   };
 
   const handleClearCompleted = () => {

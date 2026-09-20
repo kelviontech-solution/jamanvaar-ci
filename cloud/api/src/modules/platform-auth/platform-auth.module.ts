@@ -13,6 +13,6 @@ import { AuditModule } from '../audit/audit.module';
   // and any module that imports PlatformAuthModule just to use the guard
   // (RestaurantsModule, DashboardModule) needs that dependency resolvable in
   // its own DI graph, not only inside this module.
-  exports: [PlatformAuthGuard, JwtModule]
+  exports: [PlatformAuthGuard, PlatformAuthService, JwtModule]
 })
 export class PlatformAuthModule {}

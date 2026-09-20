@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { SearchResult, RestaurantDiagnostics } from '../../api/types';
 import { Card, Button, Input, Modal, Badge, EmptyState } from '../../components/ui';
+import { absoluteTime, relativeTime } from '../../lib/relativeTime';
 import { useAuth } from '../../auth/AuthContext';
 import {
   Search,
@@ -65,6 +66,11 @@ export function SupportPage() {
 
     setSearching(true);
     setError(null);
+    // A new search starts from a clean slate: results from the previous query must not stay on screen
+    // as if they matched this one (BUG-090).
+    setSearchResults(null);
+    setDiagnostics(null);
+    setSelectedRestaurantId(null);
     try {
       const res = await api.get<SearchResult>(`/api/v1/support/search?q=${encodeURIComponent(query.trim())}`);
       setSearchResults(res);
@@ -415,9 +421,12 @@ export function SupportPage() {
                           <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-muted)' }}>ID: {d.id.slice(0, 8)}…</div>
                         </td>
                         <td>{d.appVersion || <span style={{ color: 'var(--jv-text-muted)', fontStyle: 'italic' }}>Unknown</span>}</td>
-                        <td>{d.lastSeenAt ? new Date(d.lastSeenAt).toLocaleTimeString() : 'Never'}</td>
+                        <td title={d.lastSeenAt ?? undefined}>
+                          {relativeTime(d.lastSeenAt)}
+                          {d.lastSeenAt && <div style={{ fontSize: '0.75rem', color: 'var(--jv-text-muted)' }}>{absoluteTime(d.lastSeenAt)}</div>}
+                        </td>
                         <td>
-                          <Badge tone={d.status === 'ACTIVE' ? 'success' : 'neutral'}>{d.status}</Badge>
+                          <Badge tone={d.status === 'ACTIVE' ? 'success' : d.status === 'REVOKED' ? 'error' : 'neutral'}>{d.status}</Badge>
                         </td>
                         <td>
                           {d.status === 'ACTIVE' && (

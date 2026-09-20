@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { PrinterService } from '../packages/api/src/printer';
 import { db } from '../packages/database/src/db';
 import { Order } from '../packages/types/src';
@@ -56,6 +56,28 @@ const mockOrder: Order = {
 };
 
 describe('PrinterService & Automatic Built-in Kiosk Thermal Spooler', () => {
+  // BUG-024: only a real transport may report a job PRINTED. These tests exercise the queue
+  // mechanics (dedupe, retry, offline handling), so they run against the explicit dev-only
+  // VIRTUAL_EMULATOR type; the seeded USB printer has no real driver and is tested separately.
+  const kioskPrinter = () => db.configuredPrinters.find((p) => p.id === 'prn-kiosk-01')!;
+  let originalType: string;
+  beforeEach(() => {
+    originalType = kioskPrinter().interfaceType;
+    kioskPrinter().interfaceType = 'VIRTUAL_EMULATOR';
+  });
+  afterEach(() => {
+    kioskPrinter().interfaceType = originalType as any;
+  });
+
+  it('a USB printer, used outside the desktop app, reports a failed print, never a false success', async () => {
+    kioskPrinter().interfaceType = 'USB';
+    kioskPrinter().status = 'READY';
+    const usbOrder: Order = { ...mockOrder, id: `ord-usb-prn-${Date.now()}` };
+    const res = await PrinterService.printReceipt(usbOrder);
+    expect(res.success).toBe(false);
+    expect(res.message).toMatch(/desktop app/i);
+  });
+
   it('should auto-detect and configure built-in thermal printer on startup', () => {
     const res = PrinterService.autoConfigureKioskPrinter();
     expect(res.success).toBe(true);
@@ -114,12 +136,28 @@ describe('PrinterService & Automatic Built-in Kiosk Thermal Spooler', () => {
     const offlineOrder: Order = { ...mockOrder, id: `ord-offline-prn-${Date.now()}` };
     const printRes = await PrinterService.printReceipt(offlineOrder);
     expect(printRes.success).toBe(false);
-    expect(printRes.message).toContain('queued in print spooler');
+    expect(printRes.message).toMatch(/offline|paper out/i);
 
     // Restore printer to ready
     PrinterService.setPrinterStatus('prn-kiosk-01', 'READY');
     expect(PrinterService.isOnline()).toBe(true);
     const recoverRes = await PrinterService.processQueue();
     expect(recoverRes.processed).toBeGreaterThan(0);
+  });
+
+  it('with no printer configured at all (a fresh real restaurant) printing fails cleanly instead of throwing', async () => {
+    const saved = db.configuredPrinters;
+    db.configuredPrinters = [];
+    try {
+      const noPrinterOrder: Order = { ...mockOrder, id: `ord-noprn-${Date.now()}` };
+      const res = await PrinterService.printReceipt(noPrinterOrder);
+      expect(res.success).toBe(false);
+      expect(res.message).toMatch(/no printer/i);
+      const slip = await PrinterService.printTestSlip();
+      expect(slip.success).toBe(false);
+      expect(slip.message).toMatch(/no printer/i);
+    } finally {
+      db.configuredPrinters = saved;
+    }
   });
 });

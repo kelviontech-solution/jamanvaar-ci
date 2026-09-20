@@ -9,11 +9,11 @@ import {
   SearchBar,
   ConfirmModal
 } from '../../components/ui';
+import { RefreshButton, LastUpdatedNote } from '../../components/RefreshButton';
 import {
   Utensils,
   Plus,
   Send,
-  RefreshCw,
   Clock,
   Sparkles,
   Tag,
@@ -87,6 +87,13 @@ export function MasterCatalogPage() {
     setTimeout(() => setToast(null), 3800);
   };
 
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
+
+  // BUG-063: this depended on `dishCategory`, which the load itself sets on first success —
+  // so the function identity changed and the effect re-ran, fetching everything (including
+  // every restaurant, for syndication) TWICE on every page open. A ref-based "has this been
+  // defaulted yet" check breaks that self-triggering loop.
+  const dishCategoryDefaulted = useRef(false);
   const loadData = useCallback(() => {
     setLoading(true);
     setError(null);
@@ -99,13 +106,15 @@ export function MasterCatalogPage() {
         setCategories(cats);
         setItems(itms);
         setRestaurants(rests);
-        if (cats.length > 0 && !dishCategory) {
+        if (cats.length > 0 && !dishCategoryDefaulted.current) {
+          dishCategoryDefaulted.current = true;
           setDishCategory(cats[0].id);
         }
+        setLastUpdatedAt(new Date());
       })
       .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load master catalog'))
       .finally(() => setLoading(false));
-  }, [dishCategory]);
+  }, []);
 
   useEffect(loadData, [loadData]);
 
@@ -355,9 +364,8 @@ export function MasterCatalogPage() {
           </p>
         </div>
         <div className="catalog-header-actions">
-          <Button variant="ghost" onClick={loadData}>
-            <RefreshCw className="w-4 h-4 mr-1.5" /> Refresh
-          </Button>
+          <LastUpdatedNote at={lastUpdatedAt} />
+          <RefreshButton loading={loading} onRefresh={loadData} lastUpdatedAt={lastUpdatedAt} />
           <Button
             variant="ghost"
             onClick={handleImportStarterLibrary}

@@ -1,6 +1,8 @@
-import { Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { DevicesService } from './devices.service';
+import { renameDeviceSchema } from './dto/heartbeat.dto';
+import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
 
@@ -10,8 +12,19 @@ export class DevicesController {
   constructor(private readonly devices: DevicesService) {}
 
   @Get()
-  list(@Query('restaurantId') restaurantId?: string) {
-    return this.devices.list(restaurantId);
+  list(@Query() query: Record<string, string>) {
+    return this.devices.list(query);
+  }
+
+  @Get('by-restaurant')
+  byRestaurant(@Query() query: Record<string, string>) {
+    return this.devices.byRestaurant(query);
+  }
+
+  @Patch(':id')
+  @UsePipes(new ZodValidationPipe(renameDeviceSchema))
+  rename(@Param('id') id: string, @Body() body: ReturnType<typeof renameDeviceSchema.parse>, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.devices.rename(id, body.name, actor);
   }
 
   @Get(':id')

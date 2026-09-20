@@ -74,10 +74,10 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         <div className="flex flex-col justify-center min-w-0">
           <div className="flex items-center gap-2 min-w-0">
             <span
-              title={restaurantName || 'JAMANVAAR RESTAURANT'}
+              title={restaurantName || 'Restaurant'}
               className="text-xs sm:text-[13px] font-extrabold text-jaman-navy tracking-tight truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px]"
             >
-              {restaurantName || 'JAMANVAAR RESTAURANT'}
+              {restaurantName || 'Restaurant'}
             </span>
             <span className="shrink-0 px-1.5 py-0.5 rounded-md text-[9px] font-mono font-bold tracking-wider uppercase bg-jaman-navy/[0.05] text-jaman-navy border border-jaman-navy/15 shadow-2xs">
               ADMIN
@@ -91,14 +91,14 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
               className="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-slate-500 hover:text-jaman-saffron truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px] leading-tight mt-0.5 cursor-pointer transition-colors"
             >
               <Building2 className="w-3 h-3 shrink-0" />
-              <span className="truncate">{outletName || 'Ahmedabad Flagship Store'}</span>
+              <span className="truncate">{outletName || 'Main outlet'}</span>
             </button>
           ) : (
             <span
-              title={outletName || 'Ahmedabad Flagship Store'}
+              title={outletName || 'Main outlet'}
               className="text-[10px] sm:text-[11px] font-medium text-slate-500 truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px] leading-tight mt-0.5"
             >
-              {outletName || 'Ahmedabad Flagship Store'}
+              {outletName || 'Main outlet'}
             </span>
           )}
         </div>
@@ -147,30 +147,34 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         </button>
 
         {/* 3A. Consolidated Operational Context Block */}
-        <div className="hidden xl:flex items-center gap-2.5 bg-white border border-jaman-border px-3.5 py-1.5 rounded-xl text-xs select-none h-10 shadow-2xs">
-          {/* Status Dot + Terminal */}
-          <div className="flex items-center gap-1.5 font-bold text-emerald-800 text-[11px] tracking-wide shrink-0">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>{activeShift?.terminalId || 'POS-01'} ONLINE</span>
+        {/* BUG-012: this used to fall back to a fabricated "POS-01 · Amit Dave · Float ₹2,000"
+            whenever no shift was open, so a brand-new restaurant's header looked like someone
+            was already working a till. It now says plainly that no shift is open. */}
+        {activeShift ? (
+          <div className="hidden xl:flex items-center gap-2.5 bg-white border border-jaman-border px-3.5 py-1.5 rounded-xl text-xs select-none h-10 shadow-2xs">
+            <div className="flex items-center gap-1.5 font-bold text-emerald-800 text-[11px] tracking-wide shrink-0">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>{activeShift.terminalId || 'Terminal'} ONLINE</span>
+            </div>
+
+            <span className="w-px h-4 bg-[#E2D9C8]" aria-hidden="true" />
+
+            <span className="text-slate-700 font-medium text-[11px] truncate max-w-[130px]" title={activeShift.cashierName}>
+              {activeShift.cashierName || 'Unassigned cashier'}
+            </span>
+
+            <span className="w-px h-4 bg-[#E2D9C8]" aria-hidden="true" />
+
+            <span className="text-jaman-navy font-mono font-bold text-[11px] shrink-0">
+              Float: {formatINR(activeShift.openingCash ?? 0)}
+            </span>
           </div>
-
-          <span className="w-px h-4 bg-[#E2D9C8]" aria-hidden="true" />
-
-          {/* Cashier Context */}
-          <span
-            className="text-slate-700 font-medium text-[11px] truncate max-w-[130px]"
-            title={activeShift?.cashierName || 'Amit Dave · Lead Cashier'}
-          >
-            {activeShift?.cashierName || 'Amit Dave · Lead Cashier'}
-          </span>
-
-          <span className="w-px h-4 bg-[#E2D9C8]" aria-hidden="true" />
-
-          {/* Opening Float */}
-          <span className="text-jaman-navy font-mono font-bold text-[11px] shrink-0">
-            Float: {formatINR(activeShift?.openingCash || 2000)}
-          </span>
-        </div>
+        ) : (
+          <div className="hidden xl:flex items-center gap-2 bg-white border border-jaman-border px-3.5 py-1.5 rounded-xl text-xs select-none h-10 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-slate-300" />
+            <span className="text-slate-500 font-bold text-[11px]">No open shift</span>
+          </div>
+        )}
 
         {/* 3B. Core Financial Actions (EOD Z-Report & Reconciliation) */}
         <div className="flex items-center gap-1.5 sm:gap-2">

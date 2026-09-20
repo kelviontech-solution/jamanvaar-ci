@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Patch, Req, UseGuards, UsePipes } from '@nestjs/common';
 import { Device } from '@prisma/client';
 import { DevicesService } from './devices.service';
 import { heartbeatSchema } from './dto/heartbeat.dto';
@@ -19,7 +19,8 @@ export class DeviceHeartbeatController {
 
   @Patch('heartbeat')
   @UsePipes(new ZodValidationPipe(heartbeatSchema))
-  heartbeat(@Body() body: ReturnType<typeof heartbeatSchema.parse>, @CurrentDevice() device: Device) {
-    return this.devices.reportHeartbeat(device, body);
+  heartbeat(@Body() body: ReturnType<typeof heartbeatSchema.parse>, @CurrentDevice() device: Device, @Req() req: { ip?: string }) {
+    // The address the server actually saw, not one the terminal claims.
+    return this.devices.reportHeartbeat(device, { ...body, ipAddress: req.ip?.replace(/^::ffff:/, '') });
   }
 }

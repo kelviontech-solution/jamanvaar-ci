@@ -76,11 +76,11 @@ export function ApplicationsPage() {
   function openPublishModal(app: ApplicationSummary) {
     setPublishModalApp(app);
     // suggest next version (e.g. 2.4.0 -> 2.4.1)
-    const parts = app.currentVersion.split('.');
+    const parts = (app.currentVersion ?? '').split('.');
     if (parts.length === 3 && !isNaN(Number(parts[2]))) {
       setNewVersion(`${parts[0]}.${parts[1]}.${Number(parts[2]) + 1}`);
     } else {
-      setNewVersion(app.currentVersion);
+      setNewVersion(app.currentVersion ?? '1.0.0');
     }
     setNewPlatforms(app.supportedPlatforms || ['web']);
     setNewReleaseNotes('');
@@ -216,7 +216,7 @@ export function ApplicationsPage() {
                     </div>
                   </div>
                   <Badge tone={app.channel === 'STABLE' ? 'success' : 'accent'}>
-                    v{app.currentVersion}
+                    {app.currentVersion ? `v${app.currentVersion}` : 'No release yet'}
                   </Badge>
                 </div>
 
@@ -226,8 +226,14 @@ export function ApplicationsPage() {
                   <div className="app-spec-item">
                     <span className="app-spec-label">Fleet Terminals</span>
                     <span className="app-spec-value">
-                      {app.activeDevices} Active ({app.onlineDevices} Online)
+                      {app.activeDevices} Active ({app.onlineDevices} Online
+                      {app.degradedDevices ? `, ${app.degradedDevices} degraded` : ''}
+                      {app.offlineDevices ? `, ${app.offlineDevices} offline` : ''})
                     </span>
+                  </div>
+                  <div className="app-spec-item">
+                    <span className="app-spec-label">Terminals on an older version</span>
+                    <span className="app-spec-value">{app.currentVersion ? app.behindDevices ?? 0 : 'n/a'}</span>
                   </div>
                   <div className="app-spec-item">
                     <span className="app-spec-label">Release Channel</span>
@@ -282,7 +288,7 @@ export function ApplicationsPage() {
 
                 {isHistoryOpen && (
                   <div className="release-history-box">
-                    <div style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
+                    <div style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--jv-text)' }}>
                       Recent Releases ({app.recentReleases.length})
                     </div>
                     {app.recentReleases.length === 0 ? (

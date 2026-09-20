@@ -38,6 +38,8 @@ import { ApplicationEntitlementsModule } from './modules/application-entitlement
 import { PaymentsModule } from './modules/payments/payments.module';
 import { OrderSyncModule } from './modules/order-sync/order-sync.module';
 import { EntitySyncModule } from './modules/entity-sync/entity-sync.module';
+import { JobsModule } from './modules/jobs/jobs.module';
+import { PlatformNotificationsModule } from './modules/platform-notifications/platform-notifications.module';
 import { validateEnv } from './config/env.validation';
 
 @Module({
@@ -84,7 +86,9 @@ import { validateEnv } from './config/env.validation';
     ApplicationEntitlementsModule,
     PaymentsModule,
     OrderSyncModule,
-    EntitySyncModule
+    EntitySyncModule,
+    JobsModule,
+    PlatformNotificationsModule
   ],
   providers: [
     {

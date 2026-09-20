@@ -13,7 +13,7 @@ export const updateQuestionSchema = z.object({
 });
 
 export const updateSettingsSchema = z.object({
-  mode: z.enum(['OFFLINE_RULE_BASED', 'HYBRID_LLM']).optional(),
+  // No "mode": only the rule-based engine exists, so there is nothing to choose (BUG-056).
   delayedKotMinutes: z.number().int().min(5).max(60).optional(),
   lowStockThreshold: z.number().int().min(1).max(50).optional(),
   cashDrawerVarianceThreshold: z.number().int().min(50).max(10000).optional(),
@@ -49,6 +49,24 @@ export const createQuestionSchema = z.object({
 });
 
 export const logTelemetrySchema = z.object({
-  intent: z.string(),
-  queryText: z.string().optional()
+  intent: z.string().min(1).max(60),
+  queryText: z.string().max(500).optional(),
+  /** How long the terminal took to answer, measured on the terminal. */
+  latencyMs: z.number().min(0).max(60_000).optional()
+});
+
+/** Limits the platform allows a restaurant to set for itself; the same bounds as the global thresholds. */
+export const thresholdOverridesSchema = z
+  .object({
+    delayedKotMinutes: z.number().int().min(5).max(60),
+    lowStockThreshold: z.number().int().min(1).max(50),
+    cashDrawerVarianceThreshold: z.number().int().min(50).max(10000)
+  })
+  .partial()
+  .strict();
+
+export const restaurantAiAccessSchema = z.object({
+  state: z.enum(['ON', 'LOCKED', 'OFF']).nullable().optional(),
+  dailyQueryLimit: z.number().int().min(1).max(100000).nullable().optional(),
+  thresholdOverrides: thresholdOverridesSchema.nullable().optional()
 });

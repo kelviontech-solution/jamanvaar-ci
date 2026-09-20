@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
 import { usePosStore } from './store/posStore';
-import { db, CustomerRepository, NotificationRepository } from '@jamanvaar/database';
-import type { MenuItem } from '@jamanvaar/types';
+import { db, CustomerRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
+import type { MenuItem, Category } from '@jamanvaar/types';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync } from '@jamanvaar/sync';
 import { sound } from '@jamanvaar/ui';
 import { PosLogin } from './components/auth/PosLogin';
@@ -173,21 +173,60 @@ export const App: React.FC = () => {
       db.notify();
     };
 
+    // BUG-016: MENU_CATEGORY was defined in the entity-sync bridge's DTO but no app
+    // ever actually used it, so categories never synced (even though the dishes did).
+    const syncCategories = async () => {
+      await EntitySyncEngine.pushSnapshot(
+        'MENU_CATEGORY',
+        db.categories.map((c) => ({ externalId: c.id, payload: c as unknown as Record<string, unknown> }))
+      );
+      await EntitySyncEngine.catchUp('MENU_CATEGORY', (remote) => {
+        const incoming = remote.payload as unknown as Category;
+        if (!incoming || !incoming.id) return;
+        const idx = db.categories.findIndex((c) => c.id === incoming.id);
+        if (idx >= 0) {
+          db.categories[idx] = { ...db.categories[idx], ...incoming };
+        } else {
+          db.categories.push(incoming);
+        }
+      });
+      db.notify();
+    };
+
+    // BUG-019/034/035: a staff PIN issued in Restaurant Admin used to work only on the device that
+    // created it — nothing synced staff records here, despite the create/reset screen's own promise
+    // that the PIN would work on POS too. Restaurant Admin is the only place staff are created, so
+    // this terminal only pulls.
+    const syncStaff = async () => {
+      await EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
+    };
+
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
     void syncCrm();
     void syncMenu();
+    void syncCategories();
+    void syncStaff();
     void reportHeartbeat();
 
-    const interval = setInterval(() => {
+    // Orders and kitchen tickets are time-critical: every few seconds. The
+    // heavier snapshots (CRM, menu) and the heartbeat keep the slower cadence.
+    const orderInterval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
       void SyncOutboxEngine.catchUpFromCloud();
+    }, 4000);
+    const interval = setInterval(() => {
       void syncCrm();
       void syncMenu();
+      void syncCategories();
+      void syncStaff();
       void reportHeartbeat();
     }, 15000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(orderInterval);
+      clearInterval(interval);
+    };
   }, [isDeviceActivated]);
 
   // Global Keyboard Shortcuts (F1 - F10, Ctrl+K, Escape)

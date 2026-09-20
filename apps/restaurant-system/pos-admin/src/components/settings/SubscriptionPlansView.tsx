@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { printElement } from '@jamanvaar/ui';
 import { LicenseRepository } from '@jamanvaar/database';
 import { applyLicenseCertificate } from '@jamanvaar/business';
 import { PlanTier, CORE_PLAN_FEATURE_GROUPS, PRO_PLAN_FEATURE_GROUPS, countFeatures } from '@jamanvaar/types';
@@ -1266,7 +1267,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => window.print()}
+                  onClick={() => printElement('[data-print-doc="tenant-invoice"]', { title: 'Invoice', pageSize: 'A4 portrait' })}
                   className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" />
@@ -1283,7 +1284,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
             </div>
 
             {/* Invoice Print Surface */}
-            <div className="p-4 border border-slate-200 rounded-2xl text-xs text-slate-700 space-y-4">
+            <div data-print-doc="tenant-invoice" className="p-4 border border-slate-200 rounded-2xl text-xs text-slate-700 space-y-4">
               <div className="flex justify-between items-start border-b border-slate-200 pb-3">
                 <div>
                   <div className="text-lg font-black text-jaman-navy">JAMANVAAR</div>
@@ -1374,7 +1375,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => window.print()}
+                  onClick={() => printElement('[data-print-doc="tenant-receipt"]', { title: 'Payment receipt', pageSize: 'A5 portrait' })}
                   className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" />
@@ -1390,7 +1391,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
               </div>
             </div>
 
-            <div className="p-4 border border-slate-200 rounded-2xl text-xs text-slate-700 space-y-4">
+            <div data-print-doc="tenant-receipt" className="p-4 border border-slate-200 rounded-2xl text-xs text-slate-700 space-y-4">
               <div className="flex justify-between items-start border-b border-slate-200 pb-3">
                 <div>
                   <div className="text-lg font-black text-jaman-navy">JAMANVAAR</div>

@@ -26,20 +26,20 @@ export class AuditQueryService {
     };
 
     const [rows, total] = await Promise.all([
-      this.prisma.auditLog.findMany({
+      this.prisma.platformDb.auditLog.findMany({
         where,
         orderBy: { createdAt: 'desc' },
         skip: (filters.page - 1) * filters.limit,
         take: filters.limit
       }),
-      this.prisma.auditLog.count({ where })
+      this.prisma.platformDb.auditLog.count({ where })
     ]);
 
     return { rows, total, page: filters.page, limit: filters.limit };
   }
 
   distinctCategories() {
-    return this.prisma.auditLog.findMany({
+    return this.prisma.platformDb.auditLog.findMany({
       distinct: ['category'],
       select: { category: true },
       orderBy: { category: 'asc' }

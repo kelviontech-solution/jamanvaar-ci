@@ -19,3 +19,8 @@ export const updateBranchSchema = z.object({
   timezone: z.string().trim().optional()
 });
 export type UpdateBranchDto = z.infer<typeof updateBranchSchema>;
+
+export const bulkBranchStatusSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1, 'Choose at least one branch').max(200),
+  status: z.enum(['ACTIVE', 'INACTIVE'])
+});

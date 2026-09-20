@@ -1,3 +1,4 @@
+import { copyText } from '@jamanvaar/utils';
 import React, { useEffect, useState } from 'react';
 import {
   isCloudConnected,
@@ -99,11 +100,10 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
     }
   }
 
-  function copy(text: string, field: string) {
-    navigator.clipboard?.writeText(text).then(() => {
-      setCopiedField(field);
-      setTimeout(() => setCopiedField(null), 1500);
-    });
+  async function copy(text: string, field: string) {
+    if (!(await copyText(text))) return;
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 1500);
   }
 
   return (

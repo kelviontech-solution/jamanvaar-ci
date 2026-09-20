@@ -6,3 +6,4 @@ export * from './timezone';
 export * from './qrcode';
 export * from './localization';
 export * from './transliteration';
+export * from './clipboard';

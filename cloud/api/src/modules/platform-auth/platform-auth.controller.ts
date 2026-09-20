@@ -1,3 +1,5 @@
+import { permissionsForRole, PlatformRoleName } from '../../common/rbac/access';
+import { describeLocation } from '../../common/security/geo';
 import {
   Body,
   Controller,
@@ -19,6 +21,7 @@ import { changePasswordSchema, loginSchema } from './dto/login.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
+import { CurrentPlatformSession } from '../../common/decorators/current-platform-session.decorator';
 
 const REFRESH_COOKIE = 'jamanvaar_platform_refresh';
 
@@ -44,9 +47,10 @@ export class PlatformAuthController {
   @UsePipes(new ZodValidationPipe(loginSchema))
   async login(
     @Body() body: { email: string; password: string },
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ) {
-    const result = await this.authService.login(body.email, body.password);
+    const result = await this.authService.login(body.email, body.password, { userAgent: req.headers['user-agent'], ip: req.ip, location: describeLocation(req.ip, req.headers) });
     this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
     return { accessToken: result.accessToken, user: result.user };
   }
@@ -58,7 +62,7 @@ export class PlatformAuthController {
     if (!refreshToken) {
       throw new UnauthorizedException('Missing refresh token');
     }
-    const result = await this.authService.refresh(refreshToken);
+    const result = await this.authService.refresh(refreshToken, { userAgent: req.headers['user-agent'], ip: req.ip, location: describeLocation(req.ip, req.headers) });
     this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
     return { accessToken: result.accessToken, user: result.user };
   }
@@ -88,16 +92,24 @@ export class PlatformMeController {
 
   @Get('me')
   me(@CurrentPlatformUser() user: PlatformUser) {
-    return { id: user.id, email: user.email, fullName: user.fullName, role: user.role, status: user.status };
+    return {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role,
+      status: user.status,
+      permissions: permissionsForRole(user.role as PlatformRoleName)
+    };
   }
 
   @Patch('me/password')
   @UsePipes(new ZodValidationPipe(changePasswordSchema))
   async changePassword(
     @Body() body: ReturnType<typeof changePasswordSchema.parse>,
-    @CurrentPlatformUser() user: PlatformUser
+    @CurrentPlatformUser() user: PlatformUser,
+    @CurrentPlatformSession() sessionId?: string
   ) {
-    await this.authService.changePassword(user, body.currentPassword, body.newPassword);
+    await this.authService.changePassword(user, body.currentPassword, body.newPassword, sessionId);
     return { success: true };
   }
 }

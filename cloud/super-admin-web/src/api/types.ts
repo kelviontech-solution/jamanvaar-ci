@@ -155,7 +155,14 @@ export interface TenantUser {
 
 export interface ActivationKey {
   id: string;
-  code: string;
+  /** Null once the key can no longer be used (redeemed, revoked or expired); see codeLast4. */
+  code: string | null;
+  codeLast4?: string;
+  lifecycle?: 'AVAILABLE' | 'REDEEMED' | 'REVOKED' | 'EXPIRED';
+  label?: string | null;
+  batchId?: string | null;
+  branchId?: string | null;
+  branch?: { id: string; name: string } | null;
   restaurantId: string;
   status: 'ACTIVE' | 'REDEEMED' | 'REVOKED' | 'EXPIRED';
   allowedDeviceType: 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'ANY';
@@ -347,6 +354,9 @@ export interface OfflineExtension {
   extensionDays: number;
   reason: string;
   requestedBy: string;
+  ticketRef?: string | null;
+  /** Only present on the response to a grant. */
+  warnings?: string[];
   status: 'ACTIVE' | 'REVOKED' | 'EXPIRED';
   certificatePayload: string;
   certificateSignature: string;
@@ -430,9 +440,18 @@ export interface SystemHealth {
 }
 
 export interface Session {
+  /** One per login (stable across token renewals). */
   id: string;
-  createdAt: string;
+  startedAt: string;
+  lastActiveAt: string;
   expiresAt: string;
+  /** e.g. "Chrome 126 on Windows" */
+  device: string;
+  ip: string | null;
+  /** Approximate place of the sign-in, when the network in front of the API provides one. */
+  location: string | null;
+  /** True for the browser you are using right now. */
+  current: boolean;
 }
 
 export interface DashboardOperationsTelemetry {
@@ -609,10 +628,16 @@ export interface BillingSummary {
   totalInvoices: number;
   paidInvoices: number;
   pendingInvoices: number;
+  /** Unpaid and past due date. Same number as `overdueInvoices`. */
   pastDueInvoices: number;
+  overdueInvoices?: number;
   totalCollected: number; // in rupees
-  pendingAmount: number; // in rupees
+  /** Everything unpaid (pending plus overdue), in rupees. */
+  pendingAmount: number;
+  overdueAmount?: number;
+  /** Money collected over money billed. */
   collectionRatePercent?: number;
+  ageing?: { '0-30': number; '31-60': number; '61-90': number; '90+': number };
 }
 
 export interface ReceiptData {
@@ -687,14 +712,14 @@ export interface AiQuestionItem {
 }
 
 export interface AiGlobalSettings {
-  mode: 'OFFLINE_RULE_BASED' | 'HYBRID_LLM';
+  /** Only the rule-based engine exists. */
+  mode: 'OFFLINE_RULE_BASED';
   delayedKotMinutes: number;
   lowStockThreshold: number;
   cashDrawerVarianceThreshold: number;
   proactiveAlertsEnabled: boolean;
   corePlanTeaserEnabled: boolean;
   dailyQueryLimitPro: number;
-  engineLatencyMs: number;
 }
 
 export interface AiTelemetry {
@@ -703,9 +728,12 @@ export interface AiTelemetry {
   activeProTenants: number;
   totalActiveTenants: number;
   adoptionRatePercent: number;
-  topIntent: string;
+  restaurantsUsingToday?: number;
+  /** Null until a question has been answered. */
+  topIntent: string | null;
   topIntents: Array<{ intent: string; count: number }>;
-  latencyMs: number;
+  /** Measured average per answered question; null until there is data. */
+  latencyMs: number | null;
 }
 
 export interface AiAssistantConfigResponse {
@@ -739,7 +767,8 @@ export interface ApplicationSummary {
   category: string;
   description: string;
   defaultPort?: number;
-  currentVersion: string;
+  /** Null when no stable release has been published yet. */
+  currentVersion: string | null;
   channel: 'STABLE' | 'BETA';
   minSupportedVersion: string | null;
   supportedPlatforms: string[];
@@ -749,7 +778,11 @@ export interface ApplicationSummary {
   totalDevices: number;
   activeDevices: number;
   onlineDevices: number;
+  degradedDevices?: number;
   offlineDevices: number;
+  neverSeenDevices?: number;
+  /** Active terminals running an older version than the newest stable release. */
+  behindDevices?: number;
   recentReleases: AppRelease[];
 }
 
@@ -831,6 +864,8 @@ export interface TicketPersonRef {
 
 export interface SupportTicket {
   id: string;
+  /** Readable ticket number, shown as TKT-000123. */
+  number: number;
   restaurantId: string | null;
   restaurant: { id: string; name: string } | null;
   subject: string;
@@ -839,25 +874,60 @@ export interface SupportTicket {
   priority: TicketPriority;
   assignedToId: string | null;
   assignedTo: TicketPersonRef | null;
-  createdById: string;
-  createdBy: TicketPersonRef;
+  /** Null when the restaurant raised it (see source and raisedBy*). */
+  createdById: string | null;
+  createdBy: TicketPersonRef | null;
+  source: 'PLATFORM' | 'RESTAURANT';
+  category: TicketCategory;
+  raisedByName: string | null;
+  raisedByEmail: string | null;
+  branchId: string | null;
+  deviceId: string | null;
   slaDueAt: string;
   resolvedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
+export type TicketCategory = 'BILLING' | 'SYNC' | 'HARDWARE' | 'ONBOARDING' | 'FEATURE_REQUEST' | 'OTHER';
+
 export interface TicketComment {
   id: string;
   ticketId: string;
-  authorId: string;
-  author: { id: string; fullName: string };
+  authorId: string | null;
+  author: { id: string; fullName: string } | null;
+  authorType: 'PLATFORM' | 'RESTAURANT';
+  authorName: string | null;
+  /** Internal notes are for the team only. */
+  internal: boolean;
   body: string;
+  createdAt: string;
+}
+
+export interface TicketEvent {
+  id: string;
+  type: 'CREATED' | 'STATUS' | 'PRIORITY' | 'ASSIGNEE' | 'ATTACHMENT';
+  actorType: 'PLATFORM' | 'RESTAURANT';
+  actorName: string | null;
+  fromValue: string | null;
+  toValue: string | null;
+  createdAt: string;
+}
+
+export interface TicketAttachment {
+  id: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedByType: string;
+  uploadedByName: string | null;
   createdAt: string;
 }
 
 export interface SupportTicketDetail extends SupportTicket {
   comments: TicketComment[];
+  events: TicketEvent[];
+  attachments: TicketAttachment[];
 }
 
 export interface CreateRestaurantInput {
@@ -1032,3 +1102,22 @@ export interface PaymentConnection {
   updatedAt: string;
 }
 
+
+export type NotificationSeverity = 'INFO' | 'WARNING' | 'CRITICAL';
+
+export interface PlatformNotification {
+  id: string;
+  type: string;
+  severity: NotificationSeverity;
+  title: string;
+  body: string | null;
+  restaurantId: string | null;
+  link: string;
+  createdAt: string;
+  read: boolean;
+}
+
+export interface NotificationExtras {
+  unreadCount: number;
+  severityCounts: Record<NotificationSeverity, number>;
+}

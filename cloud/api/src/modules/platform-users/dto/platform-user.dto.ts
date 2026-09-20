@@ -1,3 +1,4 @@
+import { strongPassword } from '../../../common/validation/password';
 import { z } from 'zod';
 
 export const PLATFORM_ROLES = [
@@ -24,6 +25,6 @@ export type UpdateRoleDto = z.infer<typeof updateRoleSchema>;
 export const activateTeammateSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   activationToken: z.string().min(10),
-  password: z.string().min(8)
+  password: strongPassword
 });
 export type ActivateTeammateDto = z.infer<typeof activateTeammateSchema>;

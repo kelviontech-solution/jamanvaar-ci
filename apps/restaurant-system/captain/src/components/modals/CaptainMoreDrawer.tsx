@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAiAccess } from '@jamanvaar/ui';
 import { useCaptainStore } from '../../store/captainStore';
 import { captainDb } from '@jamanvaar/database';
 import {
@@ -30,6 +31,7 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
   onSelectTab,
   onOpenAiAssistant
 }) => {
+  const ai = useAiAccess();
   if (!isOpen) return null;
 
   const {
@@ -95,7 +97,7 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
         {/* Content Navigation List */}
         <div className="flex-1 p-4 overflow-y-auto space-y-2.5 bg-jaman-cream">
           {/* AI Quick Trigger — hidden when this restaurant opted out */}
-          {captainDb.restaurant?.showJamanAI !== false && (
+          {ai.showButton(captainDb.restaurant?.showJamanAI !== false) && (
           <button
             type="button"
             onClick={() => {

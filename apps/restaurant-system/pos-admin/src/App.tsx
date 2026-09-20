@@ -5,10 +5,11 @@ import {
   LicenseRepository,
   MenuRepository,
   NotificationRepository,
-  QrOrderingRepository
+  QrOrderingRepository,
+  StaffRepository
 } from '@jamanvaar/database';
-import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError, logTenantAiTelemetry, reportQrUsage, pushEntitySync, pullEntitySync, reportDeviceHeartbeat, getStoredDeviceToken } from './cloud/cloudClient';
-import { EntitySyncEngine } from '@jamanvaar/sync';
+import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, reportQrUsage, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken } from './cloud/cloudClient';
+import { EntitySyncEngine, SyncOutboxEngine } from '@jamanvaar/sync';
 import {
   Category,
   DiningTable,
@@ -28,7 +29,8 @@ import {
   JamanvaarAuthLayout,
   Modal,
   NotificationDrawerModal,
-  NotificationToastContainer
+  NotificationToastContainer,
+  useAiAccess
 } from '@jamanvaar/ui';
 import { lanMeshSync } from '@jamanvaar/sync';
 import {
@@ -62,7 +64,9 @@ import {
   UtensilsCrossed,
   Users,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  LifeBuoy,
+  Truck
 } from 'lucide-react';
 
 // Reusable Feature Modules
@@ -87,6 +91,9 @@ import { ReportBrandingSettings } from './components/settings/ReportBrandingSett
 import { SubscriptionPlansView } from './components/settings/SubscriptionPlansView';
 import { AuditTrailModule } from './components/audit/AuditTrailModule';
 import { BackupRestoreModule } from './components/backup/BackupRestoreModule';
+import { SupportTicketsModule } from './components/support/SupportTicketsModule';
+import { InventoryControlModule } from './components/inventory/InventoryControlModule';
+import { TerminalDisplaySettings } from './components/settings/TerminalDisplaySettings';
 import { PosAdminHeader } from './components/header/PosAdminHeader';
 
 // Specialized Modal Dialogs
@@ -129,9 +136,12 @@ export type PosAdminTab =
   | 'SETTINGS'
   | 'LICENSE'
   | 'AUDIT'
-  | 'BACKUP';
+  | 'BACKUP'
+  | 'SUPPORT'
+  | 'INVENTORY_CONTROL';
 
 export default function PosAdminApp() {
+  const ai = useAiAccess();
   // Check URL parameters for direct guest QR table ordering
   const queryParams = new URLSearchParams(window.location.search);
   const isGuestQrMode = queryParams.has('qrTable') || queryParams.has('table');
@@ -364,15 +374,9 @@ export default function PosAdminApp() {
   const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
   const [reportSubTab, setReportSubTab] = useState<string>('DAILY');
 
-  const handleOpenAssistant = () => {
-    const currentLicense = LicenseRepository.getLicense();
-    const isPro = currentLicense?.tier === 'PRO' || currentLicense?.entitlements?.posAssistant === true;
-    if (!isPro) {
-      setIsProUpgradeModalOpen(true);
-    } else {
-      setIsAssistantOpen(true);
-    }
-  };
+  // Whether JAMAN AI works, is locked or is hidden is decided by the platform for THIS restaurant (delivered
+  // with the heartbeat and cached), not by the local licence record, which every fresh install set to PRO.
+  const handleOpenAssistant = () => setIsAssistantOpen(true);
 
   const unreadNotifsCount = NotificationRepository.getUnreadCount('POS_ADMIN');
 
@@ -427,6 +431,16 @@ export default function PosAdminApp() {
   useEffect(() => {
     if (!getStoredDeviceToken()) return;
     EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
+    // Restaurant Admin is the owner's live window onto the restaurant: it must
+    // receive every order, payment and kitchen ticket the other devices create.
+    // It used to have no order-sync client at all (BUG-034).
+    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    void SyncOutboxEngine.catchUpFromCloud();
+    void SyncOutboxEngine.processOutbox();
+    const orderInterval = setInterval(() => {
+      void SyncOutboxEngine.processOutbox();
+      void SyncOutboxEngine.catchUpFromCloud();
+    }, 4000);
 
     const syncMenu = async () => {
       await EntitySyncEngine.pushSnapshot(
@@ -446,13 +460,49 @@ export default function PosAdminApp() {
       db.notify();
     };
 
+    // BUG-016: same gap as POS — categories were never synced, only dishes.
+    const syncCategories = async () => {
+      await EntitySyncEngine.pushSnapshot(
+        'MENU_CATEGORY',
+        db.categories.map((c) => ({ externalId: c.id, payload: c as unknown as Record<string, unknown> }))
+      );
+      await EntitySyncEngine.catchUp('MENU_CATEGORY', (remote) => {
+        const incoming = remote.payload as unknown as Category;
+        if (!incoming || !incoming.id) return;
+        const idx = db.categories.findIndex((c) => c.id === incoming.id);
+        if (idx >= 0) {
+          db.categories[idx] = { ...db.categories[idx], ...incoming };
+        } else {
+          db.categories.push(incoming);
+        }
+      });
+      db.notify();
+    };
+
+    // BUG-019/034/035: staff PINs created here previously worked only on this one device — nothing
+    // synced them to POS, Captain, KDS or Kiosk, despite the create/reset screen's own promise that
+    // they would. Restaurant Admin is the sole place staff are created, so this is push-heavy, but it
+    // still applies whatever it pulls back in case another admin device edited a record first.
+    const syncStaff = async () => {
+      await EntitySyncEngine.pushSnapshot('STAFF_USER', db.users.map((u) => ({ externalId: u.id, payload: StaffRepository.toSyncPayload(u) })));
+      await EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
+    };
+
     void syncMenu();
+    void syncCategories();
+    void syncStaff();
     void reportDeviceHeartbeat();
     const interval = setInterval(() => {
       void syncMenu();
+      void syncCategories();
+      void syncStaff();
       void reportDeviceHeartbeat();
     }, 15000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      clearInterval(orderInterval);
+      SyncOutboxEngine.configureTransport(null);
+    };
   }, [cloudConnected]);
 
   const showToast = (msg: string) => {
@@ -543,7 +593,7 @@ export default function PosAdminApp() {
                       setAuthUsername(e.target.value);
                       setAuthError('');
                     }}
-                    placeholder="e.g. admin or owner@jamanvaar.com"
+                    placeholder="Your Restaurant Admin username or email"
                     className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                   />
                 </div>
@@ -739,7 +789,8 @@ export default function PosAdminApp() {
                   section: 'MENU & INVENTORY',
                   items: [
                     { id: 'MENU', label: 'Menu & Categories', icon: UtensilsCrossed },
-                    { id: 'INVENTORY', label: 'Inventory & Recipes', icon: Package }
+                    { id: 'INVENTORY', label: 'Inventory & Recipes', icon: Package },
+                    { id: 'INVENTORY_CONTROL', label: 'Purchasing & Stock Control', icon: Truck }
                   ]
                 },
                 {
@@ -759,7 +810,8 @@ export default function PosAdminApp() {
                     { id: 'SETTINGS', label: 'Restaurant Settings', icon: Settings },
                     { id: 'LICENSE', label: 'Subscription Plans', icon: Award },
                     { id: 'AUDIT', label: 'Audit Trail Logs', icon: ShieldCheck },
-                    { id: 'BACKUP', label: 'Backup & Restore', icon: Database }
+                    { id: 'BACKUP', label: 'Backup & Restore', icon: Database },
+                    { id: 'SUPPORT', label: 'Help & Support', icon: LifeBuoy }
                   ]
                 }
               ].map((grp) => {
@@ -1074,10 +1126,13 @@ export default function PosAdminApp() {
 
             {/* TAB 15: SETTINGS & BRANDING */}
             {activeTab === 'SETTINGS' && (
-              <ReportBrandingSettings
-                showToast={showToast}
-                onUpdated={() => setDbTick((t) => t + 1)}
-              />
+              <>
+                <TerminalDisplaySettings showToast={showToast} />
+                <ReportBrandingSettings
+                  showToast={showToast}
+                  onUpdated={() => setDbTick((t) => t + 1)}
+                />
+              </>
             )}
 
             {/* TAB 16: SUBSCRIPTION PLANS */}
@@ -1095,6 +1150,10 @@ export default function PosAdminApp() {
                 showToast={showToast}
               />
             )}
+
+            {activeTab === 'INVENTORY_CONTROL' && <InventoryControlModule showToast={showToast} />}
+
+            {activeTab === 'SUPPORT' && <SupportTicketsModule showToast={showToast} />}
 
             {/* TAB 18: BACKUP & DATA RESTORE */}
             {activeTab === 'BACKUP' && (
@@ -1337,7 +1396,7 @@ export default function PosAdminApp() {
 
         <NotificationToastContainer role="POS_ADMIN" />
 
-        {db.restaurant?.showJamanAI !== false && (
+        {ai.showButton(db.restaurant?.showJamanAI !== false) && (
           <JamanAiFloatingButton
             onClick={handleOpenAssistant}
             isOpen={isAssistantOpen}
@@ -1356,8 +1415,8 @@ export default function PosAdminApp() {
               setActiveTab(action.targetTab as any);
             }
           }}
-          onQueryExecuted={(intent, queryText) => {
-            logTenantAiTelemetry(intent, queryText);
+          onQueryExecuted={(intent, _queryText, latencyMs) => {
+            void reportAiQueryNow(intent, latencyMs ?? 0);
           }}
         />
 

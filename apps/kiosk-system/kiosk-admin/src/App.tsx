@@ -55,7 +55,8 @@ import {
   ThermalReceiptView,
   JAMANVAARStartup,
   VirtualKeyboard,
-  ActivationWelcomeScreen
+  ActivationWelcomeScreen,
+  printElement
 } from '@jamanvaar/ui';
 import { DeviceHealthService, EBillService, KdsMeshService, NetworkStatusService, PaymentService, PrinterService, VoiceService } from '@jamanvaar/api';
 import { AdminChatbotEngine, MenuBuilderService, ReportGeneratorService } from '@jamanvaar/business';
@@ -439,16 +440,16 @@ export default function AdminApp() {
   // Edit Restaurant Profile Modal & Form State
   const [isEditRestaurantModalOpen, setIsEditRestaurantModalOpen] = useState<boolean>(false);
   const [restForm, setRestForm] = useState({
-    legalName: db.restaurant.legalName || 'JAMANVAAR by KELVIONTECH',
-    name: db.restaurant.name || 'JAMANVAAR by KELVIONTECH',
-    outletName: db.outlet.name || 'Ahmedabad Flagship Store',
-    address: db.outlet.address || 'Sindhu Bhavan Road, Bodakdev',
-    city: db.outlet.city || 'Ahmedabad',
-    state: db.outlet.state || 'Gujarat',
-    gstin: db.restaurant.gstin || '24AAAAA0000A1Z5',
-    fssai: '10020021000123',
-    phone: db.restaurant.phone || '+91 79 4890 1234',
-    email: db.restaurant.email || 'hello@jamanvaar.com'
+    legalName: db.restaurant.legalName || '',
+    name: db.restaurant.name || '',
+    outletName: db.outlet.name || '',
+    address: db.outlet.address || '',
+    city: db.outlet.city || '',
+    state: db.outlet.state || '',
+    gstin: db.restaurant.gstin || '',
+    fssai: db.restaurant.fssaiNumber || '',
+    phone: db.restaurant.phone || '',
+    email: db.restaurant.email || ''
   });
 
   // Dealer Data Reset & Purge Modals
@@ -1681,7 +1682,7 @@ export default function AdminApp() {
                     Restaurant Operations Overview
                   </h1>
                   <p className="text-sm text-[#4A5568] mt-1">
-                    Live telemetry, sales summary and terminal health for Ahmedabad Flagship.
+                    Live telemetry, sales summary and terminal health for {db.outlet.name || db.restaurant.name || 'your restaurant'}.
                   </p>
                 </div>
               </div>
@@ -3678,7 +3679,7 @@ export default function AdminApp() {
 
           {/* TAB 11: REPORTS & EXPORT BUILDER */}
           {activeTab === 'REPORTS' && (
-            <div className="space-y-6">
+            <div data-print-doc="kiosk-report" className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Financial & Operations Reports</h1>
@@ -3723,7 +3724,7 @@ export default function AdminApp() {
                     size="sm"
                     leftIcon={<Printer className="w-4 h-4" />}
                     onClick={() => {
-                      window.print();
+                      if (!printElement('[data-print-doc="kiosk-report"]', { title: 'Kiosk report', pageSize: 'A4 portrait' })) showToast('Open the Reports tab to print a report.');
                     }}
                   >
                     Print Report / PDF
@@ -4834,7 +4835,8 @@ export default function AdminApp() {
                     <button
                       onClick={() => {
                         setIsAssistantOpen(false);
-                        window.print();
+                        setActiveTab('REPORTS');
+                        showToast('Choose Print Report / PDF on this tab.');
                       }}
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
@@ -4895,7 +4897,7 @@ export default function AdminApp() {
         title="End-of-Day (EOD) Z-Report & Cash Settlement"
         maxWidth="2xl"
       >
-        <div className="space-y-6">
+        <div data-print-doc="kiosk-z-report" className="space-y-6">
           <div className="bg-jaman-navy text-white p-5 rounded-2xl flex items-center justify-between">
             <div>
               <span className="text-xs text-amber-400 font-bold uppercase tracking-wider">Official Store Settlement</span>
@@ -4949,7 +4951,7 @@ export default function AdminApp() {
             </div>
             <div className="flex justify-between py-1 border-b border-jaman-border">
               <span className="text-[#4A5568]">CGST (2.5%) + SGST (2.5%):</span>
-              <span className="font-bold text-jaman-saffron">{formatINR(Math.round(orders.reduce((s, o) => s + o.totalAmount, 0) * 0.0476))}</span>
+              <span className="font-bold text-jaman-saffron">{formatINR(Math.round(orders.reduce((s, o) => s + (o.taxAmount || 0), 0)))}</span>
             </div>
             <div className="flex justify-between py-1 text-sm font-black text-jaman-navy">
               <span>Net Store Revenue:</span>
@@ -4963,8 +4965,9 @@ export default function AdminApp() {
               variant="outline"
               size="sm"
               onClick={() => {
-                showToast('🖨️ Printing Z-Report slip on 80mm thermal printer...');
-                window.print();
+                if (printElement('[data-print-doc="kiosk-z-report"]', { title: 'Z-Report', pageSize: '80mm auto', margin: '2mm' })) {
+                  showToast('Z-Report ready to print.');
+                }
               }}
               leftIcon={<Printer className="w-4 h-4" />}
             >
@@ -6692,12 +6695,12 @@ export default function AdminApp() {
         title="Daily Z-Report & WhatsApp Settlement"
         maxWidth="xl"
       >
-        <div className="space-y-4 py-2 select-none">
+        <div data-print-doc="kiosk-z-report" className="space-y-4 py-2 select-none">
           <div className="bg-jaman-navy text-white p-5 rounded-2xl space-y-3">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div>
                 <h3 className="font-black text-lg text-[#FED7AA]">JAMANVAAR DAILY Z-REPORT</h3>
-                <p className="text-xs text-white/70">Ahmedabad Flagship • {formatDate(new Date())}</p>
+                <p className="text-xs text-white/70">{db.outlet.name || db.restaurant.name || ''} • {formatDate(new Date())}</p>
               </div>
               <span className="text-xs font-mono bg-white/10 px-2.5 py-1 rounded font-bold">
                 Z-REF #{Date.now().toString().slice(-6)}
@@ -6730,7 +6733,7 @@ export default function AdminApp() {
               size="sm"
               leftIcon={<Printer className="w-4 h-4" />}
               onClick={() => {
-                window.print();
+                printElement('[data-print-doc="kiosk-z-report"]', { title: 'Z-Report', pageSize: '80mm auto', margin: '2mm' });
               }}
             >
               Print 80mm Slip
@@ -7009,7 +7012,7 @@ export default function AdminApp() {
         <div className="flex items-center gap-4">
           <JamanvaarLogo variant="horizontal" size="lg" imgStyle={{ height: '52px', width: 'auto' }} />
           <div>
-            <h1 className="text-xl font-black text-jaman-navy tracking-tight">{db.restaurant.legalName || 'JAMANVAAR by KELVIONTECH'}</h1>
+            <h1 className="text-xl font-black text-jaman-navy tracking-tight">{db.restaurant.legalName || db.restaurant.name || ''}</h1>
             <p className="text-xs text-gray-600">{db.outlet.name} • {db.outlet.address}, {db.outlet.city}</p>
             <p className="text-[11px] font-mono text-gray-500 mt-0.5">GSTIN: {db.restaurant.gstin} • FSSAI: {restForm.fssai || '10020021000123'}</p>
           </div>
@@ -7155,7 +7158,7 @@ export default function AdminApp() {
         <div className="text-right space-y-4">
           <div className="inline-block text-center border-t-2 border-gray-700 pt-1.5 px-10">
             <span className="text-xs font-bold text-gray-900 block">Authorized Restaurant Manager</span>
-            <span className="text-[10px] text-gray-500">JAMANVAAR Ahmedabad Flagship</span>
+            <span className="text-[10px] text-gray-500">{db.outlet.name || db.restaurant.name || ''}</span>
           </div>
         </div>
       </div>

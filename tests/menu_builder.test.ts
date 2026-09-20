@@ -93,7 +93,8 @@ describe('Smart Preloaded Menu Library & Menu Builder', () => {
 
   it('should export menu to JSON and CSV and import back safely', () => {
     const jsonStr = MenuBuilderService.exportJSON();
-    expect(jsonStr).toContain('JAMANVAAR Restaurant');
+    // The export names this restaurant, not a hard-coded brand (BUG-042).
+    expect(JSON.parse(jsonStr).restaurant).toBe(db.restaurant.name);
 
     const csvStr = MenuBuilderService.exportCSV();
     expect(csvStr).toContain('Category,Item Name,SKU,Price');

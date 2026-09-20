@@ -11,15 +11,12 @@
  * same API as a global).
  */
 
+import { LICENSE_PUBLIC_KEYS, type LicensePublicKey } from '@jamanvaar/config';
 import { LicenseRepository } from '@jamanvaar/database';
 import type { LicenseInfo, PlanTier, PlanEntitlements } from '@jamanvaar/types';
 
-export const LICENSE_PUBLIC_KEY_JWK: JsonWebKey = {
-  kty: 'EC',
-  crv: 'P-256',
-  x: 'cvAVNFm6l4nVknr2vjaQ21EzZby6m2bXIlG3jcWoVX0',
-  y: 'bafQoC8ZaiXpkinCfXSPMJUjsqt3v0UvAbUFWZwLfsg'
-};
+/** The current key, kept for callers that pass a single key. The trusted set (with key ids) lives in @jamanvaar/config. */
+export const LICENSE_PUBLIC_KEY_JWK: JsonWebKey = LICENSE_PUBLIC_KEYS[0].jwk;
 
 export interface LicenseCertificatePayload {
   restaurantId: string;
@@ -27,6 +24,8 @@ export interface LicenseCertificatePayload {
   entitlements: Record<string, unknown>;
   expiresAt: string;
   issuedAt: string;
+  /** Which trusted key signed this (BUG-076); absent on certificates issued before key ids existed. */
+  kid?: string;
 }
 
 function base64UrlToUint8Array(b64url: string): Uint8Array<ArrayBuffer> {
@@ -37,43 +36,43 @@ function base64UrlToUint8Array(b64url: string): Uint8Array<ArrayBuffer> {
   return bytes;
 }
 
-let cachedDefaultKey: Promise<CryptoKey> | null = null;
 function importPublicKey(jwk: JsonWebKey): Promise<CryptoKey> {
   return globalThis.crypto.subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
 }
 
 /**
  * Verifies a certificate minted by cloud/api's LicensingService. Returns the
- * parsed, trustworthy payload only when the signature is valid, the payload
- * is well-formed JSON, and it has not expired — `null` in every other case.
+ * parsed, trustworthy payload only when the signature is valid under a trusted key,
+ * the payload is well-formed JSON, and it has not expired - `null` in every other case.
  * Never throws; callers should treat `null` as "not entitled", not crash.
  *
- * `publicKeyJwk` defaults to the real embedded key and should only ever be
- * overridden in tests (with a throwaway keypair) — never pass a caller-supplied
- * key in production code, or verification stops proving anything.
+ * By default every trusted public key (packages/config) is considered: the one named by the
+ * certificate's `kid` first, all of them when it names none or one we do not know. That is what lets
+ * the signing key be rotated. `publicKeys` should only ever be overridden in tests (with a throwaway
+ * pair) - never pass a caller-supplied key in production code, or verification stops proving anything.
  */
 export async function verifyLicenseCertificate(
   payloadB64: string,
   signatureB64: string,
-  publicKeyJwk: JsonWebKey = LICENSE_PUBLIC_KEY_JWK
+  publicKeys: JsonWebKey | LicensePublicKey[] = LICENSE_PUBLIC_KEYS
 ): Promise<LicenseCertificatePayload | null> {
   try {
     const payloadBytes = base64UrlToUint8Array(payloadB64);
     const signatureBytes = base64UrlToUint8Array(signatureB64);
-    const key = await (publicKeyJwk === LICENSE_PUBLIC_KEY_JWK
-      ? (cachedDefaultKey ??= importPublicKey(publicKeyJwk))
-      : importPublicKey(publicKeyJwk));
-
-    const valid = await globalThis.crypto.subtle.verify(
-      { name: 'ECDSA', hash: 'SHA-256' },
-      key,
-      signatureBytes,
-      payloadBytes
-    );
-    if (!valid) return null;
-
     const payloadJson = new TextDecoder().decode(payloadBytes);
     const payload = JSON.parse(payloadJson) as LicenseCertificatePayload;
+
+    const keys: LicensePublicKey[] = Array.isArray(publicKeys) ? publicKeys : [{ kid: payload.kid ?? '', jwk: publicKeys }];
+    const named = keys.filter((k) => k.kid === payload.kid);
+    let valid = false;
+    for (const k of named.length ? named : keys) {
+      const key = await importPublicKey(k.jwk);
+      if (await globalThis.crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, signatureBytes, payloadBytes)) {
+        valid = true;
+        break;
+      }
+    }
+    if (!valid) return null;
 
     if (!payload.restaurantId || !payload.tier || !payload.expiresAt) return null;
     if (new Date(payload.expiresAt).getTime() < Date.now()) return null;

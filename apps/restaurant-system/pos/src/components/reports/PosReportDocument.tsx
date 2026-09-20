@@ -29,10 +29,12 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
   design = 'CLASSIC'
 }) => {
   const config = ReceiptRepository.getConfig();
-  const restName = config.restaurantName || db.restaurant.name || 'JAMANVAAR Traditional Dining';
-  const gstin = config.gstin || '24AAACJ1234F1Z5';
-  const phone = config.phone || '+91 98765 43210';
-  const address = config.address || 'Ahmedabad Flagship Store, Gujarat';
+  // This restaurant's own details only; anything it has not entered is left out.
+  const restName = config.restaurantName || db.restaurant.name || '';
+  const gstin = config.gstin || db.restaurant.gstin || '';
+  const phone = config.phone || db.restaurant.phone || '';
+  const address = config.address || db.outlet?.address || db.restaurant.address || '';
+  const identityLine = [address, gstin && `GSTIN: ${gstin}`, phone && `Phone: ${phone}`].filter(Boolean).join(' • ');
 
   const s = data.summary;
 
@@ -50,10 +52,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
                 AUTHENTIC DINING
               </span>
             </div>
-            <p className="text-xs text-slate-300">
-              {address} • GSTIN: <strong className="text-amber-300 font-mono">{gstin}</strong>
-            </p>
-            <p className="text-[11px] text-slate-400">Tel: {phone} • Website: www.jamanvaar.in</p>
+            {identityLine && <p className="text-xs text-slate-300">{identityLine}</p>}
           </div>
 
           <div className="text-left sm:text-right border-t sm:border-t-0 border-white/10 pt-3 sm:pt-0">
@@ -100,11 +99,8 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-extrabold text-jaman-navy">{restName.toUpperCase()}</h1>
-              <span className="text-[10px] font-mono text-slate-400">BY KELVIONTECH</span>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {address} • GSTIN: <strong className="font-mono text-slate-700">{gstin}</strong> • Phone: {phone}
-            </p>
+            {identityLine && <p className="text-xs text-slate-500 mt-0.5">{identityLine}</p>}
           </div>
           <div className="text-left sm:text-right">
             <h2 className="text-base font-black text-jaman-navy uppercase">{data.title}</h2>
@@ -118,7 +114,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-2xl bg-[#FFFDFB] border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
-            Net Revenue Billed
+            Total Billed (incl. GST)
           </span>
           <div className="text-xl sm:text-2xl font-black font-mono text-jaman-navy">
             {formatINR(s.netSales)}
@@ -192,7 +188,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
               <strong className="font-mono text-slate-800">{formatINR(s.totalTax)}</strong>
             </div>
             <div className="flex justify-between pt-2 border-t border-slate-200 font-extrabold text-sm text-jaman-navy">
-              <span>Net Collected Revenue:</span>
+              <span>Total Collected (incl. GST):</span>
               <span className="font-mono text-emerald-700">{formatINR(s.netSales)}</span>
             </div>
           </div>
@@ -296,7 +292,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
                   <th className="py-2 px-3 text-right">Orders</th>
                   <th className="py-2 px-3 text-right">Cash Tender</th>
                   <th className="py-2 px-3 text-right">UPI / QR</th>
-                  <th className="py-2 px-3 text-right">Total Net Sales</th>
+                  <th className="py-2 px-3 text-right">Total Billed (incl. GST)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">

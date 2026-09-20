@@ -24,26 +24,26 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
   showToast,
   onUpdated
 }) => {
-  const [name, setName] = useState(db.restaurant.name || 'JAMANVAAR RESTAURANT');
+  const [name, setName] = useState(db.restaurant.name || '');
   const [legalName, setLegalName] = useState(
-    db.restaurant.legalName || 'JAMANVAAR FOODS & HOSPITALITY PRIVATE LIMITED'
+    db.restaurant.legalName || ''
   );
   const [tagline, setTagline] = useState(
-    db.restaurant.tagline || 'Authentic Indian Cuisine & Seamless Dining by KELVIONTECH'
+    db.restaurant.tagline || ''
   );
   const [logoUrl, setLogoUrl] = useState(db.restaurant.logoUrl || '/jamanvaar.png.png');
-  const [address, setAddress] = useState(db.outlet.address || db.restaurant.address || 'Sindhu Bhavan Road, Bodakdev');
-  const [city, setCity] = useState(db.outlet.city || db.restaurant.city || 'Ahmedabad');
-  const [state, setState] = useState(db.outlet.state || db.restaurant.state || 'Gujarat');
-  const [pincode, setPincode] = useState(db.restaurant.pincode || '380054');
-  const [phone, setPhone] = useState(db.restaurant.phone || '+91 79 4890 1234');
-  const [email, setEmail] = useState(db.restaurant.email || 'hello@jamanvaar.com');
-  const [gstin, setGstin] = useState(db.restaurant.gstin || '24ABCDE1234F1Z5');
-  const [fssaiNumber, setFssaiNumber] = useState(db.restaurant.fssaiNumber || '10722001000452');
-  const [msmeNumber, setMsmeNumber] = useState(db.restaurant.msmeNumber || 'UDYAM-GJ-01-0012345');
-  const [website, setWebsite] = useState(db.restaurant.website || 'https://jamanvaar.com');
+  const [address, setAddress] = useState(db.outlet.address || db.restaurant.address || '');
+  const [city, setCity] = useState(db.outlet.city || db.restaurant.city || '');
+  const [state, setState] = useState(db.outlet.state || db.restaurant.state || '');
+  const [pincode, setPincode] = useState(db.restaurant.pincode || '');
+  const [phone, setPhone] = useState(db.restaurant.phone || '');
+  const [email, setEmail] = useState(db.restaurant.email || '');
+  const [gstin, setGstin] = useState(db.restaurant.gstin || '');
+  const [fssaiNumber, setFssaiNumber] = useState(db.restaurant.fssaiNumber || '');
+  const [msmeNumber, setMsmeNumber] = useState(db.restaurant.msmeNumber || '');
+  const [website, setWebsite] = useState(db.restaurant.website || '');
   const [footerText, setFooterText] = useState(
-    db.restaurant.footerText || 'Official Daily Closing Statement • Powered by JAMANVAAR by KELVIONTECH'
+    db.restaurant.footerText || ''
   );
   const [primaryColor, setPrimaryColor] = useState(db.restaurant.primaryColor || '#0B253A');
   const [secondaryColor, setSecondaryColor] = useState(db.restaurant.secondaryColor || '#E66817');

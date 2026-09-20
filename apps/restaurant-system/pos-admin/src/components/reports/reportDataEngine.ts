@@ -886,13 +886,16 @@ export class ReportDataEngine {
       sgst += Number(o.sgstAmount || 0);
     });
 
+    // Round the total once and split it, so CGST + SGST always equals the tax shown beside them.
+    const totalTaxRounded = Math.round(cgst + sgst);
+    const cgstRounded = Math.round(cgst);
     return [
       {
         taxRatePercent: 5.0,
         taxableAmount: Math.round(taxable),
-        cgstAmount: Math.round(cgst),
-        sgstAmount: Math.round(sgst),
-        totalTax: Math.round(cgst + sgst),
+        cgstAmount: cgstRounded,
+        sgstAmount: totalTaxRounded - cgstRounded,
+        totalTax: totalTaxRounded,
         invoicesCount: invoices
       }
     ];

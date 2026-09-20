@@ -22,6 +22,6 @@ export class TenantAiAssistantController {
     @CurrentTenantUser() user: User,
     @Body() body: ReturnType<typeof logTelemetrySchema.parse>
   ) {
-    return this.aiAssistant.logTelemetry(user.restaurantId, body.intent, body.queryText);
+    return this.aiAssistant.logTelemetry(user.restaurantId, body.intent, body.latencyMs);
   }
 }

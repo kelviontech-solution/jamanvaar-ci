@@ -113,4 +113,52 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     expect(pullRes.body.entities).toHaveLength(1);
     expect(pullRes.body.entities[0]).toMatchObject({ externalId: 'item-butter-naan', payload: { name: 'Butter Naan', price: 60 } });
   });
+
+  /**
+   * BUG-019/034/035 (discovered live, verified against a real running stack): Restaurant Admin issues a
+   * PIN telling the owner "this logs them into POS, Captain, KDS and Kiosk" — but staff records were
+   * never in the entity-sync bridge at all (only CUSTOMER/MENU_ITEM/MENU_CATEGORY/INVENTORY_ITEM/
+   * PAYMENT_TRANSACTION were), so a PIN created on one device genuinely did not work on any other real
+   * device of the same restaurant. STAFF_USER closes that gap the same way MENU_ITEM did for the menu.
+   */
+  it('pushes a STAFF_USER (with its PIN hash, never a plaintext PIN) and pulls it on a DIFFERENT device of the same restaurant', async () => {
+    const kdsKeyRes = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KDS', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const kdsRedeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: kdsKeyRes.body.code, deviceType: 'KDS' });
+    const kdsToken = kdsRedeem.body.deviceToken as string;
+
+    const pushRes = await authed('post', '/api/v1/entity-sync/STAFF_USER', posToken).send({
+      events: [{ externalId: 'usr-cashier-1', payload: { id: 'usr-cashier-1', username: 'amitdave', fullName: 'Amit Dave', roleId: 'role-cashier', isActive: true, pinHash: 'pinv1:deadbeefcafef00d' } }]
+    });
+    expect(pushRes.status).toBe(201);
+    expect(JSON.stringify(pushRes.body)).not.toMatch(/"pin":|"plainPin"/);
+
+    // A different device, activated separately, sees it — this is the actual cross-app promise.
+    const pullFromKds = await authed('get', '/api/v1/entity-sync/STAFF_USER', kdsToken);
+    expect(pullFromKds.body.entities).toHaveLength(1);
+    expect(pullFromKds.body.entities[0]).toMatchObject({
+      externalId: 'usr-cashier-1',
+      payload: { fullName: 'Amit Dave', roleId: 'role-cashier', pinHash: 'pinv1:deadbeefcafef00d' }
+    });
+  });
+
+  it('a STAFF_USER pushed for one restaurant is invisible to a device on another restaurant', async () => {
+    const otherRestaurant = await authed('post', '/api/v1/restaurants', platformToken).send({
+      name: `TEST Entity Sync Other ${Date.now()}`,
+      ownerName: 'Other Owner',
+      ownerEmail: `entity-sync-other-owner-${Date.now()}@test.example.com`
+    });
+    const otherRestaurantId = otherRestaurant.body.restaurant.id;
+    const otherPlan = await authed('post', '/api/v1/plans', platformToken).send({
+      tier: 'PRO', name: `TEST Entity Sync Other Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true }
+    });
+    await authed('post', '/api/v1/subscriptions', platformToken).send({ restaurantId: otherRestaurantId, planId: otherPlan.body.id, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString() });
+    const otherKey = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId: otherRestaurantId, allowedDeviceType: 'POS', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const otherRedeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: otherKey.body.code, deviceType: 'POS' });
+
+    const pullRes = await authed('get', '/api/v1/entity-sync/STAFF_USER', otherRedeem.body.deviceToken);
+    expect(pullRes.body.entities).toEqual([]);
+
+    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: otherRestaurantId } }));
+    await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: otherPlan.body.id } }));
+  });
 });

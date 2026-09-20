@@ -1,10 +1,20 @@
 import { KOTRecord, Order, PrinterDevice, PrinterHardwareStatus, PrinterRole, PrintJob, ReceiptConfig, ReceiptPaperSize } from '@jamanvaar/types';
+import { sendRawToPrinter } from './print_transport';
 import { formatDate, formatINR, formatTime, generateUUID } from '@jamanvaar/utils';
 import { AuditRepository, db, PrintQueueRepository, ReceiptRepository } from '@jamanvaar/database';
 
 export class PrinterService {
   private static activePrinterId: string = 'prn-kiosk-01';
-  private static isProcessing = false;
+  /**
+   * `queuePrintJob` fires a background `processQueue()` without awaiting it, so the UI is never blocked on
+   * hardware; `printReceipt` then awaits its own `processQueue()` call to learn the real outcome. Without
+   * this chain, that second call would see a run already in flight, return `{processed: 0, failed: 0}`
+   * immediately, and let the caller read the job's status before the first run had actually finished
+   * dispatching it. Chaining onto the in-flight run's promise (and re-running once more after it, to catch
+   * anything queued while it was busy) means every caller's `await processQueue()` only resolves once the
+   * queue is genuinely idle.
+   */
+  private static queueRun: Promise<{ processed: number; failed: number }> | null = null;
 
   /**
    * Discovers all connected Windows / Kiosk built-in thermal printers
@@ -183,10 +193,25 @@ export class PrinterService {
     const printer = this.getPrinterForStation(kot.station);
     const payload = this.generateKOTText(kot);
 
+    if (!printer) {
+      const failed = PrintQueueRepository.addJob({
+        type: 'KOT_TICKET',
+        printerId: 'no-printer',
+        printerName: 'No printer configured',
+        targetStation: kot.station,
+        orderId: kot.orderId,
+        orderNumber: kot.orderNumber,
+        kotId: kot.id,
+        kotNumber: kot.kotNumber,
+        rawPayload: payload
+      });
+      return PrintQueueRepository.updateJobStatus(failed.id, 'FAILED', 'No printer is configured. Add one in Restaurant Admin → Printers.') || failed;
+    }
+
     printer.lastPrintAt = new Date().toISOString();
     db.notify();
 
-    return PrintQueueRepository.addJob({
+    const job = PrintQueueRepository.addJob({
       type: 'KOT_TICKET',
       printerId: printer.id,
       printerName: printer.name,
@@ -199,6 +224,10 @@ export class PrinterService {
       rawPayload: payload,
       paperSize: printer.paperSize || '80mm'
     });
+    // BUG-024: the job is PENDING until the real dispatch confirms; it used to be created
+    // already-SUCCESS and never sent anywhere.
+    void this.processQueue();
+    return job;
   }
 
   /**
@@ -228,10 +257,9 @@ export class PrinterService {
 
     let out = '';
     out += `${divider}\n`;
-    out += `${center('JAMANVAAR')}\n`;
-    out += `${center(config.restaurantName || 'Authentic Indian Cuisine')}\n`;
-    out += `${center(config.address || 'Sindhu Bhavan Road, Ahmedabad')}\n`;
-    out += `${center(`Phone: ${config.phone || '+91 79 4890 1234'}`)}\n`;
+    if (config.restaurantName) out += `${center(config.restaurantName)}\n`;
+    if (config.address) out += `${center(config.address)}\n`;
+    if (config.phone) out += `${center(`Phone: ${config.phone}`)}\n`;
     if (config.gstin) out += `${center(`GSTIN: ${config.gstin}`)}\n`;
     if (config.fssaiNumber) out += `${center(`FSSAI Lic: ${config.fssaiNumber}`)}\n`;
     out += `${divider}\n`;
@@ -354,10 +382,8 @@ export class PrinterService {
    * (port 9100 by default — the standard raw-print port most networked
    * ESC/POS printers support), via the send_escpos_bytes Tauri command.
    */
-  private static async dispatchToNetworkPrinter(printer: PrinterDevice, text: string): Promise<void> {
-    const { invoke } = await import('@tauri-apps/api/core');
-    const bytes = Array.from(this.wrapEscPos(text));
-    await invoke('send_escpos_bytes', { ip: printer.ipAddress, port: Number(printer.port) || 9100, bytes });
+  private static async dispatchToPrinter(printer: PrinterDevice, text: string): Promise<void> {
+    await sendRawToPrinter(printer, this.wrapEscPos(text));
   }
 
   /**
@@ -413,12 +439,22 @@ export class PrinterService {
   }
 
   /**
-   * Processes the print queue asynchronously with retry and crash recovery (Sections 14-17)
+   * Processes the print queue asynchronously with retry and crash recovery (Sections 14-17).
+   * Safe to call while a run is already in flight — see `queueRun` above: the call joins the current
+   * run and then runs once more, so it always resolves only once every job pending at call time is settled.
    */
   public static async processQueue(): Promise<{ processed: number; failed: number }> {
-    if (this.isProcessing) return { processed: 0, failed: 0 };
-    this.isProcessing = true;
+    if (this.queueRun) {
+      this.queueRun = this.queueRun.then(() => this.runQueueOnce());
+      return this.queueRun;
+    }
+    this.queueRun = this.runQueueOnce().finally(() => {
+      this.queueRun = null;
+    });
+    return this.queueRun;
+  }
 
+  private static async runQueueOnce(): Promise<{ processed: number; failed: number }> {
     let processed = 0;
     let failed = 0;
 
@@ -434,11 +470,10 @@ export class PrinterService {
           throw new Error(`Thermal printer "${printer.name}" is currently offline or paper out`);
         }
 
-        if (printer.interfaceType === 'NETWORK_LAN' && printer.ipAddress && this.isTauriRuntime()) {
-          await this.dispatchToNetworkPrinter(printer, job.formattedText || '');
-        }
-        // Every other interface type, and any non-Tauri runtime (Vitest,
-        // a browser preview), has no real transport yet — simulated success.
+        // BUG-024/026: only a real transport may mark a job PRINTED. Every real interface has a real
+        // transport in the desktop app (network, USB / Windows printer, serial); outside it the job
+        // fails with that reason. Only the developer simulator (VIRTUAL_EMULATOR) sends nothing.
+        await this.dispatchToPrinter(printer, job.formattedText || job.rawPayload || '');
         job.status = 'PRINTED';
         job.printedAt = new Date().toISOString();
         printer.lastPrintAt = new Date().toISOString();
@@ -462,7 +497,6 @@ export class PrinterService {
     }
 
     db.notify();
-    this.isProcessing = false;
     return { processed, failed };
   }
 
@@ -482,16 +516,28 @@ export class PrinterService {
    * High-level auto-print entry point called upon order confirmation
    */
   public static async printReceipt(order: Order): Promise<{ success: boolean; message: string; text?: string }> {
+    if (db.configuredPrinters.length === 0) {
+      // A freshly activated restaurant has no printers until the owner adds one.
+      return { success: false, message: 'No printer is configured. Add one in Restaurant Admin → Printers.' };
+    }
     const result = this.queuePrintJob(order, false);
-    const activePrinter = this.getActivePrinter();
-    const isOnline = activePrinter.status === 'READY';
+    if (result.job.status === 'PRINTED') {
+      // Duplicate-print protection already found this order printed — nothing left to dispatch.
+      return { success: true, message: result.message, text: result.job.formattedText };
+    }
+
+    // BUG-024: this used to report success purely from the printer's stored `status` flag,
+    // regardless of whether the job actually printed. Wait for the real dispatch outcome.
+    await this.processQueue();
+    const finalJob = db.printJobs.find((j) => j.id === result.job.id) || result.job;
+    const printed = finalJob.status === 'PRINTED';
 
     return {
-      success: isOnline,
-      message: isOnline
-        ? `Receipt automatically printed on ${activePrinter.name}`
-        : 'Printer offline; receipt queued in print spooler and available digitally.',
-      text: result.job.formattedText
+      success: printed,
+      message: printed
+        ? `Receipt printed on ${this.getActivePrinter().name}`
+        : finalJob.lastError || 'Receipt could not be printed; it is queued and available digitally.',
+      text: finalJob.formattedText
     };
   }
 
@@ -499,6 +545,9 @@ export class PrinterService {
    * Admin manual reprint trigger with full audit trail (Section 37)
    */
   public static async reprintReceipt(orderId: string, username: string = 'admin'): Promise<{ success: boolean; message: string }> {
+    if (db.configuredPrinters.length === 0) {
+      return { success: false, message: 'No printer is configured. Add one in Restaurant Admin → Printers.' };
+    }
     const order = db.orders.find((o) => o.id === orderId);
     if (!order) {
       return { success: false, message: 'Order not found for reprinting' };
@@ -521,7 +570,16 @@ export class PrinterService {
   /**
    * Dispatches an ESC/POS diagnostic test slip (Section 27)
    */
+  /**
+   * BUG-027: this used to send nothing anywhere and report success whenever the printer's
+   * stored status flag merely wasn't OFFLINE/ERROR — "COMMUNICATION OK" with no communication
+   * ever attempted. A test slip now goes through the exact same real dispatch path as a
+   * receipt, and succeeds only when that dispatch actually confirms.
+   */
   public static async printTestSlip(printerId?: string): Promise<{ success: boolean; message: string }> {
+    if (db.configuredPrinters.length === 0) {
+      return { success: false, message: 'No printer is configured. Add one in Restaurant Admin → Printers.' };
+    }
     const printer = printerId ? db.configuredPrinters.find((p) => p.id === printerId) || this.getActivePrinter() : this.getActivePrinter();
 
     if (printer.status === 'OFFLINE' || printer.status === 'ERROR') {
@@ -532,12 +590,29 @@ export class PrinterService {
     }
 
     printer.lastTestAt = new Date().toISOString();
-    printer.lastPrintAt = new Date().toISOString();
     db.notify();
 
+    const job: PrintJob = {
+      id: `prn-test-${generateUUID()}`,
+      printerId: printer.id,
+      status: 'PENDING',
+      attempts: 0,
+      maxAttempts: 1,
+      formattedText: `JAMANVAAR — Diagnostic Test Slip\nPrinter: ${printer.name}\nInterface: ${printer.interfaceType}\nTime: ${new Date().toLocaleString('en-IN')}`,
+      paperSize: printer.paperSize,
+      createdAt: new Date().toISOString()
+    };
+    db.printJobs.unshift(job);
+
+    await this.processQueue();
+    const finalJob = db.printJobs.find((j) => j.id === job.id) || job;
+    const printed = finalJob.status === 'PRINTED';
+
     return {
-      success: true,
-      message: `✓ Test Receipt Dispatched to "${printer.name}" (${printer.paperSize} • ${printer.port || 'USB001'})`
+      success: printed,
+      message: printed
+        ? `Test slip printed on "${printer.name}"`
+        : finalJob.lastError || `Could not reach "${printer.name}"`
     };
   }
 }

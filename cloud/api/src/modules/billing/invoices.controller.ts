@@ -12,16 +12,18 @@ export class InvoicesController {
   constructor(private readonly invoices: InvoicesService) {}
 
   @Get('summary')
-  summary() {
-    return this.invoices.getBillingSummary();
+  summary(@Query('restaurantId') restaurantId?: string) {
+    return this.invoices.getBillingSummary(restaurantId);
+  }
+
+  @Get('receivables')
+  receivables(@Query() query: Record<string, string>) {
+    return this.invoices.receivables(query);
   }
 
   @Get()
-  list(
-    @Query('restaurantId') restaurantId?: string,
-    @Query('status') status?: InvoiceStatus
-  ) {
-    return this.invoices.list(restaurantId, status);
+  list(@Query() query: Record<string, string>) {
+    return this.invoices.list(query);
   }
 
   @Post('check-renewals')
@@ -65,6 +67,6 @@ export class InvoicesController {
     @Body() body: ReturnType<typeof updateInvoiceStatusSchema.parse>,
     @CurrentPlatformUser() actor: PlatformUser
   ) {
-    return this.invoices.updateStatus(id, body.status as InvoiceStatus, actor);
+    return this.invoices.updateStatus(id, body.status as InvoiceStatus, actor, body.reason);
   }
 }

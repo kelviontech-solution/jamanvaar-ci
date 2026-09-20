@@ -37,7 +37,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { OrderDetailModal } from '../OrderDetailModal';
-import { ThermalReceiptView, printThermalReceipt, EmptyState } from '@jamanvaar/ui';
+import { ThermalReceiptView, printThermalReceipt, EmptyState, printElement } from '@jamanvaar/ui';
 
 interface OrdersModuleProps {
   orders: Order[];
@@ -323,7 +323,9 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
 
               <button
                 type="button"
-                onClick={() => window.print()}
+                onClick={() => {
+                  if (!printElement('[data-print-doc="orders-report"]', { title: 'Orders report', pageSize: 'A4 landscape' })) showToast('Nothing to print yet.');
+                }}
                 className="px-3.5 py-2 bg-white border border-jaman-border text-jaman-navy hover:bg-slate-50 text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 min-h-[40px]"
               >
                 <Printer className="w-4 h-4 text-slate-600" />
@@ -774,7 +776,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           </div>
 
           {/* Daily Orders Table (Full Desktop Table) */}
-          <div className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-xs">
+          <div data-print-doc="orders-report" className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-black">

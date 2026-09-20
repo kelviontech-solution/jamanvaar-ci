@@ -11,6 +11,8 @@ import {
   pushOrderSync,
   pullOrderSync,
   reportHeartbeat,
+  pushEntitySync,
+  pullEntitySync,
   CloudApiError,
   type CartLinePayload
 } from './cloud/cloudClient';
@@ -29,7 +31,9 @@ import {
   ReceiptRepository,
   ServiceRequestRepository,
   TableRepository,
-  WelcomeScreenSettingsRepository
+  WelcomeScreenSettingsRepository,
+  StaffRepository,
+  RestaurantIdentityRepository
 } from '@jamanvaar/database';
 import {
   CartItem,
@@ -77,7 +81,7 @@ import {
 import { formatDate, formatINR, formatTime, generateIdempotencyKey, generateUUID, localizedDescription, localizedName, SoundService } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
 import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService } from '@jamanvaar/api';
-import { SyncOutboxEngine, lanMeshSync } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync } from '@jamanvaar/sync';
 import { APP_CONSTANTS } from '@jamanvaar/config';
 import {
   AlertCircle,
@@ -171,9 +175,7 @@ export default function KioskUserApp() {
     try {
       const branding = await activateKioskDevice(activationCode);
       if (branding) {
-        db.restaurant.name = branding.name;
-        if (branding.gstin) db.restaurant.gstin = branding.gstin;
-        if (branding.address) db.restaurant.address = branding.address;
+        RestaurantIdentityRepository.adopt(getKioskRestaurantId() || db.restaurant.id, branding);
         db.notify();
       }
       setIsDeviceActivated(true);
@@ -193,7 +195,45 @@ export default function KioskUserApp() {
       return;
     }
     SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
+
+    // BUG-016: this terminal had no menu sync at all, so a fresh or cleared kiosk fell back
+    // to the local seed menu instead of the restaurant's real one. Pull-only — a customer
+    // kiosk never edits the menu.
+    const syncMenu = async () => {
+      await EntitySyncEngine.catchUp('MENU_ITEM', (remote) => {
+        const incoming = remote.payload as unknown as MenuItem;
+        if (!incoming || !incoming.id) return;
+        const idx = db.menuItems.findIndex((m) => m.id === incoming.id);
+        if (idx >= 0) {
+          db.menuItems[idx] = { ...db.menuItems[idx], ...incoming };
+        } else {
+          db.menuItems.push(incoming);
+        }
+      });
+      await EntitySyncEngine.catchUp('MENU_CATEGORY', (remote) => {
+        const incoming = remote.payload as unknown as Category;
+        if (!incoming || !incoming.id) return;
+        const idx = db.categories.findIndex((c) => c.id === incoming.id);
+        if (idx >= 0) {
+          db.categories[idx] = { ...db.categories[idx], ...incoming };
+        } else {
+          db.categories.push(incoming);
+        }
+      });
+      db.notify();
+    };
+
+    // BUG-019/034/035: the manager-override staff PIN used to work only on the device that created
+    // it — a kiosk was never in the entity-sync loop for staff, despite the create/reset screen's own
+    // promise that the PIN would work on Kiosk too. Pull only — a kiosk never edits staff.
+    const syncStaff = async () => {
+      await EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
+    };
+
     void SyncOutboxEngine.processOutbox();
+    void syncMenu();
+    void syncStaff();
     void reportHeartbeat();
 
     // Join the LAN mesh as a real KIOSK_USER peer so Kiosk Admin's Terminal
@@ -220,6 +260,8 @@ export default function KioskUserApp() {
 
     const interval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
+      void syncMenu();
+      void syncStaff();
       void reportHeartbeat();
     }, 15000);
 
@@ -1194,13 +1236,8 @@ export default function KioskUserApp() {
   // manager/admin-tier role, same as Captain's SEC-006 fix.
   const handleStaffPinVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    const userPool = (db.users || []) as (import('@jamanvaar/types').User & { pinCode?: string })[];
-    const matchedUser = userPool.find(
-      (u) =>
-        u.pinCode === staffPin &&
-        u.isActive &&
-        (u.roleId === 'role-manager' || u.roleId === 'role-admin' || u.roleId === 'role-super-admin')
-    );
+    const verified = StaffRepository.verifyPin(staffPin);
+    const matchedUser = verified?.isManager ? verified.user : undefined;
 
     if (matchedUser) {
       setStaffOverrideActive(true);

@@ -1,5 +1,5 @@
 import { Order, PaymentMethod, OrderType, OrderStatus } from '@jamanvaar/types';
-import { db, BusinessDayAccountingService } from '@jamanvaar/database';
+import { db, BusinessDayAccountingService , getOrderTenders } from '@jamanvaar/database';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 
 export type CentralDatePreset =
@@ -376,10 +376,12 @@ export class CentralReportingService {
       } else if (pm === 'CARD' || pm === 'CARD_TERMINAL' || pm === 'POS_CARD') {
         paymentBreakdown.card += orderTotal;
       } else if (pm === 'SPLIT') {
-        // Apportion split 50% Cash / 50% UPI
-        const half = Math.round(orderTotal / 2);
-        paymentBreakdown.cash += half;
-        paymentBreakdown.upi += (orderTotal - half);
+        // Apportion by the tender lines that were actually recorded — never a guessed 50/50.
+        const t = getOrderTenders(o);
+        paymentBreakdown.cash += t.cash;
+        paymentBreakdown.upi += t.upi;
+        paymentBreakdown.card += t.card;
+        paymentBreakdown.other += t.wallet + t.houseAccount + t.other;
         paymentBreakdown.split += orderTotal;
       } else {
         paymentBreakdown.other += orderTotal;

@@ -294,13 +294,24 @@ describe('SaaS management modules: Plans, Subscriptions, Activation Keys, Device
   });
 
   describe('Sessions + change password', () => {
-    it('lists the current session and can revoke it', async () => {
+    it('lists the current session and can revoke another one (which is then cut off at once)', async () => {
       const list = await authed('get', '/api/v1/platform/sessions');
       expect(list.status).toBe(200);
       expect(list.body.length).toBeGreaterThan(0);
+      expect(list.body.filter((s: { current: boolean }) => s.current)).toHaveLength(1);
 
-      const revoke = await authed('delete', `/api/v1/platform/sessions/${list.body[0].id}`);
+      // A second login (another browser) is the session we revoke; ours must keep working.
+      const other = await request(app.getHttpServer())
+        .post('/api/v1/platform-auth/login')
+        .send({ email: adminEmail, password: adminPassword });
+      const otherId = (await request(app.getHttpServer()).get('/api/v1/platform/sessions').set('Authorization', `Bearer ${other.body.accessToken}`))
+        .body.find((s: { current: boolean }) => s.current).id;
+
+      const revoke = await authed('delete', `/api/v1/platform/sessions/${otherId}`);
       expect(revoke.status).toBe(200);
+      expect(revoke.body.current).toBe(false);
+      expect((await request(app.getHttpServer()).get('/api/v1/platform/me').set('Authorization', `Bearer ${other.body.accessToken}`)).status).toBe(401);
+      expect((await authed('get', '/api/v1/platform/me')).status).toBe(200);
     });
 
     it('rejects a password change with the wrong current password', async () => {

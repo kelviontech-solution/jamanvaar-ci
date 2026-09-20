@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { SubscriptionsService } from './subscriptions.service';
-import { assignSubscriptionSchema, changePlanSchema, renewSchema } from './dto/subscription.dto';
+import { assignSubscriptionSchema, changePlanSchema, extendSchema, renewSchema } from './dto/subscription.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
@@ -48,6 +48,16 @@ export class SubscriptionsController {
     @CurrentPlatformUser() actor: PlatformUser
   ) {
     return this.subscriptions.renew(id, body.expiresAt, actor);
+  }
+
+  @Patch(':id/extend')
+  @UsePipes(new ZodValidationPipe(extendSchema))
+  extend(
+    @Param('id') id: string,
+    @Body() body: ReturnType<typeof extendSchema.parse>,
+    @CurrentPlatformUser() actor: PlatformUser
+  ) {
+    return this.subscriptions.extend(id, body.days, actor);
   }
 
   @Patch(':id/suspend')

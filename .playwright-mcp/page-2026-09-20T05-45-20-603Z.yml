@@ -1,0 +1,105 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e8]:
+          - text: "Local Core:"
+          - strong [ref=e9]: Connected
+        - button [ref=e10] [cursor=pointer]:
+          - generic [ref=e15]:
+            - text: "Network:"
+            - strong [ref=e16]: Online
+        - generic [ref=e17]: Sun, 20 Sept 2026
+    - main [ref=e21]:
+      - generic [ref=e22]:
+        - img "JAMANVAAR by Kelviontech" [ref=e25]
+        - generic [ref=e26]:
+          - heading "Smart Billing. Better Dining." [level=1] [ref=e27]:
+            - text: Smart Billing.
+            - generic [ref=e28]: Better Dining.
+          - paragraph [ref=e29]: Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.
+        - generic [ref=e30]:
+          - generic [ref=e31]: Fast Billing
+          - generic [ref=e36]: Instant KOT
+          - generic [ref=e43]: Table Management
+          - generic [ref=e49]: Offline First
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - img "Tandoori Naan" [ref=e56]
+            - generic [ref=e57]: Tandoori Breads
+          - generic [ref=e58]:
+            - img "Paneer Butter Masala" [ref=e59]
+            - generic [ref=e60]: Royal Curries
+          - generic [ref=e61]:
+            - img "Tandoori Angaar" [ref=e62]
+            - generic [ref=e63]: Tandoor Starters
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - generic [ref=e67]:
+            - generic [ref=e68]:
+              - generic [ref=e69]: Welcome to
+              - generic [ref=e70]: POS TERMINAL
+            - heading "POS Counter" [level=2] [ref=e72]
+            - paragraph [ref=e73]: Enter your 4-digit staff PIN to continue
+          - generic [ref=e74]:
+            - generic [ref=e75]:
+              - generic [ref=e76]: Select Staff Profile
+              - generic [ref=e77]:
+                - button "R Ramesh Patel (Owner) super admin" [ref=e78] [cursor=pointer]:
+                  - generic [ref=e79]: R
+                  - generic [ref=e80]:
+                    - generic [ref=e81]: Ramesh Patel (Owner)
+                    - generic [ref=e82]: super admin
+                - button "P Pooja Shah (Floor Manager) manager" [ref=e86] [cursor=pointer]:
+                  - generic [ref=e87]: P
+                  - generic [ref=e88]:
+                    - generic [ref=e89]: Pooja Shah (Floor Manager)
+                    - generic [ref=e90]: manager
+                - button "A Amit Dave (Lead Cashier) cashier" [ref=e91] [cursor=pointer]:
+                  - generic [ref=e92]: A
+                  - generic [ref=e93]:
+                    - generic [ref=e94]: Amit Dave (Lead Cashier)
+                    - generic [ref=e95]: cashier
+                - button "R Rahul Sharma (Captain) captain" [ref=e96] [cursor=pointer]:
+                  - generic [ref=e97]: R
+                  - generic [ref=e98]:
+                    - generic [ref=e99]: Rahul Sharma (Captain)
+                    - generic [ref=e100]: captain
+            - generic [ref=e107]:
+              - button "1" [ref=e108] [cursor=pointer]
+              - button "2" [ref=e109] [cursor=pointer]
+              - button "3" [ref=e110] [cursor=pointer]
+              - button "4" [ref=e111] [cursor=pointer]
+              - button "5" [ref=e112] [cursor=pointer]
+              - button "6" [ref=e113] [cursor=pointer]
+              - button "7" [ref=e114] [cursor=pointer]
+              - button "8" [ref=e115] [cursor=pointer]
+              - button "9" [ref=e116] [cursor=pointer]
+              - button "C" [ref=e117] [cursor=pointer]
+              - button "0" [ref=e118] [cursor=pointer]
+              - button [ref=e119] [cursor=pointer]
+            - button "UNLOCK TERMINAL" [disabled] [ref=e125]
+        - generic [ref=e130]:
+          - generic [ref=e131]: Role-Based Security
+          - generic [ref=e136]: •
+          - generic [ref=e137]: Instant Offline Boot
+          - generic [ref=e141]: •
+          - generic [ref=e142]: 100% Secure
+    - contentinfo [ref=e146]: © 2026 JAMANVAAR by KELVIONTECH — All rights reserved.
+  - region "JAMANVAAR Startup" [ref=e147]:
+    - generic [ref=e148]:
+      - generic [ref=e149]: KELVIONTECH ENTERPRISE
+      - generic [ref=e152]: Local Engine Active
+    - generic [ref=e158]:
+      - generic [ref=e159]: OFFLINE-FIRST INDIAN RESTAURANT SYSTEM
+      - generic [ref=e161]: v2.0 • POWERED BY KELVIONTECH
+    - main [ref=e162]:
+      - img "JAMANVAAR by KELVIONTECH" [ref=e168]
+      - paragraph [ref=e170]: Restaurant Operations Platform
+      - generic [ref=e171]: POS TERMINAL
+      - generic [ref=e176]:
+        - generic [ref=e177]: Core Engine Ready
+        - generic [ref=e179]: •
+        - generic [ref=e180]: Database Initialized
+        - generic [ref=e182]: •
+        - generic [ref=e183]: Local-First Mode

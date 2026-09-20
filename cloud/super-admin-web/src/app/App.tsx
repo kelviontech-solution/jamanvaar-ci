@@ -29,6 +29,7 @@ import { BackupsPage } from '../pages/Backups/BackupsPage';
 import { TeamPage } from '../pages/Team/TeamPage';
 import { PlatformActivatePage } from '../pages/Activate/PlatformActivatePage';
 import { TicketsPage } from '../pages/Tickets/TicketsPage';
+import { NotificationsPage } from '../pages/Notifications/NotificationsPage';
 import { DeviceDetailPage } from '../pages/Devices/DeviceDetailPage';
 import { MasterCatalogPage } from '../pages/Catalog/MasterCatalogPage';
 import { AiAssistantPage } from '../pages/AiAssistant/AiAssistantPage';
@@ -86,6 +87,7 @@ export function App() {
               <Route path="/team" element={page('Team', <TeamPage />)} />
               <Route path="/support" element={page('Support', <SupportPage />)} />
               <Route path="/tickets" element={page('Tickets', <TicketsPage />)} />
+              <Route path="/notifications" element={page('Notifications', <NotificationsPage />)} />
               <Route path="/audit-logs" element={page('AuditLogs', <AuditLogsPage />)} />
               <Route path="/system-health" element={page('SystemHealth', <SystemHealthPage />)} />
               <Route path="/settings/platform" element={page('PlatformSettings', <PlatformSettingsPage />)} />

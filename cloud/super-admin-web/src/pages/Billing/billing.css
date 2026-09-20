@@ -250,11 +250,16 @@
    A4 PRINT MEDIA OPTIMIZATION
    ───────────────────────────────────────────────────────────── */
 @media print {
-  body * {
+  /* Hide the rest of the page ONLY while a document sheet is on screen. This file ships in the
+     whole app, and a bare `body *` rule here used to blank every other page when printed
+     (Welcome Kit, reports, ...). */
+  body:has(.print-surface) * {
     visibility: hidden;
   }
 
-  .print-surface, .print-surface * {
+  /* Must be at least as specific as the hiding rule above, or the sheet itself is hidden too. */
+  body:has(.print-surface) .print-surface,
+  body:has(.print-surface) .print-surface * {
     visibility: visible;
   }
 

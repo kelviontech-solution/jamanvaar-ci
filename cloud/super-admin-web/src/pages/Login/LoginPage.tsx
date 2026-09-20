@@ -1,3 +1,4 @@
+import { API_BASE } from '../../api/client';
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
@@ -36,7 +37,7 @@ export function LoginPage() {
       if (err instanceof ApiError) {
         setError(err.message);
       } else if (err instanceof Error && err.message.includes('fetch')) {
-        setError('Cloud API is unreachable at http://localhost:4000. Please ensure the backend is running.');
+        setError(`Cloud API is unreachable at ${API_BASE}. Please check your connection or that the backend is running.`);
       } else {
         setError('Invalid credentials or unauthorized access. Please verify and try again.');
       }

@@ -1,5 +1,6 @@
 import { Order } from '@jamanvaar/types';
 import { formatDate, formatTime, formatINR } from '@jamanvaar/utils';
+import { db } from '@jamanvaar/database';
 import {
   ReportSummaryMetrics,
   DayRow,
@@ -75,7 +76,7 @@ export class ReportExportService {
    * Export Day-by-Day Matrix to CSV
    */
   public static exportDayByDayCsv(days: DayRow[]): void {
-    const headers = ['Date', 'Orders Count', 'Gross Sales (₹)', 'Discounts (₹)', 'GST Tax (₹)', 'Net Sales (₹)', 'Cash (₹)', 'UPI (₹)', 'Card (₹)', 'AOV (₹)'];
+    const headers = ['Date', 'Orders Count', 'Gross Sales (₹)', 'Discounts (₹)', 'GST Tax (₹)', 'Total Billed incl. GST (₹)', 'Cash (₹)', 'UPI (₹)', 'Card (₹)', 'AOV (₹)'];
     const rows = days.map((d) => [
       `"${d.displayDate}"`,
       `"${d.ordersCount}"`,
@@ -146,7 +147,7 @@ export class ReportExportService {
     const csv = [
       `"JAMANVAAR — GST TAX FILING & AUDIT REPORT"`,
       `"Generated At: ${formatDate(new Date())}"`,
-      `"GSTIN: 24AABCJ1984K1Z5"`,
+      `"GSTIN: ${db.restaurant.gstin || 'not registered'}"`,
       '',
       headers.join(','),
       ...rows.map((r) => r.join(','))

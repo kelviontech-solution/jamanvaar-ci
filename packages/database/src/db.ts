@@ -48,7 +48,11 @@ import {
   WelcomeScreenSettings,
   TaxGroup,
   User,
-  WaitlistEntry
+  WaitlistEntry,
+  Supplier,
+  GoodsReceipt,
+  InventoryBatch,
+  StockCount
 } from '@jamanvaar/types';
 
 import {
@@ -333,6 +337,11 @@ export class JamanvaarDatabase {
       timestamp: new Date(Date.now() - 14400000).toISOString()
     }
   ];
+
+  public suppliers: Supplier[] = [];
+  public goodsReceipts: GoodsReceipt[] = [];
+  public inventoryBatches: InventoryBatch[] = [];
+  public stockCounts: StockCount[] = [];
 
   public recipes: Recipe[] = [
     {
@@ -935,62 +944,80 @@ export class JamanvaarDatabase {
     return JamanvaarDatabase.instancesByRole.get(key)!;
   }
 
+  /**
+   * Last text written for each storage key (BUG-033). Saving used to rewrite all ~45 collections on
+   * every change, including every stored order, audit log and print job. A collection whose text has
+   * not changed is now left alone; the cache is dropped whenever storage may have changed under us.
+   */
+  private lastWritten = new Map<string, string>();
+
+  private putIfChanged(fullKey: string, text: string): void {
+    if (this.lastWritten.get(fullKey) === text) return;
+    localStorage.setItem(fullKey, text);
+    this.lastWritten.set(fullKey, text);
+  }
+
   private saveToStorage(): void {
     if (typeof localStorage === 'undefined') return;
     try {
       const p = this.storagePrefix;
-      localStorage.setItem(`${p}restaurant`, JSON.stringify(this.restaurant));
-      localStorage.setItem(`${p}outlet`, JSON.stringify(this.outlet));
-      localStorage.setItem(`${p}menu_items`, JSON.stringify(this.menuItems));
-      localStorage.setItem(`${p}categories`, JSON.stringify(this.categories));
-      localStorage.setItem(`${p}modifier_groups`, JSON.stringify(this.modifierGroups));
-      localStorage.setItem(`${p}combos`, JSON.stringify(this.combos));
-      localStorage.setItem(`${p}loyalty_tiers`, JSON.stringify(this.loyaltyTiers));
-      localStorage.setItem(`${p}loyalty_rewards`, JSON.stringify(this.loyaltyRewards));
-      localStorage.setItem(`${p}staff_schedules`, JSON.stringify(this.staffSchedules));
-      localStorage.setItem(`${p}attendance_records`, JSON.stringify(this.attendanceRecords));
-      localStorage.setItem(`${p}marketing_campaigns`, JSON.stringify(this.marketingCampaigns));
-      localStorage.setItem(`${p}delivery_riders`, JSON.stringify(this.deliveryRiders));
-      localStorage.setItem(`${p}receipt_config`, JSON.stringify(this.receiptConfig));
-      localStorage.setItem(`${p}receipt_records`, JSON.stringify(this.receiptRecords));
-      localStorage.setItem(`${p}print_jobs`, JSON.stringify(this.printJobs));
-      localStorage.setItem(`${p}orders`, JSON.stringify(this.orders));
-      localStorage.setItem(`${p}tables`, JSON.stringify(this.tables));
-      localStorage.setItem(`${p}coupons`, JSON.stringify(this.coupons));
-      localStorage.setItem(`${p}kiosks`, JSON.stringify(this.kiosks));
-      localStorage.setItem(`${p}service_requests`, JSON.stringify(this.serviceRequests));
-      localStorage.setItem(`${p}audit_logs`, JSON.stringify(this.auditLogs));
-      localStorage.setItem(`${p}shifts`, JSON.stringify(this.shifts));
-      localStorage.setItem(`${p}cash_movements`, JSON.stringify(this.cashMovements));
-      localStorage.setItem(`${p}kots`, JSON.stringify(this.kots));
-      localStorage.setItem(`${p}held_orders`, JSON.stringify(this.heldOrders));
-      localStorage.setItem(`${p}reservations`, JSON.stringify(this.reservations));
-      localStorage.setItem(`${p}waitlist`, JSON.stringify(this.waitlist));
-      localStorage.setItem(`${p}inventory_items`, JSON.stringify(this.inventoryItems));
-      localStorage.setItem(`${p}stock_movements`, JSON.stringify(this.stockMovements));
-      localStorage.setItem(`${p}recipes`, JSON.stringify(this.recipes));
-      localStorage.setItem(`${p}customer_accounts`, JSON.stringify(this.customerAccounts));
-      localStorage.setItem(`${p}users`, JSON.stringify(this.users));
-      localStorage.setItem(`${p}roles`, JSON.stringify(this.roles));
-      localStorage.setItem(`${p}configured_printers`, JSON.stringify(this.configuredPrinters));
-      localStorage.setItem(`${p}license`, JSON.stringify(this.license));
-      localStorage.setItem(`${p}tax_groups`, JSON.stringify(this.taxGroups));
-      localStorage.setItem(`${p}business_days`, JSON.stringify(this.businessDays));
-      localStorage.setItem(`${p}eod_reports`, JSON.stringify(this.eodReports));
-      localStorage.setItem(`${p}notifications`, JSON.stringify(this.notifications));
+      const put = (name: string, value: unknown) => this.putIfChanged(`${p}${name}`, JSON.stringify(value));
+      put('restaurant', this.restaurant);
+      put('outlet', this.outlet);
+      put('menu_items', this.menuItems);
+      put('categories', this.categories);
+      put('modifier_groups', this.modifierGroups);
+      put('combos', this.combos);
+      put('loyalty_tiers', this.loyaltyTiers);
+      put('loyalty_rewards', this.loyaltyRewards);
+      put('staff_schedules', this.staffSchedules);
+      put('attendance_records', this.attendanceRecords);
+      put('marketing_campaigns', this.marketingCampaigns);
+      put('delivery_riders', this.deliveryRiders);
+      put('receipt_config', this.receiptConfig);
+      put('receipt_records', this.receiptRecords);
+      put('print_jobs', this.printJobs);
+      put('orders', this.orders);
+      put('tables', this.tables);
+      put('coupons', this.coupons);
+      put('kiosks', this.kiosks);
+      put('service_requests', this.serviceRequests);
+      put('audit_logs', this.auditLogs);
+      put('shifts', this.shifts);
+      put('cash_movements', this.cashMovements);
+      put('kots', this.kots);
+      put('held_orders', this.heldOrders);
+      put('reservations', this.reservations);
+      put('waitlist', this.waitlist);
+      put('inventory_items', this.inventoryItems);
+      put('stock_movements', this.stockMovements);
+      put('suppliers', this.suppliers);
+      put('goods_receipts', this.goodsReceipts);
+      put('inventory_batches', this.inventoryBatches);
+      put('stock_counts', this.stockCounts);
+      put('recipes', this.recipes);
+      put('customer_accounts', this.customerAccounts);
+      put('users', this.users);
+      put('roles', this.roles);
+      put('configured_printers', this.configuredPrinters);
+      put('license', this.license);
+      put('tax_groups', this.taxGroups);
+      put('business_days', this.businessDays);
+      put('eod_reports', this.eodReports);
+      put('notifications', this.notifications);
       // BUG-HIGH-002 fix: syncEvents (the offline outbox queue — see
       // SyncOutboxEngine.queueEvent in @jamanvaar/sync) was never persisted
       // here, so any PENDING/FAILED event and its retry count was silently
       // lost on every reload or process restart — an offline-first system
       // whose own offline queue doesn't survive a restart.
-      localStorage.setItem(`${p}sync_events`, JSON.stringify(this.syncEvents));
-      localStorage.setItem(`${p}kiosk_display_settings`, JSON.stringify(this.kioskDisplaySettings));
-      localStorage.setItem(`${p}welcome_screen_settings`, JSON.stringify(this.welcomeScreenSettings));
+      put('sync_events', this.syncEvents);
+      put('kiosk_display_settings', this.kioskDisplaySettings);
+      put('welcome_screen_settings', this.welcomeScreenSettings);
       // qrSettings had the same gap syncEvents/kioskDisplaySettings used to
       // have — declared on this class but never actually persisted, so a
       // restaurant's QR ordering configuration (min/max order value, waiter
       // approval requirement, etc.) silently reverted to defaults on reload.
-      localStorage.setItem(`${p}qr_settings`, JSON.stringify(this.qrSettings));
+      put('qr_settings', this.qrSettings);
       localStorage.setItem(`${p}sync_timestamp`, Date.now().toString());
     } catch (e) {
       console.warn('Storage save failed:', e);
@@ -999,6 +1026,7 @@ export class JamanvaarDatabase {
 
   private loadFromStorage(): void {
     if (typeof localStorage === 'undefined') return;
+    this.lastWritten.clear();
     try {
       const p = this.storagePrefix;
       const storedRest = localStorage.getItem(`${p}restaurant`);
@@ -1024,55 +1052,27 @@ export class JamanvaarDatabase {
       if (storedItems) {
         const parsed = JSON.parse(storedItems);
         if (Array.isArray(parsed)) {
-          const seedMap = new Map<string, string>();
-          // Backfills menu-content translations onto items a browser already
-          // persisted before those translations existed in seed.ts — without
-          // this, a customer's localStorage forever shows English item names
-          // no matter what languages get added to the seed data later.
+          // BUG-017: this used to drop every NON_VEG item and anything with "chicken" in its
+          // name, then — if fewer than 8 items survived — throw away the WHOLE stored menu
+          // and replace it with the demo seed menu. A real restaurant's own menu (especially
+          // a small one, or one that sells non-veg food) could be destroyed just by loading
+          // the app. It now loads exactly what was stored: no filtering, no reseeding.
+          //
+          // The only thing still backfilled is translations for an item that IS one of our
+          // own bundled seed items (matched by id/sku) and doesn't have translations yet —
+          // never applied to a restaurant's own items, and never touches imageUrl.
           const translationsMap = new Map<string, MenuItem['translations']>();
           SEED_MENU_ITEMS.forEach((s) => {
-            if (s.imageUrl) {
-              seedMap.set(s.id, s.imageUrl);
-              if (s.sku) seedMap.set(s.sku, s.imageUrl);
-            }
             if (s.translations) {
               translationsMap.set(s.id, s.translations);
               if (s.sku) translationsMap.set(s.sku, s.translations);
             }
           });
 
-          const cleanItems = parsed
-            .filter((it: any) => it.dietaryType !== 'NON_VEG' && !it.name?.toLowerCase().includes('chicken'))
-            .map((it: any) => {
-              const seedTranslations = translationsMap.get(it.id) || translationsMap.get(it.sku);
-              const withTranslations = seedTranslations && !it.translations ? { ...it, translations: seedTranslations } : it;
-
-              if (seedMap.has(it.id)) {
-                return { ...withTranslations, imageUrl: seedMap.get(it.id)! };
-              }
-              if (seedMap.has(it.sku)) {
-                return { ...withTranslations, imageUrl: seedMap.get(it.sku)! };
-              }
-              const nameLower = (it.name || '').toLowerCase();
-              if (nameLower.includes('hara bhara')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/hara-bhara-kebab.jpg' };
-              if (nameLower.includes('crispy corn')) return { ...withTranslations, imageUrl: '/assets/menu/fast-food/peri-peri-fries.jpg' };
-              if (nameLower.includes('cigar rolls') || nameLower.includes('cheese corn')) return { ...withTranslations, imageUrl: '/assets/menu/chinese/momos.jpg' };
-              if (nameLower.includes('paneer tikka')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/paneer-tikka.jpg' };
-              if (nameLower.includes('dal makhani')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/dal-makhani.jpg' };
-              if (nameLower.includes('paneer butter') || nameLower.includes('paneer makhani')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/paneer-butter-masala.jpg' };
-              if (nameLower.includes('butter naan')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/butter-naan.jpg' };
-              if (nameLower.includes('garlic') && nameLower.includes('naan')) return { ...withTranslations, imageUrl: '/assets/menu/pizza/garlic-bread.jpg' };
-              if (nameLower.includes('biryani')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/biryani.jpg' };
-              if (nameLower.includes('coffee') || nameLower.includes('frappe')) return { ...withTranslations, imageUrl: '/assets/menu/cafe/frappe.jpg' };
-              if (nameLower.includes('gulab jamun')) return { ...withTranslations, imageUrl: '/assets/menu/north-indian/gulab-jamun.jpg' };
-              if (nameLower.includes('thali')) return { ...withTranslations, imageUrl: '/assets/menu/gujarati/thali.jpg' };
-              return withTranslations;
-            });
-          if (cleanItems.length >= 8) {
-            this.menuItems = cleanItems;
-          } else {
-            this.menuItems = [...SEED_MENU_ITEMS];
-          }
+          this.menuItems = parsed.map((it: any) => {
+            const seedTranslations = translationsMap.get(it.id) || translationsMap.get(it.sku);
+            return seedTranslations && !it.translations ? { ...it, translations: seedTranslations } : it;
+          });
         }
       }
 
@@ -1259,6 +1259,15 @@ export class JamanvaarDatabase {
       const storedMovements = localStorage.getItem(`${p}stock_movements`);
       if (storedMovements) this.stockMovements = JSON.parse(storedMovements);
 
+      const storedSuppliers = localStorage.getItem(`${p}suppliers`);
+      if (storedSuppliers) this.suppliers = JSON.parse(storedSuppliers);
+      const storedReceipts = localStorage.getItem(`${p}goods_receipts`);
+      if (storedReceipts) this.goodsReceipts = JSON.parse(storedReceipts);
+      const storedBatches = localStorage.getItem(`${p}inventory_batches`);
+      if (storedBatches) this.inventoryBatches = JSON.parse(storedBatches);
+      const storedCounts = localStorage.getItem(`${p}stock_counts`);
+      if (storedCounts) this.stockCounts = JSON.parse(storedCounts);
+
       const storedRecipes = localStorage.getItem(`${p}recipes`);
       if (storedRecipes) this.recipes = JSON.parse(storedRecipes);
 
@@ -1359,7 +1368,33 @@ export class JamanvaarDatabase {
     return this.outlet;
   }
 
+  private batchDepth = 0;
+  private batchDirty = false;
+
+  /**
+   * Runs `fn` and announces its changes once at the end (BUG-033). Settling a bill notifies about
+   * ten times (order, receipt, print job, audit log, cash drawer...); inside a batch those collapse
+   * into a single save, cloud push, broadcast and UI refresh. Batches nest; only the outermost one
+   * flushes, and it flushes even if `fn` throws.
+   */
+  public batch<T>(fn: () => T): T {
+    this.batchDepth += 1;
+    try {
+      return fn();
+    } finally {
+      this.batchDepth -= 1;
+      if (this.batchDepth === 0 && this.batchDirty) {
+        this.batchDirty = false;
+        this.notify();
+      }
+    }
+  }
+
   public notify(): void {
+    if (this.batchDepth > 0) {
+      this.batchDirty = true;
+      return;
+    }
     this.saveToStorage();
     this.pushToServer();
     try {

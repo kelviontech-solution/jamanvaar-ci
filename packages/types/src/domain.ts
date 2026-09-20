@@ -46,6 +46,8 @@ export interface InstantBillConfig {
 export interface Restaurant {
   id: string;
   name: string;
+  /** A stock count worth more than this (rupees) needs a manager's approval. */
+  stockAdjustmentApprovalLimit?: number;
   legalName?: string;
   tagline?: string;
   logoUrl?: string;
@@ -393,6 +395,10 @@ export interface CartItem {
   itemDiscountPercent?: number;
   itemDiscountAmount?: number;
   discountReason?: string;
+  /** Id of the order line this cart line became when it was first sent to the kitchen. */
+  orderItemId?: string;
+  /** How many of this line's quantity have already been sent to the kitchen (KOT). */
+  kotSentQty?: number;
 }
 
 export interface Cart {
@@ -508,6 +514,13 @@ export interface BusinessDay {
   updatedAt: string;
 }
 
+/** One tender line of a settled bill (a split bill has several). */
+export interface PaymentSplit {
+  method: 'CASH' | 'UPI' | 'CARD' | 'WALLET' | 'HOUSE_ACCOUNT';
+  amount: number;
+  reference?: string;
+}
+
 export interface Order {
   id: string;
   orderNumber: string;
@@ -553,6 +566,8 @@ export interface Order {
   estimatedWaitMinutes: number;
   tenderedAmount?: number;
   changeAmount?: number;
+  /** The real tender lines for a SPLIT bill — what was actually paid with each method. */
+  paymentSplits?: PaymentSplit[];
   createdAt: string;
   updatedAt: string;
   pickupCounter?: string;
@@ -591,6 +606,8 @@ export interface Order {
   deliveryStatus?: DeliveryStatus;
   dispatchedAt?: string;
   deliveredAt?: string;
+  /** Quantity of each order line whose recipe stock has already been consumed, keyed by order item id (BUG-044: makes stock deduction idempotent per line). */
+  stockConsumedQty?: Record<string, number>;
 }
 
 export type DeliveryStatus = 'UNASSIGNED' | 'ASSIGNED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'FAILED';
@@ -960,6 +977,8 @@ export type ReceiptDeliveryStatus = 'NOT_REQUESTED' | 'REQUESTED' | 'QUEUED' | '
 export type ReceiptPaperSize = '58mm' | '80mm';
 
 export interface ReceiptConfig {
+  /** The restaurant's own logo, printed at the top of its receipts (optional). */
+  logoUrl?: string;
   restaurantName: string;
   address: string;
   phone: string;
@@ -1001,8 +1020,12 @@ export interface PrinterDevice {
   name: string;
   role?: PrinterRole;
   driverName?: string;
+  /** The printer's name in Windows (Printers & scanners); USB and driver printers print through it. */
+  systemPrinterName?: string;
   interfaceType: PrinterInterfaceType;
   port?: string;
+  /** Serial speed for a SERIAL printer; 9600 when not set. */
+  baudRate?: number;
   ipAddress?: string;
   paperSize: ReceiptPaperSize;
   status: PrinterHardwareStatus;
@@ -1228,7 +1251,7 @@ export interface StockMovement {
   id: string;
   itemId: string;
   itemName: string;
-  type: 'PURCHASE' | 'RESTOCK' | 'SALE' | 'WASTE' | 'SPOILAGE' | 'ADJUSTMENT';
+  type: 'PURCHASE' | 'RESTOCK' | 'SALE' | 'SALE_REVERSAL' | 'WASTE' | 'SPOILAGE' | 'ADJUSTMENT';
   quantityDelta: number;
   unit: string;
   costImpact?: number;
@@ -1241,6 +1264,78 @@ export interface StockMovement {
   photoUrl?: string;
   performedBy: string;
   timestamp: string;
+}
+
+/** Someone the restaurant buys stock from (BUG-046). */
+export interface Supplier {
+  id: string;
+  name: string;
+  contactName?: string;
+  phone?: string;
+  email?: string;
+  gstin?: string;
+  paymentTerms?: string;
+  notes?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GoodsReceiptLine {
+  itemId: string;
+  itemName: string;
+  unit: string;
+  quantity: number;
+  unitCost: number;
+  expiryDate?: string;
+  lineTotal: number;
+}
+
+/** A delivery booked into stock (a goods-received note). */
+export interface GoodsReceipt {
+  id: string;
+  number: string;
+  supplierId: string;
+  supplierName: string;
+  invoiceNumber?: string;
+  receivedAt: string;
+  receivedBy: string;
+  lines: GoodsReceiptLine[];
+  totalCost: number;
+  notes?: string;
+}
+
+/** Stock from one delivery line, tracked so what expires first is used first. */
+export interface InventoryBatch {
+  id: string;
+  itemId: string;
+  receiptId: string;
+  receivedAt: string;
+  expiryDate?: string;
+  quantityReceived: number;
+  quantityRemaining: number;
+  unitCost: number;
+}
+
+export interface StockCountLine {
+  itemId: string;
+  itemName: string;
+  unit: string;
+  systemQuantity: number;
+  countedQuantity: number;
+  variance: number;
+  varianceValue: number;
+}
+
+export interface StockCount {
+  id: string;
+  number: string;
+  countedAt: string;
+  countedBy: string;
+  approvedBy?: string;
+  lines: StockCountLine[];
+  totalVarianceValue: number;
+  note?: string;
 }
 
 export interface RecipeIngredient {

@@ -80,6 +80,40 @@ fn send_escpos_bytes(ip: String, port: u16, bytes: Vec<u8>) -> Result<(), String
     Ok(())
 }
 
+// ---- Real printing (BUG-025 / BUG-026): shared native module, see packages/native/printing.rs -------------
+#[path = "../../../../../packages/native/printing.rs"]
+mod printing;
+
+/// Printers installed in Windows: rows of [name, port, driver, status].
+#[tauri::command]
+async fn list_system_printers() -> Result<Vec<Vec<String>>, String> {
+    printing::list_system_printers()
+}
+
+/// Devices on the local network that accept raw printing (port 9100).
+#[tauri::command]
+async fn scan_network_printers(subnet: Option<String>) -> Result<Vec<String>, String> {
+    printing::scan_network_printers(subnet, 9100, 300)
+}
+
+/// COM ports on this computer (Bluetooth serial printers appear here too).
+#[tauri::command]
+async fn list_serial_ports() -> Result<Vec<String>, String> {
+    printing::list_serial_ports()
+}
+
+/// Raw ESC/POS bytes to an installed (USB or driver) printer through the Windows spooler.
+#[tauri::command]
+async fn print_raw_system(name: String, bytes: Vec<u8>) -> Result<(), String> {
+    printing::print_raw_to_system_printer(&name, &bytes)
+}
+
+/// Raw ESC/POS bytes to a serial printer.
+#[tauri::command]
+async fn print_serial(port: String, baud: u32, bytes: Vec<u8>) -> Result<(), String> {
+    printing::print_to_serial(&port, baud, &bytes)
+}
+
 fn main() {
     // Start LAN beacon so Kiosk machines can discover this POS machine
     start_lan_beacon(5178);
@@ -89,7 +123,12 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_local_core_info,
             get_machine_ip,
-            send_escpos_bytes
+            send_escpos_bytes,
+            list_system_printers,
+            scan_network_printers,
+            list_serial_ports,
+            print_raw_system,
+            print_serial
         ])
         .setup(|app| {
             // Auto-launch the Local Core sidecar if present

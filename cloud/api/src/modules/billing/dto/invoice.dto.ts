@@ -23,9 +23,15 @@ export const recordPaymentSchema = z.object({
 
 export type RecordPaymentDto = z.infer<typeof recordPaymentSchema>;
 
-export const updateInvoiceStatusSchema = z.object({
-  status: z.enum(['DRAFT', 'ISSUED', 'PAID', 'PAST_DUE', 'VOID', 'REFUNDED'])
-});
+export const updateInvoiceStatusSchema = z
+  .object({
+    status: z.enum(['DRAFT', 'ISSUED', 'PAID', 'PAST_DUE', 'VOID', 'REFUNDED']),
+    reason: z.string().trim().min(5).max(500).optional()
+  })
+  .refine((v) => !['VOID', 'REFUNDED'].includes(v.status) || !!v.reason, {
+    message: 'A reason (at least 5 characters) is required to void or refund an invoice',
+    path: ['reason']
+  });
 
 export type UpdateInvoiceStatusDto = z.infer<typeof updateInvoiceStatusSchema>;
 

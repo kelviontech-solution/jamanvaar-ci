@@ -9,6 +9,7 @@ import { ApplicationEntitlementsModule } from '../application-entitlements/appli
 @Module({
   imports: [AuditModule, PlatformAuthModule, ApplicationEntitlementsModule],
   controllers: [ActivationKeysController, ActivationRedeemController],
-  providers: [ActivationKeysService]
+  providers: [ActivationKeysService],
+  exports: [ActivationKeysService]
 })
 export class ActivationKeysModule {}

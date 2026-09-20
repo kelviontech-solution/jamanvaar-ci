@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { TenantUserStatus } from '@prisma/client';
 import { Request } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
+import { assertSessionStillAllowed } from '../security/session-state';
 import {
   TENANT_JWT_AUDIENCE,
   TENANT_JWT_ISSUER,
@@ -49,6 +50,12 @@ export class TenantAuthGuard implements CanActivate {
     );
     if (!user || user.status !== TenantUserStatus.ACTIVE || user.restaurantId !== payload.restaurantId) {
       throw new UnauthorizedException('Invalid token');
+    }
+
+    // Impersonation tokens are support's window into a restaurant for debugging (even a
+    // suspended one), so they skip the restaurant/device state check; everything else must pass it.
+    if (!payload.impersonatedBy) {
+      await assertSessionStillAllowed(this.prisma, payload.restaurantId, payload.did);
     }
 
     (request as Request & { tenantUser: typeof user }).tenantUser = user;

@@ -1,3 +1,5 @@
+// Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
+import { copyText } from '../../../../../packages/utils/src/clipboard';
 import React, { useState } from 'react';
 import { Modal, Button, Input } from '../../components/ui';
 import { api, ApiError } from '../../api/client';
@@ -20,7 +22,7 @@ const ROLE_OPTIONS: Array<{ role: PlatformRole; label: string; desc: string }> =
 export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalProps) {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<PlatformRole>('SUPER_ADMIN');
+  const [role, setRole] = useState<PlatformRole>('READ_ONLY');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inviteResult, setInviteResult] = useState<{
@@ -33,7 +35,7 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
   function reset() {
     setFullName('');
     setEmail('');
-    setRole('SUPER_ADMIN');
+    setRole('READ_ONLY');
     setError(null);
     setInviteResult(null);
     setCopied(false);
@@ -68,9 +70,8 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
     }
   }
 
-  function handleCopyActivationLink() {
-    if (inviteResult?.activationUrl) {
-      navigator.clipboard.writeText(inviteResult.activationUrl);
+  async function handleCopyActivationLink() {
+    if (inviteResult?.activationUrl && (await copyText(inviteResult.activationUrl))) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     }

@@ -5,6 +5,20 @@ import { Card, Button, Input, Badge } from '../../components/ui';
 import { Sliders, Save, ShieldCheck, Wrench, Building2, Bell, AlertTriangle } from 'lucide-react';
 import '../../components/shared.css';
 import './settings.css';
+import { InvoiceSellerCard } from './InvoiceSellerCard';
+
+/** ISO timestamp -> the value a datetime-local input wants (local time, no seconds). */
+function isoToLocalInput(iso?: string | null): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function localInputToIso(v: string): string | null {
+  return v ? new Date(v).toISOString() : null;
+}
 
 export function PlatformSettingsPage() {
   const [settings, setSettings] = useState<PlatformSetting[]>([]);
@@ -16,7 +30,7 @@ export function PlatformSettingsPage() {
   const [platformName, setPlatformName] = useState('JAMANVAAR SaaS Control Plane');
   const [companyName, setCompanyName] = useState('Kelviontech');
   const [supportEmail, setSupportEmail] = useState('support@jamanvaar.app');
-  const [supportPhone, setSupportPhone] = useState('+91 98765 43210');
+  const [supportPhone, setSupportPhone] = useState('');
 
   const [trialDurationDays, setTrialDurationDays] = useState(14);
   const [maxTrialBranches, setMaxTrialBranches] = useState(1);
@@ -24,6 +38,12 @@ export function PlatformSettingsPage() {
 
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [statusBanner, setStatusBanner] = useState('');
+  const [startsAt, setStartsAt] = useState('');
+  const [endsAt, setEndsAt] = useState('');
+  /** What is actually saved (and therefore live for restaurants), as opposed to what the form shows. */
+  const [savedMaintenance, setSavedMaintenance] = useState<{ on: boolean; banner: string; startsAt: string; endsAt: string } | null>(null);
+  const [sellerValue, setSellerValue] = useState<Record<string, string> | null>(null);
+  const [formErrors, setFormErrors] = useState<{ branding?: string; defaults?: string; maintenance?: string }>({});
 
   const [saving, setSaving] = useState(false);
 
@@ -40,6 +60,7 @@ export function PlatformSettingsPage() {
             setSupportEmail(s.value.supportEmail || '');
             setSupportPhone(s.value.supportPhone || '');
           }
+          if (s.key === 'platform.billing' && s.value) setSellerValue(s.value as Record<string, string>);
           if (s.key === 'platform.defaults' && s.value) {
             setTrialDurationDays(s.value.trialDurationDays ?? 14);
             setMaxTrialBranches(s.value.maxTrialBranches ?? 1);
@@ -48,6 +69,14 @@ export function PlatformSettingsPage() {
           if (s.key === 'platform.maintenance' && s.value) {
             setMaintenanceMode(Boolean(s.value.maintenanceMode));
             setStatusBanner(s.value.statusBanner || '');
+            setStartsAt(isoToLocalInput(s.value.startsAt));
+            setEndsAt(isoToLocalInput(s.value.endsAt));
+            setSavedMaintenance({
+              on: Boolean(s.value.maintenanceMode),
+              banner: s.value.statusBanner || '',
+              startsAt: isoToLocalInput(s.value.startsAt),
+              endsAt: isoToLocalInput(s.value.endsAt)
+            });
           }
         }
         setError(null);
@@ -62,6 +91,7 @@ export function PlatformSettingsPage() {
 
   async function handleSaveBranding(e: React.FormEvent) {
     e.preventDefault();
+    setFormErrors((f) => ({ ...f, branding: undefined }));
     setSaving(true);
     try {
       await api.patch('/api/v1/platform/settings/platform.branding', {
@@ -70,7 +100,7 @@ export function PlatformSettingsPage() {
       setSuccessToast('Platform branding updated');
       setTimeout(() => setSuccessToast(null), 3000);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to save branding settings');
+      setFormErrors((f) => ({ ...f, branding: err instanceof ApiError ? err.message : 'Failed to save branding settings' }));
     } finally {
       setSaving(false);
     }
@@ -78,6 +108,7 @@ export function PlatformSettingsPage() {
 
   async function handleSaveDefaults(e: React.FormEvent) {
     e.preventDefault();
+    setFormErrors((f) => ({ ...f, defaults: undefined }));
     setSaving(true);
     try {
       await api.patch('/api/v1/platform/settings/platform.defaults', {
@@ -91,7 +122,7 @@ export function PlatformSettingsPage() {
       setSuccessToast('Onboarding default quotas updated');
       setTimeout(() => setSuccessToast(null), 3000);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to save default settings');
+      setFormErrors((f) => ({ ...f, defaults: err instanceof ApiError ? err.message : 'Failed to save default settings' }));
     } finally {
       setSaving(false);
     }
@@ -99,19 +130,32 @@ export function PlatformSettingsPage() {
 
   async function handleSaveMaintenance(e: React.FormEvent) {
     e.preventDefault();
+    setFormErrors((f) => ({ ...f, maintenance: undefined }));
     setSaving(true);
     try {
       await api.patch('/api/v1/platform/settings/platform.maintenance', {
-        value: { maintenanceMode, statusBanner }
+        value: { maintenanceMode, statusBanner, startsAt: localInputToIso(startsAt), endsAt: localInputToIso(endsAt) }
       });
-      setSuccessToast('Maintenance settings updated');
-      setTimeout(() => setSuccessToast(null), 3000);
+      setSavedMaintenance({ on: maintenanceMode, banner: statusBanner, startsAt, endsAt });
+      setSuccessToast(
+        maintenanceMode
+          ? 'Maintenance notice saved and live: restaurant apps will show it within a minute.'
+          : 'Maintenance notice switched off.'
+      );
+      setTimeout(() => setSuccessToast(null), 5000);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to save maintenance settings');
+      setFormErrors((f) => ({ ...f, maintenance: err instanceof ApiError ? err.message : 'Failed to save maintenance settings' }));
     } finally {
       setSaving(false);
     }
   }
+
+  const maintenanceDirty =
+    savedMaintenance !== null &&
+    (savedMaintenance.on !== maintenanceMode ||
+      savedMaintenance.banner !== statusBanner ||
+      savedMaintenance.startsAt !== startsAt ||
+      savedMaintenance.endsAt !== endsAt);
 
   return (
     <div>
@@ -139,7 +183,7 @@ export function PlatformSettingsPage() {
               </div>
               <div>
                 <h3 className="settings-card-title">Platform Branding</h3>
-                <p className="settings-card-desc">Global platform identity displayed across tenant consoles</p>
+                <p className="settings-card-desc">The support email and phone appear on every invoice and at the foot of every email the platform sends.</p>
               </div>
             </div>
             <form onSubmit={handleSaveBranding} className="settings-form">
@@ -161,6 +205,7 @@ export function PlatformSettingsPage() {
                   <Input value={supportPhone} onChange={(e) => setSupportPhone(e.target.value)} />
                 </div>
               </div>
+              {formErrors.branding && <div className="form-error">{formErrors.branding}</div>}
               <div style={{ marginTop: '0.5rem' }}>
                 <Button type="submit" variant="accent" disabled={saving || loading}>
                   <Save className="w-4 h-4" />
@@ -169,6 +214,15 @@ export function PlatformSettingsPage() {
               </div>
             </form>
           </Card>
+
+          <InvoiceSellerCard
+            value={sellerValue}
+            onSaved={(message) => {
+              setSuccessToast(message);
+              setTimeout(() => setSuccessToast(null), 4000);
+              loadSettings();
+            }}
+          />
 
           {/* Onboarding Defaults */}
           <Card className="settings-card">
@@ -211,6 +265,7 @@ export function PlatformSettingsPage() {
                   />
                 </div>
               </div>
+              {formErrors.defaults && <div className="form-error">{formErrors.defaults}</div>}
               <div style={{ marginTop: '0.5rem' }}>
                 <Button type="submit" variant="accent" disabled={saving || loading}>
                   <Save className="w-4 h-4" />
@@ -243,7 +298,7 @@ export function PlatformSettingsPage() {
                 <div className="maintenance-content">
                   <h4>Platform Maintenance Mode</h4>
                   <p>
-                    When enabled, tenant admins see a maintenance notice in their portals. Offline POS terminals continue operating uninterrupted without loss of local data.
+                    When saved as ON, every restaurant app (Restaurant Admin, POS, KDS, Captain, Kiosk) shows this notice at the top of the screen. It never stops billing: terminals keep working offline without losing local data.
                   </p>
                 </div>
               </div>
@@ -254,14 +309,42 @@ export function PlatformSettingsPage() {
                   value={statusBanner}
                   onChange={(e) => setStatusBanner(e.target.value)}
                   rows={3}
+                  maxLength={500}
                   placeholder="e.g. Scheduled database optimization on Sunday 2:00 AM IST. All offline devices remain operational."
                 />
+                <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>{statusBanner.length}/500. Leave empty to show a standard maintenance message.</div>
               </div>
+
+              <div className="form-row">
+                <div className="form-field">
+                  <label>Starts at (optional)</label>
+                  <Input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />
+                </div>
+                <div className="form-field">
+                  <label>Ends at (optional)</label>
+                  <Input type="datetime-local" value={endsAt} min={startsAt || undefined} onChange={(e) => setEndsAt(e.target.value)} />
+                </div>
+              </div>
+              <div className="muted" style={{ fontSize: 12 }}>
+                Without times the notice shows until you switch it off. With times it appears and disappears by itself.
+              </div>
+
+              <div
+                role="status"
+                style={{ marginTop: 8, fontSize: 13, fontWeight: 600, color: maintenanceDirty ? '#B45309' : savedMaintenance?.on ? '#047857' : 'inherit' }}
+              >
+                {maintenanceDirty
+                  ? 'You have unsaved changes: restaurants still see the previous state until you press Save.'
+                  : savedMaintenance?.on
+                    ? 'Live: restaurants are seeing this notice now.'
+                    : 'Off: no notice is being shown to restaurants.'}
+              </div>
+              {formErrors.maintenance && <div className="form-error">{formErrors.maintenance}</div>}
 
               <div style={{ marginTop: '0.5rem' }}>
                 <Button type="submit" variant="accent" disabled={saving || loading}>
                   <Save className="w-4 h-4" />
-                  <span>Save Status</span>
+                  <span>Save notice</span>
                 </Button>
               </div>
             </form>

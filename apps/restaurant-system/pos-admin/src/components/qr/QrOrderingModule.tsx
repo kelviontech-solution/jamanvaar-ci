@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { db, QrOrderingRepository, BusinessDayRepository, MenuRepository, TableRepository } from '@jamanvaar/database';
 import { Order, DiningTable, MenuItem, QrOrderingSettings, OrderStatus } from '@jamanvaar/types';
 import { EntitlementService, PLAN_DEFINITIONS } from '@jamanvaar/business';
-import { formatINR, generateQrSvg, generateQrDataUrl } from '@jamanvaar/utils';
+import { formatINR, generateQrSvg, generateQrDataUrl, copyText } from '@jamanvaar/utils';
 import { lanMeshSync } from '@jamanvaar/sync';
 import {
   QrCode,
@@ -345,7 +345,9 @@ export const QrOrderingModule: React.FC = () => {
     showToast(`Downloaded Table ${table.tableNumber} vector QR SVG!`);
   };
 
-  const handleCopyQrLink = (table: DiningTable) => {
+  const [copiedQrTable, setCopiedQrTable] = useState<string | null>(null);
+
+  const handleCopyQrLink = async (table: DiningTable) => {
     const hostUrl = typeof window !== 'undefined' && window.location?.origin
       ? window.location.origin
       : 'http://localhost:5176';
@@ -355,8 +357,12 @@ export const QrOrderingModule: React.FC = () => {
       token = generated.qrToken;
     }
     const url = `${hostUrl}/?qrTable=${table.tableNumber}&token=${token}`;
-    navigator.clipboard.writeText(url);
-    showToast(`Copied Table ${table.tableNumber} QR URL to clipboard!`);
+    const ok = await copyText(url);
+    if (ok) {
+      setCopiedQrTable(String(table.tableNumber));
+      setTimeout(() => setCopiedQrTable(null), 2000);
+    }
+    showToast(ok ? `Copied Table ${table.tableNumber} QR URL to clipboard!` : 'Could not copy automatically. Open the QR view and copy the link from there.');
   };
 
   const handleRegenerateQr = (table: DiningTable) => {
@@ -1438,7 +1444,7 @@ export const QrOrderingModule: React.FC = () => {
                             className="p-1 text-slate-400 hover:text-jaman-saffron transition-colors"
                             title="Copy QR Order Link"
                           >
-                            <Copy className="w-3.5 h-3.5" />
+                            {copiedQrTable === String(table.tableNumber) ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                           </button>
 
                           <button

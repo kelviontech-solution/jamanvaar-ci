@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Category, MenuItem, ComboDeal } from '@jamanvaar/types';
-import { db, MenuRepository, ComboRepository, AuditRepository } from '@jamanvaar/database';
+import { db, MenuRepository, ComboRepository, AuditRepository, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
+import { MenuBuilderService } from '@jamanvaar/business';
 import {
   Plus,
   Search,
@@ -10,7 +11,10 @@ import {
   Trash2,
   Percent,
   Sparkles,
-  Package
+  Package,
+  Upload,
+  Download,
+  Wand2
 } from 'lucide-react';
 import { ComboModal } from './ComboModal';
 
@@ -43,6 +47,73 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
   onRequestConfirm
 }) => {
   const [menuSearch, setMenuSearch] = useState('');
+  const csvInputRef = React.useRef<HTMLInputElement>(null);
+  const [loadingDefaults, setLoadingDefaults] = useState(false);
+
+  // BUG-014: no CSV import existed anywhere for menus, and there was no one-click way to
+  // load a starter menu — an empty menu showed only "No menu dishes found" with no way out.
+  const handleCsvFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-selecting the same file after fixing it
+    if (!file) return;
+    file.text().then((text) => {
+      const result = MenuBuilderService.importCSV(text);
+      AuditRepository.log({
+        action: 'MENU_CSV_IMPORTED',
+        category: 'MENU',
+        details: `Imported ${result.itemsImported} dish(es) and created ${result.categoriesCreated} categor${result.categoriesCreated === 1 ? 'y' : 'ies'} from "${file.name}"`,
+        username: 'Manager'
+      });
+      if (result.errors.length > 0) {
+        const preview = result.errors
+          .slice(0, 5)
+          .map((er) => `Row ${er.row}: ${er.message}`)
+          .join(' · ');
+        const more = result.errors.length > 5 ? ` (+${result.errors.length - 5} more)` : '';
+        showToast(
+          `Imported ${result.itemsImported} dish(es). ${result.errors.length} row(s) had problems and were skipped — ${preview}${more}`
+        );
+      } else {
+        showToast(`Imported ${result.itemsImported} dish(es) into ${result.categoriesCreated} new categor${result.categoriesCreated === 1 ? 'y' : 'ies'}.`);
+      }
+    });
+  };
+
+  const handleDownloadCsvTemplate = () => {
+    const templateRow = ['Category,Item Name,SKU,Price,Dietary Type,Spice Level,Description,Image URL', '"Starters","Veg Spring Roll","STR-001",180,VEG,MEDIUM,"Crispy vegetable rolls",""'].join('\n');
+    const csv = menuItems.length > 0 ? MenuBuilderService.exportCSV() : templateRow;
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jamanvaar-menu-template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // "One button that loads the default items" (owner's words). Loads every bundled cuisine
+  // template at once, skipping anything that already exists by name — the same trusted
+  // import path "Load 14 Templates" uses, just with no picker to click through first.
+  const handleLoadDefaultItems = () => {
+    setLoadingDefaults(true);
+    try {
+      const result = MenuBuilderService.importTemplates(
+        PREBUILT_MENU_TEMPLATES.map((t) => t.id),
+        {
+          importCategories: true,
+          importItems: true,
+          importImages: true,
+          importModifiers: true,
+          importCombos: true,
+          importSuggestedPrices: true,
+          duplicateStrategy: 'SKIP_DUPLICATE'
+        }
+      );
+      showToast(`Loaded ${result.importedItemsCount} default dish(es) across ${result.importedCategoriesCount} categories.`);
+    } finally {
+      setLoadingDefaults(false);
+    }
+  };
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('ALL');
   const [dietaryFilter, setDietaryFilter] = useState<string>('ALL');
 
@@ -176,6 +247,34 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
           </button>
 
           <button
+            onClick={handleLoadDefaultItems}
+            disabled={loadingDefaults}
+            title="Load a full default starter menu in one click"
+            className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
+          >
+            <Wand2 className="w-3.5 h-3.5 text-jaman-saffron" />
+            <span>{loadingDefaults ? 'Loading…' : 'Load Default Items'}</span>
+          </button>
+
+          <input ref={csvInputRef} type="file" accept=".csv,text/csv" onChange={handleCsvFileSelected} style={{ display: 'none' }} />
+          <button
+            onClick={() => csvInputRef.current?.click()}
+            title="Upload a menu CSV (download the template first if you need the columns)"
+            className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <Upload className="w-3.5 h-3.5 text-jaman-saffron" />
+            <span>Upload CSV</span>
+          </button>
+          <button
+            onClick={handleDownloadCsvTemplate}
+            title="Download a CSV template (or your current menu, if you have one)"
+            className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <Download className="w-3.5 h-3.5 text-jaman-saffron" />
+            <span>Download CSV Template</span>
+          </button>
+
+          <button
             onClick={onOpenBulkPriceModal}
             className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5"
           >
@@ -267,7 +366,51 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
       </div>
 
       {/* Dishes Grid or Empty State */}
-      {filteredMenuItems.length === 0 ? (
+      {menuItems.length === 0 ? (
+        // BUG-013/014: a brand-new restaurant's menu is genuinely empty now (no demo seed),
+        // and this used to show nothing but "No menu dishes found…" with no way forward.
+        <div className="bg-white rounded-3xl p-12 text-center border border-dashed border-jaman-border shadow-2xs space-y-4 max-w-xl mx-auto my-6">
+          <div className="w-14 h-14 bg-orange-50 text-jaman-saffron rounded-2xl flex items-center justify-center mx-auto">
+            <UtensilsCrossed className="w-7 h-7" />
+          </div>
+          <div>
+            <h3 className="font-black text-base text-jaman-navy">This restaurant has no menu yet</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+              Upload a menu CSV, load a default starter menu in one click, or add dishes one at a time.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+            <button
+              onClick={() => csvInputRef.current?.click()}
+              className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              Upload CSV
+            </button>
+            <button
+              onClick={handleLoadDefaultItems}
+              disabled={loadingDefaults}
+              className="px-4 py-2 bg-white border border-jaman-border hover:bg-[#F8F6F0] text-jaman-navy text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
+            >
+              <Wand2 className="w-3.5 h-3.5 text-jaman-saffron" />
+              {loadingDefaults ? 'Loading…' : 'Load Default Items'}
+            </button>
+            <button
+              onClick={handleDownloadCsvTemplate}
+              className="px-4 py-2 bg-white border border-jaman-border hover:bg-[#F8F6F0] text-jaman-navy text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5"
+            >
+              <Download className="w-3.5 h-3.5 text-jaman-saffron" />
+              Download Template
+            </button>
+            <button
+              onClick={() => onOpenItemModal(null)}
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl cursor-pointer"
+            >
+              + Add One Dish
+            </button>
+          </div>
+        </div>
+      ) : filteredMenuItems.length === 0 ? (
         <div className="bg-white rounded-3xl p-12 text-center border border-jaman-border shadow-2xs space-y-3 max-w-lg mx-auto my-6">
           <div className="w-12 h-12 bg-orange-50 text-jaman-saffron rounded-2xl flex items-center justify-center mx-auto">
             <UtensilsCrossed className="w-6 h-6" />

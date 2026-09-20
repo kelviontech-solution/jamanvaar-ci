@@ -107,7 +107,12 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
   };
 
   return (
-    <div className={`min-h-screen bg-[#FAF7F2] text-[#0B253A] flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans antialiased select-none ${className}`}>
+    // BUG-007: the host app's <body> intentionally sets `overflow: hidden` (a touch POS
+    // shouldn't rubber-band scroll during normal use), so this layout used to grow taller
+    // than the viewport (min-h-screen content) with nowhere for that overflow to go — the
+    // keypad and Unlock button were simply cut off below the fold on short screens. This
+    // container now scrolls internally instead.
+    <div className={`min-h-screen max-h-screen overflow-y-auto bg-[#FAF7F2] text-[#0B253A] flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans antialiased select-none ${className}`}>
       {/* Top Status Header */}
       <header className="w-full max-w-7xl mx-auto flex items-center justify-between pt-1 pb-4 shrink-0">
         {/* Left Mobile Brand (visible on small viewports) */}

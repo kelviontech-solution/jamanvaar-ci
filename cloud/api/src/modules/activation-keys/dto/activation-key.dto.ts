@@ -4,7 +4,13 @@ export const generateActivationKeySchema = z.object({
   restaurantId: z.string().uuid(),
   subscriptionId: z.string().optional(),
   allowedDeviceType: z.enum(['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'ANY']).default('ANY'),
-  expiresAt: z.coerce.date()
+  expiresAt: z.coerce.date(),
+  /** BUG-048: the branch the terminal that redeems this key belongs to. */
+  branchId: z.string().uuid().optional(),
+  /** Becomes the terminal's name, e.g. "Counter 1". */
+  label: z.string().trim().min(1).max(80).optional(),
+  /** Keys generated together (a welcome kit) share a batch. */
+  batchId: z.string().trim().min(1).max(60).optional()
 });
 export type GenerateActivationKeyDto = z.infer<typeof generateActivationKeySchema>;
 
@@ -17,3 +23,7 @@ export const redeemActivationKeySchema = z.object({
   appVersion: z.string().optional()
 });
 export type RedeemActivationKeyDto = z.infer<typeof redeemActivationKeySchema>;
+
+export const bulkRevokeKeysSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1, 'Choose at least one key').max(200)
+});

@@ -10,6 +10,27 @@ import { DeviceCommandsService, IssueCommandDto } from './device-commands.servic
 export class DeviceCommandsController {
   constructor(private readonly deviceCommandsService: DeviceCommandsService) {}
 
+  // --- Terminal / Device Polling Endpoints ---
+  // Declared FIRST on purpose: `GET me/commands` would otherwise be captured by
+  // `GET :id/commands` (id = "me"), which needs a platform login - so a terminal
+  // could never fetch its commands.
+
+  @Get('me/commands')
+  @UseGuards(DeviceAuthGuard)
+  getPendingCommands(@CurrentDevice() device: Device) {
+    return this.deviceCommandsService.getPendingForDevice(device);
+  }
+
+  @Post('me/commands/:id/ack')
+  @UseGuards(DeviceAuthGuard)
+  acknowledgeCommand(
+    @CurrentDevice() device: Device,
+    @Param('id') commandId: string,
+    @Body() body: { status: 'SUCCEEDED' | 'FAILED'; result?: Record<string, unknown>; error?: string }
+  ) {
+    return this.deviceCommandsService.acknowledgeCommand(device, commandId, body);
+  }
+
   // --- Platform Super Admin Endpoints ---
 
   @Get(':id/commands')
@@ -64,23 +85,5 @@ export class DeviceCommandsController {
     @CurrentPlatformUser() actor: PlatformUser
   ) {
     return this.deviceCommandsService.wipeDevice(deviceId, confirmationPhrase, actor);
-  }
-
-  // --- Terminal / Device Polling Endpoints ---
-
-  @Get('me/commands')
-  @UseGuards(DeviceAuthGuard)
-  getPendingCommands(@CurrentDevice() device: Device) {
-    return this.deviceCommandsService.getPendingForDevice(device);
-  }
-
-  @Post('me/commands/:id/ack')
-  @UseGuards(DeviceAuthGuard)
-  acknowledgeCommand(
-    @CurrentDevice() device: Device,
-    @Param('id') commandId: string,
-    @Body() body: { status: 'SUCCEEDED' | 'FAILED'; result?: Record<string, unknown>; error?: string }
-  ) {
-    return this.deviceCommandsService.acknowledgeCommand(device, commandId, body);
   }
 }

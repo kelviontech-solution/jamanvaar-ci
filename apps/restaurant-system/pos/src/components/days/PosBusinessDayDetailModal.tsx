@@ -4,7 +4,7 @@ import { BusinessDayRepository, PrintQueueRepository } from '@jamanvaar/database
 import { PdfReportBuilder, ReportFullData } from '../../services/pdfReportBuilder';
 import { PosPrinterService } from '../../services/printerService';
 import { PosDayOrdersModal } from './PosDayOrdersModal';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, splitTax } from '@jamanvaar/utils';
 import {
   X,
   Calendar,
@@ -77,8 +77,8 @@ export const PosBusinessDayDetailModal: React.FC<PosBusinessDayDetailModalProps>
             grossSales: businessDay.grossSales,
             discountAmount: businessDay.discounts,
             netSales: businessDay.netSales,
-            cgstAmount: Math.round(businessDay.tax / 2),
-            sgstAmount: Math.round(businessDay.tax / 2),
+            cgstAmount: splitTax(businessDay.tax, 0).cgst,
+            sgstAmount: splitTax(businessDay.tax, 0).sgst,
             totalTax: businessDay.tax,
             totalCollected: businessDay.totalCollected,
             refundsCount: businessDay.refundedOrderCount,
@@ -283,7 +283,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
               <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
-                Total Net Sales
+                Total Billed (incl. GST)
               </span>
               <div className="text-2xl font-black font-mono text-jaman-navy mt-0.5">
                 {formatINR(businessDay.netSales)}
@@ -350,16 +350,26 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
                   <span>Discounts Granted:</span>
                   <strong className="font-mono text-rose-600">- {formatINR(businessDay.discounts)}</strong>
                 </div>
+                <div className="flex justify-between text-slate-600 pt-1 border-t border-slate-100">
+                  <span>Net Sales (excl. GST):</span>
+                  <strong className="font-mono text-jaman-navy">{formatINR(businessDay.grossSales - businessDay.discounts)}</strong>
+                </div>
                 <div className="flex justify-between text-slate-600">
                   <span>CGST (2.5%):</span>
-                  <strong className="font-mono text-slate-800">{formatINR(Math.round(businessDay.tax / 2))}</strong>
+                  <strong className="font-mono text-slate-800">{formatINR(splitTax(businessDay.tax, 0).cgst)}</strong>
                 </div>
                 <div className="flex justify-between text-slate-600">
                   <span>SGST (2.5%):</span>
-                  <strong className="font-mono text-slate-800">{formatINR(Math.round(businessDay.tax / 2))}</strong>
+                  <strong className="font-mono text-slate-800">{formatINR(splitTax(businessDay.tax, 0).sgst)}</strong>
                 </div>
+                {Math.round((businessDay.netSales - (businessDay.grossSales - businessDay.discounts + businessDay.tax)) * 100) !== 0 && (
+                  <div className="flex justify-between text-slate-600">
+                    <span>Round-off:</span>
+                    <strong className="font-mono text-slate-800">{formatINR(Math.round((businessDay.netSales - (businessDay.grossSales - businessDay.discounts + businessDay.tax)) * 100) / 100)}</strong>
+                  </div>
+                )}
                 <div className="flex justify-between pt-2 border-t border-slate-100 font-black text-sm text-jaman-navy">
-                  <span>Net Collected Revenue:</span>
+                  <span>Total Collected (incl. GST):</span>
                   <span className="font-mono text-emerald-700">{formatINR(businessDay.netSales)}</span>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { AiAssistantService } from './ai-assistant.service';
-import { updateQuestionSchema, updateSettingsSchema, createQuestionSchema } from './dto/ai-assistant.dto';
+import { updateQuestionSchema, updateSettingsSchema, createQuestionSchema, restaurantAiAccessSchema } from './dto/ai-assistant.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
@@ -14,6 +14,21 @@ export class AiAssistantController {
   @Get('config')
   getConfig() {
     return this.aiAssistant.getConfig();
+  }
+
+  @Get('restaurants/:id/access')
+  getRestaurantAccess(@Param('id') id: string) {
+    return this.aiAssistant.getRestaurantAccess(id);
+  }
+
+  @Patch('restaurants/:id/access')
+  @UsePipes(new ZodValidationPipe(restaurantAiAccessSchema))
+  setRestaurantAccess(
+    @Param('id') id: string,
+    @Body() body: ReturnType<typeof restaurantAiAccessSchema.parse>,
+    @CurrentPlatformUser() actor: PlatformUser
+  ) {
+    return this.aiAssistant.setRestaurantAccess(id, body, actor);
   }
 
   @Patch('questions/:id')

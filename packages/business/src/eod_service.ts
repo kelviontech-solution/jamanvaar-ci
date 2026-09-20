@@ -1,5 +1,5 @@
 import { EodReport, EodReportBranding, Order, ShiftRecord } from '@jamanvaar/types';
-import { db } from '@jamanvaar/database';
+import { db , getOrderTenders } from '@jamanvaar/database';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 import { DayOrdersService } from './day_orders_service';
 
@@ -55,7 +55,7 @@ export class EodReportService {
     const activeShift: ShiftRecord | undefined =
       db.shifts.find((s) => s.id === shiftId) || db.shifts[0];
 
-    const cashierName = activeShift?.cashierName || 'Amit Dave (Lead Cashier)';
+    const cashierName = activeShift?.cashierName || 'No shift open';
     const cashierId = activeShift?.cashierId || 'usr-cashier-1';
     const terminalId = activeShift?.posId || 'POS-01';
     const shiftName = activeShift?.id ? 'Full Day Shift #01' : 'Standard Shift #01';
@@ -208,17 +208,19 @@ export class EodReportService {
         paymentCounts.splitPayment.count++;
         paymentCounts.splitPayment.amount += o.totalAmount;
         splitCombinations.totalSplitBills++;
-        // Allocate split subsets
-        if (ordersSettled % 3 === 0) splitCombinations.cashUpiCount++;
-        else if (ordersSettled % 3 === 1) splitCombinations.cashCardCount++;
-        else splitCombinations.upiCardCount++;
+        // Count the combination from the tender lines that were really paid
+        // (this used to rotate cash/UPI, cash/card, UPI/card by order count).
+        const t = getOrderTenders(o);
+        if (t.cash > 0 && t.upi > 0) splitCombinations.cashUpiCount++;
+        else if (t.cash > 0 && t.card > 0) splitCombinations.cashCardCount++;
+        else if (t.upi > 0 && t.card > 0) splitCombinations.upiCardCount++;
       } else {
         paymentCounts.cash.count++;
         paymentCounts.cash.amount += o.totalAmount;
       }
 
       // Captain Performance
-      const capt = o.captainName || (o.tableNumber ? 'Rahul Sharma' : undefined);
+      const capt = o.captainName || (o.tableNumber ? 'Unassigned captain' : undefined);
       if (capt) {
         const cStat = captainMap.get(capt) || { orders: 0, sales: 0 };
         cStat.orders++;
@@ -227,7 +229,7 @@ export class EodReportService {
       }
 
       // Cashier Performance
-      const cashr = o.cashierName || 'Amit Dave';
+      const cashr = o.cashierName || 'Unassigned cashier';
       const kStat = cashierMap.get(cashr) || { bills: 0, collection: 0 };
       kStat.bills++;
       kStat.collection += o.totalAmount;
@@ -285,34 +287,34 @@ export class EodReportService {
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
 
-    // Simulated low stock inventory alert
-    const lowStockInventory = [
-      { name: 'Fresh Malai Paneer', currentStock: 4.5, unit: 'kg' },
-      { name: 'Amul Salted Butter', currentStock: 2.0, unit: 'kg' },
-      { name: 'Mozzarella & Processed Cheese', currentStock: 1.8, unit: 'kg' }
-    ];
+    // Real low-stock alert from the actual inventory (it used to be three invented lines).
+    const lowStockInventory = db.inventoryItems
+      .filter((i) => i.status === 'LOW_STOCK' || i.status === 'OUT_OF_STOCK')
+      .map((i) => ({ name: i.name, currentStock: i.currentStock, unit: i.unit }));
 
     // Build Current Branding Snapshot from DB Settings
     const branding: EodReportBranding = {
-      restaurantName: db.restaurant.name || 'JAMANVAAR RESTAURANT',
-      legalName: db.restaurant.legalName || 'JAMANVAAR FOODS & HOSPITALITY PRIVATE LIMITED',
-      tagline: db.restaurant.tagline || 'Authentic Indian Cuisine & Seamless Dining by KELVIONTECH',
+      // Only this restaurant's real details: a missing GSTIN/FSSAI/MSME/owner stays blank
+      // instead of being filled with another business's invented numbers and names.
+      restaurantName: db.restaurant.name || 'Restaurant',
+      legalName: db.restaurant.legalName || db.restaurant.name || '',
+      tagline: db.restaurant.tagline || '',
       logoUrl: db.restaurant.logoUrl || '/assets/branding/jamanvaar-logo.png',
-      address: db.outlet.address || db.restaurant.address || 'Sindhu Bhavan Road, Bodakdev',
-      city: db.outlet.city || db.restaurant.city || 'Ahmedabad',
-      state: db.outlet.state || db.restaurant.state || 'Gujarat',
-      pincode: db.restaurant.pincode || '380054',
-      phone: db.restaurant.phone || '+91 79 4890 1234',
-      email: db.restaurant.email || 'hello@jamanvaar.com',
-      gstin: db.restaurant.gstin || '24ABCDE1234F1Z5',
-      fssaiNumber: db.restaurant.fssaiNumber || '10722001000452',
-      msmeNumber: db.restaurant.msmeNumber || 'UDYAM-GJ-01-0012345',
-      website: db.restaurant.website || 'https://jamanvaar.com',
-      footerText: db.restaurant.footerText || 'Official Daily Closing Statement • Powered by JAMANVAAR by KELVIONTECH',
+      address: db.outlet.address || db.restaurant.address || '',
+      city: db.outlet.city || db.restaurant.city || '',
+      state: db.outlet.state || db.restaurant.state || '',
+      pincode: db.restaurant.pincode || '',
+      phone: db.restaurant.phone || '',
+      email: db.restaurant.email || '',
+      gstin: db.restaurant.gstin || '',
+      fssaiNumber: db.restaurant.fssaiNumber || '',
+      msmeNumber: db.restaurant.msmeNumber || '',
+      website: db.restaurant.website || '',
+      footerText: db.restaurant.footerText || 'Official Daily Closing Statement',
       primaryColor: db.restaurant.primaryColor || '#0B253A',
       secondaryColor: db.restaurant.secondaryColor || '#E66817',
-      ownerName: db.restaurant.ownerName || 'Ramesh Patel',
-      managerName: db.restaurant.managerName || 'Pooja Shah'
+      ownerName: db.restaurant.ownerName || '',
+      managerName: db.restaurant.managerName || ''
     };
 
     const reportId = `EOD-${businessDate.replace(/-/g, '')}-001`;

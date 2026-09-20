@@ -18,6 +18,6 @@ export class TenantBranchesController {
 
   @Get()
   list(@CurrentTenantUser() user: User) {
-    return this.branches.list(user.restaurantId);
+    return this.branches.list({ restaurantId: user.restaurantId });
   }
 }

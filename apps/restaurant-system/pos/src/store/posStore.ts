@@ -18,7 +18,8 @@ import {
   ReceiptPaperSize,
   SelectedModifier,
   ShiftRecord,
-  User
+  User,
+  PaymentSplit
 } from '@jamanvaar/types';
 import {
   AuditRepository,
@@ -28,11 +29,13 @@ import {
   OrderRepository,
   PrintQueueRepository,
   ReceiptRepository,
-  ShiftRepository
+  ShiftRepository,
+  StaffRepository,
+  InventoryRepository
 } from '@jamanvaar/database';
 import { PosPrinterService } from '../services/printerService';
 import { PosRecoveryService } from '../services/recoveryService';
-import { lanMeshSync } from '@jamanvaar/sync';
+import { lanMeshSync, SyncOutboxEngine } from '@jamanvaar/sync';
 import { SessionPersistence, AuthStatus, calculateCart } from '@jamanvaar/business';
 import { generateUUID } from '@jamanvaar/utils';
 
@@ -114,6 +117,8 @@ interface PosState {
   discountReason: string;
   discountCode: string;
   orderNotes: string;
+  /** Id of the running (sent to kitchen, not yet paid) order this cart belongs to, for counter/takeaway orders. */
+  runningOrderId: string | null;
   recoverableDraft: DraftCartSession | null;
 
   // Active Modals & Dialogs
@@ -206,7 +211,8 @@ interface PosState {
   completePayment: (
     method: PaymentMethod,
     tenderedAmount?: number,
-    transactionId?: string
+    transactionId?: string,
+    splits?: PaymentSplit[]
   ) => Order | null;
 
   setCustomizingItem: (item: MenuItem | null) => void;
@@ -277,6 +283,66 @@ function recomputeCart(
   });
 }
 
+
+// ---- running-order helpers (BUG-032) -------------------------------------
+function newOrderItemId(idx: number): string {
+  return `oi-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 6)}`;
+}
+
+/** Gives every cart line a stable link to its order line. */
+function linkCartItems(items: CartItem[]): CartItem[] {
+  return items.map((ci, idx) => (ci.orderItemId ? ci : { ...ci, orderItemId: newOrderItemId(idx) }));
+}
+
+function cartLinesToOrderItems(items: CartItem[], existing?: Order['items']): Order['items'] {
+  return items.map((ci) => {
+    const prior = existing?.find((o) => o.id === ci.orderItemId);
+    return {
+      id: ci.orderItemId as string,
+      orderId: prior?.orderId || '',
+      menuItemId: ci.menuItemId,
+      name: ci.item.name,
+      sku: ci.item.sku,
+      quantity: ci.quantity,
+      unitPrice: ci.unitPrice,
+      modifiers: ci.selectedModifiers,
+      specialInstructions: ci.specialInstructions,
+      totalPrice: ci.itemTotal,
+      itemDiscountPercent: ci.itemDiscountPercent,
+      itemDiscountAmount: ci.itemDiscountAmount,
+      discountReason: ci.discountReason,
+      kitchenStatus: prior?.kitchenStatus || ('PREPARING' as const)
+    };
+  });
+}
+
+/** The order this cart is already attached to (table order or counter running order), if it is still open. */
+function findRunningOrder(state: { selectedTable: DiningTable | null; runningOrderId: string | null }): Order | null {
+  const byTable = state.selectedTable?.currentOrderId ? OrderRepository.getOrderById(state.selectedTable.currentOrderId) : null;
+  const byRunning = state.runningOrderId ? OrderRepository.getOrderById(state.runningOrderId) : null;
+  const found = byTable || byRunning || null;
+  if (!found) return null;
+  if (found.paymentStatus === 'SUCCESS' || found.orderStatus === 'CANCELLED' || found.orderStatus === 'COMPLETED') return null;
+  return found;
+}
+
+/** Brings an open order's lines and totals in line with the cart, and flags it for cloud sync. */
+function syncOrderToCart(order: Order, cart: Cart): void {
+  order.items = cartLinesToOrderItems(cart.items, order.items).map((it) => ({ ...it, orderId: order.id }));
+  order.subtotal = cart.subtotal;
+  order.discountAmount = cart.discountAmount;
+  order.cgstAmount = cart.cgstAmount;
+  order.sgstAmount = cart.sgstAmount;
+  order.taxAmount = cart.taxAmount;
+  order.totalAmount = cart.totalPayable;
+  order.updatedAt = new Date().toISOString();
+  order.syncStatus = 'SAVED_LOCALLY';
+  order.isSynced = false;
+  // BUG-044: items added to a running order after the first KOT were never deducted from
+  // stock (only order creation deducted). Reconcile consumes just the new/increased quantity.
+  InventoryRepository.reconcileOrder(order);
+}
+
 export const usePosStore = create<PosState>((set, get) => {
   // Check for auto-saved crash recovery draft on store initialization
   const initialDraft = PosRecoveryService.loadDraft();
@@ -331,6 +397,7 @@ export const usePosStore = create<PosState>((set, get) => {
     discountReason: '',
     discountCode: '',
     orderNotes: '',
+    runningOrderId: null,
     recoverableDraft: initialDraft,
 
     customizingItem: null,
@@ -374,9 +441,8 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     loginWithPin: (pin: string) => {
-      const user = (db.users as (User & { pinCode?: string })[]).find(
-        (u) => u.pinCode === pin && u.isActive
-      );
+      const result = StaffRepository.verifyPin(pin);
+      const user = result?.user;
 
       if (user) {
         // Persist session to localStorage (no PIN stored)
@@ -384,7 +450,7 @@ export const usePosStore = create<PosState>((set, get) => {
           userId: user.id,
           fullName: user.fullName,
           roleId: user.roleId,
-          restaurantId: 'restaurant-main',
+          restaurantId: user.restaurantId || db.restaurant.id,
           terminalId: get().posTerminalId,
           activeTab: get().activeTab
         });
@@ -434,10 +500,8 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     unlockTerminal: (pin: string) => {
-      const user = (db.users as (User & { pinCode?: string })[]).find(
-        (u) => u.pinCode === pin && u.isActive
-      );
-      if (user) {
+      const result = StaffRepository.verifyPin(pin);
+      if (result) {
         set({ isLocked: false });
         return true;
       }
@@ -922,7 +986,8 @@ export const usePosStore = create<PosState>((set, get) => {
         discountValue: 0,
         discountReason: '',
         discountCode: '',
-        orderNotes: ''
+        orderNotes: '',
+        runningOrderId: null
       });
       PosRecoveryService.clearDraft();
     },
@@ -930,6 +995,9 @@ export const usePosStore = create<PosState>((set, get) => {
     holdCurrentOrder: (label?: string) => {
       const state = get();
       if (state.cart.items.length === 0) return false;
+      // A cart that is already running in the kitchen cannot be parked - it would
+      // lose its link to the order and be sent (and billed) a second time.
+      if (findRunningOrder(state)) return false;
 
       HeldOrderRepository.holdOrder({
         label: label || (state.selectedTable ? `Table #${state.selectedTable.tableNumber}` : `Takeaway #${Date.now().toString().slice(-4)}`),
@@ -969,34 +1037,30 @@ export const usePosStore = create<PosState>((set, get) => {
       const state = get();
       if (state.cart.items.length === 0) return null;
 
-      // 1. Create or ensure Order Record in DB
-      let existingOrder = state.selectedTable?.currentOrderId
-        ? OrderRepository.getOrderById(state.selectedTable.currentOrderId)
-        : null;
+      // Only what has not been sent yet goes to the kitchen. Once everything is
+      // sent there is nothing to do - this used to create a duplicate order and
+      // a duplicate kitchen ticket on every press.
+      const linkedItems = linkCartItems(state.cart.items);
+      const unsent = linkedItems
+        .map((ci) => ({ ci, qty: ci.quantity - (ci.kotSentQty || 0) }))
+        .filter((x) => x.qty > 0);
+      if (unsent.length === 0) return null;
 
-      if (!existingOrder) {
-        const orderItems = state.cart.items.map((ci, idx) => ({
-          id: `oi-${Date.now()}-${idx}`,
-          orderId: '',
-          menuItemId: ci.menuItemId,
-          name: ci.item.name,
-          sku: ci.item.sku,
-          quantity: ci.quantity,
-          unitPrice: ci.unitPrice,
-          modifiers: ci.selectedModifiers,
-          specialInstructions: ci.specialInstructions,
-          totalPrice: ci.itemTotal,
-          kitchenStatus: 'PREPARING' as const
-        }));
+      const linkedCart: Cart = { ...state.cart, items: linkedItems };
 
-        existingOrder = OrderRepository.createOrder({
+      // 1. Create the running order, or add the new items to the existing one
+      let order = findRunningOrder(state);
+
+      if (!order) {
+        order = OrderRepository.createOrder({
           orderType: state.orderType,
+          cashierName: state.currentUser?.fullName || 'Cashier',
           tableId: state.selectedTable?.id,
           tableNumber: state.selectedTable?.tableNumber,
           guestCount: state.guestCount,
           customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone,
           customerName: state.selectedCustomer?.name || state.deliveryDetails.name,
-          items: orderItems,
+          items: cartLinesToOrderItems(linkedItems),
           subtotal: state.cart.subtotal,
           discountAmount: state.cart.discountAmount,
           cgstAmount: state.cart.cgstAmount,
@@ -1011,17 +1075,20 @@ export const usePosStore = create<PosState>((set, get) => {
         });
 
         if (state.selectedTable) {
-          state.selectedTable.currentOrderId = existingOrder.id;
+          state.selectedTable.currentOrderId = order.id;
           state.selectedTable.status = 'OCCUPIED';
         }
+      } else {
+        syncOrderToCart(order, linkedCart);
+        db.notify();
       }
 
-      // 2. Generate KOT Record(s) with Kitchen Station Routing
-      const kotItems = state.cart.items.map((ci, idx) => ({
+      // 2. Generate KOT record(s) for the NEW items only, routed by kitchen station
+      const kotItems = unsent.map(({ ci, qty }, idx) => ({
         id: `koti-${Date.now()}-${idx}`,
         menuItemId: ci.menuItemId,
         name: ci.item.name,
-        quantity: ci.quantity,
+        quantity: qty,
         modifiers: ci.selectedModifiers,
         specialInstructions: ci.specialInstructions,
         kitchenStation: ci.item.kitchenStation || 'Main Kitchen',
@@ -1029,9 +1096,9 @@ export const usePosStore = create<PosState>((set, get) => {
       }));
 
       const kots = KOTRepository.generateKOT({
-        orderId: existingOrder.id,
-        orderNumber: existingOrder.orderNumber,
-        tokenNumber: existingOrder.tokenNumber,
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        tokenNumber: order.tokenNumber,
         tableNumber: state.selectedTable?.tableNumber,
         orderType: state.orderType,
         items: kotItems,
@@ -1045,7 +1112,7 @@ export const usePosStore = create<PosState>((set, get) => {
       });
 
       // Real-time broadcast to Captain, Admin and KDS
-      lanMeshSync.broadcast('ORDER_CREATED', existingOrder);
+      lanMeshSync.broadcast('ORDER_CREATED', order);
       lanMeshSync.broadcast('KOT_CREATED', kots);
       lanMeshSync.broadcast('TABLE_STATUS_CHANGED', {
         tableNumber: state.selectedTable?.tableNumber,
@@ -1053,17 +1120,34 @@ export const usePosStore = create<PosState>((set, get) => {
         guestCount: state.guestCount
       });
 
+      // 4. The cart is now a running order: everything in it counts as sent
+      set({
+        runningOrderId: order.id,
+        cart: { ...linkedCart, items: linkedItems.map((ci) => ({ ...ci, kotSentQty: ci.quantity })) }
+      });
+
+      // Push to the cloud right away so KDS / Restaurant Admin see it in seconds.
+      SyncOutboxEngine.flush();
+
       return kots;
     },
 
-    completePayment: (method: PaymentMethod, tenderedAmount?: number, transactionId?: string) => {
+    completePayment: (method: PaymentMethod, tenderedAmount?: number, transactionId?: string, splits?: PaymentSplit[]) => {
       const state = get();
       if (state.cart.items.length === 0) return null;
 
-      // 1. Create Order if not already created
-      let order = state.selectedTable?.currentOrderId
-        ? OrderRepository.getOrderById(state.selectedTable.currentOrderId)
-        : null;
+      // 1. Settle the running order if there is one (items added after the KOT
+      // are sent to the kitchen first, so nothing that is paid for is missed).
+      const running = findRunningOrder(state);
+      if (running) {
+        const hasUnsent = state.cart.items.some((ci) => ci.quantity - (ci.kotSentQty || 0) > 0);
+        if (hasUnsent) get().sendKOT();
+      }
+      const afterSend = get();
+      let order = findRunningOrder(afterSend);
+      if (order) {
+        syncOrderToCart(order, afterSend.cart);
+      }
 
       if (!order) {
         const orderItems = state.cart.items.map((ci, idx) => ({
@@ -1085,6 +1169,7 @@ export const usePosStore = create<PosState>((set, get) => {
 
         order = OrderRepository.createOrder({
           orderType: state.orderType,
+          cashierName: state.currentUser?.fullName || 'Cashier',
           tableId: state.selectedTable?.id,
           tableNumber: state.selectedTable?.tableNumber,
           guestCount: state.guestCount,
@@ -1117,7 +1202,8 @@ export const usePosStore = create<PosState>((set, get) => {
         method,
         tenderedAmount,
         transactionId,
-        state.currentUser?.fullName || 'Cashier'
+        state.currentUser?.fullName || 'Cashier',
+        splits
       );
 
       // 3. Save receipt record & dispatch thermal print job to Print Queue
@@ -1159,6 +1245,7 @@ export const usePosStore = create<PosState>((set, get) => {
         });
 
         get().clearCart();
+        SyncOutboxEngine.flush();
       }
 
       return settled;
@@ -1227,7 +1314,9 @@ export const usePosStore = create<PosState>((set, get) => {
           unitPrice: oi.unitPrice,
           selectedModifiers: oi.modifiers || [],
           specialInstructions: oi.specialInstructions,
-          itemTotal: oi.totalPrice
+          itemTotal: oi.totalPrice,
+          orderItemId: oi.id,
+          kotSentQty: oi.quantity
         };
       });
 
@@ -1569,3 +1658,15 @@ export const usePosStore = create<PosState>((set, get) => {
     }
   };
 });
+
+// BUG-033: sending a KOT or settling a bill notifies the database around ten times (order, receipt,
+// print job, audit log, cash drawer...). Each action runs as one batch, so the local database is saved,
+// pushed and announced once per action instead of once per step.
+{
+  const actions = usePosStore.getState();
+  usePosStore.setState({
+    sendKOT: () => db.batch(() => actions.sendKOT()),
+    completePayment: (...args: Parameters<typeof actions.completePayment>) => db.batch(() => actions.completePayment(...args)),
+    executeInstantBill: (...args: Parameters<typeof actions.executeInstantBill>) => db.batch(() => actions.executeInstantBill(...args))
+  });
+}

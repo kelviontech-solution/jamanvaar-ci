@@ -1,9 +1,10 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PlatformUserStatus } from '@prisma/client';
 import { Request } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
+import { areaForPath, canAccess, PlatformRoleName } from '../rbac/access';
 import {
   PLATFORM_JWT_AUDIENCE,
   PLATFORM_JWT_ISSUER,
@@ -21,6 +22,8 @@ import {
  */
 @Injectable()
 export class PlatformAuthGuard implements CanActivate {
+  private readonly logger = new Logger(PlatformAuthGuard.name);
+
   constructor(
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
@@ -51,7 +54,29 @@ export class PlatformAuthGuard implements CanActivate {
       throw new UnauthorizedException('Invalid token');
     }
 
-    (request as Request & { platformUser: typeof user }).platformUser = user;
+    // A session that was revoked, logged out, or ended by a password change is refused at
+    // once - its access token would otherwise stay valid for up to 15 minutes.
+    if (payload.sid) {
+      const ended = await this.prisma.platformRefreshToken.findFirst({
+        where: { sessionId: payload.sid, terminatedAt: { not: null } },
+        select: { id: true }
+      });
+      if (ended) {
+        throw new UnauthorizedException({ statusCode: 401, message: 'This session was signed out.', code: 'SESSION_REVOKED' });
+      }
+    }
+
+    // Authorisation: the token proves who the caller is; the role decides what
+    // they may do. Deny by default - every platform endpoint belongs to an
+    // area and each role is granted only its areas (see common/rbac/access.ts).
+    const area = areaForPath(request.originalUrl ?? request.url ?? '');
+    if (!canAccess(user.role as PlatformRoleName, area, request.method)) {
+      this.logger.warn(`Denied ${request.method} ${request.originalUrl} for ${user.email} (${user.role}, area ${area ?? 'unmapped'})`);
+      throw new ForbiddenException('Your role does not have access to this area');
+    }
+
+    (request as Request & { platformUser: typeof user; platformSessionId?: string }).platformUser = user;
+    (request as Request & { platformSessionId?: string }).platformSessionId = payload.sid;
     return true;
   }
 

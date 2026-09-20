@@ -120,6 +120,37 @@ const menuVersions: MenuVersionSnapshot[] = [
 
 let isMenuInDraft = false;
 
+/** Splits one CSV line into fields, honouring double-quoted fields and `""`-escaped quotes. */
+function parseCsvLine(line: string): string[] {
+  const fields: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        current += ch;
+      }
+    } else if (ch === '"') {
+      inQuotes = true;
+    } else if (ch === ',') {
+      fields.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  fields.push(current);
+  return fields;
+}
+
 /**
  * Returns a normalized canonical category identifier for semantic grouping
  * (e.g. "Main Course (Curries)" -> "MAIN_COURSE", "Curries & Gravies" -> "MAIN_COURSE")
@@ -821,7 +852,7 @@ export class MenuBuilderService {
   public static exportJSON(): string {
     const data = {
       exportedAt: new Date().toISOString(),
-      restaurant: 'JAMANVAAR Restaurant',
+      restaurant: db.restaurant.name || '',
       version: menuVersions[0]?.versionTag || 'v1.0',
       categories: db.categories,
       menuItems: db.menuItems,
@@ -851,6 +882,128 @@ export class MenuBuilderService {
     });
 
     return [headers.join(','), ...rows].join('\n');
+  }
+
+  /**
+   * BUG-014: Restaurant Admin (and Super Admin, on the restaurant's behalf) had CSV export
+   * but no import — a restaurant's menu could never actually come from a CSV file. Reads
+   * exactly the columns `exportCSV()` writes, validates every row and reports bad ones by
+   * row number instead of aborting the whole file, resolves categories by name (creating
+   * one if it doesn't exist, matching `matchExistingCategory`'s fuzzy rules otherwise), and
+   * a duplicate (same SKU within the same category) is handled per `duplicateStrategy`.
+   */
+  public static importCSV(
+    csvText: string,
+    duplicateStrategy: 'KEEP_EXISTING' | 'REPLACE_DUPLICATE' | 'IMPORT_AS_NEW' | 'SKIP_DUPLICATE' = 'KEEP_EXISTING'
+  ): { itemsImported: number; itemsSkipped: number; categoriesCreated: number; errors: Array<{ row: number; message: string }> } {
+    const CSV_HEADERS = ['Category', 'Item Name', 'SKU', 'Price', 'Dietary Type', 'Spice Level', 'Description', 'Image URL'];
+    const VALID_DIETARY: DietaryType[] = ['VEG', 'NON_VEG', 'JAIN', 'VEGAN', 'EGG'];
+    const VALID_SPICE: SpiceLevel[] = ['NONE', 'MILD', 'MEDIUM', 'SPICY', 'EXTRA_SPICY'];
+
+    const result = { itemsImported: 0, itemsSkipped: 0, categoriesCreated: 0, errors: [] as Array<{ row: number; message: string }> };
+    const lines = csvText.split(/\r?\n/).filter((l) => l.trim().length > 0);
+    if (lines.length === 0) {
+      result.errors.push({ row: 1, message: 'The file is empty' });
+      return result;
+    }
+
+    const header = parseCsvLine(lines[0]).map((h) => h.trim().toLowerCase());
+    const isCanonicalHeader = CSV_HEADERS.every((h, i) => header[i] === h.toLowerCase());
+    if (!isCanonicalHeader) {
+      result.errors.push({
+        row: 1,
+        message: `Unrecognised column header. Expected: ${CSV_HEADERS.join(', ')} — download the template from "Export CSV" and edit that.`
+      });
+      return result;
+    }
+
+    for (let i = 1; i < lines.length; i++) {
+      const rowNum = i + 1; // header is row 1, matching what a spreadsheet shows
+      const [catName, name, sku, priceStr, dietaryRaw, spiceRaw, description, imageUrl] = parseCsvLine(lines[i]);
+
+      if (!name || !name.trim()) {
+        result.errors.push({ row: rowNum, message: 'Item Name is required' });
+        continue;
+      }
+      if (!catName || !catName.trim()) {
+        result.errors.push({ row: rowNum, message: 'Category is required' });
+        continue;
+      }
+      const price = Number(priceStr);
+      if (!priceStr || Number.isNaN(price) || price < 0) {
+        result.errors.push({ row: rowNum, message: `Price "${priceStr ?? ''}" is not a valid non-negative number` });
+        continue;
+      }
+      const dietaryType = (dietaryRaw || 'VEG').trim().toUpperCase() as DietaryType;
+      if (!VALID_DIETARY.includes(dietaryType)) {
+        result.errors.push({ row: rowNum, message: `Dietary Type "${dietaryRaw ?? ''}" must be one of ${VALID_DIETARY.join(', ')}` });
+        continue;
+      }
+      const spiceCandidate = (spiceRaw || 'NONE').trim().toUpperCase() as SpiceLevel;
+      const spiceLevel = VALID_SPICE.includes(spiceCandidate) ? spiceCandidate : 'NONE';
+
+      let category = matchExistingCategory(catName, db.categories);
+      if (!category) {
+        category = {
+          id: generateUUID(),
+          name: catName.trim(),
+          slug: catName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'category',
+          sortOrder: db.categories.length,
+          isActive: true
+        };
+        db.categories.push(category);
+        result.categoriesCreated++;
+      }
+
+      const skuTrimmed = sku?.trim();
+      const existingIdx = skuTrimmed
+        ? db.menuItems.findIndex((it) => it.sku === skuTrimmed && it.categoryId === category!.id)
+        : -1;
+
+      if (existingIdx >= 0 && duplicateStrategy !== 'IMPORT_AS_NEW') {
+        if (duplicateStrategy === 'REPLACE_DUPLICATE') {
+          db.menuItems[existingIdx] = {
+            ...db.menuItems[existingIdx],
+            name: name.trim(),
+            price,
+            dietaryType,
+            spiceLevel,
+            description: description?.trim() || '',
+            imageUrl: imageUrl?.trim() || undefined
+          };
+          result.itemsImported++;
+        } else {
+          // KEEP_EXISTING / SKIP_DUPLICATE
+          result.itemsSkipped++;
+        }
+        continue;
+      }
+
+      const newItem: MenuItem = {
+        id: generateUUID(),
+        categoryId: category.id,
+        sku: existingIdx >= 0 ? `${skuTrimmed}-${generateUUID().slice(0, 6)}` : skuTrimmed || generateUUID(),
+        name: name.trim(),
+        description: description?.trim() || '',
+        price,
+        dietaryType,
+        spiceLevel,
+        isPopular: false,
+        isNew: true,
+        isFeatured: false,
+        isAvailable: true,
+        prepTimeMinutes: 10,
+        allergens: [],
+        modifierGroupIds: [],
+        sortOrder: db.menuItems.length,
+        imageUrl: imageUrl?.trim() || undefined
+      };
+      db.menuItems.push(newItem);
+      result.itemsImported++;
+    }
+
+    db.notify();
+    return result;
   }
 
   /**

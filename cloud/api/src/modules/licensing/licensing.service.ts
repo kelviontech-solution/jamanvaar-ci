@@ -11,6 +11,8 @@ export interface LicenseCertificatePayload {
   entitlements: Record<string, unknown>;
   expiresAt: string;
   issuedAt: string;
+  /** The id of the signing key, so keys can be rotated (BUG-076). */
+  kid: string;
 }
 
 export interface IssuedLicenseCertificate {
@@ -86,7 +88,8 @@ export class LicensingService {
         tier: subscription.plan.tier,
         entitlements: subscription.plan.entitlements as Record<string, unknown>,
         expiresAt: subscription.expiresAt.toISOString(),
-        issuedAt: new Date().toISOString()
+        issuedAt: new Date().toISOString(),
+        kid: this.config.get<string>('LICENSE_SIGNING_KEY_ID') || 'k1'
       };
 
       const payloadJson = JSON.stringify(payload);

@@ -242,14 +242,14 @@ export class DayOrdersService {
       }
 
       // Cashier breakdown
-      const cashier = o.cashierName || 'Amit Dave';
+      const cashier = o.cashierName || 'Unassigned cashier';
       const cStat = cashierMap.get(cashier) || { ordersCount: 0, sales: 0 };
       cStat.ordersCount++;
       cStat.sales += o.totalAmount;
       cashierMap.set(cashier, cStat);
 
       // Captain breakdown
-      const captain = o.captainName || (o.tableNumber ? 'Rahul Sharma' : undefined);
+      const captain = o.captainName || (o.tableNumber ? 'Unassigned captain' : undefined);
       if (captain) {
         const captStat = captainMap.get(captain) || { ordersCount: 0, tables: new Set<string>(), sales: 0 };
         captStat.ordersCount++;

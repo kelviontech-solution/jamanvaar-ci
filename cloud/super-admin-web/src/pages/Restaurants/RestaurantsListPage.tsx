@@ -1,3 +1,5 @@
+// Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
+import { copyText } from '../../../../../packages/utils/src/clipboard';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
@@ -117,9 +119,9 @@ export function RestaurantsListPage() {
     }
   };
 
-  const handleCopyId = (e: React.MouseEvent, id: string) => {
+  const handleCopyId = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(id);
+    if (!(await copyText(id))) return;
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };

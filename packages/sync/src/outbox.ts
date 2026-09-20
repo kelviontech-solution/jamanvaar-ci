@@ -1,16 +1,48 @@
-import { SyncEvent, SyncEventType, Order, OrderItem } from '@jamanvaar/types';
-import { generateUUID } from '@jamanvaar/utils';
-import { db, KOTRepository } from '@jamanvaar/database';
+import { SyncEvent, SyncEventType, Order, OrderItem, PaymentSplit } from '@jamanvaar/types';
+import { generateUUID, splitTaxPaise } from '@jamanvaar/utils';
+import { db, KOTRepository, BusinessDayRepository } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
+
+/** Money crosses the wire in paise (integers), matching cloud/api's schema. */
+const toPaise = (rupees: number | undefined | null): number => Math.round((Number(rupees) || 0) * 100);
+const fromPaise = (paise: number | undefined | null): number => Math.round(Number(paise) || 0) / 100;
 
 export interface OrderSyncPushItem {
   externalItemId: string;
+  menuItemId?: string;
   name: string;
   quantity: number;
+  /** paise */
   unitPrice: number;
   modifiers: string[];
+  /** Full modifier lines so the kitchen ticket can be rebuilt exactly (price in paise). */
+  modifierDetails?: Array<{ optionName: string; priceDelta: number }>;
   kitchenStatus?: string;
+  kitchenStation?: string;
+  specialInstructions?: string;
+  /** paise */
   lineTotal: number;
+}
+
+export interface OrderSyncMeta {
+  orderNumber?: string;
+  tokenNumber?: string;
+  cashierName?: string;
+  captainName?: string;
+  customerName?: string;
+  customerPhone?: string;
+  guestCount?: number;
+  createdAt?: string;
+  sourceType?: string;
+  businessDayId?: string;
+  paymentTransactionId?: string;
+  tenderedAmountPaise?: number;
+  paymentSplits?: Array<{ method: string; amountPaise: number }>;
+  cgstPaise?: number;
+  sgstPaise?: number;
+  roundOffPaise?: number;
+  serviceChargePaise?: number;
+  tipPaise?: number;
 }
 
 export interface OrderSyncPushEvent {
@@ -20,11 +52,15 @@ export interface OrderSyncPushEvent {
   tableId?: string;
   tableLabel?: string;
   items: OrderSyncPushItem[];
+  /** paise */
   subtotal: number;
   taxAmount: number;
   discountAmount: number;
   totalAmount: number;
   notes?: string;
+  paymentStatus?: string;
+  paymentMethod?: string;
+  meta?: OrderSyncMeta;
   updatedAt: string;
 }
 
@@ -47,6 +83,9 @@ export interface CloudSyncedOrder {
   discountAmount: number;
   totalAmount: number;
   notes?: string | null;
+  paymentStatus?: string | null;
+  paymentMethod?: string | null;
+  meta?: OrderSyncMeta | null;
   updatedAt: string;
 }
 
@@ -90,67 +129,138 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
     tableLabel: order.tableNumber,
     items: order.items.map((it) => ({
       externalItemId: it.id,
+      menuItemId: it.menuItemId,
       name: it.name,
       quantity: it.quantity,
-      unitPrice: Math.round(it.unitPrice),
+      unitPrice: toPaise(it.unitPrice),
       modifiers: (it.modifiers || []).map((m) => m.optionName),
+      modifierDetails: (it.modifiers || []).map((m) => ({ optionName: m.optionName, priceDelta: toPaise(m.priceDelta) })),
       kitchenStatus: it.kitchenStatus,
-      lineTotal: Math.round(it.totalPrice)
+      kitchenStation: db.menuItems.find((m) => m.id === it.menuItemId)?.kitchenStation,
+      specialInstructions: it.specialInstructions,
+      lineTotal: toPaise(it.totalPrice)
     })),
-    subtotal: Math.round(order.subtotal),
-    taxAmount: Math.round(order.taxAmount),
-    discountAmount: Math.round(order.discountAmount || 0),
-    totalAmount: Math.round(order.totalAmount),
+    subtotal: toPaise(order.subtotal),
+    taxAmount: toPaise(order.taxAmount),
+    discountAmount: toPaise(order.discountAmount),
+    totalAmount: toPaise(order.totalAmount),
     notes: order.customerNotes,
+    paymentStatus: order.paymentStatus,
+    paymentMethod: order.paymentMethod,
+    meta: {
+      orderNumber: order.orderNumber,
+      tokenNumber: order.tokenNumber,
+      cashierName: order.cashierName,
+      captainName: order.captainName,
+      customerName: order.customerName,
+      customerPhone: order.customerPhone,
+      guestCount: order.guestCount,
+      createdAt: order.createdAt,
+      sourceType: order.source_type,
+      businessDayId: order.businessDayId,
+      paymentTransactionId: order.paymentTransactionId,
+      tenderedAmountPaise: order.tenderedAmount !== undefined ? toPaise(order.tenderedAmount) : undefined,
+      paymentSplits: order.paymentSplits?.map((l) => ({ method: l.method, amountPaise: toPaise(l.amount) })),
+      cgstPaise: toPaise(order.cgstAmount),
+      sgstPaise: toPaise(order.sgstAmount),
+      roundOffPaise: toPaise(order.roundOffAmount),
+      serviceChargePaise: toPaise(order.serviceChargeAmount),
+      tipPaise: toPaise(order.tipAmount)
+    },
     updatedAt: order.updatedAt
   };
 }
 
-/** Merges a remote copy into an order this device already has locally. */
-function applyRemoteToLocalOrder(local: Order, remote: CloudSyncedOrder): void {
+function orderItemFromRemote(orderId: string, ri: OrderSyncPushItem): OrderItem {
+  const details = ri.modifierDetails && ri.modifierDetails.length > 0
+    ? ri.modifierDetails
+    : (ri.modifiers || []).map((name) => ({ optionName: name, priceDelta: 0 }));
+  return {
+    id: ri.externalItemId,
+    orderId,
+    menuItemId: ri.menuItemId || ri.externalItemId,
+    name: ri.name,
+    sku: ri.menuItemId || ri.externalItemId,
+    quantity: ri.quantity,
+    unitPrice: fromPaise(ri.unitPrice),
+    modifiers: details.map((d, i) => ({
+      groupId: `remote-${i}`,
+      optionId: `remote-${i}`,
+      optionName: d.optionName,
+      priceDelta: fromPaise(d.priceDelta)
+    })) as OrderItem['modifiers'],
+    specialInstructions: ri.specialInstructions,
+    totalPrice: fromPaise(ri.lineTotal),
+    kitchenStatus: (ri.kitchenStatus as OrderItem['kitchenStatus']) || 'PENDING'
+  };
+}
+
+function applyPaymentAndTotals(local: Order, remote: CloudSyncedOrder): void {
   local.orderStatus = remote.status as Order['orderStatus'];
-  local.totalAmount = remote.totalAmount;
-  local.subtotal = remote.subtotal;
-  local.taxAmount = remote.taxAmount;
-  local.discountAmount = remote.discountAmount;
+  local.totalAmount = fromPaise(remote.totalAmount);
+  local.subtotal = fromPaise(remote.subtotal);
+  local.taxAmount = fromPaise(remote.taxAmount);
+  local.discountAmount = fromPaise(remote.discountAmount);
   local.updatedAt = remote.updatedAt;
-  // Item-level kitchenStatus is the field another device (KDS marking
-  // PREPARING/READY, Captain marking SERVED) is actually changing — merge
-  // just that in rather than overwriting pricing/quantity this device
-  // already has correct.
+  if (remote.paymentStatus) local.paymentStatus = remote.paymentStatus as Order['paymentStatus'];
+  if (remote.paymentMethod) local.paymentMethod = remote.paymentMethod as Order['paymentMethod'];
+  const m = remote.meta;
+  if (m) {
+    if (m.paymentSplits && m.paymentSplits.length > 0) {
+      local.paymentSplits = m.paymentSplits.map((l) => ({
+        method: l.method as PaymentSplit['method'],
+        amount: fromPaise(l.amountPaise)
+      }));
+    }
+    if (m.tenderedAmountPaise !== undefined) local.tenderedAmount = fromPaise(m.tenderedAmountPaise);
+    if (m.paymentTransactionId) local.paymentTransactionId = m.paymentTransactionId;
+    if (m.cgstPaise !== undefined) local.cgstAmount = fromPaise(m.cgstPaise);
+    if (m.sgstPaise !== undefined) local.sgstAmount = fromPaise(m.sgstPaise);
+    if (m.roundOffPaise !== undefined) local.roundOffAmount = fromPaise(m.roundOffPaise);
+  }
+}
+
+/** Merges a remote copy into an order this device already has locally. Returns true if items were added. */
+function applyRemoteToLocalOrder(local: Order, remote: CloudSyncedOrder): boolean {
+  applyPaymentAndTotals(local, remote);
+  let addedItems = false;
   remote.items.forEach((ri) => {
     const li = local.items.find((i) => i.id === ri.externalItemId);
-    if (li && ri.kitchenStatus) li.kitchenStatus = ri.kitchenStatus as OrderItem['kitchenStatus'];
+    if (li) {
+      // Item-level kitchenStatus is what another device (KDS marking
+      // PREPARING/READY, Captain marking SERVED) is actually changing.
+      if (ri.kitchenStatus) li.kitchenStatus = ri.kitchenStatus as OrderItem['kitchenStatus'];
+      if (ri.quantity !== li.quantity) {
+        li.quantity = ri.quantity;
+        li.totalPrice = fromPaise(ri.lineTotal);
+      }
+    } else {
+      // An add-on round: an item the other device added after the first KOT.
+      local.items.push(orderItemFromRemote(local.id, ri));
+      addedItems = true;
+    }
   });
+  return addedItems;
 }
 
 /**
  * Reconstructs a local Order from a cloud mirror for a device that didn't
  * create it (e.g. KDS/Captain pulling an order POS created). Deliberately a
- * read-mirror, not a real order-creation event — it bypasses
+ * read-mirror, not a real order-creation event - it bypasses
  * OrderRepository.createOrder()'s business side effects (inventory
  * deduction, shift totals, business-day metrics) since only the originating
  * device should book those once.
  */
 function buildLocalOrderFromRemote(remote: CloudSyncedOrder): Order {
+  const m = remote.meta || {};
   const nowIso = remote.updatedAt || new Date().toISOString();
-  const items: OrderItem[] = remote.items.map((ri) => ({
-    id: ri.externalItemId,
-    orderId: remote.externalOrderId,
-    menuItemId: ri.externalItemId,
-    name: ri.name,
-    sku: ri.externalItemId,
-    quantity: ri.quantity,
-    unitPrice: ri.unitPrice,
-    modifiers: [],
-    totalPrice: ri.lineTotal,
-    kitchenStatus: (ri.kitchenStatus as OrderItem['kitchenStatus']) || 'PENDING'
-  }));
+  const items: OrderItem[] = remote.items.map((ri) => orderItemFromRemote(remote.externalOrderId, ri));
 
-  return {
+  const order: Order = {
     id: remote.externalOrderId,
-    orderNumber: remote.externalOrderId,
-    tokenNumber: remote.externalOrderId.slice(-4).toUpperCase(),
+    orderNumber: m.orderNumber || remote.externalOrderId,
+    tokenNumber: m.tokenNumber || remote.externalOrderId.slice(-4).toUpperCase(),
+    businessDayId: m.businessDayId,
     restaurantId: db.restaurant.id,
     outletId: db.outlet?.id || db.restaurant.id,
     kioskId: 'CLOUD-SYNC',
@@ -159,32 +269,59 @@ function buildLocalOrderFromRemote(remote: CloudSyncedOrder): Order {
     orderType: (remote.orderType as Order['orderType']) || 'DINE_IN',
     tableId: remote.tableId || undefined,
     tableNumber: remote.tableLabel || undefined,
+    guestCount: m.guestCount,
+    customerName: m.customerName,
+    customerPhone: m.customerPhone,
+    cashierName: m.cashierName,
+    captainName: m.captainName,
     items,
-    subtotal: remote.subtotal,
-    discountAmount: remote.discountAmount,
-    cgstAmount: remote.taxAmount / 2,
-    sgstAmount: remote.taxAmount / 2,
-    taxAmount: remote.taxAmount,
-    serviceChargeAmount: 0,
-    tipAmount: 0,
-    roundOffAmount: 0,
-    totalAmount: remote.totalAmount,
-    paymentMethod: 'CASH_AT_COUNTER',
-    paymentStatus: 'PENDING',
+    subtotal: fromPaise(remote.subtotal),
+    discountAmount: fromPaise(remote.discountAmount),
+    cgstAmount: m.cgstPaise !== undefined ? fromPaise(m.cgstPaise) : fromPaise(splitTaxPaise(remote.taxAmount).cgst),
+    sgstAmount: m.sgstPaise !== undefined ? fromPaise(m.sgstPaise) : fromPaise(splitTaxPaise(remote.taxAmount).sgst),
+    taxAmount: fromPaise(remote.taxAmount),
+    serviceChargeAmount: fromPaise(m.serviceChargePaise),
+    tipAmount: fromPaise(m.tipPaise),
+    roundOffAmount: fromPaise(m.roundOffPaise),
+    totalAmount: fromPaise(remote.totalAmount),
+    paymentMethod: (remote.paymentMethod as Order['paymentMethod']) || 'CASH_AT_COUNTER',
+    paymentStatus: (remote.paymentStatus as Order['paymentStatus']) || 'PENDING',
     orderStatus: (remote.status as Order['orderStatus']) || 'NEW',
     estimatedWaitMinutes: 15,
-    createdAt: nowIso,
+    createdAt: m.createdAt || nowIso,
     updatedAt: nowIso,
-    source_type: 'OTHER',
+    source_type: ((m.sourceType as Order['source_type']) || 'OTHER'),
+    customerNotes: remote.notes || undefined,
     syncStatus: 'SYNCED',
     isSynced: true
   };
+  applyPaymentAndTotals(order, remote);
+  return order;
 }
 
-/** Gives a pulled-in order a kitchen ticket if it doesn't have one yet — otherwise a KDS that only just caught up would show the order without anything to prepare against. */
-function ensureKotForOrder(order: Order): void {
-  const alreadyHasKot = db.kots.some((k) => k.orderId === order.id);
-  if (alreadyHasKot || order.items.length === 0) return;
+/**
+ * Gives a pulled-in order the kitchen tickets it is missing. Quantity already
+ * covered by an existing ticket is skipped, so a follow-up round (extra items
+ * or extra quantity added after the first KOT) produces a ticket for just the
+ * new part. Orders that are already finished never get prep tickets.
+ */
+function ensureKotsForOrder(order: Order): void {
+  if (['COMPLETED', 'CANCELLED', 'REFUNDED'].includes(order.orderStatus)) return;
+
+  const covered = new Map<string, number>();
+  db.kots
+    .filter((k) => k.orderId === order.id)
+    .forEach((k) => k.items.forEach((i) => covered.set(i.menuItemId, (covered.get(i.menuItemId) || 0) + i.quantity)));
+
+  const missing = order.items
+    .map((it) => {
+      const already = covered.get(it.menuItemId) || 0;
+      const take = Math.min(already, it.quantity);
+      covered.set(it.menuItemId, already - take);
+      return { it, qty: it.quantity - take };
+    })
+    .filter((x) => x.qty > 0);
+  if (missing.length === 0) return;
 
   KOTRepository.generateKOT({
     orderId: order.id,
@@ -192,20 +329,23 @@ function ensureKotForOrder(order: Order): void {
     tokenNumber: order.tokenNumber,
     tableNumber: order.tableNumber,
     orderType: order.orderType,
-    items: order.items.map((it) => ({
-      id: it.id,
+    items: missing.map(({ it, qty }) => ({
+      id: `${it.id}-r${Date.now()}`,
       menuItemId: it.menuItemId,
       name: it.name,
-      quantity: it.quantity,
+      quantity: qty,
       modifiers: it.modifiers,
       specialInstructions: it.specialInstructions,
-      // This device hasn't necessarily synced the originating device's menu
-      // catalog (menu sync is a later phase), so the item's real kitchen
-      // station can't be resolved here — it routes to Main Kitchen until it can.
-      kitchenStation: 'Main Kitchen',
+      // The station travels with the item; fall back to this device's own
+      // menu, and only then to the main kitchen.
+      kitchenStation:
+        (it as OrderItem & { kitchenStation?: string }).kitchenStation ||
+        db.menuItems.find((mi) => mi.id === it.menuItemId)?.kitchenStation ||
+        'Main Kitchen',
       status: it.kitchenStatus || 'PENDING'
     })),
-    cashierName: 'Cloud Sync'
+    cashierName: order.cashierName || 'Cloud Sync',
+    orderNotes: order.customerNotes
   });
 }
 
@@ -236,6 +376,12 @@ export class SyncOutboxEngine {
         wasOnline = isOnlineNow;
       });
     }
+  }
+
+  /** Push pending orders right now (used after Send KOT / payment) instead of waiting for the next timer tick. */
+  public static flush(): void {
+    if (!this.transport) return;
+    void this.processOutbox();
   }
 
   public static queueEvent(eventType: SyncEventType, payload: any, kioskId: string = 'KIOSK-01'): SyncEvent {
@@ -355,20 +501,32 @@ export class SyncOutboxEngine {
 
     try {
       const { orders, serverTime } = await this.transport.pull(since);
+      const touchedDays = new Set<string>();
       for (const remote of orders) {
         const existing = db.orders.find((o) => o.id === remote.externalOrderId);
         if (existing) {
           if (new Date(remote.updatedAt).getTime() >= new Date(existing.updatedAt).getTime()) {
-            applyRemoteToLocalOrder(existing, remote);
+            const added = applyRemoteToLocalOrder(existing, remote);
+            if (added || remote.status === 'PREPARING' || remote.status === 'NEW') ensureKotsForOrder(existing);
+            if (existing.businessDayId) touchedDays.add(existing.businessDayId);
           }
         } else {
           const localOrder = buildLocalOrderFromRemote(remote);
           db.orders.push(localOrder);
-          ensureKotForOrder(localOrder);
+          ensureKotsForOrder(localOrder);
+          if (localOrder.businessDayId) touchedDays.add(localOrder.businessDayId);
           created++;
         }
         pulled++;
       }
+      // Keep this device's own day totals in step with the orders it just received.
+      touchedDays.forEach((dayId) => {
+        try {
+          BusinessDayRepository.recalculateMetrics(dayId);
+        } catch {
+          // The day may not exist on this device yet; its totals build up when it does.
+        }
+      });
       safeSet(CATCH_UP_CURSOR_KEY, serverTime);
       if (pulled > 0) db.notify();
     } catch {

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
-import { api, setAccessToken } from '../api/client';
+import { api, setAccessToken, onSessionEnded } from '../api/client';
+import { hasAccess, type AccessLevel, type Area, type Permissions } from './access';
 
 export type PlatformRole =
   | 'PLATFORM_OWNER'
@@ -15,12 +16,16 @@ export interface PlatformUser {
   fullName: string;
   role?: PlatformRole;
   status: 'ACTIVE' | 'DISABLED';
+  /** area -> read | write, sent by the API for this user's role */
+  permissions?: Permissions;
 }
 
 interface AuthContextValue {
   user: PlatformUser | null;
   status: 'loading' | 'authenticated' | 'unauthenticated';
   hasPermission: (requiredRole: PlatformRole) => boolean;
+  /** Can the signed-in user open (read) or change (write) this area? */
+  can: (area: Area | null, level?: AccessLevel) => boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -55,9 +60,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setStatus('authenticated');
   }, []);
 
+  // A revoked or expired session must land on the login screen, not leave a page full of errors.
+  useEffect(() => {
+    onSessionEnded(() => {
+      setAccessToken(null);
+      setUser(null);
+      setStatus('unauthenticated');
+    });
+    return () => onSessionEnded(null);
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await api.post('/api/v1/platform-auth/logout');
+    } catch {
+      // The session may already be gone (revoked); signing out locally is what matters.
     } finally {
       setAccessToken(null);
       setUser(null);
@@ -72,7 +89,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return current === requiredRole;
   }, [user]);
 
-  return <AuthContext.Provider value={{ user, status, hasPermission, login, logout }}>{children}</AuthContext.Provider>;
+  const can = useCallback(
+    (area: Area | null, level: AccessLevel = 'read') => hasAccess(user?.permissions, area, level),
+    [user]
+  );
+
+  return <AuthContext.Provider value={{ user, status, hasPermission, can, login, logout }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

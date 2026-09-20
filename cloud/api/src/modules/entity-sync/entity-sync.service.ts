@@ -22,15 +22,31 @@ export class EntitySyncService {
     entityType: SyncableEntityType,
     events: EntitySyncEventDto[]
   ): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
+    return this.pushEventsForRestaurant(device.restaurantId, entityType, events, device.id);
+  }
+
+  /**
+   * The same upsert `pushEvents` does, without requiring a real Device row — used by Super
+   * Admin (BUG-015) to push a restaurant's menu on its behalf. Lands in the identical
+   * SyncedEntity store a device's own push/pull already reads, so nothing about delivery to
+   * terminals has to change: the next entity-sync pull picks it up exactly like a
+   * Restaurant-Admin-pushed menu.
+   */
+  async pushEventsForRestaurant(
+    restaurantId: string,
+    entityType: SyncableEntityType,
+    events: EntitySyncEventDto[],
+    deviceId?: string
+  ): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
     const results: EntitySyncPushResult[] = [];
 
-    await this.prisma.runAsTenant(device.restaurantId, async (tx) => {
+    await this.prisma.runAsTenant(restaurantId, async (tx) => {
       for (const evt of events) {
         try {
           const existing = await tx.syncedEntity.findUnique({
             where: {
               restaurantId_entityType_externalId: {
-                restaurantId: device.restaurantId,
+                restaurantId,
                 entityType,
                 externalId: evt.externalId
               }
@@ -40,12 +56,12 @@ export class EntitySyncService {
           const saved = existing
             ? await tx.syncedEntity.update({
                 where: { id: existing.id },
-                data: { deviceId: device.id, payload: evt.payload as any, syncVersion: existing.syncVersion + 1 }
+                data: { deviceId: deviceId ?? existing.deviceId, payload: evt.payload as any, syncVersion: existing.syncVersion + 1 }
               })
             : await tx.syncedEntity.create({
                 data: {
-                  restaurantId: device.restaurantId,
-                  deviceId: device.id,
+                  restaurantId,
+                  deviceId: deviceId ?? null,
                   entityType,
                   externalId: evt.externalId,
                   payload: evt.payload as any,
@@ -64,9 +80,13 @@ export class EntitySyncService {
   }
 
   async catchUp(device: Device, entityType: SyncableEntityType, since?: string) {
+    return this.catchUpForRestaurant(device.restaurantId, entityType, since);
+  }
+
+  async catchUpForRestaurant(restaurantId: string, entityType: SyncableEntityType, since?: string) {
     const sinceDate = since ? new Date(since) : new Date(Date.now() - CATCH_UP_DEFAULT_LOOKBACK_MS);
 
-    const entities = await this.prisma.runAsTenant(device.restaurantId, (tx) =>
+    const entities = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.syncedEntity.findMany({
         where: { entityType, updatedAt: { gt: sinceDate } },
         orderBy: { updatedAt: 'asc' },

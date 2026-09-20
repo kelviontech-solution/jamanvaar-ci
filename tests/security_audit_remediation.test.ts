@@ -3,7 +3,8 @@ import {
   db,
   QrOrderingRepository,
   LicenseRepository,
-  captainDb
+  captainDb,
+  StaffRepository
 } from '@jamanvaar/database';
 import { EntitlementService } from '@jamanvaar/business';
 
@@ -130,17 +131,20 @@ describe('JAMANVAAR Security Audit Remediation Verification Suite', () => {
   });
 
   describe('3. SEC-006: Captain App Database-backed PIN Authentication', () => {
-    it('should verify registered staff users exist in captain database pool with pinCodes', () => {
-      const users = captainDb.users as (import('@jamanvaar/types').User & { pinCode?: string })[];
-      expect(users.length).toBeGreaterThan(0);
+    it('a real, Restaurant-Admin-issued PIN authenticates against the captain database pool; nothing else does', () => {
+      // BUG-005/006: no seeded demo staff or plaintext PINs any more — a captain's PIN is
+      // issued by StaffRepository (shared with captainDb; see captain_db.ts) and stored hashed.
+      const captain = StaffRepository.createUser({ fullName: 'Test Captain', username: 'testcaptain', roleId: 'role-captain' });
+      expect(captainDb.users.some((u) => u.id === captain.id)).toBe(true);
 
-      const captain = users.find((u) => u.pinCode === '2222');
-      expect(captain).toBeDefined();
-      expect(captain?.fullName).toContain('Captain');
+      const verified = StaffRepository.verifyPin(captain.issuedPin!);
+      expect(verified?.user.id).toBe(captain.id);
 
-      // Random fake PINs like '0000' must not exist in registered staff pool
-      const fakeUser = users.find((u) => u.pinCode === '0000');
-      expect(fakeUser).toBeUndefined();
+      // A random guessed PIN must not authenticate.
+      const guesses = ['0000', '1111', '9999'].filter((g) => g !== captain.issuedPin);
+      for (const guess of guesses) {
+        expect(StaffRepository.verifyPin(guess)).toBeNull();
+      }
     });
   });
 

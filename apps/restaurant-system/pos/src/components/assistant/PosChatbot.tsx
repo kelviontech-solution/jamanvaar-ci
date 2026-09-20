@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import { usePosStore } from "../../store/posStore";
 import { JamanAiAssistantModal } from "@jamanvaar/ui";
+import { reportAiQueryNow } from "../../cloud/cloudClient";
 import { PosAssistantAction } from "@jamanvaar/business";
 
 /**
@@ -47,6 +48,9 @@ export const PosChatbot: React.FC = () => {
       userRole={userRole}
       posContext={activeTab}
       onPerformAction={handlePerformAction}
+      onQueryExecuted={(intent, _query, latencyMs) => {
+        void reportAiQueryNow(intent, latencyMs ?? 0);
+      }}
     />
   );
 };

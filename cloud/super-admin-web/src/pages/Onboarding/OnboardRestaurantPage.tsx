@@ -1,3 +1,7 @@
+import { RESTAURANT_ADMIN_URL, KIOSK_ADMIN_URL } from '../../lib/appUrls';
+// Deep import, not the '@jamanvaar/ui' barrel (see layout/ProtectedLayout.tsx).
+import { printElement } from '../../../../../packages/ui/src/printElement';
+import { useCopied } from '../../components/CopyButton';
 import React, { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
@@ -120,6 +124,8 @@ interface ModulesForm {
   // /subscriptions as `applications`, which creates the ApplicationEntitlement
   // rows every app is gated against (see application-entitlements.service.ts).
   applications: AppCode[];
+  // JAMAN AI for this restaurant (BUG-057): follow the plan, or ON / LOCKED (teaser) / OFF (hidden).
+  aiState?: 'PLAN' | 'ON' | 'LOCKED' | 'OFF';
 }
 
 interface ActivationForm {
@@ -166,7 +172,8 @@ const EMPTY_MODULES: ModulesForm = {
   branchCode: 'MAIN',
   maxBranches: 1,
   maxDevices: 5,
-  applications: []
+  applications: [],
+  aiState: 'PLAN'
 };
 
 // Left empty rather than a fixed guess — the modules step (which knows the
@@ -218,6 +225,17 @@ export function OnboardRestaurantPage() {
   const [details, setDetails] = useState<DetailsForm>(EMPTY_DETAILS);
   const [owner, setOwner] = useState<OwnerForm>(EMPTY_OWNER);
   const [planForm, setPlanForm] = useState<PlanForm>(EMPTY_PLAN);
+  // Platform Settings -> "Default Trial Duration". Not every role can read settings; then 14 days is used.
+  const [trialDefaultDays, setTrialDefaultDays] = useState(14);
+  useEffect(() => {
+    api
+      .get<Array<{ key: string; value: { trialDurationDays?: number } }>>('/api/v1/platform/settings')
+      .then((rows) => {
+        const days = rows.find((r) => r.key === 'platform.defaults')?.value?.trialDurationDays;
+        if (typeof days === 'number' && days > 0) setTrialDefaultDays(days);
+      })
+      .catch(() => {});
+  }, []);
   const [modulesForm, setModulesForm] = useState<ModulesForm>(EMPTY_MODULES);
   const [activationForm, setActivationForm] = useState<ActivationForm>(EMPTY_ACTIVATION);
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -375,14 +393,17 @@ export function OnboardRestaurantPage() {
     }));
   }
 
-  function handleCopy(text: string, label: string) {
-    navigator.clipboard.writeText(text);
-    setCopyToast(`Copied ${label} to clipboard!`);
+  // A real tick on the button that was clicked (only when the copy worked), plus a toast
+  // that stays on screen wherever the page is scrolled to.
+  const { copy: copyWithTick, isCopied } = useCopied();
+  async function handleCopy(text: string, label: string) {
+    const ok = await copyWithTick(text, label);
+    setCopyToast(ok ? `Copied ${label} to clipboard!` : `Could not copy ${label} automatically. Select it and press Ctrl+C.`);
     setTimeout(() => setCopyToast(null), 3000);
   }
 
   function handlePrint() {
-    window.print();
+    printElement('.welcome-kit-container', { title: 'Welcome kit', pageSize: 'A4 portrait' });
   }
 
   /**
@@ -461,28 +482,17 @@ export function OnboardRestaurantPage() {
         sId = sub.id;
         setSubscriptionId(sId);
 
-        // Automatically issue the initial tax invoice for this subscription
-        try {
-          const baseAmt = selectedPlan.priceMonthly;
-          const taxAmt = Math.round(baseAmt * 0.18);
-          await api.post('/api/v1/invoices', {
-            restaurantId: rId,
-            subscriptionId: sId,
-            planId: selectedPlan.id,
-            amount: baseAmt,
-            taxAmount: taxAmt,
-            dueDate: expiresAt,
-            billingPeriodStart: new Date().toISOString(),
-            billingPeriodEnd: expiresAt,
-            notes: `Initial subscription invoice for ${selectedPlan.name}`
-          });
-        } catch (invErr) {
-          console.warn('Initial invoice generation skipped:', invErr);
-          setProvisioningWarnings((w) => [
-            ...w,
-            'Initial invoice was NOT created — create it manually from the Billing tab.'
-          ]);
+        // JAMAN AI is decided per restaurant. 'Follow the plan' needs no call.
+        if (modulesForm.aiState && modulesForm.aiState !== 'PLAN') {
+          try {
+            await api.patch(`/api/v1/ai-assistant/restaurants/${rId}/access`, { state: modulesForm.aiState });
+          } catch {
+            // The restaurant exists either way; it can be changed later on the JAMAN AI page.
+          }
         }
+
+        // The server issues the one initial invoice when the subscription is assigned.
+        // (The wizard used to post a second, identical invoice here - BUG-050.)
       }
 
       // Provision device activation keys
@@ -522,7 +532,8 @@ export function OnboardRestaurantPage() {
 
       setStep('done');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Onboarding failed — please review error and retry.');
+      // BUG-054: prefer the specific field error (e.g. an invalid GSTIN) over the generic message.
+      setError(err instanceof ApiError ? err.issues?.[0]?.message || err.message : 'Onboarding failed — please review error and retry.');
     } finally {
       setProcessing(false);
     }
@@ -570,8 +581,8 @@ export function OnboardRestaurantPage() {
       `Your restaurant *${details.name}* is officially onboarded and activated on JAMANVAAR SaaS.`,
       ``,
       `*YOUR RESTAURANT ADMIN CREDENTIALS:*`,
-      `• Restaurant Admin Portal (POS/Captain/KDS): http://localhost:5176`,
-      ...(hasKioskAdmin ? [`• Kiosk Admin Portal: http://localhost:5173`] : []),
+      `• Restaurant Admin Portal (POS/Captain/KDS): ${RESTAURANT_ADMIN_URL}`,
+      ...(hasKioskAdmin ? [`• Kiosk Admin Portal: ${KIOSK_ADMIN_URL}`] : []),
       `• Restaurant ID: ${restaurantId || '—'}`,
       `• Login Email: ${owner.ownerEmail}`,
       owner.passwordMode === 'set_now'
@@ -593,12 +604,12 @@ export function OnboardRestaurantPage() {
     lines.push(
       ``,
       `*FIRST TIME SETUP INSTRUCTIONS:*`,
-      `1. Open Restaurant Admin on your manager PC (http://localhost:5176).`,
+      `1. Open Restaurant Admin on your manager PC (${RESTAURANT_ADMIN_URL}).`,
       `2. Go to Subscription / Activation and enter your activation key.`,
       `3. Enter your login credentials to verify your live menu and POS terminals.`,
       ...(hasKioskAdmin
         ? [
-            `4. To manage your self-order kiosks, open the Kiosk Admin console (http://localhost:5173) and enter your KIOSK_ADMIN key.`,
+            `4. To manage your self-order kiosks, open the Kiosk Admin console (${KIOSK_ADMIN_URL}) and enter your KIOSK_ADMIN key.`,
             `5. For assistance, contact KELVIONTECH Platform Support.`
           ]
         : [`4. For assistance, contact KELVIONTECH Platform Support.`])
@@ -666,8 +677,14 @@ export function OnboardRestaurantPage() {
 
       {copyToast && (
         <div
+          role="status"
+          className="no-print"
           style={{
-            marginBottom: 16,
+            position: 'fixed',
+            bottom: 24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 2000,
             padding: '10px 16px',
             borderRadius: 8,
             backgroundColor: '#0f172a',
@@ -1031,7 +1048,20 @@ export function OnboardRestaurantPage() {
                 <label>Subscription Status</label>
                 <select
                   value={planForm.status}
-                  onChange={(e) => setPlanForm((f) => ({ ...f, status: e.target.value as 'TRIAL' | 'ACTIVE' }))}
+                  onChange={(e) => {
+                    const status = e.target.value as 'TRIAL' | 'ACTIVE';
+                    // Picking TRIAL applies the platform's default trial length; going back to ACTIVE undoes only that.
+                    setPlanForm((f) => ({
+                      ...f,
+                      status,
+                      durationDays:
+                        status === 'TRIAL'
+                          ? String(trialDefaultDays)
+                          : f.durationDays === String(trialDefaultDays)
+                            ? EMPTY_PLAN.durationDays
+                            : f.durationDays
+                    }));
+                  }}
                 >
                   <option value="ACTIVE">ACTIVE (Paid Commercial License)</option>
                   <option value="TRIAL">TRIAL (Evaluation Period)</option>
@@ -1203,6 +1233,21 @@ export function OnboardRestaurantPage() {
               </div>
             </div>
 
+            <div className="form-field" style={{ marginTop: 12, maxWidth: 460 }}>
+              <label htmlFor="onboard-ai">JAMAN AI assistant</label>
+              <select
+                id="onboard-ai"
+                value={modulesForm.aiState ?? 'PLAN'}
+                onChange={(e) => setModulesForm((m) => ({ ...m, aiState: e.target.value as ModulesForm['aiState'] }))}
+              >
+                <option value="PLAN">Follow the plan (PRO: on, CORE: locked teaser)</option>
+                <option value="ON">On: works</option>
+                <option value="LOCKED">Locked: visible with a lock, answers nothing</option>
+                <option value="OFF">Off: hidden</option>
+              </select>
+              <span className="muted" style={{ fontSize: 12 }}>Can be changed later, per restaurant, on the JAMAN AI page.</span>
+            </div>
+
             {/* Plan Feature Entitlement Summary Tags (informational — the
                 separate Feature Entitlements matrix still governs these) */}
             <div
@@ -1288,7 +1333,7 @@ export function OnboardRestaurantPage() {
                   <div className="device-key-option-label" style={{ fontWeight: 800, color: '#0b253a' }}>
                     Restaurant Admin Console (POS_ADMIN) ★
                   </div>
-                  <div className="device-key-option-desc">Manager PC / Browser Management Suite (http://localhost:5176)</div>
+                  <div className="device-key-option-desc">Manager PC / Browser Management Suite ({RESTAURANT_ADMIN_URL})</div>
                 </div>
               </label>
 
@@ -1352,7 +1397,7 @@ export function OnboardRestaurantPage() {
                 />
                 <div>
                   <div className="device-key-option-label">Kiosk Admin Terminal</div>
-                  <div className="device-key-option-desc">Kiosk Fleet & Self-Ordering Configuration (http://localhost:5173)</div>
+                  <div className="device-key-option-desc">Kiosk Fleet & Self-Ordering Configuration ({KIOSK_ADMIN_URL})</div>
                 </div>
               </label>
             </div>
@@ -1532,7 +1577,7 @@ export function OnboardRestaurantPage() {
                       style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
                       title="Copy"
                     >
-                      <Copy className="w-3.5 h-3.5" />
+                      {isCopied('Restaurant ID') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
@@ -1540,14 +1585,14 @@ export function OnboardRestaurantPage() {
                 <div className="credential-item">
                   <span className="credential-label">Restaurant Admin Portal URL (POS / Captain / KDS)</span>
                   <div className="credential-value">
-                    <span>http://localhost:5176</span>
+                    <span>{RESTAURANT_ADMIN_URL}</span>
                     <button
                       type="button"
-                      onClick={() => handleCopy('http://localhost:5176', 'Restaurant Admin Portal URL')}
+                      onClick={() => handleCopy(RESTAURANT_ADMIN_URL, 'Restaurant Admin Portal URL')}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
                       title="Copy"
                     >
-                      <Copy className="w-3.5 h-3.5" />
+                      {isCopied('Restaurant Admin Portal URL') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
@@ -1560,14 +1605,14 @@ export function OnboardRestaurantPage() {
                   <div className="credential-item">
                     <span className="credential-label">Kiosk Admin Portal URL</span>
                     <div className="credential-value">
-                      <span>http://localhost:5173</span>
+                      <span>{KIOSK_ADMIN_URL}</span>
                       <button
                         type="button"
-                        onClick={() => handleCopy('http://localhost:5173', 'Kiosk Admin Portal URL')}
+                        onClick={() => handleCopy(KIOSK_ADMIN_URL, 'Kiosk Admin Portal URL')}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
                         title="Copy"
                       >
-                        <Copy className="w-3.5 h-3.5" />
+                        {isCopied('Kiosk Admin Portal URL') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
                     </div>
                   </div>
@@ -1583,7 +1628,7 @@ export function OnboardRestaurantPage() {
                       style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
                       title="Copy"
                     >
-                      <Copy className="w-3.5 h-3.5" />
+                      {isCopied('Login Email') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
@@ -1599,7 +1644,7 @@ export function OnboardRestaurantPage() {
                         style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
                         title="Copy"
                       >
-                        <Copy className="w-3.5 h-3.5" />
+                        {isCopied('Password') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
                     )}
                   </div>
@@ -1622,7 +1667,7 @@ export function OnboardRestaurantPage() {
                           style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
                           title="Copy"
                         >
-                          <Copy className="w-3.5 h-3.5" />
+                          {isCopied('Invitation token') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       )}
                     </div>
@@ -1644,10 +1689,10 @@ export function OnboardRestaurantPage() {
                   <p style={{ margin: '6px 0 0 0', fontSize: 13, color: '#64748b' }}>
                     Provide these keys to the restaurant owner. On first login, entering the matching key registers and
                     binds the device — <strong>POS_ADMIN / POS / CAPTAIN / KDS</strong> keys at{' '}
-                    <strong>http://localhost:5176</strong>
+                    <strong>{RESTAURANT_ADMIN_URL}</strong>
                     {provisionedKeys.some((k) => k.deviceType === 'KIOSK_ADMIN') && (
                       <>
-                        , and the <strong>KIOSK_ADMIN</strong> key at <strong>http://localhost:5173</strong>
+                        , and the <strong>KIOSK_ADMIN</strong> key at <strong>{KIOSK_ADMIN_URL}</strong>
                       </>
                     )}
                     .
@@ -1664,8 +1709,8 @@ export function OnboardRestaurantPage() {
                     }}
                     style={{ fontWeight: 700, color: '#ea580c' }}
                   >
-                    <Copy className="w-3.5 h-3.5 mr-1.5" />
-                    Copy All Keys
+                    {isCopied('All Activation Keys') ? <Check className="w-3.5 h-3.5 mr-1.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5 mr-1.5" />}
+                    {isCopied('All Activation Keys') ? 'Copied' : 'Copy All Keys'}
                   </Button>
                 )}
               </div>
@@ -1709,8 +1754,8 @@ export function OnboardRestaurantPage() {
                         style={{ fontSize: 11, padding: '4px 10px', color: '#ea580c', fontWeight: 700 }}
                         onClick={() => handleCopy(k.code, `${k.deviceType} Key`)}
                       >
-                        <Copy className="w-3 h-3 mr-1" />
-                        Copy Code
+                        {isCopied(`${k.deviceType} Key`) ? <Check className="w-3 h-3 mr-1" style={{ color: '#047857' }} /> : <Copy className="w-3 h-3 mr-1" />}
+                        {isCopied(`${k.deviceType} Key`) ? 'Copied' : 'Copy Code'}
                       </Button>
                     </div>
                   ))}
@@ -1729,8 +1774,8 @@ export function OnboardRestaurantPage() {
                   variant="ghost"
                   onClick={() => handleCopy(getHandoverWhatsAppText(), 'WhatsApp Handover Message')}
                 >
-                  <Copy className="w-4 h-4 mr-1.5" />
-                  Copy WhatsApp / Email Greeting
+                  {isCopied('WhatsApp Handover Message') ? <Check className="w-4 h-4 mr-1.5" style={{ color: '#047857' }} /> : <Copy className="w-4 h-4 mr-1.5" />}
+                  {isCopied('WhatsApp Handover Message') ? 'Copied' : 'Copy WhatsApp / Email Greeting'}
                 </Button>
               </div>
 

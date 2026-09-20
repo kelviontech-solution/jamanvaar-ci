@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { areaForRoute } from '../auth/access';
 import { api } from '../api/client';
 import type { SystemHealth, SearchResult } from '../api/types';
 import { applyTheme, getStoredTheme, type ThemePreference } from '../theme';
@@ -12,6 +13,7 @@ import { applyTheme, getStoredTheme, type ThemePreference } from '../theme';
 // noise on every page. This avoids pulling that module graph in at all.
 import { JAMANVAAR_LOGOS } from '../../../../packages/ui/src/assets';
 import { JAMANVAARStartup } from '../../../../packages/ui/src/JAMANVAARStartup';
+import { NotificationBell } from '../components/NotificationBell';
 import {
   LayoutDashboard,
   Store,
@@ -27,7 +29,6 @@ import {
   HeartPulse,
   UserCog,
   Search,
-  Bell,
   LogOut,
   Menu,
   X,
@@ -118,7 +119,7 @@ const NAV_GROUPS: NavGroup[] = [
 ];
 
 export function ProtectedLayout() {
-  const { user, status, logout } = useAuth();
+  const { user, status, logout, can } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -223,39 +224,6 @@ export function ProtectedLayout() {
     };
   }, []);
 
-  // Real notification center — expiringSubscriptions and failed-backup counts
-  // were already computed server-side (DashboardSummary, backups fleet stats)
-  // but never surfaced anywhere; the header bell just linked to the audit log.
-  const [expiringSubscriptions, setExpiringSubscriptions] = useState(0);
-  const [failedBackups, setFailedBackups] = useState(0);
-  const [notifOpen, setNotifOpen] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    const check = () => {
-      Promise.all([
-        api.get<{ expiringSubscriptions: number }>('/api/v1/platform/dashboard'),
-        api.get<{ stats: { failed: number } }>('/api/v1/platform/backups')
-      ])
-        .then(([dash, backups]) => {
-          if (cancelled) return;
-          setExpiringSubscriptions(dash.expiringSubscriptions || 0);
-          setFailedBackups(backups.stats?.failed || 0);
-        })
-        .catch(() => {
-          /* notification counts are best-effort — a failed poll just leaves the last known count */
-        });
-    };
-    check();
-    const interval = setInterval(check, 60000);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, []);
-
-  const notificationCount = (expiringSubscriptions > 0 ? 1 : 0) + (failedBackups > 0 ? 1 : 0);
-
   // Dark/light theme toggle — resolves the *effective* theme (accounting for
   // 'system') so the icon always shows what clicking it will switch to next,
   // not just the raw stored preference.
@@ -299,6 +267,15 @@ export function ProtectedLayout() {
     navigate(`/restaurants?search=${encodeURIComponent(searchQuery.trim())}`);
   }
 
+  // What this signed-in role may open. The API enforces the same table; this
+  // just keeps the menu and pages honest (BUG-083).
+  const visibleNavGroups = NAV_GROUPS
+    .map((group) => ({ ...group, items: group.items.filter((item) => can(areaForRoute(item.to), 'read')) }))
+    .filter((group) => group.items.length > 0);
+  const currentArea = areaForRoute(location.pathname);
+  const canOpenPage = can(currentArea, 'read');
+  const isReadOnlyPage = canOpenPage && !can(currentArea, 'write');
+
   return (
     <JAMANVAARStartup
       appName="Super Admin"
@@ -335,7 +312,7 @@ export function ProtectedLayout() {
 
         {/* Navigation List */}
         <nav className="sidebar-nav">
-          {NAV_GROUPS.map((group) => {
+          {visibleNavGroups.map((group) => {
             const groupHasActiveItem = group.items.some((item) =>
               item.end
                 ? location.pathname === item.to
@@ -572,103 +549,7 @@ export function ProtectedLayout() {
               </span>
             </div>
 
-            {/* Real notification center — surfaces expiringSubscriptions and
-                failed-backup counts that were already computed server-side
-                but previously discarded; this used to be a permanent
-                decorative unread dot with no actual state behind it. */}
-            <div style={{ position: 'relative' }}>
-              <button
-                type="button"
-                className="header-icon-btn"
-                style={{ position: 'relative' }}
-                title="Notifications"
-                aria-label="Notifications"
-                onClick={() => setNotifOpen((prev) => !prev)}
-                onBlur={() => setTimeout(() => setNotifOpen(false), 150)}
-              >
-                <Bell className="w-4 h-4" />
-                {notificationCount > 0 && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: -3,
-                      right: -3,
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      background: '#ef4444',
-                      border: '1.5px solid #fff'
-                    }}
-                  />
-                )}
-              </button>
-
-              {notifOpen && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    right: 0,
-                    top: 'calc(100% + 8px)',
-                    width: 300,
-                    background: 'var(--jv-surface)',
-                    border: '1px solid var(--jv-border)',
-                    borderRadius: 10,
-                    boxShadow: '0 8px 28px rgba(0,0,0,0.14)',
-                    zIndex: 60,
-                    overflow: 'hidden'
-                  }}
-                >
-                  <div style={{ padding: '10px 14px', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)', borderBottom: '1px solid var(--jv-border)' }}>
-                    Notifications
-                  </div>
-                  {notificationCount === 0 ? (
-                    <div style={{ padding: '18px 14px', fontSize: 12, color: 'var(--jv-text-light)', textAlign: 'center' }}>
-                      Nothing needs your attention right now.
-                    </div>
-                  ) : (
-                    <>
-                      {expiringSubscriptions > 0 && (
-                        <Link
-                          to="/subscriptions"
-                          onMouseDown={() => setNotifOpen(false)}
-                          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderBottom: '1px solid var(--jv-border)', textDecoration: 'none' }}
-                        >
-                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', flexShrink: 0 }} />
-                          <div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--jv-text)' }}>
-                              {expiringSubscriptions} subscription{expiringSubscriptions === 1 ? '' : 's'} expiring soon
-                            </div>
-                            <div style={{ fontSize: 11, color: 'var(--jv-text-light)' }}>Renew before they lapse</div>
-                          </div>
-                        </Link>
-                      )}
-                      {failedBackups > 0 && (
-                        <Link
-                          to="/backups"
-                          onMouseDown={() => setNotifOpen(false)}
-                          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', textDecoration: 'none' }}
-                        >
-                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444', flexShrink: 0 }} />
-                          <div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--jv-text)' }}>
-                              {failedBackups} failed backup{failedBackups === 1 ? '' : 's'}
-                            </div>
-                            <div style={{ fontSize: 11, color: 'var(--jv-text-light)' }}>Review and retry the snapshot</div>
-                          </div>
-                        </Link>
-                      )}
-                    </>
-                  )}
-                  <Link
-                    to="/audit-logs"
-                    onMouseDown={() => setNotifOpen(false)}
-                    style={{ display: 'block', padding: '10px 14px', fontSize: 12, fontWeight: 700, color: 'var(--jv-text-secondary)', textAlign: 'center', borderTop: '1px solid var(--jv-border)', textDecoration: 'none' }}
-                  >
-                    View full activity log →
-                  </Link>
-                </div>
-              )}
-            </div>
+            <NotificationBell />
 
             <button
               type="button"
@@ -720,8 +601,21 @@ export function ProtectedLayout() {
         </header>
 
         {/* Page Content */}
-        <main className="app-content">
-          <Outlet />
+        <main className={`app-content${isReadOnlyPage ? ' readonly-area' : ''}`}>
+          {isReadOnlyPage && (
+            <div className="readonly-banner" role="status">
+              You have read-only access to this area. Actions that change data are disabled.
+            </div>
+          )}
+          {canOpenPage ? (
+            <Outlet />
+          ) : (
+            <div className="no-access-panel" role="alert">
+              <h2>You don't have access to this page</h2>
+              <p>Your role ({user?.role?.replace(/_/g, ' ').toLowerCase()}) does not include this area. Ask a Platform Owner if you need it.</p>
+              <Link to="/" className="btn btn-accent">Back to dashboard</Link>
+            </div>
+          )}
         </main>
       </div>
     </div>

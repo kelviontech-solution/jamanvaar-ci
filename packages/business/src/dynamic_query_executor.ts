@@ -5,6 +5,7 @@ import {
   BusinessDayAccountingService
 } from '@jamanvaar/database';
 import { PosAssistantResponse } from './pos_assistant';
+import { AiConfig } from './ai_config';
 
 export interface DynamicQueryFormula {
   targetDomain: 'ORDERS' | 'PAYMENTS' | 'KITCHEN' | 'TABLES' | 'INVENTORY' | 'SHIFTS';
@@ -208,7 +209,7 @@ export class DynamicQueryExecutor {
     const kots = db.kots || [];
     const pendingKots = kots.filter((k) => k.status === 'PENDING' || k.status === 'PREPARING');
     const now = Date.now();
-    const delayedThresholdMin = 15;
+    const delayedThresholdMin = AiConfig.getSettings().delayedKotMinutes;
 
     const delayed = pendingKots.filter((k) => {
       const created = new Date(k.createdAt).getTime();
@@ -230,7 +231,7 @@ export class DynamicQueryExecutor {
         badgeType: delayed.length > 0 ? 'warning' : 'success',
         highlightNumber: highlight,
         metrics: [
-          { label: 'Delayed (>15m)', value: `${delayed.length}`, color: delayed.length > 0 ? 'text-rose-600' : 'text-emerald-600' },
+          { label: `Delayed (>${delayedThresholdMin}m)`, value: `${delayed.length}`, color: delayed.length > 0 ? 'text-rose-600' : 'text-emerald-600' },
           { label: 'Active Queue', value: `${pendingKots.length}` },
           { label: 'Total KOTs Today', value: `${kots.length}` }
         ],
@@ -292,7 +293,7 @@ export class DynamicQueryExecutor {
   ): PosAssistantResponse {
     const inventory = db.inventoryItems || [];
     const lowStock = inventory.filter((item) => {
-      const threshold = item.reorderLevel || 5;
+      const threshold = item.reorderLevel || AiConfig.getSettings().lowStockThreshold;
       return item.currentStock <= threshold && item.currentStock > 0;
     });
     const outOfStock = inventory.filter((item) => item.currentStock <= 0);

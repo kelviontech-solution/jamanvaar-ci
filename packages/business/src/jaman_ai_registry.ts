@@ -1,4 +1,5 @@
 import { db, ShiftRepository } from '@jamanvaar/database';
+import { AiConfig, delayedKotLabel } from './ai_config';
 import { BusinessDayService } from './business_day_service';
 import { PosAssistantIntent } from './pos_assistant';
 import { DynamicQueryFormula } from './dynamic_query_executor';
@@ -138,16 +139,6 @@ export const JAMAN_AI_QUESTION_REGISTRY: JamanAiQuestion[] = [
   // SALES & FINANCE
   // ==========================================
   {
-    id: 'sales_growth',
-    category: 'SALES',
-    label: "Revenue Comparison vs Yesterday",
-    icon: 'trending-up',
-    intent: 'TODAY_SALES',
-    roles: ['MANAGER', 'OWNER_ADMIN', 'ALL'],
-    apps: ['ALL'],
-    priorityScore: 70
-  },
-  {
     id: 'sales_busiest_hour',
     category: 'SALES',
     label: "Busiest Sales Hour of the Day",
@@ -167,16 +158,6 @@ export const JAMAN_AI_QUESTION_REGISTRY: JamanAiQuestion[] = [
     apps: ['ALL'],
     priorityScore: 80
   },
-  {
-    id: 'sales_dinein_takeaway',
-    category: 'SALES',
-    label: "Dine-In vs Takeaway vs Delivery",
-    icon: 'layers',
-    intent: 'PAYMENT_SUMMARY',
-    roles: ['ALL'],
-    apps: ['ALL'],
-    priorityScore: 60
-  },
 
   // ==========================================
   // PAYMENT CHANNELS
@@ -190,6 +171,16 @@ export const JAMAN_AI_QUESTION_REGISTRY: JamanAiQuestion[] = [
     roles: ['ALL'],
     apps: ['ALL'],
     priorityScore: 75
+  },
+  {
+    id: 'payment_share',
+    category: 'PAYMENTS',
+    label: "Cash vs Digital Payment Share",
+    icon: 'pie-chart',
+    intent: 'PAYMENT_SHARE',
+    roles: ['ALL'],
+    apps: ['ALL'],
+    priorityScore: 70
   },
   {
     id: 'payment_card',
@@ -234,42 +225,6 @@ export const JAMAN_AI_QUESTION_REGISTRY: JamanAiQuestion[] = [
     roles: ['ALL'],
     apps: ['ALL'],
     priorityScore: 65
-  },
-  {
-    id: 'orders_swiggy',
-    category: 'ORDERS',
-    label: "Swiggy Delivery Orders & Volume",
-    icon: 'smartphone',
-    intent: 'SWIGGY_ORDERS',
-    roles: ['ALL'],
-    apps: ['ALL'],
-    priorityScore: 80,
-    minPlanTier: 'PRO',
-    formula: {
-      targetDomain: 'ORDERS',
-      calculationType: 'SUM',
-      filterField: 'channel',
-      filterValue: 'SWIGGY',
-      displayUnit: 'CURRENCY'
-    }
-  },
-  {
-    id: 'orders_zomato',
-    category: 'ORDERS',
-    label: "Zomato Delivery Orders & Volume",
-    icon: 'smartphone',
-    intent: 'ZOMATO_ORDERS',
-    roles: ['ALL'],
-    apps: ['ALL'],
-    priorityScore: 78,
-    minPlanTier: 'PRO',
-    formula: {
-      targetDomain: 'ORDERS',
-      calculationType: 'SUM',
-      filterField: 'channel',
-      filterValue: 'ZOMATO',
-      displayUnit: 'CURRENCY'
-    }
   },
   {
     id: 'orders_dinein_rev',
@@ -448,6 +403,16 @@ export const JAMAN_AI_QUESTION_REGISTRY: JamanAiQuestion[] = [
   // STAFF & SHIFTS
   // ==========================================
   {
+    id: 'customers_footfall',
+    category: 'CUSTOMERS',
+    label: "Footfall: Guests Served Today",
+    icon: 'users',
+    intent: 'FOOTFALL',
+    roles: ['ALL'],
+    apps: ['ALL'],
+    priorityScore: 72
+  },
+  {
     id: 'staff_active_shift',
     category: 'STAFF',
     label: "Active Cashier Shift Status",
@@ -458,11 +423,11 @@ export const JAMAN_AI_QUESTION_REGISTRY: JamanAiQuestion[] = [
     priorityScore: 80
   },
   {
-    id: 'staff_cashier_sales',
+    id: 'staff_cash_variance',
     category: 'STAFF',
-    label: "Sales by Cashier & Float Count",
+    label: "Cashier Shift Cash Variance",
     icon: 'coins',
-    intent: 'CASH_COLLECTION',
+    intent: 'CASH_VARIANCE',
     roles: ['MANAGER', 'OWNER_ADMIN', 'ALL'],
     apps: ['ALL'],
     priorityScore: 70
@@ -471,36 +436,6 @@ export const JAMAN_AI_QUESTION_REGISTRY: JamanAiQuestion[] = [
   // ==========================================
   // BUSINESS INSIGHTS
   // ==========================================
-  {
-    id: 'insights_top_opp',
-    category: 'INSIGHTS',
-    label: "Today's Key Operational Opportunity",
-    icon: 'sparkles',
-    intent: 'PRO_FEATURES',
-    roles: ['MANAGER', 'OWNER_ADMIN', 'ALL'],
-    apps: ['ALL'],
-    priorityScore: 85
-  },
-  {
-    id: 'insights_dish_promote',
-    category: 'INSIGHTS',
-    label: "Recommended Dish to Promote Tonight",
-    icon: 'utensils',
-    intent: 'TOP_ITEMS',
-    roles: ['ALL'],
-    apps: ['ALL'],
-    priorityScore: 75
-  },
-  {
-    id: 'insights_license_plans',
-    category: 'INSIGHTS',
-    label: "JAMANVAAR CORE vs PRO License Benefits",
-    icon: 'award',
-    intent: 'COMPARE_PLANS',
-    roles: ['ALL'],
-    apps: ['ALL'],
-    priorityScore: 65
-  }
 ];
 
 export class JamanAiRegistry {
@@ -510,9 +445,11 @@ export class JamanAiRegistry {
   public static getPrioritizedQuestions(app: 'POS' | 'ADMIN', userRole?: string): JamanAiQuestion[] {
     const kots = db.kots || [];
     const pendingKots = kots.filter((k) => k.status === 'PENDING' || k.status === 'PREPARING');
+    // The threshold comes from the cloud settings (Super Admin), not a number typed into the code.
+    const delayedMinutes = AiConfig.getSettings().delayedKotMinutes;
     const delayedKots = pendingKots.filter((k) => {
       const elapsedMinutes = (Date.now() - new Date(k.createdAt).getTime()) / 60000;
-      return elapsedMinutes > 15;
+      return elapsedMinutes > delayedMinutes;
     });
 
     const inventory = db.inventoryItems || [];
@@ -524,8 +461,9 @@ export class JamanAiRegistry {
 
     const allQuestions = JAMAN_AI_QUESTION_REGISTRY.filter((q) => {
       if (!q.apps.includes('ALL') && !q.apps.includes(app)) return false;
-      return true;
-    });
+      // Once the cloud catalogue is known, only the questions it enables are offered.
+      return AiConfig.isIntentEnabled(q.intent);
+    }).map((q) => (q.intent === 'DELAYED_KOT' ? { ...q, label: delayedKotLabel(delayedMinutes) } : q));
 
     // Score and rank dynamically
     const scoredQuestions = allQuestions.map((q) => {

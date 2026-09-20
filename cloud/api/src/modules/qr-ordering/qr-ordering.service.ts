@@ -215,7 +215,7 @@ export class QrOrderingService {
     // query matches audit-query.service.ts. Rows written before this module
     // persisted `restaurantId` on the audit row itself only carry the id
     // inside `details`, so both shapes are matched.
-    const rows = await this.prisma.auditLog.findMany({
+    const rows = await this.prisma.platformDb.auditLog.findMany({
       where: {
         action: { in: QR_AUDIT_ACTIONS },
         OR: [

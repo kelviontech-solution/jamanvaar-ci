@@ -21,6 +21,12 @@ export function getAccessToken() {
   return accessToken;
 }
 
+/** Called when a signed-in session can no longer be used (revoked, signed out elsewhere, expired). */
+let sessionEndedHandler: (() => void) | null = null;
+export function onSessionEnded(handler: (() => void) | null) {
+  sessionEndedHandler = handler;
+}
+
 async function refreshAccessToken(): Promise<boolean> {
   const res = await fetch(`${API_BASE}/api/v1/platform-auth/refresh`, {
     method: 'POST',
@@ -53,6 +59,7 @@ async function rawRequest<T>(path: string, options: RequestOptions = {}): Promis
   });
 
   if (res.status === 401 && !options.skipAuthRetry) {
+    const hadSession = accessToken !== null;
     if (!refreshInFlight) {
       refreshInFlight = refreshAccessToken().finally(() => {
         refreshInFlight = null;
@@ -62,6 +69,7 @@ async function rawRequest<T>(path: string, options: RequestOptions = {}): Promis
     if (refreshed) {
       return rawRequest<T>(path, { ...options, skipAuthRetry: true });
     }
+    if (hadSession) sessionEndedHandler?.();
   }
 
   const contentType = res.headers.get('content-type') ?? '';
@@ -73,7 +81,35 @@ async function rawRequest<T>(path: string, options: RequestOptions = {}): Promis
   return data as T;
 }
 
+/** An authenticated file download (the response is not JSON, so it cannot go through `rawRequest`). */
+async function download(path: string, retried = false): Promise<{ blob: Blob; filename: string | null }> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    credentials: 'include',
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+  });
+  if (res.status === 401 && !retried) {
+    if (!refreshInFlight) {
+      refreshInFlight = refreshAccessToken().finally(() => {
+        refreshInFlight = null;
+      });
+    }
+    if (await refreshInFlight) return download(path, true);
+  }
+  if (!res.ok) {
+    let message = `Download failed (${res.status})`;
+    try {
+      message = (await res.json()).message ?? message;
+    } catch {
+      // not JSON
+    }
+    throw new ApiError(message, res.status);
+  }
+  const disposition = res.headers.get('content-disposition') ?? '';
+  return { blob: await res.blob(), filename: /filename="?([^";]+)"?/.exec(disposition)?.[1] ?? null };
+}
+
 export const api = {
+  download,
   get: <T>(path: string) => rawRequest<T>(path),
   post: <T>(path: string, body?: unknown) => rawRequest<T>(path, { method: 'POST', body }),
   patch: <T>(path: string, body?: unknown) => rawRequest<T>(path, { method: 'PATCH', body }),

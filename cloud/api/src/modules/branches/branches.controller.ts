@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { BranchesService } from './branches.service';
-import { createBranchSchema, updateBranchSchema } from './dto/branch.dto';
+import { bulkBranchStatusSchema, createBranchSchema, updateBranchSchema } from './dto/branch.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
@@ -12,8 +12,14 @@ export class BranchesController {
   constructor(private readonly branches: BranchesService) {}
 
   @Get()
-  list(@Query('restaurantId') restaurantId?: string) {
-    return this.branches.list(restaurantId);
+  list(@Query() query: { restaurantId?: string; q?: string; status?: string; page?: string; pageSize?: string }) {
+    return this.branches.list(query);
+  }
+
+  @Post('bulk-status')
+  @UsePipes(new ZodValidationPipe(bulkBranchStatusSchema))
+  bulkStatus(@Body() body: ReturnType<typeof bulkBranchStatusSchema.parse>, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.branches.bulkSetStatus(body.ids, body.status, actor);
   }
 
   @Post()

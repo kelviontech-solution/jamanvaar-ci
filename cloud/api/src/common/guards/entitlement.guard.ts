@@ -39,15 +39,17 @@ export class EntitlementGuard implements CanActivate {
     }
 
     // Single source of truth: active subscription in PostgreSQL
-    const subscription = await this.prisma.subscription.findFirst({
-      where: {
-        restaurantId,
-        status: { in: ['ACTIVE', 'TRIAL'] },
-        expiresAt: { gt: new Date() }
-      },
-      include: { plan: true },
-      orderBy: { createdAt: 'desc' }
-    });
+    const subscription = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.subscription.findFirst({
+        where: {
+          restaurantId,
+          status: { in: ['ACTIVE', 'TRIAL'] },
+          expiresAt: { gt: new Date() }
+        },
+        include: { plan: true },
+        orderBy: { createdAt: 'desc' }
+      })
+    );
 
     if (!subscription) {
       throw new ForbiddenException('No active subscription found. Access is restricted.');

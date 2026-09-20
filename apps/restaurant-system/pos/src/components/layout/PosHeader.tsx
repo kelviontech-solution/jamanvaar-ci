@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
-import { BrandHeader, NotificationDrawerModal, sound } from '@jamanvaar/ui';
+import { BrandHeader, NotificationDrawerModal, sound, useAiAccess } from '@jamanvaar/ui';
 import {
   db,
   ShiftRepository,
@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 
 export const PosHeader: React.FC = () => {
+  const ai = useAiAccess();
   const {
     currentUser,
     posTerminalId,
@@ -318,7 +319,7 @@ export const PosHeader: React.FC = () => {
                   <span className="font-bold">{daySummary.opened_at ? new Date(daySummary.opened_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '–'}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-slate-50 rounded-xl">
-                  <span className="text-slate-500">Net Sales:</span>
+                  <span className="text-slate-500">Billed (incl. GST):</span>
                   <span className="font-black text-emerald-700 font-mono">{formatINR(daySummary.net_sales)}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-slate-50 rounded-xl">
@@ -453,7 +454,7 @@ export const PosHeader: React.FC = () => {
             Restaurant Admin's "Show JAMAN AI Assistant" setting. Previously
             unconditional: the only real on/off control was a platform-wide
             entitlement, with no per-restaurant preference at all. */}
-        {db.restaurant?.showJamanAI !== false && (
+        {ai.showButton(db.restaurant?.showJamanAI !== false) && (
         <button
           type="button"
           onClick={() => setIsChatbotOpen(true)}
@@ -469,6 +470,7 @@ export const PosHeader: React.FC = () => {
         >
           <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />
           <span className="hidden md:inline tracking-tight">JAMAN AI</span>
+          {ai.locked && <span aria-label="Locked" title="Not enabled for your restaurant">🔒</span>}
           {aiAlertCount > 0 && !isChatbotOpen && (
             <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-rose-600 text-white text-[9px] font-black px-1 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
               {aiAlertCount}
@@ -514,7 +516,7 @@ export const PosHeader: React.FC = () => {
                     POS-01
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500">{currentUser?.email || 'amit.dave@jamanvaar.com'}</p>
+                <p className="text-[11px] text-slate-500">{currentUser?.email || 'No email on file'}</p>
                 <div className={`flex items-center gap-1.5 text-[10px] font-bold pt-0.5 ${isOnline ? 'text-emerald-700' : 'text-amber-700'}`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                   <span>{isOnline ? 'Online' : 'Offline'} • Local Database Active</span>

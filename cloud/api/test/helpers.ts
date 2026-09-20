@@ -20,13 +20,14 @@ export async function createTestApp(
 /** Low bcrypt cost factor — correctness matters here, not production hashing speed. */
 export async function createTestPlatformUser(
   prisma: PrismaService,
-  opts: { email: string; password: string }
+  opts: { email: string; password: string; role?: 'PLATFORM_OWNER' | 'SUPER_ADMIN' | 'PLATFORM_OPS' | 'SUPPORT_ADMIN' | 'FINANCE_ADMIN' | 'READ_ONLY' }
 ) {
   return prisma.platformUser.create({
     data: {
       email: opts.email,
       passwordHash: await bcrypt.hash(opts.password, 4),
       fullName: 'Test Platform User',
+      role: opts.role ?? 'PLATFORM_OWNER',
       status: 'ACTIVE'
     }
   });

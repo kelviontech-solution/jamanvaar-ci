@@ -1,6 +1,6 @@
 import React from 'react';
 import { Order, ReceiptConfig, KOTRecord } from '@jamanvaar/types';
-import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatTime, splitTax } from '@jamanvaar/utils';
 import { JAMANVAAR_LOGOS } from './assets';
 import { CheckCircle2, Phone, Mail, QrCode } from 'lucide-react';
 
@@ -23,11 +23,12 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
   showQrCode = true,
   className = ''
 }) => {
-  const restaurantName = config.restaurantName || 'JAMANVAAR Restaurant';
-  const address = config.address || 'Sindhu Bhavan Road, Bodakdev, Ahmedabad, Gujarat 380054';
-  const phone = config.phone || '+91 79 4890 1234';
-  const gstin = config.gstin || '24AAAAA0000A1Z5';
-  const fssaiNumber = config.fssaiNumber || '10722001000452';
+  // Only what this restaurant has entered is printed; a missing detail is left out, never invented.
+  const restaurantName = config.restaurantName || '';
+  const address = config.address || '';
+  const phone = config.phone || '';
+  const gstin = config.gstin || '';
+  const fssaiNumber = config.fssaiNumber || '';
   const thankYouMessage = config.thankYouMessage || 'Thank you for dining with us!';
   const footerMessage = config.footerMessage || 'Visit again.';
   const is80mm = paperSize === '80mm';
@@ -43,33 +44,25 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
           boxShadow: '0 15px 35px -10px rgba(11, 37, 58, 0.15), 0 0 0 1px rgba(213, 206, 194, 0.6)'
         }}
       >
-        {/* Top Header with Authentic JAMANVAAR Logo */}
+        {/* Header: this restaurant's own identity. The product brand appears only in the footer. */}
         <div className="text-center pb-3 border-b border-dashed border-[#A0AEC0] space-y-1.5">
-          <div className="flex justify-center items-center py-1">
-            <img
-              src={JAMANVAAR_LOGOS.horizontal}
-              alt="JAMANVAAR"
-              className={`object-contain transition-all mx-auto ${is80mm ? 'max-w-[180px] h-14 sm:h-16' : 'max-w-[140px] h-11 sm:h-12'}`}
-              style={{
-                maxHeight: is80mm ? '60px' : '46px',
-                maxWidth: is80mm ? '180px' : '140px',
-                width: 'auto',
-                height: 'auto',
-                display: 'block'
-              }}
-            />
-          </div>
+          {config.logoUrl && (
+            <div className="flex justify-center items-center py-1">
+              <img
+                src={config.logoUrl}
+                alt={restaurantName}
+                className="object-contain mx-auto"
+                style={{ maxHeight: is80mm ? '60px' : '46px', maxWidth: is80mm ? '180px' : '140px', width: 'auto', height: 'auto', display: 'block' }}
+              />
+            </div>
+          )}
 
           <div className="space-y-0.5">
-            <h2 className="font-black text-sm sm:text-base tracking-wider uppercase text-[#0B253A]">
-              JAMANVAAR
-            </h2>
-            <div className="text-[10px] font-bold text-[#E66817] tracking-widest uppercase">
-              BY KELVIONTECH
-            </div>
-            <div className="font-semibold text-[11px] text-[#2D3748] pt-0.5">{restaurantName}</div>
-            <p className="text-[10px] text-[#718096] leading-tight max-w-[280px] mx-auto">{address}</p>
-            <p className="text-[10px] text-[#718096]">Phone: {phone}</p>
+            {restaurantName && (
+              <h2 className="font-black text-sm sm:text-base tracking-wider uppercase text-[#0B253A]">{restaurantName}</h2>
+            )}
+            {address && <p className="text-[10px] text-[#718096] leading-tight max-w-[280px] mx-auto">{address}</p>}
+            {phone && <p className="text-[10px] text-[#718096]">Phone: {phone}</p>}
           </div>
 
           <div className="flex flex-wrap justify-center gap-x-2 text-[9px] text-[#4A5568] pt-1 font-semibold">
@@ -222,7 +215,6 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
             <span className="text-[9px] font-black text-[#0B253A] tracking-wider">
               Powered by JAMANVAAR
             </span>
-            <div className="text-[8px] font-bold text-[#E66817]">BY KELVIONTECH</div>
           </div>
         </div>
       </div>
@@ -242,11 +234,11 @@ export function printThermalReceipt(
   if (typeof window === 'undefined') return;
 
   const is80mm = paperWidth === '80mm';
-  const restaurantName = config?.restaurantName || 'JAMANVAAR Restaurant';
-  const address = config?.address || 'Sindhu Bhavan Road, Bodakdev, Ahmedabad, Gujarat 380054';
-  const phone = config?.phone || '+91 79 4890 1234';
-  const gstin = config?.gstin || '24AAAAA0000A1Z5';
-  const fssaiNumber = config?.fssaiNumber || '10722001000452';
+  const restaurantName = config?.restaurantName || '';
+  const address = config?.address || '';
+  const phone = config?.phone || '';
+  const gstin = config?.gstin || '';
+  const fssaiNumber = config?.fssaiNumber || '';
   const thankYouMessage = config?.thankYouMessage || 'Thank you for dining with us!';
   const footerMessage = config?.footerMessage || 'Visit again.';
 
@@ -339,12 +331,10 @@ export function printThermalReceipt(
       </head>
       <body>
         <div class="text-center">
-          <div style="font-size: 16px; font-weight: 900; letter-spacing: 1px;">JAMANVAAR</div>
-          <div style="font-size: 9px; font-weight: bold; letter-spacing: 1px;">BY KELVIONTECH</div>
-          <div style="font-weight: bold; margin-top: 2px;">${restaurantName}</div>
-          <div style="font-size: 10px; color: #333;">${address}</div>
-          <div style="font-size: 10px;">Phone: ${phone}</div>
-          ${gstin ? `<div style="font-size: 9px;">GSTIN: ${gstin} | FSSAI: ${fssaiNumber}</div>` : ''}
+          ${restaurantName ? `<div style="font-size: 16px; font-weight: 900; letter-spacing: 1px;">${restaurantName}</div>` : ''}
+          ${address ? `<div style="font-size: 10px; color: #333;">${address}</div>` : ''}
+          ${phone ? `<div style="font-size: 10px;">Phone: ${phone}</div>` : ''}
+          ${gstin || fssaiNumber ? `<div style="font-size: 9px;">${[gstin && `GSTIN: ${gstin}`, fssaiNumber && `FSSAI: ${fssaiNumber}`].filter(Boolean).join(' | ')}</div>` : ''}
         </div>
 
         <div class="divider"></div>
@@ -380,8 +370,8 @@ export function printThermalReceipt(
 
         <div class="row"><span>Subtotal:</span><span>₹${(order.subtotal || 0).toFixed(2)}</span></div>
         ${(order.discountAmount || 0) > 0 ? `<div class="row"><span>Discount:</span><span>-₹${order.discountAmount.toFixed(2)}</span></div>` : ''}
-        <div class="row"><span>CGST (2.5%):</span><span>₹${(order.cgstAmount || (order.taxAmount ? order.taxAmount / 2 : 0)).toFixed(2)}</span></div>
-        <div class="row"><span>SGST (2.5%):</span><span>₹${(order.sgstAmount || (order.taxAmount ? order.taxAmount / 2 : 0)).toFixed(2)}</span></div>
+        <div class="row"><span>CGST (2.5%):</span><span>₹${(order.cgstAmount ?? splitTax(order.taxAmount || 0).cgst).toFixed(2)}</span></div>
+        <div class="row"><span>SGST (2.5%):</span><span>₹${(order.sgstAmount ?? splitTax(order.taxAmount || 0).sgst).toFixed(2)}</span></div>
         ${(order.roundOffAmount || 0) !== 0 ? `<div class="row"><span>Round Off:</span><span>₹${order.roundOffAmount.toFixed(2)}</span></div>` : ''}
 
         <div class="double-divider"></div>
@@ -403,7 +393,7 @@ export function printThermalReceipt(
         <div class="text-center" style="font-size: 10px; margin-top: 6px;">
           <div class="bold">${thankYouMessage}</div>
           <div>${footerMessage}</div>
-          <div style="font-size: 8px; margin-top: 6px; color: #555;">Powered by JAMANVAAR by Kelviontech</div>
+          <div style="font-size: 8px; margin-top: 6px; color: #555;">Powered by JAMANVAAR</div>
         </div>
       </body>
     </html>

@@ -1,3 +1,5 @@
+// Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
+import { copyText } from '../../../../../packages/utils/src/clipboard';
 import React, { useEffect, useState, useMemo } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { PlatformTeamUser, PlatformRole } from '../../api/types';
@@ -167,8 +169,8 @@ export function TeamPage() {
       if (res.emailSent) {
         showToast(`Invitation resent to ${u.email}`);
       } else if (res.activationUrl) {
-        navigator.clipboard.writeText(res.activationUrl);
-        showToast('Activation link copied to clipboard!');
+        const copied = await copyText(res.activationUrl);
+        showToast(copied ? 'Activation link copied to clipboard!' : `Could not copy automatically. Activation link: ${res.activationUrl}`);
       } else {
         showToast('Invitation re-generated successfully');
       }

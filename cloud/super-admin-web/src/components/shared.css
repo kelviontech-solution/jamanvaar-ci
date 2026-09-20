@@ -517,7 +517,7 @@
 }
 
 .input,
-.form-field input,
+.form-field input:not([type='checkbox']):not([type='radio']),
 .form-field select,
 .form-field textarea,
 .modal-form input:not([type='checkbox']):not([type='radio']),
@@ -538,7 +538,7 @@
 }
 
 .input:focus,
-.form-field input:focus,
+.form-field input:not([type='checkbox']):not([type='radio']):focus,
 .form-field select:focus,
 .form-field textarea:focus,
 .modal-form input:focus,
@@ -567,3 +567,243 @@
   font-weight: 400;
 }
 
+
+/* ─────────────────────────────────────────────────────────────
+   Shared building blocks that pages were already using but that
+   no stylesheet defined (BUG-079): toasts, banners, modal body,
+   loading states, page layout, form controls, auth screens.
+   ───────────────────────────────────────────────────────────── */
+
+/* Toast: floats over the page instead of rendering as loose text in the flow. */
+.floating-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 200;
+  max-width: min(420px, calc(100vw - 48px));
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--jv-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  box-shadow: 0 12px 32px -8px rgba(11, 37, 58, 0.45);
+  animation: floating-toast-in 0.18s ease-out;
+}
+@keyframes floating-toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Banners and inline messages */
+.banner,
+.error-banner,
+.banner-error,
+.page-success {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--jv-border);
+  background: var(--jv-surface-subtle);
+  color: var(--jv-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+.banner-error,
+.error-banner {
+  background: var(--jv-error-soft);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: var(--jv-error);
+}
+.page-success {
+  background: var(--jv-success-soft);
+  border-color: rgba(22, 163, 74, 0.3);
+  color: var(--jv-success);
+}
+
+/* The shared Modal renders a .modal-body; without padding its content touched the dialog edges. */
+.modal-body {
+  padding: 20px 24px;
+}
+
+/* Loading states */
+.page-loading,
+.loading-card {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--jv-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.loading-card {
+  background: var(--jv-surface);
+  border: 1px solid var(--jv-border);
+  border-radius: 12px;
+}
+
+/* Page layout */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.page-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Form controls used outside .form-field */
+.label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--jv-text-secondary);
+}
+.input-select,
+.input-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--jv-border);
+  border-radius: 8px;
+  background: var(--jv-surface);
+  color: var(--jv-text);
+  font: inherit;
+  font-size: 13px;
+}
+.input-select { height: 40px; }
+.input-textarea { resize: vertical; min-height: 84px; }
+.input-select:focus,
+.input-textarea:focus {
+  outline: none;
+  border-color: var(--jv-accent);
+  box-shadow: 0 0 0 3px var(--jv-accent-soft);
+}
+.btn-xs {
+  padding: 2px 8px;
+  height: auto;
+  font-size: 11px;
+  border-radius: 6px;
+}
+
+/* Signed-out screens that are not the main sign-in page (teammate activation, etc.),
+   replacing the old login-* classes that stopped existing when Login was rebuilt. */
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: var(--jv-bg);
+}
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 32px 28px;
+  background: var(--jv-surface);
+  border: 1px solid var(--jv-border);
+  border-radius: 16px;
+  box-shadow: var(--jv-shadow-hero);
+}
+.auth-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.auth-logo {
+  height: 44px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+.auth-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--jv-accent-soft);
+  border: 1px solid var(--jv-accent-border);
+  color: var(--jv-accent);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.auth-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--jv-text);
+}
+.auth-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--jv-text-secondary);
+}
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.auth-error {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--jv-error-soft);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: var(--jv-error);
+  font-size: 13px;
+  font-weight: 600;
+}
+.auth-success {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--jv-success-soft);
+  border: 1px solid rgba(22, 163, 74, 0.3);
+  color: var(--jv-success);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+.password-meter {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--jv-border-subtle);
+  overflow: hidden;
+}
+.password-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+/* A checkbox or radio inside a form field: normal size, label beside it, never stretched (BUG-066). */
+.form-field input[type='checkbox'],
+.form-field input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  flex: 0 0 auto;
+  accent-color: var(--jv-accent);
+}
+.form-field label:has(> input[type='checkbox']),
+.form-field label:has(> input[type='radio']),
+.form-field .checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}

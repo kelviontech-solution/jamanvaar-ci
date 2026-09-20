@@ -91,7 +91,7 @@ const ALL_REPORTS: ReportDefinition[] = [
   { id: 'GROSS_SALES', category: 'FINANCIAL', title: 'Gross Sales', subtitle: 'Unadjusted food sales before discounts and taxes', icon: DollarSign },
   { id: 'DISCOUNTS_REPORT', category: 'FINANCIAL', title: 'Discounts & Offers', subtitle: 'Promotional markdowns, manager waivers, and coupons', icon: TrendingDown },
   { id: 'TAXES_GST', category: 'FINANCIAL', title: 'Taxes / GST Report', subtitle: 'CGST 2.5% and SGST 2.5% filing figures', icon: FileText, isPopular: true },
-  { id: 'NET_SALES', category: 'FINANCIAL', title: 'Net Sales', subtitle: 'Actual earned revenue deposited into bank accounts', icon: DollarSign },
+  { id: 'NET_SALES', category: 'FINANCIAL', title: 'Total Billed (incl. GST)', subtitle: 'Everything billed, tax included; matches what was collected', icon: DollarSign },
   { id: 'PAYMENT_COLLECTION', category: 'FINANCIAL', title: 'Payment Collection', subtitle: 'Channel-wise settlement verification', icon: DollarSign, isPopular: true },
   { id: 'CASH_REPORT', category: 'FINANCIAL', title: 'Cash Report', subtitle: 'Cash drawer inflows, payouts, and safe drops', icon: DollarSign },
   { id: 'UPI_REPORT', category: 'FINANCIAL', title: 'UPI / BharatQR Report', subtitle: 'Instant QR soundbox and digital payment ledger', icon: DollarSign },
@@ -326,7 +326,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
             </button>
 
             <button
-              onClick={() => window.print()}
+              onClick={() => setIsPreviewModalOpen(true)}
               className="px-3.5 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -753,7 +753,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                       <th className="p-3">Gross</th>
                       <th className="p-3">Discount</th>
                       <th className="p-3">GST (5%)</th>
-                      <th className="p-3">Net Sales</th>
+                      <th className="p-3">Total Billed (incl. GST)</th>
                       <th className="p-3">Cash</th>
                       <th className="p-3">UPI</th>
                       <th className="p-3">Card</th>
@@ -851,7 +851,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
                   <h3 className="font-extrabold text-sm text-jaman-navy">GST Tax Audit Statement (5% Food Rate)</h3>
-                  <p className="text-xs text-slate-400">GSTIN: 24AABCJ1984K1Z5 • Restaurant Category</p>
+                  <p className="text-xs text-slate-400">GSTIN: {db.restaurant.gstin || 'not registered'}</p>
                 </div>
                 <button
                   onClick={() => {

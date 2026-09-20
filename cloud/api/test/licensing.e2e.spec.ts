@@ -1,4 +1,5 @@
 import { createPublicKey, verify } from 'crypto';
+import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
@@ -10,12 +11,18 @@ import { PrismaService } from '../src/prisma/prisma.service';
 // cloud/api is a separate CommonJS package with no dependency on the frontend
 // workspace packages. This is the PUBLIC key only; it proves nothing on its
 // own without a matching private-key signature to check against it.
-const LICENSE_PUBLIC_KEY_JWK = {
-  kty: 'EC',
-  crv: 'P-256',
-  x: 'cvAVNFm6l4nVknr2vjaQ21EzZby6m2bXIlG3jcWoVX0',
-  y: 'bafQoC8ZaiXpkinCfXSPMJUjsqt3v0UvAbUFWZwLfsg'
-};
+// The production private key is not available to tests, so the suite signs with a throwaway pair and
+// verifies against ITS public half: this proves the sign/verify contract (IEEE-P1363, key id) that the
+// apps' verifier (packages/business, packages/sync) relies on, without needing the real key.
+// ConfigModule validates the environment at import time, so this must be hoisted.
+const { LICENSE_PUBLIC_KEY_JWK } = vi.hoisted(() => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { generateKeyPairSync } = require('crypto');
+  const { privateKey, publicKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
+  process.env.LICENSE_SIGNING_PRIVATE_KEY_B64 = Buffer.from(privateKey.export({ type: 'pkcs8', format: 'pem' }).toString()).toString('base64');
+  process.env.LICENSE_SIGNING_KEY_ID = 'test-k2';
+  return { LICENSE_PUBLIC_KEY_JWK: publicKey.export({ format: 'jwk' }) as JsonWebKey };
+});
 
 function b64urlToBuffer(b64url: string): Buffer {
   return Buffer.from(b64url, 'base64url');
@@ -101,12 +108,14 @@ describe('Offline license certificate issuance (ENT-001 fix)', () => {
     const payloadBytes = b64urlToBuffer(res.body.payload);
     const signatureBytes = b64urlToBuffer(res.body.signature);
 
-    const publicKey = createPublicKey({ key: LICENSE_PUBLIC_KEY_JWK, format: 'jwk' });
+    const publicKey = createPublicKey({ key: LICENSE_PUBLIC_KEY_JWK as never, format: 'jwk' });
     const valid = verify('SHA256', payloadBytes, { key: publicKey, dsaEncoding: 'ieee-p1363' }, signatureBytes);
     expect(valid).toBe(true);
 
     const payload = JSON.parse(payloadBytes.toString('utf8'));
     expect(payload.restaurantId).toBe(restaurantId);
+    // Names the key that signed it, so the key can be rotated without breaking old certificates (BUG-076).
+    expect(payload.kid).toBe('test-k2');
     expect(payload.tier).toBe('PRO');
     expect(payload.entitlements.captainApp).toBe(true);
     expect(payload.entitlements.qrTableOrdering).toBe(true);
@@ -122,7 +131,7 @@ describe('Offline license certificate issuance (ENT-001 fix)', () => {
     const tamperedPayloadBytes = Buffer.from(JSON.stringify(payload), 'utf8');
     const signatureBytes = b64urlToBuffer(res.body.signature);
 
-    const publicKey = createPublicKey({ key: LICENSE_PUBLIC_KEY_JWK, format: 'jwk' });
+    const publicKey = createPublicKey({ key: LICENSE_PUBLIC_KEY_JWK as never, format: 'jwk' });
     const valid = verify('SHA256', tamperedPayloadBytes, { key: publicKey, dsaEncoding: 'ieee-p1363' }, signatureBytes);
     expect(valid).toBe(false);
   });

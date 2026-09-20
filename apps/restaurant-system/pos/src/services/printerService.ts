@@ -1,4 +1,5 @@
-import { db, PrintQueueRepository, ReceiptRepository, AuditRepository } from '@jamanvaar/database';
+import { db, PrintQueueRepository, ReceiptRepository, AuditRepository, PrinterRepository } from '@jamanvaar/database';
+import { detectPrinters, describeDiscovered, isAlreadyConfigured, sendRawToPrinter, type DetectionResult, type DiscoveredPrinter } from '@jamanvaar/api';
 import { Order, KOTRecord, PrintJob, ReceiptPaperSize, PrinterDevice, PrinterRole } from '@jamanvaar/types';
 
 export class PosPrinterService {
@@ -10,21 +11,43 @@ export class PosPrinterService {
   }
 
   /**
-   * Actively scans ports (USB, LAN, Serial, Windows Drivers) and updates availability
+   * BUG-025: this used to set every already-configured printer to READY and report
+   * "Found N printers (USB, LAN, Serial, Windows drivers)" without scanning anything. There is
+   * no native code yet that can enumerate real printers (Windows spooler, USB, LAN port 9100),
+   * so this reports only what is configured, changes no status, and says so plainly.
    */
-  public static scanForPrinters(): { totalFound: number; printers: PrinterDevice[] } {
-    db.configuredPrinters.forEach((p) => {
-      // Keep online unless explicitly configured as error
-      if (p.status !== 'ERROR' && p.status !== 'PAPER_OUT') {
-        p.status = 'READY';
-      }
-      p.lastTestAt = new Date().toISOString();
-    });
-    db.notify();
+  public static scanForPrinters(): {
+    totalFound: number;
+    printers: PrinterDevice[];
+    canDetectNewHardware: boolean;
+    note: string;
+  } {
     return {
       totalFound: db.configuredPrinters.length,
-      printers: db.configuredPrinters
+      printers: db.configuredPrinters,
+      canDetectNewHardware: false,
+      note: 'Automatic printer detection is not available yet: add printers manually in Restaurant Admin. Statuses shown are the last known ones, not a live check.'
     };
+  }
+
+  /**
+   * Real hardware detection (BUG-025/026), inside the desktop app: what Windows has installed (USB and
+   * driver printers), what answers on the network's raw-print port, and what serial ports exist.
+   * Returns `available: false` with an explanation in a browser tab, where none of this can be asked.
+   */
+  public static async detectHardwarePrinters(): Promise<DetectionResult> {
+    return detectPrinters();
+  }
+
+  /** True when a discovered printer is not one of this restaurant's configured printers yet. */
+  public static isNewDiscovery(found: DiscoveredPrinter): boolean {
+    return !isAlreadyConfigured(db.configuredPrinters, found);
+  }
+
+  /** Adds a printer found by detection, with a role and paper size the operator chose for it. */
+  public static addDiscoveredPrinter(found: DiscoveredPrinter, role: PrinterRole, paperSize: ReceiptPaperSize): PrinterDevice {
+    const described = describeDiscovered(found);
+    return PrinterRepository.createPrinter({ ...described, name: described.name || 'New printer', role, paperSize });
   }
 
   /**
@@ -79,18 +102,24 @@ export class PosPrinterService {
       return ' '.repeat(padLen) + text;
     };
 
+    // BUG-028: only the restaurant's real details are printed. No hardcoded brand/tagline
+    // lines, and a missing GSTIN says so instead of a placeholder being printed on a tax invoice.
+    const taxable = Math.max(0, (order.subtotal || 0) - (order.discountAmount || 0));
+    const halfRate = (amount: number | undefined): string => {
+      if (!taxable || !amount) return '0';
+      const pct = Math.round(((amount / taxable) * 100) * 100) / 100;
+      return String(pct);
+    };
     const lines: string[] = [
       center(config.restaurantName.toUpperCase()),
-      center('BY KELVIONTECH'),
-      center('Authentic Heritage Dining'),
-      center(config.address),
-      center(`Phone: ${config.phone}`),
-      center(`GSTIN: ${config.gstin}`),
-      center(`FSSAI Lic: ${config.fssaiNumber}`),
+      config.address ? center(config.address) : '',
+      config.phone ? center(`Phone: ${config.phone}`) : '',
+      center(config.gstin ? `GSTIN: ${config.gstin}` : 'GSTIN: Not registered'),
+      config.fssaiNumber ? center(`FSSAI Lic: ${config.fssaiNumber}`) : '',
       doubleDivider,
       pad(`INVOICE: ${order.orderNumber}`, `TOKEN: #${order.tokenNumber}`),
       pad(`DATE: ${new Date(order.createdAt).toLocaleDateString('en-IN')}`, `TIME: ${new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`),
-      pad(`CASHIER: ${order.kioskId || 'POS-01'}`, order.tableNumber ? `TABLE: ${order.tableNumber}` : `TYPE: ${order.orderType}`),
+      pad(`CASHIER: ${order.cashierName || 'Unassigned'}`, order.tableNumber ? `TABLE: ${order.tableNumber}` : `TYPE: ${order.orderType}`),
       order.customerName ? pad(`GUEST: ${order.customerName}`, order.customerPhone || '') : '',
       divider,
       pad('ITEM', 'QTY   AMT'),
@@ -111,8 +140,8 @@ export class PosPrinterService {
     if (order.discountAmount > 0) {
       lines.push(pad('Discount:', `-₹${order.discountAmount}`));
     }
-    lines.push(pad('CGST (2.5%):', `₹${order.cgstAmount || 0}`));
-    lines.push(pad('SGST (2.5%):', `₹${order.sgstAmount || 0}`));
+    lines.push(pad(`CGST (${halfRate(order.cgstAmount)}%):`, `₹${order.cgstAmount || 0}`));
+    lines.push(pad(`SGST (${halfRate(order.sgstAmount)}%):`, `₹${order.sgstAmount || 0}`));
     if (order.roundOffAmount !== 0) {
       lines.push(pad('Round Off:', `${order.roundOffAmount > 0 ? '+' : ''}₹${order.roundOffAmount}`));
     }
@@ -205,10 +234,49 @@ export class PosPrinterService {
    * Sends already-formatted text to a real NETWORK_LAN printer over raw TCP
    * via the send_escpos_bytes Tauri command.
    */
-  private static async dispatchToNetworkPrinter(printer: PrinterDevice, text: string): Promise<void> {
-    const { invoke } = await import('@tauri-apps/api/core');
-    const bytes = Array.from(this.wrapEscPos(text));
-    await invoke('send_escpos_bytes', { ip: printer.ipAddress, port: Number(printer.port) || 9100, bytes });
+  private static async dispatchToPrinter(printer: PrinterDevice, text: string): Promise<void> {
+    await sendRawToPrinter(printer, this.wrapEscPos(text));
+  }
+
+  /**
+   * A freshly activated real restaurant has no printers until the owner adds one (BUG-025).
+   * Printing must fail cleanly with that reason - recorded as a FAILED job the cashier can
+   * see and retry later - rather than crash the sale on `undefined.lastPrintAt`.
+   */
+  private static noPrinterJob(
+    type: PrintJob['type'],
+    payload: string,
+    ref: { orderId?: string; orderNumber?: string; tokenNumber?: string; kotId?: string; kotNumber?: string; targetStation?: string }
+  ): PrintJob {
+    const job = PrintQueueRepository.addJob({
+      type,
+      printerId: 'no-printer',
+      printerName: 'No printer configured',
+      rawPayload: payload,
+      ...ref
+    });
+    return PrintQueueRepository.updateJobStatus(job.id, 'FAILED', 'No printer is configured. Add one in Restaurant Admin → Printers.') || job;
+  }
+
+  /**
+   * BUG-024/026: the one place every print job's real outcome is decided. `addJob` creates a
+   * job PENDING (not SUCCESS) precisely so this is the only path that can mark it otherwise.
+   * NETWORK_LAN inside the desktop app is the one real transport today; VIRTUAL_EMULATOR is an
+   * explicit, dev-only simulator. Every other case — USB/SERIAL/WINDOWS_DRIVER (no native
+   * driver exists yet) or NETWORK_LAN outside the desktop app — used to "simulate success"
+   * and is now a real, explained failure instead.
+   */
+  private static async dispatchAndFinalize(job: PrintJob, printer: PrinterDevice, payload: string): Promise<PrintJob> {
+    const stored = db.printJobs.find((j) => j.id === job.id);
+    if (stored) stored.attempts += 1;
+    try {
+      // Real transports for network, USB / Windows printers and serial, in the desktop app; only the
+      // developer simulator sends nothing.
+      await this.dispatchToPrinter(printer, payload);
+      return PrintQueueRepository.updateJobStatus(job.id, 'PRINTED') || job;
+    } catch (err: any) {
+      return PrintQueueRepository.updateJobStatus(job.id, 'FAILED', err?.message || 'Printer communication failed') || job;
+    }
   }
 
   /**
@@ -216,6 +284,13 @@ export class PosPrinterService {
    */
   public static async printOrderReceipt(order: Order, paperSize?: ReceiptPaperSize): Promise<PrintJob> {
     const printer = this.getPrinterForRole('RECEIPT');
+    if (!printer) {
+      return this.noPrinterJob(
+        paperSize === '58mm' ? 'RECEIPT_58MM' : 'RECEIPT_80MM',
+        this.generateReceiptText(order, paperSize || '80mm'),
+        { orderId: order.id, orderNumber: order.orderNumber, tokenNumber: order.tokenNumber }
+      );
+    }
     const effectivePaperSize = paperSize || printer.paperSize || '80mm';
     const payload = this.generateReceiptText(order, effectivePaperSize);
 
@@ -233,15 +308,7 @@ export class PosPrinterService {
       paperSize: effectivePaperSize
     });
 
-    if (printer.interfaceType === 'NETWORK_LAN' && printer.ipAddress && this.isTauriRuntime()) {
-      try {
-        await this.dispatchToNetworkPrinter(printer, payload);
-      } catch (err: any) {
-        return PrintQueueRepository.updateJobStatus(job.id, 'FAILED', err?.message || 'Printer communication failed') || job;
-      }
-    }
-
-    return job;
+    return this.dispatchAndFinalize(job, printer, payload);
   }
 
   /**
@@ -250,6 +317,12 @@ export class PosPrinterService {
   public static async printKOT(kot: KOTRecord): Promise<PrintJob> {
     const printer = this.getPrinterForStation(kot.station);
     const payload = this.generateKOTText(kot);
+    if (!printer) {
+      return this.noPrinterJob('KOT_TICKET', payload, {
+        orderId: kot.orderId, orderNumber: kot.orderNumber, tokenNumber: kot.tokenNumber,
+        kotId: kot.id, kotNumber: kot.kotNumber, targetStation: kot.station
+      });
+    }
 
     printer.lastPrintAt = new Date().toISOString();
     db.notify();
@@ -268,15 +341,18 @@ export class PosPrinterService {
       paperSize: printer.paperSize || '80mm'
     });
 
-    if (printer.interfaceType === 'NETWORK_LAN' && printer.ipAddress && this.isTauriRuntime()) {
-      try {
-        await this.dispatchToNetworkPrinter(printer, payload);
-      } catch (err: any) {
-        return PrintQueueRepository.updateJobStatus(job.id, 'FAILED', err?.message || 'Printer communication failed') || job;
-      }
-    }
+    return this.dispatchAndFinalize(job, printer, payload);
+  }
 
-    return job;
+  /**
+   * BUG-024: Retry for a failed/pending job that actually re-sends it (the repository's
+   * retryJob only re-queues; it used to just flip the job to SUCCESS).
+   */
+  public static async retryJob(jobId: string): Promise<PrintJob | null> {
+    const queued = PrintQueueRepository.retryJob(jobId);
+    if (!queued) return null;
+    const printer = db.configuredPrinters.find((p) => p.id === queued.printerId) || this.getPrinterForRole('RECEIPT');
+    return this.dispatchAndFinalize(queued, printer, queued.rawPayload || queued.formattedText || '');
   }
 
   /**
@@ -284,6 +360,11 @@ export class PosPrinterService {
    */
   public static async reprintReceipt(order: Order, reason?: string, username: string = 'Cashier'): Promise<PrintJob> {
     const printer = this.getPrinterForRole('RECEIPT');
+    if (!printer) {
+      return this.noPrinterJob('RECEIPT_80MM', this.generateReceiptText(order, '80mm'), {
+        orderId: order.id, orderNumber: order.orderNumber, tokenNumber: order.tokenNumber
+      });
+    }
     const effectivePaperSize = printer.paperSize || '80mm';
     const payload = this.generateReceiptText(order, effectivePaperSize);
 
@@ -299,15 +380,7 @@ export class PosPrinterService {
     });
 
     job.isReprint = true;
-
-    if (printer.interfaceType === 'NETWORK_LAN' && printer.ipAddress && this.isTauriRuntime()) {
-      try {
-        await this.dispatchToNetworkPrinter(printer, payload);
-      } catch (err: any) {
-        const failed = PrintQueueRepository.updateJobStatus(job.id, 'FAILED', err?.message || 'Printer communication failed');
-        if (failed) job = { ...failed, isReprint: true };
-      }
-    }
+    job = { ...(await this.dispatchAndFinalize(job, printer, payload)), isReprint: true };
 
     AuditRepository.log({
       action: 'RECEIPT_REPRINT',
@@ -325,23 +398,24 @@ export class PosPrinterService {
    */
   public static async printTestSlip(printerId: string, paperSize: ReceiptPaperSize = '80mm'): Promise<PrintJob> {
     const printer = db.configuredPrinters.find((p) => p.id === printerId) || this.getPrinterForRole('RECEIPT');
+    if (!printer) return this.noPrinterJob('TEST_PAGE', 'JAMANVAAR diagnostic test slip', {});
 
-    const rawPayload = `
-========================================
-            JAMANVAAR POS
-           BY KELVIONTECH
-----------------------------------------
-HARDWARE DIAGNOSTIC TEST SLIP
-DEVICE: ${printer.name}
-ROLE: ${printer.role || 'GENERAL'}
-INTERFACE: ${printer.interfaceType} ${printer.port || printer.ipAddress || ''}
-PAPER SIZE: ${paperSize}
-STATUS: READY (COMMUNICATION OK)
-TIMESTAMP: ${new Date().toLocaleString('en-IN')}
-----------------------------------------
-ESC/POS Thermal Auto-Cutter Test OK
-========================================
-    `.trim();
+    // BUG-027: this used to bake a fixed "STATUS: READY (COMMUNICATION OK)" line into the
+    // slip itself, sent to the printer before anything was actually attempted — nonsensical
+    // (if communication weren't OK, the printer would never receive it to print it), and it
+    // made the real result (the job's status, below) irrelevant to what the slip claimed.
+    const rawPayload = [
+      '========================================',
+      '            JAMANVAAR POS',
+      '----------------------------------------',
+      'HARDWARE DIAGNOSTIC TEST SLIP',
+      `DEVICE: ${printer.name}`,
+      `ROLE: ${printer.role || 'GENERAL'}`,
+      `INTERFACE: ${printer.interfaceType} ${printer.port || printer.ipAddress || ''}`,
+      `PAPER SIZE: ${paperSize}`,
+      `TIMESTAMP: ${new Date().toLocaleString('en-IN')}`,
+      '========================================'
+    ].join(String.fromCharCode(10));
 
     printer.lastTestAt = new Date().toISOString();
     printer.lastPrintAt = new Date().toISOString();
@@ -355,14 +429,6 @@ ESC/POS Thermal Auto-Cutter Test OK
       paperSize
     });
 
-    if (printer.interfaceType === 'NETWORK_LAN' && printer.ipAddress && this.isTauriRuntime()) {
-      try {
-        await this.dispatchToNetworkPrinter(printer, rawPayload);
-      } catch (err: any) {
-        return PrintQueueRepository.updateJobStatus(job.id, 'FAILED', err?.message || 'Printer communication failed') || job;
-      }
-    }
-
-    return job;
+    return this.dispatchAndFinalize(job, printer, rawPayload);
   }
 }

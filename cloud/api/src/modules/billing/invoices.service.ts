@@ -1,27 +1,11 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { InvoiceStatus, PaymentMethod, PlatformUser } from '@prisma/client';
+import { InvoiceStatus, PaymentMethod, PlatformUser, Prisma } from '@prisma/client';
+import { pageOf, parsePaging } from '../../common/paging';
+import { ts } from '../../common/sql';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { BrandingService, SellerEntity } from '../platform-settings/branding.service';
 import { CreateInvoiceDto, RecordPaymentDto, TenantPaymentDto } from './dto/invoice.dto';
-
-export const PLATFORM_BILLING_ENTITY = {
-  name: 'JAMANVAAR SaaS Platform',
-  legalName: 'KELVIONTECH PRIVATE LIMITED',
-  address: 'Plot 42, Science City Road, Sola',
-  city: 'Ahmedabad',
-  state: 'Gujarat',
-  country: 'India',
-  pincode: '380060',
-  gstin: '24AAACK7890F1ZT',
-  sacCode: '997331', // Licensing services for the right to use computer software
-  sacDescription: 'Cloud SaaS Platform Subscription & Technical Support',
-  supportEmail: 'billing@jamanvaar.app',
-  bankName: 'HDFC Bank Ltd',
-  bankAccountName: 'KELVIONTECH PRIVATE LIMITED',
-  bankAccountNumber: '50200088991122',
-  bankIfsc: 'HDFC0001234',
-  upiId: 'jamanvaar@hdfcbank'
-};
 
 export interface TaxBreakup {
   amount: number; // paise
@@ -41,7 +25,8 @@ export interface TaxBreakup {
 export class InvoicesService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly branding: BrandingService
   ) {}
 
   /**
@@ -50,8 +35,9 @@ export class InvoicesService {
    * - Buyer in Gujarat: CGST 9% + SGST 9% (Intra-state)
    * - Buyer outside Gujarat: IGST 18% (Inter-state)
    */
-  calculateTaxBreakup(amount: number, restaurantState?: string | null): TaxBreakup {
-    const isIntraState = !restaurantState || restaurantState.trim().toLowerCase().includes('gujarat');
+  calculateTaxBreakup(amount: number, restaurantState: string | null | undefined, seller: Pick<SellerEntity, 'state' | 'sacCode'>): TaxBreakup {
+    const sellerState = seller.state.trim().toLowerCase();
+    const isIntraState = !restaurantState || restaurantState.trim().toLowerCase() === sellerState || restaurantState.trim().toLowerCase().includes(sellerState);
     const totalTax = Math.round(amount * 0.18);
 
     if (isIntraState) {
@@ -68,7 +54,7 @@ export class InvoicesService {
         sgstRate: 9,
         igstRate: 0,
         isIntraState: true,
-        sacCode: PLATFORM_BILLING_ENTITY.sacCode
+        sacCode: seller.sacCode
       };
     } else {
       return {
@@ -82,14 +68,15 @@ export class InvoicesService {
         sgstRate: 0,
         igstRate: 18,
         isIntraState: false,
-        sacCode: PLATFORM_BILLING_ENTITY.sacCode
+        sacCode: seller.sacCode
       };
     }
   }
 
   /** Formats raw invoice row with complete statutory tax breakdown and balance due */
-  private formatInvoiceWithTax(invoice: any) {
-    const tax = this.calculateTaxBreakup(invoice.amount, invoice.restaurant?.state);
+  private async formatInvoiceWithTax(invoice: any) {
+    const seller = await this.branding.seller();
+    const tax = this.calculateTaxBreakup(invoice.amount, invoice.restaurant?.state, seller);
     const payments = invoice.payments || [];
     const totalPaid = payments
       .filter((p: any) => p.status === 'COMPLETED')
@@ -102,44 +89,146 @@ export class InvoicesService {
       totalPaid,
       balanceDue,
       isFullyPaid: balanceDue === 0 && invoice.status === 'PAID',
-      seller: PLATFORM_BILLING_ENTITY
+      seller
     };
   }
 
+  /** Indian financial year label (April-March), e.g. "2026-27". */
+  private financialYearLabel(d: Date = new Date()): string {
+    const startYear = d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
+    return `${startYear}-${String((startYear + 1) % 100).padStart(2, '0')}`;
+  }
+
+  /** Atomic per-key counter (INSERT ... ON CONFLICT ... RETURNING): safe under concurrency and never reused. */
+  private async nextSequence(tx: any, key: string): Promise<number> {
+    const rows = (await tx.$queryRaw`
+      INSERT INTO "InvoiceCounter" ("key", "value") VALUES (${key}, 1)
+      ON CONFLICT ("key") DO UPDATE SET "value" = "InvoiceCounter"."value" + 1
+      RETURNING "value"`) as Array<{ value: number }>;
+    return Number(rows[0].value);
+  }
+
   private async generateInvoiceNumber(tx: any): Promise<string> {
-    const year = new Date().getFullYear();
-    const count = await tx.invoice.count();
-    return `INV-${year}-${String(count + 1).padStart(4, '0')}`;
+    const fy = this.financialYearLabel();
+    const seq = await this.nextSequence(tx, `INV-${fy}`);
+    return `INV-${fy}-${String(seq).padStart(4, '0')}`;
   }
 
   private async generateReceiptNumber(tx: any): Promise<string> {
-    const year = new Date().getFullYear();
-    const count = await tx.payment.count({ where: { receiptNumber: { not: null } } });
-    return `RCP-${year}-${String(count + 1).padStart(4, '0')}`;
+    const fy = this.financialYearLabel();
+    const seq = await this.nextSequence(tx, `RCP-${fy}`);
+    return `RCP-${fy}-${String(seq).padStart(4, '0')}`;
   }
 
   // ──────────────────────────────────────────────────────────────────────────
   // Super Admin API Operations
   // ──────────────────────────────────────────────────────────────────────────
 
-  async list(restaurantId?: string, status?: InvoiceStatus) {
+  /**
+   * Plain array without `page`. With `page`, invoices are searched, filtered and paged in the database
+   * and returned with per-status counts for the scope (BUG-051). "Overdue" is one rule everywhere:
+   * unpaid (ISSUED or PAST_DUE) and past its due date, whatever the stored status currently says.
+   */
+  async list(query: {
+    restaurantId?: string; status?: string; q?: string; overdue?: string; from?: string; to?: string;
+    planId?: string; page?: unknown; pageSize?: unknown;
+  } = {}) {
+    const paging = parsePaging(query);
+    const now = new Date();
+    const q = query.q?.trim();
+    const from = query.from ? new Date(query.from) : undefined;
+    const to = query.to ? new Date(query.to) : undefined;
+    const scope: Prisma.InvoiceWhereInput = {
+      ...(query.restaurantId ? { restaurantId: query.restaurantId } : {}),
+      ...(query.planId ? { planId: query.planId } : {}),
+      ...(from || to ? { createdAt: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } } : {}),
+      ...(q
+        ? { OR: [
+            { invoiceNumber: { contains: q, mode: 'insensitive' } },
+            { restaurant: { name: { contains: q, mode: 'insensitive' } } }
+          ] }
+        : {})
+    };
+    const where: Prisma.InvoiceWhereInput = {
+      AND: [
+        scope,
+        ...(query.status ? [{ status: query.status as InvoiceStatus }] : []),
+        ...(query.overdue === 'true' ? [{ status: { in: ['ISSUED', 'PAST_DUE'] as InvoiceStatus[] }, dueDate: { lt: now } }] : [])
+      ]
+    };
+    const include = {
+      restaurant: { select: { id: true, name: true, legalName: true, city: true, state: true, gstin: true } },
+      plan: { select: { id: true, name: true, tier: true } },
+      subscription: { select: { id: true, status: true, startDate: true, expiresAt: true } },
+      payments: { orderBy: { createdAt: 'desc' as const } }
+    };
+
     return this.prisma.runAsPlatform(async (tx) => {
-      const where: any = {};
-      if (restaurantId) where.restaurantId = restaurantId;
-      if (status) where.status = status;
+      if (!paging.paged) {
+        const items = await tx.invoice.findMany({ where, include, orderBy: { createdAt: 'desc' } });
+        return Promise.all(items.map((inv) => this.formatInvoiceWithTax(inv)));
+      }
+      const [items, total, grouped] = await Promise.all([
+        tx.invoice.findMany({ where, include, orderBy: [{ createdAt: 'desc' }, { id: 'asc' }], skip: paging.skip, take: paging.take }),
+        tx.invoice.count({ where }),
+        tx.invoice.groupBy({ by: ['status'], where: scope, _count: { _all: true } })
+      ]);
+      const statusCounts: Record<string, number> = { DRAFT: 0, ISSUED: 0, PAID: 0, PAST_DUE: 0, VOID: 0, REFUNDED: 0 };
+      for (const g of grouped) statusCounts[g.status] = g._count._all;
+      return { ...pageOf(await Promise.all(items.map((inv) => this.formatInvoiceWithTax(inv))), total, paging), statusCounts };
+    });
+  }
 
-      const items = await tx.invoice.findMany({
-        where,
-        include: {
-          restaurant: { select: { id: true, name: true, legalName: true, city: true, state: true, gstin: true } },
-          plan: { select: { id: true, name: true, tier: true } },
-          subscription: { select: { id: true, status: true, startDate: true, expiresAt: true } },
-          payments: { orderBy: { createdAt: 'desc' } }
-        },
-        orderBy: { createdAt: 'desc' }
+  /** One row per restaurant that owes money: what, how much is late, since when, last payment, next renewal. */
+  async receivables(query: { q?: string; page?: unknown; pageSize?: unknown } = {}) {
+    const paging = parsePaging(query);
+    const now = new Date();
+    const q = query.q?.trim();
+    const like = q ? `%${q}%` : null;
+    const limit = paging.paged ? paging.take : 1000;
+    const offset = paging.paged ? paging.skip : 0;
+    return this.prisma.runAsPlatform(async (tx) => {
+      const rows = await tx.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
+        SELECT r.id AS "restaurantId", r.name AS "restaurantName",
+          (COALESCE(SUM(i."totalAmount"), 0) / 100.0)::float8 AS outstanding,
+          (COALESCE(SUM(i."totalAmount") FILTER (WHERE i."dueDate" < ${ts(now)}), 0) / 100.0)::float8 AS overdue,
+          COUNT(i.id)::int AS "unpaidInvoices",
+          MIN(i."dueDate") AS "oldestDue",
+          (SELECT MAX(p."createdAt") FROM "Payment" p WHERE p."restaurantId" = r.id AND p.status = 'COMPLETED') AS "lastPaymentAt",
+          (SELECT MIN(s."expiresAt") FROM "Subscription" s WHERE s."restaurantId" = r.id AND s.status IN ('ACTIVE', 'TRIAL', 'PAST_DUE')) AS "nextRenewal"
+        FROM "Restaurant" r
+        JOIN "Invoice" i ON i."restaurantId" = r.id AND i.status IN ('ISSUED', 'PAST_DUE')
+        WHERE r."deletedAt" IS NULL AND (${like}::text IS NULL OR r.name ILIKE ${like})
+        GROUP BY r.id, r.name
+        ORDER BY overdue DESC, outstanding DESC, r.name ASC
+        LIMIT ${limit} OFFSET ${offset}
+      `);
+      if (!paging.paged) return rows;
+      const totalRows = await tx.$queryRaw<Array<{ n: number }>>(Prisma.sql`
+        SELECT COUNT(DISTINCT r.id)::int AS n FROM "Restaurant" r
+        JOIN "Invoice" i ON i."restaurantId" = r.id AND i.status IN ('ISSUED', 'PAST_DUE')
+        WHERE r."deletedAt" IS NULL AND (${like}::text IS NULL OR r.name ILIKE ${like})
+      `);
+      return pageOf(rows, totalRows[0]?.n ?? 0, paging);
+    });
+  }
+
+  /** Unpaid invoices whose due date has passed become PAST_DUE. Run by the scheduler; safe to repeat. */
+  async markOverdueInvoices() {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const due = await tx.invoice.findMany({
+        where: { status: 'ISSUED', dueDate: { lt: new Date() } },
+        select: { id: true, restaurantId: true, invoiceNumber: true }
       });
-
-      return items.map((inv) => this.formatInvoiceWithTax(inv));
+      if (!due.length) return { marked: 0 };
+      await tx.invoice.updateMany({ where: { id: { in: due.map((d) => d.id) } }, data: { status: 'PAST_DUE' } });
+      for (const inv of due) {
+        await this.audit.log(
+          { actorType: 'SYSTEM', restaurantId: inv.restaurantId, action: 'INVOICE_MARKED_OVERDUE', category: 'BILLING', details: { invoiceId: inv.id, invoiceNumber: inv.invoiceNumber } },
+          tx
+        );
+      }
+      return { marked: due.length };
     });
   }
 
@@ -178,7 +267,7 @@ export class InvoicesService {
       const restaurant = await tx.restaurant.findUnique({ where: { id: dto.restaurantId } });
       if (!restaurant) throw new NotFoundException('Restaurant not found');
 
-      const tax = this.calculateTaxBreakup(dto.amount, restaurant.state);
+      const tax = this.calculateTaxBreakup(dto.amount, restaurant.state, await this.branding.seller());
       const invoiceNumber = await this.generateInvoiceNumber(tx);
 
       const invoice = await tx.invoice.create({
@@ -234,12 +323,20 @@ export class InvoicesService {
     billingPeriodEnd: Date,
     billingPeriodStart: Date = new Date()
   ) {
+    // One initial invoice per subscription: a second call (a retried onboarding,
+    // or a client that also issues its own) returns the existing invoice.
+    const existingInitial = await tx.invoice.findFirst({
+      where: { subscriptionId, status: { notIn: ['VOID', 'REFUNDED'] } },
+      orderBy: { createdAt: 'asc' }
+    });
+    if (existingInitial) return existingInitial;
+
     const restaurant = await tx.restaurant.findUnique({ where: { id: restaurantId } });
     const plan = await tx.plan.findUnique({ where: { id: planId } });
     if (!restaurant || !plan) return null;
 
     const baseAmount = plan.priceMonthly; // in paise
-    const tax = this.calculateTaxBreakup(baseAmount, restaurant.state);
+    const tax = this.calculateTaxBreakup(baseAmount, restaurant.state, await this.branding.seller());
     const invoiceNumber = await this.generateInvoiceNumber(tx);
 
     const invoice = await tx.invoice.create({
@@ -386,7 +483,8 @@ export class InvoicesService {
       }
 
       const primaryPayment = invoice.payments[0];
-      const tax = this.calculateTaxBreakup(invoice.amount, invoice.restaurant.state);
+      const seller = await this.branding.seller();
+      const tax = this.calculateTaxBreakup(invoice.amount, invoice.restaurant.state, seller);
       const totalPaid = invoice.payments.reduce((sum, p) => sum + p.amount, 0);
 
       return {
@@ -417,22 +515,32 @@ export class InvoicesService {
           ownerName: invoice.restaurant.users?.[0]?.fullName || 'Restaurant Administrator',
           ownerEmail: invoice.restaurant.users?.[0]?.email || ''
         },
-        seller: PLATFORM_BILLING_ENTITY,
+        seller,
         taxBreakup: tax
       };
     });
   }
 
-  async updateStatus(invoiceId: string, status: InvoiceStatus, actor: PlatformUser) {
+  async updateStatus(invoiceId: string, status: InvoiceStatus, actor: PlatformUser, reason?: string) {
     return this.prisma.runAsPlatform(async (tx) => {
-      const invoice = await tx.invoice.findUnique({ where: { id: invoiceId } });
+      const invoice = await tx.invoice.findUnique({ where: { id: invoiceId }, include: { payments: true } });
       if (!invoice) throw new NotFoundException(`Invoice ${invoiceId} not found`);
+
+      if (status === 'PAID') {
+        // "Paid" must be backed by real payment records - it used to be settable
+        // by hand with no payment, so collected revenue and paid status disagreed.
+        const paid = invoice.payments.filter((p: any) => p.status === 'COMPLETED').reduce((sum: number, p: any) => sum + p.amount, 0);
+        if (paid < invoice.totalAmount) {
+          throw new ConflictException('Record a payment for the full invoice amount before marking it PAID');
+        }
+      }
 
       const updated = await tx.invoice.update({
         where: { id: invoiceId },
         data: {
           status,
-          paidAt: status === 'PAID' ? new Date() : status === 'VOID' ? null : invoice.paidAt
+          paidAt: status === 'PAID' ? new Date() : status === 'VOID' ? null : invoice.paidAt,
+          ...(reason ? { notes: `${invoice.notes ? invoice.notes + ' | ' : ''}${status}: ${reason}` } : {})
         },
         include: {
           restaurant: true,
@@ -448,7 +556,7 @@ export class InvoicesService {
           restaurantId: invoice.restaurantId,
           action: 'INVOICE_STATUS_UPDATED',
           category: 'BILLING',
-          details: { invoiceId, oldStatus: invoice.status, newStatus: status }
+          details: { invoiceId, oldStatus: invoice.status, newStatus: status, reason }
         },
         tx
       );
@@ -457,40 +565,51 @@ export class InvoicesService {
     });
   }
 
-  async getBillingSummary() {
+  /**
+   * Every figure is a database aggregate under one overdue rule (unpaid and past its due date), so
+   * the cards, the table and the ageing buckets can never disagree (BUG-053). The collection rate is
+   * money collected over money billed, not invoices paid over invoices issued.
+   */
+  async getBillingSummary(restaurantId?: string) {
+    const now = new Date();
+    const scope: Prisma.InvoiceWhereInput = restaurantId ? { restaurantId } : {};
+    const unpaid = { status: { in: ['ISSUED', 'PAST_DUE'] as InvoiceStatus[] } };
+    const ago = (days: number) => new Date(now.getTime() - days * 86400_000);
+
     return this.prisma.runAsPlatform(async (tx) => {
-      const [
-        totalInvoices,
-        paidInvoices,
-        pendingInvoices,
-        pastDueInvoices,
-        allPayments,
-        allIssuedInvoices
-      ] = await Promise.all([
-        tx.invoice.count({ where: { status: { not: 'VOID' } } }),
-        tx.invoice.count({ where: { status: 'PAID' } }),
-        tx.invoice.count({ where: { status: 'ISSUED' } }),
-        tx.invoice.count({ where: { status: 'PAST_DUE' } }),
-        tx.payment.findMany({ where: { status: 'COMPLETED' }, select: { amount: true } }),
-        tx.invoice.findMany({
-          where: { status: { not: 'VOID' } },
-          select: { totalAmount: true, status: true }
-        })
+      const sum = (where: Prisma.InvoiceWhereInput) => tx.invoice.aggregate({ where, _sum: { totalAmount: true }, _count: { _all: true } });
+      const [billed, paid, unpaidAgg, overdueAgg, collected, b30, b60, b90, b90plus] = await Promise.all([
+        sum({ ...scope, status: { not: 'VOID' } }),
+        tx.invoice.count({ where: { ...scope, status: 'PAID' } }),
+        sum({ ...scope, ...unpaid }),
+        sum({ ...scope, ...unpaid, dueDate: { lt: now } }),
+        tx.payment.aggregate({ where: { status: 'COMPLETED', ...(restaurantId ? { restaurantId } : {}) }, _sum: { amount: true } }),
+        sum({ ...scope, ...unpaid, dueDate: { lt: now, gte: ago(30) } }),
+        sum({ ...scope, ...unpaid, dueDate: { lt: ago(30), gte: ago(60) } }),
+        sum({ ...scope, ...unpaid, dueDate: { lt: ago(60), gte: ago(90) } }),
+        sum({ ...scope, ...unpaid, dueDate: { lt: ago(90) } })
       ]);
-
-      const totalCollectedPaise = allPayments.reduce((sum, p) => sum + p.amount, 0);
-      const pendingPaise = allIssuedInvoices
-        .filter((i) => i.status === 'ISSUED' || i.status === 'PAST_DUE')
-        .reduce((sum, i) => sum + i.totalAmount, 0);
-
+      const rupees = (paise: number | null) => (paise ?? 0) / 100;
+      const billedPaise = billed._sum.totalAmount ?? 0;
+      const collectedPaise = collected._sum.amount ?? 0;
+      const overdueCount = overdueAgg._count._all;
       return {
-        totalInvoices,
-        paidInvoices,
-        pendingInvoices,
-        pastDueInvoices,
-        totalCollected: totalCollectedPaise / 100,
-        pendingAmount: pendingPaise / 100,
-        collectionRatePercent: totalInvoices > 0 ? Math.round((paidInvoices / totalInvoices) * 100) : 0
+        totalInvoices: billed._count._all,
+        paidInvoices: paid,
+        pendingInvoices: unpaidAgg._count._all - overdueCount,
+        overdueInvoices: overdueCount,
+        // Same number as overdueInvoices, kept for clients written before there was one overdue rule.
+        pastDueInvoices: overdueCount,
+        totalCollected: rupees(collectedPaise),
+        pendingAmount: rupees(unpaidAgg._sum.totalAmount),
+        overdueAmount: rupees(overdueAgg._sum.totalAmount),
+        collectionRatePercent: billedPaise > 0 ? Math.round((collectedPaise / billedPaise) * 100) : 0,
+        ageing: {
+          '0-30': rupees(b30._sum.totalAmount),
+          '31-60': rupees(b60._sum.totalAmount),
+          '61-90': rupees(b90._sum.totalAmount),
+          '90+': rupees(b90plus._sum.totalAmount)
+        }
       };
     });
   }
@@ -548,7 +667,7 @@ export class InvoicesService {
 
         if (!hasUpcomingInvoice) {
           const baseAmount = sub.plan.priceMonthly;
-          const tax = this.calculateTaxBreakup(baseAmount, sub.restaurant.state);
+          const tax = this.calculateTaxBreakup(baseAmount, sub.restaurant.state, await this.branding.seller());
           const invoiceNumber = await this.generateInvoiceNumber(tx);
 
           const newInvoice = await tx.invoice.create({
@@ -643,7 +762,7 @@ export class InvoicesService {
         totalDue: totalDuePaise / 100,
         totalPaid: totalPaidPaise / 100,
         invoicesCount: invoices.length,
-        latestInvoice: invoices[0] ? this.formatInvoiceWithTax(invoices[0]) : null
+        latestInvoice: invoices[0] ? await this.formatInvoiceWithTax(invoices[0]) : null
       };
     });
   }
@@ -660,7 +779,7 @@ export class InvoicesService {
         orderBy: { createdAt: 'desc' }
       });
 
-      return items.map((inv) => this.formatInvoiceWithTax(inv));
+      return Promise.all(items.map((inv) => this.formatInvoiceWithTax(inv)));
     });
   }
 
@@ -784,7 +903,7 @@ export class InvoicesService {
 
       return {
         success: true,
-        invoice: this.formatInvoiceWithTax(updated),
+        invoice: await this.formatInvoiceWithTax(updated),
         payment: {
           id: payment.id,
           receiptNumber,

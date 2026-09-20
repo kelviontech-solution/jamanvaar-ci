@@ -78,7 +78,7 @@ describe('New SaaS Modules: Invoices, Applications, Support, and Platform Settin
       });
 
       expect(res.status).toBe(201);
-      expect(res.body.invoiceNumber).toMatch(/^INV-\d{4}-\d{4}$/);
+      expect(res.body.invoiceNumber).toMatch(/^INV-\d{4}-\d{2}-\d{4,}$/);
       expect(res.body.totalAmount).toBe(590000);
       expect(res.body.status).toBe('ISSUED');
       createdInvoiceId = res.body.id;

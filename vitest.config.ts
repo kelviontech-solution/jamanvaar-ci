@@ -8,7 +8,7 @@ export default defineConfig({
     // cloud/api is its own NestJS project with its own vitest config, its own
     // live-database requirements, and its own module resolution — it must not
     // be picked up (or slow down) the root offline-runtime test suite.
-    exclude: ['**/node_modules/**', '**/dist/**', 'cloud/**']
+    exclude: ['**/node_modules/**', '**/dist/**', 'cloud/**', '.claude/**', '.playwright-mcp/**']
   },
   resolve: {
     alias: {

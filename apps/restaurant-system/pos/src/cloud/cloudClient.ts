@@ -4,6 +4,7 @@
  * response's own deviceToken is used directly, no second login step.
  */
 
+import { refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
 import type {
   OrderSyncPushEvent,
   OrderSyncPushResult,
@@ -12,6 +13,9 @@ import type {
   EntitySyncPushResult,
   CloudSyncedEntity
 } from '@jamanvaar/sync';
+
+import { DeviceGate, sendHeartbeat } from '@jamanvaar/sync';
+import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -71,8 +75,17 @@ export async function activatePosDevice(code: string): Promise<void> {
 
   try {
     localStorage.setItem(RESTAURANT_ID_KEY, data.restaurantId);
+    // BUG-021: this device used to keep showing the seeded "JAMANVAAR RESTAURANT" placeholder
+    // forever, even after activating against a real restaurant with a different name.
+    if (data.restaurant) {
+      RestaurantIdentityRepository.adopt(data.restaurantId, data.restaurant);
+    }
     localStorage.setItem(DEVICE_ID_KEY, data.device.id);
     localStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken);
+    DeviceGate.reportSuccess(); // a fresh activation starts unlocked
+    MenuRepository.startFreshMenu(); // BUG-013: a real restaurant starts with no menu until one is uploaded
+    PrinterRepository.startFresh(); // BUG-025: ...and no printers until real ones are added
+    InventoryRepository.startFresh(); // BUG-045: ...and no demo ingredients/stock
   } catch {
     // Storage unavailable — activation succeeded server-side, this terminal
     // just won't remember it across reloads.
@@ -82,7 +95,7 @@ export async function activatePosDevice(code: string): Promise<void> {
 export function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const token = getPosDeviceToken();
   if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
-  return fetch(`${API_BASE}${path}`, {
+  return DeviceGate.gatedFetch(`${API_BASE}${path}`, {
     ...init,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
   });
@@ -162,15 +175,19 @@ export async function pullEntitySync(
 }
 
 export async function reportHeartbeat(): Promise<void> {
-  try {
-    await deviceFetch('/api/v1/devices/me/heartbeat', {
-      method: 'PATCH',
-      body: JSON.stringify({ syncStatus: 'ok', appVersion: '1.0.0' })
-    });
-  } catch {
-    // Best-effort — a missed heartbeat just means this device shows stale
-    // "last seen" in Super Admin until the next successful one, not a real error.
-  }
+  const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
+  if (!deviceToken) return;
+  // The platform's decision about JAMAN AI for this restaurant rides on the heartbeat (cached 5 minutes).
+  void refreshAiConfigIfStale({ apiBase: API_BASE, deviceToken });
+  // Real version (from package.json at build time), OS and sync backlog; also applies the answer: lock,
+  // notice, update offer and any signed offline extension.
+  await sendHeartbeat({
+    apiBase: API_BASE,
+    deviceToken,
+    appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0',
+    restaurantId: localStorage.getItem(RESTAURANT_ID_KEY),
+    deviceId: localStorage.getItem(DEVICE_ID_KEY)
+  });
 }
 
 export async function sendReceipt(
@@ -187,4 +204,11 @@ export async function sendReceipt(
     throw new CloudApiError(data?.message ?? `Receipt send failed (${res.status})`, res.status);
   }
   return data;
+}
+
+/** Tell the cloud a JAMAN AI question was answered (usage + measured latency) and honour its daily limit. */
+export async function reportAiQueryNow(intent: string, latencyMs: number): Promise<void> {
+  const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
+  if (!deviceToken) return;
+  await reportAiQuery({ apiBase: API_BASE, deviceToken, intent, latencyMs });
 }

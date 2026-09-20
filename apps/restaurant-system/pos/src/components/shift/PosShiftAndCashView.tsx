@@ -296,6 +296,11 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
 
   const handleDownloadShiftPdf = (shift: ShiftRecord) => {
     try {
+      // Tax comes from the shift's own bills, never from a share of sales.
+      const shiftTax = CentralReportingService.calculateFinancialSummary(
+        db.orders.filter((o) => o.shiftId === shift.id && o.paymentStatus === 'SUCCESS'),
+        `Shift ${shift.id}`
+      );
       const fullData: ReportFullData = {
         title: `Cashier Shift Statement (${shift.id})`,
         periodLabel: `Shift by ${shift.cashierName}`,
@@ -308,9 +313,9 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
           grossSales: shift.totalSales + (shift.totalDiscounts || 0),
           discountAmount: shift.totalDiscounts || 0,
           netSales: shift.totalSales,
-          cgstAmount: Math.round(shift.totalSales * 0.0238),
-          sgstAmount: Math.round(shift.totalSales * 0.0238),
-          totalTax: Math.round(shift.totalSales * 0.0476),
+          cgstAmount: shiftTax.cgstAmount,
+          sgstAmount: shiftTax.sgstAmount,
+          totalTax: shiftTax.totalTax,
           totalCollected: shift.totalSales,
           refundsCount: 0,
           refundsAmount: 0,
@@ -561,7 +566,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                   <strong className="font-mono text-rose-600">- {formatINR(shiftDiscounts)}</strong>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-200/80 font-black text-sm text-jaman-navy">
-                  <span>Total Net Sales:</span>
+                  <span>Total Billed (incl. GST):</span>
                   <span className="font-mono text-jaman-navy">{formatINR(totalShiftSales)}</span>
                 </div>
               </div>

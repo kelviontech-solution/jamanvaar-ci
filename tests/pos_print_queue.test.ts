@@ -50,7 +50,7 @@ describe('POS Thermal Print Queue & Hardware HAL Tests', () => {
     expect(receiptText).toContain('551');
   });
 
-  it('dispatches receipt print job to Print Queue with SUCCESS status and allows retry', async () => {
+  it('dispatches receipt print job to Print Queue (honest status) and allows retry', async () => {
     // No more ambient fabricated seed orders — create a real one directly.
     const order = OrderRepository.createOrder({
       orderType: 'TAKEAWAY',
@@ -76,16 +76,50 @@ describe('POS Thermal Print Queue & Hardware HAL Tests', () => {
       orderStatus: 'COMPLETED',
       source_type: 'POS'
     });
+    // BUG-024/026: only a real transport may report success. The seeded default receipt printer is
+    // a real USB printer, which needs the desktop app; make the receipt printer the explicit
+    // dev-only emulator to exercise the queue mechanics, and separately prove the USB case fails honestly.
+    const realUsb = await PosPrinterService.printOrderReceipt(order, '80mm');
+    expect(realUsb.status).toBe('FAILED');
+    expect(realUsb.errorMessage).toMatch(/desktop app/i);
+
+    db.printJobs = [];
+    const receiptPrinter = PosPrinterService.getPrinterForRole('RECEIPT');
+    const originalType = receiptPrinter.interfaceType;
+    receiptPrinter.interfaceType = 'VIRTUAL_EMULATOR';
     const job = await PosPrinterService.printOrderReceipt(order, '80mm');
+    receiptPrinter.interfaceType = originalType;
 
     expect(job).toBeDefined();
-    expect(job.status).toBe('SUCCESS');
+    expect(job.status).toBe('PRINTED');
     expect(job.type).toBe('RECEIPT_80MM');
     expect(job.orderId).toBe(order.id);
 
-    // Test retry
-    const retried = PrintQueueRepository.retryJob(job.id);
+    // Retry really re-sends: on the emulator it prints again (attempt 2); it never fakes success.
+    receiptPrinter.interfaceType = 'VIRTUAL_EMULATOR';
+    const retried = await PosPrinterService.retryJob(job.id);
+    receiptPrinter.interfaceType = originalType;
     expect(retried).not.toBeNull();
     expect(retried?.attempts).toBe(2);
+    expect(retried?.status).toBe('PRINTED');
+
+    // Retrying a job on a USB printer outside the desktop app stays FAILED, with the reason.
+    const stillFailed = await PosPrinterService.retryJob(job.id);
+    expect(stillFailed?.status).toBe('FAILED');
+    expect(stillFailed?.errorMessage).toMatch(/desktop app/i);
+  });
+
+  it('with no printer configured, receipt/KOT/test printing fails cleanly (a job with the reason), never throws', async () => {
+    db.configuredPrinters = [];
+    const order = OrderRepository.createOrder({
+      orderType: 'TAKEAWAY',
+      items: [{ id: 'oi-np', orderId: '', menuItemId: 'item-bn', name: 'Butter Naan', sku: 'BN', quantity: 1, unitPrice: 60, modifiers: [], totalPrice: 60, kitchenStatus: 'PREPARING' } as any],
+      subtotal: 60, taxAmount: 3, totalAmount: 63, paymentMethod: 'CASH', paymentStatus: 'SUCCESS', orderStatus: 'COMPLETED', source_type: 'POS'
+    } as any);
+    const receipt = await PosPrinterService.printOrderReceipt(order, '80mm');
+    expect(receipt.status).toBe('FAILED');
+    expect(receipt.errorMessage).toMatch(/no printer/i);
+    const slip = await PosPrinterService.printTestSlip('nope');
+    expect(slip.status).toBe('FAILED');
   });
 });

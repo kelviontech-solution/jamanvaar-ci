@@ -8,6 +8,8 @@ import { generateOpaqueToken, hashOpaqueToken } from '../../common/security/toke
 import { EmailService } from '../notifications/email.service';
 import { ownerInviteEmail } from '../notifications/email-templates';
 import * as bcrypt from 'bcryptjs';
+import { EntitySyncService } from '../entity-sync/entity-sync.service';
+import { ImportMenuDto } from './dto/import-menu.dto';
 
 const ACTIVATION_TOKEN_TTL_DAYS = 7;
 
@@ -18,7 +20,8 @@ export class RestaurantsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
-    private readonly email: EmailService
+    private readonly email: EmailService,
+    private readonly entitySync: EntitySyncService
   ) {}
 
   /**
@@ -246,5 +249,68 @@ export class RestaurantsService {
 
       return updated;
     });
+  }
+
+  /**
+   * BUG-015: the restaurant's real menu — the same SyncedEntity rows a device's own
+   * MENU_ITEM/MENU_CATEGORY entity-sync push/pull already reads and writes.
+   */
+  async getMenu(id: string) {
+    const restaurant = await this.prisma.runAsPlatform((tx) =>
+      tx.restaurant.findFirst({ where: { id, deletedAt: null }, select: { selfMenuUploadEnabled: true } })
+    );
+    if (!restaurant) throw new NotFoundException('Restaurant not found');
+
+    const [categories, items] = await Promise.all([
+      this.entitySync.catchUpForRestaurant(id, 'MENU_CATEGORY', new Date(0).toISOString()),
+      this.entitySync.catchUpForRestaurant(id, 'MENU_ITEM', new Date(0).toISOString())
+    ]);
+
+    return {
+      categories: categories.entities,
+      items: items.entities,
+      selfUploadEnabled: restaurant.selfMenuUploadEnabled
+    };
+  }
+
+  async importMenu(id: string, dto: ImportMenuDto, actor: PlatformUser) {
+    const restaurant = await this.prisma.runAsPlatform((tx) => tx.restaurant.findFirst({ where: { id, deletedAt: null } }));
+    if (!restaurant) throw new NotFoundException('Restaurant not found');
+
+    const [categoryResult, itemResult] = await Promise.all([
+      this.entitySync.pushEventsForRestaurant(id, 'MENU_CATEGORY', dto.categories),
+      this.entitySync.pushEventsForRestaurant(id, 'MENU_ITEM', dto.items)
+    ]);
+
+    await this.audit.log({
+      actorType: 'PLATFORM',
+      actorId: actor.id,
+      restaurantId: id,
+      action: 'RESTAURANT_MENU_IMPORTED',
+      category: 'MENU',
+      details: { categoriesImported: categoryResult.results.length, itemsImported: itemResult.results.length }
+    });
+
+    return { categoriesImported: categoryResult.results.length, itemsImported: itemResult.results.length };
+  }
+
+  async setMenuPermission(id: string, enabled: boolean, actor: PlatformUser) {
+    const restaurant = await this.prisma.runAsPlatform((tx) => tx.restaurant.findFirst({ where: { id, deletedAt: null } }));
+    if (!restaurant) throw new NotFoundException('Restaurant not found');
+
+    const updated = await this.prisma.runAsPlatform((tx) =>
+      tx.restaurant.update({ where: { id }, data: { selfMenuUploadEnabled: enabled } })
+    );
+
+    await this.audit.log({
+      actorType: 'PLATFORM',
+      actorId: actor.id,
+      restaurantId: id,
+      action: 'RESTAURANT_MENU_PERMISSION_CHANGED',
+      category: 'MENU',
+      details: { enabled }
+    });
+
+    return { selfUploadEnabled: updated.selfMenuUploadEnabled };
   }
 }

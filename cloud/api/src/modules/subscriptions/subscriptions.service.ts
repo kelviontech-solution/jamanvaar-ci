@@ -164,6 +164,57 @@ export class SubscriptionsService {
     });
   }
 
+  /**
+   * Adds `days` to the later of the current expiry and now. Unlike `renew` it does not
+   * force the status to ACTIVE: a trial stays a trial, and a lapsed one is revived to what
+   * it was (trial if it had a trial end, otherwise active). A suspended subscription must
+   * be reactivated on purpose, not by an extension.
+   */
+  async extend(id: string, days: number, actor: PlatformUser) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const existing = await tx.subscription.findUnique({ where: { id } });
+      if (!existing) throw new NotFoundException('Subscription not found');
+      if (existing.status === 'SUSPENDED') {
+        throw new ConflictException('This subscription is suspended. Reactivate it first, then extend it.');
+      }
+
+      const addMs = days * 24 * 60 * 60 * 1000;
+      const base = Math.max(existing.expiresAt.getTime(), Date.now());
+      const expiresAt = new Date(base + addMs);
+      const revivedStatus: SubscriptionStatus = existing.trialEndsAt ? 'TRIAL' : 'ACTIVE';
+
+      const updated = await tx.subscription.update({
+        where: { id },
+        data: {
+          expiresAt,
+          ...(existing.status === 'EXPIRED' ? { status: revivedStatus } : {}),
+          ...(existing.trialEndsAt ? { trialEndsAt: new Date(Math.max(existing.trialEndsAt.getTime(), Date.now()) + addMs) } : {})
+        },
+        include: { plan: true }
+      });
+
+      await this.audit.log(
+        {
+          actorType: 'PLATFORM',
+          actorId: actor.id,
+          restaurantId: existing.restaurantId,
+          action: 'SUBSCRIPTION_EXTENDED',
+          category: 'SUBSCRIPTION',
+          details: {
+            subscriptionId: id,
+            days,
+            previousExpiresAt: existing.expiresAt.toISOString(),
+            expiresAt: expiresAt.toISOString(),
+            previousStatus: existing.status
+          }
+        },
+        tx
+      );
+
+      return updated;
+    });
+  }
+
   async setStatus(id: string, status: SubscriptionStatus, actor: PlatformUser) {
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.subscription.findUnique({ where: { id } });

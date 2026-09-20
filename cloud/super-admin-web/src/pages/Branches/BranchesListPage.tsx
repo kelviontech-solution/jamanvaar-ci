@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import type { Branch } from '../../api/types';
+import { useDebounced, usePagedList } from '../../hooks/usePagedList';
+import { Pager } from '../../components/Pager';
 import {
   Badge,
   BulkActionsBar,
@@ -38,16 +40,24 @@ type BranchStatusFilter = 'ALL' | 'ACTIVE' | 'INACTIVE';
 
 export function BranchesListPage() {
   const navigate = useNavigate();
-  const [branches, setBranches] = useState<Branch[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   // Search and Filters
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<BranchStatusFilter>('ALL');
-  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('ALL');
+  // BUG-047: searching, filtering and paging all happen on the server. Search also matches the
+  // restaurant's name, so there is no need to load every restaurant into a dropdown.
+  const debouncedSearch = useDebounced(search);
+  const list = usePagedList<Branch, { statusCounts: { ACTIVE: number; INACTIVE: number } }>(
+    '/api/v1/branches',
+    { q: debouncedSearch, status: statusFilter },
+    24
+  );
+  const { loading, error } = list;
+  const load = list.reload;
+  const branches: Branch[] | null = list.extra ? list.items : null;
+  const filteredBranches = list.items;
 
   // Confirm Modal state
   const [confirmTarget, setConfirmTarget] = useState<{
@@ -77,56 +87,6 @@ export function BranchesListPage() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    api
-      .get<Branch[]>('/api/v1/branches')
-      .then((data) => {
-        setBranches(data);
-        setError(null);
-      })
-      .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load branches'))
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(load, [load]);
-
-  // Unique restaurants list for filter dropdown
-  const uniqueRestaurants = useMemo(() => {
-    if (!branches) return [];
-    const map = new Map<string, string>();
-    branches.forEach((b) => {
-      if (b.restaurant) {
-        map.set(b.restaurant.id, b.restaurant.name);
-      }
-    });
-    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
-  }, [branches]);
-
-  const filteredBranches = useMemo(() => {
-    if (!branches) return [];
-    return branches.filter((b) => {
-      if (statusFilter !== 'ALL') {
-        const isAct = b.status === 'ACTIVE';
-        if (statusFilter === 'ACTIVE' && !isAct) return false;
-        if (statusFilter === 'INACTIVE' && isAct) return false;
-      }
-      if (selectedRestaurantId !== 'ALL' && b.restaurant?.id !== selectedRestaurantId) {
-        return false;
-      }
-      if (search.trim()) {
-        const q = search.toLowerCase();
-        const matchName = b.name.toLowerCase().includes(q);
-        const matchCode = b.code.toLowerCase().includes(q);
-        const matchRest = (b.restaurant?.name || '').toLowerCase().includes(q);
-        const matchAddr = (b.address || '').toLowerCase().includes(q);
-        if (!matchName && !matchCode && !matchRest && !matchAddr) return false;
-      }
-      return true;
-    });
-  }, [branches, statusFilter, selectedRestaurantId, search]);
-
   async function handleExecuteConfirm() {
     if (!confirmTarget) return;
     setActionPending(true);
@@ -142,8 +102,8 @@ export function BranchesListPage() {
     }
   }
 
-  const activeCount = useMemo(() => branches?.filter((b) => b.status === 'ACTIVE').length || 0, [branches]);
-  const inactiveCount = useMemo(() => branches?.filter((b) => b.status !== 'ACTIVE').length || 0, [branches]);
+  const activeCount = list.extra?.statusCounts.ACTIVE ?? 0;
+  const inactiveCount = list.extra?.statusCounts.INACTIVE ?? 0;
 
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
@@ -164,15 +124,17 @@ export function BranchesListPage() {
     const ids = Array.from(selectedIds);
     setBulkPending(true);
     try {
-      const results = await Promise.allSettled(ids.map((id) => api.patch(`/api/v1/branches/${id}/${actionPath}`)));
-      const failed = results.filter((r) => r.status === 'rejected').length;
-      showToast(
-        failed === 0
-          ? `${ids.length} branch(es) ${actionPath === 'activate' ? 'activated' : 'deactivated'}`
-          : `${ids.length - failed} of ${ids.length} succeeded — ${failed} failed`
-      );
+      // One request for the whole selection, not one per branch.
+      const res = await api.post<{ updated: number; skipped: number }>('/api/v1/branches/bulk-status', {
+        ids,
+        status: actionPath === 'activate' ? 'ACTIVE' : 'INACTIVE'
+      });
+      const verb = actionPath === 'activate' ? 'activated' : 'deactivated';
+      showToast(res.skipped > 0 ? `${res.updated} branch(es) ${verb}, ${res.skipped} already were` : `${res.updated} branch(es) ${verb}`);
       setSelectedIds(new Set());
       load();
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : 'Bulk action failed');
     } finally {
       setBulkPending(false);
     }
@@ -187,7 +149,7 @@ export function BranchesListPage() {
             Branches
           </h1>
           <p className="page-subtitle" style={{ fontSize: 13.5, color: '#64748B', marginTop: 4 }}>
-            Every operational branch across all restaurant tenants — managed independently with localized hardware limits.
+            Search and audit every branch across all restaurants. Day-to-day branch management lives inside each restaurant.
           </p>
         </div>
         <Button variant="accent" onClick={() => setShowCreate(true)}>
@@ -237,7 +199,7 @@ export function BranchesListPage() {
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           {(
             [
-              { id: 'ALL', label: 'All', count: branches?.length },
+              { id: 'ALL', label: 'All', count: list.extra ? activeCount + inactiveCount : undefined },
               { id: 'ACTIVE', label: 'Active', count: activeCount },
               { id: 'INACTIVE', label: 'Inactive', count: inactiveCount }
             ] as const
@@ -272,24 +234,12 @@ export function BranchesListPage() {
           ))}
         </div>
 
-        {/* Restaurant filter */}
-        <select
-          value={selectedRestaurantId}
-          onChange={(e) => setSelectedRestaurantId(e.target.value)}
-          style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: 'var(--jv-bg)', fontWeight: 500, color: 'var(--jv-text)' }}
-        >
-          <option value="ALL">All Restaurants ({uniqueRestaurants.length})</option>
-          {uniqueRestaurants.map((r) => (
-            <option key={r.id} value={r.id}>{r.name}</option>
-          ))}
-        </select>
-
-        {(search || statusFilter !== 'ALL' || selectedRestaurantId !== 'ALL') && (
+        {(search || statusFilter !== 'ALL') && (
           <button
             type="button"
             className="btn btn-ghost btn-sm"
             style={{ fontSize: 12, color: 'var(--jv-accent)', fontWeight: 600 }}
-            onClick={() => { setSearch(''); setStatusFilter('ALL'); setSelectedRestaurantId('ALL'); }}
+            onClick={() => { setSearch(''); setStatusFilter('ALL'); }}
           >
             Clear filters
           </button>
@@ -297,7 +247,7 @@ export function BranchesListPage() {
 
         <div className="spacer" />
         <span className="muted" style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--jv-text-secondary)' }}>
-          {filteredBranches.length} of {branches?.length ?? 0}
+          {list.total} branch{list.total === 1 ? '' : 'es'}
         </span>
       </div>
 
@@ -311,7 +261,7 @@ export function BranchesListPage() {
       </BulkActionsBar>
 
       {/* Loading skeletons */}
-      {loading && !branches && (
+      {loading && !list.extra && (
         <div className="mgmt-card-grid">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="mgmt-card-skeleton" />
@@ -324,15 +274,15 @@ export function BranchesListPage() {
         <div style={{ background: 'var(--jv-surface-card)', border: '1px solid var(--jv-border)', borderRadius: 14, padding: 40 }}>
           <EmptyState
             icon={<Building2 className="w-6 h-6 text-slate-400" />}
-            title={branches.length === 0 ? 'No branches yet' : 'No matching branches found'}
+            title={!search && statusFilter === 'ALL' ? 'No branches yet' : 'No matching branches found'}
             description={
-              branches.length === 0
+              !search && statusFilter === 'ALL'
                 ? 'Every restaurant gets a primary branch on creation, and additional branches can be added here.'
-                : 'Try clearing your search query or restaurant filter to view other outlets.'
+                : 'Try clearing your search or status filter to view other branches.'
             }
             action={
-              branches.length > 0 ? (
-                <Button variant="ghost" onClick={() => { setSearch(''); setStatusFilter('ALL'); setSelectedRestaurantId('ALL'); }}>
+              search || statusFilter !== 'ALL' ? (
+                <Button variant="ghost" onClick={() => { setSearch(''); setStatusFilter('ALL'); }}>
                   Reset Filters
                 </Button>
               ) : undefined
@@ -498,6 +448,10 @@ export function BranchesListPage() {
         </div>
       )}
 
+      {list.extra && list.total > 0 && (
+        <Pager page={list.page} pageSize={list.pageSize} total={list.total} totalPages={list.totalPages} loading={loading} onPage={list.setPage} />
+      )}
+
       {showCreate && (
         <CreateBranchModal
           onClose={() => setShowCreate(false)}
@@ -515,7 +469,7 @@ export function BranchesListPage() {
           message={
             confirmTarget.action === 'activate'
               ? `Restore active operational status for branch "${confirmTarget.branch.name}"?`
-              : `Deactivating branch "${confirmTarget.branch.name}" will pause order routing for its terminals.`
+              : `Deactivating branch "${confirmTarget.branch.name}" locks the terminals assigned to it until it is activated again.`
           }
           tone={confirmTarget.action === 'activate' ? 'primary' : 'danger'}
           isPending={actionPending}

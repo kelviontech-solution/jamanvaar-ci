@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { PosReportDocument } from './PosReportDocument';
 import { ReportFullData, ReportDesign, PdfReportBuilder } from '../../services/pdfReportBuilder';
 import { PosPrinterService } from '../../services/printerService';
-import { PrintQueueRepository } from '@jamanvaar/database';
+import { db, PrintQueueRepository } from '@jamanvaar/database';
+import { slipHeader } from '@jamanvaar/utils';
 import {
   X,
   Download,
@@ -57,8 +58,7 @@ export const PosReportPreviewModal: React.FC<PosReportPreviewModalProps> = ({
     const printer = PosPrinterService.getPrinterForRole('REPORT');
     const rawPayload = `
 ========================================
-             JAMANVAAR POS
-     BY KELVIONTECH • REPORT SPOOLER
+${slipHeader(db.restaurant.name)}
 ----------------------------------------
 REPORT: ${reportData.title.toUpperCase()}
 PERIOD: ${reportData.periodLabel}

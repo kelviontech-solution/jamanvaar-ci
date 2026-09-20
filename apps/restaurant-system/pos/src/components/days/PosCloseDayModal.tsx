@@ -469,7 +469,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                     <strong className="text-jaman-navy">Amit Dave (Lead Cashier)</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span>Closing Net Revenue:</span>
+                    <span>Closing Total Billed (incl. GST):</span>
                     <strong className="text-jaman-navy">{formatINR(summary.net_sales)}</strong>
                   </div>
                   <div className="flex justify-between">

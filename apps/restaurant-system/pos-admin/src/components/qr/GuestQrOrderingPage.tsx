@@ -118,8 +118,8 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
     return QrOrderingRepository.verifyQrToken(tableNumber, token || undefined);
   }, [tableNumber, token, tick]);
 
-  const restaurant = db.restaurant || { name: 'JAMANVAAR RESTAURANT', city: 'Ahmedabad' };
-  const outlet = db.outlet || { name: 'Ahmedabad Flagship Store' };
+  const restaurant = db.restaurant || { name: '', city: '' };
+  const outlet = db.outlet || { name: '' };
   const table = verification.table || db.tables.find((t) => t.tableNumber === tableNumber);
 
   // Live QR ordering rules configured by the restaurant admin (QR Settings tab)

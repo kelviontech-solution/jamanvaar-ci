@@ -1,0 +1,5 @@
+- generic [ref=f2e4]:
+  - heading "Activate This Terminal" [level=1] [ref=f2e5]
+  - paragraph [ref=f2e6]: Enter the activation code provided by JAMANVAAR to connect this POS terminal to your restaurant.
+  - textbox "Activation code" [ref=f2e7]
+  - button "Activate" [disabled] [ref=f2e8]

@@ -593,3 +593,81 @@
   }
 }
 
+
+/* ── Role-based access (BUG-083) ── */
+.readonly-banner {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--jv-accent-soft);
+  border: 1px solid var(--jv-accent-border);
+  color: var(--jv-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+/* Buttons that create or change data are disabled in a read-only area. */
+.readonly-area .btn-primary,
+.readonly-area .btn-accent,
+.readonly-area .btn-danger {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+.no-access-panel {
+  max-width: 520px;
+  margin: 72px auto;
+  padding: 32px;
+  text-align: center;
+  background: var(--jv-surface);
+  border: 1px solid var(--jv-border);
+  border-radius: 16px;
+  box-shadow: var(--jv-shadow-card);
+}
+.no-access-panel h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  color: var(--jv-text);
+}
+.no-access-panel p {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: var(--jv-text-secondary);
+}
+
+/* ── PRINT ──
+   The shell is a fixed-height (100vh) layout whose content area scrolls. A browser prints only
+   what fits inside that box, so anything printed from a page (Welcome Kit, invoices, reports)
+   came out as an empty page. Release the fixed heights and scroll containers, and hide the
+   chrome that should never print. */
+@media print {
+  html,
+  body,
+  #root {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+  .app-shell,
+  .app-main,
+  .app-content {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+  .sidebar,
+  .app-header,
+  .readonly-banner,
+  .no-print {
+    display: none !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

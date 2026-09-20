@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { db, OrderRepository, PrintQueueRepository } from '@jamanvaar/database';
 import { PosPrinterService } from '../apps/restaurant-system/pos/src/services/printerService';
 import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
@@ -65,19 +65,21 @@ describe('POS Fast Cashier UX, Receipt & Ordering Tests', () => {
     const receiptText = PosPrinterService.generateReceiptText(order, '80mm');
 
     expect(receiptText).toContain('JAMANVAAR');
-    expect(receiptText).toContain('BY KELVIONTECH');
+    // BUG-028: no hardcoded brand/tagline lines on a restaurant's receipt.
+    expect(receiptText).not.toContain('BY KELVIONTECH');
+    expect(receiptText).not.toContain('Authentic Heritage');
     expect(receiptText).toContain('GSTIN:');
     expect(receiptText).toContain('FSSAI Lic:');
     expect(receiptText).toContain('INVOICE:');
     expect(receiptText).toContain('TOKEN:');
-    expect(receiptText).toContain('CGST (2.5%):');
-    expect(receiptText).toContain('SGST (2.5%):');
+    expect(receiptText).toMatch(/CGST \([\d.]+%\):/);
+    expect(receiptText).toMatch(/SGST \([\d.]+%\):/);
     expect(receiptText).toContain('GRAND TOTAL:');
     expect(receiptText).toContain('Payment Method:');
     expect(receiptText).toContain('Thank you');
   });
 
-  it('queues print job into real PrintQueue on settlement and supports retry', () => {
+  it('queues print job into real PrintQueue on settlement and supports retry', async () => {
     const store = usePosStore.getState();
     const item = db.menuItems[0];
     store.addItemToCart(item);
@@ -88,6 +90,13 @@ describe('POS Fast Cashier UX, Receipt & Ordering Tests', () => {
     const jobs = PrintQueueRepository.getAllJobs();
     expect(jobs.length).toBeGreaterThan(0);
     expect(jobs[0].orderId).toBe(settled?.id);
-    expect(jobs[0].status).toBe('SUCCESS');
+    // BUG-025/026: the default printer here is a real USB printer, so printing genuinely needs the
+    // desktop app's native transport — settlement fires the print without blocking the sale on it, so
+    // its outcome (here: failing honestly, since this test runs outside the desktop app) lands a moment
+    // later, not in the same tick as completePayment().
+    await vi.waitFor(() => {
+      const job = PrintQueueRepository.getAllJobs().find((j) => j.id === jobs[0].id);
+      expect(job?.status).toBe('FAILED');
+    });
   });
 });

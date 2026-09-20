@@ -7,7 +7,7 @@ import { PosPrinterService } from '../../services/printerService';
 import { PosReportDocument } from './PosReportDocument';
 import { PosReportPreviewModal } from './PosReportPreviewModal';
 import { usePosStore } from '../../store/posStore';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, slipHeader } from '@jamanvaar/utils';
 import {
   BarChart3,
   Calendar,
@@ -120,8 +120,7 @@ export const PosReportsView: React.FC = () => {
     const printer = PosPrinterService.getPrinterForRole('REPORT');
     const rawPayload = `
 ========================================
-             JAMANVAAR POS
-     BY KELVIONTECH • REPORT SPOOLER
+${slipHeader(db.restaurant.name)}
 ----------------------------------------
 REPORT: ${reportData.title.toUpperCase()}
 PERIOD: ${reportData.periodLabel}

@@ -54,7 +54,7 @@ export const PrimaryMetricsGrid: React.FC<PrimaryMetricsGridProps> = ({
               <DollarSign className="w-4.5 h-4.5" />
             </div>
             <span className="text-xs font-bold text-[#8C9BAE] uppercase tracking-wider">
-              {periodLabel} Net Sales
+              {periodLabel} Total Billed (incl. GST)
             </span>
           </div>
           <div className="mt-3 text-4xl sm:text-[46px] font-black text-jaman-navy font-mono tracking-tight leading-none">

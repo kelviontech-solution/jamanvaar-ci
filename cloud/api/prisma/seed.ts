@@ -6,6 +6,7 @@
 import { randomBytes, createHash } from 'crypto';
 import { Prisma, PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { shouldSeedDemoData } from '../src/config/seed-options';
 
 const prisma = new PrismaClient();
 
@@ -166,6 +167,187 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     }
   });
 
+  const demo = shouldSeedDemoData(process.env) ? await seedDemoTenant(tx, corePlan) : null;
+
+  // Seed AppRelease Catalog for all 6 JAMANVAAR client applications
+  const appReleases = [
+    {
+      appCode: 'POS',
+      version: '2.4.0',
+      channel: 'STABLE' as const,
+      minSupportedVersion: '2.0.0',
+      supportedPlatforms: ['windows', 'electron'],
+      releaseNotes: 'Offline-first counter billing, fast token orders, multi-payment tenders, KOT routing, ESC/POS thermal printing.',
+      downloadUrl: '/releases/jamanvaar-pos-setup-2.4.0.exe'
+    },
+    {
+      appCode: 'RESTAURANT_ADMIN',
+      version: '2.4.0',
+      channel: 'STABLE' as const,
+      minSupportedVersion: '2.0.0',
+      supportedPlatforms: ['web'],
+      releaseNotes: 'Restaurant back-office portal, menu management, floor layouts, staff roles, statutory reports, cloud sync.',
+      downloadUrl: 'http://localhost:5176'
+    },
+    {
+      appCode: 'CAPTAIN',
+      version: '2.1.0',
+      channel: 'STABLE' as const,
+      minSupportedVersion: '2.0.0',
+      supportedPlatforms: ['android', 'web'],
+      releaseNotes: 'Wireless table-side waiter ordering, instant course firing, kitchen ready alerts, tip tracking.',
+      downloadUrl: '/releases/jamanvaar-captain-v2.1.0.apk'
+    },
+    {
+      appCode: 'KDS',
+      version: '2.0.0',
+      channel: 'STABLE' as const,
+      minSupportedVersion: '1.8.0',
+      supportedPlatforms: ['web', 'android'],
+      releaseNotes: 'Multi-station kitchen routing, cook time color alerts, bump bar support, course synchronization.',
+      downloadUrl: '/releases/jamanvaar-kds-v2.0.0.apk'
+    },
+    {
+      appCode: 'KIOSK',
+      version: '1.8.0',
+      channel: 'STABLE' as const,
+      minSupportedVersion: '1.5.0',
+      supportedPlatforms: ['windows', 'android'],
+      releaseNotes: 'Self-ordering guest kiosk, dynamic combos, custom modifiers, UPI BharatQR display, auto-idle reset.',
+      downloadUrl: '/releases/jamanvaar-kiosk-v1.8.0.exe'
+    },
+    {
+      appCode: 'KIOSK_ADMIN',
+      version: '1.8.0',
+      channel: 'STABLE' as const,
+      minSupportedVersion: '1.5.0',
+      supportedPlatforms: ['web'],
+      releaseNotes: 'Kiosk terminal administration, station lock, screen branding, peripheral hardware configuration.',
+      downloadUrl: 'http://localhost:5177'
+    }
+  ];
+
+  for (const rel of appReleases) {
+    await tx.appRelease.upsert({
+      where: { appCode_version: { appCode: rel.appCode, version: rel.version } },
+      update: rel,
+      create: rel
+    });
+  }
+
+  // Seed default PlatformSettings
+  const platformSettings = [
+    {
+      key: 'platform.branding',
+      category: 'BRANDING',
+      description: 'Platform name, company branding, and primary support contact',
+      value: {
+        platformName: 'JAMANVAAR SaaS Control Plane',
+        companyName: 'Kelviontech',
+        supportEmail: 'support@jamanvaar.app',
+        supportPhone: '+91 98765 43210'
+      }
+    },
+    {
+      key: 'platform.billing',
+      category: 'BILLING',
+      description: 'Seller details printed on invoices and receipts',
+      value: {
+        tradeName: 'JAMANVAAR SaaS Platform',
+        legalName: 'KELVIONTECH PRIVATE LIMITED',
+        address: 'Plot 42, Science City Road, Sola',
+        city: 'Ahmedabad',
+        state: 'Gujarat',
+        country: 'India',
+        pincode: '380060',
+        gstin: '24AAACK7890F1ZT',
+        sacCode: '997331',
+        sacDescription: 'Cloud SaaS Platform Subscription & Technical Support',
+        bankName: 'HDFC Bank Ltd',
+        bankAccountName: 'KELVIONTECH PRIVATE LIMITED',
+        bankAccountNumber: '50200088991122',
+        bankIfsc: 'HDFC0001234',
+        upiId: 'jamanvaar@hdfcbank',
+        billingEmail: ''
+      }
+    },
+    {
+      key: 'platform.defaults',
+      category: 'DEFAULTS',
+      description: 'Default trial period and device quotas for new onboardings',
+      value: {
+        trialDurationDays: 14,
+        maxTrialBranches: 1,
+        maxTrialDevices: 5,
+        defaultCurrency: 'INR'
+      }
+    },
+    {
+      key: 'platform.maintenance',
+      category: 'SYSTEM',
+      description: 'Global maintenance mode and operational status banner',
+      value: {
+        maintenanceMode: false,
+        scheduledDowntime: null,
+        statusBanner: ''
+      }
+    }
+  ];
+
+  for (const s of platformSettings) {
+    await tx.platformSetting.upsert({
+      where: { key: s.key },
+      // Never overwrite a value an admin already configured (maintenance banner, branding, trial defaults).
+      update: { category: s.category, description: s.description },
+      create: s
+    });
+  }
+
+
+  console.log('--- Seed complete ---');
+  console.log(`Plans: ${corePlan.name} + JAMANVAAR PRO`);
+  console.log(demo ? `Demo restaurant: ${demo.demoRestaurant.name} (${demo.demoRestaurant.id})` : 'Demo restaurant: not created (production, or SEED_DEMO_DATA=false)');
+  if (superAdminWasReset) {
+    console.log('');
+    console.log('Super Admin password RESET via SEED_RESET_SUPER_ADMIN_PASSWORD — save it now, it is not stored or shown again:');
+    console.log(`  email:    ${superAdminEmail}`);
+    console.log(`  password: ${superAdminPassword}`);
+  } else if (superAdminPassword) {
+    console.log('');
+    console.log('Super Admin created — save this password now, it is not stored or shown again:');
+    console.log(`  email:    ${superAdminEmail}`);
+    console.log(`  password: ${superAdminPassword}`);
+  } else {
+    console.log(`Super Admin already exists: ${superAdminEmail} (password unchanged — set SEED_SUPER_ADMIN_PASSWORD and SEED_RESET_SUPER_ADMIN_PASSWORD=true to rotate it)`);
+  }
+  if (demo) {
+    const { demoRestaurant, demoOwnerPassword, demoOwnerActivationToken, demoOwnerActivatedNow } = demo;
+    if (demoOwnerActivatedNow && demoOwnerPassword) {
+      console.log('');
+      console.log('Demo restaurant owner ACTIVE via SEED_DEMO_OWNER_PASSWORD — save this password now, it is not stored or shown again:');
+      console.log(`  restaurantId: ${demoRestaurant.id}`);
+      console.log(`  email:        owner@demo.jamanvaar.app`);
+      console.log(`  password:     ${demoOwnerPassword}`);
+      console.log('  This is the account POS Admin / Captain / POS device-connect screens should log in with.');
+    } else if (demoOwnerActivationToken) {
+      console.log('');
+      console.log('Demo restaurant owner invitation — save this token now, it is not stored or shown again:');
+      console.log(`  restaurantId: ${demoRestaurant.id}`);
+      console.log(`  email:        owner@demo.jamanvaar.app`);
+      console.log(`  token:        ${demoOwnerActivationToken}`);
+      console.log('  Redeem it via POST /api/v1/tenant-auth/set-initial-password, or re-run this seed with');
+      console.log('  SEED_DEMO_OWNER_PASSWORD=<password> set to activate the account directly.');
+    } else {
+      console.log(`Demo restaurant owner already exists: owner@demo.jamanvaar.app (status unchanged — set SEED_DEMO_OWNER_PASSWORD and SEED_RESET_DEMO_OWNER_PASSWORD=true to activate/rotate it)`);
+    }
+  }
+}
+
+/**
+ * The sample tenant used for local development and CI (BUG-018): a demo restaurant, branch, owner,
+ * subscription and invoice. Never created in production unless SEED_DEMO_DATA=true (see src/config/seed-options.ts).
+ */
+async function seedDemoTenant(tx: Prisma.TransactionClient, corePlan: { id: string }) {
   // RLS's runAsTenant() (see prisma.service.ts) requires ids to match the
   // canonical UUID shape restaurant.id normally gets from @default(uuid()) —
   // a human-readable slug here breaks every tenant-scoped query for this row.
@@ -334,151 +516,7 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     });
   }
 
-  // Seed AppRelease Catalog for all 6 JAMANVAAR client applications
-  const appReleases = [
-    {
-      appCode: 'POS',
-      version: '2.4.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '2.0.0',
-      supportedPlatforms: ['windows', 'electron'],
-      releaseNotes: 'Offline-first counter billing, fast token orders, multi-payment tenders, KOT routing, ESC/POS thermal printing.',
-      downloadUrl: '/releases/jamanvaar-pos-setup-2.4.0.exe'
-    },
-    {
-      appCode: 'RESTAURANT_ADMIN',
-      version: '2.4.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '2.0.0',
-      supportedPlatforms: ['web'],
-      releaseNotes: 'Restaurant back-office portal, menu management, floor layouts, staff roles, statutory reports, cloud sync.',
-      downloadUrl: 'http://localhost:5176'
-    },
-    {
-      appCode: 'CAPTAIN',
-      version: '2.1.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '2.0.0',
-      supportedPlatforms: ['android', 'web'],
-      releaseNotes: 'Wireless table-side waiter ordering, instant course firing, kitchen ready alerts, tip tracking.',
-      downloadUrl: '/releases/jamanvaar-captain-v2.1.0.apk'
-    },
-    {
-      appCode: 'KDS',
-      version: '2.0.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '1.8.0',
-      supportedPlatforms: ['web', 'android'],
-      releaseNotes: 'Multi-station kitchen routing, cook time color alerts, bump bar support, course synchronization.',
-      downloadUrl: '/releases/jamanvaar-kds-v2.0.0.apk'
-    },
-    {
-      appCode: 'KIOSK',
-      version: '1.8.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '1.5.0',
-      supportedPlatforms: ['windows', 'android'],
-      releaseNotes: 'Self-ordering guest kiosk, dynamic combos, custom modifiers, UPI BharatQR display, auto-idle reset.',
-      downloadUrl: '/releases/jamanvaar-kiosk-v1.8.0.exe'
-    },
-    {
-      appCode: 'KIOSK_ADMIN',
-      version: '1.8.0',
-      channel: 'STABLE' as const,
-      minSupportedVersion: '1.5.0',
-      supportedPlatforms: ['web'],
-      releaseNotes: 'Kiosk terminal administration, station lock, screen branding, peripheral hardware configuration.',
-      downloadUrl: 'http://localhost:5177'
-    }
-  ];
-
-  for (const rel of appReleases) {
-    await tx.appRelease.upsert({
-      where: { appCode_version: { appCode: rel.appCode, version: rel.version } },
-      update: rel,
-      create: rel
-    });
-  }
-
-  // Seed default PlatformSettings
-  const platformSettings = [
-    {
-      key: 'platform.branding',
-      category: 'BRANDING',
-      description: 'Platform name, company branding, and primary support contact',
-      value: {
-        platformName: 'JAMANVAAR SaaS Control Plane',
-        companyName: 'Kelviontech',
-        supportEmail: 'support@jamanvaar.app',
-        supportPhone: '+91 98765 43210'
-      }
-    },
-    {
-      key: 'platform.defaults',
-      category: 'DEFAULTS',
-      description: 'Default trial period and device quotas for new onboardings',
-      value: {
-        trialDurationDays: 14,
-        maxTrialBranches: 1,
-        maxTrialDevices: 5,
-        defaultCurrency: 'INR'
-      }
-    },
-    {
-      key: 'platform.maintenance',
-      category: 'SYSTEM',
-      description: 'Global maintenance mode and operational status banner',
-      value: {
-        maintenanceMode: false,
-        scheduledDowntime: null,
-        statusBanner: ''
-      }
-    }
-  ];
-
-  for (const s of platformSettings) {
-    await tx.platformSetting.upsert({
-      where: { key: s.key },
-      update: { value: s.value, category: s.category, description: s.description },
-      create: s
-    });
-  }
-
-
-  console.log('--- Seed complete ---');
-  console.log(`Plans: ${corePlan.name} + JAMANVAAR PRO`);
-  console.log(`Demo restaurant: ${demoRestaurant.name} (${demoRestaurant.id})`);
-  if (superAdminWasReset) {
-    console.log('');
-    console.log('Super Admin password RESET via SEED_RESET_SUPER_ADMIN_PASSWORD — save it now, it is not stored or shown again:');
-    console.log(`  email:    ${superAdminEmail}`);
-    console.log(`  password: ${superAdminPassword}`);
-  } else if (superAdminPassword) {
-    console.log('');
-    console.log('Super Admin created — save this password now, it is not stored or shown again:');
-    console.log(`  email:    ${superAdminEmail}`);
-    console.log(`  password: ${superAdminPassword}`);
-  } else {
-    console.log(`Super Admin already exists: ${superAdminEmail} (password unchanged — set SEED_SUPER_ADMIN_PASSWORD and SEED_RESET_SUPER_ADMIN_PASSWORD=true to rotate it)`);
-  }
-  if (demoOwnerActivatedNow && demoOwnerPassword) {
-    console.log('');
-    console.log('Demo restaurant owner ACTIVE via SEED_DEMO_OWNER_PASSWORD — save this password now, it is not stored or shown again:');
-    console.log(`  restaurantId: ${demoRestaurant.id}`);
-    console.log(`  email:        owner@demo.jamanvaar.app`);
-    console.log(`  password:     ${demoOwnerPassword}`);
-    console.log('  This is the account POS Admin / Captain / POS device-connect screens should log in with.');
-  } else if (demoOwnerActivationToken) {
-    console.log('');
-    console.log('Demo restaurant owner invitation — save this token now, it is not stored or shown again:');
-    console.log(`  restaurantId: ${demoRestaurant.id}`);
-    console.log(`  email:        owner@demo.jamanvaar.app`);
-    console.log(`  token:        ${demoOwnerActivationToken}`);
-    console.log('  Redeem it via POST /api/v1/tenant-auth/set-initial-password, or re-run this seed with');
-    console.log('  SEED_DEMO_OWNER_PASSWORD=<password> set to activate the account directly.');
-  } else {
-    console.log(`Demo restaurant owner already exists: owner@demo.jamanvaar.app (status unchanged — set SEED_DEMO_OWNER_PASSWORD and SEED_RESET_DEMO_OWNER_PASSWORD=true to activate/rotate it)`);
-  }
+  return { demoRestaurant, demoOwnerPassword, demoOwnerActivationToken, demoOwnerActivatedNow };
 }
 
 main()

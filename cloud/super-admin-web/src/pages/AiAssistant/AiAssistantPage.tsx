@@ -39,6 +39,8 @@ import {
 } from 'lucide-react';
 import '../../components/shared.css';
 import './ai-assistant.css';
+import { AiRestaurantAccess } from './AiRestaurantAccess';
+import type { Plan } from '../../api/types';
 
 export function AiAssistantPage() {
   const [categories, setCategories] = useState<AiCategory[]>([]);
@@ -70,7 +72,7 @@ export function AiAssistantPage() {
   const [targetDomain, setTargetDomain] = useState<'ORDERS' | 'PAYMENTS' | 'KITCHEN' | 'TABLES' | 'INVENTORY' | 'SHIFTS'>('ORDERS');
   const [calculationType, setCalculationType] = useState<'SUM' | 'COUNT' | 'AVG' | 'RATIO' | 'TOP_LIST'>('SUM');
   const [filterField, setFilterField] = useState('channel');
-  const [filterValue, setFilterValue] = useState('SWIGGY');
+  const [filterValue, setFilterValue] = useState('DINE_IN');
   const [displayUnit, setDisplayUnit] = useState<'CURRENCY' | 'NUMBER' | 'PERCENT' | 'MINUTES'>('CURRENCY');
   const [addingQuestion, setAddingQuestion] = useState(false);
 
@@ -125,7 +127,15 @@ export function AiAssistantPage() {
   const [kotMinutes, setKotMinutes] = useState('15');
   const [stockThreshold, setStockThreshold] = useState('3');
   const [drawerVariance, setDrawerVariance] = useState('500');
-  const [engineMode, setEngineMode] = useState<'OFFLINE_RULE_BASED' | 'HYBRID_LLM'>('OFFLINE_RULE_BASED');
+  // Real plan prices, so this page never states a price the plans table no longer has.
+  const [plans, setPlans] = useState<Plan[]>([]);
+  useEffect(() => {
+    api.get<Plan[]>('/api/v1/plans').then(setPlans).catch(() => setPlans([]));
+  }, []);
+  const priceOf = (tier: 'CORE' | 'PRO') => {
+    const p = plans.filter((x) => x.tier === tier && x.status === 'ACTIVE').sort((a, b) => a.priceMonthly - b.priceMonthly)[0];
+    return p ? `₹${(p.priceMonthly / 100).toLocaleString('en-IN')}` : 'no active plan';
+  };
   const [proactiveAlerts, setProactiveAlerts] = useState(true);
   const [coreTeaser, setCoreTeaser] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
@@ -148,7 +158,6 @@ export function AiAssistantPage() {
         setKotMinutes(String(res.settings.delayedKotMinutes));
         setStockThreshold(String(res.settings.lowStockThreshold));
         setDrawerVariance(String(res.settings.cashDrawerVarianceThreshold));
-        setEngineMode(res.settings.mode);
         setProactiveAlerts(res.settings.proactiveAlertsEnabled);
         setCoreTeaser(res.settings.corePlanTeaserEnabled);
 
@@ -254,7 +263,6 @@ export function AiAssistantPage() {
         delayedKotMinutes: Number(kotMinutes),
         lowStockThreshold: Number(stockThreshold),
         cashDrawerVarianceThreshold: Number(drawerVariance),
-        mode: engineMode,
         proactiveAlertsEnabled: proactiveAlerts,
         corePlanTeaserEnabled: coreTeaser
       });
@@ -320,7 +328,7 @@ export function AiAssistantPage() {
             </span>
           </div>
           <p className="page-subtitle" style={{ margin: '4px 0 0', color: '#64748b', fontSize: 14 }}>
-            Platform-wide operations intelligence, tier entitlement gating (₹7,000 PRO vs ₹5,000 CORE), question templates, and edge query telemetry.
+            Platform-wide operations intelligence, tier entitlement gating ({priceOf('PRO')} PRO vs {priceOf('CORE')} CORE), question templates, and edge query telemetry.
           </p>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
@@ -353,7 +361,7 @@ export function AiAssistantPage() {
               </div>
               <div className="ai-metric-subtext" style={{ color: '#059669' }}>
                 <Check className="w-3.5 h-3.5" />
-                <span>{telemetry.adoptionRatePercent}% on JAMANVAAR PRO (₹7,000)</span>
+                <span>{telemetry.adoptionRatePercent}% on JAMANVAAR PRO ({priceOf('PRO')})</span>
               </div>
             </div>
           </div>
@@ -384,7 +392,7 @@ export function AiAssistantPage() {
             </div>
             <div>
               <div className="ai-metric-value" style={{ fontSize: '1.25rem', fontFamily: 'monospace' }}>
-                {telemetry.topIntent}
+                {telemetry.topIntent ?? '—'}
               </div>
               <div className="ai-metric-subtext" style={{ color: '#64748b' }}>
                 <span>Leading operational metric requested</span>
@@ -401,11 +409,11 @@ export function AiAssistantPage() {
             </div>
             <div>
               <div className="ai-metric-value">
-                &lt; {telemetry.latencyMs}ms
+                {telemetry.latencyMs != null ? `${telemetry.latencyMs} ms` : 'No data yet'}
               </div>
               <div className="ai-metric-subtext" style={{ color: '#059669' }}>
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>100% Offline Edge DB • Zero Cloud Lag</span>
+                <span>Average per answer, measured on the terminals</span>
               </div>
             </div>
           </div>
@@ -430,7 +438,7 @@ export function AiAssistantPage() {
               <div className="ai-tier-header">
                 <div>
                   <div className="ai-tier-title">JAMANVAAR CORE</div>
-                  <div style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>₹5,000 / month (Foundation)</div>
+                  <div style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>{priceOf('CORE')} / month (Foundation)</div>
                 </div>
                 <span className="ai-tier-badge" style={{ background: '#f1f5f9', color: '#475569' }}>
                   <Lock className="w-3 h-3 inline mr-1" />
@@ -440,7 +448,7 @@ export function AiAssistantPage() {
               <ul className="ai-tier-feature-list">
                 <li className="ai-tier-feature-item">
                   <Lock className="w-3.5 h-3.5 text-amber-500" />
-                  <span>JAMAN AI Assistant Locked (Upgrade CTA shown)</span>
+                  <span>JAMAN AI is LOCKED by default (a teaser), or hidden if the teaser is off</span>
                 </li>
                 <li className="ai-tier-feature-item">
                   <Lock className="w-3.5 h-3.5 text-slate-400" />
@@ -453,7 +461,7 @@ export function AiAssistantPage() {
               </ul>
             </div>
             <div style={{ background: '#f8fafc', padding: 10, borderRadius: 8, fontSize: 12, color: '#64748b' }}>
-              Cashier clicks floating pill ➔ Sees <strong>"Upgrade to PRO (₹7,000)"</strong> modal.
+              Staff tap the AI button ➔ see a locked panel with a few example questions. Nothing is answered. Switch it on for one restaurant below.
             </div>
           </div>
 
@@ -463,7 +471,7 @@ export function AiAssistantPage() {
               <div className="ai-tier-header">
                 <div>
                   <div className="ai-tier-title" style={{ color: '#b45309' }}>JAMANVAAR PRO</div>
-                  <div style={{ fontSize: 13, color: '#b45309', fontWeight: 700 }}>₹7,000 / month (Growth Edition)</div>
+                  <div style={{ fontSize: 13, color: '#b45309', fontWeight: 700 }}>{priceOf('PRO')} / month (Growth Edition)</div>
                 </div>
                 <span className="ai-tier-badge" style={{ background: '#fef3c7', color: '#b45309' }}>
                   <Unlock className="w-3 h-3 inline mr-1" />
@@ -548,18 +556,6 @@ export function AiAssistantPage() {
               <span className="muted" style={{ fontSize: 11 }}>Alerts manager when active shift variance &gt; ₹X</span>
             </div>
 
-            <div className="form-field">
-              <label>AI Processing Mode</label>
-              <select
-                value={engineMode}
-                onChange={(e) => setEngineMode(e.target.value as any)}
-                style={{ height: 40, borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px', width: '100%' }}
-              >
-                <option value="OFFLINE_RULE_BASED">Deterministic Offline Rule Engine (0ms, 0 Token Cost)</option>
-                <option value="HYBRID_LLM">Hybrid Cloud Gemini LLM (Conversational Voice/Text)</option>
-              </select>
-              <span className="muted" style={{ fontSize: 11 }}>Fallback mode for natural language queries</span>
-            </div>
           </div>
 
           <div style={{ display: 'flex', gap: 24, marginTop: 16, paddingTop: 16, borderTop: '1px solid #e2e8f0', flexWrap: 'wrap' }}>
@@ -593,6 +589,8 @@ export function AiAssistantPage() {
       </Card>
 
       {/* Question Registry & Category Manager */}
+      <AiRestaurantAccess />
+
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
           <div>

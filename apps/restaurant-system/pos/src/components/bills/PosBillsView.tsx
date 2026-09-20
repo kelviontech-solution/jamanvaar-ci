@@ -6,7 +6,7 @@ import { PdfReportBuilder, ReportFullData } from '../../services/pdfReportBuilde
 import { db, OrderRepository, AuditRepository } from '@jamanvaar/database';
 import { CentralReportingService, CentralDatePreset } from '@jamanvaar/business';
 import { Order, OrderType, PaymentMethod, OrderStatus } from '@jamanvaar/types';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, splitTax } from '@jamanvaar/utils';
 import {
   Receipt,
   Search,
@@ -207,6 +207,8 @@ export const PosBillsView: React.FC = () => {
       splitSales: summary.paymentBreakdown.split,
       discountTotal: summary.discountAmount,
       taxTotal: summary.totalTax,
+      cgstTotal: summary.cgstAmount,
+      sgstTotal: summary.sgstAmount,
       refundsTotal: summary.refundsAmount
     };
   }, [finalFilteredBills]);
@@ -400,8 +402,8 @@ export const PosBillsView: React.FC = () => {
       b.items.length,
       b.subtotal || b.totalAmount,
       b.discountAmount || 0,
-      b.cgstAmount || Math.round(b.totalAmount * 0.0238),
-      b.sgstAmount || Math.round(b.totalAmount * 0.0238),
+      b.cgstAmount ?? splitTax(b.taxAmount ?? 0).cgst,
+      b.sgstAmount ?? splitTax(b.taxAmount ?? 0).sgst,
       b.totalAmount,
       `"${b.paymentMethod}"`,
       `"${b.paymentTransactionId || ''}"`,
@@ -433,9 +435,9 @@ export const PosBillsView: React.FC = () => {
           grossSales: periodStats.grossSales,
           discountAmount: periodStats.discountTotal,
           netSales: periodStats.netSales,
-          cgstAmount: Math.round(periodStats.netSales * 0.0238),
-          sgstAmount: Math.round(periodStats.netSales * 0.0238),
-          totalTax: periodStats.taxTotal || Math.round(periodStats.netSales * 0.0476),
+          cgstAmount: periodStats.cgstTotal,
+          sgstAmount: periodStats.sgstTotal,
+          totalTax: periodStats.taxTotal,
           totalCollected: periodStats.netSales,
           refundsCount: 0,
           refundsAmount: periodStats.refundsTotal,
@@ -1028,11 +1030,11 @@ export const PosBillsView: React.FC = () => {
                 ) : null}
                 <div className="flex justify-between">
                   <span>CGST (2.5%):</span>
-                  <strong className="font-mono text-jaman-navy">{formatINR(detailModalBill.cgstAmount || Math.round(detailModalBill.totalAmount * 0.0238))}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(detailModalBill.cgstAmount ?? splitTax(detailModalBill.taxAmount ?? 0).cgst)}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>SGST (2.5%):</span>
-                  <strong className="font-mono text-jaman-navy">{formatINR(detailModalBill.sgstAmount || Math.round(detailModalBill.totalAmount * 0.0238))}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatINR(detailModalBill.sgstAmount ?? splitTax(detailModalBill.taxAmount ?? 0).sgst)}</strong>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-100 text-sm font-black text-jaman-navy">
                   <span>Total Amount Paid:</span>
@@ -1299,7 +1301,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             {formatINR(bill.totalAmount)}
           </strong>
           <span className="text-[10px] text-slate-400 block font-mono">
-            Tax: {formatINR(bill.taxAmount || Math.round(bill.totalAmount * 0.0476))}
+            Tax: {formatINR(bill.taxAmount ?? 0)}
           </span>
         </div>
 

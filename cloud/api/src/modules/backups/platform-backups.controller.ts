@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Res, UseGuards } from '@nestjs/common';
+import { Response } from 'express';
 import { PlatformUser } from '@prisma/client';
 import { BackupsService } from './backups.service';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
@@ -17,8 +18,17 @@ export class PlatformBackupsController {
 
   @Get(':backupId/download')
   async download(@Param('id') restaurantId: string, @Param('backupId') backupId: string) {
-    const url = await this.backups.getDownloadUrl(restaurantId, backupId);
+    const url = await this.backups.getDownloadUrl(restaurantId, backupId, `/api/v1/restaurants/${restaurantId}/backups/${backupId}/file`);
     return { url };
+  }
+
+  /** The decrypted backup as a JSON download, for storage that cannot hand out a direct link. */
+  @Get(':backupId/file')
+  async file(@Param('id') restaurantId: string, @Param('backupId') backupId: string, @Res() res: Response) {
+    const { body, filename } = await this.backups.getFile(restaurantId, backupId);
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(body);
   }
 }
 
@@ -29,8 +39,14 @@ export class PlatformBackupsFleetController {
   constructor(private readonly backups: BackupsService) {}
 
   @Get()
-  listFleet() {
-    return this.backups.listAllForPlatform();
+  listFleet(@Query() query: Record<string, string>) {
+    return this.backups.listAllForPlatform(query);
+  }
+
+  /** Writes and removes a probe object: "is backup storage working right now". */
+  @Get('storage-health')
+  storageHealth() {
+    return this.backups.storageHealth();
   }
 
   @Post(':restaurantId/trigger')

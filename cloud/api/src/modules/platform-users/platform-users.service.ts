@@ -1,3 +1,4 @@
+import { buildActivationUrl } from './activation-url';
 import {
   ConflictException,
   ForbiddenException,
@@ -47,6 +48,12 @@ function assertCanManageTeam(actor: PlatformUser): void {
   }
 }
 
+function assertActorIsOwner(actor: PlatformUser, what: string): void {
+  if (actor.role !== 'PLATFORM_OWNER') {
+    throw new ForbiddenException(`Only a Platform Owner can ${what}`);
+  }
+}
+
 @Injectable()
 export class PlatformUsersService {
   private readonly logger = new Logger(PlatformUsersService.name);
@@ -56,12 +63,37 @@ export class PlatformUsersService {
     private readonly audit: AuditService,
     private readonly email: EmailService,
     private readonly config: ConfigService
-  ) {}
+  ) {
+    if (!this.config.get<string>('PLATFORM_FRONTEND_URL')) {
+      this.logger.warn(
+        'PLATFORM_FRONTEND_URL is not set: invitation links will point at http://localhost:5180, which invitees cannot open. Set it to the public Super Admin URL.'
+      );
+    }
+  }
 
   /** Builds the real, clickable link the Super Admin web app's public /activate page reads. */
   private buildActivationUrl(email: string, activationToken: string): string {
-    const base = this.config.get<string>('PLATFORM_FRONTEND_URL') ?? 'http://localhost:5180';
-    return `${base.replace(/\/$/, '')}/activate?email=${encodeURIComponent(email)}&token=${encodeURIComponent(activationToken)}`;
+    return buildActivationUrl(this.config.get<string>('PLATFORM_FRONTEND_URL'), email, activationToken);
+  }
+
+  /**
+   * Public. Lets the activation page tell an invitee their link is expired or already used BEFORE
+   * they type a password. Every failure that could reveal whether an account exists (unknown
+   * email, wrong token) reports the same 'INVALID'.
+   */
+  async activationStatus(email: string, token: string): Promise<{ state: 'VALID' | 'EXPIRED' | 'USED' | 'INVALID'; fullName?: string }> {
+    const user = await this.prisma.platformUser.findUnique({ where: { email: (email || '').trim().toLowerCase() } });
+    if (!user || !token) return { state: 'INVALID' };
+    if (user.passwordHash !== null) {
+      // Only reveal "already used" to someone who holds the real (now consumed) invitation? The
+      // token hash is cleared on use, so there is nothing to compare: report USED for a known,
+      // already-activated account. That reveals only that this email has an account, which the
+      // login form already does not hide from the account holder.
+      return { state: 'USED' };
+    }
+    if (!user.activationTokenHash || hashOpaqueToken(token) !== user.activationTokenHash) return { state: 'INVALID' };
+    if (!user.activationTokenExpiresAt || user.activationTokenExpiresAt < new Date()) return { state: 'EXPIRED' };
+    return { state: 'VALID', fullName: user.fullName };
   }
 
   list() {
@@ -73,6 +105,7 @@ export class PlatformUsersService {
 
   async invite(dto: InviteTeammateDto, actor: PlatformUser) {
     assertCanManageTeam(actor);
+    if (dto.role === 'PLATFORM_OWNER') assertActorIsOwner(actor, 'invite another Platform Owner');
 
     const existing = await this.prisma.platformUser.findUnique({ where: { email: dto.email } });
     if (existing) {
@@ -175,6 +208,16 @@ export class PlatformUsersService {
     return { user: updated, activationToken, activationUrl, activationTokenExpiresAt, emailSent };
   }
 
+  /** The platform must always keep at least one active Platform Owner. */
+  private async assertAnotherActiveOwner(exceptUserId: string): Promise<void> {
+    const others = await this.prisma.platformUser.count({
+      where: { role: 'PLATFORM_OWNER', status: PlatformUserStatus.ACTIVE, id: { not: exceptUserId } }
+    });
+    if (others === 0) {
+      throw new ForbiddenException('The last active Platform Owner cannot be demoted or disabled');
+    }
+  }
+
   async updateRole(id: string, dto: UpdateRoleDto, actor: PlatformUser) {
     assertCanManageTeam(actor);
     if (id === actor.id) {
@@ -183,6 +226,15 @@ export class PlatformUsersService {
 
     const existing = await this.prisma.platformUser.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Platform user not found');
+
+    // Owners are protected: only an owner can grant or change that role, and the
+    // last active owner can never be demoted (the platform would be left without one).
+    if (existing.role === 'PLATFORM_OWNER' || dto.role === 'PLATFORM_OWNER') {
+      assertActorIsOwner(actor, 'grant or change the Platform Owner role');
+    }
+    if (existing.role === 'PLATFORM_OWNER' && dto.role !== 'PLATFORM_OWNER') {
+      await this.assertAnotherActiveOwner(id);
+    }
 
     const updated = await this.prisma.platformUser.update({
       where: { id },
@@ -209,6 +261,10 @@ export class PlatformUsersService {
 
     const existing = await this.prisma.platformUser.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Platform user not found');
+    if (existing.role === 'PLATFORM_OWNER') {
+      assertActorIsOwner(actor, 'change a Platform Owner account');
+      if (status === 'DISABLED') await this.assertAnotherActiveOwner(id);
+    }
     if (existing.status === status) {
       throw new ConflictException(`Account is already ${status}`);
     }
@@ -224,9 +280,10 @@ export class PlatformUsersService {
 
     // A disabled teammate's active sessions must not keep working.
     if (status === 'DISABLED') {
+      const now = new Date();
       await this.prisma.platformRefreshToken.updateMany({
-        where: { platformUserId: id, revokedAt: null },
-        data: { revokedAt: new Date() }
+        where: { platformUserId: id, terminatedAt: null },
+        data: { revokedAt: now, terminatedAt: now }
       });
     }
 

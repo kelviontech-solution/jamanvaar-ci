@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   Param,
@@ -15,6 +16,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { User } from '@prisma/client';
+import { AuditService } from '../audit/audit.service';
+import { displayScaleSchema } from './dto/display-scale.dto';
 import { TenantAuthService } from './tenant-auth.service';
 import {
   createTenantStaffUserSchema,
@@ -29,6 +32,8 @@ import {
   TenantRefreshDto
 } from './dto/login.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
+import { PrismaService } from '../../prisma/prisma.service';
+import { readActivePlatformNotice } from '../../common/platform-notice';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
 import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.decorator';
 
@@ -134,7 +139,17 @@ export class TenantAuthController {
 @Controller('api/v1/tenant')
 @UseGuards(TenantAuthGuard)
 export class TenantMeController {
-  constructor(private readonly authService: TenantAuthService) {}
+  constructor(
+    private readonly authService: TenantAuthService,
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService
+  ) {}
+
+  /** The platform announcement (maintenance etc.) to show at the top of Restaurant Admin, or null. */
+  @Get('platform-notice')
+  async platformNotice() {
+    return { notice: await readActivePlatformNotice(this.prisma) };
+  }
 
   @Get('me')
   me(@CurrentTenantUser() user: User) {
@@ -147,6 +162,36 @@ export class TenantMeController {
       role: user.role,
       status: user.status
     };
+  }
+
+  /** The default display size for this restaurant's terminals (BUG-008). */
+  @Get('me/display')
+  async display(@CurrentTenantUser() user: User) {
+    const restaurant = await this.prisma.runAsTenant(user.restaurantId, (tx) =>
+      tx.restaurant.findUniqueOrThrow({ where: { id: user.restaurantId }, select: { displayScalePercent: true } })
+    );
+    return { displayScalePercent: restaurant.displayScalePercent };
+  }
+
+  /** Owner or manager: change it. Terminals pick it up with their next heartbeat. */
+  @Patch('me/display')
+  @UsePipes(new ZodValidationPipe(displayScaleSchema))
+  async setDisplay(@Body() body: ReturnType<typeof displayScaleSchema.parse>, @CurrentTenantUser() user: User) {
+    if (user.role !== 'OWNER' && user.role !== 'MANAGER') {
+      throw new ForbiddenException('Only an owner or manager can change the display size.');
+    }
+    const updated = await this.prisma.runAsTenant(user.restaurantId, (tx) =>
+      tx.restaurant.update({ where: { id: user.restaurantId }, data: { displayScalePercent: body.displayScalePercent }, select: { displayScalePercent: true } })
+    );
+    await this.audit.log({
+      actorType: 'TENANT',
+      actorId: user.id,
+      restaurantId: user.restaurantId,
+      action: 'DISPLAY_SCALE_CHANGED',
+      category: 'SETTINGS',
+      details: { displayScalePercent: body.displayScalePercent }
+    });
+    return { displayScalePercent: updated.displayScalePercent };
   }
 
   @Get('me/entitlements')

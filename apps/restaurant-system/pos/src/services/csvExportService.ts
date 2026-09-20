@@ -72,7 +72,7 @@ export class CsvExportService {
       `"CGST (2.5%)",${summary.cgstAmount}`,
       `"SGST (2.5%)",${summary.sgstAmount}`,
       `"Total Tax",${summary.totalTax}`,
-      `"Net Collected Revenue",${summary.netSales}`,
+      `"Total Collected (incl. GST)",${summary.netSales}`,
       `"Total Orders Billed",${summary.ordersCount}`,
       `"Average Order Value",${summary.avgOrderValue}`,
       '',

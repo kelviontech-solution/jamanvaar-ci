@@ -18,7 +18,7 @@ export class OrderSyncController {
   @Post()
   @UsePipes(new ZodValidationPipe(pushOrderSyncSchema))
   push(@Body() body: PushOrderSyncDto, @CurrentDevice() device: Device) {
-    return this.orderSync.pushEvents(device, body.events);
+    return this.orderSync.pushEvents(device, body.events as unknown[]);
   }
 
   @Get()

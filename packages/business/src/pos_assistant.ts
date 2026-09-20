@@ -1,7 +1,8 @@
 import { db, ShiftRepository, PrintQueueRepository, BusinessDayRepository, BusinessDayAccountingService } from '@jamanvaar/database';
 import { Order, DiningTable } from '@jamanvaar/types';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, slipHeader, splitTax } from '@jamanvaar/utils';
 import { DynamicQueryExecutor, DynamicQueryFormula } from './dynamic_query_executor';
+import { AiConfig, delayedKotLabel } from './ai_config';
 
 export type PosAssistantIntent =
   | 'TODAY_SALES'
@@ -44,10 +45,12 @@ export type PosAssistantIntent =
   | 'CAPTAIN_FEATURES'
   | 'QR_FEATURES'
   | 'DYNAMIC_QUERY'
-  | 'SWIGGY_ORDERS'
-  | 'ZOMATO_ORDERS'
   | 'DINE_IN_REVENUE'
   | 'TAKEAWAY_REVENUE'
+  | 'PAYMENT_SHARE'
+  | 'FOOTFALL'
+  | 'CASH_VARIANCE'
+  | 'OCCUPIED_TABLES'
   | 'HELP_UNKNOWN';
 
 export interface PosAssistantAction {
@@ -217,24 +220,6 @@ export class PosAssistantService {
     const rawKey = typeof queryOrIntent === 'string' ? queryOrIntent : (queryOrIntent?.intent || '');
 
     // 2. Pre-configured Aggregator & Channel intents
-    if (rawKey === 'SWIGGY_ORDERS') {
-      return DynamicQueryExecutor.execute("Swiggy Delivery Orders Today", {
-        targetDomain: 'ORDERS',
-        calculationType: 'SUM',
-        filterField: 'channel',
-        filterValue: 'SWIGGY',
-        displayUnit: 'CURRENCY'
-      });
-    }
-    if (rawKey === 'ZOMATO_ORDERS') {
-      return DynamicQueryExecutor.execute("Zomato Delivery Orders Today", {
-        targetDomain: 'ORDERS',
-        calculationType: 'SUM',
-        filterField: 'channel',
-        filterValue: 'ZOMATO',
-        displayUnit: 'CURRENCY'
-      });
-    }
     if (rawKey === 'DINE_IN_REVENUE') {
       return DynamicQueryExecutor.execute("Dine-In Revenue Today", {
         targetDomain: 'ORDERS',
@@ -254,8 +239,11 @@ export class PosAssistantService {
       });
     }
 
+    // Questions the cloud catalogue offers are sent by intent name: use them as given.
+    const DIRECT = ['PAYMENT_SHARE', 'FOOTFALL', 'CASH_VARIANCE', 'OCCUPIED_TABLES', 'ACTIVE_ORDERS', 'COMPLETED_ORDERS', 'KITCHEN_PERFORMANCE', 'BEST_CATEGORY', 'AOV', 'PAYMENT_SUMMARY', 'ACTIVE_STAFF', 'BUSIEST_HOUR', 'POPULAR_COMBOS', 'AVAILABLE_TABLES', 'OUT_OF_STOCK', 'LEAST_ITEMS'];
     const intent =
       typeof rawKey === 'string' && (
+        DIRECT.includes(rawKey) ||
         rawKey.startsWith('TODAY_') ||
         rawKey.startsWith('CASH_') ||
         rawKey.startsWith('UPI_') ||
@@ -312,9 +300,11 @@ export class PosAssistantService {
 
     const kots        = db.kots || [];
     const pendingKots = kots.filter((k) => k.status === 'PENDING' || k.status === 'PREPARING');
+    // The delay threshold is a cloud setting (Super Admin, with an optional per-restaurant override).
+    const delayMinutes = AiConfig.getSettings().delayedKotMinutes;
     const delayedKots = pendingKots.filter((k) => {
       const elapsedMinutes = (Date.now() - new Date(k.createdAt).getTime()) / 60000;
-      return elapsedMinutes > 15;
+      return elapsedMinutes > delayMinutes;
     });
 
     switch (intent) {
@@ -687,17 +677,17 @@ export class PosAssistantService {
           timestamp,
           intent,
           summaryText: delayedKots.length > 0
-            ? `⚠ Alert: ${delayedKots.length} KOT tickets have exceeded the 15-minute preparation threshold.`
+            ? `⚠ Alert: ${delayedKots.length} KOT tickets have exceeded the ${delayMinutes}-minute preparation threshold.`
             : '✓ All kitchen orders are currently within normal preparation time limits (Zero delayed KOTs).',
           card: {
             title: 'Kitchen KOT Delay Monitoring',
             badge: delayedKots.length > 0 ? `${delayedKots.length} Delayed` : 'All Clear',
             badgeType: delayedKots.length > 0 ? 'danger' : 'success',
             highlightNumber: `${delayedKots.length}`,
-            highlightLabel: 'Delayed KOTs (> 15 mins)',
+            highlightLabel: delayedKotLabel(delayMinutes),
             metrics: [
               { label: 'Pending KOTs in Kitchen', value: `${pendingKots.length} tickets` },
-              { label: 'Delayed Tickets (>15m)', value: `${delayedKots.length} tickets`, color: delayedKots.length > 0 ? 'text-rose-600' : 'text-emerald-700', isBold: true }
+              { label: `Delayed Tickets (>${delayMinutes}m)`, value: `${delayedKots.length} tickets`, color: delayedKots.length > 0 ? 'text-rose-600' : 'text-emerald-700', isBold: true }
             ],
             listItems: delayedList.length > 0 ? delayedList : undefined,
             notes: delayedKots.length > 0 ? 'Expedite tickets on KDS station or check with Head Chef.' : 'Kitchen velocity is optimal.',
@@ -729,7 +719,7 @@ export class PosAssistantService {
           timestamp,
           intent,
           summaryText: pendingKots.length > 0
-            ? `${pendingKots.length} active KOT tickets are currently being prepared. ${delayedKots.length} are delayed (>15 min).`
+            ? `${pendingKots.length} active KOT tickets are currently being prepared. ${delayedKots.length} are delayed (>${delayMinutes} min).`
             : 'No active KOT tickets in kitchen — all orders are served or kitchen is clear.',
           card: {
             title: 'Live Kitchen Stations & KOTs',
@@ -739,7 +729,7 @@ export class PosAssistantService {
             highlightLabel: 'Active Tickets in Kitchen',
             metrics: [
               { label: 'Pending / Preparing', value: `${pendingKots.length} tickets`, isBold: true },
-              { label: 'Delayed (>15 min)', value: `${delayedKots.length} tickets`, color: delayedKots.length > 0 ? 'text-rose-600' : 'text-emerald-700' },
+              { label: `Delayed (>${delayMinutes} min)`, value: `${delayedKots.length} tickets`, color: delayedKots.length > 0 ? 'text-rose-600' : 'text-emerald-700' },
               ...stationMetrics
             ],
             actions: [
@@ -772,6 +762,202 @@ export class PosAssistantService {
             ],
             actions: [{ label: 'Open Tables Floor Plan', actionType: 'NAVIGATE_TAB', targetTab: 'TABLES' }],
             suggestions: ["🍽 Occupied Tables", "🔥 Delayed KOT", "📊 Today's Sales"]
+          }
+        };
+      }
+
+      case 'PAYMENT_SHARE': {
+        const digital = upiSales + cardSales;
+        const collected = cashSales + digital;
+        const cashPct = collected > 0 ? Math.round((cashSales / collected) * 100) : 0;
+        const digitalPct = collected > 0 ? 100 - cashPct : 0;
+        return {
+          id, sender: 'ASSISTANT', timestamp, intent,
+          summaryText: collected > 0
+            ? `${cashPct}% of today's collections were cash and ${digitalPct}% digital (UPI ${formatINR(upiSales)}, card ${formatINR(cardSales)}).`
+            : 'No payments have been collected yet today.',
+          card: {
+            title: 'Cash vs Digital Payment Share',
+            badge: collected > 0 ? `${digitalPct}% digital` : 'No Data',
+            badgeType: 'default',
+            highlightNumber: `${digitalPct}%`,
+            highlightLabel: 'Digital share of collections',
+            metrics: [
+              { label: 'Cash', value: `${cashPct}% (${formatINR(cashSales)})`, isBold: true },
+              { label: 'UPI', value: `${collected > 0 ? Math.round((upiSales / collected) * 100) : 0}% (${formatINR(upiSales)})` },
+              { label: 'Card', value: `${collected > 0 ? Math.round((cardSales / collected) * 100) : 0}% (${formatINR(cardSales)})` }
+            ],
+            actions: [{ label: 'Full Tender Breakdown', actionType: 'CUSTOM', payload: 'PAYMENT_SUMMARY' }],
+            suggestions: ["💰 Cash Collection", "📱 UPI Collection", "📊 Today's Sales"]
+          }
+        };
+      }
+
+      case 'FOOTFALL': {
+        const served = allOrders.filter((o) => o.orderStatus !== 'CANCELLED');
+        const guests = served.reduce((sum, o) => sum + (o.guestCount || 1), 0);
+        const dineIn = served.filter((o) => o.orderType === 'DINE_IN').reduce((sum, o) => sum + (o.guestCount || 1), 0);
+        return {
+          id, sender: 'ASSISTANT', timestamp, intent,
+          summaryText: `${guests} guests have been served today across ${served.length} orders.`,
+          card: {
+            title: 'Footfall: Guests Served Today',
+            badge: `${served.length} orders`,
+            badgeType: 'default',
+            highlightNumber: `${guests}`,
+            highlightLabel: 'Guests served today',
+            metrics: [
+              { label: 'Guests seated (dine-in)', value: `${dineIn}`, isBold: true },
+              { label: 'Other guests (takeaway / delivery)', value: `${guests - dineIn}` },
+              { label: 'Orders', value: `${served.length}` }
+            ],
+            actions: [{ label: "Today's Orders", actionType: 'NAVIGATE_TAB', targetTab: 'ORDERS' }],
+            suggestions: ["📊 Today's Sales", "🍽 Table Occupancy"]
+          }
+        };
+      }
+
+      case 'CASH_VARIANCE': {
+        const limit = AiConfig.getSettings().cashDrawerVarianceThreshold;
+        const closed = (db.shifts || []).filter((sh) => sh.status === 'CLOSED' && typeof sh.cashVariance === 'number');
+        const worst = closed.reduce<number>((m, sh) => (Math.abs(sh.cashVariance as number) > Math.abs(m) ? (sh.cashVariance as number) : m), 0);
+        const flagged = closed.filter((sh) => Math.abs(sh.cashVariance as number) > limit);
+        const openingCash = activeShift?.openingCash ?? 0;
+        return {
+          id, sender: 'ASSISTANT', timestamp, intent,
+          summaryText: closed.length > 0
+            ? `${flagged.length} of ${closed.length} closed shifts had a cash variance above ${formatINR(limit)}. The largest was ${formatINR(Math.abs(worst))}.`
+            : 'No shift has been closed yet, so there is no cash variance to report.',
+          card: {
+            title: 'Cashier Shift Cash Variance',
+            badge: flagged.length > 0 ? `${flagged.length} over limit` : 'Within limit',
+            badgeType: flagged.length > 0 ? 'danger' : 'success',
+            highlightNumber: closed.length > 0 ? formatINR(worst) : 'N/A',
+            highlightLabel: `Largest variance (alert above ${formatINR(limit)})`,
+            metrics: [
+              { label: 'Closed shifts', value: `${closed.length}` },
+              { label: 'Shifts above the alert limit', value: `${flagged.length}`, color: flagged.length > 0 ? 'text-rose-600' : 'text-emerald-700', isBold: true },
+              { label: 'Active shift opening float', value: activeShift ? formatINR(openingCash) : 'No open shift' }
+            ],
+            actions: [{ label: 'Shift Management', actionType: 'OPEN_MODAL', modalName: 'SHIFT' }],
+            suggestions: ["💰 Cash Collection", "👤 Active Staff"]
+          }
+        };
+      }
+
+      case 'ACTIVE_ORDERS': {
+        const oldest = activeOrders.reduce((m, o) => Math.max(m, (Date.now() - new Date(o.createdAt).getTime()) / 60000), 0);
+        return {
+          id, sender: 'ASSISTANT', timestamp, intent,
+          summaryText: activeOrders.length > 0 ? `${activeOrders.length} orders are in progress. The oldest has been waiting ${Math.round(oldest)} minutes.` : 'No orders are in progress right now.',
+          card: {
+            title: 'Current In-Progress Orders',
+            badge: `${activeOrders.length} active`,
+            badgeType: activeOrders.length > 0 ? 'warning' : 'success',
+            highlightNumber: `${activeOrders.length}`,
+            highlightLabel: 'Orders in progress',
+            metrics: [
+              { label: 'Longest wait', value: activeOrders.length > 0 ? `${Math.round(oldest)} min` : '-' },
+              ...activeOrders.slice(0, 5).map((o) => ({ label: `#${o.orderNumber || o.id}`, value: `${o.orderType}${o.tableNumber ? ` · Table ${o.tableNumber}` : ''}` }))
+            ],
+            actions: [{ label: 'Open Orders', actionType: 'NAVIGATE_TAB', targetTab: 'ORDERS' }],
+            suggestions: ["🔥 Delayed KOT", "📊 Today's Sales"]
+          }
+        };
+      }
+
+      case 'COMPLETED_ORDERS': {
+        return {
+          id, sender: 'ASSISTANT', timestamp, intent,
+          summaryText: `${orderCount} orders have been completed and settled today, worth ${formatINR(totalSales)}.`,
+          card: {
+            title: 'Completed & Settled Orders',
+            badge: `${orderCount} settled`,
+            badgeType: 'success',
+            highlightNumber: `${orderCount}`,
+            highlightLabel: 'Completed orders',
+            metrics: [
+              { label: 'Net sales from completed orders', value: formatINR(totalSales), isBold: true },
+              { label: 'Still in progress', value: `${activeCount}` },
+              { label: 'Cancelled', value: `${cancelledCount}` },
+              { label: 'Refunded', value: `${refundedCount}` }
+            ],
+            actions: [{ label: 'Open Bills', actionType: 'NAVIGATE_TAB', targetTab: 'BILLS' }],
+            suggestions: ["📊 Today's Sales", "🚫 Cancelled Bills"]
+          }
+        };
+      }
+
+      case 'KITCHEN_PERFORMANCE': {
+        const done = kots.filter((k) => k.readyAt);
+        const perStation: Record<string, number[]> = {};
+        done.forEach((k) => {
+          const minutes = (new Date(k.readyAt as string).getTime() - new Date(k.createdAt).getTime()) / 60000;
+          (perStation[k.station] ||= []).push(minutes);
+        });
+        const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+        const all = done.map((k) => (new Date(k.readyAt as string).getTime() - new Date(k.createdAt).getTime()) / 60000);
+        return {
+          id, sender: 'ASSISTANT', timestamp, intent,
+          summaryText: done.length > 0 ? `Kitchen tickets are taking ${Math.round(avg(all))} minutes on average, across ${done.length} completed tickets.` : 'No kitchen ticket has been completed yet, so there is no turnaround time to report.',
+          card: {
+            title: 'Kitchen Station Turnaround',
+            badge: `${done.length} tickets`,
+            badgeType: 'default',
+            highlightNumber: done.length > 0 ? `${Math.round(avg(all))} min` : 'N/A',
+            highlightLabel: 'Average time to ready',
+            metrics: done.length > 0
+              ? Object.entries(perStation).map(([station, xs]) => ({ label: station, value: `${Math.round(avg(xs))} min (${xs.length} tickets)` }))
+              : [{ label: 'Completed tickets', value: '0' }],
+            actions: [{ label: 'Live KOT Queue', actionType: 'CUSTOM', payload: 'PENDING_KOT' }],
+            suggestions: ["🔥 Delayed KOT", "🍳 Live KOT Queue"]
+          }
+        };
+      }
+
+      case 'BEST_CATEGORY': {
+        const categoryName = (menuItemId: string) => {
+          const item = (db.menuItems || []).find((m) => m.id === menuItemId);
+          return (db.categories || []).find((c) => c.id === item?.categoryId)?.name || 'Uncategorised';
+        };
+        const revenue: Record<string, number> = {};
+        allOrders.filter((o) => o.orderStatus !== 'CANCELLED').forEach((o) =>
+          o.items.forEach((it) => {
+            const name = categoryName(it.menuItemId);
+            revenue[name] = (revenue[name] || 0) + (it.totalPrice || it.unitPrice * it.quantity);
+          })
+        );
+        const ranked = Object.entries(revenue).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        return {
+          id, sender: 'ASSISTANT', timestamp, intent,
+          summaryText: ranked.length > 0 ? `${ranked[0][0]} is the top revenue category today at ${formatINR(ranked[0][1])}.` : 'No food sales recorded yet today.',
+          card: {
+            title: 'Revenue by Menu Category',
+            badge: ranked.length > 0 ? 'Top Category' : 'No Data',
+            badgeType: 'default',
+            highlightNumber: ranked.length > 0 ? ranked[0][0] : 'N/A',
+            highlightLabel: ranked.length > 0 ? formatINR(ranked[0][1]) : 'No Data',
+            metrics: ranked.length > 0 ? ranked.map(([name, amount], i) => ({ label: `#${i + 1} ${name}`, value: formatINR(amount), isBold: i === 0 })) : [{ label: 'Categories with sales', value: '0' }],
+            actions: [{ label: 'Open Menu Catalog', actionType: 'NAVIGATE_TAB', targetTab: 'MENU' }],
+            suggestions: ["🔥 Top Selling Items", "📊 Today's Sales"]
+          }
+        };
+      }
+
+      case 'OCCUPIED_TABLES': {
+        const list = occupiedTables.slice(0, 8).map((t) => `Table #${t.tableNumber}${t.currentGuests ? ` (${t.currentGuests})` : ''}`);
+        return {
+          id, sender: 'ASSISTANT', timestamp, intent,
+          summaryText: occupiedTables.length > 0 ? `${occupiedTables.length} tables are seated right now.` : 'No tables are seated right now.',
+          card: {
+            title: 'Currently Seated Tables',
+            badge: `${occupiedTables.length} seated`,
+            badgeType: occupiedTables.length > 0 ? 'warning' : 'success',
+            highlightNumber: `${occupiedTables.length}`,
+            highlightLabel: `of ${tables.length} tables`,
+            metrics: occupiedTables.length > 0 ? list.map((label) => ({ label, value: 'Seated' })) : [{ label: 'Seated tables', value: '0' }],
+            actions: [{ label: 'Open Tables Floor Plan', actionType: 'NAVIGATE_TAB', targetTab: 'TABLES' }],
+            suggestions: ["🍽 Table Occupancy", "📊 Today's Sales"]
           }
         };
       }
@@ -856,8 +1042,7 @@ export class PosAssistantService {
       case 'TAX_SUMMARY': {
         const taxable = Math.round(totalSales / 1.05);
         const totalTax = totalSales - taxable;
-        const cgst = Math.round(totalTax / 2);
-        const sgst = totalTax - cgst;
+        const { cgst, sgst } = splitTax(totalTax, 0);
 
         return {
           id,
@@ -876,8 +1061,8 @@ export class PosAssistantService {
               { label: 'Taxable Base Turnover', value: formatINR(taxable), isBold: true },
               { label: 'CGST (2.5%)', value: formatINR(cgst), color: 'text-slate-700' },
               { label: 'SGST (2.5%)', value: formatINR(sgst), color: 'text-slate-700' },
-              { label: 'GSTIN', value: db.restaurant.gstin || '24AAAAA0000A1Z5' },
-              { label: 'FSSAI License', value: '10722001000452' }
+              ...(db.restaurant.gstin ? [{ label: 'GSTIN', value: db.restaurant.gstin }] : []),
+              ...(db.restaurant.fssaiNumber ? [{ label: 'FSSAI License', value: db.restaurant.fssaiNumber }] : [])
             ],
             actions: [{ label: 'Open POS Reports', actionType: 'NAVIGATE_TAB', targetTab: 'REPORTS' }],
             suggestions: ["📊 Today's Sales", "📈 End of Day Summary"]
@@ -1259,8 +1444,7 @@ export class PosAssistantService {
 
     const rawPayload = `
 ========================================
-            JAMANVAAR POS
-           BY KELVIONTECH
+${slipHeader(db.restaurant.name)}
 ----------------------------------------
 DAILY SALES & AUDIT RECONCILIATION
 BUSINESS DAY: ${activeDay.id}

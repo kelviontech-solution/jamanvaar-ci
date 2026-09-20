@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+// Deep import, not the '@jamanvaar/ui' barrel (see layout/ProtectedLayout.tsx).
+import { printElement } from '../../../../../packages/ui/src/printElement';
 import { api, ApiError } from '../../api/client';
 import type { Invoice, BillingSummary, RestaurantCore, Plan, PaymentMethod, ReceiptData } from '../../api/types';
 import {
@@ -33,22 +35,54 @@ import {
   Check
 } from 'lucide-react';
 import { exportRowsToCsv } from '../../lib/csvExport';
+import { fetchAllPages } from '../../lib/fetchAll';
+import { useDebounced, usePagedList } from '../../hooks/usePagedList';
+import { Pager } from '../../components/Pager';
 import '../../components/shared.css';
 import '../Dashboard/dashboard.css';
 import './billing.css';
 
 type InvoiceFilterStatus = 'ALL' | 'ISSUED' | 'PAID' | 'PAST_DUE' | 'VOID';
 
+interface ReceivableRow {
+  restaurantId: string;
+  restaurantName: string;
+  outstanding: number;
+  overdue: number;
+  unpaidInvoices: number;
+  oldestDue: string | null;
+  lastPaymentAt: string | null;
+  nextRenewal: string | null;
+}
+
+const inr0 = (n: number) => `₹${n.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+
 export function BillingPage() {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [summary, setSummary] = useState<BillingSummary | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   // Search and Filter
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<InvoiceFilterStatus>('ALL');
+  // BUG-051: receivables by restaurant first; the invoice table is searched, filtered and paged on the server.
+  const [tab, setTab] = useState<'RECEIVABLES' | 'INVOICES'>('RECEIVABLES');
+  const debouncedSearch = useDebounced(search);
+  const invoiceList = usePagedList<Invoice, { statusCounts: Record<string, number> }>(
+    '/api/v1/invoices',
+    {
+      q: debouncedSearch,
+      // "Overdue" is one rule (unpaid and past its due date), not just the stored PAST_DUE status.
+      status: statusFilter === 'ALL' || statusFilter === 'PAST_DUE' ? undefined : statusFilter,
+      overdue: statusFilter === 'PAST_DUE' ? 'true' : undefined
+    },
+    25,
+    tab === 'INVOICES'
+  );
+  const receivables = usePagedList<ReceivableRow>('/api/v1/invoices/receivables', { q: debouncedSearch }, 25, tab === 'RECEIVABLES');
+  const invoices = invoiceList.items;
+  const loading = (tab === 'INVOICES' ? invoiceList.loading : receivables.loading) && summary === null;
+  const [exporting, setExporting] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Issue Invoice Modal
@@ -91,18 +125,15 @@ export function BillingPage() {
   };
 
   function loadBillingData() {
-    setLoading(true);
-    Promise.all([
-      api.get<Invoice[]>('/api/v1/invoices'),
-      api.get<BillingSummary>('/api/v1/invoices/summary')
-    ])
-      .then(([invoicesList, summaryData]) => {
-        setInvoices(invoicesList);
+    invoiceList.reload();
+    receivables.reload();
+    api
+      .get<BillingSummary>('/api/v1/invoices/summary')
+      .then((summaryData) => {
         setSummary(summaryData);
         setError(null);
       })
-      .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load billing records'))
-      .finally(() => setLoading(false));
+      .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load billing records'));
   }
 
   useEffect(() => {
@@ -268,22 +299,25 @@ export function BillingPage() {
     }
   }
 
-  const filteredInvoices = useMemo(() => {
-    return invoices.filter((i) => {
-      if (statusFilter !== 'ALL' && i.status !== statusFilter) return false;
-      if (search.trim()) {
-        const q = search.toLowerCase();
-        const matchNum = i.invoiceNumber.toLowerCase().includes(q);
-        const matchRest = (i.restaurant?.name || '').toLowerCase().includes(q);
-        const matchPlan = (i.plan?.name || '').toLowerCase().includes(q);
-        if (!matchNum && !matchRest && !matchPlan) return false;
-      }
-      return true;
-    });
-  }, [invoices, statusFilter, search]);
+  const filteredInvoices = invoices;
 
-  function handleExportCsv() {
-    exportRowsToCsv(`jamanvaar_invoices_${new Date().toISOString().slice(0, 10)}.csv`, filteredInvoices, [
+  async function handleExportCsv() {
+    setExporting(true);
+    let rows: Invoice[];
+    try {
+      // Every invoice matching the filters, not just the page on screen.
+      rows = (await fetchAllPages<Invoice>('/api/v1/invoices', {
+        q: debouncedSearch,
+        status: statusFilter === 'ALL' || statusFilter === 'PAST_DUE' ? undefined : statusFilter,
+        overdue: statusFilter === 'PAST_DUE' ? 'true' : undefined
+      })).rows;
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Export failed');
+      setExporting(false);
+      return;
+    }
+    setExporting(false);
+    exportRowsToCsv(`jamanvaar_invoices_${new Date().toISOString().slice(0, 10)}.csv`, rows, [
       { header: 'Invoice #', value: (i) => i.invoiceNumber },
       { header: 'Restaurant', value: (i) => i.restaurant?.name || '' },
       { header: 'Plan', value: (i) => i.plan?.name || 'Custom Fee' },
@@ -296,9 +330,10 @@ export function BillingPage() {
     ]);
   }
 
-  const issuedCount = invoices.filter((i) => i.status === 'ISSUED').length;
-  const paidCount = invoices.filter((i) => i.status === 'PAID').length;
-  const overdueCount = invoices.filter((i) => i.status === 'PAST_DUE').length;
+  const statusCounts = invoiceList.extra?.statusCounts;
+  const issuedCount = statusCounts?.ISSUED;
+  const paidCount = statusCounts?.PAID;
+  const overdueCount = summary?.overdueInvoices ?? summary?.pastDueInvoices;
 
   return (
     <div className="billing-container">
@@ -342,14 +377,14 @@ export function BillingPage() {
             variant="ghost"
             onClick={handleRunRenewalCheck}
             disabled={runningRenewals}
-            title="Scan subscriptions nearing renewal (7 days) and issue statutory invoices"
+            title="Renewal invoices are also issued automatically; this runs the scan right now"
           >
             <RefreshCw className={`w-4 h-4 ${runningRenewals ? 'animate-spin' : ''}`} />
             <span>{runningRenewals ? 'Scanning…' : 'Check Renewals'}</span>
           </Button>
-          <Button variant="ghost" onClick={handleExportCsv} disabled={invoices.length === 0}>
+          <Button variant="ghost" onClick={handleExportCsv} disabled={exporting || tab !== 'INVOICES' || invoiceList.total === 0}>
             <Download className="w-4 h-4" />
-            <span>Export CSV</span>
+            <span>{exporting ? 'Exporting…' : 'Export CSV'}</span>
           </Button>
           <Button variant="accent" onClick={openIssueModal}>
             <Plus className="w-4 h-4" />
@@ -377,12 +412,9 @@ export function BillingPage() {
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, minWidth: 0, flex: '1 1 260px' }}>
           <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" style={{ marginTop: 2 }} />
           <span>
-            <strong>Payment Gateway Integration:</strong> Manual Reconciliation & UPI/NEFT Bank Settled. Automated renewal generator and webhook listener active.
+            <strong>How payments work:</strong> payments for these invoices are recorded by hand (bank transfer or UPI) using Record Payment. Renewal invoices and overdue marking run automatically every 15 minutes.
           </span>
         </div>
-        <span className="badge badge-neutral" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
-          SANDBOX + PRODUCTION ENGINE
-        </span>
       </div>
 
       {error && (
@@ -415,7 +447,7 @@ export function BillingPage() {
               </div>
               <div className="billing-metric-subtext" style={{ color: '#059669' }}>
                 <Check className="w-3.5 h-3.5" />
-                <span>GST Compliant • 100% Settled</span>
+                <span>{summary.collectionRatePercent ?? 0}% of billed amount collected</span>
               </div>
             </div>
           </div>
@@ -457,21 +489,41 @@ export function BillingPage() {
           <div className="billing-metric-card">
             <div className="billing-metric-header">
               <span className="billing-metric-title">Overdue Invoices</span>
-              <div className="billing-metric-icon" style={{ background: summary.pastDueInvoices > 0 ? '#fef2f2' : '#f8fafc', color: summary.pastDueInvoices > 0 ? '#dc2626' : '#94a3b8' }}>
+              <div className="billing-metric-icon" style={{ background: (overdueCount ?? 0) > 0 ? '#fef2f2' : '#f8fafc', color: (overdueCount ?? 0) > 0 ? '#dc2626' : '#94a3b8' }}>
                 <AlertTriangle className="w-5 h-5" />
               </div>
             </div>
             <div>
-              <div className="billing-metric-value" style={{ color: summary.pastDueInvoices > 0 ? '#dc2626' : '#0f172a' }}>
-                {summary.pastDueInvoices}
+              <div className="billing-metric-value" style={{ color: (overdueCount ?? 0) > 0 ? '#dc2626' : '#0f172a' }}>
+                {overdueCount ?? 0}
               </div>
-              <div className="billing-metric-subtext" style={{ color: summary.pastDueInvoices > 0 ? '#dc2626' : '#64748b' }}>
-                <span>{summary.pastDueInvoices > 0 ? 'Requires Account Action' : 'All Accounts Current'}</span>
+              <div className="billing-metric-subtext" style={{ color: (overdueCount ?? 0) > 0 ? '#dc2626' : '#64748b' }}>
+                <span>{(overdueCount ?? 0) > 0 ? `${inr0(summary.overdueAmount ?? 0)} overdue` : 'All Accounts Current'}</span>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {summary?.ageing && (summary.overdueAmount ?? 0) > 0 && (
+        <div className="banner" style={{ marginBottom: 12, display: 'flex', gap: 18, flexWrap: 'wrap', fontSize: 13 }} aria-label="Overdue by age">
+          <strong>Overdue by age:</strong>
+          {(['0-30', '31-60', '61-90', '90+'] as const).map((b) => (
+            <span key={b}>{b} days: <strong>{inr0(summary.ageing![b])}</strong></span>
+          ))}
+        </div>
+      )}
+
+      <div className="toolbar" style={{ marginTop: 8 }}>
+        <FilterTabs<'RECEIVABLES' | 'INVOICES'>
+          value={tab}
+          onChange={setTab}
+          options={[
+            { id: 'RECEIVABLES', label: 'Who owes' },
+            { id: 'INVOICES', label: 'All invoices' }
+          ]}
+        />
+      </div>
 
       {/* Search & Filter Toolbar */}
       <div className="toolbar" style={{ marginTop: 8, flexWrap: 'wrap', gap: 12 }}>
@@ -522,7 +574,7 @@ export function BillingPage() {
 
         <div className="spacer" />
         <span className="muted" style={{ fontSize: 13 }}>
-          {filteredInvoices.length} of {invoices.length} invoices
+          {tab === 'INVOICES' ? `${invoiceList.total} invoice${invoiceList.total === 1 ? '' : 's'}` : `${receivables.total} restaurant${receivables.total === 1 ? '' : 's'} with unpaid invoices`}
         </span>
       </div>
 
@@ -532,7 +584,7 @@ export function BillingPage() {
             value={statusFilter}
             onChange={setStatusFilter}
             options={[
-              { id: 'ALL', label: 'All Invoices', count: invoices.length },
+              { id: 'ALL', label: 'All Invoices', count: statusCounts ? Object.values(statusCounts).reduce((a, b) => a + b, 0) : undefined },
               { id: 'ISSUED', label: 'Pending', count: issuedCount },
               { id: 'PAID', label: 'Paid', count: paidCount },
               { id: 'PAST_DUE', label: 'Overdue', count: overdueCount },
@@ -542,21 +594,69 @@ export function BillingPage() {
         </div>
       )}
 
+      {tab === 'RECEIVABLES' && (
+        <Card>
+          {receivables.items.length === 0 ? (
+            <EmptyState
+              icon={<Receipt className="w-6 h-6 text-slate-400" />}
+              title={receivables.loading ? 'Loading…' : search ? 'No matching restaurants' : 'Nothing owed'}
+              description={search ? 'Try a different search.' : 'Every issued invoice has been paid.'}
+            />
+          ) : (
+            <div className="data-table-container">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Restaurant</th>
+                    <th>Outstanding</th>
+                    <th>Overdue</th>
+                    <th>Unpaid invoices</th>
+                    <th>Oldest due</th>
+                    <th>Last payment</th>
+                    <th>Next renewal</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {receivables.items.map((r) => (
+                    <tr key={r.restaurantId}>
+                      <td style={{ fontWeight: 700 }}>{r.restaurantName}</td>
+                      <td>{inr0(r.outstanding)}</td>
+                      <td style={{ color: r.overdue > 0 ? '#dc2626' : undefined, fontWeight: r.overdue > 0 ? 700 : undefined }}>{r.overdue > 0 ? inr0(r.overdue) : '—'}</td>
+                      <td>{r.unpaidInvoices}</td>
+                      <td>{r.oldestDue ? new Date(r.oldestDue).toLocaleDateString('en-IN') : '—'}</td>
+                      <td>{r.lastPaymentAt ? new Date(r.lastPaymentAt).toLocaleDateString('en-IN') : 'None yet'}</td>
+                      <td>{r.nextRenewal ? new Date(r.nextRenewal).toLocaleDateString('en-IN') : '—'}</td>
+                      <td style={{ textAlign: 'right' }}>
+                        <Button size="sm" variant="ghost" onClick={() => { setSearch(r.restaurantName); setStatusFilter('ALL'); setTab('INVOICES'); }}>
+                          View invoices
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+      )}
+
       {/* Invoices List Table */}
+      {tab === 'INVOICES' && (<>
       <Card>
         {loading ? (
           <SkeletonTable rows={5} />
         ) : filteredInvoices.length === 0 ? (
           <EmptyState
             icon={<Receipt className="w-6 h-6 text-slate-400" />}
-            title={invoices.length === 0 ? 'No invoices issued' : 'No matching invoices'}
+            title={invoiceList.total === 0 && !search && statusFilter === 'ALL' ? 'No invoices issued' : 'No matching invoices'}
             description={
-              invoices.length === 0
+              invoiceList.total === 0 && !search && statusFilter === 'ALL'
                 ? 'Assign a subscription or click "Issue Invoice" to issue a statutory billing record.'
                 : 'Try changing your search query or status filter.'
             }
             action={
-              invoices.length > 0 ? (
+              search || statusFilter !== 'ALL' ? (
                 <Button variant="ghost" onClick={() => { setSearch(''); setStatusFilter('ALL'); }}>
                   Reset Filters
                 </Button>
@@ -754,6 +854,14 @@ export function BillingPage() {
           </div>
         )}
       </Card>
+      </>)}
+
+      {tab === 'RECEIVABLES' && receivables.total > 0 && (
+        <Pager page={receivables.page} pageSize={receivables.pageSize} total={receivables.total} totalPages={receivables.totalPages} loading={receivables.loading} onPage={receivables.setPage} />
+      )}
+      {tab === 'INVOICES' && invoiceList.total > 0 && (
+        <Pager page={invoiceList.page} pageSize={invoiceList.pageSize} total={invoiceList.total} totalPages={invoiceList.totalPages} loading={invoiceList.loading} onPage={invoiceList.setPage} />
+      )}
 
       {/* ─────────────────────────────────────────────────────────────
           MODAL 1: STATUTORY A4 GST TAX INVOICE PREVIEW
@@ -795,7 +903,7 @@ export function BillingPage() {
                 <Button variant="ghost" onClick={() => setViewInvoice(null)}>
                   Close
                 </Button>
-                <Button variant="accent" onClick={() => window.print()}>
+                <Button variant="accent" onClick={() => printElement('[data-print-doc="platform-invoice"]', { title: 'Invoice', pageSize: 'A4 portrait' })}>
                   <Printer className="w-4 h-4" />
                   <span>Print Invoice (A4)</span>
                 </Button>
@@ -803,7 +911,7 @@ export function BillingPage() {
             </div>
           }
         >
-          <div className="doc-sheet print-surface">
+          <div className="doc-sheet print-surface" data-print-doc="platform-invoice">
             {/* Header / Brand */}
             <div className="doc-brand-header">
               <div>
@@ -1002,14 +1110,14 @@ export function BillingPage() {
               <Button variant="ghost" onClick={() => setReceiptData(null)}>
                 Close
               </Button>
-              <Button variant="accent" onClick={() => window.print()}>
+              <Button variant="accent" onClick={() => printElement('[data-print-doc="platform-receipt"]', { title: 'Receipt', pageSize: 'A4 portrait' })}>
                 <Printer className="w-4 h-4" />
                 <span>Print Receipt (A4)</span>
               </Button>
             </div>
           }
         >
-          <div className="doc-sheet print-surface">
+          <div className="doc-sheet print-surface" data-print-doc="platform-receipt">
             <div className="doc-brand-header">
               <div>
                 <div className="doc-brand-title">
