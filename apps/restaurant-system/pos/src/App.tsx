@@ -32,7 +32,7 @@ import { PosChatbot } from './components/assistant/PosChatbot';
 import { ManagerOverrideModal } from './components/common/ManagerOverrideModal';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 import { CrashRecoveryBanner } from './components/common/CrashRecoveryBanner';
-import { NotificationToastContainer, JAMANVAARStartup, ActivationWelcomeScreen } from '@jamanvaar/ui';
+import { NotificationToastContainer, JAMANVAARStartup, ActivationWelcomeScreen, ActivationNoticeBanner } from '@jamanvaar/ui';
 import { UtensilsCrossed } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -255,6 +255,7 @@ export const App: React.FC = () => {
       <JAMANVAARStartup appName="POS Terminal" appType="POS" subtitle="Restaurant Operations Platform">
         <div className="min-h-screen flex items-center justify-center p-6">
           <form onSubmit={handleActivate} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4 text-center">
+            <ActivationNoticeBanner />
             <h1 className="text-2xl font-black text-jaman-navy">Activate This Terminal</h1>
             <p className="text-sm text-[#4A5568]">Enter the activation code provided by JAMANVAAR to connect this POS terminal to your restaurant.</p>
             <input

@@ -77,7 +77,8 @@ import {
   ProductCard,
   StatusBadge,
   ThermalReceiptView,
-  JAMANVAARStartup
+  JAMANVAARStartup,
+  ActivationNoticeBanner
 } from '@jamanvaar/ui';
 import { formatDate, formatINR, formatTime, generateIdempotencyKey, generateUUID, localizedDescription, localizedName, SoundService } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
@@ -1308,6 +1309,7 @@ export default function KioskUserApp() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-jaman-cream p-6">
         <form onSubmit={handleActivate} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4 text-center">
+          <ActivationNoticeBanner />
           <h1 className="text-2xl font-black text-jaman-navy">Activate This Kiosk</h1>
           <p className="text-sm text-[#4A5568]">Enter the activation code provided by JAMANVAAR to connect this device to your restaurant.</p>
           <input

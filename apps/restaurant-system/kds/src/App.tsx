@@ -9,7 +9,8 @@ import {
   NotificationToastContainer,
   JAMANVAARStartup,
   EmptyState,
-  ActivationWelcomeScreen
+  ActivationWelcomeScreen,
+  ActivationNoticeBanner
 } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
 import { sound } from '@jamanvaar/ui';
@@ -401,6 +402,7 @@ export const App: React.FC = () => {
       <JAMANVAARStartup appName="Kitchen Display (KDS)" appType="KDS" subtitle="Kitchen Production & Expediter System">
         <div className="min-h-screen flex items-center justify-center p-6">
           <form onSubmit={handleActivate} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4 text-center">
+            <ActivationNoticeBanner />
             <h1 className="text-2xl font-black text-jaman-navy">Activate This Terminal</h1>
             <p className="text-sm text-[#4A5568]">Enter the activation code provided by JAMANVAAR to connect this Kitchen Display to your restaurant.</p>
             <input

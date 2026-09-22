@@ -7,7 +7,8 @@ import {
   JamanvaarAuthLayout,
   JAMANVAARStartup,
   ActivationWelcomeScreen,
-  useAiAccess
+  useAiAccess,
+  ActivationNoticeBanner
 } from '@jamanvaar/ui';
 import { isDeviceConnected, connectDevice, activateCaptainDevice, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
 import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog } from '@jamanvaar/sync';
@@ -351,6 +352,7 @@ export const App: React.FC = () => {
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
         >
           <div className="space-y-5">
+            <ActivationNoticeBanner />
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Connect this Tablet</h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">

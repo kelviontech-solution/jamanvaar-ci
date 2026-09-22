@@ -55,6 +55,7 @@ import {
   StatusBadge,
   ThermalReceiptView,
   ScreenErrorBoundary,
+  ActivationNoticeBanner,
   JAMANVAARStartup,
   VirtualKeyboard,
   ActivationWelcomeScreen,
@@ -1124,6 +1125,7 @@ export default function AdminApp() {
           heroDescription="Centralized terminal command, automatic catalog sync, real-time peripheral diagnostics and upsell recommendation tuning."
         >
           <div className="space-y-5">
+            <ActivationNoticeBanner />
             {connectStep === 'CREDENTIALS' ? (
               <>
                 <div>

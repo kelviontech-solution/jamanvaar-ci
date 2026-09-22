@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
-import { Lock, WifiOff, ShieldOff, RefreshCw, Download, Unlink } from 'lucide-react';
+import { Lock, WifiOff, RefreshCw, Download } from 'lucide-react';
 import { DeviceGate, type DeviceGateCode } from '@jamanvaar/sync';
 
 export interface DeviceGateOverlayProps {
@@ -7,21 +7,7 @@ export interface DeviceGateOverlayProps {
   appName: string;
   /** How often to re-check the offline grace period. Default: every minute. */
   offlineCheckMs?: number;
-  /**
-   * Clears this terminal's own saved activation (restaurant id, device id/token) and reloads it back to the
-   * connect/activation screen. Offered only for the two lock reasons a fresh activation actually fixes
-   * (DEVICE_REVOKED, INVALID_DEVICE_CREDENTIAL) — the other reasons need the platform admin to change
-   * something elsewhere, so re-activating this device would not help.
-   *
-   * Without this, a terminal that genuinely needs re-activating had no way back to the activation screen at
-   * all: the overlay covers the whole app and nothing on it ever led anywhere, so it just sat "checking again
-   * automatically" forever (BUG-145 follow-up — reported as the terminal "going round and round").
-   */
-  onResetTerminal?: () => void;
 }
-
-/** Lock reasons a fresh activation of THIS terminal actually resolves. */
-const RESET_FIXES_CODES: ReadonlySet<DeviceGateCode> = new Set(['DEVICE_REVOKED', 'INVALID_DEVICE_CREDENTIAL']);
 
 const TITLES: Record<DeviceGateCode, string> = {
   DEVICE_REVOKED: 'Device revoked',
@@ -31,19 +17,28 @@ const TITLES: Record<DeviceGateCode, string> = {
   APP_DISABLED: 'App not enabled',
   BRANCH_INACTIVE: 'Branch deactivated',
   DEVICE_LOCKED: 'Terminal locked',
+  // Never actually shown by this overlay: DeviceGate resolves this automatically (see its own comment) rather
+  // than locking the terminal. Kept here only because the type requires every DeviceGateCode to have a title.
   INVALID_DEVICE_CREDENTIAL: 'Device not recognised',
   UPDATE_REQUIRED: 'Update required',
   OFFLINE_LIMIT: 'Check-in required'
 };
 
 /**
- * Full-screen lock shown when the platform has stopped allowing this terminal
- * to run (app disabled, device locked or revoked, restaurant suspended,
- * subscription lapsed, or offline for too long). It is an overlay, not a
- * replacement for the app, so the app's sync loop keeps running underneath and
- * the screen goes away by itself as soon as the cloud accepts the terminal again.
+ * Full-screen lock shown when the platform has stopped this RESTAURANT (or this terminal by admin decision)
+ * from operating at all: the app is disabled, the restaurant is suspended or out of subscription, a branch was
+ * deactivated, an admin locked this specific terminal, a required update has not been installed, or the
+ * terminal has been offline too long. None of these are something the terminal can fix by itself, so a
+ * full-screen block that says exactly that (and who to contact) is the right, honest thing to show — the same
+ * way "this workspace has been suspended" pages work in other SaaS products.
+ *
+ * It deliberately never appears for a stale or revoked device credential (DEVICE_REVOKED,
+ * INVALID_DEVICE_CREDENTIAL): that is not a decision about this restaurant, it is just this one terminal's own
+ * saved sign-in going bad, fixed in seconds by activating again — DeviceGate handles that itself (see its own
+ * `onIdentityInvalid`), unbinding the terminal and returning it to its own ordinary activation screen instead
+ * of ever showing this overlay for it.
  */
-export const DeviceGateOverlay: React.FC<DeviceGateOverlayProps> = ({ appName, offlineCheckMs = 60_000, onResetTerminal }) => {
+export const DeviceGateOverlay: React.FC<DeviceGateOverlayProps> = ({ appName, offlineCheckMs = 60_000 }) => {
   const state = useSyncExternalStore(
     (cb) => DeviceGate.subscribe(cb),
     () => JSON.stringify(DeviceGate.getState()),
@@ -52,13 +47,6 @@ export const DeviceGateOverlay: React.FC<DeviceGateOverlayProps> = ({ appName, o
   const gate = JSON.parse(state) as ReturnType<typeof DeviceGate.getState>;
   const [code, setCode] = useState('');
   const [codeMessage, setCodeMessage] = useState<string | null>(null);
-  const [confirmingReset, setConfirmingReset] = useState(false);
-
-  // A fresh lock reason means "reset it" is no longer the right offer for whatever is showing now — collapse
-  // the confirm step rather than leaving it open under a different message.
-  useEffect(() => {
-    setConfirmingReset(false);
-  }, [gate.code]);
 
   useEffect(() => {
     DeviceGate.evaluateOffline();
@@ -68,7 +56,7 @@ export const DeviceGateOverlay: React.FC<DeviceGateOverlayProps> = ({ appName, o
 
   if (!gate.locked || !gate.code) return null;
 
-  const Icon = gate.code === 'OFFLINE_LIMIT' ? WifiOff : gate.code === 'DEVICE_REVOKED' ? ShieldOff : Lock;
+  const Icon = gate.code === 'OFFLINE_LIMIT' ? WifiOff : Lock;
 
   return (
     <div
@@ -130,42 +118,6 @@ export const DeviceGateOverlay: React.FC<DeviceGateOverlayProps> = ({ appName, o
               Apply code
             </button>
             {codeMessage && <p className="text-xs font-semibold text-[#4A5568]" role="status">{codeMessage}</p>}
-          </div>
-        )}
-        {onResetTerminal && gate.code && RESET_FIXES_CODES.has(gate.code) && (
-          <div className="space-y-2 rounded-xl border border-[#EBE6DD] bg-[#FAF7F2] p-3 text-left">
-            {!confirmingReset ? (
-              <button
-                type="button"
-                onClick={() => setConfirmingReset(true)}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#0B253A]/20 px-4 py-2 text-sm font-bold text-[#0B253A] hover:bg-white"
-              >
-                <Unlink className="h-4 w-4" />
-                Reset this terminal
-              </button>
-            ) : (
-              <>
-                <p className="text-xs font-semibold text-[#0B253A]">
-                  This clears this terminal's saved sign-in and returns it to the activation screen. You will need a new activation key from your platform administrator.
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setConfirmingReset(false)}
-                    className="flex-1 rounded-lg border border-[#EBE6DD] px-3 py-1.5 text-xs font-bold text-[#4A5568]"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onResetTerminal}
-                    className="flex-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700"
-                  >
-                    Reset terminal
-                  </button>
-                </div>
-              </>
-            )}
           </div>
         )}
         <p className="flex items-center justify-center gap-2 text-xs text-[#4A5568]">

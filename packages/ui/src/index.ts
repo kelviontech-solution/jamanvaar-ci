@@ -22,6 +22,7 @@ export * from './SoundManager';
 export * from './VirtualKeyboard';
 export * from './ActivationWelcomeScreen';
 export * from './DeviceGateOverlay';
+export * from './ActivationNoticeBanner';
 export * from './PlatformNoticeBanner';
 export * from './useAiAccess';
 export * from './printElement';

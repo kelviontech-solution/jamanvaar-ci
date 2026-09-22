@@ -33,7 +33,8 @@ import {
   Modal,
   NotificationDrawerModal,
   NotificationToastContainer,
-  useAiAccess
+  useAiAccess,
+  ActivationNoticeBanner
 } from '@jamanvaar/ui';
 import { lanMeshSync } from '@jamanvaar/sync';
 import {
@@ -555,6 +556,7 @@ export default function PosAdminApp() {
           ]}
           footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
         >
+          <ActivationNoticeBanner />
           {authScreenState === 'FORGOT' ? (
             <ForgotPasswordPanel
               defaultEmail={authUsername}
