@@ -51,4 +51,39 @@ describe('DeviceGateOverlay', () => {
     await DeviceGate.observe(refusal(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'Invalid device credential.' }));
     expect(render()).toContain('Device not recognised');
   });
+
+  // BUG-145 follow-up: a device the cloud no longer recognises (or has revoked) used to lock the terminal
+  // forever with no way back to the activation screen — reported as the terminal "going round and round".
+  describe('resetting a terminal that a fresh activation would actually fix', () => {
+    const renderWithReset = () => renderToStaticMarkup(React.createElement(DeviceGateOverlay, { appName: 'POS Terminal', onResetTerminal: () => undefined }));
+
+    it('offers no reset button when the caller gives no onResetTerminal, even for a fixable code', async () => {
+      await DeviceGate.observe(refusal(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'x' }));
+      expect(render()).not.toContain('Reset this terminal');
+    });
+
+    it('offers "Reset this terminal" for a rejected device credential', async () => {
+      await DeviceGate.observe(refusal(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'x' }));
+      expect(renderWithReset()).toContain('Reset this terminal');
+    });
+
+    it('offers it for a revoked device too', async () => {
+      await DeviceGate.observe(refusal(401, { code: 'DEVICE_REVOKED', message: 'x' }));
+      expect(renderWithReset()).toContain('Reset this terminal');
+    });
+
+    it('does not offer it for a lock a fresh activation of this device would not fix', async () => {
+      await DeviceGate.observe(refusal(403, { code: 'RESTAURANT_SUSPENDED', message: 'x' }));
+      const html = renderWithReset();
+      expect(html).toContain('Account suspended');
+      expect(html).not.toContain('Reset this terminal');
+    });
+
+    it('does not offer it for a subscription or app-disabled lock either', async () => {
+      await DeviceGate.observe(refusal(403, { code: 'SUBSCRIPTION_INACTIVE', message: 'x' }));
+      expect(renderWithReset()).not.toContain('Reset this terminal');
+      await DeviceGate.observe(refusal(403, { code: 'APP_DISABLED', message: 'x' }));
+      expect(renderWithReset()).not.toContain('Reset this terminal');
+    });
+  });
 });

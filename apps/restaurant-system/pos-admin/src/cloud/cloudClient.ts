@@ -114,6 +114,26 @@ export function saveDeviceRegistration(deviceId: string, deviceToken: string, re
   }
 }
 
+/**
+ * Unbinds this console from the cloud (BUG-145 follow-up): a device the cloud no longer recognises, or has
+ * revoked, was stuck forever behind the lock screen with no way back to activation, since `isCloudConnected()`
+ * checks `RESTAURANT_ID_KEY`, not the device token, so the old (unused) `clearDeviceRegistration` alone would
+ * not have returned this console to the connect screen. This app is local-first — the local admin login and
+ * the day-to-day database are untouched; only the cloud/device link is reset, and screens that need it (owner
+ * cloud sign-in, backups, Help & Support) fall back to asking to reconnect.
+ */
+export function resetTerminal(): void {
+  try {
+    localStorage.removeItem(RESTAURANT_ID_KEY);
+    localStorage.removeItem(DEVICE_ID_KEY);
+    localStorage.removeItem(DEVICE_TOKEN_KEY);
+  } catch {
+    // Storage unavailable - nothing to clear, but the gate reset below still lets a reload retry cleanly.
+  }
+  DeviceGate.reset();
+}
+
+/** @deprecated use `resetTerminal`, which also clears the restaurant id so the app actually returns to the connect screen. */
 export function clearDeviceRegistration() {
   try {
     localStorage.removeItem(DEVICE_ID_KEY);
