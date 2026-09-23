@@ -5,12 +5,14 @@ import { KOTRecord, KOTStatus } from '@jamanvaar/types';
 import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
 import {
   JamanvaarAuthLayout,
+  APP_HERO_IMAGES,
   BrandHeader,
   NotificationToastContainer,
   JAMANVAARStartup,
   EmptyState,
   ActivationWelcomeScreen,
-  ActivationNoticeBanner
+  ActivationNoticeBanner,
+  ActivationHelpNote
 } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
 import { sound } from '@jamanvaar/ui';
@@ -29,7 +31,8 @@ import {
   Zap,
   Delete,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
+  ArrowRight
 } from 'lucide-react';
 
 /** Who took the order: a table order from the Captain app is the waiter's, anything else was rung up by a cashier (BUG-157). */
@@ -400,29 +403,53 @@ export const App: React.FC = () => {
   if (!isDeviceActivated) {
     return (
       <JAMANVAARStartup appName="Kitchen Display (KDS)" appType="KDS" subtitle="Kitchen Production & Expediter System">
-        <div className="min-h-screen flex items-center justify-center p-6">
-          <form onSubmit={handleActivate} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4 text-center">
-            <ActivationNoticeBanner />
-            <h1 className="text-2xl font-black text-jaman-navy">Activate This Terminal</h1>
-            <p className="text-sm text-[#4A5568]">Enter the activation code provided by JAMANVAAR to connect this Kitchen Display to your restaurant.</p>
-            <input
-              type="text"
-              value={activationCode}
-              onChange={(e) => setActivationCode(e.target.value)}
-              placeholder="Activation code"
-              className="w-full text-center text-lg font-mono bg-jaman-cream border border-jaman-border rounded-xl px-4 py-3"
-              autoFocus
-            />
-            {activationError && <p className="text-sm font-bold text-rose-700">{activationError}</p>}
+        <JamanvaarAuthLayout
+          appIdentity="KDS"
+          appTitle="Kitchen Display System"
+          appSubtitle="One-time setup — activate this display to start receiving tickets."
+          heroHeadline="Real-Time Kitchen Production Command"
+          heroHighlightWord="Live KOTs"
+          heroDescription="Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff."
+          heroImages={APP_HERO_IMAGES.KDS}
+          theme="dark"
+        >
+          <ActivationNoticeBanner />
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-[#F5F1E8] tracking-tight">Activate This Terminal</h2>
+            <p className="text-xs sm:text-sm text-[#8CA0B3] font-medium mt-1">
+              Enter the activation key from your Super Admin Welcome Kit to connect this Kitchen Display to your restaurant.
+            </p>
+          </div>
+          <form onSubmit={handleActivate} className="space-y-3.5">
+            <div>
+              <label className="text-xs font-bold text-[#8CA0B3] block mb-1.5">Activation Key *</label>
+              <input
+                type="text"
+                value={activationCode}
+                onChange={(e) => setActivationCode(e.target.value)}
+                placeholder="JMV-XXXX-XXXX-XXXX"
+                required
+                autoFocus
+                className="w-full bg-white/5 border border-white/15 focus:border-jaman-saffron focus:bg-white/10 rounded-2xl px-4 py-3 text-sm font-mono text-[#F5F1E8] font-semibold focus:outline-hidden transition-colors uppercase placeholder:text-[#5E7893]"
+              />
+            </div>
+            {activationError && (
+              <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{activationError}</span>
+              </div>
+            )}
             <button
               type="submit"
               disabled={isActivating || !activationCode.trim()}
-              className="w-full py-3 rounded-2xl bg-jaman-saffron text-white font-black uppercase tracking-wider disabled:opacity-60"
+              className="w-full py-4 rounded-2xl bg-jaman-saffron hover:bg-[#D45E0F] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
             >
-              {isActivating ? 'Activating…' : 'Activate'}
+              <span>{isActivating ? 'Activating…' : 'Activate Terminal'}</span>
+              {!isActivating && <ArrowRight className="w-4 h-4 text-white" />}
             </button>
           </form>
-        </div>
+          <ActivationHelpNote deviceNoun="terminal" dark />
+        </JamanvaarAuthLayout>
       </JAMANVAARStartup>
     );
   }
@@ -454,10 +481,12 @@ export const App: React.FC = () => {
           heroHeadline="Real-Time Kitchen Production Command"
           heroHighlightWord="Live KOTs"
           heroDescription="Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff."
+          heroImages={APP_HERO_IMAGES.KDS}
+          theme="dark"
         >
           {/* Station Selection */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+            <label className="text-xs font-bold text-[#8CA0B3] uppercase tracking-wider block">
               Select Kitchen Station Display
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -474,8 +503,8 @@ export const App: React.FC = () => {
                   onClick={() => setKdsStationSelection(st.id)}
                   className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                     kdsStationSelection === st.id
-                      ? 'bg-jaman-navy text-white border-jaman-navy shadow-xs'
-                      : 'bg-jaman-cream border-jaman-border text-slate-700 hover:bg-slate-100'
+                      ? 'bg-jaman-saffron text-white border-jaman-saffron shadow-xs'
+                      : 'bg-white/5 border-white/15 text-[#F5F1E8] hover:bg-white/10'
                   }`}
                 >
                   <span className="text-xs font-black block">{st.label}</span>
@@ -487,7 +516,7 @@ export const App: React.FC = () => {
           {/* PIN Input & Numpad */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-jaman-navy uppercase tracking-wider">
+              <label className="text-xs font-bold text-[#F5F1E8] uppercase tracking-wider">
                 Kitchen Staff PIN
               </label>
             </div>
@@ -497,7 +526,7 @@ export const App: React.FC = () => {
               value={kdsPin}
               readOnly
               placeholder="• • • •"
-              className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3 px-4 rounded-2xl bg-white border border-jaman-border focus:border-jaman-saffron outline-none text-jaman-navy"
+              className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3 px-4 rounded-2xl bg-white/5 border border-white/15 focus:border-jaman-saffron outline-none text-[#F5F1E8]"
             />
             {kdsPinError && (
               <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
@@ -516,12 +545,12 @@ export const App: React.FC = () => {
                     else if (k === '⌫') setKdsPin((prev) => prev.slice(0, -1));
                     else handleKdsPinPress(k);
                   }}
-                  className="h-12 sm:h-13 rounded-2xl bg-white hover:border-jaman-saffron hover:bg-amber-50/30 active:scale-95 text-lg font-black transition-all flex items-center justify-center border border-jaman-border text-jaman-navy shadow-2xs cursor-pointer"
+                  className="h-12 sm:h-13 rounded-2xl bg-white/5 hover:border-jaman-saffron hover:bg-white/10 active:scale-95 text-lg font-black transition-all flex items-center justify-center border border-white/15 text-[#F5F1E8] shadow-2xs cursor-pointer"
                 >
                   {k === '⌫' ? (
-                    <Delete className="w-4 h-4 text-rose-600" />
+                    <Delete className="w-4 h-4 text-rose-400" />
                   ) : k === 'C' ? (
-                    <span className="text-rose-600 font-black">C</span>
+                    <span className="text-rose-400 font-black">C</span>
                   ) : (
                     k
                   )}

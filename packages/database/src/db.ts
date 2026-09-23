@@ -96,6 +96,11 @@ export class JamanvaarDatabase {
   public welcomeScreenSettings: WelcomeScreenSettings = { ...DEFAULT_WELCOME_SCREEN_SETTINGS };
   /** Set when the floor plan was deliberately started empty (a real restaurant), so an empty list is not mistaken for missing data on reload. */
   public floorPlanStartedEmpty = false;
+  /** prefix ('K' for kiosk, '' for counter, etc.) -> ISO timestamp of the last manual token-counter
+   *  reset an admin triggered. OrderRepository.nextTokenNumber ignores orders older than this when
+   *  computing the next number for that prefix, so tokens can restart at 101 without deleting order
+   *  history. See TokenSequenceRepository. */
+  public tokenSequenceResets: Record<string, string> = {};
 
   public coupons: Coupon[] = [...SEED_COUPONS];
   public offers: Offer[] = [...SEED_OFFERS];
@@ -1028,6 +1033,7 @@ export class JamanvaarDatabase {
       put('sync_events', this.syncEvents);
       put('kiosk_display_settings', this.kioskDisplaySettings);
       put('welcome_screen_settings', this.welcomeScreenSettings);
+      put('token_sequence_resets', this.tokenSequenceResets);
       // qrSettings had the same gap syncEvents/kioskDisplaySettings used to
       // have — declared on this class but never actually persisted, so a
       // restaurant's QR ordering configuration (min/max order value, waiter
@@ -1361,6 +1367,14 @@ export class JamanvaarDatabase {
           this.qrSettings = { ...DEFAULT_QR_SETTINGS, ...JSON.parse(storedQrSettings) };
         } catch (_) {}
       }
+
+      const storedTokenSequenceResets = localStorage.getItem(`${p}token_sequence_resets`);
+      if (storedTokenSequenceResets) {
+        try {
+          const parsed = JSON.parse(storedTokenSequenceResets);
+          if (parsed && typeof parsed === 'object') this.tokenSequenceResets = parsed;
+        } catch (_) {}
+      }
     } catch (e) {
       console.warn('Storage load failed:', e);
     }
@@ -1443,6 +1457,7 @@ export class JamanvaarDatabase {
     this.taxGroups = [...SEED_TAX_GROUPS];
     this.shifts = generateSeedShifts();
     this.orders = generateSeedOrders();
+    this.tokenSequenceResets = {};
     this.notify();
   }
 }

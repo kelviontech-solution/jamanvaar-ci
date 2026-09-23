@@ -32,8 +32,8 @@ import { PosChatbot } from './components/assistant/PosChatbot';
 import { ManagerOverrideModal } from './components/common/ManagerOverrideModal';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 import { CrashRecoveryBanner } from './components/common/CrashRecoveryBanner';
-import { NotificationToastContainer, JAMANVAARStartup, ActivationWelcomeScreen, ActivationNoticeBanner } from '@jamanvaar/ui';
-import { UtensilsCrossed } from 'lucide-react';
+import { NotificationToastContainer, JAMANVAARStartup, JamanvaarAuthLayout, APP_HERO_IMAGES, ActivationWelcomeScreen, ActivationNoticeBanner, ActivationHelpNote } from '@jamanvaar/ui';
+import { UtensilsCrossed, ArrowRight, AlertCircle } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [isDeviceActivated, setIsDeviceActivated] = useState<boolean>(() => isPosDeviceConnected());
@@ -253,29 +253,59 @@ export const App: React.FC = () => {
   if (!isDeviceActivated) {
     return (
       <JAMANVAARStartup appName="POS Terminal" appType="POS" subtitle="Restaurant Operations Platform">
-        <div className="min-h-screen flex items-center justify-center p-6">
-          <form onSubmit={handleActivate} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4 text-center">
-            <ActivationNoticeBanner />
-            <h1 className="text-2xl font-black text-jaman-navy">Activate This Terminal</h1>
-            <p className="text-sm text-[#4A5568]">Enter the activation code provided by JAMANVAAR to connect this POS terminal to your restaurant.</p>
-            <input
-              type="text"
-              value={activationCode}
-              onChange={(e) => setActivationCode(e.target.value)}
-              placeholder="Activation code"
-              className="w-full text-center text-lg font-mono bg-jaman-cream border border-jaman-border rounded-xl px-4 py-3"
-              autoFocus
-            />
-            {activationError && <p className="text-sm font-bold text-rose-700">{activationError}</p>}
+        <JamanvaarAuthLayout
+          appIdentity="POS"
+          appTitle="POS Counter"
+          appSubtitle="One-time setup — activate this terminal to start billing."
+          heroHeadline="Smart Billing."
+          heroHighlightWord="Better Dining."
+          heroDescription="Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants."
+          capabilities={[
+            { label: 'Fast Billing', icon: 'zap' },
+            { label: 'Instant KOT', icon: 'printer' },
+            { label: 'Table Management', icon: 'table' },
+            { label: 'Offline First', icon: 'cloud' }
+          ]}
+          heroImages={APP_HERO_IMAGES.POS}
+          footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
+        >
+          <ActivationNoticeBanner />
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Activate This Terminal</h2>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+              Enter the activation key from your Super Admin Welcome Kit to connect this terminal to your restaurant.
+            </p>
+          </div>
+          <form onSubmit={handleActivate} className="space-y-3.5">
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Activation Key *</label>
+              <input
+                type="text"
+                value={activationCode}
+                onChange={(e) => setActivationCode(e.target.value)}
+                placeholder="JMV-XXXX-XXXX-XXXX"
+                required
+                autoFocus
+                className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors uppercase"
+              />
+            </div>
+            {activationError && (
+              <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{activationError}</span>
+              </div>
+            )}
             <button
               type="submit"
               disabled={isActivating || !activationCode.trim()}
-              className="w-full py-3 rounded-2xl bg-jaman-saffron text-white font-black uppercase tracking-wider disabled:opacity-60"
+              className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
             >
-              {isActivating ? 'Activating…' : 'Activate'}
+              <span>{isActivating ? 'Activating…' : 'Activate Terminal'}</span>
+              {!isActivating && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
             </button>
           </form>
-        </div>
+          <ActivationHelpNote deviceNoun="terminal" />
+        </JamanvaarAuthLayout>
       </JAMANVAARStartup>
     );
   }

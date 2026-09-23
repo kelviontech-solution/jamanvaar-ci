@@ -5,10 +5,12 @@ import { captainDb, StaffRepository } from '@jamanvaar/database';
 import { EntitlementService } from '@jamanvaar/business';
 import {
   JamanvaarAuthLayout,
+  APP_HERO_IMAGES,
   JAMANVAARStartup,
   ActivationWelcomeScreen,
   useAiAccess,
-  ActivationNoticeBanner
+  ActivationNoticeBanner,
+  ActivationHelpNote
 } from '@jamanvaar/ui';
 import { isDeviceConnected, connectDevice, activateCaptainDevice, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
 import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog } from '@jamanvaar/sync';
@@ -298,6 +300,7 @@ export const App: React.FC = () => {
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
+          heroImages={APP_HERO_IMAGES.CAPTAIN}
         >
           <div className="space-y-5">
             <div>
@@ -334,6 +337,7 @@ export const App: React.FC = () => {
                 {!activationBusy && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
               </button>
             </form>
+            <ActivationHelpNote deviceNoun="tablet" />
           </div>
         </JamanvaarAuthLayout>
       </JAMANVAARStartup>
@@ -350,6 +354,7 @@ export const App: React.FC = () => {
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
+          heroImages={APP_HERO_IMAGES.CAPTAIN}
         >
           <div className="space-y-5">
             <ActivationNoticeBanner />
@@ -440,6 +445,7 @@ export const App: React.FC = () => {
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
+          heroImages={APP_HERO_IMAGES.CAPTAIN}
         >
           <div className="space-y-6">
             <div>

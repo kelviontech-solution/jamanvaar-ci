@@ -24,7 +24,8 @@ export const CaptainGuestRequestsView: React.FC = () => {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newReqTable, setNewReqTable] = useState('12');
-  const [newReqType, setNewReqType] = useState<CustomerRequest['type']>('WATER');
+  // HELP is reserved for a kiosk guest's own "Call Staff" tap — staff logging a request manually pick one of the below.
+  const [newReqType, setNewReqType] = useState<Exclude<CustomerRequest['type'], 'HELP'>>('WATER');
   const [newReqNotes, setNewReqNotes] = useState('');
 
   const pendingRequests = customerRequests.filter((cr) => !cr.isResolved);
@@ -53,6 +54,8 @@ export const CaptainGuestRequestsView: React.FC = () => {
         return '👤';
       case 'BILL':
         return '🧾';
+      case 'HELP':
+        return '🙋';
       default:
         return '🔔';
     }

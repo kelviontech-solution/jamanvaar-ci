@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db, OrderRepository } from '@jamanvaar/database';
+import { db, OrderRepository, TokenSequenceRepository } from '@jamanvaar/database';
 
 /**
  * Regression suite for three data-integrity gaps found in the platform audit:
@@ -147,5 +147,20 @@ describe('token numbers (BUG-160)', () => {
     const plain = OrderRepository.createOrder({ items: [item()], subtotal: db.menuItems[0].price, totalAmount: db.menuItems[0].price });
     expect([k1.tokenNumber, k2.tokenNumber]).toEqual(['K-101', 'K-102']);
     expect(plain.tokenNumber).toBe('101');
+  });
+
+  it('an admin-triggered reset restarts a prefix at 101, and only that prefix', () => {
+    OrderRepository.createOrder({ items: [item()], subtotal: db.menuItems[0].price, totalAmount: db.menuItems[0].price, tokenNumber: OrderRepository.nextTokenNumber('K') });
+    OrderRepository.createOrder({ items: [item()], subtotal: db.menuItems[0].price, totalAmount: db.menuItems[0].price, tokenNumber: OrderRepository.nextTokenNumber('K') });
+    OrderRepository.createOrder({ items: [item()], subtotal: db.menuItems[0].price, totalAmount: db.menuItems[0].price });
+    expect(OrderRepository.nextTokenNumber('K')).toBe('K-103');
+
+    expect(TokenSequenceRepository.getLastReset('K')).toBeNull();
+    TokenSequenceRepository.reset('K');
+    expect(TokenSequenceRepository.getLastReset('K')).toBeTruthy();
+
+    expect(OrderRepository.nextTokenNumber('K')).toBe('K-101');
+    // The unprefixed counter is a separate sequence — untouched by resetting 'K'.
+    expect(OrderRepository.nextTokenNumber('')).toBe('102');
   });
 });

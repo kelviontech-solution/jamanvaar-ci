@@ -30,6 +30,7 @@ import {
   JamanAiFloatingButton,
   JAMANVAARStartup,
   JamanvaarAuthLayout,
+  APP_HERO_IMAGES,
   Modal,
   NotificationDrawerModal,
   NotificationToastContainer,
@@ -550,6 +551,7 @@ export default function PosAdminApp() {
           heroHeadline="Restaurant Control."
           heroHighlightWord="Live Intelligence."
           heroDescription="Centralized management suite for sales analytics, live KOT dispatch, recipe costing and team permissions."
+          heroImages={APP_HERO_IMAGES.ADMIN}
           capabilities={[
             { label: 'Restaurant Management', icon: 'zap' },
             { label: 'Reports & Analytics', icon: 'printer' },

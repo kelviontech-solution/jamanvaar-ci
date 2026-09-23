@@ -482,13 +482,20 @@ export class OrderRepository {
    * The next token for a business day: 101, 102 ... A device that numbers on its own passes a prefix
    * ('K' for the self-order kiosk gives K-101), so its tokens can never equal another device's (BUG-160): the
    * kiosk and the counter each used to hand out #101 on the same day, and neither knew about the other.
+   *
+   * An admin-triggered reset (TokenSequenceRepository.reset) makes orders placed before the reset
+   * invisible to this scan for that one prefix, so the sequence can restart at 101 without deleting
+   * any order history — see that class's own doc comment for the tradeoff this implies.
    */
   public static nextTokenNumber(prefix: string = '', businessDayId?: string): string {
     const dayId = businessDayId || BusinessDayRepository.getActiveBusinessDay().id;
     const tag = prefix ? `${prefix}-` : '';
+    const resetAt = db.tokenSequenceResets[prefix];
+    const resetAtMs = resetAt ? Date.parse(resetAt) : null;
     let highest = 100;
     for (const o of db.orders) {
       if (o.businessDayId !== dayId) continue;
+      if (resetAtMs !== null && new Date(o.createdAt).getTime() < resetAtMs) continue;
       const t = String(o.tokenNumber ?? '');
       if (!t.startsWith(tag)) continue;
       const rest = t.slice(tag.length);
@@ -996,6 +1003,33 @@ export class OrderRepository {
     }
 
     return false;
+  }
+}
+
+/**
+ * Lets an admin restart a device type's token sequence at 101 without deleting order history —
+ * see OrderRepository.nextTokenNumber's own comment for how the reset is applied. Deliberately not
+ * exposed as "delete today's orders": that would erase real sales data just to renumber tickets.
+ *
+ * Tradeoff an admin should know before using this: if orders were already placed today with this
+ * prefix, a reset can hand out a token number that's already in use today (e.g. two different
+ * orders both showing "K-101" on their kitchen tickets) — the UI surfaces this plainly rather than
+ * silently allowing it.
+ */
+export class TokenSequenceRepository {
+  public static getLastReset(prefix: string): string | null {
+    return db.tokenSequenceResets[prefix] ?? null;
+  }
+
+  public static reset(prefix: string, actor: string = 'Kiosk Admin'): void {
+    db.tokenSequenceResets = { ...db.tokenSequenceResets, [prefix]: new Date().toISOString() };
+    AuditRepository.log({
+      action: 'SETTINGS_UPDATE',
+      category: 'BUSINESS',
+      details: `Reset the token counter for "${prefix || 'default'}" — next order restarts at 101`,
+      username: actor
+    });
+    db.notify();
   }
 }
 
