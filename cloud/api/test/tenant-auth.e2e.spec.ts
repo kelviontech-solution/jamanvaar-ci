@@ -179,6 +179,98 @@ describe('Tenant authentication + authorization', () => {
     await prisma.runAsTenant(restaurantId, (tx) => tx.user.deleteMany({ where: { email: staffEmail } }));
   });
 
+  /**
+   * security-audit MED-13: presenting a real device's `id` with NO `deviceToken` (or a
+   * wrong one) used to still bind the session to that device's identity as long as some
+   * active device with that id existed. Device ids are not secret (visible in fleet
+   * lists), so this let a caller who merely knew an existing device's id impersonate it
+   * without ever holding its actual bearer credential.
+   */
+  it('a login with a real deviceId but no deviceToken does not bind the session to that device', async () => {
+    // Own restaurant + subscription, isolated from the outer describe block's
+    // `restaurantId` — the "Entitlements" tests below depend on that restaurant having
+    // NO subscription until they assign one themselves, so this must not share it.
+    const med13Owner = `test-med13-owner-${Date.now()}@example.com`;
+    const restRes = await authed('post', '/api/v1/restaurants', platformToken).send({ name: `TEST MED13 Restaurant ${Date.now()}`, ownerName: 'MED13 Owner', ownerEmail: med13Owner });
+    const med13RestaurantId = restRes.body.restaurant.id;
+    await request(app.getHttpServer()).post('/api/v1/tenant-auth/set-initial-password').send({
+      restaurantId: med13RestaurantId, email: med13Owner, activationToken: restRes.body.activationToken, newPassword: 'med13-correct-horse-battery'
+    });
+    const planRes = await authed('post', '/api/v1/plans', platformToken).send({
+      tier: 'PRO', name: `TEST MED13 Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true }
+    });
+    await authed('post', '/api/v1/subscriptions', platformToken).send({
+      restaurantId: med13RestaurantId, planId: planRes.body.id, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString()
+    });
+
+    const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId: med13RestaurantId, allowedDeviceType: 'POS', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const redeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: 'POS' });
+    expect(redeem.status, JSON.stringify(redeem.body)).toBe(201);
+    const realDeviceId = redeem.body.device.id;
+
+    // No deviceToken at all — the old code trusted deviceId alone here.
+    const noTokenRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId: med13RestaurantId, email: med13Owner, password: 'med13-correct-horse-battery', deviceId: realDeviceId, deviceType: 'POS' });
+    expect(noTokenRes.body.status).not.toBe('LOGIN_SUCCESS');
+    expect(noTokenRes.body.deviceId).not.toBe(realDeviceId);
+
+    // A wrong deviceToken for a real deviceId must fail the same way.
+    const wrongTokenRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId: med13RestaurantId, email: med13Owner, password: 'med13-correct-horse-battery', deviceId: realDeviceId, deviceToken: 'not-the-real-token', deviceType: 'POS' });
+    expect(wrongTokenRes.body.status).not.toBe('LOGIN_SUCCESS');
+
+    // The correct token still works (functional regression check).
+    const rightTokenRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId: med13RestaurantId, email: med13Owner, password: 'med13-correct-horse-battery', deviceId: realDeviceId, deviceToken: redeem.body.deviceToken, deviceType: 'POS' });
+    expect(rightTokenRes.body.status).toBe('LOGIN_SUCCESS');
+    expect(rightTokenRes.body.deviceId).toBe(realDeviceId);
+
+    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: med13RestaurantId } }));
+    await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: planRes.body.id } }));
+  });
+
+  /**
+   * security-audit HIGH-04: pos-admin's own client used to log in with
+   * `deviceType:'POS_ADMIN'` and NO `adminOnly` flag at all — the old server trusted
+   * that omission and let a STAFF login into the full admin console. The check must now
+   * be unconditional for POS_ADMIN/KIOSK_ADMIN device types regardless of what the
+   * client sends (or omits).
+   */
+  it('deviceType POS_ADMIN rejects a STAFF login even when the client sends no adminOnly flag at all', async () => {
+    const ownerLoginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: ownerEmail, password: ownerPassword });
+    const ownerToken = ownerLoginRes.body.accessToken;
+
+    const staffEmail = `test-posadmin-staff-${Date.now()}@example.com`;
+    const staffPassword = 'staff-correct-horse-battery';
+    const createRes = await authed('post', '/api/v1/tenant/me/users', ownerToken).send({
+      email: staffEmail, fullName: 'Floor Staff', role: 'STAFF', password: staffPassword
+    });
+    expect(createRes.status).toBe(201);
+
+    const staffLoginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: staffEmail, password: staffPassword, deviceType: 'POS_ADMIN' });
+    expect(staffLoginRes.status).toBe(403);
+
+    const kioskAdminLoginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: staffEmail, password: staffPassword, deviceType: 'KIOSK_ADMIN' });
+    expect(kioskAdminLoginRes.status).toBe(403);
+
+    // A device type with no admin console (e.g. Captain) is unaffected by this rule.
+    const captainLoginRes = await request(app.getHttpServer())
+      .post('/api/v1/tenant-auth/login')
+      .send({ restaurantId, email: staffEmail, password: staffPassword, deviceType: 'CAPTAIN' });
+    expect(captainLoginRes.status).not.toBe(403);
+
+    await prisma.runAsTenant(restaurantId, (tx) => tx.user.deleteMany({ where: { email: staffEmail } }));
+  });
+
   it('adminOnly: true succeeds for OWNER and for MANAGER', async () => {
     const ownerRes = await request(app.getHttpServer())
       .post('/api/v1/tenant-auth/login')

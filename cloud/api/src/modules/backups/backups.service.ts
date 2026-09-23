@@ -195,18 +195,29 @@ export class BackupsService {
   /**
    * A direct pre-signed link when the object sits unencrypted in S3; otherwise the API's own file route
    * (`fileRoute`), which decrypts on the server and needs the caller's normal authentication.
+   *
+   * security-audit HIGH-03: downloading a backup hands out the restaurant's full data —
+   * staff PIN hashes, every customer record, all synced orders. This used to be reachable
+   * by any role holding the generic `ops:'read'` level (READ_ONLY, SUPPORT_ADMIN), the
+   * same level as just listing backup metadata, and was never audited. The platform
+   * controller now requires `ops:'write'` before calling this; every download (platform
+   * or tenant-initiated) is logged here regardless of caller.
    */
-  async getDownloadUrl(restaurantId: string, backupId: string, fileRoute: string): Promise<string> {
+  async getDownloadUrl(restaurantId: string, backupId: string, fileRoute: string, actor: { actorType: 'PLATFORM' | 'TENANT'; actorId: string }): Promise<string> {
     const backup = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.backup.findFirst({ where: { id: backupId, restaurantId } })
     );
     if (!backup) throw new NotFoundException('Backup not found');
     if (backup.status !== 'COMPLETED') throw new NotFoundException('This backup attempt failed, so there is no file to download');
+    await this.audit.log({
+      actorType: actor.actorType, actorId: actor.actorId, restaurantId,
+      action: 'BACKUP_DOWNLOAD_URL_ISSUED', category: 'OPS', details: { backupId }
+    });
     return (await this.storage.getSignedDownloadUrl(backup.storageKey, backup.encrypted)) ?? fileRoute;
   }
 
-  /** The original JSON of a backup, decrypted and decompressed on the server. */
-  async getFile(restaurantId: string, backupId: string): Promise<{ body: string; filename: string }> {
+  /** The original JSON of a backup, decrypted and decompressed on the server. See getDownloadUrl's doc comment (HIGH-03). */
+  async getFile(restaurantId: string, backupId: string, actor: { actorType: 'PLATFORM' | 'TENANT'; actorId: string }): Promise<{ body: string; filename: string }> {
     const backup = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.backup.findFirst({ where: { id: backupId, restaurantId } })
     );
@@ -218,6 +229,10 @@ export class BackupsService {
       if (err instanceof ServiceUnavailableException) throw err;
       throw new ConflictException('The stored backup could not be read (it is missing or has been altered)');
     }
+    await this.audit.log({
+      actorType: actor.actorType, actorId: actor.actorId, restaurantId,
+      action: 'BACKUP_FILE_DOWNLOADED', category: 'OPS', details: { backupId }
+    });
     return { body, filename: `jamanvaar-backup-${backup.createdAt.toISOString().slice(0, 10)}-${backup.id.slice(0, 8)}.json` };
   }
 

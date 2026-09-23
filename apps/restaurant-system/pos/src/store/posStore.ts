@@ -260,8 +260,41 @@ export function isManagerOrAboveRole(user: { roleId?: string } | null | undefine
   return user?.roleId === 'role-manager' || user?.roleId === 'role-owner' || user?.roleId === 'role-super-admin';
 }
 
-export function isHighDiscount(type: 'PERCENTAGE' | 'FIXED', value: number): boolean {
-  return (type === 'PERCENTAGE' && value > 25) || (type === 'FIXED' && value > 500);
+/**
+ * security-audit MED-08: the old check compared only the per-application
+ * parameter (e.g. "is this single ₹499 discount over ₹500?") against the
+ * threshold, so a cashier could select every item in the bill and apply a
+ * ₹499 FIXED discount to each in one ITEMS-scope call — no single value ever
+ * crosses ₹500, but the bill's actual cash impact could be near-total. This
+ * computes the real rupee impact of the specific application (summed across
+ * every affected item for ITEMS scope) so the threshold reflects what the
+ * bill actually loses, not the shape of the parameter that produced it.
+ */
+export function computeDiscountImpactRupees(
+  params: { scope: 'BILL' | 'ITEMS'; type: 'PERCENTAGE' | 'FIXED'; value: number; itemIds?: string[] },
+  cartItems: CartItem[]
+): number {
+  if (params.scope === 'BILL') {
+    if (params.type === 'FIXED') return params.value;
+    const subtotal = cartItems.reduce((s, it) => s + it.itemTotal, 0);
+    return Math.round((subtotal * params.value) / 100);
+  }
+  const targets =
+    params.itemIds && params.itemIds.length > 0
+      ? cartItems.filter((it) => params.itemIds!.includes(it.cartItemId))
+      : cartItems;
+  if (params.type === 'FIXED') {
+    return targets.reduce((s, it) => s + Math.min(it.itemTotal, params.value), 0);
+  }
+  return targets.reduce((s, it) => s + Math.round((it.itemTotal * params.value) / 100), 0);
+}
+
+export function isHighDiscount(
+  params: { scope: 'BILL' | 'ITEMS'; type: 'PERCENTAGE' | 'FIXED'; value: number; itemIds?: string[] },
+  cartItems: CartItem[]
+): boolean {
+  if (params.type === 'PERCENTAGE' && params.value > 25) return true;
+  return computeDiscountImpactRupees(params, cartItems) > 500;
 }
 
 // Robust Indian Restaurant Tax, Discount & Round-off Calculation
@@ -362,7 +395,10 @@ export const usePosStore = create<PosState>((set, get) => {
     currentUser: restoredUser ?? null,
     authStatus: initialAuthStatus,
     isAuthenticated: initialAuthStatus === 'AUTHENTICATED',
-    isLocked: false,
+    // security-audit LOW-05: a reload used to always come back unlocked,
+    // regardless of whether the terminal was locked before the reload —
+    // restore the persisted lock state instead of hardcoding false.
+    isLocked: initialAuthStatus === 'AUTHENTICATED' && Boolean(savedSession?.locked),
     posTerminalId: savedSession?.terminalId || 'POS-01',
     isOnline: true,
     hardwareStatus: {
@@ -431,6 +467,9 @@ export const usePosStore = create<PosState>((set, get) => {
           currentUser: user,
           authStatus: 'AUTHENTICATED',
           isAuthenticated: true,
+          // security-audit LOW-05: restore the persisted lock state, not a
+          // hardcoded unlocked — see lockTerminal/unlockTerminal below.
+          isLocked: Boolean(session.locked),
           posTerminalId: session.terminalId || get().posTerminalId,
           activeTab: (session.activeTab as PosTab) || get().activeTab
         });
@@ -500,12 +539,19 @@ export const usePosStore = create<PosState>((set, get) => {
         details: `Terminal locked by cashier`,
         username: get().currentUser?.fullName || 'Cashier'
       });
+      // security-audit LOW-05: lock state used to live only in this in-memory
+      // store — a webview reload (Ctrl+R, the crash-recovery "Restore
+      // Workspace" button) re-initialized the store from the still-valid
+      // persisted session with no lock recorded, dropping straight back into
+      // the previous user's unlocked session with no PIN prompt.
+      SessionPersistence.update('pos', { locked: true });
       set({ isLocked: true });
     },
 
     unlockTerminal: (pin: string) => {
       const result = StaffRepository.verifyPin(pin);
       if (result) {
+        SessionPersistence.update('pos', { locked: false });
         set({ isLocked: false });
         return true;
       }
@@ -872,7 +918,7 @@ export const usePosStore = create<PosState>((set, get) => {
       // be applied by any caller (UI, future code, or a direct store call)
       // without a manager PIN, even if a caller skips the dialog that used to
       // be the only place this was checked.
-      if (isHighDiscount(params.type, params.value) && !isManagerOrAboveRole(state.currentUser)) {
+      if (isHighDiscount(params, state.cart.items) && !isManagerOrAboveRole(state.currentUser)) {
         get().requestManagerOverride(
           'HIGH_DISCOUNT',
           `High Discount Approval (${params.type === 'PERCENTAGE' ? `${params.value}%` : `₹${params.value}`})`,

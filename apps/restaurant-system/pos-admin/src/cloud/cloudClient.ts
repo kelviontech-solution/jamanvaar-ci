@@ -289,7 +289,11 @@ export async function cloudLogin(
       password,
       deviceId,
       deviceToken,
-      deviceType: 'POS_ADMIN'
+      deviceType: 'POS_ADMIN',
+      // security-audit HIGH-04: the server now enforces this unconditionally for
+      // deviceType POS_ADMIN regardless of this flag, but sending it explicitly keeps
+      // this call self-documenting and matches kiosk-admin's equivalent call.
+      adminOnly: true
     }
   });
 
@@ -389,7 +393,23 @@ export async function cloudResetPassword(email: string, otp: string, newPassword
   await request('/api/v1/tenant-auth/reset-password', { method: 'POST', body: { restaurantId, email, otp, newPassword }, skipAuthRetry: true });
 }
 
-export function cloudLogout() {
+/**
+ * security-audit LOW-05: this used to just null the in-memory access token —
+ * the server-side refresh session (a 30-day httpOnly cookie) stayed valid,
+ * so anything that called request() after "sign out" (support tickets,
+ * display scale, billing detail — every route not gated by
+ * isCloudLoggedIn()) would silently re-authenticate via refreshAccessToken().
+ * Revoke the refresh session server-side first, while the access token that
+ * authorizes the call is still in memory, then clear local state regardless
+ * of whether the network call succeeds (a terminal must be able to sign out
+ * even if it's offline or the server is unreachable).
+ */
+export async function cloudLogout(): Promise<void> {
+  try {
+    await request('/api/v1/tenant-auth/logout', { method: 'POST', skipAuthRetry: true });
+  } catch {
+    // Best-effort — local sign-out must proceed either way.
+  }
   accessToken = null;
 }
 
@@ -771,14 +791,14 @@ export async function reportDeviceHeartbeat(): Promise<void> {
  * request<T>() and sends the device token this app already has from its own
  * existing activation flow instead.
  */
-export async function createRefund(paymentId: string, amountPaise: number, reason: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
+export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
   const token = getStoredDeviceToken();
   if (!token) throw new CloudApiError('Device not activated', 401);
 
   const res = await fetch(`${API_BASE}/api/v1/payments/${paymentId}/refund`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ amountPaise, reason })
+    body: JSON.stringify({ amountPaise, reason, requestedBy })
   });
   const contentType = res.headers.get('content-type') ?? '';
   const data = contentType.includes('application/json') ? await res.json() : undefined;

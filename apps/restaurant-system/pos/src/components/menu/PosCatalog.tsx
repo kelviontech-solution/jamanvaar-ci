@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { usePosStore } from '../../store/posStore';
+import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { db } from '@jamanvaar/database';
 import { Category } from '@jamanvaar/types';
 import { getCanonicalCategoryKey } from '@jamanvaar/business';
@@ -118,7 +118,9 @@ export const PosCatalog: React.FC = () => {
     setDietaryFilter,
     searchQuery,
     setSearchQuery,
-    customizingItem
+    customizingItem,
+    currentUser,
+    requestManagerOverride
   } = usePosStore();
 
   const [isMenuManagerOpen, setIsMenuManagerOpen] = useState(false);
@@ -417,7 +419,22 @@ export const PosCatalog: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setIsMenuManagerOpen(true)}
+            onClick={() => {
+              // security-audit MED-06: menu edits made here propagate to every
+              // terminal fleet-wide via entity-sync, so any PIN that merely
+              // passes canUseTerminal (any floor role) used to be able to open
+              // this and reprice the whole menu with no further check.
+              if (isManagerOrAboveRole(currentUser)) {
+                setIsMenuManagerOpen(true);
+                return;
+              }
+              requestManagerOverride(
+                'PRICE_OVERRIDE',
+                'Manager Approval Required',
+                'Opening Menu Manager (prices, items, categories) requires a Manager or Owner PIN.',
+                () => setIsMenuManagerOpen(true)
+              );
+            }}
             className="min-h-[32px] px-3 py-1 bg-white hover:bg-[#FFF4ED] border border-jaman-border hover:border-[#FDBA74] text-jaman-navy hover:text-jaman-saffron rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs active:scale-95 cursor-pointer"
             title="Open Menu Manager & Prebuilt Starter Library (30 Types)"
           >

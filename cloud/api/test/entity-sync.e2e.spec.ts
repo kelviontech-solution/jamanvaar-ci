@@ -141,6 +141,45 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     });
   });
 
+  /**
+   * security-audit CRIT-01 regression: a device type with no staff-management console
+   * (Kiosk, KDS, Captain, Kiosk Admin) must not be able to write — or overwrite — a
+   * STAFF_USER record. Before the fix, this succeeded and let a public kiosk mint a
+   * fleet-wide manager PIN. Reading STAFF_USER stays open to every device type (that's
+   * how offline PIN verification works on those terminals), so this only checks the
+   * write side.
+   */
+  it('rejects a STAFF_USER push from a device type with no staff-management console (Kiosk, KDS, Captain, Kiosk Admin)', async () => {
+    const deniedTypes: Array<'KIOSK' | 'KDS' | 'CAPTAIN' | 'KIOSK_ADMIN'> = ['KIOSK', 'KDS', 'CAPTAIN', 'KIOSK_ADMIN'];
+    for (const deviceType of deniedTypes) {
+      const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: deviceType, expiresAt: new Date(Date.now() + 86400000).toISOString() });
+      const redeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType });
+      const token = redeem.body.deviceToken as string;
+
+      const res = await authed('post', '/api/v1/entity-sync/STAFF_USER', token).send({
+        events: [{ externalId: `usr-forged-${deviceType}`, payload: { id: `usr-forged-${deviceType}`, roleId: 'role-manager', isActive: true, pinHash: 'pinv1:deadbeefcafef00d' } }]
+      });
+      expect(res.status, `${deviceType} should be denied, got ${res.status}: ${JSON.stringify(res.body)}`).toBe(403);
+    }
+
+    // Confirm nothing was written despite the 403s.
+    const stillNothing = await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.syncedEntity.findMany({ where: { entityType: 'STAFF_USER', externalId: { startsWith: 'usr-forged-' } } })
+    );
+    expect(stillNothing).toHaveLength(0);
+  });
+
+  it('a POS_ADMIN device may still write STAFF_USER (the console this data actually comes from)', async () => {
+    const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'POS_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const redeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: 'POS_ADMIN' });
+    const posAdminToken = redeem.body.deviceToken as string;
+
+    const res = await authed('post', '/api/v1/entity-sync/STAFF_USER', posAdminToken).send({
+      events: [{ externalId: 'usr-legit-admin', payload: { id: 'usr-legit-admin', roleId: 'role-manager', isActive: true, pinHash: 'pinv1:cafef00ddeadbeef' } }]
+    });
+    expect(res.status, JSON.stringify(res.body)).toBe(201);
+  });
+
   it('a STAFF_USER pushed for one restaurant is invisible to a device on another restaurant', async () => {
     const otherRestaurant = await authed('post', '/api/v1/restaurants', platformToken).send({
       name: `TEST Entity Sync Other ${Date.now()}`,

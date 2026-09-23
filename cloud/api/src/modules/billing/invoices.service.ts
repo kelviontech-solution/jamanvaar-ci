@@ -821,11 +821,22 @@ export class InvoicesService {
       });
 
       if (!invoice) throw new NotFoundException('Invoice not found');
-      if (invoice.status === 'PAID') {
-        throw new BadRequestException('Invoice is already paid');
+      // security-audit CRIT-02: only ISSUED/PAST_DUE invoices are payable — the old
+      // check only rejected PAID, so a self-reported "payment" could still be recorded
+      // against a VOID or REFUNDED invoice.
+      if (invoice.status !== 'ISSUED' && invoice.status !== 'PAST_DUE') {
+        throw new BadRequestException(`Invoice cannot be paid in its current status (${invoice.status})`);
       }
 
-      const paymentAmount = dto.amount || invoice.totalAmount;
+      const alreadyPaid = invoice.payments.filter((p) => p.status === 'COMPLETED').reduce((s, p) => s + p.amount, 0);
+      const remainingBalance = Math.max(0, invoice.totalAmount - alreadyPaid);
+      if (remainingBalance <= 0) {
+        throw new BadRequestException('Invoice has no outstanding balance');
+      }
+      // security-audit CRIT-02: the amount was previously accepted as any positive
+      // integer with no upper bound, so a caller could "overpay" by an arbitrary amount
+      // in a single call. Cap it at what is actually still owed.
+      const paymentAmount = Math.min(dto.amount || remainingBalance, remainingBalance);
       const receiptNumber = await this.generateReceiptNumber(tx);
       const referenceNumber = dto.referenceNumber || `TXN-UPI-${Date.now().toString().slice(-8)}`;
 
@@ -843,7 +854,8 @@ export class InvoicesService {
         }
       });
 
-      const totalPaid = invoice.payments.reduce((s, p) => s + p.amount, 0) + paymentAmount;
+      // Only COMPLETED payments count toward "fully paid" — a FAILED/PENDING row must not.
+      const totalPaid = alreadyPaid + paymentAmount;
       const isFullyPaid = totalPaid >= invoice.totalAmount;
       const newStatus = isFullyPaid ? 'PAID' : invoice.status;
 
@@ -861,8 +873,14 @@ export class InvoicesService {
         }
       });
 
-      // Renew subscription if fully settled
-      if (isFullyPaid && invoice.subscriptionId) {
+      // Renew subscription if fully settled — but security-audit CRIT-02: a self-reported
+      // tenant payment must never silently lift a platform-imposed SUSPENDED state (that
+      // suspension may be for abuse/policy reasons unrelated to this invoice). Only
+      // ACTIVE/TRIAL/PAST_DUE subscriptions are auto-renewed here; a SUSPENDED one still
+      // gets the payment recorded (the money isn't lost) but stays suspended until a
+      // platform operator reactivates it explicitly.
+      const subscriptionIsSuspended = invoice.subscription?.status === 'SUSPENDED';
+      if (isFullyPaid && invoice.subscriptionId && !subscriptionIsSuspended) {
         await tx.subscription.update({
           where: { id: invoice.subscriptionId },
           data: {
@@ -884,6 +902,18 @@ export class InvoicesService {
               receiptNumber,
               renewedUntil: invoice.billingPeriodEnd.toISOString()
             }
+          },
+          tx
+        );
+      } else if (isFullyPaid && subscriptionIsSuspended) {
+        await this.audit.log(
+          {
+            actorType: 'TENANT',
+            actorId: userId,
+            restaurantId,
+            action: 'PAYMENT_RECORDED_WHILE_SUSPENDED',
+            category: 'SUBSCRIPTION',
+            details: { subscriptionId: invoice.subscriptionId, invoiceId, receiptNumber, note: 'Invoice paid in full but subscription remains SUSPENDED pending platform review' }
           },
           tx
         );

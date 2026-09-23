@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ts } from '../../common/sql';
+import { escapeCsvField } from '../../common/security/csv.util';
 
 @Injectable()
 export class ReportsService {
@@ -269,14 +270,14 @@ export class ReportsService {
       // inconsistent convention for the same figures.
       const headers = ['Invoice Number', 'Restaurant', 'Plan', 'Subtotal (₹)', 'Tax Amount (₹)', 'Total (₹)', 'Status', 'Issued At'];
       const rows = invoices.map((i) => [
-        i.invoiceNumber,
-        `"${i.restaurant.name.replace(/"/g, '""')}"`,
-        `"${i.plan?.name ?? 'Custom Plan'}"`,
-        (i.amount / 100).toFixed(2),
-        (i.taxAmount / 100).toFixed(2),
-        (i.totalAmount / 100).toFixed(2),
-        i.status,
-        i.createdAt.toISOString()
+        escapeCsvField(i.invoiceNumber),
+        escapeCsvField(i.restaurant.name),
+        escapeCsvField(i.plan?.name ?? 'Custom Plan'),
+        escapeCsvField((i.amount / 100).toFixed(2)),
+        escapeCsvField((i.taxAmount / 100).toFixed(2)),
+        escapeCsvField((i.totalAmount / 100).toFixed(2)),
+        escapeCsvField(i.status),
+        escapeCsvField(i.createdAt.toISOString())
       ]);
       return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     }
@@ -288,14 +289,14 @@ export class ReportsService {
       });
       const headers = ['ID', 'Restaurant Name', 'City', 'State', 'Status', 'Branches', 'Plan', 'Created At'];
       const rows = restaurants.map((r) => [
-        r.id,
-        `"${r.name.replace(/"/g, '""')}"`,
-        r.city ?? '',
-        r.state ?? '',
-        r.status,
-        r.branches.length,
-        `"${r.subscriptions[0]?.plan.name ?? 'None'}"`,
-        r.createdAt.toISOString()
+        escapeCsvField(r.id),
+        escapeCsvField(r.name),
+        escapeCsvField(r.city ?? ''),
+        escapeCsvField(r.state ?? ''),
+        escapeCsvField(r.status),
+        escapeCsvField(r.branches.length),
+        escapeCsvField(r.subscriptions[0]?.plan.name ?? 'None'),
+        escapeCsvField(r.createdAt.toISOString())
       ]);
       return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     }
@@ -306,13 +307,13 @@ export class ReportsService {
     });
     const headers = ['ID', 'Restaurant', 'Plan Tier', 'Price Monthly', 'Status', 'Start Date', 'Expires At'];
     const rows = subs.map((s) => [
-      s.id,
-      `"${s.restaurant.name.replace(/"/g, '""')}"`,
-      s.plan.tier,
-      (s.plan.priceMonthly / 100).toFixed(2),
-      s.status,
-      s.startDate.toISOString(),
-      s.expiresAt.toISOString()
+      escapeCsvField(s.id),
+      escapeCsvField(s.restaurant.name),
+      escapeCsvField(s.plan.tier),
+      escapeCsvField((s.plan.priceMonthly / 100).toFixed(2)),
+      escapeCsvField(s.status),
+      escapeCsvField(s.startDate.toISOString()),
+      escapeCsvField(s.expiresAt.toISOString())
     ]);
     return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
   }

@@ -88,9 +88,14 @@ describe('JAMANVAAR Restaurant Admin Center — Full CRUD, Persistence & Reporti
     const updated = StaffRepository.updateUser(staff.id, { roleId: 'OWNER' });
     expect(updated?.roleId).toBe('OWNER');
 
+    // security-audit MED-12: "delete" now deactivates rather than removing the row —
+    // a hard local removal is invisible to entity-sync (no delete/tombstone semantics
+    // for STAFF_USER), so a terminated employee's PIN used to keep working forever on
+    // every other terminal that had already synced their record. Deactivating instead
+    // means `isActive: false` propagates through the normal sync path.
     const deleted = StaffRepository.deleteUser(staff.id);
     expect(deleted).toBe(true);
-    expect(StaffRepository.getUserById(staff.id)).toBeUndefined();
+    expect(StaffRepository.getUserById(staff.id)?.isActive).toBe(false);
   });
 
   it('4. InventoryRepository & RecipeRepository: Raw Stock & Automatic BOM Deductions', () => {

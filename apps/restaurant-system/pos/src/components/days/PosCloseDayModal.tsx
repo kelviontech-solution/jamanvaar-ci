@@ -3,7 +3,7 @@ import { BusinessDay } from '@jamanvaar/types';
 import { BusinessDayAccountingService, BusinessDaySummary } from '@jamanvaar/database';
 import { BusinessDayService } from '@jamanvaar/business';
 import { lanMeshSync } from '@jamanvaar/sync';
-import { usePosStore } from '../../store/posStore';
+import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { formatINR } from '@jamanvaar/utils';
 import {
   X,
@@ -55,11 +55,29 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
   const expectedCash = summary.cash_expected;
   // The signed-in cashier closes the day — never a made-up name (BUG-103).
   const currentUser = usePosStore((s) => s.currentUser);
+  const requestManagerOverride = usePosStore((s) => s.requestManagerOverride);
   const closedByName = currentUser?.fullName || 'Cashier';
   const actualCash = actualCashInput !== '' ? Number(actualCashInput) : expectedCash;
   const variance = actualCash - expectedCash;
 
   const handleFinalizeClose = () => {
+    // security-audit MED-06: force-closing the business day (locking in the
+    // day's sales/variance figures and rolling every open order forward) used
+    // to need no more authority than any PIN that could log into the
+    // terminal at all.
+    if (!isManagerOrAboveRole(currentUser)) {
+      requestManagerOverride(
+        'CLOSE_DAY',
+        'Manager Approval Required',
+        `${closedByName} is closing the business day${variance !== 0 ? ` with a ₹${Math.abs(variance)} cash ${variance > 0 ? 'over' : 'short'}` : ''}.`,
+        () => runFinalizeClose()
+      );
+      return;
+    }
+    runFinalizeClose();
+  };
+
+  const runFinalizeClose = () => {
     setIsProcessing(true);
     setErrorMsg(null);
 

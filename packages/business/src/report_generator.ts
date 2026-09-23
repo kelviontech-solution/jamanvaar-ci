@@ -1,6 +1,6 @@
 import { GeneratedReport, Order, PaymentMethod } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
-import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
+import { escapeCsvField, formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 import { CentralReportingService } from './central_reporting_service';
 
 export interface DailyReportSummary {
@@ -710,24 +710,24 @@ export class ReportGeneratorService {
     orders.forEach((o) => {
       const d = new Date(o.createdAt);
       lines.push([
-        `"${o.orderNumber || ''}"`,
-        `"${o.tokenNumber || ''}"`,
-        `"${formatDate(d)}"`,
-        `"${formatTime(d)}"`,
-        `"${o.orderType || ''}"`,
-        `"${o.tableNumber || '-'}"`,
-        `"${o.customerPhone || ''}"`,
-        `"${(o.customerName || '').replace(/"/g, '""')}"`,
-        `"${o.items?.length || 0}"`,
-        `"${o.subtotal || 0}"`,
-        `"${o.discountAmount || 0}"`,
-        `"${o.cgstAmount || 0}"`,
-        `"${o.sgstAmount || 0}"`,
-        `"${o.taxAmount || 0}"`,
-        `"${o.totalAmount || 0}"`,
-        `"${o.paymentMethod || ''}"`,
-        `"${o.paymentStatus || ''}"`,
-        `"${o.orderStatus || ''}"`
+        escapeCsvField(o.orderNumber || ''),
+        escapeCsvField(o.tokenNumber || ''),
+        escapeCsvField(formatDate(d)),
+        escapeCsvField(formatTime(d)),
+        escapeCsvField(o.orderType || ''),
+        escapeCsvField(o.tableNumber || '-'),
+        escapeCsvField(o.customerPhone || ''),
+        escapeCsvField(o.customerName || ''),
+        escapeCsvField(o.items?.length || 0),
+        escapeCsvField(o.subtotal || 0),
+        escapeCsvField(o.discountAmount || 0),
+        escapeCsvField(o.cgstAmount || 0),
+        escapeCsvField(o.sgstAmount || 0),
+        escapeCsvField(o.taxAmount || 0),
+        escapeCsvField(o.totalAmount || 0),
+        escapeCsvField(o.paymentMethod || ''),
+        escapeCsvField(o.paymentStatus || ''),
+        escapeCsvField(o.orderStatus || '')
       ].join(','));
     });
 
@@ -749,7 +749,11 @@ export class ReportGeneratorService {
     ];
 
     report.rows.forEach((r) => {
-      lines.push(`"${r.label}","${r.metric1}","${r.metric2 || ''}","${r.metric3 || ''}","${r.metric4 || ''}"`);
+      lines.push(
+        [r.label, r.metric1, r.metric2 || '', r.metric3 || '', r.metric4 || '']
+          .map(escapeCsvField)
+          .join(',')
+      );
     });
 
     return lines.join('\n');

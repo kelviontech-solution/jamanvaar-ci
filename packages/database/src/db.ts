@@ -55,6 +55,8 @@ import {
   StockCount
 } from '@jamanvaar/types';
 
+import { getGuestOrderBaseUrl } from './qr_order_url';
+
 import {
   DEFAULT_QR_SETTINGS,
   DEFAULT_KIOSK_DISPLAY_SETTINGS,
@@ -1203,7 +1205,8 @@ export class JamanvaarDatabase {
           t.qrStatus = 'ACTIVE';
         }
         if (!t.qrCodeUrl) {
-          t.qrCodeUrl = `http://localhost:5176/?qrTable=${t.tableNumber}&token=${t.qrToken}`;
+          // BUG-119: the app's configured public address, never a hardcoded localhost fallback.
+          t.qrCodeUrl = `${getGuestOrderBaseUrl()}/?qrTable=${t.tableNumber}&token=${t.qrToken}`;
         }
       });
 

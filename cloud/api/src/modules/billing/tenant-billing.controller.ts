@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Post, UseGuards, UsePipes } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { InvoicesService } from './invoices.service';
 import { tenantPaymentSchema } from './dto/invoice.dto';
@@ -37,6 +37,15 @@ export class TenantBillingController {
     return this.invoices.getTenantReceipt(user.restaurantId, id);
   }
 
+  /**
+   * security-audit CRIT-02 fix: this records a payment with no payment-gateway
+   * verification behind it (see InvoicesService.processTenantPayment) — it used to be
+   * callable by ANY authenticated tenant user, including STAFF, letting anyone mark
+   * their own restaurant's invoices paid for free and silently un-suspend a
+   * platform-suspended subscription. Restricted to OWNER, the same bar the rest of
+   * this codebase already uses for other financially/administratively sensitive
+   * self-service actions (e.g. TenantAuthService.createStaffUser).
+   */
   @Post('invoices/:id/pay')
   @UsePipes(new ZodValidationPipe(tenantPaymentSchema))
   payInvoice(
@@ -44,6 +53,9 @@ export class TenantBillingController {
     @Param('id') id: string,
     @Body() body: ReturnType<typeof tenantPaymentSchema.parse>
   ) {
+    if (user.role !== 'OWNER') {
+      throw new ForbiddenException('Only the restaurant owner can record a billing payment');
+    }
     return this.invoices.processTenantPayment(user.restaurantId, id, body, user.id);
   }
 }

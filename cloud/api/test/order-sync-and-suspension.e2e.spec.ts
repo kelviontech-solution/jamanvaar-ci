@@ -117,6 +117,72 @@ describe('Order sync bridge + suspension enforcement', () => {
     expect(pullRes.body.orders.map((o: any) => o.externalOrderId)).toEqual(['local-ord-2']);
   });
 
+  /** security-audit HIGH-05: a branch-bound device must not receive another branch's orders (customer PII, totals). */
+  it('a device bound to one branch does not see another branch\'s orders on catch-up', async () => {
+    const branchARes = await authed('post', '/api/v1/branches', platformToken).send({ restaurantId, name: 'Branch A', code: 'BA' });
+    const branchBRes = await authed('post', '/api/v1/branches', platformToken).send({ restaurantId, name: 'Branch B', code: 'BB' });
+    const branchAId = branchARes.body.id;
+    const branchBId = branchBRes.body.id;
+
+    const keyA = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'POS', branchId: branchAId, expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const redeemA = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: keyA.body.code, deviceType: 'POS' });
+    const posATokenBranch = redeemA.body.deviceToken;
+
+    const keyB = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KDS', branchId: branchBId, expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const redeemB = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: keyB.body.code, deviceType: 'KDS' });
+    const kdsBTokenBranch = redeemB.body.deviceToken;
+
+    const cursorRes = await authed('get', '/api/v1/orders/sync?since=2999-01-01T00:00:00.000Z', kdsToken);
+    const cursor = cursorRes.body.serverTime;
+
+    await authed('post', '/api/v1/orders/sync', posATokenBranch).send({ events: [orderEvent('branch-a-order')] });
+
+    const branchBPull = await authed('get', `/api/v1/orders/sync?since=${encodeURIComponent(cursor)}`, kdsBTokenBranch);
+    expect(branchBPull.body.orders.map((o: any) => o.externalOrderId)).not.toContain('branch-a-order');
+
+    const branchAPull = await authed('get', `/api/v1/orders/sync?since=${encodeURIComponent(cursor)}`, posATokenBranch);
+    expect(branchAPull.body.orders.map((o: any) => o.externalOrderId)).toContain('branch-a-order');
+
+    // An unassigned device (branchId null) still sees everything. The restaurant now
+    // has 3 branches (its auto-created default, plus A and B), so a freshly-redeemed
+    // key with no explicit branchId gets no auto-assigned branch either (that only
+    // happens when the restaurant has exactly one active branch) — a real "no branch"
+    // device, unlike posToken/kdsToken from this file's beforeAll, which were redeemed
+    // back when the restaurant's own auto-created default branch was its only one.
+    const unassignedKey = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KDS', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const unassignedRedeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: unassignedKey.body.code, deviceType: 'KDS' });
+    const unassignedToken = unassignedRedeem.body.deviceToken;
+    const unassignedDeviceRow = await prisma.runAsPlatform((tx) => tx.device.findUniqueOrThrow({ where: { id: unassignedRedeem.body.device.id } }));
+    expect(unassignedDeviceRow.branchId).toBeNull();
+
+    const unassignedPull = await authed('get', `/api/v1/orders/sync?since=${encodeURIComponent(cursor)}`, unassignedToken);
+    expect(unassignedPull.body.orders.map((o: any) => o.externalOrderId)).toContain('branch-a-order');
+  });
+
+  /** security-audit HIGH-05: once an order is settled/refunded, only the settling device or a POS/POS_ADMIN device may change its payment status. */
+  it('a KDS device cannot revert a settled order\'s payment status; POS can', async () => {
+    const settled = { ...orderEvent('settled-ord-1'), paymentStatus: 'SUCCESS' };
+    const pushRes = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [settled] });
+    expect(pushRes.body.results[0].status).toBe('ok');
+
+    const kdsAttempt = await authed('post', '/api/v1/orders/sync', kdsToken).send({
+      events: [{ ...orderEvent('settled-ord-1'), paymentStatus: 'PENDING' }]
+    });
+    expect(kdsAttempt.body.results[0].status).toBe('error');
+
+    const afterKds = await prisma.runAsTenant(restaurantId, (tx) => tx.syncedOrder.findFirst({ where: { externalOrderId: 'settled-ord-1' } }));
+    expect(afterKds!.paymentStatus).toBe('SUCCESS');
+
+    const conflict = await prisma.runAsTenant(restaurantId, (tx) => tx.syncConflict.findFirst({ where: { entityId: 'settled-ord-1' } }));
+    expect(conflict).not.toBeNull();
+
+    // POS (payment-authoritative) can still legitimately issue a refund transition.
+    const posRefund = await authed('post', '/api/v1/orders/sync', posToken).send({
+      events: [{ ...orderEvent('settled-ord-1'), paymentStatus: 'REFUNDED' }]
+    });
+    expect(posRefund.body.results[0].status).toBe('ok');
+  });
+
   it('a device from another restaurant cannot see or push into this one (RLS)', async () => {
     const otherRes = await authed('post', '/api/v1/restaurants', platformToken).send({
       name: `TEST Other Order Sync Restaurant ${Date.now()}`,

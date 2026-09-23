@@ -86,4 +86,67 @@ describe('Tenant isolation via PostgreSQL Row-Level Security (Phase 1a)', () => 
     );
     expect(branches.map((b) => b.id).sort()).toEqual([branchAId, branchBId].sort());
   });
+
+  // security-audit LOW-06: these tables had no RLS at all until now — a
+  // query missing its application-level restaurantId filter would have
+  // returned every tenant's rows. Representative coverage of both policy
+  // shapes added: a direct restaurantId column (SyncEventLog, SyncConflict)
+  // and an EXISTS-based policy for a child table with no restaurantId column
+  // of its own (TicketComment, scoped through its parent SupportTicket).
+  describe('newly RLS-covered tables (LOW-06)', () => {
+    it('SyncEventLog: a tenant context for Restaurant A never sees Restaurant B\'s sync events', async () => {
+      await prisma.runAsTenant(restaurantAId, (tx) =>
+        tx.syncEventLog.create({ data: { restaurantId: restaurantAId, entityType: 'ORDER', action: 'CREATE', status: 'SUCCESS' } })
+      );
+      await prisma.runAsTenant(restaurantBId, (tx) =>
+        tx.syncEventLog.create({ data: { restaurantId: restaurantBId, entityType: 'ORDER', action: 'CREATE', status: 'SUCCESS' } })
+      );
+
+      const seenByA = await prisma.runAsTenant(restaurantAId, (tx) => tx.syncEventLog.findMany());
+      expect(seenByA.every((e) => e.restaurantId === restaurantAId)).toBe(true);
+      expect(seenByA.some((e) => e.restaurantId === restaurantBId)).toBe(false);
+
+      const noContext = await prisma.syncEventLog.findMany({ where: { restaurantId: { in: [restaurantAId, restaurantBId] } } });
+      expect(noContext).toHaveLength(0);
+    });
+
+    it('SyncConflict: a tenant context for Restaurant A never sees Restaurant B\'s conflicts', async () => {
+      await prisma.runAsTenant(restaurantAId, (tx) =>
+        tx.syncConflict.create({
+          data: { restaurantId: restaurantAId, entityType: 'ORDER', entityId: 'e-a', localVersion: {}, cloudVersion: {}, reason: 'test' }
+        })
+      );
+      await prisma.runAsTenant(restaurantBId, (tx) =>
+        tx.syncConflict.create({
+          data: { restaurantId: restaurantBId, entityType: 'ORDER', entityId: 'e-b', localVersion: {}, cloudVersion: {}, reason: 'test' }
+        })
+      );
+
+      const seenByA = await prisma.runAsTenant(restaurantAId, (tx) => tx.syncConflict.findMany());
+      expect(seenByA.every((c) => c.restaurantId === restaurantAId)).toBe(true);
+      expect(seenByA.some((c) => c.restaurantId === restaurantBId)).toBe(false);
+    });
+
+    it('TicketComment: a tenant context for Restaurant A cannot read a comment on Restaurant B\'s ticket (EXISTS-based policy)', async () => {
+      const ticketB = await prisma.runAsTenant(restaurantBId, (tx) =>
+        tx.supportTicket.create({
+          data: { restaurantId: restaurantBId, subject: 'B ticket', description: 'test', slaDueAt: new Date(Date.now() + 86400000) }
+        })
+      );
+      await prisma.runAsPlatform((tx) =>
+        tx.ticketComment.create({ data: { ticketId: ticketB.id, body: 'internal note', authorType: 'PLATFORM' } })
+      );
+
+      const seenByA = await prisma.runAsTenant(restaurantAId, (tx) => tx.ticketComment.findMany({ where: { ticketId: ticketB.id } }));
+      expect(seenByA).toHaveLength(0);
+
+      const seenByB = await prisma.runAsTenant(restaurantBId, (tx) => tx.ticketComment.findMany({ where: { ticketId: ticketB.id } }));
+      expect(seenByB).toHaveLength(1);
+
+      const seenByPlatform = await prisma.runAsPlatform((tx) => tx.ticketComment.findMany({ where: { ticketId: ticketB.id } }));
+      expect(seenByPlatform).toHaveLength(1);
+
+      await prisma.runAsPlatform((tx) => tx.supportTicket.delete({ where: { id: ticketB.id } }));
+    });
+  });
 });

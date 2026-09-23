@@ -26,6 +26,10 @@ describe('JAMANVAAR Security Audit Remediation Verification Suite', () => {
   });
 
   describe('1. SEC-003 & SEC-004: QR Table Ordering Payment & Modifier Price Tampering', () => {
+    // security-audit MED-11: verifyQrToken/createCustomerQrOrder now require a real,
+    // currently-issued token unconditionally (it used to be skippable by omitting it).
+    let qrToken: string;
+
     beforeEach(() => {
       // Temporarily set to PRO to allow QR ordering
       LicenseRepository.activatePlan('PRO');
@@ -34,12 +38,14 @@ describe('JAMANVAAR Security Audit Remediation Verification Suite', () => {
         tbl.qrStatus = 'ACTIVE';
         tbl.status = 'AVAILABLE';
       }
+      qrToken = QrOrderingRepository.generateTableQr('12').qrToken;
     });
 
     it('should set QR table order initial paymentStatus to PENDING (never SUCCESS upon self-ordering)', () => {
       const dish = db.menuItems[0];
       const order = QrOrderingRepository.createCustomerQrOrder({
         tableNumber: '12',
+        token: qrToken,
         customerName: 'Test Guest',
         paymentMethod: 'UPI',
         items: [{ menuItemId: dish.id, quantity: 1 }]
@@ -57,6 +63,7 @@ describe('JAMANVAAR Security Audit Remediation Verification Suite', () => {
       expect(() =>
         QrOrderingRepository.createCustomerQrOrder({
           tableNumber: '12',
+          token: qrToken,
           customerName: 'Attacker',
           paymentMethod: 'UPI',
           items: [
@@ -86,6 +93,7 @@ describe('JAMANVAAR Security Audit Remediation Verification Suite', () => {
       // priceDelta below (a fabricated -9999) must be ignored entirely.
       const order = QrOrderingRepository.createCustomerQrOrder({
         tableNumber: '12',
+        token: qrToken,
         customerName: 'Attacker',
         paymentMethod: 'UPI',
         items: [

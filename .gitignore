@@ -19,3 +19,4 @@ packages/database/src/live_db.json.tmp
 packages/database/src/live_db.json.bak
 .superpowers/
 data/
+.playwright-mcp/

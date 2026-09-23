@@ -26,6 +26,40 @@ describe('staff PIN hashing', () => {
     expect(verifyPinHash('4821', 'rest-1', undefined)).toBe(false);
   });
 
+  /**
+   * security-audit MED-05: hashPin now produces a much more expensive `pinv2` hash, but
+   * an existing install's already-stored `pinv1` hashes (computed with the old, weaker
+   * 2-round scheme) must keep verifying — nobody's PIN should stop working just because
+   * this shipped. `pinv1` support is verification-only; a freshly hashed PIN is always
+   * `pinv2` going forward.
+   */
+  it('still verifies a PIN against a hash computed with the old (v1) algorithm', () => {
+    // A hand-computed v1 hash for PIN '4821' at restaurant 'rest-1', frozen here rather
+    // than regenerated, so this test would actually fail if v1 support were ever removed.
+    const legacyV1Hash = 'pinv1:' +
+      (() => {
+        function fnv1a(input: string): number {
+          let hash = 0x811c9dc5;
+          for (let i = 0; i < input.length; i++) {
+            hash ^= input.charCodeAt(i);
+            hash = Math.imul(hash, 0x01000193);
+          }
+          return hash >>> 0;
+        }
+        const salted = 'rest-1:4821:jamanvaar-pin';
+        const a = fnv1a(salted);
+        const b = fnv1a(`${a.toString(16)}:${salted}`);
+        return a.toString(16).padStart(8, '0') + b.toString(16).padStart(8, '0');
+      })();
+
+    expect(verifyPinHash('4821', 'rest-1', legacyV1Hash)).toBe(true);
+    expect(verifyPinHash('9999', 'rest-1', legacyV1Hash)).toBe(false);
+    expect(isPlaintextPin(legacyV1Hash)).toBe(false);
+
+    // A freshly issued hash for the same PIN is the new, stronger v2 format.
+    expect(hashPin('4821', 'rest-1').startsWith('pinv2:')).toBe(true);
+  });
+
   it('flags an old plaintext PIN so callers can detect and migrate it', () => {
     expect(isPlaintextPin('1234')).toBe(true);
     expect(isPlaintextPin(hashPin('1234', 'rest-1'))).toBe(false);
@@ -53,11 +87,15 @@ describe('staff PIN hashing', () => {
     const takenHashes = nonWeak.map((p) => hashPin(p, 'rest-1'));
     const pin = generateUniquePin('rest-1', takenHashes);
     expect(['0000', '1111', '1234', '1212', '0001']).toContain(pin);
-  });
+    // security-audit MED-05: hashPin is intentionally stretched now, so this
+    // pathological "restaurant with ~10,000 PINs already issued" fixture takes real
+    // wall-clock time to build (~9999 hashPin calls) — a longer timeout for this one
+    // rare edge-case test, not a statement about normal (single-hash) responsiveness.
+  }, 20_000);
 
   it('throws only when truly every PIN (weak included) is taken', () => {
     const all: string[] = [];
     for (let n = 0; n < 10000; n++) all.push(hashPin(String(n).padStart(4, '0'), 'rest-1'));
     expect(() => generateUniquePin('rest-1', all)).toThrow();
-  });
+  }, 20_000);
 });

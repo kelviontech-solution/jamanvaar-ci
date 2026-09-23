@@ -73,7 +73,8 @@ export type ManagerOverrideAction =
   | 'REFUND'
   | 'PRICE_OVERRIDE'
   | 'REOPEN_BILL'
-  | 'MANUAL_CASH_DRAWER';
+  | 'MANUAL_CASH_DRAWER'
+  | 'CLOSE_DAY';
 
 export type ServiceRequestType =
   | 'CALL_STAFF'

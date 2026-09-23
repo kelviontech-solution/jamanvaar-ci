@@ -69,6 +69,7 @@ import { getOrderTenders, splitsMatchTotal } from './tender';
 import { generateOrderNumber, generateTokenNumber, generateUUID } from '@jamanvaar/utils';
 import { db } from './db';
 import { TableSync } from './table_sync';
+import { getGuestOrderBaseUrl } from './qr_order_url';
 import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync } from './collection_sync';
 import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS, SEED_ROLES, SEED_RESTAURANT } from './seed';
 import { hashPin, verifyPinHash, generateUniquePin } from './pin';
@@ -1742,6 +1743,12 @@ export class LicenseRepository {
       price: isPro ? 7000 : 5000,
       status: 'ACTIVE',
       activatedAt: new Date().toISOString(),
+      // security-audit LOW-04: the certificate's verified expiry used to be
+      // accepted as a parameter and then silently dropped — the caller
+      // cryptographically verified it, but nothing ever recorded it, so the
+      // one piece of state that should have made an offline grant actually
+      // time-limited never did anything.
+      validUntil: payload.expiresAt,
       entitlements: payload.entitlements,
       verifiedAt: new Date().toISOString(),
       verificationSource: meta.source
@@ -3123,7 +3130,23 @@ export class RecipeRepository {
   }
 }
 
+// security-audit MED-07: verifyPin() used to have no attempt limit at all —
+// every terminal (POS login/unlock, manager override, Captain, KDS, Kiosk
+// discount override) let a walk-up attacker try all 10,000 PINs with no
+// slowdown. A PIN doesn't identify who's guessing (verifyPin searches every
+// active user for a hash match), so the lockout is per-terminal-process, not
+// per-account — same shape as the LAN-pairing-PIN lockout (MED-09).
+const PIN_LOCKOUT_AFTER_FAILURES = 5;
+const PIN_LOCKOUT_MS = 30_000;
+let pinFailureCount = 0;
+let pinLockedUntil = 0;
+
 export class StaffRepository {
+  /** How long the caller must still wait, in ms, or 0 if verifyPin isn't currently locked out. */
+  public static pinLockoutRemainingMs(): number {
+    return Math.max(0, pinLockedUntil - Date.now());
+  }
+
   public static getAllUsers(): User[] {
     return db.users;
   }
@@ -3193,11 +3216,24 @@ export class StaffRepository {
    * PIN. Centralised so none of them compare a PIN to `User.pinHash` directly.
    */
   public static verifyPin(pin: string, restaurantId?: string): { user: User; isManager: boolean } | null {
+    if (Date.now() < pinLockedUntil) return null;
+    pinLockedUntil = 0;
+
     const scopedRestaurantId = restaurantId || db.restaurant.id;
     const user = (db.users as (User & { pinHash?: string })[]).find(
       (u) => u.isActive && verifyPinHash(pin, u.restaurantId || scopedRestaurantId, u.pinHash)
     );
-    if (!user) return null;
+
+    if (!user) {
+      pinFailureCount += 1;
+      if (pinFailureCount >= PIN_LOCKOUT_AFTER_FAILURES) {
+        pinLockedUntil = Date.now() + PIN_LOCKOUT_MS;
+        pinFailureCount = 0;
+      }
+      return null;
+    }
+
+    pinFailureCount = 0;
     const isManager = user.roleId === 'role-manager' || user.roleId === 'role-super-admin';
     return { user, isManager };
   }
@@ -3244,15 +3280,25 @@ export class StaffRepository {
     return db.users[idx];
   }
 
+  /**
+   * security-audit MED-12: this used to `splice` the user out of the local array —
+   * which is invisible to entity-sync (STAFF_USER has no delete/tombstone semantics,
+   * only create/update, see `applyRemoteUser` below), so a terminated employee's PIN
+   * kept working on every OTHER terminal that had already synced their record, forever.
+   * "Remove" now deactivates instead (`isActive: false`), the one STAFF_USER field that
+   * *does* propagate through the normal sync path — every terminal that pulls this
+   * update correctly refuses that PIN from then on (see StaffRepository.verifyPin's
+   * `isActive` check). The row is kept, not deleted, so it can still sync at all.
+   */
   public static deleteUser(id: string): boolean {
     const idx = db.users.findIndex((u) => u.id === id);
     if (idx === -1) return false;
     const name = db.users[idx].fullName;
-    db.users.splice(idx, 1);
+    db.users[idx] = { ...db.users[idx], isActive: false, updatedAt: new Date().toISOString() };
     AuditRepository.log({
       action: 'STAFF_DELETED',
       category: 'STAFF',
-      details: `Deleted staff member ${name}`,
+      details: `Deactivated (removed) staff member ${name}`,
       username: 'Manager'
     });
     db.notify();
@@ -4084,10 +4130,9 @@ export class QrOrderingRepository {
     const tableNumber = tableData.tableNumber || `${db.tables.length + 1}`;
     const qrShortCode = `QR-TABLE-${tableNumber.padStart(3, '0')}`;
     const qrToken = `jv_qr_tbl_${tableNumber}_${generateSecureQrTokenSuffix()}`;
-    const hostUrl = typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : 'https://jamanvaar.menu';
-    const fullUrl = `${hostUrl}/?qrTable=${tableNumber}&token=${qrToken}`;
+    // BUG-119: always the app's configured public address, never window.location.origin — a QR generated
+    // while looking at a LAN-only/localhost address must not embed that dead-end address for a guest's phone.
+    const fullUrl = `${getGuestOrderBaseUrl()}/?qrTable=${tableNumber}&token=${qrToken}`;
 
     const newTable: DiningTable = {
       id: tableData.id || `tbl-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
@@ -4208,10 +4253,7 @@ export class QrOrderingRepository {
     const tblNum = table ? table.tableNumber : tableNumber;
     const qrShortCode = `QR-TABLE-${tblNum.padStart(3, '0')}`;
     const qrToken = `jv_qr_tbl_${tblNum}_${generateSecureQrTokenSuffix()}`;
-    const hostUrl = typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : 'https://jamanvaar.menu';
-    const fullUrl = `${hostUrl}/?qrTable=${tblNum}&token=${qrToken}`;
+    const fullUrl = `${getGuestOrderBaseUrl()}/?qrTable=${tblNum}&token=${qrToken}`;
 
     if (table) {
       table.qrShortCode = qrShortCode;
@@ -4229,10 +4271,7 @@ export class QrOrderingRepository {
     const tblNum = table ? table.tableNumber : tableNumber;
     const qrShortCode = `QR-TABLE-${tblNum.padStart(3, '0')}`;
     const qrToken = `jv_qr_tbl_${tblNum}_${generateSecureQrTokenSuffix()}`;
-    const hostUrl = typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : 'https://jamanvaar.menu';
-    const fullUrl = `${hostUrl}/?qrTable=${tblNum}&token=${qrToken}`;
+    const fullUrl = `${getGuestOrderBaseUrl()}/?qrTable=${tblNum}&token=${qrToken}`;
 
     if (table) {
       table.qrShortCode = qrShortCode;
@@ -4328,7 +4367,11 @@ export class QrOrderingRepository {
       table.qrToken = `jv_qr_tbl_${table.tableNumber}_${generateSecureQrTokenSuffix()}`;
     }
 
-    if (token !== undefined && token !== table.qrToken) {
+    // security-audit MED-11: `token !== undefined &&` used to make the whole check
+    // optional — a caller could skip it entirely just by not passing a token, which is
+    // exactly what GuestQrOrderingPage's own self-fill logic did (see its fix). The
+    // token is now always required and must match.
+    if (!token || token !== table.qrToken) {
       return { isValid: false, reason: 'Security verification failed: QR token does not match this table.' };
     }
 
@@ -4394,9 +4437,11 @@ export class QrOrderingRepository {
 
   public static createCustomerQrOrder(params: {
     tableNumber: string;
-    /** SEC-010 fix: previously accepted but never actually forwarded to verifyQrToken — an
-     *  order could be placed for any table number with no token at all. Now required whenever
-     *  the caller has one (the guest ordering page always does, extracted from its scanned URL). */
+    /** SEC-010/MED-11 fix: a real, currently-issued token is now REQUIRED — omitting it (or
+     *  sending a stale/wrong one) always fails verification (see verifyQrToken). The guest
+     *  ordering page always has one, extracted from the QR code it scanned; this parameter
+     *  stays optional at the type level only so a missing token surfaces as this method's own
+     *  clear "Security verification failed" error rather than a TypeScript compile error. */
     token?: string;
     items: Array<{
       menuItemId: string;

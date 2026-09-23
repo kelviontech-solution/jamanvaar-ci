@@ -11,3 +11,16 @@ import { Throttle } from '@nestjs/throttler';
 export const DEVICE_SYNC_REQUESTS_PER_MINUTE = 1500;
 
 export const DeviceSyncThrottle = () => Throttle({ default: { limit: DEVICE_SYNC_REQUESTS_PER_MINUTE, ttl: 60_000 } });
+
+/**
+ * QR guest ordering (BUG-119) has no device credential and no login at all — it is deliberately reachable by
+ * anyone who scanned a table's QR code — so it keeps its own, much lower ceiling per address rather than the
+ * device-trusted one above. Several diners at one restaurant can share a single WiFi/NAT address, so this is
+ * higher than the platform's ordinary 120/min default but far below a device's, and the write path (placing an
+ * order) is stricter than the read path (loading the menu).
+ */
+export const QR_GUEST_READ_REQUESTS_PER_MINUTE = 60;
+export const QR_GUEST_ORDER_REQUESTS_PER_MINUTE = 12;
+
+export const QrGuestReadThrottle = () => Throttle({ default: { limit: QR_GUEST_READ_REQUESTS_PER_MINUTE, ttl: 60_000 } });
+export const QrGuestOrderThrottle = () => Throttle({ default: { limit: QR_GUEST_ORDER_REQUESTS_PER_MINUTE, ttl: 60_000 } });

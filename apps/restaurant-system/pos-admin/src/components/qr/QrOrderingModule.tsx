@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { db, QrOrderingRepository, BusinessDayRepository, MenuRepository, TableRepository } from '@jamanvaar/database';
+import { db, QrOrderingRepository, BusinessDayRepository, MenuRepository, TableRepository, getGuestOrderBaseUrl } from '@jamanvaar/database';
 import { Order, DiningTable, MenuItem, QrOrderingSettings, OrderStatus } from '@jamanvaar/types';
 import { EntitlementService, PLAN_DEFINITIONS } from '@jamanvaar/business';
 import { formatINR, generateQrSvg, generateQrDataUrl, copyText } from '@jamanvaar/utils';
@@ -326,9 +326,8 @@ export const QrOrderingModule: React.FC = () => {
   };
 
   const handleDownloadQrSvg = (table: DiningTable) => {
-    const hostUrl = typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : 'http://localhost:5176';
+    // BUG-119: the app's configured public address, never window.location.origin.
+    const hostUrl = getGuestOrderBaseUrl();
     let token = table.qrToken;
     if (!token) {
       const generated = QrOrderingRepository.generateTableQr(table.tableNumber);
@@ -348,9 +347,8 @@ export const QrOrderingModule: React.FC = () => {
   const [copiedQrTable, setCopiedQrTable] = useState<string | null>(null);
 
   const handleCopyQrLink = async (table: DiningTable) => {
-    const hostUrl = typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : 'http://localhost:5176';
+    // BUG-119: the app's configured public address, never window.location.origin.
+    const hostUrl = getGuestOrderBaseUrl();
     let token = table.qrToken;
     if (!token) {
       const generated = QrOrderingRepository.generateTableQr(table.tableNumber);

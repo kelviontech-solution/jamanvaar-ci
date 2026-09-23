@@ -127,10 +127,10 @@ export async function getPaymentStatus(paymentId: string): Promise<{ status: str
   return data;
 }
 
-export async function createRefund(paymentId: string, amountPaise: number, reason: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
+export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
   const res = await deviceFetch(`/api/v1/payments/${paymentId}/refund`, {
     method: 'POST',
-    body: JSON.stringify({ amountPaise, reason })
+    body: JSON.stringify({ amountPaise, reason, requestedBy })
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { db, StaffRepository, ManagerOverrideRepository } from '../packages/database/src';
 
 /**
@@ -71,5 +71,60 @@ describe('Staff login and PIN issuance', () => {
     expect(StaffRepository.getRoleName('role-cashier')).toMatch(/cashier/i);
     expect(StaffRepository.getRoleName('role-captain')).toMatch(/captain/i);
     expect(StaffRepository.getRoleName('does-not-exist')).toBe('Staff');
+  });
+});
+
+/**
+ * MED-07 regression: verifyPin() used to have no attempt limit — every login
+ * surface it backs (POS, Captain, KDS, Kiosk override, manager override) let
+ * an attacker try unlimited PINs. This is the one choke point every surface
+ * routes through, so the lockout is enforced here rather than duplicated in
+ * six different UI components.
+ */
+describe('Staff PIN verification lockout (MED-07)', () => {
+  beforeEach(() => {
+    db.resetToDefaultSeed();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('locks out further attempts after 5 consecutive wrong PINs, including a subsequent correct one, then clears after the cooldown', () => {
+    const staff = StaffRepository.createUser({ fullName: 'Lockout Test', username: 'lockouttest', roleId: 'role-cashier' });
+    const realPin = staff.issuedPin!;
+    const wrongPin = realPin === '0000' ? '0001' : '0000';
+
+    vi.useFakeTimers();
+
+    for (let i = 0; i < 5; i++) {
+      expect(StaffRepository.verifyPin(wrongPin)).toBeNull();
+    }
+
+    expect(StaffRepository.pinLockoutRemainingMs()).toBeGreaterThan(0);
+    // Locked out now — even the real PIN is rejected until the cooldown passes.
+    expect(StaffRepository.verifyPin(realPin)).toBeNull();
+
+    vi.advanceTimersByTime(30_001);
+
+    expect(StaffRepository.pinLockoutRemainingMs()).toBe(0);
+    expect(StaffRepository.verifyPin(realPin)?.user.id).toBe(staff.id);
+  });
+
+  it('a successful verification resets the failure counter so it does not carry into a future lockout window', () => {
+    const staff = StaffRepository.createUser({ fullName: 'Reset Counter Test', username: 'resetcountertest', roleId: 'role-cashier' });
+    const realPin = staff.issuedPin!;
+    const wrongPin = realPin === '0000' ? '0001' : '0000';
+
+    for (let i = 0; i < 4; i++) {
+      expect(StaffRepository.verifyPin(wrongPin)).toBeNull();
+    }
+    expect(StaffRepository.verifyPin(realPin)?.user.id).toBe(staff.id);
+
+    // Only 4 wrong attempts happened before the reset — one more wrong guess
+    // must not trip the lockout on its own.
+    expect(StaffRepository.verifyPin(wrongPin)).toBeNull();
+    expect(StaffRepository.pinLockoutRemainingMs()).toBe(0);
+    expect(StaffRepository.verifyPin(realPin)?.user.id).toBe(staff.id);
   });
 });

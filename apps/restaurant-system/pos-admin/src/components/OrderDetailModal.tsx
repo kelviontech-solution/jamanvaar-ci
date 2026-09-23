@@ -3,6 +3,7 @@ import { createRefund, CloudApiError } from '../cloud/cloudClient';
 import { Order, OrderStatus } from '@jamanvaar/types';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 import { Modal, Button, printThermalReceipt } from '@jamanvaar/ui';
+import { SessionPersistence } from '@jamanvaar/business';
 import { OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
 import { Printer, XCircle, RefreshCw, CheckCircle, Clock, Utensils, AlertTriangle } from 'lucide-react';
 
@@ -51,8 +52,12 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
       setVoidError('A reason is required to void this order.');
       return;
     }
+    // security-audit LOW-02: this used to hard-code 'Manager' regardless of
+    // who was actually signed in — POS-Admin's login is already restricted
+    // to MANAGER+ roles (HIGH-04), so a real identity is always available.
+    const actorName = SessionPersistence.load('admin')?.fullName || 'Manager';
     try {
-      OrderRepository.voidOrder(order.id, voidReason, 'Manager');
+      OrderRepository.voidOrder(order.id, voidReason, actorName);
     } catch (err: any) {
       setVoidError(err?.message || 'Void failed.');
       return;
@@ -71,9 +76,15 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
       return;
     }
 
+    // security-audit LOW-02: this used to hard-code 'Manager' as the actor on
+    // both the cloud refund's attribution and the local audit log, regardless
+    // of who was actually signed in. POS-Admin's login is already restricted
+    // to MANAGER+ roles (HIGH-04), so a real identity is always available.
+    const actorName = SessionPersistence.load('admin')?.fullName || 'Manager';
+
     if (order.paymentMethod === 'UPI' && order.paymentTransactionId) {
       try {
-        await createRefund(order.paymentTransactionId, Math.round(amt * 100), refundReason);
+        await createRefund(order.paymentTransactionId, Math.round(amt * 100), refundReason, actorName);
       } catch (err) {
         setRefundError(err instanceof CloudApiError ? err.message : 'Refund request failed');
         return; // never flip local status on a failed cloud refund
@@ -81,7 +92,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
     }
 
     try {
-      OrderRepository.refundOrder(order.id, amt, refundReason, 'Manager');
+      OrderRepository.refundOrder(order.id, amt, refundReason, actorName);
     } catch (err: any) {
       setRefundError(err?.message || 'Refund failed.');
       return;

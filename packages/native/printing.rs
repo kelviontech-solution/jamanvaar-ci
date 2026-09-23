@@ -85,6 +85,26 @@ pub fn subnet_prefix(ip: &str) -> Option<String> {
     Some(format!("{}.{}.{}", o[0], o[1], o[2]))
 }
 
+/// security-audit MED-15 (POS-08/POSADMIN-10/KIOSK-01): `send_escpos_bytes` in every
+/// desktop shell's `main.rs` used to open a TCP connection to ANY caller-supplied
+/// `ip:port` — a loopback address, a public IP, another host's internal service, any
+/// port at all. If a future XSS/supply-chain bug ever lets a script in the webview
+/// call it, that turns into an arbitrary internal-network TCP-send primitive. This is
+/// the same allow-list `scan_network_printers` already applies when choosing what to
+/// scan — reused here to gate what a single direct connection may target: a private
+/// IPv4 address (matching real network printer deployments) on the standard raw-print
+/// port (9100) or a small band around it that real ESC/POS printers commonly use.
+pub fn is_allowed_printer_target(ip: &str, port: u16) -> bool {
+    let addr: Ipv4Addr = match ip.trim().parse() {
+        Ok(a) => a,
+        Err(_) => return false,
+    };
+    if !addr.is_private() {
+        return false;
+    }
+    matches!(port, 9100..=9107 | 515 | 631)
+}
+
 /// A printer queue name may not contain characters that could change what a command does.
 pub fn is_safe_printer_name(name: &str) -> bool {
     let trimmed = name.trim();
@@ -311,6 +331,23 @@ pub fn print_to_serial(_port: &str, _baud: u32, _bytes: &[u8]) -> Result<(), Str
 // ---------------------------------------------------------------------------------------------
 
 pub fn send_to_network_printer(ip: &str, port: u16, bytes: &[u8]) -> Result<(), String> {
+    // security-audit MED-15: every desktop shell's `send_escpos_bytes` command used to
+    // open a TCP connection to whatever ip:port the webview passed it, with no
+    // allow-list — see `is_allowed_printer_target`'s doc comment.
+    if !is_allowed_printer_target(ip, port) {
+        return Err(format!(
+            "Refused to connect to {}:{} — only a private-network IP on a standard printer port is allowed.",
+            ip, port
+        ));
+    }
+    connect_and_send(ip, port, bytes)
+}
+
+/// Raw TCP connect-and-write, with no target validation. Only reachable through
+/// `send_to_network_printer`'s allow-list in production code; exists as its own
+/// function so tests can exercise the wire-level send mechanics against an
+/// arbitrary loopback listener without going through the allow-list.
+fn connect_and_send(ip: &str, port: u16, bytes: &[u8]) -> Result<(), String> {
     let addr = format!("{}:{}", ip, port);
     let socket_addr: SocketAddr = addr.parse().map_err(|e| format!("Invalid printer address {}: {}", addr, e))?;
     let mut stream = TcpStream::connect_timeout(&socket_addr, Duration::from_secs(5)).map_err(|e| format!("Could not connect to printer at {}: {}", addr, e))?;
@@ -361,6 +398,30 @@ mod tests {
         assert!(scan_network_printers(Some("8.8.8".to_string()), 9100, 10).is_err());
     }
 
+    /// security-audit MED-15: send_escpos_bytes/send_to_network_printer must only ever
+    /// reach a private-network printer on a real printer port — never a public IP, a
+    /// loopback/internal service, or an arbitrary port (which would make this a
+    /// general-purpose TCP-send primitive from the webview).
+    #[test]
+    fn printer_target_allow_list_rejects_non_private_or_non_printer_ports() {
+        assert!(is_allowed_printer_target("192.168.1.50", 9100));
+        assert!(is_allowed_printer_target("10.0.0.5", 9101));
+        assert!(is_allowed_printer_target("172.16.4.2", 631));
+
+        assert!(!is_allowed_printer_target("8.8.8.8", 9100), "public IP must be refused");
+        assert!(!is_allowed_printer_target("127.0.0.1", 9100), "loopback must be refused");
+        assert!(!is_allowed_printer_target("169.254.1.1", 9100), "link-local must be refused");
+        assert!(!is_allowed_printer_target("192.168.1.50", 22), "SSH port on an otherwise-private IP must be refused");
+        assert!(!is_allowed_printer_target("192.168.1.50", 3389), "RDP port must be refused");
+        assert!(!is_allowed_printer_target("not an ip", 9100), "unparseable address must be refused");
+    }
+
+    #[test]
+    fn send_to_network_printer_refuses_a_disallowed_target_before_ever_connecting() {
+        let err = send_to_network_printer("8.8.8.8", 9100, b"test").unwrap_err();
+        assert!(err.contains("Refused"), "{}", err);
+    }
+
     #[test]
     fn printer_names_cannot_smuggle_commands() {
         assert!(is_safe_printer_name("EPSON TM-T82 Receipt"));
@@ -407,7 +468,11 @@ mod tests {
             s.read_to_end(&mut buf).unwrap();
             buf
         });
-        send_to_network_printer("127.0.0.1", port, &[0x1b, 0x40, b'H', b'i']).unwrap();
+        // Loopback is intentionally outside the production allow-list (see
+        // is_allowed_printer_target), so this test — which only exists to prove
+        // the wire-level send mechanics work — talks to connect_and_send directly
+        // rather than through the allow-list-gated send_to_network_printer.
+        connect_and_send("127.0.0.1", port, &[0x1b, 0x40, b'H', b'i']).unwrap();
         assert_eq!(handle.join().unwrap(), vec![0x1b, 0x40, b'H', b'i']);
     }
 

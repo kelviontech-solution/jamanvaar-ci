@@ -12,7 +12,12 @@ import { z } from 'zod';
 // DINING_TABLE (BUG-096/097): the floor plan and each table's live state (seated, bill requested,
 // free). Several devices edit the same table, so the server keeps the change with the newest
 // `updatedAt` instead of the last one to arrive (see LAST_CHANGE_WINS_TYPES in the service).
-export const SYNCABLE_ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK'] as const;
+//
+// MODIFIER_GROUP (BUG-119): a dish's modifier options (size, extras, spice level) - MENU_ITEM only ever
+// carried `modifierGroupIds`, referencing this collection, which nothing ever synced. Needed so a device that
+// never had the local menu (e.g. the cloud pricing a QR order) can still resolve what a dish's own options and
+// their prices actually are, not just its base price.
+export const SYNCABLE_ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK'] as const;
 export type SyncableEntityType = (typeof SYNCABLE_ENTITY_TYPES)[number];
 
 export const entitySyncEventSchema = z.object({

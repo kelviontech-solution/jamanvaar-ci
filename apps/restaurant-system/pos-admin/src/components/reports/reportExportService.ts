@@ -1,5 +1,5 @@
 import { Order } from '@jamanvaar/types';
-import { formatDate, formatTime, formatINR } from '@jamanvaar/utils';
+import { formatDate, formatTime, formatINR, escapeCsvField } from '@jamanvaar/utils';
 import { db } from '@jamanvaar/database';
 import {
   ReportSummaryMetrics,
@@ -41,23 +41,23 @@ export class ReportExportService {
     ];
 
     const rows = orders.map((o) => [
-      `"${o.orderNumber || ''}"`,
-      `"${o.tokenNumber || ''}"`,
-      `"${formatDate(new Date(o.createdAt))}"`,
-      `"${formatTime(new Date(o.createdAt))}"`,
-      `"${o.orderType || ''}"`,
-      `"${o.tableNumber || '-'}"`,
-      `"${(o.customerName || '').replace(/"/g, '""')}"`,
-      `"${o.customerPhone || ''}"`,
-      `"${o.items?.length || 0}"`,
-      `"${o.subtotal || 0}"`,
-      `"${o.discountAmount || 0}"`,
-      `"${o.cgstAmount || 0}"`,
-      `"${o.sgstAmount || 0}"`,
-      `"${o.totalAmount || 0}"`,
-      `"${o.paymentMethod || ''}"`,
-      `"${o.paymentStatus || ''}"`,
-      `"${(o.captainName || o.cashierName || 'Cashier').replace(/"/g, '""')}"`
+      escapeCsvField(o.orderNumber || ''),
+      escapeCsvField(o.tokenNumber || ''),
+      escapeCsvField(formatDate(new Date(o.createdAt))),
+      escapeCsvField(formatTime(new Date(o.createdAt))),
+      escapeCsvField(o.orderType || ''),
+      escapeCsvField(o.tableNumber || '-'),
+      escapeCsvField(o.customerName || ''),
+      escapeCsvField(o.customerPhone || ''),
+      escapeCsvField(o.items?.length || 0),
+      escapeCsvField(o.subtotal || 0),
+      escapeCsvField(o.discountAmount || 0),
+      escapeCsvField(o.cgstAmount || 0),
+      escapeCsvField(o.sgstAmount || 0),
+      escapeCsvField(o.totalAmount || 0),
+      escapeCsvField(o.paymentMethod || ''),
+      escapeCsvField(o.paymentStatus || ''),
+      escapeCsvField(o.captainName || o.cashierName || 'Cashier')
     ]);
 
     const csvContent = [
@@ -107,16 +107,16 @@ export class ReportExportService {
   public static exportDishesCsv(dishes: DishPerformanceRow[]): void {
     const headers = ['Rank', 'Dish Name', 'SKU', 'Category', 'Quantity Sold', 'Gross Revenue (₹)', 'Avg Selling Price (₹)', 'Revenue Share %', 'Est. Food Cost (₹)', 'Gross Margin %'];
     const rows = dishes.map((d, idx) => [
-      `"#${idx + 1}"`,
-      `"${d.name.replace(/"/g, '""')}"`,
-      `"${d.sku}"`,
-      `"${d.categoryName}"`,
-      `"${d.quantitySold}"`,
-      `"${d.grossRevenue}"`,
-      `"${d.avgSellingPrice}"`,
-      `"${d.revenueSharePercent}%"`,
-      `"${d.foodCostEstimate}"`,
-      `"${d.grossMarginPercent}%"`
+      escapeCsvField(`#${idx + 1}`),
+      escapeCsvField(d.name),
+      escapeCsvField(d.sku),
+      escapeCsvField(d.categoryName),
+      escapeCsvField(d.quantitySold),
+      escapeCsvField(d.grossRevenue),
+      escapeCsvField(d.avgSellingPrice),
+      escapeCsvField(`${d.revenueSharePercent}%`),
+      escapeCsvField(d.foodCostEstimate),
+      escapeCsvField(`${d.grossMarginPercent}%`)
     ]);
 
     const csv = [

@@ -3,12 +3,19 @@ export interface CsvColumn<T> {
   value: (row: T) => string | number | null | undefined;
 }
 
+// security-audit LOW-01: a leading =, +, -, @, tab or CR is read as a formula
+// by Excel/Sheets/LibreOffice — guard it with a leading apostrophe so a
+// restaurant/plan/customer name chosen by an untrusted actor can't turn into
+// a formula (and potential command/URL exfiltration) for whoever opens the export.
+const CSV_FORMULA_TRIGGER_CHARS = ['=', '+', '-', '@', '\t', '\r'];
+
 function escapeCsvCell(value: string | number | null | undefined): string {
   const str = value === null || value === undefined ? '' : String(value);
-  if (/[",\n]/.test(str)) {
-    return `"${str.replace(/"/g, '""')}"`;
+  const guarded = CSV_FORMULA_TRIGGER_CHARS.some((c) => str.startsWith(c)) ? `'${str}` : str;
+  if (/[",\n]/.test(guarded) || guarded !== str) {
+    return `"${guarded.replace(/"/g, '""')}"`;
   }
-  return str;
+  return guarded;
 }
 
 /**

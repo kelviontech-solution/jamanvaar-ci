@@ -10,6 +10,8 @@ import { ownerInviteEmail } from '../notifications/email-templates';
 import * as bcrypt from 'bcryptjs';
 import { EntitySyncService } from '../entity-sync/entity-sync.service';
 import { ImportMenuDto } from './dto/import-menu.dto';
+import { redactActivationKeyCode } from '../../common/security/activation-key-presentation';
+import { PlatformRoleName, permissionsForRole } from '../../common/rbac/access';
 
 const ACTIVATION_TOKEN_TTL_DAYS = 7;
 
@@ -164,7 +166,7 @@ export class RestaurantsService {
     );
   }
 
-  async getRestaurantById(id: string) {
+  async getRestaurantById(id: string, actorRole?: PlatformRoleName) {
     const restaurant = await this.prisma.runAsPlatform((tx) =>
       tx.restaurant.findFirst({
         where: { id, deletedAt: null },
@@ -187,7 +189,19 @@ export class RestaurantsService {
               updatedAt: true
             }
           },
-          devices: true,
+          // security-audit HIGH-01/HIGH-02: `devices: true` used to return the raw row,
+          // including `deviceTokenHash` — a device's bearer credential's hash, and
+          // `activationKeys` returned the plaintext, still-redeemable `code`. Neither is
+          // needed by the Restaurant Detail screen this feeds.
+          devices: {
+            orderBy: { createdAt: 'desc' },
+            select: {
+              id: true, restaurantId: true, branchId: true, type: true, appVersion: true, status: true,
+              lastSeenAt: true, lastSyncAt: true, lastBackupAt: true, syncStatus: true, activatedAt: true,
+              createdAt: true, updatedAt: true, name: true, ipAddress: true, macAddress: true, osPlatform: true,
+              isLocked: true, lockReason: true, lockedAt: true, pendingSyncCount: true, syncError: true
+            }
+          },
           subscriptions: { orderBy: { createdAt: 'desc' }, include: { plan: true } },
           activationKeys: { orderBy: { createdAt: 'desc' } }
         }
@@ -197,7 +211,13 @@ export class RestaurantsService {
     if (!restaurant) {
       throw new NotFoundException('Restaurant not found');
     }
-    return restaurant;
+
+    const canSeeFullCode = actorRole ? permissionsForRole(actorRole).devices === 'write' : false;
+    const now = new Date();
+    return {
+      ...restaurant,
+      activationKeys: restaurant.activationKeys.map((k) => redactActivationKeyCode(k, now, canSeeFullCode))
+    };
   }
 
   async update(id: string, dto: UpdateRestaurantDto, actor: PlatformUser) {

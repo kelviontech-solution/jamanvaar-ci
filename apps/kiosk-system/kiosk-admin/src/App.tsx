@@ -521,10 +521,11 @@ export default function AdminApp() {
           ...prev,
           accountType: (data.accountType as 'BUSINESS' | 'INDIVIDUAL') ?? prev.accountType,
           businessType: data.businessType ?? prev.businessType,
-          pan: data.pan ?? prev.pan,
-          gst: data.gst ?? prev.gst,
-          cin: data.cin ?? prev.cin,
-          uidai: data.uidai ?? prev.uidai,
+          // security-audit MED-01: the server now returns these masked ("•••• 1234"),
+          // not the real value — pre-filling the edit form with a mask would let an
+          // operator accidentally resubmit the mask itself as the new PAN/GST/CIN/
+          // Aadhaar. Left blank so a resubmission always requires the real value, the
+          // same convention as a password/CVV field.
           contactName: data.contactName ?? prev.contactName,
           contactEmail: data.contactEmail ?? prev.contactEmail,
           contactPhone: data.contactPhone ?? prev.contactPhone,
@@ -4346,6 +4347,7 @@ export default function AdminApp() {
                         type="text"
                         value={paymentFormFields.uidai ?? ''}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, uidai: e.target.value }))}
+                        placeholder={paymentConnection?.uidai ? `On file: ${paymentConnection.uidai} — leave blank to keep it` : undefined}
                         className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
@@ -4356,6 +4358,7 @@ export default function AdminApp() {
                         required
                         value={paymentFormFields.pan}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, pan: e.target.value }))}
+                        placeholder={paymentConnection?.pan ? `On file: ${paymentConnection.pan} — re-enter to confirm/update` : undefined}
                         className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>

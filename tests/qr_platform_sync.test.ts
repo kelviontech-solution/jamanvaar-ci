@@ -95,12 +95,17 @@ describe('QR platform sync', () => {
 
   describe('offline-first behaviour', () => {
     it('keeps the last synced control in force when the cloud is unreachable', async () => {
+      // security-audit MED-11: token is mandatory now — this test is about the
+      // offline-control-block dimension, not the token, so a real one is generated once
+      // and reused for both checks below.
+      const { qrToken } = QrOrderingRepository.generateTableQr('12');
+
       // A good sync lands a permissive control block.
       await pullQrPlatformControl({
         ...OPTIONS_BASE,
         fetchImpl: (async () => jsonResponse(fullEntitlement())) as typeof fetch
       });
-      expect(QrOrderingRepository.verifyQrToken('12').isValid).toBe(true);
+      expect(QrOrderingRepository.verifyQrToken('12', qrToken).isValid).toBe(true);
 
       // The link then drops.
       const result = await pullQrPlatformControl({
@@ -116,7 +121,7 @@ describe('QR platform sync', () => {
 
       // Never fail closed: the restaurant keeps trading on what it was granted.
       expect(db.license.platformQrControl?.qrOrderingEnabled).toBe(true);
-      expect(QrOrderingRepository.verifyQrToken('12').isValid).toBe(true);
+      expect(QrOrderingRepository.verifyQrToken('12', qrToken).isValid).toBe(true);
     });
 
     it('does not fail open: an unreachable cloud cannot lift an existing block', async () => {
@@ -208,6 +213,8 @@ describe('QR platform sync', () => {
 
   describe('full round trip', () => {
     it('pulls rules before reporting usage, and survives a one-sided failure', async () => {
+      // security-audit MED-11: token is mandatory now for the check at the end of this test.
+      const { qrToken } = QrOrderingRepository.generateTableQr('12');
       const calls: string[] = [];
       const fetchImpl = async (url: string) => {
         calls.push(url);
@@ -226,7 +233,7 @@ describe('QR platform sync', () => {
       expect(push.ok).toBe(false);
 
       // A failed usage report must not disturb what the restaurant may do.
-      expect(QrOrderingRepository.verifyQrToken('12').isValid).toBe(true);
+      expect(QrOrderingRepository.verifyQrToken('12', qrToken).isValid).toBe(true);
     });
   });
 });

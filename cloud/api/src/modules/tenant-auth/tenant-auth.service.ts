@@ -15,7 +15,7 @@ import * as bcrypt from 'bcryptjs';
 import { User, TenantUserStatus, Device } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
-import { hashOpaqueToken, generateOpaqueToken } from '../../common/security/token.util';
+import { hashOpaqueToken, generateOpaqueToken, hashLowEntropySecret } from '../../common/security/token.util';
 import { CreateTenantStaffUserDto, TenantLoginDto, ActivateDeviceDto } from './dto/login.dto';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { AppCode } from '@prisma/client';
@@ -278,7 +278,14 @@ export class TenantAuthService {
       throw new ForbiddenException('Restaurant account is suspended or archived. Please contact Super Admin.');
     }
 
-    if (dto.adminOnly && matchedUser.role !== 'OWNER' && matchedUser.role !== 'MANAGER') {
+    // security-audit HIGH-04: `dto.adminOnly` is client-supplied and was the ONLY thing
+    // gating this — pos-admin's own client never sent it, so any tenant role (including
+    // STAFF) got a full admin-console session. POS_ADMIN and KIOSK_ADMIN are the two
+    // device types with a real staff/PIN/billing/backup admin console behind them, so
+    // the OWNER/MANAGER requirement is now enforced server-side for those device types
+    // unconditionally — the client can no longer opt out of it by omitting the flag.
+    const isAdminConsoleDevice = deviceType === 'POS_ADMIN' || deviceType === 'KIOSK_ADMIN';
+    if ((dto.adminOnly || isAdminConsoleDevice) && matchedUser.role !== 'OWNER' && matchedUser.role !== 'MANAGER') {
       throw new ForbiddenException('This login is restricted to restaurant owners and managers.');
     }
 
@@ -298,14 +305,18 @@ export class TenantAuthService {
         });
       });
 
-      if (activeDevice) {
-        if (deviceToken && activeDevice.deviceTokenHash) {
-          if (hashOpaqueToken(deviceToken) === activeDevice.deviceTokenHash) {
-            isDeviceActive = true;
-          }
-        } else {
-          isDeviceActive = true;
-        }
+      // security-audit MED-13: the old `else { isDeviceActive = true }` branch trusted
+      // `deviceId` alone whenever `deviceToken` was omitted (or the device row somehow
+      // had no stored hash) — a caller who merely knew an EXISTING device's id (device
+      // ids are not secret; they're visible in Super Admin's fleet list and API
+      // responses) could bind a session to that device's identity (the `did` JWT claim,
+      // trusted by audit trails and by `assertSessionStillAllowed`/`DeviceAuthGuard`
+      // downstream) without ever proving possession of its actual bearer token. A
+      // session may only claim an existing device's identity by presenting a token that
+      // hashes to that device's stored hash — no token, or a device row with no hash
+      // yet, both fall through to the ACTIVATION_REQUIRED path below instead.
+      if (activeDevice && deviceToken && activeDevice.deviceTokenHash && hashOpaqueToken(deviceToken) === activeDevice.deviceTokenHash) {
+        isDeviceActive = true;
       }
     }
 
@@ -449,6 +460,20 @@ export class TenantAuthService {
         );
       }
 
+      // security-audit MED-02: this path claims the key with a plain `findUnique` +
+      // later `update`, same as activation-keys.service.ts's `redeem` had — a race
+      // window where two concurrent calls both see `status === 'ACTIVE'` and both
+      // create a device from the same key. Claimed atomically here, before any device
+      // is created, mirroring the fix there (see its comment for why `updateMany` with
+      // a `status` guard is safe under Postgres's READ COMMITTED).
+      const claimed = await tx.activationKey.updateMany({
+        where: { id: key.id, status: 'ACTIVE' },
+        data: { status: 'REDEEMED', redeemedAt: new Date() }
+      });
+      if (claimed.count === 0) {
+        throw new ConflictException('This activation key has already been redeemed.');
+      }
+
       // Same real gate as activation-keys.service.ts's generate()/redeem() —
       // this is a separate device-provisioning path (the tenant-auth
       // login -> ACTIVATION_REQUIRED -> activate-device flow used by the
@@ -459,6 +484,26 @@ export class TenantAuthService {
       // specific key's allowedDeviceType and entitlement to the app itself
       // are two different questions.
       await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, dto.deviceType as AppCode);
+
+      // security-audit MED-02 (F-013): this path never checked `Plan.maxDevices` at
+      // all, unlike activation-keys.service.ts's `redeem` — a restaurant could
+      // provision unlimited terminals through the Restaurant Admin/Kiosk Admin
+      // "connect device" screen regardless of its plan's device quota.
+      const activeSubscription = await tx.subscription.findFirst({
+        where: { restaurantId: key.restaurantId, status: { in: ['ACTIVE', 'TRIAL'] } },
+        orderBy: { createdAt: 'desc' },
+        include: { plan: { select: { maxDevices: true } } }
+      });
+      if (activeSubscription) {
+        const activeDeviceCount = await tx.device.count({
+          where: { restaurantId: key.restaurantId, status: { not: 'REVOKED' } }
+        });
+        if (activeDeviceCount >= activeSubscription.plan.maxDevices) {
+          throw new ConflictException(
+            `This restaurant's plan allows ${activeSubscription.plan.maxDevices} device${activeSubscription.plan.maxDevices === 1 ? '' : 's'}, and that limit has been reached. Revoke an unused device or upgrade the plan to activate another.`
+          );
+        }
+      }
 
       const deviceToken = generateOpaqueToken();
 
@@ -481,14 +526,11 @@ export class TenantAuthService {
         }
       });
 
-      // Mark the key as redeemed
+      // status/redeemedAt were already set atomically by the claim above; only the
+      // device id (unknown until now) is filled in here.
       await tx.activationKey.update({
         where: { id: key.id },
-        data: {
-          status: 'REDEEMED',
-          redeemedAt: new Date(),
-          redeemedByDeviceId: device.id
-        }
+        data: { redeemedByDeviceId: device.id }
       });
 
       const user = await tx.user.findUnique({
@@ -817,7 +859,8 @@ export class TenantAuthService {
       await tx.user.update({
         where: { id: user.id },
         data: {
-          passwordResetHash: hashOpaqueToken(otp),
+          // security-audit HIGH-01: HMAC-keyed, not a bare hash — see hashLowEntropySecret's doc comment.
+          passwordResetHash: hashLowEntropySecret(otp, this.config.get<string>('JWT_ACCESS_SECRET')!),
           passwordResetExpiresAt: new Date(now.getTime() + TenantAuthService.RESET_CODE_MINUTES * 60_000),
           passwordResetSentAt: now,
           passwordResetAttempts: 0
@@ -855,7 +898,7 @@ export class TenantAuthService {
         return 'invalid';
       }
 
-      const given = Buffer.from(hashOpaqueToken(otp));
+      const given = Buffer.from(hashLowEntropySecret(otp, this.config.get<string>('JWT_ACCESS_SECRET')!));
       const stored = Buffer.from(user.passwordResetHash);
       if (given.length !== stored.length || !timingSafeEqual(given, stored)) {
         await tx.user.update({ where: { id: user.id }, data: { passwordResetAttempts: { increment: 1 } } });

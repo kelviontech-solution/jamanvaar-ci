@@ -3,8 +3,14 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import { DeviceGateOverlay, PlatformNoticeBanner } from '@jamanvaar/ui';
 import { DeviceGate } from '@jamanvaar/sync';
+import { setGuestOrderBaseUrl } from '@jamanvaar/database';
 import './index.css';
 import { resetTerminal, startPlatformNoticePolling } from './cloud/cloudClient';
+
+// BUG-119: a guest's table QR code is built from wherever this app is really, publicly reachable — set once
+// here from the deploy's own env, never taken from window.location.origin (which is whatever address the
+// owner's own browser happens to be on, e.g. a LAN-only localhost, unreachable from a guest's own phone).
+if (import.meta.env.VITE_RESTAURANT_ADMIN_URL) setGuestOrderBaseUrl(import.meta.env.VITE_RESTAURANT_ADMIN_URL);
 
 // BUG-145 follow-up: a device credential the cloud no longer recognises is fixed by reconnecting this console
 // again, not by blocking the screen — see DeviceGate's own comment. This is what actually does that unbinding

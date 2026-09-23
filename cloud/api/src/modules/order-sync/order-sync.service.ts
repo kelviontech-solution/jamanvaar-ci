@@ -6,6 +6,15 @@ import { OrderSyncEventDto, orderSyncEventSchema } from './dto/push-order-sync.d
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000; // 24h
 const CATCH_UP_MAX_ROWS = 500;
 
+/**
+ * security-audit HIGH-05: once an order's payment has actually settled or been refunded,
+ * that fact must not be silently reversible by a stale or malicious push from a
+ * kitchen/floor device — see the guard in `pushEvents` below.
+ */
+const TERMINAL_PAID_STATUSES: ReadonlySet<string> = new Set(['SUCCESS', 'REFUNDED']);
+/** Device types with real payment/refund authority — the only ones allowed to change a terminal payment status. */
+const PAYMENT_AUTHORITATIVE_DEVICE_TYPES: ReadonlySet<string> = new Set(['POS', 'POS_ADMIN']);
+
 export interface OrderSyncPushResult {
   externalOrderId: string;
   status: 'ok' | 'error';
@@ -56,6 +65,36 @@ export class OrderSyncService {
           const existing = await tx.syncedOrder.findUnique({
             where: { restaurantId_externalOrderId: { restaurantId: device.restaurantId, externalOrderId: evt.externalOrderId } }
           });
+
+          // security-audit HIGH-05: a settled/refunded order's payment status must not
+          // regress from a device with no payment authority (KDS, Captain, Kiosk) or
+          // from a device other than the one that actually recorded the settlement —
+          // this is exactly the "stale KDS push reopens a paid order" scenario the
+          // audit demonstrated. The push is recorded as a conflict, not silently applied.
+          if (
+            existing &&
+            existing.paymentStatus &&
+            TERMINAL_PAID_STATUSES.has(existing.paymentStatus) &&
+            evt.paymentStatus !== undefined &&
+            evt.paymentStatus !== existing.paymentStatus &&
+            existing.deviceId !== device.id &&
+            !PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type)
+          ) {
+            await tx.syncConflict.create({
+              data: {
+                restaurantId: device.restaurantId,
+                branchId: device.branchId,
+                deviceId: device.id,
+                entityType: 'ORDER',
+                entityId: evt.externalOrderId,
+                localVersion: evt as any,
+                cloudVersion: { paymentStatus: existing.paymentStatus, totalAmount: existing.totalAmount, status: existing.status } as any,
+                reason: `${device.type} device attempted to change paymentStatus from ${existing.paymentStatus} to ${evt.paymentStatus} on a settled order`
+              }
+            });
+            results.push({ externalOrderId: evt.externalOrderId, status: 'error', error: 'Order payment status is final; this device cannot change it' });
+            continue;
+          }
 
           const data = {
             restaurantId: device.restaurantId,
@@ -127,9 +166,18 @@ export class OrderSyncService {
   async catchUp(device: Device, since?: string) {
     const sinceDate = since ? new Date(since) : new Date(Date.now() - CATCH_UP_DEFAULT_LOOKBACK_MS);
 
+    // security-audit HIGH-05: this used to have no branchId filter at all, so a device
+    // bound to one branch of a multi-branch restaurant received every OTHER branch's
+    // orders too, including customer name/phone in `meta`. A device with no branch
+    // assigned (branchId null) still sees every order — that matches how an
+    // unassigned/whole-restaurant terminal is expected to behave — but a branch-bound
+    // device now only sees its own branch's orders plus any not yet tied to a branch.
     const orders = await this.prisma.runAsTenant(device.restaurantId, (tx) =>
       tx.syncedOrder.findMany({
-        where: { updatedAt: { gt: sinceDate } },
+        where: {
+          updatedAt: { gt: sinceDate },
+          ...(device.branchId ? { OR: [{ branchId: device.branchId }, { branchId: null }] } : {})
+        },
         orderBy: { updatedAt: 'asc' },
         take: CATCH_UP_MAX_ROWS
       })

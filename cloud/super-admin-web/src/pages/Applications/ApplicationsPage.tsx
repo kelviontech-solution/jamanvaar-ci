@@ -18,6 +18,22 @@ import {
   Tag,
   ShieldCheck
 } from 'lucide-react';
+
+/**
+ * security-audit MED-04/SAW-04: the server now validates `downloadUrl` as `https://`
+ * only (see cloud/api's `publishReleaseSchema`), but this page renders it as a raw
+ * `<a href>` — defense-in-depth in case a row was written before that validation
+ * existed, or the check is ever bypassed. `target="_blank"` + `noopener` alone does not
+ * stop a `javascript:` URL from executing in this page's own origin.
+ */
+function isSafeHttpsUrl(url: string | null | undefined): url is string {
+  if (!url) return false;
+  try {
+    return new URL(url).protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
 import '../../components/shared.css';
 import './applications.css';
 
@@ -260,7 +276,7 @@ export function ApplicationsPage() {
                     <span>Publish Version</span>
                   </Button>
 
-                  {app.downloadUrl && (
+                  {isSafeHttpsUrl(app.downloadUrl) && (
                     <a
                       href={app.downloadUrl}
                       target="_blank"

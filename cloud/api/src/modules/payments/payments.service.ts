@@ -3,6 +3,7 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException,
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
 import { CashfreeGatewayService } from './cashfree-gateway.service';
 import { MenuSyncService } from './menu-sync.service';
 import { priceCart, PriceValidationError, MenuSnapshotItemLookup } from './pricing.util';
@@ -17,7 +18,8 @@ export class PaymentsService {
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
     private readonly cashfree: CashfreeGatewayService,
-    private readonly menuSync: MenuSyncService
+    private readonly menuSync: MenuSyncService,
+    private readonly audit: AuditService
   ) {}
 
   async createOrGetPaymentOrder(restaurantId: string, kioskId: string, dto: CreatePaymentOrderDto) {
@@ -121,41 +123,69 @@ export class PaymentsService {
     return { paymentId: payment.id, orderId: payment.orderId, status: payment.status, amount: payment.amount, currency: payment.currency, orderStatus: payment.order.status };
   }
 
-  async createRefund(restaurantId: string, paymentId: string, dto: CreateRefundDto) {
-    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId } })
-    );
-    if (!payment) throw new NotFoundException('Payment not found');
+  async createRefund(restaurantId: string, paymentId: string, dto: CreateRefundDto, device: { id: string; type: string }) {
+    // security-audit LOW-02: the status check, the remaining-balance
+    // aggregate, and the refund insert used to be three separate
+    // runAsTenant calls — three separate transactions — so two concurrent
+    // refund requests could both read the same "remaining" balance before
+    // either had inserted its row, and both pass the check. This is now one
+    // transaction that takes a row lock on the PaymentTransaction first
+    // (`FOR UPDATE`), so a second concurrent request blocks until the first
+    // commits and then sees its refund in the aggregate.
+    const { refund, providerOrderId } = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      const locked = await tx.$queryRaw<{ id: string; status: string; amount: number; providerOrderId: string }[]>`
+        SELECT id, status, amount, "providerOrderId" FROM "PaymentTransaction" WHERE id = ${paymentId} AND "restaurantId" = ${restaurantId} FOR UPDATE
+      `;
+      const payment = locked[0];
+      if (!payment) throw new NotFoundException('Payment not found');
 
-    if (payment.status !== 'SUCCESS' && payment.status !== 'PARTIALLY_REFUNDED') {
-      throw new BadRequestException(`Cannot refund a payment in status ${payment.status}`);
-    }
+      if (payment.status !== 'SUCCESS' && payment.status !== 'PARTIALLY_REFUNDED') {
+        throw new BadRequestException(`Cannot refund a payment in status ${payment.status}`);
+      }
 
-    // PENDING counts against the remaining balance too, not just SUCCESS — a
-    // second refund request issued before the first's webhook lands must not
-    // be approved against the same remaining balance.
-    const committed = await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.refund.aggregate({
+      // PENDING counts against the remaining balance too, not just SUCCESS — a
+      // second refund request issued before the first's webhook lands must not
+      // be approved against the same remaining balance.
+      const committed = await tx.refund.aggregate({
         where: { paymentId: payment.id, status: { in: ['SUCCESS', 'PENDING'] } },
         _sum: { amount: true }
-      })
-    );
-    const alreadyCommitted = committed._sum.amount ?? 0;
-    const remaining = payment.amount - alreadyCommitted;
-    if (dto.amountPaise > remaining) {
-      throw new BadRequestException(`Refund amount ${dto.amountPaise} exceeds remaining refundable amount ${remaining}`);
-    }
+      });
+      const alreadyCommitted = committed._sum.amount ?? 0;
+      const remaining = payment.amount - alreadyCommitted;
+      if (dto.amountPaise > remaining) {
+        throw new BadRequestException(`Refund amount ${dto.amountPaise} exceeds remaining refundable amount ${remaining}`);
+      }
 
-    const refund = await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.refund.create({
-        data: { paymentId: payment.id, restaurantId, amount: dto.amountPaise, reason: dto.reason, status: 'PENDING' }
-      })
-    );
+      const created = await tx.refund.create({
+        data: {
+          paymentId: payment.id,
+          restaurantId,
+          amount: dto.amountPaise,
+          reason: dto.reason,
+          requestedBy: dto.requestedBy,
+          status: 'PENDING'
+        }
+      });
+
+      await this.audit.log(
+        {
+          actorType: 'TENANT',
+          actorId: device.id,
+          restaurantId,
+          action: 'REFUND_REQUESTED',
+          category: 'PAYMENTS',
+          details: { paymentId: payment.id, refundId: created.id, amountPaise: dto.amountPaise, requestedBy: dto.requestedBy, deviceType: device.type, reason: dto.reason }
+        },
+        tx
+      );
+
+      return { refund: created, providerOrderId: payment.providerOrderId };
+    });
 
     let result;
     try {
       result = await this.cashfree.createRefund({
-        orderId: payment.providerOrderId,
+        orderId: providerOrderId,
         refundId: refund.id,
         amountPaise: dto.amountPaise,
         note: dto.reason
@@ -177,7 +207,7 @@ export class PaymentsService {
       })
     );
     await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.update({ where: { id: payment.id }, data: { status: 'REFUND_PENDING' } })
+      tx.paymentTransaction.update({ where: { id: paymentId }, data: { status: 'REFUND_PENDING' } })
     );
 
     return { refundId: refund.id, providerRefundId: result.cfRefundId, status: result.refundStatus, amount: dto.amountPaise };

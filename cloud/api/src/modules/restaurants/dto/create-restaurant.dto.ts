@@ -18,7 +18,10 @@ export const createRestaurantSchema = z
     ownerName: z.string().trim().min(2, "Owner's name is required"),
     ownerEmail: z.string().trim().toLowerCase().email(),
     ownerPhone: z.string().trim().optional(),
-    ownerPassword: z.string().min(4).optional(),
+    // security-audit LOW-07: every other password-setting flow in tenant-auth
+    // requires 8+ characters — this platform-staff-facing route (creating a
+    // restaurant on an owner's behalf) was the one place still accepting 4.
+    ownerPassword: z.string().min(8, 'Password must be at least 8 characters').optional(),
 
     // Set by callers that immediately consume the activation token themselves
     // (e.g. the onboarding wizard's "set password now" mode, which calls

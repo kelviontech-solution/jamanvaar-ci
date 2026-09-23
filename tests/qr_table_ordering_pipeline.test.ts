@@ -166,9 +166,14 @@ describe('JAMANVAAR QR Table Ordering System End-to-End Pipeline', () => {
       const initialOrderCount = db.orders.length;
       const initialKotCount = db.kots.length;
 
+      // security-audit MED-11: token is mandatory now — the real guest flow always has
+      // one (it comes from the QR code they scanned).
+      const { qrToken } = QrOrderingRepository.generateTableQr('12');
+
       // Guest places order
       const order = QrOrderingRepository.createCustomerQrOrder({
         tableNumber: '12',
+        token: qrToken,
         customerName: 'Aarav Patel',
         customerPhone: '9876543210',
         paymentMethod: 'UPI',
@@ -238,6 +243,8 @@ describe('JAMANVAAR QR Table Ordering System End-to-End Pipeline', () => {
     it('should reject ordering if a dish is marked unavailable / sold out', () => {
       const dish = db.menuItems[0];
       const originalAvail = dish.isAvailable;
+      // security-audit MED-11: a real token is required to reach the sold-out check at all.
+      const { qrToken } = QrOrderingRepository.generateTableQr('12');
 
       // Mark sold out
       dish.isAvailable = false;
@@ -245,6 +252,7 @@ describe('JAMANVAAR QR Table Ordering System End-to-End Pipeline', () => {
       expect(() => {
         QrOrderingRepository.createCustomerQrOrder({
           tableNumber: '12',
+          token: qrToken,
           items: [{ menuItemId: dish.id, quantity: 1 }]
         });
       }).toThrow(/sold out/i);
@@ -381,16 +389,26 @@ describe('JAMANVAAR QR Table Ordering System End-to-End Pipeline', () => {
       expect(entitlement.allowed).toBe(true);
       expect(entitlement.tier).toBe('PRO');
 
-      // Verification succeeds
-      const check = QrOrderingRepository.verifyQrToken('12');
+      // security-audit MED-11: the token is mandatory now — generate the table's real,
+      // currently-issued token first (this test used to call verifyQrToken/
+      // createCustomerQrOrder with no token at all, relying on the very bypass this
+      // fix closes).
+      const { qrToken } = QrOrderingRepository.generateTableQr('12');
+
+      // Verification succeeds with the real token.
+      const check = QrOrderingRepository.verifyQrToken('12', qrToken);
       expect(check.isValid).toBe(true);
       expect(check.table?.tableNumber).toBe('12');
+
+      // Verification still fails with no token at all.
+      expect(QrOrderingRepository.verifyQrToken('12').isValid).toBe(false);
 
       // Order placement succeeds
       const dish = db.menuItems[0];
       dish.isAvailable = true;
       const order = QrOrderingRepository.createCustomerQrOrder({
         tableNumber: '12',
+        token: qrToken,
         customerName: 'Pooja Shah',
         items: [{ menuItemId: dish.id, quantity: 1 }]
       });

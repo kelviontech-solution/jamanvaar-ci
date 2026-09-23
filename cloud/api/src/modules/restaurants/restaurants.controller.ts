@@ -25,8 +25,8 @@ export class RestaurantsController {
   }
 
   @Get(':id')
-  detail(@Param('id') id: string) {
-    return this.restaurants.getRestaurantById(id);
+  detail(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.restaurants.getRestaurantById(id, actor.role as never);
   }
 
   @Patch(':id')

@@ -28,6 +28,17 @@ if (fs.existsSync(KEY_FILE)) {
 // ever known to someone who can currently see this console.
 const PAIRING_PIN = String(crypto.randomInt(100000, 999999));
 
+// security-audit MED-09: the pairing PIN is 6 digits (900,000 possible values) and this
+// service binds 0.0.0.0 — reachable by anyone on the restaurant's LAN/WiFi — so with no
+// rate limiting at all, a scripted attacker could exhaust the keyspace and receive the
+// real SERVICE_KEY in well under an hour. Tracked globally, not per-IP: this is a
+// single-tenant LAN service where a real device pairs once at setup, so a global
+// cooldown after repeated wrong guesses costs a legitimate installer nothing.
+const PAIR_LOCKOUT_AFTER_FAILURES = 5;
+const PAIR_LOCKOUT_MS = 60_000;
+let pairFailureCount = 0;
+let pairLockedUntil = 0;
+
 function isAuthorized(req, urlObj) {
   const header = req.headers['authorization'] || '';
   const bearerMatch = /^Bearer\s+(.+)$/i.exec(header);
@@ -227,16 +238,30 @@ const server = http.createServer((req, res) => {
   // and on success returns the real SERVICE_KEY the device must present as a
   // Bearer token on every protected endpoint from then on.
   if (req.method === 'POST' && pathname === '/devices/pair') {
+    // security-audit MED-09: reject before even reading the body once locked out.
+    const now = Date.now();
+    if (now < pairLockedUntil) {
+      res.writeHead(429, { 'Content-Type': 'application/json', 'Retry-After': String(Math.ceil((pairLockedUntil - now) / 1000)) });
+      res.end(JSON.stringify({ error: 'Too many wrong pairing PIN attempts. Try again shortly.' }));
+      return;
+    }
+
     let body = '';
     req.on('data', (c) => (body += c));
     req.on('end', () => {
       try {
         const payload = JSON.parse(body || '{}');
         if (String(payload.pairingPin || '') !== PAIRING_PIN) {
+          pairFailureCount += 1;
+          if (pairFailureCount >= PAIR_LOCKOUT_AFTER_FAILURES) {
+            pairLockedUntil = Date.now() + PAIR_LOCKOUT_MS;
+            pairFailureCount = 0;
+          }
           res.writeHead(401, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: 'Invalid pairing PIN. Check the PIN shown in this restaurant’s local service console.' }));
           return;
         }
+        pairFailureCount = 0;
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           success: true,

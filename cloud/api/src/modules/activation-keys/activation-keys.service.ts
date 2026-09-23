@@ -8,8 +8,10 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { GenerateActivationKeyDto, ReactivateKeyDto, RedeemActivationKeyDto } from './dto/activation-key.dto';
 import { generateOpaqueToken, hashOpaqueToken } from '../../common/security/token.util';
+import { redactActivationKeyCode } from '../../common/security/activation-key-presentation';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { onlyActiveBranchId } from '../tenant-auth/tenant-auth.service';
+import { PlatformRoleName, permissionsForRole } from '../../common/rbac/access';
 
 /** JMV-XXXX-XXXX-XXXX — human-relayable but drawn from a cryptographically random 96-bit value, not a counter or a guessable pattern. */
 function generateCode(): string {
@@ -38,16 +40,15 @@ export class ActivationKeysService {
   }
 
   /**
-   * A key's code is only useful until it is used. Once redeemed, revoked or expired it is redacted,
-   * leaving the last 4 characters so an operator can still tell keys apart (BUG-060).
+   * A key's code is only useful until it is used. Once redeemed, revoked or expired it is
+   * always redacted, leaving the last 4 characters so an operator can still tell keys
+   * apart (BUG-060). While still AVAILABLE — the state where the code is a live bearer
+   * credential (see `redactActivationKeyCode`'s doc comment) — it is shown in full only
+   * to a caller who holds `devices:'write'` (security-audit HIGH-02); a read-only role
+   * gets `codeLast4` even for an available key.
    */
-  private present<T extends { code: string; status: string; expiresAt: Date }>(key: T, now: Date) {
-    const lifecycle =
-      key.status === 'REDEEMED' ? 'REDEEMED'
-      : key.status === 'REVOKED' ? 'REVOKED'
-      : key.status === 'EXPIRED' || key.expiresAt <= now ? 'EXPIRED'
-      : 'AVAILABLE';
-    return { ...key, lifecycle, code: lifecycle === 'AVAILABLE' ? key.code : null, codeLast4: key.code.slice(-4) };
+  private present<T extends { code: string; status: string; expiresAt: Date }>(key: T, now: Date, canSeeFullCode: boolean) {
+    return redactActivationKeyCode(key, now, canSeeFullCode);
   }
 
   /**
@@ -57,7 +58,8 @@ export class ActivationKeysService {
   async list(query: {
     restaurantId?: string; q?: string; lifecycle?: string; allowedDeviceType?: string; batchId?: string;
     branchId?: string; expiringInDays?: string; page?: unknown; pageSize?: unknown;
-  } = {}) {
+  } = {}, actorRole?: PlatformRoleName) {
+    const canSeeFullCode = actorRole ? permissionsForRole(actorRole).devices === 'write' : false;
     const paging = parsePaging(query);
     const now = new Date();
     const q = query.q?.trim();
@@ -86,7 +88,7 @@ export class ActivationKeysService {
     return this.prisma.runAsPlatform(async (tx) => {
       if (!paging.paged) {
         const rows = await tx.activationKey.findMany({ where, orderBy: { createdAt: 'desc' }, include });
-        return rows.map((k) => this.present(k, now));
+        return rows.map((k) => this.present(k, now, canSeeFullCode));
       }
       const [rows, total, available, redeemed, revoked, expired] = await Promise.all([
         tx.activationKey.findMany({ where, orderBy: [{ createdAt: 'desc' }, { id: 'asc' }], include, skip: paging.skip, take: paging.take }),
@@ -96,7 +98,7 @@ export class ActivationKeysService {
         )
       ]);
       return {
-        ...pageOf(rows.map((k) => this.present(k, now)), total, paging),
+        ...pageOf(rows.map((k) => this.present(k, now, canSeeFullCode)), total, paging),
         lifecycleCounts: { AVAILABLE: available, REDEEMED: redeemed, REVOKED: revoked, EXPIRED: expired }
       };
     });
@@ -160,7 +162,7 @@ export class ActivationKeysService {
     return { revoked, skipped };
   }
 
-  async getById(id: string) {
+  async getById(id: string, actorRole?: PlatformRoleName) {
     const key = await this.prisma.runAsPlatform((tx) =>
       tx.activationKey.findUnique({
         where: { id },
@@ -168,7 +170,10 @@ export class ActivationKeysService {
       })
     );
     if (!key) throw new NotFoundException('Activation key not found');
-    return key;
+    // security-audit HIGH-02: this used to return the raw row, bypassing `present()`'s
+    // redaction entirely — a full, live-redeemable code for any AVAILABLE key.
+    const canSeeFullCode = actorRole ? permissionsForRole(actorRole).devices === 'write' : false;
+    return redactActivationKeyCode(key, new Date(), canSeeFullCode);
   }
 
   async generate(dto: GenerateActivationKeyDto, actor: PlatformUser) {
@@ -259,6 +264,23 @@ export class ActivationKeysService {
         );
       }
 
+      // security-audit MED-02: claim the key atomically HERE, before creating a device
+      // for it — the old code only flipped `status` to REDEEMED at the very end, after
+      // already creating a Device row, with nothing stopping two concurrent redemptions
+      // of the same code from both passing the `status === 'ACTIVE'` check above and
+      // each creating their own device. `updateMany` with `status: 'ACTIVE'` in its own
+      // WHERE clause is an atomic compare-and-set: under Postgres, a second concurrent
+      // UPDATE targeting the same row blocks until the first commits, then re-evaluates
+      // the WHERE clause against the now-REDEEMED row and matches zero rows — so at
+      // most one caller ever sees `claimed.count === 1`.
+      const claimed = await tx.activationKey.updateMany({
+        where: { id: key.id, status: 'ACTIVE' },
+        data: { status: 'REDEEMED', redeemedAt: new Date() }
+      });
+      if (claimed.count === 0) {
+        throw new ConflictException('Activation code has already been redeemed');
+      }
+
       // The real gate: whatever the key allowed, this restaurant's current
       // subscription must still actually include the app the device claims
       // to be — closes the window where a key was generated while entitled
@@ -308,9 +330,11 @@ export class ActivationKeysService {
         }
       });
 
+      // status/redeemedAt were already set atomically by the claim above; only the
+      // device id (unknown until now) is filled in here.
       await tx.activationKey.update({
         where: { id: key.id },
-        data: { status: 'REDEEMED', redeemedAt: new Date(), redeemedByDeviceId: device.id }
+        data: { redeemedByDeviceId: device.id }
       });
 
       await this.audit.log(

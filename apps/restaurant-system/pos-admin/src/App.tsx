@@ -300,7 +300,9 @@ export default function PosAdminApp() {
   const handleAdminLogout = () => {
     setIsAdminLoggedIn(false);
     setAuthPassword('');
-    cloudLogout();
+    // Fire-and-forget: the server-side revocation (LOW-05) must not block the
+    // UI from signing out locally, including while offline.
+    void cloudLogout();
     SessionPersistence.clear('admin');
   };
 

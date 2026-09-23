@@ -32,6 +32,6 @@ export class PaymentOrdersController {
     if (device.type !== 'POS' && device.type !== 'POS_ADMIN') {
       throw new ForbiddenException('Only a POS device can initiate a refund');
     }
-    return this.payments.createRefund(device.restaurantId, paymentId, body);
+    return this.payments.createRefund(device.restaurantId, paymentId, body, { id: device.id, type: device.type });
   }
 }

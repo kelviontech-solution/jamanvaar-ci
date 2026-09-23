@@ -1256,7 +1256,12 @@ export default function KioskUserApp() {
       });
     } else {
       setStaffPin('');
-      showToast('Invalid staff PIN.');
+      const lockoutMs = StaffRepository.pinLockoutRemainingMs();
+      showToast(
+        lockoutMs > 0
+          ? `Too many wrong PINs. Try again in ${Math.ceil(lockoutMs / 1000)}s.`
+          : 'Invalid staff PIN.'
+      );
       AuditRepository.log({
         kioskId,
         action: 'STAFF_OVERRIDE_PIN_FAILED',

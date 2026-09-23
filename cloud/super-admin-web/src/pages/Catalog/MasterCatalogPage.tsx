@@ -826,7 +826,7 @@ export function MasterCatalogPage() {
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/png, image/jpeg, image/webp, image/svg+xml"
+                    accept="image/png, image/jpeg, image/webp, image/gif"
                     style={{ display: 'none' }}
                     onChange={handleFileChange}
                   />
@@ -835,7 +835,8 @@ export function MasterCatalogPage() {
                     {uploadingImage ? 'Uploading dish photo…' : 'Click to upload dish photo'}
                   </div>
                   <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
-                    PNG, JPG, WEBP or SVG (Max 5MB)
+                    {/* security-audit LOW-03: SVG dropped — the API no longer accepts it (can carry a <script> tag) */}
+                    PNG, JPG, WEBP or GIF (Max 5MB)
                   </div>
                 </div>
               )}

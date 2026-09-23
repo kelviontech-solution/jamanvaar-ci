@@ -93,7 +93,7 @@ describe('Platform payments visibility', () => {
 
   it('includes refunds on a payment that has one', async () => {
     const paymentId = await seedPayment(10000, 'SUCCESS');
-    await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 4000, reason: 'Partial refund for visibility test' });
+    await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 4000, reason: 'Partial refund for visibility test', requestedBy: 'Test Manager' });
 
     const res = await authed('get', `/api/v1/payments?restaurantId=${restaurantId}`, platformToken);
     const row = res.body.rows.find((r: { id: string }) => r.id === paymentId);

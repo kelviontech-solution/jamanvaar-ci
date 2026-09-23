@@ -84,6 +84,46 @@ describe('Teammate invitation and activation (BUG-081)', () => {
     expect((await status(inv.email, inv.token)).body.state).toBe('USED');
   });
 
+  /**
+   * security-audit MED-03 (SAW-07/AUTH-02): resendInvite used to skip the
+   * owner-target check every other mutation on a PLATFORM_OWNER row enforces —
+   * a SUPER_ADMIN could regenerate the activation token for a still-pending
+   * PLATFORM_OWNER invite and take the account over via the public /activate endpoint.
+   */
+  it('SUPER_ADMIN cannot resend an invite to a pending PLATFORM_OWNER, but can to a pending READ_ONLY', async () => {
+    const superAdminEmail = `act-superadmin-${stamp}@example.com`;
+    await createTestPlatformUser(prisma, { email: superAdminEmail, password: ownerPassword, role: 'SUPER_ADMIN' });
+    const superAdminToken = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: superAdminEmail, password: ownerPassword })).body.accessToken;
+
+    const pendingOwnerEmail = `act-pending-owner-${stamp}@example.com`;
+    invitedEmails.push(pendingOwnerEmail, superAdminEmail);
+    const inviteRes = await request(app.getHttpServer())
+      .post('/api/v1/platform-users/invite')
+      .set('Authorization', `Bearer ${ownerToken}`)
+      .send({ email: pendingOwnerEmail, fullName: 'Pending Owner', role: 'PLATFORM_OWNER' });
+    expect(inviteRes.status, JSON.stringify(inviteRes.body)).toBe(201);
+    const pendingOwnerId = inviteRes.body.user.id;
+
+    const resendBySuperAdmin = await request(app.getHttpServer())
+      .post(`/api/v1/platform-users/${pendingOwnerId}/resend-invite`)
+      .set('Authorization', `Bearer ${superAdminToken}`);
+    expect(resendBySuperAdmin.status).toBe(403);
+
+    // A real PLATFORM_OWNER can still do it (functional regression check).
+    const resendByOwner = await request(app.getHttpServer())
+      .post(`/api/v1/platform-users/${pendingOwnerId}/resend-invite`)
+      .set('Authorization', `Bearer ${ownerToken}`);
+    expect(resendByOwner.status).toBe(201);
+
+    // SUPER_ADMIN can still resend an invite to a non-owner role.
+    const inv = await invite('ro-for-superadmin');
+    const roId = (await prisma.platformUser.findUniqueOrThrow({ where: { email: inv.email } })).id;
+    const resendReadOnly = await request(app.getHttpServer())
+      .post(`/api/v1/platform-users/${roId}/resend-invite`)
+      .set('Authorization', `Bearer ${superAdminToken}`);
+    expect(resendReadOnly.status).toBe(201);
+  });
+
   it('a weak new password is also refused when an existing teammate changes theirs', async () => {
     const res = await request(app.getHttpServer())
       .patch('/api/v1/platform/me/password')

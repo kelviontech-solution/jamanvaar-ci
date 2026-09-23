@@ -1,7 +1,10 @@
 import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { PlatformUser } from '@prisma/client';
+import { Device, PlatformUser } from '@prisma/client';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
+import { CurrentDevice } from '../../common/decorators/current-device.decorator';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
+import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
+import { DeviceSyncThrottle } from '../../common/throttle';
 import { RecordSyncLogDto, SyncObservabilityService } from './sync-observability.service';
 
 @Controller('api/v1/platform/telemetry')
@@ -50,9 +53,14 @@ export class SyncObservabilityController {
     return this.syncObservabilityService.resolveConflict(conflictId, strategy, actor);
   }
 
-  // Terminal / Device Sync reporting endpoint
+  // Terminal / Device Sync reporting endpoint.
+  // security-audit MED-14: this had no guard at all — any anonymous caller could write
+  // unbounded, fabricated telemetry rows tagged with an arbitrary restaurantId. Now
+  // requires a real device credential, and restaurantId/deviceId come from that device.
   @Post('events')
-  recordEvent(@Body() dto: RecordSyncLogDto) {
-    return this.syncObservabilityService.recordSyncLog(dto);
+  @DeviceSyncThrottle()
+  @UseGuards(DeviceAuthGuard)
+  recordEvent(@Body() dto: RecordSyncLogDto, @CurrentDevice() device: Device) {
+    return this.syncObservabilityService.recordSyncLog(device, dto);
   }
 }

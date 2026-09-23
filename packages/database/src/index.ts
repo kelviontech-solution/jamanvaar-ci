@@ -16,6 +16,7 @@ export * from './image_library';
 
 export * from './tender';
 export * from './table_sync';
+export * from './qr_order_url';
 export * from './collection_sync';
 export * from './service_messages';
 export * from './pin';
