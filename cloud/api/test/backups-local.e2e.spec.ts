@@ -20,7 +20,7 @@ const { LOCAL_DIR } = vi.hoisted(() => {
   return { LOCAL_DIR: dir as string };
 });
 
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { BackupStorageService } from '../src/modules/backups/backup-storage.service';
 import { BackupsService } from '../src/modules/backups/backups.service';
@@ -51,7 +51,7 @@ describe('Backups: local storage, encryption, failures, retention, schedule, res
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email, password });
-    token = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email, password })).body.accessToken;
+    token = (await platformLogin(app, email, password)).body.accessToken;
     const mk = async (label: string) =>
       (await api('post', '/api/v1/restaurants').send({ name: `TEST BkLocal ${label} ${stamp}`, ownerName: `Owner ${label}`, ownerEmail: `bk-${label}-${stamp}@example.com` })).body.restaurant.id as string;
     restaurantId = await mk('a');

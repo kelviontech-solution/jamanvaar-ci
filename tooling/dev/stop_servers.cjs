@@ -10,6 +10,7 @@ const TARGET_PORTS = [
   5178, // LAN Sync
   5179, // KDS
   5180, // Super Admin Web
+  5181, // Super Admin Web (stray fallback port if 5180 was already taken)
   3000,
   5000,
   8000,

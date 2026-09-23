@@ -59,6 +59,13 @@ model PlatformUser {
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
 
+  // Login OTP (second factor, required on every sign-in): only the HMAC-keyed hash of the
+  // 6-digit code is ever stored, matching User.passwordResetHash's pattern.
+  loginOtpHash       String?
+  loginOtpExpiresAt  DateTime?
+  loginOtpSentAt     DateTime?
+  loginOtpAttempts   Int                @default(0)
+
   refreshTokens    PlatformRefreshToken[]
   assignedTickets  SupportTicket[]
   createdTickets   SupportTicket[] @relation("SupportTicketCreatedBy")

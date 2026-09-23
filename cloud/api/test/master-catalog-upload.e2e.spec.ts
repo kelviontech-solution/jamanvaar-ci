@@ -3,7 +3,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 // security-audit LOW-03: master-catalog image upload used to trust the
@@ -38,8 +38,8 @@ describe('Master-catalog image upload (LOW-03)', () => {
     await createTestPlatformUser(prisma, { email: ownerEmail, password, role: 'PLATFORM_OWNER' });
     await createTestPlatformUser(prisma, { email: readOnlyEmail, password, role: 'READ_ONLY' });
 
-    ownerToken = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: ownerEmail, password })).body.accessToken;
-    readOnlyToken = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: readOnlyEmail, password })).body.accessToken;
+    ownerToken = (await platformLogin(app, ownerEmail, password)).body.accessToken;
+    readOnlyToken = (await platformLogin(app, readOnlyEmail, password)).body.accessToken;
   });
 
   afterAll(async () => {

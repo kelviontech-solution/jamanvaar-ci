@@ -17,7 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { PlatformUser } from '@prisma/client';
 import { PlatformAuthService } from './platform-auth.service';
-import { changePasswordSchema, loginSchema } from './dto/login.dto';
+import { changePasswordSchema, loginSchema, verifyOtpSchema, resendOtpSchema } from './dto/login.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
@@ -42,17 +42,37 @@ export class PlatformAuthController {
     });
   }
 
+  /** Step 1: email + password. Success does not sign in yet — it emails a 6-digit code and hands back an otpToken for verify-otp. */
   @Post('login')
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(loginSchema))
-  async login(
-    @Body() body: { email: string; password: string },
+  async login(@Body() body: { email: string; password: string }) {
+    return this.authService.login(body.email, body.password);
+  }
+
+  /** Step 2: the code from that email. Only this call actually starts a session. */
+  @Post('verify-otp')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(verifyOtpSchema))
+  async verifyOtp(
+    @Body() body: { otpToken: string; otp: string },
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ) {
-    const result = await this.authService.login(body.email, body.password, { userAgent: req.headers['user-agent'], ip: req.ip, location: describeLocation(req.ip, req.headers) });
+    const result = await this.authService.verifyOtp(body.otpToken, body.otp, {
+      userAgent: req.headers['user-agent'],
+      ip: req.ip,
+      location: describeLocation(req.ip, req.headers)
+    });
     this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
     return { accessToken: result.accessToken, user: result.user };
+  }
+
+  @Post('resend-otp')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(resendOtpSchema))
+  async resendOtp(@Body() body: { otpToken: string }) {
+    return this.authService.resendOtp(body.otpToken);
   }
 
   @Post('refresh')

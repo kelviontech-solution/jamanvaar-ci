@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -31,7 +31,7 @@ describe('Terminal display size (BUG-008)', () => {
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: staffEmail, password });
-    platformToken = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: staffEmail, password })).body.accessToken;
+    platformToken = (await platformLogin(app, staffEmail, password)).body.accessToken;
 
     const rest = await platform('post', '/api/v1/restaurants').send({ name: `TEST Display ${stamp}`, ownerName: 'Owner', ownerEmail });
     restaurantId = rest.body.restaurant.id;

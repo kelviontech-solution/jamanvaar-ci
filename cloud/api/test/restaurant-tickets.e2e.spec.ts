@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { SupportTicketsService } from '../src/modules/support-tickets/support-tickets.service';
 
@@ -56,7 +56,7 @@ describe('Restaurant-raised support tickets (BUG-088)', () => {
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: staffEmail, password, role: 'SUPPORT_ADMIN' });
     mateId = (await createTestPlatformUser(prisma, { email: mateEmail, password, role: 'SUPPORT_ADMIN' })).id;
-    const login = async (email: string) => (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email, password })).body.accessToken as string;
+    const login = async (email: string) => (await platformLogin(app, email, password)).body.accessToken as string;
     await createTestPlatformUser(prisma, { email: setupEmail, password });
     setupToken = await login(setupEmail);
     staffToken = await login(staffEmail);

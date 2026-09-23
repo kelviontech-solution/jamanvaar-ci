@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -35,7 +35,7 @@ describe('Heartbeat delivers update offers and offline extensions (BUG-065/077)'
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email, password });
-    token = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email, password })).body.accessToken;
+    token = (await platformLogin(app, email, password)).body.accessToken;
     restaurantId = (await platform('post', '/api/v1/restaurants').send({ name: `TEST Upd ${stamp}`, ownerName: 'Owner', ownerEmail: `upd-${stamp}@example.com` })).body.restaurant.id;
     branchId = (await platform('post', '/api/v1/branches').send({ restaurantId, name: 'Upd Branch', code: 'UB' })).body.id;
     planId = (await platform('post', '/api/v1/plans').send({ tier: 'PRO', name: `TEST Upd Plan ${stamp}`, priceMonthly: 700000, maxBranches: 5, maxDevices: 50, maxUsers: 20, entitlements: { posTerminal: true } })).body.id;

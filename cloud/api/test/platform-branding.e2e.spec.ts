@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { EmailService } from '../src/modules/notifications/email.service';
 
@@ -30,7 +30,7 @@ describe('Platform branding and billing details are used (BUG-092)', () => {
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password });
-    token = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: adminEmail, password })).body.accessToken;
+    token = (await platformLogin(app, adminEmail, password)).body.accessToken;
 
     for (const key of ['platform.branding', 'platform.billing']) {
       saved[key] = await prisma.runAsPlatform((tx) => tx.platformSetting.findUnique({ where: { key } }));
@@ -117,6 +117,10 @@ describe('Platform branding and billing details are used (BUG-092)', () => {
   it('every transactional email carries the support contact from branding', async () => {
     await setting('platform.branding', { supportEmail: 'help@acme.example', supportPhone: '+91 80 1234 5678', companyName: 'Acme Software' });
     const email = app.get(EmailService);
+    // createTestApp() centrally mocks EmailService.send to capture OTP codes instead of really
+    // sending; this test needs the REAL send() implementation (its HTML templating), so restore it
+    // here first — this is the last test in the file, so nothing after it needs the OTP capture.
+    vi.mocked(email.send).mockRestore();
     const sendMail = vi.fn().mockResolvedValue({});
     vi.spyOn(email as unknown as { getTransporter: () => unknown }, 'getTransporter').mockReturnValue({ sendMail });
     vi.spyOn(email, 'configured', 'get').mockReturnValue(true);

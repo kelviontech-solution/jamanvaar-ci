@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -31,7 +31,7 @@ describe('Order sync bridge + suspension enforcement', () => {
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
 
-    const loginRes = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: adminEmail, password: adminPassword });
+    const loginRes = await platformLogin(app, adminEmail, adminPassword);
     platformToken = loginRes.body.accessToken;
 
     const restaurantRes = await authed('post', '/api/v1/restaurants', platformToken).send({

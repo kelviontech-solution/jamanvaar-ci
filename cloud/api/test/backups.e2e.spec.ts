@@ -5,7 +5,7 @@ import S3rver from 's3rver';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { BackupStorageService } from '../src/modules/backups/backup-storage.service';
 
@@ -71,10 +71,8 @@ describe('Real off-device backups (S3-compatible storage)', () => {
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
 
-    const platformLogin = await request(app.getHttpServer())
-      .post('/api/v1/platform-auth/login')
-      .send({ email: adminEmail, password: adminPassword });
-    platformToken = platformLogin.body.accessToken;
+    const platformLoginRes = await platformLogin(app, adminEmail, adminPassword);
+    platformToken = platformLoginRes.body.accessToken;
 
     const restaurantRes = await authed('post', '/api/v1/restaurants', platformToken).send({
       name: `TEST Backups Restaurant ${Date.now()}`,
@@ -205,7 +203,7 @@ describe('Real off-device backups (S3-compatible storage)', () => {
   it('a READ_ONLY platform role can list backups but cannot download one', async () => {
     const readOnlyEmail = `test-backups-readonly-${Date.now()}@example.com`;
     await createTestPlatformUser(prisma, { email: readOnlyEmail, password: adminPassword, role: 'READ_ONLY' });
-    const roLogin = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: readOnlyEmail, password: adminPassword });
+    const roLogin = await platformLogin(app, readOnlyEmail, adminPassword);
     const readOnlyToken: string = roLogin.body.accessToken;
 
     const listRes = await authed('get', `/api/v1/restaurants/${restaurantId}/backups`, readOnlyToken);

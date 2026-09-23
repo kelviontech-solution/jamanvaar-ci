@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -34,7 +34,7 @@ describe('Teammate invitation and activation (BUG-081)', () => {
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: ownerEmail, password: ownerPassword });
-    ownerToken = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: ownerEmail, password: ownerPassword })).body.accessToken;
+    ownerToken = (await platformLogin(app, ownerEmail, ownerPassword)).body.accessToken;
   });
 
   afterAll(async () => {
@@ -93,7 +93,7 @@ describe('Teammate invitation and activation (BUG-081)', () => {
   it('SUPER_ADMIN cannot resend an invite to a pending PLATFORM_OWNER, but can to a pending READ_ONLY', async () => {
     const superAdminEmail = `act-superadmin-${stamp}@example.com`;
     await createTestPlatformUser(prisma, { email: superAdminEmail, password: ownerPassword, role: 'SUPER_ADMIN' });
-    const superAdminToken = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: superAdminEmail, password: ownerPassword })).body.accessToken;
+    const superAdminToken = (await platformLogin(app, superAdminEmail, ownerPassword)).body.accessToken;
 
     const pendingOwnerEmail = `act-pending-owner-${stamp}@example.com`;
     invitedEmails.push(pendingOwnerEmail, superAdminEmail);

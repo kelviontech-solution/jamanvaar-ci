@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -29,7 +29,7 @@ describe('Order sync payload fidelity and per-order validation', () => {
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
-    const login = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: adminEmail, password: adminPassword });
+    const login = await platformLogin(app, adminEmail, adminPassword);
     platformToken = login.body.accessToken;
 
     const rest = await authed('post', '/api/v1/restaurants', platformToken).send({

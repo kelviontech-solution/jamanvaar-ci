@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, extractCookie } from './helpers';
+import { createTestApp, createTestPlatformUser, extractCookie, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 describe('Tenant authentication + authorization', () => {
@@ -28,10 +28,8 @@ describe('Tenant authentication + authorization', () => {
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
 
-    const platformLogin = await request(app.getHttpServer())
-      .post('/api/v1/platform-auth/login')
-      .send({ email: adminEmail, password: adminPassword });
-    platformToken = platformLogin.body.accessToken;
+    const platformLoginRes = await platformLogin(app, adminEmail, adminPassword);
+    platformToken = platformLoginRes.body.accessToken;
 
     const restaurantRes = await authed('post', '/api/v1/restaurants', platformToken).send({
       name: `TEST Tenant Auth Restaurant ${Date.now()}`,

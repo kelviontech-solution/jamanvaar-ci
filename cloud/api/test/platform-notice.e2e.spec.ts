@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -46,7 +46,7 @@ describe('Platform notice / maintenance mode (BUG-091/092)', () => {
     );
 
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
-    const login = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: adminEmail, password: adminPassword });
+    const login = await platformLogin(app, adminEmail, adminPassword);
     platformToken = login.body.accessToken;
 
     const rest = await platform('post', '/api/v1/restaurants').send({ name: `TEST Notice ${Date.now()}`, ownerName: 'Notice Owner', ownerEmail });

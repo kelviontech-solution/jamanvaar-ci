@@ -1,8 +1,9 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser, extractCookie } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { EmailService } from '../src/modules/notifications/email.service';
 
 /**
  * BUG-093 / BUG-094: pressing "Revoke" on a session only stopped that session from
@@ -16,9 +17,25 @@ describe('Platform sessions (BUG-093/094)', () => {
   const email = `test-sessions-${Date.now()}@example.com`;
   const otherEmail = `test-sessions-other-${Date.now()}@example.com`;
   const password = 'correct-horse-battery-staple';
+  let sent: Array<{ to: string; subject: string; html: string }> = [];
+  const lastCode = () => /(\d{6})<\/span>/.exec(sent[sent.length - 1].html)![1];
 
-  const login = async (who = email, userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36') => {
-    const res = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').set('User-Agent', userAgent).send({ email: who, password });
+  /**
+   * The session (and its device/location metadata) is now created in verifyOtp(), not login() —
+   * the request that carries User-Agent / proxy headers has to be the verify-otp call, not the
+   * initial email+password one, or every device/location assertion below would see nothing.
+   */
+  const login = async (
+    who = email,
+    userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36',
+    extraHeaders: Record<string, string> = {}
+  ) => {
+    sent = [];
+    const loginRes = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: who, password });
+    expect(loginRes.status).toBe(200);
+    let verifyReq = request(app.getHttpServer()).post('/api/v1/platform-auth/verify-otp').set('User-Agent', userAgent);
+    for (const [key, value] of Object.entries(extraHeaders)) verifyReq = verifyReq.set(key, value);
+    const res = await verifyReq.send({ otpToken: loginRes.body.otpToken, otp: lastCode() });
     expect(res.status).toBe(200);
     return { token: res.body.accessToken as string, refreshCookie: extractCookie(res.headers['set-cookie'], 'jamanvaar_platform_refresh') as string };
   };
@@ -33,6 +50,12 @@ describe('Platform sessions (BUG-093/094)', () => {
   beforeAll(async () => {
     app = await createTestApp();
     prisma = app.get(PrismaService);
+    // Shadow the central EmailService spy so this file's `login()` helper can read the emailed
+    // OTP straight off `sent`, the same way platform-auth.e2e.spec.ts does.
+    vi.spyOn(app.get(EmailService), 'send').mockImplementation(async (to, subject, html) => {
+      sent.push({ to, subject, html });
+      return true;
+    });
     await createTestPlatformUser(prisma, { email, password });
     await createTestPlatformUser(prisma, { email: otherEmail, password });
   });
@@ -177,12 +200,8 @@ describe('Platform sessions (BUG-093/094)', () => {
     });
 
     it('shows an approximate location from the proxy headers, or "Local network" for a private address', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/api/v1/platform-auth/login')
-        .set('CF-IPCity', 'Ahmedabad')
-        .set('CF-IPCountry', 'IN')
-        .send({ email: ownerEmail, password });
-      const list = await as(res.body.accessToken).get('/api/v1/platform/sessions');
+      const withHeaders = await login(ownerEmail, undefined, { 'CF-IPCity': 'Ahmedabad', 'CF-IPCountry': 'IN' });
+      const list = await as(withHeaders.token).get('/api/v1/platform/sessions');
       expect(list.body.find((s: any) => s.current).location).toBe('Ahmedabad, IN');
 
       const plain = await login(ownerEmail);

@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -27,12 +27,12 @@ describe('security-audit remediation regressions', () => {
     prisma = app.get(PrismaService);
 
     await createTestPlatformUser(prisma, { email: ownerEmail, password: ownerPassword, role: 'PLATFORM_OWNER' });
-    const ownerLogin = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: ownerEmail, password: ownerPassword });
+    const ownerLogin = await platformLogin(app, ownerEmail, ownerPassword);
     ownerToken = ownerLogin.body.accessToken;
 
     const readOnlyEmail = `test-secaudit-readonly-${Date.now()}@example.com`;
     await createTestPlatformUser(prisma, { email: readOnlyEmail, password: ownerPassword, role: 'READ_ONLY' });
-    const roLogin = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: readOnlyEmail, password: ownerPassword });
+    const roLogin = await platformLogin(app, readOnlyEmail, ownerPassword);
     readOnlyToken = roLogin.body.accessToken;
 
     const restaurantRes = await authed('post', '/api/v1/restaurants', ownerToken).send({

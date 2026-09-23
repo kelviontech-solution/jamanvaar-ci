@@ -20,13 +20,23 @@ export interface PlatformUser {
   permissions?: Permissions;
 }
 
+export interface OtpChallenge {
+  otpToken: string;
+  maskedEmail: string;
+  expiresInSeconds: number;
+}
+
 interface AuthContextValue {
   user: PlatformUser | null;
   status: 'loading' | 'authenticated' | 'unauthenticated';
   hasPermission: (requiredRole: PlatformRole) => boolean;
   /** Can the signed-in user open (read) or change (write) this area? */
   can: (area: Area | null, level?: AccessLevel) => boolean;
-  login: (email: string, password: string) => Promise<void>;
+  /** Step 1: email + password. Does not sign in — emails a 6-digit code and returns the challenge to hand to verifyOtp/resendOtp. */
+  requestLogin: (email: string, password: string) => Promise<OtpChallenge>;
+  /** Step 2: the code from that email. Only this call actually starts a session. */
+  verifyOtp: (otpToken: string, otp: string) => Promise<void>;
+  resendOtp: (otpToken: string) => Promise<{ maskedEmail: string }>;
   logout: () => Promise<void>;
 }
 
@@ -50,14 +60,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })();
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const requestLogin = useCallback(async (email: string, password: string) => {
+    return api.post<OtpChallenge>('/api/v1/platform-auth/login', { email, password });
+  }, []);
+
+  const verifyOtp = useCallback(async (otpToken: string, otp: string) => {
     const result = await api.post<{ accessToken: string; user: PlatformUser }>(
-      '/api/v1/platform-auth/login',
-      { email, password }
+      '/api/v1/platform-auth/verify-otp',
+      { otpToken, otp }
     );
     setAccessToken(result.accessToken);
     setUser(result.user);
     setStatus('authenticated');
+  }, []);
+
+  const resendOtp = useCallback(async (otpToken: string) => {
+    return api.post<{ maskedEmail: string }>('/api/v1/platform-auth/resend-otp', { otpToken });
   }, []);
 
   // A revoked or expired session must land on the login screen, not leave a page full of errors.
@@ -94,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [user]
   );
 
-  return <AuthContext.Provider value={{ user, status, hasPermission, can, login, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, status, hasPermission, can, requestLogin, verifyOtp, resendOtp, logout }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 describe('New SaaS Modules: Invoices, Applications, Support, and Platform Settings', () => {
@@ -26,9 +26,7 @@ describe('New SaaS Modules: Invoices, Applications, Support, and Platform Settin
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
 
-    const loginRes = await request(app.getHttpServer())
-      .post('/api/v1/platform-auth/login')
-      .send({ email: adminEmail, password: adminPassword });
+    const loginRes = await platformLogin(app, adminEmail, adminPassword);
     accessToken = loginRes.body.accessToken;
 
     const restaurantRes = await authed('post', '/api/v1/restaurants').send({
@@ -197,8 +195,10 @@ describe('New SaaS Modules: Invoices, Applications, Support, and Platform Settin
         resendTestRestaurantId = res.body.restaurant.id;
         pendingOwnerId = res.body.owner.id;
         firstToken = res.body.activationToken;
-        // No SMTP configured in the test environment.
-        expect(res.body.emailSent).toBe(false);
+        // createTestApp() centrally mocks EmailService.send to swallow the send and report success
+        // (so tests never hit real SMTP), so this now reports true rather than the old "no SMTP
+        // configured" false.
+        expect(res.body.emailSent).toBe(true);
       });
 
       afterAll(async () => {
@@ -210,13 +210,13 @@ describe('New SaaS Modules: Invoices, Applications, Support, and Platform Settin
         expect(res.status).toBe(400);
       });
 
-      it('regenerates the activation token, reports emailSent: false with no SMTP configured, and invalidates the old token', async () => {
+      it('regenerates the activation token, reports emailSent: true (mocked, not really sent), and invalidates the old token', async () => {
         const res = await authed('post', '/api/v1/support/resend-invite').send({
           userId: pendingOwnerId,
           reason: 'test: verifying resend-invite regenerates the token'
         });
         expect(res.status).toBe(201);
-        expect(res.body.emailSent).toBe(false);
+        expect(res.body.emailSent).toBe(true);
         expect(res.body.activationToken).toBeTypeOf('string');
         expect(res.body.activationToken).not.toBe(firstToken);
 
