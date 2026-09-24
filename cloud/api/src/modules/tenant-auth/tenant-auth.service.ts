@@ -66,6 +66,12 @@ export function restaurantProfile(r: RestaurantProfile): RestaurantProfile {
   return { id: r.id, name: r.name, legalName: r.legalName ?? null, gstin: r.gstin ?? null, fssaiNumber: r.fssaiNumber ?? null, address: r.address ?? null, city: r.city ?? null, state: r.state ?? null };
 }
 
+/** RestaurantProfile plus the two fields authenticateAndRespond checks before minting a session — not part of the public profile shape any response returns. */
+interface RestaurantAuthCheck extends RestaurantProfile {
+  status: string;
+  deletedAt: Date | null;
+}
+
 export interface TenantLoginSuccess {
   status: 'LOGIN_SUCCESS';
   requiresActivation: false;
@@ -244,7 +250,7 @@ export class TenantAuthService {
    * 4. If not registered/active -> returns ACTIVATION_REQUIRED with an activationSessionToken.
    */
   async login(dto: TenantLoginDto): Promise<TenantAuthResponse> {
-    const { email, password, restaurantId, deviceId, deviceToken, deviceType, appVersion } = dto;
+    const { email, password, restaurantId } = dto;
 
     // Look up user(s) matching this email across candidate tenants
     const candidates = await this.prisma.runAsPlatform(async (tx) => {
@@ -262,6 +268,29 @@ export class TenantAuthService {
       });
     });
 
+    return this.authenticateAndRespond(candidates, password, {
+      deviceId: dto.deviceId,
+      deviceToken: dto.deviceToken,
+      deviceType: dto.deviceType,
+      appVersion: dto.appVersion,
+      adminOnly: dto.adminOnly
+    });
+  }
+
+  /**
+   * The shared core of every tenant login entry point (email-based `login()` and, from
+   * Phase 3, owner-only restaurant-code `loginOwner()`): given an already-resolved list of
+   * candidate users, checks the password against each (respecting per-account lockout),
+   * then runs the same device-activation branching (Case 1/2/3) and audit logging either
+   * entry point relies on. `candidates` may be a one-element list (owner-only login) or
+   * several (email login across a shared email address) — the logic is identical either way.
+   */
+  private async authenticateAndRespond(
+    candidates: Array<User & { restaurant: RestaurantAuthCheck }>,
+    password: string,
+    opts: { deviceId?: string; deviceToken?: string; deviceType?: string; appVersion?: string; adminOnly?: boolean }
+  ): Promise<TenantAuthResponse> {
+    const { deviceId, deviceToken, deviceType, appVersion } = opts;
     const now = new Date();
     let matchedUser: (typeof candidates)[0] | null = null;
     let sawLockedCandidate = false;
@@ -320,7 +349,7 @@ export class TenantAuthService {
     // the OWNER/MANAGER requirement is now enforced server-side for those device types
     // unconditionally — the client can no longer opt out of it by omitting the flag.
     const isAdminConsoleDevice = deviceType === 'POS_ADMIN' || deviceType === 'KIOSK_ADMIN';
-    if ((dto.adminOnly || isAdminConsoleDevice) && matchedUser.role !== 'OWNER' && matchedUser.role !== 'MANAGER') {
+    if ((opts.adminOnly || isAdminConsoleDevice) && matchedUser.role !== 'OWNER' && matchedUser.role !== 'MANAGER') {
       throw new ForbiddenException('This login is restricted to restaurant owners and managers.');
     }
 
