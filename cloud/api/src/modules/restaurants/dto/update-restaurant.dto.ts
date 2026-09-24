@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { isValidGstinFormat, isValidFssaiFormat, gstinStateCodeMatches } from '../../../common/validation/gstin';
+import { isValidIndianPhone, normalizeIndianPhone } from '../../../common/validation/phone';
 
 export const updateRestaurantSchema = z
   .object({
@@ -11,6 +12,11 @@ export const updateRestaurantSchema = z
     city: z.string().trim().optional(),
     state: z.string().trim().optional(),
     country: z.string().trim().optional(),
+    // Editable independently of restaurantCode (spec section 3): a restaurant's phone number
+    // can change without its customer-facing Restaurant ID changing. restaurantCode itself is
+    // deliberately absent from this schema — Zod strips unknown keys, so it can never be set
+    // here regardless of what a caller sends (see restaurants.e2e.spec.ts's immutability test).
+    mobile: z.string().trim().refine(isValidIndianPhone, 'A valid 10-digit Indian mobile number is required').transform(normalizeIndianPhone).optional(),
     timezone: z.string().trim().optional(),
     currency: z.string().trim().optional(),
     defaultLanguage: z.string().trim().optional()

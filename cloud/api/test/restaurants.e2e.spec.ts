@@ -175,6 +175,38 @@ describe('Restaurant management (Phase 1a)', () => {
     expect(update.body.name).toBe(`${restaurantName} Renamed`);
   });
 
+  it('mobile can be edited via the update endpoint, but restaurantCode does not follow it', async () => {
+    const create = await request(app.getHttpServer())
+      .post('/api/v1/restaurants')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: `${restaurantName} Mobile Edit`, mobile: '9700011122', ownerName: 'Owner', ownerEmail: `owner-mobedit-${Date.now()}@test.example.com` });
+    createdRestaurantIds.push(create.body.restaurant.id);
+    const originalCode = create.body.restaurant.restaurantCode;
+    expect(originalCode).toBe('JM9700011122');
+
+    const update = await request(app.getHttpServer())
+      .patch(`/api/v1/restaurants/${create.body.restaurant.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ mobile: '9700099988' });
+    expect(update.status).toBe(200);
+    expect(update.body.mobile).toBe('9700099988');
+    expect(update.body.restaurantCode).toBe(originalCode);
+  });
+
+  it('rejects a malformed mobile number on update', async () => {
+    const create = await request(app.getHttpServer())
+      .post('/api/v1/restaurants')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: `${restaurantName} Bad Mobile Update`, ownerName: 'Owner', ownerEmail: `owner-badmobupd-${Date.now()}@test.example.com` });
+    createdRestaurantIds.push(create.body.restaurant.id);
+
+    const update = await request(app.getHttpServer())
+      .patch(`/api/v1/restaurants/${create.body.restaurant.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ mobile: 'not-a-phone' });
+    expect(update.status).toBe(400);
+  });
+
   it('lists restaurants including the one just created', async () => {
     const res = await request(app.getHttpServer())
       .get('/api/v1/restaurants')
