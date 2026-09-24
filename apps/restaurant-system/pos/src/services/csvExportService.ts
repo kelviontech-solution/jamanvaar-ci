@@ -1,5 +1,6 @@
 import { Order } from '@jamanvaar/types';
 import { DailyReportSummary, TopItemStat } from '@jamanvaar/business';
+import { toCsvRow } from '@jamanvaar/utils';
 
 export class CsvExportService {
   private static triggerDownload(csvContent: string, filename: string) {
@@ -16,74 +17,70 @@ export class CsvExportService {
     }, 200);
   }
 
+  // B2-061: every row here used to be hand-quoted with `"${x}"`, which never defended against
+  // CSV/formula injection (a guest name or dish name starting with `=`/`+`/`-`/`@` fires as a
+  // formula the moment this file is opened in Excel/Sheets) and only escaped internal `"` on
+  // the one or two fields someone remembered to. toCsvRow does both, on every field, uniformly.
   public static exportOrders(orders: Order[], periodLabel: string = 'Current') {
     const headers = ['Order Number', 'Token Number', 'Date', 'Time', 'Order Type', 'Table', 'Guest Name', 'Phone', 'Items Count', 'Gross Amount', 'Discount', 'CGST', 'SGST', 'Grand Total', 'Payment Method', 'Status'];
     const rows = orders.map((o) => [
-      `"${o.orderNumber}"`,
-      `"${o.tokenNumber}"`,
-      `"${new Date(o.createdAt).toLocaleDateString('en-IN')}"`,
-      `"${new Date(o.createdAt).toLocaleTimeString('en-IN')}"`,
-      `"${o.orderType}"`,
-      `"${o.tableNumber || '-'}"`,
-      `"${(o.customerName || '').replace(/"/g, '""')}"`,
-      `"${o.customerPhone || '-'}"`,
+      o.orderNumber,
+      o.tokenNumber,
+      new Date(o.createdAt).toLocaleDateString('en-IN'),
+      new Date(o.createdAt).toLocaleTimeString('en-IN'),
+      o.orderType,
+      o.tableNumber || '-',
+      o.customerName || '',
+      o.customerPhone || '-',
       o.items.length,
       o.subtotal || o.totalAmount,
       o.discountAmount || 0,
       o.cgstAmount || 0,
       o.sgstAmount || 0,
       o.totalAmount,
-      `"${o.paymentMethod}"`,
-      `"${o.orderStatus}"`
+      o.paymentMethod,
+      o.orderStatus
     ]);
 
-    const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const csv = [toCsvRow(headers), ...rows.map(toCsvRow)].join('\r\n');
     this.triggerDownload(csv, `JAMANVAAR_Orders_${periodLabel.replace(/\s+/g, '_')}_${Date.now()}.csv`);
   }
 
   public static exportTopItems(items: TopItemStat[], periodLabel: string = 'Current') {
     const headers = ['Rank', 'Dish Name', 'Category', 'SKU', 'Quantity Sold', 'Average Rate', 'Gross Revenue'];
-    const rows = items.map((it, idx) => [
-      idx + 1,
-      `"${it.name.replace(/"/g, '""')}"`,
-      `"${it.categoryName || 'Main Course'}"`,
-      `"${it.sku || ''}"`,
-      it.quantitySold,
-      it.avgPrice,
-      it.grossRevenue
-    ]);
+    const rows = items.map((it, idx) => [idx + 1, it.name, it.categoryName || 'Main Course', it.sku || '', it.quantitySold, it.avgPrice, it.grossRevenue]);
 
-    const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const csv = [toCsvRow(headers), ...rows.map(toCsvRow)].join('\r\n');
     this.triggerDownload(csv, `JAMANVAAR_Top_Dishes_${periodLabel.replace(/\s+/g, '_')}_${Date.now()}.csv`);
   }
 
   public static exportFinancialSummary(summary: DailyReportSummary, periodLabel: string = 'Current') {
     const lines = [
-      `"JAMANVAAR POS — Financial & Tax Summary"`,
-      `"Period","${periodLabel}"`,
-      `"Generated At","${new Date().toLocaleString('en-IN')}"`,
+      toCsvRow(['JAMANVAAR POS — Financial & Tax Summary']),
+      toCsvRow(['Period', periodLabel]),
+      toCsvRow(['Generated At', new Date().toLocaleString('en-IN')]),
       '',
       // BUG-LOW-002: was 'Amount (INR)' text — every other currency-labeled
       // CSV/report export in this codebase uses the '₹' glyph (formatINR in
       // @jamanvaar/utils always emits it); standardizing on that here too.
-      `"Metric","Amount (₹)"`,
-      `"Gross Food Sales",${summary.grossSales}`,
-      `"Total Discounts",${summary.discountAmount}`,
-      `"CGST (2.5%)",${summary.cgstAmount}`,
-      `"SGST (2.5%)",${summary.sgstAmount}`,
-      `"Total Tax",${summary.totalTax}`,
-      `"Total Collected (incl. GST)",${summary.netSales}`,
-      `"Total Orders Billed",${summary.ordersCount}`,
-      `"Average Order Value",${summary.avgOrderValue}`,
+      toCsvRow(['Metric', 'Amount (₹)']),
+      toCsvRow(['Gross Food Sales', summary.grossSales]),
+      toCsvRow(['Total Discounts', summary.discountAmount]),
+      toCsvRow(['CGST (2.5%)', summary.cgstAmount]),
+      toCsvRow(['SGST (2.5%)', summary.sgstAmount]),
+      toCsvRow(['Total Tax', summary.totalTax]),
+      toCsvRow(['Total Collected (incl. GST)', summary.netSales]),
+      toCsvRow(['Total Orders Billed', summary.ordersCount]),
+      toCsvRow(['Average Order Value', summary.avgOrderValue]),
       '',
-      `"Payment Method","Collected (₹)"`,
-      `"Cash at Counter",${summary.paymentBreakdown.cash}`,
-      `"UPI / QR",${summary.paymentBreakdown.upi}`,
-      `"Credit / Debit Card",${summary.paymentBreakdown.card}`,
-      `"Split Payments",${summary.paymentBreakdown.split}`,
-      `"Digital Wallet / Other",${summary.paymentBreakdown.wallet + summary.paymentBreakdown.other}`
+      toCsvRow(['Payment Method', 'Collected (₹)']),
+      toCsvRow(['Cash at Counter', summary.paymentBreakdown.cash]),
+      toCsvRow(['UPI / QR', summary.paymentBreakdown.upi]),
+      toCsvRow(['Credit / Debit Card', summary.paymentBreakdown.card]),
+      toCsvRow(['Split Payments', summary.paymentBreakdown.split]),
+      toCsvRow(['Digital Wallet / Other', summary.paymentBreakdown.wallet + summary.paymentBreakdown.other])
     ];
 
-    this.triggerDownload(lines.join('\n'), `JAMANVAAR_Sales_Summary_${periodLabel.replace(/\s+/g, '_')}_${Date.now()}.csv`);
+    this.triggerDownload(lines.join('\r\n'), `JAMANVAAR_Sales_Summary_${periodLabel.replace(/\s+/g, '_')}_${Date.now()}.csv`);
   }
 }

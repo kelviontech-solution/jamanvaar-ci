@@ -37,6 +37,25 @@ function kotTakenByLabel(kot: KOTRecord): string {
   return order?.source_type === 'CAPTAIN' || order?.captainName ? 'Captain' : 'Cashier';
 }
 
+/**
+ * B2-020: the ticket chip printed the raw `OrderType` enum verbatim ("DINE_IN"), and a fake/test
+ * ticket with no table read the contradictory "Takeaway • DINE_IN" (the "Takeaway" half was a
+ * hardcoded guess from a missing table number, not the order's own real type). Always show a real
+ * friendly label for the order's own `orderType`, not a guess.
+ */
+const ORDER_TYPE_LABEL: Record<string, string> = {
+  DINE_IN: 'Dine In',
+  TAKEAWAY: 'Takeaway',
+  DELIVERY: 'Delivery',
+  TOKEN: 'Token',
+  TOKEN_QR: 'Token (QR)',
+  QR_TABLE: 'QR Table',
+  KIOSK: 'Kiosk',
+  PICKUP: 'Pickup',
+  ONLINE: 'Online',
+  COMPLIMENTARY: 'Complimentary'
+};
+
 export const App: React.FC = () => {
   const [kots, setKots] = useState<KOTRecord[]>(kdsDb.kots);
 
@@ -240,12 +259,12 @@ export const App: React.FC = () => {
   // logged any staff member in the moment they'd typed 4 digits, checking
   // nothing — not even a hardcoded PIN, unlike Captain/POS Admin's
   // (already-fixed or already-removed) demo bypasses.
-  const handleKdsPinPress = (digit: string) => {
+  const handleKdsPinPress = async (digit: string) => {
     if (kdsPin.length < 4) {
       const next = kdsPin + digit;
       setKdsPin(next);
       if (next.length === 4) {
-        const candidate = StaffRepository.verifyPin(next)?.user;
+        const candidate = (await StaffRepository.verifyPin(next))?.user;
         // A PIN for a role that does not work the kitchen screen is refused (BUG-118).
         const matchedUser = candidate && StaffRepository.canUseTerminal(candidate.roleId, 'KDS') ? candidate : undefined;
 
@@ -449,6 +468,8 @@ export const App: React.FC = () => {
           appIdentity="KDS"
           appTitle="Kitchen Display System"
           appSubtitle="Kitchen Stations & Line Cook Display"
+          isLocalCoreUnauthorized={kdsDb.isLocalCoreUnauthorized()}
+          healthCheckUrl={`${kdsDb.getSyncServerUrl()}/api/health`}
           heroHeadline="Real-Time Kitchen Production Command"
           heroHighlightWord="Live KOTs"
           heroDescription="Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff."
@@ -700,10 +721,10 @@ export const App: React.FC = () => {
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold mt-1">
-                          <span>{kot.tableNumber ? `Table ${kot.tableNumber}` : 'Takeaway'}</span>
+                          <span>{kot.tableNumber ? `Table ${kot.tableNumber}` : 'No table'}</span>
                           <span>•</span>
                           <span className="uppercase text-xs bg-slate-100 px-1.5 py-0.2 rounded font-black text-slate-700">
-                            {kot.orderType}
+                            {ORDER_TYPE_LABEL[kot.orderType] || kot.orderType}
                           </span>
                         </div>
                       </div>

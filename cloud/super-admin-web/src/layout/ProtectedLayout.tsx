@@ -63,6 +63,18 @@ interface NavGroup {
   items: NavItem[];
 }
 
+/** B2-052: the sidebar badge under the logo said "SUPER ADMIN" for every role — a Read-Only user
+ * was told they're a Super Admin, while the header's profile tag (right below) already correctly
+ * showed their real role from this exact mapping. One shared source now, not two that can drift. */
+const ROLE_LABEL: Record<string, string> = {
+  PLATFORM_OWNER: 'Platform Owner',
+  SUPER_ADMIN: 'Super Admin',
+  PLATFORM_OPS: 'Platform Ops',
+  SUPPORT_ADMIN: 'Support Admin',
+  FINANCE_ADMIN: 'Finance Admin',
+  READ_ONLY: 'Read-Only'
+};
+
 const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Platform Control Center',
@@ -306,7 +318,7 @@ export function ProtectedLayout() {
           </Link>
           <div className="brand-badge-row">
             <span className="platform-tag">PLATFORM CONTROL</span>
-            <span className="super-admin-badge">SUPER ADMIN</span>
+            <span className="super-admin-badge">{(user?.role && ROLE_LABEL[user.role]) || user?.role || 'Super Admin'}</span>
           </div>
         </div>
 
@@ -573,16 +585,7 @@ export function ProtectedLayout() {
               <div className="profile-info-block">
                 <div className="profile-name">{user?.fullName ?? 'Super Admin'}</div>
                 <div className="profile-role-tag">
-                  {user?.role
-                    ? {
-                        PLATFORM_OWNER: 'Platform Owner',
-                        SUPER_ADMIN: 'Super Admin',
-                        PLATFORM_OPS: 'Platform Ops',
-                        SUPPORT_ADMIN: 'Support Admin',
-                        FINANCE_ADMIN: 'Finance Admin',
-                        READ_ONLY: 'Read-Only'
-                      }[user.role] ?? user.role
-                    : 'Super Admin'}
+                  {user?.role ? ROLE_LABEL[user.role] ?? user.role : 'Super Admin'}
                 </div>
               </div>
 

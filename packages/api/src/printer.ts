@@ -1,7 +1,17 @@
 import { KOTRecord, Order, PrinterDevice, PrinterHardwareStatus, PrinterRole, PrintJob, ReceiptConfig, ReceiptPaperSize } from '@jamanvaar/types';
 import { sendRawToPrinter } from './print_transport';
-import { formatDate, formatINR, formatTime, generateUUID } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatSplitTax, formatTime, generateUUID, stripControlCharsForPrint } from '@jamanvaar/utils';
 import { AuditRepository, db, PrintQueueRepository, ReceiptRepository } from '@jamanvaar/database';
+
+// B2-023: a kiosk order's `kioskId` is the real activation UUID (needed internally for device
+// tracking), which used to print verbatim on the guest's own printed receipt
+// ("TERMINAL: 11ea4a8b-e9a4-...") — meaningless and faintly alarming to a customer. Friendly
+// labels (POS-01, KIOSK-01, ...) already print fine as-is; only a raw UUID gets swapped out.
+const KIOSK_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function friendlyTerminalLabel(kioskId: string | undefined): string {
+  if (!kioskId) return 'KIOSK-01';
+  return KIOSK_UUID_RE.test(kioskId) ? 'Self-Order Kiosk' : kioskId;
+}
 
 export class PrinterService {
   private static activePrinterId: string = 'prn-kiosk-01';
@@ -260,7 +270,11 @@ export class PrinterService {
     if (config.restaurantName) out += `${center(config.restaurantName)}\n`;
     if (config.address) out += `${center(config.address)}\n`;
     if (config.phone) out += `${center(`Phone: ${config.phone}`)}\n`;
-    if (config.gstin) out += `${center(`GSTIN: ${config.gstin}`)}\n`;
+    // B2-019: unlike the POS app's own copy of this receipt (already fixed for BUG-028), this
+    // shared copy (used by every non-POS app: Restaurant Admin, Captain, KDS, Kiosk Admin, Kiosk
+    // User) just omitted the GSTIN line entirely for a restaurant with none — a document titled
+    // a tax invoice needs to say "GSTIN: Not registered", not go silent about it.
+    out += `${center(config.gstin ? `GSTIN: ${config.gstin}` : 'GSTIN: Not registered')}\n`;
     if (config.fssaiNumber) out += `${center(`FSSAI Lic: ${config.fssaiNumber}`)}\n`;
     out += `${divider}\n`;
 
@@ -268,7 +282,7 @@ export class PrinterService {
     out += `${row(`ORDER #${order.orderNumber}`, `TOKEN #${order.tokenNumber}`)}\n`;
     out += `${row(formatDate(order.createdAt), formatTime(order.createdAt))}\n`;
     out += `${row(`TYPE: ${order.orderType}`, order.tableNumber ? `TABLE: ${order.tableNumber}` : 'COUNTER')}\n`;
-    out += `${row(`TERMINAL: ${order.kioskId || 'KIOSK-01'}`, `PAID: ${order.paymentMethod}`)}\n`;
+    out += `${row(`TERMINAL: ${friendlyTerminalLabel(order.kioskId)}`, `PAID: ${order.paymentMethod}`)}\n`;
     out += `${dashLine}\n`;
 
     // Table Header
@@ -310,8 +324,12 @@ export class PrinterService {
       out += `${row(`Discount (${order.couponCode || 'Promo'}):`, `-${formatINR(order.discountAmount)}`)}\n`;
     }
     if (config.showTaxBreakup) {
-      out += `${row('CGST @ 2.5%:', formatINR(order.cgstAmount))}\n`;
-      out += `${row('SGST @ 2.5%:', formatINR(order.sgstAmount))}\n`;
+      // B2-036/B2-019: formatINR rounds each stored half independently (e.g. 5.5 -> "6" for
+      // both), which can print CGST+SGST that no longer sum to TOTAL AMOUNT below. formatSplitTax
+      // derives both from the already-rounded whole-rupee tax total instead.
+      const { cgst, sgst } = formatSplitTax(order.taxAmount, order.cgstAmount, order.sgstAmount);
+      out += `${row('CGST @ 2.5%:', cgst)}\n`;
+      out += `${row('SGST @ 2.5%:', sgst)}\n`;
     }
     if (order.roundOffAmount !== 0) {
       out += `${row('Round Off:', formatINR(order.roundOffAmount))}\n`;
@@ -351,8 +369,15 @@ export class PrinterService {
    * Order the queue may not have (a KOT job never had one).
    */
   private static wrapEscPos(text: string): Uint8Array {
+    // B2-063: every free-text field that ends up on a receipt/KOT (dish name, customer name,
+    // Chef Notes, ...) is concatenated into `text` upstream with no filtering — a name
+    // containing a raw ESC/GS control-byte sequence (e.g. the standard "kick cash drawer"
+    // command, 0x1B 0x70 0x00 0x19 0xFA) would be sent to the printer as a real command, not
+    // just printed as text. This is the one place every receipt/KOT byte stream passes through
+    // before hitting hardware, so stripping control characters here (rather than at each
+    // individual free-text field) catches every current and future one.
     const encoder = new TextEncoder();
-    const textBytes = encoder.encode(text + '\n\n\n');
+    const textBytes = encoder.encode(stripControlCharsForPrint(text) + '\n\n\n');
 
     // ESC/POS Commands:
     // ESC @ (Initialize): 0x1B, 0x40

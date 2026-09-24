@@ -4,6 +4,7 @@
   "private": true,
   "description": "JAMANVAAR SaaS cloud backend (Super Admin control plane, Phase 1a)",
   "scripts": {
+    "postinstall": "prisma generate",
     "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",

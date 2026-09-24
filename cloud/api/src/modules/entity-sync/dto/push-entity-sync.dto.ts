@@ -12,7 +12,12 @@ import { z } from 'zod';
 // DINING_TABLE (BUG-096/097): the floor plan and each table's live state (seated, bill requested,
 // free). Several devices edit the same table, so the server keeps the change with the newest
 // `updatedAt` instead of the last one to arrive (see LAST_CHANGE_WINS_TYPES in the service).
-export const SYNCABLE_ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK'] as const;
+//
+// SHIFT / CASH_MOVEMENT (B2-056): a POS cash-drawer shift and its cash movements (payouts/cash
+// drops) only ever lived on the POS device that opened them — Restaurant Admin's Shift & Cash
+// Drawer Ledger, Reconciliation and EOD Z-Report never received them. Only POS edits its own
+// shift, so this is push-from-POS, pull-everywhere-else, same shape as the menu.
+export const SYNCABLE_ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK', 'SHIFT', 'CASH_MOVEMENT'] as const;
 export type SyncableEntityType = (typeof SYNCABLE_ENTITY_TYPES)[number];
 
 export const entitySyncEventSchema = z.object({

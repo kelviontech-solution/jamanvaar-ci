@@ -54,7 +54,9 @@ describe('JAMANVAAR Restaurant Admin Center — Full CRUD, Persistence & Reporti
     });
 
     expect(cust.name).toBe('Rohan Mehta');
-    expect(cust.phone).toBe('+91 9988776655');
+    // B2-043: createCustomer normalizes to a bare 10-digit number (normalizeIndianPhone strips
+    // the +91 prefix) so every lookup matches regardless of how the number was typed in.
+    expect(cust.phone).toBe('9988776655');
     expect(cust.loyaltyPoints).toBe(100);
 
     const updated = CustomerRepository.updateCustomer(cust.phone, { name: 'Rohan K. Mehta' });
@@ -72,8 +74,8 @@ describe('JAMANVAAR Restaurant Admin Center — Full CRUD, Persistence & Reporti
     expect(CustomerRepository.getAccount(cust.phone)).toBeUndefined();
   });
 
-  it('3. StaffRepository: Full CRUD on Users, Roles & Credentials', () => {
-    const staff = StaffRepository.createUser({
+  it('3. StaffRepository: Full CRUD on Users, Roles & Credentials', async () => {
+    const staff = await StaffRepository.createUser({
       fullName: 'Vikram Sarabhai',
       username: 'vikrams',
       roleId: 'MANAGER',

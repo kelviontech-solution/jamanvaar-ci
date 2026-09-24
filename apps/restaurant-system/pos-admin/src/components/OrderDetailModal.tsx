@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createRefund, CloudApiError } from '../cloud/cloudClient';
 import { Order, OrderStatus } from '@jamanvaar/types';
-import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatTime, formatSplitTax } from '@jamanvaar/utils';
 import { Modal, Button, printThermalReceipt } from '@jamanvaar/ui';
 import { OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
 import { Printer, XCircle, RefreshCw, CheckCircle, Clock, Utensils, AlertTriangle } from 'lucide-react';
@@ -193,13 +193,14 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 <span className="font-mono">-{formatINR(order.discountAmount)}</span>
               </div>
             )}
+            {/* B2-036: formatSplitTax guarantees the two halves sum to the displayed Total Payable. */}
             <div className="flex justify-between text-slate-600">
               <span>CGST (2.5%)</span>
-              <span className="font-mono">{formatINR(order.cgstAmount || 0)}</span>
+              <span className="font-mono">{formatSplitTax(order.taxAmount ?? 0, order.cgstAmount, order.sgstAmount).cgst}</span>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>SGST (2.5%)</span>
-              <span className="font-mono">{formatINR(order.sgstAmount || 0)}</span>
+              <span className="font-mono">{formatSplitTax(order.taxAmount ?? 0, order.cgstAmount, order.sgstAmount).sgst}</span>
             </div>
             <div className="pt-2 border-t border-slate-200 flex justify-between font-black text-sm text-jaman-navy">
               <span>Total Payable</span>

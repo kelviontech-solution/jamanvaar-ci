@@ -62,4 +62,23 @@ describe('Activation replaces the demo branch (BUG-110)', () => {
     expect(db.receiptConfig.thankYouMessage).toBe('See you soon!');
     expect(db.receiptConfig.footerMessage).toBe('Fresh daily');
   });
+
+  /**
+   * B2-042: after activation, POS's stored profile still read email 'hello@jamanvaar.com', owner
+   * 'Ramesh Patel', manager 'Pooja Shah' — the demo identities BUG-009/103/158 set out to remove,
+   * surviving as real-looking prepared-by/approved-by signatory names on EOD/Z reports. The cloud
+   * Restaurant record has no email/ownerName/managerName fields to adopt a real value from (checked
+   * the schema), so there is nothing to pull — but the demo placeholder must not survive either.
+   */
+  it('drops the demo email, owner name and manager name on activation, with nothing to replace them with (B2-042)', () => {
+    expect(db.restaurant.email).toBe('hello@jamanvaar.com');
+    expect(db.restaurant.ownerName).toBe('Ramesh Patel');
+    expect(db.restaurant.managerName).toBe('Pooja Shah');
+
+    RestaurantIdentityRepository.adopt('rest-real-8', { name: 'Spice Route' });
+
+    expect(db.restaurant.email).toBe('');
+    expect(db.restaurant.ownerName).toBe('');
+    expect(db.restaurant.managerName).toBe('');
+  });
 });

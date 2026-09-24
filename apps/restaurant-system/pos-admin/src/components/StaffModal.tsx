@@ -29,11 +29,18 @@ export const StaffModal: React.FC<StaffModalProps> = ({
   onSaved
 }) => {
   const roles = StaffRepository.getAllRoles();
+  // B2-012: this defaulted to roles[0]?.id, which happens to be 'role-super-admin' /
+  // "Super Admin / Owner" — the *most* privileged role, given by accident to any new
+  // employee whose creator didn't touch the dropdown. Fail-safe default is the other way
+  // round: the least-privileged role in the list (Kitchen Chef, view-only), same principle
+  // BUG-084 already applied to the platform-side team-invite dialog. This also covers the
+  // "staffToEdit.roleId is falsy" fallback a few lines down, which had the identical bug.
+  const leastPrivilegedRoleId = roles[roles.length - 1]?.id ?? roles[0]?.id ?? '';
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [roleId, setRoleId] = useState(roles[0]?.id ?? '');
+  const [roleId, setRoleId] = useState(leastPrivilegedRoleId);
   const [isActive, setIsActive] = useState(true);
   const [formError, setFormError] = useState('');
   const [issuedPin, setIssuedPin] = useState<string | null>(null);
@@ -47,14 +54,14 @@ export const StaffModal: React.FC<StaffModalProps> = ({
       setUsername(staffToEdit.username);
       setEmail(staffToEdit.email || '');
       setPhone(staffToEdit.phone || '');
-      setRoleId(staffToEdit.roleId || roles[0]?.id || '');
+      setRoleId(staffToEdit.roleId || leastPrivilegedRoleId);
       setIsActive(staffToEdit.isActive ?? true);
     } else {
       setFullName('');
       setUsername('');
       setEmail('');
       setPhone('');
-      setRoleId(roles[0]?.id ?? '');
+      setRoleId(leastPrivilegedRoleId);
       setIsActive(true);
     }
   }, [staffToEdit, isOpen]);
@@ -66,9 +73,9 @@ export const StaffModal: React.FC<StaffModalProps> = ({
     }
   };
 
-  const handleResetPin = () => {
+  const handleResetPin = async () => {
     if (!staffToEdit) return;
-    const result = StaffRepository.resetPin(staffToEdit.id);
+    const result = await StaffRepository.resetPin(staffToEdit.id);
     if (result) {
       setIssuedPin(result.issuedPin);
       setPinCopied(false);
@@ -83,7 +90,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
     if (!fullName || !username) {
@@ -107,7 +114,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
       onSaved();
       onClose();
     } else {
-      const created = StaffRepository.createUser({
+      const created = await StaffRepository.createUser({
         fullName,
         username,
         email,
@@ -169,7 +176,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
             required
             value={fullName}
             onChange={(e) => handleNameChange(e.target.value)}
-            placeholder="e.g. Amit Dave"
+            placeholder="Employee's full name"
             className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
           />
         </div>

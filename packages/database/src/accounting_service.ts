@@ -2,9 +2,9 @@ import { db } from './db';
 import { Order, BusinessDay, BusinessDayStatus, KOTRecord } from '@jamanvaar/types';
 import {
   formatRestaurantDate,
-  generateBusinessDayId,
   getBusinessDayDisplayDate
 } from '@jamanvaar/utils';
+import { BusinessDayRepository } from './repositories';
 
 export interface BusinessDaySummary {
   business_day_id: string;
@@ -64,51 +64,20 @@ export interface BusinessDaySummary {
 
 export class BusinessDayAccountingService {
   /**
-   * Resolves the current active business day record or creates a default one if none exists.
+   * Resolves the current active business day record, creating (or auto-rolling-over) one if
+   * needed. B2-017: this used to have its own separate, simpler logic — find whatever's already
+   * marked OPEN, or fall back to `db.businessDays[0]`, or create a fresh one only if the array
+   * was completely empty — with no 5 AM cutoff check at all. On a device that never creates an
+   * order itself (Restaurant Admin queries this for its Dashboard/reports but never calls
+   * `OrderRepository.createOrder()`), that meant this device's own "active" business day could
+   * never roll over past midnight/the cutoff on its own — only an order-creating device
+   * (`BusinessDayRepository.getActiveBusinessDay()`, which does apply the cutoff) would ever
+   * advance it. Two devices' local stores then permanently disagreed on "today", exactly the
+   * ₹410-vs-₹0 split this bug reported. Delegating here means every caller — order creation,
+   * reporting, the POS header/day-history views — shares the one real implementation.
    */
   public static getActiveBusinessDay(): BusinessDay {
-    let active = db.businessDays.find((b) => b.status === 'OPEN' || b.status === 'CLOSING' || b.status === 'REOPENED');
-    if (!active) {
-      if (db.businessDays.length > 0) {
-        active = db.businessDays[0];
-      } else {
-        const todayIso = formatRestaurantDate(new Date(), 'ISO_DATE');
-        const dayId = generateBusinessDayId(new Date());
-        const nowIso = new Date().toISOString();
-        active = {
-          id: dayId,
-          businessDate: todayIso,
-          displayDate: getBusinessDayDisplayDate(new Date()),
-          status: 'OPEN',
-          openedAt: nowIso,
-          openedBy: 'System',
-          openingCash: 2000,
-          grossSales: 0,
-          discounts: 0,
-          tax: 0,
-          netSales: 0,
-          totalCollected: 0,
-          cashSales: 0,
-          upiSales: 0,
-          cardSales: 0,
-          otherPayments: 0,
-          orderCount: 0,
-          completedOrderCount: 0,
-          cancelledOrderCount: 0,
-          refundedOrderCount: 0,
-          dineInCount: 0,
-          takeawayCount: 0,
-          deliveryCount: 0,
-          tokenCount: 0,
-          terminalId: 'POS-01',
-          createdAt: nowIso,
-          updatedAt: nowIso
-        };
-        db.businessDays.unshift(active);
-        db.notify();
-      }
-    }
-    return active;
+    return BusinessDayRepository.getActiveBusinessDay();
   }
 
   /**

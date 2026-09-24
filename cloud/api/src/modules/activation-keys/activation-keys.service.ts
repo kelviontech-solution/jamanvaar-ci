@@ -10,6 +10,7 @@ import { GenerateActivationKeyDto, ReactivateKeyDto, RedeemActivationKeyDto } fr
 import { generateOpaqueToken, hashOpaqueToken } from '../../common/security/token.util';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { onlyActiveBranchId } from '../tenant-auth/tenant-auth.service';
+import { PlatformRoleName, redactActivationCode } from '../../common/rbac/access';
 
 /** JMV-XXXX-XXXX-XXXX — human-relayable but drawn from a cryptographically random 96-bit value, not a counter or a guessable pattern. */
 function generateCode(): string {
@@ -38,16 +39,14 @@ export class ActivationKeysService {
   }
 
   /**
-   * A key's code is only useful until it is used. Once redeemed, revoked or expired it is redacted,
-   * leaving the last 4 characters so an operator can still tell keys apart (BUG-060).
+   * B2-051: an AVAILABLE key's full code used to go out to *any* caller regardless of role, so a
+   * Read-Only or Support Admin token (both only `devices: 'read'`) got a live, usable bearer
+   * credential back in full. Delegates to the one shared definition of "who gets to see a code"
+   * (`redactActivationCode`), also used by `/restaurants/:id`'s embedded activationKeys — the two
+   * endpoints must never disagree.
    */
-  private present<T extends { code: string; status: string; expiresAt: Date }>(key: T, now: Date) {
-    const lifecycle =
-      key.status === 'REDEEMED' ? 'REDEEMED'
-      : key.status === 'REVOKED' ? 'REVOKED'
-      : key.status === 'EXPIRED' || key.expiresAt <= now ? 'EXPIRED'
-      : 'AVAILABLE';
-    return { ...key, lifecycle, code: lifecycle === 'AVAILABLE' ? key.code : null, codeLast4: key.code.slice(-4) };
+  private present<T extends { code: string; status: string; expiresAt: Date }>(key: T, now: Date, actorRole: PlatformRoleName) {
+    return redactActivationCode(key, actorRole, now);
   }
 
   /**
@@ -57,7 +56,7 @@ export class ActivationKeysService {
   async list(query: {
     restaurantId?: string; q?: string; lifecycle?: string; allowedDeviceType?: string; batchId?: string;
     branchId?: string; expiringInDays?: string; page?: unknown; pageSize?: unknown;
-  } = {}) {
+  } = {}, actorRole: PlatformRoleName = 'READ_ONLY') {
     const paging = parsePaging(query);
     const now = new Date();
     const q = query.q?.trim();
@@ -86,7 +85,7 @@ export class ActivationKeysService {
     return this.prisma.runAsPlatform(async (tx) => {
       if (!paging.paged) {
         const rows = await tx.activationKey.findMany({ where, orderBy: { createdAt: 'desc' }, include });
-        return rows.map((k) => this.present(k, now));
+        return rows.map((k) => this.present(k, now, actorRole));
       }
       const [rows, total, available, redeemed, revoked, expired] = await Promise.all([
         tx.activationKey.findMany({ where, orderBy: [{ createdAt: 'desc' }, { id: 'asc' }], include, skip: paging.skip, take: paging.take }),
@@ -96,7 +95,7 @@ export class ActivationKeysService {
         )
       ]);
       return {
-        ...pageOf(rows.map((k) => this.present(k, now)), total, paging),
+        ...pageOf(rows.map((k) => this.present(k, now, actorRole)), total, paging),
         lifecycleCounts: { AVAILABLE: available, REDEEMED: redeemed, REVOKED: revoked, EXPIRED: expired }
       };
     });
@@ -160,7 +159,7 @@ export class ActivationKeysService {
     return { revoked, skipped };
   }
 
-  async getById(id: string) {
+  async getById(id: string, actorRole: PlatformRoleName = 'READ_ONLY') {
     const key = await this.prisma.runAsPlatform((tx) =>
       tx.activationKey.findUnique({
         where: { id },
@@ -168,7 +167,9 @@ export class ActivationKeysService {
       })
     );
     if (!key) throw new NotFoundException('Activation key not found');
-    return key;
+    // B2-051: this endpoint returned the raw row — full code, regardless of status or caller —
+    // with no redaction at all. Same masking as list() now applies here too.
+    return this.present(key, new Date(), actorRole);
   }
 
   async generate(dto: GenerateActivationKeyDto, actor: PlatformUser) {

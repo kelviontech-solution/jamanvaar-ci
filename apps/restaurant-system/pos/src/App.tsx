@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
+import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, CloudApiError } from './cloud/cloudClient';
 import { usePosStore } from './store/posStore';
 import { db, CustomerRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
 import type { MenuItem, Category } from '@jamanvaar/types';
-import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts } from '@jamanvaar/sync';
 import { sound } from '@jamanvaar/ui';
 import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
@@ -159,7 +159,12 @@ export const App: React.FC = () => {
     void syncMenuCatalog({ push: true });
     void syncStaff();
     void syncDiningTables();
+    // B2-056: this POS's own cash-drawer shift and its cash movements, so Restaurant Admin's
+    // Shift & Cash Drawer Ledger/Reconciliation/EOD Z-Report can see them. Only POS edits its own
+    // shift, so this terminal always pushes.
+    void syncShifts({ push: true });
     void reportHeartbeat();
+    void syncRestaurantIdentity();
 
     // Orders, kitchen tickets and table states are time-critical: every few seconds. The
     // heavier snapshots (CRM, menu) and the heartbeat keep the slower cadence.
@@ -174,7 +179,9 @@ export const App: React.FC = () => {
       void syncCrm();
       void syncMenuCatalog({ push: true });
       void syncStaff();
+      void syncShifts({ push: true });
       void reportHeartbeat();
+      void syncRestaurantIdentity();
     }, 15000);
 
     return () => {

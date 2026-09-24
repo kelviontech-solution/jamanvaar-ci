@@ -50,15 +50,20 @@ export const PosReportsView: React.FC = () => {
       selectedPeriod === 'CUSTOM' ? eDate : undefined
     );
 
-    const topItems = ReportGeneratorService.getTopSellingItems(
-      selectedPeriod === 'CUSTOM' ? sDate : undefined,
-      selectedPeriod === 'CUSTOM' ? eDate : undefined
-    );
+    // B2-032: use the exact same period-scoped `orders` the totals above were just computed
+    // from, instead of re-deriving a separate (and, for every non-CUSTOM preset, unscoped —
+    // all-time) order list via getTopSellingItems(start, end). Keeps the dish table and the
+    // summary totals on this same report always in agreement.
+    const topItems = ReportGeneratorService.getTopSellingItemsFromOrders(orders);
 
     // Cashier performance
+    // B2-032 (same pattern as BUG-028): this grouped by o.kioskId — the *terminal* id — so
+    // the "CASHIER NAME" column always printed "POS-01" instead of who actually rang up the
+    // sale, even though Order.cashierName (set from the logged-in staff member at checkout,
+    // see posStore.ts) has the real name all along.
     const cashierMap: Record<string, { name: string; count: number; sales: number; cash: number; upi: number; card: number }> = {};
     orders.forEach((o) => {
-      const cName = o.kioskId || 'Cashier Desk';
+      const cName = o.cashierName || o.kioskId || 'Cashier Desk';
       if (!cashierMap[cName]) {
         cashierMap[cName] = { name: cName, count: 0, sales: 0, cash: 0, upi: 0, card: 0 };
       }

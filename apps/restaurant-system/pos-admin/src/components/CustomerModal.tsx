@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CustomerAccount } from '@jamanvaar/types';
 import { Modal, Button } from '@jamanvaar/ui';
 import { CustomerRepository, db } from '@jamanvaar/database';
-import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
+import { formatINR, formatDate, formatTime, isValidIndianPhone, normalizeIndianPhone } from '@jamanvaar/utils';
 import {
   Award,
   ShoppingBag,
@@ -90,6 +90,33 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
       return;
     }
 
+    // B2-043: "123", "Short Ph", pure letters and "+91 92222 22223" were all accepted verbatim
+    // as a phone number — the last one becoming a *different* customer record from the same
+    // guest's "9222222223", since matching was by exact string. The phone is this record's real
+    // identity (loyalty points, the kiosk login from B2-001), so it's normalised to a bare
+    // 10-digit number and format-checked — but only for a *new* registration: the phone field is
+    // disabled while editing an existing customer (it's the record's own key, never resubmitted
+    // in `payload` below), so validating it then would block fixing an existing customer's other
+    // details just because their phone was saved before this check existed.
+    let normalizedPhone = phone;
+    if (!customerToEdit) {
+      if (!isValidIndianPhone(phone)) {
+        setFormError('Enter a valid 10-digit Indian phone number.');
+        return;
+      }
+      normalizedPhone = normalizeIndianPhone(phone);
+
+      // Registering a new guest with a phone that already belongs to someone used to silently
+      // merge into — and overwrite the name of — the existing record with no message at all
+      // ("Dup A" vanished the moment "Dup B" reused its number). A staff member creating what
+      // they believe is a brand-new guest needs to be told plainly instead.
+      const existing = CustomerRepository.getByPhone(normalizedPhone);
+      if (existing) {
+        setFormError(`This number already belongs to "${existing.name}" — open that guest's profile to edit it instead of registering a new one.`);
+        return;
+      }
+    }
+
     const payload: Partial<CustomerAccount> = {
       name,
       email,
@@ -105,7 +132,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
       CustomerRepository.updateCustomer(customerToEdit.phone, payload);
     } else {
       CustomerRepository.createCustomer({
-        phone,
+        phone: normalizedPhone,
         name,
         ...payload
       });

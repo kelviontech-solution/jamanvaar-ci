@@ -57,6 +57,15 @@ export class PlatformAuthService {
     });
   }
 
+  /**
+   * B2-030: per-account login lockout, same mechanism and thresholds as the tenant side
+   * (TenantAuthService.LOGIN_MAX_ATTEMPTS/LOGIN_LOCKOUT_MINUTES) — 10 wrong passwords in a row
+   * locks the account for 15 minutes, independent of the shared per-IP throttle. This is the
+   * platform Super Admin / Ops account, so it gets the same protection as a restaurant owner's.
+   */
+  private static readonly LOGIN_MAX_ATTEMPTS = 10;
+  private static readonly LOGIN_LOCKOUT_MINUTES = 15;
+
   private async issueRefreshToken(
     platformUserId: string,
     session: { sessionId: string; startedAt?: Date; userAgent?: string | null; ip?: string | null; location?: string | null },
@@ -107,13 +116,36 @@ export class PlatformAuthService {
     const passwordHash = user?.passwordHash ?? '$2a$10$CwTycUXWue0Thq9StjUM0uJ8Q8T6b8f1Q8T6b8f1Q8T6b8f1Q8T6b';
     const passwordOk = await bcrypt.compare(password, passwordHash);
 
-    if (!user || !passwordOk || user.status !== PlatformUserStatus.ACTIVE) {
+    // B2-030: locked accounts still run the bcrypt compare above (timing stays identical to the
+    // unknown-user/wrong-password cases — see this method's doc comment) but the result is
+    // ignored; a locked account can't log in no matter what password is supplied.
+    const now = new Date();
+    const isLocked = Boolean(user?.lockedUntil && user.lockedUntil > now);
+
+    if (!user || !passwordOk || user.status !== PlatformUserStatus.ACTIVE || isLocked) {
+      if (user && user.passwordHash && !isLocked) {
+        const attempts = user.failedLoginAttempts + 1;
+        await this.prisma.platformUser.update({
+          where: { id: user.id },
+          data: {
+            failedLoginAttempts: attempts,
+            lockedUntil: attempts >= PlatformAuthService.LOGIN_MAX_ATTEMPTS
+              ? new Date(now.getTime() + PlatformAuthService.LOGIN_LOCKOUT_MINUTES * 60_000)
+              : user.lockedUntil
+          }
+        });
+      }
+      // Deliberately the same generic message whether the account doesn't exist, the password
+      // was wrong, or the account is locked — see this method's doc comment on enumeration.
       throw new UnauthorizedException('Invalid email or password');
     }
 
     await this.prisma.platformUser.update({
       where: { id: user.id },
-      data: { lastLoginAt: new Date() }
+      data: {
+        lastLoginAt: new Date(),
+        ...(user.failedLoginAttempts > 0 || user.lockedUntil ? { failedLoginAttempts: 0, lockedUntil: null } : {})
+      }
     });
 
     const sessionId = randomUUID();

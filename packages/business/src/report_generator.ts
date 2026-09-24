@@ -1,6 +1,6 @@
 import { GeneratedReport, Order, PaymentMethod } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
-import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatTime, toCsvRow } from '@jamanvaar/utils';
 import { CentralReportingService } from './central_reporting_service';
 
 export interface DailyReportSummary {
@@ -475,7 +475,27 @@ export class ReportGeneratorService {
    * Top Selling Items Ranked by Quantity & Revenue
    */
   public static getTopSellingItems(startDate?: Date, endDate?: Date): TopItemStat[] {
-    const orders = this.getFilteredOrders(startDate, endDate);
+    return this.getTopSellingItemsFromOrders(this.getFilteredOrders(startDate, endDate));
+  }
+
+  /**
+   * B2-032: the sales-report PDF's "TOP SELLING DISHES" table came from `getTopSellingItems()`
+   * called with no dates for the 'TODAY' preset (PosReportsView only forwarded dates for
+   * 'CUSTOM'), which falls back to `getFilteredOrders(undefined, undefined)` — every order ever
+   * placed on this device, all business days combined, filtered only by non-CANCELLED. Right
+   * next to it, the report's own totals ("Gross Food Sales", "TOTAL NET SALES") come from
+   * `getReportableOrders`, which for 'TODAY' scopes strictly to the *active business day*. Two
+   * different order sets on the same page meant the dish table's revenue/quantity could never
+   * agree with the summary above it, and (compounding B2-029) a device that had ever pulled in
+   * another tenant's orders would show that tenant's dishes as "top sellers" forever, not just
+   * on the day they leaked in.
+   *
+   * This variant takes the exact, already-period-scoped order list a caller is also using for
+   * its totals, so the two can never disagree. Prefer this over `getTopSellingItems(start, end)`
+   * wherever a "top dishes" table is shown next to totals computed via `getReportableOrders` /
+   * `getReportForPeriod`.
+   */
+  public static getTopSellingItemsFromOrders(orders: Order[]): TopItemStat[] {
     const itemMap: Record<string, { id: string; name: string; sku: string; categoryId: string; qty: number; revenue: number }> = {};
 
     orders.forEach((o) => {
@@ -699,59 +719,65 @@ export class ReportGeneratorService {
       'Order Status'
     ];
 
+    // B2-061: customer name/phone are free text exported without any defense against
+    // CSV/formula injection before this fix — toCsvRow sanitizes every field uniformly.
     const lines = [
-      `"JAMANVAAR RESTAURANT — DETAILED TRANSACTIONS REPORT"`,
-      `"Generated At: ${formatDate(new Date())} ${formatTime(new Date())}"`,
-      `"Total Records: ${orders.length}"`,
+      toCsvRow(['JAMANVAAR RESTAURANT — DETAILED TRANSACTIONS REPORT']),
+      toCsvRow([`Generated At: ${formatDate(new Date())} ${formatTime(new Date())}`]),
+      toCsvRow([`Total Records: ${orders.length}`]),
       '',
-      headers.join(',')
+      toCsvRow(headers)
     ];
 
     orders.forEach((o) => {
       const d = new Date(o.createdAt);
-      lines.push([
-        `"${o.orderNumber || ''}"`,
-        `"${o.tokenNumber || ''}"`,
-        `"${formatDate(d)}"`,
-        `"${formatTime(d)}"`,
-        `"${o.orderType || ''}"`,
-        `"${o.tableNumber || '-'}"`,
-        `"${o.customerPhone || ''}"`,
-        `"${(o.customerName || '').replace(/"/g, '""')}"`,
-        `"${o.items?.length || 0}"`,
-        `"${o.subtotal || 0}"`,
-        `"${o.discountAmount || 0}"`,
-        `"${o.cgstAmount || 0}"`,
-        `"${o.sgstAmount || 0}"`,
-        `"${o.taxAmount || 0}"`,
-        `"${o.totalAmount || 0}"`,
-        `"${o.paymentMethod || ''}"`,
-        `"${o.paymentStatus || ''}"`,
-        `"${o.orderStatus || ''}"`
-      ].join(','));
+      lines.push(toCsvRow([
+        o.orderNumber || '',
+        o.tokenNumber || '',
+        formatDate(d),
+        formatTime(d),
+        o.orderType || '',
+        o.tableNumber || '-',
+        o.customerPhone || '',
+        o.customerName || '',
+        o.items?.length || 0,
+        o.subtotal || 0,
+        o.discountAmount || 0,
+        o.cgstAmount || 0,
+        o.sgstAmount || 0,
+        o.taxAmount || 0,
+        o.totalAmount || 0,
+        o.paymentMethod || '',
+        o.paymentStatus || '',
+        o.orderStatus || ''
+      ]));
     });
 
-    return lines.join('\n');
+    return lines.join('\r\n');
   }
 
   /**
    * Export structured data to standard CSV
    */
   public static exportToCsv(report: GeneratedReport): string {
+    // B2-061: `label` is a dish name for an Item Sales report (see generateItemSalesReport
+    // above) — free text with no length/character limit — written here with no quote-escaping
+    // and no defense against CSV/formula injection at all. toCsvRow fixes both, and covers
+    // every metric field too, not just label.
     const headers = ['Label', 'Attribute / Type', 'Amount / Value', 'Method / Info', 'Status'];
     const lines = [
-      `"JAMANVAAR RESTAURANT — ${report.title.toUpperCase()}"`,
-      `"Generated At: ${formatDate(report.generatedAt)} ${formatTime(report.generatedAt)}"`,
-      `"Total Gross Revenue: ${report.summaryMetrics.totalRevenue}"`,
-      `"Total Completed Orders: ${report.summaryMetrics.totalOrders}"`,
+      toCsvRow([`JAMANVAAR RESTAURANT — ${report.title.toUpperCase()}`]),
+      toCsvRow([`Generated At: ${formatDate(report.generatedAt)} ${formatTime(report.generatedAt)}`]),
+      toCsvRow([`Total Gross Revenue: ${report.summaryMetrics.totalRevenue}`]),
+      toCsvRow([`Total Completed Orders: ${report.summaryMetrics.totalOrders}`]),
       '',
-      headers.join(',')
+      toCsvRow(headers)
     ];
 
     report.rows.forEach((r) => {
-      lines.push(`"${r.label}","${r.metric1}","${r.metric2 || ''}","${r.metric3 || ''}","${r.metric4 || ''}"`);
+      lines.push(toCsvRow([r.label, r.metric1, r.metric2 || '', r.metric3 || '', r.metric4 || '']));
     });
 
-    return lines.join('\n');
+    return lines.join('\r\n');
   }
 }

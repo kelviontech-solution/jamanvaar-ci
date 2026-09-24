@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { assessRlsRole } from './rls-role';
+import * as fs from 'fs';
+import * as path from 'path';
 
 type TxClient = Prisma.TransactionClient;
 
@@ -27,6 +29,55 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   async onModuleInit() {
     await this.$connect();
     await this.checkRlsRole();
+    await this.checkMigrationsApplied();
+  }
+
+  /**
+   * B2-004: after a `git pull` that added a migration, `nest start --watch` failed to recompile
+   * (the Prisma Client didn't yet have the new columns) and the watcher just kept the previous
+   * build running — every route depending on the pulled change silently 404'd or misbehaved, with
+   * nothing in the terminal or the apps saying why. This can't retroactively fix *that* stale
+   * process (it never got to run this new code either), but it closes the gap for every run after:
+   * compares this checkout's `prisma/migrations/*` folders against what `_prisma_migrations`
+   * records as applied, and fails loudly instead of serving silently behind schema. Same
+   * fail-in-production / warn-elsewhere shape as `checkRlsRole` above (BUG-075).
+   */
+  private async checkMigrationsApplied() {
+    let migrationDirs: string[];
+    try {
+      const migrationsPath = path.join(__dirname, '..', '..', '..', 'prisma', 'migrations');
+      migrationDirs = fs
+        .readdirSync(migrationsPath, { withFileTypes: true })
+        .filter((e) => e.isDirectory())
+        .map((e) => e.name);
+    } catch {
+      // Can't locate the migrations folder from here (an unusual deployment layout) - this is a
+      // dev-convenience check, not a hard requirement, so skip rather than block startup on it.
+      return;
+    }
+    if (migrationDirs.length === 0) return;
+
+    let applied: Set<string>;
+    try {
+      const rows = await this.$queryRaw<{ migration_name: string }[]>`
+        SELECT migration_name FROM _prisma_migrations WHERE finished_at IS NOT NULL
+      `;
+      applied = new Set(rows.map((r) => r.migration_name));
+    } catch {
+      // The migrations table itself doesn't exist yet (a genuinely fresh database) - `prisma
+      // migrate deploy` handles that case on its own; nothing for this check to add here.
+      return;
+    }
+
+    const pending = migrationDirs.filter((name) => !applied.has(name));
+    if (pending.length === 0) return;
+
+    const message =
+      `Database is behind ${pending.length} migration(s) not yet applied: ${pending.join(', ')}. ` +
+      `Run "npm run prisma:deploy --workspace=@jamanvaar/cloud-api" (or "prisma migrate deploy" from cloud/api), ` +
+      `then restart the API - it was about to silently serve a build that doesn't match the connected database.`;
+    if (process.env.NODE_ENV === 'production') throw new Error(message);
+    this.logger.warn(message);
   }
 
   /** Fails startup in production, and warns elsewhere, when the connected role would bypass RLS (BUG-075). */

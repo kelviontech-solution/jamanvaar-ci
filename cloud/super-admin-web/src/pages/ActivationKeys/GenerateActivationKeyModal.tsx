@@ -113,7 +113,11 @@ export function GenerateActivationKeyModal({
                   </option>
                   {restaurants.map((r) => (
                     <option key={r.id} value={r.id}>
+                      {/* B2-049/B2-050: two restaurants can share a name (there's no uniqueness
+                          check, and franchise locations legitimately do) — the owner's email and
+                          a short id fragment let an operator tell them apart instead of guessing. */}
                       {r.name}
+                      {r.city ? ` — ${r.city}` : ''} ({r.users?.[0]?.email ?? `id: ${r.id.slice(0, 8)}`})
                     </option>
                   ))}
                 </select>

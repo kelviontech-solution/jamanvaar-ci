@@ -1,4 +1,3 @@
-import { db } from '@jamanvaar/database';
 import React, { useState, useEffect } from 'react';
 import { JamanvaarLogo, JamanvaarAppBadge, AppIdentity } from './JamanvaarBrand';
 import {
@@ -32,6 +31,23 @@ export interface JamanvaarAuthLayoutProps {
   appSubtitle: string;
   isOnline?: boolean;
   onToggleNetwork?: () => void;
+  /**
+   * B2-006/B2-008: this component used to import `@jamanvaar/database` directly just to call
+   * `db.isLocalCoreUnauthorized()` — which pulled that package's module-level singleton (and its
+   * LAN-relay auto-polling side effect) into any bundle that so much as imported this component,
+   * including Super Admin's login page, exactly the "cloud console polling a local relay" leak
+   * B2-008 documented elsewhere. Callers that care (every terminal app except Super Admin, which
+   * has no local relay at all) now pass this in themselves — they already import
+   * `@jamanvaar/database` for real reasons, so nothing new is pulled in on their behalf either.
+   */
+  isLocalCoreUnauthorized?: boolean;
+  /**
+   * B2-006: the "Cloud API: Connected"/"Local Core: Connected" badge used to be hardcoded true for
+   * Super Admin and only reflect a stale pairing flag for everyone else — never a real, live check,
+   * so it kept reading "Connected" with the API fully unreachable. When provided, this component
+   * polls that URL every 10s with a short timeout and shows the real result instead.
+   */
+  healthCheckUrl?: string;
   heroHeadline?: string;
   heroHighlightWord?: string;
   heroDescription?: string;
@@ -47,6 +63,8 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
   appSubtitle,
   isOnline = true,
   onToggleNetwork,
+  isLocalCoreUnauthorized = false,
+  healthCheckUrl,
   heroHeadline = 'Smart Billing.',
   heroHighlightWord = 'Better Dining.',
   heroDescription = 'Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.',
@@ -78,6 +96,39 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
     }, 60000);
     return () => clearInterval(timer);
   }, []);
+
+  // B2-006: a real, periodically re-checked connectivity probe, not a value that is set once (or
+  // never) and trusted forever. `null` (not yet checked) shows as "Connected" only when no
+  // `healthCheckUrl` was given at all, so existing callers keep their old behavior unless they opt
+  // into this — see the prop's own doc comment for why this couldn't just default to `db`.
+  const [apiReachable, setApiReachable] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!healthCheckUrl) return;
+    let cancelled = false;
+    const check = async () => {
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : undefined;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : undefined;
+      try {
+        // Any HTTP response at all (even a 404/401) proves the server is up and reachable - this
+        // does not need to be a dedicated health endpoint. Only a thrown exception (connection
+        // refused, DNS failure, timeout) means it genuinely isn't.
+        await fetch(healthCheckUrl, { method: 'GET', cache: 'no-store', signal: controller?.signal, mode: 'no-cors' });
+        if (!cancelled) setApiReachable(true);
+      } catch {
+        if (!cancelled) setApiReachable(false);
+      } finally {
+        if (timeoutId) clearTimeout(timeoutId);
+      }
+    };
+    void check();
+    const interval = setInterval(check, 10000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [healthCheckUrl]);
+
+  const apiBadgeConnected = healthCheckUrl ? apiReachable !== false : true;
 
   const defaultCapabilities: JamanvaarCapabilityItem[] = [
     { label: 'Fast Billing', icon: 'zap' },
@@ -130,10 +181,12 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
           {/* Local Core / Cloud API Status Badge */}
           <div className="flex items-center gap-2 bg-white border border-[#EBE6DD] px-3.5 py-1.5 rounded-full shadow-2xs">
             {/* The local relay needs a pairing no screen performs yet; once it refuses this browser, say so instead of "Connected" (BUG-156). */}
-            <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${appIdentity !== 'SUPER_ADMIN' && db.isLocalCoreUnauthorized() ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+            <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${!apiBadgeConnected ? 'bg-rose-500' : appIdentity !== 'SUPER_ADMIN' && isLocalCoreUnauthorized ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
             <span className="text-slate-600">
               {appIdentity === 'SUPER_ADMIN' ? 'Cloud API: ' : 'Local Core: '}
-              {appIdentity !== 'SUPER_ADMIN' && db.isLocalCoreUnauthorized() ? (
+              {!apiBadgeConnected ? (
+                <strong className="text-rose-700 font-extrabold">Unreachable</strong>
+              ) : appIdentity !== 'SUPER_ADMIN' && isLocalCoreUnauthorized ? (
                 <strong className="text-amber-700 font-extrabold">Not paired (cloud sync in use)</strong>
               ) : (
                 <strong className="text-emerald-700 font-extrabold">

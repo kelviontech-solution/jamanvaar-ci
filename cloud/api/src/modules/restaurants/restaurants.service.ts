@@ -10,6 +10,7 @@ import { ownerInviteEmail } from '../notifications/email-templates';
 import * as bcrypt from 'bcryptjs';
 import { EntitySyncService } from '../entity-sync/entity-sync.service';
 import { ImportMenuDto } from './dto/import-menu.dto';
+import { hasDevicesArea, PlatformRoleName, redactActivationCode } from '../../common/rbac/access';
 
 const ACTIVATION_TOKEN_TTL_DAYS = 7;
 
@@ -164,7 +165,18 @@ export class RestaurantsService {
     );
   }
 
-  async getRestaurantById(id: string) {
+  /**
+   * B2-053: this used to always embed `devices` (full rows, including each terminal's
+   * `deviceTokenHash`) and `activationKeys` (full, unredacted `code`) regardless of who was
+   * asking. The deny-by-default guard on this route only checks the `restaurants` area — which
+   * Finance, Support and Read-Only all have — so a caller explicitly refused 403 on the direct
+   * `/devices` and `/activation-keys` endpoints got the exact same data back anyway, just nested
+   * one level down. `actorRole` now gates both relations the same way the direct endpoints do
+   * (see `hasDevicesArea`), and any code included is redacted by the one shared rule
+   * (`redactActivationCode`) both this endpoint and `/activation-keys` agree on.
+   */
+  async getRestaurantById(id: string, actorRole: PlatformRoleName = 'READ_ONLY') {
+    const canSeeDevices = hasDevicesArea(actorRole);
     const restaurant = await this.prisma.runAsPlatform((tx) =>
       tx.restaurant.findFirst({
         where: { id, deletedAt: null },
@@ -187,9 +199,9 @@ export class RestaurantsService {
               updatedAt: true
             }
           },
-          devices: true,
+          devices: canSeeDevices,
           subscriptions: { orderBy: { createdAt: 'desc' }, include: { plan: true } },
-          activationKeys: { orderBy: { createdAt: 'desc' } }
+          activationKeys: canSeeDevices ? { orderBy: { createdAt: 'desc' } } : false
         }
       })
     );
@@ -197,7 +209,19 @@ export class RestaurantsService {
     if (!restaurant) {
       throw new NotFoundException('Restaurant not found');
     }
-    return restaurant;
+    if (!canSeeDevices) {
+      // Prisma still puts the keys on the object as `false`/omitted depending on relation
+      // shape; make the contract explicit rather than relying on that.
+      return { ...restaurant, devices: [], activationKeys: [] };
+    }
+    const now = new Date();
+    return {
+      ...restaurant,
+      // Never return deviceTokenHash (the stored hash of a terminal's own credential) to any
+      // client — same rule devices.service.ts's list()/getById()/revoke() already apply.
+      devices: (restaurant.devices ?? []).map((d) => ({ ...d, deviceTokenHash: undefined })),
+      activationKeys: (restaurant.activationKeys ?? []).map((k) => redactActivationCode(k, actorRole, now))
+    };
   }
 
   async update(id: string, dto: UpdateRestaurantDto, actor: PlatformUser) {

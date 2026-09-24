@@ -33,10 +33,10 @@ export const ManagerOverrideModal: React.FC = () => {
     setErrorMessage('');
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (pin.length !== 4) return;
 
-    const res = ManagerOverrideRepository.verifyPin(pin);
+    const res = await ManagerOverrideRepository.verifyPin(pin);
     if (res.success && res.isManager) {
       const managerName = res.user?.fullName || 'Manager';
       ManagerOverrideRepository.requestOverride({

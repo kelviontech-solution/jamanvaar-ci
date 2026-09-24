@@ -15,3 +15,15 @@ export const renameDeviceSchema = z.object({
   name: z.string().trim().min(1, 'Give the terminal a name').max(80)
 });
 export type RenameDeviceBody = z.infer<typeof renameDeviceSchema>;
+
+/** B2-054: Restaurant Admin's Settings save writing the restaurant's own identity back to the cloud. */
+export const restaurantIdentitySchema = z.object({
+  name: z.string().trim().min(1).max(200).optional(),
+  legalName: z.string().trim().max(200).nullable().optional(),
+  gstin: z.string().trim().max(20).nullable().optional(),
+  fssaiNumber: z.string().trim().max(20).nullable().optional(),
+  address: z.string().trim().max(300).nullable().optional(),
+  city: z.string().trim().max(100).nullable().optional(),
+  state: z.string().trim().max(100).nullable().optional()
+});
+export type RestaurantIdentityDto = z.infer<typeof restaurantIdentitySchema>;

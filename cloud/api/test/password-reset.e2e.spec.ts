@@ -109,6 +109,36 @@ describe('Restaurant user "forgot password" (BUG-142)', () => {
     expect(sent).toHaveLength(1);
   });
 
+  it('B2-047: does not wait for the mail server — a slow send must not slow the response, closing the timing side-channel that revealed which emails have accounts', async () => {
+    await clearCooldown();
+    sent = [];
+    const emailService = app.get(EmailService);
+    let settleSend!: () => void;
+    const sendSettled = new Promise<void>((resolve) => { settleSend = resolve; });
+    // Simulate a slow mail server (the real bug: SMTP round-trips took ~5.1s for a real account).
+    // mockImplementationOnce overrides only this one call — it self-reverts to beforeAll's fast
+    // mock afterward, so later tests are unaffected (mockRestore() would instead undo beforeAll's
+    // mock entirely, falling through to the real, unmocked EmailService).
+    vi.spyOn(emailService, 'send').mockImplementationOnce(async (to, subject, html) => {
+      await new Promise((r) => setTimeout(r, 400));
+      sent.push({ to, subject, html });
+      settleSend();
+      return true;
+    });
+
+    const t0 = Date.now();
+    const res = await forgot();
+    const elapsed = Date.now() - t0;
+
+    expect(res.status).toBe(200);
+    // The response must not have waited on the 400ms "mail server" — proves send() is
+    // fire-and-forget, not awaited in the request path.
+    expect(elapsed).toBeLessThan(200);
+
+    await sendSettled; // let the deliberately slow send actually finish before the test ends
+    expect(sent).toHaveLength(1);
+  });
+
   it('a successful reset signs the user out everywhere', async () => {
     sent = [];
     await clearCooldown();

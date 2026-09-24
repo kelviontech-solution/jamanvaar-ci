@@ -66,12 +66,12 @@ import {
   FoodReadyItem
 } from '@jamanvaar/types';
 import { getOrderTenders, splitsMatchTotal } from './tender';
-import { generateOrderNumber, generateTokenNumber, generateUUID } from '@jamanvaar/utils';
+import { generateOrderNumber, generateTokenNumber, generateUUID, normalizeIndianPhone, formatRestaurantDate, getRestaurantHour, getBusinessDayDisplayDate } from '@jamanvaar/utils';
 import { db } from './db';
 import { TableSync } from './table_sync';
 import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync } from './collection_sync';
 import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS, SEED_ROLES, SEED_RESTAURANT } from './seed';
-import { hashPin, verifyPinHash, generateUniquePin } from './pin';
+import { hashPin, verifyPinHash, generateUniquePin, pinFingerprint } from './pin';
 
 export class MenuRepository {
   /**
@@ -1185,8 +1185,20 @@ export class CouponRepository {
     return db.coupons.filter((c) => c.isActive);
   }
 
+  /**
+   * B2-064: previously returned any active coupon regardless of `usageCount`/`usageLimit` or
+   * `validFrom`/`validUntil` — those fields existed on the type and `incrementUsage` wrote to
+   * one of them, but nothing ever read them back, so a capped or expired coupon still redeemed
+   * forever. Now enforces both.
+   */
   public static getByCode(code: string): Coupon | undefined {
-    return db.coupons.find((c) => c.code.toUpperCase() === code.toUpperCase() && c.isActive);
+    const coupon = db.coupons.find((c) => c.code.toUpperCase() === code.toUpperCase() && c.isActive);
+    if (!coupon) return undefined;
+    const now = Date.now();
+    if (coupon.validFrom && now < new Date(coupon.validFrom).getTime()) return undefined;
+    if (coupon.validUntil && now > new Date(coupon.validUntil).getTime()) return undefined;
+    if (typeof coupon.usageLimit === 'number' && coupon.usageCount >= coupon.usageLimit) return undefined;
+    return coupon;
   }
 
   public static incrementUsage(code: string): void {
@@ -1338,8 +1350,15 @@ export class CustomerRepository {
     return db.customerAccounts.find((a) => a.phone === phone);
   }
 
+  // B2-043: matched by exact string, so "+91 92222 22223" (kiosk guest self-signup) and
+  // "9222222223" (the same guest, registered by a staff member in the CRM) became two separate
+  // accounts with two separate loyalty balances and two separate kiosk logins for one phone
+  // number. Normalising here — the shared lookup/creation choke point every caller (kiosk login,
+  // POS quick-add, the CRM) ultimately goes through — means every *new* record is keyed
+  // consistently, without having to fix every call site individually.
   public static getByPhone(phone: string): CustomerAccount | undefined {
-    return db.customerAccounts.find((a) => a.phone === phone);
+    const normalized = normalizeIndianPhone(phone);
+    return db.customerAccounts.find((a) => a.phone === phone || a.phone === normalized);
   }
 
   public static getOrCreate(phone: string, name?: string): CustomerAccount {
@@ -1347,10 +1366,11 @@ export class CustomerRepository {
   }
 
   public static getOrCreateAccount(phone: string, name?: string): CustomerAccount {
-    let account = db.customerAccounts.find((a) => a.phone === phone);
+    const normalized = normalizeIndianPhone(phone);
+    let account = db.customerAccounts.find((a) => a.phone === phone || a.phone === normalized);
     if (!account) {
       account = {
-        phone,
+        phone: normalized || phone,
         name: name || 'Valued Guest',
         loyaltyPoints: 50, // Welcome 50 points
         favoriteItemIds: [],
@@ -1385,7 +1405,11 @@ export class CustomerRepository {
   }
 
   public static createCustomer(cust: Partial<CustomerAccount> & { phone: string; name: string }): CustomerAccount {
-    const existing = db.customerAccounts.find((c) => c.phone === cust.phone);
+    // B2-043: match a normalized phone too (defense in depth — CustomerModal.tsx already
+    // normalizes before calling this, but any other caller passing a raw "+91 …" string must
+    // still find the same existing record, not create a duplicate).
+    const normalizedPhone = normalizeIndianPhone(cust.phone);
+    const existing = db.customerAccounts.find((c) => c.phone === cust.phone || c.phone === normalizedPhone);
     if (existing) {
       existing.name = cust.name || existing.name;
       if (cust.loyaltyPoints !== undefined) existing.loyaltyPoints = cust.loyaltyPoints;
@@ -1403,7 +1427,7 @@ export class CustomerRepository {
       return existing;
     }
     const newCust: CustomerAccount = {
-      phone: cust.phone,
+      phone: normalizedPhone || cust.phone,
       name: cust.name,
       email: cust.email,
       address: cust.address,
@@ -1992,6 +2016,15 @@ export class RestaurantIdentityRepository {
     db.restaurant.address = identity.address || '';
     db.restaurant.phone = identity.phone || '';
     db.restaurant.fssaiNumber = identity.fssaiNumber || '';
+    // B2-042: the cloud Restaurant record has no email/ownerName/managerName fields at all (checked
+    // the schema — nothing to adopt a real value from), but the local seed's demo placeholders
+    // ('hello@jamanvaar.com', 'Ramesh Patel', 'Pooja Shah') were surviving activation untouched and
+    // ending up as real-looking prepared-by/approved-by signatory names on EOD/Z reports. Same
+    // "blank rather than invent" treatment as gstin/address/phone above: there is no real value to
+    // adopt, so these go empty until the restaurant's own owner types a real one in Settings.
+    db.restaurant.email = '';
+    db.restaurant.ownerName = '';
+    db.restaurant.managerName = '';
     // The branch is the restaurant's own too: it used to stay the demo "Ahmedabad Flagship Store"
     // (with a demo code, address and phone) in every screen header (BUG-110). The id is kept so
     // tables and orders that point at it stay linked.
@@ -2170,6 +2203,11 @@ export class ShiftRepository {
 
     const newShift: ShiftRecord = {
       id: `shift-${Date.now()}`,
+      // B2-046: the header/shift views used to display `activeShift.id.slice(-2)` — the last two
+      // digits of this millisecond timestamp — as "Active Shift #58", which looks like a
+      // sequence number but is really just whatever the clock happened to read. This is a real
+      // count: this device's Nth shift ever opened, starting at #1 on a fresh restaurant.
+      shiftNumber: db.shifts.length + 1,
       posId,
       cashierId,
       cashierName,
@@ -2228,7 +2266,26 @@ export class ShiftRepository {
     return shift;
   }
 
-  public static addCashMovement(shiftId: string, type: 'CASH_IN' | 'CASH_OUT', amount: number, reason: string, cashierName: string, authorizedBy?: string): CashMovement {
+  /**
+   * B2-046: a Cash Out used to be applied unconditionally, with nothing checking it against what
+   * was actually in the drawer — a cashier could record taking out ₹9,000 against a ₹6,000
+   * drawer with no warning, no manager approval, and no "exceeds drawer" refusal, driving
+   * `expectedCash` negative. That negative expected figure then made the Close Shift variance
+   * ("counted − expected") look backwards — an empty drawer read as "+₹3,000 OVER" — even though
+   * that formula is arithmetically correct; the real bug was letting the input go negative in
+   * the first place. Capping Cash Out at the current drawer balance here means `expectedCash`
+   * can never go negative, so the variance calculation downstream never produces a nonsensical
+   * reading again — one root-cause fix instead of patching the display math separately.
+   * Returns null (nothing recorded, nothing mutated) on a rejected movement — never negative,
+   * never zero/blank, never CASH_OUT beyond the drawer's current expected cash — so the caller
+   * can show a real error instead of a silent no-op.
+   */
+  public static addCashMovement(shiftId: string, type: 'CASH_IN' | 'CASH_OUT', amount: number, reason: string, cashierName: string, authorizedBy?: string): CashMovement | null {
+    if (!Number.isFinite(amount) || amount <= 0) return null;
+    const shift = db.shifts.find((s) => s.id === shiftId);
+    if (!shift || shift.status !== 'OPEN') return null;
+    if (type === 'CASH_OUT' && amount > shift.expectedCash) return null;
+
     const movement: CashMovement = {
       id: `csh-${Date.now()}`,
       shiftId,
@@ -2242,13 +2299,10 @@ export class ShiftRepository {
 
     db.cashMovements.unshift(movement);
 
-    const shift = db.shifts.find((s) => s.id === shiftId);
-    if (shift) {
-      if (type === 'CASH_IN') {
-        shift.expectedCash += amount;
-      } else {
-        shift.expectedCash -= amount;
-      }
+    if (type === 'CASH_IN') {
+      shift.expectedCash += amount;
+    } else {
+      shift.expectedCash -= amount;
     }
 
     AuditRepository.log({
@@ -2560,8 +2614,8 @@ export class HeldOrderRepository {
 }
 
 export class ManagerOverrideRepository {
-  public static verifyPin(pin: string): { success: boolean; user?: User; isManager: boolean } {
-    const result = StaffRepository.verifyPin(pin);
+  public static async verifyPin(pin: string): Promise<{ success: boolean; user?: User; isManager: boolean }> {
+    const result = await StaffRepository.verifyPin(pin);
     if (!result) return { success: false, isManager: false };
     return { success: true, user: result.user, isManager: result.isManager };
   }
@@ -2761,7 +2815,38 @@ export class InventoryRepository {
     return db.inventoryItems.find((i) => i.id === id);
   }
 
-  public static createItem(data: Omit<InventoryItem, 'id' | 'updatedAt' | 'status'> & { id?: string }): InventoryItem {
+  /** A sane ceiling on a single stock item's quantity — anything past this is a data-entry mistake, not a real pantry. */
+  private static readonly MAX_STOCK_QUANTITY = 1_000_000;
+
+  /**
+   * B2-044: this used to accept anything — negative stock, negative or zero cost, a
+   * 1,000,000,000,000-unit quantity, and a duplicate SKU — with no check at all, either here or
+   * in the UI. Defense in depth: even if a future caller skips `InventoryModal.tsx`'s own
+   * pre-submit validation, corrupt data can't reach the database through this choke point.
+   * Returns null (nothing changed) on a rejected item rather than silently clamping the value,
+   * so the caller can show a real error instead of guessing what got changed.
+   *
+   * `currentStock < 0` is only rejected on **create** (`requireNonNegativeStock`): a brand-new
+   * item starting negative is always a data-entry mistake, but an *existing* item legitimately
+   * goes negative once it's been oversold — `InventoryRepository.recordMovement` (the real
+   * sale-deduction path, bypasses this method entirely) and `InventoryControl.getStockValuation`
+   * both treat a negative balance as a real, reportable state, not an error — confirmed by two
+   * existing tests in `tests/inventory_control.test.ts` that call `updateItem` with a negative
+   * `currentStock` on purpose to simulate exactly that. Blocking it here would have silently
+   * broken that intentional design instead of fixing a bug — caught by running the existing
+   * suite before, not after, calling this fix done.
+   */
+  private static validateItemInput(data: { currentStock: number; minStockLevel: number; costPerUnit: number; sku: string; excludeId?: string }, requireNonNegativeStock: boolean): boolean {
+    if (!Number.isFinite(data.currentStock) || data.currentStock > this.MAX_STOCK_QUANTITY) return false;
+    if (requireNonNegativeStock && data.currentStock < 0) return false;
+    if (!Number.isFinite(data.minStockLevel) || data.minStockLevel < 0) return false;
+    if (!Number.isFinite(data.costPerUnit) || data.costPerUnit < 0) return false;
+    if (data.sku && db.inventoryItems.some((i) => i.sku === data.sku && i.id !== data.excludeId)) return false;
+    return true;
+  }
+
+  public static createItem(data: Omit<InventoryItem, 'id' | 'updatedAt' | 'status'> & { id?: string }): InventoryItem | null {
+    if (!this.validateItemInput(data, true)) return null;
     const newItem: InventoryItem = {
       id: data.id || uniqueStockId('inv'),
       name: data.name,
@@ -2791,6 +2876,13 @@ export class InventoryRepository {
   public static updateItem(id: string, updates: Partial<InventoryItem>): InventoryItem | null {
     const item = db.inventoryItems.find((i) => i.id === id);
     if (!item) return null;
+    // B2-044: validate the resulting merged state, not just whichever fields this particular
+    // call happens to touch — editing only the supplier name must not be a backdoor around the
+    // stock/cost/SKU checks a full edit would have gone through.
+    const merged = { ...item, ...updates };
+    if (!this.validateItemInput({ currentStock: merged.currentStock, minStockLevel: merged.minStockLevel, costPerUnit: merged.costPerUnit, sku: merged.sku, excludeId: id }, false)) {
+      return null;
+    }
     Object.assign(item, updates);
     if (typeof updates.currentStock === 'number') {
       item.status = item.currentStock <= 0 ? 'OUT_OF_STOCK' : item.currentStock <= item.minStockLevel ? 'LOW_STOCK' : 'IN_STOCK';
@@ -3138,12 +3230,15 @@ export class StaffRepository {
    * stored only as a hash (see pin.ts), and returned once on `issuedPin` so the screen that
    * created the account can show/print it. It is not persisted anywhere in plaintext.
    */
-  public static createUser(
+  public static async createUser(
     userData: Partial<User> & { username: string; fullName: string; roleId: string; email?: string }
-  ): User & { issuedPin?: string } {
+  ): Promise<User & { issuedPin?: string }> {
     const restaurantId = userData.restaurantId || db.restaurant.id;
-    const pin = generateUniquePin(restaurantId, db.users.map((u) => (u as User & { pinHash?: string }).pinHash).filter((h): h is string => !!h));
-    const newUser: User & { pinHash: string } = {
+    const existingFingerprints = db.users
+      .map((u) => (u as User & { pinFingerprint?: string }).pinFingerprint)
+      .filter((f): f is string => !!f);
+    const pin = generateUniquePin(restaurantId, existingFingerprints);
+    const newUser: User & { pinHash: string; pinFingerprint: string } = {
       id: userData.id || `usr-${Date.now()}`,
       restaurantId,
       username: userData.username.toLowerCase().replace(/\s+/g, ''),
@@ -3153,7 +3248,8 @@ export class StaffRepository {
       phone: userData.phone || '',
       roleId: userData.roleId,
       isActive: userData.isActive ?? true,
-      pinHash: hashPin(pin, restaurantId),
+      pinHash: await hashPin(pin, restaurantId),
+      pinFingerprint: pinFingerprint(pin, restaurantId),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -3169,15 +3265,20 @@ export class StaffRepository {
   }
 
   /** Issues a fresh PIN for an existing staff member and invalidates the old one, once. */
-  public static resetPin(id: string): (User & { issuedPin: string }) | null {
+  public static async resetPin(id: string): Promise<(User & { issuedPin: string }) | null> {
     const idx = db.users.findIndex((u) => u.id === id);
     if (idx === -1) return null;
     const restaurantId = db.users[idx].restaurantId || db.restaurant.id;
-    const pin = generateUniquePin(
-      restaurantId,
-      db.users.map((u) => (u as User & { pinHash?: string }).pinHash).filter((h): h is string => !!h)
-    );
-    db.users[idx] = { ...db.users[idx], pinHash: hashPin(pin, restaurantId), updatedAt: new Date().toISOString() } as User;
+    const existingFingerprints = db.users
+      .map((u) => (u as User & { pinFingerprint?: string }).pinFingerprint)
+      .filter((f): f is string => !!f);
+    const pin = generateUniquePin(restaurantId, existingFingerprints);
+    db.users[idx] = {
+      ...db.users[idx],
+      pinHash: await hashPin(pin, restaurantId),
+      pinFingerprint: pinFingerprint(pin, restaurantId),
+      updatedAt: new Date().toISOString()
+    } as User;
     AuditRepository.log({
       action: 'STAFF_PIN_RESET',
       category: 'STAFF',
@@ -3190,13 +3291,17 @@ export class StaffRepository {
 
   /**
    * The one place every login surface (POS, Captain, KDS, Kiosk, manager override) verifies a
-   * PIN. Centralised so none of them compare a PIN to `User.pinHash` directly.
+   * PIN. Centralised so none of them compare a PIN to `User.pinHash` directly. Checks every
+   * active user's hash concurrently (PBKDF2 is deliberately slow per B2-014 — sequential
+   * `await`s here would multiply that cost by staff count) and returns whichever one matches.
    */
-  public static verifyPin(pin: string, restaurantId?: string): { user: User; isManager: boolean } | null {
+  public static async verifyPin(pin: string, restaurantId?: string): Promise<{ user: User; isManager: boolean } | null> {
     const scopedRestaurantId = restaurantId || db.restaurant.id;
-    const user = (db.users as (User & { pinHash?: string })[]).find(
-      (u) => u.isActive && verifyPinHash(pin, u.restaurantId || scopedRestaurantId, u.pinHash)
+    const activeUsers = (db.users as (User & { pinHash?: string })[]).filter((u) => u.isActive);
+    const matches = await Promise.all(
+      activeUsers.map((u) => verifyPinHash(pin, u.restaurantId || scopedRestaurantId, u.pinHash))
     );
+    const user = activeUsers[matches.findIndex(Boolean)];
     if (!user) return null;
     const isManager = user.roleId === 'role-manager' || user.roleId === 'role-super-admin';
     return { user, isManager };
@@ -3500,19 +3605,31 @@ export class BusinessDayRepository {
   /**
    * Calculates the canonical restaurant business date with 5:00 AM cutoff
    */
+  /**
+   * B2-017: this used to read `date.getHours()`/`getDate()`/`getMonth()`/`getFullYear()` — the
+   * *device's own* system clock/timezone, not the restaurant's. Two devices with different OS
+   * timezone settings (or a server running in UTC) computed different business-day ids for the
+   * exact same real-world moment, so one screen's "today" excluded an order another screen's
+   * "today" included. Every other business-date computation in this codebase already goes through
+   * `formatRestaurantDate`/`Intl.DateTimeFormat` pinned to Asia/Kolkata (see B2-013) — this is now
+   * the same, so every device agrees on which business day a given instant belongs to.
+   */
   public static getCanonicalBusinessDate(date: Date = new Date()): { dateKey: string; dayId: string; displayDate: string } {
-    const adjusted = new Date(date);
-    // Restaurant shifts before 5:00 AM belong to yesterday's business day
-    if (adjusted.getHours() < 5) {
-      adjusted.setDate(adjusted.getDate() - 1);
+    // A record with a missing/malformed createdAt must not crash a business-day computation —
+    // `Intl.DateTimeFormat` throws on an invalid date where the old raw `Date` getters just
+    // produced NaN/"Invalid Date" harmlessly; keep that same lenient, non-throwing behavior.
+    if (isNaN(date.getTime())) {
+      return { dateKey: 'Invalid Date', dayId: 'BD-InvalidDate', displayDate: 'Invalid Date' };
     }
-    const yyyy = adjusted.getFullYear();
-    const mm = String(adjusted.getMonth() + 1).padStart(2, '0');
-    const dd = String(adjusted.getDate()).padStart(2, '0');
+    // Restaurant shifts before 5:00 AM (the restaurant's own local time) belong to yesterday's
+    // business day. Going back a fixed 24h in absolute time — rather than mutating a local Date's
+    // day-of-month — keeps this correct regardless of the device's own timezone or DST rules.
+    const effective = getRestaurantHour(date) < 5 ? new Date(date.getTime() - 24 * 60 * 60 * 1000) : date;
+    const dateKey = formatRestaurantDate(effective, 'ISO_DATE');
     return {
-      dateKey: `${yyyy}-${mm}-${dd}`,
-      dayId: `BD-${yyyy}${mm}${dd}`,
-      displayDate: adjusted.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+      dateKey,
+      dayId: `BD-${dateKey.replace(/-/g, '')}`,
+      displayDate: getBusinessDayDisplayDate(effective)
     };
   }
 

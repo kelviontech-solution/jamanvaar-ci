@@ -159,7 +159,10 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
           <button
             type="button"
             onClick={() => onDeliverFood(table)}
-            className="w-full min-h-[46px] py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2 animate-bounce"
+            // B2-020: animate-bounce (Tailwind's infinite bounce) never stopped, making the
+            // button's own tap target visually move on a real tablet — the emerald color, shadow
+            // and flame icon already signal urgency without a moving target.
+            className="w-full min-h-[46px] py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
           >
             <Flame className="w-4 h-4 fill-white" />
             <span>DELIVER FOOD ({foodReadyCount})</span>

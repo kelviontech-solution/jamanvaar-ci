@@ -1,5 +1,5 @@
 import { Order } from '@jamanvaar/types';
-import { formatDate, formatTime, formatINR } from '@jamanvaar/utils';
+import { formatDate, formatTime, formatINR, toCsvRow } from '@jamanvaar/utils';
 import { db } from '@jamanvaar/database';
 import {
   ReportSummaryMetrics,
@@ -40,34 +40,37 @@ export class ReportExportService {
       'Captain / Cashier'
     ];
 
+    // B2-061: customer name/phone (guest-entered, and B2-043 confirmed the phone field accepts
+    // arbitrary text) is exported without any defense against CSV/formula injection. toCsvRow
+    // sanitizes every field, not just the two that had a manual quote-escape before.
     const rows = orders.map((o) => [
-      `"${o.orderNumber || ''}"`,
-      `"${o.tokenNumber || ''}"`,
-      `"${formatDate(new Date(o.createdAt))}"`,
-      `"${formatTime(new Date(o.createdAt))}"`,
-      `"${o.orderType || ''}"`,
-      `"${o.tableNumber || '-'}"`,
-      `"${(o.customerName || '').replace(/"/g, '""')}"`,
-      `"${o.customerPhone || ''}"`,
-      `"${o.items?.length || 0}"`,
-      `"${o.subtotal || 0}"`,
-      `"${o.discountAmount || 0}"`,
-      `"${o.cgstAmount || 0}"`,
-      `"${o.sgstAmount || 0}"`,
-      `"${o.totalAmount || 0}"`,
-      `"${o.paymentMethod || ''}"`,
-      `"${o.paymentStatus || ''}"`,
-      `"${(o.captainName || o.cashierName || 'Cashier').replace(/"/g, '""')}"`
+      o.orderNumber || '',
+      o.tokenNumber || '',
+      formatDate(new Date(o.createdAt)),
+      formatTime(new Date(o.createdAt)),
+      o.orderType || '',
+      o.tableNumber || '-',
+      o.customerName || '',
+      o.customerPhone || '',
+      o.items?.length || 0,
+      o.subtotal || 0,
+      o.discountAmount || 0,
+      o.cgstAmount || 0,
+      o.sgstAmount || 0,
+      o.totalAmount || 0,
+      o.paymentMethod || '',
+      o.paymentStatus || '',
+      o.captainName || o.cashierName || 'Cashier'
     ]);
 
     const csvContent = [
-      `"JAMANVAAR RESTAURANT — ${title.toUpperCase()}"`,
-      `"Generated At: ${formatDate(new Date())} ${formatTime(new Date())}"`,
-      `"Total Orders: ${orders.length}"`,
+      toCsvRow([`JAMANVAAR RESTAURANT — ${title.toUpperCase()}`]),
+      toCsvRow([`Generated At: ${formatDate(new Date())} ${formatTime(new Date())}`]),
+      toCsvRow([`Total Orders: ${orders.length}`]),
       '',
-      headers.join(','),
-      ...rows.map((r) => r.join(','))
-    ].join('\n');
+      toCsvRow(headers),
+      ...rows.map(toCsvRow)
+    ].join('\r\n');
 
     this.downloadFile(csvContent, `jamanvaar_${title.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
   }
@@ -77,26 +80,15 @@ export class ReportExportService {
    */
   public static exportDayByDayCsv(days: DayRow[]): void {
     const headers = ['Date', 'Orders Count', 'Gross Sales (₹)', 'Discounts (₹)', 'GST Tax (₹)', 'Total Billed incl. GST (₹)', 'Cash (₹)', 'UPI (₹)', 'Card (₹)', 'AOV (₹)'];
-    const rows = days.map((d) => [
-      `"${d.displayDate}"`,
-      `"${d.ordersCount}"`,
-      `"${d.grossSales}"`,
-      `"${d.discount}"`,
-      `"${d.tax}"`,
-      `"${d.netSales}"`,
-      `"${d.cash}"`,
-      `"${d.upi}"`,
-      `"${d.card}"`,
-      `"${d.avgOrderValue}"`
-    ]);
+    const rows = days.map((d) => [d.displayDate, d.ordersCount, d.grossSales, d.discount, d.tax, d.netSales, d.cash, d.upi, d.card, d.avgOrderValue]);
 
     const csv = [
-      `"JAMANVAAR — DAY-BY-DAY AUDIT MATRIX"`,
-      `"Generated At: ${formatDate(new Date())}"`,
+      toCsvRow(['JAMANVAAR — DAY-BY-DAY AUDIT MATRIX']),
+      toCsvRow([`Generated At: ${formatDate(new Date())}`]),
       '',
-      headers.join(','),
-      ...rows.map((r) => r.join(','))
-    ].join('\n');
+      toCsvRow(headers),
+      ...rows.map(toCsvRow)
+    ].join('\r\n');
 
     this.downloadFile(csv, `jamanvaar_day_by_day_ledger_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
   }
@@ -106,26 +98,28 @@ export class ReportExportService {
    */
   public static exportDishesCsv(dishes: DishPerformanceRow[]): void {
     const headers = ['Rank', 'Dish Name', 'SKU', 'Category', 'Quantity Sold', 'Gross Revenue (₹)', 'Avg Selling Price (₹)', 'Revenue Share %', 'Est. Food Cost (₹)', 'Gross Margin %'];
+    // B2-061: dish name is free text (B2-039 confirmed no length/character limit) exported
+    // without any defense against CSV/formula injection before this fix.
     const rows = dishes.map((d, idx) => [
-      `"#${idx + 1}"`,
-      `"${d.name.replace(/"/g, '""')}"`,
-      `"${d.sku}"`,
-      `"${d.categoryName}"`,
-      `"${d.quantitySold}"`,
-      `"${d.grossRevenue}"`,
-      `"${d.avgSellingPrice}"`,
-      `"${d.revenueSharePercent}%"`,
-      `"${d.foodCostEstimate}"`,
-      `"${d.grossMarginPercent}%"`
+      `#${idx + 1}`,
+      d.name,
+      d.sku,
+      d.categoryName,
+      d.quantitySold,
+      d.grossRevenue,
+      d.avgSellingPrice,
+      `${d.revenueSharePercent}%`,
+      d.foodCostEstimate,
+      `${d.grossMarginPercent}%`
     ]);
 
     const csv = [
-      `"JAMANVAAR — PRODUCT & MENU PERFORMANCE REPORT"`,
-      `"Generated At: ${formatDate(new Date())}"`,
+      toCsvRow(['JAMANVAAR — PRODUCT & MENU PERFORMANCE REPORT']),
+      toCsvRow([`Generated At: ${formatDate(new Date())}`]),
       '',
-      headers.join(','),
-      ...rows.map((r) => r.join(','))
-    ].join('\n');
+      toCsvRow(headers),
+      ...rows.map(toCsvRow)
+    ].join('\r\n');
 
     this.downloadFile(csv, `jamanvaar_dish_performance_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
   }
@@ -135,23 +129,16 @@ export class ReportExportService {
    */
   public static exportGstCsv(gstRows: GstTaxBreakdownRow[]): void {
     const headers = ['Tax Rate %', 'Invoices Count', 'Taxable Amount (₹)', 'CGST (2.5%) (₹)', 'SGST (2.5%) (₹)', 'Total GST (5%) (₹)'];
-    const rows = gstRows.map((g) => [
-      `"${g.taxRatePercent}%"`,
-      `"${g.invoicesCount}"`,
-      `"${g.taxableAmount}"`,
-      `"${g.cgstAmount}"`,
-      `"${g.sgstAmount}"`,
-      `"${g.totalTax}"`
-    ]);
+    const rows = gstRows.map((g) => [`${g.taxRatePercent}%`, g.invoicesCount, g.taxableAmount, g.cgstAmount, g.sgstAmount, g.totalTax]);
 
     const csv = [
-      `"JAMANVAAR — GST TAX FILING & AUDIT REPORT"`,
-      `"Generated At: ${formatDate(new Date())}"`,
-      `"GSTIN: ${db.restaurant.gstin || 'not registered'}"`,
+      toCsvRow(['JAMANVAAR — GST TAX FILING & AUDIT REPORT']),
+      toCsvRow([`Generated At: ${formatDate(new Date())}`]),
+      toCsvRow([`GSTIN: ${db.restaurant.gstin || 'not registered'}`]),
       '',
-      headers.join(','),
-      ...rows.map((r) => r.join(','))
-    ].join('\n');
+      toCsvRow(headers),
+      ...rows.map(toCsvRow)
+    ].join('\r\n');
 
     this.downloadFile(csv, `jamanvaar_gst_audit_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
   }

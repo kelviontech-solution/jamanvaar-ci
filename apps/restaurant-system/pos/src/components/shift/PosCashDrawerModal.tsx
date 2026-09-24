@@ -16,23 +16,41 @@ export const PosCashDrawerModal: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
   const [feedback, setFeedback] = useState('');
+  const [error, setError] = useState('');
 
   if (!isCashDrawerModalOpen) return null;
 
   const currentShift = ShiftRepository.getActiveShift();
 
+  // B2-046: this dialog used to just `return` on an invalid amount/reason/no-shift, leaving the
+  // cashier staring at a form that silently did nothing. Every rejection now has a real message,
+  // and Cash Out is checked against the drawer's own current balance before it is even
+  // attempted — the repository (ShiftRepository.addCashMovement) enforces the same limit itself
+  // and returns null if this check is ever bypassed, so the drawer can never go negative either way.
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     const amt = parseFloat(amount) || 0;
-    if (amt <= 0 || !reason.trim() || !currentShift) return;
 
-    ShiftRepository.addCashMovement(
+    if (!currentShift) { setError('No shift is open — open a shift before recording a cash movement.'); return; }
+    if (amt <= 0) { setError('Enter an amount greater than ₹0.'); return; }
+    if (!reason.trim()) { setError('Enter a reason for this movement.'); return; }
+    if (type === 'CASH_OUT' && amt > currentShift.expectedCash) {
+      setError(`Cash Out of ₹${amt} exceeds the drawer's current balance of ₹${currentShift.expectedCash}.`);
+      return;
+    }
+
+    const recorded = ShiftRepository.addCashMovement(
       currentShift.id,
       type,
       amt,
       reason.trim(),
       currentUser?.fullName || 'Cashier'
     );
+    if (!recorded) {
+      setError('Could not record this movement — the shift may have closed or the amount now exceeds the drawer balance. Refresh and try again.');
+      return;
+    }
 
     setFeedback(`Recorded ${type === 'CASH_IN' ? 'Cash In' : 'Cash Out'} of ₹${amt}!`);
     setTimeout(() => {
@@ -68,6 +86,11 @@ export const PosCashDrawerModal: React.FC = () => {
         {feedback && (
           <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-bold text-center border-b border-emerald-200">
             ✓ {feedback}
+          </div>
+        )}
+        {error && (
+          <div className="p-3 bg-rose-50 text-rose-800 text-xs font-bold text-center border-b border-rose-200">
+            {error}
           </div>
         )}
 

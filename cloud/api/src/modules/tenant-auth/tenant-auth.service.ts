@@ -262,16 +262,51 @@ export class TenantAuthService {
       });
     });
 
+    const now = new Date();
     let matchedUser: (typeof candidates)[0] | null = null;
+    let sawLockedCandidate = false;
+    const triedButWrong: (typeof candidates)[0][] = [];
     for (const cand of candidates) {
-      if (cand.passwordHash && (await bcrypt.compare(password, cand.passwordHash))) {
+      if (!cand.passwordHash) continue;
+      if (cand.lockedUntil && cand.lockedUntil > now) {
+        // Locked — don't spend a bcrypt compare on it, and it can't match while locked anyway.
+        sawLockedCandidate = true;
+        continue;
+      }
+      if (await bcrypt.compare(password, cand.passwordHash)) {
         matchedUser = cand;
         break;
       }
+      triedButWrong.push(cand);
     }
 
-    if (!matchedUser || !matchedUser.passwordHash || matchedUser.status !== TenantUserStatus.ACTIVE) {
+    if (!matchedUser || matchedUser.status !== TenantUserStatus.ACTIVE) {
+      // B2-030: every candidate whose password was actually checked and was wrong gets its
+      // counter bumped; enough in a row locks that account regardless of IP or how the
+      // attempts were spread out.
+      for (const cand of triedButWrong) {
+        const attempts = cand.failedLoginAttempts + 1;
+        const locked = attempts >= TenantAuthService.LOGIN_MAX_ATTEMPTS;
+        await this.prisma.runAsPlatform((tx) =>
+          tx.user.update({
+            where: { id: cand.id },
+            data: {
+              failedLoginAttempts: attempts,
+              lockedUntil: locked ? new Date(now.getTime() + TenantAuthService.LOGIN_LOCKOUT_MINUTES * 60_000) : cand.lockedUntil
+            }
+          })
+        );
+      }
+      if (sawLockedCandidate || triedButWrong.some((c) => c.failedLoginAttempts + 1 >= TenantAuthService.LOGIN_MAX_ATTEMPTS)) {
+        throw new UnauthorizedException(`Too many failed attempts. Try again in ${TenantAuthService.LOGIN_LOCKOUT_MINUTES} minutes.`);
+      }
       throw new UnauthorizedException('Invalid email or password');
+    }
+
+    if (matchedUser.failedLoginAttempts > 0 || matchedUser.lockedUntil) {
+      await this.prisma.runAsPlatform((tx) =>
+        tx.user.update({ where: { id: matchedUser!.id }, data: { failedLoginAttempts: 0, lockedUntil: null } })
+      );
     }
 
     if (matchedUser.restaurant.status !== 'ACTIVE' || matchedUser.restaurant.deletedAt !== null) {
@@ -802,6 +837,17 @@ export class TenantAuthService {
   private static readonly RESET_RESEND_SECONDS = 60;
 
   /**
+   * B2-030: per-account login lockout. Independent of the global per-IP throttle (which stays
+   * as a separate defense against request-flooding, not credential guessing) — a wrong password
+   * increments this account's own counter, and 10 in a row locks it for 15 minutes, no matter
+   * which IP(s) the attempts came from. This is what actually stops a guesser; the IP throttle
+   * alone let 25+ wrong passwords through in a row and, worse, could lock the real owner out
+   * once an attacker's flood tripped it.
+   */
+  private static readonly LOGIN_MAX_ATTEMPTS = 10;
+  private static readonly LOGIN_LOCKOUT_MINUTES = 15;
+
+  /**
    * "Forgot password" step 1 (BUG-142). Emails a 6-digit one-time code to an active user. It always answers the
    * same way, whether or not the address belongs to a user, so it cannot be used to find out who has an account.
    * Only a hash of the code is stored; asking again within a minute is ignored.
@@ -831,12 +877,16 @@ export class TenantAuthService {
     });
     if (!found) return;
 
-    try {
-      const mail = passwordResetOtpEmail({ fullName: found.user.fullName, otp: found.otp, minutesValid: TenantAuthService.RESET_CODE_MINUTES });
-      await this.email.send(found.user.email, mail.subject, mail.html);
-    } catch {
+    // B2-047: this used to `await` the SMTP round trip inside the request — 5.1s for a real
+    // account (mail actually sent) vs 0.01s for one that doesn't exist (nothing to send),
+    // a ~400x timing difference that let an attacker enumerate every valid email at a
+    // restaurant just by timing requests, despite both paths returning the identical generic
+    // message. Firing the send without awaiting it means both paths now return as soon as the
+    // (comparably fast) database write finishes, regardless of how slow the mail server is.
+    const mail = passwordResetOtpEmail({ fullName: found.user.fullName, otp: found.otp, minutesValid: TenantAuthService.RESET_CODE_MINUTES });
+    void this.email.send(found.user.email, mail.subject, mail.html).catch(() => {
       // A mail server problem must not reveal anything to the caller; the code simply never arrives and they can ask again.
-    }
+    });
   }
 
   /**

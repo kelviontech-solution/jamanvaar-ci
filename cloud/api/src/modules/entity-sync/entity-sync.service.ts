@@ -11,12 +11,16 @@ const CATCH_UP_MAX_ROWS = 500;
  * in here too (BUG-149): a device holding an old copy of a dish, or a dish someone deleted, must not overwrite
  * the newer edit or bring the deleted record back.
  */
-const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'COMBO', 'COUPON', 'CUSTOMER']);
+const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'COMBO', 'COUPON', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT']);
 
 function changedAt(payload: unknown): number {
   const value = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).updatedAt : undefined;
   const ms = typeof value === 'string' ? Date.parse(value) : NaN;
   return Number.isNaN(ms) ? 0 : ms;
+}
+
+function isDeleted(payload: unknown): boolean {
+  return !!(payload && typeof payload === 'object' && (payload as Record<string, unknown>).deleted === true);
 }
 
 export interface EntitySyncPushResult {
@@ -66,9 +70,27 @@ export class EntitySyncService {
             }
           });
 
-          if (existing && LAST_CHANGE_WINS_TYPES.has(entityType) && changedAt(evt.payload) < changedAt(existing.payload)) {
-            results.push({ externalId: evt.externalId, status: 'ok', syncVersion: existing.syncVersion });
-            continue;
+          if (existing && LAST_CHANGE_WINS_TYPES.has(entityType)) {
+            const existingDeleted = isDeleted(existing.payload);
+            const incomingDeleted = isDeleted(evt.payload);
+            // B2-038: a tombstone is sticky. Comparing `payload.updatedAt` alone let a device that
+            // hadn't yet learned of a deletion re-push its still-live copy with a timestamp that,
+            // under ordinary sync-tick/network timing, can land newer than the tombstone's own
+            // (each device stamps `updatedAt` with its own local clock at its own tick cadence) -
+            // overwriting the deletion in the DB, which then fanned the "revived" dish back out to
+            // every other device on their next pull. Once an entity is tombstoned here, no incoming
+            // live payload can ever undo that through this generic last-write-wins path, no matter
+            // its timestamp - only another deletion event (idempotent) is accepted. Bringing a dish
+            // back is a new create (a new externalId) through the normal Add Dish flow, never an
+            // implicit resurrection of an old one.
+            if (existingDeleted && !incomingDeleted) {
+              results.push({ externalId: evt.externalId, status: 'ok', syncVersion: existing.syncVersion });
+              continue;
+            }
+            if (changedAt(evt.payload) < changedAt(existing.payload)) {
+              results.push({ externalId: evt.externalId, status: 'ok', syncVersion: existing.syncVersion });
+              continue;
+            }
           }
 
           const saved = existing
@@ -104,9 +126,12 @@ export class EntitySyncService {
   async catchUpForRestaurant(restaurantId: string, entityType: SyncableEntityType, since?: string) {
     const sinceDate = since ? new Date(since) : new Date(Date.now() - CATCH_UP_DEFAULT_LOOKBACK_MS);
 
+    // B2-029: same missing-filter bug as order-sync.service.ts — this returned every
+    // restaurant's entities (menu items, customers, staff PIN hashes) to any device.
+    // Explicit filter here is defense in depth on top of RLS.
     const entities = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.syncedEntity.findMany({
-        where: { entityType, updatedAt: { gt: sinceDate } },
+        where: { restaurantId, entityType, updatedAt: { gt: sinceDate } },
         orderBy: { updatedAt: 'asc' },
         take: CATCH_UP_MAX_ROWS
       })

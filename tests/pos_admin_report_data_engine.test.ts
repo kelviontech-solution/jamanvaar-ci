@@ -1,7 +1,43 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db, BusinessDayRepository, KOTRepository } from '@jamanvaar/database';
+import { db, BusinessDayRepository, KOTRepository, OrderRepository } from '@jamanvaar/database';
 import { ReportDataEngine, ReportDateRange } from '../apps/restaurant-system/pos-admin/src/components/reports/reportDataEngine';
 import { Order, KOTItem } from '@jamanvaar/types';
+
+/**
+ * B2-041: this report engine's own getOrders() only ever excluded CANCELLED orders — an order
+ * only sent to the kitchen, or a kiosk checkout the guest walked away from, counted as a
+ * "completed transaction" and as cash/UPI collected in Reports & Analytics (and the PDF/CSV an
+ * owner files or sends to an accountant), even though the exact same defect (BUG-151) was
+ * already fixed on the Dashboard and Payments & Split pages.
+ */
+describe('ReportDataEngine.getOrders() excludes unpaid orders, not just cancelled ones (B2-041)', () => {
+  beforeEach(() => db.resetToDefaultSeed());
+
+  const rangeCoveringNow = (): ReportDateRange => ({
+    startDate: new Date(Date.now() - 60 * 60 * 1000),
+    endDate: new Date(Date.now() + 60 * 60 * 1000),
+    preset: 'TODAY',
+    label: 'Today'
+  });
+
+  it('leaves a KOT-only (unpaid) order out of the report, but keeps a paid one', () => {
+    const item = { id: 'i1', orderId: '', menuItemId: 'm1', name: 'Paneer', quantity: 1, unitPrice: 280, modifiers: [], totalPrice: 280, kitchenStatus: 'PENDING' as const };
+    const paid = OrderRepository.createOrder({
+      idempotencyKey: `k-${Math.random()}`, orderType: 'DINE_IN', items: [{ ...item }],
+      subtotal: 280, cgstAmount: 7, sgstAmount: 7, taxAmount: 14, totalAmount: 294,
+      paymentMethod: 'CASH', orderStatus: 'COMPLETED', paymentStatus: 'SUCCESS'
+    } as Partial<Order>);
+    const unpaid = OrderRepository.createOrder({
+      idempotencyKey: `k-${Math.random()}`, orderType: 'DINE_IN', items: [{ ...item, id: 'i2' }],
+      subtotal: 280, cgstAmount: 7, sgstAmount: 7, taxAmount: 14, totalAmount: 294,
+      paymentMethod: 'CASH', orderStatus: 'PREPARING', paymentStatus: 'PENDING'
+    } as Partial<Order>);
+
+    const orders = ReportDataEngine.getOrders(rangeCoveringNow());
+    expect(orders.some((o) => o.id === paid.id)).toBe(true);
+    expect(orders.some((o) => o.id === unpaid.id)).toBe(false);
+  });
+});
 
 /**
  * Covers two report-preview functions that used to fabricate their numbers:

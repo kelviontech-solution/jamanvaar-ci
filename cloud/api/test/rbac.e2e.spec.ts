@@ -152,4 +152,53 @@ describe('Platform RBAC (BUG-082/083/084)', () => {
     expect([403, 401]).toContain(removeSecondLast.status); // the demoted user is no longer an owner, and the last owner is protected
     await prisma.platformUser.deleteMany({ where: { id: second.id } });
   });
+
+  /**
+   * B2-051/B2-053: a role refused 403 on the direct /devices and /activation-keys endpoints
+   * used to get the exact same data back anyway, nested inside GET /restaurants/:id — the guard
+   * only checks the `restaurants` area that endpoint belongs to, not the `devices` area the
+   * embedded relations actually need. And even a role that IS allowed to see activation keys
+   * (Read-Only, Support Admin — both only `devices: 'read'`) got a live, usable code back in
+   * full, on both endpoints, because nothing masked by role, only by the key's own status.
+   */
+  it("B2-051/B2-053: an activation code and a device's credential hash are never leaked to a role that shouldn't see them, on either endpoint", async () => {
+    const restaurant = await prisma.restaurant.create({ data: { name: `TEST B2-053 ${stamp}`, status: 'ACTIVE' } });
+    createdRestaurantIds.push(restaurant.id);
+    const device = await prisma.device.create({
+      data: { restaurantId: restaurant.id, type: 'POS', status: 'ACTIVE', deviceTokenHash: 'sha256-fake-secret-for-test' }
+    });
+    const key = await prisma.activationKey.create({
+      data: { restaurantId: restaurant.id, code: 'JMV-B2053-TEST-0001', status: 'ACTIVE', allowedDeviceType: 'POS', expiresAt: new Date(Date.now() + 86400000) }
+    });
+
+    // Finance: refused 403 directly, and the nested restaurant response must not carry the data either.
+    expect((await as('FINANCE_ADMIN', 'get', `/api/v1/devices?restaurantId=${restaurant.id}`)).status).toBe(403);
+    expect((await as('FINANCE_ADMIN', 'get', `/api/v1/activation-keys?restaurantId=${restaurant.id}`)).status).toBe(403);
+    const financeNested = await as('FINANCE_ADMIN', 'get', `/api/v1/restaurants/${restaurant.id}`);
+    expect(financeNested.status).toBe(200);
+    expect(financeNested.body.devices).toEqual([]);
+    expect(financeNested.body.activationKeys).toEqual([]);
+
+    // Read-Only: has devices:read, so the relations ARE present, but never a usable code or the token hash.
+    const roNested = await as('READ_ONLY', 'get', `/api/v1/restaurants/${restaurant.id}`);
+    expect(roNested.status).toBe(200);
+    expect(roNested.body.devices[0].deviceTokenHash).toBeUndefined();
+    expect(roNested.body.activationKeys[0].code).toBeNull();
+    expect(roNested.body.activationKeys[0].codeLast4).toBe('0001');
+
+    const roDirect = await as('READ_ONLY', 'get', `/api/v1/activation-keys?restaurantId=${restaurant.id}`);
+    expect(roDirect.body[0].code).toBeNull();
+    const roDetail = await as('READ_ONLY', 'get', `/api/v1/activation-keys/${key.id}`);
+    expect(roDetail.body.code).toBeNull();
+
+    // Owner: full write access to devices, sees the real code — but never the token hash, which no client needs, ever.
+    const ownerNested = await as('PLATFORM_OWNER', 'get', `/api/v1/restaurants/${restaurant.id}`);
+    expect(ownerNested.body.activationKeys[0].code).toBe('JMV-B2053-TEST-0001');
+    expect(ownerNested.body.devices[0].deviceTokenHash).toBeUndefined();
+    const ownerDetail = await as('PLATFORM_OWNER', 'get', `/api/v1/activation-keys/${key.id}`);
+    expect(ownerDetail.body.code).toBe('JMV-B2053-TEST-0001');
+
+    await prisma.device.delete({ where: { id: device.id } });
+    await prisma.activationKey.delete({ where: { id: key.id } });
+  });
 });

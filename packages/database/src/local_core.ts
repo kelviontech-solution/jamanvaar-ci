@@ -5,7 +5,7 @@ import {
 } from './accounting_service';
 import { BusinessDayRepository, OrderRepository } from './repositories';
 import { Order, BusinessDay, DeviceRecord } from '@jamanvaar/types';
-import { formatRestaurantDate, generateBusinessDayId } from '@jamanvaar/utils';
+import { formatRestaurantDate, generateBusinessDayId, generateSecureCode } from '@jamanvaar/utils';
 
 export interface LocalCoreHealth {
   core_status: 'HEALTHY' | 'DEGRADED' | 'UNAVAILABLE';
@@ -168,7 +168,10 @@ export class JamanvaarLocalCore {
    * Generate short-lived device pairing token (5 minutes validity)
    */
   public static generatePairingToken(hostIp: string = '127.0.0.1', port: number = 8765): PairingTokenPayload {
-    const token = `PAIR-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    // B2-003: Math.random() is not a CSPRNG — this token is a real bootstrap credential for
+    // pairing a new device onto the local service (packages/database/src/local_core.ts pairs
+    // with tooling/local-runtime/local_service.cjs's own separately-generated key/PIN pair).
+    const token = `PAIR-${generateSecureCode(6, '23456789ABCDEFGHJKMNPQRSTUVWXYZ')}`;
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
     const payload: PairingTokenPayload = {

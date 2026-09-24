@@ -1,4 +1,4 @@
-import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync, FeedbackSync, type CollectionSync } from '@jamanvaar/database';
+import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync, FeedbackSync, ShiftSync, CashMovementSync, type CollectionSync } from '@jamanvaar/database';
 import { EntitySyncEngine } from './entity_sync';
 
 /** The server accepts at most this many records per push. */
@@ -91,4 +91,20 @@ let customersInFlight: Promise<void> | null = null;
 export function syncCustomers(opts: { push: boolean }): Promise<void> {
   if (!customersInFlight) customersInFlight = syncCollection('CUSTOMER', CustomerSync, opts.push).finally(() => { customersInFlight = null; });
   return customersInFlight;
+}
+
+/**
+ * Cash-drawer shifts (B2-056): only POS ever opens/edits its own shift, so this is push-from-POS,
+ * pull-everywhere-else — Restaurant Admin (and any other terminal) passes `push: false`.
+ */
+let shiftsInFlight: Promise<void> | null = null;
+
+export function syncShifts(opts: { push: boolean }): Promise<void> {
+  if (!shiftsInFlight) {
+    shiftsInFlight = (async () => {
+      await syncCollection('SHIFT', ShiftSync, opts.push);
+      await syncCollection('CASH_MOVEMENT', CashMovementSync, opts.push);
+    })().finally(() => { shiftsInFlight = null; });
+  }
+  return shiftsInFlight;
 }

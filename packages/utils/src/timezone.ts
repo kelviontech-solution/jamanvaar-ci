@@ -83,6 +83,29 @@ export function generateBusinessDayId(dateInput: Date | string = new Date()): st
 }
 
 /**
+ * The hour of day (0-23) in the restaurant's own timezone (Asia/Kolkata) — B2-017: business-day
+ * cutoff logic needs this, and a device's own `Date.getHours()` returns the *device's* system
+ * clock/timezone, not the restaurant's, which silently produced a different business-day id on a
+ * device whose OS timezone wasn't IST.
+ */
+export function getRestaurantHour(dateInput: Date | string | number = new Date()): number {
+  const date = typeof dateInput === 'string' || typeof dateInput === 'number' ? new Date(dateInput) : dateInput;
+  // `Intl.DateTimeFormat.formatToParts` throws on an invalid date, where `Date.getHours()` just
+  // returns NaN — match that lenient behavior so a record with a missing/malformed createdAt
+  // doesn't crash a business-day computation, same as before this function existed.
+  if (isNaN(date.getTime())) return NaN;
+  const hourPart = new Intl.DateTimeFormat('en-GB', {
+    timeZone: RESTAURANT_TIMEZONE,
+    hour: '2-digit',
+    hour12: false
+  })
+    .formatToParts(date)
+    .find((p) => p.type === 'hour')?.value;
+  // Some environments print "24" for midnight in 'en-GB' 24-hour formatting.
+  return hourPart ? Number(hourPart) % 24 : date.getHours();
+}
+
+/**
  * Returns human readable display date e.g. "31 August 2026"
  */
 export function getBusinessDayDisplayDate(dateInput: Date | string = new Date()): string {

@@ -1,5 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Device, Prisma, PlatformUser } from '@prisma/client';
+import type { RestaurantIdentityDto } from './dto/heartbeat.dto';
 import { pageOf, parsePaging } from '../../common/paging';
 import { ts } from '../../common/sql';
 import { compareVersions, updateFor } from '../../common/version';
@@ -150,7 +151,10 @@ export class DevicesService {
       })
     );
     if (!device) throw new NotFoundException('Device not found');
-    return device;
+    // B2-053: this returned the raw row, including deviceTokenHash — the stored hash of the
+    // terminal's own credential — to any caller with `devices` read access, unlike list()/
+    // rename() three lines below, which already strip it. Never return it to any client.
+    return { ...device, deviceTokenHash: undefined };
   }
 
   async revoke(id: string, actor: PlatformUser) {
@@ -175,7 +179,7 @@ export class DevicesService {
         tx
       );
 
-      return updated;
+      return { ...updated, deviceTokenHash: undefined };
     });
   }
 
@@ -238,6 +242,44 @@ export class DevicesService {
       })),
       serverTime: now.toISOString()
     };
+  }
+
+  /**
+   * B2-054: a terminal's restaurant profile (name/GSTIN/FSSAI/address) was adopted exactly once,
+   * at activation, and never again — a Super Admin edit or a Restaurant Admin Settings save never
+   * reached any terminal after that. Every activated device already authenticates itself here
+   * (DeviceAuthGuard) for heartbeat/kiosk-list, so the same device credential is reused for both
+   * directions of this sync instead of requiring a separate owner login, matching how every other
+   * piece of restaurant-owned data (menu, staff, tables, shifts) already syncs through a device
+   * token, not a tenant user session.
+   */
+  async getRestaurantIdentity(restaurantId: string) {
+    const restaurant = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.restaurant.findUniqueOrThrow({
+        where: { id: restaurantId },
+        select: { name: true, legalName: true, gstin: true, fssaiNumber: true, address: true, city: true, state: true, updatedAt: true }
+      })
+    );
+    return restaurant;
+  }
+
+  async updateRestaurantIdentity(restaurantId: string, dto: RestaurantIdentityDto) {
+    const restaurant = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.restaurant.update({
+        where: { id: restaurantId },
+        data: {
+          ...(dto.name !== undefined ? { name: dto.name } : {}),
+          ...(dto.legalName !== undefined ? { legalName: dto.legalName } : {}),
+          ...(dto.gstin !== undefined ? { gstin: dto.gstin } : {}),
+          ...(dto.fssaiNumber !== undefined ? { fssaiNumber: dto.fssaiNumber } : {}),
+          ...(dto.address !== undefined ? { address: dto.address } : {}),
+          ...(dto.city !== undefined ? { city: dto.city } : {}),
+          ...(dto.state !== undefined ? { state: dto.state } : {})
+        },
+        select: { name: true, legalName: true, gstin: true, fssaiNumber: true, address: true, city: true, state: true, updatedAt: true }
+      })
+    );
+    return restaurant;
   }
 
   async reportHeartbeat(device: Device, dto: HeartbeatDto) {

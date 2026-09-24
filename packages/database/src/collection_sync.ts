@@ -1,4 +1,4 @@
-import type { Category, ComboDeal, Coupon, CustomerAccount, CustomerFeedback, MenuItem } from '@jamanvaar/types';
+import type { CashMovement, Category, ComboDeal, Coupon, CustomerAccount, CustomerFeedback, MenuItem, ShiftRecord } from '@jamanvaar/types';
 import { db } from './db';
 
 /**
@@ -248,4 +248,25 @@ export const CustomerSync = new CollectionSync<CustomerAccount>(
   () => db.customerAccounts,
   (r) => typeof r.phone === 'string' && r.phone.length > 0,
   'phone'
+);
+
+// B2-056: cash-drawer shifts and their cash movements (payouts/cash-drops) only ever lived on the
+// POS device that opened them — Restaurant Admin's own Shift & Cash Drawer Ledger, Reconciliation
+// and Official EOD Z-Report pages read from a local `db.shifts`/`db.cashMovements` that never
+// received them, so it showed "No Active Register Shift" while POS had one genuinely open. Only
+// POS ever opens/edits its own shift, so this is push-from-POS, pull-everywhere-else, the same
+// shape as the menu. `ShiftRepository.getActiveShift()` already recomputes totals from this
+// device's own (already-synced) orders on every read, so a synced-in shift's *identity* (id,
+// status, openedAt, cashierName, posId) is what matters — its pulled totals get immediately
+// overwritten by that device's own correct recompute the next time anything reads it.
+export const ShiftSync = new CollectionSync<ShiftRecord>(
+  'jamanvaar_shift_sync_v1',
+  () => db.shifts,
+  (r) => typeof r.posId === 'string' && r.posId.length > 0 && typeof r.status === 'string'
+);
+
+export const CashMovementSync = new CollectionSync<CashMovement>(
+  'jamanvaar_cash_movement_sync_v1',
+  () => db.cashMovements,
+  (r) => typeof r.shiftId === 'string' && r.shiftId.length > 0
 );

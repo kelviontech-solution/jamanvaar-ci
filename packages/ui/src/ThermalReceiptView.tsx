@@ -16,6 +16,16 @@ export interface ThermalReceiptViewProps {
   className?: string;
 }
 
+// B2-023: a kiosk order's `kioskId` is the real activation UUID (needed internally for device
+// tracking), which used to print verbatim on the guest's own receipt ("POS: 11ea4a8b-e9a4-...") —
+// meaningless and faintly alarming to a customer. Friendly labels (POS-01, KIOSK-01, ...) already
+// print fine as-is; only a raw UUID gets swapped for a neutral label.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function friendlyTerminalLabel(kioskId: string | undefined): string {
+  if (!kioskId) return 'POS-01';
+  return UUID_RE.test(kioskId) ? 'Self-Order Kiosk' : kioskId;
+}
+
 export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
   order,
   config = {},
@@ -100,7 +110,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
           </div>
 
           <div className="flex justify-between text-[#718096] text-[10px]">
-            <span>{order.kioskId !== 'CLOUD-SYNC' ? `POS: ${order.kioskId || 'POS-01'}` : ''}</span>
+            <span>{order.kioskId !== 'CLOUD-SYNC' ? `POS: ${friendlyTerminalLabel(order.kioskId)}` : ''}</span>
             <span>{order.cashierName ? `Cashier: ${order.cashierName}` : order.captainName ? `Captain: ${order.captainName}` : ''}</span>
           </div>
 

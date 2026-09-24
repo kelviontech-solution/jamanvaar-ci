@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { isValidGstinFormat, isValidFssaiFormat, gstinStateCodeMatches } from '../../../common/validation/gstin';
+import { strongPassword } from '../../../common/validation/password';
 
 export const createRestaurantSchema = z
   .object({
@@ -18,7 +19,12 @@ export const createRestaurantSchema = z
     ownerName: z.string().trim().min(2, "Owner's name is required"),
     ownerEmail: z.string().trim().toLowerCase().email(),
     ownerPhone: z.string().trim().optional(),
-    ownerPassword: z.string().min(4).optional(),
+    // B2-005: was z.string().min(4) — an owner account (controls staff, devices and the
+    // cloud login for the whole restaurant) could be created with a 4-character password,
+    // confirmed live with 'abcd'. Same strength rule every other real credential in the
+    // product should use, not a weaker one just because Super Admin sets it on the owner's
+    // behalf at onboarding time.
+    ownerPassword: strongPassword.optional(),
 
     // Set by callers that immediately consume the activation token themselves
     // (e.g. the onboarding wizard's "set password now" mode, which calls

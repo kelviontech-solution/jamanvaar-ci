@@ -20,7 +20,7 @@
  * devices real and countable, which only the activation path delivers.
  */
 
-import { DeviceGate, PlatformNotice, type PlatformNoticeData, sendHeartbeat } from '@jamanvaar/sync';
+import { DeviceGate, PlatformNotice, type PlatformNoticeData, sendHeartbeat, pullRestaurantIdentity } from '@jamanvaar/sync';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, EntitySyncEvent, EntitySyncPushResult, CloudSyncedEntity } from '@jamanvaar/sync';
 import { db, LicenseRepository, MenuRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 
@@ -675,12 +675,15 @@ export function startDeviceHeartbeat(intervalMs = 15_000): void {
   const beat = () => {
     const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
     if (!deviceToken) return;
+    const restaurantId = localStorage.getItem(RESTAURANT_ID_KEY);
     void sendHeartbeat({
       apiBase: API_BASE,
       deviceToken,
       appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0',
-      restaurantId: localStorage.getItem(RESTAURANT_ID_KEY)
+      restaurantId
     });
+    // B2-054: picks up a restaurant-identity edit made on another device (or by Super Admin).
+    if (restaurantId) void pullRestaurantIdentity({ apiBase: API_BASE, deviceToken, restaurantId });
   };
   beat();
   setInterval(beat, intervalMs);

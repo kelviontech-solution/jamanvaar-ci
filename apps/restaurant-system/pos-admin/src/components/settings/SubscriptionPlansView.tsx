@@ -10,6 +10,7 @@ import {
   cloudLogin,
   cloudSetInitialPassword,
   fetchEntitlements,
+  applyEntitlementsToLicense,
   CloudApiError,
   type CloudEntitlementsResponse,
   fetchTenantBillingSummary,
@@ -151,20 +152,15 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
     setCloudSyncedAt(result.syncedAt);
     setCloudStale(result.stale);
 
-    // Synchronize cloud subscription entitlements directly into authoritative local runtime
+    // B2-055: this "apply to LicenseRepository" step is shared with the app-level periodic sync
+    // tick (App.tsx) — this screen's own useEffect only ran on mount/tab-change, so an owner not
+    // currently on this exact screen kept seeing a stale plan tier (PRO-only sidebar badges, JAMAN
+    // AI button) after a Super Admin downgrade. The tick now applies the same refresh regardless
+    // of which screen is open; this call stays too, so this screen's own state updates immediately.
+    if (result.data) {
+      applyEntitlementsToLicense(result.data);
+    }
     if (result.data?.planTier && result.data?.entitlements) {
-      const isPro = result.data.planTier === 'PRO';
-      const isEligible = result.data.subscriptionStatus === 'ACTIVE' || result.data.subscriptionStatus === 'TRIAL';
-      LicenseRepository.updateLicense({
-        tier: isPro ? 'PRO' : 'CORE',
-        planName: result.data.planName || (isPro ? 'JAMANVAAR PRO' : 'JAMANVAAR CORE'),
-        price: isPro ? 7000 : 5000,
-        status: isEligible ? 'ACTIVE' : 'SUSPENDED',
-        entitlements: {
-          ...result.data.entitlements,
-          qrTableOrdering: isPro && result.data.entitlements.qrTableOrdering !== false
-        }
-      });
       if (onUpdated) onUpdated();
     }
   }

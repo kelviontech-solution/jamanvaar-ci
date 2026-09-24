@@ -11,8 +11,8 @@ import {
 } from '@jamanvaar/database';
 import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
-import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, reportQrUsage, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken } from './cloud/cloudClient';
-import { EntitySyncEngine, SyncOutboxEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers } from '@jamanvaar/sync';
+import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, reportQrUsage, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity } from './cloud/cloudClient';
+import { EntitySyncEngine, SyncOutboxEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts } from '@jamanvaar/sync';
 import {
   Category,
   DiningTable,
@@ -467,12 +467,24 @@ export default function PosAdminApp() {
     void syncMenuCatalog({ push: true });
     void syncCustomers({ push: true }); // BUG-159: guests registered at the counter show up in the CRM
     void syncStaff();
+    // B2-056: POS's own cash-drawer shift and its cash movements, so the Shift & Cash Drawer
+    // Ledger, Reconciliation and EOD Z-Report pages here actually see them. Restaurant Admin never
+    // opens or edits a shift itself, so this device only ever pulls.
+    void syncShifts({ push: false });
+    // B2-055: keeps LicenseRepository (plan tier, sidebar badges, JAMAN AI button) in step with a
+    // Super Admin plan change regardless of which screen is open — was only ever refreshed when
+    // the Subscription Plans screen itself happened to be mounted.
+    void refreshCloudEntitlementsIntoLicense();
     void reportDeviceHeartbeat();
+    void syncRestaurantIdentity();
     const interval = setInterval(() => {
       void syncMenuCatalog({ push: true });
       void syncCustomers({ push: true });
       void syncStaff();
+      void syncShifts({ push: false });
+      void refreshCloudEntitlementsIntoLicense();
       void reportDeviceHeartbeat();
+      void syncRestaurantIdentity();
     }, 15000);
     return () => {
       clearInterval(interval);
@@ -506,8 +518,15 @@ export default function PosAdminApp() {
     return CentralReportingService.getDashboardMetrics(dashFilter as any, orders);
   }, [dashFilter, dbTick, orders]);
 
-  const dailyReport = useMemo(() => ReportGeneratorService.getDailyReport(new Date()), [dbTick, orders]);
-  const topDishes = useMemo(() => ReportGeneratorService.getTopSellingItems(), [dbTick, orders]);
+  // B2-032: getDailyReport()'s totals are scoped to today's active business day, but
+  // getTopSellingItems() with no dates aggregates every order ever stored on this device — so
+  // the dashboard's "Top Dishes" widget used to show all-time quantities/revenue (including
+  // dishes from any other restaurant's orders a device had ever pulled in, per B2-029) right
+  // next to a "Today" sales total that couldn't agree with it. Both now come from the exact
+  // same today-scoped order list.
+  const todayReport = useMemo(() => ReportGeneratorService.getReportForPeriod('TODAY'), [dbTick, orders]);
+  const dailyReport = todayReport.summary;
+  const topDishes = useMemo(() => ReportGeneratorService.getTopSellingItemsFromOrders(todayReport.orders), [todayReport]);
   const hourlySales = useMemo(() => ReportGeneratorService.getHourlySalesToday(), [dbTick, orders]);
   const peakHours = useMemo(() => ReportGeneratorService.getPeakHoursAnalysis(), [dbTick, orders]);
 
@@ -544,6 +563,8 @@ export default function PosAdminApp() {
           appSubtitle="Restaurant Operations SaaS"
           isOnline={isOnline}
           onToggleNetwork={() => setIsOnline((prev) => !prev)}
+          isLocalCoreUnauthorized={db.isLocalCoreUnauthorized()}
+          healthCheckUrl={`${db.getSyncServerUrl()}/api/health`}
           heroHeadline="Restaurant Control."
           heroHighlightWord="Live Intelligence."
           heroDescription="Centralized management suite for sales analytics, live KOT dispatch, recipe costing and team permissions."

@@ -27,14 +27,14 @@ describe('Captain session survives a reload (BUG-106)', { timeout: 60_000 }, () 
     const { db, StaffRepository } = await import('@jamanvaar/database');
     db.resetToDefaultSeed();
     db.users = [];
-    const created = StaffRepository.createUser({ username: 'ravi', fullName: 'Ravi Waiter', roleId: 'role-captain' });
+    const created = await StaffRepository.createUser({ username: 'ravi', fullName: 'Ravi Waiter', roleId: 'role-captain' });
     userId = created.id;
     pin = created.issuedPin;
   }, 60_000);
 
   it('signing in saves the real user, and a fresh start restores exactly that person', async () => {
     const first = await import('../apps/restaurant-system/captain/src/store/captainStore');
-    expect(first.useCaptainStore.getState().login(pin)).toBe(true);
+    expect(await first.useCaptainStore.getState().login(pin)).toBe(true);
 
     // The app is closed and reopened: all modules load again, reading from storage.
     vi.resetModules();

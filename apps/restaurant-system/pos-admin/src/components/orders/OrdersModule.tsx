@@ -691,7 +691,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
             <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-2.5">
               <span className="text-xs font-black uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
                 <UserCheck className="w-4 h-4 text-purple-600" />
-                <span>Captain & Floor Floor Activity</span>
+                <span>Captain & Floor Activity</span>
               </span>
               <div className="space-y-1.5 text-xs">
                 {currentDaySummary.captainBreakdown.map((capt, idx) => (

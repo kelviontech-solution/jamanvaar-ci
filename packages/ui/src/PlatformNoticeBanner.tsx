@@ -2,12 +2,22 @@ import React, { useSyncExternalStore } from 'react';
 import { ArrowUpCircle, Wrench, X } from 'lucide-react';
 import { AppUpdate, PlatformNotice } from '@jamanvaar/sync';
 
+export interface PlatformNoticeBannerProps {
+  /**
+   * B2-010: this banner used to show the identical staff-worded message ("Your
+   * terminals keep working…") to walk-in guests on the self-order Kiosk, which
+   * makes no sense to someone who isn't restaurant staff. 'guest' shows a short,
+   * neutral notice instead. Defaults to 'staff' — every other app is staff-only.
+   */
+  audience?: 'staff' | 'guest';
+}
+
 /**
  * The platform team's announcement (maintenance etc.), shown as a thin bar at the
  * very top of a restaurant app. It says plainly that selling is not affected, and
  * can be dismissed for the session.
  */
-export const PlatformNoticeBanner: React.FC = () => {
+export const PlatformNoticeBanner: React.FC<PlatformNoticeBannerProps> = ({ audience = 'staff' }) => {
   const snapshot = useSyncExternalStore(
     (cb) => PlatformNotice.subscribe(cb),
     () => JSON.stringify(PlatformNotice.getVisible()),
@@ -60,9 +70,13 @@ export const PlatformNoticeBanner: React.FC = () => {
     >
       <Wrench className="h-4 w-4 shrink-0" />
       <span className="min-w-0 flex-1">
-        {notice.message}
-        {notice.endsAt && <span className="ml-2 font-normal opacity-80">Until {new Date(notice.endsAt).toLocaleString()}.</span>}
-        <span className="ml-2 font-normal opacity-80">Billing is not affected. Your terminals keep working.</span>
+        {audience === 'guest' ? 'We are currently undergoing scheduled maintenance. Thank you for your patience!' : notice.message}
+        {audience === 'staff' && notice.endsAt && (
+          <span className="ml-2 font-normal opacity-80">{' '}Until {new Date(notice.endsAt).toLocaleString()}.</span>
+        )}
+        {audience === 'staff' && (
+          <span className="ml-2 font-normal opacity-80">{' '}Billing is not affected. Your terminals keep working.</span>
+        )}
       </span>
       <button
         type="button"

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { db } from '@jamanvaar/database';
 import { Order } from '@jamanvaar/types';
-import { formatDate, formatTime, formatINR } from '@jamanvaar/utils';
+import { formatDate, formatTime, formatINR, formatSplitTax } from '@jamanvaar/utils';
 import {
   ReportDataEngine,
   ReportPeriodPreset,
@@ -883,8 +883,9 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                         <td className="p-3 font-bold text-jaman-navy">{g.taxRatePercent}% Standard GST</td>
                         <td className="p-3">{g.invoicesCount}</td>
                         <td className="p-3 font-bold text-right">{formatINR(g.taxableAmount)}</td>
-                        <td className="p-3 text-right text-jaman-saffron">{formatINR(g.cgstAmount)}</td>
-                        <td className="p-3 text-right text-jaman-saffron">{formatINR(g.sgstAmount)}</td>
+                        {/* B2-036: derived from the same row's own totalTax via formatSplitTax. */}
+                        <td className="p-3 text-right text-jaman-saffron">{formatSplitTax(g.totalTax, g.cgstAmount, g.sgstAmount).cgst}</td>
+                        <td className="p-3 text-right text-jaman-saffron">{formatSplitTax(g.totalTax, g.cgstAmount, g.sgstAmount).sgst}</td>
                         <td className="p-3 font-black text-right text-emerald-800">{formatINR(g.totalTax)}</td>
                       </tr>
                     ))}

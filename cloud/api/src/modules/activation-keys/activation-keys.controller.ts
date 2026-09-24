@@ -5,6 +5,7 @@ import { bulkKeysSchema, bulkRevokeKeysSchema, generateActivationKeySchema, reac
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
+import { PlatformRoleName } from '../../common/rbac/access';
 
 @Controller('api/v1/activation-keys')
 @UseGuards(PlatformAuthGuard)
@@ -12,8 +13,8 @@ export class ActivationKeysController {
   constructor(private readonly activationKeys: ActivationKeysService) {}
 
   @Get()
-  list(@Query() query: Record<string, string>) {
-    return this.activationKeys.list(query);
+  list(@Query() query: Record<string, string>, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.activationKeys.list(query, actor.role as PlatformRoleName);
   }
 
   @Get('by-restaurant')
@@ -40,8 +41,8 @@ export class ActivationKeysController {
   }
 
   @Get(':id')
-  detail(@Param('id') id: string) {
-    return this.activationKeys.getById(id);
+  detail(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.activationKeys.getById(id, actor.role as PlatformRoleName);
   }
 
   @Post()

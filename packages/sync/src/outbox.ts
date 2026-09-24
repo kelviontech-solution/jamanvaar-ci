@@ -1,6 +1,6 @@
 import { SyncEvent, SyncEventType, Order, OrderItem, PaymentSplit } from '@jamanvaar/types';
 import { generateUUID, splitTaxPaise } from '@jamanvaar/utils';
-import { db, KOTRepository, BusinessDayRepository } from '@jamanvaar/database';
+import { db, KOTRepository, BusinessDayRepository, InventoryRepository } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 
 /** Money crosses the wire in paise (integers), matching cloud/api's schema. */
@@ -510,6 +510,23 @@ export class SyncOutboxEngine {
             const added = applyRemoteToLocalOrder(existing, remote);
             if (added || remote.status === 'PREPARING' || remote.status === 'NEW') ensureKotsForOrder(existing);
             if (existing.businessDayId) touchedDays.add(existing.businessDayId);
+            // B2-045: a synced-in order used to never have its ingredients deducted anywhere —
+            // buildLocalOrderFromRemote deliberately bypasses OrderRepository.createOrder()'s
+            // side effects (this function's own docstring), and the device that actually sold
+            // the dish (POS/Kiosk) has no recipe/inventory data to deduct from at all (BUG-159:
+            // neither is in the cross-device sync bridge). reconcileOrder is safe to call here
+            // regardless: it is idempotent per order (`order.stockConsumedQty`, see BUG-044), it
+            // only deducts the quantity not already accounted for, and on a device with no
+            // matching recipe (still true for POS/Kiosk today) it is a complete no-op. This
+            // naturally becomes the one place a sale's ingredients get booked, on whichever
+            // device actually owns the recipe/inventory data (Restaurant Admin) — without needing
+            // to sync inventory/recipes themselves bidirectionally to every terminal. Skipped for
+            // a CANCELLED order — it was never actually served, so nothing was consumed.
+            // (A synced-in REFUND is a known, smaller follow-up: restoreForOrder's exact
+            // full-vs-partial-refund rule isn't replicated here yet, only the base deduction.)
+            if (existing.orderStatus !== 'CANCELLED') {
+              try { InventoryRepository.reconcileOrder(existing); } catch { /* no recipe data on this device — nothing to deduct */ }
+            }
           }
         } else {
           const localOrder = buildLocalOrderFromRemote(remote);
@@ -517,6 +534,9 @@ export class SyncOutboxEngine {
           ensureKotsForOrder(localOrder);
           if (localOrder.businessDayId) touchedDays.add(localOrder.businessDayId);
           created++;
+          if (localOrder.orderStatus !== 'CANCELLED') {
+            try { InventoryRepository.reconcileOrder(localOrder); } catch { /* no recipe data on this device — nothing to deduct */ }
+          }
         }
         pulled++;
       }

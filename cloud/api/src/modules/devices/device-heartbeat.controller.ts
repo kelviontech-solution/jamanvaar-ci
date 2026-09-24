@@ -2,7 +2,7 @@ import { Body, Controller, Get, Patch, Req, UseGuards, UsePipes } from '@nestjs/
 import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { DevicesService } from './devices.service';
-import { heartbeatSchema } from './dto/heartbeat.dto';
+import { heartbeatSchema, restaurantIdentitySchema } from './dto/heartbeat.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
 import { CurrentDevice } from '../../common/decorators/current-device.decorator';
@@ -34,5 +34,18 @@ export class DeviceHeartbeatController {
   @Get('kiosks')
   kiosks(@CurrentDevice() device: Device) {
     return this.devices.listKiosksForRestaurant(device.restaurantId);
+  }
+
+  /** B2-054: the restaurant's current identity (name/GSTIN/FSSAI/address), for every activated terminal to pull. */
+  @Get('restaurant')
+  getRestaurant(@CurrentDevice() device: Device) {
+    return this.devices.getRestaurantIdentity(device.restaurantId);
+  }
+
+  /** B2-054: Restaurant Admin's Settings save writing the restaurant's own identity back to the cloud. */
+  @Patch('restaurant')
+  @UsePipes(new ZodValidationPipe(restaurantIdentitySchema))
+  updateRestaurant(@Body() body: ReturnType<typeof restaurantIdentitySchema.parse>, @CurrentDevice() device: Device) {
+    return this.devices.updateRestaurantIdentity(device.restaurantId, body);
   }
 }

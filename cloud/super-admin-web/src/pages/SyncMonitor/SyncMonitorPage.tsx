@@ -108,7 +108,14 @@ export function SyncMonitorPage() {
         </div>
 
         <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Active Reporting Terminals</span>
+          {/* B2-026: "Active Reporting Terminals" read like a live online count (Device Fleet's own
+              "ONLINE" tile, a 2-minute window) but this one counts anything that reported in the
+              last 24h (see sync-observability.service.ts's own comment) — a real, different, and
+              useful metric, just not labelled as covering a different window. An operator
+              comparing the two pages saw "1 vs 9" with nothing explaining why. Named and grouped
+              like the sibling "24h Sync Events" tile right next to it, which already says its own
+              window in its own label. */}
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Terminals Reporting (24h)</span>
           <div style={{ fontSize: 24, fontWeight: 900, color: '#0369a1', marginTop: 4 }}>
             {metrics?.activeSyncingDevices ?? '—'}
           </div>

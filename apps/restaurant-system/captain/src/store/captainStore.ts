@@ -179,7 +179,7 @@ interface CaptainState {
   // Actions
   /** Why the last sign-in was refused, in words for the person at the keypad (BUG-147). Null when there is nothing to say. */
   loginError: string | null;
-  login: (pin: string) => boolean;
+  login: (pin: string) => Promise<boolean>;
   logout: () => void;
   setActiveTab: (tab: 'TABLES' | 'ORDERS' | 'FOOD_READY' | 'KOTS' | 'MESSAGES' | 'CUSTOMERS' | 'SHIFT') => void;
   setTableWorkspaceTab: (tab: 'ORDER' | 'CART' | 'KOTS' | 'CUSTOMER' | 'BILL') => void;
@@ -318,9 +318,9 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
   loginError: null,
 
-  login: (pin: string) => {
+  login: async (pin: string) => {
     // Centralised, hashed PIN verification (BUG-005/006/009/011) — same path as POS/KDS/Kiosk.
-    const candidate = StaffRepository.verifyPin(pin)?.user;
+    const candidate = (await StaffRepository.verifyPin(pin))?.user;
     // A PIN for a role that does not work the floor is refused (BUG-118).
     const matchedUser = candidate && StaffRepository.canUseTerminal(candidate.roleId, 'CAPTAIN') ? candidate : undefined;
     // A correct PIN on the wrong screen is not a typo: say so, the way POS does (BUG-147).

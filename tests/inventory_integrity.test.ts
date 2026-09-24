@@ -140,6 +140,31 @@ describe('Inventory stock integrity (BUG-044/045)', () => {
     expect(InventoryRepository.getShortages([{ menuItemId: 'dish-1', quantity: 2 }])).toHaveLength(0);
   });
 
+  describe('B2-044: Add/Edit Stock Item validation', () => {
+    it('refuses to create an item with negative stock, negative cost, or an unrealistically large quantity', () => {
+      expect(InventoryRepository.createItem({ name: 'Bad Stock', sku: 'BAD-1', category: 'Dairy', unit: 'kg', currentStock: -5, minStockLevel: 1, reorderLevel: 2, costPerUnit: 10 })).toBeNull();
+      expect(InventoryRepository.createItem({ name: 'Bad Cost', sku: 'BAD-2', category: 'Dairy', unit: 'kg', currentStock: 5, minStockLevel: 1, reorderLevel: 2, costPerUnit: -50 })).toBeNull();
+      expect(InventoryRepository.createItem({ name: 'Bad Qty', sku: 'BAD-3', category: 'Dairy', unit: 'kg', currentStock: 1_000_000_000_000, minStockLevel: 1, reorderLevel: 2, costPerUnit: 10 })).toBeNull();
+      expect(db.inventoryItems.some((i) => i.sku.startsWith('BAD-'))).toBe(false);
+    });
+
+    it('refuses a duplicate SKU on create, but allows editing an item without tripping on its own SKU', () => {
+      const item = InventoryRepository.createItem({ name: 'Unique Item', sku: 'UNIQ-1', category: 'Dairy', unit: 'kg', currentStock: 5, minStockLevel: 1, reorderLevel: 2, costPerUnit: 10 })!;
+      expect(item).not.toBeNull();
+      expect(InventoryRepository.createItem({ name: 'Different Item', sku: 'UNIQ-1', category: 'Dairy', unit: 'kg', currentStock: 5, minStockLevel: 1, reorderLevel: 2, costPerUnit: 10 })).toBeNull();
+      // Re-saving the SAME item with its own existing SKU is not a collision with itself.
+      expect(InventoryRepository.updateItem(item.id, { name: 'Unique Item Renamed', sku: 'UNIQ-1' })).not.toBeNull();
+    });
+
+    it("B2-044 canary: updateItem still allows an EXISTING item's stock to go negative (an oversold item is a real, reportable state, not an error) — only creating a brand-new item negative is refused", () => {
+      const item = InventoryRepository.createItem({ name: 'Canary Item', sku: 'CANARY-1', category: 'Dairy', unit: 'kg', currentStock: 5, minStockLevel: 1, reorderLevel: 2, costPerUnit: 10 })!;
+      const updated = InventoryRepository.updateItem(item.id, { currentStock: -2 });
+      expect(updated).not.toBeNull();
+      expect(updated?.currentStock).toBe(-2);
+      expect(updated?.status).toBe('OUT_OF_STOCK');
+    });
+  });
+
   it('a real restaurant starts with no seeded ingredients, recipes or stock history', () => {
     db.resetToDefaultSeed();
     expect(db.inventoryItems.length).toBeGreaterThan(0); // demo seed, as before

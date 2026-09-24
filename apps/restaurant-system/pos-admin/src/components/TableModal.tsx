@@ -51,22 +51,29 @@ export const TableModal: React.FC<TableModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+    const trimmedNumber = tableNumber.trim();
     if (!zone.trim()) {
       setFormError('Choose a zone, or enter a name for a new one.');
       return;
     }
-    if (tableNumber && TableRepository.isTableNumberTaken(tableNumber, tableToEdit?.id)) {
-      setFormError(`Table ${tableNumber.trim()} already exists. Choose a different number.`);
+    if (!trimmedNumber) {
+      setFormError('Table number is required.');
       return;
     }
-    if (!tableNumber) {
-      setFormError('Table number is required.');
+    // B2-016/B2-028: a table number carrying `<b>x</b>` propagated verbatim to POS/Captain/KDS
+    // tickets, QR codes and printed receipts, none of which render through React's own escaping.
+    if (/[<>]/.test(trimmedNumber)) {
+      setFormError('Table number cannot contain < or > characters.');
+      return;
+    }
+    if (TableRepository.isTableNumberTaken(trimmedNumber, tableToEdit?.id)) {
+      setFormError(`Table ${trimmedNumber} already exists. Choose a different number.`);
       return;
     }
 
     if (tableToEdit) {
       TableRepository.updateTable(tableToEdit.id, {
-        tableNumber,
+        tableNumber: trimmedNumber,
         capacity: Number(capacity) || 4,
         zone,
         floor: Number(floor) || 1,
@@ -75,7 +82,7 @@ export const TableModal: React.FC<TableModalProps> = ({
       });
     } else {
       TableRepository.createTable({
-        tableNumber,
+        tableNumber: trimmedNumber,
         capacity: Number(capacity) || 4,
         zone,
         floor: Number(floor) || 1,

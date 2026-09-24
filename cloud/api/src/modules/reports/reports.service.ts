@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ts } from '../../common/sql';
+import { toCsv } from '../../common/csv';
+import { deviceHealth } from '../../common/device-health';
 
 @Injectable()
 export class ReportsService {
@@ -258,6 +260,9 @@ export class ReportsService {
     };
   }
 
+  // B2-061: restaurant/plan names are free text (set by whoever created the restaurant, e.g. via
+  // the platform onboarding form) reaching every one of these CSVs with only a quote-escape
+  // before this fix — no defense against CSV/formula injection. toCsv sanitizes every field.
   async generateCsv(reportType: string): Promise<string> {
     if (reportType === 'revenue') {
       const invoices = await this.prisma.platformDb.invoice.findMany({
@@ -270,15 +275,15 @@ export class ReportsService {
       const headers = ['Invoice Number', 'Restaurant', 'Plan', 'Subtotal (₹)', 'Tax Amount (₹)', 'Total (₹)', 'Status', 'Issued At'];
       const rows = invoices.map((i) => [
         i.invoiceNumber,
-        `"${i.restaurant.name.replace(/"/g, '""')}"`,
-        `"${i.plan?.name ?? 'Custom Plan'}"`,
+        i.restaurant.name,
+        i.plan?.name ?? 'Custom Plan',
         (i.amount / 100).toFixed(2),
         (i.taxAmount / 100).toFixed(2),
         (i.totalAmount / 100).toFixed(2),
         i.status,
         i.createdAt.toISOString()
       ]);
-      return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+      return toCsv(headers, rows);
     }
 
     if (reportType === 'restaurants') {
@@ -289,15 +294,15 @@ export class ReportsService {
       const headers = ['ID', 'Restaurant Name', 'City', 'State', 'Status', 'Branches', 'Plan', 'Created At'];
       const rows = restaurants.map((r) => [
         r.id,
-        `"${r.name.replace(/"/g, '""')}"`,
+        r.name,
         r.city ?? '',
         r.state ?? '',
         r.status,
         r.branches.length,
-        `"${r.subscriptions[0]?.plan.name ?? 'None'}"`,
+        r.subscriptions[0]?.plan.name ?? 'None',
         r.createdAt.toISOString()
       ]);
-      return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+      return toCsv(headers, rows);
     }
 
     // Default subscriptions CSV
@@ -307,14 +312,14 @@ export class ReportsService {
     const headers = ['ID', 'Restaurant', 'Plan Tier', 'Price Monthly', 'Status', 'Start Date', 'Expires At'];
     const rows = subs.map((s) => [
       s.id,
-      `"${s.restaurant.name.replace(/"/g, '""')}"`,
+      s.restaurant.name,
       s.plan.tier,
       (s.plan.priceMonthly / 100).toFixed(2),
       s.status,
       s.startDate.toISOString(),
       s.expiresAt.toISOString()
     ]);
-    return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    return toCsv(headers, rows);
   }
 
   async getRestaurantReport(restaurantId: string) {
@@ -333,7 +338,13 @@ export class ReportsService {
       const branchesCount = restaurant.branches.length;
       const devicesCount = restaurant.devices.length;
       const activeDevices = restaurant.devices.filter((d) => d.status === 'ACTIVE').length;
-      const offlineDevices = devicesCount - activeDevices;
+      // B2-058: was `devicesCount - activeDevices`, which lumps REVOKED devices in with genuinely
+      // offline ones ("15 offline / standby" was actually 14 revoked devices from one test probe
+      // plus 1 earlier — a revoked terminal is gone, not on standby, same class as BUG-067, whose
+      // fix already exists as the shared `deviceHealth()` helper — this screen's own metric just
+      // wasn't using it). Only devices that are ACTIVE but stale/silent count as offline here now.
+      const now = new Date();
+      const offlineDevices = restaurant.devices.filter((d) => deviceHealth(d, now) === 'offline' || deviceHealth(d, now) === 'degraded').length;
 
       const deviceTypeBreakdown: Record<string, number> = {};
       for (const d of restaurant.devices) {

@@ -111,3 +111,49 @@ export function canAccess(role: PlatformRoleName, area: Area | null, method: str
 export function permissionsForRole(role: PlatformRoleName): Partial<Record<Area, AccessLevel>> {
   return { ...(ROLE_ACCESS[role] || {}) };
 }
+
+/**
+ * B2-051/B2-053: a live activation code is a bearer credential — B2-031 confirmed one redeems a
+ * device with no login at all — so it should only ever be handed back in full to a role that can
+ * actually manage devices (`devices: 'write'`: Platform Owner, Super Admin, Platform Ops). Every
+ * other role that can see a key at all (Support Admin, Read-Only — both `devices: 'read'`) gets
+ * it redacted the same way an already-redeemed/revoked/expired key already is, regardless of the
+ * key's own lifecycle. One canonical rule, used everywhere an activation code is ever returned
+ * (the list/detail endpoints and the code embedded in a restaurant's own detail response) instead
+ * of each call site deciding for itself.
+ */
+export function canSeeFullActivationCode(role: PlatformRoleName): boolean {
+  return ROLE_ACCESS[role]?.devices === 'write';
+}
+
+/** Whether this role's response may include device/activation-key data at all (own area check, reusable outside the HTTP guard — e.g. for a nested relation on a different endpoint like `/restaurants/:id`). */
+export function hasDevicesArea(role: PlatformRoleName): boolean {
+  return Boolean(ROLE_ACCESS[role]?.devices);
+}
+
+export type ActivationKeyLifecycle = 'AVAILABLE' | 'REDEEMED' | 'REVOKED' | 'EXPIRED';
+
+/** A key's code is only useful until it is used. Once redeemed, revoked or expired it is meaningless as a credential, so it's safe to show even to a role that can't see a live one. */
+export function activationKeyLifecycle(key: { status: string; expiresAt: Date }, now: Date = new Date()): ActivationKeyLifecycle {
+  if (key.status === 'REDEEMED') return 'REDEEMED';
+  if (key.status === 'REVOKED') return 'REVOKED';
+  if (key.status === 'EXPIRED' || key.expiresAt <= now) return 'EXPIRED';
+  return 'AVAILABLE';
+}
+
+/**
+ * The one place an activation code's visibility is decided, used by both the direct
+ * activation-keys endpoints and the `devices`/`activationKeys` embedded in a restaurant's own
+ * detail response (`/restaurants/:id`) — two different endpoints must never disagree on who gets
+ * to see a live code. Redacts to `null` (keeping `codeLast4` so an operator can still tell keys
+ * apart, BUG-060) unless the key is AVAILABLE *and* the caller's role can manage devices.
+ */
+export function redactActivationCode<T extends { code: string; status: string; expiresAt: Date }>(
+  key: T,
+  role: PlatformRoleName,
+  now: Date = new Date()
+): T & { lifecycle: ActivationKeyLifecycle; codeLast4: string } {
+  const lifecycle = activationKeyLifecycle(key, now);
+  const showCode = canSeeFullActivationCode(role) && lifecycle === 'AVAILABLE';
+  return { ...key, lifecycle, code: showCode ? key.code : null, codeLast4: key.code.slice(-4) };
+}

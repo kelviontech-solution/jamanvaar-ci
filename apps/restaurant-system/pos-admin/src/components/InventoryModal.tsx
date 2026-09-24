@@ -3,6 +3,26 @@ import { InventoryItem } from '@jamanvaar/types';
 import { Modal, Button } from '@jamanvaar/ui';
 import { InventoryRepository } from '@jamanvaar/database';
 
+const MAX_STOCK_QUANTITY = 1_000_000;
+
+/**
+ * B2-044: the form auto-filled `RAW-` + a random 3-digit number (900 possible values —
+ * collisions start at ~35 items, confirmed live: two items both got `RAW-525`). Widened to 4
+ * digits (9,000 values) and, more importantly, actually checks it's unique against every
+ * existing item's SKU before accepting it, regenerating on a collision instead of trusting the
+ * odds.
+ */
+function generateUniqueSku(): string {
+  const existing = new Set(InventoryRepository.getAllItems().map((i) => i.sku));
+  let candidate: string;
+  let attempts = 0;
+  do {
+    candidate = `RAW-${Math.floor(1000 + Math.random() * 9000)}`;
+    attempts++;
+  } while (existing.has(candidate) && attempts < 50);
+  return candidate;
+}
+
 interface InventoryModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -40,7 +60,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
       setSupplierName(itemToEdit.supplierName || '');
     } else {
       setName('');
-      setSku(`RAW-${Math.floor(100 + Math.random() * 900)}`);
+      setSku(generateUniqueSku());
       setCategory('Dairy');
       setUnit('kg');
       setCurrentStock('10');
@@ -51,6 +71,12 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
     }
   }, [itemToEdit, isOpen]);
 
+  // B2-044: none of these seven inputs (name, cost, stock, threshold) had any validation at all
+  // — negative stock, negative cost, a 1,000,000,000,000-unit quantity and a duplicate item name
+  // were all accepted, none refused, no message on any. Every rule below is a real, live-confirmed
+  // gap, not a guess: the repository itself (InventoryRepository.createItem/updateItem) enforces
+  // the same numeric limits as a second, independent layer — this pre-check exists purely so the
+  // cashier sees exactly *which* field is wrong, immediately, instead of a generic failure.
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
@@ -59,30 +85,61 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
       return;
     }
 
-    if (itemToEdit) {
-      InventoryRepository.updateItem(itemToEdit.id, {
-        name,
-        sku,
-        category,
-        unit,
-        currentStock: parseFloat(currentStock) || 0,
-        minStockLevel: parseFloat(minStockLevel) || 0,
-        reorderLevel: parseFloat(reorderLevel) || 0,
-        costPerUnit: parseFloat(costPerUnit) || 0,
-        supplierName
-      });
-    } else {
-      InventoryRepository.createItem({
-        name,
-        sku,
-        category,
-        unit,
-        currentStock: parseFloat(currentStock) || 0,
-        minStockLevel: parseFloat(minStockLevel) || 0,
-        reorderLevel: parseFloat(reorderLevel) || 0,
-        costPerUnit: parseFloat(costPerUnit) || 0,
-        supplierName
-      });
+    const stockNum = parseFloat(currentStock);
+    const minNum = parseFloat(minStockLevel);
+    const reorderNum = parseFloat(reorderLevel);
+    const costNum = parseFloat(costPerUnit);
+
+    if (!Number.isFinite(stockNum) || stockNum < 0) {
+      setFormError('Current stock cannot be negative.');
+      return;
+    }
+    if (stockNum > MAX_STOCK_QUANTITY) {
+      setFormError(`Current stock is unrealistically large — enter a value under ${MAX_STOCK_QUANTITY.toLocaleString('en-IN')}.`);
+      return;
+    }
+    if (!Number.isFinite(minNum) || minNum < 0) {
+      setFormError('Min threshold cannot be negative.');
+      return;
+    }
+    if (!Number.isFinite(reorderNum) || reorderNum < 0) {
+      setFormError('Reorder level cannot be negative.');
+      return;
+    }
+    if (!Number.isFinite(costNum) || costNum < 0) {
+      setFormError('Cost per unit cannot be negative.');
+      return;
+    }
+
+    // A duplicate item name is almost never intentional — it just splits one ingredient's real
+    // stock across two untracked records (confirmed live: two separate "QA Paneer" items).
+    const nameCollision = InventoryRepository.getAllItems().find(
+      (i) => i.name.trim().toLowerCase() === name.trim().toLowerCase() && i.id !== itemToEdit?.id
+    );
+    if (nameCollision) {
+      setFormError(`"${name}" already exists in inventory (${nameCollision.currentStock} ${nameCollision.unit} in stock) — edit that item instead of creating a duplicate.`);
+      return;
+    }
+
+    const payload = {
+      name,
+      sku,
+      category,
+      unit,
+      currentStock: stockNum,
+      minStockLevel: minNum,
+      reorderLevel: reorderNum,
+      costPerUnit: costNum,
+      supplierName
+    };
+
+    const saved = itemToEdit
+      ? InventoryRepository.updateItem(itemToEdit.id, payload)
+      : InventoryRepository.createItem(payload);
+
+    if (!saved) {
+      setFormError('Could not save this item — check the SKU is not already in use on another item.');
+      return;
     }
 
     onSaved();
@@ -154,12 +211,14 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Current Stock ({unit})</label>
             <input
               type="number"
               step="0.1"
+              min="0"
+              max={MAX_STOCK_QUANTITY}
               required
               value={currentStock}
               onChange={(e) => setCurrentStock(e.target.value)}
@@ -171,9 +230,26 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
             <input
               type="number"
               step="0.1"
+              min="0"
               required
               value={minStockLevel}
               onChange={(e) => setMinStockLevel(e.target.value)}
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
+            />
+          </div>
+          <div>
+            {/* B2-044: this level existed on every item (`reorderLevel`) but had no input anywhere
+                in this form — it was hardcoded to a fixed '5' regardless of the item's real unit,
+                so "5" meant 5kg of rice and 5 saffron threads alike, and Purchasing's "Reorder &
+                expiry" tab (which reads this field) was silently wrong for almost every item. */}
+            <label className="block text-xs font-bold text-slate-600 mb-1">Reorder Level ({unit})</label>
+            <input
+              type="number"
+              step="0.1"
+              min="0"
+              required
+              value={reorderLevel}
+              onChange={(e) => setReorderLevel(e.target.value)}
               className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
             />
           </div>
@@ -182,6 +258,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
             <input
               type="number"
               step="0.1"
+              min="0"
               required
               value={costPerUnit}
               onChange={(e) => setCostPerUnit(e.target.value)}

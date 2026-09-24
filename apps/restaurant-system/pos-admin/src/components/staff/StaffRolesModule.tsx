@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, StaffShiftSchedule, AttendanceStatus, DeliveryRider } from '@jamanvaar/types';
 import { StaffRepository, StaffScheduleRepository, RiderRepository } from '@jamanvaar/database';
+import { formatRestaurantDate } from '@jamanvaar/utils';
 import {
   Plus,
   Shield,
@@ -39,7 +40,10 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
   showToast,
   onRequestConfirm
 }) => {
-  const todayKey = new Date().toISOString().slice(0, 10);
+  // B2-013: was `new Date().toISOString().slice(0, 10)` — the UTC calendar date, a day behind
+  // for a restaurant in India from midnight until 05:30 IST, exactly when a late-night restaurant
+  // opens the next day's roster. Same Asia/Kolkata-via-Intl approach already used for business days.
+  const todayKey = formatRestaurantDate(new Date(), 'ISO_DATE');
   const [selectedDate, setSelectedDate] = useState(todayKey);
   const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
   const [shiftToEdit, setShiftToEdit] = useState<StaffShiftSchedule | null>(null);
@@ -258,7 +262,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
           {/* Shifts scheduled for the selected day */}
           <div className="space-y-2">
             <h4 className="text-[11px] font-black uppercase text-slate-400 tracking-wider">
-              Shifts on {new Date(selectedDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
+              Shifts on {new Date(selectedDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Asia/Kolkata' })}
             </h4>
             {schedulesForDay.length === 0 ? (
               <div className="p-4 bg-jaman-cream rounded-xl text-center text-xs text-slate-400">

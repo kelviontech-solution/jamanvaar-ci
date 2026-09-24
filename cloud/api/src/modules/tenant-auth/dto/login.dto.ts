@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { strongPassword } from '../../../common/validation/password';
 
 // Tenant login accepts email + password, and optionally a restaurantId (if already known)
 // and deviceId/deviceToken (for checking whether this device has already been activated).
@@ -36,17 +37,22 @@ export type TenantRefreshDto = z.infer<typeof tenantRefreshSchema>;
 
 // One-time bootstrap for a PENDING_ACTIVATION owner/staff user created with passwordHash=null
 // (see RestaurantsService.createRestaurant). Not a general "forgot password" flow.
+// B2-048: all four password fields below were `z.string().min(8, …)` — 8 characters, no
+// character-class or common-password check at all, unlike the platform side's
+// `strongPassword` rule. Confirmed live: '12345678' was accepted and saved as a real owner
+// password via the change-password endpoint. These are the credentials for the account that
+// controls a restaurant's staff, devices and cloud login — same rule as everywhere else now.
 export const setInitialPasswordSchema = z.object({
   restaurantId: z.string().uuid(),
   email: z.string().trim().toLowerCase().email(),
   activationToken: z.string().min(1, 'Activation token is required'),
-  newPassword: z.string().min(8, 'Password must be at least 8 characters')
+  newPassword: strongPassword
 });
 export type SetInitialPasswordDto = z.infer<typeof setInitialPasswordSchema>;
 
 export const tenantChangePasswordSchema = z.object({
   currentPassword: z.string().min(1),
-  newPassword: z.string().min(8, 'New password must be at least 8 characters')
+  newPassword: strongPassword
 });
 export type TenantChangePasswordDto = z.infer<typeof tenantChangePasswordSchema>;
 
@@ -60,7 +66,7 @@ export const createTenantStaffUserSchema = z.object({
   fullName: z.string().trim().min(1, 'Full name is required'),
   role: z.enum(['MANAGER', 'STAFF']).default('STAFF'),
   phone: z.string().trim().optional(),
-  password: z.string().min(8, 'Password must be at least 8 characters')
+  password: strongPassword
 });
 export type CreateTenantStaffUserDto = z.infer<typeof createTenantStaffUserSchema>;
 
@@ -80,6 +86,6 @@ export const resetPasswordSchema = z.object({
   restaurantId: z.string().uuid(),
   email: z.string().trim().toLowerCase().email(),
   otp: z.string().trim().regex(/^\d{6}$/, 'The code is 6 digits'),
-  newPassword: z.string().min(8, 'Password must be at least 8 characters')
+  newPassword: strongPassword
 });
 export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;

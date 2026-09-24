@@ -209,6 +209,12 @@ export function RestaurantDetailPage() {
       .finally(() => setDiagnosticsLoading(false));
   };
   const [backups, setBackups] = useState<Backup[] | null>(null);
+  // B2-052: a 403 (Finance has no Backup & Recovery access) was silently swallowed into an empty
+  // array, rendering as "Multi-Tenant Cloud Backup Snapshots (0) ... No backups recorded" - a
+  // refusal that looks exactly like a restaurant that genuinely has zero backups, for a role that
+  // is allowed to see this page but not this data. Same honest-error pattern already used for
+  // Support & Diagnostics (`diagnosticsError` above) - the actual server message, not a fake zero.
+  const [backupsError, setBackupsError] = useState<string | null>(null);
   const [reportsData, setReportsData] = useState<RestaurantReport | null>(null);
   const [reportsLoading, setReportsLoading] = useState(false);
   const [appEntitlements, setAppEntitlements] = useState<ApplicationEntitlement[] | null>(null);
@@ -357,7 +363,9 @@ export function RestaurantDetailPage() {
       refreshDiagnostics();
     }
     if (tab === 'backups' && !backups) {
-      api.get<Backup[]>(`/api/v1/restaurants/${id}/backups`).then(setBackups).catch(() => setBackups([]));
+      api.get<Backup[]>(`/api/v1/restaurants/${id}/backups`)
+        .then((res) => { setBackups(res); setBackupsError(null); })
+        .catch((err) => { setBackups([]); setBackupsError(err instanceof ApiError ? err.message : 'Failed to load backups'); });
     }
     if (tab === 'reports' && !reportsData) {
       setReportsLoading(true);
@@ -1879,23 +1887,30 @@ export function RestaurantDetailPage() {
           <Card>
             <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
               <div>
-                <span>Multi-Tenant Cloud Backup Snapshots ({backups?.length || 0})</span>
+                <span>Multi-Tenant Cloud Backup Snapshots {backupsError ? '' : `(${backups?.length ?? 0})`}</span>
                 <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
                   Isolated point-in-time database snapshots with cryptographic SHA-256 verification.
                 </p>
               </div>
-              <Button
-                variant="accent"
-                onClick={handleTriggerManualBackup}
-                disabled={triggeringBackup}
-              >
-                <HardDrive className={`w-4 h-4 mr-1 ${triggeringBackup ? 'animate-spin' : ''}`} />
-                <span>{triggeringBackup ? 'Triggering…' : 'Trigger Cloud Backup'}</span>
-              </Button>
+              {!backupsError && (
+                <Button
+                  variant="accent"
+                  onClick={handleTriggerManualBackup}
+                  disabled={triggeringBackup}
+                >
+                  <HardDrive className={`w-4 h-4 mr-1 ${triggeringBackup ? 'animate-spin' : ''}`} />
+                  <span>{triggeringBackup ? 'Triggering…' : 'Trigger Cloud Backup'}</span>
+                </Button>
+              )}
             </div>
 
             {backups === null ? (
               <div style={{ padding: 22 }}><SkeletonTable rows={3} cols={5} /></div>
+            ) : backupsError ? (
+              <EmptyState
+                title="Your role does not have access to this area"
+                description={backupsError}
+              />
             ) : backups.length === 0 ? (
               <EmptyState
                 title="No backups recorded yet"

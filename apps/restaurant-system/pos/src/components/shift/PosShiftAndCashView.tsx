@@ -100,7 +100,7 @@ export const PosShiftAndCashView: React.FC = () => {
   const shiftSummary = useMemo(() => {
     return CentralReportingService.calculateFinancialSummary(
       shiftOrders,
-      activeShift ? `Shift #${activeShift.id.slice(-2)}` : 'Active Shift'
+      activeShift ? `Shift #${activeShift.shiftNumber ?? activeShift.id.slice(-2)}` : 'Active Shift'
     );
   }, [shiftOrders, activeShift]);
 
@@ -182,14 +182,22 @@ export const PosShiftAndCashView: React.FC = () => {
     showToast(`✓ Shift opened with opening float of ₹${openingVal}`);
   };
 
+  // B2-046: this used to just `return` on an invalid amount or missing shift — no message, the
+  // dialog just looked broken. Cash Out is now checked against the drawer's own current balance
+  // before it is attempted (ShiftRepository.addCashMovement enforces the same limit itself and
+  // returns null if bypassed), so a cashier can no longer take out more than the drawer holds.
   const handleCashMovementSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!activeShift) return;
+    if (!activeShift) { showToast('✗ No shift is open.'); return; }
     const amountVal = Number(movementAmount);
-    if (!amountVal || amountVal <= 0) return;
+    if (!amountVal || amountVal <= 0) { showToast('✗ Enter an amount greater than ₹0.'); return; }
+    if (movementType === 'CASH_OUT' && amountVal > activeShift.expectedCash) {
+      showToast(`✗ Cash Out of ₹${amountVal} exceeds the drawer's current balance of ₹${activeShift.expectedCash}.`);
+      return;
+    }
 
     const cashierName = currentUser?.fullName || activeShift.cashierName;
-    ShiftRepository.addCashMovement(
+    const recorded = ShiftRepository.addCashMovement(
       activeShift.id,
       movementType,
       amountVal,
@@ -197,6 +205,10 @@ export const PosShiftAndCashView: React.FC = () => {
       cashierName,
       movementNotes.trim() || undefined
     );
+    if (!recorded) {
+      showToast('✗ Could not record this movement — the shift may have closed. Refresh and try again.');
+      return;
+    }
 
     setCashMovementModalOpen(false);
     setMovementAmount('');
@@ -425,7 +437,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-black text-jaman-navy">
-                    Active Shift #{activeShift.id.slice(-2) || '01'}
+                    Active Shift #{activeShift.shiftNumber ?? activeShift.id.slice(-2) ?? '01'}
                   </h2>
                   <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
                     ● SHIFT OPEN
@@ -874,7 +886,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 </div>
                 <div>
                   <h3 className="font-black text-sm text-jaman-navy">Record Cash Movement</h3>
-                  <span className="text-[10px] text-slate-400">Shift #{activeShift?.id?.slice(-2)} Drawer</span>
+                  <span className="text-[10px] text-slate-400">Shift #{activeShift?.shiftNumber ?? activeShift?.id?.slice(-2)} Drawer</span>
                 </div>
               </div>
               <button
@@ -992,7 +1004,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                 </div>
                 <div>
                   <h3 className="font-black text-sm text-jaman-navy">Close Cashier Shift & Settle Drawer</h3>
-                  <span className="text-[10px] text-slate-400">Shift #{activeShift.id.slice(-2)} • {activeShift.cashierName}</span>
+                  <span className="text-[10px] text-slate-400">Shift #{activeShift.shiftNumber ?? activeShift.id.slice(-2)} • {activeShift.cashierName}</span>
                 </div>
               </div>
               <button

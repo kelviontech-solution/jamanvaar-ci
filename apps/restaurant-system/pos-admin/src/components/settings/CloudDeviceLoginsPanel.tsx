@@ -1,4 +1,4 @@
-import { copyText } from '@jamanvaar/utils';
+import { copyText, generateSecurePassword } from '@jamanvaar/utils';
 import React, { useEffect, useState } from 'react';
 import {
   isCloudConnected,
@@ -12,8 +12,12 @@ import {
 } from '../../cloud/cloudClient';
 import { KeyRound, Plus, Copy, CheckCircle2, UserRound, Ban } from 'lucide-react';
 
+// B2-003: was 'Jaman@' + Math.floor(1000 + Math.random() * 9000) — a fixed, guessable prefix
+// plus only 9,000 possible values from a non-cryptographic RNG, for a password that
+// authenticates a real cloud device/staff login. Now a cryptographically random password
+// that is guaranteed to contain every character class the server's password rule checks for.
 function randomPassword(): string {
-  return 'Jaman@' + Math.floor(1000 + Math.random() * 9000);
+  return generateSecurePassword(14);
 }
 
 /**

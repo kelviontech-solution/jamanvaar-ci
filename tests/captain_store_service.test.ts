@@ -14,12 +14,12 @@ describe('Captain service workflow', () => {
   const store = () => useCaptainStore.getState();
   const table = (n: string) => db.tables.find((t) => t.tableNumber === n)!;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     db.resetToDefaultSeed();
     db.users = [];
     db.orders = [];
     db.kots = [];
-    const created = StaffRepository.createUser({ username: 'ravi', fullName: 'Ravi Waiter', roleId: 'role-captain' });
+    const created = await StaffRepository.createUser({ username: 'ravi', fullName: 'Ravi Waiter', roleId: 'role-captain' });
     pin = created.issuedPin;
     userId = created.id;
     ServiceMessages.resetForTests();
@@ -27,38 +27,38 @@ describe('Captain service workflow', () => {
     useCaptainStore.setState({ cartItems: [], selectedTable: null, selectedTableOrder: null, foodReadyItems: [], tableFilter: 'ALL_TABLES' });
   });
 
-  const signIn = () => expect(store().login(pin)).toBe(true);
+  const signIn = async () => expect(await store().login(pin)).toBe(true);
   const addDish = (index: number, quantity = 1) => store().addItemToCart(db.menuItems[index], [], '', 'COURSE_1', quantity);
 
   describe('sign-in (BUG-105/106/107)', () => {
-    it('rejects a wrong PIN and signs in the real staff member on the right one', () => {
-      expect(store().login('0000')).toBe(false);
+    it('rejects a wrong PIN and signs in the real staff member on the right one', async () => {
+      expect(await store().login('0000')).toBe(false);
       expect(store().isLoggedIn).toBe(false);
 
-      signIn();
+      await signIn();
       expect(store().isLoggedIn).toBe(true);
       expect(store().currentCaptain?.name).toBe('Ravi Waiter');
       expect(store().currentCaptain?.id).toBe(userId);
     });
 
-    it('refuses a PIN that belongs to a role that does not work the floor (BUG-118)', () => {
-      const cook = StaffRepository.createUser({ username: 'chefji', fullName: 'Chef Ji', roleId: 'role-chef' });
-      expect(store().login(cook.issuedPin)).toBe(false);
+    it('refuses a PIN that belongs to a role that does not work the floor (BUG-118)', async () => {
+      const cook = await StaffRepository.createUser({ username: 'chefji', fullName: 'Chef Ji', roleId: 'role-chef' });
+      expect(await store().login(cook.issuedPin)).toBe(false);
       expect(store().isLoggedIn).toBe(false);
       // BUG-147: the screen says why, instead of "incorrect PIN"; a plain typo says nothing special.
       expect(store().loginError).toMatch(/Chef.*can't open the Captain app/);
-      expect(store().login('0000')).toBe(false);
+      expect(await store().login('0000')).toBe(false);
       expect(store().loginError).toBeNull();
     });
 
-    it('nobody is pre-assigned tables: the default view is every table', () => {
-      signIn();
+    it('nobody is pre-assigned tables: the default view is every table', async () => {
+      await signIn();
       expect(store().currentCaptain?.assignedTableNumbers ?? []).toEqual([]);
       expect(store().tableFilter).toBe('ALL_TABLES');
     });
 
-    it('a table that has been freed is no longer "mine", even if it was freed at the counter and still carries the waiters name', () => {
-      signIn();
+    it('a table that has been freed is no longer "mine", even if it was freed at the counter and still carries the waiters name', async () => {
+      await signIn();
       store().openTable('3', 2);
       const t3 = db.tables.find((t) => t.tableNumber === '3')!;
       t3.status = 'AVAILABLE';
@@ -66,8 +66,8 @@ describe('Captain service workflow', () => {
       expect(selectMyTables(db.tables, store().currentCaptain)).toEqual([]);
     });
 
-    it('"my tables" are the tables this waiter seated', () => {
-      signIn();
+    it('"my tables" are the tables this waiter seated', async () => {
+      await signIn();
       store().openTable('3', 2);
       const mine = selectMyTables(db.tables, store().currentCaptain);
       expect(mine.map((t) => t.tableNumber)).toEqual(['3']);
@@ -75,23 +75,23 @@ describe('Captain service workflow', () => {
   });
 
   describe('seating (BUG-109)', () => {
-    it('only offers guest counts the table can seat', () => {
+    it('only offers guest counts the table can seat', async () => {
       expect(guestCountOptions(2)).toEqual([1, 2]);
       expect(guestCountOptions(4)).toEqual([1, 2, 3, 4]);
       expect(guestCountOptions(8)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
       expect(guestCountOptions(0)).toEqual([1]);
     });
 
-    it('records who seated the table', () => {
-      signIn();
+    it('records who seated the table', async () => {
+      await signIn();
       store().openTable('1', 2);
       expect(table('1')).toMatchObject({ status: 'OCCUPIED', currentGuests: 2, openedById: userId, openedByName: 'Ravi Waiter' });
     });
   });
 
   describe('firing the KOT (BUG-101/102)', () => {
-    it('the order carries the waiter, the table link and a proper CGST/SGST/round-off bill', () => {
-      signIn();
+    it('the order carries the waiter, the table link and a proper CGST/SGST/round-off bill', async () => {
+      await signIn();
       store().openTable('1', 2);
       addDish(0, 1);
       addDish(1, 2);
@@ -107,8 +107,8 @@ describe('Captain service workflow', () => {
       expect(kots![0].serverName).toBe('Ravi Waiter');
     });
 
-    it('adding a second round reprices the whole order the same way', () => {
-      signIn();
+    it('adding a second round reprices the whole order the same way', async () => {
+      await signIn();
       store().openTable('1', 2);
       addDish(0, 1);
       store().sendKOT();
@@ -123,8 +123,8 @@ describe('Captain service workflow', () => {
       expect(order.syncStatus).toBe('SAVED_LOCALLY');
     });
 
-    it('will not fire a KOT without a table', () => {
-      signIn();
+    it('will not fire a KOT without a table', async () => {
+      await signIn();
       addDish(0, 1);
       expect(store().sendKOT()).toBeNull();
       expect(db.orders).toHaveLength(0);
@@ -132,8 +132,8 @@ describe('Captain service workflow', () => {
   });
 
   describe('bill request (BUG-099)', () => {
-    it('marks the table so the counter sees it, only when there is something to bill', () => {
-      signIn();
+    it('marks the table so the counter sees it, only when there is something to bill', async () => {
+      await signIn();
       store().openTable('1', 2);
       expect(store().requestBill('1')).toBe(false);
       expect(table('1').status).toBe('OCCUPIED');
@@ -154,8 +154,8 @@ describe('Captain service workflow', () => {
       useCaptainStore.setState({ cartItems: [], selectedTable: null, selectedTableOrder: null });
     };
 
-    it('moves the running order to a free table and frees the old one', () => {
-      signIn();
+    it('moves the running order to a free table and frees the old one', async () => {
+      await signIn();
       seatWithOrder('1');
       const orderId = table('1').currentOrderId!;
 
@@ -169,8 +169,8 @@ describe('Captain service workflow', () => {
       expect(KOTRepository.getKOTsForOrder(orderId).every((k) => k.tableNumber === '5')).toBe(true);
     });
 
-    it('refuses to move onto a table that is already in use, and leaves both untouched', () => {
-      signIn();
+    it('refuses to move onto a table that is already in use, and leaves both untouched', async () => {
+      await signIn();
       seatWithOrder('1');
       seatWithOrder('2', 1);
       const first = table('1').currentOrderId;
@@ -181,8 +181,8 @@ describe('Captain service workflow', () => {
       expect(table('2').currentOrderId).toBe(second);
     });
 
-    it('merging combines both orders into one bill and keeps the second table linked to it', () => {
-      signIn();
+    it('merging combines both orders into one bill and keeps the second table linked to it', async () => {
+      await signIn();
       seatWithOrder('1', 0, 1);
       seatWithOrder('2', 1, 2);
       const primaryId = table('1').currentOrderId!;
@@ -201,16 +201,16 @@ describe('Captain service workflow', () => {
       expect(table('1').currentGuests).toBe(4);
     });
 
-    it('refuses to merge a table that is not in use', () => {
-      signIn();
+    it('refuses to merge a table that is not in use', async () => {
+      await signIn();
       seatWithOrder('1');
       expect(store().mergeTables('1', '4')).toBe(false);
     });
   });
 
   describe('food ready and serving (BUG-098)', () => {
-    it('dishes the kitchen finished appear as food ready, and serving them clears the list', () => {
-      signIn();
+    it('dishes the kitchen finished appear as food ready, and serving them clears the list', async () => {
+      await signIn();
       store().openTable('1', 2);
       addDish(0, 1);
       addDish(1, 1);
@@ -232,8 +232,8 @@ describe('Captain service workflow', () => {
       expect(store().shiftStats.foodServed).toBeGreaterThan(0);
     });
 
-    it('delivering a table serves every dish the kitchen finished for it in one tap, and leaves other tables alone (BUG-148)', () => {
-      signIn();
+    it('delivering a table serves every dish the kitchen finished for it in one tap, and leaves other tables alone (BUG-148)', async () => {
+      await signIn();
       store().openTable('1', 2);
       addDish(0, 1);
       addDish(1, 2);
@@ -252,8 +252,8 @@ describe('Captain service workflow', () => {
       expect(OrderRepository.getOrderById(table('1').currentOrderId!)!.items.every((i) => i.kitchenStatus === 'SERVED')).toBe(true);
     });
 
-    it('a ticket served as a whole is cleared in one tap', () => {
-      signIn();
+    it('a ticket served as a whole is cleared in one tap', async () => {
+      await signIn();
       store().openTable('1', 2);
       addDish(0, 1);
       const [kot] = store().sendKOT()!;
@@ -268,8 +268,8 @@ describe('Captain service workflow', () => {
   });
 
   describe('a table whose order was settled elsewhere (BUG-097)', () => {
-    it('is freed on refresh, so the waiter is not left with a stuck table', () => {
-      signIn();
+    it('is freed on refresh, so the waiter is not left with a stuck table', async () => {
+      await signIn();
       store().openTable('1', 2);
       addDish(0, 1);
       store().sendKOT();
@@ -285,15 +285,15 @@ describe('Captain service workflow', () => {
     });
   });
   describe('messages and bill requests leave the tablet (BUG-099/100)', () => {
-    it('a message to the kitchen is queued for delivery with the table and the waiters name', () => {
-      signIn();
+    it('a message to the kitchen is queued for delivery with the table and the waiters name', async () => {
+      await signIn();
       store().sendMessage('KITCHEN', 'Food taking too long', 'Table is upset', '4');
       const [record] = ServiceMessages.collectSyncRecords();
       expect(record.payload).toMatchObject({ kind: 'MESSAGE', recipient: 'KITCHEN', senderName: 'Ravi Waiter', presetText: 'Food taking too long', customNote: 'Table is upset', tableNumber: '4' });
     });
 
-    it('a bill request is queued for the counter', () => {
-      signIn();
+    it('a bill request is queued for the counter', async () => {
+      await signIn();
       store().openTable('1', 2);
       addDish(0, 1);
       store().sendKOT();
@@ -304,15 +304,15 @@ describe('Captain service workflow', () => {
       expect(records[0].payload).toMatchObject({ kind: 'BILL_REQUEST', recipient: 'POS', tableNumber: '1', senderName: 'Ravi Waiter' });
     });
 
-    it('a refused bill request queues nothing', () => {
-      signIn();
+    it('a refused bill request queues nothing', async () => {
+      await signIn();
       store().openTable('1', 2);
       expect(store().requestBill('1')).toBe(false);
       expect(ServiceMessages.collectSyncRecords()).toHaveLength(0);
     });
 
-    it('messages that arrive from other devices show up in the inbox once, with a notification', () => {
-      signIn();
+    it('messages that arrive from other devices show up in the inbox once, with a notification', async () => {
+      await signIn();
       const incoming = { id: 'svc-9', kind: 'MESSAGE' as const, recipient: 'CAPTAIN' as const, senderName: 'Manager', presetText: 'Table 9 needs help', tableNumber: '9', createdAt: new Date().toISOString() };
       store().receiveMessages([incoming]);
       store().receiveMessages([incoming]);

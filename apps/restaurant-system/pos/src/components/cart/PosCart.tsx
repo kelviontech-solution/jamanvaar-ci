@@ -7,6 +7,14 @@ import { PosOrderNotesModal } from './PosOrderNotesModal';
 import { PosDiscountModal } from './PosDiscountModal';
 import { PosCustomerSearchDrawer } from '../customers/PosCustomerSearchDrawer';
 import { PosRepeatOrderModal } from '../orders/PosRepeatOrderModal';
+
+// B2-020: offered 1-12 guests regardless of the table's own seating capacity (BUG-109 was fixed
+// for Captain's own guest-count picker only, via this identical helper — captainStore.ts's
+// `guestCountOptions`). A 4-seat table showing "12 guests" as a selectable option is the same bug.
+function guestCountOptions(capacity: number): number[] {
+  const max = Math.max(1, Math.min(Math.floor(capacity) || 1, 12));
+  return Array.from({ length: max }, (_, i) => i + 1);
+}
 import {
   ShoppingBag,
   Plus,
@@ -235,7 +243,7 @@ export const PosCart: React.FC = () => {
                   onChange={(e) => setGuestCount(Number(e.target.value))}
                   className="bg-slate-100 border border-slate-200 rounded-lg px-2 py-1 font-black text-xs text-jaman-deepNavy cursor-pointer"
                 >
-                  {[1, 2, 3, 4, 5, 6, 8, 10, 12].map((n) => (
+                  {guestCountOptions(selectedTable.capacity).map((n) => (
                     <option key={n} value={n}>
                       {n}
                     </option>

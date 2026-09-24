@@ -15,15 +15,15 @@ describe('Staff cross-device sync payload (BUG-019/034/035)', () => {
     db.users = [];
   });
 
-  it('the sync payload carries the PIN hash and role, never a plaintext PIN', () => {
-    const { issuedPin, ...created } = StaffRepository.createUser({ username: 'amitdave', fullName: 'Amit Dave', roleId: 'role-cashier' });
+  it('the sync payload carries the PIN hash and role, never a plaintext PIN', async () => {
+    const { issuedPin, ...created } = await StaffRepository.createUser({ username: 'amitdave', fullName: 'Amit Dave', roleId: 'role-cashier' });
     const payload = StaffRepository.toSyncPayload(created);
     expect(payload).toMatchObject({ id: created.id, username: 'amitdave', fullName: 'Amit Dave', roleId: 'role-cashier', isActive: true });
     expect(payload.pinHash).toBe((created as unknown as { pinHash: string }).pinHash);
     expect(JSON.stringify(payload)).not.toContain(issuedPin);
   });
 
-  it('a remote user is created locally on first pull, and its PIN works', () => {
+  it('a remote user is created locally on first pull, and its PIN works', async () => {
     const remote = { id: 'usr-remote-1', username: 'poojashah', fullName: 'Pooja Shah', email: '', phone: '', roleId: 'role-manager', isActive: true, pinHash: 'pinv1:aabbccddeeff0011', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' };
 
     expect(db.users.find((u) => u.id === 'usr-remote-1')).toBeUndefined();
@@ -31,7 +31,7 @@ describe('Staff cross-device sync payload (BUG-019/034/035)', () => {
 
     const local = db.users.find((u) => u.id === 'usr-remote-1');
     expect(local).toMatchObject({ fullName: 'Pooja Shah', roleId: 'role-manager' });
-    expect(StaffRepository.verifyPin('0000', db.restaurant.id)).toBeNull(); // sanity: wrong pin never matches
+    expect(await StaffRepository.verifyPin('0000', db.restaurant.id)).toBeNull(); // sanity: wrong pin never matches
   });
 
   it('pulling the same user again updates it in place rather than duplicating it', () => {
@@ -57,9 +57,9 @@ describe('Staff cross-device sync payload (BUG-019/034/035)', () => {
     expect(db.users.length).toBe(before);
   });
 
-  it('every real staff member currently in the restaurant produces a valid sync payload (what the app pushes each tick)', () => {
-    StaffRepository.createUser({ username: 'a', fullName: 'A', roleId: 'role-cashier' });
-    StaffRepository.createUser({ username: 'b', fullName: 'B', roleId: 'role-manager' });
+  it('every real staff member currently in the restaurant produces a valid sync payload (what the app pushes each tick)', async () => {
+    await StaffRepository.createUser({ username: 'a', fullName: 'A', roleId: 'role-cashier' });
+    await StaffRepository.createUser({ username: 'b', fullName: 'B', roleId: 'role-manager' });
     const payloads = db.users.map((u) => StaffRepository.toSyncPayload(u));
     expect(payloads).toHaveLength(2);
     for (const p of payloads) {

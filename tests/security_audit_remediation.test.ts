@@ -131,19 +131,19 @@ describe('JAMANVAAR Security Audit Remediation Verification Suite', () => {
   });
 
   describe('3. SEC-006: Captain App Database-backed PIN Authentication', () => {
-    it('a real, Restaurant-Admin-issued PIN authenticates against the captain database pool; nothing else does', () => {
+    it('a real, Restaurant-Admin-issued PIN authenticates against the captain database pool; nothing else does', async () => {
       // BUG-005/006: no seeded demo staff or plaintext PINs any more — a captain's PIN is
       // issued by StaffRepository (shared with captainDb; see captain_db.ts) and stored hashed.
-      const captain = StaffRepository.createUser({ fullName: 'Test Captain', username: 'testcaptain', roleId: 'role-captain' });
+      const captain = await StaffRepository.createUser({ fullName: 'Test Captain', username: 'testcaptain', roleId: 'role-captain' });
       expect(captainDb.users.some((u) => u.id === captain.id)).toBe(true);
 
-      const verified = StaffRepository.verifyPin(captain.issuedPin!);
+      const verified = await StaffRepository.verifyPin(captain.issuedPin!);
       expect(verified?.user.id).toBe(captain.id);
 
       // A random guessed PIN must not authenticate.
       const guesses = ['0000', '1111', '9999'].filter((g) => g !== captain.issuedPin);
       for (const guess of guesses) {
-        expect(StaffRepository.verifyPin(guess)).toBeNull();
+        expect(await StaffRepository.verifyPin(guess)).toBeNull();
       }
     });
   });

@@ -7,7 +7,10 @@ export interface PlatformNotice {
   endsAt: string | null;
 }
 
-const DEFAULT_MESSAGE = 'The platform is under scheduled maintenance. Your terminals keep working offline.';
+// B2-010: used to say "...Your terminals keep working offline." and the UI banner appended its own
+// fixed "Billing is not affected. Your terminals keep working." right after it, with no separating
+// space and the same claim said twice. Shortened so the two pieces no longer overlap in meaning.
+const DEFAULT_MESSAGE = 'The platform is under scheduled maintenance.';
 
 /**
  * The announcement a restaurant app should show right now, or null. Built from the

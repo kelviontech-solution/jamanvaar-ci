@@ -1119,6 +1119,8 @@ export interface SplitPaymentPortion {
 
 export interface ShiftRecord {
   id: string;
+  /** This device's Nth shift ever opened (B2-046) — the display label used to be the last 2 digits of the shift id's millisecond timestamp, which looked like a sequence number but wasn't one. */
+  shiftNumber?: number;
   posId: string;
   cashierId: string;
   cashierName: string;
@@ -1137,6 +1139,8 @@ export interface ShiftRecord {
   totalDiscounts: number;
   totalOrders: number;
   notes?: string;
+  /** B2-056: cross-device sync change time (CollectionSync) — POS pushes, Restaurant Admin pulls. */
+  updatedAt?: string;
 }
 
 export interface CashMovement {
@@ -1148,6 +1152,8 @@ export interface CashMovement {
   cashierName: string;
   authorizedBy?: string;
   timestamp: string;
+  /** B2-056: cross-device sync change time (CollectionSync) — POS pushes, Restaurant Admin pulls. */
+  updatedAt?: string;
 }
 
 export interface KOTItem {

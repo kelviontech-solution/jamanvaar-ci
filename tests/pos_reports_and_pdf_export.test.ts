@@ -122,6 +122,56 @@ describe('JAMANVAAR POS — Reports & Professional PDF Export Suite', () => {
     expect(paneer?.grossRevenue).toBe(560);
   });
 
+  it('2b. B2-032: getTopSellingItemsFromOrders(orders) only counts the SAME orders the report totals used, not the whole device history', () => {
+    seedSampleOrders();
+
+    // A "today" report — the exact shape PosReportsView / pos-admin's dashboard build.
+    const { summary, orders } = ReportGeneratorService.getReportForPeriod('TODAY');
+    expect(orders.length).toBe(2); // only today's 2 orders, per seedSampleOrders()
+
+    // An order from a week-old business day — must never appear in "today"'s report at all,
+    // the way the cross-tenant/all-history contamination described in B2-032 did.
+    const ancientOrder: Order = {
+      ...db.orders[0],
+      id: 'order-ancient-1',
+      orderNumber: 'ORD-ANCIENT-1',
+      businessDayId: 'business-day-ancient',
+      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      items: [
+        {
+          id: 'oi-ancient',
+          orderId: 'order-ancient-1',
+          menuItemId: 'dish-ancient-biryani',
+          name: 'Ancient Biryani',
+          sku: 'AB-01',
+          modifiers: [],
+          quantity: 10,
+          unitPrice: 300,
+          totalPrice: 3000,
+          kitchenStatus: 'SERVED'
+        }
+      ]
+    };
+    db.orders.push(ancientOrder);
+
+    // Old, date-argument-only entry point (still used by the AI assistant / pos-admin's
+    // "all-time" surfaces where that's intentional): correctly still sees it — proves this
+    // fix didn't change getTopSellingItems()'s own long-standing behavior.
+    const allTimeDishes = ReportGeneratorService.getTopSellingItems();
+    expect(allTimeDishes.find((d) => d.name === 'Ancient Biryani')).toBeDefined();
+
+    // Fixed path: fed the exact same `orders` the "today" summary was computed from.
+    const todaysDishes = ReportGeneratorService.getTopSellingItemsFromOrders(orders);
+    expect(todaysDishes.find((d) => d.name === 'Ancient Biryani')).toBeUndefined();
+
+    // And the dish table's own revenue total now agrees with the summary it sits next to —
+    // the exact contradiction B2-032 reported ("dish table adds up to Rs. 2,986" next to
+    // "TOTAL NET SALES Rs. 410") can no longer happen.
+    const todaysDishRevenue = todaysDishes.reduce((sum, d) => sum + d.grossRevenue, 0);
+    expect(todaysDishRevenue).toBe(summary.grossSales);
+  });
+
   it('3. should generate valid PDF 1.4 vector byte stream across all 5 design templates', () => {
     seedSampleOrders();
 

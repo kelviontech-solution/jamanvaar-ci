@@ -4,7 +4,10 @@ export const generateActivationKeySchema = z.object({
   restaurantId: z.string().uuid(),
   subscriptionId: z.string().optional(),
   allowedDeviceType: z.enum(['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'ANY']).default('ANY'),
-  expiresAt: z.coerce.date(),
+  // B2-050: a key created already expired (e.g. `2020-01-01`) used to be accepted (201) and listed
+  // as Active/Available right up until someone tried to redeem it — only then did the date check
+  // (already correct) refuse it with 410. Reject dead-on-arrival keys at creation instead.
+  expiresAt: z.coerce.date().refine((d) => d.getTime() > Date.now(), { message: 'expiresAt must be in the future' }),
   /** BUG-048: the branch the terminal that redeems this key belongs to. */
   branchId: z.string().uuid().optional(),
   /** Becomes the terminal's name, e.g. "Counter 1". */
@@ -34,6 +37,6 @@ export const bulkKeysSchema = z.object({
 
 /** Bringing a key back: an optional new expiry when the old one has passed (default 30 days from now). */
 export const reactivateKeySchema = z.object({
-  expiresAt: z.coerce.date().optional()
+  expiresAt: z.coerce.date().refine((d) => d.getTime() > Date.now(), { message: 'expiresAt must be in the future' }).optional()
 });
 export type ReactivateKeyDto = z.infer<typeof reactivateKeySchema>;

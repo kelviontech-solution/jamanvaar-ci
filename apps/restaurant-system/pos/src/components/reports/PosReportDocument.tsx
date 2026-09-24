@@ -1,7 +1,7 @@
 import React from 'react';
 import { ReportFullData, ReportDesign } from '../../services/pdfReportBuilder';
 import { db, ReceiptRepository } from '@jamanvaar/database';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, formatSplitTax } from '@jamanvaar/utils';
 import {
   Building2,
   Calendar,
@@ -175,13 +175,15 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
               <span>Discounts Granted:</span>
               <strong className="font-mono text-rose-600">- {formatINR(s.discountAmount)}</strong>
             </div>
+            {/* B2-036: derived from the same total as "Total Tax Collected" below via
+                formatSplitTax, so all three figures on this document always agree. */}
             <div className="flex justify-between text-slate-600">
               <span>CGST (2.5%):</span>
-              <strong className="font-mono text-slate-800">{formatINR(s.cgstAmount)}</strong>
+              <strong className="font-mono text-slate-800">{formatSplitTax(s.totalTax, s.cgstAmount, s.sgstAmount).cgst}</strong>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>SGST (2.5%):</span>
-              <strong className="font-mono text-slate-800">{formatINR(s.sgstAmount)}</strong>
+              <strong className="font-mono text-slate-800">{formatSplitTax(s.totalTax, s.cgstAmount, s.sgstAmount).sgst}</strong>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>Total Tax Collected:</span>

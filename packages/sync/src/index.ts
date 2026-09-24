@@ -10,3 +10,4 @@ export * from './heartbeat';
 export * from './display_scale';
 export * from './floor_sync';
 export * from './menu_sync';
+export * from './restaurant_identity';

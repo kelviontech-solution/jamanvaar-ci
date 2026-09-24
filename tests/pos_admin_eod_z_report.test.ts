@@ -127,6 +127,33 @@ describe('JAMANVAAR Restaurant Admin — Premium End of Day (EOD) Z-Report Syste
     expect(db.eodReports.some((r) => r.id === saved.id)).toBe(true);
   });
 
+  it('B2-041: an unpaid (KOT-only) order is not counted as settled revenue or collected cash on the official Z-Report', () => {
+    const before = EodReportService.generateEodReport();
+
+    OrderRepository.createOrder({
+      orderType: 'DINE_IN',
+      items: [
+        { id: 'oi-eod-unpaid', orderId: '', menuItemId: 'item-eod-unpaid', name: 'Unpaid Dish', sku: 'EOD-UNPAID', quantity: 1, unitPrice: 500, modifiers: [], totalPrice: 500, kitchenStatus: 'PENDING' as const }
+      ],
+      subtotal: 500,
+      cgstAmount: 12.5,
+      sgstAmount: 12.5,
+      taxAmount: 25,
+      totalAmount: 525,
+      paymentMethod: 'CASH',
+      paymentStatus: 'PENDING',
+      orderStatus: 'PREPARING',
+      source_type: 'POS'
+    });
+
+    const after = EodReportService.generateEodReport();
+    expect(after.grossRevenue).toBe(before.grossRevenue);
+    expect(after.netRevenue).toBe(before.netRevenue);
+    expect(after.ordersSettled).toBe(before.ordersSettled);
+    expect(after.paymentSettlement.cash.amount).toBe(before.paymentSettlement.cash.amount);
+    expect(after.cashDrawer.cashSales).toBe(before.cashDrawer.cashSales);
+  });
+
   it('should immediately update EOD Branding when Restaurant Settings are edited', () => {
     const originalName = db.restaurant.name;
     const originalGstin = db.restaurant.gstin;

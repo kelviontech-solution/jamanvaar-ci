@@ -1,6 +1,6 @@
 import { Order, OrderStatus } from '@jamanvaar/types';
 import { isUnpaidOpenOrder } from '@jamanvaar/database';
-import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatTime, toCsvRow } from '@jamanvaar/utils';
 
 export interface DaySummary {
   dateKey: string; // YYYY-MM-DD
@@ -439,27 +439,29 @@ export class DayOrdersService {
       'Captain'
     ];
 
+    // B2-061: customer name/phone/cashier/captain are free text exported without any defense
+    // against CSV/formula injection before this fix — toCsvRow sanitizes every field uniformly.
     const rows = summary.orders.map((o) => [
-      `"${o.orderNumber}"`,
-      `"${o.tokenNumber}"`,
-      `"${formatTime(o.createdAt)}"`,
-      `"${o.orderType}"`,
-      `"${o.tableNumber ? 'Table ' + o.tableNumber : 'Counter'}"`,
-      `"${o.customerName || 'Walk-in'}"`,
-      `"${o.customerPhone || ''}"`,
+      o.orderNumber,
+      o.tokenNumber,
+      formatTime(o.createdAt),
+      o.orderType,
+      o.tableNumber ? 'Table ' + o.tableNumber : 'Counter',
+      o.customerName || 'Walk-in',
+      o.customerPhone || '',
       o.items.length,
       o.subtotal,
       o.discountAmount || 0,
       o.taxAmount || 0,
       o.totalAmount,
-      `"${o.paymentMethod}"`,
-      `"${o.paymentStatus}"`,
-      `"${o.orderStatus}"`,
-      `"${o.cashierName || 'Cashier'}"`,
-      `"${o.captainName || ''}"`
+      o.paymentMethod,
+      o.paymentStatus,
+      o.orderStatus,
+      o.cashierName || 'Cashier',
+      o.captainName || ''
     ]);
 
-    return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    return [toCsvRow(headers), ...rows.map(toCsvRow)].join('\r\n');
   }
 
   /**
@@ -488,9 +490,9 @@ export class DayOrdersService {
     ];
 
     const rows = summaries.map((s) => [
-      `"${s.dateKey}"`,
-      `"${s.formattedDate}"`,
-      `"${s.dayOfWeek}"`,
+      s.dateKey,
+      s.formattedDate,
+      s.dayOfWeek,
       s.totalSales,
       s.orderCount,
       s.avgOrderValue,
@@ -508,6 +510,6 @@ export class DayOrdersService {
       s.netSales
     ]);
 
-    return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    return [toCsvRow(headers), ...rows.map(toCsvRow)].join('\r\n');
   }
 }

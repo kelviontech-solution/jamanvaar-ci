@@ -234,4 +234,96 @@ describe('order sync round trip keeps the real ticket (BUG-022/023/034)', () => 
     expect(ticketsAfterFirstRound).toBe(1);
     expect(tickets.flatMap((k) => k.items.map((i) => i.name))).toContain(extra.name);
   });
+
+  describe('B2-045: an order that sells out a recipe dish deducts stock on the device that actually owns the recipe/inventory data', () => {
+    it('POS (no recipe/inventory data at all — the real-world gap, BUG-159) sells a dish; Restaurant Admin (which owns the recipe) deducts it on catch-up, exactly once', async () => {
+      const { InventoryRepository, RecipeRepository } = await import('@jamanvaar/database');
+
+      // "Device A" (POS): confirmed live in the bug's own repro — jamanvaar_db_inventory is
+      // empty on POS before and after a sale. No recipes, no inventory items, on purpose.
+      db.resetToDefaultSeed();
+      db.recipes = [];
+      db.inventoryItems = [];
+      const menuItem = db.menuItems[0];
+      const order = OrderRepository.createOrder({
+        orderType: 'DINE_IN',
+        tableNumber: '9',
+        items: [{
+          id: 'oi-b2045', orderId: '', menuItemId: menuItem.id, name: menuItem.name, sku: menuItem.sku || 'SKU',
+          quantity: 2, unitPrice: menuItem.price, modifiers: [], totalPrice: menuItem.price * 2, kitchenStatus: 'PREPARING'
+        } as any],
+        subtotal: menuItem.price * 2,
+        taxAmount: 0,
+        totalAmount: menuItem.price * 2,
+        orderStatus: 'PREPARING',
+        paymentStatus: 'PENDING',
+        cashierName: 'Real Cashier',
+        source_type: 'POS'
+      });
+      // The deduction genuinely could not happen here — there is nothing to deduct from.
+      expect(db.inventoryItems).toHaveLength(0);
+
+      SyncOutboxEngine.configureTransport(fakeCloudTransport());
+      await SyncOutboxEngine.processOutbox();
+
+      // "Device B" (Restaurant Admin): the only place recipes/inventory are ever entered.
+      db.resetToDefaultSeed();
+      db.recipes = [];
+      db.inventoryItems = [];
+      const paneer = InventoryRepository.createItem({
+        name: 'QA Paneer', sku: 'QA-PAN', category: 'Dairy', unit: 'kg', currentStock: 5, minStockLevel: 1, reorderLevel: 2, costPerUnit: 300
+      })!;
+      RecipeRepository.createRecipe({
+        menuItemId: menuItem.id,
+        menuItemName: menuItem.name,
+        ingredients: [{ inventoryItemId: paneer.id, inventoryItemName: 'QA Paneer', quantityPerPortion: 0.5, unit: 'kg' }]
+      } as any);
+
+      await SyncOutboxEngine.catchUpFromCloud();
+
+      const stockAfter = InventoryRepository.getItemById(paneer.id)!.currentStock;
+      expect(stockAfter).toBeCloseTo(4); // 5kg - (2 x 0.5kg) = 4kg — exactly what the bug said it should be
+
+      // Catching up again (a routine poll, nothing new happened) must not deduct a second time.
+      await SyncOutboxEngine.catchUpFromCloud();
+      expect(InventoryRepository.getItemById(paneer.id)!.currentStock).toBeCloseTo(4);
+    });
+
+    it('does not deduct for an order that arrives already CANCELLED — it was never actually served', async () => {
+      const { InventoryRepository, RecipeRepository } = await import('@jamanvaar/database');
+
+      db.resetToDefaultSeed();
+      db.recipes = [];
+      db.inventoryItems = [];
+      const menuItem = db.menuItems[0];
+      const order = OrderRepository.createOrder({
+        orderType: 'TAKEAWAY',
+        items: [{
+          id: 'oi-b2045-c', orderId: '', menuItemId: menuItem.id, name: menuItem.name, sku: menuItem.sku || 'SKU',
+          quantity: 1, unitPrice: menuItem.price, modifiers: [], totalPrice: menuItem.price, kitchenStatus: 'PREPARING'
+        } as any],
+        subtotal: menuItem.price, taxAmount: 0, totalAmount: menuItem.price,
+        orderStatus: 'PREPARING', paymentStatus: 'PENDING', source_type: 'POS'
+      });
+      OrderRepository.voidOrder(order.id, 'guest changed mind', 'Manager');
+
+      SyncOutboxEngine.configureTransport(fakeCloudTransport());
+      await SyncOutboxEngine.processOutbox();
+
+      db.resetToDefaultSeed();
+      db.recipes = [];
+      db.inventoryItems = [];
+      const paneer = InventoryRepository.createItem({
+        name: 'QA Paneer', sku: 'QA-PAN-2', category: 'Dairy', unit: 'kg', currentStock: 5, minStockLevel: 1, reorderLevel: 2, costPerUnit: 300
+      })!;
+      RecipeRepository.createRecipe({
+        menuItemId: menuItem.id,
+        menuItemName: menuItem.name,
+        ingredients: [{ inventoryItemId: paneer.id, inventoryItemName: 'QA Paneer', quantityPerPortion: 0.5, unit: 'kg' }]
+      } as any);
+
+      await SyncOutboxEngine.catchUpFromCloud();
+      expect(InventoryRepository.getItemById(paneer.id)!.currentStock).toBeCloseTo(5); // unchanged
+    });
+  });
 });

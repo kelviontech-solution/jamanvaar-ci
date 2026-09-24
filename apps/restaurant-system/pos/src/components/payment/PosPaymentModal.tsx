@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { usePosStore } from '../../store/posStore';
+import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { PaymentMethod, PaymentSplit } from '@jamanvaar/types';
 import { OrderRepository } from '@jamanvaar/database';
 import { formatINR, generateUUID } from '@jamanvaar/utils';
@@ -83,7 +83,9 @@ export const PosPaymentModal: React.FC = () => {
     completePayment,
     isDiscountModalOpen,
     setIsDiscountModalOpen,
-    removeDiscount
+    removeDiscount,
+    currentUser,
+    requestManagerOverride
   } = usePosStore();
 
   const totalPayable = Number(cart?.totalPayable) || 0;
@@ -380,14 +382,51 @@ export const PosPaymentModal: React.FC = () => {
       ([, amt]) => amt > 0
     );
 
+    // B2-062: House Account defers real payment to a customer's own credit/ledger — settling it
+    // with no customer attached recorded a real ₹0-cost "sale" with nothing anywhere to ever
+    // reconcile it against (no customer, no ledger entry to be short), a clean way for a
+    // cashier to pocket cash while the till and every report show the bill as settled. Requiring
+    // a real, already-attached customer at minimum makes the sale traceable to a named party,
+    // and a manager PIN (the same gate a high discount or a void needs) stops a cashier from
+    // using it unsupervised — same treatment as HIGH_DISCOUNT in PosDiscountModal.tsx.
+    const usesHouseAccount = activeEntries.some(([channel]) => channel === 'HOUSE_ACCOUNT');
+    if (usesHouseAccount && !selectedCustomer) {
+      setErrorMessage('⚠ House Account requires a customer to be attached first — use "Attach Customer" on the cart.');
+      return;
+    }
+
     let finalMethod: PaymentMethod = 'CASH';
     if (activeEntries.length > 1) {
       finalMethod = 'SPLIT';
     } else if (activeEntries.length === 1) {
       const single = activeEntries[0][0];
-      finalMethod = single === 'CASH' ? 'CASH' : single === 'UPI' ? 'UPI_QR' : single === 'CARD' ? 'CARD' : 'WALLET';
+      finalMethod =
+        single === 'CASH' ? 'CASH'
+        : single === 'UPI' ? 'UPI_QR'
+        : single === 'CARD' ? 'CARD'
+        // B2-062: this used to fall through to 'WALLET' for HOUSE_ACCOUNT too (there was no
+        // dedicated branch), recording a deferred-payment sale identically to a real digital
+        // wallet payment — indistinguishable in every report. PaymentMethod already has 'CREDIT'
+        // defined for exactly this and nothing was using it.
+        : single === 'HOUSE_ACCOUNT' ? 'CREDIT'
+        : 'WALLET';
     }
 
+    const isManagerRole = isManagerOrAboveRole(currentUser);
+    if (usesHouseAccount && !isManagerRole) {
+      requestManagerOverride(
+        'HOUSE_ACCOUNT_SETTLE',
+        'House Account Settlement Approval',
+        `Cashier ${currentUser?.fullName || 'this cashier'} is settling ₹${totalPayable} to ${selectedCustomer?.name || 'the attached customer'}'s House Account.`,
+        () => performSettle(activeEntries, finalMethod)
+      );
+      return;
+    }
+
+    performSettle(activeEntries, finalMethod);
+  };
+
+  const performSettle = (activeEntries: [PaymentChannel, number][], finalMethod: PaymentMethod) => {
     settlingRef.current = true;
     setIsProcessing(true);
 

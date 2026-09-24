@@ -144,12 +144,12 @@ interface PosState {
   } | null;
 
   // Data Actions
-  loginWithPin: (pin: string) => { success: boolean; error?: string };
+  loginWithPin: (pin: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   /** Called once on app start to restore persisted session (no PIN required) */
   restoreSession: () => void;
   lockTerminal: () => void;
-  unlockTerminal: (pin: string) => boolean;
+  unlockTerminal: (pin: string) => Promise<boolean>;
   toggleNetworkStatus: () => void;
 
   setActiveTab: (tab: PosTab) => void;
@@ -334,6 +334,12 @@ function syncOrderToCart(order: Order, cart: Cart): void {
   order.cgstAmount = cart.cgstAmount;
   order.sgstAmount = cart.sgstAmount;
   order.taxAmount = cart.taxAmount;
+  // B2-019: this copied every other cart total onto the order except roundOffAmount, so a
+  // running order's total (correctly rounded, e.g. 409.50 -> 410) stopped agreeing with its own
+  // subtotal+tax the moment it was sent to the kitchen and paid for later — the normal POS flow —
+  // while the receipt's own "Round Off" line stayed hidden (gated on `roundOffAmount !== 0`,
+  // which a stale/never-set 0 always satisfies as "nothing to show").
+  order.roundOffAmount = cart.roundOffAmount;
   order.totalAmount = cart.totalPayable;
   order.updatedAt = new Date().toISOString();
   order.syncStatus = 'SAVED_LOCALLY';
@@ -440,8 +446,8 @@ export const usePosStore = create<PosState>((set, get) => {
       }
     },
 
-    loginWithPin: (pin: string) => {
-      const result = StaffRepository.verifyPin(pin);
+    loginWithPin: async (pin: string) => {
+      const result = await StaffRepository.verifyPin(pin);
       const user = result?.user;
 
       if (user && !StaffRepository.canUseTerminal(user.roleId, 'POS')) {
@@ -503,8 +509,8 @@ export const usePosStore = create<PosState>((set, get) => {
       set({ isLocked: true });
     },
 
-    unlockTerminal: (pin: string) => {
-      const result = StaffRepository.verifyPin(pin);
+    unlockTerminal: async (pin: string) => {
+      const result = await StaffRepository.verifyPin(pin);
       if (result) {
         set({ isLocked: false });
         return true;
@@ -1071,6 +1077,13 @@ export const usePosStore = create<PosState>((set, get) => {
           sgstAmount: state.cart.sgstAmount,
           taxAmount: state.cart.taxAmount,
           totalAmount: state.cart.totalPayable,
+          // B2-019: this order-creation call (like the other two in this file, and
+          // syncOrderToCart above) copied every other cart total but not roundOffAmount, so the
+          // stored order kept totalAmount correctly rounded (e.g. 409.50 -> 410) while
+          // roundOffAmount silently stayed 0 — the receipt's own "Round Off" line is gated on
+          // `roundOffAmount !== 0`, so it never printed, and subtotal+CGST+SGST visibly didn't
+          // add up to the total with nothing on the document explaining the ₹0.50 gap.
+          roundOffAmount: state.cart.roundOffAmount,
           paymentMethod: 'CASH',
           paymentStatus: 'PENDING',
           orderStatus: 'PREPARING',
@@ -1196,6 +1209,7 @@ export const usePosStore = create<PosState>((set, get) => {
           sgstAmount: state.cart.sgstAmount,
           taxAmount: state.cart.taxAmount,
           totalAmount: state.cart.totalPayable,
+          roundOffAmount: state.cart.roundOffAmount,
           paymentMethod: method,
           paymentStatus: 'SUCCESS',
           orderStatus: 'COMPLETED',
@@ -1516,7 +1530,25 @@ export const usePosStore = create<PosState>((set, get) => {
         allowedRoles: ['role-super-admin', 'role-manager', 'role-cashier']
       };
 
-      const method = overridePaymentMethod || cfg.paymentMethod || 'CASH';
+      const rawMethod = overridePaymentMethod || cfg.paymentMethod || 'CASH';
+      // B2-062: the Instant Bill settings screen stores the literal string 'HOUSE_ACCOUNT' as
+      // this config's paymentMethod (PosSettingsView.tsx, `paymentMethod: m.id as any` — an
+      // `as any` cast around the fact that 'HOUSE_ACCOUNT' isn't a real PaymentMethod value).
+      // Normalize it to the real value ('CREDIT', already defined for exactly this) the same way
+      // the full payment modal does, instead of saving an untyped, unrecognized string on the order.
+      const isHouseAccount = (rawMethod as string) === 'HOUSE_ACCOUNT';
+      const method: PaymentMethod = isHouseAccount ? 'CREDIT' : rawMethod;
+
+      // B2-062: House Account defers real payment to a customer's own ledger. Instant Bill is a
+      // single-tap, no-review checkout — settling a House Account sale through it with no
+      // customer attached and no oversight would be an even easier version of the same fraud
+      // vector the full payment modal now closes (settle a "sale" nobody can ever trace or
+      // reconcile). Rather than silently completing it or silently failing, route the cashier to
+      // the full Pay screen, which already requires a customer and a manager PIN for this method.
+      if (isHouseAccount && (!state.selectedCustomer || !isManagerOrAboveRole(state.currentUser))) {
+        set({ isPaymentOpen: true, isInstantBillConfirmationOpen: false });
+        return null;
+      }
 
       // If confirmation required and no override was passed from modal
       if (cfg.askConfirmation && !overridePaymentMethod) {
@@ -1567,6 +1599,7 @@ export const usePosStore = create<PosState>((set, get) => {
           sgstAmount: state.cart.sgstAmount,
           taxAmount: state.cart.taxAmount,
           totalAmount: state.cart.totalPayable,
+          roundOffAmount: state.cart.roundOffAmount,
           paymentMethod: method,
           paymentStatus: 'SUCCESS',
           orderStatus: 'COMPLETED',

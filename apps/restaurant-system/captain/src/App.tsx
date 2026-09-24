@@ -228,8 +228,8 @@ export const App: React.FC = () => {
   // Handle Login PIN submission
   // One path for typed and keypad entry, so a wrong PIN always shows the error and clears the
   // entry (BUG-105: the keypad path used to ignore the result and jam at four digits).
-  const attemptLogin = (candidate: string) => {
-    const ok = login(candidate);
+  const attemptLogin = async (candidate: string) => {
+    const ok = await login(candidate);
     setPinError(!ok);
     setPinInput('');
   };
@@ -294,6 +294,8 @@ export const App: React.FC = () => {
           appIdentity="CAPTAIN"
           appTitle="Floor Captain & Service"
           appSubtitle="High-Speed Table Orders & Service"
+          isLocalCoreUnauthorized={captainDb.isLocalCoreUnauthorized()}
+          healthCheckUrl={`${captainDb.getSyncServerUrl()}/api/health`}
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
@@ -346,6 +348,8 @@ export const App: React.FC = () => {
           appIdentity="CAPTAIN"
           appTitle="Floor Captain & Service"
           appSubtitle="High-Speed Table Orders & Service"
+          isLocalCoreUnauthorized={captainDb.isLocalCoreUnauthorized()}
+          healthCheckUrl={`${captainDb.getSyncServerUrl()}/api/health`}
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
@@ -365,7 +369,7 @@ export const App: React.FC = () => {
                   type="text"
                   value={connectRestaurantId}
                   onChange={(e) => setConnectRestaurantId(e.target.value)}
-                  placeholder="Paste the ID, e.g. 7385361b-c19e-4431-beb4-135bb9b3c6db"
+                  placeholder="Paste the ID, e.g. xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                   required
                   className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                 />
@@ -435,6 +439,8 @@ export const App: React.FC = () => {
           appIdentity="CAPTAIN"
           appTitle="Floor Captain & Service"
           appSubtitle="High-Speed Table Orders & Service"
+          isLocalCoreUnauthorized={captainDb.isLocalCoreUnauthorized()}
+          healthCheckUrl={`${captainDb.getSyncServerUrl()}/api/health`}
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."

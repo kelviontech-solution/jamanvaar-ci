@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { BusinessDay, Order, OrderStatus, OrderType, PaymentMethod } from '@jamanvaar/types';
 import { BusinessDayRepository } from '@jamanvaar/database';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, formatSplitTax } from '@jamanvaar/utils';
 import { EmptyState } from '@jamanvaar/ui';
 import {
   X,
@@ -305,13 +305,15 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                       <span className="font-mono">- {formatINR(selectedOrder.discountAmount)}</span>
                     </div>
                   )}
+                  {/* B2-036: derived via formatSplitTax so the two halves always sum to the
+                      displayed Grand Total, instead of formatINR-rounding each stored half on its own. */}
                   <div className="flex justify-between">
                     <span>CGST (2.5%):</span>
-                    <span className="font-mono">{formatINR(selectedOrder.cgstAmount || 0)}</span>
+                    <span className="font-mono">{formatSplitTax(selectedOrder.taxAmount ?? 0, selectedOrder.cgstAmount, selectedOrder.sgstAmount).cgst}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>SGST (2.5%):</span>
-                    <span className="font-mono">{formatINR(selectedOrder.sgstAmount || 0)}</span>
+                    <span className="font-mono">{formatSplitTax(selectedOrder.taxAmount ?? 0, selectedOrder.cgstAmount, selectedOrder.sgstAmount).sgst}</span>
                   </div>
                   <div className="flex justify-between pt-1.5 border-t border-slate-200 font-black text-sm text-jaman-navy">
                     <span>Grand Total:</span>

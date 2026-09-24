@@ -75,4 +75,22 @@ describe('unpaid open orders are not sales', () => {
     expect(after.netSales).toBe(beforeNet);
     expect(after.cashSales).toBe(beforeCash);
   });
+
+  it('B2-034: an unpaid open order does not belong in the Bills & Invoices list itself, not just the totals', () => {
+    // Reproduces PosBillsView.tsx's exact `periodOrders` computation: before the fix this only
+    // excluded CANCELLED orders, so a KOT-only order ended up listed and rendered as a settled
+    // cash invoice ("Total Amount Paid: ₹231") for money nobody took, right alongside totals
+    // that (via calculateFinancialSummary's isUnpaidOpenOrder check) correctly excluded it —
+    // the list and the totals disagreed on the same screen.
+    const paid = make({ orderStatus: 'COMPLETED', paymentStatus: 'SUCCESS', paymentMethod: 'CASH' });
+    const unpaidKotOnly = make({ orderStatus: 'PREPARING', paymentStatus: 'PENDING', paymentMethod: 'CASH' });
+
+    const range = CentralReportingService.getBusinessDateRange('TODAY');
+    const billsShown = CentralReportingService.getReportableOrders(db.orders, range, { includeCancelled: true }).filter(
+      (o) => !isUnpaidOpenOrder(o)
+    );
+
+    expect(billsShown.some((o) => o.id === paid.id)).toBe(true);
+    expect(billsShown.some((o) => o.id === unpaidKotOnly.id)).toBe(false);
+  });
 });

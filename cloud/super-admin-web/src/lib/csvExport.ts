@@ -3,9 +3,22 @@ export interface CsvColumn<T> {
   value: (row: T) => string | number | null | undefined;
 }
 
+// B2-061: this escaped an internal quote but did nothing about CSV/formula injection
+// (CWE-1236) — a cell starting with `=`, `+`, `-` or `@` is evaluated as a formula the moment
+// the exported file is opened in Excel/Sheets. Every list page on this app (restaurants,
+// owners, devices, billing, reports, audit logs, activation keys) funnels through this one
+// function, so restaurant/owner names — free text a Super Admin enters when creating a
+// restaurant — reach it unsanitized against that class of attack. Prefixing a leading
+// formula-trigger character with `'` is the standard mitigation: the spreadsheet then renders
+// the value as literal text instead of evaluating it.
+const FORMULA_TRIGGER_CHARS = new Set(['=', '+', '-', '@', '\t', '\r']);
+
 function escapeCsvCell(value: string | number | null | undefined): string {
-  const str = value === null || value === undefined ? '' : String(value);
-  if (/[",\n]/.test(str)) {
+  let str = value === null || value === undefined ? '' : String(value);
+  if (str.length > 0 && FORMULA_TRIGGER_CHARS.has(str[0])) {
+    str = `'${str}`;
+  }
+  if (/[",\n\r]/.test(str)) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;

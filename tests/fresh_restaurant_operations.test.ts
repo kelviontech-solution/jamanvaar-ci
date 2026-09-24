@@ -31,4 +31,20 @@ describe('A newly activated restaurant starts without demo operations data (BUG-
     TableRepository.createTable({ tableNumber: '1', capacity: 4, zone: 'Main Hall' });
     expect(db.tables).toHaveLength(1);
   });
+
+  /**
+   * B2-011/B2-018: a brand-new restaurant showed 2 live "cooking" orders and their kitchen
+   * tickets before any real order was ever placed — on Restaurant Admin, POS and the live
+   * kitchen board. Investigated down to two independent causes, both already fixed elsewhere:
+   * `generateSeedOrders()` (seed.ts) used to fabricate sales history and now correctly returns
+   * `[]`, and the specific two ₹922 orders seen live were actually traced to the B2-029
+   * cross-tenant data leak (another restaurant's real orders, pulled in through a missing
+   * `restaurantId` filter on the cloud sync endpoints) rather than to seed data at all. This
+   * locks in both: no seed orders ship by default, and none are fabricated for KOTs either
+   * (KOTs only ever come from real orders — `db.kots` has no seed function of its own).
+   */
+  it('a newly activated restaurant has zero orders and zero kitchen tickets (B2-011/B2-018)', () => {
+    expect(db.orders).toEqual([]);
+    expect(db.kots).toEqual([]);
+  });
 });

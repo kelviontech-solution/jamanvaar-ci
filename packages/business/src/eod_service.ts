@@ -1,5 +1,5 @@
 import { EodReport, EodReportBranding, Order, ShiftRecord } from '@jamanvaar/types';
-import { db , getOrderTenders } from '@jamanvaar/database';
+import { db , getOrderTenders, isUnpaidOpenOrder } from '@jamanvaar/database';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 import { DayOrdersService } from './day_orders_service';
 
@@ -109,6 +109,11 @@ export class EodReportService {
 
     dayOrders.forEach((o) => {
       if (o.orderStatus === 'CANCELLED') return;
+      // B2-041: an order only sent to the kitchen (or a kiosk "pay at counter" checkout never
+      // completed) is not money yet — same BUG-151 defect already fixed on the Dashboard and
+      // Payments & Split pages, but not here, on the official EOD Z-Report a manager locks and
+      // an owner reconciles the cash drawer against.
+      if (isUnpaidOpenOrder(o)) return;
 
       if (o.orderStatus === 'REFUNDED') {
         refundsAmount += o.totalAmount;

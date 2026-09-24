@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { printElement } from '@jamanvaar/ui';
 import { EodReport } from '@jamanvaar/types';
-import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
+import { formatINR, formatDate, formatTime, formatSplitTax } from '@jamanvaar/utils';
 import { db } from '@jamanvaar/database';
 import { EodReportService, DayOrdersService } from '@jamanvaar/business';
 import {
@@ -416,16 +416,17 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                     {formatINR(report.gstSummary.taxableValue)}
                   </span>
                 </div>
+                {/* B2-036: derived from the same total as "Total GST" below via formatSplitTax. */}
                 <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-200">
                   <span className="text-[9px] text-slate-500 font-bold block uppercase">CGST (2.5%)</span>
                   <span className="font-mono font-bold text-slate-800 text-xs block mt-0.5">
-                    {formatINR(report.gstSummary.cgstAmount)}
+                    {formatSplitTax(report.gstSummary.totalTax, report.gstSummary.cgstAmount, report.gstSummary.sgstAmount).cgst}
                   </span>
                 </div>
                 <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-200">
                   <span className="text-[9px] text-slate-500 font-bold block uppercase">SGST (2.5%)</span>
                   <span className="font-mono font-bold text-slate-800 text-xs block mt-0.5">
-                    {formatINR(report.gstSummary.sgstAmount)}
+                    {formatSplitTax(report.gstSummary.totalTax, report.gstSummary.cgstAmount, report.gstSummary.sgstAmount).sgst}
                   </span>
                 </div>
                 <div className="p-1.5 bg-orange-50 rounded-lg border border-orange-200">
@@ -848,13 +849,14 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
               <span>Taxable Value:</span>
               <span>{formatINR(report.gstSummary.taxableValue)}</span>
             </div>
+            {/* B2-036: derived from the same total as "Total GST" below via formatSplitTax. */}
             <div className="flex justify-between">
               <span>CGST (2.5%):</span>
-              <span>{formatINR(report.gstSummary.cgstAmount)}</span>
+              <span>{formatSplitTax(report.gstSummary.totalTax, report.gstSummary.cgstAmount, report.gstSummary.sgstAmount).cgst}</span>
             </div>
             <div className="flex justify-between">
               <span>SGST (2.5%):</span>
-              <span>{formatINR(report.gstSummary.sgstAmount)}</span>
+              <span>{formatSplitTax(report.gstSummary.totalTax, report.gstSummary.cgstAmount, report.gstSummary.sgstAmount).sgst}</span>
             </div>
             <div className="flex justify-between font-bold">
               <span>Total GST:</span>

@@ -1,10 +1,16 @@
 import { z } from 'zod';
 
+// B2-050: renewing a subscription with `expiresAt: 2020-01-01` was accepted (200) and left the
+// subscription `status: ACTIVE` with an expiry six years in the past — the restaurant's owner
+// could still sign in and Super Admin could still issue activation keys for it. Applied to every
+// expiresAt in this module, not just renew: the same defect would reproduce identically on assign.
+const futureDate = () => z.coerce.date().refine((d) => d.getTime() > Date.now(), { message: 'expiresAt must be in the future' });
+
 export const assignSubscriptionSchema = z.object({
   restaurantId: z.string().uuid(),
   planId: z.string().min(1),
   status: z.enum(['TRIAL', 'ACTIVE']).default('ACTIVE'),
-  expiresAt: z.coerce.date(),
+  expiresAt: futureDate(),
   trialEndsAt: z.coerce.date().optional(),
   // Explicit enabled-application list from the onboarding wizard's modules
   // step. Omit to fall back to the plan tier's defaults (see
@@ -23,5 +29,5 @@ export const extendSchema = z.object({
 });
 
 export const renewSchema = z.object({
-  expiresAt: z.coerce.date()
+  expiresAt: futureDate()
 });

@@ -13,8 +13,8 @@ import type { PlanEntitlements, PlanTier } from '@jamanvaar/types';
  * the existing local mock (LicenseRepository) as its fallback.
  */
 
-import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData } from '@jamanvaar/sync';
-import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
+import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData, pullRestaurantIdentity, pushRestaurantIdentity, type RestaurantIdentityFields } from '@jamanvaar/sync';
+import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository, LicenseRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 
@@ -486,6 +486,41 @@ export async function fetchEntitlements(): Promise<{ data: CloudEntitlementsResp
   }
 }
 
+/**
+ * B2-055: a Super Admin plan change (PRO → CORE) locked the affected apps within seconds via the
+ * device-gate heartbeat, but Restaurant Admin's own Subscription Plans page, sidebar badges and
+ * JAMAN AI button kept reading the old tier — `LicenseRepository` was only ever refreshed from the
+ * live cloud when the Subscription Plans screen happened to be mounted (its own `useEffect`), so
+ * an owner not currently on that exact screen saw stale PRO-only features on a CORE plan
+ * indefinitely. Pulled out of that screen's own refresh handler so the app's periodic sync tick
+ * can keep `LicenseRepository` fresh regardless of which screen is open, the same way
+ * POS/Captain/Kiosk detect their own app-level lock quickly via heartbeat — the Settings screen
+ * still calls `fetchEntitlements()` itself for its own on-screen sync-status display, and passes
+ * the result here for the shared "apply it locally" step.
+ */
+export function applyEntitlementsToLicense(data: CloudEntitlementsResponse): void {
+  if (!data.planTier || !data.entitlements) return;
+  const isPro = data.planTier === 'PRO';
+  const isEligible = data.subscriptionStatus === 'ACTIVE' || data.subscriptionStatus === 'TRIAL';
+  LicenseRepository.updateLicense({
+    tier: isPro ? 'PRO' : 'CORE',
+    planName: data.planName || (isPro ? 'JAMANVAAR PRO' : 'JAMANVAAR CORE'),
+    price: isPro ? 7000 : 5000,
+    status: isEligible ? 'ACTIVE' : 'SUSPENDED',
+    entitlements: {
+      ...data.entitlements,
+      qrTableOrdering: isPro && data.entitlements.qrTableOrdering !== false
+    }
+  });
+}
+
+/** Fetches and applies in one call — what the app's periodic sync tick uses. */
+export async function refreshCloudEntitlementsIntoLicense(): Promise<CloudEntitlementsResponse | null> {
+  const { data } = await fetchEntitlements();
+  if (data) applyEntitlementsToLicense(data);
+  return data;
+}
+
 // ──────────────────────────────────────────────────────────────────────────
 // Tenant Billing & Invoices Operations
 // ──────────────────────────────────────────────────────────────────────────
@@ -743,6 +778,21 @@ export async function reportDeviceHeartbeat(): Promise<void> {
     restaurantId: localStorage.getItem(RESTAURANT_ID_KEY),
     deviceId: localStorage.getItem(DEVICE_ID_KEY)
   });
+}
+
+/** B2-054: picks up a restaurant-identity edit made on another device (or by Super Admin). */
+export async function syncRestaurantIdentity(): Promise<void> {
+  const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
+  const restaurantId = localStorage.getItem(RESTAURANT_ID_KEY);
+  if (!deviceToken || !restaurantId) return;
+  await pullRestaurantIdentity({ apiBase: API_BASE, deviceToken, restaurantId });
+}
+
+/** B2-054: Settings Save sends the owner's edit to the cloud, so every other terminal picks it up too. */
+export async function saveRestaurantIdentity(identity: RestaurantIdentityFields): Promise<void> {
+  const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
+  if (!deviceToken) return;
+  await pushRestaurantIdentity({ apiBase: API_BASE, deviceToken, identity });
 }
 
 /**

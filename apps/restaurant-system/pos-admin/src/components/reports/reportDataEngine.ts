@@ -1,4 +1,4 @@
-import { db } from '@jamanvaar/database';
+import { db, isUnpaidOpenOrder } from '@jamanvaar/database';
 import { Order, MenuItem, Category, DiningTable, User } from '@jamanvaar/types';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 
@@ -390,10 +390,21 @@ export class ReportDataEngine {
 
   /**
    * Filter orders by date range and additional criteria
+   *
+   * B2-041: this only ever excluded CANCELLED orders, so every order sent to the kitchen (or a
+   * kiosk "pay at counter" checkout the guest walked away from) but never actually paid counted
+   * here as a "completed transaction" and as cash/UPI collected — the exact BUG-151 defect
+   * already fixed on the Dashboard and Payments & Split pages (both of which use a different
+   * code path, `CentralReportingService`/`isUnpaidOpenOrder`), but never on this report engine,
+   * which is what the PDF/CSV an owner files or sends to an accountant is built from. Same
+   * canonical check now applies here too, so every screen agrees.
    */
   public static getOrders(range: ReportDateRange, filters?: ReportFilterOptions, includeCancelled = false): Order[] {
     return (db.orders || []).filter((o) => {
       if (!includeCancelled && o.orderStatus === 'CANCELLED') return false;
+      // Independent of includeCancelled — an unpaid open order was never money collected
+      // regardless of whether cancelled orders are also being shown.
+      if (isUnpaidOpenOrder(o)) return false;
 
       const oDate = new Date(o.createdAt);
       if (oDate < range.startDate || oDate > range.endDate) return false;

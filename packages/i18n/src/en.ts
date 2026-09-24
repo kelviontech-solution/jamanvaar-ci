@@ -86,7 +86,12 @@ export const en = {
   invalidCoupon: 'Invalid or Expired Coupon Code',
   callStaff: 'Call Staff',
   staffAssistance: 'Staff Assistance Requested',
-  staffOnTheWay: 'A team member has been notified and is heading to your kiosk/table.',
+  // B2-059: this used to say "...is heading to your kiosk/table" — CALL_STAFF messages are
+  // deliberately routed only to the counter/POS and Kiosk Admin console (see
+  // packages/database/src/service_messages.ts's isRecipientFor), never to Captain/the floor
+  // staff, so nobody is actually "heading" anywhere specific. Worded to match what is actually
+  // guaranteed: the counter was notified, not that a person is already walking over.
+  staffOnTheWay: 'The counter has been notified and will assist you shortly.',
   cancel: 'Cancel',
   confirm: 'Confirm',
   back: 'Back',

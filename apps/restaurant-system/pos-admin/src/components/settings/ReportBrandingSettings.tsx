@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { db } from '@jamanvaar/database';
+import { isValidGstinFormat, isValidFssaiFormat, isValidIndianPincode, isValidIndianPhone } from '@jamanvaar/utils';
+import { saveRestaurantIdentity } from '../../cloud/cloudClient';
 import {
   Building,
   FileText,
@@ -50,9 +52,31 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
   const [ownerName, setOwnerName] = useState(db.restaurant.ownerName || 'Ramesh Patel');
   const [managerName, setManagerName] = useState(db.restaurant.managerName || 'Pooja Shah');
   const [showJamanAI, setShowJamanAI] = useState(db.restaurant.showJamanAI !== false);
+  // B2-040: GSTIN/FSSAI/pincode/phone were accepted as any string with no format check at all —
+  // "GSTIN: abc" reached real customer tax invoices via db.receiptConfig below. All four stay
+  // optional (a small/unregistered restaurant may genuinely have none), but a value that IS
+  // given must be well-formed, same rule Super Admin's own create/update-restaurant API already
+  // enforces server-side (BUG-054) — this screen never went through that API at all.
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const errors: Record<string, string> = {};
+    if (gstin.trim() && !isValidGstinFormat(gstin)) {
+      errors.gstin = 'GSTIN must be 15 characters in the standard format (e.g. 24AAACR5055K1Z1).';
+    }
+    if (fssaiNumber.trim() && !isValidFssaiFormat(fssaiNumber)) {
+      errors.fssaiNumber = 'FSSAI licence number must be exactly 14 digits.';
+    }
+    if (pincode.trim() && !isValidIndianPincode(pincode)) {
+      errors.pincode = 'Enter a valid 6-digit PIN code.';
+    }
+    if (phone.trim() && !isValidIndianPhone(phone)) {
+      errors.phone = 'Enter a valid 10-digit Indian phone number.';
+    }
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
 
     // Update restaurant
     db.restaurant.name = name;
@@ -96,6 +120,11 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
     db.restaurant.showJamanAI = showJamanAI;
 
     db.notify();
+    // B2-054: the legal/registration details (name, GSTIN, FSSAI, address, city, state) used to
+    // stay on this one device forever — POS, Captain, KDS and both kiosk apps never learned of an
+    // edit made here, and it was lost entirely on a fresh device or a reinstall. Best-effort: a
+    // failed push is simply retried by every terminal's own periodic pull once this one succeeds.
+    void saveRestaurantIdentity({ name, legalName, gstin, fssaiNumber, address, city, state });
     onUpdated();
     showToast('Restaurant Branding & Accounting Profile Saved!');
   };
@@ -208,7 +237,6 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
               </label>
               <input
                 type="text"
-                required
                 value={legalName}
                 onChange={(e) => setLegalName(e.target.value)}
                 placeholder="e.g. JAMANVAAR FOODS & HOSPITALITY PRIVATE LIMITED"
@@ -268,12 +296,13 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
               </label>
               <input
                 type="text"
-                required
                 value={gstin}
                 onChange={(e) => setGstin(e.target.value.toUpperCase())}
                 placeholder="24ABCDE1234F1Z5"
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
+                className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron ${fieldErrors.gstin ? 'border-rose-400' : 'border-jaman-border'}`}
               />
+              {fieldErrors.gstin && <span className="text-[10px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.gstin}</span>}
+              <span className="text-[10px] text-slate-400 mt-0.5 block">Optional — leave blank if not GST-registered</span>
             </div>
 
             <div>
@@ -282,12 +311,12 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
               </label>
               <input
                 type="text"
-                required
                 value={fssaiNumber}
                 onChange={(e) => setFssaiNumber(e.target.value)}
                 placeholder="10722001000452"
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
+                className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron ${fieldErrors.fssaiNumber ? 'border-rose-400' : 'border-jaman-border'}`}
               />
+              {fieldErrors.fssaiNumber && <span className="text-[10px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.fssaiNumber}</span>}
             </div>
 
             <div>
@@ -350,13 +379,13 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 />
                 <input
                   type="text"
-                  required
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
                   placeholder="380054"
-                  className="w-1/3 bg-jaman-ivory border border-jaman-border rounded-xl px-2 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
+                  className={`w-1/3 bg-jaman-ivory border rounded-xl px-2 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron ${fieldErrors.pincode ? 'border-rose-400' : 'border-jaman-border'}`}
                 />
               </div>
+              {fieldErrors.pincode && <span className="text-[10px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.pincode}</span>}
             </div>
           </div>
         </div>
@@ -377,8 +406,9 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+91 79 4890 1234"
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
+                className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron ${fieldErrors.phone ? 'border-rose-400' : 'border-jaman-border'}`}
               />
+              {fieldErrors.phone && <span className="text-[10px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.phone}</span>}
             </div>
 
             <div>

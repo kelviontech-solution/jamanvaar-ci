@@ -81,7 +81,7 @@ export const hi = {
   invalidCoupon: 'अमान्य कूपन कोड',
   callStaff: 'स्टाफ को बुलाएं',
   staffAssistance: 'स्टाफ सहायता का अनुरोध भेजा गया',
-  staffOnTheWay: 'हमारे सहयोगी को सूचना मिल गई है और वे आपके पास आ रहे हैं।',
+  staffOnTheWay: 'काउंटर को सूचित कर दिया गया है और वे जल्द ही आपकी सहायता करेंगे।', // B2-059: see en.ts
   cancel: 'रद्द करें',
   confirm: 'पुष्टि करें',
   back: 'पीछे',

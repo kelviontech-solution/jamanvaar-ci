@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Order } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
 import { JAMANVAAR_LOGOS, printElement } from '@jamanvaar/ui';
-import { formatDate, formatTime, formatINR } from '@jamanvaar/utils';
+import { formatDate, formatTime, formatINR, formatSplitTax } from '@jamanvaar/utils';
 import {
   ReportDesignTheme,
   ReportSummaryMetrics,
@@ -478,8 +478,9 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                         <td className="p-2.5 font-bold text-jaman-navy">{g.taxRatePercent}% Food GST</td>
                         <td className="p-2.5 font-mono">{g.invoicesCount} Invoices</td>
                         <td className="p-2.5 font-mono font-bold text-right">{formatINR(g.taxableAmount)}</td>
-                        <td className="p-2.5 font-mono text-right text-jaman-saffron">{formatINR(g.cgstAmount)}</td>
-                        <td className="p-2.5 font-mono text-right text-jaman-saffron">{formatINR(g.sgstAmount)}</td>
+                        {/* B2-036: derived from the same row's own totalTax via formatSplitTax. */}
+                        <td className="p-2.5 font-mono text-right text-jaman-saffron">{formatSplitTax(g.totalTax, g.cgstAmount, g.sgstAmount).cgst}</td>
+                        <td className="p-2.5 font-mono text-right text-jaman-saffron">{formatSplitTax(g.totalTax, g.cgstAmount, g.sgstAmount).sgst}</td>
                         <td className="p-2.5 font-mono font-black text-right text-slate-900">{formatINR(g.totalTax)}</td>
                       </tr>
                     ))}

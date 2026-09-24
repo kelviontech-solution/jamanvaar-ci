@@ -101,11 +101,27 @@ export const ItemModal: React.FC<ItemModalProps> = ({
     reader.readAsDataURL(file);
   };
 
+  // B2-039: none of these had any validation — a blank (whitespace-only) name, a duplicate name,
+  // a ₹9,99,99,999 price and raw HTML in the name were all accepted, none refused, no message on
+  // any. React escapes the name on screen, so nothing executes there, but the raw string is still
+  // stored and synced to receipts/KOTs/printers, which don't get that same escaping for free.
+  const MAX_DISH_PRICE = 100000; // no real dish costs more; catches the fat-finger ₹9,99,99,999 case
+  const MAX_NAME_LENGTH = 80;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
-    if (!name || !price) {
+    const trimmedName = name.trim();
+    if (!trimmedName || !price) {
       setFormError('Dish name and price are required.');
+      return;
+    }
+    if (trimmedName.length > MAX_NAME_LENGTH) {
+      setFormError(`Dish name is too long — keep it under ${MAX_NAME_LENGTH} characters.`);
+      return;
+    }
+    if (/[<>]/.test(trimmedName)) {
+      setFormError('Dish name cannot contain < or > characters.');
       return;
     }
 
@@ -114,10 +130,22 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       setFormError('Price must be a number greater than zero.');
       return;
     }
+    if (numPrice > MAX_DISH_PRICE) {
+      setFormError(`Price is unrealistically large — enter a value under ₹${MAX_DISH_PRICE.toLocaleString('en-IN')}.`);
+      return;
+    }
+
+    const nameCollision = db.menuItems.find(
+      (i) => i.name.trim().toLowerCase() === trimmedName.toLowerCase() && i.id !== itemToEdit?.id
+    );
+    if (nameCollision) {
+      setFormError(`"${trimmedName}" already exists on the menu — edit that dish instead of creating a duplicate.`);
+      return;
+    }
 
     if (itemToEdit) {
       MenuRepository.updateMenuItem(itemToEdit.id, {
-        name,
+        name: trimmedName,
         sku,
         price: numPrice,
         categoryId,
@@ -134,12 +162,12 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       AuditRepository.log({
         action: 'MENU_ITEM_UPDATED',
         category: 'MENU',
-        details: `Updated dish "${name}" (Price: ₹${numPrice}, SKU: ${sku}, Modifiers: ${modifierGroupIds.length})`,
+        details: `Updated dish "${trimmedName}" (Price: ₹${numPrice}, SKU: ${sku}, Modifiers: ${modifierGroupIds.length})`,
         username: 'Manager'
       });
     } else {
       MenuRepository.createMenuItem({
-        name,
+        name: trimmedName,
         sku,
         price: numPrice,
         categoryId: categoryId || categories[0]?.id,
@@ -156,7 +184,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       AuditRepository.log({
         action: 'MENU_ITEM_CREATED',
         category: 'MENU',
-        details: `Created dish "${name}" (Price: ₹${numPrice}, SKU: ${sku}, Modifiers: ${modifierGroupIds.length})`,
+        details: `Created dish "${trimmedName}" (Price: ₹${numPrice}, SKU: ${sku}, Modifiers: ${modifierGroupIds.length})`,
         username: 'Manager'
       });
     }
@@ -180,6 +208,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
             <input
               type="text"
               required
+              maxLength={MAX_NAME_LENGTH}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Paneer Butter Masala"
@@ -192,6 +221,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
               type="number"
               required
               min="1"
+              max={MAX_DISH_PRICE}
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="e.g. 260"

@@ -18,7 +18,7 @@ import type {
   CloudSyncedEntity
 } from '@jamanvaar/sync';
 
-import { DeviceGate, sendHeartbeat } from '@jamanvaar/sync';
+import { DeviceGate, sendHeartbeat, pullRestaurantIdentity } from '@jamanvaar/sync';
 import { MenuRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
@@ -227,6 +227,14 @@ export async function reportHeartbeat(): Promise<void> {
     restaurantId: localStorage.getItem(RESTAURANT_ID_KEY),
     deviceId: localStorage.getItem(DEVICE_ID_KEY)
   });
+}
+
+/** B2-054: picks up a restaurant-identity edit made on another device (or by Super Admin). */
+export async function syncRestaurantIdentity(): Promise<void> {
+  const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
+  const restaurantId = localStorage.getItem(RESTAURANT_ID_KEY);
+  if (!deviceToken || !restaurantId) return;
+  await pullRestaurantIdentity({ apiBase: API_BASE, deviceToken, restaurantId });
 }
 
 /** Tell the cloud a JAMAN AI question was answered (usage + measured latency) and honour its daily limit. */

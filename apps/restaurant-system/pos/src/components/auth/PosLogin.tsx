@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, StaffRepository } from '@jamanvaar/database';
 import { JamanvaarAuthLayout } from '@jamanvaar/ui';
@@ -18,13 +18,16 @@ export const PosLogin: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // Clear error on PIN edit
-  useEffect(() => {
-    if (errorMessage) setErrorMessage('');
-  }, [pin]);
-
+  // B2-015: a `useEffect` keyed on `pin` used to clear the error message whenever `pin` changed
+  // for *any* reason — including the failure path's own `setPin('')` right after
+  // `setErrorMessage(res.error)`, which fires this effect on the very next render and erased
+  // the message before it could ever be seen (checked live: not at 100ms, not at 2.5s — it was
+  // gone immediately). Clearing the error only on a deliberate new keypress (here) — not as a
+  // passive reaction to `pin` changing — means a failed attempt's message survives until the
+  // cashier actually starts a new PIN.
   const handleKeyPress = (num: string) => {
     if (pin.length < 4) {
+      if (errorMessage) setErrorMessage('');
       const next = pin + num;
       setPin(next);
       // Auto-submit at 4 digits, matching Captain's and KDS's PIN pads —
@@ -53,8 +56,8 @@ export const PosLogin: React.FC = () => {
     }
 
     setIsVerifying(true);
-    setTimeout(() => {
-      const res = loginWithPin(pinToUse);
+    setTimeout(async () => {
+      const res = await loginWithPin(pinToUse);
       setIsVerifying(false);
       if (!res.success) {
         setErrorMessage(res.error || 'Incorrect PIN. Please try again.');
@@ -70,6 +73,8 @@ export const PosLogin: React.FC = () => {
       appSubtitle="Enter your 4-digit staff PIN to continue"
       isOnline={isOnline}
       onToggleNetwork={toggleNetworkStatus}
+      isLocalCoreUnauthorized={db.isLocalCoreUnauthorized()}
+      healthCheckUrl={`${db.getSyncServerUrl()}/api/health`}
       heroHeadline="Smart Billing."
       heroHighlightWord="Better Dining."
       heroDescription="Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants."

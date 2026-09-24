@@ -144,13 +144,26 @@ describe('Activation code redemption (the other half of activation-keys generati
   });
 
   it('rejects an expired code', async () => {
-    // expiresAt in the past — generate schema only requires a valid date, not a future one.
-    const code = await generateKey('ANY', -60 * 1000);
+    // B2-050: generation itself now refuses a past expiresAt (a key dead on arrival used to be
+    // accepted and listed as Active/Available until someone tried to redeem it) — so to reach this
+    // endpoint's own expiry check, the key has to be created valid and genuinely age past its
+    // (short) expiry before redemption is attempted, not created already-expired.
+    const code = await generateKey('ANY', 300);
+    await new Promise((resolve) => setTimeout(resolve, 700));
 
     const res = await request(app.getHttpServer())
       .post('/api/v1/activation/redeem')
       .send({ code, deviceType: 'KIOSK' });
     expect(res.status).toBe(410);
+  });
+
+  it('refuses to generate a key that is already expired (B2-050)', async () => {
+    const res = await authed('post', '/api/v1/activation-keys').send({
+      restaurantId,
+      allowedDeviceType: 'ANY',
+      expiresAt: new Date(Date.now() - 60 * 1000).toISOString()
+    });
+    expect(res.status).toBe(400);
   });
 
   it('rejects a revoked code', async () => {

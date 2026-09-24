@@ -1,6 +1,7 @@
 import { RESTAURANT_ADMIN_URL } from '../../lib/appUrls';
 // Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
 import { copyText } from '../../../../../packages/utils/src/clipboard';
+import { generateSecurePassword } from '../../../../../packages/utils/src/uuid';
 import { useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { CreateRestaurantInput, RestaurantDetail, ActivationKey } from '../../api/types';
@@ -8,22 +9,13 @@ import { Button } from '../../components/ui';
 import { Copy, Check, Eye, EyeOff, RefreshCw, KeyRound } from 'lucide-react';
 import './restaurants.css';
 
+// B2-003: was built from Math.random() for every character, including the final shuffle
+// (`.sort(() => Math.random() - 0.5)`, itself a known-biased shuffle even set aside the RNG
+// choice) — for a password that becomes a real owner's platform login. Now cryptographically
+// random throughout, via the same shared helper every other generated-password/PIN/code in
+// the product should use.
 function generateRandomPassword(): string {
-  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-  const lower = 'abcdefghijkmnopqrstuvwxyz';
-  const digits = '23456789';
-  const symbols = '!@#$%&*';
-  const all = upper + lower + digits + symbols;
-  let pass = [
-    upper[Math.floor(Math.random() * upper.length)],
-    lower[Math.floor(Math.random() * lower.length)],
-    digits[Math.floor(Math.random() * digits.length)],
-    symbols[Math.floor(Math.random() * symbols.length)]
-  ];
-  for (let i = 0; i < 8; i++) {
-    pass.push(all[Math.floor(Math.random() * all.length)]);
-  }
-  return pass.sort(() => Math.random() - 0.5).join('');
+  return generateSecurePassword(12);
 }
 
 export function CreateRestaurantModal({

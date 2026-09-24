@@ -1,6 +1,6 @@
 import { Category, ComboDeal, DietaryType, MenuItem, ModifierGroup, SpiceLevel } from '@jamanvaar/types';
 import { db, MenuRepository, ComboRepository, PREBUILT_MENU_TEMPLATES, MenuTemplate, MenuImportRecord } from '@jamanvaar/database';
-import { generateUUID } from '@jamanvaar/utils';
+import { generateUUID, toCsvRow } from '@jamanvaar/utils';
 
 export interface MenuCompletenessIssue {
   itemId: string;
@@ -866,22 +866,18 @@ export class MenuBuilderService {
    * Export full menu as CSV
    */
   public static exportCSV(): string {
+    // B2-061: dish name/description/category are free text a staff member (or, for name,
+    // effectively any authenticated device) can set to anything, including a leading `=`/`+`/
+    // `-`/`@` — a classic CSV/formula-injection payload that fires the moment this file is
+    // opened in Excel/Sheets. toCsvRow escapes quotes *and* neutralises that leading character
+    // on every field, not just the ones that happened to get a manual `.replace()` before.
     const headers = ['Category', 'Item Name', 'SKU', 'Price', 'Dietary Type', 'Spice Level', 'Description', 'Image URL'];
     const rows = db.menuItems.map((item) => {
       const cat = db.categories.find((c) => c.id === item.categoryId)?.name || 'General';
-      return [
-        `"${cat.replace(/"/g, '""')}"`,
-        `"${item.name.replace(/"/g, '""')}"`,
-        `"${item.sku || ''}"`,
-        item.price,
-        item.dietaryType,
-        item.spiceLevel,
-        `"${(item.description || '').replace(/"/g, '""')}"`,
-        `"${item.imageUrl || ''}"`
-      ].join(',');
+      return toCsvRow([cat, item.name, item.sku || '', item.price, item.dietaryType, item.spiceLevel, item.description || '', item.imageUrl || '']);
     });
 
-    return [headers.join(','), ...rows].join('\n');
+    return [toCsvRow(headers), ...rows].join('\r\n');
   }
 
   /**

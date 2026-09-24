@@ -97,4 +97,40 @@ describe('POS running order — Send KOT then Pay (BUG-032)', () => {
     expect(paid!.items.length).toBe(2);
     expect(paid!.paymentStatus).toBe('SUCCESS');
   });
+
+  it('B2-019: roundOffAmount survives Send KOT and Pay, so subtotal + tax + round-off always equals the stored total', () => {
+    // A price chosen so subtotal * 1.05 is not a whole rupee, guaranteeing a real, non-zero round-off.
+    const category = db.categories[0];
+    db.menuItems.push({
+      id: 'menu-item-b2019-test',
+      categoryId: category.id,
+      name: 'Round-Off Test Dish',
+      sku: 'B2019-01',
+      price: 111,
+      dietaryType: 'VEG',
+      spiceLevel: 'MILD',
+      description: '',
+      isAvailable: true
+    } as any);
+
+    usePosStore.getState().addItemToCart(db.menuItems.find((m) => m.id === 'menu-item-b2019-test')!);
+    const cartRoundOff = usePosStore.getState().cart.roundOffAmount;
+    expect(cartRoundOff).not.toBe(0); // sanity check: this price really does produce a non-zero round-off
+
+    usePosStore.getState().sendKOT();
+    const runningOrder = db.orders[0];
+    // B2-019: this used to silently stay 0 here even though the cart already knew better.
+    expect(runningOrder.roundOffAmount).toBe(cartRoundOff);
+
+    const total = usePosStore.getState().cart.totalPayable;
+    const paid = usePosStore.getState().completePayment('CASH', total, 'TXN-RUN-B2019');
+    expect(paid).not.toBeNull();
+    expect(paid!.roundOffAmount).toBe(cartRoundOff);
+
+    // The identity the receipt's own arithmetic depends on: nothing left unaccounted for.
+    const reconstructed = Math.round((paid!.subtotal + paid!.taxAmount + paid!.roundOffAmount) * 100) / 100;
+    expect(reconstructed).toBe(paid!.totalAmount);
+
+    db.menuItems = db.menuItems.filter((m) => m.id !== 'menu-item-b2019-test');
+  });
 });

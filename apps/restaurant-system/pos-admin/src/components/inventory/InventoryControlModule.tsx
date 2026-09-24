@@ -256,11 +256,11 @@ function StockCountPanel({ showToast }: Props) {
   });
   const netValue = rows.reduce((s, r) => s + r.value, 0);
 
-  function submit() {
+  async function submit() {
     setError(null);
     let approvedBy: string | undefined;
     if (needsApproval) {
-      const verified = StaffRepository.verifyPin(pin);
+      const verified = await StaffRepository.verifyPin(pin);
       if (!verified || !verified.isManager) return setError('Enter a manager PIN to approve this count.');
       approvedBy = verified.user.fullName;
     }

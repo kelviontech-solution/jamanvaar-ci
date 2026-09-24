@@ -7,6 +7,7 @@ import { importMenuSchema, menuPermissionSchema } from './dto/import-menu.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
+import { PlatformRoleName } from '../../common/rbac/access';
 
 @Controller('api/v1/restaurants')
 @UseGuards(PlatformAuthGuard)
@@ -25,8 +26,8 @@ export class RestaurantsController {
   }
 
   @Get(':id')
-  detail(@Param('id') id: string) {
-    return this.restaurants.getRestaurantById(id);
+  detail(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.restaurants.getRestaurantById(id, actor.role as PlatformRoleName);
   }
 
   @Patch(':id')

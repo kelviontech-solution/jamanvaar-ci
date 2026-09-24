@@ -111,6 +111,44 @@ describe('JAMANVAAR POS — Shift & Cash Management System', () => {
     expect(ShiftRepository.getActiveShift()).toBeUndefined();
   });
 
+  it('B2-046: refuses a Cash Out that would exceed the drawer, so the expected balance can never go negative', () => {
+    const shift = ShiftRepository.openShift('usr-cashier-1', 'Amit Dave', 1000, 'POS-01');
+    ShiftRepository.addCashMovement(shift.id, 'CASH_IN', 5000, 'Bank float top-up', 'Amit Dave');
+    expect(shift.expectedCash).toBe(6000);
+
+    // The bug's own live repro: a ₹9,000 Cash Out against a ₹6,000 drawer.
+    const rejected = ShiftRepository.addCashMovement(shift.id, 'CASH_OUT', 9000, 'Petty Cash Expense', 'Amit Dave');
+    expect(rejected).toBeNull();
+    expect(shift.expectedCash).toBe(6000); // unchanged — nothing was recorded
+
+    const movements = ShiftRepository.getCashMovements(shift.id);
+    expect(movements.some((m) => m.amount === 9000)).toBe(false);
+
+    // A Cash Out at or under the drawer's own balance still works normally.
+    const accepted = ShiftRepository.addCashMovement(shift.id, 'CASH_OUT', 6000, 'Full drawer payout', 'Amit Dave');
+    expect(accepted).not.toBeNull();
+    expect(shift.expectedCash).toBe(0);
+  });
+
+  it('B2-046: also refuses a non-positive amount and a movement against a closed shift, both with no side effects', () => {
+    const shift = ShiftRepository.openShift('usr-cashier-1', 'Amit Dave', 1000, 'POS-01');
+    expect(ShiftRepository.addCashMovement(shift.id, 'CASH_IN', 0, 'x', 'Amit Dave')).toBeNull();
+    expect(ShiftRepository.addCashMovement(shift.id, 'CASH_IN', -100, 'x', 'Amit Dave')).toBeNull();
+    expect(shift.expectedCash).toBe(1000);
+
+    ShiftRepository.closeShift(shift.id, 1000);
+    expect(ShiftRepository.addCashMovement(shift.id, 'CASH_IN', 100, 'too late', 'Amit Dave')).toBeNull();
+  });
+
+  it('B2-046: shiftNumber is a real per-device sequence, not the last two digits of a millisecond timestamp', () => {
+    const first = ShiftRepository.openShift('usr-1', 'Amit Dave', 1000, 'POS-01');
+    expect(first.shiftNumber).toBe(1);
+    ShiftRepository.closeShift(first.id, 1000);
+
+    const second = ShiftRepository.openShift('usr-2', 'Rahul Joshi', 1000, 'POS-01');
+    expect(second.shiftNumber).toBe(2);
+  });
+
   it('5. should preserve closed shifts in permanent shift history archive', () => {
     // Open and close Shift 1
     const shift1 = ShiftRepository.openShift('usr-1', 'Amit Dave', 1000, 'POS-01');

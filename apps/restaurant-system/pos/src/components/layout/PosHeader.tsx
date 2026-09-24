@@ -363,7 +363,7 @@ export const PosHeader: React.FC = () => {
                   }`}
                 >
                   <Clock className={`w-3.5 h-3.5 ${activeShift ? 'text-jaman-saffron' : 'text-amber-700'}`} />
-                  <span>{activeShift ? `Shift #${activeShift.id.slice(-2) || '01'} — Open Drawer` : 'Shift Closed — Open New Shift'}</span>
+                  <span>{activeShift ? `Shift #${activeShift.shiftNumber ?? activeShift.id.slice(-2) ?? '01'} — Open Drawer` : 'Shift Closed — Open New Shift'}</span>
                 </button>
 
                 <button
@@ -527,7 +527,7 @@ export const PosHeader: React.FC = () => {
               <div className="p-2 bg-slate-50 rounded-xl space-y-1 text-[11px]">
                 <div className="flex justify-between font-bold">
                   <span className="text-slate-500">Current Shift:</span>
-                  <span className="text-jaman-navy">{activeShift ? `Shift #${activeShift.id.slice(-2) || '01'} (Active)` : 'No Active Shift'}</span>
+                  <span className="text-jaman-navy">{activeShift ? `Shift #${activeShift.shiftNumber ?? activeShift.id.slice(-2) ?? '01'} (Active)` : 'No Active Shift'}</span>
                 </div>
                 <div className="flex justify-between font-bold">
                   <span className="text-slate-500">Opening Float:</span>

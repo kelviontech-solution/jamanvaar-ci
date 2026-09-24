@@ -3,10 +3,10 @@ import { createRefund, CloudApiError } from '../../cloud/cloudClient';
 import { usePosStore } from '../../store/posStore';
 import { PosPrinterService } from '../../services/printerService';
 import { PdfReportBuilder, ReportFullData } from '../../services/pdfReportBuilder';
-import { db, OrderRepository, AuditRepository } from '@jamanvaar/database';
+import { db, OrderRepository, AuditRepository, isUnpaidOpenOrder } from '@jamanvaar/database';
 import { CentralReportingService, CentralDatePreset } from '@jamanvaar/business';
 import { Order, OrderType, PaymentMethod, OrderStatus } from '@jamanvaar/types';
-import { formatINR, splitTax } from '@jamanvaar/utils';
+import { formatINR, splitTax, formatSplitTax, toCsvRow } from '@jamanvaar/utils';
 import {
   Receipt,
   Search,
@@ -113,9 +113,20 @@ export const PosBillsView: React.FC = () => {
       customStartDate,
       customEndDate
     );
+    // B2-034: this screen is "Bills & Invoices" — the Invoice Status filter right below only
+    // ever offers Completed (Paid) / Refunded / Voided, never "PREPARING" — so an order that
+    // was sent to the kitchen but never paid (isUnpaidOpenOrder) does not belong in this list
+    // at all. It used to slip through because only CANCELLED was excluded, so it appeared here
+    // rendered as a settled cash invoice ("Total Amount Paid: ₹231") for money nobody took,
+    // even though the page's own totals (via calculateFinancialSummary, which already applies
+    // this same isUnpaidOpenOrder check) correctly left it out of every sales figure — the list
+    // and the totals disagreed. Reopening a bill (below) puts it back into PREPARING, which now
+    // correctly makes it disappear from here too, back into the active order queue.
     return CentralReportingService.getReportableOrders(db.orders, currentRange, {
       includeCancelled: true
-    }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    })
+      .filter((o) => !isUnpaidOpenOrder(o))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [db.orders.length, selectedPeriod, customStartDate, customEndDate]);
 
   // Compute Period Overview Card Metrics (for Today, Yesterday, Week, Month)
@@ -389,28 +400,30 @@ export const PosBillsView: React.FC = () => {
       'Status'
     ];
 
+    // B2-061: customer name/phone/cashier are free text exported without any defense against
+    // CSV/formula injection before this fix — toCsvRow sanitizes every field uniformly.
     const rows = finalFilteredBills.map((b) => [
-      `"${b.orderNumber}"`,
-      `"${b.id}"`,
-      `"${b.tokenNumber}"`,
-      `"${new Date(b.createdAt).toLocaleDateString('en-IN')}"`,
-      `"${new Date(b.createdAt).toLocaleTimeString('en-IN')}"`,
-      `"${b.orderType}"`,
-      `"${b.customerName || 'Walk-in'}"`,
-      `"${b.customerPhone || ''}"`,
-      `"${b.cashierName || 'Staff'}"`,
+      b.orderNumber,
+      b.id,
+      b.tokenNumber,
+      new Date(b.createdAt).toLocaleDateString('en-IN'),
+      new Date(b.createdAt).toLocaleTimeString('en-IN'),
+      b.orderType,
+      b.customerName || 'Walk-in',
+      b.customerPhone || '',
+      b.cashierName || 'Staff',
       b.items.length,
       b.subtotal || b.totalAmount,
       b.discountAmount || 0,
       b.cgstAmount ?? splitTax(b.taxAmount ?? 0).cgst,
       b.sgstAmount ?? splitTax(b.taxAmount ?? 0).sgst,
       b.totalAmount,
-      `"${b.paymentMethod}"`,
-      `"${b.paymentTransactionId || ''}"`,
-      `"${b.orderStatus}"`
+      b.paymentMethod,
+      b.paymentTransactionId || '',
+      b.orderStatus
     ]);
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const csvContent = 'data:text/csv;charset=utf-8,' + [toCsvRow(headers), ...rows.map(toCsvRow)].join('\r\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -1028,13 +1041,16 @@ export const PosBillsView: React.FC = () => {
                     <strong className="font-mono">- {formatINR(detailModalBill.discountAmount)}</strong>
                   </div>
                 ) : null}
+                {/* B2-036: displayed CGST/SGST must always sum to the displayed tax total — see
+                    formatSplitTax's own doc comment for why independently formatting the stored
+                    halves (5.5 → "6" each) broke that next to "Total Amount Paid" below. */}
                 <div className="flex justify-between">
                   <span>CGST (2.5%):</span>
-                  <strong className="font-mono text-jaman-navy">{formatINR(detailModalBill.cgstAmount ?? splitTax(detailModalBill.taxAmount ?? 0).cgst)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatSplitTax(detailModalBill.taxAmount ?? 0, detailModalBill.cgstAmount, detailModalBill.sgstAmount).cgst}</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>SGST (2.5%):</span>
-                  <strong className="font-mono text-jaman-navy">{formatINR(detailModalBill.sgstAmount ?? splitTax(detailModalBill.taxAmount ?? 0).sgst)}</strong>
+                  <strong className="font-mono text-jaman-navy">{formatSplitTax(detailModalBill.taxAmount ?? 0, detailModalBill.cgstAmount, detailModalBill.sgstAmount).sgst}</strong>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-100 text-sm font-black text-jaman-navy">
                   <span>Total Amount Paid:</span>

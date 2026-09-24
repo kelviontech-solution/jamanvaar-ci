@@ -79,7 +79,7 @@ import {
   ThermalReceiptView,
   JAMANVAARStartup
 } from '@jamanvaar/ui';
-import { formatDate, formatINR, formatTime, generateIdempotencyKey, generateUUID, localizedDescription, localizedName, SoundService } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatSplitTax, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
 import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService } from '@jamanvaar/api';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncPromotions, syncFeedback, pushServiceMessages } from '@jamanvaar/sync';
@@ -324,6 +324,16 @@ export default function KioskUserApp() {
   const [phoneInput, setPhoneInput] = useState('');
   const [otpInput, setOtpInput] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  // B2-001: the generated OTP itself, its expiry and a wrong-attempt counter — none of this
+  // existed before, which is how "any 4-character input" and a fixed, reused '1234' passed.
+  // No SMS gateway is wired into this codebase (checked: no SMS/Twilio/MSG91 provider or env
+  // var anywhere), so there is no channel to deliver the code off-device — it is shown on
+  // screen honestly labelled as such, rather than a fabricated "sent to your phone" claim.
+  const [otpGenerated, setOtpGenerated] = useState('');
+  const [otpExpiresAt, setOtpExpiresAt] = useState<number>(0);
+  const [otpAttempts, setOtpAttempts] = useState(0);
+  const OTP_VALID_MS = 2 * 60 * 1000;
+  const OTP_MAX_ATTEMPTS = 5;
   const [redeemedPoints, setRedeemedPoints] = useState<number>(0);
 
   // Menu Navigation States
@@ -387,7 +397,9 @@ export default function KioskUserApp() {
   const [isStaffPinModalOpen, setIsStaffPinModalOpen] = useState(false);
   const [staffPin, setStaffPin] = useState('');
   const [staffOverrideActive, setStaffOverrideActive] = useState(false);
-  const [feedbackRating, setFeedbackRating] = useState<number>(5);
+  // B2-059: was pre-filled at 5 with no requirement to actually choose one — a guest tapping
+  // "Submit Rating" without picking a star recorded a perfect score, inflating the average.
+  const [feedbackRating, setFeedbackRating] = useState<number>(0);
   const [feedbackTags, setFeedbackTags] = useState<string[]>([]);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
@@ -502,6 +514,15 @@ export default function KioskUserApp() {
     return () => clearInterval(interval);
   }, [showIdleWarning]);
 
+  // B2-023: once Cashfree is known unavailable, don't leave the guest sitting on a UPI selection
+  // the screen itself says can't be used — switch to the one method that always works, the same
+  // way the OFFLINE case already does in handleProceedToPayment.
+  useEffect(() => {
+    if (cashfreeUnavailable && paymentMethod === 'UPI') {
+      setPaymentMethod('CASH_AT_COUNTER');
+    }
+  }, [cashfreeUnavailable, paymentMethod]);
+
   // Payment Countdown + real-payment polling. The Cashfree webhook (handled
   // entirely server-side) is what actually confirms payment — this only
   // ever reflects what GET /api/v1/payments/:paymentId/status already
@@ -612,8 +633,25 @@ export default function KioskUserApp() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  // B2-021: handleProceedToPayment creates a real order (CONFIRMED/PENDING) the moment the guest
+  // taps "Proceed to Payment", before any payment method is chosen — needed so that id exists to
+  // link the cash-at-counter token and the UPI payment-order together. If the guest then walks
+  // away (idle-timeout reset) or taps Back to the menu without ever completing payment, neither
+  // path used to touch that order at all: it sat forever as a real, unpaid CONFIRMED order,
+  // visible in Restaurant Admin's Orders list with nothing to cancel it. Called from both places
+  // the guest can leave the payment screen without finishing. A no-op once payment has actually
+  // settled (paymentStatus is no longer PENDING by then), so it never cancels a real, paid order.
+  const cancelAbandonedPendingOrder = () => {
+    if (!localOrderIdForPayment) return;
+    const order = OrderRepository.getOrderById(localOrderIdForPayment);
+    if (order && order.paymentStatus === 'PENDING' && order.orderStatus !== 'CANCELLED') {
+      OrderRepository.updateOrderStatus(order.id, 'CANCELLED', 'Guest left the kiosk before completing payment');
+    }
+  };
+
   // Full Session Memory Scrub (Sections 224-226: No customer data leaks)
   const handleFullSessionReset = () => {
+    cancelAbandonedPendingOrder();
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
@@ -640,6 +678,7 @@ export default function KioskUserApp() {
     setRedeemedPoints(0);
     setStaffOverrideActive(false);
     setFeedbackSubmitted(false);
+    setFeedbackRating(0);
     setFeedbackTags([]);
     setEBillPhoneInput('');
     setIsChatbotOpen(false);
@@ -1237,9 +1276,9 @@ export default function KioskUserApp() {
   // backdoor and KDS's unchecked PIN, just applied here to unlock a manager
   // discount override. Now validates against a real db.users record with a
   // manager/admin-tier role, same as Captain's SEC-006 fix.
-  const handleStaffPinVerify = (e: React.FormEvent) => {
+  const handleStaffPinVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    const verified = StaffRepository.verifyPin(staffPin);
+    const verified = await StaffRepository.verifyPin(staffPin);
     const matchedUser = verified?.isManager ? verified.user : undefined;
 
     if (matchedUser) {
@@ -1267,6 +1306,7 @@ export default function KioskUserApp() {
 
   // Feedback Submission
   const handleSubmitFeedback = () => {
+    if (feedbackRating === 0) return; // defense in depth alongside the button's own disabled state
     FeedbackRepository.submit({
       orderId: placedOrder?.id,
       kioskId,
@@ -1283,21 +1323,44 @@ export default function KioskUserApp() {
       alert('Please enter a valid 10-digit mobile number');
       return;
     }
+    const code = generateSecureNumericCode(4);
+    setOtpGenerated(code);
+    setOtpExpiresAt(Date.now() + OTP_VALID_MS);
+    setOtpAttempts(0);
+    setOtpInput('');
     setOtpSent(true);
-    showToast('Demo OTP is: 1234');
+    // Honest, not "sent to your phone": no SMS gateway is configured anywhere in this build.
+    showToast(`No SMS gateway configured — your one-time code is: ${code}`);
   };
 
   const handleVerifyOtp = () => {
-    if (otpInput === '1234' || otpInput.length === 4) {
+    if (Date.now() > otpExpiresAt) {
+      alert('That code has expired. Tap Send OTP again for a new one.');
+      setOtpSent(false);
+      setOtpInput('');
+      return;
+    }
+    if (otpAttempts >= OTP_MAX_ATTEMPTS) {
+      alert('Too many wrong attempts. Tap Send OTP again for a new code.');
+      setOtpSent(false);
+      setOtpInput('');
+      return;
+    }
+    if (otpInput.length === 4 && otpInput === otpGenerated) {
       const account = CustomerRepository.getOrCreateAccount(phoneInput);
       setLoggedInAccount(account);
       setIsAuthModalOpen(false);
       setOtpSent(false);
       setPhoneInput('');
       setOtpInput('');
+      setOtpGenerated('');
+      setOtpAttempts(0);
       showToast(`Welcome back, ${account.name}! (${account.loyaltyPoints} Loyalty Points Available)`);
     } else {
-      alert('Invalid OTP (Demo OTP: 1234)');
+      const attempts = otpAttempts + 1;
+      setOtpAttempts(attempts);
+      setOtpInput('');
+      alert(attempts >= OTP_MAX_ATTEMPTS ? 'Incorrect code. No attempts left — tap Send OTP again.' : `Incorrect code. ${OTP_MAX_ATTEMPTS - attempts} attempt(s) left.`);
     }
   };
 
@@ -1465,7 +1528,14 @@ export default function KioskUserApp() {
               onClick={() => {
                 SoundService.playTap();
                 if (step === 'MENU') setStep('ORDER_TYPE');
-                else if (step === 'CHECKOUT_PAYMENT') setStep('MENU');
+                else if (step === 'CHECKOUT_PAYMENT') {
+                  // B2-021: leaving the payment screen this way must not leave behind the real,
+                  // unpaid order handleProceedToPayment already created — see cancelAbandonedPendingOrder.
+                  cancelAbandonedPendingOrder();
+                  setLocalOrderIdForPayment(null);
+                  setRealPaymentId(null);
+                  setStep('MENU');
+                }
                 else if (step === 'TABLE_SELECT') setStep('ORDER_TYPE');
                 else if (step === 'ORDER_TYPE') setStep('LANGUAGE_SELECT');
               }}
@@ -2125,9 +2195,18 @@ export default function KioskUserApp() {
                     // diverge from the resolved item/combo's real current
                     // price and image the moment either was edited in Menu
                     // Builder — now read directly off the resolved object.
-                    const biryaniCombo = combos.find((c) => c.id === 'combo-biryani-feast') || combos[0];
-                    const thali = menuItems.find((m) => m.id === 'item-thali-guj') || menuItems[0];
-                    const coffee = menuItems.find((m) => m.id === 'item-cc-ice') || menuItems[0];
+                    // B2-022: the `|| combos[0]`/`|| menuItems[0]` fallbacks used to substitute a
+                    // completely unrelated dish (whatever happens to be first) whenever this
+                    // restaurant's menu doesn't have that exact seeded id — while the tile's own
+                    // title kept showing the *intended* dish's name from a hardcoded i18n string,
+                    // so the guest saw one name, tapped it, and got a different dish added to cart.
+                    // No fallback now: the tile is simply hidden (the `{x && (...)}` guards below
+                    // already handle that) when this restaurant doesn't have that specific dish,
+                    // and the title is always the resolved item's own real name, never a string
+                    // that can drift from whatever actually gets added to the cart.
+                    const biryaniCombo = combos.find((c) => c.id === 'combo-biryani-feast');
+                    const thali = menuItems.find((m) => m.id === 'item-thali-guj');
+                    const coffee = menuItems.find((m) => m.id === 'item-cc-ice');
                     return (
                       <>
                         {biryaniCombo && (
@@ -2141,7 +2220,7 @@ export default function KioskUserApp() {
                               className="w-11 h-11 rounded-xl object-cover shrink-0"
                             />
                             <div>
-                              <span className="block text-xs sm:text-sm font-black text-jaman-saffron whitespace-nowrap">{t('bannerBiryaniTitle')}</span>
+                              <span className="block text-xs sm:text-sm font-black text-jaman-saffron whitespace-nowrap">{biryaniCombo.name}</span>
                               <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">
                                 ₹{biryaniCombo.basePrice}
                                 {biryaniCombo.savingsAmount ? ` · Save ₹${biryaniCombo.savingsAmount}` : ''}
@@ -2161,7 +2240,7 @@ export default function KioskUserApp() {
                               className="w-11 h-11 rounded-xl object-cover shrink-0"
                             />
                             <div>
-                              <span className="block text-xs sm:text-sm font-black text-jaman-navy whitespace-nowrap">{t('bannerThaliTitle')}</span>
+                              <span className="block text-xs sm:text-sm font-black text-jaman-navy whitespace-nowrap">{thali.name}</span>
                               <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹{thali.price} · Chef Signature</span>
                             </div>
                           </button>
@@ -2178,7 +2257,7 @@ export default function KioskUserApp() {
                               className="w-11 h-11 rounded-xl object-cover shrink-0"
                             />
                             <div>
-                              <span className="block text-xs sm:text-sm font-black text-emerald-800 whitespace-nowrap">{t('bannerCoffeeTitle')}</span>
+                              <span className="block text-xs sm:text-sm font-black text-emerald-800 whitespace-nowrap">{coffee.name}</span>
                               <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹{coffee.price} · Cold Beverage</span>
                             </div>
                           </button>
@@ -2235,6 +2314,7 @@ export default function KioskUserApp() {
                                 onClick={() => handleSelectCombo(combo)}
                                 className="w-10 h-10 rounded-full bg-jaman-saffron hover:bg-[#F27A2B] active:bg-[#D1560D] text-white flex items-center justify-center shadow-sm shadow-jaman-saffron/25 transition-transform active:scale-90 shrink-0"
                                 title="Add Combo to Cart"
+                                aria-label={`Add ${localizedName(combo, lang)} combo to cart`}
                               >
                                 <Plus className="w-5 h-5 stroke-[2.5]" />
                               </button>
@@ -2351,6 +2431,7 @@ export default function KioskUserApp() {
                             <button
                               onClick={() => updateCartItemQuantity(ci.cartItemId, -1)}
                               className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center active:bg-gray-200 transition-colors"
+                              aria-label={`Decrease quantity of ${ci.item.name}`}
                             >
                               <Minus className="w-4 h-4 text-jaman-navy" />
                             </button>
@@ -2358,6 +2439,7 @@ export default function KioskUserApp() {
                             <button
                               onClick={() => updateCartItemQuantity(ci.cartItemId, 1)}
                               className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center active:bg-gray-200 transition-colors"
+                              aria-label={`Increase quantity of ${ci.item.name}`}
                             >
                               <Plus className="w-4 h-4 text-jaman-navy" />
                             </button>
@@ -2402,6 +2484,46 @@ export default function KioskUserApp() {
 
                 {/* Financial Summary */}
                 <div className="p-5 sm:p-6 border-t border-[#F3EFE6] bg-jaman-ivory space-y-4 shrink-0">
+
+                  {/* Coupon Code (B2-065: handleApplyCoupon/getByCode/incrementUsage already existed and
+                      worked, but no input or button anywhere in this file ever called them, so a guest
+                      could never actually redeem a coupon). */}
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs">
+                      <div>
+                        <span className="font-bold text-emerald-900">Coupon Applied: {appliedCoupon.code}</span>
+                        <p className="text-[10px] text-emerald-700">{appliedCoupon.description}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setAppliedCoupon(null); setCouponCodeInput(''); setCouponError(null); }}
+                        className="text-xs font-bold text-rose-600"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={couponCodeInput}
+                          onChange={(e) => { setCouponCodeInput(e.target.value.toUpperCase()); setCouponError(null); }}
+                          placeholder="Enter coupon code"
+                          className="flex-1 bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleApplyCoupon}
+                          disabled={!couponCodeInput.trim()}
+                          className="px-4 py-2 bg-jaman-navy text-white text-xs font-bold rounded-xl disabled:opacity-40 shrink-0"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                      {couponError && <p className="text-[10px] text-rose-600 font-semibold">{couponError}</p>}
+                    </div>
+                  )}
 
                   {/* Loyalty Redemption Option */}
                   {loggedInAccount && loggedInAccount.loyaltyPoints > 0 && (
@@ -2452,13 +2574,14 @@ export default function KioskUserApp() {
                         <span>-{formatINR(staffDiscount)}</span>
                       </div>
                     )}
+                    {/* B2-036: derived via formatSplitTax so the two halves always sum to the displayed Total Payable. */}
                     <div className="flex justify-between text-[#4A5568]">
                       <span>{t('cgst')} (2.5%)</span>
-                      <span>{formatINR(rawCalculated.cgstAmount)}</span>
+                      <span>{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).cgst}</span>
                     </div>
                     <div className="flex justify-between text-[#4A5568]">
                       <span>{t('sgst')} (2.5%)</span>
-                      <span>{formatINR(rawCalculated.sgstAmount)}</span>
+                      <span>{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).sgst}</span>
                     </div>
                     <div className="flex justify-between text-base font-black text-jaman-navy pt-2 border-t border-jaman-border">
                       <span>{t('totalPayable')}</span>
@@ -2499,6 +2622,10 @@ export default function KioskUserApp() {
                   showToast('Internet required for UPI. Please choose Pay Cash at Counter.');
                   return;
                 }
+                if (cashfreeUnavailable) {
+                  showToast('Online payment is unavailable right now. Please choose Pay Cash at Counter.');
+                  return;
+                }
                 SoundService.playTap();
                 setPaymentMethod('UPI');
               }}
@@ -2506,15 +2633,18 @@ export default function KioskUserApp() {
                 paymentMethod === 'UPI'
                   ? 'bg-white border-jaman-saffron shadow-xl'
                   : 'bg-jaman-ivory border-jaman-border hover:bg-white'
-              } ${networkState === 'OFFLINE' ? 'opacity-50 cursor-not-allowed' : ''}`}
+              } ${networkState === 'OFFLINE' || cashfreeUnavailable ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <div className="flex items-center justify-between">
                 <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center">
                   <QrCode className="w-8 h-8" />
                 </div>
-                {networkState === 'OFFLINE' && (
+                {/* B2-023: previously this tile stayed fully selectable even when Cashfree had
+                    already failed, so the guest saw a live "UPI QR Payment" option directly above
+                    text saying it was unavailable. Now marked the same way OFFLINE already is. */}
+                {(networkState === 'OFFLINE' || cashfreeUnavailable) && (
                   <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded">
-                    Requires Internet
+                    {networkState === 'OFFLINE' ? 'Requires Internet' : 'Unavailable'}
                   </span>
                 )}
               </div>
@@ -2587,7 +2717,7 @@ export default function KioskUserApp() {
               <div className="py-8 space-y-4">
                 <Coins className="w-16 h-16 text-jaman-saffron mx-auto" />
                 <h3 className="text-xl font-black text-jaman-navy">Online Payment Unavailable</h3>
-                <p className="text-sm text-[#4A5568]">Please pay cash at the counter instead — your order is already confirmed.</p>
+                <p className="text-sm text-[#4A5568]">Please pay cash at the counter instead — you'll get your token as soon as you confirm.</p>
               </div>
             )}
 
@@ -2787,7 +2917,7 @@ export default function KioskUserApp() {
                       </button>
                     ))}
                   </div>
-                  <Button variant="secondary" size="sm" onClick={handleSubmitFeedback}>
+                  <Button variant="secondary" size="sm" onClick={handleSubmitFeedback} disabled={feedbackRating === 0}>
                     Submit Rating
                   </Button>
                 </div>
@@ -3504,14 +3634,15 @@ export default function KioskUserApp() {
           ) : (
             <>
               <p className="text-xs text-[#4A5568]">
-                Enter the 4-digit verification code sent to +91 {phoneInput} (Demo OTP: <strong>1234</strong>).
+                Enter the 4-digit code for +91 {phoneInput}. No SMS gateway is configured on this kiosk, so the code was shown on screen instead of texted — it expires in 2 minutes.
               </p>
               <input
                 type="text"
+                inputMode="numeric"
                 maxLength={4}
                 value={otpInput}
-                onChange={(e) => setOtpInput(e.target.value)}
-                placeholder="1234"
+                onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                placeholder="••••"
                 className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-4 py-3 text-center text-2xl font-mono font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
               <Button variant="accent" size="md" className="w-full" onClick={handleVerifyOtp}>

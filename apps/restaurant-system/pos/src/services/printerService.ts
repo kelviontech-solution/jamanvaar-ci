@@ -1,6 +1,7 @@
 import { db, PrintQueueRepository, ReceiptRepository, AuditRepository, PrinterRepository } from '@jamanvaar/database';
 import { detectPrinters, describeDiscovered, isAlreadyConfigured, sendRawToPrinter, type DetectionResult, type DiscoveredPrinter } from '@jamanvaar/api';
 import { Order, KOTRecord, PrintJob, ReceiptPaperSize, PrinterDevice, PrinterRole } from '@jamanvaar/types';
+import { stripControlCharsForPrint } from '@jamanvaar/utils';
 
 export class PosPrinterService {
   /**
@@ -219,8 +220,15 @@ export class PosPrinterService {
    * command bytes.
    */
   private static wrapEscPos(text: string): Uint8Array {
+    // B2-063: every free-text field that ends up on a receipt/KOT (dish name, customer name,
+    // Chef Notes, ...) is concatenated into `text` upstream with no filtering — a name
+    // containing a raw ESC/GS control-byte sequence (e.g. the standard "kick cash drawer"
+    // command, 0x1B 0x70 0x00 0x19 0xFA) would be sent to the printer as a real command, not
+    // just printed as text. This is the one place every receipt/KOT byte stream passes through
+    // before hitting hardware (mirrors the identical fix in packages/api/src/printer.ts), so
+    // stripping control characters here catches every current and future field.
     const encoder = new TextEncoder();
-    const textBytes = encoder.encode(text + '\n\n\n');
+    const textBytes = encoder.encode(stripControlCharsForPrint(text) + '\n\n\n');
     const initCmd = new Uint8Array([0x1b, 0x40]);
     const cutCmd = new Uint8Array([0x1d, 0x56, 0x42, 0x00]);
     const fullPayload = new Uint8Array(initCmd.length + textBytes.length + cutCmd.length);

@@ -66,4 +66,38 @@ describe('JAMANVAAR Restaurant Admin — Customer Relationship Management (CRM)'
     // Clean up
     CustomerRepository.deleteCustomer(testPhone);
   });
+
+  describe('B2-043: phone numbers are normalised so the same guest is always the same record', () => {
+    it('a "+91 …" phone and its bare 10-digit form resolve to the same account', () => {
+      const created = CustomerRepository.getOrCreateAccount('+91 92222 22223', 'Kiosk Guest');
+      expect(created.phone).toBe('9222222223'); // stored normalised, not verbatim
+
+      const foundByBareForm = CustomerRepository.getByPhone('9222222223');
+      expect(foundByBareForm?.phone).toBe(created.phone);
+
+      // Signing up again with the +91 form finds the same account instead of creating a second one.
+      const again = CustomerRepository.getOrCreateAccount('+919222222223', 'Kiosk Guest');
+      expect(again.phone).toBe(created.phone);
+      expect(CustomerRepository.getAll().filter((c) => c.phone === '9222222223').length).toBe(1);
+
+      CustomerRepository.deleteCustomer('9222222223');
+    });
+
+    it('createCustomer normalises too, and a second registration with the "+91" form of an existing bare number is recognised as the same guest, not a duplicate', () => {
+      const phone = '9333322221';
+      CustomerRepository.createCustomer({ phone, name: 'Original Guest' });
+
+      const secondAttempt = CustomerRepository.createCustomer({ phone: '+91 93333 22221', name: 'Different Name Typed' });
+      expect(secondAttempt.phone).toBe(phone);
+      expect(CustomerRepository.getAll().filter((c) => c.phone === phone).length).toBe(1);
+
+      CustomerRepository.deleteCustomer(phone);
+    });
+
+    it('a bare 11-digit number with a leading 0 (a common landline-style typo) also normalises to the same 10-digit identity', () => {
+      const created = CustomerRepository.getOrCreateAccount('09444433332', 'Guest');
+      expect(created.phone).toBe('9444433332');
+      CustomerRepository.deleteCustomer('9444433332');
+    });
+  });
 });

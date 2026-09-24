@@ -127,9 +127,15 @@ export class OrderSyncService {
   async catchUp(device: Device, since?: string) {
     const sinceDate = since ? new Date(since) : new Date(Date.now() - CATCH_UP_DEFAULT_LOOKBACK_MS);
 
+    // B2-029: this query used to have no restaurantId filter at all, relying entirely on
+    // Postgres RLS via runAsTenant's session variable. That is real defense, but this
+    // environment's DB role is a superuser (BUG-075), which bypasses RLS outright, so the
+    // query returned every restaurant's orders to any device. Filtering explicitly here
+    // means a device only ever sees its own tenant's rows even if RLS is bypassed, broken,
+    // or misconfigured — defense in depth, not a replacement for fixing the DB role.
     const orders = await this.prisma.runAsTenant(device.restaurantId, (tx) =>
       tx.syncedOrder.findMany({
-        where: { updatedAt: { gt: sinceDate } },
+        where: { restaurantId: device.restaurantId, updatedAt: { gt: sinceDate } },
         orderBy: { updatedAt: 'asc' },
         take: CATCH_UP_MAX_ROWS
       })

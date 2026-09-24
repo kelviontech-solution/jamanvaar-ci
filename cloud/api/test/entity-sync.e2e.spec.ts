@@ -264,6 +264,41 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
       expect(pull.body.entities.find((e: { externalId: string }) => e.externalId === 'dish-2').payload).toMatchObject({ deleted: true });
     });
 
+    /**
+     * B2-038: found live (BUG-149's own delete half only partly worked) - a deleted dish flip-flopped
+     * back onto every device for ~50s before finally staying gone. The prior guard here only rejected
+     * a re-upload OLDER than the tombstone (covered above); it did nothing to stop one carrying a
+     * timestamp EQUAL TO OR NEWER than the tombstone's own - which a device that simply hadn't pulled
+     * the deletion yet could and did produce, since its own sync-tick clock keeps advancing while it
+     * remains unaware anything was deleted. That push would win the plain timestamp comparison and
+     * overwrite the tombstone in the DB, which then fanned the "revived" dish back out to every other
+     * device on their next pull - exactly the observed flip-flop. A tombstone must be sticky regardless
+     * of the incoming timestamp; only another deletion can touch a deleted record from here on.
+     */
+    it('a deleted dish stays deleted even against a re-upload timestamped the same as or after the tombstone (B2-038)', async () => {
+      await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).send({ events: [{ externalId: 'dish-3', payload: { id: 'dish-3', deleted: true, updatedAt: '2026-09-20T12:00:00.000Z' } }] });
+
+      // A device that has not yet learned of the deletion re-pushes its still-live copy, timestamped
+      // AFTER the tombstone - exactly what a device's own later sync tick produces once it re-stamps
+      // an unrelated local change on a record it doesn't know is already gone elsewhere.
+      const laterPush = await authed('post', '/api/v1/entity-sync/MENU_ITEM', kioskToken).send({
+        events: [dish({} as never)].map((e) => ({ externalId: 'dish-3', payload: { ...e.payload, id: 'dish-3', updatedAt: '2026-09-20T12:00:01.000Z' } }))
+      });
+      expect(laterPush.status).toBe(201);
+      expect(laterPush.body.results[0].status).toBe('ok'); // accepted-and-ignored, not an error - the pusher should not retry forever
+
+      const pull = await authed('get', '/api/v1/entity-sync/MENU_ITEM', posToken);
+      expect(pull.body.entities.find((e: { externalId: string }) => e.externalId === 'dish-3').payload).toMatchObject({ deleted: true });
+
+      // Only another deletion event is ever accepted for an already-tombstoned externalId.
+      const reDelete = await authed('post', '/api/v1/entity-sync/MENU_ITEM', kioskToken).send({
+        events: [{ externalId: 'dish-3', payload: { id: 'dish-3', deleted: true, updatedAt: '2026-09-20T13:00:00.000Z' } }]
+      });
+      expect(reDelete.status).toBe(201);
+      const pullAfterRedelete = await authed('get', '/api/v1/entity-sync/MENU_ITEM', posToken);
+      expect(pullAfterRedelete.body.entities.find((e: { externalId: string }) => e.externalId === 'dish-3').payload).toMatchObject({ deleted: true });
+    });
+
     it('combos, coupons and guest ratings travel between devices of the same restaurant', async () => {
       await authed('post', '/api/v1/entity-sync/COMBO', posToken).send({ events: [{ externalId: 'combo-1', payload: { id: 'combo-1', name: 'Thali Combo', updatedAt: '2026-09-20T10:00:00.000Z' } }] });
       await authed('post', '/api/v1/entity-sync/COUPON', posToken).send({ events: [{ externalId: 'cpn-1', payload: { id: 'cpn-1', code: 'WELCOME50', usageCount: 0, updatedAt: '2026-09-20T10:00:00.000Z' } }] });
