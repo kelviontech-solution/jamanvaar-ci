@@ -80,7 +80,7 @@ describe('Restaurant management (Phase 1a)', () => {
     createdRestaurantIds.push(res.body.restaurant.id);
   });
 
-  it('rejects restaurant creation with no mobile number', async () => {
+  it('allows restaurant creation with no mobile number, leaving restaurantCode null', async () => {
     const res = await request(app.getHttpServer())
       .post('/api/v1/restaurants')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -88,6 +88,22 @@ describe('Restaurant management (Phase 1a)', () => {
         name: `${restaurantName} No Mobile`,
         ownerName: 'Test Owner',
         ownerEmail: `owner-nomobile-${Date.now()}@test.example.com`
+      });
+    expect(res.status).toBe(201);
+    expect(res.body.restaurant.restaurantCode).toBeNull();
+    expect(res.body.restaurant.mobile).toBeNull();
+    createdRestaurantIds.push(res.body.restaurant.id);
+  });
+
+  it('rejects a malformed mobile number when one is given', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/restaurants')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: `${restaurantName} Bad Mobile`,
+        mobile: '12345',
+        ownerName: 'Test Owner',
+        ownerEmail: `owner-badmobile-${Date.now()}@test.example.com`
       });
     expect(res.status).toBe(400);
   });

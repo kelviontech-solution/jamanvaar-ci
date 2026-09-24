@@ -13,7 +13,12 @@ export const createRestaurantSchema = z
     city: z.string().trim().optional(),
     state: z.string().trim().optional(),
     country: z.string().trim().default('India'),
-    mobile: z.string().trim().refine(isValidIndianPhone, 'A valid 10-digit Indian mobile number is required'),
+    // Optional at the API level (many internal/test callers create a restaurant with no
+    // identity concept at all) — Super Admin's onboarding UI is where this is made required
+    // in practice (Phase 5/7). When given, it must be a valid Indian mobile and generates the
+    // customer-facing restaurantCode; when omitted, restaurantCode/mobile simply stay null,
+    // the same state a pre-Phase-1 legacy restaurant is in before the backfill script runs.
+    mobile: z.string().trim().refine(isValidIndianPhone, 'A valid 10-digit Indian mobile number is required').optional(),
     timezone: z.string().trim().default('Asia/Kolkata'),
     currency: z.string().trim().default('INR'),
     defaultLanguage: z.string().trim().default('en'),

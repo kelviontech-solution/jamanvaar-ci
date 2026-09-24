@@ -35,7 +35,6 @@ export class RestaurantsService {
    */
   async createRestaurant(dto: CreateRestaurantDto, actor: PlatformUser) {
     const result = await this.prisma.runAsPlatform(async (tx) => {
-      const restaurantCode = generateRestaurantCode(dto.mobile);
       let restaurant;
       try {
         restaurant = await tx.restaurant.create({
@@ -51,13 +50,14 @@ export class RestaurantsService {
             timezone: dto.timezone,
             currency: dto.currency,
             defaultLanguage: dto.defaultLanguage,
-            mobile: normalizeIndianPhone(dto.mobile),
-            restaurantCode
+            ...(dto.mobile
+              ? { mobile: normalizeIndianPhone(dto.mobile), restaurantCode: generateRestaurantCode(dto.mobile) }
+              : {})
           }
         });
       } catch (err) {
         if (err instanceof Error && 'code' in err && (err as { code?: string }).code === 'P2002') {
-          throw new ConflictException(`A restaurant is already registered with mobile number ${normalizeIndianPhone(dto.mobile)}`);
+          throw new ConflictException(`A restaurant is already registered with mobile number ${normalizeIndianPhone(dto.mobile!)}`);
         }
         throw err;
       }
@@ -252,6 +252,22 @@ export class RestaurantsService {
       devices: restaurant.devices ?? [],
       activationKeys: (restaurant.activationKeys ?? []).map((k) => redactActivationKeyCode(k, now, canSeeFullCode))
     };
+  }
+
+  /**
+   * Resolves a customer-facing Restaurant ID to its internal id/name — used by login,
+   * forgot-password and Kiosk activation screens (Phases 3/4/8) before any credential is
+   * checked. A Restaurant ID is not itself a secret (same footing as the raw UUID already
+   * was — see tenant-auth.service.ts's login() comment on restaurantId being "effectively
+   * public"), so a plain 404 for an unknown code is fine; only the account's *password* needs
+   * a generic/constant-time response.
+   */
+  async resolveByCode(restaurantCode: string): Promise<{ restaurantId: string; name: string }> {
+    const restaurant = await this.prisma.runAsPlatform((tx) =>
+      tx.restaurant.findFirst({ where: { restaurantCode, deletedAt: null }, select: { id: true, name: true } })
+    );
+    if (!restaurant) throw new NotFoundException('Restaurant not found');
+    return { restaurantId: restaurant.id, name: restaurant.name };
   }
 
   async update(id: string, dto: UpdateRestaurantDto, actor: PlatformUser) {
