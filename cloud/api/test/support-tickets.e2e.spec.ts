@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -38,7 +38,7 @@ describe('Support tickets (BUG-085/086/087)', () => {
     mateId = mate.id;
     disabledId = off.id;
     await prisma.platformUser.update({ where: { id: off.id }, data: { status: 'DISABLED' } });
-    meToken = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: emails.me, password })).body.accessToken;
+    meToken = (await platformLogin(app, emails.me, password)).body.accessToken;
   });
 
   afterAll(async () => {

@@ -1,12 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PlatformUser } from '@prisma/client';
+import { Device, PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 
+/**
+ * security-audit MED-14: `restaurantId`/`deviceId` are no longer taken from the
+ * request body — the caller must authenticate as a real device (`DeviceAuthGuard`),
+ * and both values come from that device's own row instead (see `recordSyncLog`).
+ */
 export interface RecordSyncLogDto {
-  restaurantId: string;
   branchId?: string;
-  deviceId?: string;
   entityType: 'ORDER' | 'MENU' | 'INVENTORY' | 'CUSTOMER';
   action: 'CREATE' | 'UPDATE' | 'DELETE';
   status: 'SUCCESS' | 'FAILED' | 'PENDING';
@@ -120,12 +123,16 @@ export class SyncObservabilityService {
     });
   }
 
-  async recordSyncLog(dto: RecordSyncLogDto) {
+  async recordSyncLog(device: Device, dto: RecordSyncLogDto) {
+    // security-audit MED-14: restaurantId/deviceId come from the authenticated device,
+    // never the request body — this endpoint used to have no guard at all, so anyone
+    // could write an unbounded, unauthenticated stream of fabricated telemetry rows
+    // tagged with an arbitrary restaurantId (including another tenant's).
     return this.prisma.platformDb.syncEventLog.create({
       data: {
-        restaurantId: dto.restaurantId,
+        restaurantId: device.restaurantId,
         branchId: dto.branchId,
-        deviceId: dto.deviceId,
+        deviceId: device.id,
         entityType: dto.entityType,
         action: dto.action,
         status: dto.status,

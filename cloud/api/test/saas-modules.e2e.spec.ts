@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 describe('SaaS management modules: Plans, Subscriptions, Activation Keys, Devices, Branches, Owners, Audit, Health, Sessions', () => {
@@ -31,9 +31,7 @@ describe('SaaS management modules: Plans, Subscriptions, Activation Keys, Device
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
 
-    const loginRes = await request(app.getHttpServer())
-      .post('/api/v1/platform-auth/login')
-      .send({ email: adminEmail, password: adminPassword });
+    const loginRes = await platformLogin(app, adminEmail, adminPassword);
     accessToken = loginRes.body.accessToken;
 
     const restaurantRes = await authed('post', '/api/v1/restaurants').send({
@@ -301,9 +299,7 @@ describe('SaaS management modules: Plans, Subscriptions, Activation Keys, Device
       expect(list.body.filter((s: { current: boolean }) => s.current)).toHaveLength(1);
 
       // A second login (another browser) is the session we revoke; ours must keep working.
-      const other = await request(app.getHttpServer())
-        .post('/api/v1/platform-auth/login')
-        .send({ email: adminEmail, password: adminPassword });
+      const other = await platformLogin(app, adminEmail, adminPassword);
       const otherId = (await request(app.getHttpServer()).get('/api/v1/platform/sessions').set('Authorization', `Bearer ${other.body.accessToken}`))
         .body.find((s: { current: boolean }) => s.current).id;
 
@@ -332,9 +328,7 @@ describe('SaaS management modules: Plans, Subscriptions, Activation Keys, Device
       expect(oldLogin.status).toBe(401);
 
       // New password does.
-      const newLogin = await request(app.getHttpServer())
-        .post('/api/v1/platform-auth/login')
-        .send({ email: adminEmail, password: 'brand-new-password-123' });
+      const newLogin = await platformLogin(app, adminEmail, 'brand-new-password-123');
       expect(newLogin.status).toBe(200);
       accessToken = newLogin.body.accessToken;
     });

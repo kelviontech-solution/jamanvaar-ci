@@ -114,6 +114,26 @@ export function saveDeviceRegistration(deviceId: string, deviceToken: string, re
   }
 }
 
+/**
+ * Unbinds this console from the cloud (BUG-145 follow-up): a device the cloud no longer recognises, or has
+ * revoked, was stuck forever behind the lock screen with no way back to activation, since `isCloudConnected()`
+ * checks `RESTAURANT_ID_KEY`, not the device token, so the old (unused) `clearDeviceRegistration` alone would
+ * not have returned this console to the connect screen. This app is local-first — the local admin login and
+ * the day-to-day database are untouched; only the cloud/device link is reset, and screens that need it (owner
+ * cloud sign-in, backups, Help & Support) fall back to asking to reconnect.
+ */
+export function resetTerminal(): void {
+  try {
+    localStorage.removeItem(RESTAURANT_ID_KEY);
+    localStorage.removeItem(DEVICE_ID_KEY);
+    localStorage.removeItem(DEVICE_TOKEN_KEY);
+  } catch {
+    // Storage unavailable - nothing to clear, but the gate reset below still lets a reload retry cleanly.
+  }
+  DeviceGate.reset();
+}
+
+/** @deprecated use `resetTerminal`, which also clears the restaurant id so the app actually returns to the connect screen. */
 export function clearDeviceRegistration() {
   try {
     localStorage.removeItem(DEVICE_ID_KEY);
@@ -269,7 +289,11 @@ export async function cloudLogin(
       password,
       deviceId,
       deviceToken,
-      deviceType: 'POS_ADMIN'
+      deviceType: 'POS_ADMIN',
+      // security-audit HIGH-04: the server now enforces this unconditionally for
+      // deviceType POS_ADMIN regardless of this flag, but sending it explicitly keeps
+      // this call self-documenting and matches kiosk-admin's equivalent call.
+      adminOnly: true
     }
   });
 
@@ -369,7 +393,23 @@ export async function cloudResetPassword(email: string, otp: string, newPassword
   await request('/api/v1/tenant-auth/reset-password', { method: 'POST', body: { restaurantId, email, otp, newPassword }, skipAuthRetry: true });
 }
 
-export function cloudLogout() {
+/**
+ * security-audit LOW-05: this used to just null the in-memory access token —
+ * the server-side refresh session (a 30-day httpOnly cookie) stayed valid,
+ * so anything that called request() after "sign out" (support tickets,
+ * display scale, billing detail — every route not gated by
+ * isCloudLoggedIn()) would silently re-authenticate via refreshAccessToken().
+ * Revoke the refresh session server-side first, while the access token that
+ * authorizes the call is still in memory, then clear local state regardless
+ * of whether the network call succeeds (a terminal must be able to sign out
+ * even if it's offline or the server is unreachable).
+ */
+export async function cloudLogout(): Promise<void> {
+  try {
+    await request('/api/v1/tenant-auth/logout', { method: 'POST', skipAuthRetry: true });
+  } catch {
+    // Best-effort — local sign-out must proceed either way.
+  }
   accessToken = null;
 }
 
@@ -801,14 +841,14 @@ export async function saveRestaurantIdentity(identity: RestaurantIdentityFields)
  * request<T>() and sends the device token this app already has from its own
  * existing activation flow instead.
  */
-export async function createRefund(paymentId: string, amountPaise: number, reason: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
+export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
   const token = getStoredDeviceToken();
   if (!token) throw new CloudApiError('Device not activated', 401);
 
   const res = await fetch(`${API_BASE}/api/v1/payments/${paymentId}/refund`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ amountPaise, reason })
+    body: JSON.stringify({ amountPaise, reason, requestedBy })
   });
   const contentType = res.headers.get('content-type') ?? '';
   const data = contentType.includes('application/json') ? await res.json() : undefined;

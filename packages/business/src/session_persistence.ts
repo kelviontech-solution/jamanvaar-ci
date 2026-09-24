@@ -37,6 +37,15 @@ export interface PersistedSession {
   businessDayId?: string;
   /** Active POS tab to restore navigation */
   activeTab?: string;
+  /**
+   * security-audit LOW-05: whether the terminal was locked when this session
+   * was last touched. Persisted (not just held in component/store state) so
+   * a webview reload — Ctrl+R, a crash-recovery "Restore Workspace" button,
+   * or the accelerator itself — restores a locked terminal locked, instead of
+   * silently dropping back into the previously signed-in user's unlocked
+   * session with no PIN prompt.
+   */
+  locked?: boolean;
   /** Expiry timestamp (ms since epoch) */
   expiresAt: number;
   /** Wall-clock of last activity (used for lock-after-inactivity) */

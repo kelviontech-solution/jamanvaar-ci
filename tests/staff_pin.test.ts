@@ -38,6 +38,14 @@ describe('staff PIN hashing', () => {
     expect(await verifyPinHash('4821', 'rest-1', undefined)).toBe(false);
   });
 
+  /**
+   * B2-014 / security-audit MED-05: hashPin now produces a much more expensive `pinv2` hash
+   * (real PBKDF2-HMAC-SHA256, not the hand-rolled stretch an alternate fix on another branch
+   * used — see pin.ts's own doc comment for why PBKDF2 was kept), but an existing install's
+   * already-stored `pinv1` hashes (computed with the old, weaker 2-round FNV-1a scheme) must
+   * keep verifying — nobody's PIN should stop working just because this shipped. `pinv1`
+   * support is verification-only; a freshly hashed PIN is always `pinv2` going forward.
+   */
   it('still verifies a legacy pinv1 (pre-B2-014) hash — old PINs keep working', async () => {
     // Reproduces the exact legacy algorithm inline (two FNV-1a rounds over a fixed public salt)
     // rather than importing it, since it is deliberately no longer exported for new use.
@@ -55,6 +63,10 @@ describe('staff PIN hashing', () => {
     const legacyHash = 'pinv1:' + a.toString(16).padStart(8, '0') + b.toString(16).padStart(8, '0');
     expect(await verifyPinHash('4821', 'rest-1', legacyHash)).toBe(true);
     expect(await verifyPinHash('9999', 'rest-1', legacyHash)).toBe(false);
+    expect(isPlaintextPin(legacyHash)).toBe(false);
+
+    // A freshly issued hash for the same PIN is the new, stronger v2 format.
+    expect((await hashPin('4821', 'rest-1')).startsWith('pinv2:')).toBe(true);
   });
 
   it('flags an old plaintext PIN so callers can detect and migrate it', async () => {
@@ -93,11 +105,14 @@ describe('staff PIN hashing', () => {
     const takenFingerprints = nonWeak.map((p) => pinFingerprint(p, 'rest-1'));
     const pin = generateUniquePin('rest-1', takenFingerprints);
     expect(['0000', '1111', '1234', '1212', '0001']).toContain(pin);
-  });
+    // This pathological "restaurant with ~10,000 PINs already issued" fixture builds
+    // ~9999 fingerprints — a longer timeout for this one rare edge-case test, not a
+    // statement about normal (single-PIN) responsiveness.
+  }, 20_000);
 
   it('throws only when truly every PIN (weak included) is taken', () => {
     const all: string[] = [];
     for (let n = 0; n < 10000; n++) all.push(pinFingerprint(String(n).padStart(4, '0'), 'rest-1'));
     expect(() => generateUniquePin('rest-1', all)).toThrow();
-  });
+  }, 20_000);
 });

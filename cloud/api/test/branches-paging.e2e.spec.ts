@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /** BUG-047: the branches list loaded every branch of every restaurant and the browser did the rest. */
@@ -23,7 +23,7 @@ describe('Branches list is paged, searched and filtered on the server (BUG-047)'
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email, password });
-    token = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email, password })).body.accessToken;
+    token = (await platformLogin(app, email, password)).body.accessToken;
     const r = await auth(request(app.getHttpServer()).post('/api/v1/restaurants')).send({
       name: `TEST Branch Paging ${stamp}`, ownerName: 'Owner', ownerEmail: `branch-paging-${stamp}@example.com`
     });

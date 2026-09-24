@@ -30,10 +30,12 @@ import {
   JamanAiFloatingButton,
   JAMANVAARStartup,
   JamanvaarAuthLayout,
+  APP_HERO_IMAGES,
   Modal,
   NotificationDrawerModal,
   NotificationToastContainer,
-  useAiAccess
+  useAiAccess,
+  ActivationNoticeBanner
 } from '@jamanvaar/ui';
 import { lanMeshSync } from '@jamanvaar/sync';
 import {
@@ -299,7 +301,9 @@ export default function PosAdminApp() {
   const handleAdminLogout = () => {
     setIsAdminLoggedIn(false);
     setAuthPassword('');
-    cloudLogout();
+    // Fire-and-forget: the server-side revocation (LOW-05) must not block the
+    // UI from signing out locally, including while offline.
+    void cloudLogout();
     SessionPersistence.clear('admin');
   };
 
@@ -568,6 +572,7 @@ export default function PosAdminApp() {
           heroHeadline="Restaurant Control."
           heroHighlightWord="Live Intelligence."
           heroDescription="Centralized management suite for sales analytics, live KOT dispatch, recipe costing and team permissions."
+          heroImages={APP_HERO_IMAGES.ADMIN}
           capabilities={[
             { label: 'Restaurant Management', icon: 'zap' },
             { label: 'Reports & Analytics', icon: 'printer' },
@@ -576,6 +581,7 @@ export default function PosAdminApp() {
           ]}
           footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
         >
+          <ActivationNoticeBanner />
           {authScreenState === 'FORGOT' ? (
             <ForgotPasswordPanel
               defaultEmail={authUsername}

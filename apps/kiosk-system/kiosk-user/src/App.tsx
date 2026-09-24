@@ -55,7 +55,6 @@ import {
   OrderType,
   PaymentMethod,
   PaymentStatus,
-  ReceiptDeliveryMethod,
   SelectedModifier
 } from '@jamanvaar/types';
 import {
@@ -77,7 +76,10 @@ import {
   ProductCard,
   StatusBadge,
   ThermalReceiptView,
-  JAMANVAARStartup
+  JAMANVAARStartup,
+  JamanvaarKioskAuthLayout,
+  ActivationNoticeBanner,
+  ActivationHelpNote
 } from '@jamanvaar/ui';
 import { formatDate, formatINR, formatSplitTax, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
@@ -100,16 +102,17 @@ import {
   Globe,
   Grid,
   Heart,
-  HelpCircle,
   Info,
+  ArrowRight,
   Key,
+  KeyRound,
+  HelpCircle,
   Lock,
   Mail,
   MessageCircle,
   MessageSquare,
   Minus,
   PackagePlus,
-  Phone,
   PhoneCall,
   Plus,
   Printer,
@@ -160,6 +163,13 @@ const LANGUAGE_OPTIONS: Array<{ code: SupportedLanguage; label: string; native: 
   { code: 'gu', label: 'Gujarati', native: 'ગુજરાતી' }
 ];
 
+/** Every real activation key is JMV-XXXX-XXXX-XXXX (see activation-keys.service.ts's own generator) — reformats as the installer types so they don't have to type the dashes themselves. */
+function formatActivationKeyInput(raw: string): string {
+  const clean = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const groups = [clean.slice(0, 3), clean.slice(3, 7), clean.slice(7, 11), clean.slice(11, 15)].filter(Boolean);
+  return groups.join('-');
+}
+
 export default function KioskUserApp() {
   // Device activation (Phase 3) — this terminal has no identity until an
   // activation code is redeemed; everything below assumes a real device.
@@ -167,6 +177,7 @@ export default function KioskUserApp() {
   const [activationCode, setActivationCode] = useState('');
   const [activationError, setActivationError] = useState('');
   const [isActivating, setIsActivating] = useState(false);
+  const [showKeyHint, setShowKeyHint] = useState(false);
   const kioskId = getKioskDeviceId() ?? 'KIOSK-01';
 
   const handleActivate = async (e: React.FormEvent) => {
@@ -387,7 +398,6 @@ export default function KioskUserApp() {
   // Digital E-Bill & WhatsApp Receipt States (Sections 130-152)
   const [isEBillModalOpen, setIsEBillModalOpen] = useState(false);
   const [eBillPhoneInput, setEBillPhoneInput] = useState('');
-  const [selectedEBillMethod, setSelectedEBillMethod] = useState<ReceiptDeliveryMethod>('WHATSAPP');
   const [eBillSuccessMessage, setEBillSuccessMessage] = useState<string | null>(null);
 
   // Modals for Extra Features
@@ -784,13 +794,17 @@ export default function KioskUserApp() {
     setSelectedModifiers(defaultModifiersFor(item));
   };
 
-  // Tapping the card body itself (not the + or Customize buttons) should
-  // only open the options modal when the item actually has something to
-  // customize — otherwise it used to force the modal open for every card,
-  // including plain items like Butter Naan with zero modifier groups.
+  // Tapping the card body itself (not the + or Customize buttons) opens the
+  // options modal when the item actually has something to customize —
+  // otherwise it used to force the modal open for every card, including
+  // plain items like Butter Naan with zero modifier groups. For a plain
+  // item, the tap instead adds it directly (same as "+"), so tapping the
+  // card body is never a dead click.
   const handleCardClick = (item: MenuItem) => {
     if (item.modifierGroupIds && item.modifierGroupIds.length > 0) {
       handleOpenCustomize(item);
+    } else {
+      handleSelectItem(item);
     }
   };
 
@@ -1201,29 +1215,19 @@ export default function KioskUserApp() {
     await proceedToConfirmation(order, networkState === 'ONLINE');
   };
 
-  // Dispatch WhatsApp or SMS E-Bill
+  // Dispatch WhatsApp E-Bill (the kiosk's only digital delivery channel — SMS receipt was removed
+  // per owner request in favor of WhatsApp, which carries the same tax invoice for free).
   const handleDispatchEBill = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!placedOrder || !eBillPhoneInput) return;
 
-    if (selectedEBillMethod === 'WHATSAPP') {
-      const res = await EBillService.sendWhatsAppEBill(placedOrder, eBillPhoneInput, receiptConfig, sendReceipt);
-      ReceiptRepository.addRecord(res.record);
-      if (res.success) {
-        setEBillSuccessMessage(res.message);
-        showToast(res.message);
-      } else {
-        alert(res.message);
-      }
-    } else if (selectedEBillMethod === 'SMS') {
-      const res = await EBillService.sendSmsEBill(placedOrder, eBillPhoneInput, sendReceipt);
-      ReceiptRepository.addRecord(res.record);
-      if (res.success) {
-        setEBillSuccessMessage(res.message);
-        showToast(res.message);
-      } else {
-        alert(res.message);
-      }
+    const res = await EBillService.sendWhatsAppEBill(placedOrder, eBillPhoneInput, receiptConfig, sendReceipt);
+    ReceiptRepository.addRecord(res.record);
+    if (res.success) {
+      setEBillSuccessMessage(res.message);
+      showToast(res.message);
+    } else {
+      alert(res.message);
     }
   };
 
@@ -1294,7 +1298,12 @@ export default function KioskUserApp() {
       });
     } else {
       setStaffPin('');
-      showToast('Invalid staff PIN.');
+      const lockoutMs = StaffRepository.pinLockoutRemainingMs();
+      showToast(
+        lockoutMs > 0
+          ? `Too many wrong PINs. Try again in ${Math.ceil(lockoutMs / 1000)}s.`
+          : 'Invalid staff PIN.'
+      );
       AuditRepository.log({
         kioskId,
         action: 'STAFF_OVERRIDE_PIN_FAILED',
@@ -1369,28 +1378,80 @@ export default function KioskUserApp() {
   // early-return (including the maintenance lock check right below).
   if (!isDeviceActivated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-jaman-cream p-6">
-        <form onSubmit={handleActivate} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4 text-center">
-          <h1 className="text-2xl font-black text-jaman-navy">Activate This Kiosk</h1>
-          <p className="text-sm text-[#4A5568]">Enter the activation code provided by JAMANVAAR to connect this device to your restaurant.</p>
-          <input
-            type="text"
-            value={activationCode}
-            onChange={(e) => setActivationCode(e.target.value)}
-            placeholder="Activation code"
-            className="w-full text-center text-lg font-mono bg-jaman-cream border border-jaman-border rounded-xl px-4 py-3"
-            autoFocus
-          />
-          {activationError && <p className="text-sm font-bold text-rose-700">{activationError}</p>}
-          <button
-            type="submit"
-            disabled={isActivating || !activationCode.trim()}
-            className="w-full py-3 rounded-2xl bg-jaman-saffron text-white font-black uppercase tracking-wider disabled:opacity-60"
-          >
-            {isActivating ? 'Activating…' : 'Activate'}
-          </button>
-        </form>
-      </div>
+      <JAMANVAARStartup appName="Self-Order Kiosk" appType="KIOSK" subtitle="Customer Self-Ordering Terminal">
+        <JamanvaarKioskAuthLayout
+          backgroundPhoto="https://images.unsplash.com/photo-1538334421852-687c439c92f4?auto=format&fit=crop&w=1800&q=80"
+          foodPhoto="/assets/menu/biryani/royal-veg-biryani.jpg"
+          heroHeadline={['Guests order.', 'Kitchen fires', 'instantly.']}
+          heroDescription="A modern self-ordering kiosk for a smoother and happier dining experience."
+          features={[
+            { icon: 'touch', label: 'Touch to Order' },
+            { icon: 'kitchen', label: 'Instant Kitchen Orders' },
+            { icon: 'suggest', label: 'Smart Suggestions' },
+            { icon: 'happy', label: 'Happier Customers' }
+          ]}
+        >
+          <ActivationNoticeBanner />
+          <div className="space-y-1 mb-5">
+            <h2 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">Activate This Kiosk</h2>
+            <p className="text-sm sm:text-base text-[#52677A] font-medium">
+              Enter the activation key from your Super Admin Welcome Kit to connect this kiosk to your restaurant.
+            </p>
+          </div>
+          <form onSubmit={handleActivate} className="space-y-4">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="kiosk-activation-key" className="text-xs font-extrabold text-jaman-navy flex items-center gap-1.5">
+                  <KeyRound className="w-3.5 h-3.5 text-jaman-saffron" />
+                  Activation Key *
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowKeyHint((v) => !v)}
+                  className="text-xs font-bold text-jaman-navy/70 hover:text-jaman-saffron flex items-center gap-1 cursor-pointer"
+                >
+                  <HelpCircle className="w-3.5 h-3.5" />
+                  Where can I find this?
+                </button>
+              </div>
+              {showKeyHint && (
+                <p className="text-[11px] text-[#52677A] font-medium bg-[#FFF8EE] border border-[#F0E2D0] rounded-xl px-3 py-2 mb-2">
+                  Your restaurant owner gets it from Restaurant Admin under Subscription Plans, Device &amp; Staff Logins, once JAMANVAAR has activated your plan.
+                </p>
+              )}
+              <input
+                id="kiosk-activation-key"
+                type="text"
+                value={activationCode}
+                onChange={(e) => setActivationCode(formatActivationKeyInput(e.target.value))}
+                placeholder="JMV-XXXX-XXXX-XXXX"
+                required
+                autoFocus
+                inputMode="text"
+                aria-describedby={activationError ? 'kiosk-activation-error' : undefined}
+                className="w-full bg-[#FFFCF8] border-[1.5px] border-[#E5D7C8] focus:border-[#F97316] focus:shadow-[0_0_0_4px_rgba(249,115,22,0.10)] rounded-2xl px-5 py-4 text-lg text-center font-mono text-jaman-navy font-bold focus:outline-hidden transition-all uppercase tracking-wider placeholder:text-slate-400"
+              />
+            </div>
+            {activationError && (
+              <div id="kiosk-activation-error" role="alert" className="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 px-4 py-3 rounded-2xl text-center flex items-center justify-center gap-1.5">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{activationError}</span>
+              </div>
+            )}
+            <button
+              type="submit"
+              disabled={isActivating || !activationCode.trim()}
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#FF8A00] to-[#F97316] hover:brightness-105 disabled:opacity-50 disabled:grayscale text-white font-extrabold text-base shadow-[0_10px_24px_rgba(249,115,22,0.28)] transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>{isActivating ? 'Connecting kiosk…' : 'Activate Kiosk'}</span>
+              {!isActivating && <ArrowRight className="w-5 h-5" />}
+            </button>
+          </form>
+          <div className="mt-4">
+            <ActivationHelpNote deviceNoun="kiosk" />
+          </div>
+        </JamanvaarKioskAuthLayout>
+      </JAMANVAARStartup>
     );
   }
 
@@ -1810,10 +1871,10 @@ export default function KioskUserApp() {
 
       {/* STEP 1: WELCOME SCREEN */}
       {step === 'WELCOME' && (
-        <div className="flex-1 w-full h-full relative isolate bg-jaman-ivory kiosk-bg bg-cover bg-bottom bg-no-repeat flex flex-col overflow-hidden">
-          <style>{`
-            .kiosk-bg { background-image: url('/language-selection-bg.png'); }
-          `}</style>
+        <div
+          className="flex-1 w-full h-full relative isolate bg-jaman-ivory bg-cover bg-bottom bg-no-repeat flex flex-col overflow-hidden"
+          style={{ backgroundImage: `url('${welcomeSettings.backgroundImageUrl || '/language-selection-bg.png'}')` }}
+        >
 
           {/* Light legibility wash — flat opacity (no gradient stops, so no
               possible boundary line), inset-0 over the full w-full h-full
@@ -2827,7 +2888,7 @@ export default function KioskUserApp() {
                   Digital Delivery & E-Bill Options
                 </h4>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div className="grid grid-cols-3 gap-2.5">
                   {/* Printing is always an explicit, on-demand action here —
                       the app has no way to confirm paper actually came out
                       of a physical printer, so it never claims a receipt
@@ -2856,29 +2917,14 @@ export default function KioskUserApp() {
 
                   {/* Option 1: WhatsApp E-Bill */}
                   <button
-                    onClick={() => {
-                      setSelectedEBillMethod('WHATSAPP');
-                      setIsEBillModalOpen(true);
-                    }}
+                    onClick={() => setIsEBillModalOpen(true)}
                     className="p-3 rounded-2xl bg-jaman-ivory border border-jaman-border hover:bg-emerald-50 hover:border-emerald-500 flex flex-col items-center gap-1.5 transition-all active:scale-95"
                   >
                     <MessageSquare className="w-5 h-5 text-emerald-600" />
                     <span className="text-[11px] font-bold text-jaman-navy">WhatsApp E-Bill</span>
                   </button>
 
-                  {/* Option 2: SMS E-Bill */}
-                  <button
-                    onClick={() => {
-                      setSelectedEBillMethod('SMS');
-                      setIsEBillModalOpen(true);
-                    }}
-                    className="p-3 rounded-2xl bg-jaman-ivory border border-jaman-border hover:bg-blue-50 hover:border-blue-500 flex flex-col items-center gap-1.5 transition-all active:scale-95"
-                  >
-                    <Phone className="w-5 h-5 text-blue-600" />
-                    <span className="text-[11px] font-bold text-jaman-navy">SMS Receipt</span>
-                  </button>
-
-                  {/* Option 3: Scannable QR Code */}
+                  {/* Option 2: Scannable QR Code */}
                   <button
                     onClick={() => {
                       setIsHandoffModalOpen(true);
@@ -2981,7 +3027,8 @@ export default function KioskUserApp() {
                       .map((kot) => (
                         <pre
                           key={kot.id}
-                          className="bg-jaman-navy text-emerald-300 text-[10px] leading-relaxed font-mono p-4 rounded-xl overflow-x-auto whitespace-pre w-full max-w-[300px] mx-auto"
+                          className="text-emerald-300 text-[10px] leading-relaxed font-mono p-4 rounded-xl overflow-x-auto whitespace-pre w-full max-w-[300px] mx-auto"
+                          style={{ backgroundColor: receiptConfig.kotThemeColor || '#0B253A' }}
                         >
                           {PrinterService.generateKOTText(kot)}
                         </pre>
@@ -3074,7 +3121,7 @@ export default function KioskUserApp() {
       <Modal
         isOpen={isEBillModalOpen}
         onClose={() => setIsEBillModalOpen(false)}
-        title={selectedEBillMethod === 'WHATSAPP' ? 'Send WhatsApp E-Bill' : 'Send SMS E-Bill'}
+        title="Send WhatsApp E-Bill"
       >
         <form onSubmit={handleDispatchEBill} className="space-y-4 py-2">
           <p className="text-xs text-[#4A5568]">
@@ -3102,7 +3149,7 @@ export default function KioskUserApp() {
               Cancel
             </Button>
             <Button variant="accent" type="submit" leftIcon={<Send className="w-3.5 h-3.5" />}>
-              Send {selectedEBillMethod === 'WHATSAPP' ? 'WhatsApp Bill' : 'SMS Bill'}
+              Send WhatsApp Bill
             </Button>
           </div>
         </form>

@@ -184,7 +184,16 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
     // appears immediately, with correct modal-close/sound timing, instead of via
     // a delayed round-trip through the store's own override redirect.
     const isManagerRole = isManagerOrAboveRole(currentUser);
-    const needsApproval = isHighDiscount(discountType, numVal) && !isManagerRole;
+    const needsApproval =
+      isHighDiscount(
+        {
+          scope,
+          type: discountType,
+          value: numVal,
+          itemIds: scope === 'ITEMS' ? selectedItemIds : undefined
+        },
+        cart.items
+      ) && !isManagerRole;
 
     if (needsApproval) {
       requestManagerOverride(

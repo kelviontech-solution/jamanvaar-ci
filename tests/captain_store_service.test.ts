@@ -321,5 +321,26 @@ describe('Captain service workflow', () => {
       expect(store().messages[0]).toMatchObject({ senderName: 'Manager', presetText: 'Table 9 needs help', tableNumber: '9' });
       expect(store().notifications.some((n) => n.message.includes('Table 9 needs help'))).toBe(true);
     });
+
+    it('a kiosk guest\'s Call Staff tap lands in Guest Requests, not the general message inbox', () => {
+      signIn();
+      const incoming = {
+        id: 'svc-call-1',
+        kind: 'CALL_STAFF' as const,
+        recipient: 'COUNTER' as const,
+        senderName: 'Self-order kiosk',
+        presetText: 'A guest at Table 5 asked for help.',
+        tableNumber: '5',
+        createdAt: new Date().toISOString()
+      };
+      store().receiveMessages([incoming]);
+      store().receiveMessages([incoming]); // delivered twice — must not duplicate
+
+      const requests = store().customerRequests.filter((r) => r.id === 'svc-svc-call-1');
+      expect(requests).toHaveLength(1);
+      expect(requests[0]).toMatchObject({ tableNumber: '5', type: 'HELP', notes: 'A guest at Table 5 asked for help.', isResolved: false });
+      expect(store().messages.some((m) => m.id === 'svc-call-1')).toBe(false);
+      expect(store().notifications.some((n) => n.type === 'GUEST_HELP' && n.message.includes('Table 5'))).toBe(true);
+    });
   });
 });

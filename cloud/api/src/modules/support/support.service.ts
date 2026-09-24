@@ -5,12 +5,36 @@ import { AuditService } from '../audit/audit.service';
 import { EmailService } from '../notifications/email.service';
 import { resendInviteEmail } from '../notifications/email-templates';
 import { generateOpaqueToken, hashOpaqueToken } from '../../common/security/token.util';
+import { redactActivationKeyCode } from '../../common/security/activation-key-presentation';
+import { PlatformRoleName, permissionsForRole } from '../../common/rbac/access';
 import { TenantAuthService } from '../tenant-auth/tenant-auth.service';
 
 const ACTIVATION_TOKEN_TTL_DAYS = 7;
 
 /** Only these roles may impersonate a tenant owner for debugging — matches the same set that can manage the platform team. */
 const IMPERSONATION_ALLOWED_ROLES = ['PLATFORM_OWNER', 'SUPER_ADMIN', 'SUPPORT_ADMIN'];
+
+/**
+ * security-audit HIGH-01: `search()`/`getDiagnostics()` used to `include` the full `User`
+ * and `Device` rows with no `select` — every platform role holding `support:'read'`
+ * (down to READ_ONLY) could read `passwordHash` (bcrypt), `activationTokenHash`, and —
+ * critically — `passwordResetHash`, an *unsalted SHA-256 of a 6-digit password-reset OTP*
+ * (see TenantAuthService.requestPasswordReset). That hash is brute-forceable offline in
+ * well under a second, turning read-only support access into full tenant-owner account
+ * takeover. Both models are now fetched through the same non-secret projection the rest
+ * of the codebase already uses correctly (see OwnersService.OWNER_SELECT).
+ */
+const SUPPORT_USER_SELECT = {
+  id: true, restaurantId: true, branchId: true, email: true, phone: true, fullName: true,
+  role: true, status: true, invitedAt: true, activatedAt: true, createdAt: true, updatedAt: true
+} as const;
+
+const SUPPORT_DEVICE_SELECT = {
+  id: true, restaurantId: true, branchId: true, type: true, appVersion: true, status: true,
+  lastSeenAt: true, lastSyncAt: true, lastBackupAt: true, syncStatus: true, activatedAt: true,
+  createdAt: true, updatedAt: true, name: true, ipAddress: true, macAddress: true, osPlatform: true,
+  isLocked: true, lockReason: true, lockedAt: true, pendingSyncCount: true, syncError: true
+} as const;
 
 @Injectable()
 export class SupportService {
@@ -21,12 +45,14 @@ export class SupportService {
     private readonly tenantAuth: TenantAuthService
   ) {}
 
-  async search(query: string) {
+  async search(query: string, actorRole?: PlatformRoleName) {
     if (!query || query.trim().length < 2) {
       return { restaurants: [], owners: [], devices: [], activationKeys: [] };
     }
 
     const q = query.trim();
+    const canSeeFullCode = actorRole ? permissionsForRole(actorRole).devices === 'write' : false;
+    const now = new Date();
 
     return this.prisma.runAsPlatform(async (tx) => {
       const [restaurants, owners, devices, activationKeys] = await Promise.all([
@@ -53,7 +79,8 @@ export class SupportService {
             ]
           },
           take: 8,
-          include: {
+          select: {
+            ...SUPPORT_USER_SELECT,
             restaurant: { select: { id: true, name: true, status: true } }
           }
         }),
@@ -65,7 +92,8 @@ export class SupportService {
             ]
           },
           take: 8,
-          include: {
+          select: {
+            ...SUPPORT_DEVICE_SELECT,
             restaurant: { select: { id: true, name: true } },
             branch: { select: { id: true, name: true } }
           }
@@ -81,18 +109,21 @@ export class SupportService {
         })
       ]);
 
-      return { restaurants, owners, devices, activationKeys };
+      return { restaurants, owners, devices, activationKeys: activationKeys.map((k) => redactActivationKeyCode(k, now, canSeeFullCode)) };
     });
   }
 
-  async getDiagnostics(restaurantId: string) {
+  async getDiagnostics(restaurantId: string, actorRole?: PlatformRoleName) {
+    const canSeeFullCode = actorRole ? permissionsForRole(actorRole).devices === 'write' : false;
+    const now = new Date();
+
     return this.prisma.runAsPlatform(async (tx) => {
       const restaurant = await tx.restaurant.findUnique({
         where: { id: restaurantId },
         include: {
           branches: true,
-          users: { orderBy: { createdAt: 'asc' } },
-          devices: { orderBy: { createdAt: 'desc' } },
+          users: { orderBy: { createdAt: 'asc' }, select: SUPPORT_USER_SELECT },
+          devices: { orderBy: { createdAt: 'desc' }, select: SUPPORT_DEVICE_SELECT },
           subscriptions: {
             include: { plan: true },
             orderBy: { createdAt: 'desc' },
@@ -139,7 +170,7 @@ export class SupportService {
         subscriptionsHistory: restaurant.subscriptions,
         devices: restaurant.devices,
         onlineDevicesCount,
-        activationKeys: restaurant.activationKeys,
+        activationKeys: restaurant.activationKeys.map((k) => redactActivationKeyCode(k, now, canSeeFullCode)),
         recentAudits,
         entitlements: activeSubscription?.plan?.entitlements || null
       };

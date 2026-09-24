@@ -240,6 +240,33 @@ export class MasterCatalogService {
   }
 
   /**
+   * security-audit LOW-03: the extension used to come straight from the
+   * client-declared `fileName` and the type check only looked at the
+   * client-declared `contentType` — neither is trustworthy (a client can
+   * send `contentType: 'image/png'` with `fileName: 'x.html'` and arbitrary
+   * bytes). This sniffs the real file type from its magic bytes and returns
+   * null for anything that isn't one of the raster formats a dish photo
+   * actually needs. SVG is deliberately not supported: it's XML text that
+   * can carry a <script> tag, and "is this SVG" can't be distinguished from
+   * "is this HTML" by content alone the way the other formats' binary
+   * signatures can.
+   */
+  private sniffImageType(buffer: Buffer): { ext: string; contentType: string } | null {
+    if (buffer.length >= 8 && buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) {
+      return { ext: '.png', contentType: 'image/png' };
+    }
+    if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+      return { ext: '.jpg', contentType: 'image/jpeg' };
+    }
+    if (buffer.length >= 6 && buffer.toString('ascii', 0, 6) === 'GIF87a') return { ext: '.gif', contentType: 'image/gif' };
+    if (buffer.length >= 6 && buffer.toString('ascii', 0, 6) === 'GIF89a') return { ext: '.gif', contentType: 'image/gif' };
+    if (buffer.length >= 12 && buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP') {
+      return { ext: '.webp', contentType: 'image/webp' };
+    }
+    return null;
+  }
+
+  /**
    * Safe image upload handler: Validates content type, image size (<5MB),
    * writes to public assets directory and returns permanent accessible URL.
    */
@@ -247,11 +274,6 @@ export class MasterCatalogService {
     dto: { fileName: string; contentType: string; base64Data: string },
     actor: PlatformUser
   ) {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'];
-    if (!dto.contentType || !allowedTypes.includes(dto.contentType)) {
-      throw new BadRequestException('Unsupported image type. Allowed: JPEG, PNG, WEBP, SVG, GIF.');
-    }
-
     // Clean base64 header if included (e.g. data:image/png;base64,...)
     const cleanBase64 = dto.base64Data.includes(',')
       ? dto.base64Data.split(',')[1]
@@ -262,11 +284,13 @@ export class MasterCatalogService {
       throw new BadRequestException('Image size exceeds 5MB limit.');
     }
 
-    const ext = dto.fileName.includes('.')
-      ? dto.fileName.substring(dto.fileName.lastIndexOf('.'))
-      : '.jpg';
+    const sniffed = this.sniffImageType(buffer);
+    if (!sniffed) {
+      throw new BadRequestException('Unsupported or unrecognised image type. Allowed: JPEG, PNG, WEBP, GIF.');
+    }
+
     const safeHash = Math.random().toString(36).substring(2, 10) + '_' + Date.now();
-    const targetFileName = `dish_${safeHash}${ext}`;
+    const targetFileName = `dish_${safeHash}${sniffed.ext}`;
 
     const fs = await import('fs');
     const path = await import('path');

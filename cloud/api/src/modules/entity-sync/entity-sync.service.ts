@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Device } from '@prisma/client';
+import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EntitySyncEventDto, SyncableEntityType } from './dto/push-entity-sync.dto';
 
@@ -11,7 +11,7 @@ const CATCH_UP_MAX_ROWS = 500;
  * in here too (BUG-149): a device holding an old copy of a dish, or a dish someone deleted, must not overwrite
  * the newer edit or bring the deleted record back.
  */
-const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'COMBO', 'COUPON', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT']);
+const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'COMBO', 'COUPON', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT']);
 
 function changedAt(payload: unknown): number {
   const value = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).updatedAt : undefined;
@@ -110,6 +110,7 @@ export class EntitySyncService {
               });
 
           results.push({ externalId: evt.externalId, status: 'ok', syncVersion: saved.syncVersion });
+          if (entityType === 'DINING_TABLE') await this.syncQrTableLink(tx, restaurantId, evt);
         } catch (err: any) {
           results.push({ externalId: evt.externalId, status: 'error', error: err?.message ?? 'Unknown error' });
         }
@@ -117,6 +118,40 @@ export class EntitySyncService {
     });
 
     return { results, serverTime: new Date().toISOString() };
+  }
+
+  /**
+   * BUG-119: keeps QrTableLink's own indexed row (`qrToken` -> restaurant + table) in step with whatever a
+   * device just pushed for this table, so a guest scanning the printed QR code always resolves to the current
+   * state without a public request ever scanning tenant-scoped SyncedEntity data. A regenerated token
+   * (`regenerateTableQr`) leaves a NEW row here; the table's earlier token(s) are deactivated so an old,
+   * still-printed sticker gives an honest "no longer valid" instead of quietly still working.
+   */
+  private async syncQrTableLink(tx: Prisma.TransactionClient, restaurantId: string, evt: EntitySyncEventDto): Promise<void> {
+    const payload = evt.payload as Record<string, unknown>;
+    const tableId = evt.externalId;
+
+    if (payload?.deleted === true) {
+      await tx.qrTableLink.updateMany({ where: { restaurantId, tableId }, data: { isActive: false } });
+      return;
+    }
+
+    const qrToken = typeof payload.qrToken === 'string' ? payload.qrToken : null;
+    const tableNumber = typeof payload.tableNumber === 'string' ? payload.tableNumber : tableId;
+    const isActive = payload.isActive !== false && payload.qrStatus !== 'DISABLED';
+
+    if (qrToken) {
+      await tx.qrTableLink.upsert({
+        where: { qrToken },
+        update: { restaurantId, tableId, tableNumber, isActive },
+        create: { qrToken, restaurantId, tableId, tableNumber, isActive }
+      });
+      // A regenerated token supersedes whatever this table's earlier token(s) were.
+      await tx.qrTableLink.updateMany({ where: { restaurantId, tableId, qrToken: { not: qrToken } }, data: { isActive: false } });
+    } else {
+      // The table itself was pushed with no token at all (QR never generated, or explicitly cleared).
+      await tx.qrTableLink.updateMany({ where: { restaurantId, tableId }, data: { isActive: false } });
+    }
   }
 
   async catchUp(device: Device, entityType: SyncableEntityType, since?: string) {

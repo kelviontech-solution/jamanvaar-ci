@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { printElement } from '@jamanvaar/ui';
 import { DiningTable } from '@jamanvaar/types';
-import { db, QrOrderingRepository } from '@jamanvaar/database';
+import { db, QrOrderingRepository, getGuestOrderBaseUrl } from '@jamanvaar/database';
 import { generateQrSvg, generateQrDataUrl, copyText } from '@jamanvaar/utils';
 import {
   Printer,
@@ -60,10 +60,8 @@ export const QrCardDesignerModal: React.FC<QrCardDesignerModalProps> = ({
 
   const outlet = db.outlet || { name: '' };
 
-  // Host origin for the public QR link
-  const hostUrl = typeof window !== 'undefined' && window.location?.origin
-    ? window.location.origin
-    : 'http://localhost:5176';
+  // Host origin for the public QR link (BUG-119: the app's configured public address, never window.location.origin).
+  const hostUrl = getGuestOrderBaseUrl();
 
   /**
    * Read-only during render. Issuing a token is a db mutation (db.notify()), so it must

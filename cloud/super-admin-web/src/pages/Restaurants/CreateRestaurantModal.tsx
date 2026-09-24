@@ -4,7 +4,7 @@ import { copyText } from '../../../../../packages/utils/src/clipboard';
 import { generateSecurePassword } from '../../../../../packages/utils/src/uuid';
 import { useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
-import type { CreateRestaurantInput, RestaurantDetail, ActivationKey } from '../../api/types';
+import type { CreateRestaurantInput, RestaurantDetail, ActivationKey, Plan } from '../../api/types';
 import { Button } from '../../components/ui';
 import { Copy, Check, Eye, EyeOff, RefreshCw, KeyRound } from 'lucide-react';
 import './restaurants.css';
@@ -67,6 +67,33 @@ export function CreateRestaurantModal({
         '/api/v1/restaurants',
         form
       );
+
+      // Restaurant creation alone leaves the tenant with no subscription and
+      // therefore no enabled applications — every device activation attempt
+      // would fail with "<app> is not enabled on this restaurant's current
+      // subscription" no matter what activation key is handed out below.
+      // A 30-day TRIAL keeps this a low-commitment convenience action (it
+      // deliberately does not generate an invoice the way an ACTIVE
+      // subscription would); PRO is picked so every app — not just POS —
+      // is ready to activate immediately, matching what this modal already
+      // promises on the confirmation screen.
+      try {
+        const plans = await api.get<Plan[]>('/api/v1/plans?excludeTestFixtures=true');
+        const activePlans = plans.filter((p) => p.status === 'ACTIVE');
+        const defaultPlan = activePlans.find((p) => p.tier === 'PRO') || activePlans[0];
+        if (defaultPlan) {
+          await api.post('/api/v1/subscriptions', {
+            restaurantId: res.restaurant.id,
+            planId: defaultPlan.id,
+            status: 'TRIAL',
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          });
+        } else {
+          console.warn('Auto subscription assignment skipped: no active plan found.');
+        }
+      } catch (subErr) {
+        console.warn('Auto subscription assignment error:', subErr);
+      }
 
       // Also generate an initial terminal activation key for this restaurant
       let keyResult: string | undefined;

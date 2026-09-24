@@ -1,5 +1,5 @@
 import { permissionsForRole, PlatformRoleName } from '../../common/rbac/access';
-import { randomBytes, randomUUID, createHash } from 'crypto';
+import { randomBytes, randomUUID, randomInt, createHash, timingSafeEqual } from 'crypto';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -7,6 +7,9 @@ import * as bcrypt from 'bcryptjs';
 import { PlatformUser, PlatformUserStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { EmailService } from '../notifications/email.service';
+import { platformLoginOtpEmail } from '../notifications/email-templates';
+import { hashLowEntropySecret } from '../../common/security/token.util';
 
 export const PLATFORM_JWT_ISSUER = 'jamanvaar-platform';
 export const PLATFORM_JWT_AUDIENCE = 'jamanvaar-platform';
@@ -34,17 +37,45 @@ export interface LoginResult {
   };
 }
 
+/** Returned by login() once the password has checked out — a session is only ever issued after verifyOtp(). */
+export interface OtpChallenge {
+  status: 'OTP_REQUIRED';
+  otpToken: string;
+  maskedEmail: string;
+  expiresInSeconds: number;
+}
+
+const OTP_PURPOSE = 'PLATFORM_LOGIN_OTP';
+
+interface OtpTokenPayload {
+  sub: string; // PlatformUser.id
+  purpose: typeof OTP_PURPOSE;
+}
+
 function hashRefreshToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
 }
 
+/** kelviontech@gmail.com -> ke***ch@gmail.com — enough for the person to recognise their own inbox, not enough to leak it whole. */
+function maskEmail(email: string): string {
+  const [local, domain] = email.split('@');
+  if (!domain || local.length <= 2) return `${local[0] ?? '*'}***@${domain ?? ''}`;
+  return `${local.slice(0, 2)}${'*'.repeat(Math.max(local.length - 4, 3))}${local.slice(-2)}@${domain}`;
+}
+
 @Injectable()
 export class PlatformAuthService {
+  /** How long a login OTP works, how many wrong guesses it survives, and the wait before another can be requested. */
+  private static readonly OTP_MINUTES = 10;
+  private static readonly OTP_MAX_ATTEMPTS = 5;
+  private static readonly OTP_RESEND_SECONDS = 45;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly email: EmailService
   ) {}
 
   private signAccessToken(user: PlatformUser, sessionId: string): string {
@@ -93,8 +124,63 @@ export class PlatformAuthService {
     return { token, expiresAt };
   }
 
-  /** Never throws on unknown-user/bad-password differently — timing/response are identical either way. */
-  async login(email: string, password: string, context: SessionContext = {}): Promise<LoginResult> {
+  private signOtpToken(userId: string): string {
+    const payload: OtpTokenPayload = { sub: userId, purpose: OTP_PURPOSE };
+    return this.jwt.sign(payload, {
+      secret: this.config.get<string>('JWT_ACCESS_SECRET'),
+      expiresIn: `${PlatformAuthService.OTP_MINUTES}m`
+    });
+  }
+
+  private verifyOtpToken(otpToken: string): OtpTokenPayload {
+    let decoded: OtpTokenPayload;
+    try {
+      decoded = this.jwt.verify(otpToken, { secret: this.config.get<string>('JWT_ACCESS_SECRET') });
+    } catch {
+      throw new UnauthorizedException('Your sign-in session has expired. Please sign in again.');
+    }
+    if (decoded.purpose !== OTP_PURPOSE) {
+      throw new UnauthorizedException('Invalid sign-in session');
+    }
+    return decoded;
+  }
+
+  /** Generates, stores (hashed) and emails a fresh 6-digit code, returning the challenge the client should hold onto. */
+  private async issueOtp(user: PlatformUser): Promise<OtpChallenge> {
+    const otp = String(randomInt(0, 1_000_000)).padStart(6, '0');
+    const now = new Date();
+    await this.prisma.platformUser.update({
+      where: { id: user.id },
+      data: {
+        loginOtpHash: hashLowEntropySecret(otp, this.config.get<string>('JWT_ACCESS_SECRET')!),
+        loginOtpExpiresAt: new Date(now.getTime() + PlatformAuthService.OTP_MINUTES * 60_000),
+        loginOtpSentAt: now,
+        loginOtpAttempts: 0
+      }
+    });
+
+    try {
+      const mail = platformLoginOtpEmail({ fullName: user.fullName, otp, minutesValid: PlatformAuthService.OTP_MINUTES });
+      await this.email.send(user.email, mail.subject, mail.html);
+    } catch {
+      // A mail server problem must not block sign-in from working once SMTP recovers; verifyOtp still checks the stored hash.
+    }
+
+    return {
+      status: 'OTP_REQUIRED',
+      otpToken: this.signOtpToken(user.id),
+      maskedEmail: maskEmail(user.email),
+      expiresInSeconds: PlatformAuthService.OTP_MINUTES * 60
+    };
+  }
+
+  /**
+   * Step 1 of sign-in: verifies email + password only. On success, a 6-digit code is emailed to the
+   * account's address and the caller gets back an opaque `otpToken` (no session yet) to pass to
+   * verifyOtp(). Never throws on unknown-user/bad-password differently — timing/response are
+   * identical either way.
+   */
+  async login(email: string, password: string): Promise<OtpChallenge> {
     const user = await this.prisma.platformUser.findUnique({ where: { email } });
 
     // Always run bcrypt.compare, even for a nonexistent user, against a fixed
@@ -140,13 +226,83 @@ export class PlatformAuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    await this.prisma.platformUser.update({
-      where: { id: user.id },
-      data: {
-        lastLoginAt: new Date(),
-        ...(user.failedLoginAttempts > 0 || user.lockedUntil ? { failedLoginAttempts: 0, lockedUntil: null } : {})
-      }
+    // B2-030: a right password only gets here — it does not mean the login itself has
+    // succeeded yet, since the OTP challenge below still has to be answered correctly. The
+    // failedLoginAttempts/lockedUntil reset that used to happen right here now happens in
+    // `verifyOtp()`, at the point the login actually completes.
+    await this.audit.log({
+      actorType: 'PLATFORM',
+      actorId: user.id,
+      action: 'PLATFORM_LOGIN_OTP_SENT',
+      category: 'AUTH',
+      details: { email: user.email }
     });
+
+    return this.issueOtp(user);
+  }
+
+  /**
+   * "Resend code" — same 45s cooldown pattern as tenant password-reset, so a slow inbox can ask
+   * again without spamming a new code (and invalidating the one already in flight) every second.
+   */
+  async resendOtp(otpToken: string): Promise<{ maskedEmail: string }> {
+    const { sub } = this.verifyOtpToken(otpToken);
+    const user = await this.prisma.platformUser.findUnique({ where: { id: sub } });
+    if (!user || user.status !== PlatformUserStatus.ACTIVE) {
+      throw new UnauthorizedException('Your sign-in session has expired. Please sign in again.');
+    }
+    const now = Date.now();
+    if (user.loginOtpSentAt && now - user.loginOtpSentAt.getTime() < PlatformAuthService.OTP_RESEND_SECONDS * 1000) {
+      return { maskedEmail: maskEmail(user.email) };
+    }
+    const challenge = await this.issueOtp(user);
+    return { maskedEmail: challenge.maskedEmail };
+  }
+
+  /**
+   * Step 2 of sign-in: the code from that email. A wrong, expired or already-used code all get the
+   * same answer; after too many wrong guesses the code is dropped and a new one must be requested
+   * (matches TenantAuthService.resetPassword's anti-bruteforce shape).
+   */
+  async verifyOtp(otpToken: string, otp: string, context: SessionContext = {}): Promise<LoginResult> {
+    const { sub } = this.verifyOtpToken(otpToken);
+
+    const outcome = await (async (): Promise<'ok' | 'invalid'> => {
+      const user = await this.prisma.platformUser.findUnique({ where: { id: sub } });
+      if (!user || user.status !== PlatformUserStatus.ACTIVE || !user.loginOtpHash || !user.loginOtpExpiresAt) return 'invalid';
+      if (user.loginOtpExpiresAt < new Date() || user.loginOtpAttempts >= PlatformAuthService.OTP_MAX_ATTEMPTS) {
+        await this.prisma.platformUser.update({ where: { id: user.id }, data: { loginOtpHash: null, loginOtpExpiresAt: null } });
+        return 'invalid';
+      }
+
+      const given = Buffer.from(hashLowEntropySecret(otp, this.config.get<string>('JWT_ACCESS_SECRET')!));
+      const stored = Buffer.from(user.loginOtpHash);
+      if (given.length !== stored.length || !timingSafeEqual(given, stored)) {
+        await this.prisma.platformUser.update({ where: { id: user.id }, data: { loginOtpAttempts: { increment: 1 } } });
+        return 'invalid';
+      }
+
+      // B2-030: this is the real "login succeeded" moment (password + OTP both correct) —
+      // clear the failed-attempt counter and any lockout here, not after the password check
+      // alone, since a right password with a wrong/expired OTP is not a completed login.
+      await this.prisma.platformUser.update({
+        where: { id: user.id },
+        data: {
+          loginOtpHash: null,
+          loginOtpExpiresAt: null,
+          loginOtpAttempts: 0,
+          lastLoginAt: new Date(),
+          ...(user.failedLoginAttempts > 0 || user.lockedUntil ? { failedLoginAttempts: 0, lockedUntil: null } : {})
+        }
+      });
+      return 'ok';
+    })();
+
+    if (outcome !== 'ok') {
+      throw new UnauthorizedException('That code is not valid or has expired. Ask for a new one.');
+    }
+
+    const user = await this.prisma.platformUser.findUniqueOrThrow({ where: { id: sub } });
 
     const sessionId = randomUUID();
     const accessToken = this.signAccessToken(user, sessionId);

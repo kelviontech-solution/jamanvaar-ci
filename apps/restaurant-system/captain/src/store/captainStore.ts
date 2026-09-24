@@ -56,7 +56,8 @@ export interface InternalMessage {
 export interface CustomerRequest {
   id: string;
   tableNumber: string;
-  type: 'WATER' | 'PLATES' | 'CUTLERY' | 'TISSUE' | 'CLEANING' | 'MANAGER' | 'BILL' | 'OTHER';
+  /** HELP: a guest tapped "Call Staff" at a self-order kiosk — no table-service type fits, and it needs its own icon. */
+  type: 'WATER' | 'PLATES' | 'CUTLERY' | 'TISSUE' | 'CLEANING' | 'MANAGER' | 'BILL' | 'HELP' | 'OTHER';
   notes?: string;
   createdAt: string;
   isAcknowledged: boolean;
@@ -1013,12 +1014,24 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   },
 
   receiveMessages: (incoming) => {
-    const known = new Set(get().messages.map((m) => m.id));
-    const fresh = incoming.filter((m) => !known.has(m.id));
-    if (fresh.length === 0) return;
+    // A kiosk guest's "Call Staff" arrives here as a ServiceMessage the same as any staff-to-staff
+    // message, but it belongs in the Guest Requests list with the other table-service requests
+    // (its own accept/resolve workflow), not buried in the general staff inbox mislabeled as a
+    // manager message from nobody in particular.
+    const staffCalls = incoming.filter((m) => m.kind === 'CALL_STAFF');
+    const otherMessages = incoming.filter((m) => m.kind !== 'CALL_STAFF');
+
+    const knownMessageIds = new Set(get().messages.map((m) => m.id));
+    const freshMessages = otherMessages.filter((m) => !knownMessageIds.has(m.id));
+
+    const knownRequestIds = new Set(get().customerRequests.map((r) => r.id));
+    const freshCalls = staffCalls.filter((m) => !knownRequestIds.has(`svc-${m.id}`));
+
+    if (freshMessages.length === 0 && freshCalls.length === 0) return;
+
     set((s) => ({
       messages: [
-        ...fresh.map((m): InternalMessage => ({
+        ...freshMessages.map((m): InternalMessage => ({
           id: m.id,
           senderName: m.senderName,
           senderRole: 'MANAGER',
@@ -1032,11 +1045,32 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
         })),
         ...s.messages
       ],
+      customerRequests: [
+        ...freshCalls.map((m): CustomerRequest => ({
+          id: `svc-${m.id}`,
+          tableNumber: m.tableNumber || 'Kiosk',
+          type: 'HELP',
+          notes: m.customNote || m.presetText,
+          createdAt: m.createdAt,
+          isAcknowledged: false,
+          isResolved: false
+        })),
+        ...s.customerRequests
+      ],
       notifications: [
-        ...fresh.map((m): CaptainNotification => ({
+        ...freshMessages.map((m): CaptainNotification => ({
           id: `notif-${m.id}`,
           type: 'MANAGER_MESSAGE',
           title: `💬 ${m.senderName}${m.tableNumber ? ` — Table ${m.tableNumber}` : ''}`,
+          message: m.customNote || m.presetText,
+          tableNumber: m.tableNumber,
+          timestamp: m.createdAt,
+          isRead: false
+        })),
+        ...freshCalls.map((m): CaptainNotification => ({
+          id: `notif-${m.id}`,
+          type: 'GUEST_HELP',
+          title: `🙋 Guest needs help${m.tableNumber ? ` — Table ${m.tableNumber}` : ''}`,
           message: m.customNote || m.presetText,
           tableNumber: m.tableNumber,
           timestamp: m.createdAt,

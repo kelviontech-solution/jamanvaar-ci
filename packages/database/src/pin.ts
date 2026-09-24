@@ -9,19 +9,32 @@
  * possession of the device is), but "plaintext PIN sitting in the DB" is worth
  * closing regardless.
  *
- * B2-014: the original hash here was two rounds of FNV-1a (a fast, non-cryptographic
- * checksum, not a security hash) over a single hardcoded salt baked into the shipped
- * client bundle (`jamanvaar-pin`) — so with only 10,000 possible 4-digit PINs, anyone
- * who read the bundle (trivial; it's shipped to the browser) could precompute every
- * PIN's hash once and instantly reverse any stolen `pinHash`, for every restaurant.
- * Replaced with PBKDF2-HMAC-SHA256 (Web Crypto `subtle.deriveBits`, the same primitive
- * this codebase already trusts for license-certificate verification in
- * `packages/business/src/license_certificate.ts`) with a random salt generated fresh
- * per hash and a deliberately high iteration count, so: (a) no salt can be precomputed
- * against ahead of time, and (b) even with the hash and salt in hand, checking all
- * 10,000 candidate PINs costs real, deliberately-slowed CPU time instead of microseconds.
- * This does not make a 4-digit PIN "secure" in an absolute sense — no hash can, the
- * keyspace is too small — it closes the specific "reversed in milliseconds" gap.
+ * B2-014 / security-audit MED-05: this was fixed independently on two branches — one
+ * (kept here) replaced the hash with real PBKDF2-HMAC-SHA256 via Web Crypto
+ * `subtle.deriveBits`; the other built a dependency-free, synchronous "stretched" FNV-1a
+ * mix, reasoning that this package couldn't depend on an async crypto API since every
+ * caller checked a PIN synchronously. That constraint no longer holds: this same B2-014
+ * fix already made every caller (`StaffRepository.createUser`/`resetPin`/`verifyPin`, and
+ * every login screen that calls them) `async`, so there is no synchronous call site left
+ * to accommodate. With that constraint gone, a real, standards-based KDF (PBKDF2) is
+ * strictly stronger than a hand-rolled stretch of a non-cryptographic mixing function —
+ * this is the same primitive this codebase already trusts for license-certificate
+ * verification in `packages/business/src/license_certificate.ts` — so PBKDF2 is what's
+ * kept, not the synchronous alternative.
+ *
+ * The original hash here was two rounds of FNV-1a (a fast, non-cryptographic checksum,
+ * not a security hash) over a single hardcoded salt baked into the shipped client bundle
+ * (`jamanvaar-pin`) — so with only 10,000 possible 4-digit PINs, anyone who read the
+ * bundle (trivial; it's shipped to the browser) could precompute every PIN's hash once
+ * and instantly reverse any stolen `pinHash`, for every restaurant. Replaced with
+ * PBKDF2-HMAC-SHA256 with a random salt generated fresh per hash and a deliberately high
+ * iteration count, so: (a) no salt can be precomputed against ahead of time, and (b) even
+ * with the hash and salt in hand, checking all 10,000 candidate PINs costs real,
+ * deliberately-slowed CPU time instead of microseconds. This does not make a 4-digit PIN
+ * "secure" in an absolute sense — no hash can, the keyspace is too small — it closes the
+ * specific "reversed in milliseconds" gap. The real mitigations for the small keyspace
+ * are (a) not letting the hash leak to an untrusted device in the first place, and (b)
+ * rate-limiting/locking out PIN attempts wherever one is checked (see B2-030/MED-07).
  */
 
 import { secureRandomBytes, secureRandomIndex } from '@jamanvaar/utils';
@@ -110,7 +123,7 @@ export async function verifyPinHash(pin: string, restaurantId: string, storedHas
   return false;
 }
 
-/** True for anything that still looks like an old plaintext 4-digit PIN, not one of our hashes. */
+/** True for anything that still looks like an old plaintext 4-digit PIN, not one of our hashes (any version). */
 export function isPlaintextPin(value: string | undefined): boolean {
   return typeof value === 'string' && !value.startsWith(HASH_PREFIX_V1) && !value.startsWith(HASH_PREFIX_V2);
 }

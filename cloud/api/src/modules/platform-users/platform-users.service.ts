@@ -163,6 +163,14 @@ export class PlatformUsersService {
 
     const existing = await this.prisma.platformUser.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Platform user not found');
+    // security-audit MED-03: every OTHER mutation on a PLATFORM_OWNER row in this
+    // service (updateRole, setStatus) requires the actor to themselves be an owner —
+    // this one didn't, so a SUPER_ADMIN could regenerate a fresh, 7-day activation
+    // token for a still-pending PLATFORM_OWNER invite and take over that owner-level
+    // identity via the public /platform-users/activate endpoint.
+    if (existing.role === 'PLATFORM_OWNER') {
+      assertActorIsOwner(actor, 'resend an invite to a Platform Owner');
+    }
     if (existing.status !== PlatformUserStatus.PENDING_ACTIVATION) {
       throw new ConflictException('This account has already been activated');
     }

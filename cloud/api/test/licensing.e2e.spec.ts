@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 // Mirrors the public half of packages/business/src/license_certificate.ts's
@@ -47,10 +47,8 @@ describe('Offline license certificate issuance (ENT-001 fix)', () => {
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
 
-    const platformLogin = await request(app.getHttpServer())
-      .post('/api/v1/platform-auth/login')
-      .send({ email: adminEmail, password: adminPassword });
-    platformToken = platformLogin.body.accessToken;
+    const platformLoginRes = await platformLogin(app, adminEmail, adminPassword);
+    platformToken = platformLoginRes.body.accessToken;
 
     const restaurantRes = await authed('post', '/api/v1/restaurants', platformToken).send({
       name: `TEST Licensing Restaurant ${Date.now()}`,

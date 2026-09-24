@@ -1,35 +1,32 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { db, QrOrderingRepository, MenuRepository, NotificationRepository, KOTRepository } from '@jamanvaar/database';
-import { lanMeshSync } from '@jamanvaar/sync';
-import { MenuItem, DiningTable, Order, SelectedModifier, DietaryType, OrderStatus } from '@jamanvaar/types';
-import { formatINR, generateQrDataUrl } from '@jamanvaar/utils';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { SelectedModifier } from '@jamanvaar/types';
+import { formatINR } from '@jamanvaar/utils';
 import {
-  Smartphone,
   Search,
   Plus,
   Minus,
   ShoppingBag,
   ArrowLeft,
-  CheckCircle2,
-  Clock,
   Sparkles,
   Flame,
-  ChefHat,
   Info,
   Check,
-  CreditCard,
-  QrCode,
   DollarSign,
   UtensilsCrossed,
-  RotateCcw,
   AlertTriangle,
-  Bell,
   X,
   ChevronRight,
-  ShieldCheck,
-  Coffee,
-  Heart
+  Loader2
 } from 'lucide-react';
+import {
+  fetchQrGuestSession,
+  placeQrGuestOrder,
+  fetchQrGuestOrderStatus,
+  generateIdempotencyKey,
+  QrGuestApiError,
+  type QrGuestSession,
+  type QrGuestModifierGroup
+} from '../../cloud/qrGuestClient';
 
 interface GuestQrOrderingPageProps {
   tableNumber?: string;
@@ -39,39 +36,89 @@ interface GuestQrOrderingPageProps {
   onExit?: () => void;
 }
 
+interface GuestMenuItemVM {
+  id: string;
+  name: string;
+  description?: string;
+  categoryId: string;
+  price: number; // rupees
+  imageUrl?: string;
+  dietaryType?: string;
+  modifierGroupIds: string[];
+}
+
+interface GuestModifierOptionVM {
+  id: string;
+  name: string;
+  priceDelta: number; // rupees
+}
+
+interface GuestModifierGroupVM {
+  id: string;
+  name: string;
+  isRequired: boolean;
+  minSelections: number;
+  maxSelections: number;
+  options: GuestModifierOptionVM[];
+}
+
 interface LocalCartItem {
   cartId: string;
-  menuItem: MenuItem;
+  menuItem: GuestMenuItemVM;
   quantity: number;
   selectedModifiers: SelectedModifier[];
   specialInstructions: string;
   totalPrice: number;
 }
 
+interface TrackedOrderLineVM {
+  id: string;
+  name: string;
+  quantity: number;
+  modifierNames: string[];
+  specialInstructions?: string;
+  totalPrice: number; // rupees
+}
+
+interface TrackedOrderVM {
+  externalOrderId: string;
+  tokenNumber: string;
+  createdAt?: string;
+  /** Known only for an order placed THIS session — the guest status endpoint deliberately returns just status/token. */
+  totalAmount?: number;
+  status: string;
+  items?: TrackedOrderLineVM[];
+}
+
+/** The platform's shared modifier catalogue is priced in paise server-side; this page works in rupees throughout, like every other price on it. */
+function toModifierGroupVMs(groups: QrGuestModifierGroup[]): GuestModifierGroupVM[] {
+  return groups.map((g) => ({
+    id: g.id,
+    name: g.name,
+    isRequired: g.isRequired,
+    minSelections: g.minSelections,
+    maxSelections: g.maxSelections,
+    options: g.options.map((o) => ({ id: o.id, name: o.name, priceDelta: o.priceDelta / 100 }))
+  }));
+}
+
+const TERMINAL_STATUSES = new Set(['SERVED', 'COLLECTED', 'COMPLETED', 'CANCELLED', 'REFUNDED']);
+
 export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   tableNumber: propTableNumber,
   qrToken: propQrToken,
   initialOrderId,
-  onExit
+  onExit: _onExit
 }) => {
-  // Extract table and token from props or URL query parameters
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const initialTableNumber = propTableNumber || urlParams?.get('qrTable') || urlParams?.get('table') || '1';
-  const tableRec = db.tables.find((t) => t.tableNumber === initialTableNumber);
-  const initialToken = propQrToken || urlParams?.get('token') || urlParams?.get('qrToken') || tableRec?.qrToken || '';
+  const [tableNumber] = useState<string>(propTableNumber || urlParams?.get('qrTable') || urlParams?.get('table') || '1');
+  const [token] = useState<string>(propQrToken || urlParams?.get('token') || urlParams?.get('qrToken') || '');
 
-  const [tableNumber, setTableNumber] = useState<string>(initialTableNumber);
-  const [token, setToken] = useState<string>(initialToken);
-
-  useEffect(() => {
-    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-    const currentTableNum = propTableNumber || params?.get('qrTable') || params?.get('table') || '1';
-    setTableNumber(currentTableNum);
-
-    const tRec = db.tables.find((t) => t.tableNumber === currentTableNum);
-    const currentTok = propQrToken || params?.get('token') || params?.get('qrToken') || tRec?.qrToken || '';
-    setToken(currentTok);
-  }, [propTableNumber, propQrToken]);
+  // BUG-119: the real session — table, live menu, real modifier catalogue — resolved from the cloud by the QR
+  // token alone. Never this device's own local db: a real guest's own phone has never seen it and never will.
+  const [session, setSession] = useState<QrGuestSession | null>(null);
+  const [sessionLoading, setSessionLoading] = useState<boolean>(true);
+  const [sessionError, setSessionError] = useState<string | null>(null);
 
   // View state: 'MENU' | 'CUSTOMIZE' | 'CART' | 'TRACKING'
   const [viewState, setViewState] = useState<'MENU' | 'CUSTOMIZE' | 'CART' | 'TRACKING'>('MENU');
@@ -80,9 +127,8 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   const [dietaryFilter, setDietaryFilter] = useState<'ALL' | 'VEG' | 'NON_VEG'>('ALL');
 
   // Customization modal state
-  const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
+  const [customizingItem, setCustomizingItem] = useState<GuestMenuItemVM | null>(null);
   const [itemQuantity, setItemQuantity] = useState<number>(1);
-  /** Chosen modifier option ids keyed by the REAL modifier group id from db.modifierGroups. */
   const [selectedOptionIds, setSelectedOptionIds] = useState<Record<string, string[]>>({});
   const [specialNote, setSpecialNote] = useState<string>('');
 
@@ -90,60 +136,91 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   const [cartItems, setCartItems] = useState<LocalCartItem[]>([]);
   const [guestName, setGuestName] = useState<string>('');
   const [guestPhone, setGuestPhone] = useState<string>('');
-  const [paymentMode, setPaymentMode] = useState<'UPI' | 'CASH' | 'CARD'>('UPI');
   const [orderError, setOrderError] = useState<string | null>(null);
   const [isPlacingOrder, setIsPlacingOrder] = useState<boolean>(false);
 
   // Order tracking state
-  const [activeTrackedOrderId, setActiveTrackedOrderId] = useState<string | null>(initialOrderId || null);
-  const [tick, setTick] = useState<number>(0);
-  const [serviceRequested, setServiceRequested] = useState<boolean>(false);
+  const [trackedOrder, setTrackedOrder] = useState<TrackedOrderVM | null>(null);
+  /** Generated once per checkout attempt and resent unchanged on a retry, so a flaky mobile network never double-orders. */
+  const pendingIdempotencyKeyRef = useRef<string | null>(null);
 
-  // Subscribe to DB updates for live menu sync and order status
+  // Resolve the table and load its real, live menu straight from the cloud.
   useEffect(() => {
-    const unsub = db.subscribe(() => setTick((t) => t + 1));
-    return unsub;
-  }, []);
+    let cancelled = false;
+    if (!token) {
+      setSessionLoading(false);
+      setSessionError('This QR code is missing its verification code. Please scan the code printed on your table again.');
+      return;
+    }
+    setSessionLoading(true);
+    setSessionError(null);
+    fetchQrGuestSession(token)
+      .then((data) => {
+        if (!cancelled) setSession(data);
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) setSessionError(err instanceof QrGuestApiError ? err.message : 'This table QR is currently unavailable.');
+      })
+      .finally(() => {
+        if (!cancelled) setSessionLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   // Deep-link straight into the live tracker when POS opens a specific guest order
   useEffect(() => {
     if (initialOrderId) {
-      setActiveTrackedOrderId(initialOrderId);
+      setTrackedOrder((prev) => prev ?? { externalOrderId: initialOrderId, tokenNumber: '', status: 'PREPARING' });
       setViewState('TRACKING');
     }
   }, [initialOrderId]);
 
-  // Verify Table & QR token
-  const verification = useMemo(() => {
-    return QrOrderingRepository.verifyQrToken(tableNumber, token || undefined);
-  }, [tableNumber, token, tick]);
+  // Poll live status while an order is being tracked and hasn't reached a final state
+  useEffect(() => {
+    if (!trackedOrder || !token || TERMINAL_STATUSES.has(trackedOrder.status)) return;
+    let cancelled = false;
+    const orderId = trackedOrder.externalOrderId;
+    const poll = async () => {
+      try {
+        const status = await fetchQrGuestOrderStatus(orderId, token);
+        if (cancelled) return;
+        setTrackedOrder((prev) =>
+          prev && prev.externalOrderId === orderId
+            ? { ...prev, status: status.status, tokenNumber: status.tokenNumber || prev.tokenNumber }
+            : prev
+        );
+      } catch {
+        // Offline or a blip — the last known status stays on screen; the next tick tries again.
+      }
+    };
+    const interval = setInterval(poll, 6000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [trackedOrder?.externalOrderId, trackedOrder?.status, token]);
 
-  const restaurant = db.restaurant || { name: '', city: '' };
-  const outlet = db.outlet || { name: '' };
-  const table = verification.table || db.tables.find((t) => t.tableNumber === tableNumber);
+  const restaurantName = session?.restaurant.name || '';
+  const displayTableNumber = session?.table.tableNumber || tableNumber;
 
-  // Live QR ordering rules configured by the restaurant admin (QR Settings tab)
-  const qrSettings = useMemo(() => QrOrderingRepository.getSettings(), [tick]);
+  const modifierGroupsById = useMemo(() => {
+    const groups = toModifierGroupVMs(session?.modifierGroups || []);
+    return new Map(groups.map((g) => [g.id, g]));
+  }, [session]);
 
   /**
-   * Modifier groups actually configured for the dish being customised.
-   * These come straight out of db.modifierGroups - the guest UI must never invent
-   * its own option names or prices, because createCustomerQrOrder re-validates every
-   * modifier against the canonical catalog (SEC-004) and rejects anything unknown.
+   * Modifier groups actually configured for the dish being customised. These come straight from the session
+   * the cloud resolved for this token — the guest UI must never invent its own option names or prices, because
+   * placeQrGuestOrder re-validates every modifier against the same catalogue and rejects anything unknown.
    */
   const activeModifierGroups = useMemo(() => {
     if (!customizingItem) return [];
-    if (!qrSettings.allowCustomerModifications) return [];
-    const ids = customizingItem.modifierGroupIds || [];
-    return db.modifierGroups
-      .filter((g) => ids.includes(g.id))
-      .map((g) => ({
-        ...g,
-        options: g.options.filter((o) => o.isAvailable !== false)
-      }))
-      .filter((g) => g.options.length > 0)
-      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-  }, [customizingItem, qrSettings.allowCustomerModifications, tick]);
+    return (customizingItem.modifierGroupIds || [])
+      .map((id) => modifierGroupsById.get(id))
+      .filter((g): g is GuestModifierGroupVM => !!g);
+  }, [customizingItem, modifierGroupsById]);
 
   /** Flattens the current selection into real SelectedModifier records with catalog prices. */
   const buildSelectedModifiers = (): SelectedModifier[] => {
@@ -178,14 +255,21 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
     });
   }, [activeModifierGroups, selectedOptionIds]);
 
-  // Categories & Menu items
-  const categories = useMemo(() => {
-    return db.categories.filter((c) => c.isActive);
-  }, [tick]);
+  // Categories & Menu items — straight from the resolved session
+  const categories = session?.categories || [];
 
-  const menuItems = useMemo(() => {
-    return db.menuItems.filter((m) => m.isAvailable !== false);
-  }, [tick]);
+  const menuItems: GuestMenuItemVM[] = useMemo(() => {
+    return (session?.items || []).map((it) => ({
+      id: it.externalItemId,
+      name: it.name,
+      description: it.description,
+      categoryId: it.categoryId,
+      price: it.price,
+      imageUrl: it.imageUrl,
+      dietaryType: it.dietaryType,
+      modifierGroupIds: it.modifierGroupIds
+    }));
+  }, [session]);
 
   const filteredMenuItems = useMemo(() => {
     return menuItems.filter((item) => {
@@ -203,37 +287,21 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   }, [menuItems, activeCategory, dietaryFilter, searchQuery]);
 
   // Cart Calculations
-  const cartSubtotal = useMemo(() => {
-    return cartItems.reduce((s, it) => s + it.totalPrice, 0);
-  }, [cartItems]);
-
+  const cartSubtotal = useMemo(() => cartItems.reduce((s, it) => s + it.totalPrice, 0), [cartItems]);
   const cartCgst = Math.round(cartSubtotal * 0.025 * 100) / 100;
   const cartSgst = Math.round(cartSubtotal * 0.025 * 100) / 100;
   const cartTax = cartCgst + cartSgst;
   const cartTotal = Math.round(cartSubtotal + cartTax);
   const totalItemCount = cartItems.reduce((sum, it) => sum + it.quantity, 0);
 
-  // Active tracked order
-  const trackedOrder: Order | undefined = useMemo(() => {
-    if (!activeTrackedOrderId) return undefined;
-    return db.orders.find((o) => o.id === activeTrackedOrderId || o.orderNumber === activeTrackedOrderId);
-  }, [activeTrackedOrderId, tick, db.orders]);
-
-  // Handle opening customizer - pre-selects each group's catalog default
-  const handleOpenCustomize = (item: MenuItem) => {
-    const ids = item.modifierGroupIds || [];
-    const groups = db.modifierGroups.filter((g) => ids.includes(g.id));
+  // Handle opening customizer - pre-selects each required group's first option
+  const handleOpenCustomize = (item: GuestMenuItemVM) => {
+    const groups = (item.modifierGroupIds || [])
+      .map((id) => modifierGroupsById.get(id))
+      .filter((g): g is GuestModifierGroupVM => !!g);
     const defaults: Record<string, string[]> = {};
     groups.forEach((g) => {
-      const available = g.options.filter((o) => o.isAvailable !== false);
-      const def = available.find((o) => o.isDefault);
-      if (def) {
-        defaults[g.id] = [def.id];
-      } else if (g.isRequired && available.length > 0) {
-        defaults[g.id] = [available[0].id];
-      } else {
-        defaults[g.id] = [];
-      }
+      defaults[g.id] = g.isRequired && g.options.length > 0 ? [g.options[0].id] : [];
     });
 
     setCustomizingItem(item);
@@ -286,7 +354,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
       menuItem: customizingItem,
       quantity: itemQuantity,
       selectedModifiers: modifiers,
-      specialInstructions: qrSettings.allowSpecialInstructions ? specialNote : '',
+      specialInstructions: specialNote,
       totalPrice
     };
 
@@ -314,96 +382,75 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
     );
   };
 
-  /** Real order-value guardrails configured in QR Settings. Returns null when the cart is allowed. */
-  const orderValueBlockReason = useMemo(() => {
-    if (cartItems.length === 0) return null;
-    const min = qrSettings.minOrderValue || 0;
-    const max = qrSettings.maxOrderValue || 0;
-    if (min > 0 && cartTotal < min) {
-      return `Minimum table order for this restaurant is ${formatINR(min)}. Please add ${formatINR(min - cartTotal)} more.`;
-    }
-    if (max > 0 && cartTotal > max) {
-      return `Self-order limit for this table is ${formatINR(max)}. Please ask a captain to place the balance of this order.`;
-    }
-    return null;
-  }, [cartItems.length, cartTotal, qrSettings.minOrderValue, qrSettings.maxOrderValue]);
-
-  // Place Order through real backend pipeline
-  const handlePlaceOrder = () => {
-    if (cartItems.length === 0) return;
-    if (orderValueBlockReason) {
-      setOrderError(orderValueBlockReason);
-      return;
-    }
+  // Place Order through the real cloud pipeline — the same SyncedOrder row every POS/KDS already pulls from
+  const handlePlaceOrder = async () => {
+    if (cartItems.length === 0 || !token) return;
     setOrderError(null);
     setIsPlacingOrder(true);
 
+    if (!pendingIdempotencyKeyRef.current) pendingIdempotencyKeyRef.current = generateIdempotencyKey();
+    const idempotencyKey = pendingIdempotencyKeyRef.current;
+
     try {
-      const newOrder = QrOrderingRepository.createCustomerQrOrder({
-        tableNumber,
-        token: token || undefined,
+      const confirmation = await placeQrGuestOrder({
+        token,
+        idempotencyKey,
         items: cartItems.map((ci) => ({
-          menuItemId: ci.menuItem.id,
+          externalItemId: ci.menuItem.id,
           quantity: ci.quantity,
-          selectedModifiers: ci.selectedModifiers,
-          specialInstructions: ci.specialInstructions
+          selectedOptionIds: ci.selectedModifiers.map((m) => m.optionId),
+          specialInstructions: ci.specialInstructions || undefined
         })),
-        customerNotes: cartItems
-          .map((ci) => ci.specialInstructions)
-          .filter(Boolean)
-          .join('; '),
-        customerName: guestName.trim()
-          ? `${guestName.trim()} (Table ${tableNumber})`
-          : `Guest (Table ${tableNumber})`,
-        customerPhone: guestPhone.trim() || undefined,
-        paymentMethod: paymentMode
+        orderNotes:
+          cartItems
+            .map((ci) => ci.specialInstructions)
+            .filter(Boolean)
+            .join('; ') || undefined,
+        customerName: guestName.trim() || undefined,
+        customerPhone: guestPhone.trim() || undefined
       });
 
-      setActiveTrackedOrderId(newOrder.id);
+      setTrackedOrder({
+        externalOrderId: confirmation.externalOrderId,
+        tokenNumber: confirmation.tokenNumber,
+        totalAmount: confirmation.totalAmount,
+        status: confirmation.status,
+        createdAt: new Date().toISOString(),
+        items: cartItems.map((ci) => ({
+          id: ci.cartId,
+          name: ci.menuItem.name,
+          quantity: ci.quantity,
+          modifierNames: ci.selectedModifiers.map((m) => m.optionName),
+          specialInstructions: ci.specialInstructions || undefined,
+          totalPrice: ci.totalPrice
+        }))
+      });
+      pendingIdempotencyKeyRef.current = null;
       setCartItems([]);
       setViewState('TRACKING');
-
-      // 4. Emit LAN Mesh real-time events so POS and KDS receive order & KOTs immediately
-      try {
-        lanMeshSync.broadcast('ORDER_CREATED', newOrder);
-        const kots = KOTRepository.getKOTsForOrder(newOrder.id);
-        if (kots.length > 0) {
-          lanMeshSync.broadcast('KOT_CREATED', kots);
-        }
-        lanMeshSync.broadcast('TABLE_STATUS_CHANGED', {
-          tableNumber,
-          status: 'OCCUPIED',
-          orderId: newOrder.id
-        });
-      } catch (syncErr) {
-        console.warn('LAN Mesh sync broadcast skipped:', syncErr);
-      }
-    } catch (err: any) {
-      setOrderError(err?.message || 'Failed to place order. Please verify table connection.');
+    } catch (err: unknown) {
+      setOrderError(err instanceof QrGuestApiError ? err.message : 'Failed to place order. Please try again.');
     } finally {
       setIsPlacingOrder(false);
     }
   };
 
-  // Request Table Assistance / Water
-  const handleRequestService = (type: string = 'Service') => {
-    NotificationRepository.createNotification({
-      type: 'CAPTAIN_CALLED' as any,
-      title: `🔔 Table ${tableNumber} Requests ${type}`,
-      message: `Guest at Table ${tableNumber} tapped "${type}" on QR Digital Menu.`,
-      priority: 'NORMAL',
-      targetRoles: ['POS', 'POS_ADMIN', 'CAPTAIN', 'ALL'],
-      tableNumber,
-      meta: { tableNumber, serviceType: type }
-    });
-    setServiceRequested(true);
-    setTimeout(() => setServiceRequested(false), 4000);
-  };
+  // ========================================================================
+  // VIEW: LOADING (resolving the token against the cloud)
+  // ========================================================================
+  if (sessionLoading) {
+    return (
+      <div className="min-h-screen bg-jaman-cream text-jaman-navy flex flex-col items-center justify-center gap-3 p-6 font-sans">
+        <Loader2 className="w-8 h-8 text-jaman-saffron animate-spin" />
+        <p className="text-xs font-bold text-slate-500">Loading today's menu...</p>
+      </div>
+    );
+  }
 
   // ========================================================================
-  // VIEW: ERROR STATE (Invalid / Disabled QR)
+  // VIEW: ERROR STATE (Invalid / Disabled / Unreachable QR)
   // ========================================================================
-  if (!verification.isValid) {
+  if (sessionError || !session) {
     return (
       <div className="min-h-screen bg-jaman-cream text-jaman-navy flex flex-col justify-between items-center p-6 font-sans">
         <div className="w-full max-w-md pt-8 text-center space-y-6">
@@ -413,7 +460,6 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
               J
             </div>
             <h1 className="text-xl font-black tracking-wider text-jaman-navy uppercase">JAMANVAAR</h1>
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">{restaurant.name}</p>
           </div>
 
           {/* Error Card */}
@@ -424,25 +470,18 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             <div className="space-y-1.5">
               <h2 className="text-base font-black text-jaman-navy">Table QR Code Unavailable</h2>
               <p className="text-xs text-slate-600 leading-relaxed">
-                {verification.reason || 'This table QR is currently inactive or has been rotated.'}
+                {sessionError || 'This table QR is currently inactive or has been rotated.'}
               </p>
             </div>
 
             <div className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border text-xs font-mono font-bold text-slate-500">
               Table Reference: Table {tableNumber}
             </div>
-
-            <button
-              onClick={() => handleRequestService('Assistance with QR Code')}
-              className="w-full py-3 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider shadow-md transition-all cursor-pointer"
-            >
-              {serviceRequested ? '✓ Staff Notified!' : 'Call Table Staff for Help'}
-            </button>
           </div>
         </div>
 
         <div className="text-center text-[11px] text-slate-400 font-medium pb-4">
-          Powered by JAMANVAAR Dining OS • Contact restaurant front desk
+          Powered by JAMANVAAR Dining OS • Please ask a team member for help
         </div>
       </div>
     );
@@ -452,16 +491,17 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
   // VIEW: ORDER TRACKING SCREEN (Live Order Status)
   // ========================================================================
   if (viewState === 'TRACKING' && trackedOrder) {
-    const statuses: Array<{ key: OrderStatus; label: string; sub: string }> = [
-      { key: 'NEW', label: 'Order Placed', sub: 'Received by kitchen & POS' },
-      { key: 'ACCEPTED', label: 'Accepted by Staff', sub: 'Confirmed by restaurant cashier' },
-      { key: 'PREPARING', label: 'Cooking in Kitchen', sub: 'Freshly preparing your dishes' },
+    // A QR order goes straight to the kitchen — there is no separate "accepted by cashier" step for a guest,
+    // unlike a cashier building a cart on POS.
+    const statuses: Array<{ key: string; label: string; sub: string }> = [
+      { key: 'PREPARING', label: 'Order Placed & Cooking', sub: 'Received by kitchen & POS instantly' },
       { key: 'READY', label: 'Ready to Serve', sub: 'Being plated at kitchen station' },
       { key: 'SERVED', label: 'Served at Table', sub: 'Enjoy your delicious feast' }
     ];
 
-    const currentIdx = statuses.findIndex((s) => s.key === trackedOrder.orderStatus);
-    const activeStep = currentIdx !== -1 ? currentIdx : 0;
+    const isCancelled = trackedOrder.status === 'CANCELLED' || trackedOrder.status === 'REFUNDED';
+    const currentIdx = statuses.findIndex((s) => s.key === trackedOrder.status);
+    const activeStep = currentIdx !== -1 ? currentIdx : TERMINAL_STATUSES.has(trackedOrder.status) ? statuses.length - 1 : 0;
 
     return (
       <div className="min-h-screen bg-jaman-cream text-jaman-navy flex flex-col font-sans max-w-md mx-auto shadow-2xl border-x border-jaman-border">
@@ -473,7 +513,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             </div>
             <div>
               <h2 className="text-xs font-black tracking-wider uppercase">JAMANVAAR</h2>
-              <p className="text-[10px] text-amber-300 font-bold">Table {tableNumber} • Live Tracker</p>
+              <p className="text-[10px] text-amber-300 font-bold">Table {displayTableNumber} • Live Tracker</p>
             </div>
           </div>
 
@@ -493,154 +533,124 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">ORDER CONFIRMED</span>
-                <h3 className="text-xl font-black font-mono text-jaman-navy">#{trackedOrder.orderNumber}</h3>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-xs font-black bg-jaman-saffron text-white px-2 py-0.5 rounded-md font-mono">
-                    Token #{trackedOrder.tokenNumber}
-                  </span>
+                <h3 className="text-xl font-black font-mono text-jaman-navy">Token #{trackedOrder.tokenNumber || '—'}</h3>
+                {trackedOrder.createdAt && (
                   <span className="text-xs font-bold text-slate-500">
-                    • Placed {new Date(trackedOrder.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    Placed {new Date(trackedOrder.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                )}
+              </div>
+
+              {typeof trackedOrder.totalAmount === 'number' && (
+                <div className="text-right">
+                  <span className="text-xs font-bold text-slate-400 uppercase block">Amount</span>
+                  <span className="text-lg font-black font-mono text-jaman-saffron">{formatINR(trackedOrder.totalAmount)}</span>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded block mt-0.5">
+                    Pay at Counter
                   </span>
                 </div>
-              </div>
-
-              <div className="text-right">
-                <span className="text-xs font-bold text-slate-400 uppercase block">Amount</span>
-                <span className="text-lg font-black font-mono text-jaman-saffron">{formatINR(trackedOrder.totalAmount)}</span>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded block mt-0.5">
-                  {trackedOrder.paymentMethod} • {trackedOrder.paymentStatus}
-                </span>
-              </div>
+              )}
             </div>
-
-            {/* Estimated time pill: sourced from the order record written by the repository */}
-            {trackedOrder.estimatedWaitMinutes ? (
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-amber-900 font-bold">
-                  <Clock className="w-4 h-4 text-jaman-saffron" />
-                  <span>Estimated Wait Time:</span>
-                </div>
-                <span className="font-black text-jaman-saffron font-mono text-sm">
-                  ~{trackedOrder.estimatedWaitMinutes} mins
-                </span>
-              </div>
-            ) : null}
           </div>
 
-          {/* Live Timeline Stepper */}
-          <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm space-y-4">
-            <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />
-              <span>Live Kitchen & Service Timeline</span>
-            </h4>
+          {isCancelled ? (
+            <div className="bg-rose-50 border border-rose-200 rounded-3xl p-5 text-center space-y-1.5">
+              <AlertTriangle className="w-6 h-6 text-rose-600 mx-auto" />
+              <h4 className="text-sm font-black text-rose-800">This order was cancelled</h4>
+              <p className="text-xs text-rose-600">Please speak to a team member at the counter.</p>
+            </div>
+          ) : (
+            /* Live Timeline Stepper */
+            <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm space-y-4">
+              <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />
+                <span>Live Kitchen & Service Timeline</span>
+              </h4>
 
-            <div className="space-y-4 pl-2">
-              {statuses.map((step, idx) => {
-                const isPassed = idx <= activeStep;
-                const isCurrent = idx === activeStep;
+              <div className="space-y-4 pl-2">
+                {statuses.map((step, idx) => {
+                  const isPassed = idx <= activeStep;
+                  const isCurrent = idx === activeStep;
 
-                return (
-                  <div key={step.key} className="flex items-start gap-3 relative">
-                    {/* Vertical connecting line */}
-                    {idx < statuses.length - 1 && (
-                      <div
-                        className={`absolute left-3.5 top-7 bottom-0 w-0.5 ${
-                          idx < activeStep ? 'bg-emerald-500' : 'bg-slate-200'
-                        }`}
-                      />
-                    )}
-
-                    {/* Step Icon */}
-                    <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 z-10 transition-all ${
-                        isCurrent
-                          ? 'bg-jaman-saffron text-white ring-4 ring-orange-100 animate-pulse'
-                          : isPassed
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-slate-100 text-slate-400 border border-slate-300'
-                      }`}
-                    >
-                      {isPassed && !isCurrent ? (
-                        <Check className="w-4 h-4 stroke-[3]" />
-                      ) : (
-                        <span className="text-xs font-black">{idx + 1}</span>
-                      )}
-                    </div>
-
-                    {/* Step Content */}
-                    <div className="flex-1 pt-0.5">
-                      <div className="flex items-center justify-between">
-                        <h5
-                          className={`text-xs font-black ${
-                            isCurrent ? 'text-jaman-saffron' : isPassed ? 'text-jaman-navy' : 'text-slate-400'
+                  return (
+                    <div key={step.key} className="flex items-start gap-3 relative">
+                      {/* Vertical connecting line */}
+                      {idx < statuses.length - 1 && (
+                        <div
+                          className={`absolute left-3.5 top-7 bottom-0 w-0.5 ${
+                            idx < activeStep ? 'bg-emerald-500' : 'bg-slate-200'
                           }`}
-                        >
-                          {step.label}
-                        </h5>
-                        {isCurrent && (
-                          <span className="text-[10px] font-black bg-orange-100 text-jaman-saffron px-2 py-0.5 rounded-full">
-                            IN PROGRESS
-                          </span>
+                        />
+                      )}
+
+                      {/* Step Icon */}
+                      <div
+                        className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 z-10 transition-all ${
+                          isCurrent
+                            ? 'bg-jaman-saffron text-white ring-4 ring-orange-100 animate-pulse'
+                            : isPassed
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-slate-100 text-slate-400 border border-slate-300'
+                        }`}
+                      >
+                        {isPassed && !isCurrent ? (
+                          <Check className="w-4 h-4 stroke-[3]" />
+                        ) : (
+                          <span className="text-xs font-black">{idx + 1}</span>
                         )}
                       </div>
-                      <p className="text-[11px] text-slate-500 leading-tight mt-0.5">{step.sub}</p>
+
+                      {/* Step Content */}
+                      <div className="flex-1 pt-0.5">
+                        <div className="flex items-center justify-between">
+                          <h5
+                            className={`text-xs font-black ${
+                              isCurrent ? 'text-jaman-saffron' : isPassed ? 'text-jaman-navy' : 'text-slate-400'
+                            }`}
+                          >
+                            {step.label}
+                          </h5>
+                          {isCurrent && (
+                            <span className="text-[10px] font-black bg-orange-100 text-jaman-saffron px-2 py-0.5 rounded-full">
+                              IN PROGRESS
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-500 leading-tight mt-0.5">{step.sub}</p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Ordered Dishes List */}
-          <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm space-y-3">
-            <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider">
-              Dishes in this Order ({trackedOrder.items.length})
-            </h4>
+          {/* Ordered Dishes List — known only for an order placed this browsing session */}
+          {trackedOrder.items && trackedOrder.items.length > 0 && (
+            <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm space-y-3">
+              <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider">
+                Dishes in this Order ({trackedOrder.items.length})
+              </h4>
 
-            <div className="divide-y divide-slate-100">
-              {trackedOrder.items.map((item) => (
-                <div key={item.id} className="py-2.5 flex items-center justify-between text-xs">
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-1.5 font-black text-jaman-navy">
-                      <span className="font-mono text-jaman-saffron">{item.quantity}×</span>
-                      <span>{item.name}</span>
+              <div className="divide-y divide-slate-100">
+                {trackedOrder.items.map((item) => (
+                  <div key={item.id} className="py-2.5 flex items-center justify-between text-xs">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1.5 font-black text-jaman-navy">
+                        <span className="font-mono text-jaman-saffron">{item.quantity}×</span>
+                        <span>{item.name}</span>
+                      </div>
+                      {item.modifierNames.length > 0 && (
+                        <p className="text-[10px] text-slate-500">{item.modifierNames.join(', ')}</p>
+                      )}
+                      {item.specialInstructions && (
+                        <p className="text-[10px] text-amber-700 italic">Note: {item.specialInstructions}</p>
+                      )}
                     </div>
-                    {item.modifiers && item.modifiers.length > 0 && (
-                      <p className="text-[10px] text-slate-500">
-                        {item.modifiers.map((m) => m.optionName).join(', ')}
-                      </p>
-                    )}
-                    {item.specialInstructions && (
-                      <p className="text-[10px] text-amber-700 italic">
-                        Note: {item.specialInstructions}
-                      </p>
-                    )}
+                    <span className="font-mono font-bold text-slate-700">{formatINR(item.totalPrice)}</span>
                   </div>
-                  <span className="font-mono font-bold text-slate-700">{formatINR(item.totalPrice)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Assistance quick buttons */}
-          <div className="grid grid-cols-2 gap-2 pt-2">
-            <button
-              onClick={() => handleRequestService('Water')}
-              className="py-3 px-3 rounded-2xl bg-white border border-jaman-border hover:bg-slate-50 font-bold text-xs text-slate-700 flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-            >
-              <span>💧 Request Water</span>
-            </button>
-            <button
-              onClick={() => handleRequestService('Cutlery / Napkins')}
-              className="py-3 px-3 rounded-2xl bg-white border border-jaman-border hover:bg-slate-50 font-bold text-xs text-slate-700 flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-            >
-              <span>🍴 Request Cutlery</span>
-            </button>
-          </div>
-
-          {serviceRequested && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-center text-xs font-bold text-emerald-800 animate-in fade-in">
-              ✓ Table captain notified! Someone will assist you shortly.
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -652,7 +662,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             className="w-full py-3.5 rounded-2xl bg-jaman-navy hover:bg-[#123959] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4 text-jaman-saffron" />
-            <span>Order More Delicacies for Table {tableNumber}</span>
+            <span>Order More Delicacies for Table {displayTableNumber}</span>
           </button>
         </div>
       </div>
@@ -675,7 +685,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
           </button>
           <div className="text-center">
             <h2 className="text-sm font-black text-jaman-navy">Your Table Order</h2>
-            <p className="text-[11px] text-slate-500 font-bold">Table {tableNumber} • {totalItemCount} Items</p>
+            <p className="text-[11px] text-slate-500 font-bold">Table {displayTableNumber} • {totalItemCount} Items</p>
           </div>
           <div className="w-8" />
         </div>
@@ -713,7 +723,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                   <div key={item.cartId} className="py-3 flex items-start justify-between gap-3">
                     <div className="space-y-1 flex-1">
                       <div className="flex items-center gap-2">
-                        {item.menuItem.dietaryType === 'VEG' ? (
+                        {item.menuItem.dietaryType === 'VEG' || item.menuItem.dietaryType === 'JAIN' ? (
                           <span className="w-3.5 h-3.5 border border-emerald-600 flex items-center justify-center shrink-0">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                           </span>
@@ -725,7 +735,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                         <h4 className="text-xs font-black text-jaman-navy">{item.menuItem.name}</h4>
                       </div>
 
-                      {item.selectedModifiers && item.selectedModifiers.length > 0 && (
+                      {item.selectedModifiers.length > 0 && (
                         <p className="text-[10px] text-slate-500 pl-5">
                           {item.selectedModifiers.map((m) => m.optionName).join(', ')}
                         </p>
@@ -788,9 +798,9 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                 </div>
               </div>
 
-              {/* Guest Details & Payment Mode */}
+              {/* Guest Details & Payment */}
               <div className="bg-white rounded-3xl p-4 border border-jaman-border shadow-sm space-y-3">
-                <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider">Guest & Payment</h4>
+                <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider">Guest Details</h4>
 
                 <div className="space-y-2">
                   <input
@@ -809,32 +819,10 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                   />
                 </div>
 
-                <div className="space-y-1.5 pt-1">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase block">Payment Preference</span>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { id: 'UPI', label: 'UPI QR', icon: QrCode },
-                      { id: 'CASH', label: 'Pay at Counter', icon: DollarSign },
-                      { id: 'CARD', label: 'Card', icon: CreditCard }
-                    ].map((mode) => {
-                      const Icon = mode.icon;
-                      const isSel = paymentMode === mode.id;
-                      return (
-                        <button
-                          key={mode.id}
-                          onClick={() => setPaymentMode(mode.id as any)}
-                          className={`p-2.5 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1 ${
-                            isSel
-                              ? 'bg-amber-50 border-jaman-saffron text-jaman-saffron font-black'
-                              : 'border-jaman-border bg-jaman-cream text-slate-600 font-bold'
-                          }`}
-                        >
-                          <Icon className="w-4 h-4" />
-                          <span className="text-[10px]">{mode.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                {/* v1 is pay-at-counter only (BUG-119): a public, unauthenticated endpoint is not where a first cut of this feature should also integrate a payment gateway. */}
+                <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5">
+                  <DollarSign className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <span className="text-[11px] font-bold text-emerald-800">Pay at the counter when your order arrives.</span>
                 </div>
               </div>
             </div>
@@ -844,14 +832,9 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
         {/* Bottom Place Order Bar */}
         {cartItems.length > 0 && (
           <div className="p-4 bg-white border-t border-jaman-border sticky bottom-0 z-30 space-y-2">
-            {orderValueBlockReason && (
-              <p className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-center">
-                {orderValueBlockReason}
-              </p>
-            )}
             <button
               onClick={handlePlaceOrder}
-              disabled={isPlacingOrder || Boolean(orderValueBlockReason)}
+              disabled={isPlacingOrder}
               className="w-full py-4 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider flex items-center justify-between px-5 shadow-lg shadow-orange-500/25 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
             >
               <span>{isPlacingOrder ? 'Sending to Kitchen...' : 'Place Order Now'}</span>
@@ -917,9 +900,7 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             <div className="bg-white rounded-3xl p-4 border border-jaman-border text-center space-y-1">
               <Info className="w-5 h-5 text-slate-300 mx-auto" />
               <p className="text-[11px] text-slate-500 font-medium">
-                {qrSettings.allowCustomerModifications
-                  ? 'This dish is served exactly as described by the chef. No options to choose.'
-                  : 'Dish customisation is currently turned off by the restaurant.'}
+                This dish is served exactly as described by the chef. No options to choose.
               </p>
             </div>
           ) : (
@@ -945,10 +926,6 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                       {group.isRequired ? 'Required' : maxSel > 1 ? `Pick up to ${maxSel}` : 'Optional'}
                     </span>
                   </div>
-
-                  {group.description && (
-                    <p className="text-[11px] text-slate-500 leading-tight">{group.description}</p>
-                  )}
 
                   <div className={maxSel > 1 ? 'space-y-2' : 'grid grid-cols-2 gap-2'}>
                     {group.options.map((opt) => {
@@ -980,20 +957,18 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
           )}
 
           {/* Cooking Instructions */}
-          {qrSettings.allowSpecialInstructions && (
-            <div className="bg-white rounded-3xl p-4 border border-jaman-border space-y-2">
-              <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider">
-                Special Cooking Instructions
-              </h4>
-              <textarea
-                value={specialNote}
-                onChange={(e) => setSpecialNote(e.target.value)}
-                placeholder="e.g., Less spicy, no onion-garlic, extra crispy naan..."
-                rows={2}
-                className="w-full bg-jaman-cream border border-jaman-border rounded-xl p-2.5 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
-              />
-            </div>
-          )}
+          <div className="bg-white rounded-3xl p-4 border border-jaman-border space-y-2">
+            <h4 className="text-xs font-black text-jaman-navy uppercase tracking-wider">
+              Special Cooking Instructions
+            </h4>
+            <textarea
+              value={specialNote}
+              onChange={(e) => setSpecialNote(e.target.value)}
+              placeholder="e.g., Less spicy, no onion-garlic, extra crispy naan..."
+              rows={2}
+              className="w-full bg-jaman-cream border border-jaman-border rounded-xl p-2.5 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
+            />
+          </div>
 
           {/* Quantity Selector */}
           <div className="bg-white rounded-3xl p-4 border border-jaman-border flex items-center justify-between">
@@ -1050,15 +1025,15 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
             </div>
             <div>
               <h1 className="text-xs font-black tracking-widest uppercase">JAMANVAAR</h1>
-              <p className="text-[10px] text-amber-300 font-bold">{outlet.name}</p>
+              <p className="text-[10px] text-amber-300 font-bold">{restaurantName}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-black bg-jaman-saffron text-white px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
-              <span>📍 Table {tableNumber}</span>
+              <span>📍 Table {displayTableNumber}</span>
             </span>
-            {activeTrackedOrderId && (
+            {trackedOrder && (
               <button
                 onClick={() => setViewState('TRACKING')}
                 className="text-[10px] font-black bg-emerald-500 text-white px-2 py-1 rounded-full animate-pulse cursor-pointer"
@@ -1189,12 +1164,6 @@ export const GuestQrOrderingPage: React.FC<GuestQrOrderingPageProps> = ({
                       <p className="text-[11px] text-slate-500 line-clamp-2 leading-tight">
                         {item.description}
                       </p>
-                    )}
-                    {item.spiceLevel && item.spiceLevel !== 'NONE' && (
-                      <div className="flex items-center gap-1 text-[10px] font-bold text-amber-700">
-                        <Flame className="w-3 h-3 text-jaman-saffron" />
-                        <span>{item.spiceLevel}</span>
-                      </div>
                     )}
                   </div>
 

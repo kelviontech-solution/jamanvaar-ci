@@ -1,66 +1,59 @@
-# REMEDIATION ROADMAP — Jamanvaar Security Remediation
+# Remediation Roadmap
 
-**Remediation Rule:** No application source code has been modified during this audit. All items below are prioritized recommendations requiring explicit approval before implementation.
+**Updated 2026-09-23: Phases 0–3 are done and verified, Phase 4 (Low) is 5 of 7 done** (root `vitest` suite — 887 tests — and `cloud/api`'s Postgres-backed e2e suite — 442 tests — both green after every change below). See [`FINDINGS.md`](FINDINGS.md)'s "Remediation status" table for the authoritative per-finding status; this file's checkboxes track the same information at the file/task level. Each item names the exact file(s) changed; full context is in `FINDINGS.md` and the linked `_work/*.md` report.
 
----
+## Phase 0 — Do today, independent of everything else
 
-## Phase P0 — Immediate Containment & Hotfixes (Priority: Immediate)
+- [x] `cloud/api/prisma/_tmp_user.ts` and `_tmp_rel.ts` deleted from the working tree; `AUDIT_BRIEF.md`'s credentials section redacted. **Still open (process, not code):** whether `live-verify@jamanvaar.local` was ever live anywhere is unconfirmed from source alone — rotate it wherever it might exist, and purge it from git history (a working-tree delete alone leaves it in history).
+- [ ] Add a CI secret-scanning step (gitleaks or trufflehog) so this class of leak is caught before the next merge, not after. Not done this pass.
 
-| Priority | Finding IDs | Affected Component | Required Code & Architecture Changes | Required Regression Test | Risk of Change | Verification Method |
-|:---:|---|---|---|---|:---:|---|
-| **P0-1** | **F-001** | `cloud/api/src/modules/billing/tenant-billing.controller.ts`, `invoices.service.ts` | Remove client-asserted payment settlement in `processTenantPayment`. Status transition to `PAID` and subscription renewal must strictly require Cashfree webhook signature verification. Restrict endpoint to `OWNER` role and use it solely to initiate gateway payment checkout sessions. | Assert that calling `POST /api/v1/tenant/billing/invoices/:id/pay` with arbitrary body returns 400/403 and leaves invoice status `ISSUED` and subscription expiration unchanged. | Minimal (disables fraudulent bypass). | Unit & e2e test with synthetic unpaid invoice. |
-| **P0-2** | **F-004, F-005** | `cloud/api/src/modules/support/support.service.ts` | Add explicit `select` projection to `support.service.ts:search` queries on `User`, `Device`, and `ActivationKey`. Exclude `passwordHash`, `activationTokenHash`, `deviceTokenHash`, and `code`. Remove `activationToken` from `resendInvite` response body. | Response payload shape assertion verifying absence of hash fields and activation codes for all roles. | Low. UI consumes only public fields. | Inspect JSON response of `GET /api/v1/support/search?q=test`. |
-| **P0-3** | **F-002, F-033** | `tooling/local-runtime/`, POS Sidecar | Bind `standalone_local_core.cjs` to `127.0.0.1` by default. Remove committed `.local_service_key` from version control and rotate the key. Exclude `JamanvaarLocalCore.exe` from git tracking. | Assert that unauthenticated external LAN requests to `http://<ip>:5178/api/orders` are rejected or refused connection. | High for LAN mesh sync (requires terminal pairing). | Probe local port 5178 from secondary network interface. |
-| **P0-4** | **F-003** | `cloud/api/src/modules/sync-observability/sync-observability.controller.ts` | Apply `@UseGuards(DeviceAuthGuard)` to `POST /api/v1/platform/telemetry/events`. Derive `restaurantId` and `deviceId` strictly from the validated device token. | Assert unauthenticated POST returns 401 Unauthorized. | Low. Active devices already hold device tokens. | Integration test verifying 401 on anonymous request. |
-| **P0-5** | **F-006** | `packages/database/src/live_db.json`, installer scripts | Untrack `live_db.json` from git. Enforce mandatory PIN change and admin credential initialization during first launch. | Verify `live_db.json` is in `.gitignore` and `git ls-files` reports no tracked file. | Low. Clean seed is created on fresh boot. | `git ls-files packages/database/src/live_db.json`. |
-| **P0-6** | **F-025, F-046** | `cloud/api/package.json`, `.env` | Set `NODE_ENV=production` explicitly in `start:prod`. Require connection via a dedicated non-superuser PostgreSQL role (`jamanvaar_app`) without `BYPASSRLS`. Fail server startup if superuser connects in production. | Assert startup throws fatal error when connected as `postgres` with `NODE_ENV=production`. | Low. Standard production hardening. | Run `npm run start:prod` and check log output. |
+## Phase 1 — The one fix that closes ~⅓ of the register
 
----
+- [x] **CRIT-01** — `EntitySyncController`/`EntitySyncService` now enforce `ENTITY_WRITE_ALLOWED_DEVICE_TYPES` (only `POS`/`POS_ADMIN` may write `STAFF_USER`) via `assertDeviceMayWrite()`.
+- [x] e2e regression added to `cloud/api/test/entity-sync.e2e.spec.ts` (denied device type → 403; `POS_ADMIN` → succeeds).
 
-## Phase P1 — Critical Security Fixes (Priority: High)
+## Phase 2 — Remaining Critical + all High (all narrow, mechanical fixes)
 
-| Priority | Finding IDs | Affected Component | Required Code & Architecture Changes | Required Regression Test | Risk of Change | Verification Method |
-|:---:|---|---|---|---|:---:|---|
-| **P1-1** | **F-014, F-015, F-007** | `cloud/api/src/modules/order-sync/`, `entity-sync/`, `repositories.ts` | 1. Recalculate order line totals and taxes server-side using current menu pricing snapshot.<br>2. Restrict entity-sync endpoints by `device.type` (`CUSTOMER` access limited to `POS` and `POS_ADMIN`).<br>3. Make QR table token mandatory in `repositories.ts:validateQrTableAccess`. | Push order with manipulated price and assert server overrides with database price. Assert Kiosk token cannot fetch customer entities. | Medium. Requires local offline terminals to push item IDs and quantities rather than pre-summed totals. | Send tampered order payload and verify cloud database record. |
-| **P1-2** | **F-016, F-017** | `cloud/api/src/modules/payments/` | 1. Require staff authorization PIN/token for `POST /api/v1/payments/:id/refund`.<br>2. Execute refund balance check inside a `SELECT ... FOR UPDATE` database transaction.<br>3. Reject invalid webhook signatures immediately with 400 without persisting payload to PostgreSQL. | Run concurrent refund test with two simultaneous requests; assert only one succeeds. Send invalid webhook; verify zero rows created in `WebhookEvent`. | Low to Medium. Refund UI must prompt for staff PIN. | Automated concurrency test script. |
-| **P1-3** | **F-010, F-011, F-013** | `cloud/api/src/modules/activation-keys/`, `tenant-auth/` | 1. Store activation key codes as SHA-256 hashes.<br>2. Execute redemption using an atomic conditional query (`UPDATE "ActivationKey" SET status='REDEEMED' WHERE code_hash=:hash AND status='ACTIVE'`).<br>3. Enforce `Plan.maxDevices` in `tenant-auth.service.ts:activateDevice`.<br>4. Require `deviceToken` whenever `deviceId` is provided in tenant login. | Concurrent redemption test asserting only one device activates. Assert `activateDevice` rejects when plan device limit is reached. | Medium (database migration required to hash existing unredeemed keys). | End-to-end device activation suite. |
-| **P1-4** | **F-018** | `cloud/api/src/modules/master-catalog/` | 1. Disallow `.svg` and `.html` file types.<br>2. Validate MIME types using magic-byte inspection.<br>3. Derive file extension strictly from detected MIME type, ignoring client `fileName`.<br>4. Store uploads in S3 object storage on an isolated CDN domain. | Upload `.svg` and `.html` files; assert 400 BadRequest. | Low. Dish catalog only requires JPEG/PNG/WebP. | Unit test with disguised payload. |
-| **P1-5** | **F-028, F-029** | `apps/*/src-tauri/` | 1. Restrict `send_escpos_bytes` to whitelisted printer IP addresses.<br>2. Set strict Content Security Policy (`CSP`) in `tauri.conf.json`.<br>3. Authenticate UDP discovery beacons or validate source socket address. | Assert calling `send_escpos_bytes` to an unwhitelisted IP returns an error. | Medium (printer configuration UI must register allowed printer IPs). | Tauri command execution test. |
+- [x] **CRIT-02** — `tenant-billing.controller.ts` requires `OWNER`; `invoices.service.ts` rejects non-`ISSUED/PAST_DUE` invoices, caps payment at remaining balance, and never auto-reactivates a `SUSPENDED` subscription from a tenant-initiated call. 5 e2e tests in `tenant-billing.e2e.spec.ts`.
+- [x] **CRIT-03** — `standalone_local_core.cjs`, `sea-config.json`, `sea-prep.blob`, and the tracked `.exe` deleted; `build_release.cjs` and `build_production_release.ps1` repointed at `local_service.cjs`; warning comments added at every remaining binary-copy site.
+- [x] **HIGH-01** — `support.service.ts` uses explicit `select` allow-lists (`SUPPORT_USER_SELECT`/`SUPPORT_DEVICE_SELECT`); reset-OTP hash now HMAC'd via `hashLowEntropySecret`.
+- [x] **HIGH-02** — Activation-key codes redacted to `codeLast4` via a shared `redactActivationKeyCode` helper everywhere except the one-time generation response; the `getById` redaction gap (which previously bypassed this entirely) is closed.
+- [x] **HIGH-03** — Backup download routes require `ops:write` (`assertCanDownloadBackups`); every download now calls `audit.log(...)`.
+- [x] **HIGH-04** — `tenant-auth.service.ts`'s `login()` now rejects `POS_ADMIN`/`KIOSK_ADMIN` logins below MANAGER server-side regardless of client-sent `adminOnly`; `pos-admin/src/cloud/cloudClient.ts` also sends `adminOnly: true`.
+- [x] **HIGH-05** — `order-sync.service.ts`'s `catchUp` now filters by `branchId`; a push regressing `paymentStatus` on a terminal-state order from a non-POS-family device is rejected into `SyncConflict`.
 
----
+## Phase 3 — Medium register
 
-## Phase P2 — High-Priority Access Control & Session Hardening
+- [x] MED-01 — PAN/GST/CIN/UIDAI masked in `payment-connections.service.ts`'s `toOwnView()`; resubmission merges omitted optional fields (`dto.x ?? existing?.x ?? null`) instead of nulling them.
+- [x] MED-02 — Atomic `updateMany` compare-and-set claim in both `activation-keys.service.ts` and `tenant-auth.service.ts`'s redemption paths; the latter also gained a `maxDevices` check it never had.
+- [x] MED-03 — `platform-users.service.ts`'s `resendInvite` now calls `assertActorIsOwner` when the target is a pending `PLATFORM_OWNER`.
+- [x] MED-04 — `application.dto.ts`'s `downloadUrl` requires `https://`; `PlatformNoticeBanner.tsx` and `ApplicationsPage.tsx` both gained an `isSafeHttpsUrl()` render guard.
+- [x] MED-05 — `packages/database/src/pin.ts` rewritten: 25,000-round numeric mixing stretch (`pinv2:`), with `pinv1:` still verifiable for backward compatibility.
+- [x] MED-06 (scoped) — Manager approval now required in the POS terminal to: open the Menu Manager (`PosCatalog.tsx`), record a Cash Out (`PosCashDrawerModal.tsx`), and force-close the business day (`PosCloseDayModal.tsx`). **Not a full permission-system rewrite** — see `FINDINGS.md`'s note on residual scope.
+- [x] MED-07 — `StaffRepository.verifyPin` (the one choke point every login surface routes through) locks out after 5 consecutive wrong PINs for 30s; UI messaging added to `ManagerOverrideModal.tsx` and Kiosk's staff-discount override.
+- [x] MED-08 — Manager-approval threshold now keys off `computeDiscountImpactRupees` (actual aggregate rupee impact across every affected item), not the raw per-application parameter.
+- [x] MED-09 — `local_service.cjs`'s `/devices/pair` locks out after 5 wrong PINs for 60s; verified live against a running instance.
+- [x] MED-10 — Folded into HIGH-03's fix (same `ops:write` gate and audit-log requirement).
+- [x] MED-11 — `verifyQrToken` requires a real, non-empty token unconditionally.
+- [x] MED-12 — `deleteUser` soft-deletes (`isActive: false`) so entity-sync tombstones propagate instead of the record resurrecting.
+- [x] MED-13 — Tenant login requires a matching `deviceToken` whenever `deviceId` is supplied.
+- [x] MED-14 — `recordSyncLog` derives `restaurantId`/`deviceId` from the authenticated device instead of trusting the client-supplied `RecordSyncLogDto` fields.
 
-| Finding IDs | Affected Area | Remediation Summary |
-|---|---|---|
-| **F-020** | `cloud/api/src/modules/backups/tenant-backups.controller.ts` | Apply `@Roles('OWNER', 'MANAGER')` to prevent low-privileged `STAFF` from downloading database backups. |
-| **F-021** | `cloud/api/src/modules/owners/` | Enforce 10-character password policy, check `user.role === 'OWNER'`, and invalidate active refresh tokens upon password reset. |
-| **F-022** | `cloud/super-admin-web/src/pages/restaurants/RestaurantDetailPage.tsx` | Transmit support impersonation credentials via `window.postMessage` or short-lived one-time code rather than URL query parameters. |
-| **F-023** | `cloud/api/src/common/guards/*-auth.guard.ts` | Explicitly specify `algorithms: ['HS256']` in `jwt.verifyAsync`. Configure separate secrets (`PLATFORM_JWT_SECRET` and `TENANT_JWT_SECRET`). |
-| **F-024** | `cloud/api/src/modules/tenant-auth/tenant-auth.service.ts` | Implement account-based login lockout (e.g. 5 failed attempts per 15 minutes), constant-time dummy password hashing, and cap candidate evaluations. |
-| **F-012** | `cloud/api/src/modules/tenant-auth/tenant-auth.service.ts` | Perform refresh token validation and revocation in a single database transaction; invalidate all user tokens if an already-revoked token is presented. |
-| **F-030** | `packages/database/src/pin.ts` | Upgrade staff PIN hashing from 32-bit FNV-1a to Argon2id / PBKDF2 with salt. |
-| **F-008** | `packages/database/src/db.ts` | Cryptographically verify license certificates (`license_certificate.ts`) before applying updates from sync peers. |
-| **F-035, F-036** | `cloud/api/src/modules/backups/`, `payments/` | Restrict backup download permissions to `PLATFORM_OWNER` and `SUPER_ADMIN`. Mask Aadhaar (`uidai`) and PAN numbers in API responses. |
-| **F-037** | `cloud/api/src/modules/notifications/receipts.controller.ts` | Link receipt sending to an active paid order ID and enforce per-restaurant daily message rate limits. |
+## Phase 4 — Low register / hardening
 
----
+- [x] **LOW-01** — CSV formula-injection guard (`escapeCsvField`, shared via `@jamanvaar/utils` where the consumer already depends on it, duplicated locally in `cloud/api` and `super-admin-web` which don't) applied to every export site found: cloud reports, Super Admin, POS-Admin, POS.
+- [x] MED-15 (Tauri hardening, tracked here since it's the same "harden the shells" theme as this phase) — printer-target allow-list (`is_allowed_printer_target`) enforced in `packages/native/printing.rs`; real CSP added to all 4 `tauri.conf.json` files. `connect-src`/`img-src` intentionally stay broad — see `FINDINGS.md`'s note.
+- [x] **LOW-02** — `payments.service.ts`'s `createRefund` is one transaction with a `FOR UPDATE` row lock on `PaymentTransaction` (closes the read-then-write race — proven with a real concurrent-request test); `requestedBy` is now mandatory on the refund DTO, persisted on `Refund.requestedBy`, and audit-logged; POS and POS-Admin clients now send the real approving manager's name instead of nothing / a hardcoded `'Manager'`.
+- [x] **LOW-03** — `master-catalog.service.ts`'s `uploadImage` now sniffs the real file type from magic bytes (PNG/JPEG/GIF/WEBP only; SVG dropped entirely) instead of trusting client-declared `contentType`/`fileName`; verified with a forged-content e2e test (an HTML payload lying about being a PNG is rejected and never reaches disk).
+- [x] LOW-04 (partial) — `LicenseRepository.setVerifiedLicense` now records the certificate's verified `expiresAt` into `validUntil` instead of silently dropping it. New offline-expiry *enforcement* deliberately not added — see `FINDINGS.md` for why.
+- [x] **LOW-05** — POS-Admin's `cloudLogout()` now revokes the server-side refresh session (`POST /tenant-auth/logout`) before clearing local state; POS's `lockTerminal()`/`unlockTerminal()` now persist `locked` on the session record so a reload restores the lock instead of dropping it. Both verified with real round-trip tests.
+- [x] **LOW-06** — RLS (`ENABLE`+`FORCE`+`tenant_isolation` policy) added to `DeviceCommand`, `RestaurantMenuSyndication`, `SyncEventLog`, `SyncConflict`, `OfflineExtension`, `BackupRestoreJob`, `SupportTicket`, and its 3 children via an EXISTS-based policy. New migration `20260923120000_low06_rls_coverage`. Verification caught and fixed a real deployment mistake — see `FINDINGS.md`'s LOW-06 entry for the full story of applying it to the wrong (superuser) database first.
+- [x] LOW-07 (partial) — owner-password floor raised from 4 to 8 characters (`create-restaurant.dto.ts`); `cloud/api`'s `start:prod` script now sets `NODE_ENV=production`.
+- [ ] LOW-04 (remainder) — offline-expiry enforcement. Deliberately not done — see `FINDINGS.md`.
+- [ ] LOW-07 (remainder) — seed script's plan-price `upsert` still overwrites admin-edited prices on every run (a product-behavior question as much as a security one); fabricated placeholder revenue number; 11 `npm audit` advisories; installer trust-store scope; tracked build-artifact cleanup.
 
-## Phase P3 — Medium & Low Priority Hardening
+## What this roadmap deliberately does not include
 
-- **F-038:** Sanitize CSV exports by prefixing formula triggers (`=`, `+`, `-`, `@`) with a single quote `'`; validate the `type` parameter against an allowlist.
-- **F-039:** Exclude passwords and activation tokens from `localStorage` draft saving in `OnboardRestaurantPage.tsx`.
-- **F-040:** Reduce default JSON body parser limit in `main.ts` from 20 MB to 1 MB and cap list query pagination.
-- **F-041:** Return uniform responses on `GET /api/v1/platform-users/activation-status` to eliminate user enumeration.
-- **F-042:** Remove default hardcoded staff PIN `1234` from `captainStore.ts`.
-- **F-034:** Remove code from installer scripts that imports self-signed certificates into `Cert:\CurrentUser\Root`.
-
----
-
-## Phase P4 — Long-Term Architecture & Quality Assurance
-
-- **F-043:** Implement full branch-level multi-tenancy in cloud synchronization and reporting services (`branchId` enforcement).
-- **F-043:** Add PostgreSQL migrations to enable Row-Level Security across all 19 operational tables currently lacking RLS.
-- **F-044:** Remove dead `EntitlementGuard` code.
-- **F-045:** Synchronize architecture documentation with runtime implementation.
-- **F-047:** Implement CI/CD automated pipeline with dependency auditing, secret scanning, and reproducible builds.
+- Regression tests were written alongside every fix in this pass (not as a separate step) — see each `.test.ts`/`.e2e.spec.ts` file touched for the exact assertions, so they can't silently drift from what was actually fixed.
+- No architectural rewrite was done or is recommended anywhere in this register. Every fix above is scoped to one or a few files. The system's core scaffolding (RLS, JWT realm separation, ECDSA cert verification, idempotency keys, device-auth centralization) did not need to change — see the Executive Summary's "what's genuinely well-built" section.
+- Production deployment facts this pass could not verify from source alone (whether the real deployment's process manager actually sets `NODE_ENV=production`, the real CORS origin list, TLS termination, whether `build_release.cjs` vs. the other installer scripts is what customers actually receive, whether the HIGH-06 credential was ever live, whether the LOW-06 migration has been deployed to every real environment and whether the role each one connects as is non-superuser/non-BYPASSRLS) should be confirmed by whoever owns deployment before treating those specific items as fully closed.

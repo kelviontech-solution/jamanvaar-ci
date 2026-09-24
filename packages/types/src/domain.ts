@@ -692,6 +692,9 @@ export interface WelcomeScreenSettings {
    *  welcome-screen promo and opt in later. */
   showPromoBanner: boolean;
   promoBannerText?: string;
+  /** Full-bleed photo behind the welcome screen. Unset falls back to the bundled default
+   *  (/language-selection-bg.png) so an existing install sees no change until an admin picks one. */
+  backgroundImageUrl?: string;
 }
 
 export interface VoiceConfig {
@@ -1010,6 +1013,15 @@ export interface ReceiptConfig {
   enableSms: boolean;
   enableEmail: boolean;
   enableQrReceipt: boolean;
+  /** Hex highlight color for the on-screen/WhatsApp receipt's token badge and totals rule.
+   *  Default (unset) is the JAMANVAAR brand orange. A physical thermal printout stays
+   *  black-and-white regardless — thermal printer hardware cannot print color. */
+  accentColor?: string;
+  /** Background color of the on-screen Kitchen Order Ticket preview (the kiosk's own "what got
+   *  sent to the kitchen" card, not the physical KOT printout, which is monochrome). Must stay a
+   *  dark tone for the light ticket text to stay legible, so this is chosen from a curated set
+   *  rather than an arbitrary hex. Default (unset) is JAMANVAAR navy. */
+  kotThemeColor?: string;
 }
 
 export interface ReceiptRecord {
@@ -1484,7 +1496,7 @@ export interface BusinessDayPreCloseCheck {
 
 export interface CaptainNotification {
   id: string;
-  type: 'FOOD_READY' | 'KOT_DELAYED' | 'BILL_READY' | 'TABLE_ASSIGNED' | 'TABLE_TRANSFER' | 'MANAGER_MESSAGE' | 'SYNC_ISSUE';
+  type: 'FOOD_READY' | 'KOT_DELAYED' | 'BILL_READY' | 'TABLE_ASSIGNED' | 'TABLE_TRANSFER' | 'MANAGER_MESSAGE' | 'GUEST_HELP' | 'SYNC_ISSUE';
   title: string;
   message: string;
   tableNumber?: string;

@@ -116,4 +116,23 @@ describe('License certificate verification (ENT-001 / SEC-002)', () => {
     const result = await applyLicenseCertificate(cert, 'rest-expected');
     expect(result.ok).toBe(false);
   });
+
+  // security-audit LOW-04: setVerifiedLicense used to accept an already-verified
+  // payload's `expiresAt` and then silently drop it — nothing ever recorded the
+  // one piece of data that should have made an offline grant time-limited. This
+  // tests the repository method directly (its own doc comment says it takes
+  // data already verified elsewhere — that's exactly what applyLicenseCertificate
+  // does right before calling it, tested above against the real embedded key).
+  it('setVerifiedLicense records the verified expiry into LicenseRepository.validUntil', () => {
+    LicenseRepository.activatePlan('CORE');
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+    const updated = LicenseRepository.setVerifiedLicense(
+      { tier: 'PRO', entitlements: { captainApp: true, qrTableOrdering: true, posTerminal: true } as any, expiresAt },
+      { source: 'offline-certificate' }
+    );
+
+    expect(updated.validUntil).toBe(expiresAt);
+    expect(LicenseRepository.getLicense().validUntil).toBe(expiresAt);
+  });
 });

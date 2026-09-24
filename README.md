@@ -56,7 +56,7 @@ Customers and dealers do **NOT** need Node.js, terminal commands, or development
 
 ## 💻 Running Development Servers
 
-To run the platform servers and developer applications, refer to the complete [**Server Launch Guide (RUN_SERVERS.md)**](./RUN_SERVERS.md):
+To run the platform servers and developer applications, refer to the complete [**Server Launch Guide (RUN_SERVERS.md)**](./docs/development/RUN_SERVERS.md):
 
 ```bash
 # Launch ALL 9 platform services concurrently (Cloud + All Terminals)

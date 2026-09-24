@@ -13,6 +13,21 @@ export interface PlatformNoticeBannerProps {
 }
 
 /**
+ * security-audit MED-04: the server now validates `downloadUrl` as `https://` only
+ * (see cloud/api's `publishReleaseSchema`), but this banner ships to every terminal app
+ * and renders whatever the heartbeat response carries — this is defense-in-depth in
+ * case that server-side check is ever bypassed or a stale/cached response is served.
+ */
+function isSafeHttpsUrl(url: string | null | undefined): url is string {
+  if (!url) return false;
+  try {
+    return new URL(url).protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+/**
  * The platform team's announcement (maintenance etc.), shown as a thin bar at the
  * very top of a restaurant app. It says plainly that selling is not affected, and
  * can be dismissed for the session.
@@ -43,7 +58,7 @@ export const PlatformNoticeBanner: React.FC<PlatformNoticeBannerProps> = ({ audi
         <ArrowUpCircle className="h-4 w-4 shrink-0" />
         <span className="min-w-0 flex-1">
           Version {update.latestVersion} is available.
-          {update.downloadUrl && (
+          {isSafeHttpsUrl(update.downloadUrl) && (
             <a href={update.downloadUrl} target="_blank" rel="noreferrer" className="ml-2 underline">
               Download
             </a>

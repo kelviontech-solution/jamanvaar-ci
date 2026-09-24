@@ -25,6 +25,13 @@ export interface JamanvaarCapabilityItem {
   sublabel?: string;
 }
 
+export interface JamanvaarHeroImage {
+  src: string;
+  fallbackSrc: string;
+  alt: string;
+  label: string;
+}
+
 export interface JamanvaarAuthLayoutProps {
   appIdentity: AppIdentity | string;
   appTitle: string;
@@ -52,10 +59,147 @@ export interface JamanvaarAuthLayoutProps {
   heroHighlightWord?: string;
   heroDescription?: string;
   capabilities?: JamanvaarCapabilityItem[];
+  /**
+   * Every app defaulted to the same hardcoded north-indian trio, so the
+   * login/activation screens of five different apps looked identical apart
+   * from the headline text. Each app now passes its own set (see the
+   * per-app APP_HERO_IMAGES exports below) so the hero visual matches what
+   * that app actually does — plated dishes for the counter/kiosk apps,
+   * kitchen-station shots for KDS, and so on. Falls back to the original
+   * trio when omitted, so any caller not yet migrated keeps working.
+   */
+  heroImages?: [JamanvaarHeroImage, JamanvaarHeroImage, JamanvaarHeroImage];
+  /**
+   * Kitchen displays run dark by design — a bright white screen is a real
+   * problem for visibility and glare on a line under hot lights, not just an
+   * aesthetic choice. 'dark' recolors the whole layout (canvas, card,
+   * capability tiles, status pills) instead of just the background, since a
+   * white card floating on a dark canvas would defeat the point.
+   */
+  theme?: 'light' | 'dark';
   children: React.ReactNode;
   footerNote?: string;
   className?: string;
 }
+
+const DEFAULT_HERO_IMAGES: [JamanvaarHeroImage, JamanvaarHeroImage, JamanvaarHeroImage] = [
+  {
+    src: '/assets/menu/north-indian/butter-naan.jpg',
+    fallbackSrc: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=400&q=80',
+    alt: 'Tandoori Naan',
+    label: 'Tandoori Breads'
+  },
+  {
+    src: '/assets/menu/north-indian/paneer-butter-masala.jpg',
+    fallbackSrc: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=400&q=80',
+    alt: 'Paneer Butter Masala',
+    label: 'Royal Curries'
+  },
+  {
+    src: '/assets/menu/north-indian/paneer-tikka.jpg',
+    fallbackSrc: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=400&q=80',
+    alt: 'Tandoori Angaar',
+    label: 'Tandoor Starters'
+  }
+];
+
+/**
+ * Per-app hero image sets — import and pass as `heroImages` so each app's
+ * auth screens carry a distinct visual identity instead of the same three
+ * dishes everywhere. Every path is served from that app's own
+ * public/assets/menu/, which already ships the full shared image library.
+ */
+export const APP_HERO_IMAGES: Record<string, [JamanvaarHeroImage, JamanvaarHeroImage, JamanvaarHeroImage]> = {
+  POS: DEFAULT_HERO_IMAGES,
+  ADMIN: DEFAULT_HERO_IMAGES,
+  // Self-order kiosk: quick, casual, guest-browsed bites — not the same
+  // "plated for you by a waiter" feel as the counter/admin apps.
+  KIOSK: [
+    {
+      src: '/assets/menu/fast-food/burger.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80',
+      alt: 'Loaded Burger',
+      label: 'Quick Bites'
+    },
+    {
+      src: '/assets/menu/chaat/pani-puri.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=400&q=80',
+      alt: 'Pani Puri',
+      label: 'Street Chaat'
+    },
+    {
+      src: '/assets/menu/snacks/samosa.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=400&q=80',
+      alt: 'Crispy Samosa',
+      label: 'Crispy Snacks'
+    }
+  ],
+  KIOSK_ADMIN: [
+    {
+      src: '/assets/menu/fast-food/burger.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80',
+      alt: 'Loaded Burger',
+      label: 'Quick Bites'
+    },
+    {
+      src: '/assets/menu/chaat/pani-puri.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=400&q=80',
+      alt: 'Pani Puri',
+      label: 'Street Chaat'
+    },
+    {
+      src: '/assets/menu/snacks/samosa.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=400&q=80',
+      alt: 'Crispy Samosa',
+      label: 'Crispy Snacks'
+    }
+  ],
+  // Kitchen Display: this app lives behind the pass, not front-of-house —
+  // the hero shows the stations it actually routes tickets to (matching
+  // KDS's own "Main Kitchen / Tandoor / Beverage" station selector).
+  KDS: [
+    {
+      src: '/assets/menu/tandoor/PT-04.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=400&q=80',
+      alt: 'Tandoor Grill',
+      label: 'Tandoor Station'
+    },
+    {
+      src: '/assets/menu/chinese/hakka-noodles.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=400&q=80',
+      alt: 'Wok-Tossed Noodles',
+      label: 'Wok Station'
+    },
+    {
+      src: '/assets/menu/south-indian/masala-dosa.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=400&q=80',
+      alt: 'Masala Dosa',
+      label: 'Dosa Station'
+    }
+  ],
+  // Captain: full table-side service — thali/main-course spread rather than
+  // starters, since Captain is about the whole seated meal, not a quick counter sale.
+  CAPTAIN: [
+    {
+      src: '/assets/menu/thali/gujarati-thali.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=400&q=80',
+      alt: 'Royal Thali',
+      label: 'Full-Course Thali'
+    },
+    {
+      src: '/assets/menu/main-course/DM-05.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=400&q=80',
+      alt: 'Dal Makhani',
+      label: 'Main Course'
+    },
+    {
+      src: '/assets/menu/beverages/mojito.jpg',
+      fallbackSrc: 'https://images.unsplash.com/photo-1546171753-97d7676e4602?auto=format&fit=crop&w=400&q=80',
+      alt: 'Fresh Mojito',
+      label: 'Table Beverages'
+    }
+  ]
+};
 
 export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
   appIdentity,
@@ -69,10 +213,13 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
   heroHighlightWord = 'Better Dining.',
   heroDescription = 'Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.',
   capabilities,
+  heroImages = DEFAULT_HERO_IMAGES,
+  theme = 'light',
   children,
   footerNote = 'Role-Based Security • Instant Offline Boot • 100% Secure',
   className = ''
 }) => {
+  const dark = theme === 'dark';
   // Live formatted current date e.g. "Mon, 31 Aug 2025"
   const [formattedDate, setFormattedDate] = useState(() => {
     return new Date().toLocaleDateString('en-GB', {
@@ -164,12 +311,16 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
     // than the viewport (min-h-screen content) with nowhere for that overflow to go — the
     // keypad and Unlock button were simply cut off below the fold on short screens. This
     // container now scrolls internally instead.
-    <div className={`min-h-screen max-h-screen overflow-y-auto bg-[#FAF7F2] text-[#0B253A] flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans antialiased select-none ${className}`}>
+    <div
+      className={`min-h-screen max-h-screen overflow-y-auto flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans antialiased select-none ${
+        dark ? 'bg-[#081B2C] text-[#F5F1E8]' : 'bg-[#FAF7F2] text-[#0B253A]'
+      } ${className}`}
+    >
       {/* Top Status Header */}
       <header className="w-full max-w-7xl mx-auto flex items-center justify-between pt-1 pb-4 shrink-0">
         {/* Left Mobile Brand (visible on small viewports) */}
         <div className="flex lg:hidden items-center gap-2">
-          <JamanvaarLogo variant="horizontal" size="sm" imgStyle={{ height: '40px', width: 'auto' }} />
+          <JamanvaarLogo variant={dark ? 'light' : 'horizontal'} size="sm" imgStyle={{ height: '40px', width: 'auto' }} />
         </div>
 
         <div className="hidden lg:block">
@@ -179,17 +330,17 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
         {/* Real-time Connection Status Pills (Matching Reference Mockup) */}
         <div className="flex items-center gap-2.5 sm:gap-3 text-xs font-bold ml-auto">
           {/* Local Core / Cloud API Status Badge */}
-          <div className="flex items-center gap-2 bg-white border border-[#EBE6DD] px-3.5 py-1.5 rounded-full shadow-2xs">
+          <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-2xs ${dark ? 'bg-white/5 border border-white/10' : 'bg-white border border-[#EBE6DD]'}`}>
             {/* The local relay needs a pairing no screen performs yet; once it refuses this browser, say so instead of "Connected" (BUG-156). */}
             <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${!apiBadgeConnected ? 'bg-rose-500' : appIdentity !== 'SUPER_ADMIN' && isLocalCoreUnauthorized ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
-            <span className="text-slate-600">
+            <span className={dark ? 'text-[#8CA0B3]' : 'text-slate-600'}>
               {appIdentity === 'SUPER_ADMIN' ? 'Cloud API: ' : 'Local Core: '}
               {!apiBadgeConnected ? (
-                <strong className="text-rose-700 font-extrabold">Unreachable</strong>
+                <strong className={dark ? 'text-rose-400 font-extrabold' : 'text-rose-700 font-extrabold'}>Unreachable</strong>
               ) : appIdentity !== 'SUPER_ADMIN' && isLocalCoreUnauthorized ? (
-                <strong className="text-amber-700 font-extrabold">Not paired (cloud sync in use)</strong>
+                <strong className={dark ? 'text-amber-400 font-extrabold' : 'text-amber-700 font-extrabold'}>Not paired (cloud sync in use)</strong>
               ) : (
-                <strong className="text-emerald-700 font-extrabold">
+                <strong className={dark ? 'text-emerald-400 font-extrabold' : 'text-emerald-700 font-extrabold'}>
                   {appIdentity === 'SUPER_ADMIN' ? 'Connected (Port 4000)' : 'Connected'}
                 </strong>
               )}
@@ -201,28 +352,30 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
             type="button"
             onClick={onToggleNetwork}
             title="Click to toggle simulated network mode"
-            className="flex items-center gap-2 bg-white border border-[#EBE6DD] hover:border-[#E66817]/50 px-3.5 py-1.5 rounded-full shadow-2xs transition-colors cursor-pointer"
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-2xs transition-colors cursor-pointer ${
+              dark ? 'bg-white/5 border border-white/10 hover:border-[#E66817]/50' : 'bg-white border border-[#EBE6DD] hover:border-[#E66817]/50'
+            }`}
           >
             {isOnline ? (
               <>
-                <Wifi className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span className="text-slate-600">
-                  Network: <strong className="text-emerald-700 font-extrabold">Online</strong>
+                <Wifi className={`w-3.5 h-3.5 shrink-0 ${dark ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                <span className={dark ? 'text-[#8CA0B3]' : 'text-slate-600'}>
+                  Network: <strong className={dark ? 'text-emerald-400 font-extrabold' : 'text-emerald-700 font-extrabold'}>Online</strong>
                 </span>
               </>
             ) : (
               <>
-                <WifiOff className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                <span className="text-slate-600">
-                  Network: <strong className="text-amber-700 font-extrabold">Offline Ready</strong>
+                <WifiOff className={`w-3.5 h-3.5 shrink-0 ${dark ? 'text-amber-400' : 'text-amber-600'}`} />
+                <span className={dark ? 'text-[#8CA0B3]' : 'text-slate-600'}>
+                  Network: <strong className={dark ? 'text-amber-400 font-extrabold' : 'text-amber-700 font-extrabold'}>Offline Ready</strong>
                 </span>
               </>
             )}
           </button>
 
           {/* Live Date Pill */}
-          <div className="hidden md:flex items-center gap-1.5 bg-white border border-[#EBE6DD] px-3.5 py-1.5 rounded-full text-slate-600 shadow-2xs">
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+          <div className={`hidden md:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full shadow-2xs ${dark ? 'bg-white/5 border border-white/10 text-[#8CA0B3]' : 'bg-white border border-[#EBE6DD] text-slate-600'}`}>
+            <Calendar className={`w-3.5 h-3.5 ${dark ? 'text-[#5E7893]' : 'text-slate-400'}`} />
             <span className="font-semibold">{formattedDate}</span>
           </div>
         </div>
@@ -235,7 +388,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
           {/* Official JAMANVAAR by KELVIONTECH Brand Logo — Prominent & Balanced */}
           <div className="w-full flex justify-center lg:justify-start pb-1">
             <JamanvaarLogo
-              variant="horizontal"
+              variant={dark ? 'light' : 'horizontal'}
               size="2xl"
               imgStyle={{ height: '180px', maxHeight: '180px', width: 'auto' }}
               className="drop-shadow-md hover:scale-[1.02] transition-transform duration-300"
@@ -244,13 +397,13 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
 
           {/* Brand Headline */}
           <div className="w-full max-w-md">
-            <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-black text-[#0B253A] tracking-tight leading-[1.12]">
+            <h1 className={`text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight leading-[1.12] ${dark ? 'text-[#F5F1E8]' : 'text-[#0B253A]'}`}>
               {heroHeadline}{' '}
               {heroHighlightWord && (
                 <span className="block text-[#E66817]">{heroHighlightWord}</span>
               )}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-2.5">
+            <p className={`text-xs sm:text-sm font-medium leading-relaxed mt-2.5 ${dark ? 'text-[#8CA0B3]' : 'text-slate-600'}`}>
               {heroDescription}
             </p>
           </div>
@@ -260,70 +413,48 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
             {activeCapabilities.map((cap, i) => (
               <div
                 key={i}
-                className="bg-white border border-[#EBE6DD] rounded-2xl p-2.5 sm:p-3 text-center flex flex-col items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs hover:border-[#E66817]/40 transition-all group"
+                className={`rounded-2xl p-2.5 sm:p-3 text-center flex flex-col items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs transition-all group ${
+                  dark ? 'bg-white/5 border border-white/10 hover:border-[#E66817]/50' : 'bg-white border border-[#EBE6DD] hover:border-[#E66817]/40'
+                }`}
               >
-                <div className="w-8 h-8 rounded-xl bg-[#FAF7F2] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${dark ? 'bg-white/10' : 'bg-[#FAF7F2]'}`}>
                   {renderCapabilityIcon(cap.icon || cap.iconName)}
                 </div>
-                <span className="text-[11px] font-extrabold text-[#0B253A] leading-tight">
+                <span className={`text-[11px] font-extrabold leading-tight ${dark ? 'text-[#F5F1E8]' : 'text-[#0B253A]'}`}>
                   {cap.label}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* Authentic Local Indian Food Platter Visual (Offline Packaged) */}
-          <div className="w-full max-w-md rounded-2xl border border-[#EBE6DD] bg-white p-2 shadow-2xs flex items-center justify-between gap-2 overflow-hidden">
-            <div className="relative flex-1 h-24 sm:h-28 rounded-xl overflow-hidden group">
-              <img
-                src="/assets/menu/north-indian/butter-naan.jpg"
-                alt="Tandoori Naan"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=400&q=80';
-                }}
-              />
-              <span className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-xs text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                Tandoori Breads
-              </span>
-            </div>
-
-            <div className="relative flex-1 h-24 sm:h-28 rounded-xl overflow-hidden group">
-              <img
-                src="/assets/menu/north-indian/paneer-butter-masala.jpg"
-                alt="Paneer Butter Masala"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=400&q=80';
-                }}
-              />
-              <span className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-xs text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                Royal Curries
-              </span>
-            </div>
-
-            <div className="relative flex-1 h-24 sm:h-28 rounded-xl overflow-hidden group">
-              <img
-                src="/assets/menu/north-indian/paneer-tikka.jpg"
-                alt="Tandoori Angaar"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=400&q=80';
-                }}
-              />
-              <span className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-xs text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                Tandoor Starters
-              </span>
-            </div>
+          {/* App-specific Visual Identity Strip — see APP_HERO_IMAGES; falls
+              back to the north-indian trio when a caller hasn't passed one. */}
+          <div className={`w-full max-w-md rounded-2xl p-2 shadow-2xs flex items-center justify-between gap-2 overflow-hidden ${dark ? 'bg-white/5 border border-white/10' : 'bg-white border border-[#EBE6DD]'}`}>
+            {heroImages.map((img) => (
+              <div key={img.src} className="relative flex-1 h-24 sm:h-28 rounded-xl overflow-hidden group">
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = img.fallbackSrc;
+                  }}
+                />
+                <span className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-xs text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                  {img.label}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* RIGHT COLUMN: PREMIUM WHITE AUTHENTICATION CARD */}
+        {/* RIGHT COLUMN: AUTHENTICATION CARD */}
         <div className="lg:col-span-6 w-full max-w-md mx-auto lg:max-w-none">
-          <div className="bg-white border border-[#EBE6DD] rounded-3xl p-6 sm:p-8 lg:p-9 shadow-xl shadow-slate-200/60 relative overflow-hidden">
+          <div
+            className={`rounded-3xl p-6 sm:p-8 lg:p-9 relative overflow-hidden ${
+              dark ? 'bg-[#0F2940] border border-white/10 shadow-xl shadow-black/30' : 'bg-white border border-[#EBE6DD] shadow-xl shadow-slate-200/60'
+            }`}
+          >
             {/* Top Brand Accent Line */}
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#E66817] via-[#F27E2B] to-[#E66817]" />
 
@@ -333,7 +464,11 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                 <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#E66817]">
                   Welcome to
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 bg-[#FFF7ED] text-[#E66817] border border-[#FFEDD5]">
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 text-[#E66817] border ${
+                    dark ? 'bg-[#E66817]/10 border-[#E66817]/25' : 'bg-[#FFF7ED] border-[#FFEDD5]'
+                  }`}
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E66817]" />
                   {appIdentity === 'POS'
                     ? 'POS TERMINAL'
@@ -351,10 +486,10 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                 </span>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-black text-[#0B253A] tracking-tight">
+              <h2 className={`text-2xl sm:text-3xl font-black tracking-tight ${dark ? 'text-[#F5F1E8]' : 'text-[#0B253A]'}`}>
                 {appTitle}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
+              <p className={`text-xs sm:text-sm font-medium ${dark ? 'text-[#8CA0B3]' : 'text-slate-500'}`}>
                 {appSubtitle}
               </p>
             </div>
@@ -366,19 +501,19 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
           </div>
 
           {/* Below-Card Assurance Badges */}
-          <div className="mt-3.5 flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-slate-500 text-[11px] font-bold">
+          <div className={`mt-3.5 flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-[11px] font-bold ${dark ? 'text-[#8CA0B3]' : 'text-slate-500'}`}>
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-[#E66817]" />
               <span>Role-Based Security</span>
             </div>
             <span>•</span>
             <div className="flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-emerald-600" />
+              <Zap className={`w-3.5 h-3.5 ${dark ? 'text-emerald-400' : 'text-emerald-600'}`} />
               <span>Instant Offline Boot</span>
             </div>
             <span>•</span>
             <div className="flex items-center gap-1.5">
-              <Cloud className="w-3.5 h-3.5 text-blue-600" />
+              <Cloud className={`w-3.5 h-3.5 ${dark ? 'text-blue-400' : 'text-blue-600'}`} />
               <span>100% Secure</span>
             </div>
           </div>
@@ -386,7 +521,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
       </main>
 
       {/* Footer Copyright */}
-      <footer className="w-full text-center text-xs text-slate-400 font-medium pt-4 shrink-0">
+      <footer className={`w-full text-center text-xs font-medium pt-4 shrink-0 ${dark ? 'text-[#5E7893]' : 'text-slate-400'}`}>
         © {new Date().getFullYear()} JAMANVAAR by KELVIONTECH — All rights reserved.
       </footer>
     </div>

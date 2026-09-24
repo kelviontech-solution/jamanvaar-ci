@@ -11,7 +11,9 @@
   ],
   "scripts": {
     "dev:sync": "node tooling/local-runtime/sync_server.cjs",
+    "predev:cloud-api": "node tooling/dev/free_ports.cjs 4000",
     "dev:cloud-api": "npm run start:dev --workspace=@jamanvaar/cloud-api",
+    "predev:super-admin": "node tooling/dev/free_ports.cjs 5180",
     "dev:super-admin": "npm run dev --workspace=@jamanvaar/super-admin-web",
     "dev:cloud": "concurrently -n \"API,SUPER-ADMIN\" -c \"blue,magenta\" \"npm run dev:cloud-api\" \"npm run dev:super-admin\"",
     "test:cloud-api": "npm run test --workspace=@jamanvaar/cloud-api",

@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -31,7 +31,7 @@ describe('Platform notification centre (BUG-064)', () => {
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: emailA, password });
     userBId = (await createTestPlatformUser(prisma, { email: emailB, password })).id;
-    const login = async (email: string) => (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email, password })).body.accessToken as string;
+    const login = async (email: string) => (await platformLogin(app, email, password)).body.accessToken as string;
     tokenA = await login(emailA);
     tokenB = await login(emailB);
 

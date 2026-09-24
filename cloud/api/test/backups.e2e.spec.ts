@@ -5,7 +5,7 @@ import S3rver from 's3rver';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { BackupStorageService } from '../src/modules/backups/backup-storage.service';
 
@@ -71,10 +71,8 @@ describe('Real off-device backups (S3-compatible storage)', () => {
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
 
-    const platformLogin = await request(app.getHttpServer())
-      .post('/api/v1/platform-auth/login')
-      .send({ email: adminEmail, password: adminPassword });
-    platformToken = platformLogin.body.accessToken;
+    const platformLoginRes = await platformLogin(app, adminEmail, adminPassword);
+    platformToken = platformLoginRes.body.accessToken;
 
     const restaurantRes = await authed('post', '/api/v1/restaurants', platformToken).send({
       name: `TEST Backups Restaurant ${Date.now()}`,
@@ -199,6 +197,55 @@ describe('Real off-device backups (S3-compatible storage)', () => {
     const urlRes = await authed('get', `/api/v1/restaurants/${restaurantId}/backups/${backupId}/download`, platformToken);
     expect(urlRes.status).toBe(200);
     expect(urlRes.body.url).toContain(`localhost:${S3_PORT}`);
+  });
+
+  /** security-audit HIGH-03: listing metadata stays open to read-only roles; the actual download does not. */
+  it('a READ_ONLY platform role can list backups but cannot download one', async () => {
+    const readOnlyEmail = `test-backups-readonly-${Date.now()}@example.com`;
+    await createTestPlatformUser(prisma, { email: readOnlyEmail, password: adminPassword, role: 'READ_ONLY' });
+    const roLogin = await platformLogin(app, readOnlyEmail, adminPassword);
+    const readOnlyToken: string = roLogin.body.accessToken;
+
+    const listRes = await authed('get', `/api/v1/restaurants/${restaurantId}/backups`, readOnlyToken);
+    expect(listRes.status).toBe(200);
+    const backupId = listRes.body[0].id;
+
+    const downloadRes = await authed('get', `/api/v1/restaurants/${restaurantId}/backups/${backupId}/download`, readOnlyToken);
+    expect(downloadRes.status).toBe(403);
+    const fileRes = await authed('get', `/api/v1/restaurants/${restaurantId}/backups/${backupId}/file`, readOnlyToken);
+    expect(fileRes.status).toBe(403);
+
+    await prisma.platformUser.deleteMany({ where: { email: readOnlyEmail } });
+  });
+
+  /** security-audit MED-10: only POS/POS_ADMIN — the terminals that actually run the local database — may upload an automatic backup. */
+  it('a KDS device (not revoked) is refused when it tries to push a backup', async () => {
+    const keyRes = await authed('post', '/api/v1/activation-keys', platformToken).send({
+      restaurantId, allowedDeviceType: 'KDS', expiresAt: new Date(Date.now() + 86400000).toISOString()
+    });
+    const redeemRes = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: keyRes.body.code, deviceType: 'KDS' });
+    const deviceToken: string = redeemRes.body.deviceToken;
+
+    const res = await authed('post', '/api/v1/devices/me/backups', deviceToken).send({ data: { deviceGenerated: true } });
+    expect(res.status).toBe(403);
+  });
+
+  /** security-audit MED-10: only the OWNER may create, list, or download the restaurant's own cloud backups. */
+  it('a STAFF tenant login cannot create, list, or download this restaurant\'s cloud backups', async () => {
+    const staffRes = await authed('post', '/api/v1/tenant/me/users', tenantToken).send({
+      email: `backups-staff-${Date.now()}@test.example.com`, fullName: 'Backups Staff', role: 'STAFF', password: 'staff-correct-horse-battery'
+    });
+    expect(staffRes.status, JSON.stringify(staffRes.body)).toBe(201);
+    const staffLogin = await request(app.getHttpServer()).post('/api/v1/tenant-auth/login').send({
+      restaurantId, email: staffRes.body.email, password: 'staff-correct-horse-battery'
+    });
+    const staffToken: string = staffLogin.body.accessToken;
+
+    expect((await authed('post', '/api/v1/tenant/me/backups', staffToken).send({ data: { x: 1 } })).status).toBe(403);
+    expect((await authed('get', '/api/v1/tenant/me/backups', staffToken)).status).toBe(403);
+    const listRes = await authed('get', '/api/v1/tenant/me/backups', tenantToken);
+    const backupId = listRes.body[0].id;
+    expect((await authed('get', `/api/v1/tenant/me/backups/${backupId}/download`, staffToken)).status).toBe(403);
   });
 
   it('a device can authenticate and push its own automatic backup, and its lastBackupAt updates', async () => {

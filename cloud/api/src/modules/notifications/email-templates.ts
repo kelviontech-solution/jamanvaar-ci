@@ -99,3 +99,19 @@ export function passwordResetOtpEmail(params: { fullName: string; otp: string; m
     `
   };
 }
+
+export function platformLoginOtpEmail(params: { fullName: string; otp: string; minutesValid: number }): { subject: string; html: string } {
+  return {
+    subject: 'Your JAMANVAAR Super Admin sign-in code',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #0b253a;">
+        <h2 style="color: #0b253a;">Confirm it's you</h2>
+        <p>Hi ${params.fullName}, someone is signing in to JAMANVAAR Platform Control with your account. Enter this code to continue:</p>
+        <p style="text-align: center; margin: 24px 0;">
+          <span style="font-family: monospace; font-size: 32px; letter-spacing: 8px; font-weight: bold; background: #FFF4ED; border: 1px solid #FDBA74; border-radius: 10px; padding: 12px 20px; display: inline-block;">${params.otp}</span>
+        </p>
+        <p style="color: #7a8b9e; font-size: 13px;">The code works once and expires in ${params.minutesValid} minutes. If this wasn't you, ignore this email and consider changing your password &mdash; no access was granted without it.</p>
+      </div>
+    `
+  };
+}

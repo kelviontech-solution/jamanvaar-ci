@@ -51,14 +51,31 @@ const CLOUD_LOCK_CODES: DeviceGateCode[] = [
   'BRANCH_INACTIVE',
   'DEVICE_LOCKED',
   // BUG-145: the cloud does not recognise this terminal's credential at all (device removed, database restored,
-  // token corrupted). Every call fails until it is activated again, so it must not pretend to be live.
+  // token corrupted). Every call fails until it is activated again.
   'INVALID_DEVICE_CREDENTIAL'
 ];
 
+/**
+ * These two are not a platform decision about the RESTAURANT (suspended, disabled, out of subscription) — they
+ * mean this one physical terminal's own saved credential is dead (a device row removed some other way than
+ * revoke, a database restore, a corrupted token, or an admin's deliberate revoke of this specific terminal).
+ * The fix is always the same and always available immediately: activate this terminal again.
+ *
+ * A restaurant that is mid-service should never be walled off by a full-screen "locked" modal over something a
+ * fresh activation key fixes in seconds — that used to leave staff staring at a dead screen with no way out
+ * ("going round and round" — BUG-145 follow-up). Instead the terminal quietly unbinds itself (the registered
+ * app clears its own stored restaurant/device keys and reloads into its own ordinary activation screen — the
+ * exact same screen used the first time this terminal was ever set up) and that screen explains why, the same
+ * way a real login page explains "your session expired" instead of the whole site refusing to render.
+ */
+const IDENTITY_INVALID_CODES: ReadonlySet<DeviceGateCode> = new Set(['DEVICE_REVOKED', 'INVALID_DEVICE_CREDENTIAL']);
+
 const STORAGE_KEY = 'jamanvaar_device_gate_v1';
+/** Survives `reset()` on purpose: the whole point is that the terminal's OWN activation screen shows it next. */
+const DISCONNECT_REASON_KEY = 'jamanvaar_device_disconnect_reason_v1';
 export const DEFAULT_OFFLINE_GRACE_DAYS = 7;
 
-const memory: { value: string | null } = { value: null };
+const memory: { value: string | null; disconnectReason: string | null } = { value: null, disconnectReason: null };
 
 function readStorage(): DeviceGateState | null {
   try {
@@ -80,7 +97,7 @@ function writeStorage(state: DeviceGateState): void {
 }
 
 const MESSAGES: Record<DeviceGateCode, string> = {
-  DEVICE_REVOKED: 'This device has been revoked. Contact your platform administrator.',
+  DEVICE_REVOKED: 'This terminal was revoked by your platform administrator. Please activate it again with a new activation key.',
   RESTAURANT_SUSPENDED: 'This restaurant account is suspended. Please contact your platform administrator.',
   RESTAURANT_INACTIVE: 'This restaurant account is no longer active.',
   SUBSCRIPTION_INACTIVE: 'This restaurant has no active subscription. Please contact your platform administrator.',
@@ -126,7 +143,71 @@ export class DeviceGate {
   /** Forget everything (used by tests and when a device is re-activated). */
   static reset(): void {
     memory.value = null;
+    this.identityInvalidHandled = false;
     this.set({ locked: false });
+  }
+
+  /**
+   * Registered once, at boot, by each app: how THIS app clears its own saved restaurant id and device
+   * credential and gets itself back to its own activation/connect screen (e.g. `resetTerminal()` in that
+   * app's `cloudClient.ts`, then a reload). `DeviceGate` itself has no idea what an app's storage keys are
+   * called, so it only calls whatever the app registered — this is what actually happens automatically the
+   * moment an invalid credential is detected; nothing is shown to the person operating the terminal until
+   * their own app's activation screen appears with `consumeDisconnectReason()`'s explanation on it.
+   */
+  private static identityInvalidHandler: (() => void) | null = null;
+  private static identityInvalidHandled = false;
+
+  static onIdentityInvalid(handler: () => void): void {
+    this.identityInvalidHandler = handler;
+  }
+
+  /** Remembered across the reload `onIdentityInvalid`'s handler triggers, so the activation screen can explain why. */
+  static rememberDisconnectReason(message: string): void {
+    try {
+      if (typeof localStorage !== 'undefined') localStorage.setItem(DISCONNECT_REASON_KEY, message);
+      else memory.disconnectReason = message;
+    } catch {
+      memory.disconnectReason = message;
+    }
+  }
+
+  /**
+   * Read without clearing it — safe to call more than once for the same reason (React 18 StrictMode calls a
+   * `useState` lazy initializer twice on purpose; reading here must never itself be the thing that makes the
+   * second call see nothing). The activation screen uses this to decide what to display.
+   */
+  static peekDisconnectReason(): string | null {
+    try {
+      return typeof localStorage !== 'undefined' ? localStorage.getItem(DISCONNECT_REASON_KEY) : memory.disconnectReason;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Marks it as shown, so it does not reappear on a later visit. Safe to call more than once (or never). */
+  static consumeDisconnectReason(): string | null {
+    const value = this.peekDisconnectReason();
+    try {
+      if (typeof localStorage !== 'undefined') localStorage.removeItem(DISCONNECT_REASON_KEY);
+      else memory.disconnectReason = null;
+    } catch {
+      memory.disconnectReason = null;
+    }
+    return value;
+  }
+
+  /**
+   * This terminal's own saved credential is dead (BUG-145 follow-up). Unlike every other lock reason, this is
+   * never shown as a blocking screen: the restaurant may be mid-service, and everything this terminal does
+   * locally still works. It only means cloud sync for this device is broken until someone re-activates it —
+   * exactly like a "reconnect your account" banner in any ordinary SaaS product, not an outage.
+   */
+  private static handleIdentityInvalid(code: DeviceGateCode, message?: string): void {
+    if (this.identityInvalidHandled) return; // one reload is enough; further 401s on the way out are expected
+    this.identityInvalidHandled = true;
+    this.rememberDisconnectReason(message || MESSAGES[code]);
+    this.identityInvalidHandler?.();
   }
 
   static setLastCheckIn(iso: string): void {
@@ -211,9 +292,13 @@ export class DeviceGate {
     if (res.status !== 401 && res.status !== 403) return;
     try {
       const body = (await res.clone().json()) as { code?: string; message?: string; reason?: string };
-      if (body && CLOUD_LOCK_CODES.includes(body.code as DeviceGateCode)) {
+      const code = body?.code as DeviceGateCode | undefined;
+      if (!code || !CLOUD_LOCK_CODES.includes(code)) return;
+      if (IDENTITY_INVALID_CODES.has(code)) {
         // The server's wording for a rejected credential is a bare 'Invalid device credential.'; ours says what to do.
-        this.lock(body.code as DeviceGateCode, body.code === 'INVALID_DEVICE_CREDENTIAL' ? undefined : body.message, body.reason);
+        this.handleIdentityInvalid(code, code === 'INVALID_DEVICE_CREDENTIAL' ? undefined : body.message);
+      } else {
+        this.lock(code, body.message, body.reason);
       }
     } catch {
       // Not JSON: an ordinary error, not a platform decision.

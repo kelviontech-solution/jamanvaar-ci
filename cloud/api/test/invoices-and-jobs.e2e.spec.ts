@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -44,7 +44,7 @@ describe('Invoices listing, summary and scheduled jobs (BUG-051/053)', () => {
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email, password });
-    token = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email, password })).body.accessToken;
+    token = (await platformLogin(app, email, password)).body.accessToken;
     const mk = async (label: string) =>
       (await api('post', '/api/v1/restaurants').send({ name: `TEST Inv ${label} ${stamp}`, ownerName: `Owner ${label}`, ownerEmail: `inv-${label}-${stamp}@example.com` })).body.restaurant.id as string;
     restaurantA = await mk('a');

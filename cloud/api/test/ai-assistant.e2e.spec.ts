@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -41,7 +41,7 @@ describe('JAMAN AI configuration, access and usage (BUG-055..058)', () => {
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email, password });
-    token = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email, password })).body.accessToken;
+    token = (await platformLogin(app, email, password)).body.accessToken;
     const plan = async (tier: string) =>
       (await platform('post', '/api/v1/plans').send({ tier, name: `TEST AI ${tier} ${stamp}`, priceMonthly: tier === 'PRO' ? 700000 : 500000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true } })).body.id as string;
     corePlanId = await plan('CORE');

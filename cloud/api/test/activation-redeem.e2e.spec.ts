@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 describe('Activation code redemption (the other half of activation-keys generation)', () => {
@@ -33,9 +33,7 @@ describe('Activation code redemption (the other half of activation-keys generati
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
 
-    const loginRes = await request(app.getHttpServer())
-      .post('/api/v1/platform-auth/login')
-      .send({ email: adminEmail, password: adminPassword });
+    const loginRes = await platformLogin(app, adminEmail, adminPassword);
     platformToken = loginRes.body.accessToken;
 
     const restaurantRes = await authed('post', '/api/v1/restaurants').send({
@@ -182,6 +180,33 @@ describe('Activation code redemption (the other half of activation-keys generati
       .post('/api/v1/activation/redeem')
       .send({ code, deviceType: 'KIOSK' });
     expect(res.status).toBe(410);
+  });
+
+  /**
+   * security-audit MED-02: 10 concurrent redemptions of the SAME code used to be able
+   * to all succeed (a plain read-then-write race), each minting its own device from a
+   * single-use key. Exactly one must win now.
+   */
+  it('exactly one of many concurrent redemptions of the same code succeeds', async () => {
+    const code = await generateKey('ANY');
+
+    const responses = await Promise.all(
+      Array.from({ length: 10 }, () => request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code, deviceType: 'POS' }))
+    );
+
+    // The actual security invariant: at most one caller may ever see success — this is
+    // what the old, non-atomic claim violated. A "loser" under 10-way concurrency in
+    // this test's small connection pool may occasionally surface as a transaction-pool
+    // timeout (500) rather than a clean 409 conflict; that's a test-harness artifact of
+    // the pool size, not a security-relevant outcome, so it isn't asserted strictly —
+    // what matters is that it is never a second 201.
+    const succeeded = responses.filter((r) => r.status === 201);
+    expect(succeeded).toHaveLength(1);
+    expect(responses.every((r) => r.status === 201 || r.status === 409 || r.status >= 500)).toBe(true);
+
+    const key = await prisma.runAsPlatform((tx) => tx.activationKey.findUnique({ where: { code } }));
+    expect(key!.status).toBe('REDEEMED');
+    expect(key!.redeemedByDeviceId).toBe(succeeded[0].body.device.id);
   });
 
   it('creates a SYSTEM audit record for a successful redemption', async () => {

@@ -1,6 +1,7 @@
 export * from './Logo';
 export * from './JamanvaarBrand';
 export * from './JamanvaarAuthLayout';
+export * from './JamanvaarKioskAuthLayout';
 export * from './assets';
 export * from './Button';
 export * from './StatusBadge';
@@ -22,6 +23,8 @@ export * from './SoundManager';
 export * from './VirtualKeyboard';
 export * from './ActivationWelcomeScreen';
 export * from './DeviceGateOverlay';
+export * from './ActivationNoticeBanner';
+export * from './ActivationHelpNote';
 export * from './PlatformNoticeBanner';
 export * from './useAiAccess';
 export * from './printElement';

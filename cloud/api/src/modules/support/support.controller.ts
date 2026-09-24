@@ -10,13 +10,13 @@ export class SupportController {
   constructor(private readonly support: SupportService) {}
 
   @Get('search')
-  search(@Query('q') query: string) {
-    return this.support.search(query);
+  search(@Query('q') query: string, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.support.search(query, actor.role as never);
   }
 
   @Get('diagnostics/:restaurantId')
-  diagnostics(@Param('restaurantId') restaurantId: string) {
-    return this.support.getDiagnostics(restaurantId);
+  diagnostics(@Param('restaurantId') restaurantId: string, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.support.getDiagnostics(restaurantId, actor.role as never);
   }
 
   @Post('resend-invite')

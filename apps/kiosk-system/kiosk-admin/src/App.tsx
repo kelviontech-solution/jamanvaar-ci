@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { OnboardingChecklistCard } from './components/OnboardingChecklistCard';
+import { CategoryModal } from './components/CategoryModal';
 import {
   AuditRepository,
   ComboRepository,
@@ -17,6 +18,7 @@ import {
   ReceiptRepository,
   ServiceRequestRepository,
   TableRepository,
+  TokenSequenceRepository,
   WelcomeScreenSettingsRepository
 } from '@jamanvaar/database';
 import {
@@ -48,6 +50,7 @@ import {
   JamanvaarLogo,
   JamanvaarAppBadge,
   JamanvaarAuthLayout,
+  APP_HERO_IMAGES,
   BrandHeader,
   Modal,
   OfflineBanner,
@@ -55,6 +58,8 @@ import {
   StatusBadge,
   ThermalReceiptView,
   ScreenErrorBoundary,
+  ActivationNoticeBanner,
+  ActivationHelpNote,
   JAMANVAARStartup,
   VirtualKeyboard,
   ActivationWelcomeScreen,
@@ -201,6 +206,18 @@ const SAMPLE_RECEIPT_ORDER = {
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()
 } as unknown as Order;
+
+/** Curated welcome-screen background photos (real, verified Unsplash images — restaurant ambience,
+ *  not dish close-ups). An admin can also upload their own or paste a URL instead. */
+const WELCOME_BACKGROUND_GALLERY: Array<{ label: string; url: string }> = [
+  { label: 'Warm Dining Room', url: 'https://images.unsplash.com/photo-1538334421852-687c439c92f4?auto=format&fit=crop&w=1800&q=80' },
+  { label: 'Elegant Table Setting', url: 'https://images.unsplash.com/photo-1667388969250-1c7220bf3f37?auto=format&fit=crop&w=1800&q=80' },
+  { label: 'Cozy Booth Seating', url: 'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=1800&q=80' },
+  { label: 'Modern Interior', url: 'https://images.unsplash.com/photo-1613274554329-70f997f5789f?auto=format&fit=crop&w=1800&q=80' },
+  { label: 'Warm Ambient Lighting', url: 'https://images.unsplash.com/photo-1729394405518-eaf2a0203aa7?auto=format&fit=crop&w=1800&q=80' },
+  { label: 'Fine Dining Setting', url: 'https://images.unsplash.com/photo-1570560258879-af7f8e1447ac?auto=format&fit=crop&w=1800&q=80' },
+  { label: 'Contemporary Dining', url: 'https://images.unsplash.com/photo-1636405189493-181ecf851006?auto=format&fit=crop&w=1800&q=80' }
+];
 
 export default function AdminApp() {
   const [activeTab, setActiveTab] = useState<AdminTab>('DASHBOARD');
@@ -360,6 +377,8 @@ export default function AdminApp() {
   // Modals
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [confirmingTokenReset, setConfirmingTokenReset] = useState(false);
   const [isAddComboModalOpen, setIsAddComboModalOpen] = useState(false);
   const [isAddCouponModalOpen, setIsAddCouponModalOpen] = useState(false);
   const [isDiagModalOpen, setIsDiagModalOpen] = useState(false);
@@ -394,6 +413,11 @@ export default function AdminApp() {
   const [photoSourceTab, setPhotoSourceTab] = useState<'UPLOAD' | 'URL' | 'LIBRARY'>('UPLOAD');
   const [uploadedImagePreview, setUploadedImagePreview] = useState<string | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string>('');
+
+  // Welcome screen background photo picker (Kiosk Admin only — separate from the dish Photo Hub above)
+  const [bgPhotoTab, setBgPhotoTab] = useState<'GALLERY' | 'UPLOAD' | 'URL'>('GALLERY');
+  const [bgUploadPreview, setBgUploadPreview] = useState<string | null>(null);
+  const [bgUrlInput, setBgUrlInput] = useState('');
 
   // Missing Data / Completeness Assistant Modal
   const [isMissingDataModalOpen, setIsMissingDataModalOpen] = useState(false);
@@ -444,10 +468,6 @@ export default function AdminApp() {
   const [activeKeyboardField, setActiveKeyboardField] = useState<
     null | { lang: 'hi' | 'gu'; field: 'name' | 'description' }
   >(null);
-
-  // Form states for Category
-  const [newCatName, setNewCatName] = useState('');
-  const [newCatIcon, setNewCatIcon] = useState('Utensils');
 
   // Form states for Combo — mainItemIds/etc. used to be hardcoded to
   // menuItems[0]/menuItems[1] regardless of what the admin actually picked;
@@ -524,10 +544,11 @@ export default function AdminApp() {
           ...prev,
           accountType: (data.accountType as 'BUSINESS' | 'INDIVIDUAL') ?? prev.accountType,
           businessType: data.businessType ?? prev.businessType,
-          pan: data.pan ?? prev.pan,
-          gst: data.gst ?? prev.gst,
-          cin: data.cin ?? prev.cin,
-          uidai: data.uidai ?? prev.uidai,
+          // security-audit MED-01: the server now returns these masked ("•••• 1234"),
+          // not the real value — pre-filling the edit form with a mask would let an
+          // operator accidentally resubmit the mask itself as the new PAN/GST/CIN/
+          // Aadhaar. Left blank so a resubmission always requires the real value, the
+          // same convention as a password/CVV field.
           contactName: data.contactName ?? prev.contactName,
           contactEmail: data.contactEmail ?? prev.contactEmail,
           contactPhone: data.contactPhone ?? prev.contactPhone,
@@ -984,28 +1005,6 @@ export default function AdminApp() {
     setNewItemDescGu('');
   };
 
-  const handleCreateCategory = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newCatName) return;
-
-    const created = MenuRepository.createCategory({
-      name: newCatName,
-      slug: newCatName.toLowerCase().replace(/\s+/g, '-'),
-      iconName: newCatIcon
-    });
-
-    AuditRepository.log({
-      username: 'admin',
-      action: 'CATEGORY_CREATED',
-      category: 'MENU',
-      details: `Created new category "${created.name}"`
-    });
-
-    showToast(`Created category: ${created.name}`);
-    setIsAddCategoryModalOpen(false);
-    setNewCatName('');
-  };
-
   const toggleComboItem = (
     setter: React.Dispatch<React.SetStateAction<string[]>>
   ) => (id: string) => {
@@ -1151,8 +1150,10 @@ export default function AdminApp() {
           heroHeadline="Self-Ordering Fleet."
           heroHighlightWord="Zero Touch Errors."
           heroDescription="Centralized terminal command, automatic catalog sync, real-time peripheral diagnostics and upsell recommendation tuning."
+          heroImages={APP_HERO_IMAGES.KIOSK_ADMIN}
         >
           <div className="space-y-5">
+            <ActivationNoticeBanner />
             {connectStep === 'CREDENTIALS' ? (
               <>
                 <div>
@@ -1259,6 +1260,7 @@ export default function AdminApp() {
                     ← Back
                   </button>
                 </form>
+                <ActivationHelpNote deviceNoun="terminal" />
               </>
             )}
           </div>
@@ -1299,6 +1301,7 @@ export default function AdminApp() {
         heroHeadline="Self-Ordering Fleet."
         heroHighlightWord="Zero Touch Errors."
         heroDescription="Centralized terminal command, automatic catalog sync, real-time peripheral diagnostics and upsell recommendation tuning."
+        heroImages={APP_HERO_IMAGES.KIOSK_ADMIN}
         capabilities={[
           { label: 'Terminal Fleet', icon: 'zap' },
           { label: 'Catalog Engine', icon: 'printer' },
@@ -2192,7 +2195,14 @@ export default function AdminApp() {
                   >
                     🚀 Publish
                   </Button>
-                  <Button variant="secondary" size="sm" onClick={() => setIsAddCategoryModalOpen(true)}>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      setEditingCategory(null);
+                      setIsAddCategoryModalOpen(true);
+                    }}
+                  >
                     + Category
                   </Button>
                   <Button
@@ -2277,12 +2287,30 @@ export default function AdminApp() {
                     All Categories ({menuItems.length})
                   </button>
                   {categories.map((c) => (
-                    <CategoryCard
-                      key={c.id}
-                      category={c}
-                      isSelected={selectedCategoryFilter === c.id}
-                      onSelect={() => setSelectedCategoryFilter(c.id)}
-                    />
+                    <div key={c.id} className="relative shrink-0">
+                      <CategoryCard
+                        category={c}
+                        isSelected={selectedCategoryFilter === c.id}
+                        onSelect={() => setSelectedCategoryFilter(c.id)}
+                        className="pr-9"
+                      />
+                      <button
+                        type="button"
+                        title={`Edit "${c.name}"`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingCategory(c);
+                          setIsAddCategoryModalOpen(true);
+                        }}
+                        className={`absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg flex items-center justify-center transition-colors ${
+                          selectedCategoryFilter === c.id
+                            ? 'text-white/70 hover:text-white hover:bg-white/10'
+                            : 'text-[#8C9BAE] hover:text-jaman-navy hover:bg-[#F4EFE6]'
+                        }`}
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   ))}
                 </div>
 
@@ -3323,6 +3351,101 @@ export default function AdminApp() {
                     </div>
 
                     <h3 className="font-bold text-base text-jaman-navy pt-3 border-t border-[#F3EFE6]">
+                      Logo & Colors
+                    </h3>
+                    <p className="text-[11px] text-[#4A5568] -mt-2">
+                      Applied to the on-screen and WhatsApp receipt, and the KOT preview here in Kiosk Admin. The logo also prints on the physical slip; thermal printers can only print in black &amp; white, so the color choices below are screen-only.
+                    </p>
+
+                    <div>
+                      <label className="block text-xs font-bold text-jaman-navy mb-1">Receipt Logo</label>
+                      <div className="flex items-center gap-3">
+                        <div className="w-16 h-16 rounded-xl border border-jaman-border bg-jaman-ivory flex items-center justify-center overflow-hidden shrink-0">
+                          {receiptForm.logoUrl ? (
+                            <img src={receiptForm.logoUrl} alt="Receipt logo" className="w-full h-full object-contain" />
+                          ) : (
+                            <span className="text-[10px] text-[#8C9BAE] text-center px-1">No logo</span>
+                          )}
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div
+                            className="border-2 border-dashed rounded-xl p-2.5 text-center cursor-pointer border-[#D4CBBF] bg-jaman-ivory hover:border-jaman-saffron hover:bg-[#FFF4ED]/30 transition-colors"
+                            onClick={() => document.getElementById('receipt-logo-upload-input')?.click()}
+                          >
+                            <input
+                              id="receipt-logo-upload-input"
+                              type="file"
+                              accept="image/png, image/jpeg, image/webp"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                if (file.size > 2 * 1024 * 1024) {
+                                  alert('Please select a logo image smaller than 2MB');
+                                  return;
+                                }
+                                const reader = new FileReader();
+                                reader.onload = (ev) => setReceiptForm({ ...receiptForm, logoUrl: ev.target?.result as string });
+                                reader.readAsDataURL(file);
+                              }}
+                            />
+                            <span className="text-[11px] font-bold text-jaman-navy">📁 Click to upload a logo (PNG/JPG, under 2MB)</span>
+                          </div>
+                          <input
+                            type="url"
+                            value={receiptForm.logoUrl?.startsWith('data:') ? '' : receiptForm.logoUrl || ''}
+                            onChange={(e) => setReceiptForm({ ...receiptForm, logoUrl: e.target.value || undefined })}
+                            placeholder="...or paste a logo image URL"
+                            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-jaman-navy mb-1.5">Receipt Accent Color</label>
+                        <div className="flex flex-wrap gap-2">
+                          {['#E66817', '#0B253A', '#059669', '#DC2626', '#7C3AED', '#D97706', '#0D9488', '#475569'].map((color) => (
+                            <button
+                              key={color}
+                              type="button"
+                              title={color}
+                              onClick={() => setReceiptForm({ ...receiptForm, accentColor: color })}
+                              className={`w-8 h-8 rounded-full border-2 transition-transform ${
+                                (receiptForm.accentColor || '#E66817') === color ? 'border-jaman-navy scale-110' : 'border-white shadow-sm'
+                              }`}
+                              style={{ backgroundColor: color }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-jaman-navy mb-1.5">KOT Preview Color</label>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { name: 'Navy', hex: '#0B253A' },
+                            { name: 'Charcoal', hex: '#1F2937' },
+                            { name: 'Forest', hex: '#14532D' },
+                            { name: 'Maroon', hex: '#7F1D1D' },
+                            { name: 'Slate', hex: '#334155' }
+                          ].map(({ name, hex }) => (
+                            <button
+                              key={hex}
+                              type="button"
+                              title={name}
+                              onClick={() => setReceiptForm({ ...receiptForm, kotThemeColor: hex })}
+                              className={`w-8 h-8 rounded-full border-2 transition-transform ${
+                                (receiptForm.kotThemeColor || '#0B253A') === hex ? 'border-jaman-navy scale-110' : 'border-white shadow-sm'
+                              }`}
+                              style={{ backgroundColor: hex }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <h3 className="font-bold text-base text-jaman-navy pt-3 border-t border-[#F3EFE6]">
                       Paper Dimension & Display Rules
                     </h3>
 
@@ -4279,6 +4402,62 @@ export default function AdminApp() {
                 </div>
               </div>
 
+              {/* Token Counter — previously the kiosk's order token (e.g. K-105) could only ever go
+                  up, resetting on its own at the start of a new business day; an admin had no way
+                  to force it back to 101 mid-day (e.g. after clearing test orders). */}
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
+                <div>
+                  <h4 className="font-bold text-jaman-navy">Order Token Counter</h4>
+                  <p className="text-xs text-[#4A5568]">
+                    The kiosk hands out sequential tokens (K-101, K-102...) that reset automatically each new business day. Use this only to force an early restart mid-day.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between gap-3 bg-jaman-ivory rounded-xl p-4 border border-jaman-border">
+                  <div>
+                    <p className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider">Next Kiosk Token</p>
+                    <p className="text-2xl font-black text-jaman-navy">{OrderRepository.nextTokenNumber('K')}</p>
+                    {TokenSequenceRepository.getLastReset('K') && (
+                      <p className="text-[10px] text-[#8C9BAE] mt-0.5">
+                        Last reset {new Date(TokenSequenceRepository.getLastReset('K')!).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+
+                  {confirmingTokenReset ? (
+                    <div className="text-right space-y-2">
+                      <p className="text-[11px] font-bold text-rose-600 max-w-[220px]">
+                        If orders were already placed today, new tokens may repeat one already used today. Continue?
+                      </p>
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setConfirmingTokenReset(false)}
+                          className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            TokenSequenceRepository.reset('K');
+                            setConfirmingTokenReset(false);
+                            showToast('Token counter reset — next order starts at K-101.');
+                          }}
+                          className="px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs"
+                        >
+                          Yes, Reset
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button variant="secondary" size="sm" onClick={() => setConfirmingTokenReset(true)}>
+                      Reset to 101
+                    </Button>
+                  )}
+                </div>
+              </div>
+
               <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
                 <div>
                   <h4 className="font-bold text-jaman-navy">Payment Gateway</h4>
@@ -4379,6 +4558,7 @@ export default function AdminApp() {
                         type="text"
                         value={paymentFormFields.uidai ?? ''}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, uidai: e.target.value }))}
+                        placeholder={paymentConnection?.uidai ? `On file: ${paymentConnection.uidai} — leave blank to keep it` : undefined}
                         className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
@@ -4389,6 +4569,7 @@ export default function AdminApp() {
                         required
                         value={paymentFormFields.pan}
                         onChange={(e) => setPaymentFormFields((p) => ({ ...p, pan: e.target.value }))}
+                        placeholder={paymentConnection?.pan ? `On file: ${paymentConnection.pan} — re-enter to confirm/update` : undefined}
                         className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
@@ -4566,6 +4747,162 @@ export default function AdminApp() {
                     />
                   )}
                 </div>
+              </div>
+
+              {/* Welcome Screen Background Photo — previously hardcoded to a single bundled PNG
+                  with no way to change it; owner requested being able to put up their own kiosk
+                  photo, pick from a preloaded gallery, and see the change reflected live. */}
+              <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
+                <div>
+                  <h4 className="font-bold text-jaman-navy">Welcome Screen Background Photo</h4>
+                  <p className="text-xs text-[#4A5568]">
+                    The full-screen photo behind the "Start Order" screen. Pick a preloaded photo, upload your own, or paste a link — it updates on the kiosk instantly.
+                  </p>
+                </div>
+
+                {(() => {
+                  const currentBg = WelcomeScreenSettingsRepository.getSettings().backgroundImageUrl;
+                  const applyBackground = (url: string | undefined) => {
+                    WelcomeScreenSettingsRepository.updateSettings({ backgroundImageUrl: url });
+                    showToast(url ? 'Welcome screen background updated.' : 'Reset to the default background.');
+                  };
+
+                  return (
+                    <>
+                      <div className="rounded-2xl overflow-hidden border border-jaman-border bg-jaman-ivory aspect-video max-w-md">
+                        <img
+                          src={currentBg || '/language-selection-bg.png'}
+                          alt="Current welcome screen background"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-2 border-b border-jaman-border pb-2">
+                        {(['GALLERY', 'UPLOAD', 'URL'] as const).map((tab) => (
+                          <button
+                            key={tab}
+                            type="button"
+                            onClick={() => setBgPhotoTab(tab)}
+                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                              bgPhotoTab === tab
+                                ? 'bg-jaman-navy text-white shadow-sm'
+                                : 'bg-jaman-ivory border border-jaman-border text-[#4A5568] hover:bg-[#F4EFE6]'
+                            }`}
+                          >
+                            {tab === 'GALLERY' ? '🎨 Preloaded Gallery' : tab === 'UPLOAD' ? '📁 Upload Your Own' : '🔗 Paste Image URL'}
+                          </button>
+                        ))}
+                      </div>
+
+                      {bgPhotoTab === 'GALLERY' && (
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                          {WELCOME_BACKGROUND_GALLERY.map((photo) => (
+                            <button
+                              key={photo.url}
+                              type="button"
+                              onClick={() => applyBackground(photo.url)}
+                              title={photo.label}
+                              className={`relative aspect-video rounded-xl overflow-hidden border-2 transition-all ${
+                                currentBg === photo.url ? 'border-jaman-saffron ring-2 ring-jaman-saffron/30' : 'border-jaman-border hover:border-jaman-saffron/50'
+                              }`}
+                            >
+                              <img src={photo.url} alt={photo.label} className="w-full h-full object-cover" />
+                              {currentBg === photo.url && (
+                                <span className="absolute inset-0 bg-jaman-navy/20 flex items-center justify-center">
+                                  <CheckCircle2 className="w-6 h-6 text-white drop-shadow-md" />
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {bgPhotoTab === 'UPLOAD' && (
+                        <div className="space-y-3">
+                          <div
+                            className={`border-2 border-dashed rounded-2xl p-5 text-center transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer ${
+                              bgUploadPreview ? 'border-emerald-400 bg-emerald-50/40' : 'border-[#D4CBBF] bg-jaman-ivory hover:border-jaman-saffron hover:bg-[#FFF4ED]/30'
+                            }`}
+                            onClick={() => document.getElementById('welcome-bg-upload-input')?.click()}
+                          >
+                            <input
+                              id="welcome-bg-upload-input"
+                              type="file"
+                              accept="image/png, image/jpeg, image/webp"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                if (file.size > 8 * 1024 * 1024) {
+                                  alert('Please select an image smaller than 8MB');
+                                  return;
+                                }
+                                const reader = new FileReader();
+                                reader.onload = (ev) => setBgUploadPreview(ev.target?.result as string);
+                                reader.readAsDataURL(file);
+                              }}
+                            />
+                            {bgUploadPreview ? (
+                              <p className="text-xs font-bold text-emerald-800">✓ Ready to apply — click "Apply Photo" below, or click here to choose a different file.</p>
+                            ) : (
+                              <p className="text-xs font-bold text-jaman-navy">Click to choose a photo from this device (landscape works best — 1920×1080 or wider)</p>
+                            )}
+                          </div>
+                          {bgUploadPreview && (
+                            <div className="flex justify-end gap-2">
+                              <Button variant="ghost" size="sm" onClick={() => setBgUploadPreview(null)}>Cancel</Button>
+                              <Button
+                                variant="accent"
+                                size="sm"
+                                className="bg-jaman-saffron hover:bg-[#d55b0e] text-white font-bold"
+                                onClick={() => {
+                                  applyBackground(bgUploadPreview!);
+                                  setBgUploadPreview(null);
+                                }}
+                              >
+                                Apply Photo
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {bgPhotoTab === 'URL' && (
+                        <div className="flex gap-2">
+                          <input
+                            type="url"
+                            value={bgUrlInput}
+                            onChange={(e) => setBgUrlInput(e.target.value)}
+                            placeholder="https://your-server.com/kiosk-background.jpg"
+                            className="flex-1 bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                          />
+                          <Button
+                            variant="accent"
+                            size="sm"
+                            disabled={!bgUrlInput.trim()}
+                            className="bg-jaman-saffron hover:bg-[#d55b0e] text-white font-bold shrink-0"
+                            onClick={() => {
+                              applyBackground(bgUrlInput.trim());
+                              setBgUrlInput('');
+                            }}
+                          >
+                            Apply
+                          </Button>
+                        </div>
+                      )}
+
+                      {currentBg && (
+                        <button
+                          type="button"
+                          onClick={() => applyBackground(undefined)}
+                          className="text-xs font-bold text-slate-500 hover:text-jaman-navy underline"
+                        >
+                          Reset to default background
+                        </button>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
 
               <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-6">
@@ -5516,35 +5853,24 @@ export default function AdminApp() {
         />
       )}
 
-      {/* MODAL: ADD CATEGORY */}
-      <Modal
+      {/* MODAL: ADD / EDIT CATEGORY */}
+      <CategoryModal
         isOpen={isAddCategoryModalOpen}
-        onClose={() => setIsAddCategoryModalOpen(false)}
-        title="Add Menu Category"
-      >
-        <form onSubmit={handleCreateCategory} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-jaman-navy mb-1">Category Name *</label>
-            <input
-              type="text"
-              required
-              value={newCatName}
-              onChange={(e) => setNewCatName(e.target.value)}
-              placeholder="E.g., Tandoori Platters, South Indian, Desserts"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="ghost" type="button" onClick={() => setIsAddCategoryModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" type="submit">
-              Create Category
-            </Button>
-          </div>
-        </form>
-      </Modal>
+        onClose={() => {
+          setIsAddCategoryModalOpen(false);
+          setEditingCategory(null);
+        }}
+        categoryToEdit={editingCategory}
+        onSaved={() => {
+          showToast(editingCategory ? `Updated category: ${editingCategory.name}` : 'Category created');
+          if (editingCategory) setEditingCategory(null);
+        }}
+        onDeleted={() => {
+          showToast(`Deleted category: ${editingCategory?.name ?? ''}`);
+          if (selectedCategoryFilter === editingCategory?.id) setSelectedCategoryFilter('ALL');
+          setEditingCategory(null);
+        }}
+      />
 
       {/* MODAL: ADD COUPON */}
       <Modal

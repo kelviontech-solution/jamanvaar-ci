@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -31,7 +31,7 @@ describe('Terminal display size (BUG-008)', () => {
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: staffEmail, password });
-    platformToken = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: staffEmail, password })).body.accessToken;
+    platformToken = (await platformLogin(app, staffEmail, password)).body.accessToken;
 
     const rest = await platform('post', '/api/v1/restaurants').send({ name: `TEST Display ${stamp}`, ownerName: 'Owner', ownerEmail });
     restaurantId = rest.body.restaurant.id;
@@ -49,11 +49,15 @@ describe('Terminal display size (BUG-008)', () => {
     const pos = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: posKey.body.code, deviceType: 'POS' });
     deviceToken = pos.body.deviceToken;
 
-    // A staff login (not owner or manager) issued by the owner.
+    // A staff login (not owner or manager) issued by the owner. Uses the POS device,
+    // not the POS_ADMIN one above — security-audit HIGH-04 now correctly refuses a
+    // STAFF login against an admin-console device type (POS_ADMIN/KIOSK_ADMIN), and
+    // this test's own point is to check a non-owner/manager role against the display
+    // endpoint, not to (mis)use POS_ADMIN as an incidental login vehicle for it.
     const staffEmailLogin = `ds-cashier-${stamp}@test.example.com`;
     const created = await request(app.getHttpServer()).post('/api/v1/tenant/me/users').set('Authorization', `Bearer ${ownerToken}`).send({ email: staffEmailLogin, fullName: 'Cashier One', role: 'STAFF', password: 'cashier-password-123' });
     expect(created.status).toBe(201);
-    const staffSession = await request(app.getHttpServer()).post('/api/v1/tenant-auth/login').send({ email: staffEmailLogin, password: 'cashier-password-123', restaurantId, deviceId: adminDevice.body.device.id, deviceToken: adminDevice.body.deviceToken, deviceType: 'POS_ADMIN' });
+    const staffSession = await request(app.getHttpServer()).post('/api/v1/tenant-auth/login').send({ email: staffEmailLogin, password: 'cashier-password-123', restaurantId, deviceId: pos.body.device.id, deviceToken: pos.body.deviceToken, deviceType: 'POS' });
     staffUserToken = staffSession.body.accessToken;
     expect(staffUserToken).toBeTruthy();
   }, 120_000);

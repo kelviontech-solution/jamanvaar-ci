@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { usePosStore } from '../../store/posStore';
+import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { db, ShiftRepository } from '@jamanvaar/database';
 import {
   X,
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export const PosCashDrawerModal: React.FC = () => {
-  const { isCashDrawerModalOpen, setIsCashDrawerModalOpen, currentUser } = usePosStore();
+  const { isCashDrawerModalOpen, setIsCashDrawerModalOpen, currentUser, requestManagerOverride } = usePosStore();
   const [type, setType] = useState<'CASH_IN' | 'CASH_OUT'>('CASH_IN');
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
@@ -27,21 +27,9 @@ export const PosCashDrawerModal: React.FC = () => {
   // and Cash Out is checked against the drawer's own current balance before it is even
   // attempted — the repository (ShiftRepository.addCashMovement) enforces the same limit itself
   // and returns null if this check is ever bypassed, so the drawer can never go negative either way.
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    const amt = parseFloat(amount) || 0;
-
-    if (!currentShift) { setError('No shift is open — open a shift before recording a cash movement.'); return; }
-    if (amt <= 0) { setError('Enter an amount greater than ₹0.'); return; }
-    if (!reason.trim()) { setError('Enter a reason for this movement.'); return; }
-    if (type === 'CASH_OUT' && amt > currentShift.expectedCash) {
-      setError(`Cash Out of ₹${amt} exceeds the drawer's current balance of ₹${currentShift.expectedCash}.`);
-      return;
-    }
-
+  const commitCashMovement = (amt: number) => {
     const recorded = ShiftRepository.addCashMovement(
-      currentShift.id,
+      currentShift!.id,
       type,
       amt,
       reason.trim(),
@@ -59,6 +47,37 @@ export const PosCashDrawerModal: React.FC = () => {
       setAmount('');
       setReason('');
     }, 1200);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    const amt = parseFloat(amount) || 0;
+
+    if (!currentShift) { setError('No shift is open — open a shift before recording a cash movement.'); return; }
+    if (amt <= 0) { setError('Enter an amount greater than ₹0.'); return; }
+    if (!reason.trim()) { setError('Enter a reason for this movement.'); return; }
+    if (type === 'CASH_OUT' && amt > currentShift.expectedCash) {
+      setError(`Cash Out of ₹${amt} exceeds the drawer's current balance of ₹${currentShift.expectedCash}.`);
+      return;
+    }
+
+    // security-audit MED-06: cash physically leaving the drawer used to need
+    // no more authority than any PIN that could log into this terminal at
+    // all — a cashier could record an unlimited "Cash Out" with any reason
+    // string. Cash In (adding float) stays ungated; it's a bookkeeping entry,
+    // not a way to remove money from the drawer.
+    if (type === 'CASH_OUT' && !isManagerOrAboveRole(currentUser)) {
+      requestManagerOverride(
+        'MANUAL_CASH_DRAWER',
+        'Manager Approval Required',
+        `${currentUser?.fullName || 'Cashier'} is recording a ₹${amt} Cash Out — "${reason.trim()}".`,
+        () => commitCashMovement(amt)
+      );
+      return;
+    }
+
+    commitCashMovement(amt);
   };
 
   return (

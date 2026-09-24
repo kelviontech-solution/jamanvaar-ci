@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
-import { Lock, WifiOff, ShieldOff, RefreshCw, Download } from 'lucide-react';
+import { Lock, WifiOff, RefreshCw, Download } from 'lucide-react';
 import { DeviceGate, type DeviceGateCode } from '@jamanvaar/sync';
 
 export interface DeviceGateOverlayProps {
@@ -17,17 +17,26 @@ const TITLES: Record<DeviceGateCode, string> = {
   APP_DISABLED: 'App not enabled',
   BRANCH_INACTIVE: 'Branch deactivated',
   DEVICE_LOCKED: 'Terminal locked',
+  // Never actually shown by this overlay: DeviceGate resolves this automatically (see its own comment) rather
+  // than locking the terminal. Kept here only because the type requires every DeviceGateCode to have a title.
   INVALID_DEVICE_CREDENTIAL: 'Device not recognised',
   UPDATE_REQUIRED: 'Update required',
   OFFLINE_LIMIT: 'Check-in required'
 };
 
 /**
- * Full-screen lock shown when the platform has stopped allowing this terminal
- * to run (app disabled, device locked or revoked, restaurant suspended,
- * subscription lapsed, or offline for too long). It is an overlay, not a
- * replacement for the app, so the app's sync loop keeps running underneath and
- * the screen goes away by itself as soon as the cloud accepts the terminal again.
+ * Full-screen lock shown when the platform has stopped this RESTAURANT (or this terminal by admin decision)
+ * from operating at all: the app is disabled, the restaurant is suspended or out of subscription, a branch was
+ * deactivated, an admin locked this specific terminal, a required update has not been installed, or the
+ * terminal has been offline too long. None of these are something the terminal can fix by itself, so a
+ * full-screen block that says exactly that (and who to contact) is the right, honest thing to show — the same
+ * way "this workspace has been suspended" pages work in other SaaS products.
+ *
+ * It deliberately never appears for a stale or revoked device credential (DEVICE_REVOKED,
+ * INVALID_DEVICE_CREDENTIAL): that is not a decision about this restaurant, it is just this one terminal's own
+ * saved sign-in going bad, fixed in seconds by activating again — DeviceGate handles that itself (see its own
+ * `onIdentityInvalid`), unbinding the terminal and returning it to its own ordinary activation screen instead
+ * of ever showing this overlay for it.
  */
 export const DeviceGateOverlay: React.FC<DeviceGateOverlayProps> = ({ appName, offlineCheckMs = 60_000 }) => {
   const state = useSyncExternalStore(
@@ -47,7 +56,7 @@ export const DeviceGateOverlay: React.FC<DeviceGateOverlayProps> = ({ appName, o
 
   if (!gate.locked || !gate.code) return null;
 
-  const Icon = gate.code === 'OFFLINE_LIMIT' ? WifiOff : gate.code === 'DEVICE_REVOKED' ? ShieldOff : Lock;
+  const Icon = gate.code === 'OFFLINE_LIMIT' ? WifiOff : Lock;
 
   return (
     <div

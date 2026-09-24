@@ -62,6 +62,13 @@ model PlatformUser {
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
 
+  // Login OTP (second factor, required on every sign-in): only the HMAC-keyed hash of the
+  // 6-digit code is ever stored, matching User.passwordResetHash's pattern.
+  loginOtpHash       String?
+  loginOtpExpiresAt  DateTime?
+  loginOtpSentAt     DateTime?
+  loginOtpAttempts   Int                @default(0)
+
   refreshTokens    PlatformRefreshToken[]
   assignedTickets  SupportTicket[]
   createdTickets   SupportTicket[] @relation("SupportTicketCreatedBy")
@@ -141,6 +148,7 @@ model Restaurant {
   syncEventLogs       SyncEventLog[]
   syncConflicts       SyncConflict[]
   offlineExtensions   OfflineExtension[]
+  qrTableLinks        QrTableLink[]
   sandboxes           RestaurantSandbox[]
   restoreJobs         BackupRestoreJob[]
   applicationEntitlements ApplicationEntitlement[]
@@ -1261,6 +1269,29 @@ model SyncedOrder {
   @@index([restaurantId, updatedAt])
   @@index([deviceId])
   @@index([branchId])
+}
+
+/// A table's QR ordering token, kept as its own indexed row (BUG-119) rather than searched for inside
+/// SyncedEntity's per-tenant JSON payloads. A guest's phone knows only the token printed on the table — it has
+/// no restaurant/tenant context yet — so this is the one lookup in the whole sync bridge a request with no
+/// tenant identity is allowed to make, and it must resolve in one indexed read across the whole platform, not
+/// a cross-tenant scan. Kept in step with DINING_TABLE's own entity-sync push (EntitySyncService), never
+/// written to directly by a client.
+model QrTableLink {
+  id           String     @id @default(uuid())
+  qrToken      String     @unique
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branchId     String?
+  tableId      String // the local app's own DiningTable.id
+  tableNumber  String
+  /// Mirrors DiningTable.qrStatus; a DISABLED or removed table is refused here even though the token itself
+  /// still resolves (so a stale sticker on a table gives a clear, honest answer, not a generic 404).
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([restaurantId])
 }
 
 // A generic sync mirror for domains that don't (yet) need Order's dedicated

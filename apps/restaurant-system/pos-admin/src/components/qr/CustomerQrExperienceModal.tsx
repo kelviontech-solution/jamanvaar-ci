@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { db } from '@jamanvaar/database';
+import { db, getGuestOrderBaseUrl } from '@jamanvaar/database';
 import { DiningTable } from '@jamanvaar/types';
 import {
   Smartphone,
@@ -36,9 +36,9 @@ export const CustomerQrExperienceModal: React.FC<CustomerQrExperienceModalProps>
     return tables.find((t) => t.tableNumber === selectedTableNumber) || tables[0];
   }, [tables, selectedTableNumber]);
 
-  const hostUrl = typeof window !== 'undefined' && window.location?.origin
-    ? window.location.origin
-    : 'http://localhost:5176';
+  // BUG-119: the app's configured public address, never window.location.origin (a preview built while the
+  // owner is on a LAN-only/localhost address must not show a link no guest's phone could ever reach).
+  const hostUrl = getGuestOrderBaseUrl();
 
   const tableGuestUrl = useMemo(() => {
     const tbl = currentTable || { tableNumber: selectedTableNumber, qrToken: '' };

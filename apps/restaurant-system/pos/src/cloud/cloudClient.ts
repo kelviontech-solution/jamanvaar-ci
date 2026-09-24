@@ -61,6 +61,22 @@ export function getPosRestaurantId(): string | null {
   }
 }
 
+/**
+ * Unbinds this terminal (BUG-145 follow-up): a device the cloud no longer recognises, or has revoked, was
+ * stuck forever behind the lock screen with no way back to activation. Clears the saved restaurant id and
+ * device credential and forgets the lock state, so the app falls back to asking for a fresh activation key.
+ */
+export function resetTerminal(): void {
+  try {
+    localStorage.removeItem(RESTAURANT_ID_KEY);
+    localStorage.removeItem(DEVICE_ID_KEY);
+    localStorage.removeItem(DEVICE_TOKEN_KEY);
+  } catch {
+    // Storage unavailable - nothing to clear, but the gate reset below still lets a reload retry cleanly.
+  }
+  DeviceGate.reset();
+}
+
 export async function activatePosDevice(code: string): Promise<void> {
   const res = await fetch(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
@@ -111,10 +127,10 @@ export async function getPaymentStatus(paymentId: string): Promise<{ status: str
   return data;
 }
 
-export async function createRefund(paymentId: string, amountPaise: number, reason: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
+export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
   const res = await deviceFetch(`/api/v1/payments/${paymentId}/refund`, {
     method: 'POST',
-    body: JSON.stringify({ amountPaise, reason })
+    body: JSON.stringify({ amountPaise, reason, requestedBy })
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {

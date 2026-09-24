@@ -5,9 +5,12 @@ import { captainDb, StaffRepository } from '@jamanvaar/database';
 import { EntitlementService } from '@jamanvaar/business';
 import {
   JamanvaarAuthLayout,
+  APP_HERO_IMAGES,
   JAMANVAARStartup,
   ActivationWelcomeScreen,
-  useAiAccess
+  useAiAccess,
+  ActivationNoticeBanner,
+  ActivationHelpNote
 } from '@jamanvaar/ui';
 import { isDeviceConnected, connectDevice, activateCaptainDevice, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
 import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog } from '@jamanvaar/sync';
@@ -299,6 +302,7 @@ export const App: React.FC = () => {
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
+          heroImages={APP_HERO_IMAGES.CAPTAIN}
         >
           <div className="space-y-5">
             <div>
@@ -335,6 +339,7 @@ export const App: React.FC = () => {
                 {!activationBusy && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
               </button>
             </form>
+            <ActivationHelpNote deviceNoun="tablet" />
           </div>
         </JamanvaarAuthLayout>
       </JAMANVAARStartup>
@@ -353,8 +358,10 @@ export const App: React.FC = () => {
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
+          heroImages={APP_HERO_IMAGES.CAPTAIN}
         >
           <div className="space-y-5">
+            <ActivationNoticeBanner />
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Connect this Tablet</h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
@@ -444,6 +451,7 @@ export const App: React.FC = () => {
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
+          heroImages={APP_HERO_IMAGES.CAPTAIN}
         >
           <div className="space-y-6">
             <div>

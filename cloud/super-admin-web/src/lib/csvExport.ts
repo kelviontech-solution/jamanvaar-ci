@@ -3,14 +3,17 @@ export interface CsvColumn<T> {
   value: (row: T) => string | number | null | undefined;
 }
 
-// B2-061: this escaped an internal quote but did nothing about CSV/formula injection
-// (CWE-1236) — a cell starting with `=`, `+`, `-` or `@` is evaluated as a formula the moment
-// the exported file is opened in Excel/Sheets. Every list page on this app (restaurants,
-// owners, devices, billing, reports, audit logs, activation keys) funnels through this one
-// function, so restaurant/owner names — free text a Super Admin enters when creating a
+// B2-061 / security-audit LOW-01: this escaped an internal quote but did nothing about
+// CSV/formula injection (CWE-1236) — a cell starting with `=`, `+`, `-` or `@` is evaluated as a
+// formula the moment the exported file is opened in Excel/Sheets. Every list page on this app
+// (restaurants, owners, devices, billing, reports, audit logs, activation keys) funnels through
+// this one function, so restaurant/owner names — free text a Super Admin enters when creating a
 // restaurant — reach it unsanitized against that class of attack. Prefixing a leading
 // formula-trigger character with `'` is the standard mitigation: the spreadsheet then renders
-// the value as literal text instead of evaluating it.
+// the value as literal text instead of evaluating it. (Kept self-contained rather than importing
+// the equivalent helper from `@jamanvaar/utils` — that barrel pulls in the local device database,
+// the exact class of unwanted side effect on Super Admin that B2-006 removed this session; see
+// `CopyButton.tsx`'s own deep-import comment for the same reason.)
 const FORMULA_TRIGGER_CHARS = new Set(['=', '+', '-', '@', '\t', '\r']);
 
 function escapeCsvCell(value: string | number | null | undefined): string {

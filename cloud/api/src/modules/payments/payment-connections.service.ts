@@ -44,9 +44,14 @@ export class PaymentConnectionsService {
         accountType: dto.accountType,
         businessType: dto.businessType ?? null,
         pan: dto.pan,
-        gst: dto.gst ?? null,
-        cin: dto.cin ?? null,
-        uidai: dto.uidai ?? null,
+        // security-audit MED-01: gst/cin/uidai are optional in the DTO, and the API now
+        // returns them masked (not the real value) for the resubmit form to pre-fill
+        // from — an omitted field on resubmit must therefore keep whatever real value
+        // is already on file, not silently null it out. `pan`/`contactName`/etc. stay
+        // full-replace: they are required by the DTO, so they're always re-supplied.
+        gst: dto.gst ?? existing?.gst ?? null,
+        cin: dto.cin ?? existing?.cin ?? null,
+        uidai: dto.uidai ?? existing?.uidai ?? null,
         contactName: dto.contactName,
         contactEmail: dto.contactEmail,
         contactPhone: dto.contactPhone,
@@ -116,14 +121,23 @@ export class PaymentConnectionsService {
     // Deliberately never includes the settlement account number, even
     // decrypted for its own owner — once encrypted at submission time, the
     // plaintext is never sent back over the wire again.
+    //
+    // security-audit MED-01: pan/gst/cin/uidai (Aadhaar) used to be returned in full,
+    // in plaintext, to OWNER/MANAGER — the same roles that can legitimately view this
+    // screen, but Aadhaar in particular is government-ID material that has no reason to
+    // round-trip over the wire again once submitted. Masked the same way the platform
+    // (Super Admin) view of this data already was. The client no longer pre-fills its
+    // edit form from these fields (see kiosk-admin's cloudClient.ts consumer) — a
+    // resubmission requires re-entering the real value, the same convention used for a
+    // password or CVV field.
     return {
       status: connection.status,
       accountType: connection.accountType,
       businessType: connection.businessType,
-      pan: connection.pan,
-      gst: connection.gst,
-      cin: connection.cin,
-      uidai: connection.uidai,
+      pan: maskLast4(connection.pan),
+      gst: maskLast4(connection.gst),
+      cin: maskLast4(connection.cin),
+      uidai: maskLast4(connection.uidai),
       contactName: connection.contactName,
       contactEmail: connection.contactEmail,
       contactPhone: connection.contactPhone,

@@ -34,6 +34,7 @@ import { OfflinePolicyModule } from './modules/offline-policy/offline-policy.mod
 import { SandboxesModule } from './modules/sandboxes/sandboxes.module';
 import { AiAssistantModule } from './modules/ai-assistant/ai-assistant.module';
 import { QrOrderingModule } from './modules/qr-ordering/qr-ordering.module';
+import { QrGuestOrderingModule } from './modules/qr-guest-ordering/qr-guest-ordering.module';
 import { ApplicationEntitlementsModule } from './modules/application-entitlements/application-entitlements.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { OrderSyncModule } from './modules/order-sync/order-sync.module';
@@ -83,6 +84,7 @@ import { validateEnv } from './config/env.validation';
     SandboxesModule,
     AiAssistantModule,
     QrOrderingModule,
+    QrGuestOrderingModule,
     ApplicationEntitlementsModule,
     PaymentsModule,
     OrderSyncModule,

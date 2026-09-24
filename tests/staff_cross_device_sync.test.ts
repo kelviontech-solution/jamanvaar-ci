@@ -44,6 +44,33 @@ describe('Staff cross-device sync payload (BUG-019/034/035)', () => {
     expect(matches[0].fullName).toBe('Rahul Sharma (Senior)');
   });
 
+  /**
+   * security-audit MED-12: "Remove staff" (StaffRepository.deleteUser) used to splice
+   * the row out of the LOCAL array only — invisible to entity-sync, since STAFF_USER
+   * has no delete/tombstone semantics, only create/update. A terminated employee's PIN
+   * kept authenticating on every other terminal that had already pulled their record.
+   * This is the push side of the fix in the test above: deleting locally must still
+   * produce a syncable, isActive:false payload — the record must not simply vanish.
+   */
+  it('deleting a staff member locally produces an isActive:false sync payload, not a vanished record', async () => {
+    const created = await StaffRepository.createUser({ username: 'temp', fullName: 'Temp Worker', roleId: 'role-cashier' });
+    const deleted = StaffRepository.deleteUser(created.id);
+    expect(deleted).toBe(true);
+
+    const local = db.users.find((u) => u.id === created.id);
+    expect(local).toBeDefined(); // still present, not spliced away — this is what makes it syncable at all
+    expect(local!.isActive).toBe(false);
+
+    const payload = StaffRepository.toSyncPayload(local!);
+    expect(payload.id).toBe(created.id);
+    expect(payload.isActive).toBe(false);
+
+    // The other side: a second "device" pulling this payload correctly deactivates too.
+    db.users = db.users.filter((u) => u.id !== created.id); // simulate a device that never had this user
+    StaffRepository.applyRemoteUser(payload);
+    expect(db.users.find((u) => u.id === created.id)?.isActive).toBe(false);
+  });
+
   it('a deactivated staff member syncs as inactive, and their PIN then stops working everywhere', () => {
     const remote = { id: 'usr-remote-3', username: 'off', fullName: 'Off Duty', roleId: 'role-cashier', isActive: false, pinHash: 'pinv1:deadbeefcafef00d' };
     StaffRepository.applyRemoteUser(remote);

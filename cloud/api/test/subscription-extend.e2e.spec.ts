@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -29,7 +29,7 @@ describe('Extend a subscription (BUG-003)', () => {
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password });
-    token = (await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: adminEmail, password })).body.accessToken;
+    token = (await platformLogin(app, adminEmail, password)).body.accessToken;
     const rest = await api('post', '/api/v1/restaurants').send({ name: `TEST Extend ${Date.now()}`, ownerName: 'Ext Owner', ownerEmail: `ext-owner-${Date.now()}@test.example.com` });
     restaurantId = rest.body.restaurant.id;
     const plan = await api('post', '/api/v1/plans').send({ tier: 'PRO', name: `TEST Extend Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true } });

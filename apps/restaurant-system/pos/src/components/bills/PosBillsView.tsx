@@ -326,7 +326,7 @@ export const PosBillsView: React.FC = () => {
         // to the existing local-only refund, unchanged.
         if (bill.paymentMethod === 'UPI' && bill.paymentTransactionId) {
           try {
-            await createRefund(bill.paymentTransactionId, Math.round(amt * 100), refundReasonInput);
+            await createRefund(bill.paymentTransactionId, Math.round(amt * 100), refundReasonInput, mgr);
           } catch (err) {
             const message = err instanceof CloudApiError ? err.message : 'Refund request failed';
             showToast(`✗ Refund failed for Invoice #${bill.orderNumber}: ${message}`);

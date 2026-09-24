@@ -74,7 +74,8 @@ export type ManagerOverrideAction =
   | 'PRICE_OVERRIDE'
   | 'REOPEN_BILL'
   | 'MANUAL_CASH_DRAWER'
-  | 'HOUSE_ACCOUNT_SETTLE';
+  | 'HOUSE_ACCOUNT_SETTLE'
+  | 'CLOSE_DAY';
 
 export type ServiceRequestType =
   | 'CALL_STAFF'

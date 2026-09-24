@@ -1,7 +1,7 @@
 import { INestApplication, ServiceUnavailableException } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
 
@@ -77,7 +77,7 @@ describe('Payment connection onboarding', () => {
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
 
-    const loginRes = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: adminEmail, password: adminPassword });
+    const loginRes = await platformLogin(app, adminEmail, adminPassword);
     platformToken = loginRes.body.accessToken;
 
     const ownerEmail = `pay-connection-owner-${Date.now()}@test.example.com`;
@@ -185,7 +185,36 @@ describe('Payment connection onboarding', () => {
     const res = await authed('get', '/api/v1/tenant/payment-connection', ownerToken);
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('PENDING_VERIFICATION');
-    expect(res.body.pan).toBe('ABCDE1234F');
+    // security-audit MED-01: pan/gst/cin/uidai are masked in the tenant's own view now
+    // (they used to round-trip in full plaintext) — real value confirmed via the DB row.
+    expect(res.body.pan).toBe('•••• 234F');
+    const stored = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId } }));
+    expect(stored.pan).toBe('ABCDE1234F');
+  });
+
+  /**
+   * security-audit MED-01: since the GET response now masks gst/cin/uidai, a resubmit
+   * form built from it can no longer safely pre-fill them — omitting an optional field
+   * on resubmit must keep the real value already on file, not null it out (a naive
+   * full-replace upsert would otherwise erase it the moment the operator makes any
+   * unrelated edit, e.g. correcting the contact phone).
+   */
+  it('resubmitting with gst/cin/uidai omitted keeps the previously-submitted real values, not null', async () => {
+    await authed('post', '/api/v1/tenant/payment-connection', ownerToken).send({ ...validSubmission, gst: '27ABCDE1234F1Z5', uidai: '234567890123' });
+
+    const stored1 = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId } }));
+    expect(stored1.gst).toBe('27ABCDE1234F1Z5');
+    expect(stored1.uidai).toBe('234567890123');
+
+    // Resubmit (e.g. to fix the contact phone) without gst/uidai in the body at all.
+    const { gst: _gst, uidai: _uidai, ...withoutOptional } = { ...validSubmission, contactPhone: '9999999999' } as Record<string, unknown>;
+    const res = await authed('post', '/api/v1/tenant/payment-connection', ownerToken).send(withoutOptional);
+    expect(res.status, JSON.stringify(res.body)).toBe(201);
+
+    const stored2 = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId } }));
+    expect(stored2.gst).toBe('27ABCDE1234F1Z5');
+    expect(stored2.uidai).toBe('234567890123');
+    expect(stored2.contactPhone).toBe('9999999999');
   });
 
   it('the settlement account number is actually encrypted at rest, not stored in plaintext', async () => {

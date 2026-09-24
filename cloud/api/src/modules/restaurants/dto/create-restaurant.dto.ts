@@ -19,11 +19,11 @@ export const createRestaurantSchema = z
     ownerName: z.string().trim().min(2, "Owner's name is required"),
     ownerEmail: z.string().trim().toLowerCase().email(),
     ownerPhone: z.string().trim().optional(),
-    // B2-005: was z.string().min(4) — an owner account (controls staff, devices and the
-    // cloud login for the whole restaurant) could be created with a 4-character password,
-    // confirmed live with 'abcd'. Same strength rule every other real credential in the
-    // product should use, not a weaker one just because Super Admin sets it on the owner's
-    // behalf at onboarding time.
+    // B2-005 / security-audit LOW-07: was z.string().min(4) — an owner account (controls
+    // staff, devices and the cloud login for the whole restaurant) could be created with a
+    // 4-character password, confirmed live with 'abcd'. Same strength rule every other real
+    // credential in the product uses (`strongPassword`), not a weaker one just because Super
+    // Admin sets it on the owner's behalf at onboarding time.
     ownerPassword: strongPassword.optional(),
 
     // Set by callers that immediately consume the activation token themselves

@@ -444,10 +444,22 @@ function Build-Installer {
 # Copy app_data and icons into each individual app folder
 Copy-Item -Recurse -Force $posDist (Join-Path $windowsDir "pos\app_data")
 Copy-Item -Force $iconPath (Join-Path $windowsDir "pos\icon.ico")
+# security-audit CRIT-03: JamanvaarLocalCore.exe is no longer committed to the repo
+# (it was found to be built from a stale, unauthenticated LAN-server source — see
+# tooling/local-runtime/README.md). $ErrorActionPreference is "Stop", so this script
+# now correctly aborts here instead of silently packaging a missing or stale binary.
+# Regenerate it per that README, and verify it requires the service key, before
+# re-running this release script.
 Copy-Item -Force (Join-Path $workspaceRoot "tooling\local-runtime\JamanvaarLocalCore.exe") (Join-Path $windowsDir "pos\JamanvaarLocalCore.exe")
 
 Copy-Item -Recurse -Force $posAdminDist (Join-Path $windowsDir "pos-admin\app_data")
 Copy-Item -Force $iconPath (Join-Path $windowsDir "pos-admin\icon.ico")
+# security-audit CRIT-03: JamanvaarLocalCore.exe is no longer committed to the repo
+# (it was found to be built from a stale, unauthenticated LAN-server source — see
+# tooling/local-runtime/README.md). $ErrorActionPreference is "Stop", so this script
+# now correctly aborts here instead of silently packaging a missing or stale binary.
+# Regenerate it per that README, and verify it requires the service key, before
+# re-running this release script.
 Copy-Item -Force (Join-Path $workspaceRoot "tooling\local-runtime\JamanvaarLocalCore.exe") (Join-Path $windowsDir "pos-admin\JamanvaarLocalCore.exe")
 
 Copy-Item -Recurse -Force $kioskDist (Join-Path $windowsDir "kiosk\app_data")
@@ -475,6 +487,12 @@ $posMachineDir = Join-Path $packagesDir "JAMANVAAR-POS-MACHINE"
 New-Item -ItemType Directory -Force -Path $posMachineDir | Out-Null
 Copy-Item -Force $posInstaller (Join-Path $posMachineDir "JAMANVAAR-POS-Setup.exe")
 Copy-Item -Force $posAdminInstaller (Join-Path $posMachineDir "JAMANVAAR-POS-Admin-Setup.exe")
+# security-audit CRIT-03: JamanvaarLocalCore.exe is no longer committed to the repo
+# (it was found to be built from a stale, unauthenticated LAN-server source — see
+# tooling/local-runtime/README.md). $ErrorActionPreference is "Stop", so this script
+# now correctly aborts here instead of silently packaging a missing or stale binary.
+# Regenerate it per that README, and verify it requires the service key, before
+# re-running this release script.
 Copy-Item -Force (Join-Path $workspaceRoot "tooling\local-runtime\JamanvaarLocalCore.exe") (Join-Path $posMachineDir "JamanvaarLocalCore.exe")
 
 $posReadme = @(

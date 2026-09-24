@@ -272,8 +272,18 @@ namespace Jamanvaar.${app.name}
   // Copy app_data, icon, and Local Core
   copyDir(app.dist, path.join(app.outDir, 'app_data'));
   fs.copyFileSync(ICON_PATH, path.join(app.outDir, 'icon.ico'));
-  if (app.startsCore && fs.existsSync(LOCAL_CORE_EXE)) {
-    fs.copyFileSync(LOCAL_CORE_EXE, path.join(app.outDir, 'JamanvaarLocalCore.exe'));
+  if (app.startsCore) {
+    // security-audit CRIT-03: this used to silently ship whatever stale, possibly
+    // unauthenticated binary happened to be sitting in tooling/local-runtime/ (see its
+    // README.md). The binary is no longer committed at all — regenerate it from the
+    // now-correctly-pointed sea-config.json before cutting a release, and verify the
+    // rebuilt exe actually requires the service key (see README.md) before shipping it.
+    if (fs.existsSync(LOCAL_CORE_EXE)) {
+      fs.copyFileSync(LOCAL_CORE_EXE, path.join(app.outDir, 'JamanvaarLocalCore.exe'));
+    } else {
+      console.warn(`  ⚠ JamanvaarLocalCore.exe not found — ${app.exeName} will ship WITHOUT the LAN local-core server.`);
+      console.warn('    See tooling/local-runtime/README.md to regenerate it before release, then re-run this script.');
+    }
   }
 
   console.log(`  ✓ Compiled application: ${app.exeName}`);
@@ -513,8 +523,12 @@ const posMachineDir = path.join(PACKAGES_DIR, 'JAMANVAAR-POS-MACHINE');
 ensureDir(posMachineDir);
 fs.copyFileSync(path.join(WINDOWS_DIR, 'pos', 'JAMANVAAR-POS-Setup.exe'), path.join(posMachineDir, 'JAMANVAAR-POS-Setup.exe'));
 fs.copyFileSync(path.join(WINDOWS_DIR, 'pos-admin', 'JAMANVAAR-POS-Admin-Setup.exe'), path.join(posMachineDir, 'JAMANVAAR-POS-Admin-Setup.exe'));
+// security-audit CRIT-03 — see the note at the other LOCAL_CORE_EXE copy above.
 if (fs.existsSync(LOCAL_CORE_EXE)) {
   fs.copyFileSync(LOCAL_CORE_EXE, path.join(posMachineDir, 'JamanvaarLocalCore.exe'));
+} else {
+  console.warn('  ⚠ JamanvaarLocalCore.exe not found — the POS machine package will ship WITHOUT the LAN local-core server.');
+  console.warn('    See tooling/local-runtime/README.md to regenerate it before release, then re-run this script.');
 }
 
 const posReadme = `================================================================

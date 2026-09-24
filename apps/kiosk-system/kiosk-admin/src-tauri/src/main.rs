@@ -5,21 +5,9 @@
 /// printers support).
 #[tauri::command]
 fn send_escpos_bytes(ip: String, port: u16, bytes: Vec<u8>) -> Result<(), String> {
-    use std::io::Write;
-    use std::net::TcpStream;
-    use std::time::Duration;
-
-    let addr = format!("{}:{}", ip, port);
-    let socket_addr = addr
-        .parse()
-        .map_err(|e| format!("Invalid printer address {}: {}", addr, e))?;
-    let mut stream = TcpStream::connect_timeout(&socket_addr, Duration::from_secs(5))
-        .map_err(|e| format!("Could not connect to printer at {}: {}", addr, e))?;
-    stream.set_write_timeout(Some(Duration::from_secs(5))).ok();
-    stream
-        .write_all(&bytes)
-        .map_err(|e| format!("Failed to send data to printer: {}", e))?;
-    Ok(())
+    // security-audit MED-15: delegates to the shared, allow-list-checked
+    // implementation — see printing::send_to_network_printer / is_allowed_printer_target.
+    printing::send_to_network_printer(&ip, port, &bytes)
 }
 
 // ---- Real printing (BUG-025 / BUG-026): shared native module, see packages/native/printing.rs -------------

@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { createTestApp, createTestPlatformUser } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
 
@@ -27,7 +27,7 @@ describe('Platform payments visibility', () => {
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
 
-    const loginRes = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: adminEmail, password: adminPassword });
+    const loginRes = await platformLogin(app, adminEmail, adminPassword);
     platformToken = loginRes.body.accessToken;
 
     const restaurantRes = await authed('post', '/api/v1/restaurants', platformToken).send({
@@ -93,7 +93,7 @@ describe('Platform payments visibility', () => {
 
   it('includes refunds on a payment that has one', async () => {
     const paymentId = await seedPayment(10000, 'SUCCESS');
-    await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 4000, reason: 'Partial refund for visibility test' });
+    await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 4000, reason: 'Partial refund for visibility test', requestedBy: 'Test Manager' });
 
     const res = await authed('get', `/api/v1/payments?restaurantId=${restaurantId}`, platformToken);
     const row = res.body.rows.find((r: { id: string }) => r.id === paymentId);

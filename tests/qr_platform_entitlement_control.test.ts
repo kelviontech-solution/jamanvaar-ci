@@ -100,7 +100,10 @@ describe('Super Admin platform control over QR ordering', () => {
     it('leaves QR ordering governed by the plan alone when the platform has never synced a control block', () => {
       delete (db.license as { platformQrControl?: unknown }).platformQrControl;
 
-      const check = QrOrderingRepository.verifyQrToken('12');
+      // security-audit MED-11: token is mandatory now — this test is about the
+      // entitlement/control-block dimension, not the token, so a real one is generated.
+      const { qrToken } = QrOrderingRepository.generateTableQr('12');
+      const check = QrOrderingRepository.verifyQrToken('12', qrToken);
       expect(check.isValid).toBe(true);
     });
   });

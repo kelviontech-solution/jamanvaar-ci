@@ -72,9 +72,9 @@ function remember(id: string): void {
 }
 
 function isRecipientFor(reader: ServiceMessageReader, msg: ServiceMessage): boolean {
-  // A guest at a self-order kiosk asking for help (BUG-137) goes to the people who staff the counter and the
-  // kiosk console - not to the kitchen or the waiters.
-  if (msg.kind === 'CALL_STAFF') return reader === 'POS' || reader === 'POS_ADMIN' || reader === 'KIOSK_ADMIN';
+  // A guest at a self-order kiosk asking for help (BUG-137) goes to the people who staff the counter, the
+  // kiosk console, and the captains actually walking the floor - not to the kitchen.
+  if (msg.kind === 'CALL_STAFF') return reader === 'POS' || reader === 'POS_ADMIN' || reader === 'KIOSK_ADMIN' || reader === 'CAPTAIN';
   if (msg.recipient === 'ALL') return true;
   if (msg.kind === 'BILL_REQUEST') return reader === 'POS' || reader === 'POS_ADMIN';
   switch (reader) {

@@ -19,6 +19,7 @@ packages/database/src/live_db.json.tmp
 packages/database/src/live_db.json.bak
 .superpowers/
 data/
+.playwright-mcp/
 
 # B2-002: one-off developer/debug scripts (e.g. a scratch script that seeds a platform
 # account with a hardcoded password, or pokes a DB field for local testing) must never be

@@ -10,7 +10,8 @@ import { ownerInviteEmail } from '../notifications/email-templates';
 import * as bcrypt from 'bcryptjs';
 import { EntitySyncService } from '../entity-sync/entity-sync.service';
 import { ImportMenuDto } from './dto/import-menu.dto';
-import { hasDevicesArea, PlatformRoleName, redactActivationCode } from '../../common/rbac/access';
+import { redactActivationKeyCode } from '../../common/security/activation-key-presentation';
+import { hasDevicesArea, PlatformRoleName, permissionsForRole } from '../../common/rbac/access';
 
 const ACTIVATION_TOKEN_TTL_DAYS = 7;
 
@@ -166,14 +167,16 @@ export class RestaurantsService {
   }
 
   /**
-   * B2-053: this used to always embed `devices` (full rows, including each terminal's
-   * `deviceTokenHash`) and `activationKeys` (full, unredacted `code`) regardless of who was
-   * asking. The deny-by-default guard on this route only checks the `restaurants` area — which
-   * Finance, Support and Read-Only all have — so a caller explicitly refused 403 on the direct
-   * `/devices` and `/activation-keys` endpoints got the exact same data back anyway, just nested
-   * one level down. `actorRole` now gates both relations the same way the direct endpoints do
-   * (see `hasDevicesArea`), and any code included is redacted by the one shared rule
-   * (`redactActivationCode`) both this endpoint and `/activation-keys` agree on.
+   * B2-053 / security-audit HIGH-01/HIGH-02: this used to always embed `devices` (full rows,
+   * including each terminal's `deviceTokenHash`) and `activationKeys` (full, unredacted `code`)
+   * regardless of who was asking. The deny-by-default guard on this route only checks the
+   * `restaurants` area — which Finance, Support and Read-Only all have — so a caller explicitly
+   * refused 403 on the direct `/devices` and `/activation-keys` endpoints got the exact same
+   * data back anyway, just nested one level down. `actorRole` now gates both relations the same
+   * way the direct endpoints do (see `hasDevicesArea`); the `devices` relation is also fetched
+   * through an explicit field `select` rather than `true`, so `deviceTokenHash` is never even
+   * read out of the database for this endpoint, and any code included is redacted by the one
+   * shared rule (`redactActivationKeyCode`) every endpoint that can return one agrees on.
    */
   async getRestaurantById(id: string, actorRole: PlatformRoleName = 'READ_ONLY') {
     const canSeeDevices = hasDevicesArea(actorRole);
@@ -199,7 +202,22 @@ export class RestaurantsService {
               updatedAt: true
             }
           },
-          devices: canSeeDevices,
+          // security-audit HIGH-01/HIGH-02: `devices: true` used to return the raw row,
+          // including `deviceTokenHash` — a device's bearer credential's hash. An explicit
+          // `select` means it's never even read out of the database for this endpoint,
+          // regardless of `canSeeDevices` below. `false` (no relation at all) when the
+          // caller's role has no devices area — same as `/devices` returning 403 directly.
+          devices: canSeeDevices
+            ? {
+                orderBy: { createdAt: 'desc' },
+                select: {
+                  id: true, restaurantId: true, branchId: true, type: true, appVersion: true, status: true,
+                  lastSeenAt: true, lastSyncAt: true, lastBackupAt: true, syncStatus: true, activatedAt: true,
+                  createdAt: true, updatedAt: true, name: true, ipAddress: true, macAddress: true, osPlatform: true,
+                  isLocked: true, lockReason: true, lockedAt: true, pendingSyncCount: true, syncError: true
+                }
+              }
+            : false,
           subscriptions: { orderBy: { createdAt: 'desc' }, include: { plan: true } },
           activationKeys: canSeeDevices ? { orderBy: { createdAt: 'desc' } } : false
         }
@@ -214,13 +232,12 @@ export class RestaurantsService {
       // shape; make the contract explicit rather than relying on that.
       return { ...restaurant, devices: [], activationKeys: [] };
     }
+    const canSeeFullCode = permissionsForRole(actorRole).devices === 'write';
     const now = new Date();
     return {
       ...restaurant,
-      // Never return deviceTokenHash (the stored hash of a terminal's own credential) to any
-      // client — same rule devices.service.ts's list()/getById()/revoke() already apply.
-      devices: (restaurant.devices ?? []).map((d) => ({ ...d, deviceTokenHash: undefined })),
-      activationKeys: (restaurant.activationKeys ?? []).map((k) => redactActivationCode(k, actorRole, now))
+      devices: restaurant.devices ?? [],
+      activationKeys: (restaurant.activationKeys ?? []).map((k) => redactActivationKeyCode(k, now, canSeeFullCode))
     };
   }
 

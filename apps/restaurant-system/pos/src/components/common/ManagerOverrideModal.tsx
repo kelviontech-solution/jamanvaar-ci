@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
-import { ManagerOverrideRepository } from '@jamanvaar/database';
+import { ManagerOverrideRepository, StaffRepository } from '@jamanvaar/database';
 import {
   ShieldAlert,
   X,
@@ -49,7 +49,12 @@ export const ManagerOverrideModal: React.FC = () => {
       pendingOverride.onApprove(managerName);
       closeOverrideModal();
     } else {
-      setErrorMessage('Authorization failed. Only a Manager or Admin PIN is permitted.');
+      const lockoutMs = StaffRepository.pinLockoutRemainingMs();
+      setErrorMessage(
+        lockoutMs > 0
+          ? `Too many wrong PINs. Try again in ${Math.ceil(lockoutMs / 1000)}s.`
+          : 'Authorization failed. Only a Manager or Admin PIN is permitted.'
+      );
       setPin('');
     }
   };

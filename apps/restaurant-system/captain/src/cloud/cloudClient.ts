@@ -58,6 +58,24 @@ export function getConnectedDeviceLabel(): string | null {
   }
 }
 
+/**
+ * Unbinds this terminal (BUG-145 follow-up): a device the cloud no longer recognises, or has revoked, was
+ * stuck forever behind the lock screen with no way back to activation, since `isDeviceConnected()` (and so
+ * the whole connect screen) is gated on `RESTAURANT_ID_KEY`, not the device token. Clearing it, along with
+ * the device id/token and label, is what actually returns this tablet to the connect/activation screen.
+ */
+export function resetTerminal(): void {
+  try {
+    localStorage.removeItem(RESTAURANT_ID_KEY);
+    localStorage.removeItem(DEVICE_LABEL_KEY);
+    localStorage.removeItem(DEVICE_ID_KEY);
+    localStorage.removeItem(DEVICE_TOKEN_KEY);
+  } catch {
+    // Storage unavailable - nothing to clear, but the gate reset below still lets a reload retry cleanly.
+  }
+  DeviceGate.reset();
+}
+
 function getStoredDeviceId(): string | null {
   try {
     return localStorage.getItem(DEVICE_ID_KEY);

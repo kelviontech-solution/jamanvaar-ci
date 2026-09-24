@@ -36,7 +36,12 @@ describe('Restaurant user "forgot password" (BUG-142)', () => {
       return true;
     });
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
-    const token = (await http().post('/api/v1/platform-auth/login').send({ email: adminEmail, password: adminPassword })).body.accessToken;
+    // Platform sign-in is now two-step (OTP emailed after password checks out); the spy above
+    // captures that email the same as any tenant "forgot password" email, so the same
+    // sent/lastCode() pair reads the code back.
+    const adminLoginRes = await http().post('/api/v1/platform-auth/login').send({ email: adminEmail, password: adminPassword });
+    const adminVerifyRes = await http().post('/api/v1/platform-auth/verify-otp').send({ otpToken: adminLoginRes.body.otpToken, otp: lastCode() });
+    const token = adminVerifyRes.body.accessToken;
     const created = await http().post('/api/v1/restaurants').set('Authorization', `Bearer ${token}`).send({ name: `TEST Pw Reset ${stamp}`, ownerName: 'Reset Owner', ownerEmail });
     restaurantId = created.body.restaurant.id;
     await http().post('/api/v1/tenant-auth/set-initial-password').send({ restaurantId, email: ownerEmail, activationToken: created.body.activationToken, newPassword: oldPassword });

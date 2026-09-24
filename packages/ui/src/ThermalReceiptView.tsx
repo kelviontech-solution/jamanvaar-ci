@@ -42,6 +42,8 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
   const thankYouMessage = config.thankYouMessage || 'Thank you for dining with us!';
   const footerMessage = config.footerMessage || 'Visit again.';
   const is80mm = paperSize === '80mm';
+  // On-screen/WhatsApp only — a physical thermal printout is black-and-white regardless of this.
+  const accent = config.accentColor || '#E66817';
 
   return (
     <div className={`flex flex-col items-center select-none ${className}`}>
@@ -87,7 +89,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
             <span className="font-black text-xs text-[#0B253A] uppercase tracking-wide">
               TAX INVOICE / RECEIPT
             </span>
-            <span className="bg-[#E66817]/10 text-[#E66817] px-2 py-0.5 rounded font-black text-xs">
+            <span className="px-2 py-0.5 rounded font-black text-xs" style={{ backgroundColor: `${accent}1a`, color: accent }}>
               TOKEN #{order.tokenNumber}
             </span>
           </div>
@@ -193,19 +195,30 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
             </div>
           )}
 
-          <div className="flex justify-between items-center text-sm font-black pt-1.5 border-t-2 border-[#1A202C] text-[#0B253A]">
+          <div className="flex justify-between items-center text-sm font-black pt-1.5 border-t-2 text-[#0B253A]" style={{ borderColor: accent }}>
             <span>TOTAL</span>
             <span className="text-base">₹{order.totalAmount ?? 0}</span>
           </div>
         </div>
 
-        {/* Payment Confirmation */}
-        <div className="py-2 border-b border-dashed border-[#A0AEC0] flex justify-between items-center text-[11px]">
-          <span className="font-bold text-[#4A5568]">PAID VIA:</span>
-          <span className="font-black text-emerald-800 uppercase bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-            {order.paymentMethod}
-          </span>
-        </div>
+        {/* Payment Confirmation — cash gets a distinct amber tone from digital payments, so a
+            cashier scanning a stack of receipts can tell which need to be reconciled against the
+            cash drawer at a glance (on-screen/WhatsApp only; the printed slip is monochrome). */}
+        {(() => {
+          const isCash = order.paymentMethod === 'CASH_AT_COUNTER' || order.paymentMethod === 'CASH';
+          return (
+            <div className="py-2 border-b border-dashed border-[#A0AEC0] flex justify-between items-center text-[11px]">
+              <span className="font-bold text-[#4A5568]">PAID VIA:</span>
+              <span
+                className={`font-black uppercase px-2 py-0.5 rounded border ${
+                  isCash ? 'text-amber-800 bg-amber-50 border-amber-200' : 'text-emerald-800 bg-emerald-50 border-emerald-200'
+                }`}
+              >
+                {order.paymentMethod}
+              </span>
+            </div>
+          );
+        })()}
 
         {/* Footer with Optional QR and Brand Credits */}
         <div className="text-center pt-3 text-[10px] space-y-1.5 text-[#718096]">
@@ -341,6 +354,7 @@ export function printThermalReceipt(
       </head>
       <body>
         <div class="text-center">
+          ${config?.logoUrl ? `<img src="${config.logoUrl}" style="max-height: 50px; max-width: 200px; margin: 0 auto 4px; display: block; filter: grayscale(1) contrast(1.4);" />` : ''}
           ${restaurantName ? `<div style="font-size: 16px; font-weight: 900; letter-spacing: 1px;">${restaurantName}</div>` : ''}
           ${address ? `<div style="font-size: 10px; color: #333;">${address}</div>` : ''}
           ${phone ? `<div style="font-size: 10px;">Phone: ${phone}</div>` : ''}

@@ -13,6 +13,7 @@ describe('DeviceGate', () => {
 
   beforeEach(() => {
     DeviceGate.reset();
+    DeviceGate.consumeDisconnectReason(); // drain any reason left over from a previous test
   });
 
   it('starts unlocked', () => {
@@ -32,9 +33,13 @@ describe('DeviceGate', () => {
     expect(DeviceGate.getState().reason).toBe('Stolen terminal');
   });
 
-  it('a revoked device (401) locks too', async () => {
+  // BUG-145 follow-up: a revoked device (or any rejected credential — see below) is this ONE terminal's own
+  // saved sign-in going bad, fixed in seconds by activating again, not a decision about the restaurant. It
+  // must never block the screen — see the identity-invalid tests further down.
+  it('a revoked device (401) does not lock the terminal', async () => {
+    DeviceGate.onIdentityInvalid(() => undefined);
     await DeviceGate.observe(json(401, { code: 'DEVICE_REVOKED', message: 'Revoked.' }));
-    expect(DeviceGate.getState().code).toBe('DEVICE_REVOKED');
+    expect(DeviceGate.getState().locked).toBe(false);
   });
 
   it('does not lock on a refusal without a known code (an ordinary permission error)', async () => {
@@ -154,11 +159,51 @@ describe('DeviceGate', () => {
   });
 
   // BUG-145: the cloud refuses an unknown/inactive device credential with INVALID_DEVICE_CREDENTIAL, which
-  // was not a lock code, so the terminal kept showing stale data with no sign that it had lost the cloud.
-  it('a refused device credential locks the terminal with a re-activate message (BUG-145)', async () => {
-    await DeviceGate.observe(json(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'Invalid device credential.' }));
-    const s = DeviceGate.getState();
-    expect(s).toMatchObject({ locked: true, code: 'INVALID_DEVICE_CREDENTIAL' });
-    expect(s.message).toMatch(/re-?activate/i);
+  // was not a lock code at all, so the terminal kept showing stale data with no sign it had lost the cloud.
+  //
+  // BUG-145 follow-up: locking the whole screen for this was itself wrong — a restaurant mid-service must
+  // never be walled off by something a fresh activation key fixes in seconds, and there was no way back to
+  // the activation screen from behind the lock at all ("going round and round"). It is now handled
+  // automatically: the app that registered `onIdentityInvalid` unbinds itself and reloads into its own
+  // ordinary activation screen, which explains why via `consumeDisconnectReason()` — never a lock screen.
+  describe('a rejected device credential (BUG-145 follow-up: never locks, always self-heals)', () => {
+    it('does not lock the terminal', async () => {
+      DeviceGate.onIdentityInvalid(() => undefined);
+      await DeviceGate.observe(json(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'Invalid device credential.' }));
+      expect(DeviceGate.getState().locked).toBe(false);
+    });
+
+    it('calls the app-registered handler exactly once, and remembers why for the activation screen', async () => {
+      let calls = 0;
+      DeviceGate.onIdentityInvalid(() => { calls++; });
+      await DeviceGate.observe(json(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'Invalid device credential.' }));
+      expect(calls).toBe(1);
+      expect(DeviceGate.consumeDisconnectReason()).toMatch(/re-?activate/i);
+    });
+
+    it('does not call the handler again for further 401s on the way out (the app is already reloading)', async () => {
+      let calls = 0;
+      DeviceGate.onIdentityInvalid(() => { calls++; });
+      await DeviceGate.observe(json(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'x' }));
+      await DeviceGate.observe(json(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'x' }));
+      await DeviceGate.observe(json(401, { code: 'DEVICE_REVOKED', message: 'x' }));
+      expect(calls).toBe(1);
+    });
+
+    it('a fresh reset() (a real reload landing on the activation screen) allows the next invalid credential to be handled again', async () => {
+      let calls = 0;
+      DeviceGate.onIdentityInvalid(() => { calls++; });
+      await DeviceGate.observe(json(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'x' }));
+      DeviceGate.reset();
+      await DeviceGate.observe(json(401, { code: 'INVALID_DEVICE_CREDENTIAL', message: 'x' }));
+      expect(calls).toBe(2);
+    });
+
+    it('the disconnect reason is read once and then gone (DEVICE_REVOKED passes through the server message)', async () => {
+      DeviceGate.onIdentityInvalid(() => undefined);
+      await DeviceGate.observe(json(401, { code: 'DEVICE_REVOKED', message: 'Please re-activate.' }));
+      expect(DeviceGate.consumeDisconnectReason()).toBe('Please re-activate.');
+      expect(DeviceGate.consumeDisconnectReason()).toBeNull();
+    });
   });
 });

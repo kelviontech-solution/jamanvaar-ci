@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import * as bcrypt from 'bcryptjs';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp } from './helpers';
+import { createTestApp, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -41,7 +41,7 @@ describe('Platform RBAC (BUG-082/083/084)', () => {
         data: { email: emails[role], passwordHash: await bcrypt.hash(password, 4), fullName: `RBAC ${role}`, role, status: 'ACTIVE' }
       });
       userIds[role] = user.id;
-      const login = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: emails[role], password });
+      const login = await platformLogin(app, emails[role], password);
       tokens[role] = login.body.accessToken;
     }
   });
@@ -101,7 +101,7 @@ describe('Platform RBAC (BUG-082/083/084)', () => {
     expect(me.body.permissions.restaurants).toBe('read');
     expect(me.body.permissions.devices).toBeUndefined();
 
-    const login = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: emails.READ_ONLY, password });
+    const login = await platformLogin(app, emails.READ_ONLY, password);
     expect(login.body.user.permissions.billing).toBe('read');
   });
 
@@ -129,7 +129,7 @@ describe('Platform RBAC (BUG-082/083/084)', () => {
       data: { email: `rbac-second-owner-${stamp}@example.com`, passwordHash: await bcrypt.hash(password, 4), fullName: 'Second Owner', role: 'PLATFORM_OWNER', status: 'ACTIVE' }
     });
     emails.SECOND = second.email;
-    const login = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: second.email, password });
+    const login = await platformLogin(app, second.email, password);
     tokens.SECOND = login.body.accessToken;
 
     const disableOwner = await as('SECOND', 'patch', `/api/v1/platform-users/${userIds.PLATFORM_OWNER}/disable`);
@@ -140,7 +140,7 @@ describe('Platform RBAC (BUG-082/083/084)', () => {
     // Disabling ended the owner's sessions (BUG-093), so a re-enabled owner has to sign in again.
     const staleOwner = await as('PLATFORM_OWNER', 'get', '/api/v1/platform/me');
     expect(staleOwner.status).toBe(401);
-    const relogin = await request(app.getHttpServer()).post('/api/v1/platform-auth/login').send({ email: emails.PLATFORM_OWNER, password });
+    const relogin = await platformLogin(app, emails.PLATFORM_OWNER, password);
     tokens.PLATFORM_OWNER = relogin.body.accessToken;
     await prisma.platformUser.update({ where: { id: second.id }, data: { status: 'DISABLED' } });
     const lastOwnerDemote = await as('PLATFORM_OWNER', 'patch', `/api/v1/platform-users/${userIds.PLATFORM_OWNER}/role`).send({ role: 'SUPER_ADMIN' });
