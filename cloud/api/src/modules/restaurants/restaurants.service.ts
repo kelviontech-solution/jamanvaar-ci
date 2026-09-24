@@ -12,6 +12,8 @@ import { EntitySyncService } from '../entity-sync/entity-sync.service';
 import { ImportMenuDto } from './dto/import-menu.dto';
 import { redactActivationKeyCode } from '../../common/security/activation-key-presentation';
 import { hasDevicesArea, PlatformRoleName, permissionsForRole } from '../../common/rbac/access';
+import { generateRestaurantCode } from './restaurant-code.util';
+import { normalizeIndianPhone } from '../../common/validation/phone';
 
 const ACTIVATION_TOKEN_TTL_DAYS = 7;
 
@@ -33,21 +35,32 @@ export class RestaurantsService {
    */
   async createRestaurant(dto: CreateRestaurantDto, actor: PlatformUser) {
     const result = await this.prisma.runAsPlatform(async (tx) => {
-      const restaurant = await tx.restaurant.create({
-        data: {
-          name: dto.name,
-          legalName: dto.legalName,
-          gstin: dto.gstin,
-          fssaiNumber: dto.fssaiNumber,
-          address: dto.address,
-          city: dto.city,
-          state: dto.state,
-          country: dto.country,
-          timezone: dto.timezone,
-          currency: dto.currency,
-          defaultLanguage: dto.defaultLanguage
+      const restaurantCode = generateRestaurantCode(dto.mobile);
+      let restaurant;
+      try {
+        restaurant = await tx.restaurant.create({
+          data: {
+            name: dto.name,
+            legalName: dto.legalName,
+            gstin: dto.gstin,
+            fssaiNumber: dto.fssaiNumber,
+            address: dto.address,
+            city: dto.city,
+            state: dto.state,
+            country: dto.country,
+            timezone: dto.timezone,
+            currency: dto.currency,
+            defaultLanguage: dto.defaultLanguage,
+            mobile: normalizeIndianPhone(dto.mobile),
+            restaurantCode
+          }
+        });
+      } catch (err) {
+        if (err instanceof Error && 'code' in err && (err as { code?: string }).code === 'P2002') {
+          throw new ConflictException(`A restaurant is already registered with mobile number ${normalizeIndianPhone(dto.mobile)}`);
         }
-      });
+        throw err;
+      }
 
       const branch = await tx.branch.create({
         data: {

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { isValidGstinFormat, isValidFssaiFormat, gstinStateCodeMatches } from '../../../common/validation/gstin';
+import { isValidIndianPhone } from '../../../common/validation/phone';
 import { strongPassword } from '../../../common/validation/password';
 
 export const createRestaurantSchema = z
@@ -12,6 +13,7 @@ export const createRestaurantSchema = z
     city: z.string().trim().optional(),
     state: z.string().trim().optional(),
     country: z.string().trim().default('India'),
+    mobile: z.string().trim().refine(isValidIndianPhone, 'A valid 10-digit Indian mobile number is required'),
     timezone: z.string().trim().default('Asia/Kolkata'),
     currency: z.string().trim().default('INR'),
     defaultLanguage: z.string().trim().default('en'),

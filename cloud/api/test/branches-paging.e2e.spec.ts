@@ -25,7 +25,7 @@ describe('Branches list is paged, searched and filtered on the server (BUG-047)'
     await createTestPlatformUser(prisma, { email, password });
     token = (await platformLogin(app, email, password)).body.accessToken;
     const r = await auth(request(app.getHttpServer()).post('/api/v1/restaurants')).send({
-      name: `TEST Branch Paging ${stamp}`, ownerName: 'Owner', ownerEmail: `branch-paging-${stamp}@example.com`
+      name: `TEST Branch Paging ${stamp}`, mobile: `9${String(stamp).slice(-9)}`, ownerName: 'Owner', ownerEmail: `branch-paging-${stamp}@example.com`
     });
     restaurantId = r.body.restaurant.id;
     for (const [name, code] of [['Alpha Kitchen', 'AK'], ['Beta Bistro', 'BB'], ['Gamma Grill', 'GG']]) {

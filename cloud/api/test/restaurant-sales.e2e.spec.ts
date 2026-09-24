@@ -40,7 +40,7 @@ describe('Restaurant sales report for Super Admin (BUG-041)', () => {
     await createTestPlatformUser(prisma, { email, password });
     token = (await platformLogin(app, email, password)).body.accessToken;
     restaurantId = (await auth(request(app.getHttpServer()).post('/api/v1/restaurants')).send({
-      name: `TEST Sales ${stamp}`, ownerName: 'Owner', ownerEmail: `sales-${stamp}@example.com`
+      name: `TEST Sales ${stamp}`, mobile: `9${String(stamp).slice(-9)}`, ownerName: 'Owner', ownerEmail: `sales-${stamp}@example.com`
     })).body.restaurant.id;
     branchId = (await auth(request(app.getHttpServer()).post('/api/v1/branches')).send({ restaurantId, name: 'Sales Branch', code: 'SB' })).body.id;
 
@@ -89,7 +89,7 @@ describe('Restaurant sales report for Super Admin (BUG-041)', () => {
   });
 
   it('says so when a restaurant has synced nothing, instead of showing zeros as if they were real', async () => {
-    const other = (await auth(request(app.getHttpServer()).post('/api/v1/restaurants')).send({ name: `TEST Sales Empty ${stamp}`, ownerName: 'O2', ownerEmail: `sales-empty-${stamp}@example.com` })).body.restaurant.id;
+    const other = (await auth(request(app.getHttpServer()).post('/api/v1/restaurants')).send({ name: `TEST Sales Empty ${stamp}`, mobile: `8${String(stamp).slice(-9)}`, ownerName: 'O2', ownerEmail: `sales-empty-${stamp}@example.com` })).body.restaurant.id;
     const res = await auth(request(app.getHttpServer()).get(`/api/v1/platform/reports/restaurants/${other}/sales`));
     expect(res.body.hasData).toBe(false);
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: other } }));

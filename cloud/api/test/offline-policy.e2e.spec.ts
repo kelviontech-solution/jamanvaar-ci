@@ -51,6 +51,7 @@ describe('Emergency offline extensions (BUG-078)', () => {
     const mk = async (label: string) => {
       const res = await auth(request(app.getHttpServer()).post('/api/v1/restaurants')).send({
         name: `TEST Offline ${label} ${stamp}`,
+        mobile: `9${String(stamp).slice(-8)}${label.charCodeAt(0) % 10}`,
         ownerName: `Owner ${label}`,
         ownerEmail: `offline-${label}-${stamp}@example.com`
       });
@@ -102,7 +103,7 @@ describe('Emergency offline extensions (BUG-078)', () => {
 
   it('lists terminals by the real offline rule: approaching the 7-day limit, and already locked unless an extension covers them (BUG-077)', async () => {
     const day = 86400_000;
-    const fresh = (await auth(request(app.getHttpServer()).post('/api/v1/restaurants')).send({ name: `TEST Offline fresh ${stamp}`, ownerName: 'O3', ownerEmail: `offline-fresh-${stamp}@example.com` })).body.restaurant.id as string;
+    const fresh = (await auth(request(app.getHttpServer()).post('/api/v1/restaurants')).send({ name: `TEST Offline fresh ${stamp}`, mobile: `7${String(stamp).slice(-9)}`, ownerName: 'O3', ownerEmail: `offline-fresh-${stamp}@example.com` })).body.restaurant.id as string;
     const mk = (rid: string, name: string, ago: number) =>
       prisma.runAsPlatform((tx) => tx.device.create({ data: { restaurantId: rid, type: 'POS', status: 'ACTIVE', name, lastSeenAt: new Date(Date.now() - ago) } as never }));
     await mk(fresh, 'seen-1d', 1 * day);

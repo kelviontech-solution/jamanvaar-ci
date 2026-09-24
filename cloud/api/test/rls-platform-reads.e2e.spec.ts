@@ -25,7 +25,7 @@ describe('Platform-wide reads work under row-level security (BUG-075)', () => {
     await createTestPlatformUser(prisma, { email, password });
     token = (await platformLogin(app, email, password)).body.accessToken;
     restaurantId = (await request(app.getHttpServer()).post('/api/v1/restaurants').set('Authorization', `Bearer ${token}`).send({
-      name: `TEST RLS Reads ${stamp}`, ownerName: 'Owner', ownerEmail: `rls-reads-${stamp}@example.com`
+      name: `TEST RLS Reads ${stamp}`, mobile: `9${String(stamp).slice(-9)}`, ownerName: 'Owner', ownerEmail: `rls-reads-${stamp}@example.com`
     })).body.restaurant.id;
     await prisma.runAsPlatform((tx) => tx.device.create({ data: { restaurantId, type: 'POS', status: 'ACTIVE', lastSeenAt: new Date() } }));
   }, 60_000);

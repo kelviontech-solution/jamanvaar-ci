@@ -62,6 +62,7 @@ describe('Restaurant management (Phase 1a)', () => {
         name: restaurantName,
         city: 'Ahmedabad',
         state: 'Gujarat',
+        mobile: '9876500001',
         ownerName: 'Test Owner',
         ownerEmail: `owner-${Date.now()}@test.example.com`,
         ownerPhone: '9999999999'
@@ -77,6 +78,85 @@ describe('Restaurant management (Phase 1a)', () => {
     expect(res.body.owner).not.toHaveProperty('passwordHash');
 
     createdRestaurantIds.push(res.body.restaurant.id);
+  });
+
+  it('rejects restaurant creation with no mobile number', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/restaurants')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: `${restaurantName} No Mobile`,
+        ownerName: 'Test Owner',
+        ownerEmail: `owner-nomobile-${Date.now()}@test.example.com`
+      });
+    expect(res.status).toBe(400);
+  });
+
+  it('generates a JM-prefixed restaurantCode from the mobile number', async () => {
+    const mobile = '9876543210';
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/restaurants')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: `${restaurantName} With Mobile`,
+        mobile,
+        ownerName: 'Test Owner',
+        ownerEmail: `owner-code-${Date.now()}@test.example.com`
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.restaurant.restaurantCode).toBe('JM9876543210');
+    expect(res.body.restaurant.mobile).toBe(mobile);
+    expect(res.body.restaurant.restaurantCodeIsFallback).toBe(false);
+    createdRestaurantIds.push(res.body.restaurant.id);
+  });
+
+  it('assigns a different code to a second restaurant with a different mobile', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/restaurants')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: `${restaurantName} Second`,
+        mobile: '9123456780',
+        ownerName: 'Test Owner',
+        ownerEmail: `owner-second-${Date.now()}@test.example.com`
+      });
+    expect(res.status).toBe(201);
+    expect(res.body.restaurant.restaurantCode).toBe('JM9123456780');
+    createdRestaurantIds.push(res.body.restaurant.id);
+  });
+
+  it('rejects two restaurants sharing the same mobile number (same code would collide)', async () => {
+    const mobile = '9111122223';
+    const first = await request(app.getHttpServer())
+      .post('/api/v1/restaurants')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: `${restaurantName} Dup A`, mobile, ownerName: 'Owner A', ownerEmail: `owner-dupa-${Date.now()}@test.example.com` });
+    expect(first.status).toBe(201);
+    createdRestaurantIds.push(first.body.restaurant.id);
+
+    const second = await request(app.getHttpServer())
+      .post('/api/v1/restaurants')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: `${restaurantName} Dup B`, mobile, ownerName: 'Owner B', ownerEmail: `owner-dupb-${Date.now()}@test.example.com` });
+    expect(second.status).toBe(409);
+  });
+
+  it('restaurantCode cannot be changed via the update endpoint', async () => {
+    const create = await request(app.getHttpServer())
+      .post('/api/v1/restaurants')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: `${restaurantName} Immutable`, mobile: '9988776655', ownerName: 'Owner', ownerEmail: `owner-immut-${Date.now()}@test.example.com` });
+    createdRestaurantIds.push(create.body.restaurant.id);
+    const originalCode = create.body.restaurant.restaurantCode;
+
+    const update = await request(app.getHttpServer())
+      .patch(`/api/v1/restaurants/${create.body.restaurant.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ restaurantCode: 'JM0000000000', name: `${restaurantName} Renamed` });
+    expect(update.status).toBe(200);
+    expect(update.body.restaurantCode).toBe(originalCode);
+    expect(update.body.name).toBe(`${restaurantName} Renamed`);
   });
 
   it('lists restaurants including the one just created', async () => {
