@@ -89,4 +89,27 @@ describe('Multi-family subscriptions (Phase 2)', () => {
     });
     expect(res.status).toBe(409);
   });
+
+  it('an activation key can be generated for CAPTAIN (from the RESTAURANT/PRO sub, created before the KIOSK sub) and for KIOSK (from the KIOSK sub) on the same restaurant', async () => {
+    // CAPTAIN is in PRO tier's default apps but not CORE's — the KIOSK subscription (CORE
+    // tier) was created *after* the RESTAURANT one in this file's beforeAll/earlier tests, so
+    // this only passes if isAppEnabled aggregates across every active subscription rather than
+    // only checking the most recently created one.
+    const captainKey = await auth(request(app.getHttpServer()).post('/api/v1/activation-keys')).send({
+      restaurantId, allowedDeviceType: 'CAPTAIN', expiresAt: inDays(1)
+    });
+    expect(captainKey.status).toBe(201);
+
+    // KIOSK/KIOSK_ADMIN aren't in CORE tier's default app list, so enable KIOSK explicitly on
+    // the kiosk subscription first (Super Admin's existing per-app override path).
+    const subsList = await auth(request(app.getHttpServer()).get('/api/v1/subscriptions'));
+    const kioskSubscriptionId = subsList.body.find((s: { planId: string }) => s.planId === kioskPlanId).id;
+    const enableKiosk = await auth(request(app.getHttpServer()).patch(`/api/v1/subscriptions/${kioskSubscriptionId}/applications/KIOSK`)).send({ enabled: true });
+    expect(enableKiosk.status).toBe(200);
+
+    const kioskKey = await auth(request(app.getHttpServer()).post('/api/v1/activation-keys')).send({
+      restaurantId, allowedDeviceType: 'KIOSK', expiresAt: inDays(1)
+    });
+    expect(kioskKey.status).toBe(201);
+  });
 });

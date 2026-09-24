@@ -129,18 +129,23 @@ export class ApplicationEntitlementsService {
    * restaurant? Fails closed — no subscription, no row, or an explicitly
    * disabled row all mean "no", the same way an unset RLS context denies
    * every row rather than defaulting to visible.
+   *
+   * Phase 2: a restaurant may hold more than one active subscription at once (one per
+   * product family — see SubscriptionsService.assign), so this checks every active/trial/
+   * past-due subscription and returns true if ANY of them grants the app, not just whichever
+   * was created most recently.
    */
   async isAppEnabled(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<boolean> {
-    const sub = await tx.subscription.findFirst({
+    const subs = await tx.subscription.findMany({
       where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] } },
-      orderBy: { createdAt: 'desc' }
+      select: { id: true }
     });
-    if (!sub) return false;
+    if (subs.length === 0) return false;
 
-    const row = await tx.applicationEntitlement.findUnique({
-      where: { subscriptionId_appCode: { subscriptionId: sub.id, appCode } }
+    const row = await tx.applicationEntitlement.findFirst({
+      where: { subscriptionId: { in: subs.map((s) => s.id) }, appCode, enabled: true }
     });
-    return row?.enabled ?? false;
+    return row !== null;
   }
 
   /** Throws a clear 403 instead of a bare boolean when the caller wants to fail the request outright. */
