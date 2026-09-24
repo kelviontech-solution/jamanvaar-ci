@@ -35,7 +35,12 @@ export class SubscriptionsService {
     return sub;
   }
 
-  /** One active-lifecycle subscription per restaurant; a restaurant that already has one must use change-plan/renew instead. */
+  /**
+   * One active-lifecycle subscription per (restaurant, product family) — a restaurant may
+   * hold a RESTAURANT-family subscription and a KIOSK-family one concurrently (Phase 2), but
+   * not two of the same family; a restaurant that already has one in this plan's family must
+   * use change-plan/renew instead.
+   */
   async assign(dto: AssignSubscriptionDto, actor: PlatformUser) {
     return this.prisma.runAsPlatform(async (tx) => {
       const restaurant = await tx.restaurant.findFirst({ where: { id: dto.restaurantId, deletedAt: null } });
@@ -45,10 +50,16 @@ export class SubscriptionsService {
       if (!plan) throw new NotFoundException('Plan not found');
 
       const existing = await tx.subscription.findFirst({
-        where: { restaurantId: dto.restaurantId, status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] } }
+        where: {
+          restaurantId: dto.restaurantId,
+          status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] },
+          plan: { productFamily: plan.productFamily }
+        }
       });
       if (existing) {
-        throw new ConflictException('Restaurant already has an active subscription — use change-plan or renew');
+        throw new ConflictException(
+          `Restaurant already has an active ${plan.productFamily} subscription — use change-plan or renew`
+        );
       }
 
       const sub = await tx.subscription.create({
