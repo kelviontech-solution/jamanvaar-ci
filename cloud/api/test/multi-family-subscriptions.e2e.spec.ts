@@ -16,6 +16,7 @@ describe('Multi-family subscriptions (Phase 2)', () => {
   let restaurantId: string;
   let restaurantPlanId: string;
   let kioskPlanId: string;
+  const ownerPassword = 'correct-horse-battery-staple-1';
   const inDays = (d: number) => new Date(Date.now() + d * 86400_000).toISOString();
 
   const auth = (r: request.Test) => r.set('Authorization', `Bearer ${token}`);
@@ -26,11 +27,16 @@ describe('Multi-family subscriptions (Phase 2)', () => {
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
     token = (await platformLogin(app, adminEmail, adminPassword)).body.accessToken;
 
+    const ownerEmail = `multifam-${stamp}@example.com`;
     const restaurant = await auth(request(app.getHttpServer()).post('/api/v1/restaurants')).send({
-      name: `TEST Multifam ${stamp}`, mobile: `9${String(stamp).slice(-9)}`, ownerName: 'Owner', ownerEmail: `multifam-${stamp}@example.com`
+      name: `TEST Multifam ${stamp}`, mobile: `9${String(stamp).slice(-9)}`, ownerName: 'Owner', ownerEmail
     });
     restaurantId = restaurant.body.restaurant.id;
     createdRestaurantIds.push(restaurantId);
+
+    await request(app.getHttpServer()).post('/api/v1/tenant-auth/set-initial-password').send({
+      restaurantId, email: ownerEmail, activationToken: restaurant.body.activationToken, newPassword: ownerPassword
+    });
 
     const restaurantPlan = await auth(request(app.getHttpServer()).post('/api/v1/plans')).send({
       tier: 'PRO', name: `TEST Multifam Restaurant Plan ${stamp}`, priceMonthly: 700000, maxBranches: 5, maxDevices: 3, maxUsers: 10, entitlements: {}
@@ -142,5 +148,22 @@ describe('Multi-family subscriptions (Phase 2)', () => {
     const posKey = await genKey('POS');
     const posRes = await redeem(posKey, 'POS');
     expect(posRes.status).toBe(201);
+  });
+
+  it('getEntitlements lists both active subscriptions and their combined effective entitlements', async () => {
+    const tenantLogin = await request(app.getHttpServer()).post('/api/v1/tenant-auth/login').send({
+      restaurantId, email: `multifam-${stamp}@example.com`, password: ownerPassword
+    });
+    expect(tenantLogin.status).toBe(200);
+    const tenantToken = tenantLogin.body.accessToken;
+
+    const res = await request(app.getHttpServer()).get('/api/v1/tenant/me/entitlements').set('Authorization', `Bearer ${tenantToken}`);
+    expect(res.status).toBe(200);
+    expect(res.body.subscriptions).toHaveLength(2);
+    expect(res.body.subscriptions.map((s: { productFamily: string }) => s.productFamily).sort()).toEqual(['KIOSK', 'RESTAURANT']);
+    expect(res.body.effectiveEntitlements).toBeDefined();
+    // The top-level (backward-compatible) fields still describe the RESTAURANT-family
+    // subscription specifically — the one every pre-Phase-2 caller cared about.
+    expect(res.body.planTier).toBe('PRO');
   });
 });

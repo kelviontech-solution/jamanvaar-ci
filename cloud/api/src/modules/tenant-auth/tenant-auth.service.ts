@@ -663,10 +663,17 @@ export class TenantAuthService {
    * entitlement-check endpoint (see docs/architecture/super-admin-architecture.md §I.4).
    * Returns entitlements: null (not an error) when there's no ACTIVE/TRIAL subscription;
    * callers should treat that as "nothing entitled" rather than crash.
+   *
+   * Phase 2: a restaurant may hold more than one active subscription at once (one per
+   * product family). Every top-level field here describes the RESTAURANT-family subscription
+   * specifically (or, absent one, whichever is most recent) — unchanged in shape and value
+   * from before this phase, so a restaurant with only ever one subscription sees
+   * byte-identical output. `subscriptions` and `effectiveEntitlements` are new and additive,
+   * for callers that need the full multi-subscription picture.
    */
   async getEntitlements(restaurantId: string) {
     return this.prisma.runAsTenant(restaurantId, async (tx) => {
-      const subscription = await tx.subscription.findFirst({
+      const subscriptions = await tx.subscription.findMany({
         where: {
           restaurantId,
           status: { in: ['ACTIVE', 'TRIAL'] },
@@ -676,22 +683,46 @@ export class TenantAuthService {
         orderBy: { createdAt: 'desc' }
       });
 
-      if (!subscription) {
-        return { subscriptionStatus: null, expiresAt: null, planName: null, planTier: null, entitlements: null, limits: null };
+      if (subscriptions.length === 0) {
+        return {
+          subscriptionStatus: null, expiresAt: null, planName: null, planTier: null, entitlements: null, limits: null,
+          subscriptions: [], effectiveEntitlements: {}
+        };
+      }
+
+      const primary = subscriptions.find((s) => s.plan.productFamily === 'RESTAURANT') ?? subscriptions[0];
+
+      const effectiveEntitlements: Record<string, boolean> = {};
+      for (const sub of subscriptions) {
+        const flags = (sub.plan.entitlements as Record<string, boolean>) ?? {};
+        for (const [key, value] of Object.entries(flags)) {
+          effectiveEntitlements[key] = effectiveEntitlements[key] || value;
+        }
       }
 
       return {
-        subscriptionStatus: subscription.status,
+        subscriptionStatus: primary.status,
         // When the current subscription ends (BUG-158: a console showed a made-up "valid until" date).
-        expiresAt: subscription.expiresAt,
-        planName: subscription.plan.name,
-        planTier: subscription.plan.tier,
-        entitlements: subscription.plan.entitlements,
+        expiresAt: primary.expiresAt,
+        planName: primary.plan.name,
+        planTier: primary.plan.tier,
+        entitlements: primary.plan.entitlements,
         limits: {
-          maxBranches: subscription.plan.maxBranches,
-          maxDevices: subscription.plan.maxDevices,
-          maxUsers: subscription.plan.maxUsers
-        }
+          maxBranches: primary.plan.maxBranches,
+          maxDevices: primary.plan.maxDevices,
+          maxUsers: primary.plan.maxUsers
+        },
+        subscriptions: subscriptions.map((s) => ({
+          subscriptionId: s.id,
+          productFamily: s.plan.productFamily,
+          planName: s.plan.name,
+          planTier: s.plan.tier,
+          status: s.status,
+          expiresAt: s.expiresAt,
+          entitlements: s.plan.entitlements,
+          limits: { maxBranches: s.plan.maxBranches, maxDevices: s.plan.maxDevices, maxUsers: s.plan.maxUsers }
+        })),
+        effectiveEntitlements
       };
     });
   }
