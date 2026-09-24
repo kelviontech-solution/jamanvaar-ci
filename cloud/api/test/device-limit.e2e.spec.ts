@@ -9,6 +9,12 @@ import { PrismaService } from '../src/prisma/prisma.service';
  * a restaurant could redeem any number of activation keys regardless of its plan. Redeeming
  * a key that would exceed the plan's device limit is now refused with a clear reason;
  * revoking a device frees its seat back up.
+ *
+ * Phase 2: the cap is enforced per app (e.g. POS's own count vs POS's own quota), not as one
+ * pool shared across every device type on the subscription — see
+ * ApplicationEntitlementsService.assertDeviceQuotaAvailable. This file's two tests redeem the
+ * *same* device type repeatedly to exercise that cap; multi-family-subscriptions.e2e.spec.ts
+ * covers that two different apps' quotas are independent of each other.
  */
 describe('Plan device limit enforcement (BUG-061)', () => {
   let app: INestApplication;
@@ -50,23 +56,28 @@ describe('Plan device limit enforcement (BUG-061)', () => {
     await app.close();
   });
 
-  it('redeems up to the plan limit, then refuses the next one with a clear reason', async () => {
+  it('redeems up to the plan limit for one app, then refuses the next one of that same app with a clear reason', async () => {
     const first = await redeem('POS');
     expect(first.status).toBe(201);
-    const second = await redeem('KDS');
+    const second = await redeem('POS');
     expect(second.status).toBe(201);
 
-    const third = await redeem('CAPTAIN');
+    const third = await redeem('POS');
     expect(third.status).toBe(409);
-    expect(third.body.message).toMatch(/device limit|maxDevices|2 device/i);
+    expect(third.body.message).toMatch(/device|maxDevices|2 device/i);
   });
 
-  it('revoking a device frees its seat so a new one can be redeemed', async () => {
-    const devices = await prisma.runAsPlatform((tx) => tx.device.findMany({ where: { restaurantId } }));
+  it('a different app (KDS) has its own independent cap, unaffected by POS being full', async () => {
+    const res = await redeem('KDS');
+    expect(res.status).toBe(201);
+  });
+
+  it('revoking a device frees its seat so a new one of the same app can be redeemed', async () => {
+    const devices = await prisma.runAsPlatform((tx) => tx.device.findMany({ where: { restaurantId, type: 'POS' } }));
     expect(devices.length).toBe(2);
     await api('patch', `/api/v1/devices/${devices[0].id}/revoke`);
 
-    const res = await redeem('CAPTAIN');
+    const res = await redeem('POS');
     expect(res.status).toBe(201);
   });
 });

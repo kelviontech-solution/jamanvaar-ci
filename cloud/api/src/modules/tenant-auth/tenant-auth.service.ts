@@ -520,25 +520,10 @@ export class TenantAuthService {
       // are two different questions.
       await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, dto.deviceType as AppCode);
 
-      // security-audit MED-02 (F-013): this path never checked `Plan.maxDevices` at
-      // all, unlike activation-keys.service.ts's `redeem` — a restaurant could
-      // provision unlimited terminals through the Restaurant Admin/Kiosk Admin
-      // "connect device" screen regardless of its plan's device quota.
-      const activeSubscription = await tx.subscription.findFirst({
-        where: { restaurantId: key.restaurantId, status: { in: ['ACTIVE', 'TRIAL'] } },
-        orderBy: { createdAt: 'desc' },
-        include: { plan: { select: { maxDevices: true } } }
-      });
-      if (activeSubscription) {
-        const activeDeviceCount = await tx.device.count({
-          where: { restaurantId: key.restaurantId, status: { not: 'REVOKED' } }
-        });
-        if (activeDeviceCount >= activeSubscription.plan.maxDevices) {
-          throw new ConflictException(
-            `This restaurant's plan allows ${activeSubscription.plan.maxDevices} device${activeSubscription.plan.maxDevices === 1 ? '' : 's'}, and that limit has been reached. Revoke an unused device or upgrade the plan to activate another.`
-          );
-        }
-      }
+      // security-audit MED-02 (F-013) / Phase 2: per-app quota, not one global cap shared
+      // across every device type and every subscription the restaurant holds (see
+      // ApplicationEntitlementsService.assertDeviceQuotaAvailable's doc comment).
+      await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, dto.deviceType as AppCode);
 
       const deviceToken = generateOpaqueToken();
 

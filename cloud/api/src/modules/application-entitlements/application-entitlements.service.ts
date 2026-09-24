@@ -1,5 +1,5 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { AppCode, PlanTier, PlatformUser, Prisma } from '@prisma/client';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { AppCode, DeviceType, PlanTier, PlatformUser, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { UpdateApplicationEntitlementDto } from './dto/application-entitlement.dto';
@@ -154,6 +154,42 @@ export class ApplicationEntitlementsService {
     if (!ok) {
       throw new ForbiddenException(
         `${appCode} is not enabled on this restaurant's current subscription. Enable it under Applications before provisioning a device.`
+      );
+    }
+  }
+
+  /**
+   * The real per-app device cap: how many `appCode` devices this restaurant may have active,
+   * right now. Resolves to whichever active subscription's entitlement row grants `appCode`
+   * (isAppEnabled's aggregation — normally exactly one), using that row's own deviceQuota
+   * override if set, falling back to *that row's own subscription's* plan.maxDevices — never
+   * some other active subscription's plan, even if the restaurant holds several (spec section
+   * 38: quotas are per-app, not one global pool shared across every subscription).
+   * A no-op (never throws) when there's no active subscription or no granting entitlement row
+   * — assertAppEnabled is the gate for that; this only caps an app that's already allowed.
+   */
+  async assertDeviceQuotaAvailable(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<void> {
+    const subs = await tx.subscription.findMany({
+      where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE'] } },
+      select: { id: true, plan: { select: { maxDevices: true } } }
+    });
+    if (subs.length === 0) return;
+
+    const row = await tx.applicationEntitlement.findFirst({
+      where: { subscriptionId: { in: subs.map((s) => s.id) }, appCode, enabled: true }
+    });
+    if (!row) return;
+
+    const owningSub = subs.find((s) => s.id === row.subscriptionId);
+    if (!owningSub) return;
+    const quota = row.deviceQuota ?? owningSub.plan.maxDevices;
+
+    const activeDeviceCount = await tx.device.count({
+      where: { restaurantId, type: appCode as unknown as DeviceType, status: { not: 'REVOKED' } }
+    });
+    if (activeDeviceCount >= quota) {
+      throw new ConflictException(
+        `This restaurant's ${appCode} entitlement allows ${quota} device${quota === 1 ? '' : 's'}, and that limit has been reached. Revoke an unused device or upgrade the plan to activate another.`
       );
     }
   }

@@ -54,7 +54,12 @@ describe('Multi-family subscriptions (Phase 2)', () => {
 
   it('assigns a RESTAURANT-family subscription', async () => {
     const res = await auth(request(app.getHttpServer()).post('/api/v1/subscriptions')).send({
-      restaurantId, planId: restaurantPlanId, status: 'ACTIVE', expiresAt: inDays(365)
+      restaurantId, planId: restaurantPlanId, status: 'ACTIVE', expiresAt: inDays(365),
+      // Excludes KIOSK/KIOSK_ADMIN even though PRO tier's defaults would otherwise include
+      // them — this file's later tests need KIOSK granted by exactly one subscription (the
+      // KIOSK-family one) to isolate per-app quota independence. Pre-Phase-5, PRO's defaults
+      // still bundle Kiosk in; Phase 5 removes that bundling for real.
+      applications: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS']
     });
     expect(res.status).toBe(201);
   });
@@ -111,5 +116,31 @@ describe('Multi-family subscriptions (Phase 2)', () => {
       restaurantId, allowedDeviceType: 'KIOSK', expiresAt: inDays(1)
     });
     expect(kioskKey.status).toBe(201);
+  });
+
+  it('device quota is enforced per app, independently — POS uses the RESTAURANT plan cap, KIOSK uses the KIOSK plan cap', async () => {
+    const redeem = (code: string, deviceType: string) =>
+      request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code, deviceType, appVersion: '1.0.0' });
+    const genKey = async (deviceType: string) => {
+      const res = await auth(request(app.getHttpServer()).post('/api/v1/activation-keys')).send({ restaurantId, allowedDeviceType: deviceType, expiresAt: inDays(1) });
+      return res.body.code as string;
+    };
+
+    // The KIOSK plan's cap is 2 — fill it.
+    for (let i = 0; i < 2; i++) {
+      const key = await genKey('KIOSK');
+      const res = await redeem(key, 'KIOSK');
+      expect(res.status).toBe(201);
+    }
+    // A 3rd KIOSK device is rejected — the KIOSK plan's own cap (2) is reached.
+    const thirdKioskKey = await genKey('KIOSK');
+    const thirdKiosk = await redeem(thirdKioskKey, 'KIOSK');
+    expect(thirdKiosk.status).toBe(409);
+
+    // POS is governed by the separate RESTAURANT plan's cap of 3, and is unaffected by KIOSK
+    // being full — proving quotas are per-app, not one shared pool across every subscription.
+    const posKey = await genKey('POS');
+    const posRes = await redeem(posKey, 'POS');
+    expect(posRes.status).toBe(201);
   });
 });

@@ -292,24 +292,10 @@ export class ActivationKeysService {
       // has nothing to check it against yet).
       await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, dto.deviceType as AppCode);
 
-      // BUG-061: the plan's maxDevices was stored and shown in Super Admin ("Plan Quotas")
-      // but never actually checked, so a restaurant could activate unlimited terminals. A
-      // revoked device doesn't count — revoking one frees its seat back up.
-      const activeSubscription = await tx.subscription.findFirst({
-        where: { restaurantId: key.restaurantId, status: { in: ['ACTIVE', 'TRIAL'] } },
-        orderBy: { createdAt: 'desc' },
-        include: { plan: { select: { maxDevices: true } } }
-      });
-      if (activeSubscription) {
-        const activeDeviceCount = await tx.device.count({
-          where: { restaurantId: key.restaurantId, status: { not: 'REVOKED' } }
-        });
-        if (activeDeviceCount >= activeSubscription.plan.maxDevices) {
-          throw new ConflictException(
-            `This restaurant's plan allows ${activeSubscription.plan.maxDevices} device${activeSubscription.plan.maxDevices === 1 ? '' : 's'}, and that limit has been reached. Revoke an unused device or upgrade the plan to activate another.`
-          );
-        }
-      }
+      // BUG-061 / Phase 2: the quota check is per-app now, not one global cap shared across
+      // every device type and every subscription the restaurant holds (see
+      // ApplicationEntitlementsService.assertDeviceQuotaAvailable's doc comment).
+      await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, dto.deviceType as AppCode);
 
       // The device's long-lived credential for everything it calls after this
       // point (e.g. PATCH /api/v1/devices/me/heartbeat) — returned once, here,
@@ -425,19 +411,8 @@ export class ActivationKeysService {
       if (existing.redeemedByDeviceId) {
         const device = await tx.device.findUnique({ where: { id: existing.redeemedByDeviceId } });
         if (device && device.status === 'REVOKED') {
-          const subscription = await tx.subscription.findFirst({
-            where: { restaurantId: existing.restaurantId, status: { in: ['ACTIVE', 'TRIAL'] } },
-            orderBy: { createdAt: 'desc' },
-            include: { plan: { select: { maxDevices: true } } }
-          });
-          if (subscription) {
-            const seats = await tx.device.count({ where: { restaurantId: existing.restaurantId, status: { not: 'REVOKED' } } });
-            if (seats >= subscription.plan.maxDevices) {
-              throw new ConflictException(
-                `This restaurant's plan allows ${subscription.plan.maxDevices} device${subscription.plan.maxDevices === 1 ? '' : 's'}, and that limit has been reached. Revoke an unused device or upgrade the plan to bring this terminal back.`
-              );
-            }
-          }
+          // Phase 2: per-app quota, not one global cap (see assertDeviceQuotaAvailable).
+          await this.appEntitlements.assertDeviceQuotaAvailable(tx, existing.restaurantId, device.type as AppCode);
           await tx.device.update({ where: { id: device.id }, data: { status: 'ACTIVE' } });
           restoredDeviceId = device.id;
         }
