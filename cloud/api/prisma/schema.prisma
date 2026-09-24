@@ -126,6 +126,18 @@ model Restaurant {
   timezone        String           @default("Asia/Kolkata")
   currency        String           @default("INR")
   defaultLanguage String           @default("en")
+  /// Registered/verified mobile number this restaurant's customer-facing Restaurant ID is
+  /// derived from. Editable (a restaurant's phone can change) — restaurantCode is NOT
+  /// recomputed when this changes; it stays immutable once generated (spec section 3).
+  mobile          String?
+  /// Customer-facing Restaurant ID ("JM" + 10-digit mobile, e.g. JM9876543210). Immutable
+  /// after creation. Null only for legacy rows not yet backfilled (see the Phase 1 backfill
+  /// script) — every restaurant created after this migration always has one.
+  restaurantCode  String?          @unique
+  /// True when this code came from the migration-safe fallback path (no valid mobile found
+  /// during backfill) rather than a real registered number — Super Admin should review and
+  /// correct these (spec section 44).
+  restaurantCodeIsFallback Boolean @default(false)
   status          RestaurantStatus @default(ACTIVE)
   /// BUG-015: whether the Restaurant Admin may upload their own menu CSV. Super Admin can
   /// always upload for the restaurant regardless of this flag.
