@@ -9,6 +9,7 @@ import { EntitySyncModule } from '../entity-sync/entity-sync.module';
 @Module({
   imports: [AuditModule, PlatformAuthModule, EntitySyncModule],
   controllers: [RestaurantsController, RestaurantLookupController],
-  providers: [RestaurantsService]
+  providers: [RestaurantsService],
+  exports: [RestaurantsService]
 })
 export class RestaurantsModule {}

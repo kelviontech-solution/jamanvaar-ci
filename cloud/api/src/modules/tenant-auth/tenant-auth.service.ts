@@ -16,11 +16,12 @@ import { User, TenantUserStatus, Device } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { hashOpaqueToken, generateOpaqueToken, hashLowEntropySecret } from '../../common/security/token.util';
-import { CreateTenantStaffUserDto, TenantLoginDto, ActivateDeviceDto } from './dto/login.dto';
+import { CreateTenantStaffUserDto, TenantLoginDto, ActivateDeviceDto, LoginOwnerDto } from './dto/login.dto';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { AppCode } from '@prisma/client';
 import { EmailService } from '../notifications/email.service';
 import { passwordResetOtpEmail } from '../notifications/email-templates';
+import { RestaurantsService } from '../restaurants/restaurants.service';
 
 /** A restaurant with a single active branch has an obvious answer for which branch a new terminal belongs to. */
 export async function onlyActiveBranchId(tx: { branch: { findMany: (args: any) => Promise<Array<{ id: string }>> } }, restaurantId: string): Promise<string | null> {
@@ -119,7 +120,8 @@ export class TenantAuthService {
     private readonly config: ConfigService,
     private readonly audit: AuditService,
     private readonly appEntitlements: ApplicationEntitlementsService,
-    private readonly email: EmailService
+    private readonly email: EmailService,
+    private readonly restaurants: RestaurantsService
   ) {}
 
   private signAccessToken(user: User, deviceId?: string): string {
@@ -469,6 +471,35 @@ export class TenantAuthService {
       user: publicUser(matchedUser),
       restaurant: restaurantProfile(matchedUser.restaurant)
     };
+  }
+
+  /**
+   * Owner-only restaurant-code login (spec section 5/33): no email, just the restaurant's
+   * customer-facing ID + the owner's password. Delegates to the exact same
+   * authenticateAndRespond core as email-login — lockout, device-activation branching and
+   * audit logging are all identical, applied to a one-candidate list instead of an
+   * email-matched one.
+   */
+  async loginOwner(dto: LoginOwnerDto): Promise<TenantAuthResponse> {
+    const { restaurantId } = await this.restaurants.resolveByCode(dto.restaurantCode);
+
+    const candidates = await this.prisma.runAsPlatform((tx) =>
+      tx.user.findMany({
+        where: { restaurantId, role: 'OWNER', status: { not: TenantUserStatus.DISABLED } },
+        include: {
+          restaurant: {
+            select: { id: true, name: true, status: true, deletedAt: true, legalName: true, gstin: true, fssaiNumber: true, address: true, city: true, state: true }
+          }
+        }
+      })
+    );
+
+    return this.authenticateAndRespond(candidates, dto.password, {
+      deviceId: dto.deviceId,
+      deviceToken: dto.deviceToken,
+      deviceType: dto.deviceType,
+      appVersion: dto.appVersion
+    });
   }
 
   /**

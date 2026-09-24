@@ -29,9 +29,11 @@ import {
   tenantLoginSchema,
   activateDeviceSchema,
   tenantRefreshSchema,
+  loginOwnerSchema,
   TenantLoginDto,
   ActivateDeviceDto,
-  TenantRefreshDto
+  TenantRefreshDto,
+  LoginOwnerDto
 } from './dto/login.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -94,6 +96,25 @@ export class TenantAuthController {
     @Res({ passthrough: true }) res: Response
   ) {
     const result = await this.authService.login(body);
+    if (result.status === 'LOGIN_SUCCESS') {
+      this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
+      if (body.returnRefreshToken) {
+        return { ...result, refreshToken: result.refreshToken, refreshTokenExpiresAt: result.refreshTokenExpiresAt };
+      }
+      const { refreshToken, refreshTokenExpiresAt, ...withoutRefreshToken } = result;
+      return withoutRefreshToken;
+    }
+    return result;
+  }
+
+  @Post('login-owner')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(loginOwnerSchema))
+  async loginOwner(
+    @Body() body: LoginOwnerDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const result = await this.authService.loginOwner(body);
     if (result.status === 'LOGIN_SUCCESS') {
       this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
       if (body.returnRefreshToken) {
