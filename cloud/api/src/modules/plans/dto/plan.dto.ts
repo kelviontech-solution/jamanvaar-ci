@@ -3,6 +3,7 @@ import { entitlementsSchema } from '../entitlements';
 
 export const createPlanSchema = z.object({
   tier: z.enum(['CORE', 'PRO', 'ENTERPRISE']),
+  productFamily: z.enum(['RESTAURANT', 'KIOSK']).default('RESTAURANT'),
   name: z.string().trim().min(2, 'Plan name is required'),
   description: z.string().trim().optional(),
   priceMonthly: z.number().int().nonnegative('Monthly price must be 0 or more'),

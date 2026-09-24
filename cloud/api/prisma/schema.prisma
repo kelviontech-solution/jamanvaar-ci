@@ -288,9 +288,18 @@ enum PlanStatus {
   INACTIVE
 }
 
+enum ProductFamily {
+  RESTAURANT
+  KIOSK
+}
+
 model Plan {
   id           String     @id @default(uuid())
   tier         PlanTier
+  /// Which commercial product line this plan belongs to. A restaurant may hold one active
+  /// subscription per family at once (see SubscriptionsService.assign) — e.g. a RESTAURANT
+  /// Core/Pro/QR plan plus a separate KIOSK Standard/Pro add-on, concurrently.
+  productFamily ProductFamily @default(RESTAURANT)
   name         String
   description  String?
   priceMonthly Int // paise, avoids float rounding
