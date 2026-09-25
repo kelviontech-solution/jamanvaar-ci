@@ -479,7 +479,8 @@ async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
     { code: 'KIOSK_ADMIN', name: 'Kiosk Admin', description: 'Back-office console for managing kiosk menu and settings.', categoryCode: 'kiosk', appCode: 'KIOSK_ADMIN' },
     { code: 'advancedServiceWorkflow', name: 'Real-Time Multi-Machine Mesh Sync', description: 'POS/Captain/KDS/Kiosk real-time order and table synchronization.', categoryCode: 'sync', legacyEntitlementKey: 'advancedServiceWorkflow' },
     { code: 'posAssistant', name: 'JAMAN AI Assistant', description: 'Offline, local-data-based natural-language restaurant queries.', categoryCode: 'ai', legacyEntitlementKey: 'posAssistant' },
-    { code: 'advancedCaptainReports', name: 'Advanced Analytics & CRM', description: 'Advanced sales analytics, channel performance and staff attribution.', categoryCode: 'analytics', legacyEntitlementKey: 'advancedCaptainReports' }
+    { code: 'advancedCaptainReports', name: 'Advanced Analytics & CRM', description: 'Advanced sales analytics, channel performance and staff attribution.', categoryCode: 'analytics', legacyEntitlementKey: 'advancedCaptainReports' },
+    { code: 'kioskRemoteManagement', name: 'Kiosk Remote Fleet Management', description: 'Remote restart, cache clear, diagnostics, sync and update commands for kiosks (Kiosk Pro).', categoryCode: 'kiosk' }
   ];
 
   const featureIdByCode = new Map<string, string>();
@@ -502,6 +503,11 @@ async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
   // KIOSK_ADMIN depends on selfOrderKiosk (the KIOSK app) — set once both rows exist.
   await tx.feature.update({
     where: { code: 'KIOSK_ADMIN' },
+    data: { dependsOnFeatureIds: [featureIdByCode.get('selfOrderKiosk')!] }
+  });
+  // Kiosk remote management is an extension of the kiosk itself.
+  await tx.feature.update({
+    where: { code: 'kioskRemoteManagement' },
     data: { dependsOnFeatureIds: [featureIdByCode.get('selfOrderKiosk')!] }
   });
   // POS_ADMIN (restaurantAdmin) depends on POS (posTerminal).

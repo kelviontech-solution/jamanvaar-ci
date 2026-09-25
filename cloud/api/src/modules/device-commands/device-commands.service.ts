@@ -3,6 +3,20 @@ import { Device, DeviceCommandStatus, DeviceCommandType, PlatformUser } from '@p
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 
+/**
+ * Kiosk Pro's real differentiator: remote fleet management. Kiosk Standard keeps the safety
+ * basics (lock/unlock/force-logout/disable/wipe); these operational commands need a Pro/Enterprise
+ * KIOSK-family subscription.
+ */
+const KIOSK_PRO_ONLY_COMMANDS: ReadonlySet<DeviceCommandType> = new Set<DeviceCommandType>([
+  DeviceCommandType.RESTART_APP,
+  DeviceCommandType.CLEAR_CACHE,
+  DeviceCommandType.REQUEST_DIAGNOSTICS,
+  DeviceCommandType.REQUEST_SYNC,
+  DeviceCommandType.REQUEST_HEALTH,
+  DeviceCommandType.APP_UPDATE
+]);
+
 export interface IssueCommandDto {
   commandType: DeviceCommandType;
   payload?: Record<string, unknown>;
@@ -47,6 +61,22 @@ export class DeviceCommandsService {
       });
       if (!device) throw new NotFoundException('Device not found');
       if (device.status === 'REVOKED') throw new ConflictException('Cannot issue commands to a revoked device');
+
+      if ((device.type === 'KIOSK' || device.type === 'KIOSK_ADMIN') && KIOSK_PRO_ONLY_COMMANDS.has(dto.commandType)) {
+        const proSub = await tx.subscription.findFirst({
+          where: {
+            restaurantId: device.restaurantId,
+            status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] },
+            plan: { productFamily: 'KIOSK', tier: { in: ['PRO', 'ENTERPRISE'] } }
+          },
+          select: { id: true }
+        });
+        if (!proSub) {
+          throw new ForbiddenException(
+            `Remote ${dto.commandType.toLowerCase().replace(/_/g, ' ')} for kiosks is part of Kiosk Pro. Upgrade this restaurant's Kiosk plan to use it.`
+          );
+        }
+      }
 
       const expiresAt = new Date(Date.now() + (dto.expiresInMinutes || 1440) * 60 * 1000); // default 24h
 
