@@ -47,7 +47,9 @@ describe('Menu snapshot sync (Kiosk Admin -> cloud)', () => {
       restaurantId,
       planId,
       status: 'ACTIVE',
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      // Phase 5 split Kiosk into its own commercial family — PRO's defaults no longer include it.
+      applications: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN']
     });
 
     const keyRes = await authed('post', '/api/v1/activation-keys', platformToken).send({

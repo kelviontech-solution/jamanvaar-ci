@@ -12,8 +12,8 @@ export const updateApplicationEntitlementSchema = z.object({
 export type UpdateApplicationEntitlementDto = z.infer<typeof updateApplicationEntitlementSchema>;
 
 export const setSubscriptionApplicationsSchema = z.object({
-  // Explicit enabled-app list. Omit entirely to fall back to the plan
-  // tier's defaults (see DEFAULT_APPS_BY_TIER in the service).
+  // Explicit enabled-app list. Omit entirely to fall back to the plan's
+  // (productFamily, tier) defaults (see DEFAULT_APPS_BY_FAMILY_TIER in the service).
   applications: z.array(z.enum(APP_CODES)).optional()
 });
 export type SetSubscriptionApplicationsDto = z.infer<typeof setSubscriptionApplicationsSchema>;

@@ -65,7 +65,10 @@ describe('Activation code redemption (the other half of activation-keys generati
       restaurantId,
       planId,
       status: 'ACTIVE',
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      // Phase 5 split Kiosk into its own commercial family — a RESTAURANT-family PRO plan no
+      // longer defaults to including it, and this suite redeems KIOSK keys below.
+      applications: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN']
     });
     expect(subRes.status).toBe(201);
   });

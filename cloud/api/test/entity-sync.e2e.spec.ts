@@ -42,7 +42,10 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     });
     planId = planRes.body.id;
     await authed('post', '/api/v1/subscriptions', platformToken).send({
-      restaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      restaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      // Phase 5 split Kiosk into its own commercial family — PRO's defaults no longer include
+      // it, and this suite's KIOSK/CAPTAIN describe blocks below redeem those device types.
+      applications: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN']
     });
 
     const keyRes = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'POS', expiresAt: new Date(Date.now() + 86400000).toISOString() });

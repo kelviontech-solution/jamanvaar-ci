@@ -39,14 +39,17 @@ describe('Refund creation', () => {
     });
     restaurantId = restaurantRes.body.restaurant.id;
 
-    // PRO tier — POS alone is already CORE-tier, but KIOSK (needed for the
-    // "wrong device type" test) requires PRO, per DEFAULT_APPS_BY_TIER.
+    // PRO tier — POS is already CORE-tier's default. Phase 5 split Kiosk into its own
+    // commercial family, so a RESTAURANT-family PRO plan no longer defaults to including it —
+    // this test needs both POS and KIOSK (for the "wrong device type" test), so it asks for
+    // them explicitly rather than relying on tier defaults.
     const planRes = await authed('post', '/api/v1/plans', platformToken).send({
       tier: 'PRO', name: `TEST Refund Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { kiosk: true }
     });
     planId = planRes.body.id;
     await authed('post', '/api/v1/subscriptions', platformToken).send({
-      restaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      restaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      applications: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN']
     });
 
     const posKeyRes = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'POS', expiresAt: new Date(Date.now() + 86400000).toISOString() });
