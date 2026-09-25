@@ -294,6 +294,43 @@ enum ProductFamily {
   KIOSK
 }
 
+model FeatureCategory {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  description String
+  sortOrder   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  features Feature[]
+}
+
+model Feature {
+  id                   String          @id @default(uuid())
+  code                 String          @unique
+  name                 String
+  description          String
+  categoryId           String
+  category             FeatureCategory @relation(fields: [categoryId], references: [id])
+  // Links to the real per-app enforcement mechanism for the 7 app-level features (null for the
+  // 15 finer-grained legacy features that aren't a separate app).
+  appCode              AppCode?
+  // Bridges to the pre-existing Plan.entitlements JSON key this feature corresponds to, for the
+  // 21 features that existed before this table did. Never set through the CRUD API — only the
+  // seed sets it, since it documents a fact about already-existing data, not something to invent
+  // going forward.
+  legacyEntitlementKey String?         @unique
+  // Plain string list of other Feature.id values, not an enforced FK — the API layer (not the
+  // database) proves referential integrity here (see FeaturesService).
+  dependsOnFeatureIds  String[]        @default([])
+  isActive             Boolean         @default(true)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  @@index([categoryId])
+}
+
 model Plan {
   id           String     @id @default(uuid())
   tier         PlanTier
