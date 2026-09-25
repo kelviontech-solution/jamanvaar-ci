@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { OnboardingChecklistCard } from './components/OnboardingChecklistCard';
 import { CategoryModal } from './components/CategoryModal';
+import { KioskForgotPasswordPanel } from './components/KioskForgotPasswordPanel';
 import {
   AuditRepository,
   ComboRepository,
@@ -70,17 +71,19 @@ import { AdminChatbotEngine, MenuBuilderService, ReportGeneratorService } from '
 import { FOOD_IMAGE_LIBRARY, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncPromotions, syncFeedback, syncServiceMessages, publishCatalogNow, syncDiningTables } from '@jamanvaar/sync';
 import {
-  connectDeviceStep1,
+  connectDeviceStep1Owner,
   connectDeviceStep2,
   isDeviceConnected,
   CloudApiError,
-  staffLogin,
+  staffLoginOwner,
   staffLogout,
   isStaffLoggedIn,
   getStaffUser,
   startSilentRefresh,
   getConnectedRestaurantId,
   onSessionExpired,
+  requestPasswordResetOwner,
+  resetPasswordOwner,
   getPaymentConnection,
   submitPaymentConnection,
   syncMenuToCloud,
@@ -239,12 +242,16 @@ export default function AdminApp() {
   // up (see cloud/cloudClient.ts for why this is two calls, not one).
   const [deviceConnected, setDeviceConnected] = useState(isDeviceConnected());
   const [connectStep, setConnectStep] = useState<'CREDENTIALS' | 'ACTIVATION_KEY'>('CREDENTIALS');
-  const [connectRestaurantId, setConnectRestaurantId] = useState('');
-  const [connectEmail, setConnectEmail] = useState('');
+  // The restaurant's customer-facing ID (JM…), typed by the operator — not the internal UUID.
+  const [connectRestaurantCode, setConnectRestaurantCode] = useState('');
   const [connectPassword, setConnectPassword] = useState('');
   const [connectActivationKey, setConnectActivationKey] = useState('');
   const [connectActivationSessionToken, setConnectActivationSessionToken] = useState('');
   const [connectRestaurantName, setConnectRestaurantName] = useState('');
+  // The internal UUID resolved server-side from connectRestaurantCode — connectDeviceStep2
+  // still needs this to persist the connection locally; the operator never sees or types it.
+  const [connectResolvedRestaurantId, setConnectResolvedRestaurantId] = useState('');
+  const [connectOwnerLabel, setConnectOwnerLabel] = useState('Owner');
   const [connectBusy, setConnectBusy] = useState(false);
   const [connectError, setConnectError] = useState('');
   // Only true right after THIS connection succeeds — a one-time
@@ -256,17 +263,19 @@ export default function AdminApp() {
     setConnectError('');
     setConnectBusy(true);
     try {
-      const result = await connectDeviceStep1(connectRestaurantId, connectEmail, connectPassword);
+      const result = await connectDeviceStep1Owner(connectRestaurantCode, connectPassword);
       if (result.status === 'CONNECTED') {
         setDeviceConnected(true);
         setShowActivationWelcome(true);
       } else {
         setConnectActivationSessionToken(result.activationSessionToken);
         setConnectRestaurantName(result.restaurantName);
+        setConnectResolvedRestaurantId(result.restaurantId);
+        setConnectOwnerLabel(result.ownerLabel ?? 'Owner');
         setConnectStep('ACTIVATION_KEY');
       }
     } catch (err) {
-      setConnectError(err instanceof CloudApiError ? err.message : 'Could not connect — check your details and try again.');
+      setConnectError(err instanceof CloudApiError ? err.message : 'Could not connect — check your Restaurant ID and password and try again.');
     } finally {
       setConnectBusy(false);
     }
@@ -277,7 +286,7 @@ export default function AdminApp() {
     setConnectError('');
     setConnectBusy(true);
     try {
-      await connectDeviceStep2(connectActivationSessionToken, connectActivationKey, connectRestaurantId, connectEmail, connectRestaurantName);
+      await connectDeviceStep2(connectActivationSessionToken, connectActivationKey, connectResolvedRestaurantId, connectOwnerLabel, connectRestaurantName);
       setDeviceConnected(true);
       setShowActivationWelcome(true);
     } catch (err) {
@@ -304,11 +313,13 @@ export default function AdminApp() {
 
   // Kiosk Admin Authentication State — restored from a real tenant-user session
   const [isKioskAdminLoggedIn, setIsKioskAdminLoggedIn] = useState<boolean>(() => isStaffLoggedIn());
-  const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
   const [authBusy, setAuthBusy] = useState(false);
+  // Owner-only login (spec 7/33/54): no email field — the terminal is already connected to a
+  // known restaurant, so only the owner's password is asked for daily sign-in.
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   useEffect(() => {
     if (isStaffLoggedIn()) {
@@ -339,8 +350,8 @@ export default function AdminApp() {
 
   const handleKioskAdminLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!authEmail.trim() || !authPassword.trim()) {
-      setAuthError('Please enter email and password.');
+    if (!authPassword.trim()) {
+      setAuthError('Please enter the password.');
       return;
     }
 
@@ -353,7 +364,7 @@ export default function AdminApp() {
     setAuthBusy(true);
     setAuthError('');
     try {
-      await staffLogin(restaurantId, authEmail, authPassword);
+      await staffLoginOwner(restaurantId, authPassword);
       setIsKioskAdminLoggedIn(true);
       setAuthPassword('');
     } catch (err) {
@@ -1159,7 +1170,7 @@ export default function AdminApp() {
                 <div>
                   <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Connect this Terminal</h2>
                   <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                    One-time setup — enter the Restaurant ID and login the restaurant owner generated for this terminal.
+                    One-time setup — enter your Restaurant ID and the owner's password.
                   </p>
                 </div>
                 <form onSubmit={handleConnectCredentials} className="space-y-3.5">
@@ -1167,9 +1178,9 @@ export default function AdminApp() {
                     <label className="text-xs font-bold text-slate-700 block mb-1.5">Restaurant ID *</label>
                     <input
                       type="text"
-                      value={connectRestaurantId}
-                      onChange={(e) => setConnectRestaurantId(e.target.value)}
-                      placeholder="Paste the ID, e.g. xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                      value={connectRestaurantCode}
+                      onChange={(e) => setConnectRestaurantCode(e.target.value)}
+                      placeholder="e.g. JM9876543210"
                       required
                       className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                     />
@@ -1178,17 +1189,7 @@ export default function AdminApp() {
                   </p>
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1.5">Login Email *</label>
-                    <input
-                      type="email"
-                      value={connectEmail}
-                      onChange={(e) => setConnectEmail(e.target.value)}
-                      required
-                      className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1.5">Password *</label>
+                    <label className="text-xs font-bold text-slate-700 block mb-1.5">Owner Password *</label>
                     <input
                       type="password"
                       value={connectPassword}
@@ -1310,23 +1311,13 @@ export default function AdminApp() {
         ]}
         footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
       >
+        {showForgotPassword ? (
+          <KioskForgotPasswordPanel
+            onBack={() => setShowForgotPassword(false)}
+            onDone={() => setShowForgotPassword(false)}
+          />
+        ) : (
         <form onSubmit={handleKioskAdminLogin} className="space-y-3.5 pt-2">
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
-              Email *
-            </label>
-            <input
-              type="email"
-              value={authEmail}
-              onChange={(e) => {
-                setAuthEmail(e.target.value);
-                setAuthError('');
-              }}
-              placeholder="owner@yourrestaurant.com"
-              className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
-            />
-          </div>
-
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-bold text-slate-700">Password *</label>
@@ -1347,6 +1338,7 @@ export default function AdminApp() {
                   setAuthError('');
                 }}
                 placeholder="Enter your password"
+                autoFocus
                 className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
               />
             </div>
@@ -1360,7 +1352,7 @@ export default function AdminApp() {
           )}
 
           <p className="text-xs text-slate-500 text-center pt-0.5">
-            Owners and managers only. Contact your Restaurant Admin if you need access.
+            Owners only. Contact your Super Admin if you need access.
           </p>
 
           <button
@@ -1370,7 +1362,16 @@ export default function AdminApp() {
           >
             {authBusy ? 'Signing in...' : 'Sign In'}
           </button>
+
+          <button
+            type="button"
+            onClick={() => setShowForgotPassword(true)}
+            className="w-full py-2 text-center text-xs font-bold text-jaman-saffron hover:underline cursor-pointer"
+          >
+            Forgot Password?
+          </button>
         </form>
+        )}
       </JamanvaarAuthLayout>
       </JAMANVAARStartup>
     );

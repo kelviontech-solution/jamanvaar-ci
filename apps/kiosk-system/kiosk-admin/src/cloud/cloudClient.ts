@@ -106,6 +106,9 @@ export interface ActivationRequiredResult {
    *  typed (owner-only connect flow) — connectDeviceStep2 still needs this to persist the
    *  connection, but the caller here never had it to begin with. */
   restaurantId: string;
+  /** The owner's display name, when known (owner-only connect flow) — connectDeviceStep2's
+   *  ownerLabel parameter, since there's no typed email to fall back to for that anymore. */
+  ownerLabel?: string;
 }
 
 /**
@@ -183,7 +186,8 @@ export async function connectDeviceStep1Owner(
       status: 'ACTIVATION_REQUIRED',
       activationSessionToken: data.activationSessionToken,
       restaurantName: data.restaurant?.name ?? restaurantCode.trim(),
-      restaurantId: data.restaurant?.id
+      restaurantId: data.restaurant?.id,
+      ownerLabel: data.user?.fullName
     };
   }
 
@@ -420,12 +424,23 @@ export async function staffLoginOwner(restaurantId: string, password: string): P
   return user;
 }
 
-/** Restaurant-code forgot-password, step 1 (spec section 34): resolves the owner and masks their email for display. */
-export async function requestPasswordResetOwner(restaurantCode: string): Promise<{ maskedEmail: string }> {
+export type OwnerIdentifier = { restaurantCode: string } | { restaurantId: string };
+
+function identifierBody(identifier: OwnerIdentifier): Record<string, string> {
+  return 'restaurantCode' in identifier ? { restaurantCode: identifier.restaurantCode.trim() } : { restaurantId: identifier.restaurantId };
+}
+
+/**
+ * Restaurant-code forgot-password, step 1 (spec section 34): resolves the owner and masks
+ * their email for display. Accepts either the typed restaurantCode or an already-connected
+ * device's stored restaurantId — the daily-login screen's "Forgot Password?" never has the
+ * code, only the internal id it already knows.
+ */
+export async function requestPasswordResetOwner(identifier: OwnerIdentifier): Promise<{ maskedEmail: string }> {
   const res = await fetch(`${API_BASE}/api/v1/tenant-auth/forgot-password-owner`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ restaurantCode: restaurantCode.trim() })
+    body: JSON.stringify(identifierBody(identifier))
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
@@ -435,11 +450,11 @@ export async function requestPasswordResetOwner(restaurantCode: string): Promise
 }
 
 /** Restaurant-code forgot-password, step 2: the emailed code and the new password. */
-export async function resetPasswordOwner(restaurantCode: string, otp: string, newPassword: string): Promise<void> {
+export async function resetPasswordOwner(identifier: OwnerIdentifier, otp: string, newPassword: string): Promise<void> {
   const res = await fetch(`${API_BASE}/api/v1/tenant-auth/reset-password-owner`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ restaurantCode: restaurantCode.trim(), otp: otp.trim(), newPassword })
+    body: JSON.stringify({ ...identifierBody(identifier), otp: otp.trim(), newPassword })
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
