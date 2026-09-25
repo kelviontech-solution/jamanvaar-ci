@@ -1,4 +1,6 @@
-import { AppCode } from '@prisma/client';
+import { AppCode, Prisma } from '@prisma/client';
+
+type TxClient = Prisma.TransactionClient;
 
 export interface FeatureCatalogEntry {
   category: string;
@@ -7,45 +9,30 @@ export interface FeatureCatalogEntry {
   dependsOn: AppCode[];
 }
 
-export const FEATURE_CATALOG: Record<AppCode, FeatureCatalogEntry> = {
-  POS: {
-    category: 'RESTAURANT_CORE',
-    description: 'Point-of-sale terminal — takes orders and processes bills.',
-    dependsOn: []
-  },
-  POS_ADMIN: {
-    category: 'RESTAURANT_CORE',
-    description: 'Back-office console for managing menu, staff and settings.',
-    dependsOn: ['POS']
-  },
-  CAPTAIN: {
-    category: 'RESTAURANT_ADDON',
-    description: 'Waiter-facing tableside ordering app.',
-    dependsOn: []
-  },
-  KDS: {
-    category: 'RESTAURANT_ADDON',
-    description: 'Kitchen display screen showing incoming orders.',
-    dependsOn: []
-  },
-  QR_ORDERING: {
-    category: 'RESTAURANT_ADDON',
-    description: "Guest self-ordering from a table's QR code.",
-    dependsOn: []
-  },
-  KIOSK: {
-    category: 'KIOSK_CORE',
-    description: 'Self-service ordering kiosk terminal.',
-    dependsOn: []
-  },
-  KIOSK_ADMIN: {
-    category: 'KIOSK_CORE',
-    description: 'Back-office console for managing kiosk menu and settings.',
-    dependsOn: ['KIOSK']
-  }
-};
+/**
+ * Builds the AppCode catalog from the live Feature table: only rows with an appCode take part,
+ * and dependsOn resolves each dependsOnFeatureIds entry to that feature's own appCode.
+ */
+export async function getFeatureCatalog(tx: TxClient): Promise<Record<AppCode, FeatureCatalogEntry>> {
+  const features = await tx.feature.findMany({
+    where: { appCode: { not: null } },
+    include: { category: true }
+  });
+  const byId = new Map(features.map((f) => [f.id, f]));
 
-/** Which of the given enabled app codes declare a dependency on `appCode` — used to refuse disabling a prerequisite still in use by an active dependent. */
-export function dependentsOf(appCode: AppCode, enabledAppCodes: AppCode[]): AppCode[] {
-  return enabledAppCodes.filter((candidate) => FEATURE_CATALOG[candidate].dependsOn.includes(appCode));
+  const catalog = {} as Record<AppCode, FeatureCatalogEntry>;
+  for (const f of features) {
+    if (!f.appCode) continue;
+    const dependsOn = f.dependsOnFeatureIds
+      .map((id) => byId.get(id)?.appCode)
+      .filter((code): code is AppCode => code !== null && code !== undefined);
+    catalog[f.appCode] = { category: f.category.name, description: f.description, dependsOn };
+  }
+  return catalog;
+}
+
+/** Which of the given enabled app codes declare a dependency on `appCode` — used to refuse disabling a prerequisite still in use. */
+export async function getDependentsOf(tx: TxClient, appCode: AppCode, enabledAppCodes: AppCode[]): Promise<AppCode[]> {
+  const catalog = await getFeatureCatalog(tx);
+  return enabledAppCodes.filter((candidate) => catalog[candidate]?.dependsOn.includes(appCode));
 }

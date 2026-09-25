@@ -3,7 +3,7 @@ import { AppCode, DeviceType, PlanTier, PlatformUser, Prisma, ProductFamily } fr
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { UpdateApplicationEntitlementDto } from './dto/application-entitlement.dto';
-import { dependentsOf } from './feature-catalog';
+import { getDependentsOf } from './feature-catalog';
 
 type TxClient = Prisma.TransactionClient;
 
@@ -18,8 +18,8 @@ export const ALL_APP_CODES: AppCode[] = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', '
  * mechanism exists (spec section 37) — Super Admin can already override per-subscription via
  * the `applications` param regardless.
  */
-type FamilyTierKey = `${ProductFamily}:${PlanTier}`;
-const DEFAULT_APPS_BY_FAMILY_TIER: Partial<Record<FamilyTierKey, AppCode[]>> = {
+export type FamilyTierKey = `${ProductFamily}:${PlanTier}`;
+export const DEFAULT_APPS_BY_FAMILY_TIER: Partial<Record<FamilyTierKey, AppCode[]>> = {
   'RESTAURANT:CORE': ['POS', 'POS_ADMIN'],
   'RESTAURANT:PRO': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS'],
   'RESTAURANT:QR': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'QR_ORDERING'],
@@ -29,7 +29,7 @@ const DEFAULT_APPS_BY_FAMILY_TIER: Partial<Record<FamilyTierKey, AppCode[]>> = {
   'KIOSK:ENTERPRISE': ['KIOSK', 'KIOSK_ADMIN']
 };
 
-function defaultAppsFor(productFamily: ProductFamily, tier: PlanTier): AppCode[] {
+export function defaultAppsFor(productFamily: ProductFamily, tier: PlanTier): AppCode[] {
   return DEFAULT_APPS_BY_FAMILY_TIER[`${productFamily}:${tier}`] ?? [];
 }
 
@@ -126,7 +126,7 @@ export class ApplicationEntitlementsService {
         const enabledRows = await tx.applicationEntitlement.findMany({
           where: { subscriptionId, enabled: true }
         });
-        const dependents = dependentsOf(appCode, enabledRows.map((row) => row.appCode));
+        const dependents = await getDependentsOf(tx, appCode,enabledRows.map((row) => row.appCode));
         if (dependents.length > 0) {
           throw new ConflictException(
             `${appCode} is required by ${dependents.length} enabled feature${dependents.length === 1 ? '' : 's'} (${dependents.join(', ')}). Disable ${dependents.length === 1 ? 'it' : 'them'} first.`

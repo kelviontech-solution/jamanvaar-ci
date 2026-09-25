@@ -5,7 +5,8 @@ import { updateApplicationEntitlementSchema } from './dto/application-entitlemen
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
-import { FEATURE_CATALOG } from './feature-catalog';
+import { getFeatureCatalog } from './feature-catalog';
+import { PrismaService } from '../../prisma/prisma.service';
 
 // Two thin controllers sharing one service, each mounted under the resource
 // it naturally belongs to (subscriptions/:id/applications for
@@ -48,8 +49,10 @@ export class RestaurantApplicationsController {
 @Controller('api/v1/application-entitlements')
 @UseGuards(PlatformAuthGuard)
 export class ApplicationCatalogController {
+  constructor(private readonly prisma: PrismaService) {}
+
   @Get('catalog')
   getCatalog() {
-    return FEATURE_CATALOG;
+    return this.prisma.runAsPlatform((tx) => getFeatureCatalog(tx));
   }
 }

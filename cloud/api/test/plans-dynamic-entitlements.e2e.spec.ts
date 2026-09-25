@@ -90,3 +90,46 @@ describe('Plan.entitlements keys are DB-driven (Phase 11)', () => {
     expect(badUpdate.status).toBe(400);
   });
 });
+
+describe('Plan responses carry computed defaultApps (Phase 11)', () => {
+  let app: INestApplication;
+  let prisma: PrismaService;
+  const adminEmail = `test-default-apps-admin-${Date.now()}@example.com`;
+  let token: string;
+  const planIds: string[] = [];
+  const api = (method: 'get' | 'post', url: string) => request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
+
+  beforeAll(async () => {
+    app = await createTestApp();
+    prisma = app.get(PrismaService);
+    await createTestPlatformUser(prisma, { email: adminEmail, password: 'correct-horse-battery-staple' });
+    token = (await platformLogin(app, adminEmail, 'correct-horse-battery-staple')).body.accessToken;
+  });
+
+  afterAll(async () => {
+    await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: { in: planIds } } }));
+    await prisma.platformUser.deleteMany({ where: { email: adminEmail } });
+    await app.close();
+  });
+
+  it('matches productFamily/tier on create, get and list', async () => {
+    const core = await api('post', '/api/v1/plans').send({
+      tier: 'CORE', productFamily: 'RESTAURANT', name: `TEST defaultApps core ${Date.now()}`,
+      priceMonthly: 500000, maxBranches: 1, maxDevices: 5, maxUsers: 10, entitlements: {}
+    });
+    planIds.push(core.body.id);
+    expect([...core.body.defaultApps].sort()).toEqual(['POS', 'POS_ADMIN']);
+
+    const kiosk = await api('post', '/api/v1/plans').send({
+      tier: 'PRO', productFamily: 'KIOSK', name: `TEST defaultApps kiosk ${Date.now()}`,
+      priceMonthly: 900000, maxBranches: 1, maxDevices: 5, maxUsers: 10, entitlements: {}
+    });
+    planIds.push(kiosk.body.id);
+    expect([...kiosk.body.defaultApps].sort()).toEqual(['KIOSK', 'KIOSK_ADMIN']);
+
+    const detail = await api('get', `/api/v1/plans/${kiosk.body.id}`);
+    expect(detail.body.defaultApps).toEqual(kiosk.body.defaultApps);
+    const list = await api('get', '/api/v1/plans');
+    expect(list.body.every((p: { defaultApps: unknown }) => Array.isArray(p.defaultApps))).toBe(true);
+  });
+});

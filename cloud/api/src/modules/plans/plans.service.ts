@@ -1,5 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PlanStatus, PlatformUser, Prisma } from '@prisma/client';
+import { PlanStatus, PlanTier, PlatformUser, Prisma, ProductFamily } from '@prisma/client';
+import { defaultAppsFor } from '../application-entitlements/application-entitlements.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { CreatePlanDto, UpdatePlanDto } from './dto/plan.dto';
@@ -31,13 +32,20 @@ export class PlansService {
    * everything, including old/test plans it may want to clean up.
    */
   list(opts: { excludeTestFixtures?: boolean } = {}) {
-    return this.prisma.runAsPlatform((tx) =>
-      tx.plan.findMany({
-        where: opts.excludeTestFixtures ? { name: { not: { startsWith: 'TEST ' } } } : undefined,
-        orderBy: { createdAt: 'asc' },
-        include: { _count: { select: { subscriptions: true } } }
-      })
-    );
+    return this.prisma
+      .runAsPlatform((tx) =>
+        tx.plan.findMany({
+          where: opts.excludeTestFixtures ? { name: { not: { startsWith: 'TEST ' } } } : undefined,
+          orderBy: { createdAt: 'asc' },
+          include: { _count: { select: { subscriptions: true } } }
+        })
+      )
+      .then((plans) => plans.map((p) => this.withDefaultApps(p)));
+  }
+
+  /** Computed at read time from productFamily+tier — never stored. */
+  private withDefaultApps<T extends { productFamily: ProductFamily; tier: PlanTier }>(plan: T) {
+    return { ...plan, defaultApps: defaultAppsFor(plan.productFamily, plan.tier) };
   }
 
   async getById(id: string) {
@@ -53,7 +61,7 @@ export class PlansService {
       })
     );
     if (!plan) throw new NotFoundException('Plan not found');
-    return plan;
+    return this.withDefaultApps(plan);
   }
 
   /** Checks incoming keys against the live Feature.legacyEntitlementKey set and returns a dense object (missing keys false). */
@@ -89,7 +97,7 @@ export class PlansService {
       category: 'PLAN',
       details: { planId: plan.id, name: plan.name, tier: plan.tier }
     });
-    return plan;
+    return this.withDefaultApps(plan);
   }
 
   async update(id: string, dto: UpdatePlanDto, actor: PlatformUser) {
@@ -110,7 +118,7 @@ export class PlansService {
       category: 'PLAN',
       details: { planId: plan.id, name: plan.name }
     });
-    return plan;
+    return this.withDefaultApps(plan);
   }
 
   async setStatus(id: string, status: PlanStatus, actor: PlatformUser) {
@@ -130,6 +138,6 @@ export class PlansService {
       category: 'PLAN',
       details: { planId: plan.id, previousStatus }
     });
-    return plan;
+    return this.withDefaultApps(plan);
   }
 }
