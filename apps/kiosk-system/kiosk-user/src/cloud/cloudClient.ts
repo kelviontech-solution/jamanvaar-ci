@@ -16,6 +16,11 @@ const RESTAURANT_ID_KEY = 'jamanvaar_kiosk_user_restaurant_id';
 const DEVICE_ID_KEY = 'jamanvaar_kiosk_user_device_id';
 const DEVICE_TOKEN_KEY = 'jamanvaar_kiosk_user_device_token';
 
+/** Mirrors cloud/api's restaurant-code.util.ts RESTAURANT_CODE_RE exactly — "JM" + a mobile
+ * number starting 6-9 + 9 more digits. Checked client-side so a malformed entry never reaches
+ * the network as a wasted round trip. */
+export const RESTAURANT_CODE_RE = /^JM[6-9][0-9]{9}$/;
+
 export class CloudApiError extends Error {
   constructor(
     message: string,
@@ -84,7 +89,36 @@ export interface ActivationRestaurantBranding {
   address: string | null;
 }
 
-export async function activateKioskDevice(code: string): Promise<ActivationRestaurantBranding | null> {
+export interface ActivationResult {
+  restaurantId: string;
+  deviceId: string;
+  branding: ActivationRestaurantBranding | null;
+}
+
+export interface ResolvedRestaurant {
+  restaurantId: string;
+  name: string;
+}
+
+export async function resolveRestaurantByCode(code: string): Promise<ResolvedRestaurant> {
+  const res = await fetch(`${API_BASE}/api/v1/restaurant-lookup/resolve`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ restaurantCode: code.trim().toUpperCase() })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(
+      res.status === 404
+        ? "We couldn't find a restaurant with that ID. Double-check it with your Super Admin."
+        : data?.message ?? `Lookup failed (${res.status})`,
+      res.status
+    );
+  }
+  return data;
+}
+
+export async function activateKioskDevice(code: string): Promise<ActivationResult> {
   const res = await fetch(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -112,7 +146,7 @@ export async function activateKioskDevice(code: string): Promise<ActivationResta
 
   // Real branding, so the welcome screen stops showing db.ts's local seed
   // placeholder ("My Restaurant") the moment this terminal is activated.
-  return data.restaurant ?? null;
+  return { restaurantId: data.restaurantId, deviceId: data.device.id, branding: data.restaurant ?? null };
 }
 
 export function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
