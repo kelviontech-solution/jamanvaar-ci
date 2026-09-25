@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Device } from '@prisma/client';
+import { randomUUID } from 'node:crypto';
+import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { OrderSyncEventDto, orderSyncEventSchema } from './dto/push-order-sync.dto';
 
@@ -19,7 +20,24 @@ export interface OrderSyncPushResult {
   externalOrderId: string;
   status: 'ok' | 'error';
   syncVersion?: number;
+  /** True when this eventId was already applied: nothing changed, the original outcome is returned. */
+  duplicate?: boolean;
   error?: string;
+}
+
+type TxClient = Prisma.TransactionClient;
+
+/** One gapless counter per restaurant. Branch devices filter by branch on read but share the counter, so a cursor is always coherent. */
+const SEQUENCE_SCOPE = '_';
+
+/** Bumps and returns the restaurant's change sequence. The row lock is held until the enclosing transaction ends, so sequence order equals commit order. */
+async function nextSequence(tx: TxClient, restaurantId: string): Promise<number> {
+  const rows = await tx.$queryRaw<{ value: number }[]>`
+    INSERT INTO "SyncSequence" ("restaurantId", "scope", "value")
+    VALUES (${restaurantId}, ${SEQUENCE_SCOPE}, 1)
+    ON CONFLICT ("restaurantId", "scope") DO UPDATE SET "value" = "SyncSequence"."value" + 1
+    RETURNING "value"`;
+  return Number(rows[0].value);
 }
 
 @Injectable()
@@ -61,7 +79,26 @@ export class OrderSyncService {
           continue;
         }
         const evt: OrderSyncEventDto = parsed.data;
+        let claimed = false;
         try {
+          // Exactly-once: claim the eventId first. If it was already claimed, answer from the recorded
+          // outcome and change nothing, so a retry after a lost response (or a delayed replay of an
+          // older event) can never re-apply.
+          if (evt.eventId) {
+            const claim = await tx.$executeRaw`
+              INSERT INTO "ProcessedSyncEvent" ("id", "restaurantId", "eventId", "deviceId", "entityType", "entityId", "result")
+              VALUES (${randomUUID()}, ${device.restaurantId}, ${evt.eventId}, ${device.id}, 'ORDER', ${evt.externalOrderId}, '{}'::jsonb)
+              ON CONFLICT ("restaurantId", "eventId") DO NOTHING`;
+            if (claim === 0) {
+              const prior = await tx.processedSyncEvent.findUnique({
+                where: { restaurantId_eventId: { restaurantId: device.restaurantId, eventId: evt.eventId } }
+              });
+              const priorResult = (prior?.result ?? {}) as { syncVersion?: number };
+              results.push({ externalOrderId: evt.externalOrderId, status: 'ok', syncVersion: priorResult.syncVersion, duplicate: true });
+              continue;
+            }
+            claimed = true;
+          }
           const existing = await tx.syncedOrder.findUnique({
             where: { restaurantId_externalOrderId: { restaurantId: device.restaurantId, externalOrderId: evt.externalOrderId } }
           });
@@ -92,6 +129,7 @@ export class OrderSyncService {
                 reason: `${device.type} device attempted to change paymentStatus from ${existing.paymentStatus} to ${evt.paymentStatus} on a settled order`
               }
             });
+            if (claimed) await this.releaseClaim(tx, device.restaurantId, evt.eventId!);
             results.push({ externalOrderId: evt.externalOrderId, status: 'error', error: 'Order payment status is final; this device cannot change it' });
             continue;
           }
@@ -115,13 +153,14 @@ export class OrderSyncService {
             meta: (evt.meta ?? undefined) as any
           };
 
+          const seq = await nextSequence(tx, device.restaurantId);
           const saved = existing
             ? await tx.syncedOrder.update({
                 where: { id: existing.id },
-                data: { ...data, syncVersion: existing.syncVersion + 1 }
+                data: { ...data, syncVersion: existing.syncVersion + 1, seq }
               })
             // The order belongs to the branch of the terminal that first pushed it (BUG-048).
-            : await tx.syncedOrder.create({ data: { ...data, branchId: device.branchId, syncVersion: 1 } });
+            : await tx.syncedOrder.create({ data: { ...data, branchId: device.branchId, syncVersion: 1, seq } });
 
           await tx.syncEventLog.create({
             data: {
@@ -135,8 +174,15 @@ export class OrderSyncService {
             }
           });
 
+          if (claimed) {
+            await tx.processedSyncEvent.update({
+              where: { restaurantId_eventId: { restaurantId: device.restaurantId, eventId: evt.eventId! } },
+              data: { result: { syncVersion: saved.syncVersion, seq } }
+            });
+          }
           results.push({ externalOrderId: evt.externalOrderId, status: 'ok', syncVersion: saved.syncVersion });
         } catch (err: any) {
+          if (claimed) await this.releaseClaim(tx, device.restaurantId, evt.eventId!);
           await tx.syncEventLog.create({
             data: {
               restaurantId: device.restaurantId,
@@ -157,40 +203,45 @@ export class OrderSyncService {
     return { results, serverTime: new Date().toISOString() };
   }
 
+  /** A failed event must stay retryable, so its claim is dropped rather than recorded as applied. */
+  private async releaseClaim(tx: TxClient, restaurantId: string, eventId: string) {
+    await tx.processedSyncEvent.deleteMany({ where: { restaurantId, eventId } }).catch(() => undefined);
+  }
+
   /**
    * Catch-up/replay pull for a (re)connecting device — not just a live push
    * target. `since` is the cursor the device persisted from a prior call's
    * `serverTime`, so a device that was offline for hours gets everything it
    * missed in one shot rather than only future pushes.
    */
-  async catchUp(device: Device, since?: string) {
-    const sinceDate = since ? new Date(since) : new Date(Date.now() - CATCH_UP_DEFAULT_LOOKBACK_MS);
+  async catchUp(device: Device, since?: string, afterSeq?: number) {
+    const branchFilter = device.branchId ? { OR: [{ branchId: device.branchId }, { branchId: null }] } : {};
 
-    // B2-029: this query used to have no restaurantId filter at all, relying entirely on
-    // Postgres RLS via runAsTenant's session variable. That is real defense, but this
-    // environment's DB role is a superuser (BUG-075), which bypasses RLS outright, so the
-    // query returned every restaurant's orders to any device. Filtering explicitly here
-    // means a device only ever sees its own tenant's rows even if RLS is bypassed, broken,
-    // or misconfigured — defense in depth, not a replacement for fixing the DB role.
-    //
-    // security-audit HIGH-05: this also used to have no branchId filter at all, so a device
-    // bound to one branch of a multi-branch restaurant received every OTHER branch's
-    // orders too, including customer name/phone in `meta`. A device with no branch
-    // assigned (branchId null) still sees every order — that matches how an
-    // unassigned/whole-restaurant terminal is expected to behave — but a branch-bound
-    // device now only sees its own branch's orders plus any not yet tied to a branch.
+    // Sequence cursor (preferred): strictly increasing, gapless, independent of any clock.
+    if (afterSeq !== undefined) {
+      const rows = await this.prisma.runAsTenant(device.restaurantId, (tx) =>
+        tx.syncedOrder.findMany({
+          where: { restaurantId: device.restaurantId, seq: { gt: afterSeq }, ...branchFilter },
+          orderBy: { seq: 'asc' },
+          take: CATCH_UP_MAX_ROWS + 1
+        })
+      );
+      const hasMore = rows.length > CATCH_UP_MAX_ROWS;
+      const orders = hasMore ? rows.slice(0, CATCH_UP_MAX_ROWS) : rows;
+      const latestSeq = orders.length > 0 ? (orders[orders.length - 1].seq as number) : afterSeq;
+      return { orders, latestSeq, hasMore, serverTime: new Date().toISOString() };
+    }
+
+    // Legacy timestamp cursor, kept for app versions that predate the sequence.
+    const sinceDate = since ? new Date(since) : new Date(Date.now() - CATCH_UP_DEFAULT_LOOKBACK_MS);
     const orders = await this.prisma.runAsTenant(device.restaurantId, (tx) =>
       tx.syncedOrder.findMany({
-        where: {
-          restaurantId: device.restaurantId,
-          updatedAt: { gt: sinceDate },
-          ...(device.branchId ? { OR: [{ branchId: device.branchId }, { branchId: null }] } : {})
-        },
+        where: { restaurantId: device.restaurantId, updatedAt: { gt: sinceDate }, ...branchFilter },
         orderBy: { updatedAt: 'asc' },
         take: CATCH_UP_MAX_ROWS
       })
     );
-
-    return { orders, serverTime: new Date().toISOString() };
+    const latestSeq = orders.reduce((max, o) => Math.max(max, o.seq ?? 0), 0);
+    return { orders, latestSeq, serverTime: new Date().toISOString() };
   }
 }

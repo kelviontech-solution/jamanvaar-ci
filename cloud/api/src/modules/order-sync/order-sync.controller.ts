@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { OrderSyncService } from './order-sync.service';
@@ -24,7 +24,15 @@ export class OrderSyncController {
   }
 
   @Get()
-  pull(@Query('since') since: string | undefined, @CurrentDevice() device: Device) {
-    return this.orderSync.catchUp(device, since);
+  pull(
+    @Query('since') since: string | undefined,
+    @Query('afterSeq') afterSeq: string | undefined,
+    @CurrentDevice() device: Device
+  ) {
+    const parsed = afterSeq === undefined ? undefined : Number(afterSeq);
+    if (parsed !== undefined && (!Number.isInteger(parsed) || parsed < 0)) {
+      throw new BadRequestException('afterSeq must be a non-negative integer');
+    }
+    return this.orderSync.catchUp(device, since, parsed);
   }
 }

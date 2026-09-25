@@ -171,6 +171,8 @@ model Restaurant {
   webhookEvents           WebhookEvent[]
   menuSnapshotItems       MenuSnapshotItem[]
   syncedOrders            SyncedOrder[]
+  processedSyncEvents     ProcessedSyncEvent[]
+  syncSequences           SyncSequence[]
   syncedEntities          SyncedEntity[]
   aiAccess                RestaurantAiAccess?
   aiUsage                 AiUsageDaily[]
@@ -1324,11 +1326,14 @@ model SyncedOrder {
   paymentMethod   String? // CASH / UPI / CARD / SPLIT / ...
   meta            Json? // order/token numbers, cashier, customer, tender lines, tax split, business day
   syncVersion     Int        @default(1) // bumped on every push; lets a puller detect it missed an update
+  /// Monotonic per-branch change sequence (see SyncSequence): the pull cursor. Null only for rows written before it existed.
+  seq             Int?
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
   @@unique([restaurantId, externalOrderId])
   @@index([restaurantId, updatedAt])
+  @@index([restaurantId, branchId, seq])
   @@index([deviceId])
   @@index([branchId])
 }
@@ -1473,4 +1478,38 @@ model PlatformNotificationRead {
 
   @@id([notificationId, userId])
   @@index([userId])
+}
+
+
+// ---------------------------------------------------------------------------
+// Sync redesign: exactly-once event application and a monotonic pull cursor.
+// ---------------------------------------------------------------------------
+
+/// One row per event the server has applied. (restaurantId, eventId) is unique, so a retried or
+/// replayed push is recognised and answered from `result` instead of being applied again.
+model ProcessedSyncEvent {
+  id           String     @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  eventId      String
+  deviceId     String?
+  entityType   String
+  entityId     String
+  result       Json
+  createdAt    DateTime   @default(now())
+
+  @@unique([restaurantId, eventId])
+  @@index([restaurantId, createdAt])
+}
+
+/// Change counter per (restaurant, branch). Bumped inside the same transaction as the write, so the
+/// row lock makes sequence order equal commit order and a reader can never skip a lower number.
+/// scope is the branchId, or "_" for a device with no branch.
+model SyncSequence {
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  scope        String
+  value        Int        @default(0)
+
+  @@id([restaurantId, scope])
 }
