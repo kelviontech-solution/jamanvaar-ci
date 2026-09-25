@@ -30,6 +30,17 @@ export class InvoicesService {
   ) {}
 
   /**
+   * Phase 5: a plan with priceYearly set bills that amount over a real 365-day period; one
+   * without it keeps the original 30-day/priceMonthly behavior every existing plan fixture
+   * (none of which set priceYearly) already relies on. `!= null` (not truthy) so a genuinely
+   * free plan (priceYearly: 0) is still treated as annual, not as "unset".
+   */
+  private billingCycleFor(plan: { priceMonthly: number; priceYearly: number | null }): { amount: number; periodDays: number } {
+    if (plan.priceYearly != null) return { amount: plan.priceYearly, periodDays: 365 };
+    return { amount: plan.priceMonthly, periodDays: 30 };
+  }
+
+  /**
    * Statutory GST 18% calculation engine based on Indian tax jurisdiction.
    * Ahmedabad, Gujarat seller (Code 24):
    * - Buyer in Gujarat: CGST 9% + SGST 9% (Intra-state)
@@ -335,7 +346,7 @@ export class InvoicesService {
     const plan = await tx.plan.findUnique({ where: { id: planId } });
     if (!restaurant || !plan) return null;
 
-    const baseAmount = plan.priceMonthly; // in paise
+    const { amount: baseAmount } = this.billingCycleFor(plan);
     const tax = this.calculateTaxBreakup(baseAmount, restaurant.state, await this.branding.seller());
     const invoiceNumber = await this.generateInvoiceNumber(tx);
 
@@ -656,8 +667,9 @@ export class InvoicesService {
 
         // Check if an invoice covering the next renewal period has already been issued
         const latestInvoice = sub.invoices[0];
+        const { amount: baseAmount, periodDays } = this.billingCycleFor(sub.plan);
         const nextPeriodStart = new Date(sub.expiresAt);
-        const nextPeriodEnd = new Date(nextPeriodStart.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const nextPeriodEnd = new Date(nextPeriodStart.getTime() + periodDays * 24 * 60 * 60 * 1000);
 
         const hasUpcomingInvoice = latestInvoice && (
           latestInvoice.billingPeriodEnd >= nextPeriodStart &&
@@ -666,7 +678,6 @@ export class InvoicesService {
         );
 
         if (!hasUpcomingInvoice) {
-          const baseAmount = sub.plan.priceMonthly;
           const tax = this.calculateTaxBreakup(baseAmount, sub.restaurant.state, await this.branding.seller());
           const invoiceNumber = await this.generateInvoiceNumber(tx);
 
