@@ -47,7 +47,8 @@ import {
   Boxes,
   ShieldAlert,
   Sparkles,
-  QrCode
+  QrCode,
+  ListChecks
 } from 'lucide-react';
 import './layout.css';
 
@@ -94,6 +95,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'SaaS Management',
     items: [
       { to: '/plans', label: 'Plans & Entitlements', icon: Package },
+      { to: '/feature-catalog', label: 'Feature Catalog', icon: ListChecks },
       { to: '/qr-ordering', label: 'QR Ordering Suite', icon: QrCode },
       { to: '/ai-assistant', label: 'JAMAN AI Engine', icon: Sparkles },
       { to: '/catalog', label: 'Master Menu Catalog', icon: Utensils },

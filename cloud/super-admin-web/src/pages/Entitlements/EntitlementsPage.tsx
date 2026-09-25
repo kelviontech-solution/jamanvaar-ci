@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
-import { ENTITLEMENT_LABELS, type EntitlementKey, type Plan } from '../../api/types';
+import { ENTITLEMENT_LABELS, APP_CODE_LABELS, type AppCode, type EntitlementKey, type FeatureCatalog, type Plan } from '../../api/types';
 import {
   CORE_PLAN_FEATURE_GROUPS,
   PRO_PLAN_FEATURE_GROUPS,
@@ -15,6 +15,7 @@ import '../Plans/plans.css';
 
 export function EntitlementsPage() {
   const [plans, setPlans] = useState<Plan[] | null>(null);
+  const [catalog, setCatalog] = useState<FeatureCatalog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedTierFilter, setSelectedTierFilter] = useState<'ALL' | 'ACTIVE_ONLY'>('ACTIVE_ONLY');
@@ -23,10 +24,10 @@ export function EntitlementsPage() {
 
   useEffect(() => {
     setLoading(true);
-    api
-      .get<Plan[]>('/api/v1/plans')
-      .then((data) => {
+    Promise.all([api.get<Plan[]>('/api/v1/plans'), api.get<FeatureCatalog>('/api/v1/application-entitlements/catalog')])
+      .then(([data, catalogData]) => {
         setPlans(data);
+        setCatalog(catalogData);
         setError(null);
       })
       .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load plans'))
@@ -263,6 +264,46 @@ export function EntitlementsPage() {
                         </tbody>
                       );
                     })
+                )}
+
+                {catalog && (
+                  <tbody style={{ borderBottom: '2px solid #e2e8f0' }}>
+                    <tr style={{ background: '#f8fafc' }}>
+                      <td
+                        colSpan={filteredPlans.length + 1}
+                        style={{ padding: '12px 20px', fontWeight: 900, fontSize: 13, color: '#0B253A', borderTop: '1px solid var(--jv-border)', borderBottom: '1px solid var(--jv-border)' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span>🔌</span>
+                          <span>Connected Applications</span>
+                        </div>
+                      </td>
+                    </tr>
+                    {(Object.keys(catalog) as AppCode[]).map((appCode) => (
+                      <tr key={appCode} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '10px 20px', fontWeight: 600, color: '#1e293b' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ color: '#64748b', fontSize: 12 }}>•</span>
+                            <span title={catalog[appCode].description}>{APP_CODE_LABELS[appCode] ?? appCode}</span>
+                          </div>
+                        </td>
+                        {filteredPlans.map((p) => {
+                          const included = (p.defaultApps ?? []).includes(appCode);
+                          return (
+                            <td key={p.id} style={{ padding: '10px 20px', textAlign: 'center', borderLeft: '1px solid var(--jv-border)' }}>
+                              {included ? (
+                                <span style={{ color: '#16a34a', fontWeight: 900, fontSize: 15 }}>
+                                  ✓ <span style={{ fontSize: 11, fontWeight: 700 }}>Included</span>
+                                </span>
+                              ) : (
+                                <span style={{ color: '#cbd5e1', fontWeight: 700, fontSize: 14 }}>—</span>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
                 )}
               </table>
             </div>

@@ -62,6 +62,8 @@ export interface Plan {
   maxDevices: number;
   maxUsers: number;
   entitlements: Entitlements;
+  /** Computed server-side from productFamily+tier: which AppCodes this plan turns on by default. */
+  defaultApps?: AppCode[];
   status: 'ACTIVE' | 'INACTIVE';
   createdAt: string;
   _count?: { subscriptions: number };
@@ -107,6 +109,30 @@ export interface FeatureCatalogEntry {
 
 /** GET /api/v1/application-entitlements/catalog — one entry per AppCode. */
 export type FeatureCatalog = Record<AppCode, FeatureCatalogEntry>;
+
+export interface FeatureCategoryRecord {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FeatureRecord {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  categoryId: string;
+  appCode: AppCode | null;
+  legacyEntitlementKey: string | null;
+  dependsOnFeatureIds: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Subscription {
   id: string;

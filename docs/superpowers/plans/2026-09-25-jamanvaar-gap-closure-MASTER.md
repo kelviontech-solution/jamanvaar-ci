@@ -115,8 +115,8 @@ research and a commercial pricing recommendation (§48-49) — business research
 
 | # | Phase | Depends on | Plan file |
 |---|-------|-----------|-----------|
-| 10 | Generic `Feature`/`FeatureCategory` database model + CRUD API | — | written at start of Phase 10 |
-| 11 | Migrate every consumer (Super Admin pages, `ApplicationEntitlementsService`, `plans/entitlements.ts`) onto the generic model; new Feature Catalog admin page | 10 | written at start of Phase 11 |
+| 10 | Generic `Feature`/`FeatureCategory` database model + CRUD API | — | **done** (docs: phase10 plan) |
+| 11 | Migrate every consumer (Super Admin pages, `ApplicationEntitlementsService`, `plans/entitlements.ts`) onto the generic model; new Feature Catalog admin page | 10 | **done** (docs: phase11 plan) |
 | 12 | Reconcile the offline license/entitlement system with QR tier + Kiosk family | 10, 11 | written at start of Phase 12 |
 | 13 | Real functional differentiation for Kiosk Pro vs Kiosk Standard | 10, 11 | written at start of Phase 13 |
 | 14 | Restaurant-creation wizard + entitlement preview; feature-disable usage-impact warning; named per-app-type default quotas | 11 | written at start of Phase 14 |

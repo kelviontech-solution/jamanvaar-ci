@@ -16,6 +16,7 @@ import { PlanDetailPage } from '../pages/Plans/PlanDetailPage';
 import { SubscriptionsListPage } from '../pages/Subscriptions/SubscriptionsListPage';
 import { BillingPage } from '../pages/Billing/BillingPage';
 import { EntitlementsPage } from '../pages/Entitlements/EntitlementsPage';
+import { FeatureCatalogPage } from '../pages/FeatureCatalog/FeatureCatalogPage';
 import { ActivationKeysListPage } from '../pages/ActivationKeys/ActivationKeysListPage';
 import { DevicesListPage } from '../pages/Devices/DevicesListPage';
 import { AuditLogsPage } from '../pages/AuditLogs/AuditLogsPage';
@@ -74,6 +75,7 @@ export function App() {
               <Route path="/subscriptions" element={page('SubscriptionsList', <SubscriptionsListPage />)} />
               <Route path="/billing" element={page('Billing', <BillingPage />)} />
               <Route path="/entitlements" element={page('Entitlements', <EntitlementsPage />)} />
+              <Route path="/feature-catalog" element={page('FeatureCatalog', <FeatureCatalogPage />)} />
               <Route path="/reports" element={page('Reports', <ReportsPage />)} />
               <Route path="/applications" element={page('Applications', <ApplicationsPage />)} />
               <Route path="/activation-keys" element={page('ActivationKeysList', <ActivationKeysListPage />)} />
