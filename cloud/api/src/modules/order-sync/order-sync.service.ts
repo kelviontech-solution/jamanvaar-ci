@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { nextSyncSequence } from '../../common/sync-sequence';
 import { OrderSyncEventDto, orderSyncEventSchema } from './dto/push-order-sync.dto';
 
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000; // 24h
@@ -27,18 +28,6 @@ export interface OrderSyncPushResult {
 
 type TxClient = Prisma.TransactionClient;
 
-/** One gapless counter per restaurant. Branch devices filter by branch on read but share the counter, so a cursor is always coherent. */
-const SEQUENCE_SCOPE = '_';
-
-/** Bumps and returns the restaurant's change sequence. The row lock is held until the enclosing transaction ends, so sequence order equals commit order. */
-async function nextSequence(tx: TxClient, restaurantId: string): Promise<number> {
-  const rows = await tx.$queryRaw<{ value: number }[]>`
-    INSERT INTO "SyncSequence" ("restaurantId", "scope", "value")
-    VALUES (${restaurantId}, ${SEQUENCE_SCOPE}, 1)
-    ON CONFLICT ("restaurantId", "scope") DO UPDATE SET "value" = "SyncSequence"."value" + 1
-    RETURNING "value"`;
-  return Number(rows[0].value);
-}
 
 function transactionIdOf(meta: unknown): string | undefined {
   const id = meta && typeof meta === 'object' ? (meta as { paymentTransactionId?: unknown }).paymentTransactionId : undefined;
@@ -171,7 +160,7 @@ export class OrderSyncService {
             meta: (evt.meta ?? undefined) as any
           };
 
-          const seq = await nextSequence(tx, device.restaurantId);
+          const seq = await nextSyncSequence(tx, device.restaurantId);
           const saved = existing
             ? await tx.syncedOrder.update({
                 where: { id: existing.id },

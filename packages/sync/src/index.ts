@@ -12,3 +12,4 @@ export * from './floor_sync';
 export * from './menu_sync';
 export * from './restaurant_identity';
 export * from './sync_protocol';
+export * from './inventory_ledger_sync';

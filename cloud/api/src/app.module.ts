@@ -39,6 +39,7 @@ import { ApplicationEntitlementsModule } from './modules/application-entitlement
 import { FeaturesModule } from './modules/features/features.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { OrderSyncModule } from './modules/order-sync/order-sync.module';
+import { InventoryLedgerModule } from './modules/inventory-ledger/inventory-ledger.module';
 import { EntitySyncModule } from './modules/entity-sync/entity-sync.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { PlatformNotificationsModule } from './modules/platform-notifications/platform-notifications.module';
@@ -90,6 +91,7 @@ import { validateEnv } from './config/env.validation';
     FeaturesModule,
     PaymentsModule,
     OrderSyncModule,
+    InventoryLedgerModule,
     EntitySyncModule,
     JobsModule,
     PlatformNotificationsModule

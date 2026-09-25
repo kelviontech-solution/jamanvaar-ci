@@ -11,8 +11,8 @@ import {
 } from '@jamanvaar/database';
 import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
-import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, reportQrUsage, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity, leaseNumberBlock } from './cloud/cloudClient';
-import { EntitySyncEngine, SyncOutboxEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts } from '@jamanvaar/sync';
+import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, reportQrUsage, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements } from './cloud/cloudClient';
+import { EntitySyncEngine, SyncOutboxEngine, InventoryLedgerSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts } from '@jamanvaar/sync';
 import {
   Category,
   DiningTable,
@@ -444,11 +444,14 @@ export default function PosAdminApp() {
     // receive every order, payment and kitchen ticket the other devices create.
     // It used to have no order-sync client at all (BUG-034).
     SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync, leaseNumbers: leaseNumberBlock, deviceId: () => localStorage.getItem('jamanvaar_cloud_device_id') });
+    InventoryLedgerSync.configureTransport({ push: pushInventoryMovements, pull: pullInventoryMovements });
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
+    void InventoryLedgerSync.sync();
     void syncDiningTables();
     const orderInterval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
+      void InventoryLedgerSync.sync();
       void SyncOutboxEngine.catchUpFromCloud();
       // BUG-096/097: the floor plan built here, and each table's live state, are shared with POS and Captain.
       void syncDiningTables();

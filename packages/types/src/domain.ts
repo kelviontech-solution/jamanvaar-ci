@@ -1303,6 +1303,10 @@ export interface StockMovement {
   photoUrl?: string;
   performedBy: string;
   timestamp: string;
+  /** Set once the movement is acknowledged by the cloud ledger; unset means still to be pushed. */
+  syncedAt?: string;
+  /** True for a mirror of a movement made on another device (already in the ledger, never pushed). */
+  remote?: boolean;
 }
 
 /** Someone the restaurant buys stock from (BUG-046). */

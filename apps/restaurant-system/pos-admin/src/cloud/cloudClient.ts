@@ -1,4 +1,4 @@
-import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder } from '@jamanvaar/sync';
+import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, PushedMovement, RemoteMovement } from '@jamanvaar/sync';
 import { refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
 import type { PlanEntitlements, PlanTier } from '@jamanvaar/types';
 
@@ -1047,5 +1047,19 @@ export async function leaseNumberBlock(kind: 'ORDER' | 'KOT', count: number): Pr
   const res = await deviceFetch('/api/v1/sync/number-leases', { method: 'POST', body: JSON.stringify({ kind, count }) });
   const data = await res.json().catch(() => null);
   if (!res.ok) throw new Error((data && data.message) || `Number lease failed (${res.status})`);
+  return data;
+}
+
+export async function pushInventoryMovements(movements: PushedMovement[]): Promise<{ results: Array<{ movementId: string; status: 'ok' | 'error'; duplicate?: boolean; error?: string }> }> {
+  const res = await deviceFetch('/api/v1/inventory/movements', { method: 'POST', body: JSON.stringify({ movements }) });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) throw new CloudApiError(data?.message ?? `Inventory movement push failed (${res.status})`, res.status);
+  return data;
+}
+
+export async function pullInventoryMovements(afterSeq: number): Promise<{ movements: RemoteMovement[]; latestSeq: number; hasMore: boolean }> {
+  const res = await deviceFetch(`/api/v1/inventory/movements?afterSeq=${afterSeq}`);
+  const data = await parseJsonResponse(res);
+  if (!res.ok) throw new CloudApiError(data?.message ?? `Inventory movement pull failed (${res.status})`, res.status);
   return data;
 }
