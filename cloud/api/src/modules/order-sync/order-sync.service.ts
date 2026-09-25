@@ -40,6 +40,33 @@ async function nextSequence(tx: TxClient, restaurantId: string): Promise<number>
   return Number(rows[0].value);
 }
 
+function transactionIdOf(meta: unknown): string | undefined {
+  const id = meta && typeof meta === 'object' ? (meta as { paymentTransactionId?: unknown }).paymentTransactionId : undefined;
+  return typeof id === 'string' && id ? id : undefined;
+}
+
+/** The single place that decides whether a push may change an order's payment state. Null means allowed. */
+function paymentViolation(
+  existing: { paymentStatus: string | null; deviceId: string | null; meta: unknown },
+  evt: OrderSyncEventDto,
+  device: Device
+): { code: string; message: string } | null {
+  if (!existing.paymentStatus || !TERMINAL_PAID_STATUSES.has(existing.paymentStatus)) return null;
+  if (evt.paymentStatus === undefined || evt.paymentStatus === existing.paymentStatus) {
+    const paidWith = transactionIdOf(existing.meta);
+    const incoming = transactionIdOf(evt.meta);
+    if (existing.paymentStatus === 'SUCCESS' && paidWith && incoming && paidWith !== incoming) {
+      return { code: 'ORDER_ALREADY_PAID', message: 'This order was already paid by another transaction' };
+    }
+    return null;
+  }
+  if (existing.paymentStatus === 'SUCCESS' && evt.paymentStatus === 'REFUNDED') {
+    const mayRefund = PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type) || existing.deviceId === device.id;
+    return mayRefund ? null : { code: 'REFUND_NOT_AUTHORIZED', message: 'This device cannot refund a payment it did not record' };
+  }
+  return { code: 'PAYMENT_STATUS_FINAL', message: 'A settled order cannot go back to an unpaid state' };
+}
+
 @Injectable()
 export class OrderSyncService {
   constructor(private readonly prisma: PrismaService) {}
@@ -103,20 +130,11 @@ export class OrderSyncService {
             where: { restaurantId_externalOrderId: { restaurantId: device.restaurantId, externalOrderId: evt.externalOrderId } }
           });
 
-          // security-audit HIGH-05: a settled/refunded order's payment status must not
-          // regress from a device with no payment authority (KDS, Captain, Kiosk) or
-          // from a device other than the one that actually recorded the settlement —
-          // this is exactly the "stale KDS push reopens a paid order" scenario the
-          // audit demonstrated. The push is recorded as a conflict, not silently applied.
-          if (
-            existing &&
-            existing.paymentStatus &&
-            TERMINAL_PAID_STATUSES.has(existing.paymentStatus) &&
-            evt.paymentStatus !== undefined &&
-            evt.paymentStatus !== existing.paymentStatus &&
-            existing.deviceId !== device.id &&
-            !PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type)
-          ) {
+          // A settled payment is a business invariant, not an ordinary sync conflict: one order is paid
+          // once, a paid order can be refunded but never silently reopened, and only a device with
+          // payment authority may refund. Violations are refused and recorded, never applied.
+          const violation = existing ? paymentViolation(existing, evt, device) : null;
+          if (existing && violation) {
             await tx.syncConflict.create({
               data: {
                 restaurantId: device.restaurantId,
@@ -125,12 +143,12 @@ export class OrderSyncService {
                 entityType: 'ORDER',
                 entityId: evt.externalOrderId,
                 localVersion: evt as any,
-                cloudVersion: { paymentStatus: existing.paymentStatus, totalAmount: existing.totalAmount, status: existing.status } as any,
-                reason: `${device.type} device attempted to change paymentStatus from ${existing.paymentStatus} to ${evt.paymentStatus} on a settled order`
+                cloudVersion: { paymentStatus: existing.paymentStatus, totalAmount: existing.totalAmount, status: existing.status, meta: existing.meta } as any,
+                reason: `${violation.code}: ${device.type} device sent paymentStatus ${evt.paymentStatus} on an order already ${existing.paymentStatus}`
               }
             });
             if (claimed) await this.releaseClaim(tx, device.restaurantId, evt.eventId!);
-            results.push({ externalOrderId: evt.externalOrderId, status: 'error', error: 'Order payment status is final; this device cannot change it' });
+            results.push({ externalOrderId: evt.externalOrderId, status: 'error', error: `${violation.code}: ${violation.message}` });
             continue;
           }
 

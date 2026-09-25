@@ -17,6 +17,7 @@ describe('Order sync: event idempotency and sequence cursor', () => {
   let restaurantId: string;
   let planId: string;
   let posToken: string;
+  let pos2Token: string;
   let kdsToken: string;
 
   const authed = (method: 'get' | 'post', url: string, token: string) =>
@@ -53,6 +54,7 @@ describe('Order sync: event idempotency and sequence cursor', () => {
       return (await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: type })).body.deviceToken as string;
     };
     posToken = await mk('POS');
+    pos2Token = await mk('POS');
     kdsToken = await mk('KDS');
   });
 
@@ -128,5 +130,39 @@ describe('Order sync: event idempotency and sequence cursor', () => {
     const res = await authed('get', `/api/v1/orders/sync?since=${encodeURIComponent(new Date(Date.now() - 3600_000).toISOString())}`, kdsToken);
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.orders)).toBe(true);
+  });
+
+  const paid = (id: string, txn: string, status = 'SUCCESS') => ({
+    ...orderEvent(id, 'COMPLETED'),
+    paymentStatus: status,
+    paymentMethod: 'CASH',
+    meta: { paymentTransactionId: txn }
+  });
+
+  it('a second terminal cannot pay an already-paid order (ORDER_ALREADY_PAID), and the attempt is recorded', async () => {
+    const first = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [paid('pay-1', 'TXN-A')] });
+    expect(first.body.results[0].status).toBe('ok');
+
+    const second = await authed('post', '/api/v1/orders/sync', pos2Token).send({ events: [paid('pay-1', 'TXN-B')] });
+    expect(second.body.results[0]).toMatchObject({ status: 'error', error: expect.stringContaining('ORDER_ALREADY_PAID') });
+
+    const row = await prisma.runAsPlatform((tx) => tx.syncedOrder.findFirstOrThrow({ where: { restaurantId, externalOrderId: 'pay-1' } }));
+    expect((row.meta as { paymentTransactionId?: string }).paymentTransactionId).toBe('TXN-A');
+    const conflicts = await prisma.runAsPlatform((tx) => tx.syncConflict.count({ where: { restaurantId, entityId: 'pay-1' } }));
+    expect(conflicts).toBeGreaterThanOrEqual(1);
+  });
+
+  it('re-sending the same payment (same transaction) is not a conflict', async () => {
+    await authed('post', '/api/v1/orders/sync', posToken).send({ events: [paid('pay-2', 'TXN-C')] });
+    const again = await authed('post', '/api/v1/orders/sync', pos2Token).send({ events: [paid('pay-2', 'TXN-C')] });
+    expect(again.body.results[0].status).toBe('ok');
+  });
+
+  it('a paid order can be refunded but can never revert to unpaid', async () => {
+    await authed('post', '/api/v1/orders/sync', posToken).send({ events: [paid('pay-3', 'TXN-D')] });
+    const revert = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [paid('pay-3', 'TXN-D', 'PENDING')] });
+    expect(revert.body.results[0].status).toBe('error');
+    const refund = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [paid('pay-3', 'TXN-D', 'REFUNDED')] });
+    expect(refund.body.results[0].status).toBe('ok');
   });
 });
