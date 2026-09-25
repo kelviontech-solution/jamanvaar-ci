@@ -20,3 +20,4 @@ export * from './qr_order_url';
 export * from './collection_sync';
 export * from './service_messages';
 export * from './pin';
+export * from './number_allocator';

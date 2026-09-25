@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
 import { EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus } from '@jamanvaar/types';
-import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError } from './cloud/cloudClient';
+import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
 import {
   JamanvaarAuthLayout,
   APP_HERO_IMAGES,
@@ -94,7 +94,7 @@ export const App: React.FC = () => {
       SyncOutboxEngine.configureTransport(null);
       return;
     }
-    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync, leaseNumbers: leaseNumberBlock, deviceId: () => localStorage.getItem('jamanvaar_kds_device_id') });
     EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
 
     // BUG-019/034/035: a staff PIN issued in Restaurant Admin used to work only on the device that

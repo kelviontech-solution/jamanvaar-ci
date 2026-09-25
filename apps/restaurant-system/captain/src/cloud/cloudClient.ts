@@ -261,3 +261,11 @@ export async function reportAiQueryNow(intent: string, latencyMs: number): Promi
   if (!deviceToken) return;
   await reportAiQuery({ apiBase: API_BASE, deviceToken, intent, latencyMs });
 }
+
+/** Reserves a block of human order/KOT numbers for this device so offline terminals never issue the same number. */
+export async function leaseNumberBlock(kind: 'ORDER' | 'KOT', count: number): Promise<{ kind: 'ORDER' | 'KOT'; prefix: string; businessDate: string; start: number; count: number }> {
+  const res = await deviceFetch('/api/v1/sync/number-leases', { method: 'POST', body: JSON.stringify({ kind, count }) });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && data.message) || `Number lease failed (${res.status})`);
+  return data;
+}

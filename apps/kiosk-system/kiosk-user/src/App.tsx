@@ -17,8 +17,7 @@ import {
   pushEntitySync,
   pullEntitySync,
   CloudApiError,
-  type CartLinePayload
-} from './cloud/cloudClient';
+  type CartLinePayload, leaseNumberBlock } from './cloud/cloudClient';
 import {
   AuditRepository,
   ComboRepository,
@@ -262,7 +261,7 @@ export default function KioskUserApp() {
       SyncOutboxEngine.configureTransport(null);
       return;
     }
-    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync, leaseNumbers: leaseNumberBlock, deviceId: () => localStorage.getItem('jamanvaar_kiosk_user_device_id') });
     EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
 
     // BUG-016: this terminal had no menu sync at all, so a fresh or cleared kiosk fell back

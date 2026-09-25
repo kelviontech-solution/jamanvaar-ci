@@ -1041,3 +1041,11 @@ export async function fetchDisplayScale(): Promise<number> {
 export async function saveDisplayScale(percent: number): Promise<number> {
   return (await request<{ displayScalePercent: number }>('/api/v1/tenant/me/display', { method: 'PATCH', body: { displayScalePercent: percent } })).displayScalePercent;
 }
+
+/** Reserves a block of human order/KOT numbers for this device so offline terminals never issue the same number. */
+export async function leaseNumberBlock(kind: 'ORDER' | 'KOT', count: number): Promise<{ kind: 'ORDER' | 'KOT'; prefix: string; businessDate: string; start: number; count: number }> {
+  const res = await deviceFetch('/api/v1/sync/number-leases', { method: 'POST', body: JSON.stringify({ kind, count }) });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && data.message) || `Number lease failed (${res.status})`);
+  return data;
+}

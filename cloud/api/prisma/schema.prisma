@@ -173,6 +173,7 @@ model Restaurant {
   syncedOrders            SyncedOrder[]
   processedSyncEvents     ProcessedSyncEvent[]
   syncSequences           SyncSequence[]
+  numberSequences         NumberSequence[]
   syncedEntities          SyncedEntity[]
   aiAccess                RestaurantAiAccess?
   aiUsage                 AiUsageDaily[]
@@ -1512,4 +1513,17 @@ model SyncSequence {
   value        Int        @default(0)
 
   @@id([restaurantId, scope])
+}
+
+/// Human-readable order/KOT numbers are leased to devices in blocks, per branch and business day, so two
+/// terminals numbering offline can never produce the same number. `next` is the first unleased number.
+model NumberSequence {
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  scope        String // branchId, or "_" for a device with no branch
+  kind         String // ORDER | KOT
+  businessDate String // YYYYMMDD in the branch's timezone
+  next         Int        @default(1)
+
+  @@id([restaurantId, scope, kind, businessDate])
 }

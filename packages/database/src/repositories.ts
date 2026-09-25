@@ -1,3 +1,4 @@
+import { NumberAllocator } from './number_allocator';
 import {
   AppNotification,
   PaymentSplit,
@@ -581,6 +582,10 @@ export class OrderRepository {
     const tokenNumber = orderData.tokenNumber || OrderRepository.nextTokenNumber('', businessDayId);
     // Hard uniqueness guarantee, not just a low-probability random draw.
     let orderNumber = orderData.orderNumber;
+    if (!orderNumber) {
+      // An activated device numbers from server-leased blocks (collision-free across offline terminals).
+      orderNumber = NumberAllocator.next('ORDER') ?? undefined;
+    }
     if (!orderNumber) {
       do {
         orderNumber = generateOrderNumber();
@@ -2428,7 +2433,11 @@ export class KOTRepository {
     Object.entries(stationMap).forEach(([stationName, stationItems]) => {
       const kotRecord: KOTRecord = {
         id: `kot-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
-        kotNumber: `KOT-${String(nextKotSeq).padStart(2, '0')}`,
+        kotNumber: (() => {
+          const allocated = NumberAllocator.next('KOT');
+          if (allocated) return allocated;
+          return `KOT-${String(nextKotSeq).padStart(2, '0')}`;
+        })(),
         orderId: params.orderId,
         orderNumber: params.orderNumber,
         tokenNumber: params.tokenNumber,

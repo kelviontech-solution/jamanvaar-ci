@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, CloudApiError } from './cloud/cloudClient';
+import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
 import { usePosStore } from './store/posStore';
 import { db, CustomerRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
 import type { MenuItem, Category } from '@jamanvaar/types';
@@ -128,7 +128,7 @@ export const App: React.FC = () => {
       SyncOutboxEngine.configureTransport(null);
       return;
     }
-    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync, leaseNumbers: leaseNumberBlock, deviceId: () => localStorage.getItem('jamanvaar_pos_device_id') });
     EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
 
     // Guests registered here reach Restaurant Admin's CRM and back (BUG-159): only what changed is sent, and the

@@ -95,8 +95,7 @@ import {
   getDeviceTokenForSync,
   refreshLicenseFromCloud,
   type PaymentConnectionFields,
-  type PaymentConnectionStatus
-} from './cloud/cloudClient';
+  type PaymentConnectionStatus, leaseNumberBlock, getLocalDeviceCode } from './cloud/cloudClient';
 import {
   Activity,
   AlertCircle,
@@ -723,7 +722,7 @@ export default function AdminApp() {
   // and the list of kiosks never reached this console.
   useEffect(() => {
     if (!deviceConnected || !getDeviceTokenForSync()) return;
-    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync });
+    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync, leaseNumbers: leaseNumberBlock, deviceId: getLocalDeviceCode });
     EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
 
     const refreshKiosks = async () => {

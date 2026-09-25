@@ -1,6 +1,6 @@
 import { SyncEvent, SyncEventType, Order, OrderItem, PaymentSplit } from '@jamanvaar/types';
 import { generateUUID, splitTaxPaise } from '@jamanvaar/utils';
-import { db, KOTRepository, BusinessDayRepository, InventoryRepository } from '@jamanvaar/database';
+import { db, KOTRepository, BusinessDayRepository, InventoryRepository, NumberAllocator, type NumberLease } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 import { nextAttemptState } from './sync_protocol';
 
@@ -105,6 +105,10 @@ export interface OrderSyncTransport {
   push(events: OrderSyncPushEvent[]): Promise<{ results: OrderSyncPushResult[]; serverTime: string }>;
   /** `cursor` is either `seq:<n>` (preferred) or a legacy ISO timestamp; undefined means first pull. */
   pull(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean }>;
+  /** Reserves a block of human order/KOT numbers for this device (POST /sync/number-leases). */
+  leaseNumbers?(kind: 'ORDER' | 'KOT', count: number): Promise<NumberLease>;
+  /** This device's id, used to derive the short code that keeps offline fallback numbers unique. */
+  deviceId?(): string | null;
 }
 
 const CATCH_UP_CURSOR_KEY = 'jamanvaar_order_sync_cursor';
@@ -385,6 +389,7 @@ export class SyncOutboxEngine {
    */
   public static configureTransport(transport: OrderSyncTransport | null): void {
     this.transport = transport;
+    NumberAllocator.reload();
     this.unsubscribeNetwork?.();
     this.unsubscribeNetwork = null;
 
@@ -398,6 +403,26 @@ export class SyncOutboxEngine {
         }
         wasOnline = isOnlineNow;
       });
+    }
+  }
+
+  /** Tops up the leased number blocks while online. A failure just means fallback numbering keeps working. */
+  private static async refillNumberLeases(): Promise<void> {
+    const t = this.transport;
+    if (!t?.leaseNumbers) return;
+    for (const kind of ['ORDER', 'KOT'] as const) {
+      if (NumberAllocator.isConfigured() && !NumberAllocator.needsRefill(kind)) continue;
+      try {
+        const lease = await t.leaseNumbers(kind, 100);
+        if (!NumberAllocator.isConfigured()) {
+          const id = t.deviceId?.();
+          if (!id) return;
+          NumberAllocator.configure({ deviceCode: 'D' + id.replace(/-/g, '').slice(0, 6).toUpperCase(), branchCode: lease.prefix });
+        }
+        NumberAllocator.addLease(lease);
+      } catch {
+        return;
+      }
     }
   }
 
@@ -427,6 +452,7 @@ export class SyncOutboxEngine {
     if (this.isSyncing) return { processed: 0, failed: 0 };
     this.isSyncing = true;
     NetworkStatusService.setNetworkState('SYNCING', NetworkStatusService.getLatency());
+    void this.refillNumberLeases();
 
     let processed = 0;
     let failed = 0;

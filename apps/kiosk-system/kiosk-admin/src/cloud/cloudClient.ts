@@ -920,3 +920,26 @@ export async function refreshLicenseFromCloud(activeKiosks: number): Promise<voi
     // Offline: keep what was last known.
   }
 }
+
+/** Kiosk Admin stores no device id, so it keeps a random local code that keeps its fallback order numbers unique. */
+export function getLocalDeviceCode(): string {
+  const KEY = 'jamanvaar_kiosk_admin_device_code';
+  try {
+    let code = localStorage.getItem(KEY);
+    if (!code) {
+      code = Array.from({ length: 12 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+      localStorage.setItem(KEY, code);
+    }
+    return code;
+  } catch {
+    return 'ffffffffffff';
+  }
+}
+
+/** Reserves a block of human order/KOT numbers for this device so offline terminals never issue the same number. */
+export async function leaseNumberBlock(kind: 'ORDER' | 'KOT', count: number): Promise<{ kind: 'ORDER' | 'KOT'; prefix: string; businessDate: string; start: number; count: number }> {
+  const res = await deviceFetch('/api/v1/sync/number-leases', { method: 'POST', body: JSON.stringify({ kind, count }) });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && data.message) || `Number lease failed (${res.status})`);
+  return data;
+}
