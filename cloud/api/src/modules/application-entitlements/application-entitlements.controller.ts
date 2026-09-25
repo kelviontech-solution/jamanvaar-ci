@@ -5,6 +5,7 @@ import { updateApplicationEntitlementSchema } from './dto/application-entitlemen
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
+import { FEATURE_CATALOG } from './feature-catalog';
 
 // Two thin controllers sharing one service, each mounted under the resource
 // it naturally belongs to (subscriptions/:id/applications for
@@ -41,5 +42,14 @@ export class RestaurantApplicationsController {
   @Get('api/v1/restaurants/:id/applications')
   listForRestaurant(@Param('id') id: string) {
     return this.entitlements.listForRestaurant(id);
+  }
+}
+
+@Controller('api/v1/application-entitlements')
+@UseGuards(PlatformAuthGuard)
+export class ApplicationCatalogController {
+  @Get('catalog')
+  getCatalog() {
+    return FEATURE_CATALOG;
   }
 }
