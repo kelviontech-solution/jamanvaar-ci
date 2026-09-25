@@ -11,7 +11,7 @@ import {
 } from '@jamanvaar/database';
 import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
-import { isCloudConnected, redeemActivationCode, cloudLogin, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, reportQrUsage, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity } from './cloud/cloudClient';
+import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, reportQrUsage, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity } from './cloud/cloudClient';
 import { EntitySyncEngine, SyncOutboxEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts } from '@jamanvaar/sync';
 import {
   Category,
@@ -185,7 +185,7 @@ export default function PosAdminApp() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(
     () => SessionPersistence.isValid('admin')
   );
-  const [authUsername, setAuthUsername] = useState('admin');
+  const [authRestaurantCode, setAuthRestaurantCode] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -236,18 +236,17 @@ export default function PosAdminApp() {
 
   const handleAdminLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!authUsername.trim() || !authPassword.trim()) {
-      setAuthError('Please enter both username/email and password.');
+    if (!authRestaurantCode.trim() || !authPassword.trim()) {
+      setAuthError('Please enter your Restaurant ID and password.');
       return;
     }
 
-    const trimmedUser = authUsername.trim();
     setAuthError('');
     setLoginBusy(true);
 
-    // Production Multi-Tenant Cloud Authentication
+    // Production Multi-Tenant Cloud Authentication (owner-only — spec sections 5/33)
     try {
-      const authResult = await cloudLogin(trimmedUser, authPassword);
+      const authResult = await cloudLoginOwner(authRestaurantCode.trim(), authPassword);
 
       if (authResult.requiresActivation) {
         // First-time login on this device -> Prompt for Welcome Kit activation key
@@ -584,10 +583,9 @@ export default function PosAdminApp() {
           <ActivationNoticeBanner />
           {authScreenState === 'FORGOT' ? (
             <ForgotPasswordPanel
-              defaultEmail={authUsername}
+              defaultRestaurantCode={authRestaurantCode}
               onBack={() => setAuthScreenState('LOGIN')}
-              onDone={(email) => {
-                setAuthUsername(email);
+              onDone={() => {
                 setAuthPassword('');
                 setAuthScreenState('LOGIN');
                 setAuthError('');
@@ -599,23 +597,23 @@ export default function PosAdminApp() {
               <form onSubmit={handleAdminLogin} className="space-y-3.5 pt-2">
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
-                    Username or Email *
+                    Restaurant ID *
                   </label>
                   <input
                     type="text"
-                    value={authUsername}
+                    value={authRestaurantCode}
                     onChange={(e) => {
-                      setAuthUsername(e.target.value);
+                      setAuthRestaurantCode(e.target.value);
                       setAuthError('');
                     }}
-                    placeholder="Your Restaurant Admin username or email"
-                    className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
+                    placeholder="e.g. JM9876543210"
+                    className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                   />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold text-slate-700">Password *</label>
+                    <label className="text-xs font-bold text-slate-700">Owner Password *</label>
                     <button
                       type="button"
                       onClick={() => setShowPassword((p) => !p)}
@@ -632,7 +630,7 @@ export default function PosAdminApp() {
                         setAuthPassword(e.target.value);
                         setAuthError('');
                       }}
-                      placeholder="Enter admin password"
+                      placeholder="Enter owner password"
                       className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                     />
                   </div>

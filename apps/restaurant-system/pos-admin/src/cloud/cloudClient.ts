@@ -321,6 +321,61 @@ export async function cloudLogin(
 }
 
 /**
+ * Owner-only Restaurant Admin login (spec sections 5/33): Restaurant ID (JM…) + the owner's
+ * password — no email, no ambiguity about which restaurant. Same two-shape response as
+ * cloudLogin (LOGIN_SUCCESS / ACTIVATION_REQUIRED).
+ */
+export async function cloudLoginOwner(restaurantCode: string, password: string): Promise<CloudAuthResult> {
+  const deviceId = getStoredDeviceId() || undefined;
+  const deviceToken = getStoredDeviceToken() || undefined;
+
+  const result = await request<
+    | {
+        status: 'LOGIN_SUCCESS';
+        requiresActivation: false;
+        accessToken: string;
+        user: { id: string; fullName: string; role: string; restaurantId: string; email: string };
+        restaurant: CloudRestaurantProfile;
+        deviceId?: string;
+        deviceToken?: string;
+      }
+    | {
+        status: 'ACTIVATION_REQUIRED';
+        requiresActivation: true;
+        activationSessionToken: string;
+        restaurant: CloudRestaurantProfile;
+        user: { id: string; fullName: string; email: string };
+        message: string;
+      }
+  >('/api/v1/tenant-auth/login-owner', {
+    method: 'POST',
+    body: { restaurantCode, password, deviceId, deviceToken, deviceType: 'POS_ADMIN' }
+  });
+
+  if (result.status === 'LOGIN_SUCCESS') {
+    accessToken = result.accessToken;
+    setRestaurantId(result.restaurant.id);
+    if (result.deviceId && result.deviceToken) {
+      saveDeviceRegistration(result.deviceId, result.deviceToken, result.restaurant.id);
+    }
+    return {
+      requiresActivation: false,
+      user: result.user,
+      restaurant: result.restaurant,
+      deviceId: result.deviceId
+    };
+  }
+
+  return {
+    requiresActivation: true,
+    activationSessionToken: result.activationSessionToken,
+    restaurant: result.restaurant,
+    user: result.user,
+    message: result.message
+  };
+}
+
+/**
  * Redeems an activation key for this authenticated session, binds the device in PostgreSQL,
  * and sets up persistent device credentials so future logins do not ask for activation.
  */
@@ -391,6 +446,30 @@ export async function cloudResetPassword(email: string, otp: string, newPassword
   const restaurantId = getRestaurantId();
   if (!restaurantId) throw new CloudApiError('This terminal is not connected to a restaurant yet', 400);
   await request('/api/v1/tenant-auth/reset-password', { method: 'POST', body: { restaurantId, email, otp, newPassword }, skipAuthRetry: true });
+}
+
+/**
+ * Restaurant-code forgot-password, step 1 (spec section 34): resolves the owner and masks
+ * their email for display. Unlike cloudRequestPasswordReset above, this never depends on
+ * getRestaurantId() — a terminal that has never signed in yet has no stored restaurantId at
+ * all (it's only set inside cloudLogin/cloudLoginOwner on success), so the operator types the
+ * Restaurant ID directly here instead.
+ */
+export async function cloudRequestPasswordResetOwner(restaurantCode: string): Promise<{ maskedEmail: string }> {
+  return request<{ maskedEmail: string }>('/api/v1/tenant-auth/forgot-password-owner', {
+    method: 'POST',
+    body: { restaurantCode },
+    skipAuthRetry: true
+  });
+}
+
+/** Restaurant-code forgot-password, step 2: the emailed code and the new password. */
+export async function cloudResetPasswordOwner(restaurantCode: string, otp: string, newPassword: string): Promise<void> {
+  await request('/api/v1/tenant-auth/reset-password-owner', {
+    method: 'POST',
+    body: { restaurantCode, otp, newPassword },
+    skipAuthRetry: true
+  });
 }
 
 /**
