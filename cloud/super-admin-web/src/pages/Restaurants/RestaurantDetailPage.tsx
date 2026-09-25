@@ -666,11 +666,16 @@ export function RestaurantDetailPage() {
     if (!activeSub) return;
     setSavingAppCode(appCode);
     try {
-      const updated = await api.patch<ApplicationEntitlement>(
+      await api.patch<ApplicationEntitlement>(
         `/api/v1/subscriptions/${activeSub.id}/applications/${appCode}`,
         { enabled: nextEnabled }
       );
-      setAppEntitlements((prev) => (prev ? prev.map((e) => (e.appCode === appCode ? updated : e)) : prev));
+      // Refetch rather than splice in the PATCH response directly: the PATCH endpoint returns the
+      // raw entitlement row with no `source` field (only the GET list endpoints compute PLAN vs
+      // MANUAL_OVERRIDE), so merging it in-place would silently drop this row's source badge
+      // until the next full reload.
+      const refreshed = await api.get<ApplicationEntitlement[]>(`/api/v1/restaurants/${id}/applications`);
+      setAppEntitlements(refreshed);
       showToast(`${APP_CODE_LABELS[appCode]} ${nextEnabled ? 'enabled' : 'disabled'} for this restaurant.`);
     } catch (err) {
       showToast(err instanceof ApiError ? err.message : `Failed to update ${APP_CODE_LABELS[appCode]}`);
