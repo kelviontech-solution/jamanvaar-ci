@@ -70,7 +70,7 @@ const AREA_RULES: Array<{ test: (p: string) => boolean; area: Area }> = [
   { test: (p) => /^\/api\/v1\/restaurants\/[^/]+\/license-certificate(\/|$)/.test(p), area: 'licensing' },
   { test: (p) => /^\/api\/v1\/restaurants\/[^/]+\/payment-connection(\/|$)/.test(p), area: 'billing' },
   { test: (p) => /^\/api\/v1\/(restaurants|owners|branches)(\/|$)/.test(p), area: 'restaurants' },
-  { test: (p) => /^\/api\/v1\/(subscriptions|plans)(\/|$)/.test(p), area: 'subscriptions' },
+  { test: (p) => /^\/api\/v1\/(subscriptions|plans|features|feature-categories|application-entitlements)(\/|$)/.test(p), area: 'subscriptions' },
   { test: (p) => /^\/api\/v1\/(invoices|payments|payment-connections)(\/|$)/.test(p), area: 'billing' },
   { test: (p) => /^\/api\/v1\/(activation-keys|devices)(\/|$)/.test(p), area: 'devices' },
   { test: (p) => /^\/api\/v1\/(applications)(\/|$)/.test(p), area: 'ops' },
