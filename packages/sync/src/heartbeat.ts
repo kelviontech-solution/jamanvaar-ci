@@ -1,3 +1,4 @@
+import { db } from '@jamanvaar/database';
 import { DeviceGate, type HeartbeatAnswer } from './device_gate';
 import { SyncOutboxEngine } from './outbox';
 
@@ -14,12 +15,17 @@ export function detectOsPlatform(): string | undefined {
 /** What a terminal tells the cloud about itself, from real state (BUG-065/069): its version, OS and sync backlog. */
 export function buildHeartbeatBody(appVersion: string) {
   const stats = SyncOutboxEngine.getSyncStats();
+  const persistence = db.getPersistenceHealth();
+  const problems: string[] = [];
+  if (!persistence.ok) problems.push(`Local storage is failing (${persistence.error}); recent changes are not saved on this device`);
+  if (stats.deadLetterCount > 0) problems.push(`${stats.deadLetterCount} order(s) could not be synced and the device gave up: needs attention`);
+  if (stats.failedCount > 0) problems.push(`${stats.failedCount} change(s) could not be synced`);
   return {
-    syncStatus: stats.failedCount > 0 ? 'error' : stats.pendingCount > 0 ? 'pending' : 'ok',
+    syncStatus: problems.length > 0 ? 'error' : stats.pendingCount > 0 ? 'pending' : 'ok',
     appVersion,
     osPlatform: detectOsPlatform(),
     pendingSyncCount: stats.pendingCount,
-    syncError: stats.failedCount > 0 ? `${stats.failedCount} change(s) could not be synced` : null
+    syncError: problems.length > 0 ? problems.join('; ').slice(0, 290) : null
   };
 }
 

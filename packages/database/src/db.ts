@@ -976,11 +976,73 @@ export class JamanvaarDatabase {
     this.lastWritten.set(fullKey, text);
   }
 
+  /** Last save failure (quota full, storage unavailable...), or null when the last save succeeded. */
+  private persistenceError: string | null = null;
+
+  /** Whether the last attempt to save to local storage succeeded. A failing store means recent changes exist only in memory. */
+  public getPersistenceHealth(): { ok: boolean; error: string | null } {
+    return { ok: this.persistenceError === null, error: this.persistenceError };
+  }
+
+  private journalKey(): string {
+    return `${this.storagePrefix}__journal`;
+  }
+
+  /**
+   * Writes a set of changed collections so a crash part-way through cannot leave some of them
+   * updated and others not. The full set is first written to ONE journal entry (a single setItem is
+   * atomic); the collections are then written individually and the journal removed. On startup a
+   * surviving journal is replayed (see recoverJournal), so a save is either fully applied or never
+   * started. A single changed collection needs no journal.
+   */
+  private commitPending(pending: Map<string, string>): void {
+    if (pending.size === 0) return;
+    const journalKey = this.journalKey();
+    let journaled = false;
+    if (pending.size > 1) {
+      try {
+        localStorage.setItem(journalKey, JSON.stringify(Object.fromEntries(pending)));
+        journaled = true;
+      } catch {
+        // Could not journal (e.g. quota): fall through to direct writes; failures are reported below.
+      }
+    }
+    for (const [key, text] of pending) {
+      localStorage.setItem(key, text);
+      this.lastWritten.set(key, text);
+    }
+    if (journaled) localStorage.removeItem(journalKey);
+  }
+
+  /** Replays a journal left by a save that was interrupted, restoring all-or-nothing behaviour. */
+  private recoverJournal(): void {
+    if (typeof localStorage === 'undefined') return;
+    const journalKey = this.journalKey();
+    const raw = localStorage.getItem(journalKey);
+    if (!raw) return;
+    try {
+      const entries = JSON.parse(raw) as Record<string, string>;
+      for (const [key, text] of Object.entries(entries)) localStorage.setItem(key, text);
+    } catch {
+      // A corrupt journal cannot be replayed; the collections on disk are the last consistent state.
+    }
+    try {
+      localStorage.removeItem(journalKey);
+    } catch {
+      // Ignore: replaying it again later is harmless.
+    }
+  }
+
   private saveToStorage(): void {
     if (typeof localStorage === 'undefined') return;
     try {
       const p = this.storagePrefix;
-      const put = (name: string, value: unknown) => this.putIfChanged(`${p}${name}`, JSON.stringify(value));
+      const pending = new Map<string, string>();
+      const put = (name: string, value: unknown) => {
+        const key = `${p}${name}`;
+        const text = JSON.stringify(value);
+        if (this.lastWritten.get(key) !== text) pending.set(key, text);
+      };
       put('restaurant', this.restaurant);
       put('outlet', this.outlet);
       put('menu_items', this.menuItems);
@@ -1039,15 +1101,20 @@ export class JamanvaarDatabase {
       // restaurant's QR ordering configuration (min/max order value, waiter
       // approval requirement, etc.) silently reverted to defaults on reload.
       put('qr_settings', this.qrSettings);
+      this.commitPending(pending);
       localStorage.setItem(`${p}sync_timestamp`, Date.now().toString());
+      this.persistenceError = null;
     } catch (e) {
-      console.warn('Storage save failed:', e);
+      // Never swallow this: the changes exist only in memory until a later save succeeds.
+      this.persistenceError = e instanceof Error ? `${e.name}: ${e.message}` : String(e);
+      console.error('Local storage save failed - recent changes are not yet persisted:', e);
     }
   }
 
   private loadFromStorage(): void {
     if (typeof localStorage === 'undefined') return;
     this.lastWritten.clear();
+    this.recoverJournal();
     try {
       const p = this.storagePrefix;
       const storedRest = localStorage.getItem(`${p}restaurant`);
@@ -1419,6 +1486,30 @@ export class JamanvaarDatabase {
         this.batchDirty = false;
         this.notify();
       }
+    }
+  }
+
+  /**
+   * Runs `fn` as one unit: its changes are announced/saved once (like batch), and if it throws, every
+   * collection the core order/KOT/stock/cash flows touch is restored to how it was before `fn` ran,
+   * so a failure half-way through can never leave an order without its KOT or a sale without its stock movement.
+   */
+  public transaction<T>(fn: () => T): T {
+    const names = [
+      'orders', 'kots', 'syncEvents', 'inventoryItems', 'stockMovements', 'cashMovements', 'shifts',
+      'receiptRecords', 'printJobs', 'auditLogs', 'businessDays', 'heldOrders', 'customerAccounts', 'tables'
+    ] as const;
+    const self = this as unknown as Record<string, unknown[]>;
+    const snapshot = names.map((n) => [n, structuredClone(self[n])] as const);
+    try {
+      return this.batch(fn);
+    } catch (err) {
+      for (const [n, saved] of snapshot) {
+        const live = self[n];
+        if (Array.isArray(live)) live.splice(0, live.length, ...(saved as unknown[]));
+      }
+      this.notify();
+      throw err;
     }
   }
 

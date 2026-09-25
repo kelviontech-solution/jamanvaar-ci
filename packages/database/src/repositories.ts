@@ -565,7 +565,12 @@ export class OrderRepository {
     return typeof orderData.subtotal === 'number' ? orderData.subtotal : expectedSubtotal;
   }
 
+  /** Atomic: if anything inside fails, no half-created order (or its side effects) is left behind. */
   public static createOrder(orderData: Partial<Order>): Order {
+    return db.transaction(() => this.createOrderInner(orderData));
+  }
+
+  private static createOrderInner(orderData: Partial<Order>): Order {
     // Idempotency fix: a key was generated and stored on every order, but never
     // looked up before insert — a retried/duplicated submit (network retry, a
     // double-tapped "place order" button re-firing the same request) created a
@@ -2398,6 +2403,22 @@ export class KOTRepository {
   }
 
   public static generateKOT(params: {
+    orderId: string;
+    orderNumber: string;
+    tokenNumber: string;
+    tableNumber?: string;
+    orderType: OrderType;
+    items: KOTItem[];
+    station?: string;
+    type?: KOTType;
+    cashierName: string;
+    serverName?: string;
+    orderNotes?: string;
+  }): KOTRecord[] {
+    return db.transaction(() => this.generateKOTInner(params));
+  }
+
+  private static generateKOTInner(params: {
     orderId: string;
     orderNumber: string;
     tokenNumber: string;
