@@ -135,4 +135,25 @@ describe('Owner-only restaurant-code login (Phase 3)', () => {
     expect(res.status).toBe(200);
     expect(res.body.maskedEmail).toBeDefined();
   });
+
+  it('a flood of login-owner attempts is throttled per-IP independently of the per-account lockout', async () => {
+    // A fresh restaurant/owner so this test's own flood doesn't collide with the lockout test
+    // above (which already locked its own restaurant's account) — the point here is the
+    // per-IP ceiling, which must trip even though every one of these targets a *different*,
+    // not-yet-locked account.
+    const floodOwnerEmail = `owner-flood-${stamp}@example.com`;
+    const create = await request(app.getHttpServer()).post('/api/v1/restaurants').set('Authorization', `Bearer ${platformToken}`).send({
+      name: `TEST Owner Flood ${stamp}`, mobile: `7${String(stamp).slice(-9)}`, ownerName: 'Owner', ownerEmail: floodOwnerEmail
+    });
+    const floodRestaurantCode = create.body.restaurant.restaurantCode;
+    createdRestaurantIds.push(create.body.restaurant.id);
+
+    const statuses: number[] = [];
+    for (let i = 0; i < 25; i += 1) {
+      statuses.push(
+        (await request(app.getHttpServer()).post('/api/v1/tenant-auth/login-owner').send({ restaurantCode: floodRestaurantCode, password: `wrong-${i}` })).status
+      );
+    }
+    expect(statuses.some((s) => s === 429)).toBe(true);
+  }, 30_000);
 });

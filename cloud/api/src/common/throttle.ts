@@ -24,3 +24,15 @@ export const QR_GUEST_ORDER_REQUESTS_PER_MINUTE = 12;
 
 export const QrGuestReadThrottle = () => Throttle({ default: { limit: QR_GUEST_READ_REQUESTS_PER_MINUTE, ttl: 60_000 } });
 export const QrGuestOrderThrottle = () => Throttle({ default: { limit: QR_GUEST_ORDER_REQUESTS_PER_MINUTE, ttl: 60_000 } });
+
+/**
+ * Restaurant-code lookup and owner-auth endpoints (Phase 9) are reachable with no credential at
+ * all — the global 120/min/IP default is sized for ordinary authenticated app traffic, not for
+ * an enumeration/brute-force-sensitive public endpoint. This is independent of, and on top of,
+ * the per-account lockout TenantAuthService already enforces (see its LOGIN_MAX_ATTEMPTS/
+ * RESET_MAX_ATTEMPTS) — that stops one account being brute-forced; this stops one address
+ * spraying many different accounts.
+ */
+export const PUBLIC_AUTH_REQUESTS_PER_MINUTE = 20;
+
+export const PublicAuthThrottle = () => Throttle({ default: { limit: PUBLIC_AUTH_REQUESTS_PER_MINUTE, ttl: 60_000 } });

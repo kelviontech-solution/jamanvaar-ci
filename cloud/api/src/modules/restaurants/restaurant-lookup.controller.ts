@@ -2,6 +2,7 @@ import { Body, Controller, HttpCode, Post, UsePipes } from '@nestjs/common';
 import { RestaurantsService } from './restaurants.service';
 import { resolveRestaurantCodeSchema, ResolveRestaurantCodeDto } from './dto/restaurant-lookup.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
+import { PublicAuthThrottle } from '../../common/throttle';
 
 /**
  * Deliberately unguarded — same reasoning as ActivationRedeemController: a login or
@@ -14,6 +15,7 @@ export class RestaurantLookupController {
 
   @Post('resolve')
   @HttpCode(200)
+  @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(resolveRestaurantCodeSchema))
   resolve(@Body() body: ResolveRestaurantCodeDto) {
     return this.restaurants.resolveByCode(body.restaurantCode);

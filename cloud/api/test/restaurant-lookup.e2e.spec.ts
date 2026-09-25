@@ -73,4 +73,25 @@ describe('Restaurant-code lookup (Phase 1)', () => {
       .send({ restaurantCode: 'JM9812345670' });
     expect(Object.keys(res.body).sort()).toEqual(['name', 'restaurantId']);
   });
+
+  // Order matters: the per-IP throttle window is shared by every request this file's supertest
+  // client makes, so the "a handful of legitimate lookups" check must run before the flood test
+  // below exhausts the window, not after.
+  it('a handful of legitimate lookups (an installer double-checking an ID) are never throttled', async () => {
+    const statuses: number[] = [];
+    for (let i = 0; i < 5; i += 1) {
+      statuses.push((await request(app.getHttpServer()).post('/api/v1/restaurant-lookup/resolve').send({ restaurantCode: 'JM9812345670' })).status);
+    }
+    expect(statuses.every((s) => s === 200)).toBe(true);
+  });
+
+  it('throttles a flood of lookups from one address well below the generic 120/min default', async () => {
+    const statuses: number[] = [];
+    for (let i = 0; i < 25; i += 1) {
+      statuses.push(
+        (await request(app.getHttpServer()).post('/api/v1/restaurant-lookup/resolve').send({ restaurantCode: 'JM6000000001' })).status
+      );
+    }
+    expect(statuses.some((s) => s === 429)).toBe(true);
+  }, 30_000);
 });

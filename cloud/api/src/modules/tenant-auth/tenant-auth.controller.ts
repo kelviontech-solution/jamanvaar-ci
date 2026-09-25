@@ -44,6 +44,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { readActivePlatformNotice } from '../../common/platform-notice';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
 import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.decorator';
+import { PublicAuthThrottle } from '../../common/throttle';
 
 const REFRESH_COOKIE = 'jamanvaar_tenant_refresh';
 
@@ -95,6 +96,7 @@ export class TenantAuthController {
   /** Restaurant-code forgot-password, step 1 (spec section 6/34): resolves the code to the owner and masks their email for display. */
   @Post('forgot-password-owner')
   @HttpCode(200)
+  @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(forgotPasswordOwnerSchema))
   async forgotPasswordOwner(@Body() body: ForgotPasswordOwnerDto) {
     return this.authService.forgotPasswordOwner(body);
@@ -103,6 +105,7 @@ export class TenantAuthController {
   /** Restaurant-code forgot-password, step 2: the emailed code and the new password. */
   @Post('reset-password-owner')
   @HttpCode(200)
+  @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(resetPasswordOwnerSchema))
   async resetPasswordOwner(@Body() body: ResetPasswordOwnerDto) {
     await this.authService.resetPasswordOwner(body, body.otp, body.newPassword);
@@ -130,6 +133,7 @@ export class TenantAuthController {
 
   @Post('login-owner')
   @HttpCode(200)
+  @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(loginOwnerSchema))
   async loginOwner(
     @Body() body: LoginOwnerDto,
