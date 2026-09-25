@@ -248,6 +248,12 @@ export default function KioskUserApp() {
     setIsDeviceActivated(true);
   };
 
+  useEffect(() => {
+    if (activationStep !== 'success') return;
+    const timer = setTimeout(() => setActivationStep('form'), 4000);
+    return () => clearTimeout(timer);
+  }, [activationStep]);
+
   // Wires the real sync bridge (Phase 3) so orders placed here actually
   // reach KDS/Captain via a persisted, catch-up-capable path instead of the
   // "✓ Sent to Kitchen" badge below being asserted rather than proven.
@@ -1422,6 +1428,40 @@ export default function KioskUserApp() {
       alert(attempts >= OTP_MAX_ATTEMPTS ? 'Incorrect code. No attempts left — tap Send OTP again.' : `Incorrect code. ${OTP_MAX_ATTEMPTS - attempts} attempt(s) left.`);
     }
   };
+
+  if (activationStep === 'success' && activationSuccess) {
+    return (
+      <div className="min-h-screen bg-jaman-ivory flex flex-col items-center justify-center p-8 text-center select-none">
+        <div className="flex justify-center">
+          <JamanvaarLogo variant="horizontal" size="xl" imgStyle={{ height: '80px', width: 'auto' }} />
+        </div>
+        <div className="mt-8 p-8 max-w-md bg-white rounded-3xl border border-jaman-border shadow-xl">
+          <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-600 mb-4">
+            <CheckCircle2 className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-black text-jaman-navy">Kiosk Connected!</h2>
+          <p className="text-sm text-[#4A5568] mt-3 leading-relaxed">
+            This terminal is now activated for <strong>{activationSuccess.restaurantName}</strong>.
+          </p>
+          {activationSuccess.mismatchNote && (
+            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mt-4 text-left">
+              {activationSuccess.mismatchNote}
+            </p>
+          )}
+          <div className="mt-6 pt-4 border-t border-[#F3EFE6] text-xs text-[#8C9BAE] font-medium">
+            Terminal ID: {activationSuccess.deviceId.slice(0, 8)}
+          </div>
+          <button
+            type="button"
+            onClick={() => setActivationStep('form')}
+            className="mt-6 w-full py-3 rounded-2xl bg-gradient-to-r from-[#FF8A00] to-[#F97316] hover:brightness-105 text-white font-extrabold text-sm shadow-[0_10px_24px_rgba(249,115,22,0.28)] transition-all active:scale-[0.99] cursor-pointer"
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Device activation gate — nothing below assumes a valid restaurant/
   // device identity until this passes, so it runs before every other
