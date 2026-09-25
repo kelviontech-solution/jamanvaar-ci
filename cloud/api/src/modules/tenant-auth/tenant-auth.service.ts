@@ -481,7 +481,7 @@ export class TenantAuthService {
    * email-matched one.
    */
   async loginOwner(dto: LoginOwnerDto): Promise<TenantAuthResponse> {
-    const { restaurantId } = await this.restaurants.resolveByCode(dto.restaurantCode);
+    const restaurantId = dto.restaurantId ?? (await this.restaurants.resolveByCode(dto.restaurantCode!)).restaurantId;
 
     const candidates = await this.prisma.runAsPlatform((tx) =>
       tx.user.findMany({

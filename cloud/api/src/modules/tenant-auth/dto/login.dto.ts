@@ -23,13 +23,19 @@ export type TenantLoginDto = z.infer<typeof tenantLoginSchema>;
 // Owner-only login (spec sections 5/33): no email, just the restaurant's customer-facing ID +
 // the owner's password. Manager/Staff keep using tenantLoginSchema above unchanged.
 export const loginOwnerSchema = z.object({
-  restaurantCode: z.string().trim().toUpperCase(),
+  restaurantCode: z.string().trim().toUpperCase().optional(),
+  // Already-resolved internal id, for a device that's connected and knows which restaurant it
+  // belongs to (e.g. Kiosk Admin's daily login) — no need to make it re-type/remember the code.
+  restaurantId: z.string().uuid().optional(),
   password: z.string().min(1, 'Password is required'),
   deviceId: z.string().optional(),
   deviceToken: z.string().optional(),
   deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN', 'KIOSK_ADMIN']).optional(),
   appVersion: z.string().optional(),
   returnRefreshToken: z.boolean().optional()
+}).refine((v) => Boolean(v.restaurantCode || v.restaurantId), {
+  message: 'Either restaurantCode or restaurantId is required',
+  path: ['restaurantCode']
 });
 export type LoginOwnerDto = z.infer<typeof loginOwnerSchema>;
 

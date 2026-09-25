@@ -70,6 +70,17 @@ describe('Owner-only restaurant-code login (Phase 3)', () => {
     expect(res.status).toBe(404);
   });
 
+  it('logs the owner in with the internal restaurantId directly (no restaurantCode needed)', async () => {
+    const res = await request(app.getHttpServer()).post('/api/v1/tenant-auth/login-owner').send({ restaurantId, password: ownerPassword });
+    expect(res.status).toBe(200);
+    expect(res.body.user.role).toBe('OWNER');
+  });
+
+  it('rejects login-owner when neither restaurantCode nor restaurantId is given', async () => {
+    const res = await request(app.getHttpServer()).post('/api/v1/tenant-auth/login-owner').send({ password: ownerPassword });
+    expect(res.status).toBe(400);
+  });
+
   it('locks the owner account out after enough wrong passwords, same as email-login', async () => {
     for (let i = 0; i < 10; i++) {
       await request(app.getHttpServer()).post('/api/v1/tenant-auth/login-owner').send({ restaurantCode, password: `wrong-${i}` });
