@@ -13,6 +13,9 @@
  * nothing on the other.
  */
 
+import { PaymentPolicy } from '@jamanvaar/database';
+import { NetworkStatusService } from '@jamanvaar/api';
+
 export type Responder = 'core' | 'cloud';
 export type ConnectionMode = 'ONLINE' | 'LOCAL' | 'OFFLINE';
 
@@ -111,6 +114,18 @@ export class EndpointResolver {
     this.health[r] = { ok, at: this.now() };
     if (ok) this.responder = r;
     if (changed) this.emit();
+    this.publishReachability();
+  }
+
+  /** True only if a request to the cloud itself succeeded recently. Being on Wi-Fi does not count. */
+  static internetVerified(): boolean {
+    const h = this.health.cloud;
+    return !!h && h.ok && this.now() - h.at < STATE_TTL_MS;
+  }
+
+  private static publishReachability(): void {
+    PaymentPolicy.setInternetVerifier(() => this.internetVerified());
+    if (this.health.cloud || this.health.core) NetworkStatusService.reportReachability(this.internetVerified() ? 'ONLINE' : this.mode() === 'LOCAL' ? 'LOCAL' : 'OFFLINE');
   }
 
   /** Which server a request for `path` would go to right now. */

@@ -1,3 +1,4 @@
+import { PaymentPolicy } from './payment_policy';
 import { NumberAllocator } from './number_allocator';
 import {
   AppNotification,
@@ -571,6 +572,8 @@ export class OrderRepository {
   }
 
   private static createOrderInner(orderData: Partial<Order>): Order {
+    // An order created already-paid by UPI is a UPI payment being recorded: same rule as settleOrder.
+    if ((orderData.paymentStatus ?? 'PENDING') === 'SUCCESS') PaymentPolicy.assertAllowed(orderData.paymentMethod ?? '');
     // Idempotency fix: a key was generated and stored on every order, but never
     // looked up before insert — a retried/duplicated submit (network retry, a
     // double-tapped "place order" button re-firing the same request) created a
@@ -653,7 +656,7 @@ export class OrderRepository {
       roundOffAmount: orderData.roundOffAmount || 0,
       totalAmount: orderData.totalAmount || 0,
       paymentMethod: orderData.paymentMethod || 'UPI_QR',
-      paymentStatus: orderData.paymentStatus || 'SUCCESS',
+      paymentStatus: orderData.paymentStatus || 'PENDING',
       paymentTransactionId: orderData.paymentTransactionId,
       orderStatus: orderData.orderStatus || 'CONFIRMED',
       estimatedWaitMinutes: orderData.estimatedWaitMinutes || 15,
@@ -765,6 +768,16 @@ export class OrderRepository {
   ): Order | null {
     const order = db.orders.find((o) => o.id === id);
     if (!order) return null;
+
+    // Settling is idempotent: the same payment again changes nothing; a different one is refused.
+    if (order.paymentStatus === 'SUCCESS' && order.paymentTransactionId) {
+      if (transactionId && transactionId !== order.paymentTransactionId) {
+        throw new Error(`ORDER_ALREADY_PAID: this order was already paid (${order.paymentTransactionId})`);
+      }
+      return order;
+    }
+    // No screen and no sync path may record a UPI payment as taken while the internet is unverified.
+    PaymentPolicy.assertAllowed(paymentMethod);
 
     if (splits && splits.length > 0 && !splitsMatchTotal(splits, order.totalAmount)) {
       throw new Error(`Payment lines do not add up to the bill total (₹${order.totalAmount})`);

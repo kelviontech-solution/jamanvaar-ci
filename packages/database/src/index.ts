@@ -26,3 +26,4 @@ export * from './durable/durable_storage';
 export * from './durable/cluster_backend';
 export * from './durable/worker_backend';
 export * from './durable/browser_boot';
+export * from './payment_policy';
