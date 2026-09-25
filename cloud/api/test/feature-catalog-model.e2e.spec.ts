@@ -94,6 +94,12 @@ describe('Generic feature catalog model (Phase 10)', () => {
     expect(kioskAdmin.dependsOnFeatureIds).toEqual([kiosk.id]);
   });
 
+  it('restaurantAdmin (POS_ADMIN) depends on posTerminal (POS), mirroring the legacy hardcoded catalog', async () => {
+    const restaurantAdmin = await prisma.runAsPlatform((tx) => tx.feature.findUniqueOrThrow({ where: { code: 'restaurantAdmin' } }));
+    const posTerminal = await prisma.runAsPlatform((tx) => tx.feature.findUniqueOrThrow({ where: { code: 'posTerminal' } }));
+    expect(restaurantAdmin.dependsOnFeatureIds).toEqual([posTerminal.id]);
+  });
+
   it('re-running the seed is idempotent: same 16 categories and 22 features, no duplicates', async () => {
     const { execSync } = await import('node:child_process');
     // Runs ts-node directly (not `npx prisma db seed`, which re-loads .env through Prisma's own

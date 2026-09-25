@@ -504,6 +504,11 @@ async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
     where: { code: 'KIOSK_ADMIN' },
     data: { dependsOnFeatureIds: [featureIdByCode.get('selfOrderKiosk')!] }
   });
+  // POS_ADMIN (restaurantAdmin) depends on POS (posTerminal).
+  await tx.feature.update({
+    where: { code: 'restaurantAdmin' },
+    data: { dependsOnFeatureIds: [featureIdByCode.get('posTerminal')!] }
+  });
 }
 
 /**
