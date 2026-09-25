@@ -17,6 +17,7 @@ export interface HeartbeatDto {
   osPlatform?: string;
   pendingSyncCount?: number;
   syncError?: string | null;
+  menuVersion?: number;
   ipAddress?: string;
 }
 
@@ -296,6 +297,7 @@ export class DevicesService {
           ...(dto.osPlatform ? { osPlatform: dto.osPlatform } : {}),
           ...(dto.ipAddress ? { ipAddress: dto.ipAddress } : {}),
           ...(dto.pendingSyncCount !== undefined ? { pendingSyncCount: dto.pendingSyncCount } : {}),
+          ...(dto.menuVersion !== undefined ? { menuVersion: dto.menuVersion } : {}),
           // null clears a previous error once the terminal recovers.
           ...(dto.syncError !== undefined ? { syncError: dto.syncError } : {})
         }

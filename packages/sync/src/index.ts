@@ -13,3 +13,6 @@ export * from './menu_sync';
 export * from './restaurant_identity';
 export * from './sync_protocol';
 export * from './inventory_ledger_sync';
+export * from './device_commands';
+export * from './menu_version';
+export * from './realtime_client';

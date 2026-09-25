@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { Device, PlatformUser } from '@prisma/client';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
 import { CurrentDevice } from '../../common/decorators/current-device.decorator';
@@ -6,10 +6,14 @@ import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
 import { DeviceSyncThrottle } from '../../common/throttle';
 import { RecordSyncLogDto, SyncObservabilityService } from './sync-observability.service';
+import { SyncReconciliationService } from './sync-reconciliation.service';
 
 @Controller('api/v1/platform/telemetry')
 export class SyncObservabilityController {
-  constructor(private readonly syncObservabilityService: SyncObservabilityService) {}
+  constructor(
+    private readonly syncObservabilityService: SyncObservabilityService,
+    private readonly reconciliation: SyncReconciliationService
+  ) {}
 
   @Get('database')
   @UseGuards(PlatformAuthGuard)
@@ -35,6 +39,19 @@ export class SyncObservabilityController {
       status,
       limit: limit ? parseInt(limit, 10) : undefined
     });
+  }
+
+  @Get('reconciliation')
+  @UseGuards(PlatformAuthGuard)
+  reconcile(@Query('restaurantId') restaurantId: string) {
+    if (!restaurantId) throw new BadRequestException('restaurantId is required');
+    return this.reconciliation.runAsPlatform(restaurantId);
+  }
+
+  @Get('trace/:traceId')
+  @UseGuards(PlatformAuthGuard)
+  trace(@Param('traceId') traceId: string) {
+    return this.reconciliation.trace(traceId);
   }
 
   @Get('conflicts')

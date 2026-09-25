@@ -4,6 +4,7 @@ import { Device } from '@prisma/client';
 import { z } from 'zod';
 import { PrismaService } from '../../prisma/prisma.service';
 import { nextSyncSequence } from '../../common/sync-sequence';
+import { RealtimeBus } from '../../common/realtime/realtime-bus';
 
 const PAGE = 500;
 
@@ -32,7 +33,10 @@ export interface MovementPushResult {
 
 @Injectable()
 export class InventoryLedgerService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly realtime: RealtimeBus
+  ) {}
 
   /** Appends each movement once. A retried movementId is acknowledged as a duplicate and never counted twice. */
   async push(device: Device, rawMovements: unknown[]): Promise<{ results: MovementPushResult[] }> {
@@ -66,6 +70,9 @@ export class InventoryLedgerService {
         results.push(inserted === 0 ? { movementId: m.movementId, status: 'ok', duplicate: true } : { movementId: m.movementId, status: 'ok', seq });
       }
     });
+    if (results.some((r) => r.status === 'ok' && !r.duplicate)) {
+      this.realtime.publish({ restaurantId: device.restaurantId, branchId: device.branchId, kind: 'inventory', originDeviceId: device.id });
+    }
     return { results };
   }
 

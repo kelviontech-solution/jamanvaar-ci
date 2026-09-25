@@ -77,29 +77,31 @@ export class DeviceAuthGuard implements CanActivate {
 
     // Restaurant.status and Subscription.status are independent - a restaurant can
     // stay ACTIVE while its subscription lapses, and that must block terminals too.
-    const subscription = await this.prisma.runAsPlatform((tx) =>
-      tx.subscription.findFirst({
+    // A restaurant may hold one active subscription per product family (a Restaurant plan plus a
+    // separate Kiosk plan), so every active subscription is considered, not just the newest one.
+    const subscriptions = await this.prisma.runAsPlatform((tx) =>
+      tx.subscription.findMany({
         where: {
           restaurantId: device.restaurantId,
           status: { in: ['ACTIVE', 'TRIAL'] },
           expiresAt: { gt: new Date() }
         },
-        orderBy: { createdAt: 'desc' },
         select: { id: true }
       })
     );
-    if (!subscription) {
+    if (subscriptions.length === 0) {
       this.deny('forbidden', 'SUBSCRIPTION_INACTIVE', 'This restaurant has no active subscription. Please contact your platform administrator.');
     }
 
     // Per-application switch: disabling POS / KDS / ... for a restaurant in Super
     // Admin must stop the terminals that are already running, not just block new ones.
     const entitlement = await this.prisma.runAsPlatform((tx) =>
-      tx.applicationEntitlement.findUnique({
-        where: { subscriptionId_appCode: { subscriptionId: subscription!.id, appCode: device.type } }
+      tx.applicationEntitlement.findFirst({
+        where: { subscriptionId: { in: subscriptions.map((sub) => sub.id) }, appCode: device.type, enabled: true },
+        select: { id: true }
       })
     );
-    if (!entitlement || !entitlement.enabled) {
+    if (!entitlement) {
       this.deny('forbidden', 'APP_DISABLED', `${device.type} is not enabled for this restaurant. Please contact your platform administrator.`);
     }
 

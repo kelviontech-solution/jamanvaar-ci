@@ -871,12 +871,46 @@ export interface CloudKiosk {
   isLocked: boolean;
   lockReason: string | null;
   branchName: string | null;
+  /** Changes on the kiosk not yet synced to the cloud. */
+  pendingSyncCount: number;
+  /** Set when the kiosk reports a problem (failed syncs, failing local storage). */
+  syncError: string | null;
+  lastSyncAt: string | null;
 }
 
-/** The self-order kiosks this restaurant has really activated (BUG-132). */
+/** The self-order kiosks this restaurant has really activated: health, backlog and errors (BUG-132). */
 export async function fetchCloudKiosks(): Promise<CloudKiosk[]> {
-  const data = await jsonOrThrow<{ kiosks: CloudKiosk[] }>(await deviceFetch('/api/v1/devices/me/kiosks'), 'Kiosk list');
-  return data.kiosks;
+  const data = await jsonOrThrow<{
+    devices: Array<{
+      id: string; type: string; name: string | null; appVersion: string | null; lastSeenAt: string | null; lastSyncAt: string | null;
+      health: CloudKiosk['health']; isLocked: boolean; lockReason: string | null; pendingSyncCount: number | null;
+      syncError: string | null; branch: { name: string } | null;
+    }>;
+  }>(await deviceFetch('/api/v1/devices/me/fleet'), 'Kiosk fleet');
+  return data.devices
+    .filter((d) => d.type === 'KIOSK')
+    .map((d) => ({
+      id: d.id, name: d.name ?? 'Kiosk', appVersion: d.appVersion, lastSeenAt: d.lastSeenAt, health: d.health,
+      isLocked: d.isLocked, lockReason: d.lockReason, branchName: d.branch?.name ?? null,
+      pendingSyncCount: d.pendingSyncCount ?? 0, syncError: d.syncError, lastSyncAt: d.lastSyncAt
+    }));
+}
+
+export type KioskCommandType = 'REQUEST_SYNC' | 'REQUEST_DIAGNOSTICS' | 'RESTART_APP' | 'CLEAR_CACHE' | 'LOCK' | 'UNLOCK';
+
+/**
+ * Sends a command to one kiosk through the cloud (authenticated as this console, audited, delivered on the
+ * kiosk's next heartbeat, retried until acknowledged). A unique key per click makes a retried send harmless.
+ */
+export async function sendKioskCommand(kioskId: string, commandType: KioskCommandType, payload?: Record<string, unknown>): Promise<void> {
+  const idempotencyKey = `${commandType}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  await jsonOrThrow(
+    await deviceFetch(`/api/v1/devices/me/fleet/${kioskId}/commands`, {
+      method: 'POST',
+      body: JSON.stringify({ commandType, payload, idempotencyKey })
+    }),
+    'Kiosk command'
+  );
 }
 
 /**

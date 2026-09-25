@@ -175,6 +175,7 @@ model Restaurant {
   syncSequences           SyncSequence[]
   numberSequences         NumberSequence[]
   inventoryMovements      InventoryMovement[]
+  menuPublications        MenuPublication[]
   syncedEntities          SyncedEntity[]
   aiAccess                RestaurantAiAccess?
   aiUsage                 AiUsageDaily[]
@@ -520,6 +521,8 @@ model Device {
   lockedAt         DateTime?
   pendingSyncCount Int             @default(0)
   syncError        String?
+  /// The menu version this device last reported as fully applied (see MenuPublication).
+  menuVersion      Int?
 
   backups          Backup[]
   commands         DeviceCommand[]
@@ -880,11 +883,16 @@ model DeviceCommand {
   result         Json?
   errorMessage   String?
   issuedById     String?
+  /// Deliveries of this command beyond the first (no acknowledgement within the window).
+  retryCount     Int                 @default(0)
+  /// Lets a console retry a send without creating a second command.
+  idempotencyKey String?
   issuedAt       DateTime            @default(now())
   acknowledgedAt DateTime?
   executedAt     DateTime?
   expiresAt      DateTime
 
+  @@unique([deviceId, idempotencyKey])
   @@index([deviceId, status])
   @@index([restaurantId])
   @@index([status])
@@ -960,6 +968,10 @@ model SyncEventLog {
   deviceId     String?
   device       Device?    @relation(fields: [deviceId], references: [id], onDelete: SetNull)
   entityType   String     // ORDER, MENU, INVENTORY, CUSTOMER
+  entityId     String?
+  /// Ties one journey (device -> server -> conflicts) together for support; defaults to the order id.
+  traceId      String?
+  eventId      String?
   action       String     // CREATE, UPDATE, DELETE
   status       String     // SUCCESS, FAILED, PENDING
   latencyMs    Int        @default(0)
@@ -969,6 +981,7 @@ model SyncEventLog {
 
   @@index([restaurantId, timestamp])
   @@index([status])
+  @@index([traceId])
 }
 
 model SyncConflict {
@@ -1552,4 +1565,20 @@ model InventoryMovement {
   @@unique([restaurantId, movementId])
   @@index([restaurantId, branchId, seq])
   @@index([restaurantId, branchId, itemId])
+}
+
+/// A published menu version. Devices report the version they have applied, so support can see which one
+/// is behind. `watermark` is the server time of the publish: a device that has pulled menu changes made
+/// up to that moment has this version.
+model MenuPublication {
+  id                  String     @id @default(uuid())
+  restaurantId        String
+  restaurant          Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  version             Int
+  watermark           DateTime
+  note                String?
+  publishedByDeviceId String?
+  createdAt           DateTime   @default(now())
+
+  @@unique([restaurantId, version])
 }

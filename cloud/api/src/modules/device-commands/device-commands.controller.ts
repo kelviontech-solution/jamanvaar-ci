@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device, DeviceCommandType, PlatformUser } from '@prisma/client';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
@@ -6,11 +6,15 @@ import { CurrentDevice } from '../../common/decorators/current-device.decorator'
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
 import { DeviceCommandsService, IssueCommandDto } from './device-commands.service';
+import { SyncReconciliationService } from '../sync-observability/sync-reconciliation.service';
 
 @DeviceSyncThrottle()
 @Controller('api/v1/devices')
 export class DeviceCommandsController {
-  constructor(private readonly deviceCommandsService: DeviceCommandsService) {}
+  constructor(
+    private readonly deviceCommandsService: DeviceCommandsService,
+    private readonly reconciliation: SyncReconciliationService
+  ) {}
 
   // --- Terminal / Device Polling Endpoints ---
   // Declared FIRST on purpose: `GET me/commands` would otherwise be captured by
@@ -31,6 +35,33 @@ export class DeviceCommandsController {
     @Body() body: { status: 'SUCCEEDED' | 'FAILED'; result?: Record<string, unknown>; error?: string }
   ) {
     return this.deviceCommandsService.acknowledgeCommand(device, commandId, body);
+  }
+
+  // --- Restaurant admin console endpoints (Kiosk Admin / Restaurant Admin), authenticated as the console device ---
+
+  @Get('me/fleet')
+  @UseGuards(DeviceAuthGuard)
+  fleet(@CurrentDevice() device: Device) {
+    return this.deviceCommandsService.listFleet(device);
+  }
+
+  @Get('me/sync-issues')
+  @UseGuards(DeviceAuthGuard)
+  syncIssues(@CurrentDevice() device: Device) {
+    if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
+      throw new ForbiddenException('Only an admin console can view sync issues');
+    }
+    return this.reconciliation.runAsTenant(device.restaurantId, device.branchId);
+  }
+
+  @Post('me/fleet/:targetId/commands')
+  @UseGuards(DeviceAuthGuard)
+  issueFromConsole(
+    @CurrentDevice() device: Device,
+    @Param('targetId') targetId: string,
+    @Body() dto: IssueCommandDto & { idempotencyKey?: string }
+  ) {
+    return this.deviceCommandsService.issueFromDevice(device, targetId, dto);
   }
 
   // --- Platform Super Admin Endpoints ---

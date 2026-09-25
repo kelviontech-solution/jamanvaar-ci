@@ -92,6 +92,9 @@ import {
   pushEntitySync,
   pullEntitySync,
   fetchCloudKiosks,
+  sendKioskCommand,
+  type CloudKiosk,
+  type KioskCommandType,
   getDeviceTokenForSync,
   refreshLicenseFromCloud,
   type PaymentConnectionFields,
@@ -716,6 +719,15 @@ export default function AdminApp() {
   // (QA audit BUG-004).
   // Kiosks that the cloud reports as really online, so the LAN-mesh fleet refresh below does not mark them offline.
   const cloudOnlineKioskIds = React.useRef<Set<string>>(new Set());
+  const [kioskFleet, setKioskFleet] = React.useState<Record<string, CloudKiosk>>({});
+  const runKioskCommand = async (kioskId: string, name: string, type: KioskCommandType, label: string, payload?: Record<string, unknown>) => {
+    try {
+      await sendKioskCommand(kioskId, type, payload);
+      showToast(`${label} sent to ${name}. It runs on the kiosk's next check-in.`);
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : `Could not send ${label}`);
+    }
+  };
 
   // Cloud sync for this console (BUG-130/132/133/136/137/138). It used to sync nothing but a price table, so
   // menu, combos and coupons edited here never reached the self-order kiosk, and orders, ratings, help requests
@@ -741,6 +753,7 @@ export default function AdminApp() {
           KioskRepository.updateKioskStatus(k.id, k.isLocked ? 'LOCKED' : reachable ? 'ONLINE' : 'OFFLINE', k.isLocked);
         });
         cloudOnlineKioskIds.current = online;
+        setKioskFleet(Object.fromEntries(kiosks.map((k) => [k.id, k])));
         void refreshLicenseFromCloud(kiosks.length);
       } catch {
         // Offline: keep what was last known.
@@ -3162,6 +3175,37 @@ export default function AdminApp() {
                         <span className="text-[#8C9BAE]">Version:</span>
                         <div className="font-semibold text-jaman-navy font-mono">{k.appVersion}</div>
                       </div>
+                      <div>
+                        <span className="text-[#8C9BAE]">Pending changes:</span>
+                        <div className="font-semibold text-jaman-navy font-mono">{kioskFleet[k.id]?.pendingSyncCount ?? '—'}</div>
+                      </div>
+                      <div>
+                        <span className="text-[#8C9BAE]">Last synced:</span>
+                        <div className="font-semibold text-jaman-navy font-mono">
+                          {kioskFleet[k.id]?.lastSyncAt ? formatTime(kioskFleet[k.id]!.lastSyncAt!) : '—'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {kioskFleet[k.id]?.syncError && (
+                      <div role="alert" className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">
+                        {kioskFleet[k.id]!.syncError}
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" onClick={() => void runKioskCommand(k.id, k.name, 'REQUEST_SYNC', 'Sync now')}>
+                        Sync now
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => void runKioskCommand(k.id, k.name, 'REQUEST_SYNC', 'Menu refresh', { scope: 'MENU' })}>
+                        Refresh menu
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => void runKioskCommand(k.id, k.name, 'REQUEST_DIAGNOSTICS', 'Diagnostics request')}>
+                        Diagnostics
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => void runKioskCommand(k.id, k.name, 'RESTART_APP', 'Restart')}>
+                        Restart
+                      </Button>
                     </div>
 
                     <div className="flex items-center justify-between pt-2 border-t border-[#F3EFE6]">
@@ -3178,7 +3222,7 @@ export default function AdminApp() {
                             isLocked: nextLocked,
                             status: nextStatus
                           });
-                          showToast(`${k.name} lock state toggled!`);
+                          void runKioskCommand(k.id, k.name, nextLocked ? 'LOCK' : 'UNLOCK', nextLocked ? 'Lock' : 'Unlock');
                         }}
                       >
                         {k.isLocked ? 'Unlock Kiosk' : 'Lockdown Kiosk'}

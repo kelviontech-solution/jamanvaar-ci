@@ -1,5 +1,7 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { Device, DeviceCommandStatus, DeviceCommandType, PlatformUser } from '@prisma/client';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Device, DeviceCommandStatus, DeviceCommandType, DeviceType, PlatformUser, Prisma } from '@prisma/client';
+import { deviceHealth } from '../../common/device-health';
+import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 
@@ -23,11 +25,15 @@ export interface IssueCommandDto {
   expiresInMinutes?: number;
 }
 
+const REDELIVER_AFTER_MS = 2 * 60 * 1000;
+const MAX_REDELIVERIES = 3;
+
 @Injectable()
 export class DeviceCommandsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly realtime: RealtimeBus
   ) {}
 
   async listForDevice(deviceId: string) {
@@ -53,13 +59,116 @@ export class DeviceCommandsService {
     );
   }
 
+  private notifyDevice(command: { deviceId: string; restaurantId: string }) {
+    this.realtime.publish({ restaurantId: command.restaurantId, branchId: null, deviceId: command.deviceId, kind: 'command' });
+  }
+
   async issueCommand(deviceId: string, dto: IssueCommandDto, actor: PlatformUser) {
-    return this.prisma.runAsPlatform(async (tx) => {
+    const command = await this.prisma.runAsPlatform(async (tx) => {
       const device = await tx.device.findUnique({
         where: { id: deviceId },
         include: { restaurant: true }
       });
       if (!device) throw new NotFoundException('Device not found');
+      return this.persistCommand(tx, device, dto, { actorType: 'PLATFORM', id: actor.id });
+    });
+    this.notifyDevice(command);
+    return command;
+  }
+
+  /** Commands a restaurant's own admin console may send to the devices it manages. Destructive ones stay Super Admin only. */
+  static readonly FLEET_COMMANDS: ReadonlySet<DeviceCommandType> = new Set<DeviceCommandType>([
+    DeviceCommandType.REQUEST_SYNC,
+    DeviceCommandType.REQUEST_HEALTH,
+    DeviceCommandType.REQUEST_DIAGNOSTICS,
+    DeviceCommandType.RESTART_APP,
+    DeviceCommandType.CLEAR_CACHE,
+    DeviceCommandType.LOCK,
+    DeviceCommandType.UNLOCK
+  ]);
+
+  /** The devices a console can see and command: its whole restaurant, or only its own branch when it is branch-bound. */
+  private scopeWhere(issuer: Device) {
+    return { restaurantId: issuer.restaurantId, ...(issuer.branchId ? { branchId: issuer.branchId } : {}) };
+  }
+
+  /**
+   * A Kiosk Admin / Restaurant Admin console sending a command to a device it manages. Authenticated as
+   * the console device itself, restricted to its own restaurant (and branch), limited to FLEET_COMMANDS,
+   * idempotent on `idempotencyKey`, and audited as the console.
+   */
+  async issueFromDevice(issuer: Device, targetId: string, dto: IssueCommandDto & { idempotencyKey?: string }) {
+    if (issuer.type !== 'KIOSK_ADMIN' && issuer.type !== 'POS_ADMIN') {
+      throw new ForbiddenException('Only an admin console can send commands to other devices');
+    }
+    if (!DeviceCommandsService.FLEET_COMMANDS.has(dto.commandType)) {
+      throw new BadRequestException(`${dto.commandType} cannot be sent from a restaurant console`);
+    }
+    const command = await this.prisma.runAsTenant(issuer.restaurantId, async (tx) => {
+      const target = await tx.device.findFirst({ where: { id: targetId, ...this.scopeWhere(issuer) } });
+      if (!target) throw new NotFoundException('Device not found');
+      if (issuer.type === 'KIOSK_ADMIN' && target.type !== 'KIOSK') {
+        throw new ForbiddenException('Kiosk Admin can only manage kiosks');
+      }
+      if (dto.idempotencyKey) {
+        const prior = await tx.deviceCommand.findFirst({ where: { deviceId: target.id, idempotencyKey: dto.idempotencyKey } });
+        if (prior) return prior;
+      }
+      return this.persistCommand(tx, target, dto, { actorType: 'TENANT', id: issuer.id, idempotencyKey: dto.idempotencyKey });
+    });
+    this.notifyDevice(command);
+    return command;
+  }
+
+  /** The console's view of the fleet it manages: every device with health, backlog, errors and version. */
+  async listFleet(issuer: Device) {
+    if (issuer.type !== 'KIOSK_ADMIN' && issuer.type !== 'POS_ADMIN') {
+      throw new ForbiddenException('Only an admin console can list the device fleet');
+    }
+    const rows = await this.prisma.runAsTenant(issuer.restaurantId, (tx) =>
+      tx.device.findMany({
+        where: { ...this.scopeWhere(issuer), status: { not: 'REVOKED' }, ...(issuer.type === 'KIOSK_ADMIN' ? { type: { in: ['KIOSK', 'KIOSK_ADMIN'] as DeviceType[] } } : {}) },
+        select: {
+          id: true, type: true, name: true, status: true, lastSeenAt: true, lastSyncAt: true, appVersion: true, isLocked: true,
+          lockReason: true, pendingSyncCount: true, syncStatus: true, syncError: true, menuVersion: true, branch: { select: { id: true, name: true } }
+        },
+        orderBy: [{ type: 'asc' }, { createdAt: 'asc' }]
+      })
+    );
+    const now = new Date();
+    const latestMenu = await this.prisma.runAsTenant(issuer.restaurantId, (tx) =>
+      tx.menuPublication.findFirst({ where: { restaurantId: issuer.restaurantId }, orderBy: { version: 'desc' }, select: { version: true } })
+    );
+    const latestMenuVersion = latestMenu?.version ?? 0;
+    const devices = rows.map((d) => ({
+      id: d.id, type: d.type, name: d.name, appVersion: d.appVersion, lastSeenAt: d.lastSeenAt, lastSyncAt: d.lastSyncAt,
+      health: deviceHealth(d, now), isLocked: d.isLocked, lockReason: d.lockReason,
+      pendingSyncCount: d.pendingSyncCount, syncStatus: d.syncStatus, syncError: d.syncError,
+      menuVersion: d.menuVersion, latestMenuVersion,
+      menuStatus: latestMenuVersion === 0 ? 'none' : (d.menuVersion ?? 0) >= latestMenuVersion ? 'current' : 'behind',
+      branch: d.branch
+    }));
+    return {
+      devices,
+      summary: {
+        total: devices.length,
+        online: devices.filter((d) => d.health === 'online').length,
+        offline: devices.filter((d) => d.health === 'offline' || d.health === 'degraded').length,
+        needsAttention: devices.filter((d) => d.syncError || d.health === 'offline').length,
+        pendingChanges: devices.reduce((n, d) => n + (d.pendingSyncCount ?? 0), 0)
+      },
+      serverTime: now.toISOString()
+    };
+  }
+
+  private async persistCommand(
+    tx: Prisma.TransactionClient,
+    device: Device,
+    dto: IssueCommandDto,
+    issuer: { actorType: 'PLATFORM' | 'TENANT'; id: string; idempotencyKey?: string }
+  ) {
+    const deviceId = device.id;
+    {
       if (device.status === 'REVOKED') throw new ConflictException('Cannot issue commands to a revoked device');
 
       if ((device.type === 'KIOSK' || device.type === 'KIOSK_ADMIN') && KIOSK_PRO_ONLY_COMMANDS.has(dto.commandType)) {
@@ -87,7 +196,8 @@ export class DeviceCommandsService {
           commandType: dto.commandType,
           status: DeviceCommandStatus.PENDING,
           payload: (dto.payload || {}) as any,
-          issuedById: actor.id,
+          issuedById: issuer.id,
+          idempotencyKey: issuer.idempotencyKey,
           expiresAt
         }
       });
@@ -112,8 +222,8 @@ export class DeviceCommandsService {
 
       await this.audit.log(
         {
-          actorType: 'PLATFORM',
-          actorId: actor.id,
+          actorType: issuer.actorType,
+          actorId: issuer.id,
           restaurantId: device.restaurantId,
           action: `DEVICE_COMMAND_${dto.commandType}`,
           category: 'MDM',
@@ -128,7 +238,7 @@ export class DeviceCommandsService {
       );
 
       return command;
-    });
+    }
   }
 
   async lockDevice(deviceId: string, reason: string, actor: PlatformUser) {
@@ -169,13 +279,30 @@ export class DeviceCommandsService {
         data: { status: 'EXPIRED' }
       });
 
+      // A command delivered (SENT) but never acknowledged is delivered again after a while, up to
+      // MAX_DELIVERIES times, then failed so a dead device never leaves it hanging silently.
+      const redeliverBefore = new Date(now.getTime() - REDELIVER_AFTER_MS);
+      await tx.deviceCommand.updateMany({
+        where: { deviceId: device.id, status: 'SENT', acknowledgedAt: { lt: redeliverBefore }, retryCount: { gte: MAX_REDELIVERIES } },
+        data: { status: 'FAILED', errorMessage: `No acknowledgement from the device after ${MAX_REDELIVERIES + 1} deliveries`, executedAt: now }
+      });
+
       const pending = await tx.deviceCommand.findMany({
-        where: { deviceId: device.id, status: 'PENDING' },
+        where: {
+          deviceId: device.id,
+          OR: [
+            { status: 'PENDING' },
+            { status: 'SENT', acknowledgedAt: { lt: redeliverBefore }, retryCount: { lt: MAX_REDELIVERIES } }
+          ]
+        },
         orderBy: { issuedAt: 'asc' }
       });
 
       if (pending.length > 0) {
-        // Mark as SENT
+        await tx.deviceCommand.updateMany({
+          where: { id: { in: pending.filter((p) => p.status === 'SENT').map((p) => p.id) } },
+          data: { retryCount: { increment: 1 } }
+        });
         await tx.deviceCommand.updateMany({
           where: { id: { in: pending.map((p) => p.id) } },
           data: { status: 'SENT', acknowledgedAt: now }

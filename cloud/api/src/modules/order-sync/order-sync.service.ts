@@ -4,6 +4,7 @@ import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { nextSyncSequence } from '../../common/sync-sequence';
 import { mergeOrderItems } from './order-merge';
+import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { OrderSyncEventDto, orderSyncEventSchema } from './dto/push-order-sync.dto';
 
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000; // 24h
@@ -59,7 +60,10 @@ function paymentViolation(
 
 @Injectable()
 export class OrderSyncService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly realtime: RealtimeBus
+  ) {}
 
   /**
    * Upserts each event by (restaurantId, externalOrderId) — the local app's
@@ -69,6 +73,7 @@ export class OrderSyncService {
    */
   async pushEvents(device: Device, rawEvents: unknown[]): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
     const results: OrderSyncPushResult[] = [];
+    let latestSeq: number | undefined;
 
     await this.prisma.runAsTenant(device.restaurantId, async (tx) => {
       for (const raw of rawEvents) {
@@ -168,6 +173,7 @@ export class OrderSyncService {
           };
 
           const seq = await nextSyncSequence(tx, device.restaurantId);
+          latestSeq = seq;
           const saved = existing
             ? await tx.syncedOrder.update({
                 where: { id: existing.id },
@@ -181,6 +187,9 @@ export class OrderSyncService {
               restaurantId: device.restaurantId,
               deviceId: device.id,
               entityType: 'ORDER',
+              entityId: evt.externalOrderId,
+              traceId: evt.traceId ?? evt.externalOrderId,
+              eventId: evt.eventId,
               action: existing ? 'UPDATE' : 'CREATE',
               status: 'SUCCESS',
               latencyMs: Date.now() - startedAt,
@@ -202,6 +211,9 @@ export class OrderSyncService {
               restaurantId: device.restaurantId,
               deviceId: device.id,
               entityType: 'ORDER',
+              entityId: evt.externalOrderId,
+              traceId: evt.traceId ?? evt.externalOrderId,
+              eventId: evt.eventId,
               action: 'UPDATE',
               status: 'FAILED',
               latencyMs: Date.now() - startedAt,
@@ -214,6 +226,10 @@ export class OrderSyncService {
       }
     });
 
+    // Wake the branch only after the transaction has committed, so a woken device's pull always sees the change.
+    if (results.some((r) => r.status === 'ok' && !r.duplicate)) {
+      this.realtime.publish({ restaurantId: device.restaurantId, branchId: device.branchId, kind: 'orders', seq: latestSeq, originDeviceId: device.id });
+    }
     return { results, serverTime: new Date().toISOString() };
   }
 
