@@ -700,8 +700,19 @@ export function RestaurantDetailPage() {
             )}
           </div>
           <p className="page-subtitle">
-            {[restaurant.city, restaurant.state, restaurant.country].filter(Boolean).join(', ')} • {restaurant.branches.length} Branch{restaurant.branches.length > 1 ? 'es' : ''} • {restaurant.devices.length} Registered Terminal{restaurant.devices.length > 1 ? 's' : ''} • ID: <code className="mono" style={{ fontSize: 11 }}>{restaurant.id}</code>
+            {[restaurant.city, restaurant.state, restaurant.country].filter(Boolean).join(', ')} • {restaurant.branches.length} Branch{restaurant.branches.length > 1 ? 'es' : ''} • {restaurant.devices.length} Registered Terminal{restaurant.devices.length > 1 ? 's' : ''}
           </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+            {restaurant.restaurantCode ? (
+              <>
+                <span className="muted" style={{ fontSize: 12, fontWeight: 600 }}>Restaurant ID:</span>
+                <code className="mono" style={{ fontSize: 13, fontWeight: 800, color: '#0B253A' }}>{restaurant.restaurantCode}</code>
+                <CopyButton text={restaurant.restaurantCode} label="Copy" title="Copy the Restaurant ID" />
+              </>
+            ) : (
+              <Badge tone="warning">Restaurant ID not yet assigned — add a mobile number to generate one</Badge>
+            )}
+          </div>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <Button variant="accent" onClick={() => setModal('activation')}>
@@ -754,9 +765,14 @@ export function RestaurantDetailPage() {
               <dl className="detail-list">
                 <dt>Restaurant ID</dt>
                 <dd>
-                  <span className="mono" style={{ fontSize: 12, wordBreak: 'break-all' }}>{restaurant.id}</span>{' '}
-                  <CopyButton text={restaurant.id} label="Copy ID" title="Copy the Restaurant ID" />
+                  {restaurant.restaurantCode ? (
+                    <span className="mono" style={{ fontSize: 13, fontWeight: 700 }}>{restaurant.restaurantCode}</span>
+                  ) : (
+                    <span className="muted">Not yet assigned</span>
+                  )}
                 </dd>
+                <dt>Registered Mobile</dt>
+                <dd>{restaurant.mobile || '—'}</dd>
                 <dt>Legal Name</dt>
                 <dd>{restaurant.legalName || '—'}</dd>
                 <dt>GSTIN</dt>
@@ -774,6 +790,16 @@ export function RestaurantDetailPage() {
                 <dt>Onboarded</dt>
                 <dd>{new Date(restaurant.createdAt).toLocaleDateString('en-IN')}</dd>
               </dl>
+              <details style={{ marginTop: 12 }}>
+                <summary style={{ cursor: 'pointer', fontSize: 12, fontWeight: 700, color: '#64748b' }}>
+                  Advanced / Internal IDs
+                </summary>
+                <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span className="muted" style={{ fontSize: 11 }}>Internal UUID:</span>
+                  <span className="mono" style={{ fontSize: 11, wordBreak: 'break-all' }}>{restaurant.id}</span>
+                  <CopyButton text={restaurant.id} label="Copy" title="Copy the internal UUID" />
+                </div>
+              </details>
             </Card>
 
             <Card className="detail-card">
@@ -815,8 +841,12 @@ export function RestaurantDetailPage() {
                 </div>
                 <div style={{ margin: '8px 0 0 0', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 13, color: '#0B253A' }}>
                   <strong>Restaurant ID</strong>
-                  <code className="mono" style={{ fontSize: 12, background: '#fff', border: '1px solid #FDBA74', borderRadius: 8, padding: '3px 8px', wordBreak: 'break-all' }}>{restaurant.id}</code>
-                  <CopyButton text={restaurant.id} label="Copy ID" title="Copy the Restaurant ID" />
+                  <code className="mono" style={{ fontSize: 12, background: '#fff', border: '1px solid #FDBA74', borderRadius: 8, padding: '3px 8px', wordBreak: 'break-all' }}>
+                    {restaurant.restaurantCode ?? 'Not yet assigned'}
+                  </code>
+                  {restaurant.restaurantCode && (
+                    <CopyButton text={restaurant.restaurantCode} label="Copy ID" title="Copy the Restaurant ID" />
+                  )}
                 </div>
                 <p style={{ margin: '6px 0 0 0', fontSize: 13, color: '#64748b' }}>
                   <strong>Kiosk Admin</strong> and <strong>Captain</strong> ask for this Restaurant ID together with the restaurant owner's login before they take a key.
