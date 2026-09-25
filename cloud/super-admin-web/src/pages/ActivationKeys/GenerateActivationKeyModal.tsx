@@ -2,7 +2,7 @@
 import { copyText } from '../../../../../packages/utils/src/clipboard';
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
-import type { Branch, RestaurantListItem } from '../../api/types';
+import type { ApplicationEntitlement, Branch, RestaurantDetail, RestaurantListItem } from '../../api/types';
 import { Button } from '../../components/ui';
 import '../../components/shared.css';
 
@@ -27,6 +27,8 @@ export function GenerateActivationKeyModal({
   const [submitting, setSubmitting] = useState(false);
   const [createdCode, setCreatedCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [quotaPreview, setQuotaPreview] = useState<{ current: number; quota: number } | null>(null);
+  const [quotaLoading, setQuotaLoading] = useState(false);
 
   useEffect(() => {
     if (!fixedRestaurantId) {
@@ -42,6 +44,27 @@ export function GenerateActivationKeyModal({
     }
     api.get<Branch[]>(`/api/v1/branches?restaurantId=${encodeURIComponent(restaurantId)}`).then(setBranches).catch(() => setBranches([]));
   }, [restaurantId]);
+
+  useEffect(() => {
+    setQuotaPreview(null);
+    // 'ANY' isn't a single AppCode — no per-app quota applies to it.
+    if (!restaurantId || deviceType === 'ANY') return;
+    setQuotaLoading(true);
+    Promise.all([
+      api.get<RestaurantDetail>(`/api/v1/restaurants/${restaurantId}`),
+      api.get<ApplicationEntitlement[]>(`/api/v1/restaurants/${restaurantId}/applications`)
+    ])
+      .then(([restaurant, entitlements]) => {
+        const current = restaurant.devices.filter((d) => (d as { type: string }).type === deviceType && d.status !== 'REVOKED').length;
+        const row = entitlements.find((e) => e.appCode === deviceType);
+        const activeSub = restaurant.subscriptions.find((s) => s.status === 'ACTIVE' || s.status === 'TRIAL') ?? restaurant.subscriptions[0];
+        // No entitlement row yet (a pre-Phase-2 subscription) — fall back to the plan's overall cap.
+        const quota = row?.deviceQuota ?? activeSub?.plan.maxDevices ?? 0;
+        setQuotaPreview({ current, quota });
+      })
+      .catch(() => setQuotaPreview(null))
+      .finally(() => setQuotaLoading(false));
+  }, [restaurantId, deviceType]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -141,6 +164,18 @@ export function GenerateActivationKeyModal({
                 <input type="number" min={1} value={expiryDays} onChange={(e) => setExpiryDays(e.target.value)} required />
               </div>
             </div>
+            {deviceType !== 'ANY' && restaurantId && (
+              <div style={{ fontSize: 12, color: '#64748b', margin: '-4px 0 4px' }}>
+                {quotaLoading ? (
+                  'Checking device quota…'
+                ) : quotaPreview ? (
+                  <span style={{ color: quotaPreview.current + 1 > quotaPreview.quota ? '#dc2626' : '#64748b', fontWeight: quotaPreview.current + 1 > quotaPreview.quota ? 700 : 400 }}>
+                    {quotaPreview.current} / {quotaPreview.quota} devices in use → {quotaPreview.current + 1} / {quotaPreview.quota} after this key is redeemed
+                    {quotaPreview.current + 1 > quotaPreview.quota ? ' — over quota, redemption will be refused' : ''}
+                  </span>
+                ) : null}
+              </div>
+            )}
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="key-branch">Branch</label>
