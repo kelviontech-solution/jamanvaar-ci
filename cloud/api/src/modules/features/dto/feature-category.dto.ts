@@ -9,7 +9,7 @@ export const createFeatureCategorySchema = z.object({
 export type CreateFeatureCategoryDto = z.infer<typeof createFeatureCategorySchema>;
 
 export const updateFeatureCategorySchema = z.object({
-  code: z.undefined({ error: 'code is immutable once created' }).optional(),
+  code: z.undefined({ message: 'code is immutable once created' }).optional(),
   name: z.string().trim().min(1).max(120).optional(),
   description: z.string().trim().min(1).optional(),
   sortOrder: z.number().int().optional()

@@ -84,7 +84,7 @@ describe('Generic feature catalog model (Phase 10)', () => {
     const legacyKeys = new Set(features.map((f) => f.legacyEntitlementKey).filter((k): k is string => k !== null));
     expect(legacyKeys.size).toBe(21); // every one of the 21 pre-existing Plan.entitlements keys, exactly once each
 
-    const appCodes = new Set(features.map((f) => f.appCode).filter((a): a is string => a !== null));
+    const appCodes = new Set(features.map((f) => f.appCode).filter((a) => a !== null).map((a) => a as string));
     expect(appCodes).toEqual(new Set(['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING']));
   });
 
@@ -113,4 +113,67 @@ describe('Generic feature catalog model (Phase 10)', () => {
     expect(categoriesAfterSecondRun).toBe(categories);
     expect(featuresAfterSecondRun).toBe(features);
   }, 30_000);
+
+  it('creates a feature under an existing category, lists it, and rejects a dependsOnFeatureIds entry that is not a real feature id', async () => {
+    const categories = await authed('get', '/api/v1/feature-categories');
+    const categoryId = categories.body[0].id;
+
+    const bad = await authed('post', '/api/v1/features').send({
+      code: `test_feature_bad_dep_${Date.now()}`, name: 'Bad Dep', description: 'Has a fake dependency.',
+      categoryId, dependsOnFeatureIds: ['00000000-0000-0000-0000-000000000000']
+    });
+    expect(bad.status).toBe(400);
+
+    const good = await authed('post', '/api/v1/features').send({
+      code: `test_feature_${Date.now()}`, name: 'Test Feature', description: 'A feature created by a test.', categoryId
+    });
+    expect(good.status).toBe(201);
+
+    const list = await authed('get', '/api/v1/features');
+    expect(list.body.some((f: { id: string }) => f.id === good.body.id)).toBe(true);
+
+    await authed('patch', `/api/v1/features/${good.body.id}`).send({ isActive: false });
+    await authed('delete', `/api/v1/features/${good.body.id}`).then((r) => expect(r.status).toBe(200));
+  });
+
+  it('rejects deleting a feature that another feature depends on, until it is deactivated, and rejects deleting an active feature outright', async () => {
+    const categories = await authed('get', '/api/v1/feature-categories');
+    const categoryId = categories.body[0].id;
+
+    const base = await authed('post', '/api/v1/features').send({
+      code: `test_base_${Date.now()}`, name: 'Base', description: 'A base feature.', categoryId
+    });
+    const dependent = await authed('post', '/api/v1/features').send({
+      code: `test_dependent_${Date.now()}`, name: 'Dependent', description: 'Depends on base.', categoryId, dependsOnFeatureIds: [base.body.id]
+    });
+    expect(dependent.status).toBe(201);
+
+    // Still active: deletion refused outright, before dependency is even considered.
+    const deleteActive = await authed('delete', `/api/v1/features/${base.body.id}`);
+    expect(deleteActive.status).toBe(400);
+
+    const deactivate = await authed('patch', `/api/v1/features/${base.body.id}`).send({ isActive: false });
+    expect(deactivate.status).toBe(200);
+
+    // Now inactive, but something else still depends on it.
+    const deleteStillDependedOn = await authed('delete', `/api/v1/features/${base.body.id}`);
+    expect(deleteStillDependedOn.status).toBe(409);
+    expect(deleteStillDependedOn.body.message).toContain('Dependent');
+
+    await authed('patch', `/api/v1/features/${dependent.body.id}`).send({ isActive: false });
+    await authed('delete', `/api/v1/features/${dependent.body.id}`);
+
+    const deleteNowUnblocked = await authed('delete', `/api/v1/features/${base.body.id}`);
+    expect(deleteNowUnblocked.status).toBe(200);
+  });
+
+  it('rejects setting legacyEntitlementKey through the API and rejects changing code after creation', async () => {
+    const categories = await authed('get', '/api/v1/feature-categories');
+    const categoryId = categories.body[0].id;
+    const create = await authed('post', '/api/v1/features').send({
+      code: `test_no_legacy_${Date.now()}`, name: 'No Legacy', description: 'Should not accept a legacy key.', categoryId,
+      legacyEntitlementKey: 'somethingMadeUp'
+    });
+    expect(create.status).toBe(400);
+  });
 });
