@@ -52,7 +52,11 @@ describe('Device enforcement (BUG-049/059/068)', () => {
     });
     planId = plan.body.id;
     const sub = await platform('post', '/api/v1/subscriptions').send({
-      restaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString()
+      restaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString(),
+      // Phase 6 added a POS_ADMIN-requires-POS dependency check — this suite disables POS
+      // directly and asserts KDS is unaffected, so it excludes POS_ADMIN (which it never
+      // exercises) to keep that assertion valid without touching the dependency graph.
+      applications: ['POS', 'KDS']
     });
     subscriptionId = sub.body.id;
 
