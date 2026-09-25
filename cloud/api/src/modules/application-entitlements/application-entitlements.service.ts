@@ -3,6 +3,7 @@ import { AppCode, DeviceType, PlanTier, PlatformUser, Prisma, ProductFamily } fr
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { UpdateApplicationEntitlementDto } from './dto/application-entitlement.dto';
+import { dependentsOf } from './feature-catalog';
 
 type TxClient = Prisma.TransactionClient;
 
@@ -103,6 +104,18 @@ export class ApplicationEntitlementsService {
         where: { subscriptionId_appCode: { subscriptionId, appCode } }
       });
       if (!existing) throw new NotFoundException(`No ${appCode} entitlement row for this subscription`);
+
+      if (dto.enabled === false && existing.enabled) {
+        const enabledRows = await tx.applicationEntitlement.findMany({
+          where: { subscriptionId, enabled: true }
+        });
+        const dependents = dependentsOf(appCode, enabledRows.map((row) => row.appCode));
+        if (dependents.length > 0) {
+          throw new ConflictException(
+            `${appCode} is required by ${dependents.length} enabled feature${dependents.length === 1 ? '' : 's'} (${dependents.join(', ')}). Disable ${dependents.length === 1 ? 'it' : 'them'} first.`
+          );
+        }
+      }
 
       const updated = await tx.applicationEntitlement.update({
         where: { subscriptionId_appCode: { subscriptionId, appCode } },
