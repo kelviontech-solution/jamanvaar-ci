@@ -262,6 +262,8 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     }
   });
 
+  await seedFeatureCatalog(tx);
+
   const demo = shouldSeedDemoData(process.env) ? await seedDemoTenant(tx, corePlan) : null;
 
   // Seed AppRelease Catalog for all 6 JAMANVAAR client applications
@@ -407,6 +409,101 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
       console.log(`Demo restaurant owner already exists: owner@demo.jamanvaar.app (status unchanged — set SEED_DEMO_OWNER_PASSWORD and SEED_RESET_DEMO_OWNER_PASSWORD=true to activate/rotate it)`);
     }
   }
+}
+
+/**
+ * Phase 10 (gap closure): seeds the real, queryable Feature/FeatureCategory catalog from the
+ * union of the 21 pre-existing Plan.entitlements keys and the 7 AppCode values, so both existing
+ * entitlement systems keep working unchanged while this table becomes the source of truth for
+ * describing them going forward. upsert-by-code throughout, so re-running this seed is always
+ * safe (matches this project's established idempotent-backfill pattern).
+ */
+async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
+  const categories: Array<{ code: string; name: string; description: string; sortOrder: number }> = [
+    { code: 'pos_billing', name: 'POS & Fast Billing', description: 'Fast counter billing, dine-in/takeaway/delivery/token order creation, discounts and automated tax calculation.', sortOrder: 1 },
+    { code: 'payments_cash', name: 'Payments & Cash Drawer', description: 'Cash, UPI/BharatQR, card and split payments, cashier shifts, cash float and variance tracking.', sortOrder: 2 },
+    { code: 'table_floor', name: 'Table & Floor Management', description: 'Visual floor plan, multi-zone dining, table occupancy status, table merge, split and transfer.', sortOrder: 3 },
+    { code: 'kitchen_kot', name: 'Kitchen, KOT & KDS', description: 'KOT generation, kitchen timers, multi-station kitchen routing, preparing/ready tracking and station load balancing.', sortOrder: 4 },
+    { code: 'menu_inventory', name: 'Menu & Inventory Management', description: 'Categorized menu, item modifiers, recipe costing, dish availability toggles, stock adjustments and low stock alerts.', sortOrder: 5 },
+    { code: 'reports_gst', name: 'Reports & GST', description: 'Statutory GST reporting (CGST/SGST), daily sales summaries and discount reporting.', sortOrder: 6 },
+    { code: 'offline_ops', name: 'Offline-First Operations', description: 'Local SQLite database, offline billing and order creation, automatic sync when back online.', sortOrder: 7 },
+    { code: 'printing_hw', name: 'Printing & Hardware', description: '58mm/80mm ESC/POS thermal receipt printing and print queue management.', sortOrder: 8 },
+    { code: 'customer_mgmt', name: 'Customer Management', description: 'Customer database, order/visit history and loyalty points.', sortOrder: 9 },
+    { code: 'restaurant_admin', name: 'Restaurant Administration', description: 'Restaurant settings, branch information, tax/bill/printer configuration, user and role management.', sortOrder: 10 },
+    { code: 'captain', name: 'Wireless Captain / Waiter App', description: 'Table-side ordering, course dispatch, order status tracking and waiter performance.', sortOrder: 11 },
+    { code: 'qr_ordering', name: 'QR Table Ordering', description: 'Table QR code, scan-to-order digital menu, customer cart and order submission direct to POS/kitchen.', sortOrder: 12 },
+    { code: 'kiosk', name: 'Self-Order Kiosk', description: 'Customer-facing self-ordering kiosk terminal and its Kiosk Admin management console.', sortOrder: 13 },
+    { code: 'sync', name: 'Real-Time Multi-Machine Mesh Sync', description: 'POS/Captain/KDS/Kiosk real-time order, table, menu and availability synchronization.', sortOrder: 14 },
+    { code: 'ai', name: 'JAMANVAAR AI Restaurant Assistant', description: 'Natural-language restaurant queries answered from local, offline data.', sortOrder: 15 },
+    { code: 'analytics', name: 'Advanced Analytics & CRM', description: 'Advanced sales analytics, channel performance, customer lifetime value and staff attribution.', sortOrder: 16 }
+  ];
+
+  const categoryIdByCode = new Map<string, string>();
+  for (const c of categories) {
+    const row = await tx.featureCategory.upsert({
+      where: { code: c.code },
+      create: c,
+      update: { name: c.name, description: c.description, sortOrder: c.sortOrder }
+    });
+    categoryIdByCode.set(c.code, row.id);
+  }
+
+  interface FeatureSeed {
+    code: string;
+    name: string;
+    description: string;
+    categoryCode: string;
+    appCode?: 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'QR_ORDERING';
+    legacyEntitlementKey?: string;
+  }
+
+  const features: FeatureSeed[] = [
+    { code: 'posTerminal', name: 'POS Terminal', description: 'Counter billing terminal — order creation, item search and bill generation.', categoryCode: 'pos_billing', appCode: 'POS', legacyEntitlementKey: 'posTerminal' },
+    { code: 'dineInTakeawayDeliveryToken', name: 'Dine-In / Takeaway / Delivery / Token', description: 'Order-type selection at billing.', categoryCode: 'pos_billing', legacyEntitlementKey: 'dineInTakeawayDeliveryToken' },
+    { code: 'multiPaymentTenders', name: 'Multi-Payment Tenders', description: 'Cash, UPI/BharatQR, card and split payments.', categoryCode: 'payments_cash', legacyEntitlementKey: 'multiPaymentTenders' },
+    { code: 'shiftAndCashDrawer', name: 'Shift & Cash Drawer', description: 'Cashier shift tracking, opening/closing cash and variance.', categoryCode: 'payments_cash', legacyEntitlementKey: 'shiftAndCashDrawer' },
+    { code: 'tableManagement', name: 'Table Management', description: 'Visual floor plan and table occupancy tracking.', categoryCode: 'table_floor', legacyEntitlementKey: 'tableManagement' },
+    { code: 'kotKdsRouting', name: 'KOT / KDS Routing', description: 'Kitchen order ticket generation and kitchen display routing.', categoryCode: 'kitchen_kot', appCode: 'KDS', legacyEntitlementKey: 'kotKdsRouting' },
+    { code: 'menuManagement', name: 'Menu Management', description: 'Category and dish management.', categoryCode: 'menu_inventory', legacyEntitlementKey: 'menuManagement' },
+    { code: 'foodCustomization', name: 'Food Customization', description: 'Item modifiers and customization options.', categoryCode: 'menu_inventory', legacyEntitlementKey: 'foodCustomization' },
+    { code: 'inventoryManagement', name: 'Inventory Management', description: 'Stock tracking and dish availability toggles.', categoryCode: 'menu_inventory', legacyEntitlementKey: 'inventoryManagement' },
+    { code: 'salesAndGstReports', name: 'Sales & GST Reports', description: 'Daily sales and statutory GST reporting.', categoryCode: 'reports_gst', legacyEntitlementKey: 'salesAndGstReports' },
+    { code: 'discountsAndGst', name: 'Discounts & GST', description: 'Discount application and automated GST calculation.', categoryCode: 'reports_gst', legacyEntitlementKey: 'discountsAndGst' },
+    { code: 'offlineBilling', name: 'Offline Billing', description: 'Local-first billing that works with no internet connection.', categoryCode: 'offline_ops', legacyEntitlementKey: 'offlineBilling' },
+    { code: 'receiptPrinting', name: 'Receipt Printing', description: 'Thermal receipt and KOT printing.', categoryCode: 'printing_hw', legacyEntitlementKey: 'receiptPrinting' },
+    { code: 'customerManagement', name: 'Customer Management', description: 'Customer database and order history.', categoryCode: 'customer_mgmt', legacyEntitlementKey: 'customerManagement' },
+    { code: 'restaurantAdmin', name: 'Restaurant Admin', description: 'Back-office console for managing menu, staff and settings.', categoryCode: 'restaurant_admin', appCode: 'POS_ADMIN', legacyEntitlementKey: 'restaurantAdmin' },
+    { code: 'captainApp', name: 'Captain App', description: 'Waiter-facing tableside ordering app.', categoryCode: 'captain', appCode: 'CAPTAIN', legacyEntitlementKey: 'captainApp' },
+    { code: 'qrTableOrdering', name: 'QR Table Ordering', description: "Guest self-ordering from a table's QR code.", categoryCode: 'qr_ordering', appCode: 'QR_ORDERING', legacyEntitlementKey: 'qrTableOrdering' },
+    { code: 'selfOrderKiosk', name: 'Self-Order Kiosk', description: 'Self-service ordering kiosk terminal.', categoryCode: 'kiosk', appCode: 'KIOSK', legacyEntitlementKey: 'selfOrderKiosk' },
+    { code: 'KIOSK_ADMIN', name: 'Kiosk Admin', description: 'Back-office console for managing kiosk menu and settings.', categoryCode: 'kiosk', appCode: 'KIOSK_ADMIN' },
+    { code: 'advancedServiceWorkflow', name: 'Real-Time Multi-Machine Mesh Sync', description: 'POS/Captain/KDS/Kiosk real-time order and table synchronization.', categoryCode: 'sync', legacyEntitlementKey: 'advancedServiceWorkflow' },
+    { code: 'posAssistant', name: 'JAMAN AI Assistant', description: 'Offline, local-data-based natural-language restaurant queries.', categoryCode: 'ai', legacyEntitlementKey: 'posAssistant' },
+    { code: 'advancedCaptainReports', name: 'Advanced Analytics & CRM', description: 'Advanced sales analytics, channel performance and staff attribution.', categoryCode: 'analytics', legacyEntitlementKey: 'advancedCaptainReports' }
+  ];
+
+  const featureIdByCode = new Map<string, string>();
+  for (const f of features) {
+    const row = await tx.feature.upsert({
+      where: { code: f.code },
+      create: {
+        code: f.code,
+        name: f.name,
+        description: f.description,
+        categoryId: categoryIdByCode.get(f.categoryCode)!,
+        appCode: f.appCode ?? null,
+        legacyEntitlementKey: f.legacyEntitlementKey ?? null
+      },
+      update: { name: f.name, description: f.description, categoryId: categoryIdByCode.get(f.categoryCode)! }
+    });
+    featureIdByCode.set(f.code, row.id);
+  }
+
+  // KIOSK_ADMIN depends on selfOrderKiosk (the KIOSK app) — set once both rows exist.
+  await tx.feature.update({
+    where: { code: 'KIOSK_ADMIN' },
+    data: { dependsOnFeatureIds: [featureIdByCode.get('selfOrderKiosk')!] }
+  });
 }
 
 /**
