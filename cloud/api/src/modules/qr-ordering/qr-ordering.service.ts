@@ -109,7 +109,13 @@ const QR_RESTAURANT_INCLUDE = {
     where: { status: 'ACTIVE' as const },
     orderBy: { createdAt: 'desc' as const },
     take: 1,
-    include: { plan: true }
+    include: {
+      plan: true,
+      // Phase 5: QR_ORDERING is now a first-class AppCode with its own ApplicationEntitlement
+      // row — pre-fetched here (same style as `plan`) so resolveEntitlement can check it
+      // synchronously alongside the legacy flat flag, with no extra query.
+      applicationEntitlements: { where: { appCode: 'QR_ORDERING' as const, enabled: true }, take: 1 }
+    }
   }
 };
 
@@ -394,13 +400,18 @@ export class QrOrderingService {
 
   /** Plan entitlements form the base; a persisted platform override wins field by field. */
   private resolveEntitlement(restaurant: QrRestaurantRow, rawOverride: unknown): QrEntitlement {
-    const plan = restaurant.subscriptions[0]?.plan;
+    const subscription = restaurant.subscriptions[0];
+    const plan = subscription?.plan;
     const planTier = plan?.tier ?? 'CORE';
     const planEntitlements = asRecord(plan?.entitlements);
 
     // QR table ordering ships with JAMANVAAR PRO (INR 7,000); CORE (INR 5,000)
-    // does not include it.
-    const planQrEntitled = readBoolean(planEntitlements, 'qrTableOrdering') ?? planTier === 'PRO';
+    // does not include it. Phase 5: QR_ORDERING is now also a real AppCode with its own
+    // ApplicationEntitlement row (e.g. the JAMANVAAR QR tier grants it explicitly) — an
+    // existing PRO-tier restaurant with only the legacy flag must keep working, so this is an
+    // OR, not a replacement.
+    const legacyQrEntitled = readBoolean(planEntitlements, 'qrTableOrdering') ?? planTier === 'PRO';
+    const planQrEntitled = legacyQrEntitled || Boolean(subscription?.applicationEntitlements?.length);
     const planMaxTables = readPositiveInt(planEntitlements, 'qrMaxActiveTables') ?? (planTier === 'PRO' ? 50 : 15);
 
     const base: Omit<QrEntitlement, 'source'> = {

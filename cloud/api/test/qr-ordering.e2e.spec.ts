@@ -91,4 +91,32 @@ describe('QR ordering usage: tenant report -> platform read', () => {
 
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: otherRestaurantId } }));
   });
+
+  it('a restaurant entitled to QR_ORDERING via the new AppCode mechanism is qrEntitled even with the legacy flag off (Phase 5)', async () => {
+    const stamp = Date.now();
+    const restaurant = await authed('post', '/api/v1/restaurants', platformToken).send({
+      name: `TEST QR AppCode Restaurant ${stamp}`, mobile: `9${String(stamp).slice(-9)}`, ownerName: 'Owner', ownerEmail: `qrappcode-${stamp}@example.com`
+    });
+    const qrRestaurantId = restaurant.body.restaurant.id;
+
+    const plan = await authed('post', '/api/v1/plans', platformToken).send({
+      tier: 'QR', name: `TEST QR AppCode Plan ${stamp}`, priceMonthly: 75000, priceYearly: 900000,
+      maxBranches: 1, maxDevices: 5, maxUsers: 5,
+      entitlements: { qrTableOrdering: false } // legacy flag deliberately off
+    });
+
+    const sub = await authed('post', '/api/v1/subscriptions', platformToken).send({
+      restaurantId: qrRestaurantId, planId: plan.body.id, status: 'ACTIVE', expiresAt: new Date(Date.now() + 365 * 86400000).toISOString(),
+      applications: ['POS', 'POS_ADMIN', 'QR_ORDERING'] // explicit — grants the new AppCode
+    });
+    expect(sub.status).toBe(201);
+
+    const ownerEmail2 = `qrappcode-owner-${stamp}@example.com`;
+    const detail = await authed('get', `/api/v1/qr-ordering/restaurants/${qrRestaurantId}`, platformToken);
+    expect(detail.status).toBe(200);
+    expect(detail.body.entitlement.qrEntitled).toBe(true);
+
+    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: qrRestaurantId } }));
+    await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: plan.body.id } }));
+  });
 });
