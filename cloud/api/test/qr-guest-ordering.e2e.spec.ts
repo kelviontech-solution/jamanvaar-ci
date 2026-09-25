@@ -213,7 +213,7 @@ describe('QR guest ordering (BUG-119)', () => {
     });
     const coreRestaurantId = coreRestaurant.body.restaurant.id;
     const corePlan = await authed('post', '/api/v1/plans', platformToken).send({
-      tier: 'CORE', name: `TEST QR Guest Core Plan ${Date.now()}`, priceMonthly: 500000, maxBranches: 1, maxDevices: 5, maxUsers: 5, entitlements: { pos: true }
+      tier: 'CORE', name: `TEST QR Guest Core Plan ${Date.now()}`, priceMonthly: 500000, maxBranches: 1, maxDevices: 5, maxUsers: 5, entitlements: { posTerminal: true }
     });
     await authed('post', '/api/v1/subscriptions', platformToken).send({
       restaurantId: coreRestaurantId, planId: corePlan.body.id, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()

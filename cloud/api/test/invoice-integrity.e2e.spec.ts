@@ -43,7 +43,7 @@ describe('Invoice integrity (BUG-050, BUG-052)', () => {
     const login = await platformLogin(app, adminEmail, adminPassword);
     token = login.body.accessToken;
     const plan = await authed('post', '/api/v1/plans').send({
-      tier: 'PRO', name: `TEST Invoice Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true }
+      tier: 'PRO', name: `TEST Invoice Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true }
     });
     planId = plan.body.id;
   });

@@ -40,7 +40,7 @@ describe('Menu snapshot sync (Kiosk Admin -> cloud)', () => {
       maxBranches: 3,
       maxDevices: 20,
       maxUsers: 20,
-      entitlements: { kiosk: true }
+      entitlements: { selfOrderKiosk: true }
     });
     planId = planRes.body.id;
     await authed('post', '/api/v1/subscriptions', platformToken).send({

@@ -43,7 +43,7 @@ describe('security-audit remediation regressions', () => {
     restaurantId = restaurantRes.body.restaurant.id;
 
     const planRes = await authed('post', '/api/v1/plans', ownerToken).send({
-      tier: 'PRO', name: `TEST SecAudit Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true }
+      tier: 'PRO', name: `TEST SecAudit Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true }
     });
     planId = planRes.body.id;
     await authed('post', '/api/v1/subscriptions', ownerToken).send({

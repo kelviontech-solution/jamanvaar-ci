@@ -195,7 +195,7 @@ describe('Tenant authentication + authorization', () => {
       restaurantId: med13RestaurantId, email: med13Owner, activationToken: restRes.body.activationToken, newPassword: 'med13-correct-horse-battery'
     });
     const planRes = await authed('post', '/api/v1/plans', platformToken).send({
-      tier: 'PRO', name: `TEST MED13 Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true }
+      tier: 'PRO', name: `TEST MED13 Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true }
     });
     await authed('post', '/api/v1/subscriptions', platformToken).send({
       restaurantId: med13RestaurantId, planId: planRes.body.id, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString()

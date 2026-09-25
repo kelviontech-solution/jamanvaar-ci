@@ -48,7 +48,7 @@ describe('Device enforcement (BUG-049/059/068)', () => {
     });
     restaurantId = rest.body.restaurant.id;
     const plan = await platform('post', '/api/v1/plans').send({
-      tier: 'PRO', name: `TEST Enf Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true, kds: true }
+      tier: 'PRO', name: `TEST Enf Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true, kotKdsRouting: true }
     });
     planId = plan.body.id;
     const sub = await platform('post', '/api/v1/subscriptions').send({

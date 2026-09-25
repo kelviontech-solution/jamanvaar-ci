@@ -44,7 +44,7 @@ describe('Restaurant Admin session enforcement (BUG-089)', () => {
       .send({ restaurantId, email: ownerEmail, activationToken: rest.body.activationToken, newPassword: ownerPassword });
 
     const plan = await platform('post', '/api/v1/plans').send({
-      tier: 'PRO', name: `TEST Tenant Enf Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true }
+      tier: 'PRO', name: `TEST Tenant Enf Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true }
     });
     planId = plan.body.id;
     await platform('post', '/api/v1/subscriptions').send({ restaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString() });

@@ -59,7 +59,7 @@ describe('Payment order creation', () => {
     restaurantId = restaurantRes.body.restaurant.id;
 
     const planRes = await authed('post', '/api/v1/plans', platformToken).send({
-      tier: 'PRO', name: `TEST Pay Orders Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { kiosk: true }
+      tier: 'PRO', name: `TEST Pay Orders Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { selfOrderKiosk: true }
     });
     planId = planRes.body.id;
     await authed('post', '/api/v1/subscriptions', platformToken).send({

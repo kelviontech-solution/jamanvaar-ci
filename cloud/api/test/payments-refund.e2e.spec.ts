@@ -44,7 +44,7 @@ describe('Refund creation', () => {
     // this test needs both POS and KIOSK (for the "wrong device type" test), so it asks for
     // them explicitly rather than relying on tier defaults.
     const planRes = await authed('post', '/api/v1/plans', platformToken).send({
-      tier: 'PRO', name: `TEST Refund Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { kiosk: true }
+      tier: 'PRO', name: `TEST Refund Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { selfOrderKiosk: true }
     });
     planId = planRes.body.id;
     await authed('post', '/api/v1/subscriptions', platformToken).send({

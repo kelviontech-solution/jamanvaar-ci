@@ -61,7 +61,7 @@ describe('Restaurant-raised support tickets (BUG-088)', () => {
     setupToken = await login(setupEmail);
     staffToken = await login(staffEmail);
     mateToken = await login(mateEmail);
-    planId = (await setup('post', '/api/v1/plans').send({ tier: 'PRO', name: `TEST RT Plan ${stamp}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true } })).body.id;
+    planId = (await setup('post', '/api/v1/plans').send({ tier: 'PRO', name: `TEST RT Plan ${stamp}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true } })).body.id;
     A = await makeTenant('a');
     B = await makeTenant('b');
   }, 120_000);

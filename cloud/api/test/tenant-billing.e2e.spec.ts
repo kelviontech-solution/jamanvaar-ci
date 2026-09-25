@@ -72,7 +72,7 @@ describe('Tenant billing payment authorization (CRIT-02)', () => {
     ownerToken = ownerLogin.body.accessToken;
 
     const planRes = await authed('post', '/api/v1/plans', platformToken).send({
-      tier: 'PRO', name: `TEST Tenant Billing Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true }
+      tier: 'PRO', name: `TEST Tenant Billing Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true }
     });
     planId = planRes.body.id;
     const subRes = await authed('post', '/api/v1/subscriptions', platformToken).send({ restaurantId, planId, status: 'ACTIVE', expiresAt: inDays(30) });

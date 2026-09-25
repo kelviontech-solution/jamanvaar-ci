@@ -1,8 +1,11 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PlanStatus, PlatformUser, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { CreatePlanDto, UpdatePlanDto } from './dto/plan.dto';
+import { ENTITLEMENT_KEYS } from './entitlements';
+
+type TxClient = Prisma.TransactionClient;
 
 /**
  * Plan itself is platform-global (no restaurantId, no RLS), but every method
@@ -53,10 +56,32 @@ export class PlansService {
     return plan;
   }
 
+  /** Checks incoming keys against the live Feature.legacyEntitlementKey set and returns a dense object (missing keys false). */
+  private async assertValidEntitlementKeys(
+    tx: TxClient,
+    incoming: Record<string, boolean>
+  ): Promise<Record<string, boolean>> {
+    const live = await tx.feature.findMany({
+      where: { legacyEntitlementKey: { not: null } },
+      select: { legacyEntitlementKey: true }
+    });
+    const validKeys = new Set<string>(ENTITLEMENT_KEYS);
+    for (const f of live) if (f.legacyEntitlementKey) validKeys.add(f.legacyEntitlementKey);
+
+    const unknown = Object.keys(incoming).filter((k) => !validKeys.has(k));
+    if (unknown.length > 0) {
+      throw new BadRequestException(`Unknown entitlement key${unknown.length === 1 ? '' : 's'}: ${unknown.join(', ')}`);
+    }
+    const dense: Record<string, boolean> = {};
+    for (const key of validKeys) dense[key] = incoming[key] ?? false;
+    return dense;
+  }
+
   async create(dto: CreatePlanDto, actor: PlatformUser) {
-    const plan = await this.prisma.runAsPlatform((tx) =>
-      tx.plan.create({ data: dto as Prisma.PlanCreateInput })
-    );
+    const plan = await this.prisma.runAsPlatform(async (tx) => {
+      const entitlements = await this.assertValidEntitlementKeys(tx, dto.entitlements);
+      return tx.plan.create({ data: { ...dto, entitlements } as Prisma.PlanCreateInput });
+    });
     await this.audit.log({
       actorType: 'PLATFORM',
       actorId: actor.id,
@@ -71,7 +96,11 @@ export class PlansService {
     const plan = await this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.plan.findUnique({ where: { id } });
       if (!existing) throw new NotFoundException('Plan not found');
-      return tx.plan.update({ where: { id }, data: dto as Prisma.PlanUpdateInput });
+      const data = { ...dto } as Prisma.PlanUpdateInput;
+      if (dto.entitlements !== undefined) {
+        data.entitlements = await this.assertValidEntitlementKeys(tx, dto.entitlements);
+      }
+      return tx.plan.update({ where: { id }, data });
     });
 
     await this.audit.log({

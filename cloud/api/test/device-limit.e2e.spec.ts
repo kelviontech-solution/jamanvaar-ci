@@ -43,7 +43,7 @@ describe('Plan device limit enforcement (BUG-061)', () => {
     restaurantId = rest.body.restaurant.id;
     const plan = await api('post', '/api/v1/plans').send({
       tier: 'PRO', name: `TEST DevLimit Plan ${Date.now()}`, priceMonthly: 100000, maxBranches: 3, maxDevices: 2, maxUsers: 10,
-      entitlements: { pos: true, kds: true, captain: true }
+      entitlements: { posTerminal: true, kotKdsRouting: true, captainApp: true }
     });
     planId = plan.body.id;
     await api('post', '/api/v1/subscriptions').send({ restaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString() });

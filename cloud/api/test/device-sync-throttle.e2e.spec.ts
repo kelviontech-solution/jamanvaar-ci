@@ -36,7 +36,7 @@ describe('Rate limiting for terminal sync', () => {
     });
     restaurantId = restaurant.body.restaurant.id;
     const plan = await authed('post', '/api/v1/plans', platformToken).send({
-      tier: 'PRO', name: `TEST Throttle Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true }
+      tier: 'PRO', name: `TEST Throttle Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true }
     });
     planId = plan.body.id;
     await authed('post', '/api/v1/subscriptions', platformToken).send({ restaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString() });

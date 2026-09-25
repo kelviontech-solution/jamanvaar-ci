@@ -38,7 +38,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     restaurantId = restaurantRes.body.restaurant.id;
 
     const planRes = await authed('post', '/api/v1/plans', platformToken).send({
-      tier: 'PRO', name: `TEST Entity Sync Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true }
+      tier: 'PRO', name: `TEST Entity Sync Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true }
     });
     planId = planRes.body.id;
     await authed('post', '/api/v1/subscriptions', platformToken).send({
@@ -191,7 +191,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     });
     const otherRestaurantId = otherRestaurant.body.restaurant.id;
     const otherPlan = await authed('post', '/api/v1/plans', platformToken).send({
-      tier: 'PRO', name: `TEST Entity Sync Other Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true }
+      tier: 'PRO', name: `TEST Entity Sync Other Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true }
     });
     await authed('post', '/api/v1/subscriptions', platformToken).send({ restaurantId: otherRestaurantId, planId: otherPlan.body.id, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString() });
     const otherKey = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId: otherRestaurantId, allowedDeviceType: 'POS', expiresAt: new Date(Date.now() + 86400000).toISOString() });

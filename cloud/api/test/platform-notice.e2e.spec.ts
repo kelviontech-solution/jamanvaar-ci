@@ -55,7 +55,7 @@ describe('Platform notice / maintenance mode (BUG-091/092)', () => {
       .post('/api/v1/tenant-auth/set-initial-password')
       .send({ restaurantId, email: ownerEmail, activationToken: rest.body.activationToken, newPassword: ownerPassword });
     const plan = await platform('post', '/api/v1/plans').send({
-      tier: 'PRO', name: `TEST Notice Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true }
+      tier: 'PRO', name: `TEST Notice Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true }
     });
     planId = plan.body.id;
     await platform('post', '/api/v1/subscriptions').send({ restaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString() });

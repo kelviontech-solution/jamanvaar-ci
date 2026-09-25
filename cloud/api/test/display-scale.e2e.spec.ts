@@ -36,7 +36,7 @@ describe('Terminal display size (BUG-008)', () => {
     const rest = await platform('post', '/api/v1/restaurants').send({ name: `TEST Display ${stamp}`, ownerName: 'Owner', ownerEmail });
     restaurantId = rest.body.restaurant.id;
     await request(app.getHttpServer()).post('/api/v1/tenant-auth/set-initial-password').send({ restaurantId, email: ownerEmail, activationToken: rest.body.activationToken, newPassword: ownerPassword });
-    planId = (await platform('post', '/api/v1/plans').send({ tier: 'PRO', name: `TEST DS Plan ${stamp}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true } })).body.id;
+    planId = (await platform('post', '/api/v1/plans').send({ tier: 'PRO', name: `TEST DS Plan ${stamp}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true } })).body.id;
     await platform('post', '/api/v1/subscriptions').send({ restaurantId, planId, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString() });
 
     const adminKey = await platform('post', '/api/v1/activation-keys').send({ restaurantId, allowedDeviceType: 'POS_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });

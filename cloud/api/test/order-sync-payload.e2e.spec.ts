@@ -39,7 +39,7 @@ describe('Order sync payload fidelity and per-order validation', () => {
     });
     restaurantId = rest.body.restaurant.id;
     const plan = await authed('post', '/api/v1/plans', platformToken).send({
-      tier: 'PRO', name: `TEST Payload Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { pos: true, kds: true }
+      tier: 'PRO', name: `TEST Payload Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true, kotKdsRouting: true }
     });
     planId = plan.body.id;
     await authed('post', '/api/v1/subscriptions', platformToken).send({

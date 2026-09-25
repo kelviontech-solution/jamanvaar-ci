@@ -32,11 +32,9 @@ export const ENTITLEMENT_KEYS = [
 
 export type EntitlementKey = (typeof ENTITLEMENT_KEYS)[number];
 
-export const entitlementsSchema = z
-  .object(Object.fromEntries(ENTITLEMENT_KEYS.map((k) => [k, z.boolean()])) as Record<EntitlementKey, z.ZodBoolean>)
-  .partial()
-  .transform((val) => {
-    const full: Record<string, boolean> = {};
-    for (const key of ENTITLEMENT_KEYS) full[key] = val[key] ?? false;
-    return full;
-  });
+/**
+ * Shape-only validation (any string key -> boolean). Key validity is checked against the live
+ * Feature.legacyEntitlementKey column in PlansService.assertValidEntitlementKeys, since this
+ * runs synchronously inside the shared ZodValidationPipe.
+ */
+export const entitlementsSchema = z.record(z.string(), z.boolean());
