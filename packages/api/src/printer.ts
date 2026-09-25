@@ -1,5 +1,5 @@
 import { KOTRecord, Order, PrinterDevice, PrinterHardwareStatus, PrinterRole, PrintJob, ReceiptConfig, ReceiptPaperSize } from '@jamanvaar/types';
-import { sendRawToPrinter } from './print_transport';
+import { Platform, ESC_POS_DRAWER_KICK } from './platform';
 import { formatDate, formatINR, formatSplitTax, formatTime, generateUUID, stripControlCharsForPrint } from '@jamanvaar/utils';
 import { AuditRepository, db, PrintQueueRepository, ReceiptRepository } from '@jamanvaar/database';
 
@@ -408,7 +408,21 @@ export class PrinterService {
    * ESC/POS printers support), via the send_escpos_bytes Tauri command.
    */
   private static async dispatchToPrinter(printer: PrinterDevice, text: string): Promise<void> {
-    await sendRawToPrinter(printer, this.wrapEscPos(text));
+    await Platform.printer.send(printer, this.wrapEscPos(text));
+  }
+
+  /**
+   * Pops the cash drawer (connected to the receipt printer) through the printer port: local hardware, no
+   * internet, and it reports why when it cannot rather than pretending.
+   */
+  public static async openCashDrawer(): Promise<{ success: boolean; message: string }> {
+    try {
+      const printer = this.getPrinterForRole('RECEIPT');
+      await Platform.printer.send(printer, ESC_POS_DRAWER_KICK);
+      return { success: true, message: 'Cash drawer opened' };
+    } catch (err: any) {
+      return { success: false, message: err?.message || 'Could not open the cash drawer' };
+    }
   }
 
   /**

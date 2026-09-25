@@ -34,6 +34,7 @@ import {
   InventoryRepository
 } from '@jamanvaar/database';
 import { PosPrinterService } from '../services/printerService';
+import { Platform } from '@jamanvaar/api';
 import { PosRecoveryService } from '../services/recoveryService';
 import { lanMeshSync, SyncOutboxEngine } from '@jamanvaar/sync';
 import { SessionPersistence, AuthStatus, calculateCart } from '@jamanvaar/business';
@@ -1319,12 +1320,13 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     openCashDrawer: () => {
-      AuditRepository.log({
-        action: 'CASH_DRAWER_OPENED',
-        category: 'HARDWARE',
-        details: `Cash drawer kick command sent by ${get().currentUser?.fullName || 'Cashier'}`,
-        username: get().currentUser?.fullName || 'Cashier'
-      });
+      const username = get().currentUser?.fullName || 'Cashier';
+      // Goes through the cash-drawer port (local hardware, no internet). A drawer that did not open is
+      // recorded as such rather than as a success, and never blocks the sale.
+      void Platform.cashDrawer.open().then(
+        () => AuditRepository.log({ action: 'CASH_DRAWER_OPENED', category: 'HARDWARE', details: `Cash drawer opened by ${username}`, username }),
+        (err: Error) => AuditRepository.log({ action: 'CASH_DRAWER_OPEN_FAILED', category: 'HARDWARE', details: `Cash drawer did not open (${err?.message || 'unknown reason'}); requested by ${username}`, username })
+      );
     },
 
     requestManagerOverride: (action, title, details, onApprove) => {
