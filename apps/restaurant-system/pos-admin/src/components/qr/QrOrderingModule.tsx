@@ -51,6 +51,18 @@ export type QrAdminSubTab = 'OVERVIEW' | 'TABLES' | 'MENU' | 'ORDERS' | 'ANALYTI
 export const QrOrderingModule: React.FC = () => {
   const [activeSubTab, setActiveSubTab] = useState<QrAdminSubTab>('OVERVIEW');
   const [tick, setTick] = useState<number>(0);
+  // QR guests order through the cloud, so this module is meaningless without a connection.
+  const [isOnline, setIsOnline] = useState<boolean>(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
+  useEffect(() => {
+    const up = () => setIsOnline(true);
+    const down = () => setIsOnline(false);
+    window.addEventListener('online', up);
+    window.addEventListener('offline', down);
+    return () => {
+      window.removeEventListener('online', up);
+      window.removeEventListener('offline', down);
+    };
+  }, []);
 
   // Modals state
   const [isCustomerPreviewOpen, setIsCustomerPreviewOpen] = useState<boolean>(false);
@@ -722,6 +734,11 @@ export const QrOrderingModule: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-jaman-cream overflow-hidden select-none">
+      {!isOnline && (
+        <div role="alert" className="bg-amber-100 border-b border-amber-300 px-5 py-2 text-xs font-bold text-amber-900 shrink-0">
+          You are offline. QR scanning and guest ordering need an internet connection and are paused until you reconnect. Counter POS billing is unaffected.
+        </div>
+      )}
       {/* Top Section Navigation Header */}
       <div className="bg-white border-b border-jaman-border px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-2xs">
         <div className="flex items-center gap-3">

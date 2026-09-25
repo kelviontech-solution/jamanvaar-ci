@@ -61,6 +61,14 @@ export const PLAN_DEFINITIONS: Record<PlanTier, PlanDefinition> = {
   }
 };
 
+// Cloud-issued certificates can carry tiers beyond the local CORE/PRO pair (QR, ENTERPRISE);
+// each of those includes everything PRO does, so gates must not test `tier === 'PRO'` literally.
+const PRO_OR_HIGHER_TIERS = new Set<string>(['PRO', 'QR', 'ENTERPRISE']);
+
+function isProOrHigher(tier: string | undefined): boolean {
+  return tier !== undefined && PRO_OR_HIGHER_TIERS.has(tier);
+}
+
 export class EntitlementService {
   public static getActiveLicense(): LicenseInfo {
     return LicenseRepository.getLicense();
@@ -77,7 +85,7 @@ export class EntitlementService {
     message?: string;
   } {
     const license = LicenseRepository.getLicense();
-    const isPro = license?.tier === 'PRO' && Boolean(license?.entitlements?.captainApp);
+    const isPro = isProOrHigher(license?.tier) && Boolean(license?.entitlements?.captainApp);
 
     if (!isPro) {
       return {
@@ -89,29 +97,36 @@ export class EntitlementService {
 
     return {
       allowed: true,
-      tier: 'PRO'
+      tier: license.tier
     };
   }
 
+  /**
+   * QR guests scan and order through the cloud, so this feature can never work offline even when
+   * the plan includes it: `requiresInternet` tells callers to also gate on connectivity.
+   */
   public static checkQrOrderingAccess(): {
     allowed: boolean;
     tier: PlanTier;
+    requiresInternet: true;
     message?: string;
   } {
     const license = LicenseRepository.getLicense();
-    const isPro = license?.tier === 'PRO' && Boolean(license?.entitlements?.qrTableOrdering !== false);
+    const isPro = isProOrHigher(license?.tier) && Boolean(license?.entitlements?.qrTableOrdering !== false);
 
     if (!isPro) {
       return {
         allowed: false,
         tier: license?.tier || 'CORE',
+        requiresInternet: true,
         message: 'QR Table Ordering is exclusively available in the JAMANVAAR PRO (₹7,000) plan. Allotment must be provisioned by Platform Super Admin.'
       };
     }
 
     return {
       allowed: true,
-      tier: 'PRO'
+      tier: license.tier,
+      requiresInternet: true
     };
   }
 
@@ -121,7 +136,7 @@ export class EntitlementService {
     message?: string;
   } {
     const license = LicenseRepository.getLicense();
-    const isPro = license?.tier === 'PRO' && Boolean(license?.entitlements?.selfOrderKiosk);
+    const isPro = isProOrHigher(license?.tier) && Boolean(license?.entitlements?.selfOrderKiosk);
 
     if (!isPro) {
       return {
@@ -133,7 +148,7 @@ export class EntitlementService {
 
     return {
       allowed: true,
-      tier: 'PRO'
+      tier: license.tier
     };
   }
 
@@ -160,7 +175,7 @@ export class EntitlementService {
     message?: string;
   } {
     const license = LicenseRepository.getLicense();
-    const isPro = license?.tier === 'PRO' && Boolean(license?.entitlements?.advancedCaptainReports);
+    const isPro = isProOrHigher(license?.tier) && Boolean(license?.entitlements?.advancedCaptainReports);
 
     return {
       allowed: isPro,
@@ -177,7 +192,7 @@ export class EntitlementService {
     message?: string;
   } {
     const license = LicenseRepository.getLicense();
-    const isPro = license?.tier === 'PRO';
+    const isPro = isProOrHigher(license?.tier);
 
     return {
       allowed: isPro,
