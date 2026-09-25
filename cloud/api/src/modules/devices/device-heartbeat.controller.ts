@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Req, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, UseGuards, UsePipes } from '@nestjs/common';
 import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { DevicesService } from './devices.service';
@@ -34,6 +34,19 @@ export class DeviceHeartbeatController {
   @Get('kiosks')
   kiosks(@CurrentDevice() device: Device) {
     return this.devices.listKiosksForRestaurant(device.restaurantId);
+  }
+
+  /** The device roster a Branch Core caches so it can authorize devices while offline. Console devices only. */
+  @Get('roster')
+  roster(@CurrentDevice() device: Device) {
+    return this.devices.getBranchRoster(device);
+  }
+
+  /** A Branch Core reporting the state of the devices it serves, so the cloud fleet view stays accurate. */
+  @Post('branch-report')
+  branchReport(@Body() body: { devices?: unknown }, @CurrentDevice() device: Device) {
+    const list = Array.isArray(body?.devices) ? (body.devices as never[]) : [];
+    return this.devices.reportBranchDevices(device, list);
   }
 
   /** B2-054: the restaurant's current identity (name/GSTIN/FSSAI/address), for every activated terminal to pull. */

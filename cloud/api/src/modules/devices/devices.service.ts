@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Device, Prisma, PlatformUser } from '@prisma/client';
 import type { RestaurantIdentityDto } from './dto/heartbeat.dto';
 import { pageOf, parsePaging } from '../../common/paging';
@@ -221,6 +221,74 @@ export class DevicesService {
    * that path now — the device identifies itself via its own long-lived
    * credential, never a caller-supplied device id.
    */
+  /**
+   * What a Branch Core needs to authorize devices with the internet down: who may connect (credential
+   * hashes, never plain tokens), which app each device may run, and the subscription window. Only a
+   * Restaurant Admin console device may fetch it, and only for its own restaurant (and branch, if bound).
+   */
+  async getBranchRoster(issuer: Device) {
+    if (issuer.type !== 'POS_ADMIN') throw new ForbiddenException('Only a Restaurant Admin console can download the branch roster');
+    return this.prisma.runAsTenant(issuer.restaurantId, async (tx) => {
+      const scope = { restaurantId: issuer.restaurantId, ...(issuer.branchId ? { branchId: issuer.branchId } : {}) };
+      const [devices, branches, restaurant, subs] = await Promise.all([
+        tx.device.findMany({
+          where: scope,
+          select: { id: true, type: true, name: true, branchId: true, status: true, isLocked: true, deviceTokenHash: true }
+        }),
+        tx.branch.findMany({ where: { restaurantId: issuer.restaurantId, ...(issuer.branchId ? { id: issuer.branchId } : {}) }, select: { id: true, name: true, code: true, timezone: true, status: true } }),
+        tx.restaurant.findUniqueOrThrow({ where: { id: issuer.restaurantId }, select: { id: true, name: true, status: true } }),
+        tx.subscription.findMany({ where: { restaurantId: issuer.restaurantId, status: { in: ['ACTIVE', 'TRIAL'] }, expiresAt: { gt: new Date() } }, select: { id: true, expiresAt: true } })
+      ]);
+      const enabled = subs.length
+        ? await tx.applicationEntitlement.findMany({ where: { subscriptionId: { in: subs.map((x) => x.id) }, enabled: true }, select: { appCode: true } })
+        : [];
+      const enabledApps = new Set<string>(enabled.map((e) => e.appCode));
+      const latestExpiry = subs.reduce<Date | null>((max, x) => (!max || x.expiresAt > max ? x.expiresAt : max), null);
+      return {
+        restaurant,
+        branches,
+        subscription: { active: subs.length > 0, expiresAt: latestExpiry?.toISOString() ?? null, enabledApps: [...enabledApps] },
+        devices: devices.map((d) => ({
+          id: d.id, type: d.type, name: d.name, branchId: d.branchId, status: d.status, isLocked: d.isLocked,
+          tokenHash: d.deviceTokenHash, appEnabled: enabledApps.has(d.type)
+        })),
+        serverTime: new Date().toISOString()
+      };
+    });
+  }
+
+  /**
+   * A Branch Core reporting on the devices it serves. Those devices talk to the core, not the cloud, so
+   * this is how the cloud fleet view learns when they were last seen and what they have pending.
+   * Restricted to the restaurant's own devices; a reported time is never accepted from the future.
+   */
+  async reportBranchDevices(
+    issuer: Device,
+    reports: Array<{ deviceId: string; lastSeenAt?: string | null; pendingSyncCount?: number; syncError?: string | null; appVersion?: string | null; menuVersion?: number | null; syncStatus?: string | null }>
+  ) {
+    if (issuer.type !== 'POS_ADMIN') throw new ForbiddenException('Only a Restaurant Admin console can report device status');
+    const now = Date.now();
+    return this.prisma.runAsTenant(issuer.restaurantId, async (tx) => {
+      let updated = 0;
+      for (const r of reports.slice(0, 500)) {
+        const seen = r.lastSeenAt ? Math.min(Date.parse(r.lastSeenAt) || 0, now) : 0;
+        const res = await tx.device.updateMany({
+          where: { id: r.deviceId, restaurantId: issuer.restaurantId, ...(issuer.branchId ? { branchId: issuer.branchId } : {}), status: 'ACTIVE' },
+          data: {
+            ...(seen ? { lastSeenAt: new Date(seen) } : {}),
+            ...(r.pendingSyncCount !== undefined ? { pendingSyncCount: r.pendingSyncCount } : {}),
+            ...(r.syncError !== undefined ? { syncError: r.syncError } : {}),
+            ...(r.appVersion ? { appVersion: r.appVersion } : {}),
+            ...(r.menuVersion !== undefined && r.menuVersion !== null ? { menuVersion: r.menuVersion } : {}),
+            ...(r.syncStatus ? { syncStatus: r.syncStatus } : {})
+          }
+        });
+        updated += res.count;
+      }
+      return { updated };
+    });
+  }
+
   async listKiosksForRestaurant(restaurantId: string) {
     const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.device.findMany({
