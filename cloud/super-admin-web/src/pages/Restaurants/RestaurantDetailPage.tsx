@@ -219,6 +219,7 @@ export function RestaurantDetailPage() {
   const [reportsLoading, setReportsLoading] = useState(false);
   const [appEntitlements, setAppEntitlements] = useState<ApplicationEntitlement[] | null>(null);
   const [savingAppCode, setSavingAppCode] = useState<AppCode | null>(null);
+  const [impactPrompt, setImpactPrompt] = useState<{ appCode: AppCode; message: string } | null>(null);
   const [featureCatalog, setFeatureCatalog] = useState<FeatureCatalog | null>(null);
 
   // Password reset modal state
@@ -662,13 +663,13 @@ export function RestaurantDetailPage() {
   const allActiveSubs = restaurant.subscriptions.filter((s) => s.status === 'ACTIVE' || s.status === 'TRIAL');
   const familyLabel = (family: string | undefined) => (family === 'KIOSK' ? 'Kiosk Add-on' : 'Restaurant Plan');
 
-  async function handleToggleApplication(appCode: AppCode, nextEnabled: boolean) {
+  async function handleToggleApplication(appCode: AppCode, nextEnabled: boolean, acknowledgeDeviceImpact = false) {
     if (!activeSub) return;
     setSavingAppCode(appCode);
     try {
       await api.patch<ApplicationEntitlement>(
         `/api/v1/subscriptions/${activeSub.id}/applications/${appCode}`,
-        { enabled: nextEnabled }
+        { enabled: nextEnabled, ...(acknowledgeDeviceImpact ? { acknowledgeDeviceImpact: true } : {}) }
       );
       // Refetch rather than splice in the PATCH response directly: the PATCH endpoint returns the
       // raw entitlement row with no `source` field (only the GET list endpoints compute PLAN vs
@@ -678,7 +679,11 @@ export function RestaurantDetailPage() {
       setAppEntitlements(refreshed);
       showToast(`${APP_CODE_LABELS[appCode]} ${nextEnabled ? 'enabled' : 'disabled'} for this restaurant.`);
     } catch (err) {
-      showToast(err instanceof ApiError ? err.message : `Failed to update ${APP_CODE_LABELS[appCode]}`);
+      if (err instanceof ApiError && err.status === 409 && err.message.includes('acknowledgeDeviceImpact')) {
+        setImpactPrompt({ appCode, message: err.message });
+      } else {
+        showToast(err instanceof ApiError ? err.message : `Failed to update ${APP_CODE_LABELS[appCode]}`);
+      }
     } finally {
       setSavingAppCode(null);
     }
@@ -2302,6 +2307,20 @@ export function RestaurantDetailPage() {
           </div>
         </Modal>
       )}
+
+      <ConfirmModal
+        isOpen={impactPrompt !== null}
+        title={`Disable ${impactPrompt ? APP_CODE_LABELS[impactPrompt.appCode] : ''}?`}
+        message={impactPrompt?.message.replace(' Resend with acknowledgeDeviceImpact: true to confirm.', '') ?? ''}
+        confirmLabel="Disable anyway"
+        tone="danger"
+        onConfirm={() => {
+          const p = impactPrompt;
+          setImpactPrompt(null);
+          if (p) void handleToggleApplication(p.appCode, false, true);
+        }}
+        onClose={() => setImpactPrompt(null)}
+      />
 
       {/* Confirm Dialog */}
       {confirmAction && (

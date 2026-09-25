@@ -134,6 +134,17 @@ export class ApplicationEntitlementsService {
         }
       }
 
+      if (dto.enabled === false && existing.enabled && !dto.acknowledgeDeviceImpact) {
+        const activeDevices = await tx.device.count({
+          where: { restaurantId: existing.restaurantId, type: appCode as unknown as DeviceType, status: { not: 'REVOKED' } }
+        });
+        if (activeDevices > 0) {
+          throw new ConflictException(
+            `${activeDevices} active ${appCode} device${activeDevices === 1 ? '' : 's'} will stop working if this app is disabled. Resend with acknowledgeDeviceImpact: true to confirm.`
+          );
+        }
+      }
+
       const updated = await tx.applicationEntitlement.update({
         where: { subscriptionId_appCode: { subscriptionId, appCode } },
         data: {
@@ -152,7 +163,7 @@ export class ApplicationEntitlementsService {
           restaurantId: existing.restaurantId,
           action: 'APPLICATION_ENTITLEMENT_UPDATED',
           category: 'APPLICATIONS',
-          details: { subscriptionId, appCode, changes: dto }
+          details: { subscriptionId, appCode, changes: { ...dto, acknowledgeDeviceImpact: undefined } }
         },
         tx
       );
@@ -219,7 +230,11 @@ export class ApplicationEntitlementsService {
 
     const owningSub = subs.find((s) => s.id === row.subscriptionId);
     if (!owningSub) return;
-    const quota = row.deviceQuota ?? owningSub.plan.maxDevices;
+    const featureQuota =
+      row.deviceQuota === null
+        ? (await tx.feature.findFirst({ where: { appCode, isActive: true }, select: { defaultDeviceQuota: true } }))?.defaultDeviceQuota
+        : null;
+    const quota = row.deviceQuota ?? featureQuota ?? owningSub.plan.maxDevices;
 
     const activeDeviceCount = await tx.device.count({
       where: { restaurantId, type: appCode as unknown as DeviceType, status: { not: 'REVOKED' } }

@@ -21,6 +21,7 @@ export function FeatureFormModal({
   const [description, setDescription] = useState(feature?.description ?? '');
   const [categoryId, setCategoryId] = useState(feature?.categoryId ?? categories[0]?.id ?? '');
   const [appCode, setAppCode] = useState<string>(feature?.appCode ?? '');
+  const [quota, setQuota] = useState<string>(feature?.defaultDeviceQuota ? String(feature.defaultDeviceQuota) : '');
   const [dependsOn, setDependsOn] = useState<string[]>(feature?.dependsOnFeatureIds ?? []);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -34,7 +35,7 @@ export function FeatureFormModal({
     setError(null);
     setSubmitting(true);
     try {
-      const payload = { name, description, categoryId, appCode: appCode || null, dependsOnFeatureIds: dependsOn };
+      const payload = { name, description, categoryId, appCode: appCode || null, dependsOnFeatureIds: dependsOn, defaultDeviceQuota: quota ? Number(quota) : null };
       if (feature) {
         await api.patch(`/api/v1/features/${feature.id}`, payload);
       } else {
@@ -92,6 +93,10 @@ export function FeatureFormModal({
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
+        </div>
+        <div className="field">
+          <label>Default device quota (optional — max active devices for this app; blank uses the plan's limit)</label>
+          <Input type="number" min={1} value={quota} onChange={(e) => setQuota(e.target.value)} />
         </div>
         <div className="field">
           <label>Depends On (features that must be enabled for this one to work)</label>

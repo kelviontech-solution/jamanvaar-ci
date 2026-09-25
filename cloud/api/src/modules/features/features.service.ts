@@ -35,6 +35,7 @@ export class FeaturesService {
           description: dto.description,
           categoryId: dto.categoryId,
           appCode: dto.appCode ?? null,
+          defaultDeviceQuota: dto.defaultDeviceQuota ?? null,
           dependsOnFeatureIds: dto.dependsOnFeatureIds ?? []
         }
       });

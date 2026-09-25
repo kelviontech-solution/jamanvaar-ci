@@ -10,6 +10,7 @@ export const createFeatureSchema = z
     categoryId: z.string().uuid(),
     appCode: z.enum(APP_CODES).nullable().optional(),
     dependsOnFeatureIds: z.array(z.string().uuid()).optional(),
+    defaultDeviceQuota: z.number().int().positive().nullable().optional(),
     legacyEntitlementKey: z.undefined({ message: 'legacyEntitlementKey can only be set by the seed, never through this API' }).optional()
   })
   .strict();
@@ -24,6 +25,7 @@ export const updateFeatureSchema = z
     categoryId: z.string().uuid().optional(),
     appCode: z.enum(APP_CODES).nullable().optional(),
     dependsOnFeatureIds: z.array(z.string().uuid()).optional(),
+    defaultDeviceQuota: z.number().int().positive().nullable().optional(),
     isActive: z.boolean().optional()
   })
   .strict();

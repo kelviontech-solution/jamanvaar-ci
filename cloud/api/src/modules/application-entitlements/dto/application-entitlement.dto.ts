@@ -4,6 +4,8 @@ export const APP_CODES = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_
 
 export const updateApplicationEntitlementSchema = z.object({
   enabled: z.boolean().optional(),
+  // Must be true to disable an app that still has active devices; those devices stop working.
+  acknowledgeDeviceImpact: z.boolean().optional(),
   // null explicitly clears an override back to "inherit the plan's maxDevices";
   // omitted leaves the current value untouched.
   deviceQuota: z.number().int().positive().nullable().optional(),

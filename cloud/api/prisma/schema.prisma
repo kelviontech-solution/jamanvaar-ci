@@ -321,6 +321,8 @@ model Feature {
   // seed sets it, since it documents a fact about already-existing data, not something to invent
   // going forward.
   legacyEntitlementKey String?         @unique
+  // Per-app default device cap when the entitlement row has no override; null = Plan.maxDevices.
+  defaultDeviceQuota   Int?
   // Plain string list of other Feature.id values, not an enforced FK — the API layer (not the
   // database) proves referential integrity here (see FeaturesService).
   dependsOnFeatureIds  String[]        @default([])

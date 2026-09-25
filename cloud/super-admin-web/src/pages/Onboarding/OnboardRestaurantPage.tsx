@@ -186,16 +186,6 @@ const EMPTY_ACTIVATION: ActivationForm = {
   expiryDays: '30'
 };
 
-// Mirrors DEFAULT_APPS_BY_TIER in cloud/api's application-entitlements.service.ts
-// — this copy only decides the checkbox starting state; the backend remains
-// the actual source of truth and applies its own defaults if a caller ever
-// omits `applications` entirely.
-const DEFAULT_APPS_BY_TIER: Record<string, AppCode[]> = {
-  CORE: ['POS', 'POS_ADMIN', 'KDS'],
-  PRO: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN'],
-  ENTERPRISE: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN']
-};
-
 // A half-filled onboarding form used to simply vanish on any navigation
 // away (back button, accidental refresh, closing the tab) — everything
 // lived in plain useState with nothing backing it. This is the shape of
@@ -369,6 +359,8 @@ export function OnboardRestaurantPage() {
 
   function handleSelectPlan(plan: Plan) {
     setPlanForm((f) => ({ ...f, planId: plan.id }));
+    // Applications pre-selected for a previously chosen plan must not carry over to this one.
+    setModulesForm((m) => ({ ...m, applications: [] }));
     setModulesForm((m) => ({
       ...m,
       maxBranches: plan.maxBranches,
@@ -937,7 +929,7 @@ export function OnboardRestaurantPage() {
               e.preventDefault();
               setModulesForm((m) => ({
                 ...m,
-                applications: m.applications.length > 0 ? m.applications : (DEFAULT_APPS_BY_TIER[selectedPlan?.tier ?? 'CORE'] ?? [])
+                applications: m.applications.length > 0 ? m.applications : (selectedPlan?.defaultApps ?? [])
               }));
               setStep('modules');
             }}
@@ -1012,8 +1004,7 @@ export function OnboardRestaurantPage() {
                       {/* Self-Order Kiosk + its admin console are a real,
                           distinct AppCode pair (KIOSK / KIOSK_ADMIN) gated
                           the same way Captain/QR are — PRO-tier only per
-                          DEFAULT_APPS_BY_TIER in application-entitlements.
-                          service.ts — but this card never listed them at
+                          the plan's computed defaultApps — but this card never listed them at
                           all, so an onboarding admin had no way to see
                           whether a plan included Kiosk. */}
                       <li className="plan-feature-item">

@@ -128,6 +128,7 @@ export interface FeatureRecord {
   categoryId: string;
   appCode: AppCode | null;
   legacyEntitlementKey: string | null;
+  defaultDeviceQuota: number | null;
   dependsOnFeatureIds: string[];
   isActive: boolean;
   createdAt: string;

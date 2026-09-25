@@ -77,7 +77,7 @@ describe('Device enforcement (BUG-049/059/068)', () => {
   });
 
   it('disabling the POS application stops POS terminals only, with an APP_DISABLED reason', async () => {
-    const off = await platform('patch', `/api/v1/subscriptions/${subscriptionId}/applications/POS`).send({ enabled: false });
+    const off = await platform('patch', `/api/v1/subscriptions/${subscriptionId}/applications/POS`).send({ enabled: false, acknowledgeDeviceImpact: true });
     expect(off.status).toBe(200);
 
     const blocked = await device('get', '/api/v1/orders/sync', posToken);
