@@ -655,6 +655,12 @@ export function RestaurantDetailPage() {
     ) ?? restaurant.subscriptions[0];
   const effectiveTier = (activeSub?.plan.tier as 'CORE' | 'PRO') || 'CORE';
   const isPro = effectiveTier === 'PRO';
+  // Phase 2/5: a restaurant may hold one active subscription per productFamily concurrently —
+  // a RESTAURANT-family base plan plus a separate KIOSK-family add-on. `activeSub` above stays
+  // the single "primary" one every other tab's logic keys off of (backward compatible); this is
+  // every subscription currently ACTIVE or TRIAL, for the overview's combined summary.
+  const allActiveSubs = restaurant.subscriptions.filter((s) => s.status === 'ACTIVE' || s.status === 'TRIAL');
+  const familyLabel = (family: string | undefined) => (family === 'KIOSK' ? 'Kiosk Add-on' : 'Restaurant Plan');
 
   async function handleToggleApplication(appCode: AppCode, nextEnabled: boolean) {
     if (!activeSub) return;
@@ -1099,6 +1105,7 @@ export function RestaurantDetailPage() {
                 </h3>
                 <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>
                   Governs feature flags, maximum allowed POS terminals, and cloud sync policies.
+                  {allActiveSubs.length > 1 && ` This restaurant holds ${allActiveSubs.length} active subscriptions — see the Applications tab for their combined entitlements.`}
                 </p>
               </div>
 
@@ -1141,6 +1148,25 @@ export function RestaurantDetailPage() {
               <EmptyState title="No active subscription" description="Assign a plan to enable features and issue licensing certificates." />
             )}
           </Card>
+
+          {allActiveSubs.filter((s) => s.id !== activeSub?.id).length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+              {allActiveSubs.filter((s) => s.id !== activeSub?.id).map((s) => (
+                <Card key={s.id} style={{ padding: 18 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>
+                      {familyLabel((s.plan as { productFamily?: string }).productFamily)}
+                    </span>
+                    <Badge tone={statusTone(s.status)} pulse={s.status === 'ACTIVE'}>{s.status}</Badge>
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 800 }}>{s.plan.name}</div>
+                  <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+                    {s.plan.tier} · ₹{(s.plan.priceMonthly / 100).toLocaleString('en-IN')}/mo · expires {new Date(s.expiresAt).toLocaleDateString('en-IN')}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
 
           {/* Cryptographic Offline License Certificate */}
           <LicenseCertificatePanel restaurantId={restaurant.id} />
