@@ -121,4 +121,43 @@ describe('Feature catalog (Phase 6)', () => {
       .send({ enabled: false });
     expect(res.status).toBe(200);
   });
+
+  it('a row matching its plan tier default reports source PLAN; one manually disabled away from the default reports MANUAL_OVERRIDE', async () => {
+    const before = await request(app.getHttpServer())
+      .get(`/api/v1/subscriptions/${subscriptionId}/applications`)
+      .set('Authorization', `Bearer ${platformToken}`);
+    // POS was re-disabled by the earlier tests and never re-enabled since; PRO tier defaults it to true.
+    const posRow = before.body.find((r: { appCode: string }) => r.appCode === 'POS');
+    expect(posRow.enabled).toBe(false);
+    expect(posRow.source).toBe('MANUAL_OVERRIDE');
+
+    // QR_ORDERING was never touched — PRO tier's default for it is false, and it's still false.
+    const qrRow = before.body.find((r: { appCode: string }) => r.appCode === 'QR_ORDERING');
+    expect(qrRow.enabled).toBe(false);
+    expect(qrRow.source).toBe('PLAN');
+
+    // Manually enable QR_ORDERING, which the PRO tier default does not include.
+    const enable = await request(app.getHttpServer())
+      .patch(`/api/v1/subscriptions/${subscriptionId}/applications/QR_ORDERING`)
+      .set('Authorization', `Bearer ${platformToken}`)
+      .send({ enabled: true });
+    expect(enable.status).toBe(200);
+
+    const after = await request(app.getHttpServer())
+      .get(`/api/v1/subscriptions/${subscriptionId}/applications`)
+      .set('Authorization', `Bearer ${platformToken}`);
+    const qrRowAfter = after.body.find((r: { appCode: string }) => r.appCode === 'QR_ORDERING');
+    expect(qrRowAfter.enabled).toBe(true);
+    expect(qrRowAfter.source).toBe('MANUAL_OVERRIDE');
+  });
+
+  it('the restaurant-level applications read also carries source', async () => {
+    const res = await request(app.getHttpServer())
+      .get(`/api/v1/restaurants/${restaurantId}/applications`)
+      .set('Authorization', `Bearer ${platformToken}`);
+    expect(res.status).toBe(200);
+    for (const row of res.body) {
+      expect(['PLAN', 'MANUAL_OVERRIDE']).toContain(row.source);
+    }
+  });
 });

@@ -73,14 +73,29 @@ export class ApplicationEntitlementsService {
     );
   }
 
+  private withSource<T extends { appCode: AppCode; enabled: boolean }>(
+    rows: T[],
+    plan: { tier: PlanTier; productFamily: ProductFamily }
+  ): (T & { source: 'PLAN' | 'MANUAL_OVERRIDE' })[] {
+    const defaults = new Set(defaultAppsFor(plan.productFamily, plan.tier));
+    return rows.map((row) => ({
+      ...row,
+      source: row.enabled === defaults.has(row.appCode) ? ('PLAN' as const) : ('MANUAL_OVERRIDE' as const)
+    }));
+  }
+
   async listForSubscription(subscriptionId: string) {
     return this.prisma.runAsPlatform(async (tx) => {
-      const sub = await tx.subscription.findUnique({ where: { id: subscriptionId } });
+      const sub = await tx.subscription.findUnique({
+        where: { id: subscriptionId },
+        include: { plan: { select: { tier: true, productFamily: true } } }
+      });
       if (!sub) throw new NotFoundException('Subscription not found');
-      return tx.applicationEntitlement.findMany({
+      const rows = await tx.applicationEntitlement.findMany({
         where: { subscriptionId },
         orderBy: { appCode: 'asc' }
       });
+      return this.withSource(rows, sub.plan);
     });
   }
 
@@ -88,13 +103,15 @@ export class ApplicationEntitlementsService {
     return this.prisma.runAsPlatform(async (tx) => {
       const sub = await tx.subscription.findFirst({
         where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] } },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
+        include: { plan: { select: { tier: true, productFamily: true } } }
       });
       if (!sub) return [];
-      return tx.applicationEntitlement.findMany({
+      const rows = await tx.applicationEntitlement.findMany({
         where: { subscriptionId: sub.id },
         orderBy: { appCode: 'asc' }
       });
+      return this.withSource(rows, sub.plan);
     });
   }
 
