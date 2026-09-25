@@ -3,6 +3,7 @@ import { generateUUID, splitTaxPaise } from '@jamanvaar/utils';
 import { db, KOTRepository, BusinessDayRepository, InventoryRepository, NumberAllocator, type NumberLease } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 import { nextAttemptState } from './sync_protocol';
+import { EndpointResolver } from './endpoint_resolver';
 
 /** Money crosses the wire in paise (integers), matching cloud/api's schema. */
 const toPaise = (rupees: number | undefined | null): number => Math.round((Number(rupees) || 0) * 100);
@@ -549,7 +550,11 @@ export class SyncOutboxEngine {
   public static async catchUpFromCloud(): Promise<{ pulled: number; created: number }> {
     if (!this.transport) return { pulled: 0, created: 0 };
 
-    let cursor = safeGet(CATCH_UP_CURSOR_KEY) ?? undefined;
+    // A position on the Branch Core means nothing on the cloud (and vice versa), so each has its own cursor.
+    const ORDERS_PATH = '/api/v1/orders/sync';
+    const cursorKey = EndpointResolver.cursorKey(CATCH_UP_CURSOR_KEY, ORDERS_PATH);
+    const predicted = EndpointResolver.serverKeyFor(ORDERS_PATH);
+    let cursor = safeGet(cursorKey) ?? undefined;
     let pulled = 0;
     let created = 0;
 
@@ -557,6 +562,9 @@ export class SyncOutboxEngine {
       // Follow `hasMore` so a long outage catches up page by page, saving the cursor after each applied page.
       for (let page = 0; page < 50; page++) {
       const { orders, serverTime, latestSeq, hasMore } = await this.transport.pull(cursor);
+      // If the other server answered (fallback), the orders are still applied (safe, idempotent) but the
+      // position it returned belongs to a different server than the cursor that was sent: do not store it.
+      const answeredByPredicted = (EndpointResolver.lastResponder() ?? predicted) === predicted;
       const touchedDays = new Set<string>();
       for (const remote of orders) {
         const existing = db.orders.find((o) => o.id === remote.externalOrderId);
@@ -608,7 +616,8 @@ export class SyncOutboxEngine {
       KOTRepository.reconcileWithOrders();
       // Prefer the gapless sequence; use the server clock only while no sequenced row has been seen.
       cursor = latestSeq && latestSeq > 0 ? `seq:${latestSeq}` : serverTime;
-      safeSet(CATCH_UP_CURSOR_KEY, cursor);
+      if (!answeredByPredicted) break;
+      safeSet(cursorKey, cursor);
       if (!hasMore) break;
       }
       if (pulled > 0) db.notify();

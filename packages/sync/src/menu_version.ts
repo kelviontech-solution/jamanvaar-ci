@@ -5,6 +5,8 @@
  * reported in the heartbeat so Kiosk Admin and support can see which device is behind.
  */
 
+import { EndpointResolver } from './endpoint_resolver';
+
 const APPLIED_KEY = 'jamanvaar_menu_applied_version';
 const CURSOR_PREFIX = 'jamanvaar_entity_sync_cursor_';
 const MENU_ENTITIES = ['MENU_CATEGORY', 'MENU_ITEM'];
@@ -40,7 +42,7 @@ export class MenuVersionTracker {
 
     const mark = Date.parse(latest.watermark);
     const caughtUp = MENU_ENTITIES.every((entity) => {
-      const cursor = read(CURSOR_PREFIX + entity);
+      const cursor = read(EndpointResolver.cursorKey(CURSOR_PREFIX + entity, `/api/v1/entity-sync/${entity}`));
       return cursor !== null && Date.parse(cursor) >= mark;
     });
     if (caughtUp && latest.version > this.applied()) {

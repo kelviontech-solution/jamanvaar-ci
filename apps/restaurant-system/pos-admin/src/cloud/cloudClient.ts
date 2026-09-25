@@ -13,10 +13,13 @@ import type { PlanEntitlements, PlanTier } from '@jamanvaar/types';
  * the existing local mock (LicenseRepository) as its fallback.
  */
 
-import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData, pullRestaurantIdentity, pushRestaurantIdentity, type RestaurantIdentityFields, orderSyncPullQuery } from '@jamanvaar/sync';
+import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData, pullRestaurantIdentity, pushRestaurantIdentity, type RestaurantIdentityFields, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
 import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository, LicenseRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
+// Operational traffic goes to the restaurant's Branch Core when one is configured and reachable; the cloud otherwise.
+EndpointResolver.setTransport((url, init) => DeviceGate.gatedFetch(url, init));
+EndpointResolver.configure({ cloudBase: API_BASE, coreUrl: import.meta.env.VITE_BRANCH_CORE_URL });
 
 const RESTAURANT_ID_KEY = 'jamanvaar_cloud_restaurant_id';
 const ENTITLEMENTS_CACHE_KEY = 'jamanvaar_cloud_entitlements_cache';
@@ -193,7 +196,7 @@ interface RequestOptions {
 }
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const res = await DeviceGate.gatedFetch(`${API_BASE}${path}`, {
+  const res = await EndpointResolver.fetch(path, {
     method: options.method ?? 'GET',
     credentials: 'include',
     headers: {

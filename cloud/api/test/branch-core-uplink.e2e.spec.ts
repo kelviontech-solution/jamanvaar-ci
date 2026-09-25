@@ -218,4 +218,49 @@ describe('Branch Core <-> Cloud', () => {
     await uplink.sync();
     expect(() => core.authenticate(posToken)).toThrow(/revoked/);
   });
+
+  it('a freshly activated core, started as a service, syncs by itself: local order in, cloud order out, no button pressed', async () => {
+    const { mkdtempSync, rmSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const { activate, run } = await import('../../../packages/branch-core/src/main');
+    const dir = mkdtempSync(join(tmpdir(), 'jv-core-run-'));
+
+    const key = await platform('post', '/api/v1/activation-keys').send({ restaurantId, branchId: branchA, allowedDeviceType: 'POS_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    await activate(dir, cloudBase, key.body.code);
+
+    const port = 5300 + Math.floor(Math.random() * 500);
+    const running = await run(dir, port, {});
+    try {
+      // A new POS activated in the cloud while this core is up.
+      const newPos = await activate2();
+      let ready = false;
+      for (let i = 0; i < 40 && !ready; i++) {
+        const r = await fetch(`http://127.0.0.1:${port}/api/v1/orders/sync?afterSeq=0`, { headers: { Authorization: `Bearer ${newPos}` } });
+        ready = r.status === 200;
+        if (!ready) await new Promise((r2) => setTimeout(r2, 250));
+      }
+      expect(ready).toBe(true);
+
+      const push = await fetch(`http://127.0.0.1:${port}/api/v1/orders/sync`, {
+        method: 'POST', headers: { Authorization: `Bearer ${newPos}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ events: [orderEvent('service-1', 'SVC-1')] })
+      });
+      expect(push.status).toBe(201);
+
+      let inCloud = 0;
+      for (let i = 0; i < 60 && inCloud === 0; i++) {
+        inCloud = await prisma.runAsPlatform((tx) => tx.syncedOrder.count({ where: { restaurantId, externalOrderId: 'service-1' } }));
+        if (inCloud === 0) await new Promise((r) => setTimeout(r, 250));
+      }
+      expect(inCloud).toBe(1);
+    } finally {
+      await running.stop();
+      try { rmSync(dir, { recursive: true, force: true }); } catch { /* still closing */ }
+    }
+  }, 60000);
+
+  async function activate2() {
+    return (await activate('POS', branchA)).token;
+  }
 });

@@ -20,11 +20,14 @@
  * devices real and countable, which only the activation path delivers.
  */
 
-import { DeviceGate, PlatformNotice, type PlatformNoticeData, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery } from '@jamanvaar/sync';
+import { DeviceGate, PlatformNotice, type PlatformNoticeData, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, EntitySyncEvent, EntitySyncPushResult, CloudSyncedEntity } from '@jamanvaar/sync';
 import { db, LicenseRepository, MenuRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
+// Operational traffic goes to the restaurant's Branch Core when one is configured and reachable; the cloud otherwise.
+EndpointResolver.setTransport((url, init) => DeviceGate.gatedFetch(url, init));
+EndpointResolver.configure({ cloudBase: API_BASE, coreUrl: import.meta.env.VITE_BRANCH_CORE_URL });
 
 const RESTAURANT_ID_KEY = 'jamanvaar_kiosk_admin_restaurant_id';
 const DEVICE_LABEL_KEY = 'jamanvaar_kiosk_admin_device_label';
@@ -670,7 +673,7 @@ async function tenantFetch(path: string, init: RequestInit): Promise<Response> {
   if (!token) {
     throw new CloudApiError('Not signed in', 401);
   }
-  return DeviceGate.gatedFetch(`${API_BASE}${path}`, {
+  return EndpointResolver.fetch(path, {
     ...init,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
   });

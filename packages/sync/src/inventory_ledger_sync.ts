@@ -31,13 +31,16 @@ export interface LedgerTransport {
   pull(afterSeq: number): Promise<{ movements: RemoteMovement[]; latestSeq: number; hasMore: boolean }>;
 }
 
+import { EndpointResolver } from './endpoint_resolver';
+
 const CURSOR_KEY = 'jamanvaar_inventory_ledger_cursor';
+const LEDGER_PATH = '/api/v1/inventory/movements';
 const PUSH_BATCH = 100;
 const MAX_PAGES = 20;
 
 function readCursor(): number {
   try {
-    const n = Number(localStorage.getItem(CURSOR_KEY));
+    const n = Number(localStorage.getItem(EndpointResolver.cursorKey(CURSOR_KEY, LEDGER_PATH)));
     return Number.isInteger(n) && n >= 0 ? n : 0;
   } catch {
     return 0;
@@ -46,7 +49,7 @@ function readCursor(): number {
 
 function writeCursor(seq: number): void {
   try {
-    localStorage.setItem(CURSOR_KEY, String(seq));
+    localStorage.setItem(EndpointResolver.cursorKey(CURSOR_KEY, LEDGER_PATH), String(seq));
   } catch {
     // Storage unavailable: the next sync re-pulls, and applied movements are skipped by their mirror rows.
   }

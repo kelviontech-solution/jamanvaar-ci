@@ -4,6 +4,7 @@ import { SyncOutboxEngine } from './outbox';
 import { DeviceCommandRunner } from './device_commands';
 import { MenuVersionTracker } from './menu_version';
 import { RealtimeClient } from './realtime_client';
+import { EndpointResolver } from './endpoint_resolver';
 import { InventoryLedgerSync } from './inventory_ledger_sync';
 import { syncMenuCatalog } from './menu_sync';
 
@@ -38,18 +39,24 @@ export function buildHeartbeatBody(appVersion: string) {
 
 type HeartbeatOpts = { apiBase: string; deviceToken: string };
 
+/** Sends an operational request to the Branch Core if there is one and it is reachable, otherwise to the cloud. */
+function routed(opts: HeartbeatOpts, path: string, init?: RequestInit): Promise<Response> {
+  EndpointResolver.ensureConfigured(opts.apiBase);
+  return EndpointResolver.fetch(path, init, (url, i) => DeviceGate.gatedFetch(url, i));
+}
+
 /** Fetches this device's queued commands, runs the ones the app supports, and acknowledges each. */
 async function runDeviceCommands(opts: HeartbeatOpts): Promise<void> {
   DeviceCommandRunner.registerDefaults();
   const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${opts.deviceToken}` };
   await DeviceCommandRunner.run({
     async list() {
-      const r = await DeviceGate.gatedFetch(`${opts.apiBase}/api/v1/devices/me/commands`, { headers });
+      const r = await routed(opts, '/api/v1/devices/me/commands', { headers });
       if (!r.ok) throw new Error(`commands ${r.status}`);
       return (await r.json()) as Array<{ id: string; commandType: string; payload?: unknown }>;
     },
     async ack(id, outcome) {
-      await DeviceGate.gatedFetch(`${opts.apiBase}/api/v1/devices/me/commands/${id}/ack`, { method: 'POST', headers, body: JSON.stringify(outcome) });
+      await routed(opts, `/api/v1/devices/me/commands/${id}/ack`, { method: 'POST', headers, body: JSON.stringify(outcome) });
     }
   });
 }
@@ -95,7 +102,7 @@ export async function sendHeartbeat(opts: {
   deviceId?: string | null;
 }): Promise<void> {
   try {
-    const res = await DeviceGate.gatedFetch(`${opts.apiBase}/api/v1/devices/me/heartbeat`, {
+    const res = await routed(opts, '/api/v1/devices/me/heartbeat', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${opts.deviceToken}` },
       body: JSON.stringify(buildHeartbeatBody(opts.appVersion))
@@ -107,7 +114,7 @@ export async function sendHeartbeat(opts: {
         deviceId: opts.deviceId
       });
       void MenuVersionTracker.refresh(async () => {
-        const r = await DeviceGate.gatedFetch(`${opts.apiBase}/api/v1/menu/version`, { headers: { Authorization: `Bearer ${opts.deviceToken}` } });
+        const r = await routed(opts, '/api/v1/menu/version', { headers: { Authorization: `Bearer ${opts.deviceToken}` } });
         return r.ok ? ((await r.json()) as { version: number; watermark: string | null }) : null;
       });
       await runDeviceCommands(opts);

@@ -51,6 +51,8 @@ function safeSet(key: string, value: string): void {
   }
 }
 
+import { EndpointResolver } from './endpoint_resolver';
+
 export class EntitySyncEngine {
   private static transport: EntitySyncTransport | null = null;
 
@@ -72,7 +74,8 @@ export class EntitySyncEngine {
   /** Pulls everything changed since the last call and hands each record to `onEntity` to merge into local storage — the merge policy is domain-specific, so it stays with the caller. */
   public static async catchUp(entityType: string, onEntity: (entity: CloudSyncedEntity) => void): Promise<{ pulled: number }> {
     if (!this.transport) return { pulled: 0 };
-    const cursorKey = `jamanvaar_entity_sync_cursor_${entityType}`;
+    const cursorKey = EndpointResolver.cursorKey(`jamanvaar_entity_sync_cursor_${entityType}`, `/api/v1/entity-sync/${entityType}`);
+    const predicted = EndpointResolver.serverKeyFor(`/api/v1/entity-sync/${entityType}`);
     // A device that has never pulled asks for everything, not just the last day: devices no longer re-upload
     // unchanged records every tick (BUG-149), so a menu untouched for a week must still reach a new terminal.
     const since = safeGet(cursorKey) ?? new Date(0).toISOString();
@@ -80,6 +83,7 @@ export class EntitySyncEngine {
     try {
       const { entities, serverTime } = await this.transport.pull(entityType, since);
       entities.forEach(onEntity);
+      if ((EndpointResolver.lastResponder() ?? predicted) !== predicted) return { pulled: entities.length }; // answered by the other server: its position is not ours
       // A full page means there may be more: continue from the last record received, not from "now", so
       // nothing beyond the page limit is skipped.
       const last = entities[entities.length - 1];

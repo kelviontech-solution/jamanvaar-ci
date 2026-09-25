@@ -1,4 +1,5 @@
 import { backoffDelayMs } from './sync_protocol';
+import { EndpointResolver } from './endpoint_resolver';
 
 /**
  * Listens to the cloud's realtime stream (server-sent events) so a device hears about changes within a
@@ -91,7 +92,9 @@ export class RealtimeClient {
       try {
         this.controller = new AbortController();
         const doFetch = this.opts.fetchImpl ?? fetch;
-        const res = await doFetch(`${this.opts.apiBase}/api/v1/realtime/stream`, {
+        const streamPath = '/api/v1/realtime/stream';
+        EndpointResolver.ensureConfigured(this.opts.apiBase);
+        const res = await doFetch(`${this.opts.fetchImpl ? this.opts.apiBase : EndpointResolver.baseFor(streamPath)}${streamPath}`, {
           headers: { Authorization: `Bearer ${this.opts.deviceToken}`, Accept: 'text/event-stream' },
           signal: this.controller.signal
         });

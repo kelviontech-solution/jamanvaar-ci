@@ -14,10 +14,13 @@ import type {
   CloudSyncedEntity
 } from '@jamanvaar/sync';
 
-import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery } from '@jamanvaar/sync';
+import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
 import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
+// Operational traffic goes to the restaurant's Branch Core when one is configured and reachable; the cloud otherwise.
+EndpointResolver.setTransport((url, init) => DeviceGate.gatedFetch(url, init));
+EndpointResolver.configure({ cloudBase: API_BASE, coreUrl: import.meta.env.VITE_BRANCH_CORE_URL });
 
 const RESTAURANT_ID_KEY = 'jamanvaar_pos_restaurant_id';
 const DEVICE_ID_KEY = 'jamanvaar_pos_device_id';
@@ -112,7 +115,7 @@ export async function activatePosDevice(code: string): Promise<void> {
 export function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const token = getPosDeviceToken();
   if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
-  return DeviceGate.gatedFetch(`${API_BASE}${path}`, {
+  return EndpointResolver.fetch(path, {
     ...init,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
   });
