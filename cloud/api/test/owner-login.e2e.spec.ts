@@ -129,4 +129,10 @@ describe('Owner-only restaurant-code login (Phase 3)', () => {
     const login = await request(app.getHttpServer()).post('/api/v1/tenant-auth/login-owner').send({ restaurantCode: roundTripRestaurantCode, password: newPassword });
     expect(login.status).toBe(200);
   });
+
+  it('forgot-password-owner accepts an internal restaurantId directly (no restaurantCode needed)', async () => {
+    const res = await request(app.getHttpServer()).post('/api/v1/tenant-auth/forgot-password-owner').send({ restaurantId });
+    expect(res.status).toBe(200);
+    expect(res.body.maskedEmail).toBeDefined();
+  });
 });

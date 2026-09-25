@@ -1058,8 +1058,8 @@ export class TenantAuthService {
    * property (expiry, attempt limit, resend cooldown, HMAC hash, silent no-op for an
    * unactivated owner) carries over by construction, not by re-implementation.
    */
-  async forgotPasswordOwner(restaurantCode: string): Promise<{ success: true; maskedEmail: string }> {
-    const { restaurantId } = await this.restaurants.resolveByCode(restaurantCode);
+  async forgotPasswordOwner(identifier: { restaurantCode?: string; restaurantId?: string }): Promise<{ success: true; maskedEmail: string }> {
+    const restaurantId = identifier.restaurantId ?? (await this.restaurants.resolveByCode(identifier.restaurantCode!)).restaurantId;
     const owner = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.user.findFirst({ where: { restaurantId, role: 'OWNER' } })
     );
@@ -1070,8 +1070,8 @@ export class TenantAuthService {
   }
 
   /** Restaurant-code forgot-password, step 2: the emailed code and the new password. */
-  async resetPasswordOwner(restaurantCode: string, otp: string, newPassword: string): Promise<void> {
-    const { restaurantId } = await this.restaurants.resolveByCode(restaurantCode);
+  async resetPasswordOwner(identifier: { restaurantCode?: string; restaurantId?: string }, otp: string, newPassword: string): Promise<void> {
+    const restaurantId = identifier.restaurantId ?? (await this.restaurants.resolveByCode(identifier.restaurantCode!)).restaurantId;
     const owner = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.user.findFirst({ where: { restaurantId, role: 'OWNER' } })
     );

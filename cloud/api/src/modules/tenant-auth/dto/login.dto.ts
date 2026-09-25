@@ -39,13 +39,23 @@ export const loginOwnerSchema = z.object({
 });
 export type LoginOwnerDto = z.infer<typeof loginOwnerSchema>;
 
-export const forgotPasswordOwnerSchema = z.object({ restaurantCode: z.string().trim().toUpperCase() });
+export const forgotPasswordOwnerSchema = z.object({
+  restaurantCode: z.string().trim().toUpperCase().optional(),
+  restaurantId: z.string().uuid().optional()
+}).refine((v) => Boolean(v.restaurantCode || v.restaurantId), {
+  message: 'Either restaurantCode or restaurantId is required',
+  path: ['restaurantCode']
+});
 export type ForgotPasswordOwnerDto = z.infer<typeof forgotPasswordOwnerSchema>;
 
 export const resetPasswordOwnerSchema = z.object({
-  restaurantCode: z.string().trim().toUpperCase(),
+  restaurantCode: z.string().trim().toUpperCase().optional(),
+  restaurantId: z.string().uuid().optional(),
   otp: z.string().trim().regex(/^\d{6}$/, 'The code is 6 digits'),
   newPassword: strongPassword
+}).refine((v) => Boolean(v.restaurantCode || v.restaurantId), {
+  message: 'Either restaurantCode or restaurantId is required',
+  path: ['restaurantCode']
 });
 export type ResetPasswordOwnerDto = z.infer<typeof resetPasswordOwnerSchema>;
 

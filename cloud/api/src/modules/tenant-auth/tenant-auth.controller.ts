@@ -97,7 +97,7 @@ export class TenantAuthController {
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(forgotPasswordOwnerSchema))
   async forgotPasswordOwner(@Body() body: ForgotPasswordOwnerDto) {
-    return this.authService.forgotPasswordOwner(body.restaurantCode);
+    return this.authService.forgotPasswordOwner(body);
   }
 
   /** Restaurant-code forgot-password, step 2: the emailed code and the new password. */
@@ -105,7 +105,7 @@ export class TenantAuthController {
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(resetPasswordOwnerSchema))
   async resetPasswordOwner(@Body() body: ResetPasswordOwnerDto) {
-    await this.authService.resetPasswordOwner(body.restaurantCode, body.otp, body.newPassword);
+    await this.authService.resetPasswordOwner(body, body.otp, body.newPassword);
     return { success: true };
   }
 
