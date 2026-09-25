@@ -603,7 +603,12 @@ export interface Order {
     note?: string;
     actor?: string;
   }>;
-  syncStatus?: 'SAVED_LOCALLY' | 'SYNCING' | 'SYNCED' | 'FAILED';
+  syncStatus?: 'SAVED_LOCALLY' | 'SYNCING' | 'SYNCED' | 'FAILED' | 'DEAD_LETTER';
+  /** Failed push attempts since the last success; drives backoff and dead-lettering. */
+  syncAttempts?: number;
+  /** Epoch ms before which the outbox will not retry this order. */
+  syncNextAttemptAt?: number;
+  syncLastError?: string;
   eBillStatus?: ReceiptDeliveryStatus;
   eBillMethod?: ReceiptDeliveryMethod;
   eBillRecipient?: string;

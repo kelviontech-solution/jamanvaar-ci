@@ -2,6 +2,7 @@ import { SyncEvent, SyncEventType, Order, OrderItem, PaymentSplit } from '@jaman
 import { generateUUID, splitTaxPaise } from '@jamanvaar/utils';
 import { db, KOTRepository, BusinessDayRepository, InventoryRepository } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
+import { nextAttemptState } from './sync_protocol';
 
 /** Money crosses the wire in paise (integers), matching cloud/api's schema. */
 const toPaise = (rupees: number | undefined | null): number => Math.round((Number(rupees) || 0) * 100);
@@ -46,6 +47,8 @@ export interface OrderSyncMeta {
 }
 
 export interface OrderSyncPushEvent {
+  /** Identifies this exact version of the order: stable across retries, new whenever the order changes. The server applies it once. */
+  eventId?: string;
   externalOrderId: string;
   orderType: string;
   status: string;
@@ -68,6 +71,7 @@ export interface OrderSyncPushResult {
   externalOrderId: string;
   status: 'ok' | 'error';
   syncVersion?: number;
+  duplicate?: boolean;
   error?: string;
 }
 
@@ -99,7 +103,8 @@ export interface CloudSyncedOrder {
  */
 export interface OrderSyncTransport {
   push(events: OrderSyncPushEvent[]): Promise<{ results: OrderSyncPushResult[]; serverTime: string }>;
-  pull(since?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string }>;
+  /** `cursor` is either `seq:<n>` (preferred) or a legacy ISO timestamp; undefined means first pull. */
+  pull(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean }>;
 }
 
 const CATCH_UP_CURSOR_KEY = 'jamanvaar_order_sync_cursor';
@@ -120,8 +125,25 @@ function safeSet(key: string, value: string): void {
   }
 }
 
+function markSynced(order: Order): void {
+  order.syncStatus = 'SYNCED';
+  order.syncAttempts = 0;
+  order.syncNextAttemptAt = undefined;
+  order.syncLastError = undefined;
+}
+
+/** One more failed attempt: back off with jitter, and dead-letter (keep, never delete) after too many. */
+function markFailedAttempt(order: Order, error: string): void {
+  const next = nextAttemptState({ attemptCount: order.syncAttempts ?? 0, status: 'FAILED' }, Date.now());
+  order.syncAttempts = next.attemptCount;
+  order.syncStatus = next.status === 'DEAD_LETTER' ? 'DEAD_LETTER' : 'FAILED';
+  order.syncNextAttemptAt = next.nextAttemptAt;
+  order.syncLastError = error.slice(0, 300);
+}
+
 function toPushEvent(order: Order): OrderSyncPushEvent {
   return {
+    eventId: `${order.id}@${order.updatedAt}`,
     externalOrderId: order.id,
     orderType: order.orderType,
     status: order.orderStatus,
@@ -371,7 +393,7 @@ export class SyncOutboxEngine {
       this.unsubscribeNetwork = NetworkStatusService.subscribe((state) => {
         const isOnlineNow = state === 'ONLINE';
         if (isOnlineNow && !wasOnline) {
-          void this.processOutbox();
+          void this.processOutbox({ ignoreBackoff: true });
           void this.catchUpFromCloud();
         }
         wasOnline = isOnlineNow;
@@ -401,7 +423,7 @@ export class SyncOutboxEngine {
     return event;
   }
 
-  public static async processOutbox(): Promise<{ processed: number; failed: number }> {
+  public static async processOutbox(opts: { ignoreBackoff?: boolean } = {}): Promise<{ processed: number; failed: number }> {
     if (this.isSyncing) return { processed: 0, failed: 0 };
     this.isSyncing = true;
     NetworkStatusService.setNetworkState('SYNCING', NetworkStatusService.getLatency());
@@ -410,7 +432,12 @@ export class SyncOutboxEngine {
     let failed = 0;
 
     // 1. Push orders the local app has marked as needing a cloud copy.
-    const pendingOrders = db.orders.filter((o) => o.syncStatus === 'SAVED_LOCALLY' || o.syncStatus === 'FAILED');
+    const nowMs = Date.now();
+    const pendingOrders = db.orders.filter(
+      (o) =>
+        o.syncStatus === 'SAVED_LOCALLY' ||
+        (o.syncStatus === 'FAILED' && (opts.ignoreBackoff || (o.syncNextAttemptAt ?? 0) <= nowMs))
+    );
 
     if (pendingOrders.length > 0) {
       if (!this.transport) {
@@ -431,17 +458,17 @@ export class SyncOutboxEngine {
           for (const ord of pendingOrders) {
             const res = byId.get(ord.id);
             if (res && res.status === 'ok') {
-              ord.syncStatus = 'SYNCED';
+              markSynced(ord);
               processed++;
             } else {
-              ord.syncStatus = 'FAILED';
+              markFailedAttempt(ord, res?.error ?? 'Not acknowledged by the server');
               failed++;
             }
           }
           NetworkStatusService.setNetworkState('ONLINE', 18);
-        } catch {
+        } catch (err) {
           for (const ord of pendingOrders) {
-            ord.syncStatus = 'FAILED';
+            markFailedAttempt(ord, err instanceof Error ? err.message : 'Network error');
             failed++;
           }
           NetworkStatusService.setNetworkState('OFFLINE', 0);
@@ -496,12 +523,14 @@ export class SyncOutboxEngine {
   public static async catchUpFromCloud(): Promise<{ pulled: number; created: number }> {
     if (!this.transport) return { pulled: 0, created: 0 };
 
-    const since = safeGet(CATCH_UP_CURSOR_KEY) ?? undefined;
+    let cursor = safeGet(CATCH_UP_CURSOR_KEY) ?? undefined;
     let pulled = 0;
     let created = 0;
 
     try {
-      const { orders, serverTime } = await this.transport.pull(since);
+      // Follow `hasMore` so a long outage catches up page by page, saving the cursor after each applied page.
+      for (let page = 0; page < 50; page++) {
+      const { orders, serverTime, latestSeq, hasMore } = await this.transport.pull(cursor);
       const touchedDays = new Set<string>();
       for (const remote of orders) {
         const existing = db.orders.find((o) => o.id === remote.externalOrderId);
@@ -551,7 +580,11 @@ export class SyncOutboxEngine {
       // Kitchen tickets are per device: bring them in line with the order state just received, so a
       // dish the kitchen finished shows as ready here and a settled order's ticket clears (BUG-098/113).
       KOTRepository.reconcileWithOrders();
-      safeSet(CATCH_UP_CURSOR_KEY, serverTime);
+      // Prefer the gapless sequence; use the server clock only while no sequenced row has been seen.
+      cursor = latestSeq && latestSeq > 0 ? `seq:${latestSeq}` : serverTime;
+      safeSet(CATCH_UP_CURSOR_KEY, cursor);
+      if (!hasMore) break;
+      }
       if (pulled > 0) db.notify();
     } catch {
       // Leave the cursor untouched — the next attempt retries from the same point.
@@ -560,7 +593,22 @@ export class SyncOutboxEngine {
     return { pulled, created };
   }
 
-  public static getSyncStats(): { pendingCount: number; syncedCount: number; failedCount: number } {
+  /** Orders the outbox gave up on. Kept for an operator to inspect and retry; never deleted. */
+  public static getDeadLetters(): Order[] {
+    return db.orders.filter((o) => o.syncStatus === 'DEAD_LETTER');
+  }
+
+  public static retryDeadLetter(orderId: string): boolean {
+    const order = db.orders.find((o) => o.id === orderId && o.syncStatus === 'DEAD_LETTER');
+    if (!order) return false;
+    order.syncStatus = 'SAVED_LOCALLY';
+    order.syncAttempts = 0;
+    order.syncNextAttemptAt = undefined;
+    db.notify();
+    return true;
+  }
+
+  public static getSyncStats(): { pendingCount: number; syncedCount: number; failedCount: number; deadLetterCount: number } {
     const pendingOrders = db.orders.filter((o) => o.syncStatus === 'SAVED_LOCALLY' || o.syncStatus === 'SYNCING').length;
     const syncedOrders = db.orders.filter((o) => !o.syncStatus || o.syncStatus === 'SYNCED').length;
     const failedOrders = db.orders.filter((o) => o.syncStatus === 'FAILED').length;
@@ -571,7 +619,8 @@ export class SyncOutboxEngine {
     return {
       pendingCount: pendingOrders + pendingEvents,
       syncedCount: syncedOrders,
-      failedCount: failedOrders + failedEvents
+      failedCount: failedOrders + failedEvents,
+      deadLetterCount: db.orders.filter((o) => o.syncStatus === 'DEAD_LETTER').length
     };
   }
 }

@@ -20,7 +20,7 @@
  * devices real and countable, which only the activation path delivers.
  */
 
-import { DeviceGate, PlatformNotice, type PlatformNoticeData, sendHeartbeat, pullRestaurantIdentity } from '@jamanvaar/sync';
+import { DeviceGate, PlatformNotice, type PlatformNoticeData, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery } from '@jamanvaar/sync';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, EntitySyncEvent, EntitySyncPushResult, CloudSyncedEntity } from '@jamanvaar/sync';
 import { db, LicenseRepository, MenuRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 
@@ -848,8 +848,8 @@ export async function pushOrderSync(events: OrderSyncPushEvent[]): Promise<{ res
   return jsonOrThrow(await deviceFetch('/api/v1/orders/sync', { method: 'POST', body: JSON.stringify({ events }) }), 'Order sync push');
 }
 
-export async function pullOrderSync(since?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string }> {
-  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+export async function pullOrderSync(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean }> {
+  const query = orderSyncPullQuery(cursor);
   return jsonOrThrow(await deviceFetch(`/api/v1/orders/sync${query}`), 'Order sync pull');
 }
 

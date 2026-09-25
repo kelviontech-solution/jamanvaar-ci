@@ -13,7 +13,7 @@ import type { PlanEntitlements, PlanTier } from '@jamanvaar/types';
  * the existing local mock (LicenseRepository) as its fallback.
  */
 
-import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData, pullRestaurantIdentity, pushRestaurantIdentity, type RestaurantIdentityFields } from '@jamanvaar/sync';
+import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData, pullRestaurantIdentity, pushRestaurantIdentity, type RestaurantIdentityFields, orderSyncPullQuery } from '@jamanvaar/sync';
 import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository, LicenseRepository } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
@@ -845,8 +845,8 @@ export async function pushOrderSync(
   return data;
 }
 
-export async function pullOrderSync(since?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string }> {
-  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+export async function pullOrderSync(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean }> {
+  const query = orderSyncPullQuery(cursor);
   const res = await deviceFetch(`/api/v1/orders/sync${query}`);
   const data = await parseJsonResponse(res);
   if (!res.ok) {
