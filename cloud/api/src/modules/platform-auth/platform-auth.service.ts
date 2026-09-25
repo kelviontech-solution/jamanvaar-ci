@@ -9,7 +9,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { EmailService } from '../notifications/email.service';
 import { platformLoginOtpEmail } from '../notifications/email-templates';
-import { hashLowEntropySecret } from '../../common/security/token.util';
+import { hashLowEntropySecret, maskEmail } from '../../common/security/token.util';
 
 export const PLATFORM_JWT_ISSUER = 'jamanvaar-platform';
 export const PLATFORM_JWT_AUDIENCE = 'jamanvaar-platform';
@@ -56,12 +56,6 @@ function hashRefreshToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
 }
 
-/** kelviontech@gmail.com -> ke***ch@gmail.com — enough for the person to recognise their own inbox, not enough to leak it whole. */
-function maskEmail(email: string): string {
-  const [local, domain] = email.split('@');
-  if (!domain || local.length <= 2) return `${local[0] ?? '*'}***@${domain ?? ''}`;
-  return `${local.slice(0, 2)}${'*'.repeat(Math.max(local.length - 4, 3))}${local.slice(-2)}@${domain}`;
-}
 
 @Injectable()
 export class PlatformAuthService {

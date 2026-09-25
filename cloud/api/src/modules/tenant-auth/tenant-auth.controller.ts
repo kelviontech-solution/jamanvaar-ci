@@ -30,10 +30,14 @@ import {
   activateDeviceSchema,
   tenantRefreshSchema,
   loginOwnerSchema,
+  forgotPasswordOwnerSchema,
+  resetPasswordOwnerSchema,
   TenantLoginDto,
   ActivateDeviceDto,
   TenantRefreshDto,
-  LoginOwnerDto
+  LoginOwnerDto,
+  ForgotPasswordOwnerDto,
+  ResetPasswordOwnerDto
 } from './dto/login.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -85,6 +89,23 @@ export class TenantAuthController {
   @UsePipes(new ZodValidationPipe(resetPasswordSchema))
   async resetPassword(@Body() body: { restaurantId: string; email: string; otp: string; newPassword: string }) {
     await this.authService.resetPassword(body.restaurantId, body.email, body.otp, body.newPassword);
+    return { success: true };
+  }
+
+  /** Restaurant-code forgot-password, step 1 (spec section 6/34): resolves the code to the owner and masks their email for display. */
+  @Post('forgot-password-owner')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(forgotPasswordOwnerSchema))
+  async forgotPasswordOwner(@Body() body: ForgotPasswordOwnerDto) {
+    return this.authService.forgotPasswordOwner(body.restaurantCode);
+  }
+
+  /** Restaurant-code forgot-password, step 2: the emailed code and the new password. */
+  @Post('reset-password-owner')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(resetPasswordOwnerSchema))
+  async resetPasswordOwner(@Body() body: ResetPasswordOwnerDto) {
+    await this.authService.resetPasswordOwner(body.restaurantCode, body.otp, body.newPassword);
     return { success: true };
   }
 

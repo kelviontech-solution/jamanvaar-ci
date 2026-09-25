@@ -15,7 +15,7 @@ import * as bcrypt from 'bcryptjs';
 import { User, TenantUserStatus, Device } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
-import { hashOpaqueToken, generateOpaqueToken, hashLowEntropySecret } from '../../common/security/token.util';
+import { hashOpaqueToken, generateOpaqueToken, hashLowEntropySecret, maskEmail } from '../../common/security/token.util';
 import { CreateTenantStaffUserDto, TenantLoginDto, ActivateDeviceDto, LoginOwnerDto } from './dto/login.dto';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { AppCode } from '@prisma/client';
@@ -1049,5 +1049,34 @@ export class TenantAuthService {
       return 'ok';
     });
     if (outcome !== 'ok') throw new BadRequestException('That code is not valid or has expired. Ask for a new one.');
+  }
+
+  /**
+   * Restaurant-code forgot-password, step 1 (spec section 6/34): resolves the code to the
+   * restaurant's OWNER, masks their email for display (matching the UI's "OTP sent to
+   * o***@example.com"), and reuses requestPasswordReset unmodified — every existing security
+   * property (expiry, attempt limit, resend cooldown, HMAC hash, silent no-op for an
+   * unactivated owner) carries over by construction, not by re-implementation.
+   */
+  async forgotPasswordOwner(restaurantCode: string): Promise<{ success: true; maskedEmail: string }> {
+    const { restaurantId } = await this.restaurants.resolveByCode(restaurantCode);
+    const owner = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.user.findFirst({ where: { restaurantId, role: 'OWNER' } })
+    );
+    if (!owner) throw new NotFoundException('Restaurant not found');
+
+    await this.requestPasswordReset(restaurantId, owner.email);
+    return { success: true, maskedEmail: maskEmail(owner.email) };
+  }
+
+  /** Restaurant-code forgot-password, step 2: the emailed code and the new password. */
+  async resetPasswordOwner(restaurantCode: string, otp: string, newPassword: string): Promise<void> {
+    const { restaurantId } = await this.restaurants.resolveByCode(restaurantCode);
+    const owner = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.user.findFirst({ where: { restaurantId, role: 'OWNER' } })
+    );
+    if (!owner) throw new NotFoundException('Restaurant not found');
+
+    await this.resetPassword(restaurantId, owner.email, otp, newPassword);
   }
 }

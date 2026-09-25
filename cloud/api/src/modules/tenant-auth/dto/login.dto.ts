@@ -33,6 +33,16 @@ export const loginOwnerSchema = z.object({
 });
 export type LoginOwnerDto = z.infer<typeof loginOwnerSchema>;
 
+export const forgotPasswordOwnerSchema = z.object({ restaurantCode: z.string().trim().toUpperCase() });
+export type ForgotPasswordOwnerDto = z.infer<typeof forgotPasswordOwnerSchema>;
+
+export const resetPasswordOwnerSchema = z.object({
+  restaurantCode: z.string().trim().toUpperCase(),
+  otp: z.string().trim().regex(/^\d{6}$/, 'The code is 6 digits'),
+  newPassword: strongPassword
+});
+export type ResetPasswordOwnerDto = z.infer<typeof resetPasswordOwnerSchema>;
+
 export const activateDeviceSchema = z.object({
   activationSessionToken: z.string().min(1, 'Activation session token is required'),
   activationKey: z.string().trim().min(1, 'Activation key is required'),

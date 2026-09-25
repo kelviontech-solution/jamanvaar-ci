@@ -29,3 +29,14 @@ export function hashOpaqueToken(token: string): string {
 export function hashLowEntropySecret(secret: string, serverKey: string): string {
   return createHmac('sha256', serverKey).update(secret).digest('hex');
 }
+
+/**
+ * kelviontech@gmail.com -> ke***ch@gmail.com — enough for the person to recognise their own
+ * inbox, not enough to leak it whole. Shared by platform-auth (login OTP) and tenant-auth
+ * (restaurant-code forgot-password, Phase 3) — one definition, not two subtly different ones.
+ */
+export function maskEmail(email: string): string {
+  const [local, domain] = email.split('@');
+  if (!domain || local.length <= 2) return `${local[0] ?? '*'}***@${domain ?? ''}`;
+  return `${local.slice(0, 2)}${'*'.repeat(Math.max(local.length - 4, 3))}${local.slice(-2)}@${domain}`;
+}
