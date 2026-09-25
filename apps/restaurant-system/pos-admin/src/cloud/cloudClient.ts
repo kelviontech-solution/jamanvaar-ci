@@ -1063,3 +1063,46 @@ export async function pullInventoryMovements(afterSeq: number): Promise<{ moveme
   if (!res.ok) throw new CloudApiError(data?.message ?? `Inventory movement pull failed (${res.status})`, res.status);
   return data;
 }
+
+export interface SyncIssue {
+  code: string;
+  severity: 'high' | 'medium' | 'low';
+  message: string;
+  entityType: string;
+  entityId?: string;
+  detail?: string;
+}
+
+export interface FleetDevice {
+  id: string;
+  type: string;
+  name: string | null;
+  health: string;
+  appVersion: string | null;
+  pendingSyncCount: number | null;
+  syncError: string | null;
+  menuVersion: number | null;
+  menuStatus: 'none' | 'current' | 'behind';
+}
+
+async function jsonOrThrowCloud<T>(res: Response, what: string): Promise<T> {
+  const data = await parseJsonResponse(res);
+  if (!res.ok) throw new CloudApiError(data?.message ?? `${what} failed (${res.status})`, res.status);
+  return data as T;
+}
+
+export async function fetchSyncIssues(): Promise<SyncIssue[]> {
+  return (await jsonOrThrowCloud<{ issues: SyncIssue[] }>(await deviceFetch('/api/v1/devices/me/sync-issues'), 'Sync issues')).issues;
+}
+
+export async function fetchDeviceFleet(): Promise<FleetDevice[]> {
+  return (await jsonOrThrowCloud<{ devices: FleetDevice[] }>(await deviceFetch('/api/v1/devices/me/fleet'), 'Device fleet')).devices;
+}
+
+export async function fetchMenuVersion(): Promise<{ version: number; watermark: string | null }> {
+  return jsonOrThrowCloud(await deviceFetch('/api/v1/menu/version'), 'Menu version');
+}
+
+export async function publishMenu(note?: string): Promise<{ version: number }> {
+  return jsonOrThrowCloud(await deviceFetch('/api/v1/menu/publish', { method: 'POST', body: JSON.stringify({ note }) }), 'Menu publish');
+}

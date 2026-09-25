@@ -11,6 +11,7 @@ import {
 } from '@jamanvaar/database';
 import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
+import { SyncHealthPanel } from './components/sync/SyncHealthPanel';
 import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, reportQrUsage, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements } from './cloud/cloudClient';
 import { EntitySyncEngine, SyncOutboxEngine, InventoryLedgerSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts } from '@jamanvaar/sync';
 import {
@@ -71,7 +72,8 @@ import {
   Sparkles,
   ArrowRight,
   LifeBuoy,
-  Truck
+  Truck,
+  RefreshCw
 } from 'lucide-react';
 
 // Reusable Feature Modules
@@ -138,6 +140,7 @@ export type PosAdminTab =
   | 'REPORTS'
   | 'SHIFTS'
   | 'HARDWARE'
+  | 'SYNC'
   | 'SETTINGS'
   | 'LICENSE'
   | 'AUDIT'
@@ -840,6 +843,7 @@ export default function PosAdminApp() {
                   items: [
                     { id: 'REPORTS', label: 'Reports & Analytics', icon: TrendingUp },
                     { id: 'HARDWARE', label: 'Printers & Devices', icon: Printer },
+                    { id: 'SYNC', label: 'Sync & Devices', icon: RefreshCw },
                     { id: 'SETTINGS', label: 'Restaurant Settings', icon: Settings },
                     { id: 'LICENSE', label: 'Subscription Plans', icon: Award },
                     { id: 'AUDIT', label: 'Audit Trail Logs', icon: ShieldCheck },
@@ -1014,6 +1018,8 @@ export default function PosAdminApp() {
             )}
 
             {/* TAB 6: MENU & CATEGORIES */}
+            {activeTab === 'SYNC' && <SyncHealthPanel showToast={showToast} />}
+
             {activeTab === 'MENU' && (
               <MenuCategoriesModule
                 categories={categories}

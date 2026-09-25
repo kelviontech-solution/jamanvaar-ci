@@ -33,24 +33,53 @@ Per-order `syncAttempts`, `syncNextAttemptAt`, `syncLastError`; failures back of
 ### Inventory ledger
 `InventoryMovement` holds signed movements per branch, idempotent by `movementId`, sequenced by the same restaurant counter. `POST/GET /inventory/movements`, `GET /inventory/balances`. Branch devices see only their branch; a restaurant-wide device (Restaurant Admin) sees every branch and may post a movement for a named branch of its own restaurant. Client `InventoryLedgerSync` pushes each local stock movement once and applies other devices' movements exactly once (mirror rows prevent double-apply); overselling shows as a negative balance instead of disappearing. Wired into Restaurant Admin, which owns inventory.
 
+### Server-side order safety (added after chaos testing)
+- **Item-level merge** (`order-merge.ts`): each item remembers the device that added it. A device's push is authoritative for its own items (its removals are honoured); other devices' items are kept; kitchen status only moves forward, so a delayed copy can never un-ready a dish. If another device's items were kept, the order is flagged `needsTotalsReview` (totals are never silently recomputed). Order-level `status` deliberately stays last-write-wins, because the app legitimately moves READY back to PREPARING when an item is added to a ready order.
+- **Meta is merged key by key**, so a push that omits a key (a KDS update has no payment reference) can never erase the stored payment transaction id.
+- **Per-order advisory locks** taken in sorted order before the sequence counter, and a **savepoint per event**, so concurrent creates of one order and a failing event no longer abort the whole batch.
+- A seeded **chaos harness** (`sync-chaos.e2e.spec.ts`: 40 orders across 3 POS + KDS, events duplicated 1-3x, shuffled globally and sent 8 at a time, plus 60 shuffled inventory movements) asserts: one order per id, no item lost, kitchen progress never undone, exactly one payment accepted per order, unique sequence numbers, a fresh device catching up receives every order once, every event applied at most once, and stock sums exactly. It found the two bugs above; it passes for seeds 20260925, 1, 7, 42, 1234, 99999. Replay with `CHAOS_SEED=<n>`.
+
+### Local store durability (`packages/database/src/db.ts`)
+Saves are journaled: all changed collections are first written to one journal entry, then to their own keys, then the journal is removed; on startup a surviving journal is replayed, so a crash part-way through a save leaves either all of it or none. `db.transaction()` rolls the core order/KOT/stock/cash collections back if its function throws, and `createOrder` / `generateKOT` run inside it. A failing store (quota full) is no longer swallowed: `getPersistenceHealth()` reports it and the heartbeat sends it to the cloud. **This is still localStorage**, not SQLite/IndexedDB: journaling gives atomicity across collections but not the size, concurrency or query guarantees of a real database. Moving to IndexedDB/SQLite remains the long-term fix and would need the synchronous repository API made async across all apps.
+
+### Device fleet and commands
+- Kiosk Admin / Restaurant Admin authenticate as the console device: `GET /devices/me/fleet` (whole restaurant, or branch if the console is branch-bound; Kiosk Admin sees kiosks only) with health, pending changes, errors, versions and menu status; `POST /devices/me/fleet/:id/commands` for `REQUEST_SYNC` (scope `MENU` or all), `REQUEST_HEALTH`, `REQUEST_DIAGNOSTICS`, `RESTART_APP`, `CLEAR_CACHE`, `LOCK`, `UNLOCK`. Idempotent on `idempotencyKey`, audited as the console, Kiosk Pro gating retained, destructive commands remain Super Admin only.
+- Delivery: a command sent but not acknowledged is redelivered after 2 minutes up to 3 more times, then marked FAILED.
+- Every app now executes commands (`DeviceCommandRunner`, driven by the heartbeat): sync, health, diagnostics and restart are real; lock/unlock ride the heartbeat gate; anything else is acknowledged as FAILED "not supported" rather than pretending. A command id is remembered so a redelivery after a crash is re-acknowledged, not re-run.
+- Fixed a related bug: the device guard checked only the restaurant's newest subscription, so adding a Restaurant plan after a Kiosk plan locked every kiosk (`APP_DISABLED`). It now accepts any active subscription that grants the app.
+
+### Menu versioning
+`POST /menu/publish` (Restaurant Admin only) records numbered versions; devices report the version they have applied (their menu catch-up cursors have passed the publish moment) in the heartbeat; the fleet shows `current` / `behind`. This is a version marker, not draft isolation: edits still reach devices as they are made.
+
+### Reconciliation and tracing
+`GET /platform/telemetry/reconciliation?restaurantId=` (Super Admin) and `GET /devices/me/sync-issues` (Restaurant Admin) report, never repair: paid orders with no payment transaction, duplicate order numbers, negative stock, unresolved conflicts, devices with errors or offline with a backlog, recently failed commands. Every order sync log row carries `traceId` (defaults to the order id), `eventId` and `entityId`; `GET /platform/telemetry/trace/:traceId` returns the whole journey. Restaurant Admin has a "Sync & Devices" tab (fleet, menu publish, review list).
+
+### Realtime
+`GET /realtime/stream` is a server-sent-events stream (no new dependency; a WebSocket library is not installed). It is authenticated by the device credential and scoped from it (restaurant; branch plus restaurant-wide devices; commands only to the addressed device). Events carry no data, only "pull now": `orders`, `inventory`, `menu`, `command`. Published after the write commits and never to the device that caused the change. The stream re-checks the device every 30 s and ends with `revoked` if it is no longer active. The client (`RealtimeClient`, started from the heartbeat) reconnects with backoff and coalesces bursts; the existing polling remains the fallback. Multiple API instances would need a shared channel (Redis pub/sub or Postgres LISTEN/NOTIFY).
+
+### Offline subscription behaviour (existing, documented here)
+A terminal keeps working offline for up to **7 days since its last successful check-in**, regardless of what happens to the subscription in the meantime, so an expiry can never cut off billing mid-service. After 7 days it locks with `OFFLINE_LIMIT` until it reaches the cloud, or an operator pastes a Super-Admin-signed emergency extension (verified offline against built-in public keys, which also releases a terminal already locked for being offline). When it reconnects, the cloud's answer (`SUBSCRIPTION_INACTIVE`, `APP_DISABLED`, `RESTAURANT_SUSPENDED`, `DEVICE_REVOKED`, branch deactivated) is applied at once. A revoked device that is online is cut off immediately (realtime stream and every API call); offline it is cut off at its next successful contact, or by the 7-day limit.
+
+## Corrections to the first audit
+- Inventory was not previously overwritten across devices (nothing synced it); the ledger is a foundation for multi-device stock.
+- Kiosk orders were not a separate pipeline: kiosk-user pushes them through the same `/orders/sync` as POS, Captain and KDS. The `Order` table is only the online-payment record.
+
 ## Data ownership
 
 See `DATA_OWNERSHIP_MATRIX.md`.
 
 ## Not built (honest list)
 
-1. **Item-level order merge.** An order's items are still one JSON blob per push; two devices editing the same order concurrently can overwrite each other's items. Fixing it needs client-side add/remove/void events with tombstones, not just a server change.
-2. **Transactional local store.** Devices still persist to localStorage, so "order + KOT + outbox row commit atomically" and crash-safe writes are **not** guaranteed. Recommended next: IndexedDB transactions, then SQLite inside Tauri. This is the largest remaining gap.
-3. **Realtime fan-out.** No WebSocket gateway yet; devices poll every few seconds. Plan: a NestJS gateway authenticated by device token, scoped by credentials (never client-supplied ids), fed by a transactional server outbox; the sequence cursor stays the recovery path.
-4. **Kiosk fleet view and richer heartbeat** (menu/config version, pending count per device), and device commands beyond the current set.
-5. **Menu publish/versioning with branch overrides**, and per-branch menu propagation reports.
-6. **KOT status state machine on the server and server-side KOT/order-source unification** (`Order` for kiosk vs `SyncedOrder`).
-7. **Reconciliation jobs, a sync-issues admin screen, trace ids, a chaos test harness.**
-8. **Offline subscription-expiry grace policy** documentation and tests.
+1. **A real transactional local database** (IndexedDB / SQLite). Journaled saves reduce the risk but localStorage is still the store.
+2. **Draft menu isolation and branch-level menu overrides.** Publishing is versioning only.
+3. **A server-side KOT state machine as an explicit table.** Kitchen progress is enforced monotonic per item, but there is no separate KOT entity on the server.
+4. **Multi-instance realtime**, **priority scheduling wired into the outbox** (the helper exists and is tested), and a **dead-letter admin screen** (the queue is inspectable through the API and heartbeat; there is no dedicated UI).
+5. **Kiosk commands beyond those listed**: FORCE_UPDATE, PRINT_TEST, and configuration push (welcome text) as commands.
+6. **Multi-branch reporting rollups and per-branch inventory in Restaurant Admin's own UI**, which still reads its local stock.
 
 ## Verification
 
-- `cloud/api`: 661 passing, 4 skipped; the only failures are the two pre-existing ones (`rbac` B2-051/B2-053, `restaurant-identity-sync`). A few unrelated specs are timing-flaky under full-suite load and pass in isolation.
-- Root suite: 1003 passing (138 files).
-- New tests: `sync_protocol` (6), `outbox_reliability` (6), `number_allocator` (9), `numbering_integration` (3), `inventory_ledger_sync` (6); API `sync-events-and-sequence` (9), `number-leases` (5), `inventory-ledger` (7).
-- Not run: crash/power-failure simulation, network-chaos harness, multi-device end-to-end through real UIs.
+- `cloud/api`: 698 passing, 4 skipped; the only failures are the two pre-existing ones (`rbac` B2-051/B2-053, `restaurant-identity-sync`). A few unrelated specs are timing-flaky under full-suite load and pass in isolation.
+- Root suite: 1030 passing (143 files).
+- New since the first pass: `persistence_atomicity` (4), `heartbeat_health` (3), `device_command_runner` (7), `menu_version_tracker` (6), `realtime_client` (7); API `order-merge.unit` (9), `device-command-fleet` (7), `sync-reconciliation` (7), `menu-versioning` (5), `realtime-stream` (5), `sync-chaos` (1, six seeds).
+- Not run: real-device or real-browser end to end (the new Restaurant Admin and Kiosk Admin screens are type-checked, not exercised in a browser), power-loss testing on real hardware, load testing, multi-instance realtime.

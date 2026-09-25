@@ -76,6 +76,19 @@ export class OrderSyncService {
     let latestSeq: number | undefined;
 
     await this.prisma.runAsTenant(device.restaurantId, async (tx) => {
+      // Serialise writers of the same order. Two devices creating or updating one order at once used to
+      // race (both see "no such order", one create then fails and aborts the whole transaction). Locks are
+      // taken up front in sorted order, before the sequence counter is touched, so two batches can never
+      // wait on each other in a cycle.
+      const orderIds = new Set<string>();
+      for (const raw of rawEvents) {
+        const id = raw && typeof raw === 'object' ? (raw as { externalOrderId?: unknown }).externalOrderId : undefined;
+        if (typeof id === 'string' && id) orderIds.add(id);
+      }
+      for (const id of [...orderIds].sort()) {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + device.restaurantId + ':' + id}))`;
+      }
+
       for (const raw of rawEvents) {
         const startedAt = Date.now();
         const parsed = orderSyncEventSchema.safeParse(raw);
@@ -102,6 +115,8 @@ export class OrderSyncService {
         }
         const evt: OrderSyncEventDto = parsed.data;
         let claimed = false;
+        // A database error inside one event must not poison the transaction for the rest of the batch.
+        await tx.$executeRaw`SAVEPOINT order_event`;
         try {
           // Exactly-once: claim the eventId first. If it was already claimed, answer from the recorded
           // outcome and change nothing, so a retry after a lost response (or a delayed replay of an
@@ -151,7 +166,14 @@ export class OrderSyncService {
           // each other, and kitchen progress never regresses. Totals stay as the pushing device computed
           // them (money is never silently recomputed); if other devices' items were kept, flag for review.
           const merge = mergeOrderItems((existing?.items as any[] | undefined) ?? undefined, evt.items as any[], device.id);
-          const mergedMeta = merge.foreignItemsKept ? { ...((evt.meta as object) ?? {}), needsTotalsReview: true } : evt.meta;
+          // Meta is merged key by key: a push that omits a key (a KDS status update has no payment reference)
+          // must never erase what another device recorded, such as the payment transaction id.
+          const priorMeta = (existing?.meta as Record<string, unknown> | null) ?? {};
+          const incomingMeta = (evt.meta as Record<string, unknown> | undefined) ?? {};
+          const mergedMeta: Record<string, unknown> | undefined =
+            existing || evt.meta || merge.foreignItemsKept
+              ? { ...priorMeta, ...incomingMeta, ...(merge.foreignItemsKept ? { needsTotalsReview: true } : {}) }
+              : undefined;
 
           const data = {
             restaurantId: device.restaurantId,
@@ -205,7 +227,8 @@ export class OrderSyncService {
           }
           results.push({ externalOrderId: evt.externalOrderId, status: 'ok', syncVersion: saved.syncVersion });
         } catch (err: any) {
-          if (claimed) await this.releaseClaim(tx, device.restaurantId, evt.eventId!);
+          await tx.$executeRaw`ROLLBACK TO SAVEPOINT order_event`;
+          // The savepoint rollback also undid the event claim, so the event stays retryable.
           await tx.syncEventLog.create({
             data: {
               restaurantId: device.restaurantId,
