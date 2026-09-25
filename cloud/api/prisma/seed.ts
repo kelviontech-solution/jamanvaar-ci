@@ -113,14 +113,19 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     selfOrderKiosk: true
   };
 
+  // Phase 5: real annual pricing. priceMonthly is kept populated with the amortized
+  // monthly-equivalent (priceYearly / 12) purely so existing MRR/ARR/upsell-price display code
+  // that still reads priceMonthly keeps working unchanged — the real billed amount and period
+  // for these plans is priceYearly/365 days (see InvoicesService.billingCycleFor).
   const corePlan = await tx.plan.upsert({
     where: { id: 'seed-plan-core' },
     update: {
       tier: 'CORE',
+      productFamily: 'RESTAURANT',
       name: 'JAMANVAAR CORE',
-      description: 'Foundation Edition: POS + Complete Restaurant Management (10 modules, 183 base features)',
-      priceMonthly: 500000,
-      priceYearly: 5000000,
+      description: 'Run the restaurant: POS, billing, KOT, menu, inventory, basic reports.',
+      priceMonthly: 42000, // ₹420/mo amortized — not a real billing option
+      priceYearly: 500000, // paise = ₹5,000/yr
       maxBranches: 1,
       maxDevices: 5,
       maxUsers: 10,
@@ -129,10 +134,11 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     create: {
       id: 'seed-plan-core',
       tier: 'CORE',
+      productFamily: 'RESTAURANT',
       name: 'JAMANVAAR CORE',
-      description: 'Foundation Edition: POS + Complete Restaurant Management (10 modules, 183 base features)',
-      priceMonthly: 500000, // paise = ₹5,000
-      priceYearly: 5000000, // paise = ₹50,000
+      description: 'Run the restaurant: POS, billing, KOT, menu, inventory, basic reports.',
+      priceMonthly: 42000,
+      priceYearly: 500000,
       maxBranches: 1,
       maxDevices: 5,
       maxUsers: 10,
@@ -144,10 +150,11 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     where: { id: 'seed-plan-pro' },
     update: {
       tier: 'PRO',
+      productFamily: 'RESTAURANT',
       name: 'JAMANVAAR PRO',
-      description: 'Flagship Edition: Everything in Core + Wireless Captain, QR Table Ordering, Mesh Sync & AI (364 features total)',
-      priceMonthly: 700000,
-      priceYearly: 7000000,
+      description: 'Everything in Core, plus KDS and the Captain wireless service workflow.',
+      priceMonthly: 58000, // ₹580/mo amortized
+      priceYearly: 700000, // paise = ₹7,000/yr
       maxBranches: 5,
       maxDevices: 20,
       maxUsers: 50,
@@ -156,14 +163,102 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     create: {
       id: 'seed-plan-pro',
       tier: 'PRO',
+      productFamily: 'RESTAURANT',
       name: 'JAMANVAAR PRO',
-      description: 'Flagship Edition: Everything in Core + Wireless Captain, QR Table Ordering, Mesh Sync & AI (364 features total)',
-      priceMonthly: 700000, // paise = ₹7,000
-      priceYearly: 7000000, // paise = ₹70,000
+      description: 'Everything in Core, plus KDS and the Captain wireless service workflow.',
+      priceMonthly: 58000,
+      priceYearly: 700000,
       maxBranches: 5,
       maxDevices: 20,
       maxUsers: 50,
       entitlements: proEntitlements
+    }
+  });
+
+  await tx.plan.upsert({
+    where: { id: 'seed-plan-qr' },
+    update: {
+      tier: 'QR',
+      productFamily: 'RESTAURANT',
+      name: 'JAMANVAAR QR',
+      description: 'Everything in Pro, plus QR table ordering for guest self-service.',
+      priceMonthly: 75000, // ₹750/mo amortized
+      priceYearly: 900000, // paise = ₹9,000/yr
+      maxBranches: 5,
+      maxDevices: 20,
+      maxUsers: 50,
+      entitlements: { ...proEntitlements, qrTableOrdering: true }
+    },
+    create: {
+      id: 'seed-plan-qr',
+      tier: 'QR',
+      productFamily: 'RESTAURANT',
+      name: 'JAMANVAAR QR',
+      description: 'Everything in Pro, plus QR table ordering for guest self-service.',
+      priceMonthly: 75000,
+      priceYearly: 900000,
+      maxBranches: 5,
+      maxDevices: 20,
+      maxUsers: 50,
+      entitlements: { ...proEntitlements, qrTableOrdering: true }
+    }
+  });
+
+  await tx.plan.upsert({
+    where: { id: 'seed-plan-kiosk-standard' },
+    update: {
+      tier: 'CORE',
+      productFamily: 'KIOSK',
+      name: 'KIOSK STANDARD',
+      description: 'Self-ordering kiosk + Kiosk Admin: menu sync, cart, checkout, basic device management.',
+      priceMonthly: 75000, // ₹750/mo amortized
+      priceYearly: 900000, // paise = ₹9,000/yr
+      maxBranches: 5,
+      maxDevices: 5,
+      maxUsers: 10,
+      entitlements: { selfOrderKiosk: true }
+    },
+    create: {
+      id: 'seed-plan-kiosk-standard',
+      tier: 'CORE',
+      productFamily: 'KIOSK',
+      name: 'KIOSK STANDARD',
+      description: 'Self-ordering kiosk + Kiosk Admin: menu sync, cart, checkout, basic device management.',
+      priceMonthly: 75000,
+      priceYearly: 900000,
+      maxBranches: 5,
+      maxDevices: 5,
+      maxUsers: 10,
+      entitlements: { selfOrderKiosk: true }
+    }
+  });
+
+  await tx.plan.upsert({
+    where: { id: 'seed-plan-kiosk-pro' },
+    update: {
+      tier: 'PRO',
+      productFamily: 'KIOSK',
+      name: 'KIOSK PRO',
+      description: 'Everything in Kiosk Standard, plus multi-kiosk remote management and advanced analytics.',
+      priceMonthly: 92000, // ₹920/mo amortized
+      priceYearly: 1100000, // paise = ₹11,000/yr
+      maxBranches: 5,
+      maxDevices: 20,
+      maxUsers: 10,
+      entitlements: { selfOrderKiosk: true }
+    },
+    create: {
+      id: 'seed-plan-kiosk-pro',
+      tier: 'PRO',
+      productFamily: 'KIOSK',
+      name: 'KIOSK PRO',
+      description: 'Everything in Kiosk Standard, plus multi-kiosk remote management and advanced analytics.',
+      priceMonthly: 92000,
+      priceYearly: 1100000,
+      maxBranches: 5,
+      maxDevices: 20,
+      maxUsers: 10,
+      entitlements: { selfOrderKiosk: true }
     }
   });
 
@@ -276,7 +371,7 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
 
 
   console.log('--- Seed complete ---');
-  console.log(`Plans: ${corePlan.name} + JAMANVAAR PRO`);
+  console.log(`Plans: ${corePlan.name} + JAMANVAAR PRO + JAMANVAAR QR + KIOSK STANDARD + KIOSK PRO`);
   console.log(demo ? `Demo restaurant: ${demo.demoRestaurant.name} (${demo.demoRestaurant.id})` : 'Demo restaurant: not created (production, or SEED_DEMO_DATA=false)');
   if (superAdminWasReset) {
     console.log('');
