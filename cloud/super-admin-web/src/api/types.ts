@@ -50,7 +50,10 @@ export const ENTITLEMENT_LABELS: Record<EntitlementKey, string> = {
 
 export interface Plan {
   id: string;
-  tier: 'CORE' | 'PRO' | 'ENTERPRISE';
+  tier: 'CORE' | 'PRO' | 'QR' | 'ENTERPRISE';
+  // Which commercial product line this plan belongs to — a restaurant may hold one active
+  // subscription per family concurrently (a RESTAURANT plan plus a separate KIOSK add-on).
+  productFamily: 'RESTAURANT' | 'KIOSK';
   name: string;
   description: string | null;
   priceMonthly: number;
@@ -68,7 +71,7 @@ export interface PlanDetail extends Plan {
   subscriptions: Array<Subscription & { restaurant: { id: string; name: string; status: string } }>;
 }
 
-export const APP_CODES = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN'] as const;
+export const APP_CODES = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING'] as const;
 export type AppCode = (typeof APP_CODES)[number];
 
 export const APP_CODE_LABELS: Record<AppCode, string> = {
@@ -77,7 +80,8 @@ export const APP_CODE_LABELS: Record<AppCode, string> = {
   CAPTAIN: 'Captain App',
   KDS: 'Kitchen Display (KDS)',
   KIOSK: 'Self-Ordering Kiosk',
-  KIOSK_ADMIN: 'Kiosk Admin'
+  KIOSK_ADMIN: 'Kiosk Admin',
+  QR_ORDERING: 'QR Table Ordering'
 };
 
 export interface ApplicationEntitlement {
@@ -90,7 +94,19 @@ export interface ApplicationEntitlement {
   config: Record<string, unknown> | null;
   createdAt: string;
   updatedAt: string;
+  // Phase 6: whether `enabled` currently matches the owning subscription's plan-tier default, or
+  // was manually toggled away from it by a Super Admin.
+  source: 'PLAN' | 'MANUAL_OVERRIDE';
 }
+
+export interface FeatureCatalogEntry {
+  category: string;
+  description: string;
+  dependsOn: AppCode[];
+}
+
+/** GET /api/v1/application-entitlements/catalog — one entry per AppCode. */
+export type FeatureCatalog = Record<AppCode, FeatureCatalogEntry>;
 
 export interface Subscription {
   id: string;
@@ -108,6 +124,10 @@ export interface SubscriptionListItem extends Subscription {
 
 export interface RestaurantCore {
   id: string;
+  // Customer-facing identity ("JM" + 10-digit mobile). Null for a legacy restaurant the Phase 1
+  // backfill flagged for manual review (no valid mobile on record at backfill time).
+  restaurantCode: string | null;
+  mobile: string | null;
   name: string;
   legalName: string | null;
   address?: string | null;

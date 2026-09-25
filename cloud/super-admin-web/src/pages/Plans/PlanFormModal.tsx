@@ -17,7 +17,10 @@ import '../../components/shared.css';
 import './plans.css';
 
 interface FormState {
-  tier: 'CORE' | 'PRO' | 'ENTERPRISE';
+  // QR/ENTERPRISE plans are created via seed/API today, not this form — 'QR' is accepted here so
+  // opening an *existing* QR-tier plan for edit doesn't type-error or crash; the tier picker below
+  // only offers CORE/PRO/ENTERPRISE, unchanged from before this phase.
+  tier: 'CORE' | 'PRO' | 'QR' | 'ENTERPRISE';
   name: string;
   description: string;
   priceMonthly: string;
@@ -81,8 +84,11 @@ export function PlanFormModal({
   }
 
   function handleTierChange(tier: FormState['tier']) {
-    // When tier changes in creation mode or user requests it, apply canonical tier inheritance
-    const resolved = resolveTierEntitlements(tier, form.entitlements);
+    // When tier changes in creation mode or user requests it, apply canonical tier inheritance.
+    // resolveTierEntitlements (from @jamanvaar/types, shared with the local runtime) only knows
+    // CORE/PRO/ENTERPRISE — 'QR' plans aren't created/edited via this tier-switcher (the picker
+    // below only offers those three), so QR falls back to CORE's entitlement defaults here.
+    const resolved = resolveTierEntitlements(tier === 'QR' ? 'CORE' : tier, form.entitlements);
     let defaultPrice = form.priceMonthly;
     let defaultName = form.name;
     if (!plan) {
