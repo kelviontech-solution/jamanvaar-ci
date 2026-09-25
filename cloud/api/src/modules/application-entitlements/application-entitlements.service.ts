@@ -1,30 +1,36 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { AppCode, DeviceType, PlanTier, PlatformUser, Prisma } from '@prisma/client';
+import { AppCode, DeviceType, PlanTier, PlatformUser, Prisma, ProductFamily } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { UpdateApplicationEntitlementDto } from './dto/application-entitlement.dto';
 
 type TxClient = Prisma.TransactionClient;
 
-export const ALL_APP_CODES: AppCode[] = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN'];
+export const ALL_APP_CODES: AppCode[] = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING'];
 
 /**
- * Which applications each plan tier includes by default. This is the one
- * place that decision lives — everything else (onboarding, plan-change,
- * activation-key gating) calls into this service rather than re-encoding
- * "does this tier include Kiosk" itself.
- *
- * Matches the tier split already established in Plan.entitlements (seed.ts):
- * CORE is the counter/back-office basics, PRO adds the wireless/self-service
- * tier (Captain, Kiosk, Kiosk Admin). ENTERPRISE is treated as a superset of
- * PRO — the same convention already used everywhere in super-admin-web
- * (`tier === 'PRO' || tier === 'ENTERPRISE'`).
+ * Which applications each (product family, plan tier) pair includes by default. Phase 2 let a
+ * restaurant hold a RESTAURANT-family subscription and a KIOSK-family one concurrently, and the
+ * same tier name (CORE, PRO) now means different apps in each family — a single
+ * Record<PlanTier, AppCode[]> can no longer express that, so this is keyed on both.
+ * ENTERPRISE (in either family) is treated as a superset default until a real custom-plan
+ * mechanism exists (spec section 37) — Super Admin can already override per-subscription via
+ * the `applications` param regardless.
  */
-export const DEFAULT_APPS_BY_TIER: Record<PlanTier, AppCode[]> = {
-  CORE: ['POS', 'POS_ADMIN', 'KDS'],
-  PRO: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN'],
-  ENTERPRISE: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN']
+type FamilyTierKey = `${ProductFamily}:${PlanTier}`;
+const DEFAULT_APPS_BY_FAMILY_TIER: Partial<Record<FamilyTierKey, AppCode[]>> = {
+  'RESTAURANT:CORE': ['POS', 'POS_ADMIN'],
+  'RESTAURANT:PRO': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS'],
+  'RESTAURANT:QR': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'QR_ORDERING'],
+  'RESTAURANT:ENTERPRISE': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'QR_ORDERING'],
+  'KIOSK:CORE': ['KIOSK', 'KIOSK_ADMIN'],
+  'KIOSK:PRO': ['KIOSK', 'KIOSK_ADMIN'],
+  'KIOSK:ENTERPRISE': ['KIOSK', 'KIOSK_ADMIN']
 };
+
+function defaultAppsFor(productFamily: ProductFamily, tier: PlanTier): AppCode[] {
+  return DEFAULT_APPS_BY_FAMILY_TIER[`${productFamily}:${tier}`] ?? [];
+}
 
 @Injectable()
 export class ApplicationEntitlementsService {
@@ -49,10 +55,11 @@ export class ApplicationEntitlementsService {
     tx: TxClient,
     restaurantId: string,
     subscriptionId: string,
+    productFamily: ProductFamily,
     tier: PlanTier,
     enabledApps?: AppCode[]
   ): Promise<void> {
-    const enabled = new Set(enabledApps ?? DEFAULT_APPS_BY_TIER[tier]);
+    const enabled = new Set(enabledApps ?? defaultAppsFor(productFamily, tier));
 
     await Promise.all(
       ALL_APP_CODES.map((appCode) =>

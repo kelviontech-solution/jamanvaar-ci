@@ -82,6 +82,7 @@ export class SubscriptionsService {
         tx,
         dto.restaurantId,
         sub.id,
+        plan.productFamily,
         plan.tier,
         dto.applications
       );
@@ -130,7 +131,7 @@ export class SubscriptionsService {
       // leaving the operator to remember to flip six switches by hand. A
       // restaurant-specific deviceQuota/config override on an existing row
       // is untouched either way (see ensureRowsForSubscription).
-      await this.appEntitlements.ensureRowsForSubscription(tx, existing.restaurantId, id, newPlan.tier);
+      await this.appEntitlements.ensureRowsForSubscription(tx, existing.restaurantId, id, newPlan.productFamily, newPlan.tier);
 
       await this.audit.log(
         {

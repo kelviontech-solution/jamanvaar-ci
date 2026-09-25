@@ -280,6 +280,7 @@ model TenantRefreshToken {
 enum PlanTier {
   CORE
   PRO
+  QR
   ENTERPRISE
 }
 
@@ -361,6 +362,7 @@ enum AppCode {
   KDS
   KIOSK
   KIOSK_ADMIN
+  QR_ORDERING
 }
 
 model ApplicationEntitlement {

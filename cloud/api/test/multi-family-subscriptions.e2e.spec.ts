@@ -166,4 +166,21 @@ describe('Multi-family subscriptions (Phase 2)', () => {
     // subscription specifically — the one every pre-Phase-2 caller cared about.
     expect(res.body.planTier).toBe('PRO');
   });
+
+  it('a KIOSK-family CORE-tier plan defaults to KIOSK+KIOSK_ADMIN, never POS', async () => {
+    const kioskCoreRestaurant = await auth(request(app.getHttpServer()).post('/api/v1/restaurants')).send({
+      name: `TEST Family Default ${stamp}`, mobile: `7${String(stamp).slice(-9)}`, ownerName: 'Owner', ownerEmail: `familydefault-${stamp}@example.com`
+    });
+    createdRestaurantIds.push(kioskCoreRestaurant.body.restaurant.id);
+
+    const sub = await auth(request(app.getHttpServer()).post('/api/v1/subscriptions')).send({
+      restaurantId: kioskCoreRestaurant.body.restaurant.id, planId: kioskPlanId, status: 'ACTIVE', expiresAt: inDays(365)
+      // no explicit `applications` — must fall back to KIOSK-family CORE-tier defaults
+    });
+    expect(sub.status).toBe(201);
+
+    const rows = await auth(request(app.getHttpServer()).get(`/api/v1/subscriptions/${sub.body.id}/applications`));
+    const enabledCodes = rows.body.filter((r: { enabled: boolean }) => r.enabled).map((r: { appCode: string }) => r.appCode).sort();
+    expect(enabledCodes).toEqual(['KIOSK', 'KIOSK_ADMIN']);
+  });
 });

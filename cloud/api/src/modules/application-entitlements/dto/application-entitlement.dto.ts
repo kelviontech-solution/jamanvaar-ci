@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const APP_CODES = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN'] as const;
+export const APP_CODES = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING'] as const;
 
 export const updateApplicationEntitlementSchema = z.object({
   enabled: z.boolean().optional(),

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { entitlementsSchema } from '../entitlements';
 
 export const createPlanSchema = z.object({
-  tier: z.enum(['CORE', 'PRO', 'ENTERPRISE']),
+  tier: z.enum(['CORE', 'PRO', 'QR', 'ENTERPRISE']),
   productFamily: z.enum(['RESTAURANT', 'KIOSK']).default('RESTAURANT'),
   name: z.string().trim().min(2, 'Plan name is required'),
   description: z.string().trim().optional(),
