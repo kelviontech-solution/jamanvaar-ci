@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { load as loadCashfree } from '@cashfreepayments/cashfree-js';
 import {
   activateKioskDevice,
+  resolveRestaurantByCode,
+  syncRestaurantIdentity,
+  RESTAURANT_CODE_RE,
   isKioskDeviceConnected,
   getKioskDeviceId,
   getKioskRestaurantId,
@@ -127,6 +130,7 @@ import {
   Smartphone,
   Sparkles,
   Star,
+  Store,
   Tag,
   ThumbsUp,
   Trash2,
@@ -174,28 +178,74 @@ export default function KioskUserApp() {
   // Device activation (Phase 3) — this terminal has no identity until an
   // activation code is redeemed; everything below assumes a real device.
   const [isDeviceActivated, setIsDeviceActivated] = useState<boolean>(() => isKioskDeviceConnected());
+  const [restaurantCodeInput, setRestaurantCodeInput] = useState('');
   const [activationCode, setActivationCode] = useState('');
   const [activationError, setActivationError] = useState('');
-  const [isActivating, setIsActivating] = useState(false);
   const [showKeyHint, setShowKeyHint] = useState(false);
   const kioskId = getKioskDeviceId() ?? 'KIOSK-01';
 
+  type ActivationStep = 'form' | 'verifying' | 'registering' | 'syncing' | 'success';
+  const [activationStep, setActivationStep] = useState<ActivationStep>('form');
+  const [activationSuccess, setActivationSuccess] = useState<{
+    restaurantName: string;
+    deviceId: string;
+    mismatchNote: string | null;
+  } | null>(null);
+
   const handleActivate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsActivating(true);
     setActivationError('');
+
+    const typedCode = restaurantCodeInput.trim().toUpperCase();
+    if (!RESTAURANT_CODE_RE.test(typedCode)) {
+      setActivationError('Restaurant ID must look like JM9876543210.');
+      return;
+    }
+
+    setActivationStep('verifying');
+    let resolved: { restaurantId: string; name: string };
     try {
-      const branding = await activateKioskDevice(activationCode);
-      if (branding) {
-        RestaurantIdentityRepository.adopt(getKioskRestaurantId() || db.restaurant.id, branding);
-        db.notify();
-      }
-      setIsDeviceActivated(true);
+      resolved = await resolveRestaurantByCode(typedCode);
+    } catch (err) {
+      setActivationError(err instanceof CloudApiError ? err.message : 'Could not verify that Restaurant ID');
+      setActivationStep('form');
+      return;
+    }
+
+    setActivationStep('registering');
+    let result: Awaited<ReturnType<typeof activateKioskDevice>>;
+    try {
+      result = await activateKioskDevice(activationCode);
     } catch (err) {
       setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed');
-    } finally {
-      setIsActivating(false);
+      setActivationStep('form');
+      return;
     }
+
+    if (result.branding) {
+      RestaurantIdentityRepository.adopt(getKioskRestaurantId() || db.restaurant.id, result.branding);
+      db.notify();
+    }
+
+    setActivationStep('syncing');
+    try {
+      await syncRestaurantIdentity();
+    } catch {
+      // The device is already correctly activated at this point (redeem already succeeded) — a
+      // failed identity pull just means the very latest edits sync on the next heartbeat instead
+      // of immediately. Never strand the installer here or fail an otherwise-successful activation.
+    }
+
+    setActivationSuccess({
+      restaurantName: result.branding?.name ?? resolved.name,
+      deviceId: result.deviceId,
+      mismatchNote:
+        result.restaurantId !== resolved.restaurantId
+          ? `This activation key belongs to a different restaurant (${result.branding?.name ?? 'unknown'}) than the ID you entered (${resolved.name}). The kiosk is connected to ${result.branding?.name ?? "the key's restaurant"}.`
+          : null
+    });
+    setActivationStep('success');
+    setIsDeviceActivated(true);
   };
 
   // Wires the real sync bridge (Phase 3) so orders placed here actually
@@ -1400,6 +1450,23 @@ export default function KioskUserApp() {
           </div>
           <form onSubmit={handleActivate} className="space-y-4">
             <div>
+              <label htmlFor="kiosk-restaurant-code" className="text-xs font-extrabold text-jaman-navy flex items-center gap-1.5 mb-1.5">
+                <Store className="w-3.5 h-3.5 text-jaman-saffron" />
+                Restaurant ID *
+              </label>
+              <input
+                id="kiosk-restaurant-code"
+                type="text"
+                value={restaurantCodeInput}
+                onChange={(e) => setRestaurantCodeInput(e.target.value.toUpperCase())}
+                placeholder="JM9876543210"
+                required
+                autoFocus
+                inputMode="text"
+                className="w-full bg-[#FFFCF8] border-[1.5px] border-[#E5D7C8] focus:border-[#F97316] focus:shadow-[0_0_0_4px_rgba(249,115,22,0.10)] rounded-2xl px-5 py-4 text-lg text-center font-mono text-jaman-navy font-bold focus:outline-hidden transition-all uppercase tracking-wider placeholder:text-slate-400"
+              />
+            </div>
+            <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label htmlFor="kiosk-activation-key" className="text-xs font-extrabold text-jaman-navy flex items-center gap-1.5">
                   <KeyRound className="w-3.5 h-3.5 text-jaman-saffron" />
@@ -1416,7 +1483,7 @@ export default function KioskUserApp() {
               </div>
               {showKeyHint && (
                 <p className="text-[11px] text-[#52677A] font-medium bg-[#FFF8EE] border border-[#F0E2D0] rounded-xl px-3 py-2 mb-2">
-                  Your restaurant owner gets it from Restaurant Admin under Subscription Plans, Device &amp; Staff Logins, once JAMANVAAR has activated your plan.
+                  Your restaurant owner gets both of these from Restaurant Admin under Subscription Plans, Device &amp; Staff Logins, once JAMANVAAR has activated your plan.
                 </p>
               )}
               <input
@@ -1426,7 +1493,6 @@ export default function KioskUserApp() {
                 onChange={(e) => setActivationCode(formatActivationKeyInput(e.target.value))}
                 placeholder="JMV-XXXX-XXXX-XXXX"
                 required
-                autoFocus
                 inputMode="text"
                 aria-describedby={activationError ? 'kiosk-activation-error' : undefined}
                 className="w-full bg-[#FFFCF8] border-[1.5px] border-[#E5D7C8] focus:border-[#F97316] focus:shadow-[0_0_0_4px_rgba(249,115,22,0.10)] rounded-2xl px-5 py-4 text-lg text-center font-mono text-jaman-navy font-bold focus:outline-hidden transition-all uppercase tracking-wider placeholder:text-slate-400"
@@ -1440,11 +1506,16 @@ export default function KioskUserApp() {
             )}
             <button
               type="submit"
-              disabled={isActivating || !activationCode.trim()}
+              disabled={activationStep !== 'form' || !activationCode.trim() || !restaurantCodeInput.trim()}
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#FF8A00] to-[#F97316] hover:brightness-105 disabled:opacity-50 disabled:grayscale text-white font-extrabold text-base shadow-[0_10px_24px_rgba(249,115,22,0.28)] transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
             >
-              <span>{isActivating ? 'Connecting kiosk…' : 'Activate Kiosk'}</span>
-              {!isActivating && <ArrowRight className="w-5 h-5" />}
+              <span>
+                {activationStep === 'verifying' && 'Verifying restaurant…'}
+                {activationStep === 'registering' && 'Connecting kiosk…'}
+                {activationStep === 'syncing' && 'Syncing restaurant details…'}
+                {activationStep === 'form' && 'Activate Kiosk'}
+              </span>
+              {activationStep === 'form' && <ArrowRight className="w-5 h-5" />}
             </button>
           </form>
           <div className="mt-4">
