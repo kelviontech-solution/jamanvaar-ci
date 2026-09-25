@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { nextSyncSequence } from '../../common/sync-sequence';
+import { mergeOrderItems } from './order-merge';
 import { OrderSyncEventDto, orderSyncEventSchema } from './dto/push-order-sync.dto';
 
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000; // 24h
@@ -141,6 +142,12 @@ export class OrderSyncService {
             continue;
           }
 
+          // Items are merged per originating device so POS and Captain adding to one order never erase
+          // each other, and kitchen progress never regresses. Totals stay as the pushing device computed
+          // them (money is never silently recomputed); if other devices' items were kept, flag for review.
+          const merge = mergeOrderItems((existing?.items as any[] | undefined) ?? undefined, evt.items as any[], device.id);
+          const mergedMeta = merge.foreignItemsKept ? { ...((evt.meta as object) ?? {}), needsTotalsReview: true } : evt.meta;
+
           const data = {
             restaurantId: device.restaurantId,
             deviceId: device.id,
@@ -149,7 +156,7 @@ export class OrderSyncService {
             status: evt.status,
             tableId: evt.tableId,
             tableLabel: evt.tableLabel,
-            items: evt.items as any,
+            items: merge.items as any,
             subtotal: evt.subtotal,
             taxAmount: evt.taxAmount,
             discountAmount: evt.discountAmount,
@@ -157,7 +164,7 @@ export class OrderSyncService {
             notes: evt.notes,
             paymentStatus: evt.paymentStatus,
             paymentMethod: evt.paymentMethod,
-            meta: (evt.meta ?? undefined) as any
+            meta: (mergedMeta ?? undefined) as any
           };
 
           const seq = await nextSyncSequence(tx, device.restaurantId);

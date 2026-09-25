@@ -165,4 +165,36 @@ describe('Order sync: event idempotency and sequence cursor', () => {
     const refund = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [paid('pay-3', 'TXN-D', 'REFUNDED')] });
     expect(refund.body.results[0].status).toBe('ok');
   });
+
+  const withItems = (id: string, items: Array<{ id: string; kitchenStatus?: string }>) => ({
+    ...orderEvent(id, 'NEW'),
+    items: items.map((i) => ({ externalItemId: i.id, name: i.id, quantity: 1, unitPrice: 1000, modifiers: [], lineTotal: 1000, ...(i.kitchenStatus ? { kitchenStatus: i.kitchenStatus } : {}) }))
+  });
+  const storedItems = async (id: string) => {
+    const row = await prisma.runAsPlatform((tx) => tx.syncedOrder.findFirstOrThrow({ where: { restaurantId, externalOrderId: id } }));
+    return { items: row.items as Array<{ externalItemId: string; kitchenStatus?: string; originDeviceId?: string }>, meta: row.meta as { needsTotalsReview?: boolean } | null };
+  };
+
+  it('two terminals adding to the same order keep each others items, and the order is flagged for totals review', async () => {
+    await authed('post', '/api/v1/orders/sync', posToken).send({ events: [withItems('merge-1', [{ id: 'a' }])] });
+    await authed('post', '/api/v1/orders/sync', pos2Token).send({ events: [withItems('merge-1', [{ id: 'c' }])] });
+    const { items, meta } = await storedItems('merge-1');
+    expect(items.map((i) => i.externalItemId).sort()).toEqual(['a', 'c']);
+    expect(new Set(items.map((i) => i.originDeviceId)).size).toBe(2);
+    expect(meta?.needsTotalsReview).toBe(true);
+  });
+
+  it('a stale push cannot move a dish backwards once the kitchen has advanced it', async () => {
+    await authed('post', '/api/v1/orders/sync', posToken).send({ events: [withItems('merge-2', [{ id: 'a', kitchenStatus: 'PENDING' }])] });
+    await authed('post', '/api/v1/orders/sync', kdsToken).send({ events: [withItems('merge-2', [{ id: 'a', kitchenStatus: 'READY' }])] });
+    await authed('post', '/api/v1/orders/sync', posToken).send({ events: [withItems('merge-2', [{ id: 'a', kitchenStatus: 'PENDING' }])] });
+    const { items } = await storedItems('merge-2');
+    expect(items[0].kitchenStatus).toBe('READY');
+  });
+
+  it('the device that added an item can remove it', async () => {
+    await authed('post', '/api/v1/orders/sync', posToken).send({ events: [withItems('merge-3', [{ id: 'a' }, { id: 'b' }])] });
+    await authed('post', '/api/v1/orders/sync', posToken).send({ events: [withItems('merge-3', [{ id: 'a' }])] });
+    expect((await storedItems('merge-3')).items.map((i) => i.externalItemId)).toEqual(['a']);
+  });
 });
