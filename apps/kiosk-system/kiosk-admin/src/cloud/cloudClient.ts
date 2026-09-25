@@ -102,6 +102,10 @@ export interface ActivationRequiredResult {
   status: 'ACTIVATION_REQUIRED';
   activationSessionToken: string;
   restaurantName: string;
+  /** The restaurant's internal id, resolved server-side from the restaurantCode the operator
+   *  typed (owner-only connect flow) — connectDeviceStep2 still needs this to persist the
+   *  connection, but the caller here never had it to begin with. */
+  restaurantId: string;
 }
 
 /**
@@ -137,7 +141,8 @@ export async function connectDeviceStep1(
     return {
       status: 'ACTIVATION_REQUIRED',
       activationSessionToken: data.activationSessionToken,
-      restaurantName: data.restaurant?.name ?? restaurantId.trim()
+      restaurantName: data.restaurant?.name ?? restaurantId.trim(),
+      restaurantId: data.restaurant?.id ?? restaurantId.trim()
     };
   }
 
@@ -145,6 +150,44 @@ export async function connectDeviceStep1(
   // combination already has an active, non-device-scoped session type —
   // treat it the same as connected rather than erroring.
   persistConnection(restaurantId, data?.user?.fullName ?? email.trim());
+  return { status: 'CONNECTED' };
+}
+
+/**
+ * Owner-only variant of connectDeviceStep1 (spec sections 7/54/55): the operator enters the
+ * restaurant's customer-facing Restaurant ID (JM…) and the owner's password — no email. Same
+ * two return shapes, same downstream connectDeviceStep2 call.
+ */
+export async function connectDeviceStep1Owner(
+  restaurantCode: string,
+  password: string
+): Promise<ConnectStepResult | ActivationRequiredResult> {
+  const res = await fetch(`${API_BASE}/api/v1/tenant-auth/login-owner`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      restaurantCode: restaurantCode.trim(),
+      password,
+      deviceType: 'KIOSK_ADMIN'
+    })
+  });
+
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Connection failed (${res.status})`, res.status);
+  }
+
+  if (data?.status === 'ACTIVATION_REQUIRED') {
+    return {
+      status: 'ACTIVATION_REQUIRED',
+      activationSessionToken: data.activationSessionToken,
+      restaurantName: data.restaurant?.name ?? restaurantCode.trim(),
+      restaurantId: data.restaurant?.id
+    };
+  }
+
+  persistConnection(data?.restaurant?.id, data?.user?.fullName ?? 'Owner');
   return { status: 'CONNECTED' };
 }
 
@@ -347,6 +390,61 @@ export async function staffLogin(restaurantId: string, email: string, password: 
   persistTenantSession(data.refreshToken, user);
   startSilentRefresh();
   return user;
+}
+
+/**
+ * Owner-only daily login (spec sections 7/33/54): just the owner's password — the restaurant is
+ * already known (this terminal is connected), so there's no code or email to type every time.
+ */
+export async function staffLoginOwner(restaurantId: string, password: string): Promise<StaffUser> {
+  const res = await fetch(`${API_BASE}/api/v1/tenant-auth/login-owner`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      restaurantId,
+      password,
+      returnRefreshToken: true
+    })
+  });
+
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Login failed (${res.status})`, res.status);
+  }
+
+  tenantAccessToken = data.accessToken;
+  adoptRestaurantIdentity(restaurantId, data.restaurant?.name);
+  const user: StaffUser = { fullName: data.user.fullName, role: data.user.role };
+  persistTenantSession(data.refreshToken, user);
+  startSilentRefresh();
+  return user;
+}
+
+/** Restaurant-code forgot-password, step 1 (spec section 34): resolves the owner and masks their email for display. */
+export async function requestPasswordResetOwner(restaurantCode: string): Promise<{ maskedEmail: string }> {
+  const res = await fetch(`${API_BASE}/api/v1/tenant-auth/forgot-password-owner`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ restaurantCode: restaurantCode.trim() })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Could not send the code (${res.status})`, res.status);
+  }
+  return { maskedEmail: data.maskedEmail };
+}
+
+/** Restaurant-code forgot-password, step 2: the emailed code and the new password. */
+export async function resetPasswordOwner(restaurantCode: string, otp: string, newPassword: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/v1/tenant-auth/reset-password-owner`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ restaurantCode: restaurantCode.trim(), otp: otp.trim(), newPassword })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Could not reset the password (${res.status})`, res.status);
+  }
 }
 
 /**
