@@ -8,6 +8,8 @@ const appVersion = (JSON.parse(readFileSync(path.resolve(__dirname, 'package.jso
 export default defineConfig({
   base: './',
   plugins: [react()],
+  optimizeDeps: { exclude: ['@sqlite.org/sqlite-wasm'] },
+  worker: { format: 'es' },
   define: { __APP_VERSION__: JSON.stringify(appVersion) },
   resolve: {
     alias: {

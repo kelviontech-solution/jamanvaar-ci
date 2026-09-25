@@ -82,6 +82,17 @@ import { MenuImportRecord } from './menu_templates';
  * Runs with synchronous zero-latency local caching, persistent localStorage backing,
  * and transactional state safety.
  */
+/** The storage shape the database needs: the browser's localStorage, or the SQLite-backed DurableStorage. */
+export interface DbStorage {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
+  /** True when writes made in the same tick are committed as one atomic transaction. */
+  readonly atomicBatches?: boolean;
+  health?(): { ok: boolean; error: string | null };
+  onRemoteChange?: ((ops: Array<{ op: 'set'; key: string; value: string } | { op: 'remove'; key: string }>) => void) | null;
+}
+
 export class JamanvaarDatabase {
   private static instance: JamanvaarDatabase;
 
@@ -970,8 +981,56 @@ export class JamanvaarDatabase {
    */
   private lastWritten = new Map<string, string>();
 
+  /**
+   * Where collections are persisted. Until a durable store is attached this is the browser's localStorage;
+   * once attached (see attachDurableStorage) it is SQLite, read synchronously from memory and written
+   * atomically in the background.
+   */
+  private store: DbStorage | null = null;
+
+  private ls(): DbStorage | null {
+    if (this.store) return this.store;
+    try {
+      return typeof localStorage === 'undefined' ? null : (localStorage as unknown as DbStorage);
+    } catch {
+      return null;
+    }
+  }
+
+  /** Switches this database to a durable store and reloads everything from it. Call once at startup, before the UI renders. */
+  public attachDurableStorage(store: DbStorage): void {
+    this.store = store;
+    this.lastWritten.clear();
+    this.persistenceError = null;
+    this.loadFromStorage();
+    // Another window on this machine changed the shared database: adopt its data, as the old storage event did.
+    store.onRemoteChange = (ops) => {
+      if (!ops.some((op) => op.key.startsWith(this.storagePrefix))) return;
+      for (const op of ops) {
+        if (op.op === 'set') this.lastWritten.set(op.key, op.value);
+        else this.lastWritten.delete(op.key);
+      }
+      this.loadFromStorage();
+      this.listeners.forEach((fn) => fn());
+    };
+    this.listeners.forEach((fn) => fn());
+  }
+
+  /** Storage prefixes of every database instance, for the one-time import from localStorage. */
+  public static knownPrefixes(): string[] {
+    const prefixes = new Set<string>([JamanvaarDatabase.getInstance().storagePrefix]);
+    for (const inst of JamanvaarDatabase.instancesByRole.values()) prefixes.add(inst.storagePrefix);
+    return [...prefixes];
+  }
+
+  public static attachDurableStorageToAll(store: DbStorage): void {
+    JamanvaarDatabase.getInstance().attachDurableStorage(store);
+    for (const inst of JamanvaarDatabase.instancesByRole.values()) inst.attachDurableStorage(store);
+  }
+
   private putIfChanged(fullKey: string, text: string): void {
-    if (this.lastWritten.get(fullKey) === text) return;
+    const localStorage = this.ls();
+    if (!localStorage || this.lastWritten.get(fullKey) === text) return;
     localStorage.setItem(fullKey, text);
     this.lastWritten.set(fullKey, text);
   }
@@ -981,6 +1040,9 @@ export class JamanvaarDatabase {
 
   /** Whether the last attempt to save to local storage succeeded. A failing store means recent changes exist only in memory. */
   public getPersistenceHealth(): { ok: boolean; error: string | null } {
+    // A durable store writes in the background, so its failures surface here rather than as an exception.
+    const background = this.store?.health?.();
+    if (background && !background.ok) return { ok: false, error: background.error };
     return { ok: this.persistenceError === null, error: this.persistenceError };
   }
 
@@ -997,9 +1059,12 @@ export class JamanvaarDatabase {
    */
   private commitPending(pending: Map<string, string>): void {
     if (pending.size === 0) return;
+    const localStorage = this.ls();
+    if (!localStorage) return;
     const journalKey = this.journalKey();
     let journaled = false;
-    if (pending.size > 1) {
+    // A store that already commits one tick's writes as a single transaction needs no separate journal.
+    if (pending.size > 1 && !this.store?.atomicBatches) {
       try {
         localStorage.setItem(journalKey, JSON.stringify(Object.fromEntries(pending)));
         journaled = true;
@@ -1016,7 +1081,8 @@ export class JamanvaarDatabase {
 
   /** Replays a journal left by a save that was interrupted, restoring all-or-nothing behaviour. */
   private recoverJournal(): void {
-    if (typeof localStorage === 'undefined') return;
+    const localStorage = this.ls();
+    if (!localStorage) return;
     const journalKey = this.journalKey();
     const raw = localStorage.getItem(journalKey);
     if (!raw) return;
@@ -1034,7 +1100,8 @@ export class JamanvaarDatabase {
   }
 
   private saveToStorage(): void {
-    if (typeof localStorage === 'undefined') return;
+    const localStorage = this.ls();
+    if (!localStorage) return;
     try {
       const p = this.storagePrefix;
       const pending = new Map<string, string>();
@@ -1112,7 +1179,8 @@ export class JamanvaarDatabase {
   }
 
   private loadFromStorage(): void {
-    if (typeof localStorage === 'undefined') return;
+    const localStorage = this.ls();
+    if (!localStorage) return;
     this.lastWritten.clear();
     this.recoverJournal();
     try {

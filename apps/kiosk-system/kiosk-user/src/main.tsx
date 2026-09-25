@@ -1,3 +1,4 @@
+import { bootDurableStorage } from '@jamanvaar/database';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -13,10 +14,13 @@ DeviceGate.onIdentityInvalid(() => {
   window.location.reload();
 });
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-    <PlatformNoticeBanner audience="guest" />
-    <DeviceGateOverlay appName="Kiosk" />
-  </React.StrictMode>
-);
+// The local database moves from localStorage to SQLite before anything reads it. If the browser can't, the app carries on as before.
+void bootDurableStorage().then(() => {
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <App />
+      <PlatformNoticeBanner audience="guest" />
+      <DeviceGateOverlay appName="Kiosk" />
+    </React.StrictMode>
+  );
+});

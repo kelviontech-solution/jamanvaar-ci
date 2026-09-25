@@ -39,8 +39,18 @@ Per-order `syncAttempts`, `syncNextAttemptAt`, `syncLastError`; failures back of
 - **Per-order advisory locks** taken in sorted order before the sequence counter, and a **savepoint per event**, so concurrent creates of one order and a failing event no longer abort the whole batch.
 - A seeded **chaos harness** (`sync-chaos.e2e.spec.ts`: 40 orders across 3 POS + KDS, events duplicated 1-3x, shuffled globally and sent 8 at a time, plus 60 shuffled inventory movements) asserts: one order per id, no item lost, kitchen progress never undone, exactly one payment accepted per order, unique sequence numbers, a fresh device catching up receives every order once, every event applied at most once, and stock sums exactly. It found the two bugs above; it passes for seeds 20260925, 1, 7, 42, 1234, 99999. Replay with `CHAOS_SEED=<n>`.
 
-### Local store durability (`packages/database/src/db.ts`)
-Saves are journaled: all changed collections are first written to one journal entry, then to their own keys, then the journal is removed; on startup a surviving journal is replayed, so a crash part-way through a save leaves either all of it or none. `db.transaction()` rolls the core order/KOT/stock/cash collections back if its function throws, and `createOrder` / `generateKOT` run inside it. A failing store (quota full) is no longer swallowed: `getPersistenceHealth()` reports it and the heartbeat sends it to the cloud. **This is still localStorage**, not SQLite/IndexedDB: journaling gives atomicity across collections but not the size, concurrency or query guarantees of a real database. Moving to IndexedDB/SQLite remains the long-term fix and would need the synchronous repository API made async across all apps.
+### Local store: SQLite (`packages/database/src/durable/`)
+The apps' database now persists to **SQLite (official SQLite WASM) on the browser's private file system**, replacing localStorage for all restaurant data (orders, KOTs, menu, stock, staff, sync queue, and so on). Small settings, tokens and sync cursors stay in localStorage on purpose.
+
+- **How it works.** The app still reads synchronously from memory, so no repository changed. Writes update memory at once and are committed to SQLite in the background: everything changed in one tick is **one SQL transaction**, so an order and its KOT and its sync-queue state are all-or-nothing, and a crash can no longer leave half of a save. Batches are written strictly in order; a failed batch is kept and retried, and the failure is reported through `db.getPersistenceHealth()` and the heartbeat.
+- **Incremental writes.** A list of records with unique `id`s (orders, KOTs, stock movements, audit log...) is stored one row per record and only changed rows are rewritten, so a shop with tens of thousands of orders does not rewrite them all on every sale. Order is preserved without renumbering on inserts at the front (verified). No 5 MB localStorage cap.
+- **One database shared by every window.** The desktop launcher serves POS, Restaurant Admin, Kiosk and Kiosk Admin from one origin and they intentionally share one local database. SQLite's file access allows only one owner, and it is not available inside a SharedWorker (checked in a real browser), so the windows elect a **leader** with the browser's Web Locks: the leader runs the SQLite worker, persists every window's writes in order and broadcasts what changed; the others keep a full in-memory copy and send writes to the leader. When the leader window closes, another takes over and continues; writes that were not acknowledged are retried. This matches the old cross-window behaviour (last write to a collection wins) but is durable.
+- **Migration.** On first start the existing localStorage data for each database prefix is copied into SQLite once (only if SQLite has none), and the originals are left in place as a backup. The browser is asked to mark the storage persistent so it is not evicted.
+- **Fallback.** If a browser lacks workers, OPFS or Web Locks, the app continues on localStorage exactly as before.
+- **Verified in a real browser** (POS app, Chromium): SQLite active with the data migrated and healthy; data intact after reload; a second window joined as a follower, its write reached the first window, and after the leader window was closed the follower took over, kept writing, and everything survived a reload. Production build bundles the worker and WASM; the launcher's static server now serves `.wasm` with the right type.
+- **Durability window.** Because writes are committed in the background, the last few milliseconds before a hard power cut can be lost (a page close pushes a flush). SQLite itself is set to full synchronous commits.
+
+(The earlier journaled-localStorage layer remains as the fallback path and is unchanged.)
 
 ### Device fleet and commands
 - Kiosk Admin / Restaurant Admin authenticate as the console device: `GET /devices/me/fleet` (whole restaurant, or branch if the console is branch-bound; Kiosk Admin sees kiosks only) with health, pending changes, errors, versions and menu status; `POST /devices/me/fleet/:id/commands` for `REQUEST_SYNC` (scope `MENU` or all), `REQUEST_HEALTH`, `REQUEST_DIAGNOSTICS`, `RESTART_APP`, `CLEAR_CACHE`, `LOCK`, `UNLOCK`. Idempotent on `idempotencyKey`, audited as the console, Kiosk Pro gating retained, destructive commands remain Super Admin only.
@@ -70,7 +80,7 @@ See `DATA_OWNERSHIP_MATRIX.md`.
 
 ## Not built (honest list)
 
-1. **A real transactional local database** (IndexedDB / SQLite). Journaled saves reduce the risk but localStorage is still the store.
+1. **Native SQLite hosts.** The store runs SQLite in the browser. A future Tauri/Node host could reuse the same engine (a Node driver already exists for tests); the launcher's built `dist` folders must be rebuilt to ship this.
 2. **Draft menu isolation and branch-level menu overrides.** Publishing is versioning only.
 3. **A server-side KOT state machine as an explicit table.** Kitchen progress is enforced monotonic per item, but there is no separate KOT entity on the server.
 4. **Multi-instance realtime**, **priority scheduling wired into the outbox** (the helper exists and is tested), and a **dead-letter admin screen** (the queue is inspectable through the API and heartbeat; there is no dedicated UI).
@@ -79,7 +89,7 @@ See `DATA_OWNERSHIP_MATRIX.md`.
 
 ## Verification
 
-- `cloud/api`: 698 passing, 4 skipped; the only failures are the two pre-existing ones (`rbac` B2-051/B2-053, `restaurant-identity-sync`). A few unrelated specs are timing-flaky under full-suite load and pass in isolation.
-- Root suite: 1030 passing (143 files).
-- New since the first pass: `persistence_atomicity` (4), `heartbeat_health` (3), `device_command_runner` (7), `menu_version_tracker` (6), `realtime_client` (7); API `order-merge.unit` (9), `device-command-fleet` (7), `sync-reconciliation` (7), `menu-versioning` (5), `realtime-stream` (5), `sync-chaos` (1, six seeds).
-- Not run: real-device or real-browser end to end (the new Restaurant Admin and Kiosk Admin screens are type-checked, not exercised in a browser), power-loss testing on real hardware, load testing, multi-instance realtime.
+- `cloud/api`: 698 passing, 4 skipped; the only failures are the two pre-existing ones (`rbac` B2-051/B2-053, `restaurant-identity-sync`).
+- Root suite: 1053 passing (146 files), including `durable_store` (14), `durable_cluster` (5), `durable_db_integration` (4).
+- Real browser (Chromium via Playwright): SQLite boot, migration, reload persistence, two-window sharing and leader failover on the POS app; production build of the POS app.
+- Not run: the other five apps in a browser (same boot code), a full API + app + browser end-to-end of offline-then-reconnect, power-loss on real hardware, load testing with very large order histories.

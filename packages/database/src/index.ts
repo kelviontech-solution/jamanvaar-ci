@@ -21,3 +21,8 @@ export * from './collection_sync';
 export * from './service_messages';
 export * from './pin';
 export * from './number_allocator';
+export * from './durable/sql_kv_engine';
+export * from './durable/durable_storage';
+export * from './durable/cluster_backend';
+export * from './durable/worker_backend';
+export * from './durable/browser_boot';

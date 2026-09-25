@@ -698,6 +698,8 @@ const server = http.createServer((req, res) => {
       '.js': 'application/javascript; charset=utf-8',
       '.css': 'text/css; charset=utf-8',
       '.json': 'application/json',
+      '.wasm': 'application/wasm',
+      '.mjs': 'application/javascript; charset=utf-8',
       '.png': 'image/png',
       '.jpg': 'image/jpeg',
       '.jpeg': 'image/jpeg',
