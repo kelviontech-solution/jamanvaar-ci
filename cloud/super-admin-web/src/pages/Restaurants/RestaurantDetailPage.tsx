@@ -17,7 +17,7 @@ import type {
   PlatformPaymentPage
 } from '../../api/types';
 import { ENTITLEMENT_LABELS, type EntitlementKey } from '../../api/types';
-import { APP_CODES, APP_CODE_LABELS, type AppCode, type ApplicationEntitlement } from '../../api/types';
+import { APP_CODES, APP_CODE_LABELS, type AppCode, type ApplicationEntitlement, type FeatureCatalog } from '../../api/types';
 import {
   Badge,
   Button,
@@ -219,6 +219,7 @@ export function RestaurantDetailPage() {
   const [reportsLoading, setReportsLoading] = useState(false);
   const [appEntitlements, setAppEntitlements] = useState<ApplicationEntitlement[] | null>(null);
   const [savingAppCode, setSavingAppCode] = useState<AppCode | null>(null);
+  const [featureCatalog, setFeatureCatalog] = useState<FeatureCatalog | null>(null);
 
   // Password reset modal state
   const [resetPasswordUser, setResetPasswordUser] = useState<{ id: string; name: string; email: string } | null>(null);
@@ -381,10 +382,15 @@ export function RestaurantDetailPage() {
         .then(setAppEntitlements)
         .catch(() => setAppEntitlements([]));
     }
+    if (tab === 'applications' && !featureCatalog) {
+      // Degrades gracefully: if this call fails, category/description/source badges are just
+      // omitted — the enable/disable toggles below read from appEntitlements alone and keep working.
+      api.get<FeatureCatalog>('/api/v1/application-entitlements/catalog').then(setFeatureCatalog).catch(() => {});
+    }
     if (tab === 'menu' && !menu) {
       loadMenu();
     }
-  }, [tab, id, activity, invoices, diagnostics, backups, reportsData, appEntitlements, menu, loadMenu, paymentsStatusFilter, paymentsPage]);
+  }, [tab, id, activity, invoices, diagnostics, backups, reportsData, appEntitlements, featureCatalog, menu, loadMenu, paymentsStatusFilter, paymentsPage]);
 
   async function executeConfirmedAction() {
     if (!confirmAction) return;
@@ -1196,15 +1202,28 @@ export function RestaurantDetailPage() {
                   >
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                       <div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: enabled ? '#166534' : '#0B253A' }}>
-                          {APP_CODE_LABELS[code]}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: enabled ? '#166534' : '#0B253A' }}>
+                            {APP_CODE_LABELS[code]}
+                          </span>
+                          {featureCatalog?.[code] && (
+                            <span style={{ fontSize: 10, fontWeight: 700, color: '#64748b', border: '1px solid #e2e8f0', borderRadius: 6, padding: '1px 6px' }}>
+                              {featureCatalog[code].category}
+                            </span>
+                          )}
                         </div>
+                        {featureCatalog?.[code] && (
+                          <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 2 }}>{featureCatalog[code].description}</div>
+                        )}
                         <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
                           {deviceCount} device{deviceCount === 1 ? '' : 's'} active
                           {row?.deviceQuota ? ` · quota ${row.deviceQuota}` : ''}
                         </div>
                       </div>
-                      <Badge tone={enabled ? 'success' : 'neutral'}>{enabled ? 'Enabled' : 'Disabled'}</Badge>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                        <Badge tone={enabled ? 'success' : 'neutral'}>{enabled ? 'Enabled' : 'Disabled'}</Badge>
+                        {row?.source === 'MANUAL_OVERRIDE' && <Badge tone="warning">Manual override</Badge>}
+                      </div>
                     </div>
                     <Button
                       variant={enabled ? 'ghost' : 'primary'}
