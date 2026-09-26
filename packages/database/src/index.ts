@@ -27,3 +27,4 @@ export * from './durable/cluster_backend';
 export * from './durable/worker_backend';
 export * from './durable/browser_boot';
 export * from './payment_policy';
+export * from './key_value_store';

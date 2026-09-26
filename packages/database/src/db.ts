@@ -1,3 +1,4 @@
+import { KeyValueStore } from './key_value_store';
 import {
   AppNotification,
   AuditLog,
@@ -610,11 +611,9 @@ export class JamanvaarDatabase {
     if (this.customSyncServerUrl && this.customSyncServerUrl.trim().length > 0) {
       return this.customSyncServerUrl.trim().replace(/\/+$/, '');
     }
-    if (typeof localStorage !== 'undefined') {
-      const customUrl = localStorage.getItem('jamanvaar_sync_server_url');
-      if (customUrl && customUrl.trim().length > 0) {
-        return customUrl.trim().replace(/\/+$/, '');
-      }
+    const customUrl = KeyValueStore.get('jamanvaar_sync_server_url');
+    if (customUrl && customUrl.trim().length > 0) {
+      return customUrl.trim().replace(/\/+$/, '');
     }
     if (typeof window !== 'undefined' && window.location && window.location.hostname) {
       return `http://${window.location.hostname}:5178`;
@@ -625,9 +624,7 @@ export class JamanvaarDatabase {
   public setSyncServerUrl(url: string): void {
     const cleanUrl = url.trim().replace(/\/+$/, '');
     this.customSyncServerUrl = cleanUrl;
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('jamanvaar_sync_server_url', cleanUrl);
-    }
+    KeyValueStore.set('jamanvaar_sync_server_url', cleanUrl);
     this.initServerSync();
     this.notify();
   }

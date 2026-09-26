@@ -1,7 +1,11 @@
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash, createHmac, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { BranchStore } from './store';
 import { mergeOrderItems, paymentViolation } from './rules';
+import { canonicalCommand } from '../../sync/src/command_signing';
+
+/** Version of the shared sync protocol this core speaks (bump on any wire-format change). */
+export const SYNC_PROTOCOL_VERSION = 1;
 
 export class CoreError extends Error {
   constructor(
@@ -21,6 +25,8 @@ export interface CoreConfig {
   timezone?: string;
   /** How long the core keeps authorizing devices without hearing from the cloud (matches the terminals' own offline limit). */
   offlineGraceDays?: number;
+  /** Reported in the version report (support, safe updates). */
+  appVersion?: string;
   now?: () => number;
 }
 
@@ -502,7 +508,13 @@ export class BranchCore {
       for (const r of rows) {
         this.store.run("UPDATE commands SET status = 'SENT', sent_at = ?, retry_count = retry_count + ? WHERE id = ?", now, r.status === 'SENT' ? 1 : 0, r.id);
       }
-      return rows.map((r) => ({ id: r.id, commandType: r.type, payload: r.payload ? JSON.parse(r.payload) : {} }));
+      const keyRow = this.store.get<{ token_hash: string | null }>('SELECT token_hash FROM devices WHERE id = ?', device.id);
+      return rows.map((r) => {
+        const cmd = { id: r.id as string, commandType: r.type as string, payload: r.payload ? JSON.parse(r.payload) : {} };
+        // Signed with a key only this core and the target device hold, so a forged LAN command is refused.
+        const signature = keyRow?.token_hash ? createHmac('sha256', keyRow.token_hash).update(canonicalCommand({ ...cmd, deviceId: device.id })).digest('hex') : undefined;
+        return { ...cmd, signature };
+      });
     });
   }
 
@@ -562,6 +574,13 @@ export class BranchCore {
       restaurantId: this.cfg.restaurantId,
       branchId: this.cfg.branchId,
       schemaVersion: this.store.schemaVersion,
+      versions: {
+        app: this.cfg.appVersion ?? '0',
+        database: this.store.schemaVersion,
+        syncProtocol: SYNC_PROTOCOL_VERSION,
+        menu: Number(this.store.get<{ v: number | null }>("SELECT MAX(sync_version) AS v FROM entities WHERE entity_type LIKE 'MENU%'")?.v ?? 0),
+        config: Number(this.store.getConfig('config_version') ?? 0)
+      },
       sequence: this.store.currentSeq(),
       pendingCloudEvents: q("SELECT COUNT(*) AS n FROM cloud_outbox WHERE status = 'PENDING'"),
       failedCloudEvents: q("SELECT COUNT(*) AS n FROM cloud_outbox WHERE status = 'DEAD_LETTER'"),

@@ -1,3 +1,4 @@
+import { KeyValueStore } from '../key_value_store';
 import { JamanvaarDatabase } from '../db';
 import { DurableStorage, migrateFromLocalStorage } from './durable_storage';
 import { ClusterBackend, type Locks } from './cluster_backend';
@@ -40,6 +41,7 @@ export async function bootDurableStorage(): Promise<DurableBootResult> {
     }
 
     JamanvaarDatabase.attachDurableStorageToAll(storage);
+    KeyValueStore.attach(storage);
 
     // Best effort: push anything still queued when the window goes away.
     window.addEventListener('pagehide', () => void storage.flush().catch(() => undefined));

@@ -1,3 +1,4 @@
+import { KeyValueStore } from '@jamanvaar/database';
 /**
  * PlatformNotice: the announcement the platform team publishes (currently
  * maintenance mode) as seen by a restaurant app. It arrives in a terminal's
@@ -18,7 +19,7 @@ const memory: { value: string | null } = { value: null };
 
 function load(): PlatformNoticeData | null {
   try {
-    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : memory.value;
+    const raw = KeyValueStore.get(STORAGE_KEY) ?? memory.value;
     return raw ? (JSON.parse(raw) as PlatformNoticeData) : null;
   } catch {
     return null;
@@ -28,9 +29,9 @@ function load(): PlatformNoticeData | null {
 function save(value: PlatformNoticeData | null): void {
   const raw = value ? JSON.stringify(value) : null;
   try {
-    if (typeof localStorage === 'undefined') memory.value = raw;
-    else if (raw) localStorage.setItem(STORAGE_KEY, raw);
-    else localStorage.removeItem(STORAGE_KEY);
+    memory.value = raw;
+    if (raw) KeyValueStore.set(STORAGE_KEY, raw);
+    else KeyValueStore.remove(STORAGE_KEY);
   } catch {
     memory.value = raw;
   }

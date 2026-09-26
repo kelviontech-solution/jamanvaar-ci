@@ -1,3 +1,4 @@
+import { KeyValueStore } from '@jamanvaar/database';
 import { SyncOutboxEngine } from './outbox';
 import { syncMenuCatalog } from './menu_sync';
 
@@ -12,6 +13,8 @@ export interface DeviceCommandRecord {
   id: string;
   commandType: string;
   payload?: unknown;
+  /** Present on commands delivered by a Branch Core (see command_signing.ts). */
+  signature?: string;
 }
 
 export interface CommandOutcome {
@@ -35,7 +38,7 @@ const HEARTBEAT_APPLIED = new Set(['LOCK', 'UNLOCK', 'DISABLE_DEVICE', 'ENABLE_D
 
 function readDone(): string[] {
   try {
-    return JSON.parse(localStorage.getItem(DONE_KEY) ?? '[]');
+    return JSON.parse(KeyValueStore.get(DONE_KEY) ?? '[]');
   } catch {
     return [];
   }
@@ -43,7 +46,7 @@ function readDone(): string[] {
 
 function writeDone(ids: string[]): void {
   try {
-    localStorage.setItem(DONE_KEY, JSON.stringify(ids.slice(-DONE_LIMIT)));
+    KeyValueStore.set(DONE_KEY, JSON.stringify(ids.slice(-DONE_LIMIT)));
   } catch {
     // Without storage a redelivered command may run again; the commands supported here are safe to repeat.
   }
@@ -95,7 +98,8 @@ export class DeviceCommandRunner {
     }
   }
 
-  static async run(io: CommandIo): Promise<{ executed: number; failed: number }> {
+  /** `verify` returns false for a command that must not run (e.g. a forged LAN command); it is refused and acknowledged as FAILED. */
+  static async run(io: CommandIo, verify?: (cmd: DeviceCommandRecord) => Promise<boolean>): Promise<{ executed: number; failed: number }> {
     if (this.running) return { executed: 0, failed: 0 };
     this.running = true;
     let executed = 0;
@@ -111,7 +115,9 @@ export class DeviceCommandRunner {
       for (const cmd of commands) {
         let outcome: CommandOutcome;
         const alreadyDone = done.includes(cmd.id);
-        if (alreadyDone) {
+        if (!alreadyDone && verify && !(await verify(cmd))) {
+          outcome = { status: 'FAILED', error: 'Command signature is missing or invalid; refused' };
+        } else if (alreadyDone) {
           outcome = { status: 'SUCCEEDED', result: { note: 'already executed' } };
         } else if (HEARTBEAT_APPLIED.has(cmd.commandType)) {
           outcome = { status: 'SUCCEEDED', result: { note: 'applied through the device heartbeat' } };

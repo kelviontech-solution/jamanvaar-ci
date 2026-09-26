@@ -1,4 +1,6 @@
 import http from 'node:http';
+import https from 'node:https';
+import { X509Certificate } from 'node:crypto';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { BranchCore, CoreError, type AuthedDevice, type RealtimeEvent } from './core';
@@ -14,6 +16,8 @@ export interface ServerOptions {
   appDirs?: Record<string, string>;
   recheckMs?: number;
   version?: string;
+  /** Serve HTTPS with this certificate. Devices pin its fingerprint (advertised at /discover) when they pair. */
+  tls?: { cert: string | Buffer; key: string | Buffer };
 }
 
 /** Same visibility rules as the cloud's realtime stream, derived from the authenticated device. */
@@ -47,7 +51,8 @@ export function createServer(core: BranchCore, opts: ServerOptions = {}): http.S
       });
     });
 
-  const server = http.createServer(async (req, res) => {
+  const tlsFingerprint = opts.tls ? new X509Certificate(opts.tls.cert).fingerprint256 : undefined;
+  const handler = async (req: http.IncomingMessage, res: http.ServerResponse) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
@@ -62,7 +67,7 @@ export function createServer(core: BranchCore, opts: ServerOptions = {}): http.S
       if (req.method === 'GET' && (p === '/health' || p === '/api/health')) return send(res, 200, { ok: true, service: 'jamanvaar-branch-core', version: opts.version ?? '0' });
       if (req.method === 'GET' && p === '/discover') {
         const c = core.status();
-        return send(res, 200, { service: 'jamanvaar-branch-core', restaurantId: c.restaurantId, branchCode: core.cfg.branchCode, schemaVersion: c.schemaVersion });
+        return send(res, 200, { service: 'jamanvaar-branch-core', restaurantId: c.restaurantId, branchCode: core.cfg.branchCode, schemaVersion: c.schemaVersion, tls: !!opts.tls, tlsFingerprint });
       }
 
       // ---- static apps served by the core (so screens can load with the internet down)
@@ -172,6 +177,6 @@ export function createServer(core: BranchCore, opts: ServerOptions = {}): http.S
       console.error('Branch Core error:', err);
       return send(res, 500, { statusCode: 500, message: 'Internal error' });
     }
-  });
-  return server;
+  };
+  return (opts.tls ? https.createServer({ cert: opts.tls.cert, key: opts.tls.key }, handler) : http.createServer(handler)) as http.Server;
 }

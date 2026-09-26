@@ -37,7 +37,7 @@ const CATCH_UP_PAGE_SIZE = 500;
 
 function safeGet(key: string): string | null {
   try {
-    return localStorage.getItem(key);
+    return KeyValueStore.get(key);
   } catch {
     return null;
   }
@@ -45,12 +45,13 @@ function safeGet(key: string): string | null {
 
 function safeSet(key: string, value: string): void {
   try {
-    localStorage.setItem(key, value);
+    KeyValueStore.set(key, value);
   } catch {
     // Storage unavailable — the next pull just re-uses the default lookback window.
   }
 }
 
+import { KeyValueStore } from '@jamanvaar/database';
 import { EndpointResolver } from './endpoint_resolver';
 
 export class EntitySyncEngine {

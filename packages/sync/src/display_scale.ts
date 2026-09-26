@@ -1,3 +1,4 @@
+import { KeyValueStore } from '@jamanvaar/database';
 /**
  * How big everything is on a terminal (BUG-008). The POS used to open at an unexplained 130% that nothing
  * controlled. The size now comes from the restaurant's default (set in Restaurant Admin, delivered with the
@@ -18,7 +19,7 @@ const usable = (v: unknown): v is number => typeof v === 'number' && Number.isFi
 
 function read(key: string): number | null {
   try {
-    const raw = (globalThis as { localStorage?: { getItem(k: string): string | null } }).localStorage?.getItem(key);
+    const raw = KeyValueStore.get(key);
     const n = raw === null || raw === undefined ? NaN : Number(raw);
     return usable(n) ? clamp(n) : null;
   } catch {
@@ -28,10 +29,8 @@ function read(key: string): number | null {
 
 function write(key: string, value: number | null) {
   try {
-    const storage = (globalThis as { localStorage?: { setItem(k: string, v: string): void; removeItem(k: string): void } }).localStorage;
-    if (!storage) return;
-    if (value === null) storage.removeItem(key);
-    else storage.setItem(key, String(value));
+    if (value === null) KeyValueStore.remove(key);
+    else KeyValueStore.set(key, String(value));
   } catch {
     // storage can be unavailable; the value still applies for this session
   }

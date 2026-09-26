@@ -1,3 +1,4 @@
+import { KeyValueStore } from './key_value_store';
 import type { CashMovement, Category, ComboDeal, Coupon, CustomerAccount, CustomerFeedback, MenuItem, ShiftRecord } from '@jamanvaar/types';
 import { db } from './db';
 
@@ -75,7 +76,7 @@ export class CollectionSync<T extends Syncable> {
     if (this.loaded) return this.memory;
     this.loaded = true;
     try {
-      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(this.storageKey) : null;
+      const raw = KeyValueStore.get(this.storageKey);
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<SyncState>;
         this.memory = { sigs: parsed.sigs, pushed: parsed.pushed ?? {}, tombstones: parsed.tombstones ?? {} };
@@ -88,7 +89,7 @@ export class CollectionSync<T extends Syncable> {
 
   private save(): void {
     try {
-      if (typeof localStorage !== 'undefined') localStorage.setItem(this.storageKey, JSON.stringify(this.memory));
+      KeyValueStore.set(this.storageKey, JSON.stringify(this.memory));
     } catch {
       // Storage unavailable - state stays in memory for this session.
     }

@@ -13,6 +13,7 @@
  * nothing on the other.
  */
 
+import { KeyValueStore } from '@jamanvaar/database';
 import { PaymentPolicy } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 
@@ -62,12 +63,12 @@ export class EndpointResolver {
     this.now = opts.now ?? Date.now;
   }
 
-  /** `coreUrl` defaults to the address saved at setup (localStorage) so every app on this machine agrees. */
+  /** `coreUrl` defaults to the address saved at setup (the key-value store) so every app on this machine agrees. */
   static configure(opts: { cloudBase: string; coreUrl?: string | null }): void {
     this.cloudBase = opts.cloudBase.replace(/\/+$/, '');
     const saved = (() => {
       try {
-        return typeof localStorage === 'undefined' ? null : localStorage.getItem(CORE_URL_KEY);
+        return KeyValueStore.get(CORE_URL_KEY);
       } catch {
         return null;
       }
@@ -81,9 +82,9 @@ export class EndpointResolver {
     this.coreUrl = url ? url.replace(/\/+$/, '') : null;
     this.health.core = null;
     try {
-      if (typeof localStorage !== 'undefined') {
-        if (url) localStorage.setItem(CORE_URL_KEY, url);
-        else localStorage.removeItem(CORE_URL_KEY);
+      {
+        if (url) KeyValueStore.set(CORE_URL_KEY, url);
+        else KeyValueStore.remove(CORE_URL_KEY);
       }
     } catch {
       // storage unavailable: the address applies for this session only

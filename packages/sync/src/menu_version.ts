@@ -5,6 +5,7 @@
  * reported in the heartbeat so Kiosk Admin and support can see which device is behind.
  */
 
+import { KeyValueStore } from '@jamanvaar/database';
 import { EndpointResolver } from './endpoint_resolver';
 
 const APPLIED_KEY = 'jamanvaar_menu_applied_version';
@@ -18,7 +19,7 @@ export interface LatestMenuVersion {
 
 function read(key: string): string | null {
   try {
-    return localStorage.getItem(key);
+    return KeyValueStore.get(key);
   } catch {
     return null;
   }
@@ -47,7 +48,7 @@ export class MenuVersionTracker {
     });
     if (caughtUp && latest.version > this.applied()) {
       try {
-        localStorage.setItem(APPLIED_KEY, String(latest.version));
+        KeyValueStore.set(APPLIED_KEY, String(latest.version));
       } catch {
         // Storage unavailable: it is recomputed on the next refresh.
       }

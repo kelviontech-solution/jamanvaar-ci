@@ -1,3 +1,4 @@
+import { KeyValueStore } from '@jamanvaar/database';
 import { SyncEvent, SyncEventType, Order, OrderItem, PaymentSplit } from '@jamanvaar/types';
 import { generateUUID, splitTaxPaise } from '@jamanvaar/utils';
 import { db, KOTRepository, BusinessDayRepository, InventoryRepository, NumberAllocator, type NumberLease } from '@jamanvaar/database';
@@ -116,7 +117,7 @@ const CATCH_UP_CURSOR_KEY = 'jamanvaar_order_sync_cursor';
 
 function safeGet(key: string): string | null {
   try {
-    return localStorage.getItem(key);
+    return KeyValueStore.get(key);
   } catch {
     return null;
   }
@@ -124,7 +125,7 @@ function safeGet(key: string): string | null {
 
 function safeSet(key: string, value: string): void {
   try {
-    localStorage.setItem(key, value);
+    KeyValueStore.set(key, value);
   } catch {
     // Storage unavailable — the next catch-up just re-pulls from the default lookback window.
   }

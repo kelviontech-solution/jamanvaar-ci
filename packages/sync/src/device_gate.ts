@@ -9,6 +9,7 @@
  * for longer than its offline grace period (apps are offline-first, so a
  * limited offline window is allowed, not unlimited).
  */
+import { KeyValueStore } from '@jamanvaar/database';
 import { DisplayScale } from './display_scale';
 import { LICENSE_PUBLIC_KEYS, type LicensePublicKey } from '@jamanvaar/config';
 import { AppUpdate, type AppUpdateOffer } from './app_update';
@@ -79,7 +80,7 @@ const memory: { value: string | null; disconnectReason: string | null } = { valu
 
 function readStorage(): DeviceGateState | null {
   try {
-    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : memory.value;
+    const raw = KeyValueStore.get(STORAGE_KEY) ?? memory.value;
     return raw ? (JSON.parse(raw) as DeviceGateState) : null;
   } catch {
     return null;
@@ -89,8 +90,8 @@ function readStorage(): DeviceGateState | null {
 function writeStorage(state: DeviceGateState): void {
   const raw = JSON.stringify(state);
   try {
-    if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_KEY, raw);
-    else memory.value = raw;
+    memory.value = raw;
+    KeyValueStore.set(STORAGE_KEY, raw);
   } catch {
     memory.value = raw;
   }
@@ -165,8 +166,8 @@ export class DeviceGate {
   /** Remembered across the reload `onIdentityInvalid`'s handler triggers, so the activation screen can explain why. */
   static rememberDisconnectReason(message: string): void {
     try {
-      if (typeof localStorage !== 'undefined') localStorage.setItem(DISCONNECT_REASON_KEY, message);
-      else memory.disconnectReason = message;
+      memory.disconnectReason = message;
+      KeyValueStore.set(DISCONNECT_REASON_KEY, message);
     } catch {
       memory.disconnectReason = message;
     }
@@ -179,7 +180,7 @@ export class DeviceGate {
    */
   static peekDisconnectReason(): string | null {
     try {
-      return typeof localStorage !== 'undefined' ? localStorage.getItem(DISCONNECT_REASON_KEY) : memory.disconnectReason;
+      return KeyValueStore.get(DISCONNECT_REASON_KEY) ?? memory.disconnectReason;
     } catch {
       return null;
     }
@@ -189,8 +190,9 @@ export class DeviceGate {
   static consumeDisconnectReason(): string | null {
     const value = this.peekDisconnectReason();
     try {
-      if (typeof localStorage !== 'undefined') localStorage.removeItem(DISCONNECT_REASON_KEY);
-      else memory.disconnectReason = null;
+      memory.disconnectReason = null;
+      KeyValueStore.remove(DISCONNECT_REASON_KEY);
+      memory.disconnectReason = null;
     } catch {
       memory.disconnectReason = null;
     }

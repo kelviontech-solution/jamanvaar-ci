@@ -7,6 +7,7 @@ import { RealtimeClient } from './realtime_client';
 import { EndpointResolver } from './endpoint_resolver';
 import { InventoryLedgerSync } from './inventory_ledger_sync';
 import { syncMenuCatalog } from './menu_sync';
+import { tokenKey, verifyCommand } from './command_signing';
 
 /** A readable OS name for the fleet list ("Windows", "Android", ...). Never throws. */
 export function detectOsPlatform(): string | undefined {
@@ -49,15 +50,24 @@ function routed(opts: HeartbeatOpts, path: string, init?: RequestInit): Promise<
 async function runDeviceCommands(opts: HeartbeatOpts): Promise<void> {
   DeviceCommandRunner.registerDefaults();
   const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${opts.deviceToken}` };
+  let fromCore = false;
   await DeviceCommandRunner.run({
     async list() {
       const r = await routed(opts, '/api/v1/devices/me/commands', { headers });
       if (!r.ok) throw new Error(`commands ${r.status}`);
-      return (await r.json()) as Array<{ id: string; commandType: string; payload?: unknown }>;
+      const list = (await r.json()) as Array<{ id: string; commandType: string; payload?: unknown; signature?: string }>;
+      fromCore = EndpointResolver.lastResponder() === 'core';
+      return list;
     },
     async ack(id, outcome) {
       await routed(opts, `/api/v1/devices/me/commands/${id}/ack`, { method: 'POST', headers, body: JSON.stringify(outcome) });
     }
+  }, async (cmd) => {
+    // Commands from the cloud arrive over TLS from a trusted origin. Anything from a Branch Core on the LAN must carry the core's signature.
+    if (!fromCore) return true;
+    const deviceId = DeviceGate.getState().deviceId;
+    if (!deviceId) return false; // this device does not yet know its own id: fail closed
+    return verifyCommand(await tokenKey(opts.deviceToken), { id: cmd.id, commandType: cmd.commandType, payload: cmd.payload, deviceId }, cmd.signature);
   });
 }
 

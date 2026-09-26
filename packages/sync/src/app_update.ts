@@ -1,3 +1,4 @@
+import { KeyValueStore } from '@jamanvaar/database';
 /**
  * "A newer version of this app is available" (BUG-065). The cloud puts an offer in every heartbeat
  * answer; this keeps the latest one, lets the operator dismiss an optional one for that version, and
@@ -20,7 +21,7 @@ interface Stored {
 
 function read(): Stored {
   try {
-    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : memory.value;
+    const raw = KeyValueStore.get(STORAGE_KEY) ?? memory.value;
     return raw ? (JSON.parse(raw) as Stored) : { offer: null, dismissedVersion: null };
   } catch {
     return { offer: null, dismissedVersion: null };
@@ -30,8 +31,8 @@ function read(): Stored {
 function write(state: Stored): void {
   const raw = JSON.stringify(state);
   try {
-    if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_KEY, raw);
-    else memory.value = raw;
+    memory.value = raw;
+    KeyValueStore.set(STORAGE_KEY, raw);
   } catch {
     memory.value = raw;
   }
