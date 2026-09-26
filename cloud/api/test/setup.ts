@@ -9,3 +9,4 @@ if (process.env.TEST_DATABASE_URL) process.env.DATABASE_URL = process.env.TEST_D
 process.env.SMTP_HOST = '';
 process.env.QR_RESOLVE_CACHE_MS = '0'; // suites that need the cache turn it on explicitly
 process.env.DEVICE_AUTH_CACHE_MS = '0'; // suites that need the device cache turn it on explicitly
+process.env.PUBLIC_AUTH_RPM = '100000';

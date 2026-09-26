@@ -4,6 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { UpdateOwnerDto } from './dto/owner.dto';
 import * as bcrypt from 'bcryptjs';
+import { BCRYPT_COST } from '../../common/security/password-cost';
 
 /** Never selects passwordHash — matches the same shape restaurants.service.ts already uses for owner rows. */
 const OWNER_SELECT = {
@@ -101,7 +102,7 @@ export class OwnersService {
       const existing = await tx.user.findFirst({ where: { id } });
       if (!existing) throw new NotFoundException('User not found');
 
-      const passwordHash = await bcrypt.hash(newPassword, 10);
+      const passwordHash = await bcrypt.hash(newPassword, BCRYPT_COST);
       const updated = await tx.user.update({
         where: { id },
         data: {

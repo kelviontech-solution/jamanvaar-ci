@@ -78,7 +78,7 @@ Confidence HIGH. The server authorizes terminal calls by device type (`payment-o
 **F-11. Unauthenticated credential endpoints use the general 120 requests/minute/address limit, not the strict 20/minute limit.**
 Confidence HIGH. `tenant-auth.controller.ts` `login`, `set-initial-password`, `forgot-password`, `reset-password`, `activate-device`, `refresh` (`:68-166`) and `activation-redeem.controller.ts:15` carry no `@PublicAuthThrottle()`; only the two `*-owner` variants and restaurant lookup do (`throttle.ts:41`). Per-account lockout (10 attempts, 15 minutes: `tenant-auth.service.ts:965-966`) limits guessing one account, but one address may spray 120 accounts/minute. Fix: apply `PublicAuthThrottle` to those routes. Risk LOW.
 
-**F-12. `QrCode` is tenant-owned but has no row-level security.**
+**F-12. WITHDRAWN (false positive). `QrCode` is tenant-owned; row-level security is already enabled and forced on it (verified live in `pg_class`; the earlier static read of the creating migration missed the policy added later).**
 Confidence HIGH (added in the QR phase). The migration `20260926100000_qr_ordering_saas` creates the table with no policy; every admin query filters by `restaurantId` (`qr-admin.service.ts:100,197,262,270`) and the public path reads by token as platform (`qr-public.service.ts:95`). One forgotten filter would leak across tenants. Fix: enable and force RLS with the standard policy; public token lookup already runs as platform. Risk LOW.
 
 **F-13. One 20 MB JSON body limit applies to every route, including unauthenticated ones.**
@@ -106,7 +106,7 @@ Confidence HIGH. Audit actions (`grep` of `action:` across modules) cover platfo
 
 ## 3. Multi-tenant result
 
-* **Tenant/restaurant isolation: evidence FOR.** RLS enabled and forced on 42 tables with `SET LOCAL` context inside every transaction; `runAsTenant` validates the restaurant id as a UUID before interpolating it (`prisma.service.ts:139-144`), the only two raw-unsafe statements in the code base; TEST: `tenant-isolation.e2e`, `rls-platform-reads.e2e`, `order-sync-and-suspension.e2e` (a device of another restaurant cannot see or push), all passed. Tables without RLS: 17 of 58, all platform-global by design except `QrCode` (F-12), `AuditLog` and `PlatformNotification` (carry a restaurant id; not exposed to tenants by any route found).
+* **Tenant/restaurant isolation: evidence FOR.** RLS enabled and forced on 42 tables with `SET LOCAL` context inside every transaction; `runAsTenant` validates the restaurant id as a UUID before interpolating it (`prisma.service.ts:139-144`), the only two raw-unsafe statements in the code base; TEST: `tenant-isolation.e2e`, `rls-platform-reads.e2e`, `order-sync-and-suspension.e2e` (a device of another restaurant cannot see or push), all passed. Tables without RLS: 16 of 58, all platform-global by design except `AuditLog` and `PlatformNotification` (carry a restaurant id; not exposed to tenants by any route found).
 * **Branch isolation: evidence FOR** for orders and inventory (branch filter in `catchUp`, `inventory-ledger`; TEST: `onboarding-hardening`, `ecosystem.e2e`, `audit-probes`) and, since the last phase, for the floor plan. **Against:** a restaurant-wide admin console sees all branches by design; other entity types (menu, customers, staff) are restaurant-wide by design.
 * **Device isolation: evidence FOR** cross-restaurant (credential resolves to one device row; `DeviceAuthGuard` re-checks every request; TEST `device-enforcement`, cache invalidation test). **Against** within one restaurant: F-01, F-02, F-03 (least-trusted devices hold broad authority).
 * **Role isolation:** platform roles are enforced server-side and deny-by-default (TEST `rbac.e2e`); tenant users have three roles and only owner-level user management is server-enforced; terminal staff roles are client-side only (F-10).
@@ -176,3 +176,40 @@ Anything touching: production configuration and secrets (F-04, F-07, F-14), cred
 * KDS and Captain have no native shell in the repository; their packaging security is unknown.
 * The Super Admin front-end, POS and Kiosk source were searched for storage and XSS sinks but not read line by line.
 * Live exploitation was not attempted; F-01 to F-03 are code traces with the executable verification tests listed above still to be written.
+
+
+---
+
+## Remediation status (update after the fix pass)
+
+Verified by tests: full cloud suite 105 files / 862 tests pass (run with a real Postgres, RLS enforced); root suite 164 files / 1155 tests pass; `tsc -b` has no errors in `apps/`, `packages/`, `cloud/` sources (pre-existing type errors remain only in a few `tests/*.ts` files, unrelated to this work).
+
+| Finding | Status | What was done |
+|---|---|---|
+| F-01 write authority per device type | FIXED | `entity-authority.ts` table enforced in the controller; kiosk/KDS/captain cannot write prices, tax, staff, customers, cash, payments. Tests: `security-hardening.e2e`, `.unit`, `entity-sync.e2e` |
+| F-02 PIN hashes / customers to public kiosk | FIXED | kiosk cannot read CUSTOMER/SHIFT/CASH/PAYMENT; STAFF_USER pulls are role-filtered per terminal; kiosk manager override now calls `POST /api/v1/staff/verify-manager-pin` (server-side PBKDF2, per-terminal and per-restaurant lockout, audited) |
+| F-03 orders declared paid | FIXED | only POS/POS_ADMIN may declare SUCCESS/REFUNDED; others need a settled payment transaction, else a `PAYMENT_UNVERIFIED` conflict; voids/refunds/status corrections audited |
+| F-04 weak secrets accepted | FIXED | production boot refuses placeholder/short/repeated JWT and QR secrets, localhost/* CORS, malformed backup key (`productionConfigProblems`) |
+| F-05 ANY code as admin console | FIXED | refused at redemption |
+| F-06 licence bound to restaurant | FIXED (client) | both POS and POS Admin pass the device's own restaurant id. Not fixed: clock rollback guard (needs a monotonic time source; documented residual) |
+| F-07 development signing key | FIXED (bundle) | `k2` is included only in non-production builds. **Action for you:** certificates must be signed with the production key (`k1` or a new one); the private key in the OneDrive-synced `cloud/api/.env` must be moved out of the synced folder and rotated. Cannot be done from code |
+| F-08 Branch Core identity | PARTLY | pairing now verifies the core belongs to this device's restaurant (test `probe_core_restaurant`). TLS fingerprint pinning and mandatory TLS are NOT implemented (residual, needs installation-flow decision) |
+| F-09 Branch Core credential at rest | PARTLY | data dir 0700 / files 0600 where the OS supports it. On Windows no change: OS-protected storage (DPAPI) not implemented |
+| F-10 staff roles client-only | PARTLY | manager override on kiosk is server-verified; POS/Captain roles remain enforced on the client (residual, large change) |
+| F-11 public auth throttles | FIXED | `PublicAuthThrottle` on the six tenant auth routes and redemption |
+| F-12 QrCode RLS | WITHDRAWN | false positive |
+| F-13 body limits | FIXED | per-route limits; anonymous callers never get a large limit |
+| F-14 unencrypted backups | FIXED | refused in production without key |
+| F-15 audit gaps | FIXED | failed logins, lockouts, refresh reuse, sensitive entity changes audited |
+| F-16 proxy / client address | FIXED | `TRUST_PROXY` (count of proxies) |
+| F-17 Tauri CSP / IPC | PARTLY | `form-action 'none'` added. `connect-src`/`img-src` must stay broad (cloud host and LAN Branch Core are set per installation). Printer/serial command allow-lists (Rust) NOT changed |
+| F-18 tokens in localStorage | ACCEPTED | no injection sink found; stays a documented residual |
+| F-19 legacy local service | FIXED | constant-time key compare, key accepted from headers only |
+| F-20 log redaction | FIXED | legacy QR routes redacted |
+| F-21 refresh rotation race | FIXED | atomic revoke, reuse detection ends all sessions |
+| F-22 restaurant-code enumeration | ACCEPTED | throttled; changing the code format is a product decision |
+| F-23 hygiene | FIXED | bcrypt cost 12, CORS default not applied in production, CSPRNG file names, CI `permissions: contents: read`, `@types/pg` moved to devDependencies. Action-tag pinning to commit SHAs NOT done (needs network lookup) |
+| F-24 webhook freshness | ACCEPTED | replay already neutralised |
+
+### What this does NOT prove
+Deployment configuration and secret rotation, dependency vulnerability scan (needs network), Rust/Tauri code and real hardware, TLS at the real edge, penetration testing of a running deployment.

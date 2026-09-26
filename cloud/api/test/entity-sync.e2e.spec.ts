@@ -18,6 +18,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
   let restaurantId: string;
   let planId: string;
   let posToken: string;
+  let posAdminToken: string;
 
   const authed = (method: 'get' | 'post', url: string, token: string) =>
     request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
@@ -51,6 +52,9 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     const keyRes = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'POS', expiresAt: new Date(Date.now() + 86400000).toISOString() });
     const redeemRes = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: keyRes.body.code, deviceType: 'POS' });
     posToken = redeemRes.body.deviceToken;
+    const adminKey = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'POS_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const adminRedeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: adminKey.body.code, deviceType: 'POS_ADMIN' });
+    posAdminToken = adminRedeem.body.deviceToken;
   });
 
   afterAll(async () => {
@@ -94,7 +98,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
   });
 
   it('keeps CUSTOMER and INVENTORY_ITEM rows fully separate even with the same externalId', async () => {
-    await authed('post', '/api/v1/entity-sync/INVENTORY_ITEM', posToken).send({
+    await authed('post', '/api/v1/entity-sync/INVENTORY_ITEM', posAdminToken).send({
       events: [{ externalId: '9876543210', payload: { name: 'Basmati Rice', currentStock: 40, unit: 'kg' } }]
     });
 
@@ -130,7 +134,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     const kdsToken = kdsRedeem.body.deviceToken as string;
 
     const pushRes = await authed('post', '/api/v1/entity-sync/STAFF_USER', posToken).send({
-      events: [{ externalId: 'usr-cashier-1', payload: { id: 'usr-cashier-1', username: 'amitdave', fullName: 'Amit Dave', roleId: 'role-cashier', isActive: true, pinHash: 'pinv1:deadbeefcafef00d' } }]
+      events: [{ externalId: 'usr-chef-1', payload: { id: 'usr-chef-1', username: 'amitdave', fullName: 'Amit Dave', roleId: 'role-chef', isActive: true, pinHash: 'pinv1:deadbeefcafef00d' } }]
     });
     expect(pushRes.status).toBe(201);
     expect(JSON.stringify(pushRes.body)).not.toMatch(/"pin":|"plainPin"/);
@@ -139,8 +143,8 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     const pullFromKds = await authed('get', '/api/v1/entity-sync/STAFF_USER', kdsToken);
     expect(pullFromKds.body.entities).toHaveLength(1);
     expect(pullFromKds.body.entities[0]).toMatchObject({
-      externalId: 'usr-cashier-1',
-      payload: { fullName: 'Amit Dave', roleId: 'role-cashier', pinHash: 'pinv1:deadbeefcafef00d' }
+      externalId: 'usr-chef-1',
+      payload: { fullName: 'Amit Dave', roleId: 'role-chef', pinHash: 'pinv1:deadbeefcafef00d' }
     });
   });
 
@@ -279,8 +283,8 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     });
 
     beforeAll(async () => {
-      const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK', expiresAt: new Date(Date.now() + 86400000).toISOString() });
-      const redeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: 'KIOSK' });
+      const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+      const redeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: 'KIOSK_ADMIN' });
       kioskToken = redeem.body.deviceToken as string;
     });
 
@@ -342,8 +346,8 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     });
 
     it('combos, coupons and guest ratings travel between devices of the same restaurant', async () => {
-      await authed('post', '/api/v1/entity-sync/COMBO', posToken).send({ events: [{ externalId: 'combo-1', payload: { id: 'combo-1', name: 'Thali Combo', updatedAt: '2026-09-20T10:00:00.000Z' } }] });
-      await authed('post', '/api/v1/entity-sync/COUPON', posToken).send({ events: [{ externalId: 'cpn-1', payload: { id: 'cpn-1', code: 'WELCOME50', usageCount: 0, updatedAt: '2026-09-20T10:00:00.000Z' } }] });
+      await authed('post', '/api/v1/entity-sync/COMBO', posAdminToken).send({ events: [{ externalId: 'combo-1', payload: { id: 'combo-1', name: 'Thali Combo', updatedAt: '2026-09-20T10:00:00.000Z' } }] });
+      await authed('post', '/api/v1/entity-sync/COUPON', posAdminToken).send({ events: [{ externalId: 'cpn-1', payload: { id: 'cpn-1', code: 'WELCOME50', usageCount: 0, updatedAt: '2026-09-20T10:00:00.000Z' } }] });
       await authed('post', '/api/v1/entity-sync/CUSTOMER_FEEDBACK', kioskToken).send({ events: [{ externalId: 'fb-1', payload: { id: 'fb-1', rating: 5, kioskId: 'K1', createdAt: '2026-09-20T10:00:00.000Z' } }] });
 
       expect((await authed('get', '/api/v1/entity-sync/COMBO', kioskToken)).body.entities[0].payload).toMatchObject({ name: 'Thali Combo' });
@@ -352,7 +356,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
 
       // A redemption counted on the kiosk (newer) wins over the older copy, and an older copy cannot undo it.
       await authed('post', '/api/v1/entity-sync/COUPON', kioskToken).send({ events: [{ externalId: 'cpn-1', payload: { id: 'cpn-1', code: 'WELCOME50', usageCount: 3, updatedAt: '2026-09-20T11:00:00.000Z' } }] });
-      await authed('post', '/api/v1/entity-sync/COUPON', posToken).send({ events: [{ externalId: 'cpn-1', payload: { id: 'cpn-1', code: 'WELCOME50', usageCount: 0, updatedAt: '2026-09-20T10:00:00.000Z' } }] });
+      await authed('post', '/api/v1/entity-sync/COUPON', posAdminToken).send({ events: [{ externalId: 'cpn-1', payload: { id: 'cpn-1', code: 'WELCOME50', usageCount: 0, updatedAt: '2026-09-20T10:00:00.000Z' } }] });
       expect((await authed('get', '/api/v1/entity-sync/COUPON', posToken)).body.entities[0].payload).toMatchObject({ usageCount: 3 });
     });
 

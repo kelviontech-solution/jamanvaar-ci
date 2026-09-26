@@ -5,6 +5,9 @@ import { createTestApp, createTestPlatformUser, platformLogin } from './helpers'
 import { PrismaService } from '../src/prisma/prisma.service';
 import { EmailService } from '../src/modules/notifications/email.service';
 
+// this suite exercises the real per-address limit, so it opts out of the relaxed test-wide value
+vi.hoisted(() => { process.env.PUBLIC_AUTH_RPM = '20'; });
+
 describe('Owner-only restaurant-code login (Phase 3)', () => {
   let app: INestApplication;
   let prisma: PrismaService;

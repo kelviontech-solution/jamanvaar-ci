@@ -1,3 +1,4 @@
+import { PublicAuthThrottle } from '../../common/throttle';
 import { Body, Controller, Post, UsePipes } from '@nestjs/common';
 import { ActivationKeysService } from './activation-keys.service';
 import { redeemActivationKeySchema } from './dto/activation-key.dto';
@@ -13,6 +14,7 @@ export class ActivationRedeemController {
   constructor(private readonly activationKeys: ActivationKeysService) {}
 
   @Post('redeem')
+  @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(redeemActivationKeySchema))
   redeem(@Body() body: ReturnType<typeof redeemActivationKeySchema.parse>) {
     return this.activationKeys.redeem(body);

@@ -289,7 +289,7 @@ export class MasterCatalogService {
       throw new BadRequestException('Unsupported or unrecognised image type. Allowed: JPEG, PNG, WEBP, GIF.');
     }
 
-    const safeHash = Math.random().toString(36).substring(2, 10) + '_' + Date.now();
+    const safeHash = (await import('crypto')).randomBytes(9).toString('hex') + '_' + Date.now();
     const targetFileName = `dish_${safeHash}${sniffed.ext}`;
 
     const fs = await import('fs');

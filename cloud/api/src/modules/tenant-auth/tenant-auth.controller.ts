@@ -67,6 +67,7 @@ export class TenantAuthController {
 
   @Post('set-initial-password')
   @HttpCode(200)
+  @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(setInitialPasswordSchema))
   async setInitialPassword(
     @Body() body: { restaurantId: string; email: string; activationToken: string; newPassword: string }
@@ -78,6 +79,7 @@ export class TenantAuthController {
   /** "Forgot password", step 1 (BUG-142). Always the same answer, so it cannot be used to find out who has an account. */
   @Post('forgot-password')
   @HttpCode(200)
+  @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(forgotPasswordSchema))
   async forgotPassword(@Body() body: { restaurantId: string; email: string }) {
     await this.authService.requestPasswordReset(body.restaurantId, body.email);
@@ -87,6 +89,7 @@ export class TenantAuthController {
   /** "Forgot password", step 2: the emailed code and the new password. */
   @Post('reset-password')
   @HttpCode(200)
+  @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(resetPasswordSchema))
   async resetPassword(@Body() body: { restaurantId: string; email: string; otp: string; newPassword: string }) {
     await this.authService.resetPassword(body.restaurantId, body.email, body.otp, body.newPassword);
@@ -114,6 +117,7 @@ export class TenantAuthController {
 
   @Post('login')
   @HttpCode(200)
+  @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(tenantLoginSchema))
   async login(
     @Body() body: TenantLoginDto,
@@ -153,6 +157,7 @@ export class TenantAuthController {
 
   @Post('activate-device')
   @HttpCode(200)
+  @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(activateDeviceSchema))
   async activateDevice(
     @Body() body: ActivateDeviceDto,
@@ -165,6 +170,7 @@ export class TenantAuthController {
 
   @Post('refresh')
   @HttpCode(200)
+  @PublicAuthThrottle()
   @UsePipes(new ZodValidationPipe(tenantRefreshSchema))
   async refresh(
     @Req() req: Request,

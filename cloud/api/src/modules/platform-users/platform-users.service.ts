@@ -9,6 +9,7 @@ import {
   UnauthorizedException
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
+import { BCRYPT_COST } from '../../common/security/password-cost';
 import { ConfigService } from '@nestjs/config';
 import { PlatformUser, PlatformUserStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -326,7 +327,7 @@ export class PlatformUsersService {
     await this.prisma.platformUser.update({
       where: { id: user.id },
       data: {
-        passwordHash: await bcrypt.hash(dto.password, 10),
+        passwordHash: await bcrypt.hash(dto.password, BCRYPT_COST),
         status: PlatformUserStatus.ACTIVE,
         activatedAt: new Date(),
         activationTokenHash: null,

@@ -157,6 +157,10 @@ export class BackupStorageService {
   async upload(restaurantId: string, jsonPayload: string): Promise<UploadedBackup> {
     const compressed = gzipSync(Buffer.from(jsonPayload, 'utf8'));
     const key = this.encryptionKey();
+    // Backups hold customers and PIN hashes. In production an unencrypted backup is refused rather than stored.
+    if (!key && this.config.get<string>('NODE_ENV') === 'production') {
+      throw new ServiceUnavailableException('Backups are disabled until BACKUP_ENCRYPTION_KEY_B64 is configured on this server');
+    }
     const stored = key ? this.encrypt(compressed, key) : compressed;
     const checksumSha256 = createHash('sha256').update(stored).digest('hex');
     const storageKey = `restaurants/${restaurantId}/${Date.now()}-${checksumSha256.slice(0, 12)}.json.gz${key ? '.enc' : ''}`;

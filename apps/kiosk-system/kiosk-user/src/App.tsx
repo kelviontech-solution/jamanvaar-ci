@@ -17,7 +17,7 @@ import {
   pushEntitySync,
   pullEntitySync,
   CloudApiError,
-  type CartLinePayload, leaseNumberBlock } from './cloud/cloudClient';
+  type CartLinePayload, leaseNumberBlock, verifyManagerPin } from './cloud/cloudClient';
 import {
   AuditRepository,
   ComboRepository,
@@ -1360,8 +1360,15 @@ export default function KioskUserApp() {
   // manager/admin-tier role, same as Captain's SEC-006 fix.
   const handleStaffPinVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    const verified = await StaffRepository.verifyPin(staffPin);
-    const matchedUser = verified?.isManager ? verified.user : undefined;
+    // The kiosk holds no PIN hashes (a public terminal must not): the server says whether this is a manager's PIN.
+    let matchedUser: { fullName: string } | undefined;
+    let serverMessage: string | null = null;
+    try {
+      const approved = await verifyManagerPin(staffPin);
+      matchedUser = approved ? { fullName: approved.staffName } : undefined;
+    } catch (err) {
+      serverMessage = err instanceof Error && (err as { status?: number }).status === 429 ? err.message : 'A manager override needs a connection to the restaurant server.';
+    }
 
     if (matchedUser) {
       setStaffOverrideActive(true);
@@ -1376,12 +1383,7 @@ export default function KioskUserApp() {
       });
     } else {
       setStaffPin('');
-      const lockoutMs = StaffRepository.pinLockoutRemainingMs();
-      showToast(
-        lockoutMs > 0
-          ? `Too many wrong PINs. Try again in ${Math.ceil(lockoutMs / 1000)}s.`
-          : 'Invalid staff PIN.'
-      );
+      showToast(serverMessage ?? 'Invalid staff PIN.');
       AuditRepository.log({
         kioskId,
         action: 'STAFF_OVERRIDE_PIN_FAILED',

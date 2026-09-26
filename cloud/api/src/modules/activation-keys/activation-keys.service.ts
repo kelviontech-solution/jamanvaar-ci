@@ -301,6 +301,12 @@ export class ActivationKeysService {
         );
       }
 
+      // A key issued for "any terminal" cannot turn into an admin console: whoever installs a kitchen screen or a kiosk with it must not
+      // be able to choose to become Restaurant Admin or Kiosk Admin. A console needs a key issued for that console.
+      if (key.allowedDeviceType === 'ANY' && RESTAURANT_WIDE_TYPES.has(dto.deviceType)) {
+        throw new BadRequestException('This activation code is not for an admin console. Ask for a key issued for the admin console.');
+      }
+
       // security-audit MED-02: claim the key atomically HERE, before creating a device
       // for it — the old code only flipped `status` to REDEEMED at the very end, after
       // already creating a Device row, with nothing stopping two concurrent redemptions

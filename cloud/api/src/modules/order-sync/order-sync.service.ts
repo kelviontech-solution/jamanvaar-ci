@@ -6,6 +6,7 @@ import { nextSyncSequence } from '../../common/sync-sequence';
 import { mergeOrderItems } from './order-merge';
 import { decideStatus, integrityFlags } from './order-rules';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
+import { AuditService } from '../audit/audit.service';
 import { OrderSyncEventDto, orderSyncEventSchema } from './dto/push-order-sync.dto';
 
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000; // 24h
@@ -101,7 +102,8 @@ function paymentViolation(
 export class OrderSyncService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly realtime: RealtimeBus
+    private readonly realtime: RealtimeBus,
+    private readonly audit: AuditService
   ) {}
 
   /**
@@ -275,6 +277,32 @@ export class OrderSyncService {
           const finalMeta = { ...(mergedMeta ?? {}), ...serverMeta, ...(existing && Array.isArray(priorMeta.reviewFlags) && reviewFlags.length === 0 ? { reviewFlags: priorMeta.reviewFlags } : {}) };
           delete (finalMeta as Record<string, unknown>).statusCorrection;
 
+          // Only the counter (POS, POS Admin) may declare an order paid or refunded. Any other terminal may report a payment only when it
+          // points at a settled gateway transaction of this restaurant that covers the total; otherwise the order keeps its payment
+          // state (or starts unpaid) and the attempt is recorded. This is what stops a kiosk, kitchen screen or Captain from inserting
+          // "paid" sales that no money stands behind.
+          let payStatus = evt.paymentStatus;
+          if (payStatus && !PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type) && payStatus !== existing?.paymentStatus && TERMINAL_PAID_STATUSES.has(payStatus)) {
+            const ref = (evt.meta as { paymentTransactionId?: string } | undefined)?.paymentTransactionId;
+            const settled = payStatus === 'SUCCESS' && ref
+              ? await tx.paymentTransaction.findFirst({
+                  where: { restaurantId: device.restaurantId, status: 'SUCCESS', OR: [{ id: ref }, { providerOrderId: ref }, { providerPaymentId: ref }] },
+                  select: { amount: true }
+                })
+              : null;
+            if (!settled || settled.amount < evt.totalAmount) {
+              await tx.syncConflict.create({
+                data: {
+                  restaurantId: device.restaurantId, branchId: device.branchId, deviceId: device.id, entityType: 'ORDER', entityId: evt.externalOrderId,
+                  localVersion: { paymentStatus: payStatus, totalAmount: evt.totalAmount, paymentTransactionId: ref ?? null } as any,
+                  cloudVersion: { paymentStatus: existing?.paymentStatus ?? null } as any,
+                  reason: `PAYMENT_UNVERIFIED: a ${device.type} device reported the order as ${payStatus} without a settled gateway payment covering it`
+                }
+              });
+              payStatus = existing?.paymentStatus ?? 'PENDING';
+            }
+          }
+
           const data = {
             restaurantId: device.restaurantId,
             deviceId: device.id,
@@ -282,7 +310,7 @@ export class OrderSyncService {
             status: decision.status,
             ...header,
             items: merge.items as any,
-            paymentStatus: evt.paymentStatus,
+            paymentStatus: payStatus,
             paymentMethod: evt.paymentMethod,
             meta: finalMeta as any
           };
@@ -318,6 +346,21 @@ export class OrderSyncService {
               where: { restaurantId_eventId: { restaurantId: device.restaurantId, eventId: evt.eventId! } },
               data: { result: { syncVersion: saved.syncVersion, seq } }
             });
+          }
+          // Actions that take money or an order back are attributed to the terminal that did them and the name it declared. The name is
+          // what the terminal says, not proof of who stood there; the device id and type are what the server knows.
+          const voided = ['CANCELLED', 'VOID', 'VOIDED', 'REFUNDED'].includes(decision.status) && existing?.status !== decision.status;
+          const refunded = payStatus === 'REFUNDED' && existing?.paymentStatus !== 'REFUNDED';
+          const corrected = (evt.meta as { statusCorrection?: boolean } | undefined)?.statusCorrection === true && existing?.status !== decision.status;
+          if (existing && (voided || refunded || corrected)) {
+            await this.audit.log(
+              {
+                actorType: 'TENANT', actorId: device.id, restaurantId: device.restaurantId,
+                action: refunded ? 'ORDER_REFUNDED' : corrected ? 'ORDER_STATUS_CORRECTED' : 'ORDER_VOIDED', category: 'ORDER',
+                details: { orderId: evt.externalOrderId, from: existing.status, to: decision.status, totalAmount: evt.totalAmount, deviceType: device.type, declaredBy: (evt.meta as { cashierName?: string; captainName?: string } | undefined)?.cashierName ?? (evt.meta as { captainName?: string } | undefined)?.captainName ?? null }
+              },
+              tx
+            );
           }
           results.push({ externalOrderId: evt.externalOrderId, status: 'ok', syncVersion: saved.syncVersion });
         } catch (err: any) {

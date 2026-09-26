@@ -8,6 +8,7 @@ import { generateOpaqueToken, hashOpaqueToken } from '../../common/security/toke
 import { EmailService } from '../notifications/email.service';
 import { ownerInviteEmail } from '../notifications/email-templates';
 import * as bcrypt from 'bcryptjs';
+import { BCRYPT_COST } from '../../common/security/password-cost';
 import { EntitySyncService } from '../entity-sync/entity-sync.service';
 import { ImportMenuDto } from './dto/import-menu.dto';
 import { redactActivationKeyCode } from '../../common/security/activation-key-presentation';
@@ -80,7 +81,7 @@ export class RestaurantsService {
       const activationToken = generateOpaqueToken();
       const activationTokenExpiresAt = new Date(Date.now() + ACTIVATION_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000);
 
-      const passwordHash = dto.ownerPassword ? await bcrypt.hash(dto.ownerPassword, 10) : null;
+      const passwordHash = dto.ownerPassword ? await bcrypt.hash(dto.ownerPassword, BCRYPT_COST) : null;
       const ownerStatus = dto.ownerPassword ? 'ACTIVE' : 'PENDING_ACTIVATION';
       const activatedAt = dto.ownerPassword ? new Date() : null;
 

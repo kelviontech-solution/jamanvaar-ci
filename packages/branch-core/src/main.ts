@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdirSync, readFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { BranchStore } from './store';
 import { BranchCore } from './core';
 import { createServer } from './server';
@@ -34,8 +34,15 @@ function parseArgs(argv: string[]): Args {
 }
 
 function openStore(dataDir: string): BranchStore {
-  mkdirSync(dataDir, { recursive: true });
-  return new BranchStore(path.join(dataDir, 'branch-core.sqlite3'));
+  mkdirSync(dataDir, { recursive: true, mode: 0o700 });
+  const file = path.join(dataDir, 'branch-core.sqlite3');
+  const store = new BranchStore(file);
+  // The file holds the cloud credential of this branch: owner-only where the OS supports file modes (a no-op on Windows, where the user profile ACL applies).
+  for (const f of [file, `${file}-wal`, `${file}-shm`]) {
+    try { if (existsSync(f)) chmodSync(f, 0o600); } catch { /* best effort */ }
+  }
+  try { chmodSync(dataDir, 0o700); } catch { /* best effort */ }
+  return store;
 }
 
 export async function activate(dataDir: string, cloudBase: string, code: string): Promise<void> {

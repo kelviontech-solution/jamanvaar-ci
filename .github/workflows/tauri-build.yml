@@ -25,6 +25,10 @@ on:
       - 'packages/**/src/**'
   workflow_dispatch: {}
 
+# The build only reads the repository; nothing here needs to write to it.
+permissions:
+  contents: read
+
 jobs:
   build:
     name: ${{ matrix.name }}

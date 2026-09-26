@@ -42,8 +42,11 @@ let pairLockedUntil = 0;
 function isAuthorized(req, urlObj) {
   const header = req.headers['authorization'] || '';
   const bearerMatch = /^Bearer\s+(.+)$/i.exec(header);
-  const presentedKey = (bearerMatch ? bearerMatch[1] : req.headers['x-service-key']) || urlObj.searchParams.get('key') || '';
-  return presentedKey === SERVICE_KEY;
+  // The key is accepted from headers only: a key in the URL ends up in logs and browser history.
+  const presentedKey = String((bearerMatch ? bearerMatch[1] : req.headers['x-service-key']) || '');
+  const a = crypto.createHash('sha256').update(presentedKey).digest();
+  const b = crypto.createHash('sha256').update(String(SERVICE_KEY)).digest();
+  return crypto.timingSafeEqual(a, b);
 }
 
 // Data-bearing endpoints only — /health, /sync/status (no sensitive payload),

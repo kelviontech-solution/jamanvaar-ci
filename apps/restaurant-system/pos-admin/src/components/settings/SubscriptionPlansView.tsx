@@ -281,7 +281,10 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
       return;
     }
 
-    const result = await applyLicenseCertificate(cert);
+    // A certificate is bound to one restaurant: a terminal that knows which restaurant it belongs to refuses any other's.
+    let ownRestaurantId: string | undefined;
+    try { ownRestaurantId = localStorage.getItem('jamanvaar_cloud_restaurant_id') || undefined; } catch { /* storage unavailable: no local binding to enforce */ }
+    const result = await applyLicenseCertificate(cert, ownRestaurantId);
     if (!result.ok) {
       const reasons: Record<typeof result.reason, string> = {
         malformed: 'That does not look like a License Certificate — paste it exactly as Super Admin provided it.',

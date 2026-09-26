@@ -2,9 +2,38 @@ import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
 import { EntitySyncEventDto, SyncableEntityType } from './dto/push-entity-sync.dto';
 import { PUBLISHED_DEMO_QR_TOKENS } from './published-demo-qr-tokens';
 import { menuEntityProblem } from './menu-entity-schemas';
+import { staffVisibleTo } from './entity-authority';
+
+/** What is worth an audit line when a synced record changes: money, tax, staff access and coupon value. Never the PIN hash itself. */
+export function sensitiveChange(entityType: string, before: Record<string, unknown> | null, after: Record<string, unknown>): Record<string, unknown> | null {
+  const gone = after.deleted === true;
+  const was = before && before.deleted !== true ? before : null;
+  const diff = (keys: string[]) => Object.fromEntries(keys.filter((k) => JSON.stringify(was?.[k]) !== JSON.stringify(after[k])).map((k) => [k, { from: was?.[k] ?? null, to: after[k] ?? null }]));
+  if (entityType === 'MENU_ITEM') {
+    const d = diff(['price', 'taxGroupId']);
+    return !gone && Object.keys(d).length > 0 && was ? { name: after.name, changes: d } : gone && was ? { name: was.name, removed: true } : null;
+  }
+  if (entityType === 'TAX_GROUP') {
+    const d = diff(['cgstPercent', 'sgstPercent', 'igstPercent', 'isInclusive', 'isActive']);
+    return gone ? { name: was?.name ?? null, removed: true } : !was ? { name: after.name, created: true } : Object.keys(d).length > 0 ? { name: after.name, changes: d } : null;
+  }
+  if (entityType === 'COUPON') {
+    const d = diff(['discountType', 'discountValue', 'maxDiscountAmount', 'isActive']);
+    return gone ? { code: was?.code ?? null, removed: true } : !was ? { code: after.code, created: true } : Object.keys(d).length > 0 ? { code: after.code, changes: d } : null;
+  }
+  if (entityType === 'STAFF_USER') {
+    if (gone) return was ? { staff: was.fullName ?? null, removed: true } : null;
+    if (!was) return { staff: after.fullName ?? null, roleId: after.roleId ?? null, created: true };
+    const d = diff(['roleId', 'isActive']);
+    const pinChanged = was.pinHash !== after.pinHash;
+    return Object.keys(d).length > 0 || pinChanged ? { staff: after.fullName ?? null, changes: d, pinChanged } : null;
+  }
+  return null;
+}
 
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000;
 const CATCH_UP_MAX_ROWS = 500;
@@ -35,14 +64,14 @@ export interface EntitySyncPushResult {
 
 @Injectable()
 export class EntitySyncService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService) {}
 
   async pushEvents(
     device: Device,
     entityType: SyncableEntityType,
     events: EntitySyncEventDto[]
   ): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
-    return this.pushEventsForRestaurant(device.restaurantId, entityType, events, device.id, device.branchId);
+    return this.pushEventsForRestaurant(device.restaurantId, entityType, events, device.id, device.branchId, device.type);
   }
 
   /**
@@ -57,7 +86,8 @@ export class EntitySyncService {
     entityType: SyncableEntityType,
     events: EntitySyncEventDto[],
     deviceId?: string,
-    deviceBranchId?: string | null
+    deviceBranchId?: string | null,
+    deviceType?: string
   ): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
     const results: EntitySyncPushResult[] = [];
 
@@ -77,6 +107,15 @@ export class EntitySyncService {
               const basePrice = (base?.payload as { price?: number } | undefined)?.price;
               if (typeof basePrice === 'number') evt = { ...evt, payload: { ...evt.payload, price: basePrice } };
             }
+          }
+          if (entityType === 'COUPON' && deviceType === 'KIOSK' && evt.payload.deleted !== true) {
+            // A kiosk reports redemptions; it cannot create a coupon or change what one is worth.
+            const base = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'COUPON', externalId: evt.externalId } } });
+            const cur = base?.payload as Record<string, unknown> | undefined;
+            if (!cur || cur.deleted === true) throw new Error('A kiosk cannot create a coupon');
+            const seen = typeof evt.payload.usageCount === 'number' ? evt.payload.usageCount : 0;
+            const prior = typeof cur.usageCount === 'number' ? cur.usageCount : 0;
+            evt = { ...evt, payload: { ...cur, usageCount: Math.max(prior, seen), updatedAt: evt.payload.updatedAt ?? cur.updatedAt } };
           }
           const problem = menuEntityProblem(entityType, evt.payload);
           if (problem) {
@@ -133,6 +172,10 @@ export class EntitySyncService {
               });
 
           results.push({ externalId: evt.externalId, status: 'ok', syncVersion: saved.syncVersion });
+          const change = sensitiveChange(entityType, (existing?.payload as Record<string, unknown> | null) ?? null, evt.payload);
+          if (change) {
+            await this.audit.log({ actorType: deviceId ? 'TENANT' : 'SYSTEM', actorId: deviceId, restaurantId, action: `SYNC_${entityType}_CHANGED`, category: 'SYNC', details: { entityId: evt.externalId, deviceType: deviceType ?? null, ...change } as never }, tx);
+          }
           if (entityType === 'DINING_TABLE') await this.syncQrTableLink(tx, restaurantId, evt, deviceBranchId ?? null);
         } catch (err: any) {
           results.push({ externalId: evt.externalId, status: 'error', error: err?.message ?? 'Unknown error' });
@@ -176,14 +219,14 @@ export class EntitySyncService {
   }
 
   async catchUp(device: Device, entityType: SyncableEntityType, since?: string) {
-    return this.catchUpForRestaurant(device.restaurantId, entityType, since, (entityType === 'DINING_TABLE' || entityType === 'MENU_ITEM') ? device.branchId : null);
+    return this.catchUpForRestaurant(device.restaurantId, entityType, since, (entityType === 'DINING_TABLE' || entityType === 'MENU_ITEM') ? device.branchId : null, device.type);
   }
 
   /**
    * `branchId` scopes branch-owned records (the floor plan): a branch terminal receives its own branch's tables and any table
    * that names no branch, never another branch's. Restaurant-wide types (menu, staff, customers) are not filtered.
    */
-  async catchUpForRestaurant(restaurantId: string, entityType: SyncableEntityType, since?: string, branchId: string | null = null) {
+  async catchUpForRestaurant(restaurantId: string, entityType: SyncableEntityType, since?: string, branchId: string | null = null, deviceType?: string) {
     const sinceDate = since ? new Date(since) : new Date(Date.now() - CATCH_UP_DEFAULT_LOOKBACK_MS);
 
     // B2-029: same missing-filter bug as order-sync.service.ts — this returned every
@@ -197,6 +240,10 @@ export class EntitySyncService {
       })
     );
 
+    if (entityType === 'STAFF_USER' && deviceType) {
+      const staff = entities.filter((e) => staffVisibleTo(deviceType as never, e.payload as Record<string, unknown> | null));
+      return { entities: staff, serverTime: new Date().toISOString() };
+    }
     if (entityType === 'MENU_ITEM' && branchId) {
       // This branch's own price and availability, applied on the way out: POS, Kiosk and Captain of the branch receive the dish
       // as the branch sells it, with no change to any device. The restaurant-wide record itself is never modified.

@@ -4,6 +4,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { BCRYPT_COST } from '../../common/security/password-cost';
 import { PlatformUser, PlatformUserStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
@@ -214,6 +215,7 @@ export class PlatformAuthService {
               : user.lockedUntil
           }
         });
+        await this.audit.log({ actorType: 'PLATFORM', actorId: user.id, action: attempts >= PlatformAuthService.LOGIN_MAX_ATTEMPTS ? 'PLATFORM_ACCOUNT_LOCKED' : 'PLATFORM_LOGIN_FAILED', category: 'AUTH', details: { attempts } });
       }
       // Deliberately the same generic message whether the account doesn't exist, the password
       // was wrong, or the account is locked — see this method's doc comment on enumeration.
@@ -418,7 +420,7 @@ export class PlatformAuthService {
 
     await this.prisma.platformUser.update({
       where: { id: user.id },
-      data: { passwordHash: await bcrypt.hash(newPassword, 10) }
+      data: { passwordHash: await bcrypt.hash(newPassword, BCRYPT_COST) }
     });
 
     // Sign out every OTHER session - a password change should not leave old

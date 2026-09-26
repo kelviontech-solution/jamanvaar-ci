@@ -10,5 +10,8 @@ export function redactUrl(url: string): string {
   return url
     .replace(/(\/api\/v1\/public\/qr\/orders\/)[^/?#]+/, '$1:orderRef')
     .replace(/(\/api\/v1\/public\/qr\/)(?!orders\/|session)[^/?#]+/, '$1:token')
-    .replace(/(\/q\/)[^/?#]+/, '$1:token');
+    .replace(/(\/q\/)[^/?#]+/, '$1:token')
+    // the legacy guest routes carry the code in the query string and the order reference in the path
+    .replace(/([?&]token=)[^&#]*/, '$1:token')
+    .replace(/(\/api\/v1\/qr-guest\/orders\/)[^/?#]+/, '$1:orderRef');
 }

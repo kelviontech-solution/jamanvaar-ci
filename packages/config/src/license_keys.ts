@@ -12,6 +12,18 @@ export interface LicensePublicKey {
   jwk: JsonWebKey;
 }
 
+/** True in a production build (Vite sets `import.meta.env.PROD`); false in development, tests and plain Node. */
+const isProductionBundle = (import.meta as unknown as { env?: { PROD?: boolean } }).env?.PROD === true;
+
+const DEVELOPMENT_KEYS: LicensePublicKey[] = [
+  {
+    // Development key: its private half lives only in cloud/api/.env on the development machine.
+    // It is trusted in development and test builds ONLY; a production bundle never carries it.
+    kid: 'k2',
+    jwk: { kty: 'EC', crv: 'P-256', x: 'zaCC1jlvmsNZsUPrz-bolMm0waKF_wYV8WimmIZvmM4', y: 'GDKm_kViW0jh8XnjVAhTwjR7DIA13cmxhuoPw7Cn5FQ' }
+  }
+];
+
 export const LICENSE_PUBLIC_KEYS: LicensePublicKey[] = [
   {
     kid: 'k1',
@@ -22,10 +34,5 @@ export const LICENSE_PUBLIC_KEYS: LicensePublicKey[] = [
       y: 'bafQoC8ZaiXpkinCfXSPMJUjsqt3v0UvAbUFWZwLfsg'
     }
   },
-  {
-    // Development key: its private half lives only in cloud/api/.env on the development machine.
-    // Replace this entry with your production key (scripts/generate-license-key.js) before shipping.
-    kid: 'k2',
-    jwk: { kty: 'EC', crv: 'P-256', x: 'zaCC1jlvmsNZsUPrz-bolMm0waKF_wYV8WimmIZvmM4', y: 'GDKm_kViW0jh8XnjVAhTwjR7DIA13cmxhuoPw7Cn5FQ' }
-  }
+  ...(isProductionBundle ? [] : DEVELOPMENT_KEYS)
 ];

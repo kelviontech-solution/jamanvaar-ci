@@ -57,16 +57,47 @@ const envSchema = z.object({
   CASHFREE_WEBHOOK_NOTIFY_URL: z.string().optional(),
   // Optional: AES-256-GCM key (32 bytes, base64) for encrypting
   // RestaurantPaymentConnection settlement bank details at rest.
-  PAYMENT_CREDENTIAL_ENCRYPTION_KEY: z.string().optional()
+  PAYMENT_CREDENTIAL_ENCRYPTION_KEY: z.string().optional(),
+  // Number of reverse proxies in front of the API (1 behind one load balancer). Unset means the API sees the connecting address
+  // itself. Never set it to `true`: that lets any caller choose their own address for rate limiting.
+  TRUST_PROXY: z.coerce.number().int().min(0).max(5).optional(),
+  // Separate secret for QR guest session signatures; falls back to JWT_ACCESS_SECRET when unset.
+  QR_SESSION_SECRET: z.string().min(32).optional(),
+  // Requests of terminals sharing one address (a whole branch) per minute; see common/throttle.ts.
+  DEVICE_SYNC_RPM: z.coerce.number().int().positive().optional()
 });
 
 export type ValidatedEnv = z.infer<typeof envSchema>;
+
+/** A secret that is long enough AND not an obvious placeholder or a repeated pattern. */
+export function isStrongSecret(value: string | undefined): boolean {
+  if (!value || value.length < 32) return false;
+  if (/change.?me|changeme|replace.?me|example|secret|password|dev.?secret|test.?secret|your[-_ ]/i.test(value)) return false;
+  return new Set(value).size >= 12; // "aaaa..." or "abababab..." is not a secret
+}
+
+/** What must be true before the API may start in production. Returned as plain sentences so the boot error is readable. */
+export function productionConfigProblems(config: Record<string, unknown>): string[] {
+  const problems: string[] = [];
+  if (!isStrongSecret(config.JWT_ACCESS_SECRET as string | undefined)) problems.push('JWT_ACCESS_SECRET must be a random secret of 32+ characters (not a placeholder).');
+  if (config.QR_SESSION_SECRET !== undefined && !isStrongSecret(config.QR_SESSION_SECRET as string)) problems.push('QR_SESSION_SECRET must be a random secret of 32+ characters.');
+  const cors = String(config.CORS_ALLOWED_ORIGINS ?? '').trim();
+  if (!cors) problems.push('CORS_ALLOWED_ORIGINS must list the console origins in production (an empty list would block every console).');
+  else if (cors.split(',').some((o) => /localhost|127\.0\.0\.1/.test(o) || o.trim() === '*')) problems.push('CORS_ALLOWED_ORIGINS must not contain localhost or * in production.');
+  const backupKey = config.BACKUP_ENCRYPTION_KEY_B64 as string | undefined;
+  if (backupKey && Buffer.from(backupKey, 'base64').length !== 32) problems.push('BACKUP_ENCRYPTION_KEY_B64 must be 32 random bytes, base64 encoded.');
+  return problems;
+}
 
 export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
   const result = envSchema.safeParse(config);
   if (!result.success) {
     const issues = result.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`).join('\n');
     throw new Error(`Invalid environment configuration:\n${issues}`);
+  }
+  if (result.data.NODE_ENV === 'production') {
+    const problems = productionConfigProblems(config);
+    if (problems.length) throw new Error(['Unsafe production configuration:', ...problems.map((p) => `  - ${p}`)].join(String.fromCharCode(10)));
   }
   return result.data;
 }

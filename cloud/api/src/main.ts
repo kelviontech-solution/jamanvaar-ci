@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { redactUrl, requestIdFrom } from './common/request-context';
+import { bodyLimitFor } from './common/body-limits';
 import { json, raw, urlencoded } from 'express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
@@ -21,8 +22,19 @@ async function bootstrap() {
   // skip this one path instead of double-consuming the request stream, so
   // every other route is unaffected.
   app.use('/api/v1/payments/cashfree/webhook', raw({ type: '*/*', limit: '1mb' }));
-  app.use(json({ limit: '20mb' }));
-  app.use(urlencoded({ extended: true, limit: '20mb' }));
+  // Body size depends on the route (see common/body-limits.ts): small by default, large only where pictures and backups really go.
+  const jsonParsers = new Map<number, ReturnType<typeof json>>();
+  app.use((req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) => {
+    const limit = bodyLimitFor(req.originalUrl ?? req.url ?? '', typeof req.headers.authorization === 'string' && req.headers.authorization.length > 0);
+    let parser = jsonParsers.get(limit);
+    if (!parser) { parser = json({ limit }); jsonParsers.set(limit, parser); }
+    parser(req, res, next);
+  });
+  app.use(urlencoded({ extended: true, limit: '64kb' }));
+  // Behind a reverse proxy the connecting address is the proxy's: say how many proxies there are so per-address limits see the real caller.
+  // Never `true`: that would let any caller choose their own address.
+  const trustProxy = app.get(ConfigService).get<string>('TRUST_PROXY');
+  if (trustProxy !== undefined && trustProxy !== '') app.getHttpAdapter().getInstance().set('trust proxy', Number(trustProxy));
   const config = app.get(ConfigService);
 
   // HTTP Security Headers (SEC-012 fix)
@@ -50,9 +62,10 @@ async function bootstrap() {
     next();
   });
 
+  // The local development consoles are only a default outside production; production must list its own origins (an unset list allows none).
+  const devOrigins = 'http://localhost:5180,http://localhost:5176,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5177,http://localhost:5179';
   const allowedOrigins = (
-    config.get<string>('CORS_ALLOWED_ORIGINS') ??
-      'http://localhost:5180,http://localhost:5176,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5177,http://localhost:5179'
+    config.get<string>('CORS_ALLOWED_ORIGINS') ?? (config.get<string>('NODE_ENV') === 'production' ? '' : devOrigins)
   )
     .split(',')
     .map((o) => o.trim())

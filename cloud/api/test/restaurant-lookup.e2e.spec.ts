@@ -1,8 +1,11 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
+
+// this suite exercises the real per-address limit, so it opts out of the relaxed test-wide value
+vi.hoisted(() => { process.env.PUBLIC_AUTH_RPM = '20'; });
 
 describe('Restaurant-code lookup (Phase 1)', () => {
   let app: INestApplication;

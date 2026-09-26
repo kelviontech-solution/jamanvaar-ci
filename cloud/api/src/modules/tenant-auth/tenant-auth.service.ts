@@ -12,6 +12,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { BCRYPT_COST } from '../../common/security/password-cost';
 import { User, TenantUserStatus, Device } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
@@ -222,7 +223,7 @@ export class TenantAuthService {
       await tx.user.update({
         where: { id: user.id },
         data: {
-          passwordHash: await bcrypt.hash(newPassword, 10),
+          passwordHash: await bcrypt.hash(newPassword, BCRYPT_COST),
           status: TenantUserStatus.ACTIVE,
           activatedAt: new Date(),
           activationTokenHash: null,
@@ -327,6 +328,7 @@ export class TenantAuthService {
             }
           })
         );
+        await this.audit.log({ actorType: 'TENANT', actorId: cand.id, restaurantId: cand.restaurantId, action: locked ? 'TENANT_ACCOUNT_LOCKED' : 'TENANT_LOGIN_FAILED', category: 'AUTH', details: { attempts } });
       }
       if (sawLockedCandidate || triedButWrong.some((c) => c.failedLoginAttempts + 1 >= TenantAuthService.LOGIN_MAX_ATTEMPTS)) {
         throw new UnauthorizedException(`Too many failed attempts. Try again in ${TenantAuthService.LOGIN_LOCKOUT_MINUTES} minutes.`);
@@ -680,15 +682,25 @@ export class TenantAuthService {
       tx.tenantRefreshToken.findUnique({ where: { tokenHash }, include: { user: true } })
     );
 
+    if (existing && existing.revokedAt && existing.expiresAt >= new Date()) {
+      // A token that was already used is being presented again: either a replay or a stolen copy. End every session of this user.
+      await this.prisma.runAsTenant(existing.user.restaurantId, (tx) =>
+        tx.tenantRefreshToken.updateMany({ where: { userId: existing.userId, revokedAt: null }, data: { revokedAt: new Date() } })
+      );
+      await this.audit.log({ actorType: 'TENANT', actorId: existing.userId, restaurantId: existing.user.restaurantId, action: 'TENANT_REFRESH_TOKEN_REUSE', category: 'AUTH' });
+      throw new UnauthorizedException('Invalid refresh token');
+    }
     if (!existing || existing.revokedAt || existing.expiresAt < new Date()) {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
     const user = existing.user;
 
-    await this.prisma.runAsTenant(user.restaurantId, (tx) =>
-      tx.tenantRefreshToken.update({ where: { id: existing.id }, data: { revokedAt: new Date() } })
+    // Revoke atomically: of two simultaneous refreshes with the same token exactly one gets the new pair.
+    const claimed = await this.prisma.runAsTenant(user.restaurantId, (tx) =>
+      tx.tenantRefreshToken.updateMany({ where: { id: existing.id, revokedAt: null }, data: { revokedAt: new Date() } })
     );
+    if (claimed.count === 0) throw new UnauthorizedException('Invalid refresh token');
 
     if (user.status !== TenantUserStatus.ACTIVE) {
       throw new UnauthorizedException('Account disabled');
@@ -851,7 +863,7 @@ export class TenantAuthService {
           phone: dto.phone,
           role: dto.role,
           status: TenantUserStatus.ACTIVE,
-          passwordHash: await bcrypt.hash(dto.password, 10),
+          passwordHash: await bcrypt.hash(dto.password, BCRYPT_COST),
           activatedAt: new Date()
         },
         select: TenantAuthService.USER_LIST_SELECT
@@ -927,7 +939,7 @@ export class TenantAuthService {
     await this.prisma.runAsTenant(user.restaurantId, async (tx) => {
       await tx.user.update({
         where: { id: user.id },
-        data: { passwordHash: await bcrypt.hash(newPassword, 10) }
+        data: { passwordHash: await bcrypt.hash(newPassword, BCRYPT_COST) }
       });
 
       // A password change should not leave old refresh tokens still valid.
@@ -1034,7 +1046,7 @@ export class TenantAuthService {
       await tx.user.update({
         where: { id: user.id },
         data: {
-          passwordHash: await bcrypt.hash(newPassword, 10),
+          passwordHash: await bcrypt.hash(newPassword, BCRYPT_COST),
           passwordResetHash: null,
           passwordResetExpiresAt: null,
           passwordResetAttempts: 0

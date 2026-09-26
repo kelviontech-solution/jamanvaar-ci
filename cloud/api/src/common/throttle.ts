@@ -36,6 +36,6 @@ export const QrGuestOrderThrottle = () => Throttle({ default: { limit: QR_GUEST_
  * RESET_MAX_ATTEMPTS) — that stops one account being brute-forced; this stops one address
  * spraying many different accounts.
  */
-export const PUBLIC_AUTH_REQUESTS_PER_MINUTE = 20;
+export const PUBLIC_AUTH_REQUESTS_PER_MINUTE = Number(process.env.PUBLIC_AUTH_RPM) > 0 ? Number(process.env.PUBLIC_AUTH_RPM) : 20;
 
 export const PublicAuthThrottle = () => Throttle({ default: { limit: PUBLIC_AUTH_REQUESTS_PER_MINUTE, ttl: 60_000 } });

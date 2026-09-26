@@ -301,3 +301,17 @@ export async function leaseNumberBlock(kind: 'ORDER' | 'KOT', count: number): Pr
   if (!res.ok) throw new Error((data && data.message) || `Number lease failed (${res.status})`);
   return data;
 }
+
+
+/**
+ * Is this a manager PIN? Asked of the server: a public kiosk holds no PIN hashes, so it cannot check one itself.
+ * Resolves to the manager's name, or null for a wrong PIN; throws when the server cannot be reached or the PIN is locked out.
+ */
+export async function verifyManagerPin(pin: string): Promise<{ staffName: string } | null> {
+  const res = await deviceFetch('/api/v1/staff/verify-manager-pin', { method: 'POST', body: JSON.stringify({ pin }) });
+  if (res.status === 403) return null;
+  const data = await parseJsonResponse(res);
+  if (res.status === 429) throw new CloudApiError(data?.message ?? 'Too many wrong PINs. Try again in a few minutes.', 429);
+  if (!res.ok) throw new CloudApiError(data?.message ?? `Manager check failed (${res.status})`, res.status);
+  return { staffName: String(data.staffName ?? 'Manager') };
+}
