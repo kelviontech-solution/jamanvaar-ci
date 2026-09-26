@@ -6,6 +6,7 @@ import { json, raw, urlencoded } from 'express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import { corsFor, qrOriginsFrom } from './common/cors';
 
 async function bootstrap() {
   // Default body size (~100kb) is too small for a full restaurant database
@@ -51,10 +52,11 @@ async function bootstrap() {
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean);
-  app.enableCors({
-    origin: allowedOrigins,
-    credentials: true
-  });
+  const qrOrigins = qrOriginsFrom({ QR_ORDER_BASE_URL: config.get<string>('QR_ORDER_BASE_URL'), QR_ALLOWED_ORIGINS: config.get<string>('QR_ALLOWED_ORIGINS'), NODE_ENV: config.get<string>('NODE_ENV') });
+  // Per-request decision: consoles and terminals by the configured list, the public QR routes by the ordering website only.
+  app.enableCors(((req: { url?: string; headers: { origin?: string } }, callback: (err: Error | null, options?: Record<string, unknown>) => void) => {
+    callback(null, corsFor({ allowedOrigins, qrOrigins }, req.url ?? '/', req.headers.origin));
+  }) as never);
 
   const port = config.get<number>('PORT') ?? 4000;
   await app.listen(port);

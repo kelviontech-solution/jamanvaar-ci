@@ -135,7 +135,10 @@ export class EntitySyncService {
     const payload = evt.payload as Record<string, unknown>;
     if (payload?.deleted === true) return;
     const qrToken = typeof payload.qrToken === 'string' ? payload.qrToken : null;
-    if (!qrToken || !/^jv_qr_tbl_[A-Za-z0-9_]{10,150}$/.test(qrToken)) return;
+    // Only tokens the old client generated randomly (144 bits of hex after the table number) are ever mirrored. The old
+    // client also derived tokens from the table number and id for tables that had none; those are guessable, so they are
+    // refused and that table simply has no working legacy code until a real one is generated.
+    if (!qrToken || !/^jv_qr_tbl_[A-Za-z0-9]{1,10}_[a-f0-9]{32,64}$/.test(qrToken)) return;
     if (payload.qrStatus === 'DISABLED' || payload.isActive === false) return;
 
     const tableNumber = typeof payload.tableNumber === 'string' ? payload.tableNumber : evt.externalId;

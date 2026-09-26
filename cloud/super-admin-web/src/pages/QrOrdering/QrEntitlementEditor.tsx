@@ -176,14 +176,15 @@ export function QrEntitlementEditor({
               type="number"
               min={0}
               max={5000}
-              value={draft.maxActiveTables}
+              value={draft.maxActiveTables ?? ''}
+              placeholder="No limit"
               disabled={saving}
               onChange={(e) => {
                 const parsed = parseInt(e.target.value, 10);
-                onChange({ maxActiveTables: Number.isFinite(parsed) && parsed >= 0 ? parsed : 0 });
+                onChange({ maxActiveTables: Number.isFinite(parsed) && parsed >= 0 ? parsed : null });
               }}
             />
-            <span className="field-hint">Number of table QR codes that may be live at once.</span>
+            <span className="field-hint">Number of table QR codes that may be live at once. Leave empty for no limit.</span>
           </div>
 
           <div className="form-field" style={{ marginBottom: 0 }}>

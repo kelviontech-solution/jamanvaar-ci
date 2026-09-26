@@ -528,7 +528,7 @@ export function QrRestaurantDetailPanel({
                   <Field label="Plan">
                     {row.planName} ({row.planTier})
                   </Field>
-                  <Field label="Table quota">{formatCount(row.maxActiveTables)}</Field>
+                  <Field label="Table quota">{row.maxActiveTables === null ? "No limit" : formatCount(row.maxActiveTables)}</Field>
                   <Field label="Last QR activity">{formatRelative(row.lastActivityAt)}</Field>
                 </div>
                 <p className="form-note" style={{ marginTop: 12 }}>

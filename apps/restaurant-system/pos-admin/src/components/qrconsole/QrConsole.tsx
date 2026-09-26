@@ -1,0 +1,323 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Lock, QrCode, CheckCircle2, RefreshCw, Printer, Download, Ban, RotateCcw, Trash2, Copy, Plus, WifiOff } from 'lucide-react';
+import { generateQrDataUrl } from '@jamanvaar/utils';
+import { CloudApiError } from '../../cloud/cloudClient';
+import { QrAdminApi, type QrBranch, type QrOrderRow, type QrOverview, type QrSettings, type QrTableRow } from '../../cloud/qrAdminClient';
+import { useQrEntitlement } from './useQrEntitlement';
+import { downloadCardPng, printCards } from './qrPrint';
+
+type Tab = 'OVERVIEW' | 'TABLES' | 'ORDERS' | 'SETTINGS';
+
+const errText = (e: unknown) => (e instanceof CloudApiError || e instanceof Error ? e.message : 'Something went wrong');
+
+const inr = (n: number) => `₹${n.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+
+/**
+ * Restaurant Admin's QR Ordering. Everything on it comes from the server: the plan answer, the tables, the codes, the
+ * orders and every number. A restaurant whose plan does not include QR Ordering sees that it exists and why it is
+ * locked, and cannot do anything with it: the server refuses each action, not only this screen.
+ */
+export function QrConsole({ onViewPlan, showToast }: { onViewPlan: () => void; showToast: (msg: string) => void }) {
+  const { state, refresh } = useQrEntitlement();
+  const [tab, setTab] = useState<Tab>('OVERVIEW');
+
+  if (state.status === 'loading') return <div className="p-8 text-sm text-slate-500">Checking your plan…</div>;
+  if (state.status === 'unknown') {
+    return (
+      <div className="p-8 max-w-xl">
+        <div className="flex items-center gap-3 text-slate-700 font-bold"><WifiOff className="w-5 h-5" /> QR Ordering</div>
+        <p className="mt-2 text-sm text-slate-600">{state.message}</p>
+        <button onClick={refresh} className="mt-4 px-4 py-2 rounded-xl bg-jaman-navy text-white text-sm font-bold">Try again</button>
+      </div>
+    );
+  }
+
+  const { entitlement, fromCache } = state;
+  if (!entitlement.enabled) return <LockedView message={entitlement.lockedMessage} planName={entitlement.planName} onViewPlan={onViewPlan} />;
+
+  const tabs: Array<[Tab, string]> = [['OVERVIEW', 'Overview'], ['TABLES', 'Tables & QR'], ['ORDERS', 'QR Orders'], ['SETTINGS', 'QR Settings']];
+  return (
+    <div className="space-y-5" data-testid="qr-console">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">QR Ordering</h1>
+          <p className="text-sm text-[#4A5568] mt-1">Guests scan the code on their table, order from your menu, and the order reaches your counter and kitchen.</p>
+        </div>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black">
+          <CheckCircle2 className="w-3.5 h-3.5" /> Enabled ✓{entitlement.source === 'MANUAL_OVERRIDE' ? ' (special access)' : ''}
+        </span>
+      </div>
+      {fromCache && <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">Showing your last known plan. Connect to the internet to refresh it; QR changes need a connection.</div>}
+
+      <div className="flex gap-1 bg-white border border-jaman-border p-1 rounded-2xl w-fit">
+        {tabs.map(([id, label]) => (
+          <button key={id} onClick={() => setTab(id)} className={`px-4 py-1.5 rounded-xl text-xs font-bold ${tab === id ? 'bg-jaman-navy text-white' : 'text-slate-600 hover:bg-jaman-cream'}`}>{label}</button>
+        ))}
+      </div>
+
+      {tab === 'OVERVIEW' && <Overview />}
+      {tab === 'TABLES' && <TablesAndQr showToast={showToast} />}
+      {tab === 'ORDERS' && <Orders />}
+      {tab === 'SETTINGS' && <Settings showToast={showToast} />}
+    </div>
+  );
+}
+
+function LockedView({ message, planName, onViewPlan }: { message: string | null; planName: string | null; onViewPlan: () => void }) {
+  return (
+    <div className="max-w-2xl" data-testid="qr-locked">
+      <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy flex items-center gap-2"><QrCode className="w-7 h-7" /> QR Ordering <Lock className="w-5 h-5 text-slate-400" /></h1>
+      <div className="mt-5 rounded-3xl border border-jaman-border bg-white p-6">
+        <div className="flex items-center gap-2 text-slate-700 font-extrabold"><Lock className="w-4 h-4" /> {message ?? 'QR Ordering is available on an eligible plan.'}</div>
+        <p className="mt-3 text-sm text-slate-600">
+          With QR Ordering, each table gets its own code. Guests scan it with their phone, see your menu, and place an order that appears at your counter and on your kitchen screen, with no app to install.
+        </p>
+        {planName && <p className="mt-3 text-xs text-slate-500">Your current plan: <b>{planName}</b></p>}
+        <button onClick={onViewPlan} className="mt-5 px-5 py-2.5 rounded-xl bg-jaman-navy text-white text-sm font-bold">View Plan</button>
+      </div>
+    </div>
+  );
+}
+
+function useLoad<T>(load: () => Promise<T>, everyMs?: number): { data: T | null; error: string | null; reload: () => void } {
+  const [data, setData] = useState<T | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const reload = useCallback(() => {
+    load().then((d) => { setData(d); setError(null); }).catch((e) => setError(errText(e)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    reload();
+    if (!everyMs) return;
+    const t = setInterval(reload, everyMs);
+    return () => clearInterval(t);
+  }, [reload, everyMs]);
+  return { data, error, reload };
+}
+
+function Tile({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="rounded-2xl border border-jaman-border bg-white p-4">
+      <div className="text-2xl font-black text-jaman-navy">{value}</div>
+      <div className="text-xs text-slate-500 mt-1">{label}</div>
+    </div>
+  );
+}
+
+function Overview() {
+  const { data, error } = useLoad<QrOverview>(QrAdminApi.overview, 30000);
+  if (error) return <div className="text-sm text-rose-700">{error}</div>;
+  if (!data) return <div className="text-sm text-slate-500">Loading…</div>;
+  const t = data.today;
+  return (
+    <div className="space-y-5">
+      {!data.publicBaseUrlConfigured && (
+        <div className="text-sm rounded-2xl border border-rose-200 bg-rose-50 text-rose-800 p-4">The ordering website address has not been set up for this platform yet, so QR links cannot be created. Please contact support.</div>
+      )}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Tile label="Tables" value={data.tables} />
+        <Tile label="Active QR codes" value={data.activeCodes} />
+        <Tile label="QR orders today" value={t.ordersPlaced} />
+        <Tile label="QR sales today" value={inr(t.sales)} />
+        <Tile label="Waiting / in kitchen" value={t.ordersPending} />
+        <Tile label="Completed" value={t.ordersCompleted} />
+        <Tile label="Scans today" value={t.scans} />
+        <Tile label="Average order" value={inr(t.averageOrderValue)} />
+      </div>
+      <div className="rounded-2xl border border-jaman-border bg-white p-4">
+        <div className="font-bold text-jaman-navy mb-2">Orders by table today</div>
+        {t.ordersByTable.length === 0 ? <div className="text-sm text-slate-500">No QR orders yet today.</div> : (
+          <ul className="text-sm divide-y">{t.ordersByTable.map((r) => <li key={r.table} className="py-1.5 flex justify-between"><span>Table {r.table}</span><b>{r.orders}</b></li>)}</ul>
+        )}
+        <div className="text-[11px] text-slate-400 mt-3">Counted by the server from real orders. Sales are what guests ordered; only counter-settled bills are paid sales ({inr(t.paidSales)} so far).</div>
+      </div>
+    </div>
+  );
+}
+
+function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
+  const tables = useLoad<QrTableRow[]>(QrAdminApi.tables, 20000);
+  const branches = useLoad<QrBranch[]>(QrAdminApi.branches);
+  const [branchId, setBranchId] = useState<string>('');
+  const [busy, setBusy] = useState<string | null>(null);
+  const [viewing, setViewing] = useState<QrTableRow | null>(null);
+  const activeBranches = useMemo(() => (branches.data ?? []).filter((b) => b.status === 'ACTIVE'), [branches.data]);
+  const chosenBranch = branchId || (activeBranches.length === 1 ? activeBranches[0].id : '');
+
+  const run = async (key: string, fn: () => Promise<unknown>, done: string) => {
+    setBusy(key);
+    try {
+      await fn();
+      showToast(done);
+      tables.reload();
+    } catch (e) {
+      showToast(errText(e));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const printOne = async (row: QrTableRow) => {
+    try { printCards([await QrAdminApi.printData(row.qr!.id)]); } catch (e) { showToast(errText(e)); }
+  };
+  const printAll = async () => {
+    try {
+      const rows = (tables.data ?? []).filter((r) => r.qr?.status === 'ACTIVE');
+      if (rows.length === 0) return showToast('There are no active QR codes to print.');
+      printCards(await Promise.all(rows.map((r) => QrAdminApi.printData(r.qr!.id))));
+    } catch (e) { showToast(errText(e)); }
+  };
+  const downloadAll = async () => {
+    try {
+      const rows = (tables.data ?? []).filter((r) => r.qr?.status === 'ACTIVE');
+      if (rows.length === 0) return showToast('There are no active QR codes to download.');
+      for (const r of rows) await downloadCardPng(await QrAdminApi.printData(r.qr!.id), `table-${r.displayNumber}`);
+    } catch (e) { showToast(errText(e)); }
+  };
+
+  if (tables.error) return <div className="text-sm text-rose-700">{tables.error}</div>;
+  const rows = tables.data ?? [];
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        {activeBranches.length > 1 && (
+          <select value={branchId} onChange={(e) => setBranchId(e.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm" aria-label="Branch for new codes">
+            <option value="">Choose branch for new codes…</option>
+            {activeBranches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+          </select>
+        )}
+        <button onClick={printAll} className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5"><Printer className="w-3.5 h-3.5" /> Print All</button>
+        <button onClick={downloadAll} className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5"><Download className="w-3.5 h-3.5" /> Download All</button>
+        <button
+          disabled={!chosenBranch || busy === 'menu'}
+          onClick={() => run('menu', () => QrAdminApi.menuCode(chosenBranch, 'Menu card'), 'Menu-only code created')}
+          className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5 disabled:opacity-40"
+          title="A code with no table, for menu cards"
+        ><Plus className="w-3.5 h-3.5" /> Menu-only code</button>
+      </div>
+
+      {rows.length === 0 ? (
+        <div className="text-sm text-slate-600 rounded-2xl border border-jaman-border bg-white p-6">No tables yet. Add your tables under <b>Floor / Tables</b>; they appear here to receive QR codes.</div>
+      ) : (
+        <div className="rounded-2xl border border-jaman-border bg-white divide-y">
+          {rows.map((row) => {
+            const q = row.qr;
+            return (
+              <div key={row.tableId} className="p-3 flex flex-wrap items-center gap-3 text-sm">
+                <div className="w-28 font-extrabold text-jaman-navy">Table {row.displayNumber}</div>
+                <div className="w-32 text-xs text-slate-500">{q?.branchName ?? (row.zone ?? '')}</div>
+                <div className="w-24">
+                  {!row.isActive ? <span className="text-slate-500 text-xs font-bold">Table off</span>
+                    : !q ? <span className="text-slate-500 text-xs font-bold">No code</span>
+                    : q.status === 'ACTIVE' ? <span className="text-emerald-700 text-xs font-black">Active</span>
+                    : q.status === 'DISABLED' ? <span className="text-amber-700 text-xs font-black">Disabled</span>
+                    : <span className="text-rose-700 text-xs font-black">Revoked</span>}
+                </div>
+                <div className="flex flex-wrap gap-1.5 ml-auto">
+                  {(!q || q.status === 'REVOKED') && (
+                    <button disabled={busy === row.tableId || (activeBranches.length > 1 && !chosenBranch)} onClick={() => run(row.tableId, () => QrAdminApi.generate(row.tableId, chosenBranch || undefined), `QR code created for table ${row.displayNumber}`)} className="px-3 py-1.5 rounded-lg bg-jaman-navy text-white text-xs font-bold disabled:opacity-40">Generate QR</button>
+                  )}
+                  {q?.status === 'ACTIVE' && <>
+                    <button onClick={() => setViewing(row)} className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold">View QR</button>
+                    <button onClick={() => printOne(row)} className="px-2 py-1.5 rounded-lg border border-slate-300" title="Print"><Printer className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => { if (window.confirm('Regenerate this code? The printed one will stop working immediately.')) void run(row.tableId, () => QrAdminApi.regenerate(q.id), 'New code created; the old one no longer works'); }} className="px-2 py-1.5 rounded-lg border border-slate-300" title="Regenerate"><RefreshCw className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => run(row.tableId, () => QrAdminApi.disable(q.id), 'Code disabled')} className="px-2 py-1.5 rounded-lg border border-slate-300" title="Disable"><Ban className="w-3.5 h-3.5" /></button>
+                  </>}
+                  {q?.status === 'DISABLED' && <button onClick={() => run(row.tableId, () => QrAdminApi.enable(q.id), 'Code enabled')} className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center gap-1"><RotateCcw className="w-3.5 h-3.5" /> Enable</button>}
+                  {q && q.status !== 'REVOKED' && <button onClick={() => { if (window.confirm('Revoke this code permanently?')) void run(row.tableId, () => QrAdminApi.revoke(q.id), 'Code revoked'); }} className="px-2 py-1.5 rounded-lg border border-rose-200 text-rose-700" title="Revoke"><Trash2 className="w-3.5 h-3.5" /></button>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {viewing?.qr?.url && <QrDialog row={viewing} onClose={() => setViewing(null)} showToast={showToast} />}
+    </div>
+  );
+}
+
+function QrDialog({ row, onClose, showToast }: { row: QrTableRow; onClose: () => void; showToast: (m: string) => void }) {
+  const url = row.qr!.url!;
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-3xl p-6 w-full max-w-sm text-center" onClick={(e) => e.stopPropagation()}>
+        <div className="font-black text-jaman-navy text-lg">Table {row.displayNumber}</div>
+        <img src={generateQrDataUrl(url, { size: 260, margin: 4, color: '#000000' })} alt={`QR code for table ${row.displayNumber}`} className="mx-auto my-3" width={260} height={260} />
+        <div className="text-[11px] text-slate-500 break-all">{url}</div>
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <button onClick={() => { void navigator.clipboard?.writeText(url); showToast('Link copied'); }} className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center gap-1"><Copy className="w-3.5 h-3.5" /> Copy link</button>
+          <button onClick={async () => { try { await downloadCardPng(await QrAdminApi.printData(row.qr!.id), `table-${row.displayNumber}`); } catch (e) { showToast(errText(e)); } }} className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center gap-1"><Download className="w-3.5 h-3.5" /> PNG</button>
+          <button onClick={async () => { try { printCards([await QrAdminApi.printData(row.qr!.id)]); } catch (e) { showToast(errText(e)); } }} className="px-3 py-1.5 rounded-lg bg-jaman-navy text-white text-xs font-bold flex items-center gap-1"><Printer className="w-3.5 h-3.5" /> Print / PDF</button>
+        </div>
+        <button onClick={onClose} className="mt-4 text-xs text-slate-500">Close</button>
+      </div>
+    </div>
+  );
+}
+
+const STATUS_WORDS: Record<string, string> = { NEW: 'Waiting', PREPARING: 'Preparing', CONFIRMED: 'Preparing', READY: 'Ready', SERVED: 'Served', COMPLETED: 'Completed', CANCELLED: 'Cancelled' };
+
+function Orders() {
+  const { data, error } = useLoad<QrOrderRow[]>(() => QrAdminApi.orders(), 10000);
+  if (error) return <div className="text-sm text-rose-700">{error}</div>;
+  if (!data) return <div className="text-sm text-slate-500">Loading…</div>;
+  if (data.length === 0) return <div className="text-sm text-slate-600 rounded-2xl border border-jaman-border bg-white p-6">No QR orders yet. They also appear in your counter's order list, marked QR.</div>;
+  return (
+    <div className="rounded-2xl border border-jaman-border bg-white overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead className="text-left text-xs text-slate-500"><tr><th className="p-3">Order</th><th>Table</th><th>Status</th><th>Payment</th><th className="text-right">Total</th><th className="p-3 text-right">Placed</th></tr></thead>
+        <tbody>
+          {data.map((o, i) => (
+            <tr key={`${o.orderNumber}-${i}`} className="border-t">
+              <td className="p-3 font-bold">{o.orderNumber ?? '-'}</td>
+              <td>{o.table ?? '-'}</td>
+              <td>{STATUS_WORDS[o.status] ?? o.status}</td>
+              <td>{o.paymentStatus === 'SUCCESS' ? 'Paid' : 'Pay at counter'}</td>
+              <td className="text-right">{inr(o.total)}</td>
+              <td className="p-3 text-right text-slate-500">{new Date(o.placedAt).toLocaleString('en-IN')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+const SETTING_ROWS: Array<[keyof QrSettings, string, string, boolean?]> = [
+  ['orderingEnabled', 'QR ordering', 'Turn all QR ordering on or off at once.'],
+  ['tableOrderingEnabled', 'Table ordering', 'Codes on tables that identify the table.'],
+  ['menuOnlyEnabled', 'Menu-only codes', 'Codes for menu cards; the guest chooses dine-in with a table number, or takeaway.'],
+  ['allowCustomerNotes', 'Customer notes', 'Let guests add notes to their order.'],
+  ['allowModifiers', 'Customisations', 'Let guests choose add-ons and options.'],
+  ['allowCash', 'Pay at counter', 'Guests pay at the counter when they are done.'],
+  ['allowOnlinePayment', 'Online payment', 'Not available yet: guests pay at the counter.', true],
+  ['showOrderStatus', 'Show order status', 'Guests can follow Received, Preparing, Ready.'],
+  ['autoAccept', 'Send straight to the kitchen', 'When off, the counter accepts each order first.'],
+  ['requireCustomerName', 'Ask for name', 'Guests must enter their name.'],
+  ['requireCustomerPhone', 'Ask for mobile number', 'Guests must enter their mobile number.']
+];
+
+function Settings({ showToast }: { showToast: (m: string) => void }) {
+  const { data, error, reload } = useLoad<QrSettings>(QrAdminApi.settings);
+  const save = async (key: keyof QrSettings, value: boolean) => {
+    try {
+      await QrAdminApi.saveSettings({ [key]: value });
+      showToast('Saved');
+      reload();
+    } catch (e) {
+      showToast(errText(e));
+    }
+  };
+  if (error) return <div className="text-sm text-rose-700">{error}</div>;
+  if (!data) return <div className="text-sm text-slate-500">Loading…</div>;
+  return (
+    <div className="rounded-2xl border border-jaman-border bg-white divide-y max-w-2xl">
+      {SETTING_ROWS.map(([key, label, help, unavailable]) => (
+        <label key={key} className={`flex items-center justify-between gap-4 p-4 ${unavailable ? 'opacity-50' : ''}`}>
+          <span><span className="block font-bold text-sm text-jaman-navy">{label}</span><span className="block text-xs text-slate-500">{help}</span></span>
+          <input type="checkbox" className="w-5 h-5" checked={data[key]} disabled={unavailable} onChange={(e) => void save(key, e.target.checked)} />
+        </label>
+      ))}
+    </div>
+  );
+}

@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   db,
-  QrOrderingRepository,
   LicenseRepository,
   captainDb,
   StaffRepository
@@ -25,99 +24,8 @@ describe('JAMANVAAR Security Audit Remediation Verification Suite', () => {
     LicenseRepository.activatePlan('CORE');
   });
 
-  describe('1. SEC-003 & SEC-004: QR Table Ordering Payment & Modifier Price Tampering', () => {
-    // security-audit MED-11: verifyQrToken/createCustomerQrOrder now require a real,
-    // currently-issued token unconditionally (it used to be skippable by omitting it).
-    let qrToken: string;
-
-    beforeEach(() => {
-      // Temporarily set to PRO to allow QR ordering
-      LicenseRepository.activatePlan('PRO');
-      const tbl = db.tables.find((t) => t.tableNumber === '12');
-      if (tbl) {
-        tbl.qrStatus = 'ACTIVE';
-        tbl.status = 'AVAILABLE';
-      }
-      qrToken = QrOrderingRepository.generateTableQr('12').qrToken;
-    });
-
-    it('should set QR table order initial paymentStatus to PENDING (never SUCCESS upon self-ordering)', () => {
-      const dish = db.menuItems[0];
-      const order = QrOrderingRepository.createCustomerQrOrder({
-        tableNumber: '12',
-        token: qrToken,
-        customerName: 'Test Guest',
-        paymentMethod: 'UPI',
-        items: [{ menuItemId: dish.id, quantity: 1 }]
-      });
-
-      expect(order.paymentStatus).toBe('PENDING');
-      expect(order.timeline?.[0].note).toContain('PENDING verification');
-    });
-
-    it('rejects an order containing a fabricated modifier that does not exist in any real modifier group', () => {
-      const dish = db.menuItems[0];
-
-      // Malicious client invents a modifier group/option with a negative priceDelta,
-      // hoping it gets accepted (even sanitized to 0) rather than rejected outright.
-      expect(() =>
-        QrOrderingRepository.createCustomerQrOrder({
-          tableNumber: '12',
-          token: qrToken,
-          customerName: 'Attacker',
-          paymentMethod: 'UPI',
-          items: [
-            {
-              menuItemId: dish.id,
-              quantity: 1,
-              selectedModifiers: [
-                {
-                  groupId: 'mod-fake',
-                  groupName: 'Hacked Discount',
-                  optionId: 'opt-neg',
-                  optionName: 'Minus 500',
-                  priceDelta: -500
-                }
-              ]
-            }
-          ]
-        })
-      ).toThrow(/not a valid modifier/i);
-    });
-
-    it('uses the server-side priceDelta for a real modifier even if the client sends a tampered value alongside it', () => {
-      const dish = db.menuItems[0];
-      const basePrice = dish.price;
-
-      // opt-cheese is real, with a real priceDelta of 35 — the client-sent
-      // priceDelta below (a fabricated -9999) must be ignored entirely.
-      const order = QrOrderingRepository.createCustomerQrOrder({
-        tableNumber: '12',
-        token: qrToken,
-        customerName: 'Attacker',
-        paymentMethod: 'UPI',
-        items: [
-          {
-            menuItemId: dish.id,
-            quantity: 1,
-            selectedModifiers: [
-              {
-                groupId: 'mod-addons',
-                groupName: 'Add-ons',
-                optionId: 'opt-cheese',
-                optionName: 'Extra Amul Cheese',
-                priceDelta: -9999
-              }
-            ]
-          }
-        ]
-      });
-
-      expect(order.items[0].modifiers[0].priceDelta).toBe(35);
-      expect(order.items[0].unitPrice).toBe(basePrice + 35);
-      expect(order.totalAmount).toBeGreaterThan(0);
-    });
-  });
+  // SEC-003 / SEC-004 (QR ordering payment and modifier price tampering) are now enforced and tested on the server:
+  // cloud/api/test/qr-ordering-saas.e2e.spec.ts (client prices, totals and unknown options are rejected, orders stay unpaid).
 
   describe('2. SEC-007: Captain App SaaS Entitlement Enforcement', () => {
     it('should lock out Captain App when restaurant is on JAMANVAAR CORE (₹5,000)', () => {

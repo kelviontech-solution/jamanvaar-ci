@@ -1032,7 +1032,8 @@ export interface RestaurantReport {
 export interface QrEntitlement {
   qrEntitled: boolean;
   qrOrderingEnabled: boolean;
-  maxActiveTables: number;
+  /** Null: no limit is configured on the plan or the override. */
+  maxActiveTables: number | null;
   /** `null` means unlimited daily orders. */
   maxOrdersPerDay: number | null;
   digitalMenu: boolean;
@@ -1074,7 +1075,8 @@ export interface RestaurantQrStatusItem {
   planTier: string;
   qrEntitled: boolean;
   qrOrderingEnabled: boolean;
-  maxActiveTables: number;
+  /** Null: no limit is configured on the plan or the override. */
+  maxActiveTables: number | null;
   /** Only meaningful when `hasUsageData` is true. */
   activeQrTables: number;
   /** Only meaningful when `hasUsageData` is true. */

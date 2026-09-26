@@ -7,7 +7,7 @@ import { CurrentDevice } from '../../common/decorators/current-device.decorator'
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { QrRateLimitInterceptor } from './qr-rate-limit';
 import { QrAdminService, generateQrSchema, GenerateQr } from './qr-admin.service';
-import { QrPublicService, placeQrOrderSchema, PlaceQrOrder } from './qr-public.service';
+import { QrPublicService, placeQrOrderSchema, PlaceQrOrder, quoteQrOrderSchema, QuoteQrOrder } from './qr-public.service';
 import { qrSettingsSchema, QrSettingsUpdate } from './qr-settings.service';
 
 /**
@@ -42,6 +42,13 @@ export class QrPublicController {
       return;
     }
     return menu;
+  }
+
+  @Post(':token/quote')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(quoteQrOrderSchema))
+  quote(@Param('token') token: string, @Body() body: QuoteQrOrder) {
+    return this.qr.quote(token, body);
   }
 
   @Post(':token/orders')

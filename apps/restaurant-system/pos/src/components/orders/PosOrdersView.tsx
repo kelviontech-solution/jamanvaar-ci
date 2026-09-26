@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { usePosStore } from '../../store/posStore';
-import { db, OrderRepository, BusinessDayRepository, QrOrderingRepository, RiderRepository } from '@jamanvaar/database';
+import { db, OrderRepository, BusinessDayRepository, summarizeStations, RiderRepository } from '@jamanvaar/database';
 import { Order, OrderStatus } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
 import { getPaymentStatus } from '../../cloud/cloudClient';
+import { QrOrdersInbox } from './QrOrdersInbox';
 import {
   ShoppingBag,
   Search,
@@ -188,6 +189,7 @@ export const PosOrdersView: React.FC = () => {
   return (
     <>
     <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-hidden select-none">
+      <QrOrdersInbox actor={currentUser?.fullName || 'Cashier'} />
       {/* Header & Session Scope Indicator */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4 shrink-0">
         <div>
@@ -574,7 +576,7 @@ export const PosOrdersView: React.FC = () => {
                 </div>
                 <p className="text-[11px] text-slate-600">
                   {selectedOrder.kitchenRouting?.summaryText ||
-                    QrOrderingRepository.getStationRouting(selectedOrder.items).summaryText}
+                    summarizeStations(selectedOrder.items).summaryText}
                 </p>
               </div>
 

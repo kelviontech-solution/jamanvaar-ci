@@ -41,6 +41,10 @@ export const placeQrOrderSchema = z
   .strict();
 export type PlaceQrOrder = z.infer<typeof placeQrOrderSchema>;
 
+/** A price check for the checkout screen: the same lines, no order created. */
+export const quoteQrOrderSchema = z.object({ items: z.array(qrOrderLineSchema).min(1).max(50) }).strict();
+export type QuoteQrOrder = z.infer<typeof quoteQrOrderSchema>;
+
 export interface QrContext {
   code: QrCode;
   restaurant: { id: string; name: string; address: string | null; city: string | null; timezone: string };
@@ -153,6 +157,26 @@ export class QrPublicService {
   }
 
   // ------------------------------------------------------------------ ordering (spec 18-21, 44, 45, 56, 58)
+
+  /** Exact server prices for a cart, so the guest sees the real subtotal, tax and total BEFORE placing the order. Creates nothing. */
+  async quote(rawToken: string, dto: QuoteQrOrder) {
+    const ctx = await this.resolve(rawToken);
+    if (!ctx.settings.allowModifiers && dto.items.some((i) => i.optionIds.length > 0)) throw new BadRequestException('Customisations are turned off for QR orders.');
+    if (!ctx.settings.allowCustomerNotes && dto.items.some((i) => i.note)) throw new BadRequestException('This restaurant does not accept item notes.');
+    const menu = await this.menus.build(ctx.restaurant.id, ctx.branch.id);
+    try {
+      const priced = priceCart(dto.items.map((i) => ({ externalItemId: i.itemId, quantity: i.quantity, selectedOptionIds: i.optionIds })), menu.lookup);
+      return {
+        lines: priced.lines.map((l) => ({ itemId: l.externalItemId, name: l.name, quantity: l.quantity, unitPrice: l.unitPrice / 100, lineTotal: l.lineTotal / 100, options: l.modifiers.map((m) => m.name) })),
+        subtotal: priced.subtotal / 100,
+        tax: priced.taxAmount / 100,
+        total: priced.totalAmount / 100
+      };
+    } catch (err) {
+      if (err instanceof PriceValidationError) throw new BadRequestException(err.message);
+      throw err;
+    }
+  }
 
   async placeOrder(rawToken: string, dto: PlaceQrOrder, sessionId?: string) {
     // A code that cannot be resolved has nothing to record against; the refusal itself is the answer.

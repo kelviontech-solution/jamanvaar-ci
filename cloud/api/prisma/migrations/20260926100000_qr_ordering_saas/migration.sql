@@ -141,3 +141,11 @@ FROM "PlatformSetting" ps
 WHERE ps."key" = 'qr_ordering.entitlement.' || ae."restaurantId"
   AND ae."appCode" = 'QR_ORDERING'
   AND ae."subscriptionId" = (SELECT s."id" FROM "Subscription" s WHERE s."restaurantId" = ae."restaurantId" AND s."status" IN ('TRIAL', 'ACTIVE', 'PAST_DUE') ORDER BY s."createdAt" DESC LIMIT 1);
+
+-- 6. Guessable legacy tokens ---------------------------------------------------
+-- The old Restaurant Admin derived a token from the table number and id for any table that had none
+-- ("jv_qr_tbl_<n>_<id>"): predictable, so anyone could open another restaurant's table. Only the randomly generated
+-- form (144 bits of hex) stays valid; those codes are revoked and the restaurant generates real ones.
+UPDATE "QrCode" SET "status" = 'REVOKED', "revokedAt" = CURRENT_TIMESTAMP
+WHERE "status" <> 'REVOKED' AND "publicToken" LIKE 'jv\_qr\_tbl\_%'
+  AND "publicToken" !~ '^jv_qr_tbl_[A-Za-z0-9]{1,10}_[a-f0-9]{32,64}$';

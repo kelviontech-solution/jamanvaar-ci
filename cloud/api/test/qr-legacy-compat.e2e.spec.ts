@@ -46,7 +46,9 @@ describe('QR legacy codes and the deprecated guest adapter', () => {
   let branchA: string;
   let branchB: string;
   let restA: string;
-  const legacyToken = `jv_qr_tbl_1_${stamp}abcdef0123456789`;
+  // What the old client generated: table number, then 144 random bits as hex.
+  const legacyToken = `jv_qr_tbl_1_${'a3f9'.repeat(9)}`;
+  const guessableToken = 'jv_qr_tbl_1_tbl1';
 
   beforeAll(async () => {
     app = await createTestApp();

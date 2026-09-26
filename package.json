@@ -6,6 +6,7 @@
   "workspaces": [
     "apps/kiosk-system/*",
     "apps/restaurant-system/*",
+    "apps/qr-guest",
     "packages/*",
     "cloud/*"
   ],
@@ -23,6 +24,8 @@
     "dev:pos-admin": "npm run dev --workspace=@jamanvaar/pos-admin",
     "dev:captain": "npm run dev --workspace=@jamanvaar/captain",
     "dev:kds": "npm run dev --workspace=@jamanvaar/kds",
+    "dev:qr-guest": "npm run dev --workspace=@jamanvaar/qr-guest",
+    "build:qr-guest": "npm run build --workspace=@jamanvaar/qr-guest",
     "dev": "concurrently \"npm run dev:sync\" \"npm run dev:kiosk-admin\" \"npm run dev:kiosk\" \"npm run dev:pos\" \"npm run dev:pos-admin\" \"npm run dev:captain\" \"npm run dev:kds\"",
     "dev:all": "concurrently -n \"API,SUPER,POS-ADM,POS,CAPT,KDS,KIOSK,K-ADM,SYNC\" -c \"blue,magenta,cyan,green,yellow,red,blueBright,magentaBright,gray\" \"npm run dev:cloud-api\" \"npm run dev:super-admin\" \"npm run dev:pos-admin\" \"npm run dev:pos\" \"npm run dev:captain\" \"npm run dev:kds\" \"npm run dev:kiosk\" \"npm run dev:kiosk-admin\" \"npm run dev:sync\"",
     "stop": "node tooling/dev/stop_servers.cjs",

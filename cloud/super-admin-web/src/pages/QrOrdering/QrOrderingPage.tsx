@@ -477,7 +477,7 @@ export function QrOrderingPage() {
                 </thead>
                 <tbody>
                   {filtered.map((r) => {
-                    const quota = r.maxActiveTables;
+                    const quota = r.maxActiveTables ?? 0; // no limit configured: no usage bar
                     const usedPct = r.hasUsageData && quota > 0 ? Math.min(100, (r.activeQrTables / quota) * 100) : 0;
                     const barColor =
                       quota > 0 && r.activeQrTables >= quota

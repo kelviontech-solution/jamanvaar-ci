@@ -56,7 +56,6 @@ import {
   StockCount
 } from '@jamanvaar/types';
 
-import { getGuestOrderBaseUrl } from './qr_order_url';
 
 import {
   DEFAULT_QR_SETTINGS,
@@ -1329,24 +1328,6 @@ export class JamanvaarDatabase {
       } else {
         this.tables = SEED_TABLES.map((t) => ({ ...t }));
       }
-
-      // Guarantee all tables have valid, persistent qrToken, qrShortCode, and qrCodeUrl
-      this.tables.forEach((t) => {
-        const seedMatch = SEED_TABLES.find((st) => st.tableNumber === t.tableNumber);
-        if (!t.qrToken) {
-          t.qrToken = seedMatch?.qrToken || `jv_qr_tbl_${t.tableNumber}_${t.id.replace(/[^a-zA-Z0-9]/g, '')}`;
-        }
-        if (!t.qrShortCode) {
-          t.qrShortCode = seedMatch?.qrShortCode || `QR-TABLE-${t.tableNumber.padStart(3, '0')}`;
-        }
-        if (!t.qrStatus) {
-          t.qrStatus = 'ACTIVE';
-        }
-        if (!t.qrCodeUrl) {
-          // BUG-119: the app's configured public address, never a hardcoded localhost fallback.
-          t.qrCodeUrl = `${getGuestOrderBaseUrl()}/?qrTable=${t.tableNumber}&token=${t.qrToken}`;
-        }
-      });
 
       const storedCoupons = localStorage.getItem(`${p}coupons`);
       if (storedCoupons) this.coupons = JSON.parse(storedCoupons);

@@ -426,6 +426,17 @@ describe('QR ordering (SaaS)', () => {
         expect(res.body.orderNumber).toMatch(/^QR-\d+$/);
       });
 
+      it('quotes the exact server price before the order is placed, and creates nothing', async () => {
+        const before = await prisma.runAsPlatform((tx) => tx.syncedOrder.count({ where: { restaurantId: F.A.id } }));
+        const q = await http().post(`/api/v1/public/qr/${tokenA12}/quote`).send({ items: [{ itemId: 'pizza-a', quantity: 2, optionIds: ['opt-cheese-a'] }, { itemId: 'coffee-a', quantity: 1, optionIds: [] }] });
+        expect(q.status, JSON.stringify(q.body)).toBe(200);
+        expect(q.body).toMatchObject({ subtotal: 688, tax: 34.4, total: 722.4 });
+        expect(q.body.lines[0]).toMatchObject({ name: 'Paneer Pizza a', quantity: 2, unitPrice: 284, lineTotal: 596.4 });
+        expect((await http().post(`/api/v1/public/qr/${tokenA12}/quote`).send({ items: [{ itemId: 'nope', quantity: 1, optionIds: [] }] })).status).toBe(400);
+        expect((await http().post(`/api/v1/public/qr/${tokenA12}/quote`).send({ items: [{ itemId: 'coffee-a', quantity: 1, optionIds: [] }], restaurantId: F.B.id })).status).toBe(400);
+        expect(await prisma.runAsPlatform((tx) => tx.syncedOrder.count({ where: { restaurantId: F.A.id } }))).toBe(before);
+      });
+
       it('rejects any client price, total, restaurant, branch or table in the body', async () => {
         for (const extra of [{ total: 1 }, { restaurantId: F.B.id }, { branchId: F.B.b1 }, { tableId: 'tbl-b1' }, { unitPrice: 1 }]) {
           const res = await http().post(`/api/v1/public/qr/${tokenA12}/orders`).send(orderBody([{ itemId: 'coffee-a', quantity: 1 }], extra));

@@ -4,6 +4,8 @@ interface ImportMetaEnv {
   readonly VITE_CLOUD_API_BASE_URL?: string;
   /** Where this app is really, publicly reachable (BUG-119) — a guest's table QR code is built from this, never from window.location.origin. */
   readonly VITE_RESTAURANT_ADMIN_URL?: string;
+  /** Address of the customer ordering website; old printed codes are forwarded there. */
+  readonly VITE_QR_ORDER_URL?: string;
 }
 
 interface ImportMeta {

@@ -1,0 +1,16 @@
+{
+  "name": "@jamanvaar/qr-guest",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The customer QR ordering web app: opened by scanning a table's QR code. Web only; it uses the public QR API and nothing from the restaurant apps.",
+  "scripts": {
+    "dev": "vite --port 5190",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

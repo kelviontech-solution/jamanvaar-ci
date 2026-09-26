@@ -5,14 +5,13 @@ import {
   LicenseRepository,
   MenuRepository,
   NotificationRepository,
-  QrOrderingRepository,
   RestaurantIdentityRepository,
   StaffRepository
 } from '@jamanvaar/database';
 import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
 import { SyncHealthPanel } from './components/sync/SyncHealthPanel';
-import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, reportQrUsage, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements } from './cloud/cloudClient';
+import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements } from './cloud/cloudClient';
 import { EntitySyncEngine, SyncOutboxEngine, InventoryLedgerSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts } from '@jamanvaar/sync';
 import {
   Category,
@@ -81,8 +80,9 @@ import { RestaurantDashboard } from './components/dashboard/RestaurantDashboard'
 import { BillingInvoicesModule } from './components/billing/BillingInvoicesModule';
 import { OrdersModule } from './components/orders/OrdersModule';
 import { KitchenKotModule } from './components/kitchen/KitchenKotModule';
-import { QrOrderingModule } from './components/qr/QrOrderingModule';
-import { GuestQrOrderingPage } from './components/qr/GuestQrOrderingPage';
+import { QrConsole } from './components/qrconsole/QrConsole';
+import { useQrEntitlement } from './components/qrconsole/useQrEntitlement';
+import { LegacyGuestRedirect } from './components/qrconsole/LegacyGuestRedirect';
 import { MenuCategoriesModule } from './components/menu/MenuCategoriesModule';
 import { FloorTablesModule } from './components/tables/FloorTablesModule';
 import { ReservationsModule } from './components/reservations/ReservationsModule';
@@ -155,10 +155,14 @@ export default function PosAdminApp() {
   const isGuestQrMode = queryParams.has('qrTable') || queryParams.has('table');
 
   if (isGuestQrMode) {
-    return <GuestQrOrderingPage />;
+    return <LegacyGuestRedirect />;
   }
 
   const [activeTab, setActiveTab] = useState<PosAdminTab>('DASHBOARD');
+  // Whether QR Ordering is in this restaurant's plan, as the server says (cached for a week offline).
+  const qr = useQrEntitlement();
+  const qrKnown = qr.state.status === 'ready';
+  const qrLocked = qr.state.status === 'ready' && !qr.state.entitlement.enabled;
   const [dbTick, setDbTick] = useState(0);
 
   // Sidebar sections are collapsible and remembered per install (localStorage)
@@ -414,26 +418,6 @@ export default function PosAdminApp() {
       clearInterval(pollInterval);
     };
   }, []);
-
-  // Real QR-table activity has always existed locally — Super Admin's QR
-  // Ordering Suite showed 0 usage for every restaurant not because nothing
-  // happened, but because no client ever called the real, already-existing
-  // reporting endpoint. Only meaningful once this session has an actual
-  // owner/manager login (reportQrUsage no-ops itself when logged out).
-  useEffect(() => {
-    if (!cloudConnected) return;
-    const report = () => {
-      const stats = QrOrderingRepository.getQrStats('TODAY');
-      void reportQrUsage({
-        activeTables: stats.activeTablesCount,
-        ordersToday: stats.totalOrders,
-        revenueToday: stats.totalRevenue
-      });
-    };
-    report();
-    const interval = setInterval(report, 60000);
-    return () => clearInterval(interval);
-  }, [cloudConnected]);
 
   // Database-layer gap: the menu previously lived only in whichever device's
   // browser created it — Restaurant Admin is the actual menu-editing
@@ -892,13 +876,13 @@ export default function PosAdminApp() {
                       // owner could only tell it was locked after navigating
                       // in. Now the whole row visibly dims and shows a lock
                       // icon before the click, not after.
-                      const isLockedPro = nav.id === 'QR_ORDERING' && db.license?.tier !== 'PRO';
+                      const isLockedPro = nav.id === 'QR_ORDERING' && qrLocked;
 
                       return (
                         <button
                           key={nav.id}
                           onClick={() => setActiveTab(nav.id as PosAdminTab)}
-                          title={isLockedPro ? 'PRO plan required — tap to see what unlocks' : undefined}
+                          title={isLockedPro ? 'Not included in your current plan — tap to see what it offers' : undefined}
                           className={`relative w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-xs sm:text-[13px] transition-all duration-150 cursor-pointer ${
                             isSelected
                               ? 'bg-jaman-navy text-white shadow-xs'
@@ -924,16 +908,16 @@ export default function PosAdminApp() {
                           </div>
 
                           <div className="flex items-center gap-1.5 shrink-0">
-                            {nav.id === 'QR_ORDERING' && (
+                            {nav.id === 'QR_ORDERING' && qrKnown && (
                               <span
                                 className={`flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-black rounded-md uppercase ${
-                                  db.license?.tier === 'PRO'
+                                  !qrLocked
                                     ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                                     : 'bg-amber-100 text-amber-800 border border-amber-200'
                                 }`}
                               >
                                 {isLockedPro && <Lock className="w-2.5 h-2.5" />}
-                                PRO
+                                {qrLocked ? 'Locked' : 'On'}
                               </span>
                             )}
                             {badgeCount > 0 && (
@@ -989,7 +973,7 @@ export default function PosAdminApp() {
             )}
 
             {/* TAB 2: DIGITAL ORDERING & QR SUITE */}
-            {activeTab === 'QR_ORDERING' && <QrOrderingModule />}
+            {activeTab === 'QR_ORDERING' && <QrConsole onViewPlan={() => setActiveTab('LICENSE')} showToast={showToast} />}
 
             {/* TAB 3: BILLING / INVOICES */}
             {activeTab === 'BILLING_SALES' && (

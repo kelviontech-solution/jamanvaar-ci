@@ -807,20 +807,6 @@ export async function logTenantAiTelemetry(intent: string, queryText?: string): 
   }).catch(() => {});
 }
 
-/**
- * Real QR-table activity exists locally the whole time — the platform-level
- * QR Ordering Suite in Super Admin showed 0 usage for every restaurant not
- * because nothing happened, but because no client ever called this
- * already-real endpoint to report it.
- */
-export async function reportQrUsage(input: { activeTables: number; ordersToday: number; revenueToday: number }): Promise<void> {
-  if (!isCloudLoggedIn()) return;
-  await request('/api/v1/tenant/qr-ordering/usage', {
-    method: 'POST',
-    body: input
-  }).catch(() => {});
-}
-
 /** Same device-authed bypass pattern as createRefund() below — order-sync and entity-sync are DeviceAuthGuard endpoints, not user-session ones. */
 function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const token = getStoredDeviceToken();
@@ -1110,4 +1096,9 @@ export async function fetchMenuVersion(): Promise<{ version: number; watermark: 
 
 export async function publishMenu(note?: string): Promise<{ version: number }> {
   return jsonOrThrowCloud(await deviceFetch('/api/v1/menu/publish', { method: 'POST', body: JSON.stringify({ note }) }), 'Menu publish');
+}
+
+/** A JSON call to the cloud as this Restaurant Admin console (its device credential). Throws CloudApiError with the server's own message. */
+export async function qrApi<T>(path: string, init: RequestInit = {}): Promise<T> {
+  return jsonOrThrowCloud<T>(await deviceFetch(path, init), 'QR ordering');
 }
