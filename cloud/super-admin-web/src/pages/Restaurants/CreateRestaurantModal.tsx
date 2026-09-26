@@ -27,6 +27,7 @@ export function CreateRestaurantModal({
 }) {
   const [form, setForm] = useState<CreateRestaurantInput>({
     name: '',
+    mobile: '',
     city: 'Ahmedabad',
     state: 'Gujarat',
     ownerName: '',
@@ -224,6 +225,17 @@ export function CreateRestaurantModal({
                   required
                 />
                 {fieldErrors.name && <div className="error">{fieldErrors.name}</div>}
+              </div>
+              <div className="field">
+                <label>Restaurant Mobile * (makes the Restaurant ID)</label>
+                <input
+                  placeholder="10-digit mobile, e.g. 9876543210"
+                  value={form.mobile || ''}
+                  onChange={(e) => update('mobile', e.target.value.replace(/[^0-9+ ]/g, ''))}
+                  inputMode="tel"
+                  required
+                />
+                {fieldErrors.mobile && <div className="error">{fieldErrors.mobile}</div>}
               </div>
               <div className="field">
                 <label>City</label>

@@ -6,28 +6,43 @@
  * what to paste rather than a magic link.
  */
 
+const esc = (v: string): string => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/**
+ * The owner's first email: the Restaurant ID (which every terminal asks for before it will accept a key), the login email, and
+ * EITHER the first password Super Admin chose (the owner should change it after first sign-in) OR an invitation token to set one.
+ */
 export function ownerInviteEmail(params: {
   restaurantName: string;
   ownerName: string;
   email: string;
-  activationToken: string;
-  expiresAt: Date;
+  restaurantCode?: string | null;
+  /** The first password, when Super Admin set one at onboarding. */
+  initialPassword?: string;
+  /** The one-time invitation token, when the owner sets their own password. */
+  activationToken?: string;
+  expiresAt?: Date;
 }): { subject: string; html: string } {
-  const expiry = params.expiresAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  const expiry = params.expiresAt ? params.expiresAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const mono = 'font-family: monospace; font-size: 16px; background: #f3f6f9; padding: 2px 6px; border-radius: 4px;';
+  const rows = [
+    params.restaurantCode ? `<li>Restaurant ID: <strong style="${mono}">${esc(params.restaurantCode)}</strong></li>` : '',
+    `<li>Login email: <strong>${esc(params.email)}</strong></li>`,
+    params.initialPassword ? `<li>First-time password: <strong style="${mono}">${esc(params.initialPassword)}</strong></li>` : '',
+    !params.initialPassword && params.activationToken ? `<li>Invitation token: <strong style="${mono}">${esc(params.activationToken)}</strong></li>` : ''
+  ].join('');
+  const steps = params.initialPassword
+    ? `<p>Open the Restaurant Admin app, choose &ldquo;Restaurant Owner? Sign in with your JAMANVAAR Cloud account&rdquo;, and sign in with the details above. <strong>Please change this password after your first sign-in.</strong></p>`
+    : `<p>Open the Restaurant Admin app, choose &ldquo;Restaurant Owner? Sign in with your JAMANVAAR Cloud account&rdquo;, then &ldquo;First time? Set your password&rdquo;, and enter the details above.</p>`;
   return {
-    subject: `Set up your JAMANVAAR account for ${params.restaurantName}`,
+    subject: `Your JAMANVAAR account for ${params.restaurantName}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #0b253a;">
-        <h2 style="color: #0b253a;">Welcome to JAMANVAAR, ${params.ownerName}</h2>
-        <p>Your restaurant <strong>${params.restaurantName}</strong> has been set up on JAMANVAAR Cloud. To finish setting up your account:</p>
-        <ol>
-          <li>Open the Restaurant Admin app for your restaurant.</li>
-          <li>Choose &ldquo;Restaurant Owner? Sign in with your JAMANVAAR Cloud account&rdquo; on the login screen.</li>
-          <li>Enter your activation code (sent separately by your onboarding contact), then choose &ldquo;First time? Set your password&rdquo;.</li>
-          <li>Use this login email: <strong>${params.email}</strong></li>
-          <li>Use this invitation token: <strong style="font-family: monospace; font-size: 16px;">${params.activationToken}</strong></li>
-        </ol>
-        <p style="color: #7a8b9e; font-size: 13px;">This invitation token expires on ${expiry}. If it expires, ask your onboarding contact to resend it.</p>
+        <h2 style="color: #0b253a;">Welcome to JAMANVAAR, ${esc(params.ownerName)}</h2>
+        <p>Your restaurant <strong>${esc(params.restaurantName)}</strong> has been set up on JAMANVAAR Cloud. Your details:</p>
+        <ul style="line-height: 1.9;">${rows}</ul>
+        ${steps}
+        <p style="color: #7a8b9e; font-size: 13px;">Your terminals (POS, Captain, Kitchen Display, Kiosk) ask for the Restaurant ID together with an activation key that your onboarding contact will give you. Keep this email private.${expiry && !params.initialPassword ? ` The invitation token expires on ${expiry}; if it does, ask your onboarding contact to resend it.` : ''}</p>
       </div>
     `
   };

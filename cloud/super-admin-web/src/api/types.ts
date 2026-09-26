@@ -979,6 +979,8 @@ export interface SupportTicketDetail extends SupportTicket {
 
 export interface CreateRestaurantInput {
   name: string;
+  /** Registered 10-digit mobile; the Restaurant ID (JM + mobile) is made from it. */
+  mobile?: string;
   city?: string;
   state?: string;
   ownerName: string;

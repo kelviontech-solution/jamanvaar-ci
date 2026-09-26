@@ -88,6 +88,8 @@ const STEPS: Array<{ key: Step; label: string }> = [
 
 interface DetailsForm {
   name: string;
+  /** The restaurant's registered 10-digit mobile; the customer-facing Restaurant ID (JM + mobile) is made from it. */
+  mobile: string;
   legalName: string;
   gstin: string;
   fssaiNumber: string;
@@ -142,6 +144,7 @@ interface ProvisionedKey {
 
 const EMPTY_DETAILS: DetailsForm = {
   name: '',
+  mobile: '',
   legalName: '',
   gstin: '',
   fssaiNumber: '',
@@ -232,6 +235,7 @@ export function OnboardRestaurantPage() {
 
   // Execution state & outputs
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [restaurantCode, setRestaurantCode] = useState<string | null>(null);
   // Shown to the operator regardless of email outcome — this is the only way
   // the owner can self-activate via pos-admin's invitation-token flow, and
   // when passwordMode is 'invite' it's also what gets emailed to them
@@ -412,7 +416,7 @@ export function OnboardRestaurantPage() {
       let rId = restaurantId;
       if (!rId) {
         const res = await api.post<{
-          restaurant: { id: string };
+          restaurant: { id: string; restaurantCode?: string | null };
           owner: { id: string; email: string };
           activationToken: string;
           emailSent: boolean;
@@ -420,6 +424,7 @@ export function OnboardRestaurantPage() {
           '/api/v1/restaurants',
           {
             name: details.name,
+            mobile: details.mobile.trim(),
             legalName: details.legalName || undefined,
             gstin: details.gstin || undefined,
             fssaiNumber: details.fssaiNumber || undefined,
@@ -430,34 +435,17 @@ export function OnboardRestaurantPage() {
             ownerName: owner.ownerName,
             ownerEmail: owner.ownerEmail,
             ownerPhone: owner.ownerPhone || undefined,
-            // "set now" mode consumes this exact token in the very next call
-            // below — an invite email built around it would already be dead
-            // by the time the owner read it, so don't send one in that case.
-            skipInviteEmail: owner.passwordMode === 'set_now'
+            // "Set now": the password goes in with the creation, so the owner starts ACTIVE and the server emails
+            // them the Restaurant ID, login and this first password. Otherwise the server emails an invitation token.
+            ...(owner.passwordMode === 'set_now' && owner.initialPassword.trim() ? { ownerPassword: owner.initialPassword.trim() } : {})
           }
         );
         rId = res.restaurant.id;
         setRestaurantId(rId);
+        setRestaurantCode(res.restaurant.restaurantCode ?? null);
         setOwnerActivationToken(res.activationToken);
         setInviteEmailSent(res.emailSent);
 
-        // If Super Admin provided an initial password, set it now to activate the owner account!
-        if (owner.passwordMode === 'set_now' && owner.initialPassword.trim()) {
-          try {
-            await api.post('/api/v1/tenant-auth/set-initial-password', {
-              restaurantId: rId,
-              email: owner.ownerEmail,
-              activationToken: res.activationToken,
-              newPassword: owner.initialPassword.trim()
-            });
-          } catch (passErr) {
-            console.warn('Initial password set error:', passErr);
-            setProvisioningWarnings((w) => [
-              ...w,
-              'Owner password was NOT set — the owner cannot log in yet. Use "Reset Password" from the restaurant detail page to retry.'
-            ]);
-          }
-        }
       }
 
       let sId = subscriptionId;
@@ -721,6 +709,18 @@ export function OnboardRestaurantPage() {
                   onChange={(e) => setDetails((d) => ({ ...d, name: e.target.value }))}
                   placeholder="e.g. The Royal Haveli"
                   required
+                />
+              </div>
+              <div className="field">
+                <label>Restaurant Mobile Number * (makes the Restaurant ID)</label>
+                <input
+                  value={details.mobile ?? ''}
+                  onChange={(e) => setDetails((d) => ({ ...d, mobile: e.target.value.replace(/[^0-9+ ]/g, '') }))}
+                  placeholder="10-digit mobile, e.g. 9876543210"
+                  inputMode="tel"
+                  required
+                  pattern="(\+?91)?[ ]?[6-9][0-9]{9}"
+                  title="A valid 10-digit Indian mobile number"
                 />
               </div>
               <div className="field">
@@ -1561,10 +1561,10 @@ export function OnboardRestaurantPage() {
                 <div className="credential-item">
                   <span className="credential-label">Restaurant ID</span>
                   <div className="credential-value">
-                    <span>{restaurantId}</span>
+                    <span>{restaurantCode ?? restaurantId}</span>
                     <button
                       type="button"
-                      onClick={() => handleCopy(restaurantId || '', 'Restaurant ID')}
+                      onClick={() => handleCopy(restaurantCode ?? restaurantId ?? '', 'Restaurant ID')}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
                       title="Copy"
                     >

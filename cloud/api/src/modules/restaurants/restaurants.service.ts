@@ -146,8 +146,9 @@ export class RestaurantsService {
           restaurantName: result.restaurant.name,
           ownerName: result.owner.fullName,
           email: result.owner.email,
-          activationToken: result.activationToken,
-          expiresAt: result.activationTokenExpiresAt
+          restaurantCode: result.restaurant.restaurantCode,
+          // A password Super Admin chose is mailed as the first-time password; otherwise the owner gets the token to set their own.
+          ...(dto.ownerPassword ? { initialPassword: dto.ownerPassword } : { activationToken: result.activationToken, expiresAt: result.activationTokenExpiresAt })
         });
         emailSent = await this.email.send(result.owner.email, subject, html);
       } catch (err) {
@@ -276,7 +277,18 @@ export class RestaurantsService {
       const existing = await tx.restaurant.findFirst({ where: { id, deletedAt: null } });
       if (!existing) throw new NotFoundException('Restaurant not found');
 
-      const updated = await tx.restaurant.update({ where: { id }, data: dto });
+      // A restaurant created before it had a mobile number has no Restaurant ID; the first mobile given to it assigns one, once.
+      // After that the code never follows the mobile (a changed phone must not change the ID printed on keys and QR codes).
+      const data = !existing.restaurantCode && dto.mobile ? { ...dto, restaurantCode: generateRestaurantCode(dto.mobile) } : dto;
+      let updated;
+      try {
+        updated = await tx.restaurant.update({ where: { id }, data });
+      } catch (err) {
+        if (err instanceof Error && 'code' in err && (err as { code?: string }).code === 'P2002') {
+          throw new ConflictException('A restaurant is already registered with that mobile number');
+        }
+        throw err;
+      }
 
       await this.audit.log(
         {
