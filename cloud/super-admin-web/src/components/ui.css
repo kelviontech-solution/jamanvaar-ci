@@ -104,6 +104,11 @@
 }
 
 /* Cards */
+/* A card whose content (headings, rows, forms) needs breathing room; tables that should run edge to edge use a bare .card. */
+.card-pad {
+  padding: 20px 24px;
+}
+
 .card {
   background: var(--jv-surface);
   border: 1px solid var(--jv-border);

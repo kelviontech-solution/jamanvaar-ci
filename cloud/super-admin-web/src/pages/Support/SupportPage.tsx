@@ -163,7 +163,7 @@ export function SupportPage() {
       {successToast && <div className="page-success">{successToast}</div>}
 
       {/* Universal Search Bar */}
-      <Card className="support-search-card">
+      <Card className="support-search-card card-pad">
         <form onSubmit={handleSearch} className="support-search-input-box">
           <Search className="w-5 h-5 support-search-icon" />
           <input
@@ -258,7 +258,7 @@ export function SupportPage() {
         <div className="diagnostics-panel">
           {/* Summary Column */}
           <div className="diag-summary-col">
-            <Card>
+            <Card className="card-pad">
               <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem' }}>Tenant Profile</h3>
               <div className="diag-kv-row">
                 <span className="diag-kv-label">Restaurant Name</span>
@@ -321,7 +321,7 @@ export function SupportPage() {
             </Card>
 
             {impersonationResult && impersonationResult.restaurantName === diagnostics.restaurant.name && (
-              <Card style={{ border: '1px solid var(--jv-accent-border)', background: 'var(--jv-accent-soft)' }}>
+              <Card className="card-pad" style={{ border: '1px solid var(--jv-accent-border)', background: 'var(--jv-accent-soft)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                   <h3 style={{ margin: 0, fontSize: '0.95rem' }}>Impersonation Token — {impersonationResult.ownerName}</h3>
                   <button
@@ -364,7 +364,7 @@ export function SupportPage() {
             )}
 
             {/* Owner accounts */}
-            <Card>
+            <Card className="card-pad">
               <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem' }}>Owner Accounts</h3>
               {diagnostics.owners.map((o) => (
                 <div key={o.id} style={{ padding: '0.5rem 0', borderBottom: '1px solid var(--jv-border)' }}>
@@ -398,7 +398,7 @@ export function SupportPage() {
 
           {/* Details & Live Telemetry Column */}
           <div className="diag-details-col">
-            <Card>
+            <Card className="card-pad">
               <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem' }}>Connected Terminal Hardware</h3>
               {diagnostics.devices.length === 0 ? (
                 <div style={{ color: 'var(--jv-text-muted)' }}>No devices registered yet.</div>
@@ -452,7 +452,7 @@ export function SupportPage() {
               )}
             </Card>
 
-            <Card>
+            <Card className="card-pad">
               <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem' }}>Recent Diagnostic Audit Logs</h3>
               {diagnostics.recentAudits.length === 0 ? (
                 <div style={{ color: 'var(--jv-text-muted)' }}>No audit entries logged for this tenant.</div>
@@ -526,7 +526,7 @@ export function SupportPage() {
           </div>
 
           {/* Quick Inspection Targets */}
-          <Card>
+          <Card className="card-pad">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--jv-primary)' }}>

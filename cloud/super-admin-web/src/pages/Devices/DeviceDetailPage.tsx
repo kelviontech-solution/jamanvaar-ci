@@ -198,7 +198,7 @@ export function DeviceDetailPage() {
 
       {/* Grid: Telemetry & Connectivity */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20, marginBottom: 24 }}>
-        <Card>
+        <Card className="card-pad">
           <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Hardware & Operational Identity</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
@@ -224,7 +224,7 @@ export function DeviceDetailPage() {
           </div>
         </Card>
 
-        <Card>
+        <Card className="card-pad">
           <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Connectivity & Sync Telemetry</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
@@ -256,7 +256,7 @@ export function DeviceDetailPage() {
       </div>
 
       {/* Remote Commands Audit History */}
-      <Card>
+      <Card className="card-pad">
         <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Remote Command History ({commands.length})</h3>
         {commands.length === 0 ? (
           <div style={{ padding: 32, textAlign: 'center', color: '#94a3b8' }}>
