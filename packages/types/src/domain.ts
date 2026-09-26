@@ -1040,7 +1040,7 @@ export interface ReceiptConfig {
   enableSms: boolean;
   enableEmail: boolean;
   enableQrReceipt: boolean;
-  /** Hex highlight color for the on-screen/WhatsApp receipt's token badge and totals rule.
+  /** @deprecated Receipts and KOTs are standard black and white; this value is ignored. Was: hex highlight color for the token badge and totals rule.
    *  Default (unset) is the JAMANVAAR brand orange. A physical thermal printout stays
    *  black-and-white regardless — thermal printer hardware cannot print color. */
   accentColor?: string;
@@ -1048,7 +1048,7 @@ export interface ReceiptConfig {
   showCashWatermark?: boolean;
   /** The word repeated in that watermark (default "CASH"). */
   cashWatermarkText?: string;
-  /** Background color of the on-screen Kitchen Order Ticket preview (the kiosk's own "what got
+  /** @deprecated Ignored: the KOT preview is black on white. Was: background color of the on-screen Kitchen Order Ticket preview (the kiosk's own "what got
    *  sent to the kitchen" card, not the physical KOT printout, which is monochrome). Must stay a
    *  dark tone for the light ticket text to stay legible, so this is chosen from a curated set
    *  rather than an arbitrary hex. Default (unset) is JAMANVAAR navy. */

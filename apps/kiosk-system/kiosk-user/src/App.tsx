@@ -3162,8 +3162,7 @@ export default function KioskUserApp() {
                       .map((kot) => (
                         <pre
                           key={kot.id}
-                          className="text-emerald-300 text-[10px] leading-relaxed font-mono p-4 rounded-xl overflow-x-auto whitespace-pre w-full max-w-[300px] mx-auto"
-                          style={{ backgroundColor: receiptConfig.kotThemeColor || '#0B253A' }}
+                          className="bg-white text-black border border-dashed border-black text-[10px] leading-relaxed font-mono p-4 rounded-xl overflow-x-auto whitespace-pre w-full max-w-[300px] mx-auto"
                         >
                           {PrinterService.generateKOTText(kot)}
                         </pre>

@@ -83,8 +83,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
   const thankYouMessage = config.thankYouMessage || 'Thank you for dining with us!';
   const footerMessage = config.footerMessage || 'Visit again.';
   const is80mm = paperSize === '80mm';
-  // On-screen/WhatsApp only — a physical thermal printout is black-and-white regardless of this.
-  const accent = config.accentColor || '#E66817';
+  // Receipts are standard black and white on screen and on paper; the restaurant cannot change their colours.
   const watermark = cashWatermarkFor(order, config);
 
   return (
@@ -98,7 +97,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
           boxShadow: '0 15px 35px -10px rgba(11, 37, 58, 0.15), 0 0 0 1px rgba(213, 206, 194, 0.6)'
         }}
       >
-        {watermark && <WatermarkRows word={watermark} color="rgba(180, 83, 9, 0.11)" />}
+        {watermark && <WatermarkRows word={watermark} color="rgba(0, 0, 0, 0.09)" />}
         {/* Header: this restaurant's own identity. The product brand appears only in the footer. */}
         <div className="text-center pb-3 border-b border-dashed border-[#A0AEC0] space-y-1.5" style={{ position: 'relative', zIndex: 1 }}>
           {config.logoUrl && (
@@ -114,7 +113,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
 
           <div className="space-y-0.5">
             {restaurantName && (
-              <h2 className="font-black text-sm sm:text-base tracking-wider uppercase text-[#0B253A]">{restaurantName}</h2>
+              <h2 className="font-black text-sm sm:text-base tracking-wider uppercase text-black">{restaurantName}</h2>
             )}
             {address && <p className="text-[10px] text-[#718096] leading-tight max-w-[280px] mx-auto">{address}</p>}
             {phone && <p className="text-[10px] text-[#718096]">Phone: {phone}</p>}
@@ -129,22 +128,22 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
         {/* Tax Invoice & Token Info */}
         <div className="py-2.5 border-b border-dashed border-[#A0AEC0] space-y-1 text-[11px]">
           <div className="flex justify-between items-center pb-1 border-b border-slate-100">
-            <span className="font-black text-xs text-[#0B253A] uppercase tracking-wide">
+            <span className="font-black text-xs text-black uppercase tracking-wide">
               TAX INVOICE / RECEIPT
             </span>
-            <span className="px-2 py-0.5 rounded font-black text-xs" style={{ backgroundColor: `${accent}1a`, color: accent }}>
+            <span className="px-2 py-0.5 rounded font-black text-xs" style={{ backgroundColor: '#fff', color: '#000', border: '1.5px solid #000' }}>
               TOKEN #{order.tokenNumber}
             </span>
           </div>
 
           <div className="flex justify-between text-[#4A5568] pt-1">
             <span>Invoice No:</span>
-            <span className="font-bold text-[#0B253A]">{order.orderNumber}</span>
+            <span className="font-bold text-black">{order.orderNumber}</span>
           </div>
 
           <div className="flex justify-between text-[#4A5568]">
             <span>Order Type:</span>
-            <span className="font-bold text-[#0B253A]">
+            <span className="font-bold text-black">
               {order.orderType} {order.tableNumber ? `(TABLE ${order.tableNumber})` : ''}
             </span>
           </div>
@@ -191,7 +190,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
                   </div>
                 )}
                 {it.specialInstructions && (
-                  <div className="text-[9px] text-amber-700 pl-2 font-medium">
+                  <div className="text-[9px] text-neutral-600 pl-2 font-medium">
                     Note: {it.specialInstructions}
                   </div>
                 )}
@@ -208,7 +207,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
           </div>
 
           {(order.discountAmount || 0) > 0 && (
-            <div className="flex justify-between text-emerald-700 font-semibold">
+            <div className="flex justify-between text-black font-semibold">
               <span className="truncate max-w-[200px]">
                 Discount
                 {order.discountReason
@@ -238,13 +237,13 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
             </div>
           )}
 
-          <div className="flex justify-between items-center text-sm font-black pt-1.5 border-t-2 text-[#0B253A]" style={{ borderColor: accent }}>
+          <div className="flex justify-between items-center text-sm font-black pt-1.5 border-t-2 text-black" style={{ borderColor: '#000' }}>
             <span>TOTAL</span>
             <span className="text-base">₹{order.totalAmount ?? 0}</span>
           </div>
         </div>
 
-        {/* Payment Confirmation — cash gets a distinct amber tone from digital payments, so a
+        {/* Payment Confirmation — cash is marked by a heavier border than digital payments, so a
             cashier scanning a stack of receipts can tell which need to be reconciled against the
             cash drawer at a glance (on-screen/WhatsApp only; the printed slip is monochrome). */}
         {(() => {
@@ -254,7 +253,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
               <span className="font-bold text-[#4A5568]">PAID VIA:</span>
               <span
                 className={`font-black uppercase px-2 py-0.5 rounded border ${
-                  isCash ? 'text-amber-800 bg-amber-50 border-amber-200' : 'text-emerald-800 bg-emerald-50 border-emerald-200'
+                  isCash ? 'text-black bg-white border-black border-2' : 'text-black bg-white border-neutral-500'
                 }`}
               >
                 {order.paymentMethod}
@@ -271,14 +270,14 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
           {showQrCode && (
             <div className="py-1 flex flex-col items-center">
               <div className="w-16 h-16 bg-[#FAF7F2] border border-[#E2E8F0] rounded-lg p-1 flex items-center justify-center">
-                <QrCode className="w-full h-full text-[#0B253A]" />
+                <QrCode className="w-full h-full text-black" />
               </div>
               <span className="text-[8px] text-[#A0AEC0] mt-0.5">Scan for E-Bill & Feedback</span>
             </div>
           )}
 
           <div className="pt-1 border-t border-slate-100">
-            <span className="text-[9px] font-black text-[#0B253A] tracking-wider">
+            <span className="text-[9px] font-black text-black tracking-wider">
               Powered by JAMANVAAR
             </span>
           </div>
@@ -515,7 +514,7 @@ export function printThermalKotTicket(
     <tr style="border-bottom: 1px dotted #ccc;">
       <td style="padding: 6px 0; font-size: ${is80mm ? '14px' : '12px'}; font-weight: 900;">
         ${it.name}
-        ${it.specialInstructions ? `<br/><span style="font-size: 10px; font-weight: bold; color: #d9534f;">NOTE: ${it.specialInstructions}</span>` : ''}
+        ${it.specialInstructions ? `<br/><span style="font-size: 10px; font-weight: bold; color: #000;">NOTE: ${it.specialInstructions}</span>` : ''}
       </td>
       <td style="padding: 6px 0; text-align: right; font-size: ${is80mm ? '16px' : '14px'}; font-weight: 900;">
         x${it.quantity}
