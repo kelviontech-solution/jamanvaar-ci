@@ -29,14 +29,24 @@ export class OwnersService {
     private readonly audit: AuditService
   ) {}
 
-  list() {
-    return this.prisma.runAsPlatform((tx) =>
+  /**
+   * An owner whose restaurant is suspended or archived cannot operate, so the console shows them as suspended (DISABLED) too,
+   * instead of "active" beside a suspended restaurant. Their own stored status is untouched, so reactivating the restaurant
+   * brings them back exactly as they were (including a still-pending invitation).
+   */
+  private effective<T extends { status: TenantUserStatus; restaurant: { status: string } }>(owner: T): T {
+    return owner.restaurant.status !== 'ACTIVE' && owner.status === 'ACTIVE' ? { ...owner, status: TenantUserStatus.DISABLED } : owner;
+  }
+
+  async list() {
+    const owners = await this.prisma.runAsPlatform((tx) =>
       tx.user.findMany({
         where: { role: 'OWNER' },
         orderBy: { createdAt: 'desc' },
         select: { ...OWNER_SELECT, restaurant: { select: { id: true, name: true, status: true } } }
       })
     );
+    return owners.map((o) => this.effective(o));
   }
 
   async getById(id: string) {
@@ -47,7 +57,7 @@ export class OwnersService {
       })
     );
     if (!owner) throw new NotFoundException('Owner not found');
-    return owner;
+    return this.effective(owner);
   }
 
   async update(id: string, dto: UpdateOwnerDto, actor: PlatformUser) {

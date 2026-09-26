@@ -318,6 +318,17 @@ export class RestaurantsService {
 
       const updated = await tx.restaurant.update({ where: { id }, data: { status } });
 
+      // The restaurant and its subscriptions move together, so no screen shows "suspended" beside "active". Suspending puts every
+      // running subscription on hold; reactivating resumes the ones that were on hold (a trial stays a trial).
+      if (status === 'SUSPENDED') {
+        await tx.subscription.updateMany({ where: { restaurantId: id, status: { in: ['ACTIVE', 'TRIAL', 'PAST_DUE'] } }, data: { status: 'SUSPENDED' } });
+      } else if (status === 'ACTIVE') {
+        const held = await tx.subscription.findMany({ where: { restaurantId: id, status: 'SUSPENDED' }, select: { id: true, trialEndsAt: true, expiresAt: true } });
+        for (const sub of held) {
+          await tx.subscription.update({ where: { id: sub.id }, data: { status: sub.expiresAt.getTime() < Date.now() ? 'EXPIRED' : sub.trialEndsAt && sub.trialEndsAt.getTime() > Date.now() ? 'TRIAL' : 'ACTIVE' } });
+        }
+      }
+
       await this.audit.log(
         {
           actorType: 'PLATFORM',

@@ -236,6 +236,15 @@ export class SubscriptionsService {
 
       const updated = await tx.subscription.update({ where: { id }, data: { status }, include: { plan: true } });
 
+      // Keep the restaurant in step: suspending its last running subscription suspends the restaurant, and reactivating a
+      // subscription brings a suspended restaurant back (the owner and terminals follow the restaurant).
+      if (status === 'SUSPENDED') {
+        const running = await tx.subscription.count({ where: { restaurantId: existing.restaurantId, id: { not: id }, status: { in: ['ACTIVE', 'TRIAL', 'PAST_DUE'] } } });
+        if (running === 0) await tx.restaurant.updateMany({ where: { id: existing.restaurantId, status: 'ACTIVE' }, data: { status: 'SUSPENDED' } });
+      } else if (status === 'ACTIVE' || status === 'TRIAL') {
+        await tx.restaurant.updateMany({ where: { id: existing.restaurantId, status: 'SUSPENDED' }, data: { status: 'ACTIVE' } });
+      }
+
       await this.audit.log(
         {
           actorType: 'PLATFORM',
