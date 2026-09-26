@@ -44,9 +44,12 @@ export class StaffApprovalService {
     const rows = await this.prisma.runAsTenant(rid, (tx) => tx.syncedEntity.findMany({ where: { restaurantId: rid, entityType: 'STAFF_USER' }, select: { externalId: true, payload: true } }));
     let matched: FoundStaff | null = null;
     for (const row of rows) {
-      const p = row.payload as { deleted?: unknown; isActive?: unknown; roleId?: unknown; pinHash?: unknown; fullName?: unknown; id?: unknown } | null;
+      const p = row.payload as { deleted?: unknown; isActive?: unknown; roleId?: unknown; pinHash?: unknown; fullName?: unknown; id?: unknown; pinScope?: unknown } | null;
       if (!p || p.deleted === true || p.isActive === false || typeof p.roleId !== 'string' || !accept(p.roleId) || typeof p.pinHash !== 'string') continue;
-      if (this.matches(pin, rid, p.pinHash)) matched = { id: typeof p.id === 'string' ? p.id : row.externalId, fullName: typeof p.fullName === 'string' ? p.fullName : 'Staff', roleId: p.roleId };
+      // The PIN was hashed under the restaurant id the console had at the time: normally the real one, but staff made before the console was
+      // bound to its restaurant carry `pinScope` (or the built-in placeholder id).
+      const scopes = [...new Set([rid, typeof p.pinScope === 'string' ? p.pinScope : '', 'rest-jamanvaar-main'].filter(Boolean))];
+      if (scopes.some((scope) => this.matches(pin, scope, p.pinHash as string))) matched = { id: typeof p.id === 'string' ? p.id : row.externalId, fullName: typeof p.fullName === 'string' ? p.fullName : 'Staff', roleId: p.roleId };
     }
     return matched;
   }

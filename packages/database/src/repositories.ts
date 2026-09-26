@@ -3506,11 +3506,28 @@ export class StaffRepository {
     pinLockedUntil = 0;
 
     const scopedRestaurantId = restaurantId || db.restaurant.id;
-    const activeUsers = (db.users as (User & { pinHash?: string })[]).filter((u) => u.isActive);
-    const matches = await Promise.all(
-      activeUsers.map((u) => verifyPinHash(pin, u.restaurantId || scopedRestaurantId, u.pinHash))
-    );
-    const user = activeUsers[matches.findIndex(Boolean)];
+    const activeUsers = (db.users as (User & { pinHash?: string; pinScope?: string })[]).filter((u) => u.isActive);
+    // A PIN is hashed under a restaurant id. Normally that is this restaurant's; a staff member made before the console was bound to
+    // its real restaurant carries the placeholder id instead. Try the likely ids one round at a time (each round checks every
+    // person at once), so the common case costs a single round.
+    const scopeRounds: Array<(u: (typeof activeUsers)[number]) => string | undefined> = [
+      (u) => u.pinScope || u.restaurantId || scopedRestaurantId,
+      (u) => scopedRestaurantId,
+      (u) => u.restaurantId,
+      () => SEED_RESTAURANT.id
+    ];
+    let user: (typeof activeUsers)[number] | undefined;
+    const tried = new Set<string>();
+    for (const scopeOf of scopeRounds) {
+      const round = activeUsers.map((u) => ({ u, scope: scopeOf(u) })).filter((x): x is { u: (typeof activeUsers)[number]; scope: string } => !!x.scope && !tried.has(`${x.u.id}|${x.scope}`));
+      round.forEach((x) => tried.add(`${x.u.id}|${x.scope}`));
+      const matches = await Promise.all(round.map((x) => verifyPinHash(pin, x.scope, x.u.pinHash)));
+      const hit = matches.findIndex(Boolean);
+      if (hit >= 0) {
+        user = round[hit].u;
+        break;
+      }
+    }
 
     if (!user) {
       pinFailureCount += 1;
@@ -3601,7 +3618,9 @@ export class StaffRepository {
    */
   public static toSyncPayload(user: User): Record<string, unknown> {
     const { id, username, fullName, email, phone, roleId, isActive, createdAt, updatedAt } = user;
-    return { id, username, fullName, email, phone, roleId, isActive, createdAt, updatedAt, pinHash: (user as User & { pinHash?: string }).pinHash };
+    // `pinScope` is the restaurant id this PIN was hashed under. A staff member created before this console was bound to its real
+    // restaurant (under the placeholder id) would otherwise fail to verify on the POS, which hashes under its own id.
+    return { id, username, fullName, email, phone, roleId, isActive, createdAt, updatedAt, pinHash: (user as User & { pinHash?: string }).pinHash, pinScope: user.restaurantId };
   }
 
   /** Applies one STAFF_USER record pulled from the cloud: creates it locally, or updates it in place by id. */
@@ -3619,6 +3638,7 @@ export class StaffRepository {
       roleId: typeof remote.roleId === 'string' ? remote.roleId : 'role-cashier',
       isActive: remote.isActive !== false,
       pinHash,
+      pinScope: typeof remote.pinScope === 'string' && remote.pinScope ? remote.pinScope : undefined,
       createdAt: typeof remote.createdAt === 'string' ? remote.createdAt : new Date().toISOString(),
       updatedAt: typeof remote.updatedAt === 'string' ? remote.updatedAt : new Date().toISOString()
     } as User & { pinHash: string };
