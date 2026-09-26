@@ -12,7 +12,7 @@ import {
   ActivationNoticeBanner,
   ActivationHelpNote
 } from '@jamanvaar/ui';
-import { isDeviceConnected, connectDevice, activateCaptainDevice, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
+import { isDeviceConnected, activateCaptainWithKey, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
 import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog } from '@jamanvaar/sync';
 
 // Captain Modular Layout & Views
@@ -70,55 +70,22 @@ export const App: React.FC = () => {
   // connected. isDeviceConnected() persists across reloads, so this screen
   // only ever appears the first time a tablet is set up.
   const [deviceConnected, setDeviceConnected] = useState(isDeviceConnected());
-  const [connectRestaurantId, setConnectRestaurantId] = useState('');
-  const [connectEmail, setConnectEmail] = useState('');
-  const [connectPassword, setConnectPassword] = useState('');
-  const [connectBusy, setConnectBusy] = useState(false);
-  const [connectError, setConnectError] = useState('');
-
-  // A tablet cloud/api has never seen before comes back ACTIVATION_REQUIRED
-  // from the login step — the same Welcome Kit activation key pos-admin
-  // uses is needed once before this device has a real token.
-  const [awaitingActivationKey, setAwaitingActivationKey] = useState(false);
-  const [activationSessionToken, setActivationSessionToken] = useState('');
   const [activationKeyInput, setActivationKeyInput] = useState('');
   const [activationBusy, setActivationBusy] = useState(false);
   const [activationError, setActivationError] = useState('');
-  // Only true right after THIS connection succeeds — a one-time orientation
-  // screen, not a persistent state.
+  // Only true right after THIS activation succeeds — a one-time orientation screen, not a persistent state.
   const [showActivationWelcome, setShowActivationWelcome] = useState(false);
-
-  const handleConnectDevice = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setConnectError('');
-    setConnectBusy(true);
-    try {
-      const result = await connectDevice(connectRestaurantId, connectEmail, connectPassword);
-      if (result.requiresActivation && result.activationSessionToken) {
-        setActivationSessionToken(result.activationSessionToken);
-        setAwaitingActivationKey(true);
-      } else {
-        setDeviceConnected(true);
-        setShowActivationWelcome(true);
-      }
-    } catch (err) {
-      setConnectError(err instanceof CloudApiError ? err.message : 'Could not connect — check your details and try again.');
-    } finally {
-      setConnectBusy(false);
-    }
-  };
 
   const handleActivateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setActivationError('');
     setActivationBusy(true);
     try {
-      await activateCaptainDevice(activationSessionToken, activationKeyInput);
-      setAwaitingActivationKey(false);
+      await activateCaptainWithKey(activationKeyInput);
       setDeviceConnected(true);
       setShowActivationWelcome(true);
     } catch (err) {
-      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed. Please verify the code.');
+      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed. Please verify the key.');
     } finally {
       setActivationBusy(false);
     }
@@ -290,7 +257,7 @@ export const App: React.FC = () => {
     );
   }
 
-  if (!deviceConnected && awaitingActivationKey) {
+  if (!deviceConnected) {
     return (
       <JAMANVAARStartup appName="CAPTAIN APP" appType="CAPTAIN" minDurationMs={1500}>
         <JamanvaarAuthLayout
@@ -305,10 +272,11 @@ export const App: React.FC = () => {
           heroImages={APP_HERO_IMAGES.CAPTAIN}
         >
           <div className="space-y-5">
+            <ActivationNoticeBanner />
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Activate this Tablet</h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                This tablet hasn't connected before — enter the activation key from your Super Admin Welcome Kit to finish setup.
+                One-time setup — enter the activation key from your Super Admin Welcome Kit. Nothing else is needed.
               </p>
             </div>
             <form onSubmit={handleActivateSubmit} className="space-y-3.5">
@@ -318,10 +286,10 @@ export const App: React.FC = () => {
                   type="text"
                   value={activationKeyInput}
                   onChange={(e) => setActivationKeyInput(e.target.value)}
-                  placeholder="From your Welcome Kit"
+                  placeholder="JMV-XXXX-XXXX-XXXX"
                   required
                   autoFocus
-                  className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
+                  className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors uppercase"
                 />
               </div>
               {activationError && (
@@ -340,85 +308,6 @@ export const App: React.FC = () => {
               </button>
             </form>
             <ActivationHelpNote deviceNoun="tablet" />
-          </div>
-        </JamanvaarAuthLayout>
-      </JAMANVAARStartup>
-    );
-  }
-
-  if (!deviceConnected) {
-    return (
-      <JAMANVAARStartup appName="CAPTAIN APP" appType="CAPTAIN" minDurationMs={1500}>
-        <JamanvaarAuthLayout
-          appIdentity="CAPTAIN"
-          appTitle="Floor Captain & Service"
-          appSubtitle="High-Speed Table Orders & Service"
-          isLocalCoreUnauthorized={captainDb.isLocalCoreUnauthorized()}
-          healthCheckUrl={`${captainDb.getSyncServerUrl()}/api/health`}
-          heroHeadline="Touch-First Restaurant Floor Command"
-          heroHighlightWord="Instant KOT"
-          heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
-          heroImages={APP_HERO_IMAGES.CAPTAIN}
-        >
-          <div className="space-y-5">
-            <ActivationNoticeBanner />
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Connect this Tablet</h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                One-time setup — enter the Restaurant ID and login the restaurant owner generated for this tablet.
-                You won't be asked again after this.
-              </p>
-            </div>
-            <form onSubmit={handleConnectDevice} className="space-y-3.5">
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">Restaurant ID *</label>
-                <input
-                  type="text"
-                  value={connectRestaurantId}
-                  onChange={(e) => setConnectRestaurantId(e.target.value)}
-                  placeholder="Paste the ID, e.g. xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                  required
-                  className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
-                />
-                <p className="text-[11px] text-slate-500 mt-1.5">
-                    Find it in Super Admin: Restaurants, open the restaurant, Restaurant ID (with a Copy button). The owner can also copy it in Restaurant Admin under Subscription Plans, Device &amp; Staff Logins.
-                  </p>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">Login Email *</label>
-                <input
-                  type="email"
-                  value={connectEmail}
-                  onChange={(e) => setConnectEmail(e.target.value)}
-                  required
-                  className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">Password *</label>
-                <input
-                  type="password"
-                  value={connectPassword}
-                  onChange={(e) => setConnectPassword(e.target.value)}
-                  required
-                  className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
-                />
-              </div>
-              {connectError && (
-                <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                  <span>{connectError}</span>
-                </div>
-              )}
-              <button
-                type="submit"
-                disabled={connectBusy}
-                className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>{connectBusy ? 'Connecting…' : 'Connect Tablet'}</span>
-                {!connectBusy && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
-              </button>
-            </form>
           </div>
         </JamanvaarAuthLayout>
       </JAMANVAARStartup>

@@ -114,64 +114,20 @@ function persistConnection(restaurantId: string, label: string, deviceId?: strin
 }
 
 /**
- * Step 1: the id + password the restaurant owner generated for this tablet
- * (see CloudDeviceLoginsPanel in pos-admin). A device this restaurant has
- * never seen before comes back ACTIVATION_REQUIRED — caller must then call
- * activateCaptainDevice() with a Welcome Kit key before this tablet has a
- * device token.
+ * Activates this tablet with the one activation key from the Super Admin Welcome Kit, the same way the POS and Kitchen Display do:
+ * the key alone identifies the restaurant, so nothing else is asked.
  */
-export async function connectDevice(
-  restaurantId: string,
-  email: string,
-  password: string
-): Promise<{ requiresActivation: boolean; activationSessionToken?: string }> {
-  const res = await fetch(`${API_BASE}/api/v1/tenant-auth/login`, {
+export async function activateCaptainWithKey(code: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
-    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      restaurantId: restaurantId.trim(),
-      email: email.trim(),
-      password,
-      deviceType: 'CAPTAIN',
-      deviceId: getStoredDeviceId() ?? undefined,
-      deviceToken: getCaptainDeviceToken() ?? undefined
-    })
+    body: JSON.stringify({ code: code.trim(), deviceType: 'CAPTAIN', appVersion: '1.0.0' })
   });
-
-  const data = await parseJsonResponse(res);
-  if (!res.ok) {
-    throw new CloudApiError(data?.message ?? `Connection failed (${res.status})`, res.status);
-  }
-
-  if (data.status === 'ACTIVATION_REQUIRED') {
-    return { requiresActivation: true, activationSessionToken: data.activationSessionToken };
-  }
-
-  persistConnection(data.restaurant.id, data.user?.fullName ?? email.trim(), data.deviceId, data.deviceToken, data.restaurant.name);
-  return { requiresActivation: false };
-}
-
-/** Step 2, only on a tablet's first-ever connect: redeems the Welcome Kit activation key and mints this device's token. */
-export async function activateCaptainDevice(activationSessionToken: string, activationKey: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/v1/tenant-auth/activate-device`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      activationSessionToken,
-      activationKey: activationKey.trim(),
-      deviceType: 'CAPTAIN',
-      deviceName: 'Captain Tablet'
-    })
-  });
-
   const data = await parseJsonResponse(res);
   if (!res.ok) {
     throw new CloudApiError(data?.message ?? `Activation failed (${res.status})`, res.status);
   }
-
-  persistConnection(data.restaurant.id, data.user?.fullName ?? 'Captain Tablet', data.deviceId, data.deviceToken, data.restaurant.name);
+  persistConnection(data.restaurantId, data.device?.name ?? 'Captain Tablet', data.device?.id, data.deviceToken, data.restaurant?.name);
 }
 
 export function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {

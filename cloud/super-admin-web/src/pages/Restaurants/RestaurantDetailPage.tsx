@@ -874,7 +874,7 @@ export function RestaurantDetailPage() {
                   )}
                 </div>
                 <p style={{ margin: '6px 0 0 0', fontSize: 13, color: '#64748b' }}>
-                  <strong>Kiosk Admin</strong> and <strong>Captain</strong> ask for this Restaurant ID together with the restaurant owner's login before they take a key.
+                  <strong>Kiosk Admin</strong> asks for this Restaurant ID together with the restaurant owner's login before it takes a key. <strong>Captain</strong>, POS and Kitchen Display need only their key.
                   {' '}Relay these keys to the restaurant owner. On first login at <strong>Restaurant Admin ({RESTAURANT_ADMIN_URL})</strong>, <strong>POS</strong>, or <strong>Captain</strong>, entering this key registers and binds the device.
                   {restaurant.activationKeys.some((k) => k.allowedDeviceType === 'KIOSK_ADMIN') && (
                     <>
