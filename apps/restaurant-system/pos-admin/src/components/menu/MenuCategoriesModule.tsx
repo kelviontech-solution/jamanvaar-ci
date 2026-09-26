@@ -160,23 +160,16 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
     });
   })();
 
-  const handleDuplicateDish = (dish: MenuItem) => {
-    MenuRepository.createMenuItem({
-      name: `${dish.name} (Copy)`,
-      sku: `SKU-${Math.floor(1000 + Math.random() * 9000)}`,
-      price: dish.price,
-      categoryId: dish.categoryId,
-      kitchenStation: dish.kitchenStation,
-      dietaryType: dish.dietaryType,
-      spiceLevel: dish.spiceLevel,
-      description: dish.description,
-      imageUrl: dish.imageUrl,
-      isAvailable: true,
-      isPopular: false,
-      isFeatured: false
-    });
-    showToast(`Duplicated dish: ${dish.name}`);
+  // A menu never keeps the same dish twice: any copies that arrive (a sync, an old import) are cleared, and the owner can also run it by hand.
+  const handleRemoveDuplicates = (quiet = false) => {
+    const { removed } = MenuRepository.removeDuplicateDishes();
+    if (removed > 0) showToast(`Removed ${removed} duplicate dish${removed === 1 ? '' : 'es'}.`);
+    else if (!quiet) showToast('No duplicate dishes found.');
   };
+  useEffect(() => {
+    handleRemoveDuplicates(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuItems.length]);
 
   const handleDeleteDish = (dish: MenuItem) => {
     if (onRequestConfirm) {
@@ -295,6 +288,15 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
           >
             <Percent className="w-3.5 h-3.5 text-jaman-saffron" />
             <span>Bulk Price Adjust</span>
+          </button>
+
+          <button
+            onClick={() => handleRemoveDuplicates()}
+            className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5"
+            title="Remove dishes that appear more than once"
+          >
+            <Copy className="w-3.5 h-3.5 text-jaman-saffron" />
+            <span>Remove Duplicates</span>
           </button>
         </div>
       </div>
@@ -534,13 +536,6 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                   </button>
 
                   <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => handleDuplicateDish(item)}
-                      title="Duplicate Dish"
-                      className="p-1.5 hover:bg-jaman-cream rounded-lg text-slate-400 hover:text-jaman-navy transition-colors cursor-pointer"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
                     <button
                       onClick={() => onOpenItemModal(item)}
                       title="Edit Dish"

@@ -350,6 +350,9 @@ export class MenuRepository {
   }
 
   public static createMenuItem(itemData: Partial<MenuItem>): MenuItem {
+    // A dish that is already on the menu is never added a second time; the existing one is returned.
+    const already = this.findDuplicateDish(itemData.name || 'New Dish', { sku: itemData.sku, categoryId: itemData.categoryId });
+    if (already) return already;
     const newItem: MenuItem = {
       id: itemData.id || `item-${Date.now()}`,
       categoryId: itemData.categoryId || db.categories[0]?.id || '',
@@ -391,6 +394,60 @@ export class MenuRepository {
     db.menuItems[idx] = { ...db.menuItems[idx], ...updates };
     db.notify();
     return db.menuItems[idx];
+  }
+
+  /** Dish names compare without case, spaces or punctuation, so "Paneer Tikka Angara" and "paneer-tikka  angara!" are one dish. */
+  public static normalizeDishName(name: string): string {
+    return (name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  /** The dish already on the menu with this name (or, when given, the same SKU in the same category), if any. */
+  public static findDuplicateDish(name: string, opts: { excludeId?: string; sku?: string; categoryId?: string } = {}): MenuItem | undefined {
+    const norm = this.normalizeDishName(name);
+    return db.menuItems.find(
+      (i) =>
+        i.id !== opts.excludeId &&
+        ((norm !== '' && this.normalizeDishName(i.name) === norm) || (!!opts.sku && !!i.sku && i.sku === opts.sku && i.categoryId === opts.categoryId))
+    );
+  }
+
+  /**
+   * Removes dishes that are the same dish twice (same name once case and punctuation are ignored, or the same SKU in one category).
+   * Of each group the best copy stays: the one with a photo, then the one that is available, then the oldest. Combos that pointed
+   * at a removed copy are re-pointed at the one that stays, and every removal is recorded so other devices drop it too.
+   */
+  public static removeDuplicateDishes(): { removed: number; kept: number } {
+    const groups = new Map<string, MenuItem[]>();
+    const add = (key: string, item: MenuItem) => groups.set(key, [...(groups.get(key) ?? []), item]);
+    for (const item of db.menuItems) {
+      const norm = this.normalizeDishName(item.name);
+      if (norm) add(`n:${norm}`, item);
+      if (item.sku) add(`s:${item.categoryId}:${item.sku}`, item);
+    }
+    const doomed = new Map<string, string>(); // removed id -> kept id
+    const score = (i: MenuItem) => (i.imageUrl && !i.imageUrl.includes('fallback') ? 2 : 0) + (i.isAvailable ? 1 : 0);
+    for (const items of groups.values()) {
+      const live = items.filter((i) => !doomed.has(i.id));
+      if (live.length < 2) continue;
+      const keep = [...live].sort((a, b) => score(b) - score(a) || db.menuItems.indexOf(a) - db.menuItems.indexOf(b))[0];
+      for (const other of live) if (other.id !== keep.id) doomed.set(other.id, keep.id);
+    }
+    if (doomed.size === 0) return { removed: 0, kept: db.menuItems.length };
+    for (const combo of db.combos ?? []) {
+      for (const field of ['mainItemIds', 'sideItemIds', 'drinkItemIds', 'dessertItemIds'] as const) {
+        const ids = (combo as unknown as Record<string, string[] | undefined>)[field];
+        if (Array.isArray(ids)) (combo as unknown as Record<string, string[]>)[field] = [...new Set(ids.map((id) => doomed.get(id) ?? id))];
+      }
+    }
+    for (const id of doomed.keys()) {
+      const idx = db.menuItems.findIndex((i) => i.id === id);
+      if (idx !== -1) {
+        db.menuItems.splice(idx, 1);
+        MenuItemSync.recordDeletion(id);
+      }
+    }
+    db.notify();
+    return { removed: doomed.size, kept: db.menuItems.length };
   }
 
   public static deleteMenuItem(id: string): boolean {
