@@ -10,7 +10,7 @@
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, EntitySyncEvent, EntitySyncPushResult, CloudSyncedEntity } from '@jamanvaar/sync';
 
 import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
-import { MenuRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
+import { MenuRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 // Operational traffic goes to the restaurant's Branch Core when one is configured and reachable; the cloud otherwise.
@@ -80,6 +80,7 @@ export async function activateKdsDevice(code: string): Promise<void> {
   }
 
   try {
+    TenantIsolation.enter(data.restaurantId); // a different restaurant's local data is never carried over
     localStorage.setItem(RESTAURANT_ID_KEY, data.restaurantId);
     // BUG-021: this device used to keep showing the seeded "JAMANVAAR RESTAURANT" placeholder
     // forever, even after activating against a real restaurant with a different name.

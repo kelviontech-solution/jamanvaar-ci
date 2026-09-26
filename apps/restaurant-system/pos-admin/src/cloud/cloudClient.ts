@@ -14,7 +14,7 @@ import type { PlanEntitlements, PlanTier } from '@jamanvaar/types';
  */
 
 import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData, pullRestaurantIdentity, pushRestaurantIdentity, type RestaurantIdentityFields, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
-import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository, LicenseRepository } from '@jamanvaar/database';
+import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository, LicenseRepository, TenantIsolation } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 // Operational traffic goes to the restaurant's Branch Core when one is configured and reachable; the cloud otherwise.
@@ -80,6 +80,7 @@ function getRestaurantId(): string | null {
 
 function setRestaurantId(id: string) {
   try {
+    TenantIsolation.enter(id, { unknownIsForeign: false }); // a different restaurant's local data is never carried over
     localStorage.setItem(RESTAURANT_ID_KEY, id);
   } catch {
     // Storage unavailable (private mode, etc.) — connection just won't persist across reloads.
@@ -111,6 +112,7 @@ export function saveDeviceRegistration(deviceId: string, deviceToken: string, re
     RestaurantIdentityRepository.startFreshOperations(); // BUG-115: ...and no demo combos, coupons, offers or tables
     PrinterRepository.startFresh(); // BUG-025: ...and no printers until real ones are added
     InventoryRepository.startFresh(); // BUG-045: ...and no demo ingredients/stock
+    TenantIsolation.enter(restaurantId, { unknownIsForeign: false }); // a different restaurant's local data is never carried over
     localStorage.setItem(RESTAURANT_ID_KEY, restaurantId);
   } catch {
     // Storage unavailable

@@ -8,7 +8,7 @@
  */
 
 import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
-import { MenuRepository, PrinterRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
+import { MenuRepository, PrinterRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 // Operational traffic goes to the restaurant's Branch Core when one is configured and reachable; the cloud otherwise.
@@ -134,6 +134,7 @@ export async function activateKioskDevice(code: string): Promise<ActivationResul
   }
 
   try {
+    TenantIsolation.enter(data.restaurantId); // a different restaurant's local data is never carried over
     localStorage.setItem(RESTAURANT_ID_KEY, data.restaurantId);
     localStorage.setItem(DEVICE_ID_KEY, data.device.id);
     localStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken);

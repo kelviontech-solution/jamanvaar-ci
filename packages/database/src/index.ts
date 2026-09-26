@@ -28,3 +28,4 @@ export * from './durable/worker_backend';
 export * from './durable/browser_boot';
 export * from './payment_policy';
 export * from './key_value_store';
+export * from './tenant_isolation';

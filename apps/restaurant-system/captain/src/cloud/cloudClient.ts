@@ -19,7 +19,7 @@ import type {
 } from '@jamanvaar/sync';
 
 import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
-import { MenuRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
+import { MenuRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 // Operational traffic goes to the restaurant's Branch Core when one is configured and reachable; the cloud otherwise.
@@ -97,6 +97,7 @@ function getCaptainDeviceToken(): string | null {
 
 function persistConnection(restaurantId: string, label: string, deviceId?: string, deviceToken?: string, restaurantName?: string) {
   try {
+    TenantIsolation.enter(restaurantId); // a different restaurant's local data is never carried over
     localStorage.setItem(RESTAURANT_ID_KEY, restaurantId);
     localStorage.setItem(DEVICE_LABEL_KEY, label);
     if (deviceId) localStorage.setItem(DEVICE_ID_KEY, deviceId);

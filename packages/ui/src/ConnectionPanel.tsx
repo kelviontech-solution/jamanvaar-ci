@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { collectDiagnostics, connectionStatus, saveCoreUrl, syncNow, EndpointResolver, type StatusTone } from '@jamanvaar/sync';
-import { db } from '@jamanvaar/database';
+import { db, TenantIsolation } from '@jamanvaar/database';
 
 const TONE: Record<StatusTone, string> = {
   ok: 'bg-emerald-50 text-emerald-800 border-emerald-200',
@@ -94,6 +94,23 @@ export const ConnectionPanel: React.FC<{ appVersion: string; showToast?: (msg: s
         <Row k="Orders on this device" v={d.orders} />
         <Row k="Local storage" v={d.storage.ok ? 'Healthy' : `Problem: ${d.storage.error}`} />
         <Row k="App version" v={d.appVersion} />
+      </div>
+
+      <div className="rounded-2xl border border-rose-200 p-4">
+        <div className="font-bold text-rose-800">Start this device fresh</div>
+        <p className="text-xs text-slate-500 mt-1">Removes the staff list, orders and other data stored on this device and downloads this restaurant's own data again. Use it if you see staff, orders or items that are not yours. Orders not yet sent are set aside, not deleted.</p>
+        <button
+          type="button"
+          onClick={() => {
+            if (!window.confirm('Remove the data stored on this device and download it again from your restaurant account?')) return;
+            const r = TenantIsolation.reset(db.restaurant.id);
+            say(r.quarantined > 0 ? `Device cleared. ${r.quarantined} unsent order(s) were set aside.` : 'Device cleared. Your restaurant data will download again.');
+            void syncNow();
+          }}
+          className="mt-3 px-4 py-2 rounded-xl bg-rose-600 text-white text-sm font-bold"
+        >
+          Clear and re-download
+        </button>
       </div>
     </div>
   );

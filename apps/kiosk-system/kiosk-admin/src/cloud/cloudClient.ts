@@ -22,7 +22,7 @@
 
 import { DeviceGate, PlatformNotice, type PlatformNoticeData, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, EntitySyncEvent, EntitySyncPushResult, CloudSyncedEntity } from '@jamanvaar/sync';
-import { db, LicenseRepository, MenuRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
+import { db, LicenseRepository, MenuRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 // Operational traffic goes to the restaurant's Branch Core when one is configured and reachable; the cloud otherwise.
@@ -256,6 +256,7 @@ function adoptRestaurantIdentity(restaurantId: string, restaurantName: unknown):
 
 function persistConnection(restaurantId: string, label: string): void {
   try {
+    TenantIsolation.enter(restaurantId.trim(), { unknownIsForeign: false }); // a different restaurant's local data is never carried over
     localStorage.setItem(RESTAURANT_ID_KEY, restaurantId.trim());
     localStorage.setItem(DEVICE_LABEL_KEY, label);
   } catch {
