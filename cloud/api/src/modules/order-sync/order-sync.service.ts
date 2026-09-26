@@ -6,7 +6,10 @@ import { nextSyncSequence } from '../../common/sync-sequence';
 import { mergeOrderItems } from './order-merge';
 import { decideStatus, integrityFlags } from './order-rules';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
+import { ConfigService } from '@nestjs/config';
 import { AuditService } from '../audit/audit.service';
+import { StaffSessionService } from '../entity-sync/staff-session.service';
+import { MANAGER_ROLES } from '../entity-sync/entity-authority';
 import { OrderSyncEventDto, orderSyncEventSchema } from './dto/push-order-sync.dto';
 
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000; // 24h
@@ -20,6 +23,8 @@ const CATCH_UP_MAX_ROWS = 500;
 const TERMINAL_PAID_STATUSES: ReadonlySet<string> = new Set(['SUCCESS', 'REFUNDED']);
 /** Device types with real payment/refund authority — the only ones allowed to change a terminal payment status. */
 const PAYMENT_AUTHORITATIVE_DEVICE_TYPES: ReadonlySet<string> = new Set(['POS', 'POS_ADMIN']);
+/** The owner-level consoles sign in with an account, not a terminal PIN, so the staff-proof rule below does not apply to them. */
+const STAFF_PROOF_EXEMPT_DEVICE_TYPES: ReadonlySet<string> = new Set(['POS_ADMIN', 'KIOSK_ADMIN']);
 
 
 /** The channel an order came from, recorded once at creation and never changed by later pushes. */
@@ -103,7 +108,9 @@ export class OrderSyncService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly realtime: RealtimeBus,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly sessions: StaffSessionService,
+    private readonly config: ConfigService
   ) {}
 
   /**
@@ -303,6 +310,54 @@ export class OrderSyncService {
             }
           }
 
+          // Taking an order or money back must be done by someone the server can name. The terminal stamps the signed session of the
+          // person signed in (and, for an override, the manager's approval); the server reads the ROLE from that proof. A cashier's own
+          // session without a manager approval is refused; no proof at all (an offline sign-in) is accepted but flagged, or refused when
+          // the deployment sets REQUIRE_STAFF_SESSION=true. The tokens themselves are never stored.
+          const staffFinalMeta = finalMeta as Record<string, unknown>;
+          delete staffFinalMeta.staffSession;
+          delete staffFinalMeta.approvalSession;
+          const takesBack = !!existing && (['CANCELLED', 'VOID', 'VOIDED', 'REFUNDED'].includes(decision.status) && existing.status !== decision.status
+            || (payStatus === 'REFUNDED' && existing.paymentStatus !== 'REFUNDED')
+            || ((evt.meta as { statusCorrection?: boolean } | undefined)?.statusCorrection === true && existing.status !== decision.status));
+          if (takesBack && !STAFF_PROOF_EXEMPT_DEVICE_TYPES.has(device.type)) {
+            const at = Date.parse(evt.updatedAt) || Date.now();
+            const rawSession = (evt.meta as { staffSession?: string } | undefined)?.staffSession;
+            const rawApproval = (evt.meta as { approvalSession?: string } | undefined)?.approvalSession;
+            const session = this.sessions.verify(rawSession, device.restaurantId, device.id, 'session', at);
+            const approval = this.sessions.verify(rawApproval, device.restaurantId, device.id, 'approval', at);
+            const stillActive = async (sid: string) => {
+              const row = await tx.syncedEntity.findFirst({ where: { restaurantId: device.restaurantId, entityType: 'STAFF_USER', externalId: sid }, select: { payload: true } });
+              const p = row?.payload as { deleted?: unknown; isActive?: unknown } | null;
+              return !p || (p.deleted !== true && p.isActive !== false);
+            };
+            const managerEvidence = [approval, session].find((c) => c && MANAGER_ROLES.includes(c.role)) ?? null;
+            const evidence = managerEvidence && (await stillActive(managerEvidence.sid)) ? managerEvidence : null;
+            if (evidence) {
+              staffFinalMeta.verifiedStaff = { id: evidence.sid, name: evidence.name, role: evidence.role };
+            } else {
+              const refusal = session
+                ? 'STAFF_NOT_AUTHORIZED: this action needs a manager; the person signed in on the terminal is not one and no manager approval came with it'
+                : this.config.get<string>('REQUIRE_STAFF_SESSION') === 'true'
+                  ? 'STAFF_UNVERIFIED: this action needs a signed-in staff member and none was proven'
+                  : null;
+              await tx.syncConflict.create({
+                data: {
+                  restaurantId: device.restaurantId, branchId: device.branchId, deviceId: device.id, entityType: 'ORDER', entityId: evt.externalOrderId,
+                  localVersion: { status: evt.status, paymentStatus: evt.paymentStatus, totalAmount: evt.totalAmount } as any,
+                  cloudVersion: { status: existing!.status, paymentStatus: existing!.paymentStatus } as any,
+                  reason: refusal ?? `STAFF_UNVERIFIED: ${device.type} took an order or money back without proof of who did it (accepted: offline sign-in)`
+                }
+              });
+              if (refusal) {
+                if (claimed) await this.releaseClaim(tx, device.restaurantId, evt.eventId!);
+                results.push({ externalOrderId: evt.externalOrderId, status: 'error', error: refusal });
+                continue;
+              }
+              staffFinalMeta.actorVerified = false;
+            }
+          }
+
           const data = {
             restaurantId: device.restaurantId,
             deviceId: device.id,
@@ -357,7 +412,7 @@ export class OrderSyncService {
               {
                 actorType: 'TENANT', actorId: device.id, restaurantId: device.restaurantId,
                 action: refunded ? 'ORDER_REFUNDED' : corrected ? 'ORDER_STATUS_CORRECTED' : 'ORDER_VOIDED', category: 'ORDER',
-                details: { orderId: evt.externalOrderId, from: existing.status, to: decision.status, totalAmount: evt.totalAmount, deviceType: device.type, declaredBy: (evt.meta as { cashierName?: string; captainName?: string } | undefined)?.cashierName ?? (evt.meta as { captainName?: string } | undefined)?.captainName ?? null }
+                details: { orderId: evt.externalOrderId, from: existing.status, to: decision.status, totalAmount: evt.totalAmount, deviceType: device.type, verifiedStaff: (finalMeta as Record<string, unknown>).verifiedStaff ?? null, declaredBy: (evt.meta as { cashierName?: string; captainName?: string } | undefined)?.cashierName ?? (evt.meta as { captainName?: string } | undefined)?.captainName ?? null }
               },
               tx
             );

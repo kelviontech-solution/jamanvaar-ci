@@ -23,7 +23,8 @@ import {
   type ServiceMessage
 } from '@jamanvaar/database';
 import type { User } from '@jamanvaar/types';
-import { lanMeshSync } from '@jamanvaar/sync';
+import { lanMeshSync, StaffSession } from '@jamanvaar/sync';
+import { deviceFetch as captainDeviceFetch } from '../cloud/cloudClient';
 import { SessionPersistence, AuthStatus, priceOrderLines } from '@jamanvaar/business';
 
 export interface CartItemEntry {
@@ -331,6 +332,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     if (matchedUser) {
       const captainProfile = profileFromUser(matchedUser);
       const startTime = new Date().toISOString();
+      void StaffSession.signIn(pin, captainDeviceFetch); // the server names who is on the floor (best effort offline)
       SessionPersistence.save('captain', {
         userId: matchedUser.id,
         fullName: matchedUser.fullName,
@@ -357,6 +359,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
   logout: () => {
     SessionPersistence.clear('captain');
+    StaffSession.clear();
     set({
       currentCaptain: null,
       authStatus: 'UNAUTHENTICATED',

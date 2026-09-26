@@ -174,7 +174,7 @@ export async function activateCaptainDevice(activationSessionToken: string, acti
   persistConnection(data.restaurant.id, data.user?.fullName ?? 'Captain Tablet', data.deviceId, data.deviceToken, data.restaurant.name);
 }
 
-function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
+export function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const token = getCaptainDeviceToken();
   if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
   return EndpointResolver.fetch(path, {

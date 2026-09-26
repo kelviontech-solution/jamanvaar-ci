@@ -49,6 +49,9 @@ export const orderSyncMetaSchema = z
     acceptedBy: z.string().max(64).optional(),
     /** A counter device (POS / POS Admin) deliberately correcting an order's state, e.g. re-opening a wrongly completed order. */
     statusCorrection: z.boolean().optional(),
+    /** Signed proof of who was signed in on the terminal / which manager approved (see StaffSessionService). Verified, then dropped. */
+    staffSession: z.string().max(1200).optional(),
+    approvalSession: z.string().max(1200).optional(),
     businessDayId: z.string().max(64).optional(),
     paymentTransactionId: z.string().max(128).optional(),
     tenderedAmountPaise: z.number().int().optional(),

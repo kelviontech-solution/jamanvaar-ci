@@ -21,4 +21,11 @@ export class StaffApprovalController {
   verify(@Body() body: z.infer<typeof verifySchema>, @CurrentDevice() device: Device) {
     return this.approval.verifyManagerPin(device, body.pin);
   }
+
+  /** A staff member signs in on this terminal (POS, Captain, KDS). Returns the signed session the terminal stamps onto what it does. */
+  @Post('sign-in')
+  @UsePipes(new ZodValidationPipe(verifySchema))
+  signIn(@Body() body: z.infer<typeof verifySchema>, @CurrentDevice() device: Device) {
+    return this.approval.signIn(device, body.pin);
+  }
 }

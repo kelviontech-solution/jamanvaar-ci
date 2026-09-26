@@ -1,3 +1,4 @@
+import { StaffSession } from './staff_session';
 import { KeyValueStore } from '@jamanvaar/database';
 import { SyncEvent, SyncEventType, Order, OrderItem, PaymentSplit } from '@jamanvaar/types';
 import { generateUUID, splitTaxPaise } from '@jamanvaar/utils';
@@ -49,6 +50,9 @@ export interface OrderSyncMeta {
   roundOffPaise?: number;
   serviceChargePaise?: number;
   tipPaise?: number;
+  /** Signed proof of who was signed in / which manager approved; the server verifies it (see staff_session.ts). */
+  staffSession?: string;
+  approvalSession?: string;
 }
 
 export interface OrderSyncPushEvent {
@@ -220,7 +224,9 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
       sgstPaise: toPaise(order.sgstAmount),
       roundOffPaise: toPaise(order.roundOffAmount),
       serviceChargePaise: toPaise(order.serviceChargeAmount),
-      tipPaise: toPaise(order.tipAmount)
+      tipPaise: toPaise(order.tipAmount),
+      staffSession: StaffSession.sessionToken(),
+      approvalSession: StaffSession.approvalToken()
     },
     updatedAt: order.updatedAt
   };

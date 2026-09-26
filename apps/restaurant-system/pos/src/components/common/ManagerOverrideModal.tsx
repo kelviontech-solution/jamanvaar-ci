@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { ManagerOverrideRepository, StaffRepository } from '@jamanvaar/database';
+import { StaffSession } from '@jamanvaar/sync';
+import { deviceFetch } from '../../cloud/cloudClient';
 import {
   ShieldAlert,
   X,
@@ -39,6 +41,8 @@ export const ManagerOverrideModal: React.FC = () => {
     const res = await ManagerOverrideRepository.verifyPin(pin);
     if (res.success && res.isManager) {
       const managerName = res.user?.fullName || 'Manager';
+      // The server confirms the manager and gives a short approval that travels with the action this unlocks (best effort offline).
+      await StaffSession.approve(pin, deviceFetch);
       ManagerOverrideRepository.requestOverride({
         action: pendingOverride.action,
         reason: pendingOverride.details || 'Manager authorized sensitive action',

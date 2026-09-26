@@ -113,6 +113,15 @@ pub fn is_safe_printer_name(name: &str) -> bool {
         && !trimmed.chars().any(|c| c.is_control() || matches!(c, '"' | '`' | '$' | ';' | '|' | '&' | '<' | '>'))
 }
 
+/// The most a single print job may carry. A receipt or kitchen ticket is a few kilobytes; a script asking for more is not printing one.
+pub const MAX_PRINT_BYTES: usize = 1024 * 1024;
+
+/// Is `name` one of the printers Windows actually has installed (compared without regard to case)? A page script may only print to those.
+pub fn is_installed_printer(name: &str, installed: &[PrinterRow]) -> bool {
+    let wanted = name.trim().to_lowercase();
+    installed.iter().any(|row| row.first().map(|n| n.trim().to_lowercase() == wanted).unwrap_or(false))
+}
+
 /// COM1 to COM256, in any case. Also accepts the `\\.\COM10` form.
 pub fn normalize_com_port(port: &str) -> Option<String> {
     let p = port.trim().trim_start_matches("\\\\.\\").to_uppercase();
@@ -209,6 +218,14 @@ pub fn print_raw_to_system_printer(name: &str, bytes: &[u8]) -> Result<(), Strin
     }
     if bytes.is_empty() {
         return Err("There is nothing to print.".to_string());
+    }
+    if bytes.len() > MAX_PRINT_BYTES {
+        return Err("That print job is too large.".to_string());
+    }
+    // Only a printer this computer really has: the page cannot aim the spooler at an arbitrary queue name.
+    let installed = list_system_printers()?;
+    if !is_installed_printer(name, &installed) {
+        return Err(format!("\"{}\" is not an installed printer on this computer.", name.trim()));
     }
     let mut path = std::env::temp_dir();
     path.push(format!("jamanvaar-print-{}-{}.bin", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_nanos()).unwrap_or(0)));
@@ -307,6 +324,13 @@ pub fn print_to_serial(port: &str, baud: u32, bytes: &[u8]) -> Result<(), String
     if !is_supported_baud(baud) {
         return Err(format!("{} is not a supported serial speed.", baud));
     }
+    if bytes.len() > MAX_PRINT_BYTES {
+        return Err("That print job is too large.".to_string());
+    }
+    // Only a port this computer really has.
+    if !list_serial_ports()?.iter().any(|p| p == &com) {
+        return Err(format!("{} is not a serial port on this computer.", com));
+    }
     let mode = hidden(Command::new("cmd").args(["/C", "mode", &format!("{}:", com), &format!("BAUD={}", baud), "PARITY=n", "DATA=8", "STOP=1"]))
         .output()
         .map_err(|e| format!("Could not set up {}: {}", com, e))?;
@@ -358,6 +382,14 @@ fn connect_and_send(ip: &str, port: u16, bytes: &[u8]) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn only_installed_printers_are_accepted() {
+        let installed = vec![vec!["EPSON TM-T82".to_string(), "USB001".to_string()]];
+        assert!(is_installed_printer("epson tm-t82 ", &installed));
+        assert!(!is_installed_printer("Some Other Queue", &installed));
+        assert!(!is_installed_printer("", &installed));
+    }
 
     #[test]
     fn parses_powershell_lines_into_rows() {

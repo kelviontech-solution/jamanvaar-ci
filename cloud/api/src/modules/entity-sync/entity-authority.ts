@@ -77,3 +77,11 @@ export function staffVisibleTo(deviceType: DeviceType, payload: Record<string, u
   const allowed = role ? TERMINAL_ROLES[role] : undefined;
   return allowed ? allowed.includes(terminal) : true;
 }
+
+/** May this staff role sign in on this kind of terminal? A role not listed is not restricted; consoles and the counter accept everyone. */
+export function roleMaySignInOn(roleId: string, deviceType: DeviceType): boolean {
+  const terminal = TERMINAL_OF_DEVICE[deviceType];
+  if (!terminal) return true;
+  const allowed = TERMINAL_ROLES[roleId];
+  return allowed ? allowed.includes(terminal) : true;
+}

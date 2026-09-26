@@ -3,6 +3,7 @@ export * from './lan_mesh_sync';
 export * from './command_pipeline';
 export * from './entity_sync';
 export * from './device_gate';
+export * from './staff_session';
 export * from './platform_notice';
 export * from './app_update';
 export * from './offline_extension';

@@ -36,7 +36,8 @@ import {
 import { PosPrinterService } from '../services/printerService';
 import { Platform } from '@jamanvaar/api';
 import { PosRecoveryService } from '../services/recoveryService';
-import { lanMeshSync, SyncOutboxEngine } from '@jamanvaar/sync';
+import { lanMeshSync, SyncOutboxEngine, StaffSession } from '@jamanvaar/sync';
+import { deviceFetch as posDeviceFetch } from '../cloud/cloudClient';
 import { SessionPersistence, AuthStatus, calculateCart } from '@jamanvaar/business';
 import { generateUUID } from '@jamanvaar/utils';
 
@@ -510,6 +511,8 @@ export const usePosStore = create<PosState>((set, get) => {
           isAuthenticated: true,
           isLocked: false
         });
+        // The server signs this person in so what they do can be attributed to a named, role-checked staff member (best effort offline).
+        void StaffSession.signIn(pin, posDeviceFetch);
         AuditRepository.log({
           action: 'LOGIN_SUCCESS',
           category: 'AUTH',
@@ -531,6 +534,7 @@ export const usePosStore = create<PosState>((set, get) => {
       });
       // Clear persisted session — next reload will show login
       SessionPersistence.clear('pos');
+      StaffSession.clear();
       set({
         currentUser: null,
         authStatus: 'UNAUTHENTICATED',
@@ -560,6 +564,7 @@ export const usePosStore = create<PosState>((set, get) => {
       if (result) {
         SessionPersistence.update('pos', { locked: false });
         set({ isLocked: false });
+        void StaffSession.signIn(pin, posDeviceFetch); // whoever unlocks is who is now at the counter
         return true;
       }
       return false;

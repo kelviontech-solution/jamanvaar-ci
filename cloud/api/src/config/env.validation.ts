@@ -60,6 +60,9 @@ const envSchema = z.object({
   PAYMENT_CREDENTIAL_ENCRYPTION_KEY: z.string().optional(),
   // Number of reverse proxies in front of the API (1 behind one load balancer). Unset means the API sees the connecting address
   // itself. Never set it to `true`: that lets any caller choose their own address for rate limiting.
+  // 'true' makes the server refuse voids/refunds/corrections that arrive with no signed proof of who did them (default: accept and flag, so a
+  // terminal that signed in offline can still sync).
+  REQUIRE_STAFF_SESSION: z.enum(['true', 'false']).optional(),
   TRUST_PROXY: z.coerce.number().int().min(0).max(5).optional(),
   // Separate secret for QR guest session signatures; falls back to JWT_ACCESS_SECRET when unset.
   QR_SESSION_SECRET: z.string().min(32).optional(),
