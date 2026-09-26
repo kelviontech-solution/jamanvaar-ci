@@ -78,7 +78,30 @@ export const DEFAULT_OFFLINE_GRACE_DAYS = 7;
 
 const memory: { value: string | null; disconnectReason: string | null } = { value: null, disconnectReason: null };
 
+/**
+ * Set (synchronously, in plain localStorage) when the person at a locked terminal chooses to disconnect it. Until the terminal makes a
+ * successful call with a new activation, no lock is shown or restored: otherwise an in-flight request answered "suspended", or a lock
+ * still waiting in slower storage, brought the same screen straight back after the reload.
+ */
+const DISCONNECTED_FLAG = 'jamanvaar_gate_disconnected';
+const isDisconnected = (): boolean => {
+  try {
+    return globalThis.localStorage?.getItem(DISCONNECTED_FLAG) === '1';
+  } catch {
+    return false;
+  }
+};
+const setDisconnected = (on: boolean): void => {
+  try {
+    if (on) globalThis.localStorage?.setItem(DISCONNECTED_FLAG, '1');
+    else globalThis.localStorage?.removeItem(DISCONNECTED_FLAG);
+  } catch {
+    /* storage unavailable: the in-memory reset still applies until the reload */
+  }
+};
+
 function readStorage(): DeviceGateState | null {
+  if (isDisconnected()) return null;
   try {
     const raw = KeyValueStore.get(STORAGE_KEY) ?? memory.value;
     return raw ? (JSON.parse(raw) as DeviceGateState) : null;
@@ -244,6 +267,7 @@ export class DeviceGate {
    */
   static disconnectTerminal(): void {
     this.rememberDisconnectReason('This terminal was disconnected. Enter an activation key to connect it again.');
+    setDisconnected(true);
     this.reset();
     this.identityInvalidHandled = true;
     if (this.identityInvalidHandler) this.identityInvalidHandler();
@@ -255,6 +279,7 @@ export class DeviceGate {
   }
 
   private static lock(code: DeviceGateCode, message?: string, reason?: string): void {
+    if (isDisconnected()) return; // the person chose to disconnect; nothing to lock until a new activation succeeds
     this.set({
       ...this.state,
       locked: true,
@@ -273,6 +298,7 @@ export class DeviceGate {
    * request would clear the lock and the next heartbeat would raise it again, so it flickered.
    */
   static reportSuccess(opts: { releaseUpdateLock?: boolean } = {}): void {
+    setDisconnected(false); // a successful call means the terminal has a working activation again
     if (this.state.locked && this.state.code === 'UPDATE_REQUIRED' && !opts.releaseUpdateLock) {
       this.set({ ...this.state, lastCheckInAt: new Date().toISOString() });
       return;
