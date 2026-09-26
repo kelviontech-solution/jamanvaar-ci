@@ -1,1870 +1,268 @@
-You are a Senior SaaS Architect, Distributed Systems Engineer, Restaurant POS Architect, QA Architect, and Integration Test Engineer.
-
-I want you to perform a COMPLETE END-TO-END AUDIT and TEST of JAMANVAAR restaurant onboarding and multi-application/device integration.
-
-This is NOT a simple UI test.
-
-The objective is to verify that when a restaurant is onboarded with different combinations of:
-
-- POS
-- Kiosk
-- KDS
-- Captain App
-- Restaurant Admin
-- Multiple POS devices
-- Multiple Kiosks
-- Multiple Captain devices
-- Multiple branches
-
-the correct devices/apps are activated, configured, connected, synchronized, and able to exchange data correctly.
-
-The system must behave correctly regardless of the combination selected during onboarding.
-
-==================================================
-1. FIRST READ THE EXISTING ARCHITECTURE
-==================================================
-
-Before changing code:
-
-Inspect the complete repository.
-
-Understand:
-
-- Super Admin
-- Restaurant Admin
-- POS
-- POS Admin
-- Kiosk
-- Kiosk Admin
-- KDS
-- Captain
-- QR Ordering
-- Branch Core / Local Core if implemented
-- Cloud backend
-- authentication
-- device registration
-- activation keys
-- plans
-- licenses
-- entitlements
-- restaurant
-- branch
-- tables
-- menu
-- orders
-- KOT
-- KDS
-- inventory
-- sync
-- WebSocket
-- local storage
-- event system
-- device management
-
-Do not assume the existing architecture is correct.
-
-Trace the real code.
-
-Identify:
-
-- APIs
-- database models
-- device registration
-- authentication
-- authorization
-- local storage
-- sync queues
-- event handling
-- order creation
-- KOT creation
-- KDS delivery
-- Captain order flow
-- Kiosk order flow
-- POS order flow
-
-==================================================
-2. CREATE A TEST SPECIFICATION
-==================================================
-
-Create:
-
-docs/RESTAURANT_ONBOARDING_AND_MULTI_APP_TEST_PLAN.md
-
-This document must contain the complete test matrix described below.
-
-Do NOT immediately start changing the application.
-
-First create the test plan based on the actual architecture.
-
-==================================================
-3. CORE RESTAURANT STRUCTURE
-==================================================
-
-The fundamental hierarchy should be:
-
-SUPER ADMIN
-    ↓
-RESTAURANT
-    ↓
-BRANCH
-    ↓
-DEVICES / APPLICATIONS
-
-Example:
-
-Restaurant:
-JM9999999999
-
-Branch:
-Ahmedabad Main
-
-Devices:
-
-POS-01
-POS-02
-
-KIOSK-01
-KIOSK-02
-
-KDS-01
-
-CAPTAIN-01
-CAPTAIN-02
-CAPTAIN-03
-
-The system must understand that these devices belong to:
-
-Restaurant
-+
-Branch
-+
-Device Type
-+
-Device Identity
-
-==================================================
-4. VERY IMPORTANT — DEVICE COUNT
-==================================================
-
-Do NOT assume:
-
-one restaurant = one POS.
-
-A restaurant may have:
-
-1 POS
-2 POS
-5 POS
-10 POS
-
-Likewise:
-
-1 Kiosk
-2 Kiosks
-5 Kiosks
-
-and:
-
-1 Captain
-10 Captain devices
-
-and:
-
-1 KDS
-multiple KDS screens
-
-The architecture must support multiple devices without creating duplicate restaurants, duplicate branches, duplicate menus, or duplicate order systems.
-
-==================================================
-5. ONBOARDING SHOULD NOT CREATE DUPLICATE RESTAURANTS
-==================================================
-
-Example:
-
-Super Admin creates:
-
-Restaurant:
-ABC Restaurant
-
-Branch:
-Main Branch
-
-Then activates:
-
-POS-01
-POS-02
-Kiosk-01
-Kiosk-02
-KDS-01
-Captain-01
-
-All devices must belong to the SAME:
-
-restaurantId
-
-and appropriate:
-
-branchId
-
-Do NOT create:
-
-Restaurant A → POS
-Restaurant B → Kiosk
-
-They must remain one tenant.
-
-==================================================
-6. DEVICE IDENTITY
-==================================================
-
-Every installed/registered device must have a unique:
-
-deviceId
-
-Conceptually:
-
-restaurantId
-branchId
-deviceId
-deviceType
-
-Example:
-
-JM9999999999
-BR001
-POS-01
-POS
-
-JM9999999999
-BR001
-POS-02
-POS
-
-JM9999999999
-BR001
-KIOSK-01
-KIOSK
-
-JM9999999999
-BR001
-KDS-01
-KDS
-
-JM9999999999
-BR001
-CAPTAIN-01
-CAPTAIN
-
-Do not use restaurantId as deviceId.
-
-Do not use device type as deviceId.
-
-==================================================
-7. PLAN ENTITLEMENT
-==================================================
-
-Test onboarding against the existing plan/entitlement architecture.
-
-Example:
-
-PLAN A:
-
-POS
-Restaurant Admin
-
-PLAN B:
-
-POS
-Restaurant Admin
-KDS
-Captain
-
-PLAN C:
-
-POS
-Restaurant Admin
-KDS
-Captain
-QR Ordering
-
-Kiosk should only be available when its entitlement is enabled.
-
-Do not use:
-
-if plan === "7000"
-
-or:
-
-if plan === "9000"
-
-Use the centralized entitlement system.
-
-==================================================
-8. ONBOARDING MATRIX
-==================================================
-
-Create a complete test matrix.
-
-At minimum test:
-
-CASE 01
-
-Restaurant:
-POS only
-
-Expected:
-
-Restaurant Admin ✓
-POS ✓
-KDS ✗
-Kiosk ✗
-Captain ✗
-
---------------------------------
-
-CASE 02
-
-Restaurant:
-POS + KDS
-
-Expected:
-
-POS ✓
-KDS ✓
-Restaurant Admin ✓
-
-POS orders must reach KDS.
-
---------------------------------
-
-CASE 03
-
-Restaurant:
-POS + Captain
-
-Expected:
-
-POS ✓
-Captain ✓
-
-Captain-created orders must reach POS/order pipeline.
-
---------------------------------
-
-CASE 04
-
-Restaurant:
-POS + KDS + Captain
-
-Expected:
-
-POS
-KDS
-Captain
-
-All connected through canonical order architecture.
-
---------------------------------
-
-CASE 05
-
-Restaurant:
-POS + Kiosk
-
-Expected:
-
-POS ✓
-Kiosk ✓
-
-Kiosk orders must reach POS.
-
---------------------------------
-
-CASE 06
-
-Restaurant:
-POS + Kiosk + KDS
-
-Expected:
-
-Kiosk
-    ↓
-Canonical Order
-    ↓
-POS / Branch Core
-    ↓
-KOT
-    ↓
-KDS
-
-POS orders:
-
-POS
-    ↓
-KOT
-    ↓
-KDS
-
-Both sources must reach KDS correctly.
-
---------------------------------
-
-CASE 07
-
-Restaurant:
-POS + Kiosk + Captain + KDS
-
-Expected:
-
-POS
-Kiosk
-Captain
-
-all produce canonical orders.
-
-All relevant KOTs reach KDS.
-
---------------------------------
-
-CASE 08
-
-Restaurant:
-POS + Kiosk + QR + KDS
-
-Expected:
-
-POS orders
-Kiosk orders
-QR orders
-
-all reach canonical order pipeline and KDS.
-
---------------------------------
-
-CASE 09
-
-Restaurant:
-POS + Kiosk + Captain + QR + KDS
-
-Full configuration.
-
-Test all order sources simultaneously.
-
-==================================================
-9. MULTIPLE POS TEST
-==================================================
-
-Test:
-
-POS-01
-POS-02
-POS-03
-
-All belong to the same:
-
-restaurant
-branch
-
-Create orders simultaneously.
-
-Expected:
-
-No duplicate orders.
-
-No lost orders.
-
-No ID collisions.
-
-No overwritten carts.
-
-No cross-device data leakage.
-
-==================================================
-10. MULTIPLE KIOSK TEST
-==================================================
-
-Test:
-
-Kiosk-01
-Kiosk-02
-Kiosk-03
-
-All operate simultaneously.
-
-Customer A orders from Kiosk-01.
-
-Customer B orders from Kiosk-02.
-
-Expected:
-
-Independent orders.
-
-Both reach:
-
-canonical order system
-POS
-KOT
-KDS
-
-No duplicate order creation.
-
-==================================================
-11. POS + KIOSK CONCURRENCY
-==================================================
-
-This is a critical scenario.
-
-At the same time:
-
-POS-01 creates Order A.
-
-Kiosk-01 creates Order B.
-
-Expected:
-
-Order A
-and
-Order B
-
-both exist.
-
-Both receive unique IDs.
-
-Both reach KOT.
-
-Both reach KDS.
-
-Neither overwrites the other.
-
-==================================================
-12. POS + KIOSK + CAPTAIN CONCURRENCY
-==================================================
-
-Simultaneously:
-
-POS:
-Order A
-
-Kiosk:
-Order B
-
-Captain:
-Order C
-
-Expected:
-
-A
-B
-C
-
-all exist independently.
-
-All enter the same canonical order pipeline.
-
-All generate appropriate KOT events.
-
-KDS receives all required kitchen work.
-
-==================================================
-13. MULTIPLE CAPTAIN DEVICES
-==================================================
-
-Test:
-
-Captain-01
-Captain-02
-Captain-03
-
-All create orders simultaneously.
-
-Expected:
-
-Each device can operate independently.
-
-No duplicate orders.
-
-No lost orders.
-
-No overwritten orders.
-
-All orders are associated with:
-
-restaurantId
-branchId
-source = CAPTAIN
-deviceId
-
-where applicable.
-
-==================================================
-14. MULTIPLE KDS SCREENS
-==================================================
-
-If the architecture supports multiple KDS screens:
-
-Test:
-
-KDS-01
-KDS-02
-
-Determine whether KDS screens represent:
-
-- same kitchen
-- different kitchen stations
-- different categories
-- different branches
-
-Do not assume all KDS screens should receive identical data.
-
-Verify the existing routing configuration.
-
-Example:
-
-KDS Kitchen:
-
-Pizza
-
-KDS Bar:
-
-Drinks
-
-KDS Main:
-
-All food
-
-Verify routing according to actual system requirements.
-
-==================================================
-15. KIOSK → KDS
-==================================================
-
-Test:
-
-Customer orders at Kiosk.
-
-Expected:
-
-Kiosk
- ↓
-Canonical Order
- ↓
-KOT
- ↓
-KDS
-
-Verify:
-
-order items
-modifiers
-quantity
-table/order type
-source
-timestamps
-
-are preserved.
-
-==================================================
-16. POS → KDS
-==================================================
-
-Test:
-
-Cashier creates order.
-
-Expected:
-
-POS
- ↓
-Canonical Order
- ↓
-KOT
- ↓
-KDS
-
-Verify exactly the same order data.
-
-==================================================
-17. CAPTAIN → KDS
-==================================================
-
-Captain creates order.
-
-Expected:
-
-Captain
- ↓
-Canonical Order
- ↓
-KOT
- ↓
-KDS
-
-No separate Captain-only order pipeline.
-
-==================================================
-18. QR → KDS
-==================================================
-
-If QR Ordering is enabled:
-
-Customer:
-
-QR
- ↓
-Order
- ↓
-KOT
- ↓
-KDS
-
-Verify table context.
-
-==================================================
-19. CROSS-DEVICE ORDER CONSISTENCY
-==================================================
-
-For every order verify:
-
-restaurantId
-branchId
-orderId
-source
-deviceId
-tableId where applicable
-items
-modifiers
-pricing
-tax
-status
-timestamps
-
-remain consistent across:
-
-POS
-Restaurant Admin
-KDS
-Captain
-Kiosk
-Cloud
-Branch Core
-
-where applicable.
-
-==================================================
-20. ORDER STATUS PROPAGATION
-==================================================
-
-Test:
-
-POS creates order.
-
-KDS:
-
-NEW
-→ PREPARING
-→ READY
-
-Verify the correct state propagates back to:
-
-POS
-Restaurant Admin
-Captain
-customer QR where applicable
-
-Do not allow stale devices to overwrite newer states incorrectly.
-
-==================================================
-21. CONCURRENT ORDER STATUS UPDATES
-==================================================
-
-Example:
-
-KDS-01:
-
-Order #1001 → PREPARING
-
-KDS-02:
-
-same order → READY
-
-Test how the architecture handles concurrent updates.
-
-Determine the authoritative state transition rules.
-
-Do not use uncontrolled last-write-wins if it can produce invalid order states.
-
-==================================================
-22. CONCURRENT ITEM MODIFICATION
-==================================================
-
-Test:
-
-POS changes an order item.
-
-Captain changes another item.
-
-Kiosk/order source attempts another modification.
-
-Determine the existing conflict strategy.
-
-Do not silently overwrite the complete order JSON.
-
-If item-level merge is required, verify it.
-
-==================================================
-23. PAYMENT CONCURRENCY
-==================================================
-
-Payment implementation is NOT the focus of this phase.
-
-However, audit the architecture for:
-
-POS payment
-Kiosk payment
-QR payment
-
-and verify that the order model can eventually support safe payment concurrency.
-
-Do NOT implement Razorpay now.
-
-Do NOT implement Cash payment changes now.
-
-Just verify architecture readiness.
-
-==================================================
-24. INVENTORY CONCURRENCY
-==================================================
-
-Example:
-
-POS sells:
-
-2 Pizza
-
-Kiosk sells:
-
-1 Pizza
-
-Captain sells:
-
-1 Pizza
-
-All simultaneously.
-
-Inventory should not become:
-
-incorrect due to last-write-wins snapshots.
-
-Verify the current inventory architecture.
-
-If ledger/movement architecture exists, test it.
-
-If not, document the gap.
-
-==================================================
-25. OFFLINE POS + ONLINE KIOSK
-==================================================
-
-Test:
-
-POS internet:
-OFFLINE
-
-Kiosk:
-ONLINE
-
-Branch Core:
-AVAILABLE
-
-Verify:
-
-POS can continue local operation.
-
-Kiosk can continue operation.
-
-When synchronization resumes:
-
-orders converge correctly.
-
-No duplicate order IDs.
-
-No missing KOTs.
-
-==================================================
-26. OFFLINE MULTIPLE POS
-==================================================
-
-POS-01:
-
-OFFLINE
-
-POS-02:
-
-OFFLINE
-
-Both create orders.
-
-Expected:
-
-No collision.
-
-When internet/network returns:
-
-both synchronize.
-
-No order loss.
-
-==================================================
-27. OFFLINE KIOSK
-==================================================
-
-If kiosk offline operation is supported:
-
-Kiosk creates order locally.
-
-Verify:
-
-local persistence
-queue
-retry
-sync
-idempotency
-
-If public QR ordering cannot operate without internet, document that explicitly.
-
-Do not fake internet availability.
-
-==================================================
-28. BRANCH CORE FAILURE
-==================================================
-
-If Branch Core exists:
-
-Simulate:
-
-Branch Core OFFLINE/STOPPED.
-
-Determine:
-
-What POS can still do?
-
-What Kiosk can still do?
-
-What Captain can still do?
-
-What KDS can still do?
-
-What happens when Branch Core returns?
-
-Document the exact fallback behavior.
-
-Do not create a hidden single point of failure.
-
-==================================================
-29. DEVICE RESTART
-==================================================
-
-For every application:
-
-POS
-Kiosk
-Captain
-KDS
-Restaurant Admin
-
-Test:
-
-Create data.
-
-Close application/browser.
-
-Restart.
-
-Verify:
-
-local data survives.
-
-Pending sync survives.
-
-Device identity survives.
-
-No duplicate registration.
-
-No duplicate orders.
-
-==================================================
-30. DEVICE RE-REGISTRATION
-==================================================
-
-Test:
-
-POS-01 is already registered.
-
-Restart/reinstall simulation.
-
-Verify device identity behavior.
-
-Determine whether the system:
-
-recognizes existing device
-
-or
-
-creates duplicate device.
-
-There must be a safe device registration strategy.
-
-==================================================
-31. DEVICE ACTIVATION
-==================================================
-
-Test onboarding:
-
-Super Admin creates restaurant.
-
-Plan assigned.
-
-Activation credentials generated.
-
-POS activated.
-
-Kiosk activated.
-
-KDS activated.
-
-Captain activated.
-
-Verify each device receives:
-
-restaurantId
-branchId
-deviceId
-deviceType
-entitlements
-configuration
-sync credentials
-
-Do not require the Super Admin to manually create a completely separate restaurant integration for every device.
-
-==================================================
-32. DEVICE LIMITS
-==================================================
-
-If plans contain device limits:
-
-Test:
-
-Plan allows:
-
-2 POS
-
-Attempt to register:
-
-POS-03
-
-Expected:
-
-blocked or requires authorized upgrade/override.
-
-Do not silently allow unlimited devices if plan limits exist.
-
-==================================================
-33. KIOSK ADMIN
-==================================================
-
-Test:
-
-One Kiosk Admin manages:
-
-Kiosk-01
-Kiosk-02
-Kiosk-03
-
-Kiosk Admin should see:
-
-device
-status
-last seen
-last sync
-pending events
-errors
-version
-
-Kiosk Admin should NOT need a separate restaurant for every kiosk.
-
-==================================================
-34. RESTAURANT ADMIN DEVICE FLEET
-==================================================
-
-Restaurant Admin should be able to understand the operational fleet.
-
-Example:
-
-Devices:
-
-POS-01     ONLINE
-POS-02     OFFLINE
-KIOSK-01   ONLINE
-KIOSK-02   ONLINE
-KDS-01     ONLINE
-CAPTAIN-01 ONLINE
-CAPTAIN-02 ONLINE
-
-Show:
-
-last seen
-last sync
-pending events
-errors
-device type
-branch
-
-Do not show fake statuses.
-
-==================================================
-35. DEVICE COMMANDS
-==================================================
-
-Test commands such as:
-
-SYNC_NOW
-
-where supported.
-
-Example:
-
-Restaurant Admin:
-
-POS-02
-[Sync Now]
-
-If POS-02 is online:
-
-command delivered.
-
-If offline:
-
-command remains pending.
-
-When POS-02 reconnects:
-
-command is received.
-
-Do not pretend an offline device received a command.
-
-==================================================
-36. RESTAURANT → BRANCH DATA ISOLATION
-==================================================
-
-Test:
-
-Restaurant A
-Branch A1
-Branch A2
-
-Restaurant B
-Branch B1
-
-Ensure:
-
-A1 cannot access A2 data unless explicitly authorized.
-
-Restaurant A cannot access Restaurant B.
-
-Devices cannot cross tenant boundaries.
-
-==================================================
-37. MENU PROPAGATION
-==================================================
-
-Restaurant Admin changes:
-
-Pizza price
-
-Publish.
-
-Verify:
-
-POS
-Kiosk
-Captain
-QR
-
-receive the correct menu/configuration according to their channel.
-
-No stale configuration should silently become authoritative.
-
-==================================================
-38. MENU CONCURRENCY
-==================================================
-
-Test:
-
-Restaurant Admin changes menu.
-
-Kiosk is using old menu.
-
-POS is using old menu.
-
-Customer QR loads new menu.
-
-Verify versioning and order-time validation.
-
-Old cached clients must not be able to submit invalid prices.
-
-==================================================
-39. ENTITLEMENT CHANGE WHILE DEVICES ARE ONLINE
-==================================================
-
-Example:
-
-Restaurant currently has:
-
-POS
-KDS
-Captain
-QR
-
-Super Admin disables:
-
-QR_ORDERING
-
-Expected:
-
-QR new orders become unavailable.
-
-Existing historical QR orders remain.
-
-Other features continue.
-
-Verify propagation to:
-
-Restaurant Admin
-QR
-POS where relevant
-Branch Core
-
-==================================================
-40. ENTITLEMENT CHANGE WHILE DEVICE IS OFFLINE
-==================================================
-
-Example:
-
-POS/Kiosk is offline.
-
-Super Admin changes restaurant entitlement.
-
-Device reconnects.
-
-Verify entitlement refresh.
-
-Do not allow permanently stale privileges.
-
-==================================================
-41. MULTI-BRANCH DEVICE TEST
-==================================================
-
-Restaurant:
-
-JM9999999999
-
-Branch A:
-
-POS-A1
-KDS-A
-Kiosk-A
-
-Branch B:
-
-POS-B1
-KDS-B
-Kiosk-B
-
-Verify:
-
-Branch A order → Branch A KDS
-
-Branch B order → Branch B KDS
-
-Never:
-
-Branch A order → Branch B KDS
-
-unless explicitly configured as a shared kitchen.
-
-==================================================
-42. SHARED KITCHEN TEST
-==================================================
-
-If the architecture supports a shared kitchen across branches:
-
-test explicitly.
-
-Do not assume.
-
-Document:
-
-Branch A
-    ↓
-Shared KDS
-
-Branch B
-    ↓
-Shared KDS
-
-Verify routing rules.
-
-==================================================
-43. NETWORK TOPOLOGY TEST
-==================================================
-
-Test intended network architecture:
-
-Cloud
- ↓
-Internet
- ↓
-Branch Core
- ↓
-LAN
- ├── POS
- ├── Kiosk
- ├── Captain
- └── KDS
-
-Verify which communication happens through:
-
-Cloud
-
-and which through:
-
-Branch Core/LAN.
-
-Do not allow applications to randomly use incompatible communication paths.
-
-==================================================
-44. DATA FLOW DOCUMENTATION
-==================================================
-
-Create a complete data flow diagram for:
-
-POS Order
-
-Kiosk Order
-
-Captain Order
-
-QR Order
-
-Each must show:
-
-UI
-→ Local DB
-→ Branch Core
-→ Cloud
-→ Sync
-→ POS
-→ KOT
-→ KDS
-
-where applicable.
-
-Document the actual implementation rather than an imagined architecture.
-
-==================================================
-45. EVENT FLOW
-==================================================
-
-For every major operation identify events.
-
-Example:
-
-ORDER_CREATED
-ORDER_UPDATED
-KOT_CREATED
-KOT_UPDATED
-ORDER_STATUS_CHANGED
-MENU_UPDATED
-INVENTORY_MOVEMENT
-DEVICE_REGISTERED
-DEVICE_SYNCED
-
-Verify:
-
-eventId
-
-is unique per event.
-
-Never use orderId as eventId.
-
-==================================================
-46. DUPLICATE EVENT TEST
-==================================================
-
-Send the same event multiple times.
-
-Expected:
-
-ONE logical result.
-
-Test:
-
-POS
-Kiosk
-Captain
-KDS
-Branch Core
-Cloud
-
-for idempotent processing.
-
-==================================================
-47. OUT-OF-ORDER EVENT TEST
-==================================================
-
-Deliver:
-
-Event 103
-
-before:
-
-Event 102
-
-Determine whether the system:
-
-buffers
-recovers
-uses sequence
-uses version
-rejects safely
-
-Do not silently apply stale state over newer state.
-
-==================================================
-48. SYNC CURSOR TEST
-==================================================
-
-Test:
-
-Client cursor:
-
-100
-
-Server:
-
-101
-102
-103
-
-Client receives:
-
-101
-102
-
-disconnects.
-
-Reconnects.
-
-Expected:
-
-103 is received.
-
-No missed event.
-
-Do not use only updatedAt timestamp synchronization.
-
-==================================================
-49. WEBSOCKET FAILURE TEST
-==================================================
-
-If WebSocket exists:
-
-Disconnect it.
-
-Create order.
-
-Verify:
-
-Order still reaches destination through recovery/sync.
-
-WebSocket must be an acceleration mechanism, not the only correctness mechanism.
-
-==================================================
-50. DATABASE TRANSACTION TEST
-==================================================
-
-For order creation verify that:
-
-Order
-+
-Order Items
-+
-KOT/outbox event
-
-cannot end up partially committed.
-
-Simulate failure at different stages.
-
-Expected:
-
-transaction rollback or recoverable state.
-
-Never:
-
-Order exists
-
-but:
-
-sync event permanently missing.
-
-==================================================
-51. HIGH-CONCURRENCY TEST MATRIX
-==================================================
-
-Test combinations such as:
-
-2 POS + 1 KDS
-
-2 POS + 2 Kiosk + 1 KDS
-
-3 POS + 3 Kiosk + 2 KDS + 5 Captain
-
-5 POS + 5 Kiosk + 2 KDS + 10 Captain
-
-QR + POS + Kiosk + Captain simultaneously
-
-multiple branches simultaneously
-
-multiple restaurants simultaneously
-
-Do not only test each application independently.
-
-Test the ecosystem.
-
-==================================================
-52. DATA CONSISTENCY MATRIX
-==================================================
-
-For each order verify:
-
-SOURCE
-POS / KIOSK / CAPTAIN / QR
-
-↓
-
-LOCAL STATE
-
-↓
-
-BRANCH CORE
-
-↓
-
-CLOUD
-
-↓
-
-CANONICAL ORDER
-
-↓
-
-KOT
-
-↓
-
-KDS
-
-↓
-
-ORDER STATUS
-
-Every stage must preserve:
-
-orderId
-restaurantId
-branchId
-source
-deviceId
-tableId
-items
-modifiers
-quantity
-pricing
-tax
-status
-timestamps
-
-where applicable.
-
-==================================================
-53. TEST AUTOMATION
-==================================================
-
-Build automated integration/E2E tests wherever possible.
-
-Do not rely only on manual clicking.
-
-Use the project's existing:
-
-Playwright
-API tests
-unit tests
-integration tests
-
-or equivalent.
-
-Test actual APIs and database state.
-
-==================================================
-54. TEST DATA SETUP
-==================================================
-
-Create reusable test fixtures.
-
-Example:
-
-Restaurant:
-TEST_RESTAURANT_01
-
-Branches:
-
-BRANCH_A
-BRANCH_B
-
-Devices:
-
-POS_01
-POS_02
-KIOSK_01
-KIOSK_02
-KDS_01
-CAPTAIN_01
-CAPTAIN_02
-
-Tables:
-
-T01
-T02
-T03
-
-Menu:
-
-Pizza
-Burger
-Coffee
-
-This should be test data only.
-
-Do not introduce hardcoded production behavior.
-
-==================================================
-55. FAILURE INJECTION
-==================================================
-
-Where practical test:
-
-- network disconnect
-- API timeout
-- database timeout
-- duplicate request
-- duplicate event
-- device restart
-- Branch Core restart
-- WebSocket disconnect
-- stale menu
-- stale entitlement
-- concurrent order
-- concurrent status update
-
-==================================================
-56. ACCEPTANCE CRITERIA
-==================================================
-
-The onboarding/multi-app architecture is considered verified only when:
-
-[ ] Restaurant can be created
-[ ] Branch can be created
-[ ] Plan can be assigned
-[ ] Entitlements propagate
-[ ] Devices register correctly
-[ ] Multiple POS supported
-[ ] Multiple Kiosk supported
-[ ] Multiple Captain devices supported
-[ ] Multiple KDS supported where designed
-[ ] POS → KDS works
-[ ] Kiosk → POS works
-[ ] Kiosk → KDS works
-[ ] Captain → POS works
-[ ] Captain → KDS works
-[ ] QR → POS works
-[ ] QR → KDS works
-[ ] Multiple simultaneous orders work
-[ ] No duplicate orders
-[ ] No lost orders
-[ ] No order ID collision
-[ ] No KOT ID collision
-[ ] Restaurant isolation works
-[ ] Branch isolation works
-[ ] Device isolation works
-[ ] Menu propagation works
-[ ] Entitlement changes work
-[ ] Offline behavior is understood
-[ ] Sync recovery works
-[ ] WebSocket recovery works
-[ ] Device restart works
-[ ] Device re-registration works
-[ ] High concurrency tests pass
-[ ] Load tests produce measurable results
-[ ] No critical data corruption
-[ ] No production hardcoding introduced
-
-==================================================
-57. FINAL REPORT
-==================================================
-
-After testing, create:
-
-docs/RESTAURANT_ONBOARDING_MULTI_APP_TEST_REPORT.md
-
-Include:
-
-1. Architecture tested
-2. Device combinations tested
-3. Onboarding scenarios
-4. Data flow results
-5. POS tests
-6. Kiosk tests
-7. Captain tests
-8. KDS tests
-9. QR tests
-10. Multi-device tests
-11. Multi-branch tests
-12. Concurrency tests
-13. Offline tests
-14. Sync tests
-15. Failure recovery tests
-16. Security/isolation tests
-17. Load tests
-18. Failed tests
-19. Bugs found
-20. Architectural weaknesses
-21. Recommended fixes
-22. Remaining risks
-
-For every failed test include:
-
-TEST ID
-EXPECTED
-ACTUAL
-ROOT CAUSE
-FILE/MODULE
-SEVERITY
-RECOMMENDED FIX
-
-==================================================
-58. IMPORTANT — DO NOT FAKE PASS
-==================================================
-
-Never mark a test PASS simply because the UI appears correct.
-
-Verify:
-
-Database state
-API response
-local state
-sync events
-device state
-order state
-KOT state
-KDS state
-
-A green UI is not proof of correct architecture.
-
-==================================================
-59. IMPORTANT — NO PACKAGING
-==================================================
-
-Do NOT create:
-
-EXE
-APK
-AAB
-installer
-production package
-
-The purpose of this task is:
-
-ARCHITECTURE + INTEGRATION + CONCURRENCY + DATA FLOW + TESTING.
-
-The applications must become packaging-ready, but packaging happens later.
-
-==================================================
-60. EXECUTION METHOD
-==================================================
-
-Do not attempt all tests in one giant operation.
-
-First:
-
-1. Audit the repository.
-2. Create/update the test plan.
-3. Create a test matrix.
-4. Identify existing test infrastructure.
-5. Identify missing test infrastructure.
-6. Execute tests in logical groups.
-7. Fix verified architectural problems.
-8. Re-run affected tests.
-9. Update the test report.
-10. Continue until the complete matrix has been evaluated.
-
-Never make a large architectural change without first understanding the existing implementation.
-
-==================================================
-FINAL OBJECTIVE
-==================================================
-
-I want confidence that JAMANVAAR works as ONE connected restaurant ecosystem.
-
-Example:
-
-Restaurant
-    ↓
-Branch
-    ↓
-┌─────────────┬─────────────┬─────────────┬─────────────┐
-│ POS 1       │ POS 2       │ Kiosk 1     │ Kiosk 2     │
-└─────────────┴─────────────┴─────────────┴─────────────┘
-       │              │             │            │
-       └──────────────┴─────────────┴────────────┘
-                              ↓
-                         Branch Core
-                              ↓
-                      Canonical Order
-                              ↓
-                    ┌─────────┴─────────┐
-                    ↓                   ↓
-                   KOT                 KDS
-                    ↑
-              Captain / QR
-
-Every application must understand:
-
-WHO
-    = restaurant
-
-WHERE
-    = branch
-
-WHICH DEVICE
-    = deviceId
-
-WHAT
-    = order/event
-
-WHERE IT CAME FROM
-    = source/channel
-
-AND HOW IT SYNCS
-    = event + idempotency + cursor
-
-The final system must support multiple devices and simultaneous operations without duplicate, lost, overwritten, or cross-tenant data.
+# Restaurant onboarding and multi-application test plan
+
+Source requirement: [RESTAURANT_ONBOARDING_MULTI_APP_TEST_SPECIFICATION.md](RESTAURANT_ONBOARDING_MULTI_APP_TEST_SPECIFICATION.md) (the original 60-section brief; it was previously stored under this file's name). Findings and execution log: [RESTAURANT_ONBOARDING_MULTI_APP_TEST_REPORT.md](RESTAURANT_ONBOARDING_MULTI_APP_TEST_REPORT.md).
+
+**Status of this document: architecture audit only.** It records how the code actually works, the test matrix built from it, and which cells are verified. No production code was changed. The only code added is `cloud/api/test/audit-probes.e2e.spec.ts` (19 probes, described in section 6). Nothing here was packaged.
+
+## 1. Status legend (used in every matrix)
+
+| Mark | Meaning |
+|---|---|
+| **PASS-EXISTING** | An existing automated test asserts this and passed in today's full runs (cloud 98 files / 807 tests; root 161 files / 1124 tests). Matched by reading the test's assertions, not only its title. |
+| **PASS-PROBE** | Verified by an audit probe run for this audit. |
+| **DEFECT-CONFIRMED** | An audit probe asserting the required behaviour FAILED against the current code, for the stated reason (probe id given). |
+| **DEFECT-BY-CODE** | Read in the code, believed wrong, **not yet executed**. Needs a probe before it is treated as fact. |
+| **PARTIAL** | Some of the cell is tested; the missing part is named. |
+| **GAP** | No test exists. Behaviour not known. |
+| **DESIGN** | The architecture deliberately does not do this; the spec item does not apply or needs a decision. |
+
+## 2. The architecture as it actually is (traced from code)
+
+### 2.1 Tenancy and identity
+* `Restaurant` → `Branch` → `Device` in PostgreSQL with row-level security on `restaurantId` (`runAsTenant` / `runAsPlatform`). `Device.id` is a server-generated UUID; `restaurantId`, `branchId`, `type` are separate columns (`schema.prisma` model `Device`). Device types: POS, POS_ADMIN, CAPTAIN, KDS, KIOSK, KIOSK_ADMIN. QR is not a device.
+* A device gets its identity **only** by redeeming a single-use `ActivationKey` (`activation-keys.service.ts: redeem`). The key carries `allowedDeviceType`, optional `branchId`, `label` (becomes `Device.name`). The device receives one opaque bearer token (hash stored). There is **no client-side stable device identity** (no hardware id, no client-generated device id): a reinstall is a new key, a new `Device` row and a new seat.
+* `Device.branchId` is `key.branchId ?? onlyActiveBranchId(restaurant)`; the latter returns `null` when the restaurant has more than one active branch. `Device.branchId` is `ON DELETE SET NULL`.
+
+### 2.2 Entitlements
+* One service, `ApplicationEntitlementsService`: `appsForPlan` = tier bundle (`DEFAULT_APPS_BY_FAMILY_TIER`: CORE POS+POS_ADMIN; PRO adds CAPTAIN+KDS; QR adds QR_ORDERING only by flag) **plus** every application whose bridged plan flag (`posTerminal`, `kotKdsRouting`, `captainApp`, `selfOrderKiosk`, `qrTableOrdering`, `restaurantAdmin`) is true. Rows are dense per subscription (`ApplicationEntitlement`, all 7 app codes).
+* Enforcement points: key generation (`assertAppEnabled`), redeem (`assertAppEnabled` + `assertDeviceQuotaAvailable`), **every device request** (`DeviceAuthGuard`: device status, restaurant status, active subscription, application entitlement for `device.type`, branch active, MDM lock), QR resolution (`resolve`).
+* Quota: per application `deviceQuota` → `Feature.defaultDeviceQuota` → plan `maxDevices`, counted per restaurant and device type (not per branch).
+* A restaurant may hold one active subscription per product family (RESTAURANT + KIOSK).
+
+### 2.3 Order pipeline (canonical order)
+* `SyncedOrder` (unique `restaurantId + externalOrderId`), `source` derived from device type / meta (`orderSourceFor`), `branchId` = branch of the **first pushing device**, `seq` from `nextSyncSequence` (per-restaurant counter row; the row lock is held to commit, so sequence numbers are gapless and commit-ordered).
+* Push (`OrderSyncService.pushEvents`): one transaction per request; advisory lock per order id (sorted); per-event SAVEPOINT; exactly-once claim of `eventId` in `ProcessedSyncEvent`; payment invariants (`paymentViolation`); **item-level merge** (`mergeOrderItems`: items owned by originating device, kitchen progress ranks forward only); meta merged key by key; then a **plain overwrite of header fields** (`status`, totals, `tableId`, `notes`, `orderType`) with the pushing device's values. Order, `SyncEventLog`, `ProcessedSyncEvent` and `seq` commit together.
+* Pull (`catchUp`): `afterSeq` cursor (server-side gapless); legacy `since` timestamp cursor still served. Branch filter: `device.branchId ? (branchId = mine OR branchId IS NULL) : none`.
+* Server-created orders (QR): `ingestServerOrder`, same table, same sequence, same locks, `source = QR`.
+* Wake-ups: `RealtimeBus` (SSE per device, relayed across API instances through PostgreSQL LISTEN/NOTIFY). Every device also polls (KDS every 3 s, others 15 s); an event only means "pull now".
+
+### 2.4 KOT / KDS
+* **There is no KOT entity in the cloud.** A KOT is a local object on each device, derived from the order's items (`ensureKotsForOrder`, `kitchen_routing.ts`). Only QR orders get deterministic KOT ids/numbers (`kot-<orderId>-r<round>`); POS-created KOTs use the device's own numbering (number leases, disjoint per branch).
+* Kitchen state crosses devices as **item `kitchenStatus`** inside the order (rank-forward merge). KOT status is recomputed locally (`KOTRepository.reconcileWithOrders`).
+* Routing: each item carries `kitchenStation` (from the menu). A KDS chooses its **station name at the screen** (session `stationName`, default ALL) and filters locally. The server does not know which station a KDS serves; every KDS in a branch receives every branch order.
+
+### 2.5 Sync paths and the topology
+* Devices talk through `EndpointResolver`: Branch Core (LAN) first when discovered, cloud as fallback, each with its own cursor key. Branch Core (`packages/branch-core`) uplinks to the cloud (`uplink.ts`), receives the device roster (`/branch-roster`) to authenticate devices offline.
+* Non-order data (`entity-sync`): menu, categories, modifier/tax groups, tables, staff, customers, combos, coupons, shifts, feedback, service messages. Restaurant-wide; **not branch-scoped**; last-change-wins by payload `updatedAt` with sticky tombstones.
+* Inventory: cloud movement ledger (`InventoryMovement`, per branch, idempotent by `movementId`, `seq`); devices with recipe data (Restaurant Admin) deduct on pull via `reconcileOrder`.
+* Numbers: `NumberSequence` leases (branch-scoped, disjoint blocks) for ORDER/KOT; QR uses its own `QR-n` counter.
+
+### 2.6 Order data flow per source (implemented, not idealised)
+
+| Source | Path |
+|---|---|
+| POS | UI → local DB (`OrderRepository.createOrder`, local KOTs) → `order.syncStatus = SAVED_LOCALLY` (the outbox is the flag on the order) → `processOutbox` → Branch Core or cloud `POST /orders/sync` → `SyncedOrder(source=POS)`, seq → other devices pull by cursor → each builds its own KOT / order copy |
+| Kiosk | UI → local DB → same outbox → `source=KIOSK` (device type) → POS / KDS / Admin pull. Kiosk does not pull orders back (push only) |
+| Captain | UI → local DB → same outbox → `source=CAPTAIN` → items merged per device with POS additions |
+| QR | Guest browser → public API → priced from the published snapshot → `ingestServerOrder` → `SyncedOrder(source=QR, status NEW or PREPARING by autoAccept)`, seq → POS `QrOrderDesk` accepts (first-accept-wins, `acceptedBy`) → KDS/Captain/Admin pull; deterministic KOTs |
+| KDS | pulls orders, builds KOTs, pushes item `kitchenStatus` / order status through the same endpoint (`source` from device type KDS is not a sales channel) |
+
+## 3. Test infrastructure inventory
+
+| Layer | What exists | What is missing |
+|---|---|---|
+| Cloud API e2e (`cloud/api/test`, Vitest + Supertest, real PostgreSQL with RLS, non-superuser) | 99 spec files. Activation, device limits, enforcement, fleet, commands, sync sequence/chaos/reconciliation, order merge, tenant isolation, roster, realtime, inventory ledger, number leases, multi-family, QR (4 specs + scale) | Whole-ecosystem specs (POS+Kiosk+Captain+QR+KDS at once); multi-branch KDS routing; device re-registration; quota race; branch policy; status state machine |
+| Root suite (`tests`, Vitest, in-process simulation of local DBs and a fake cloud transport) | 161 files: outbox reliability, persistence, LAN mesh, Branch Core (chaos, discovery, operations), KDS/KOT routing, floor sync, inventory ledger sync, unified local core, per-role DBs | Multi-device simulation with real cloud (only fake transports); clock-skew; multi-KDS station |
+| Browser E2E | Playwright MCP used ad hoc (guest page, Restaurant Admin screens). No committed Playwright suite | A committed multi-app browser regression; no KDS/Captain/Kiosk/POS browser run |
+| Load | `cloud/api/scripts/qr-load.ts` (QR only) and in-suite acceptance tests | A device-order load harness (POS/Kiosk/Captain pushes), multi-restaurant/branch soak |
+| Fixtures | Ad hoc per spec (restaurant/plan/branch/device creators repeated) | One shared fixture builder for the spec's `TEST_RESTAURANT_01` topology |
+
+## 4. The test matrix
+
+Section numbers follow the source specification. "Existing evidence" names the spec/test file; all listed files passed in today's runs.
+
+### 4.1 Onboarding and entitlement (spec 3-8, 31, 32, 39, 40)
+
+| ID | Scenario | Status | Evidence / note |
+|---|---|---|---|
+| ON-01 | Restaurant, branch, plan, subscription created; applications derived from the plan through the central service | PASS-EXISTING | `restaurants`, `plans-dynamic-entitlements`, `application-entitlements-db-catalog`, `saas-modules` |
+| ON-02 | CASE 01-09 (POS only ... full): exactly the expected applications entitled; keys for any other type refused | **PASS-PROBE** | `audit-probes` P-OK-5 x9 (CORE tier + feature flags) |
+| ON-03 | Onboarding wizard "enabledApps" path with the same combinations | GAP | Only the plan-flag path was probed |
+| ON-04 | Kiosk only when its entitlement is on (RESTAURANT vs KIOSK family, two subscriptions) | PASS-EXISTING | `multi-family-subscriptions` |
+| ON-05 | Admin view of applications across BOTH subscriptions (Restaurant + Kiosk) | **DEFECT-CONFIRMED** | P-FAIL-6: `listForRestaurant` reads only the newest subscription; a restaurant with both shows `[KIOSK, KIOSK_ADMIN]` and no POS |
+| ON-06 | Same restaurantId for every device; no duplicate restaurants/branches | PASS-PROBE | P-OK-1 |
+| ON-07 | Device ids unique server UUIDs, not restaurantId/type | PASS-PROBE | P-OK-1 |
+| ON-08 | Per-application device quota; independent per app; revoke frees a seat | PASS-EXISTING | `device-limit`, `feature-disable-impact-and-quotas` |
+| ON-09 | Quota under **concurrent** redemption of different keys | **DEFECT-CONFIRMED** | P-FAIL-2: quota 2, six concurrent redeems, **6 devices created** (`assertDeviceQuotaAvailable` counts then inserts with no lock) |
+| ON-10 | Same code redeemed concurrently: one wins | PASS-EXISTING | `activation-redeem` (atomic `updateMany` claim) |
+| ON-11 | Entitlement disabled while devices online: device refused at once (`APP_DISABLED`); existing orders remain | PASS-EXISTING | `device-enforcement`, `order-sync-and-suspension`, `qr-scale` (QR) |
+| ON-12 | Entitlement changed while a device is offline: refreshed on reconnect, no stale privilege | PASS-EXISTING (by design) | Enforcement is per request (`DeviceAuthGuard`), so there is no cached privilege to go stale. Local-app behaviour on restore: PARTIAL (`license_entitlements`, `device_gate`) |
+| ON-13 | Quota is per restaurant+type, not per branch | DESIGN | Needs a decision if a chain wants a per-branch cap |
+| ON-14 | Device seat per `label` uniqueness (POS-01, POS-02) | GAP | `Device.name` is free text, not unique; two devices can share a name |
+
+### 4.2 Device identity, registration, restart (spec 6, 29-31)
+
+| ID | Scenario | Status | Evidence / note |
+|---|---|---|---|
+| DV-01 | Activation returns restaurantId, branchId, deviceId, type, token, restaurant identity | PASS-EXISTING | `activation-redeem`, `restaurant-identity-sync` |
+| DV-02 | Entitlements/configuration delivered to a device after activation | PARTIAL | `tenant/me/entitlements` and identity sync exist; per-device configuration (e.g. KDS station) does not (see KD-02) |
+| DV-03 | Re-registration / reinstall of the same physical device | GAP + **DESIGN DEFECT-BY-CODE** | No client device id: reinstall consumes a new key and a new seat while the old device stays ACTIVE until revoked. Policy decision required |
+| DV-04 | Restart preserves local data, pending sync, identity, no duplicate registration | PASS-EXISTING | `outbox_reliability`, `sync_outbox_persistence`, `pos_crash_recovery`, `persistence_atomicity`, `db_persistence_batching` (fake storage, not a browser restart) |
+| DV-05 | Device with no branch in a multi-branch restaurant | **DEFECT-CONFIRMED** | P-FAIL-3: redeem succeeds (201) with `branchId = null` |
+| DV-06 | Device revoke / lock / branch deactivate | PASS-EXISTING | `device-enforcement`, `device-command-fleet` |
+| DV-07 | Kiosk Admin sees its fleet with status, last seen, backlog, errors; commands only to own restaurant's kiosks | PASS-EXISTING | `device-command-fleet` |
+| DV-08 | Fleet statuses are computed from real heartbeat times, not invented | PASS-EXISTING | `fleet-and-keys` (health counts), `heartbeat_health` |
+| DV-09 | Offline command stays pending and is delivered on reconnect; redelivery limits | PASS-EXISTING | `device-command-fleet`, `device_command_runner` |
+
+### 4.3 Order sources and the canonical pipeline (spec 9-19, 52)
+
+| ID | Scenario | Status | Evidence / note |
+|---|---|---|---|
+| OR-01 | POS -> canonical order -> other device pull | PASS-EXISTING | `order-sync-and-suspension`, `order_sync_fidelity` |
+| OR-02 | Kiosk -> POS | PARTIAL | `pos_kiosk_integration`, `kiosk_kot_routing` (simulated); no cloud two-device test with a KIOSK-type device |
+| OR-03 | Captain -> POS/order pipeline (no Captain-only pipeline) | PASS-EXISTING | `sync-events-and-sequence` (two device types share one order), `captain_app_workflows` |
+| OR-04 | QR -> POS and KDS with table context | PASS-EXISTING | `qr-ordering-saas`, `qr_order_propagation` |
+| OR-05 | Simultaneous POS + KDS + second POS pushes: all land once, distinct seq | PASS-PROBE | P-OK-3 |
+| OR-06 | 100 concurrent QR orders on one table | PASS-EXISTING | `qr-scale` |
+| OR-07 | Multiple POS / Kiosk / Captain devices creating orders simultaneously, all sources at once | **GAP** | Only three device types x one order each (P-OK-3). No N-device, all-source run |
+| OR-08 | Order id / KOT id collision across devices | PARTIAL | Number leases disjoint (`number-leases`); order ids are device-generated `ord-<ts>-<rand4>` (`repositories.ts`): 4 base-36 chars of randomness per millisecond, collision odds low but not proven; KOT ids for non-QR orders are `kot-<ts>-<rand3>` |
+| OR-09 | Field-by-field consistency across POS, Admin, KDS, Captain, Kiosk, Cloud, Branch Core (restaurantId, branchId, source, deviceId, tableId, items, modifiers, pricing, tax, status, timestamps) | PARTIAL | Cloud-side and QR checked; `order_sync_fidelity` covers POS -> pulled device. No test compares the tuple end to end across five apps |
+| OR-10 | Order `source` and `deviceId` recorded | PARTIAL | `source` derived from device type; **KDS/POS_ADMIN pushes on an existing order do not change `source` (correct)**, but `SyncedOrder.deviceId` is overwritten by the last pushing device, so the originating device is lost (DEFECT-BY-CODE: `data.deviceId = device.id` on every update) |
+
+### 4.4 Status propagation and conflicts (spec 20-22, 47)
+
+| ID | Scenario | Status | Evidence / note |
+|---|---|---|---|
+| ST-01 | Item kitchen progress never regresses | PASS-EXISTING + PASS-PROBE | `order-merge.unit`, P-OK-4 |
+| ST-02 | ORDER-level status cannot regress (READY then stale PREPARING, fresh eventId) | **DEFECT-CONFIRMED** | P-FAIL-1: stored `PREPARING`. `data.status = evt.status` unconditionally; only replays of the **same** eventId are ignored |
+| ST-03 | Concurrent KDS-01 PREPARING vs KDS-02 READY: authoritative transition rules | **DEFECT-CONFIRMED** (same cause) | No transition table; last request wins |
+| ST-04 | Concurrent item modification (POS vs Captain vs Kiosk) | PASS-EXISTING | `sync-events-and-sequence` (two terminals adding keep each other's items, flagged for totals review) |
+| ST-05 | Concurrent header changes (totals, table, notes) | DEFECT-BY-CODE | Header overwritten by the last pusher; only a `needsTotalsReview` flag when foreign items were kept. No `If-Match` / version precondition |
+| ST-06 | Any device type may set any order status | DEFECT-BY-CODE | `paymentViolation` only protects payment. A KIOSK could mark an order COMPLETED. No role-to-transition rules |
+| ST-07 | Out-of-order delivery (event 103 before 102) | PARTIAL | Cursor is server-sequenced and gapless (`sync-events-and-sequence`), but **client events are not sequenced**: an older event with a new eventId is applied as newer (ST-02) |
+| ST-08 | Client applies remote order only if `remote.updatedAt >= local.updatedAt` | DEFECT-BY-CODE | `remote.updatedAt` is the SERVER clock, `local.updatedAt` the DEVICE clock (`outbox.ts catchUpFromCloud`). A device whose clock runs ahead ignores server updates (READY from KDS never shown). Not tested |
+| ST-09 | Status propagates back to POS / Admin / Captain / QR customer | PARTIAL | QR customer status: PASS-EXISTING. POS/Captain: by cursor pull, tested in simulation only |
+
+### 4.5 Sync, events, cursors, WebSocket (spec 45-50)
+
+| ID | Scenario | Status | Evidence / note |
+|---|---|---|---|
+| SY-01 | Same event sent repeatedly -> one logical result | PASS-EXISTING | `sync-events-and-sequence`, `sync-chaos` |
+| SY-02 | `eventId` unique per event | **DEFECT-BY-CODE / risk** | Client eventId = `<orderId>@<updatedAt>` (`outbox.ts toPushEvent`). Two distinct changes that share an `updatedAt` millisecond, or a change that does not bump `updatedAt`, produce the **same** eventId and the second is silently dropped as a duplicate. Needs a probe against the device code |
+| SY-03 | Cursor 100 -> receive 101,102 -> disconnect -> 103 | PASS-EXISTING | `sync-events-and-sequence` (pull by sequence), `sync_protocol`, `outbox_reliability` |
+| SY-04 | No dependence on `updatedAt` alone | PARTIAL | Orders: sequence. Entities (menu, tables, staff): `updatedAt` last-change-wins with sticky tombstones |
+| SY-05 | WebSocket/SSE failure: order still arrives by pull | PASS-EXISTING | `realtime-stream`, `realtime_client`, KDS 3 s poll |
+| SY-06 | Cross-instance wake-up | PASS-EXISTING | `qr-scale` (LISTEN/NOTIFY, relay reconnect) |
+| SY-07 | Order + items + sync record cannot partially commit (cloud) | PASS-EXISTING (by design) | one transaction: order, `SyncEventLog`, `ProcessedSyncEvent`, `seq`; SAVEPOINT per event |
+| SY-08 | Local order + outbox marker cannot separate (device) | PARTIAL | The outbox is the `syncStatus` flag on the order, so they are one record; `persistence_atomicity`, `sync_outbox_persistence` cover it. Crash between in-memory create and debounced persist (`db_persistence_batching`) is a documented window; not exercised against a real browser/SQLite kill |
+| SY-09 | Failure injection: DB timeout / API timeout / duplicate request | PARTIAL | `sync-chaos`, `outbox_reliability`, `qr-scale` (transient retry) |
+
+### 4.6 Branch and tenant isolation (spec 36, 41, 42)
+
+| ID | Scenario | Status | Evidence / note |
+|---|---|---|---|
+| BR-01 | Restaurant A cannot read Restaurant B (RLS) | PASS-EXISTING | `tenant-isolation`, `rls-platform-reads`, `order-sync-and-suspension` |
+| BR-02 | Branch A order reaches Branch A KDS only | PASS-PROBE + PASS-EXISTING | P-OK-2, `order-sync-and-suspension` |
+| BR-03 | Branch-bound device cannot post inventory into another branch | PASS-EXISTING | `inventory-ledger` |
+| BR-04 | **Branchless** device sees every branch's orders, and its orders are visible to every branch | **DEFECT-CONFIRMED** | P-FAIL-4 (`catchUp`: no filter when `branchId` is null; `OR branchId IS NULL` for branch devices) |
+| BR-05 | Branch A cannot pull Branch B's **tables** | **DEFECT-CONFIRMED** | P-FAIL-5: entity sync has no branch filter |
+| BR-06 | Menu / staff / customers / combos across branches | DESIGN (needs decision) | Restaurant-wide by design. The published QR menu honours branch lists and per-branch overrides; **POS, Kiosk and Captain do not** (they read the synced catalogue) |
+| BR-07 | Shared kitchen across branches | DESIGN / GAP | No configuration exists; branch filter makes it impossible unless a device is branchless (which is the defect in BR-04) |
+| BR-08 | Deleting a branch | DEFECT-BY-CODE | `Device.branchId ON DELETE SET NULL` turns its devices branchless (BR-04). Whether a branch can be hard-deleted was not checked |
+
+### 4.7 KDS, stations, Captain, Kiosk specifics (spec 14-18, 33)
+
+| ID | Scenario | Status | Evidence / note |
+|---|---|---|---|
+| KD-01 | POS/Kiosk/Captain/QR order -> KOT -> KDS with items, modifiers, quantity, table, source | PARTIAL | KOT derivation tested locally (`pos_kot_and_stations`, `kiosk_kot_routing`, `suite_architecture_and_kds`, `kot_status_from_orders`); QR deterministic KOTs tested; no cloud-connected multi-app run |
+| KD-02 | Multiple KDS screens = stations: routing configured where? | **FINDING** | Station chosen on the KDS screen, matched by name against `item.kitchenStation`; the server has no KDS-to-station assignment, so a mistyped/renamed station silently shows nothing; two KDS on "ALL" both show everything |
+| KD-03 | Two KDS bump different items of one order | PARTIAL | Item ranks merge forward (ST-01); KOT-level status per station recomputed locally |
+| KD-04 | KDS in a branch with no POS online | PARTIAL | Pull path works with cloud; Branch Core fallback tested in root suite |
+| KD-05 | Kiosk fleet management from Kiosk Admin | PASS-EXISTING | DV-07 |
+
+### 4.8 Offline, Branch Core, topology (spec 25-28, 43)
+
+| ID | Scenario | Status | Evidence / note |
+|---|---|---|---|
+| OF-01 | Offline POS, online Kiosk converge with no duplicate ids | PARTIAL | `offline_routing_integration`, `sync_online_offline`, `sync-chaos` |
+| OF-02 | Two offline POS create orders, then sync | PASS-EXISTING (simulated) | `number_allocator`, `number-leases`, `cross_app_sync_cluster` |
+| OF-03 | Offline kiosk | PARTIAL | Kiosk local persistence + outbox tested; public QR cannot operate offline (DESIGN, documented in `QR_ORDERING_OFFLINE_BEHAVIOR.md`) |
+| OF-04 | Branch Core stopped: what each app can still do | PARTIAL | `branch_core_chaos`, `branch_core_operations`, `endpoint_resolver` (fallback to cloud). No per-app matrix |
+| OF-05 | Which traffic uses cloud vs Branch Core/LAN; no incompatible paths | PARTIAL | `EndpointResolver` decides per request; entity sync and menu publish go to the cloud only; documented in `CURRENT_SYNC_ARCHITECTURE.md`; no automated topology assertion |
+
+### 4.9 Menu, inventory, payment readiness (spec 23, 24, 37, 38)
+
+| ID | Scenario | Status | Evidence / note |
+|---|---|---|---|
+| MN-01 | Menu edit -> publish -> QR sees only the published snapshot; orders validated against it (409 on price change) | PASS-EXISTING | `qr-menu-control`, `menu-versioning` |
+| MN-02 | POS / Kiosk / Captain menu propagation after a change | PARTIAL | `menu_edit_delete_sync`, `menu_version_tracker`, `payments-menu-sync`; entity sync is restaurant-wide, last-change-wins |
+| MN-03 | Old cached POS/Kiosk menu cannot submit invalid prices | **GAP / DEFECT-BY-CODE** | Only QR prices on the server; device orders (POS, Kiosk, Captain) are accepted with whatever prices the device computed (totals never recomputed) |
+| MN-04 | Branch price overrides visible on POS / Kiosk / Captain | **GAP** | Overrides exist only in the QR snapshot |
+| IN-01 | Concurrent sales by several devices add up (ledger) | PASS-EXISTING | `inventory-ledger`, `inventory_ledger_sync` |
+| IN-02 | QR orders deduct inventory | **DEFECT-BY-CODE** | The cloud creates no movements for QR orders; deduction happens only on a pulling device that owns recipe data (`reconcileOrder`). If none is online the sale is never booked; if two Admin consoles pull, both may book (idempotency is per local order, not per ledger movement id: unverified) |
+| PY-01 | Order model supports safe payment concurrency | PASS-EXISTING (readiness only) | `paymentViolation` (paid once, refund authority, no revert), `payments-*` specs. Not extended: out of scope |
+
+### 4.10 Concurrency and load matrix (spec 51)
+
+| ID | Combination | Status |
+|---|---|---|
+| CC-01 | 2 POS + 1 KDS | PARTIAL (P-OK-3, 3 events) |
+| CC-02 | 2 POS + 2 Kiosk + 1 KDS | GAP |
+| CC-03 | 3 POS + 3 Kiosk + 2 KDS + 5 Captain | GAP |
+| CC-04 | 5 POS + 5 Kiosk + 2 KDS + 10 Captain | GAP |
+| CC-05 | QR + POS + Kiosk + Captain simultaneously | GAP |
+| CC-06 | Multiple branches simultaneously | GAP (branch isolation verified only for a sequential order, P-OK-2) |
+| CC-07 | Multiple restaurants simultaneously | PARTIAL (`qr-scale`: two restaurants, QR only) |
+| CC-08 | Measured throughput of device order pushes (per-restaurant sequence row is a serialization point) | GAP |
+
+## 5. Confirmed and suspected defects (ordered by severity)
+
+| # | Severity | Status | Finding | Where |
+|---|---|---|---|---|
+| D1 | **Critical** | CONFIRMED (P-FAIL-2) | Device quota is not enforced under concurrency: 6 of 6 concurrent activations succeeded against a quota of 2 | `activation-keys.service.ts redeem`, `application-entitlements.service.ts assertDeviceQuotaAvailable` |
+| D2 | **High** | CONFIRMED (P-FAIL-3, P-FAIL-4) | A device can be activated with no branch in a multi-branch restaurant and then reads all branches' orders and writes orders every branch sees | `activation-keys.service.ts` (`onlyActiveBranchId`), `order-sync.service.ts catchUp` |
+| D3 | **High** | CONFIRMED (P-FAIL-1) | Order status is last-request-wins with no transition rules; a stale or wrong device can move an order backwards | `order-sync.service.ts` (`status: evt.status`) |
+| D4 | **High** | CONFIRMED (P-FAIL-5) | Tables (and every other entity type) are not branch-scoped; Branch B devices pull Branch A's floor | `entity-sync.service.ts` |
+| D5 | **High** | BY CODE | Device-computed prices/totals are trusted; only QR prices are server-validated (MN-03). Any order source other than QR can submit any price | `order-sync.service.ts` |
+| D6 | **High** | BY CODE | Client compares server `updatedAt` with device `updatedAt`: clock skew can hide server updates (ST-08) | `packages/sync/src/outbox.ts` |
+| D7 | **High** | BY CODE | `eventId = orderId@updatedAt` can collide and silently drop a real change (SY-02) | `packages/sync/src/outbox.ts` |
+| D8 | **Medium** | BY CODE | Any device type can set any order status (ST-06); header fields have no version precondition (ST-05) | `order-sync.service.ts` |
+| D9 | **Medium** | CONFIRMED (P-FAIL-6) | Admin application list shows only the newest subscription's apps; source labels ignore flag-granted apps | `application-entitlements.service.ts listForRestaurant/withSource` |
+| D10 | **Medium** | BY CODE | QR orders never deduct inventory unless a recipe-owning device pulls them; double deduction possible with two consoles (IN-02) | `outbox.ts`, `ingestServerOrder` |
+| D11 | **Medium** | BY CODE | `SyncedOrder.deviceId` is overwritten on every update, losing the originating device (OR-10) | `order-sync.service.ts` |
+| D12 | **Medium** | DESIGN GAP | No stable device identity: reinstall = new key + seat (DV-03) | `activation-keys.service.ts`, schema |
+| D13 | **Medium** | FINDING | KDS station assignment is client-side only (KD-02) | `kds/src/App.tsx` |
+| D14 | **Low** | BY CODE | `Device.name` not unique; order/KOT ids rely on timestamp + short random (OR-08, ON-14) | schema, `repositories.ts` |
+| D15 | **Low** | NOTE | `DeviceAuthGuard` does four queries on every device request (per-request enforcement is correct; cost matters at scale) | `device-auth.guard.ts` |
+
+## 6. Audit probes added (executed)
+
+`cloud/api/test/audit-probes.e2e.spec.ts`, run against the real test database. `it.fails` = the required behaviour is NOT met (the probe passes while the defect exists and turns red when it is fixed); plain `it` = required behaviour met. Each `it.fails` probe was also run as a plain `it` once to confirm it fails for the stated reason (recorded in the report).
+
+| Probe | Result |
+|---|---|
+| P-OK-1 device identity / branch binding | met |
+| P-OK-2 branch A order reaches only branch A KDS | met |
+| P-OK-3 three terminals at once, distinct seq | met |
+| P-OK-4 item kitchen progress cannot regress | met |
+| P-OK-5 x9 onboarding CASE 01-09 | met (all nine) |
+| P-FAIL-1 order status regression | **defect** (`PREPARING` stored) |
+| P-FAIL-2 quota under concurrency | **defect** (6 > 2) |
+| P-FAIL-3 branchless activation | **defect** (201) |
+| P-FAIL-4 branchless device sees other branches | **defect** |
+| P-FAIL-5 table isolation by branch | **defect** |
+| P-FAIL-6 admin apps across subscriptions | **defect** |
+
+## 7. Missing tests to write (no fix needed to write them)
+
+1. Whole-ecosystem cloud spec with a shared fixture (TEST_RESTAURANT_01: two branches, 2 POS, 2 Kiosk, KDS x2, Captain x3, QR, tables T01-T03, Pizza/Burger/Coffee): CC-01 to CC-08, all sources at once, field-consistency tuple (OR-09).
+2. Device-code probes (root suite): eventId collision (SY-02), clock skew (ST-08), originating-device loss (OR-10), double inventory deduction with two consoles (IN-02).
+3. Multi-KDS station routing and two-KDS bump (KD-02/03).
+4. Device re-registration behaviour (DV-03) once a policy is chosen.
+5. Branch Core stopped: a per-application capability matrix (OF-04).
+6. Order-level status transition table and version precondition tests (ST-02/03/05/06) written first as failing tests.
+7. Server-side price validation for device orders (MN-03) once a decision is taken.
+8. A committed Playwright regression for guest, Restaurant Admin, KDS, Captain, Kiosk, POS.
+
+## 8. Recommended execution order
+
+1. **Fix D1** (quota race). Small, self-contained: serialise redemption per restaurant and app (advisory lock inside `redeem`), re-run P-FAIL-2 and `device-limit`.
+2. **Decide and fix D2** (branch policy). Recommended: refuse key generation and redemption without a branch when the restaurant has more than one active branch; allow a restaurant-wide device only for POS_ADMIN/KIOSK_ADMIN; stop treating `branchId IS NULL` orders as visible to every branch. Re-run P-FAIL-3/4 and the branch specs.
+3. **Fix D3 and D8** (order status). Add a transition table (who may move an order to which status; forward-only unless an explicit correction event), reject stale header writes with a version precondition, keep item merge. Tests first (ST-02/03/05/06).
+4. **Fix D6 and D7** (client correctness). Server-time comparison for remote apply; per-event unique `eventId` (UUID) with the order id kept as a separate field. These affect every app; do after the server rules so the new tests cover both ends.
+5. **Decide and fix D4** (entity branch scope), starting with `DINING_TABLE`; **decide D5** (server price validation for device orders) and **D10** (where inventory is booked for QR orders).
+6. **Fix D9** (admin view across subscriptions).
+7. Write the ecosystem, multi-KDS and Branch-Core-stopped tests (section 7) and run the load matrix (CC-01..08), producing measured numbers.
+8. Address D11-D15 and the device re-registration policy (D12).
+
+Decisions needed from you before steps 2, 5 and 8: branchless device policy; whether POS/Kiosk/Captain prices are validated server-side; whether branch price overrides apply to POS/Kiosk/Captain; whether a KDS is assigned a station by the server; device re-registration policy (re-bind an existing device vs new seat).
