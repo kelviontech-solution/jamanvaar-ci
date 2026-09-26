@@ -1,5 +1,7 @@
 # QR Ordering: Execution Plan
 
+> **Status (2026-09-26): implemented.** Phases P0 to P14 were carried out; P15 (ordering over the restaurant LAN) was not built. What was done, what is verified and what remains is in `QR_ORDERING_IMPLEMENTATION_REPORT.md`. The plan below is kept unchanged as the design record.
+
 Source specification: `docs/qr.implemtantion.md` (the file is spelled that way in the repository; 2,966 lines, 74 numbered sections, 51 KB). All 74 sections were read end to end. This document turns them into ordered phases. **No production code was changed while writing it.** Nothing here builds an EXE, APK, AAB or installer.
 
 Every statement about the current code below was checked against the repository on 2026-09-26. Things I could not confirm by reading are marked **VERIFY** and are the first thing the owning phase must prove with a failing test.

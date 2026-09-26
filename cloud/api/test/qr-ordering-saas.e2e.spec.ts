@@ -391,6 +391,31 @@ describe('QR ordering (SaaS)', () => {
       await table(F.A.console, 'tbl-a1', '1', { branchId: F.A.b1, isActive: true });
     });
 
+    it('a suspended restaurant and a deactivated branch stop the guest page at once, and coming back restores it', async () => {
+      const r = await restaurant('QrStates', F.qr);
+      const console = await activate(r.id, 'POS_ADMIN');
+      const b = await branch(r.id, 'S Main', 'SSM');
+      await seedMenu(console, 's');
+      await table(console, 'tbl-s9', '1', { branchId: b });
+      const t = tokenOf((await gen(console, 'tbl-s9')).body.url);
+      expect((await http().get(`/api/v1/public/qr/${t}`)).status).toBe(200);
+
+      await platform('patch', `/api/v1/branches/${b}/deactivate`).send({});
+      const branchOff = await http().get(`/api/v1/public/qr/${t}`);
+      expect(branchOff.status).toBe(410);
+      expect(branchOff.body.code).toBe('BRANCH_INACTIVE');
+      await platform('patch', `/api/v1/branches/${b}/activate`).send({});
+      expect((await http().get(`/api/v1/public/qr/${t}`)).status).toBe(200);
+
+      await platform('patch', `/api/v1/restaurants/${r.id}/suspend`).send({});
+      const suspended = await http().get(`/api/v1/public/qr/${t}`);
+      expect(suspended.status).toBe(410);
+      expect(suspended.body.code).toBe('RESTAURANT_INACTIVE');
+      expect((await http().post(`/api/v1/public/qr/${t}/orders`).send(orderBody([{ itemId: 'coffee-s', quantity: 1 }]))).status).toBe(410);
+      await platform('patch', `/api/v1/restaurants/${r.id}/reactivate`).send({});
+      expect((await http().get(`/api/v1/public/qr/${t}`)).status).toBe(200);
+    });
+
     it('a table that belongs to another branch cannot be opened through this branch\'s code', async () => {
       const r = await restaurant('QrBranchClash', F.qr);
       const console = await activate(r.id, 'POS_ADMIN');
