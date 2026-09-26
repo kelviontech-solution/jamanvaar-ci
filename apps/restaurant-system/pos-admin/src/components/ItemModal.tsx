@@ -182,7 +182,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         sku,
         price: numPrice,
         categoryId,
-        kitchenStation,
+        kitchenStation: kitchenStation.trim() || 'Main Kitchen',
         dietaryType,
         spiceLevel,
         description,
@@ -211,7 +211,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         sku,
         price: numPrice,
         categoryId: categoryId || categories[0]?.id,
-        kitchenStation,
+        kitchenStation: kitchenStation.trim() || 'Main Kitchen',
         dietaryType,
         spiceLevel,
         description,
@@ -306,17 +306,20 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Kitchen Station</label>
-            <select
+            {/* Any station name works; the ones already on the menu are suggested. The KDS screens list exactly these. */}
+            <input
+              list="kitchen-station-options"
               value={kitchenStation}
               onChange={(e) => setKitchenStation(e.target.value)}
+              placeholder="e.g. Main Kitchen, Tandoor, Bar"
+              maxLength={40}
               className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
-            >
-              <option value="Main Kitchen">Main Kitchen</option>
-              <option value="Tandoor Section">Tandoor Section</option>
-              <option value="Curry Station">Curry Station</option>
-              <option value="Beverages Bar">Beverages Bar</option>
-              <option value="Dessert Counter">Dessert Counter</option>
-            </select>
+            />
+            <datalist id="kitchen-station-options">
+              {Array.from(new Set(['Main Kitchen', ...db.menuItems.map((m) => (m.kitchenStation || '').trim()).filter(Boolean)])).map((n) => (
+                <option key={n} value={n} />
+              ))}
+            </datalist>
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Dietary Type</label>

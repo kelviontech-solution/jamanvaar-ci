@@ -318,9 +318,28 @@ export const App: React.FC = () => {
     SessionPersistence.clear('kds');
   };
 
+  // The kitchen stations are the ones this restaurant really uses: every station named on a dish in the menu (Restaurant Admin > Menu),
+  // plus any a live ticket already carries. Nothing is hard-coded, so a new station added to a dish appears here by itself.
+  const kitchenStations = useMemo(() => {
+    const seen = new Map<string, string>();
+    const add = (name?: string) => {
+      const t = (name || '').trim();
+      if (t && t.toUpperCase() !== 'ALL' && !seen.has(t.toLowerCase())) seen.set(t.toLowerCase(), t);
+    };
+    db.menuItems.forEach((m) => add(m.kitchenStation));
+    kots.forEach((k) => { add(k.station); k.items?.forEach((it) => add(it.kitchenStation)); });
+    add(getAssignedStation() || undefined);
+    return [...seen.values()].sort((a, b) => a.localeCompare(b));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kots, db.menuItems.length]);
+  const stationChoices = useMemo(() => [{ id: 'ALL', label: 'All stations' }, ...kitchenStations.map((n) => ({ id: n, label: n }))], [kitchenStations]);
+
   // Station Filtering Logic
   const stationKots = useMemo(() => {
     if (selectedStation === 'ALL') return kots;
+    const exact = selectedStation.trim().toLowerCase();
+    const sameStation = kots.filter((kot) => (kot.station || '').trim().toLowerCase() === exact || kot.items?.some((it) => (it.kitchenStation || '').trim().toLowerCase() === exact));
+    if (sameStation.length > 0) return sameStation;
     const stLower = selectedStation.toLowerCase();
     return kots.filter((kot) => {
       const kotStation = (kot.station || '').toLowerCase();
@@ -447,18 +466,17 @@ export const App: React.FC = () => {
           heroHighlightWord="Live KOTs"
           heroDescription="Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff."
           heroImages={APP_HERO_IMAGES.KDS}
-          theme="dark"
         >
           <ActivationNoticeBanner />
           <div>
-            <h2 className="text-xl sm:text-2xl font-black text-[#F5F1E8] tracking-tight">Activate This Terminal</h2>
-            <p className="text-xs sm:text-sm text-[#8CA0B3] font-medium mt-1">
+            <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Activate This Terminal</h2>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
               Enter the activation key from your Super Admin Welcome Kit to connect this Kitchen Display to your restaurant.
             </p>
           </div>
           <form onSubmit={handleActivate} className="space-y-3.5">
             <div>
-              <label className="text-xs font-bold text-[#8CA0B3] block mb-1.5">Activation Key *</label>
+              <label className="text-xs font-bold text-slate-500 block mb-1.5">Activation Key *</label>
               <input
                 type="text"
                 value={activationCode}
@@ -466,7 +484,7 @@ export const App: React.FC = () => {
                 placeholder="JMV-XXXX-XXXX-XXXX"
                 required
                 autoFocus
-                className="w-full bg-white/5 border border-white/15 focus:border-jaman-saffron focus:bg-white/10 rounded-2xl px-4 py-3 text-sm font-mono text-[#F5F1E8] font-semibold focus:outline-hidden transition-colors uppercase placeholder:text-[#5E7893]"
+                className="w-full bg-white border border-jaman-border focus:border-jaman-saffron focus:ring-2 focus:ring-jaman-saffron/20 rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors uppercase placeholder:text-slate-400"
               />
             </div>
             {activationError && (
@@ -484,7 +502,7 @@ export const App: React.FC = () => {
               {!isActivating && <ArrowRight className="w-4 h-4 text-white" />}
             </button>
           </form>
-          <ActivationHelpNote deviceNoun="terminal" dark />
+          <ActivationHelpNote deviceNoun="terminal" />
         </JamanvaarAuthLayout>
       </JAMANVAARStartup>
     );
@@ -520,80 +538,77 @@ export const App: React.FC = () => {
           heroHighlightWord="Live KOTs"
           heroDescription="Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff."
           heroImages={APP_HERO_IMAGES.KDS}
-          theme="dark"
         >
-          {/* Station Selection */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-[#8CA0B3] uppercase tracking-wider block">
-              Select Kitchen Station Display
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { id: 'ALL', label: '🍽 All Kitchen Stations' },
-                { id: 'Main Kitchen', label: '🍳 Main Kitchen (Curry/Gravy)' },
-                { id: 'Tandoor', label: '🔥 Tandoor Station' },
-                { id: 'Beverage', label: '☕ Beverage & Bar' },
-                { id: 'Dessert', label: '🍨 Dessert & Mithai' }
-              ].map((st) => (
-                <button
-                  key={st.id}
-                  type="button"
-                  onClick={() => setKdsStationSelection(st.id)}
-                  className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-                    kdsStationSelection === st.id
-                      ? 'bg-jaman-saffron text-white border-jaman-saffron shadow-xs'
-                      : 'bg-white/5 border-white/15 text-[#F5F1E8] hover:bg-white/10'
-                  }`}
-                >
-                  <span className="text-xs font-black block">{st.label}</span>
-                </button>
-              ))}
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Kitchen Staff Sign In</h2>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Choose your station, then enter your 4-digit staff PIN</p>
             </div>
-          </div>
 
-          {/* PIN Input & Numpad */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-[#F5F1E8] uppercase tracking-wider">
-                Kitchen Staff PIN
-              </label>
+            {/* Station: the ones on this restaurant's menu. A station assigned to this screen in Restaurant Admin is fixed. */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-jaman-navy uppercase tracking-wider">Kitchen Station</label>
+              {getAssignedStation() ? (
+                <div className="p-3.5 rounded-2xl bg-[#FDFBF7] border border-jaman-border text-xs font-bold text-jaman-navy">
+                  This screen is assigned to <span className="text-jaman-saffron">{getAssignedStation()}</span> by your restaurant admin.
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {stationChoices.map((st) => (
+                    <button
+                      key={st.id}
+                      type="button"
+                      onClick={() => setKdsStationSelection(st.id)}
+                      className={`px-4 py-2.5 rounded-xl border text-xs font-black transition-all cursor-pointer ${
+                        kdsStationSelection === st.id
+                          ? 'bg-jaman-navy text-white border-jaman-navy shadow-xs'
+                          : 'bg-jaman-cream border-jaman-border text-jaman-navy hover:bg-[#FFF4ED] hover:border-jaman-saffron'
+                      }`}
+                    >
+                      {st.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {kitchenStations.length === 0 && (
+                <p className="text-[11px] text-slate-500 font-medium">No kitchen stations are set on the menu yet, so this screen shows every ticket.</p>
+              )}
             </div>
-            <input
-              type="password"
-              maxLength={4}
-              value={kdsPin}
-              readOnly
-              placeholder="• • • •"
-              className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3 px-4 rounded-2xl bg-white/5 border border-white/15 focus:border-jaman-saffron outline-none text-[#F5F1E8]"
-            />
-            {kdsPinError && (
-              <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>{kdsPinDenied ?? 'Incorrect PIN. Please try again.'}</span>
+
+            {/* PIN Input & Numpad */}
+            <div className="space-y-3">
+              <label className="block text-xs font-bold text-jaman-navy uppercase tracking-wider">Staff 4-Digit PIN</label>
+              <input
+                type="password"
+                maxLength={4}
+                value={kdsPin}
+                readOnly
+                placeholder="• • • •"
+                className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3.5 px-4 rounded-2xl bg-white border border-jaman-border focus:border-jaman-saffron outline-none text-jaman-navy"
+              />
+              {kdsPinError && (
+                <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{kdsPinDenied ?? 'Incorrect PIN. Please try again.'}</span>
+                </div>
+              )}
+
+              <div className="grid grid-cols-3 gap-2 pt-1">
+                {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '⌫'].map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => {
+                      if (k === 'C') { setKdsPin(''); setKdsPinError(false); }
+                      else if (k === '⌫') setKdsPin((prev) => prev.slice(0, -1));
+                      else handleKdsPinPress(k);
+                    }}
+                    className="h-14 rounded-2xl bg-jaman-cream hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border text-lg font-black font-mono text-jaman-navy active:scale-95 transition-all cursor-pointer flex items-center justify-center shadow-2xs"
+                  >
+                    {k === '⌫' ? <Delete className="w-4 h-4 text-slate-500" /> : k === 'C' ? <span className="text-xs font-black uppercase tracking-wider text-slate-500">Clear</span> : k}
+                  </button>
+                ))}
               </div>
-            )}
-
-            <div className="grid grid-cols-3 gap-2 pt-1">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '⌫'].map((k) => (
-                <button
-                  key={k}
-                  type="button"
-                  onClick={() => {
-                    if (k === 'C') setKdsPin('');
-                    else if (k === '⌫') setKdsPin((prev) => prev.slice(0, -1));
-                    else handleKdsPinPress(k);
-                  }}
-                  className="h-12 sm:h-13 rounded-2xl bg-white/5 hover:border-jaman-saffron hover:bg-white/10 active:scale-95 text-lg font-black transition-all flex items-center justify-center border border-white/15 text-[#F5F1E8] shadow-2xs cursor-pointer"
-                >
-                  {k === '⌫' ? (
-                    <Delete className="w-4 h-4 text-rose-400" />
-                  ) : k === 'C' ? (
-                    <span className="text-rose-400 font-black">C</span>
-                  ) : (
-                    k
-                  )}
-                </button>
-              ))}
             </div>
           </div>
         </JamanvaarAuthLayout>
@@ -624,13 +639,7 @@ export const App: React.FC = () => {
 
           {/* Center: Touch Station Selector Pills */}
           <div className="flex items-center gap-1.5 bg-jaman-cream p-1 rounded-2xl border border-jaman-border overflow-x-auto">
-            {[
-              { id: 'ALL', label: '🍽 All' },
-              { id: 'Main Kitchen', label: '🍳 Main' },
-              { id: 'Tandoor', label: '🔥 Tandoor' },
-              { id: 'Beverage', label: '☕ Beverage' },
-              { id: 'Dessert', label: '🍨 Dessert' }
-            ].map((st) => (
+            {stationChoices.map((st) => (
               <button
                 key={st.id}
                 type="button"
