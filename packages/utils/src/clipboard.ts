@@ -26,7 +26,7 @@ function legacyCopy(text: string): boolean {
   area.setAttribute('readonly', '');
   Object.assign(area.style, { position: 'fixed', top: '0', left: '-9999px', opacity: '0' });
   // Inside the element that has focus (a dialog or focus-trapped panel can refuse focus to something appended to <body>).
-  const host = (document.activeElement && document.activeElement.parentElement) || document.body;
+  const host: HTMLElement = (document.activeElement && document.activeElement.parentElement) || document.body;
   host.appendChild(area);
   try {
     area.focus();
@@ -36,6 +36,6 @@ function legacyCopy(text: string): boolean {
   } catch {
     return false;
   } finally {
-    area.remove();
+    host.removeChild(area);
   }
 }
