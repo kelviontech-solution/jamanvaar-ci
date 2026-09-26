@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
-import { getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages } from '@jamanvaar/sync';
+import { getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages, syncMenuCatalog } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus } from '@jamanvaar/types';
 import { Platform } from '@jamanvaar/api';
 import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
@@ -114,6 +114,8 @@ export const App: React.FC = () => {
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
     void syncStaff();
+    // The menu (read-only here) tells this screen which kitchen stations the restaurant uses.
+    void syncMenuCatalog({ push: false });
     void reportHeartbeat();
 
     // A kitchen needs new tickets within seconds, not every 15 s.
@@ -125,6 +127,7 @@ export const App: React.FC = () => {
     }, 3000);
     const interval = setInterval(() => {
       void syncStaff();
+      void syncMenuCatalog({ push: false });
       void reportHeartbeat();
     }, 15000);
 
