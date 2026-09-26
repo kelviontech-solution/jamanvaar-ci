@@ -1442,7 +1442,12 @@ export default function PosAdminApp() {
           userRole="OWNER_ADMIN"
           onPerformAction={(action) => {
             if (action.actionType === 'NAVIGATE_TAB' && action.targetTab) {
-              setActiveTab(action.targetTab as any);
+              // The assistant names screens the way the POS does; this console calls a few of them differently. An unknown name is
+              // ignored (staying where you are) rather than opening a blank page.
+              const alias: Record<string, PosAdminTab> = { BILLS: 'BILLING_SALES', KOT: 'KITCHEN_KOT' };
+              const known: PosAdminTab[] = ['DASHBOARD', 'QR_ORDERING', 'BILLING_SALES', 'ORDERS', 'LIVE_KDS', 'MENU', 'MENU_OPTIONS', 'TABLES', 'RESERVATIONS', 'KITCHEN_KOT', 'INVENTORY', 'CUSTOMERS', 'STAFF', 'PAYMENTS', 'REPORTS', 'SHIFTS', 'HARDWARE', 'SYNC', 'SETTINGS', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT', 'INVENTORY_CONTROL'];
+              const target = alias[action.targetTab] ?? (known.includes(action.targetTab as PosAdminTab) ? (action.targetTab as PosAdminTab) : null);
+              if (target) setActiveTab(target);
             }
           }}
           onQueryExecuted={(intent, _queryText, latencyMs) => {
