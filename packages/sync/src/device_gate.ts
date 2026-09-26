@@ -237,6 +237,19 @@ export class DeviceGate {
     this.identityInvalidHandler?.();
   }
 
+  /**
+   * The person at a locked terminal chooses to leave this restaurant's binding: clears the lock and runs the app's own
+   * "forget this restaurant and device, go back to activation" handler. This is the way out of a lock screen that will not clear
+   * (the restaurant stays suspended, or the key entered belongs to a different restaurant).
+   */
+  static disconnectTerminal(): void {
+    this.rememberDisconnectReason('This terminal was disconnected. Enter an activation key to connect it again.');
+    this.reset();
+    this.identityInvalidHandled = true;
+    if (this.identityInvalidHandler) this.identityInvalidHandler();
+    else if (typeof window !== 'undefined') window.location.reload();
+  }
+
   static setLastCheckIn(iso: string): void {
     this.set({ ...this.state, lastCheckInAt: iso });
   }

@@ -124,6 +124,16 @@ export const DeviceGateOverlay: React.FC<DeviceGateOverlayProps> = ({ appName, o
           <RefreshCw className="h-3.5 w-3.5 animate-spin" />
           Checking again automatically. This screen clears once access is restored.
         </p>
+        <div className="space-y-1 border-t border-[#EBE6DD] pt-4">
+          <button
+            type="button"
+            onClick={() => DeviceGate.disconnectTerminal()}
+            className="w-full rounded-xl border border-[#0B253A] px-4 py-2.5 text-sm font-bold text-[#0B253A] hover:bg-[#0B253A] hover:text-white"
+          >
+            Use a different activation key
+          </button>
+          <p className="text-[11px] text-[#8A94A6]">Disconnects this terminal from this restaurant and returns to the activation screen. Nothing is deleted.</p>
+        </div>
         {gate.since && (
           <p className="text-[10px] text-[#8A94A6]">Locked since {new Date(gate.since).toLocaleString()}</p>
         )}
