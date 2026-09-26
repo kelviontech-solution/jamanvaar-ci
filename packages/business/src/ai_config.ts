@@ -123,10 +123,11 @@ export class AiConfig {
    * that is ON: it can never turn on what the platform locked, and it does not hide the lock.
    */
   static shouldShowButton(ownerWantsIt: boolean): boolean {
+    // The owner's "hide it" always wins, including over the upgrade teaser shown on a locked plan.
+    if (!ownerWantsIt) return false;
     const state = this.getState();
     if (state === 'OFF') return false;
-    if (state === 'LOCKED') return true;
-    return ownerWantsIt;
+    return true;
   }
 
   static getSettings(): AiThresholds {

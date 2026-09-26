@@ -66,7 +66,8 @@ describe('JAMANVAAR Restaurant Admin — Premium End of Day (EOD) Z-Report Syste
 
     // 2. Shift Information
     expect(report.cashierName).toBeDefined();
-    expect(report.terminalId).toBe('POS-01');
+    // no shift is open in this fixture, so there is no terminal to name (it used to print a made-up POS-01)
+    expect(report.terminalId).toBe('—');
     expect(report.openingFloat).toBeGreaterThanOrEqual(0);
     expect(report.closingFloat).toBeGreaterThanOrEqual(report.openingFloat);
 

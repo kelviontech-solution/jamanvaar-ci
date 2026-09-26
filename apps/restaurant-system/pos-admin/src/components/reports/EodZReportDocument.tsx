@@ -44,7 +44,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
 }) => {
   const [printPaperSize, setPrintPaperSize] = useState<'A4' | '80MM'>('A4');
   const [managerNotes, setManagerNotes] = useState(
-    initialReport?.managerNotes || 'All lunch and dinner dining operations completed with zero system discrepancies.'
+    initialReport?.managerNotes || ''
   );
   
   // Default to current business day
@@ -244,10 +244,25 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
 
               {/* Legal Tax & Contact Credentials */}
               <div className="text-right text-[10px] text-slate-600 space-y-0.5 font-mono">
-                <div><strong>{report.branding.address}</strong>, {report.branding.city}, {report.branding.state} {report.branding.pincode}</div>
-                <div>GSTIN: <strong className="text-jaman-navy">{report.branding.gstin}</strong> • FSSAI: <strong className="text-jaman-navy">{report.branding.fssaiNumber}</strong></div>
+                {/* Only what the restaurant has actually filled in Restaurant Settings is printed; nothing is left as an empty label. */}
+                {[report.branding.address, report.branding.city, [report.branding.state, report.branding.pincode].filter(Boolean).join(' ')].filter(Boolean).length > 0 && (
+                  <div><strong>{[report.branding.address, report.branding.city, [report.branding.state, report.branding.pincode].filter(Boolean).join(' ')].filter(Boolean).join(', ')}</strong></div>
+                )}
+                {(report.branding.gstin || report.branding.fssaiNumber) && (
+                  <div>
+                    {report.branding.gstin && <>GSTIN: <strong className="text-jaman-navy">{report.branding.gstin}</strong></>}
+                    {report.branding.gstin && report.branding.fssaiNumber && ' • '}
+                    {report.branding.fssaiNumber && <>FSSAI: <strong className="text-jaman-navy">{report.branding.fssaiNumber}</strong></>}
+                  </div>
+                )}
                 {report.branding.msmeNumber && <div>MSME: <strong>{report.branding.msmeNumber}</strong></div>}
-                <div>Phone: {report.branding.phone} • Email: {report.branding.email}</div>
+                {(report.branding.phone || report.branding.email) && (
+                  <div>
+                    {report.branding.phone && <>Phone: {report.branding.phone}</>}
+                    {report.branding.phone && report.branding.email && ' • '}
+                    {report.branding.email && <>Email: {report.branding.email}</>}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -706,7 +721,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                   ))}
                 </div>
                 <span className="text-[10px] text-slate-500 block">
-                  Average Table Turnaround: <strong>{report.tableUtilization.avgDiningTimeMinutes} Minutes</strong>
+                  Average Table Turnaround: <strong>{report.tableUtilization.avgDiningTimeMinutes > 0 ? `${report.tableUtilization.avgDiningTimeMinutes} Minutes` : '—'}</strong>
                 </span>
               </div>
 
@@ -740,9 +755,11 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                   className="w-full bg-jaman-cream border border-slate-300 rounded-xl p-2 text-xs font-semibold focus:outline-none"
                 />
               </div>
-              <p className="hidden print:block text-xs font-medium text-slate-800 bg-jaman-cream p-2 rounded-lg border border-slate-200 italic">
-                "{managerNotes}"
-              </p>
+              {managerNotes.trim() && (
+                <p className="hidden print:block text-xs font-medium text-slate-800 bg-jaman-cream p-2 rounded-lg border border-slate-200 italic">
+                  "{managerNotes}"
+                </p>
+              )}
             </div>
 
             {/* Section 19: OFFICIAL SIGNATURES SECTION */}
@@ -764,7 +781,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                     ____________________
                   </div>
                   <strong className="block text-jaman-navy text-[11px]">Manager Signature</strong>
-                  <span className="text-[9px] text-slate-500 block truncate">{report.branding.managerName || 'Pooja Shah'}</span>
+                  <span className="text-[9px] text-slate-500 block truncate">{report.branding.managerName || ''}</span>
                 </div>
 
                 <div className="space-y-1">
@@ -772,7 +789,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                     ____________________
                   </div>
                   <strong className="block text-jaman-navy text-[11px]">Owner Signature</strong>
-                  <span className="text-[9px] text-slate-500 block truncate">{report.branding.ownerName || 'Ramesh Patel'}</span>
+                  <span className="text-[9px] text-slate-500 block truncate">{report.branding.ownerName || ''}</span>
                 </div>
 
                 <div className="space-y-1">

@@ -104,6 +104,16 @@ describe('Restaurant identity sync across devices (B2-054)', () => {
     expect(admin2.body.gstin ?? admin2.body.restaurant?.gstin).toBe('24AAACR5055K1Z1');
   });
 
+  it("the owner's Show JAMAN AI choice is saved in the cloud and every other terminal reads it", async () => {
+    const admin = await enroll('POS_ADMIN');
+    const pos = await enroll('POS');
+    expect((await getIdentity(pos)).body.showJamanAI).toBe(true); // default: shown
+    expect((await patchIdentity(admin, { showJamanAI: false })).body.showJamanAI).toBe(false);
+    expect((await getIdentity(pos)).body.showJamanAI).toBe(false);
+    await patchIdentity(admin, { showJamanAI: true });
+    expect((await getIdentity(pos)).body.showJamanAI).toBe(true);
+  });
+
   it('rejects a malformed GSTIN/FSSAI the same way the platform API already does, rather than saving garbage to a real tax field', async () => {
     const admin = await enroll('POS_ADMIN');
     // The DTO caps length; a wildly oversized value should never pass through to a bill.

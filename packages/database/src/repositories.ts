@@ -2121,11 +2121,14 @@ export class RestaurantIdentityRepository {
     city?: string | null;
     state?: string | null;
     phone?: string | null;
+    showJamanAI?: boolean;
   }): void {
     const r = db.restaurant;
     const restaurantChanged = r.id !== profile.id;
     r.id = profile.id;
     if (profile.name) r.name = profile.name;
+    // The owner's choice lives in the cloud and is the same on every terminal.
+    if (typeof profile.showJamanAI === 'boolean') r.showJamanAI = profile.showJamanAI;
 
     const fields: Array<'legalName' | 'gstin' | 'fssaiNumber' | 'address' | 'city' | 'state' | 'phone'> = ['legalName', 'gstin', 'fssaiNumber', 'address', 'city', 'state', 'phone'];
     for (const f of fields) {

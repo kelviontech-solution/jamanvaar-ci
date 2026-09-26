@@ -10,6 +10,8 @@ export interface RestaurantIdentityFields {
   address?: string | null;
   city?: string | null;
   state?: string | null;
+  /** The owner's "Show JAMAN AI Assistant" choice; every terminal follows it. */
+  showJamanAI?: boolean;
 }
 
 /** What the cloud always returns for a GET — `name` is a required column, never absent. */

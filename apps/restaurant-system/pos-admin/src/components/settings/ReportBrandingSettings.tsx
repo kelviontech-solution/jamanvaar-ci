@@ -124,7 +124,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
     // stay on this one device forever — POS, Captain, KDS and both kiosk apps never learned of an
     // edit made here, and it was lost entirely on a fresh device or a reinstall. Best-effort: a
     // failed push is simply retried by every terminal's own periodic pull once this one succeeds.
-    void saveRestaurantIdentity({ name, legalName, gstin, fssaiNumber, address, city, state });
+    void saveRestaurantIdentity({ name, legalName, gstin, fssaiNumber, address, city, state, showJamanAI });
     onUpdated();
     showToast('Restaurant Branding & Accounting Profile Saved!');
   };
@@ -166,7 +166,14 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
           <input
             type="checkbox"
             checked={showJamanAI}
-            onChange={(e) => setShowJamanAI(e.target.checked)}
+            onChange={(e) => {
+              // Takes effect at once (no Save needed) and is sent to the cloud so POS and Captain follow it too.
+              const on = e.target.checked;
+              setShowJamanAI(on);
+              db.restaurant.showJamanAI = on;
+              db.notify();
+              void saveRestaurantIdentity({ showJamanAI: on });
+            }}
             className="sr-only peer"
           />
           <div className="w-11 h-6 bg-slate-200 peer-checked:bg-jaman-saffron rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5" />

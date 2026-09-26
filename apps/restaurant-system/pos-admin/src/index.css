@@ -195,7 +195,14 @@ body {
   }
 
   /* Un-constrain html, body, and root elements to enable full multi-page printing */
-  html, body, #root, #root > div, main, div[class*="overflow-y-auto"], div[class*="overflow-hidden"], div[class*="fixed"], div[class*="h-screen"], div[class*="h-full"] {
+  /* Only the app shell around the document is released; nothing INSIDE the printed document is touched, so its own flex and grid
+     layouts (columns, totals, tables) print exactly as designed. */
+  html, body, #root, #root > div, main,
+  div[class*="overflow-y-auto"]:not(.jv-print-target *),
+  div[class*="overflow-hidden"]:not(.jv-print-target *),
+  div[class*="fixed"]:not(.jv-print-target *),
+  div[class*="h-screen"]:not(.jv-print-target *),
+  div[class*="h-full"]:not(.jv-print-target *) {
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
@@ -239,10 +246,12 @@ body {
 
   .eod-a4-document {
     display: block !important;
+    box-sizing: border-box !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 auto !important;
-    padding: 10mm 15mm !important;
+    /* The printed page already has its own margin; this is only a small inner gutter. */
+    padding: 0 2mm !important;
     border: none !important;
     box-shadow: none !important;
     background: #FFFFFF !important;
@@ -258,5 +267,28 @@ body {
     box-shadow: none !important;
     background: #FFFFFF !important;
   }
+
+  /* The parts printElement hides must stay hidden: the broad rules above would otherwise turn them back into blocks. */
+  html body .jv-print-hide.jv-print-hide,
+  html body .no-print.no-print {
+    display: none !important;
+  }
+
+  /* A printed report: keep each block together instead of cutting it across two pages. */
+  .jv-print-target table,
+  .jv-print-target tr,
+  .jv-print-target figure,
+  .jv-print-target [class*="rounded-2xl"],
+  .jv-print-target [class*="rounded-xl"] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .jv-print-target h1, .jv-print-target h2, .jv-print-target h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  .jv-print-target thead { display: table-header-group; }
+  .jv-print-target, .jv-print-target * { box-sizing: border-box; }
+
 }
 

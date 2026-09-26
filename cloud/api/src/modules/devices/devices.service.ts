@@ -339,14 +339,15 @@ export class DevicesService {
     const restaurant = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.restaurant.findUniqueOrThrow({
         where: { id: restaurantId },
-        select: { name: true, legalName: true, gstin: true, fssaiNumber: true, address: true, city: true, state: true, updatedAt: true }
+        select: { name: true, legalName: true, gstin: true, fssaiNumber: true, address: true, city: true, state: true, showJamanAi: true, updatedAt: true }
       })
     );
-    return restaurant;
+    const { showJamanAi, ...rest } = restaurant;
+    return { ...rest, showJamanAI: showJamanAi };
   }
 
   async updateRestaurantIdentity(restaurantId: string, dto: RestaurantIdentityDto) {
-    const restaurant = await this.prisma.runAsTenant(restaurantId, (tx) =>
+    await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.restaurant.update({
         where: { id: restaurantId },
         data: {
@@ -356,12 +357,12 @@ export class DevicesService {
           ...(dto.fssaiNumber !== undefined ? { fssaiNumber: dto.fssaiNumber } : {}),
           ...(dto.address !== undefined ? { address: dto.address } : {}),
           ...(dto.city !== undefined ? { city: dto.city } : {}),
-          ...(dto.state !== undefined ? { state: dto.state } : {})
-        },
-        select: { name: true, legalName: true, gstin: true, fssaiNumber: true, address: true, city: true, state: true, updatedAt: true }
+          ...(dto.state !== undefined ? { state: dto.state } : {}),
+          ...(dto.showJamanAI !== undefined ? { showJamanAi: dto.showJamanAI } : {})
+        }
       })
     );
-    return restaurant;
+    return this.getRestaurantIdentity(restaurantId);
   }
 
   async reportHeartbeat(device: Device, dto: HeartbeatDto) {

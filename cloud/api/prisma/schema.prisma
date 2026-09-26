@@ -142,6 +142,8 @@ model Restaurant {
   /// BUG-015: whether the Restaurant Admin may upload their own menu CSV. Super Admin can
   /// always upload for the restaurant regardless of this flag.
   selfMenuUploadEnabled Boolean    @default(true)
+  /// The owner's choice to show the JAMAN AI button on this restaurant's terminals (Restaurant Admin > Settings).
+  showJamanAi     Boolean          @default(true)
   deletedAt       DateTime?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt

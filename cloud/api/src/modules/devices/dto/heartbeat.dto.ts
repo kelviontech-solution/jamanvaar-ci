@@ -25,6 +25,7 @@ export const restaurantIdentitySchema = z.object({
   fssaiNumber: z.string().trim().max(20).nullable().optional(),
   address: z.string().trim().max(300).nullable().optional(),
   city: z.string().trim().max(100).nullable().optional(),
-  state: z.string().trim().max(100).nullable().optional()
+  state: z.string().trim().max(100).nullable().optional(),
+  showJamanAI: z.boolean().optional()
 });
 export type RestaurantIdentityDto = z.infer<typeof restaurantIdentitySchema>;

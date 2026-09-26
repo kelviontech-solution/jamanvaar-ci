@@ -1,8 +1,0 @@
-- generic [ref=e4]:
-  - generic [ref=e5]:
-    - img "JAMANVAAR" [ref=e6]
-    - generic [ref=e7]: ACTIVATE ACCOUNT
-  - generic [ref=e8]:
-    - heading "This invitation link is not valid" [level=1] [ref=e12]
-    - paragraph [ref=e13]: The link is incomplete or was replaced by a newer invitation. Use the most recent email, or ask a Platform Owner to resend it.
-    - button "Go to sign in" [ref=e14] [cursor=pointer]

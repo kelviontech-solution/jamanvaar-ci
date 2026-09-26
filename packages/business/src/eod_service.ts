@@ -3,6 +3,13 @@ import { db , getOrderTenders, isUnpaidOpenOrder } from '@jamanvaar/database';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 import { DayOrdersService } from './day_orders_service';
 
+/** "09:00 AM → 06:30 PM" from the real shift, or a dash when there is none. */
+function shiftDurationLabel(shift: ShiftRecord | undefined): string {
+  if (!shift?.openedAt) return '—';
+  const t = (iso: string) => new Date(iso).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  return `${t(shift.openedAt)} → ${shift.closedAt ? t(shift.closedAt) : 'open'}`;
+}
+
 export class EodReportService {
   /**
    * Generates a complete, official EOD Z-Report snapshot based on real database data
@@ -56,10 +63,10 @@ export class EodReportService {
       db.shifts.find((s) => s.id === shiftId) || db.shifts[0];
 
     const cashierName = activeShift?.cashierName || 'No shift open';
-    const cashierId = activeShift?.cashierId || 'usr-cashier-1';
-    const terminalId = activeShift?.posId || 'POS-01';
-    const shiftName = activeShift?.id ? 'Full Day Shift #01' : 'Standard Shift #01';
-    const openingFloat = activeShift?.openingCash || 2000;
+    const cashierId = activeShift?.cashierId || '';
+    const terminalId = activeShift?.posId || '—';
+    const shiftName = activeShift ? `Shift #${activeShift.shiftNumber ?? 1}` : 'No shift open';
+    const openingFloat = activeShift?.openingCash ?? 0;
 
     // Financial & Order aggregations
     let grossRevenue = 0;
@@ -76,6 +83,7 @@ export class EodReportService {
     let ordersSettled = 0;
     let customersServed = 0;
     const tablesServedSet = new Set<string>();
+    const diningMinutes: number[] = [];
 
     const paymentCounts = {
       cash: { count: 0, amount: 0 },
@@ -126,6 +134,8 @@ export class EodReportService {
 
       if (o.tableNumber) {
         tablesServedSet.add(o.tableNumber);
+        const mins = (new Date(o.updatedAt ?? '').getTime() - new Date(o.createdAt ?? '').getTime()) / 60000;
+        if (Number.isFinite(mins) && mins > 0 && mins < 600) diningMinutes.push(mins);
         const tblKey = `Table ${o.tableNumber}`;
         tableMap.set(tblKey, (tableMap.get(tblKey) || 0) + o.totalAmount);
       }
@@ -256,6 +266,7 @@ export class EodReportService {
     const cashSales = paymentCounts.cash.amount;
     const cashRefund = refundsAmount > 0 ? Math.round(refundsAmount * 0.3) : 0;
     const cashPaidOut = 0;
+    const avgDiningMinutes = diningMinutes.length ? Math.round(diningMinutes.reduce((a, b) => a + b, 0) / diningMinutes.length) : 0;
     const expectedDrawer = openingFloat + cashSales - cashRefund - cashPaidOut;
     const actualDrawer = expectedDrawer; // Perfectly balanced by default
     const closingFloat = actualDrawer;
@@ -335,10 +346,10 @@ export class EodReportService {
       terminalId,
       openingFloat,
       closingFloat,
-      shiftDuration: '09:00 AM → 11:58 PM',
+      shiftDuration: shiftDurationLabel(activeShift),
       ordersSettled,
       customersServed,
-      tablesServed: tablesServedSet.size || 12,
+      tablesServed: tablesServedSet.size,
 
       grossRevenue,
       netRevenue,
@@ -394,13 +405,13 @@ export class EodReportService {
       cashierPerformance,
       tableUtilization: {
         topTables,
-        avgDiningTimeMinutes: 52
+        avgDiningTimeMinutes: avgDiningMinutes
       },
       lowStockInventory,
-      managerNotes: managerNotesInput || 'All operations and dining services completed smoothly for the shift.',
+      managerNotes: managerNotesInput || '',
       generatedAt: now.toISOString(),
       generatedAtFormatted,
-      generatedBy: generatedByInput || db.restaurant.managerName || 'Pooja Shah (Floor Manager)',
+      generatedBy: generatedByInput || db.restaurant.managerName || '',
       status: 'DRAFT',
       branding
     };
