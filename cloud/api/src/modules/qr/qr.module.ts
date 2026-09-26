@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { QrCacheFlushInterceptor } from './qr-cache-flush.interceptor';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { AuditModule } from '../audit/audit.module';
 import { ApplicationEntitlementsModule } from '../application-entitlements/application-entitlements.module';
@@ -25,7 +27,7 @@ import { QrRateLimiter, QrRateLimitInterceptor } from './qr-rate-limit';
 @Module({
   imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule],
   controllers: [QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController],
-  providers: [QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics],
+  providers: [QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
   exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService, QrAdmission]
 })
 export class QrModule {}

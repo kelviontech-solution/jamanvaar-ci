@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 export type RealtimeKind = 'orders' | 'inventory' | 'menu' | 'command';
 
 export interface RealtimeEvent {
+  /** '*' means every restaurant: sent to all connected devices after the relay reconnects, so they pull anything they missed. */
   restaurantId: string;
   /** Null means every device of the restaurant; otherwise that branch plus restaurant-wide (branchless) devices. */
   branchId: string | null;
@@ -41,6 +42,7 @@ export class RealtimeBus implements OnModuleInit, OnModuleDestroy {
   private readonly instanceId = randomUUID();
   private client: Client | null = null;
   private closing = false;
+  private everConnected = false;
   private retry: NodeJS.Timeout | null = null;
 
   async onModuleInit(): Promise<void> {
@@ -76,6 +78,10 @@ export class RealtimeBus implements OnModuleInit, OnModuleDestroy {
       await client.connect();
       await client.query(`LISTEN ${CHANNEL}`);
       this.client = client;
+      // Wake-ups raised elsewhere while the relay was down were lost. Tell every connected device to pull now, so a gap costs
+      // one extra pull and never a missed change.
+      if (this.everConnected) for (const kind of ['orders', 'inventory', 'menu'] as const) this.events$.next({ restaurantId: '*', branchId: null, kind });
+      this.everConnected = true;
     } catch (e) {
       this.lost(client, e as Error);
     }
@@ -107,7 +113,7 @@ export class RealtimeBus implements OnModuleInit, OnModuleDestroy {
 
   /** Whether `event` may be delivered to a device with these credentials. Scope comes from the authenticated device, never from the client. */
   static isVisibleTo(event: RealtimeEvent, device: { id: string; restaurantId: string; branchId: string | null }): boolean {
-    if (event.restaurantId !== device.restaurantId) return false;
+    if (event.restaurantId !== '*' && event.restaurantId !== device.restaurantId) return false;
     if (event.originDeviceId && event.originDeviceId === device.id) return false;
     if (event.deviceId) return event.deviceId === device.id;
     if (event.branchId && device.branchId && event.branchId !== device.branchId) return false;

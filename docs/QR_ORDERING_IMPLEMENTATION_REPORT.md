@@ -200,11 +200,18 @@ Verification at this point: cloud suite has only the two failures that predate t
 
 **Browser verification (Playwright, real API + Vite dev server):** the guest page loaded the published menu, showed the required "Size – Choose 1 (required)" and "Extras – Choose up to 2" rules with the Add button disabled until a size was chosen, priced Large + Extra cheese at ₹344, and placed the order: QR-1, ₹361.20 (₹344 + 5%), status screen shown.
 
-### Still not done or not verified
+### Third pass: closing the remaining list
 
-* The Restaurant Admin screens (Customisations & Tax, publish panel, branch prices, category editor, table management, branding form) are typechecked and their server endpoints are tested, but **were not clicked through in a browser** (activating a Restaurant Admin device in a browser was not set up).
-* Full edit → publish → guest → POS/KDS propagation across every device app (R10) is covered on the cloud side only.
-* Resolution cache does not see a plan downgrade made elsewhere until it expires (≤ 2 s).
-* The realtime relay is best-effort; devices still pull on their normal cycle.
-* Rate-limit windows are fixed one-minute buckets (a burst at a boundary can pass up to twice a limit).
-* Timing figures are from a development machine and are not a production capacity claim.
+* **Rate limits are now sliding**, not fixed buckets: a burst that straddles a minute boundary is counted together (`qr-scale.e2e`, clock-pinned test).
+* **Plan, subscription, application-entitlement, restaurant/branch and platform QR changes flush the resolution cache on every instance immediately** (`qr-scale.e2e`: entitlement switched off by platform staff stops a cached instance at once).
+* **Realtime relay gaps heal themselves**: after the PostgreSQL relay reconnects, every connected device is told once to pull orders, inventory and menu, so a gap costs one extra pull and never a missed change (`qr-scale.e2e`).
+* **Device end of the QR path** (R10): a cloud-created QR order arrives on a device with real option prices, groups, tax and menu-version snapshot, and a later kitchen-status push carries them back intact (`tests/qr_order_propagation.test.ts`).
+* **Restaurant Admin screens driven in a real browser** (real API, Vite dev server, owner sign-in, device activation): Customisations & Tax lists the synced groups and taxes; a new group was created and **published through the UI** (version 1, "Up to date"); branch prices list both branches; a table was added through the QR console (multi-branch guard asked for a branch first), its QR generated, and the branding form saved (verified on the server); the category editor opens with picture, description and QR-visibility controls.
+* **The two failures that predated this work were test bugs and are fixed**: `rbac.e2e` created rows outside row-level security; `restaurant-identity-sync.e2e` used the old one-step platform login. Cloud suite is now fully green: 98 files, 807 tests (1 skipped by design). Root suite 161 files, 1124 tests.
+
+### What remains, stated plainly
+
+* Timing figures are development-machine measurements, not production capacity; the design (shared counters, admission control, retry, caches) is what scales, and the harness (`cloud/api/scripts/qr-load.ts`) is how to measure a real deployment.
+* Not exercised in a browser: dragging through every field of every new Restaurant Admin form (dish tax/QR/quantity fields, per-option notes, logo upload, branch price edits). Their logic and endpoints are covered by tests; the screens render and the flows above were driven end to end.
+* The realtime relay and rate counters depend on PostgreSQL being reachable; both degrade safely (local delivery only; guests let through) rather than failing requests.
+* Starter data still seeds a "Restaurant Standard GST (5%)" tax group on a new device; it is now visible and deletable in Customisations & Tax.

@@ -162,14 +162,14 @@ describe('Platform RBAC (BUG-082/083/084)', () => {
    * full, on both endpoints, because nothing masked by role, only by the key's own status.
    */
   it("B2-051/B2-053: an activation code and a device's credential hash are never leaked to a role that shouldn't see them, on either endpoint", async () => {
-    const restaurant = await prisma.restaurant.create({ data: { name: `TEST B2-053 ${stamp}`, status: 'ACTIVE' } });
+    const restaurant = await prisma.runAsPlatform((tx) => tx.restaurant.create({ data: { name: `TEST B2-053 ${stamp}`, status: 'ACTIVE' } }));
     createdRestaurantIds.push(restaurant.id);
-    const device = await prisma.device.create({
+    const device = await prisma.runAsPlatform((tx) => tx.device.create({
       data: { restaurantId: restaurant.id, type: 'POS', status: 'ACTIVE', deviceTokenHash: 'sha256-fake-secret-for-test' }
-    });
-    const key = await prisma.activationKey.create({
+    }));
+    const key = await prisma.runAsPlatform((tx) => tx.activationKey.create({
       data: { restaurantId: restaurant.id, code: 'JMV-B2053-TEST-0001', status: 'ACTIVE', allowedDeviceType: 'POS', expiresAt: new Date(Date.now() + 86400000) }
-    });
+    }));
 
     // Finance: refused 403 directly, and the nested restaurant response must not carry the data either.
     expect((await as('FINANCE_ADMIN', 'get', `/api/v1/devices?restaurantId=${restaurant.id}`)).status).toBe(403);
@@ -198,7 +198,7 @@ describe('Platform RBAC (BUG-082/083/084)', () => {
     const ownerDetail = await as('PLATFORM_OWNER', 'get', `/api/v1/activation-keys/${key.id}`);
     expect(ownerDetail.body.code).toBe('JMV-B2053-TEST-0001');
 
-    await prisma.device.delete({ where: { id: device.id } });
-    await prisma.activationKey.delete({ where: { id: key.id } });
+    await prisma.runAsPlatform((tx) => tx.device.delete({ where: { id: device.id } }));
+    await prisma.runAsPlatform((tx) => tx.activationKey.delete({ where: { id: key.id } }));
   });
 });

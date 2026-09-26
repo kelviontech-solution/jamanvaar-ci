@@ -7,8 +7,7 @@ import { RealtimeBus } from '../../common/realtime/realtime-bus';
  * A scan is resolved with about eight small queries (code, restaurant, branch, subscription, entitlement, settings, table).
  * A busy table repeats that for every request, so the result is kept for a very short time. Safety comes from three things:
  * the entry is keyed by the unguessable token and holds only that token's own restaurant; a revoke, disable, regenerate or
- * settings change drops every entry of that restaurant on ALL instances immediately (PostgreSQL NOTIFY); and anything changed
- * elsewhere (a plan downgrade) is picked up when the entry expires, at most QR_RESOLVE_CACHE_MS later (default 2 s, 0 = off).
+ * settings change drops every entry of that restaurant on ALL instances immediately (PostgreSQL NOTIFY); and a change of plan, subscription or application entitlement flushes them all at once (default 2 s, 0 = off).
  * Failures are never cached, so a bad token always reaches the database limiter.
  */
 @Injectable()
@@ -45,7 +44,7 @@ export class QrResolutionCache<T extends { restaurant: { id: string } }> impleme
 
   private drop(restaurantId: string): void {
     this.stats.invalidations++;
-    for (const [k, v] of this.entries) if (v.value.restaurant.id === restaurantId) this.entries.delete(k);
+    for (const [k, v] of this.entries) if (restaurantId === '*' || v.value.restaurant.id === restaurantId) this.entries.delete(k);
   }
 
   /** Call after any change to a restaurant's codes or QR settings. */

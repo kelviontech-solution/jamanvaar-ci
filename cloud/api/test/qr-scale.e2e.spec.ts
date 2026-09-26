@@ -212,6 +212,69 @@ describe('QR ordering: scale, resilience and shared counters', () => {
       }
     });
 
+    it('an entitlement switched off by platform staff stops a cached instance immediately (no waiting for expiry)', async () => {
+      const previous = process.env.QR_RESOLVE_CACHE_MS;
+      process.env.QR_RESOLVE_CACHE_MS = '60000';
+      const cached = await createTestApp();
+      process.env.QR_RESOLVE_CACHE_MS = previous;
+      try {
+        await cached.listen(0);
+        cached.get(QrRateLimiter).configure(OPEN);
+        const c = request(await cached.getUrl());
+        await new Promise((r) => setTimeout(r, 300));
+        const token = F.b.tokens[0];
+        expect((await c.get(`/api/v1/public/qr/${token}`)).status).toBe(200);
+        expect((await c.get(`/api/v1/public/qr/${token}`)).status).toBe(200); // served from the cache
+        await platform('patch', `/api/v1/qr-ordering/restaurants/${F.b.rid}/entitlement`).send({ qrEntitled: false });
+        let status = 200;
+        for (let i = 0; i < 40 && status === 200; i++) { status = (await c.get(`/api/v1/public/qr/${token}`)).status; if (status === 200) await new Promise((r) => setTimeout(r, 50)); }
+        expect(status).toBe(403); // ENTITLEMENT_REQUIRED
+        await platform('patch', `/api/v1/qr-ordering/restaurants/${F.b.rid}/entitlement`).send({ qrEntitled: true });
+        for (let i = 0; i < 40 && status !== 200; i++) { status = (await c.get(`/api/v1/public/qr/${token}`)).status; if (status !== 200) await new Promise((r) => setTimeout(r, 50)); }
+        expect(status).toBe(200);
+      } finally {
+        await platform('patch', `/api/v1/qr-ordering/restaurants/${F.b.rid}/entitlement`).send({ qrEntitled: true });
+        await cached.close();
+      }
+    });
+
+    it('rate limits slide: a burst that straddles a minute boundary is counted together', async () => {
+      const limiter = app.get(QrRateLimiter) as any;
+      limiter.configure({ ...OPEN, tokenRequestsPerMinute: 10 }, `slide-${stamp}`);
+      const realNow = Date.now;
+      try {
+        // Pin the clock to 5 s into a minute: send 10 requests (all allowed), then move 5 s into the NEXT minute.
+        const base = Math.floor(realNow() / 60000) * 60000 + 60000 * 10;
+        Date.now = () => base + 5000;
+        const token = F.b.tokens[1];
+        const first = [];
+        for (let i = 0; i < 10; i++) first.push((await http().get(`/api/v1/public/qr/${token}`)).status);
+        expect(first.every((c) => c === 200)).toBe(true);
+        Date.now = () => base + 60000 + 5000;
+        // A fixed window would allow 10 more now; sliding still counts ~92% of the earlier burst.
+        expect((await http().get(`/api/v1/public/qr/${token}`)).status).toBe(429);
+        Date.now = () => base + 60000 + 59000; // almost a full minute after the burst: the allowance has come back
+        expect((await http().get(`/api/v1/public/qr/${token}`)).status).toBe(200);
+      } finally {
+        Date.now = realNow;
+        limiter.configure(OPEN);
+      }
+    });
+
+    it('a relay reconnect makes every device pull once, and the wildcard never crosses a restaurant boundary otherwise', async () => {
+      const dev = { id: 'd1', restaurantId: F.b.rid, branchId: null };
+      expect(RealtimeBus.isVisibleTo({ restaurantId: '*', branchId: null, kind: 'orders' }, dev)).toBe(true);
+      expect(RealtimeBus.isVisibleTo({ restaurantId: F.a.rid, branchId: null, kind: 'orders' }, dev)).toBe(false);
+      const bus = app2.get(RealtimeBus) as any;
+      const seen: RealtimeEvent[] = [];
+      const sub = bus.events$.subscribe((e: RealtimeEvent) => { if (e.restaurantId === '*') seen.push(e); });
+      const old = bus.client;
+      await old.end(); // the relay connection drops
+      for (let i = 0; i < 80 && seen.length < 3; i++) await new Promise((r) => setTimeout(r, 100));
+      sub.unsubscribe();
+      expect(seen.map((e) => e.kind).sort()).toEqual(['inventory', 'menu', 'orders']);
+    }, 20_000);
+
     it('a counter store that cannot be read lets the guest through rather than failing the request', async () => {
       const limiter = app.get(QrRateLimiter) as any;
       const original = limiter.bump;

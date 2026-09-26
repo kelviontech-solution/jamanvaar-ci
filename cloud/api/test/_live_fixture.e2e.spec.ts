@@ -19,8 +19,10 @@ it.skipIf(!process.env.LIVE_FIXTURE)('live fixture', async () => {
   const tok = (await platformLogin(app, email, 'correct-horse-battery-staple')).body.accessToken;
   const P = (m: 'get' | 'post', u: string) => request(app.getHttpServer())[m](u).set('Authorization', `Bearer ${tok}`);
   const plan = await P('post', '/api/v1/plans').send({ tier: 'QR', name: `Live QR plan ${stamp}`, priceMonthly: 900000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true, restaurantAdmin: true, kotKdsRouting: true, qrTableOrdering: true } });
-  const rest = await P('post', '/api/v1/restaurants').send({ name: `Spice Route ${stamp}`, ownerName: 'Owner', ownerEmail: `live-owner-${stamp}@test.example.com` });
+  const rest = await P('post', '/api/v1/restaurants').send({ name: `Spice Route ${stamp}`, ownerName: 'Owner', ownerEmail: `live-owner-${stamp}@test.example.com`, mobile: `9${String(stamp).slice(-9)}` });
   const rid = rest.body.restaurant.id;
+  const ownerEmail = `live-owner-${stamp}@test.example.com`;
+  await request(app.getHttpServer()).post('/api/v1/tenant-auth/set-initial-password').send({ restaurantId: rid, email: ownerEmail, activationToken: rest.body.activationToken, newPassword: 'live-owner-password-123' });
   await P('post', '/api/v1/subscriptions').send({ restaurantId: rid, planId: plan.body.id, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString() });
   const branch = (await P('post', '/api/v1/branches').send({ restaurantId: rid, name: 'Ahmedabad Main', code: 'AMD' })).body.id;
   const act = async (type: string, branchId?: string) => {
@@ -28,6 +30,7 @@ it.skipIf(!process.env.LIVE_FIXTURE)('live fixture', async () => {
     return (await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: type })).body.deviceToken as string;
   };
   const admin = await act('POS_ADMIN');
+  const spareKey = (await P('post', '/api/v1/activation-keys').send({ restaurantId: rid, allowedDeviceType: 'POS_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() })).body.code;
   const pos = await act('POS', branch);
   const push = (type: string, id: string, payload: Record<string, unknown>) =>
     request(app.getHttpServer()).post(`/api/v1/entity-sync/${type}`).set('Authorization', `Bearer ${admin}`).send({ events: [{ externalId: id, payload: { id, ...payload, updatedAt: new Date().toISOString() } }] });
@@ -40,7 +43,7 @@ it.skipIf(!process.env.LIVE_FIXTURE)('live fixture', async () => {
   await push('MENU_ITEM', 'cc', { categoryId: 'drinks', name: 'Cold Coffee', price: 120, isAvailable: true, taxGroupId: 'tax5', modifierGroupIds: [], kitchenStation: 'Bar' });
   await push('DINING_TABLE', 'tbl12', { tableNumber: '12', capacity: 4, isActive: true, branchId: branch });
   const made = await request(app.getHttpServer()).post('/api/v1/restaurant/qr/tables/tbl12/generate').set('Authorization', `Bearer ${admin}`).send({ branchId: branch });
-  writeFileSync(process.env.LIVE_FIXTURE as string, JSON.stringify({ url: made.body.url, admin, pos, restaurantId: rid }));
+  writeFileSync(process.env.LIVE_FIXTURE as string, JSON.stringify({ url: made.body.url, admin, pos, restaurantId: rid, ownerEmail, ownerPassword: 'live-owner-password-123', restaurantCode: rest.body.restaurant.restaurantCode, spareKey }));
   // Data is left in place for the real server started separately; remove it with LIVE_CLEANUP.
   writeFileSync(`${process.env.LIVE_FIXTURE}.cleanup`, JSON.stringify({ rid, plan: plan.body.id, email }));
   await app.close();

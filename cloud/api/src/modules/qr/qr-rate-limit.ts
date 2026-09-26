@@ -37,8 +37,8 @@ const WINDOW_MS = 60_000;
  * Abuse protection for the public QR endpoints. Limits are per address, per code, per session and per order (never
  * one blunt per-address number, which would either block a whole restaurant behind one router or let a script guess
  * tokens). Counters live in PostgreSQL (table RateCounter, one atomic upsert per request for all keys), so every API
- * instance shares the same ceilings and a restart forgets nothing. Windows are fixed one-minute buckets; a bucket
- * boundary can let through at most twice a limit for a moment, which is accepted for the simplicity and speed.
+ * instance shares the same ceilings and a restart forgets nothing. Counts are sliding over the last minute (current
+ * bucket plus the still-relevant share of the previous one).
  * If the counter store itself is unreachable the request is let through (the request needs the database anyway).
  */
 @Injectable()
@@ -76,15 +76,26 @@ export class QrRateLimiter {
     return createHash('sha256').update(this.epoch + k).digest('base64url').slice(0, 22);
   }
 
-  /** Adds `inc` to each counter for the current window in one round trip and returns the new counts, in order. */
+  /**
+   * Adds `inc` to each counter for the current one-minute bucket and returns each key's SLIDING count, in order: this bucket plus
+   * the share of the previous bucket that still falls inside the last 60 seconds. One round trip. A burst straddling a bucket
+   * boundary is therefore counted together instead of getting a fresh allowance.
+   */
   private async bump(entries: Array<{ key: string; inc: number }>): Promise<number[]> {
-    const window = Math.floor(Date.now() / WINDOW_MS);
+    const now = Date.now();
+    const window = Math.floor(now / WINDOW_MS);
+    const remaining = 1 - (now % WINDOW_MS) / WINDOW_MS; // share of the previous bucket still inside the sliding minute
     const rows = entries.map((e) => Prisma.sql`(${this.key(e.key)}, ${window}::bigint, ${e.inc}::int)`);
-    const res = await this.prisma.$queryRaw<Array<{ key: string; count: number }>>(Prisma.sql`
-      INSERT INTO "RateCounter" AS c ("key", "windowStart", "count") VALUES ${Prisma.join(rows)}
-      ON CONFLICT ("key", "windowStart") DO UPDATE SET "count" = c."count" + EXCLUDED."count"
-      RETURNING "key", "count"`);
-    const byKey = new Map(res.map((r) => [r.key, r.count]));
+    const res = await this.prisma.$queryRaw<Array<{ key: string; cur: number; prev: number }>>(Prisma.sql`
+      WITH up AS (
+        INSERT INTO "RateCounter" AS c ("key", "windowStart", "count") VALUES ${Prisma.join(rows)}
+        ON CONFLICT ("key", "windowStart") DO UPDATE SET "count" = c."count" + EXCLUDED."count"
+        RETURNING "key", "count"
+      )
+      SELECT up."key" AS key, up."count" AS cur,
+             COALESCE((SELECT p."count" FROM "RateCounter" p WHERE p."key" = up."key" AND p."windowStart" = ${window - 1}::bigint), 0) AS prev
+      FROM up`);
+    const byKey = new Map(res.map((r) => [r.key, Math.ceil(Number(r.cur) + Number(r.prev) * remaining)]));
     return entries.map((e) => byKey.get(this.key(e.key)) ?? 0);
   }
 
