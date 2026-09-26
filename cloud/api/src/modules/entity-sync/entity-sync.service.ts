@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EntitySyncEventDto, SyncableEntityType } from './dto/push-entity-sync.dto';
+import { PUBLISHED_DEMO_QR_TOKENS } from './published-demo-qr-tokens';
+import { menuEntityProblem } from './menu-entity-schemas';
 
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000;
 const CATCH_UP_MAX_ROWS = 500;
@@ -62,6 +64,11 @@ export class EntitySyncService {
     await this.prisma.runAsTenant(restaurantId, async (tx) => {
       for (const evt of events) {
         try {
+          const problem = menuEntityProblem(entityType, evt.payload);
+          if (problem) {
+            results.push({ externalId: evt.externalId, status: 'error', error: problem });
+            continue;
+          }
           const existing = await tx.syncedEntity.findUnique({
             where: {
               restaurantId_entityType_externalId: {
@@ -139,6 +146,7 @@ export class EntitySyncService {
     // client also derived tokens from the table number and id for tables that had none; those are guessable, so they are
     // refused and that table simply has no working legacy code until a real one is generated.
     if (!qrToken || !/^jv_qr_tbl_[A-Za-z0-9]{1,10}_[a-f0-9]{32,64}$/.test(qrToken)) return;
+    if (PUBLISHED_DEMO_QR_TOKENS.has(qrToken)) return;
     if (payload.qrStatus === 'DISABLED' || payload.isActive === false) return;
 
     const tableNumber = typeof payload.tableNumber === 'string' ? payload.tableNumber : evt.externalId;

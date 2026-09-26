@@ -23,6 +23,7 @@ interface MenuCategoriesModuleProps {
   menuItems: MenuItem[];
   onOpenItemModal: (item?: MenuItem | null) => void;
   onOpenCategoryModal: (cat?: Category | null) => void;
+  onCategoriesChanged?: () => void;
   onOpenPrebuiltMenuModal: () => void;
   onOpenBulkPriceModal: () => void;
   showToast: (msg: string) => void;
@@ -41,6 +42,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
   menuItems,
   onOpenItemModal,
   onOpenCategoryModal,
+  onCategoriesChanged,
   onOpenPrebuiltMenuModal,
   onOpenBulkPriceModal,
   showToast,
@@ -346,7 +348,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             All Categories ({menuItems.length})
           </button>
 
-          {categories.map((c: Category) => (
+          {[...categories].sort((a, b) => a.sortOrder - b.sortOrder).map((c: Category) => (
             <div key={c.id} className="relative group shrink-0">
               <button
                 onClick={() => setSelectedCategoryFilter(c.id)}
@@ -356,13 +358,20 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                     : 'bg-jaman-cream hover:bg-[#F4EFE6] text-slate-700'
                 }`}
               >
-                <span>{c.name}</span>
+                <span>{c.name}{c.qrVisible === false ? ' (hidden from QR)' : ''}</span>
                 <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${
                   selectedCategoryFilter === c.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
                 }`}>
                   {menuItems.filter(m => m.categoryId === c.id).length}
                 </span>
               </button>
+              {selectedCategoryFilter === c.id && (
+                <span className="absolute -top-2 right-0 flex gap-0.5 bg-white border border-jaman-border rounded-lg shadow-xs px-0.5">
+                  <button type="button" aria-label={`Move ${c.name} earlier`} onClick={() => { if (MenuRepository.moveCategory(c.id, -1)) onCategoriesChanged?.(); }} className="text-[10px] px-1 font-black text-slate-600">◀</button>
+                  <button type="button" aria-label={`Move ${c.name} later`} onClick={() => { if (MenuRepository.moveCategory(c.id, 1)) onCategoriesChanged?.(); }} className="text-[10px] px-1 font-black text-slate-600">▶</button>
+                  <button type="button" aria-label={`Edit ${c.name}`} onClick={() => onOpenCategoryModal(c)} className="text-[10px] px-1 font-black text-jaman-saffron">Edit</button>
+                </span>
+              )}
             </div>
           ))}
         </div>

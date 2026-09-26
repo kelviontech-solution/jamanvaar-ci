@@ -2,7 +2,11 @@
  * The public QR API, and nothing else. No credentials, no cookies: the token in the address is the whole identity,
  * and the server derives restaurant, branch and table from it.
  */
+export interface Branding { welcomeTitle: string | null; welcomeMessage: string | null; footerMessage: string | null; orderButtonLabel: string | null; accentColor: string | null; logoUrl: string | null }
+
 export interface Describe {
+  currency?: string;
+  branding?: Branding;
   restaurant: { name: string; address?: string; city?: string };
   branch: { name: string };
   mode: 'TABLE_ORDER' | 'MENU_ONLY';

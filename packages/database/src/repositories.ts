@@ -71,6 +71,7 @@ import { getOrderTenders, splitsMatchTotal } from './tender';
 import { generateOrderNumber, generateTokenNumber, generateUUID, normalizeIndianPhone, formatRestaurantDate, getRestaurantHour, getBusinessDayDisplayDate } from '@jamanvaar/utils';
 import { db } from './db';
 import { TableSync } from './table_sync';
+import { canMoveTable } from './table_state';
 import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync } from './collection_sync';
 import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS, SEED_ROLES, SEED_RESTAURANT } from './seed';
 import { hashPin, verifyPinHash, generateUniquePin, pinFingerprint } from './pin';
@@ -112,14 +113,15 @@ export class MenuRepository {
 
   public static createCategory(category: Partial<Category>): Category {
     const newCat: Category = {
-      id: category.id || `cat-${Date.now()}`,
+      id: category.id || `cat-${Date.now().toString(36)}-${globalThis.crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}`,
       name: category.name || 'New Category',
-      slug: category.slug || `cat-${Date.now()}`,
+      slug: category.slug || `cat-${Date.now().toString(36)}`,
       description: category.description || '',
       iconName: category.iconName || 'Utensils',
       imageUrl: category.imageUrl,
       sortOrder: category.sortOrder || db.categories.length + 1,
-      isActive: true,
+      isActive: category.isActive ?? true,
+      ...(category.qrVisible !== undefined ? { qrVisible: category.qrVisible } : {}),
       translations: category.translations
     };
     db.categories.push(newCat);
@@ -133,6 +135,18 @@ export class MenuRepository {
     db.categories[idx] = { ...db.categories[idx], ...updates };
     db.notify();
     return db.categories[idx];
+  }
+
+  /** Moves a category one place earlier (-1) or later (+1) in the menu and renumbers every category so the order is exact. */
+  public static moveCategory(id: string, delta: -1 | 1): boolean {
+    const ordered = [...db.categories].sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
+    const i = ordered.findIndex((c) => c.id === id);
+    const j = i + delta;
+    if (i < 0 || j < 0 || j >= ordered.length) return false;
+    [ordered[i], ordered[j]] = [ordered[j], ordered[i]];
+    ordered.forEach((c, idx) => { c.sortOrder = idx + 1; });
+    db.notify();
+    return true;
   }
 
   public static deleteCategory(id: string): boolean {
@@ -1197,6 +1211,8 @@ export class TableRepository {
   public static updateTableStatus(id: string, status: DiningTable['status']): DiningTable | null {
     const tbl = db.tables.find((t) => t.id === id);
     if (!tbl) return null;
+    // A move the table cannot legally make (for example free -> billing, or anything out of BLOCKED but AVAILABLE) is refused.
+    if (!canMoveTable(tbl.status, status)) return null;
     tbl.status = status;
     if (status === 'AVAILABLE') {
       tbl.currentOrderId = undefined;

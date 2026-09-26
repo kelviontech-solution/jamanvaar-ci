@@ -91,6 +91,8 @@ export interface QrPrintData {
 }
 
 const base = '/api/v1/restaurant/qr';
+export interface QrBrandingView { welcomeTitle: string | null; welcomeMessage: string | null; footerMessage: string | null; orderButtonLabel: string | null; accentColor: string | null; logoUrl: string | null }
+
 const json = (body: unknown): RequestInit => ({ method: 'POST', body: JSON.stringify(body) });
 
 export const QrAdminApi = {
@@ -101,6 +103,10 @@ export const QrAdminApi = {
   orders: (branchId?: string) => qrApi<QrOrderRow[]>(`${base}/orders${branchId ? `?branchId=${encodeURIComponent(branchId)}` : ''}`),
   settings: () => qrApi<QrSettings>(`${base}/settings`),
   saveSettings: (changes: Partial<QrSettings>) => qrApi<QrSettings>(`${base}/settings`, { method: 'PUT', body: JSON.stringify(changes) }),
+  branding: () => qrApi<QrBrandingView>(`${base}/branding`),
+  updateBranding: (body: Partial<Record<'welcomeTitle' | 'welcomeMessage' | 'footerMessage' | 'orderButtonLabel' | 'accentColor', string>> & { logo?: string | null }) => qrApi<QrBrandingView>(`${base}/branding`, { method: 'PUT', body: JSON.stringify(body) }),
+  createTable: (body: { tableNumber: string; capacity: number; branchId?: string; zone?: string }) => qrApi<{ id: string }>(`${base}/tables`, json(body)),
+  updateTable: (tableId: string, body: { tableNumber?: string; capacity?: number; isActive?: boolean }) => qrApi<unknown>(`${base}/tables/${encodeURIComponent(tableId)}`, { method: 'PUT', body: JSON.stringify(body) }),
   generate: (tableId: string, branchId?: string) => qrApi<{ id: string; url: string | null }>(`${base}/tables/${encodeURIComponent(tableId)}/generate`, json(branchId ? { branchId } : {})),
   menuCode: (branchId: string, label: string) => qrApi<{ id: string; url: string | null }>(`${base}/menu-codes`, json({ branchId, label })),
   regenerate: (codeId: string) => qrApi<{ id: string; url: string | null }>(`${base}/codes/${codeId}/regenerate`, json({})),

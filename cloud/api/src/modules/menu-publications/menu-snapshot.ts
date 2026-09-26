@@ -169,6 +169,17 @@ function sniff(bytes: Buffer): string | null {
 
 export interface ExtractedImage { hash: string; contentType: string; data: Buffer }
 
+/** Checks one inline picture (real PNG/JPEG/WebP/GIF, at most 1 MB) and returns its bytes and address, or the reason it is refused. */
+export function parseInlineImage(url: string): { image: ExtractedImage } | { error: string } {
+  const m = DATA_URL.exec(url);
+  if (!m) return { error: 'the picture is not a PNG, JPEG, WebP or GIF' };
+  const data = Buffer.from(m[2].replace(/\s+/g, ''), 'base64');
+  if (data.length > MAX_MENU_IMAGE_BYTES) return { error: 'the picture is larger than 1 MB' };
+  const type = sniff(data);
+  if (!type || type !== m[1]) return { error: 'the picture file is damaged or not what it claims to be' };
+  return { image: { hash: createHash('sha256').update(data).digest('hex'), contentType: type, data } };
+}
+
 /**
  * Pictures typed into the menu as inline data (base64) are moved out of the snapshot into their own store, and the snapshot
  * keeps only `img:<sha256>`. Only real PNG/JPEG/WebP/GIF bytes under 1 MB are accepted (never SVG, which can carry script);

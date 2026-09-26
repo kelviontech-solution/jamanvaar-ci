@@ -2,9 +2,10 @@ import { CallHandler, ExecutionContext, HttpException, Injectable, Logger, NestI
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { createHash } from 'node:crypto';
-import { Observable, catchError, from, mergeMap, throwError } from 'rxjs';
+import { Observable, catchError, from, mergeMap, tap, throwError } from 'rxjs';
 import { PrismaService } from '../../prisma/prisma.service';
 import { QrSessions } from './qr-session';
+import { QrMetrics } from './qr-metrics';
 
 export interface QrRateLimits {
   /** Every public QR request from one address. Deliberately generous: one restaurant's guests share one Wi-Fi address. */
@@ -128,7 +129,7 @@ export class QrRateLimiter {
 
 @Injectable()
 export class QrRateLimitInterceptor implements NestInterceptor {
-  constructor(private readonly limiter: QrRateLimiter, private readonly sessions: QrSessions) {}
+  constructor(private readonly limiter: QrRateLimiter, private readonly sessions: QrSessions, private readonly metrics: QrMetrics) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const req = context.switchToHttp().getRequest<{ ip?: string; url?: string; method: string; params?: Record<string, string>; query?: Record<string, string>; body?: { token?: string }; qrSession?: string; headers: Record<string, string | undefined> }>();
@@ -138,6 +139,10 @@ export class QrRateLimitInterceptor implements NestInterceptor {
     if (/\/images\/[a-f0-9]{64}$/.test(req.url ?? '')) return next.handle();
     // Only a session this system issued counts; a made-up one is ignored, so it cannot be used to dodge or to spoil limits.
     req.qrSession = this.sessions.verify(req.headers['x-qr-session']);
+    const started = Date.now();
+    const kind = req.method === 'POST' ? 'order' : /\/menu$/.test(req.url ?? '') ? 'menu' : 'other';
+    const res = context.switchToHttp().getResponse<{ statusCode?: number }>();
+    const done = (status: number) => this.metrics.record(status, Date.now() - started, kind);
     return from(
       this.limiter.admit({
         ip,
@@ -152,10 +157,16 @@ export class QrRateLimitInterceptor implements NestInterceptor {
           catchError((err) => {
             const code = err instanceof HttpException ? (err.getResponse() as { code?: string })?.code : undefined;
             if (code === 'QR_NOT_FOUND' || code === 'INVALID_QR') void this.limiter.recordFailedLookup(ip);
+            done(err instanceof HttpException ? err.getStatus() : 500);
             return throwError(() => err);
-          })
+          }),
+          tap(() => done(res.statusCode ?? 200))
         )
-      )
+      ),
+      catchError((err) => {
+        if (err instanceof HttpException && err.getStatus() === 429) done(429);
+        return throwError(() => err);
+      })
     );
   }
 }

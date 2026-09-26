@@ -1016,6 +1016,7 @@ export default function PosAdminApp() {
                   setItemToEdit(item || null);
                   setIsItemModalOpen(true);
                 }}
+                onCategoriesChanged={() => setDbTick((t) => t + 1)}
                 onOpenCategoryModal={(cat) => {
                   setCategoryToEdit(cat || null);
                   setIsCategoryModalOpen(true);

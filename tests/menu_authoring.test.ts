@@ -60,3 +60,24 @@ describe('Restaurant authoring of modifier groups and tax groups', () => {
     expect(db.taxGroups.some((x) => x.id === t.id)).toBe(false);
   });
 });
+
+import { MenuRepository } from '../packages/database/src';
+
+describe('categories', () => {
+  it('a new category keeps what was asked for, and moving renumbers the whole menu order exactly', () => {
+    db.resetToDefaultSeed();
+    const a = MenuRepository.createCategory({ name: 'Zeta', isActive: false, qrVisible: false, imageUrl: 'data:image/jpeg;base64,AAAA' });
+    expect(a.isActive).toBe(false);
+    expect(a.qrVisible).toBe(false);
+    expect(a.imageUrl).toContain('data:image');
+    const b = MenuRepository.createCategory({ name: 'Alpha' });
+    expect(new Set([a.id, b.id]).size).toBe(2);
+    const before = [...db.categories].sort((x, y) => x.sortOrder - y.sortOrder).map((c) => c.id);
+    expect(MenuRepository.moveCategory(b.id, -1)).toBe(true);
+    const after = [...db.categories].sort((x, y) => x.sortOrder - y.sortOrder).map((c) => c.id);
+    expect(after.indexOf(b.id)).toBe(before.indexOf(b.id) - 1);
+    expect(new Set(db.categories.map((c) => c.sortOrder)).size).toBe(db.categories.length);
+    const first = after[0];
+    expect(MenuRepository.moveCategory(first, -1)).toBe(false);
+  });
+});

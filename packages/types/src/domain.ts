@@ -382,6 +382,7 @@ export interface DiningTable {
   currentGuests?: number;
   zone: string; // e.g., 'Main Hall', 'AC Section', 'Balcony'
   floor: number;
+  /** Retired: QR codes are minted, versioned and revoked by the cloud. These only remain so old saved data still loads; they are never synced or used. */
   qrCodeUrl?: string;
   qrShortCode?: string;
   qrToken?: string;

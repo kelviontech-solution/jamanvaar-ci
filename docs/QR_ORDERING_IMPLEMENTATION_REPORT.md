@@ -179,3 +179,32 @@ The timing figures were measured against a local PostgreSQL on a development mac
 * **S8** a metrics endpoint (admission statistics exist in memory only).
 * **S9** failure-injection beyond the counter store, 1000 concurrent resolutions, multi-hour soak.
 * Legacy table fields `qrToken/qrCodeUrl/qrShortCode` still sync between devices (they are no longer used for ordering).
+
+## Second pass: the previously "not done" items
+
+Verification at this point: cloud suite has only the two failures that predate this work; root suite 160 files / 1122 tests pass; `cloud/api`, `pos-admin` and `qr-guest` typecheck clean. Migrations `…0927000000_qr_indexes`, `…010000_revoke_demo_qr_tokens`, `…020000_qr_branding` (and the earlier four) are applied to the dev and test databases. No EXE, APK or installer was built.
+
+| Item | Now | Evidence |
+|---|---|---|
+| R1 | Menu records are validated when pushed (item price/quantity/channels, category, modifier group and options, tax percentages, table number/status); a bad record is refused with the reason, an older device's price-less dish is stored but blocks publishing | `qr-menu-control.e2e` |
+| R3 | Category editor: picture, description, hide-from-QR, reorder (◀ ▶), edit button on the category chips; option notes in the group editor; `createCategory` no longer ignores "inactive" | `tests/menu_authoring.test.ts` (6); typecheck |
+| R7 | Restaurant-set heading, welcome and footer text, order-button text, brand colour, logo (`QrBranding`), and the restaurant's own currency on the guest page; form in QR Settings | `qr-menu-control.e2e` (branding), **guest flow driven in a real browser** (below) |
+| S0 | `cloud/api/scripts/qr-load.ts` load harness (CLI and library) | `qr-scale.e2e` (120 orders, 60 guests, 0 duplicates, ~128 orders/s on the dev machine) |
+| S1 | Table state machine in the device repository; server validates table records; console can add, rename, switch on/off a table; print selected; open orders per table | `tests/table_state.test.ts`, `qr-menu-control.e2e` (table management) |
+| S4 | Short-lived resolution cache (`QR_RESOLVE_CACHE_MS`, default 2 s) with immediate cross-instance invalidation on revoke/disable/regenerate/settings/table change | `qr-scale.e2e` (revoke and settings change on one instance stop another instance at once) |
+| S5 | Two indexes added from reading the hot paths (`restaurantId+source+createdAt`, `restaurantId+tableId+status`); `EXPLAIN` on a near-empty test table is not conclusive, so this is analysis, not measured gain | `EXPLAIN` run, migration |
+| S6 | Cross-instance realtime through PostgreSQL LISTEN/NOTIFY (no Redis): a wake-up raised on one API instance reaches devices on another; reconnects on loss | `qr-scale.e2e` (two live app instances) |
+| S8 | Platform-only `GET /api/v1/qr-ordering/runtime` (outcomes, latency percentiles, admission and cache statistics; no tokens) | `qr-scale.e2e` |
+| S9 | 1000 resolutions (cross-restaurant check), transient-failure retry ends in exactly one order, harness run | `qr-scale.e2e` |
+| Legacy | Demo-data QR tokens that were public in the repository are removed from starter data, refused by the mirror, revoked by migration; devices no longer sync the retired table QR fields | `qr-menu-control.e2e` |
+
+**Browser verification (Playwright, real API + Vite dev server):** the guest page loaded the published menu, showed the required "Size – Choose 1 (required)" and "Extras – Choose up to 2" rules with the Add button disabled until a size was chosen, priced Large + Extra cheese at ₹344, and placed the order: QR-1, ₹361.20 (₹344 + 5%), status screen shown.
+
+### Still not done or not verified
+
+* The Restaurant Admin screens (Customisations & Tax, publish panel, branch prices, category editor, table management, branding form) are typechecked and their server endpoints are tested, but **were not clicked through in a browser** (activating a Restaurant Admin device in a browser was not set up).
+* Full edit → publish → guest → POS/KDS propagation across every device app (R10) is covered on the cloud side only.
+* Resolution cache does not see a plan downgrade made elsewhere until it expires (≤ 2 s).
+* The realtime relay is best-effort; devices still pull on their normal cycle.
+* Rate-limit windows are fixed one-minute buckets (a burst at a boundary can pass up to twice a limit).
+* Timing figures are from a development machine and are not a production capacity claim.

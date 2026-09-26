@@ -1,11 +1,13 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Device, Prisma } from '@prisma/client';
+import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
-import { QrSettingsService, QrSettingsUpdate } from './qr-settings.service';
+import { QrResolutionCache } from './qr-resolution-cache';
+import { QrSettingsService, QrSettingsUpdate, QrBrandingUpdate } from './qr-settings.service';
 import { newPublicToken, QR_APP_CODE, QR_AUDIT, QR_EVENT, QR_MODE, QR_STATUS, startOfDayIn } from './qr.support';
 
 export const generateQrSchema = z
@@ -17,6 +19,27 @@ export const generateQrSchema = z
   })
   .strict();
 export type GenerateQr = z.infer<typeof generateQrSchema>;
+
+export const createTableSchema = z
+  .object({
+    tableNumber: z.string().trim().min(1).max(20),
+    capacity: z.number().int().min(1).max(200).default(4),
+    zone: z.string().trim().max(60).optional(),
+    branchId: z.string().uuid().optional()
+  })
+  .strict();
+export type CreateTable = z.infer<typeof createTableSchema>;
+
+export const updateTableSchema = z
+  .object({
+    tableNumber: z.string().trim().min(1).max(20).optional(),
+    capacity: z.number().int().min(1).max(200).optional(),
+    zone: z.string().trim().max(60).optional(),
+    isActive: z.boolean().optional()
+  })
+  .strict()
+  .refine((v) => Object.keys(v).length > 0, { message: 'Nothing to change' });
+export type UpdateTable = z.infer<typeof updateTableSchema>;
 
 type Tx = Prisma.TransactionClient;
 const isObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -33,7 +56,8 @@ export class QrAdminService {
     private readonly audit: AuditService,
     private readonly config: ConfigService,
     private readonly entitlements: ApplicationEntitlementsService,
-    private readonly settings: QrSettingsService
+    private readonly settings: QrSettingsService,
+    private readonly cache: QrResolutionCache<{ restaurant: { id: string } }>
   ) {}
 
   /** Only the restaurant's own Restaurant Admin console may manage QR codes. */
@@ -107,6 +131,42 @@ export class QrAdminService {
       .sort((a, b) => a.displayNumber.localeCompare(b.displayNumber, undefined, { numeric: true }));
   }
 
+  /** Adds a table from the console. It lands in the same store the floor plan syncs through, so every device receives it. */
+  async createTable(device: Device, dto: CreateTable) {
+    const restaurantId = device.restaurantId;
+    return this.prisma.runAsTenant(restaurantId, async (tx) => {
+      const branchId = await this.resolveBranch(tx, restaurantId, dto.branchId, null);
+      const live = (await tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'DINING_TABLE' }, select: { payload: true } })).map((r) => r.payload as Record<string, unknown>).filter((p) => isObject(p) && p.deleted !== true);
+      if (live.some((p) => String(p.tableNumber ?? '').toLowerCase() === dto.tableNumber.toLowerCase() && (p.branchId === undefined || p.branchId === branchId))) throw new ConflictException(`Table ${dto.tableNumber} already exists in this branch.`);
+      const id = `tbl-${Date.now().toString(36)}-${randomBytes(4).toString('hex')}`;
+      const payload = { id, tableNumber: dto.tableNumber, capacity: dto.capacity, zone: dto.zone ?? 'Main Hall', floor: 1, status: 'AVAILABLE', isActive: true, branchId, updatedAt: new Date().toISOString() };
+      await tx.syncedEntity.create({ data: { restaurantId, deviceId: device.id, entityType: 'DINING_TABLE', externalId: id, payload } });
+      await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId, action: 'TABLE_CREATED', category: 'QR_ORDERING', details: { tableId: id, tableNumber: dto.tableNumber, branchId } }, tx);
+      return payload;
+    });
+  }
+
+  /** Renames, resizes, or switches a table on/off. A switched-off table's QR code stops resolving straight away. */
+  async updateTable(device: Device, tableId: string, dto: UpdateTable) {
+    const restaurantId = device.restaurantId;
+    const out = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      const row = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'DINING_TABLE', externalId: tableId } } });
+      const current = isObject(row?.payload) && (row!.payload as Record<string, unknown>).deleted !== true ? (row!.payload as Record<string, unknown>) : null;
+      if (!row || !current) throw new NotFoundException('That table does not exist.');
+      if (dto.tableNumber && dto.tableNumber.toLowerCase() !== String(current.tableNumber ?? '').toLowerCase()) {
+        const others = (await tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'DINING_TABLE', NOT: { id: row.id } }, select: { payload: true } })).map((r) => r.payload as Record<string, unknown>);
+        if (others.some((p) => isObject(p) && p.deleted !== true && String(p.tableNumber ?? '').toLowerCase() === dto.tableNumber!.toLowerCase() && (p.branchId ?? null) === (current.branchId ?? null))) throw new ConflictException(`Table ${dto.tableNumber} already exists in this branch.`);
+      }
+      const payload = { ...current, ...dto, updatedAt: new Date().toISOString() };
+      await tx.syncedEntity.update({ where: { id: row.id }, data: { payload, syncVersion: row.syncVersion + 1 } });
+      if (dto.tableNumber) await tx.qrCode.updateMany({ where: { restaurantId, tableId }, data: { tableNumber: dto.tableNumber } });
+      await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId, action: 'TABLE_UPDATED', category: 'QR_ORDERING', details: { tableId, changes: dto } }, tx);
+      return payload;
+    });
+    this.cache.invalidate(restaurantId);
+    return out;
+  }
+
   async listBranches(restaurantId: string) {
     return this.prisma.runAsTenant(restaurantId, (tx) => tx.branch.findMany({ where: { restaurantId }, select: { id: true, name: true, status: true }, orderBy: { name: 'asc' } }));
   }
@@ -145,6 +205,7 @@ export class QrAdminService {
       await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId, action: QR_AUDIT.CREATED, category: 'QR_ORDERING', details: { qrCodeId: code.id, branchId, tableId: dto.tableId ?? null, mode: dto.mode } }, tx);
       return code;
     });
+    this.cache.invalidate(restaurantId);
     return this.view(created);
   }
 
@@ -162,6 +223,7 @@ export class QrAdminService {
       await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId, action: QR_AUDIT.REGENERATED, category: 'QR_ORDERING', details: { previousQrCodeId: current.id, qrCodeId: fresh.id, version: fresh.version, tableId: current.tableId } }, tx);
       return fresh;
     });
+    this.cache.invalidate(restaurantId);
     return this.view(next);
   }
 
@@ -192,6 +254,7 @@ export class QrAdminService {
       await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId, action, category: 'QR_ORDERING', details: { qrCodeId: current.id, from: current.status, to } }, tx);
       return row;
     });
+    this.cache.invalidate(restaurantId);
     return this.view(updated);
   }
 
@@ -295,6 +358,14 @@ export class QrAdminService {
   async updateSettings(device: Device, changes: QrSettingsUpdate, branchId?: string) {
     await this.requireEnabled(device.restaurantId);
     return this.settings.update(device.restaurantId, { id: device.id, type: 'DEVICE' }, changes, branchId ?? null);
+  }
+
+  getBranding(restaurantId: string) {
+    return this.settings.branding(restaurantId);
+  }
+
+  updateBranding(device: Device, changes: QrBrandingUpdate) {
+    return this.settings.updateBranding(device.restaurantId, { id: device.id, type: 'DEVICE' }, changes);
   }
 
   getSettings(restaurantId: string, branchId?: string) {

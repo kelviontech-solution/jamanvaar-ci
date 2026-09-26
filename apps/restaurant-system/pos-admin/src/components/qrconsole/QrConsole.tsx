@@ -58,7 +58,7 @@ export function QrConsole({ onViewPlan, showToast }: { onViewPlan: () => void; s
       {tab === 'OVERVIEW' && <Overview />}
       {tab === 'TABLES' && <TablesAndQr showToast={showToast} />}
       {tab === 'ORDERS' && <Orders />}
-      {tab === 'SETTINGS' && <Settings showToast={showToast} />}
+      {tab === 'SETTINGS' && <div className="space-y-6"><Settings showToast={showToast} /><BrandingForm showToast={showToast} /></div>}
     </div>
   );
 }
@@ -141,6 +141,12 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
   const [branchId, setBranchId] = useState<string>('');
   const [busy, setBusy] = useState<string | null>(null);
   const [viewing, setViewing] = useState<QrTableRow | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [adding, setAdding] = useState(false);
+  const [newNumber, setNewNumber] = useState('');
+  const [newCapacity, setNewCapacity] = useState('4');
+  const [renaming, setRenaming] = useState<{ id: string; value: string } | null>(null);
+  const toggle = (id: string) => setSelected((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const activeBranches = useMemo(() => (branches.data ?? []).filter((b) => b.status === 'ACTIVE'), [branches.data]);
   const chosenBranch = branchId || (activeBranches.length === 1 ? activeBranches[0].id : '');
 
@@ -167,6 +173,18 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
       printCards(await Promise.all(rows.map((r) => QrAdminApi.printData(r.qr!.id))));
     } catch (e) { showToast(errText(e)); }
   };
+  const printSelected = async () => {
+    try {
+      const rows = (tables.data ?? []).filter((r) => selected.has(r.tableId) && r.qr?.status === 'ACTIVE');
+      if (rows.length === 0) return showToast('Tick tables that have an active QR code first.');
+      printCards(await Promise.all(rows.map((r) => QrAdminApi.printData(r.qr!.id))));
+    } catch (e) { showToast(errText(e)); }
+  };
+  const addTable = () => run('add', async () => {
+    await QrAdminApi.createTable({ tableNumber: newNumber.trim(), capacity: Math.max(1, Math.floor(Number(newCapacity) || 4)), ...(chosenBranch ? { branchId: chosenBranch } : {}) });
+    setNewNumber('');
+    setAdding(false);
+  }, `Table ${newNumber.trim()} added`);
   const downloadAll = async () => {
     try {
       const rows = (tables.data ?? []).filter((r) => r.qr?.status === 'ACTIVE');
@@ -186,6 +204,8 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
             {activeBranches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
           </select>
         )}
+        <button onClick={() => setAdding((a) => !a)} className="px-3 py-2 rounded-xl bg-jaman-navy text-white text-xs font-bold flex items-center gap-1.5"><Plus className="w-3.5 h-3.5" /> Add table</button>
+        <button onClick={printSelected} disabled={selected.size === 0} className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5 disabled:opacity-40"><Printer className="w-3.5 h-3.5" /> Print selected ({selected.size})</button>
         <button onClick={printAll} className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5"><Printer className="w-3.5 h-3.5" /> Print All</button>
         <button onClick={downloadAll} className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5"><Download className="w-3.5 h-3.5" /> Download All</button>
         <button
@@ -196,15 +216,30 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
         ><Plus className="w-3.5 h-3.5" /> Menu-only code</button>
       </div>
 
+      {adding && (
+        <div className="rounded-2xl border border-jaman-saffron bg-white p-4 flex flex-wrap items-end gap-3">
+          <label className="text-xs font-bold text-slate-600">Table number or name<input value={newNumber} maxLength={20} onChange={(e) => setNewNumber(e.target.value)} className="block mt-1 rounded-xl border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. 12 or Terrace 1" /></label>
+          <label className="text-xs font-bold text-slate-600">Seats<input type="number" min={1} max={200} value={newCapacity} onChange={(e) => setNewCapacity(e.target.value)} className="block mt-1 w-20 rounded-xl border border-slate-300 px-3 py-2 text-sm" /></label>
+          <button disabled={!newNumber.trim() || busy === 'add' || (activeBranches.length > 1 && !chosenBranch)} onClick={addTable} className="px-4 py-2 rounded-xl bg-jaman-saffron text-white text-sm font-bold disabled:opacity-40">Save table</button>
+          {activeBranches.length > 1 && !chosenBranch && <span className="text-xs text-amber-700">Choose a branch above first.</span>}
+        </div>
+      )}
+
       {rows.length === 0 ? (
-        <div className="text-sm text-slate-600 rounded-2xl border border-jaman-border bg-white p-6">No tables yet. Add your tables under <b>Floor / Tables</b>; they appear here to receive QR codes.</div>
+        <div className="text-sm text-slate-600 rounded-2xl border border-jaman-border bg-white p-6">No tables yet. Use <b>Add table</b> above (or add them under Floor / Tables); they appear here to receive QR codes.</div>
       ) : (
         <div className="rounded-2xl border border-jaman-border bg-white divide-y">
           {rows.map((row) => {
             const q = row.qr;
             return (
               <div key={row.tableId} className="p-3 flex flex-wrap items-center gap-3 text-sm">
-                <div className="w-28 font-extrabold text-jaman-navy">Table {row.displayNumber}</div>
+                <input type="checkbox" checked={selected.has(row.tableId)} onChange={() => toggle(row.tableId)} aria-label={`Select table ${row.displayNumber}`} disabled={row.qr?.status !== 'ACTIVE'} />
+                {renaming?.id === row.tableId ? (
+                  <span className="w-40 flex gap-1"><input autoFocus value={renaming.value} maxLength={20} onChange={(e) => setRenaming({ id: row.tableId, value: e.target.value })} className="w-24 rounded-lg border border-slate-300 px-2 py-1 text-xs" />
+                    <button onClick={() => { const v = renaming.value.trim(); setRenaming(null); if (v && v !== row.displayNumber) void run(row.tableId, () => QrAdminApi.updateTable(row.tableId, { tableNumber: v }), 'Table renamed'); }} className="text-xs font-bold text-jaman-saffron">Save</button></span>
+                ) : (
+                  <div className="w-28 font-extrabold text-jaman-navy">Table {row.displayNumber} <button onClick={() => setRenaming({ id: row.tableId, value: row.displayNumber })} className="text-[10px] font-bold text-slate-400 ml-1" aria-label={`Rename table ${row.displayNumber}`}>edit</button></div>
+                )}
                 <div className="w-32 text-xs text-slate-500">{q?.branchName ?? (row.zone ?? '')}</div>
                 <div className="w-24">
                   {!row.isActive ? <span className="text-slate-500 text-xs font-bold">Table off</span>
@@ -224,6 +259,7 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
                     <button onClick={() => run(row.tableId, () => QrAdminApi.disable(q.id), 'Code disabled')} className="px-2 py-1.5 rounded-lg border border-slate-300" title="Disable"><Ban className="w-3.5 h-3.5" /></button>
                   </>}
                   {q?.status === 'DISABLED' && <button onClick={() => run(row.tableId, () => QrAdminApi.enable(q.id), 'Code enabled')} className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center gap-1"><RotateCcw className="w-3.5 h-3.5" /> Enable</button>}
+                  <button onClick={() => run(row.tableId, () => QrAdminApi.updateTable(row.tableId, { isActive: !row.isActive }), row.isActive ? `Table ${row.displayNumber} switched off` : `Table ${row.displayNumber} switched on`)} className="px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-bold" title="Switch this table on or off">{row.isActive ? 'Turn off' : 'Turn on'}</button>
                   {q && q.status !== 'REVOKED' && <button onClick={() => { if (window.confirm('Revoke this code permanently?')) void run(row.tableId, () => QrAdminApi.revoke(q.id), 'Code revoked'); }} className="px-2 py-1.5 rounded-lg border border-rose-200 text-rose-700" title="Revoke"><Trash2 className="w-3.5 h-3.5" /></button>}
                 </div>
               </div>
@@ -318,6 +354,74 @@ function Settings({ showToast }: { showToast: (m: string) => void }) {
           <input type="checkbox" className="w-5 h-5" checked={data[key]} disabled={unavailable} onChange={(e) => void save(key, e.target.checked)} />
         </label>
       ))}
+    </div>
+  );
+}
+
+
+/** The restaurant's own words, colour and logo on the guest page. Saved straight to the cloud; guests see it on their next scan. */
+export function BrandingForm({ showToast }: { showToast: (m: string) => void }) {
+  const current = useLoad<import('../../cloud/qrAdminClient').QrBrandingView>(QrAdminApi.branding);
+  const [f, setF] = useState<Record<string, string>>({});
+  const [logo, setLogo] = useState<string | null | undefined>(undefined);
+  const [saving, setSaving] = useState(false);
+  const val = (k: string) => f[k] ?? (current.data as unknown as Record<string, string | null> | null)?.[k] ?? '';
+  const set = (k: string, v: string) => setF((o) => ({ ...o, [k]: v }));
+
+  const pickLogo = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, 400 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * scale);
+        c.height = Math.round(img.height * scale);
+        c.getContext('2d')?.drawImage(img, 0, 0, c.width, c.height);
+        setLogo(c.toDataURL('image/png'));
+      };
+      img.src = ev.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const body: Record<string, string | null> = { ...f };
+      if (logo !== undefined) body.logo = logo;
+      if (Object.keys(body).length === 0) return showToast('Nothing to save.');
+      await QrAdminApi.updateBranding(body);
+      setF({});
+      setLogo(undefined);
+      current.reload();
+      showToast('Saved. Guests see it on their next scan.');
+    } catch (e) {
+      showToast(errText(e));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputCls = 'block mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm';
+  return (
+    <div className="rounded-2xl border border-jaman-border bg-white p-4 space-y-3">
+      <h3 className="font-extrabold text-jaman-navy text-sm">Guest page: your words, colour and logo</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label className="text-xs font-bold text-slate-600">Heading (default: your restaurant name)<input className={inputCls} maxLength={80} value={val('welcomeTitle')} onChange={(e) => set('welcomeTitle', e.target.value)} /></label>
+        <label className="text-xs font-bold text-slate-600">Order button text (default: Place order)<input className={inputCls} maxLength={30} value={val('orderButtonLabel')} onChange={(e) => set('orderButtonLabel', e.target.value)} /></label>
+        <label className="text-xs font-bold text-slate-600">Welcome message<input className={inputCls} maxLength={300} value={val('welcomeMessage')} onChange={(e) => set('welcomeMessage', e.target.value)} /></label>
+        <label className="text-xs font-bold text-slate-600">Footer message<input className={inputCls} maxLength={300} value={val('footerMessage')} onChange={(e) => set('footerMessage', e.target.value)} /></label>
+        <label className="text-xs font-bold text-slate-600">Brand colour<input type="color" className="block mt-1 h-10 w-20 rounded-lg border border-slate-300" value={/^#[0-9a-fA-F]{6}$/.test(val('accentColor')) ? val('accentColor') : '#0b253a'} onChange={(e) => set('accentColor', e.target.value)} /></label>
+        <div className="text-xs font-bold text-slate-600">Logo
+          <div className="flex items-center gap-2 mt-1">
+            {(logo ?? current.data?.logoUrl) && <img src={logo ?? undefined} alt="" className="h-10 rounded" />}
+            <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => { const file = e.target.files?.[0]; if (file) pickLogo(file); }} />
+            {(logo || current.data?.logoUrl) && <button type="button" className="text-rose-600" onClick={() => setLogo(null)}>Remove</button>}
+          </div>
+        </div>
+      </div>
+      <button disabled={saving} onClick={save} className="px-4 py-2 rounded-xl bg-jaman-saffron text-white text-sm font-bold disabled:opacity-40">Save</button>
     </div>
   );
 }

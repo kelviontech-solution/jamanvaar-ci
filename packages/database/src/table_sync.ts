@@ -69,9 +69,7 @@ function signature(t: Partial<DiningTable>): string {
     t.currentOrderId ?? null,
     t.isActive,
     t.openedById ?? null,
-    t.openedByName ?? null,
-    t.qrToken ?? null,
-    t.qrStatus ?? null
+    t.openedByName ?? null
   ]);
 }
 
@@ -95,10 +93,6 @@ function toPayload(t: DiningTable): Record<string, unknown> {
     currentOrderId: t.currentOrderId ?? null,
     openedById: t.openedById ?? null,
     openedByName: t.openedByName ?? null,
-    qrCodeUrl: t.qrCodeUrl,
-    qrShortCode: t.qrShortCode,
-    qrToken: t.qrToken,
-    qrStatus: t.qrStatus,
     updatedAt: t.updatedAt ?? EPOCH
   };
 }
@@ -201,10 +195,6 @@ export class TableSync {
       // A table that is free again is nobody's (it can still arrive carrying the last waiter's name).
       openedById: status === 'AVAILABLE' ? undefined : optional(remote.openedById),
       openedByName: status === 'AVAILABLE' ? undefined : optional(remote.openedByName),
-      qrCodeUrl: optional(remote.qrCodeUrl),
-      qrShortCode: optional(remote.qrShortCode),
-      qrToken: optional(remote.qrToken),
-      qrStatus: (optional(remote.qrStatus) as DiningTable['qrStatus']) ?? undefined,
       updatedAt: typeof remote.updatedAt === 'string' ? remote.updatedAt : EPOCH
     };
 
@@ -219,10 +209,6 @@ export class TableSync {
         ...incoming,
         // The branch is set by the restaurant's console; a copy that lacks it must not erase it.
         branchId: incoming.branchId ?? local.branchId,
-        qrCodeUrl: incoming.qrCodeUrl ?? local.qrCodeUrl,
-        qrShortCode: incoming.qrShortCode ?? local.qrShortCode,
-        qrToken: incoming.qrToken ?? local.qrToken,
-        qrStatus: incoming.qrStatus ?? local.qrStatus,
         totalOrdersToday: local.totalOrdersToday,
         totalRevenueToday: local.totalRevenueToday,
         lastOrderId: local.lastOrderId,

@@ -4,6 +4,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { QrRateLimiter } from '../src/modules/qr/qr-rate-limit';
+import { PUBLISHED_DEMO_QR_TOKENS } from '../src/modules/entity-sync/published-demo-qr-tokens';
 import { extractImages, buildContent, MAX_MENU_IMAGE_BYTES } from '../src/modules/menu-publications/menu-snapshot';
 
 /**
@@ -131,14 +132,21 @@ describe('QR ordering: restaurant-controlled menu', () => {
       expect((await as('get', '/api/v1/menu/draft-status', F.console)).body.hasUnpublishedChanges).toBe(false);
     });
 
-    it('a menu with a blocking problem cannot be published, and the last good menu stays live', async () => {
+    it('a bad menu record is refused where it is pushed, and one without a price cannot be published; the last good menu stays live', async () => {
       const before = (await http().get(`/api/v1/public/qr/${F.token1}/menu`)).body.menuVersion;
-      await push(F.console, 'MENU_ITEM', 'bad-price', { categoryId: 'pizza', name: 'Bad Price', price: -5, isAvailable: true });
+      const bad = await push(F.console, 'MENU_ITEM', 'bad-price', { categoryId: 'pizza', name: 'Bad Price', price: -5, isAvailable: true });
+      expect(bad.body.results[0]).toMatchObject({ status: 'error' });
+      expect(bad.body.results[0].error).toContain('price');
+      expect((await push(F.console, 'MODIFIER_GROUP', 'bad-group', { name: 'Bad', minSelections: 3, maxSelections: 1, options: [] })).body.results[0].status).toBe('error');
+      expect((await push(F.console, 'MENU_ITEM', 'bad-qty', { name: 'Qty', price: 5, minQuantity: 9, maxQuantity: 2 })).body.results[0].status).toBe('error');
+      expect((await push(F.console, 'TAX_GROUP', 'bad-tax', { name: 'Tax', igstPercent: 500 })).body.results[0].status).toBe('error');
+      // An old device may still push a dish with no price: it is stored, but publishing refuses until it is fixed.
+      expect((await push(F.console, 'MENU_ITEM', 'no-price', { categoryId: 'pizza', name: 'No Price', isAvailable: true })).body.results[0].status).toBe('ok');
       const res = await publish(F.console, 'should fail');
       expect(res.status).toBe(422);
-      expect(res.body.errors.join(' ')).toContain('Bad Price');
+      expect(res.body.errors.join(' ')).toContain('No Price');
       expect((await http().get(`/api/v1/public/qr/${F.token1}/menu`)).body.menuVersion).toBe(before);
-      await push(F.console, 'MENU_ITEM', 'bad-price', { categoryId: 'pizza', name: 'Bad Price', price: 5, isAvailable: true, deleted: true });
+      await push(F.console, 'MENU_ITEM', 'no-price', { categoryId: 'pizza', name: 'No Price', price: 5, isAvailable: true, deleted: true });
       expect((await publish(F.console, 'fixed')).status).toBe(201);
     });
 
@@ -298,6 +306,71 @@ describe('QR ordering: restaurant-controlled menu', () => {
       const other = await as('get', '/api/v1/restaurant/qr/tables/tbl12/orders', F.console);
       expect(other.body.some((o: any) => o.orderNumber === a.body.orderNumber && o.total === a.body.total && res.body.every((r: any) => r.orderNumber !== o.orderNumber))).toBe(false);
       expect((await as('get', '/api/v1/restaurant/qr/tables/tbl21/orders', F.pos1)).status).toBe(403);
+    });
+  });
+
+  describe('tokens published in demo data', () => {
+    it('a demo table carrying a token that is public in the repository never becomes a working QR code', async () => {
+      const demo = [...PUBLISHED_DEMO_QR_TOKENS][0];
+      await push(F.console, 'DINING_TABLE', 'demo-tbl', { tableNumber: '99', capacity: 2, isActive: true, branchId: F.b1, qrToken: demo, qrStatus: 'ACTIVE' });
+      expect((await http().get(`/api/v1/public/qr/${demo}`)).status).toBe(404);
+      expect(await prisma.runAsPlatform((tx) => tx.qrCode.count({ where: { publicToken: demo } }))).toBe(0);
+    });
+  });
+
+  describe('table management from the console', () => {
+    it('adds, renames and switches off a table; devices receive it; its QR stops when it is off', async () => {
+      const created = await as('post', '/api/v1/restaurant/qr/tables', F.console).send({ tableNumber: 'T-New', capacity: 6, branchId: F.b1 });
+      expect(created.status, JSON.stringify(created.body)).toBe(201);
+      expect(created.body.id).toMatch(/^tbl-/);
+      expect((await as('post', '/api/v1/restaurant/qr/tables', F.console).send({ tableNumber: 't-new', branchId: F.b1 })).status).toBe(409);
+      expect((await as('post', '/api/v1/restaurant/qr/tables', F.console).send({ tableNumber: 'T-New', branchId: F.b2 })).status).toBe(201);
+      expect((await as('post', '/api/v1/restaurant/qr/tables', F.pos1).send({ tableNumber: 'X', branchId: F.b1 })).status).toBe(403);
+      const rows = await prisma.runAsPlatform((tx) => tx.syncedEntity.findMany({ where: { restaurantId: F.rid, entityType: 'DINING_TABLE' } }));
+      expect(JSON.stringify(rows.map((r) => r.payload))).toContain('T-New');
+
+      const gen = await as('post', `/api/v1/restaurant/qr/tables/${created.body.id}/generate`, F.console).send({ branchId: F.b1 });
+      const token = tokenOf(gen.body.url);
+      expect((await http().get(`/api/v1/public/qr/${token}`)).body.table.displayNumber).toBe('T-New');
+      expect((await as('put', `/api/v1/restaurant/qr/tables/${created.body.id}`, F.console).send({ tableNumber: 'Terrace 1' })).status).toBe(200);
+      expect((await http().get(`/api/v1/public/qr/${token}`)).body.table.displayNumber).toBe('Terrace 1');
+      await as('put', `/api/v1/restaurant/qr/tables/${created.body.id}`, F.console).send({ isActive: false });
+      expect((await http().get(`/api/v1/public/qr/${token}`)).status).toBe(410);
+      await as('put', `/api/v1/restaurant/qr/tables/${created.body.id}`, F.console).send({ isActive: true });
+      expect((await http().get(`/api/v1/public/qr/${token}`)).status).toBe(200);
+      expect((await as('put', '/api/v1/restaurant/qr/tables/nope', F.console).send({ capacity: 2 })).status).toBe(404);
+      expect((await as('put', `/api/v1/restaurant/qr/tables/${created.body.id}`, F.console).send({})).status).toBe(400);
+    });
+  });
+
+  describe('the restaurant\'s own words, colour and logo', () => {
+    const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    it('a restaurant that set nothing gets a plain page; what it sets appears on the guest page, with its own currency', async () => {
+      const plain = (await http().get(`/api/v1/public/qr/${F.token1}`)).body;
+      expect(plain.currency).toBe('INR');
+      expect(plain.branding).toEqual({ welcomeTitle: null, welcomeMessage: null, footerMessage: null, orderButtonLabel: null, accentColor: null, logoUrl: null });
+      const put = await as('put', '/api/v1/restaurant/qr/branding', F.console).send({ welcomeTitle: 'Welcome to Tandoor House', welcomeMessage: 'Order from your seat', footerMessage: 'Thank you', orderButtonLabel: 'Send to kitchen', accentColor: '#E4572E', logo: `data:image/png;base64,${PNG}` });
+      expect(put.status, JSON.stringify(put.body)).toBe(200);
+      const shown = (await http().get(`/api/v1/public/qr/${F.token1}`)).body.branding;
+      expect(shown).toMatchObject({ welcomeTitle: 'Welcome to Tandoor House', orderButtonLabel: 'Send to kitchen', accentColor: '#E4572E' });
+      expect(shown.logoUrl).toMatch(/^\/api\/v1\/public\/qr\/images\/[a-f0-9]{64}$/);
+      expect((await http().get(shown.logoUrl)).status).toBe(200);
+      expect((await as('get', '/api/v1/restaurant/qr/branding', F.console)).body.welcomeMessage).toBe('Order from your seat');
+      // clearing a field removes it
+      await as('put', '/api/v1/restaurant/qr/branding', F.console).send({ welcomeMessage: '', logo: null });
+      const cleared = (await http().get(`/api/v1/public/qr/${F.token1}`)).body.branding;
+      expect(cleared.welcomeMessage).toBeNull();
+      expect(cleared.logoUrl).toBeNull();
+    });
+
+    it('rejects bad colours, unknown fields, fake logos and non-console callers', async () => {
+      const put = (b: any, tok = F.console) => as('put', '/api/v1/restaurant/qr/branding', tok).send(b);
+      expect((await put({ accentColor: 'red' })).status).toBe(400);
+      expect((await put({ accentColor: 'javascript:alert(1)' })).status).toBe(400);
+      expect((await put({ hackerField: 'x' })).status).toBe(400);
+      expect((await put({ logo: 'data:image/svg+xml;base64,' + Buffer.from('<svg/>').toString('base64') })).status).toBe(400);
+      expect((await put({})).status).toBe(400);
+      expect((await put({ welcomeTitle: 'x' }, F.pos1)).status).toBe(403);
     });
   });
 });

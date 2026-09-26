@@ -8,6 +8,7 @@ import { OrderSyncService } from '../order-sync/order-sync.service';
 import { priceCart, PriceValidationError } from '../payments/pricing.util';
 import { QrMenuService } from './qr-menu.service';
 import { QrAdmission } from './qr-resilience';
+import { QrResolutionCache } from './qr-resolution-cache';
 import { QrSettingsService, QrSettingsView } from './qr-settings.service';
 import {
   businessDateIn, customerStatusFor, newPublicOrderId, PUBLIC_ORDER_ID_PATTERN, QR_APP_CODE, QR_EVENT, QR_MODE, QR_STATUS, QR_TOKEN_PATTERN,
@@ -50,7 +51,7 @@ export type QuoteQrOrder = z.infer<typeof quoteQrOrderSchema>;
 
 export interface QrContext {
   code: QrCode;
-  restaurant: { id: string; name: string; address: string | null; city: string | null; timezone: string };
+  restaurant: { id: string; name: string; address: string | null; city: string | null; timezone: string; currency: string };
   branch: { id: string; name: string };
   settings: QrSettingsView;
   entitlement: ResolvedEntitlement;
@@ -68,7 +69,8 @@ export class QrPublicService {
     private readonly menus: QrMenuService,
     private readonly settingsService: QrSettingsService,
     private readonly orders: OrderSyncService,
-    private readonly admission: QrAdmission
+    private readonly admission: QrAdmission,
+    private readonly cache: QrResolutionCache<QrContext>
   ) {}
 
   // ------------------------------------------------------------------ resolution (spec 13, 14)
@@ -81,6 +83,14 @@ export class QrPublicService {
    */
   async resolve(rawToken: string): Promise<QrContext> {
     if (typeof rawToken !== 'string' || !QR_TOKEN_PATTERN.test(rawToken)) throw new QrUnavailableException('INVALID_QR');
+    const cached = this.cache.get(rawToken);
+    if (cached) return cached;
+    const ctx = await this.resolveFresh(rawToken);
+    this.cache.set(rawToken, ctx);
+    return ctx;
+  }
+
+  private async resolveFresh(rawToken: string): Promise<QrContext> {
 
     const code = await this.prisma.runAsPlatform((tx) => tx.qrCode.findUnique({ where: { publicToken: rawToken } }));
     if (!code) throw new QrUnavailableException('QR_NOT_FOUND');
@@ -90,7 +100,7 @@ export class QrPublicService {
 
     const [restaurant, branch, entitlement] = await this.prisma.runAsPlatform(async (tx) =>
       Promise.all([
-        tx.restaurant.findFirst({ where: { id: code.restaurantId, deletedAt: null }, select: { id: true, name: true, address: true, city: true, timezone: true, status: true } }),
+        tx.restaurant.findFirst({ where: { id: code.restaurantId, deletedAt: null }, select: { id: true, name: true, address: true, city: true, timezone: true, currency: true, status: true } }),
         tx.branch.findFirst({ where: { id: code.branchId!, restaurantId: code.restaurantId }, select: { id: true, name: true, status: true } }),
         this.entitlements.resolve(tx, code.restaurantId, QR_APP_CODE)
       ])
@@ -124,8 +134,11 @@ export class QrPublicService {
   async describe(rawToken: string, sessionId?: string) {
     const ctx = await this.resolve(rawToken);
     const menu = await this.menus.build(ctx.restaurant.id, ctx.branch.id);
+    const branding = await this.settingsService.branding(ctx.restaurant.id);
     await this.touchScan(ctx, sessionId);
     return {
+      currency: ctx.restaurant.currency,
+      branding,
       restaurant: { name: ctx.restaurant.name, address: ctx.restaurant.address ?? undefined, city: ctx.restaurant.city ?? undefined },
       branch: { name: ctx.branch.name },
       mode: ctx.code.mode,

@@ -5,7 +5,9 @@ import { ApplicationEntitlementsModule } from '../application-entitlements/appli
 import { MenuPublicationsModule } from '../menu-publications/menu-publications.module';
 import { OrderSyncModule } from '../order-sync/order-sync.module';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
-import { QrPublicController, QrRestaurantController } from './qr.controllers';
+import { PlatformAuthModule } from '../platform-auth/platform-auth.module';
+import { QrMetrics } from './qr-metrics';
+import { QrPublicController, QrRestaurantController, QrRuntimeController } from './qr.controllers';
 import { QrLegacyGuestController } from './qr-legacy.controller';
 import { QrAdminService } from './qr-admin.service';
 import { QrMenuService } from './qr-menu.service';
@@ -13,6 +15,7 @@ import { QrPublicService } from './qr-public.service';
 import { QrSettingsService } from './qr-settings.service';
 import { QrSessions } from './qr-session';
 import { QrAdmission } from './qr-resilience';
+import { QrResolutionCache } from './qr-resolution-cache';
 import { QrRateLimiter, QrRateLimitInterceptor } from './qr-rate-limit';
 
 /**
@@ -20,9 +23,9 @@ import { QrRateLimiter, QrRateLimitInterceptor } from './qr-rate-limit';
  * analytics events. It owns no order table, no menu, no sync protocol and no entitlement logic of its own.
  */
 @Module({
-  imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule],
-  controllers: [QrPublicController, QrRestaurantController, QrLegacyGuestController],
-  providers: [QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission],
+  imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule],
+  controllers: [QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController],
+  providers: [QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics],
   exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService, QrAdmission]
 })
 export class QrModule {}

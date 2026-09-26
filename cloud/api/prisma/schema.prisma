@@ -180,6 +180,7 @@ model Restaurant {
   menuPublications        MenuPublication[]
   menuSnapshots           MenuSnapshot[]
   menuImages              MenuImage[]
+  qrBranding              QrBranding?
   syncedEntities          SyncedEntity[]
   aiAccess                RestaurantAiAccess?
   aiUsage                 AiUsageDaily[]
@@ -1359,6 +1360,8 @@ model SyncedOrder {
 
   @@unique([restaurantId, externalOrderId])
   @@index([restaurantId, branchId, source, createdAt])
+  @@index([restaurantId, source, createdAt])
+  @@index([restaurantId, tableId, status])
   @@index([restaurantId, updatedAt])
   @@index([restaurantId, branchId, seq])
   @@index([deviceId])
@@ -1646,6 +1649,19 @@ model MenuPublication {
   createdAt           DateTime   @default(now())
 
   @@unique([restaurantId, version])
+}
+
+/// The restaurant's own words, colour and logo on the guest ordering page.
+model QrBranding {
+  restaurantId     String     @id
+  restaurant       Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  welcomeTitle     String?
+  welcomeMessage   String?
+  footerMessage    String?
+  orderButtonLabel String?
+  accentColor      String?
+  logoRef          String?
+  updatedAt        DateTime   @default(now()) @updatedAt
 }
 
 /// A picture used by the published menu, addressed by the SHA-256 of its bytes.

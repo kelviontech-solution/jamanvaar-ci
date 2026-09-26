@@ -21,6 +21,8 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   const [description, setDescription] = useState('');
   const [iconName, setIconName] = useState('UtensilsCrossed');
   const [isActive, setIsActive] = useState(true);
+  const [qrVisible, setQrVisible] = useState(true);
+  const [imageUrl, setImageUrl] = useState('');
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
@@ -30,14 +32,36 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
       setDescription(categoryToEdit.description || '');
       setIconName(categoryToEdit.iconName || 'UtensilsCrossed');
       setIsActive(categoryToEdit.isActive ?? true);
+      setQrVisible(categoryToEdit.qrVisible !== false);
+      setImageUrl(categoryToEdit.imageUrl || '');
     } else {
       setName('');
       setSlug('');
       setDescription('');
       setIconName('UtensilsCrossed');
       setIsActive(true);
+      setQrVisible(true);
+      setImageUrl('');
     }
   }, [categoryToEdit, isOpen]);
+
+  // A category picture is shrunk in the browser (max 600 px, JPEG) so the published menu stays small.
+  const pickImage = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, 600 / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d')?.drawImage(img, 0, 0, canvas.width, canvas.height);
+        setImageUrl(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.src = ev.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleNameChange = (val: string) => {
     setName(val);
@@ -60,7 +84,9 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
         slug: slug || name.toLowerCase().replace(/\s+/g, '-'),
         description,
         iconName,
-        isActive
+        isActive,
+        qrVisible,
+        imageUrl: imageUrl || undefined
       });
       AuditRepository.log({
         action: 'CATEGORY_UPDATED',
@@ -74,7 +100,9 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
         slug: slug || name.toLowerCase().replace(/\s+/g, '-'),
         description,
         iconName,
-        isActive
+        isActive,
+        qrVisible,
+        imageUrl: imageUrl || undefined
       });
       AuditRepository.log({
         action: 'CATEGORY_CREATED',
@@ -145,6 +173,19 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-jaman-saffron"
           />
         </div>
+
+        <div className="flex items-center gap-3">
+          {imageUrl && <img src={imageUrl} alt="" className="w-14 h-14 rounded-xl object-cover border border-jaman-border" />}
+          <label className="text-xs font-bold text-slate-600">Picture (optional)
+            <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickImage(f); }} className="block mt-1 text-xs" />
+          </label>
+          {imageUrl && <button type="button" onClick={() => setImageUrl('')} className="text-xs font-bold text-rose-600">Remove</button>}
+        </div>
+
+        <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+          <input type="checkbox" checked={qrVisible} onChange={(e) => setQrVisible(e.target.checked)} className="rounded" />
+          <span>Show this category to guests who order by QR</span>
+        </label>
 
         <div className="flex items-center gap-2 pt-1">
           <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">

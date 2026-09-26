@@ -151,6 +151,7 @@ const GroupEditor: React.FC<{ group: ModifierGroup | null; onSaved: (g: Modifier
         {options.map((o, i) => (
           <div key={o.id || `new-${i}`} className="flex flex-wrap items-center gap-2">
             <input className={`${input} flex-1 min-w-[8rem]`} value={o.name} maxLength={60} onChange={(e) => setOpt(i, { name: e.target.value })} placeholder="Option name" />
+            <input className={`${input} flex-1 min-w-[8rem]`} value={o.description ?? ''} maxLength={100} onChange={(e) => setOpt(i, { description: e.target.value })} placeholder="Short note (optional)" aria-label="Option note" />
             <span className="text-xs text-slate-500">+₹</span>
             <input type="number" min={0} step="0.5" className="w-24 bg-jaman-ivory border border-jaman-border rounded-xl px-2 py-2 text-sm" value={o.priceDelta} onChange={(e) => setOpt(i, { priceDelta: Number(e.target.value) })} />
             <label className="text-[11px] flex items-center gap-1"><input type="checkbox" checked={o.isDefault === true} onChange={(e) => setOpt(i, { isDefault: e.target.checked })} /> Pre-selected</label>

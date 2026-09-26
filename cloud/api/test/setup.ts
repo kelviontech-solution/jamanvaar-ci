@@ -7,3 +7,4 @@ if (process.env.TEST_DATABASE_URL) process.env.DATABASE_URL = process.env.TEST_D
 
 // Tests must never send real email, whatever SMTP settings the developer's .env holds.
 process.env.SMTP_HOST = '';
+process.env.QR_RESOLVE_CACHE_MS = '0'; // suites that need the cache turn it on explicitly

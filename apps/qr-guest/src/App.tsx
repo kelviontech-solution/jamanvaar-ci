@@ -2,8 +2,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ApiError, QrApi, imageSrc, type Describe, type Menu, type MenuGroup, type MenuItem, type Placed, type Quote } from './api';
 import { addLine, emptyCart, itemCount, parseCart, removeLine, setQuantity, toOrderItems, unavailableLines, withAttempt, estimatedSubtotal, type Cart } from './cart';
 
-/** Whole rupees stay whole (₹249); anything with paise shows both digits (₹40.40). */
-const inr = (n: number) => `₹${n.toLocaleString('en-IN', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 })}`;
+/** Money in the restaurant's own currency (from the server). Whole amounts stay whole; anything with a fraction shows both digits. */
+let currencyCode = 'INR';
+const inr = (n: number) => {
+  try {
+    return new Intl.NumberFormat(currencyCode === 'INR' ? 'en-IN' : undefined, { style: 'currency', currency: currencyCode, minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 }).format(n);
+  } catch {
+    return `${currencyCode} ${n.toFixed(Number.isInteger(n) ? 0 : 2)}`;
+  }
+};
 const randomId = (n = 20) => Array.from(crypto.getRandomValues(new Uint8Array(n)), (b) => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join('');
 
 /** localStorage can be unavailable (private mode); everything works without it, it only remembers the cart. */
@@ -66,6 +73,7 @@ function Ordering({ token }: { token: string }) {
     try {
       await ensureSession();
       const [d, m] = await Promise.all([QrApi.describe(token, sessionId), QrApi.menu(token, sessionId)]);
+      currencyCode = d.currency || 'INR';
       setInfo(d);
       seenMenuVersion = m.menu?.menuVersion ?? seenMenuVersion;
       etag.current = m.etag;
@@ -108,14 +116,16 @@ function Ordering({ token }: { token: string }) {
   const gone = unavailableLines(cart, new Set(menu.items.map((i) => i.id)));
 
   return (
-    <div className="app">
+    <div className="app" style={info.branding?.accentColor ? ({ ['--navy' as string]: info.branding.accentColor } as React.CSSProperties) : undefined}>
       <header className="top">
+        {imageSrc(info.branding?.logoUrl ?? undefined) && <img src={imageSrc(info.branding?.logoUrl ?? undefined)} alt="" className="logo" style={{ height: 36, borderRadius: 8 }} />}
         <div>
-          <div className="name">{info.restaurant.name}</div>
+          <div className="name">{info.branding?.welcomeTitle || info.restaurant.name}</div>
           <div className="sub">{info.branch.name}{info.table ? ` · Table ${info.table.displayNumber}` : ' · Menu'}</div>
         </div>
         <div className="mode">{info.mode === 'TABLE_ORDER' ? 'Dine-in ordering' : 'Order'}</div>
       </header>
+      {info.branding?.welcomeMessage && screen === 'MENU' && <p className="muted pad">{info.branding.welcomeMessage}</p>}
 
       {screen === 'MENU' && <MenuScreen info={info} menu={menu} cart={cart} setCart={setCart} onCart={() => setScreen('CART')} placed={placed} onStatus={() => setScreen('STATUS')} />}
       {screen === 'CART' && <CartScreen token={token} cart={cart} setCart={setCart} gone={gone.map((g) => g.key)} onBack={() => setScreen('MENU')} onNext={() => setScreen('CHECKOUT')} />}
@@ -124,6 +134,7 @@ function Ordering({ token }: { token: string }) {
           onPlaced={(p) => { store.set(`jv_qr_last:${token}`, p.publicOrderId); setPlaced(p); setCart(emptyCart()); setScreen('STATUS'); }} />
       )}
       {screen === 'STATUS' && placed && <StatusScreen placed={placed} setPlaced={setPlaced} showStatus={info.ordering.settings.showOrderStatus} onMore={() => setScreen('MENU')} />}
+      {info.branding?.footerMessage && <footer className="muted pad" style={{ textAlign: 'center' }}>{info.branding.footerMessage}</footer>}
     </div>
   );
 }
@@ -350,7 +361,7 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
       {quote && <Totals quote={quote} />}
       <p className="muted">You pay at the counter when you are done. No payment is taken here.</p>
       {error && <p className="warn" role="alert">{error}</p>}
-      <button className="primary" disabled={busy || !quote || !ready} onClick={() => void submit()}>{busy ? 'Placing…' : quote ? `Place order · ${inr(quote.total)}` : 'Place order'}</button>
+      <button className="primary" disabled={busy || !quote || !ready} onClick={() => void submit()}>{busy ? 'Placing…' : quote ? `${info.branding?.orderButtonLabel || 'Place order'} · ${inr(quote.total)}` : (info.branding?.orderButtonLabel || 'Place order')}</button>
     </section>
   );
 }

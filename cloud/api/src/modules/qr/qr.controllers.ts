@@ -7,11 +7,15 @@ import { CurrentDevice } from '../../common/decorators/current-device.decorator'
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { QrRateLimitInterceptor } from './qr-rate-limit';
 import { QrSessions } from './qr-session';
+import { QrMetrics } from './qr-metrics';
+import { QrAdmission } from './qr-resilience';
+import { QrResolutionCache } from './qr-resolution-cache';
+import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { MenuPublicationsService } from '../menu-publications/menu-publications.service';
 import { QrBusyException } from './qr-resilience';
-import { QrAdminService, generateQrSchema, GenerateQr } from './qr-admin.service';
+import { QrAdminService, generateQrSchema, GenerateQr, createTableSchema, CreateTable, updateTableSchema, UpdateTable } from './qr-admin.service';
 import { QrPublicService, placeQrOrderSchema, PlaceQrOrder, quoteQrOrderSchema, QuoteQrOrder } from './qr-public.service';
-import { qrSettingsSchema, QrSettingsUpdate } from './qr-settings.service';
+import { qrSettingsSchema, QrSettingsUpdate, qrBrandingSchema, QrBrandingUpdate } from './qr-settings.service';
 
 /**
  * The customer's endpoints. No login, no device credential: the token in the path is the whole identity, and
@@ -114,6 +118,20 @@ export class QrRestaurantController {
     return this.qr.listTables(device.restaurantId);
   }
 
+  @Post('tables')
+  @UsePipes(new ZodValidationPipe(createTableSchema))
+  createTable(@CurrentDevice() device: Device, @Body() body: CreateTable) {
+    this.qr.assertConsole(device);
+    return this.qr.createTable(device, body);
+  }
+
+  @Put('tables/:tableId')
+  @UsePipes(new ZodValidationPipe(updateTableSchema))
+  updateTable(@CurrentDevice() device: Device, @Param('tableId') tableId: string, @Body() body: UpdateTable) {
+    this.qr.assertConsole(device);
+    return this.qr.updateTable(device, tableId, body);
+  }
+
   @Post('tables/:tableId/generate')
   @UsePipes(new ZodValidationPipe(generateQrSchema.omit({ tableId: true })))
   generate(@CurrentDevice() device: Device, @Param('tableId') tableId: string, @Body() body: Omit<GenerateQr, 'tableId'>) {
@@ -175,6 +193,19 @@ export class QrRestaurantController {
     return this.qr.tableOrders(device.restaurantId, tableId);
   }
 
+  @Get('branding')
+  branding(@CurrentDevice() device: Device) {
+    this.qr.assertConsole(device);
+    return this.qr.getBranding(device.restaurantId);
+  }
+
+  @Put('branding')
+  @UsePipes(new ZodValidationPipe(qrBrandingSchema))
+  updateBranding(@CurrentDevice() device: Device, @Body() body: QrBrandingUpdate) {
+    this.qr.assertConsole(device);
+    return this.qr.updateBranding(device, body);
+  }
+
   @Get('settings')
   getSettings(@CurrentDevice() device: Device, @Query('branchId') branchId?: string) {
     this.qr.assertConsole(device);
@@ -186,5 +217,17 @@ export class QrRestaurantController {
   putSettings(@CurrentDevice() device: Device, @Body() body: QrSettingsUpdate, @Query('branchId') branchId?: string) {
     this.qr.assertConsole(device);
     return this.qr.updateSettings(device, body, branchId);
+  }
+}
+
+/** Operating figures for platform staff: this instance's request outcomes, latency, admission control and caches. */
+@Controller('api/v1/qr-ordering/runtime')
+@UseGuards(PlatformAuthGuard)
+export class QrRuntimeController {
+  constructor(private readonly metrics: QrMetrics, private readonly admission: QrAdmission, private readonly cache: QrResolutionCache<{ restaurant: { id: string } }>) {}
+
+  @Get()
+  runtime() {
+    return { ...this.metrics.snapshot(), admission: this.admission.stats, resolutionCache: this.cache.stats };
   }
 }

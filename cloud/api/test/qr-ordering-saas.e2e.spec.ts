@@ -346,7 +346,7 @@ describe('QR ordering (SaaS)', () => {
       const info = await http().get(`/api/v1/public/qr/${tokenA12}`);
       const text = JSON.stringify(info.body);
       for (const forbidden of [F.A.id, F.A.b1, 'restaurantId', 'branchId', 'tableId', 'deviceToken', 'password', 'gstin', 'subscription']) expect(text).not.toContain(forbidden);
-      expect(Object.keys(info.body).sort()).toEqual(['branch', 'mode', 'ordering', 'restaurant', 'table']);
+      expect(Object.keys(info.body).sort()).toEqual(['branch', 'branding', 'currency', 'mode', 'ordering', 'restaurant', 'table']);
     });
 
     it('serves the restaurant\'s own menu with its own modifiers, hides other channels, sold-out and unpriceable dishes', async () => {
