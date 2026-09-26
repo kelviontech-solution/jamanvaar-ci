@@ -26,6 +26,47 @@ function friendlyTerminalLabel(kioskId: string | undefined): string {
   return UUID_RE.test(kioskId) ? 'Self-Order Kiosk' : kioskId;
 }
 
+
+/** Is this a cash bill that should carry the watermark? Settings decide (on by default); the word is editable in Kiosk Admin. */
+export function cashWatermarkFor(order: { paymentMethod?: string }, config?: Partial<ReceiptConfig>): string | null {
+  const isCash = order.paymentMethod === 'CASH_AT_COUNTER' || order.paymentMethod === 'CASH';
+  if (!isCash || config?.showCashWatermark === false) return null;
+  return (config?.cashWatermarkText || 'CASH').trim().toUpperCase().slice(0, 12) || 'CASH';
+}
+
+/** Four slanted rows of the word, light enough to read the bill through it. */
+const WatermarkRows: React.FC<{ word: string; color: string }> = ({ word, color }) => (
+  <div
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0 overflow-hidden"
+    style={{ zIndex: 0 }}
+  >
+    <div
+      style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        width: '220%',
+        transform: 'translate(-50%, -50%) rotate(-28deg)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2rem',
+        alignItems: 'center',
+        color,
+        fontWeight: 900,
+        fontSize: '2.3rem',
+        letterSpacing: '0.18em',
+        whiteSpace: 'nowrap',
+        userSelect: 'none'
+      }}
+    >
+      {[0, 1, 2, 3].map((i) => (
+        <span key={i} style={{ marginLeft: i % 2 ? '3rem' : 0 }}>{`${word} ${word} ${word}`}</span>
+      ))}
+    </div>
+  </div>
+);
+
 export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
   order,
   config = {},
@@ -44,6 +85,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
   const is80mm = paperSize === '80mm';
   // On-screen/WhatsApp only — a physical thermal printout is black-and-white regardless of this.
   const accent = config.accentColor || '#E66817';
+  const watermark = cashWatermarkFor(order, config);
 
   return (
     <div className={`flex flex-col items-center select-none ${className}`}>
@@ -56,8 +98,9 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
           boxShadow: '0 15px 35px -10px rgba(11, 37, 58, 0.15), 0 0 0 1px rgba(213, 206, 194, 0.6)'
         }}
       >
+        {watermark && <WatermarkRows word={watermark} color="rgba(180, 83, 9, 0.11)" />}
         {/* Header: this restaurant's own identity. The product brand appears only in the footer. */}
-        <div className="text-center pb-3 border-b border-dashed border-[#A0AEC0] space-y-1.5">
+        <div className="text-center pb-3 border-b border-dashed border-[#A0AEC0] space-y-1.5" style={{ position: 'relative', zIndex: 1 }}>
           {config.logoUrl && (
             <div className="flex justify-center items-center py-1">
               <img
@@ -265,6 +308,11 @@ export function printThermalReceipt(
   const thankYouMessage = config?.thankYouMessage || 'Thank you for dining with us!';
   const footerMessage = config?.footerMessage || 'Visit again.';
 
+  const watermark = cashWatermarkFor(order, config);
+  const watermarkHtml = watermark
+    ? `<div style="position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;"><div style="position: absolute; top: 50%; left: 50%; width: 220%; transform: translate(-50%, -50%) rotate(-28deg); display: flex; flex-direction: column; gap: ${is80mm ? 26 : 18}px; align-items: center; color: #d4d4d4; font-weight: 900; font-size: ${is80mm ? 30 : 22}px; letter-spacing: 0.18em; white-space: nowrap;">${[0, 1, 2, 3].map((i) => `<span style="margin-left: ${i % 2 ? 24 : 0}px;">${watermark} ${watermark} ${watermark}</span>`).join('')}</div></div>`
+    : '';
+
   const itemsHtml = (order.items || []).map((it) => `
     <tr style="border-bottom: 1px dotted #ccc;">
       <td style="padding: 4px 0; font-weight: bold;">${it.name}${it.specialInstructions ? `<br/><span style="font-size: 9px; color: #666;">(${it.specialInstructions})</span>` : ''}</td>
@@ -353,6 +401,7 @@ export function printThermalReceipt(
         </style>
       </head>
       <body>
+        ${watermarkHtml}
         <div class="text-center">
           ${config?.logoUrl ? `<img src="${config.logoUrl}" style="max-height: 50px; max-width: 200px; margin: 0 auto 4px; display: block; filter: grayscale(1) contrast(1.4);" />` : ''}
           ${restaurantName ? `<div style="font-size: 16px; font-weight: 900; letter-spacing: 1px;">${restaurantName}</div>` : ''}

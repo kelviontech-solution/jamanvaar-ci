@@ -3395,10 +3395,10 @@ export default function AdminApp() {
                     </div>
 
                     <h3 className="font-bold text-base text-jaman-navy pt-3 border-t border-[#F3EFE6]">
-                      Logo & Colors
+                      Logo
                     </h3>
                     <p className="text-[11px] text-[#4A5568] -mt-2">
-                      Applied to the on-screen and WhatsApp receipt, and the KOT preview here in Kiosk Admin. The logo also prints on the physical slip; thermal printers can only print in black &amp; white, so the color choices below are screen-only.
+                      Shown on the on-screen and WhatsApp receipt and printed at the top of the physical slip.
                     </p>
 
                     <div>
@@ -3442,49 +3442,6 @@ export default function AdminApp() {
                             placeholder="...or paste a logo image URL"
                             className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                           />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-bold text-jaman-navy mb-1.5">Receipt Accent Color</label>
-                        <div className="flex flex-wrap gap-2">
-                          {['#E66817', '#0B253A', '#059669', '#DC2626', '#7C3AED', '#D97706', '#0D9488', '#475569'].map((color) => (
-                            <button
-                              key={color}
-                              type="button"
-                              title={color}
-                              onClick={() => setReceiptForm({ ...receiptForm, accentColor: color })}
-                              className={`w-8 h-8 rounded-full border-2 transition-transform ${
-                                (receiptForm.accentColor || '#E66817') === color ? 'border-jaman-navy scale-110' : 'border-white shadow-sm'
-                              }`}
-                              style={{ backgroundColor: color }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-jaman-navy mb-1.5">KOT Preview Color</label>
-                        <div className="flex flex-wrap gap-2">
-                          {[
-                            { name: 'Navy', hex: '#0B253A' },
-                            { name: 'Charcoal', hex: '#1F2937' },
-                            { name: 'Forest', hex: '#14532D' },
-                            { name: 'Maroon', hex: '#7F1D1D' },
-                            { name: 'Slate', hex: '#334155' }
-                          ].map(({ name, hex }) => (
-                            <button
-                              key={hex}
-                              type="button"
-                              title={name}
-                              onClick={() => setReceiptForm({ ...receiptForm, kotThemeColor: hex })}
-                              className={`w-8 h-8 rounded-full border-2 transition-transform ${
-                                (receiptForm.kotThemeColor || '#0B253A') === hex ? 'border-jaman-navy scale-110' : 'border-white shadow-sm'
-                              }`}
-                              style={{ backgroundColor: hex }}
-                            />
-                          ))}
                         </div>
                       </div>
                     </div>
@@ -3537,6 +3494,34 @@ export default function AdminApp() {
                         />
                         WhatsApp Bill
                       </label>
+                    </div>
+
+                    {/* Cash bills: a light slanted "CASH" across the slip, so cash bills are easy to spot and reconcile. */}
+                    <div className="p-4 bg-jaman-ivory border border-jaman-border rounded-2xl space-y-3">
+                      <label className="flex items-start gap-2 text-xs font-semibold text-jaman-navy cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={receiptForm.showCashWatermark !== false}
+                          onChange={(e) => setReceiptForm({ ...receiptForm, showCashWatermark: e.target.checked })}
+                          className="rounded text-jaman-saffron mt-0.5"
+                        />
+                        <span>
+                          Mark cash bills with a light diagonal watermark
+                          <span className="block font-normal text-slate-500 mt-0.5">Bills paid by cash at the counter show the word across the slip in four slanted lines, faint enough to read the bill through it. Card and UPI bills stay plain.</span>
+                        </span>
+                      </label>
+                      {receiptForm.showCashWatermark !== false && (
+                        <div className="max-w-xs">
+                          <label className="block text-[11px] font-bold text-jaman-navy mb-1">Watermark word</label>
+                          <input
+                            value={receiptForm.cashWatermarkText ?? ''}
+                            onChange={(e) => setReceiptForm({ ...receiptForm, cashWatermarkText: e.target.value.slice(0, 12) })}
+                            placeholder="CASH"
+                            maxLength={12}
+                            className="w-full bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-black tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                          />
+                        </div>
+                      )}
                     </div>
 
                     <div className="pt-3 border-t border-[#F3EFE6] flex justify-end">
