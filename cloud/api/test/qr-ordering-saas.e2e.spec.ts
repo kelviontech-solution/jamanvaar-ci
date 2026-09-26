@@ -715,7 +715,9 @@ describe('QR ordering (SaaS)', () => {
         const events = await prisma.runAsPlatform((tx) => tx.qrEvent.findMany({ where: { restaurantId: F.A.id } }));
         const types = new Set(events.map((e) => e.type));
         for (const t of ['QR_SCANNED', 'QR_MENU_VIEWED', 'QR_ORDER_STARTED', 'QR_ORDER_PLACED', 'QR_ORDER_FAILED']) expect(types.has(t), t).toBe(true);
-        expect(JSON.stringify(events)).not.toMatch(/Guest|9876|ip/i);
+        // The pseudonymous session id is random text and can contain any letters; everything else must hold no personal data.
+        const withoutSession = events.map(({ sessionId: _s, ...rest }) => rest);
+        expect(JSON.stringify(withoutSession)).not.toMatch(/Guest|9876|ip|ipAddress/i);
       });
 
       it('the platform view is computed from orders, and the old client-reported usage call cannot inflate it', async () => {
