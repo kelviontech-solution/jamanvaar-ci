@@ -76,6 +76,37 @@ const ROLE_LABEL: Record<string, string> = {
   READ_ONLY: 'Read-Only'
 };
 
+/** Words people type for a page that are not in its menu name (including common misspellings), so the header search finds pages too. */
+const PAGE_KEYWORDS: Record<string, string> = {
+  '/': 'home overview dashboard kpi revenue summary',
+  '/restaurants': 'tenant tenants onboard onboarding customer hotel dhaba suspend',
+  '/owners': 'owner owners login account password',
+  '/branches': 'branch outlet location',
+  '/subscriptions': 'subscription plan renew renewal suspend reactivate expiry',
+  '/billing': 'invoice invoices receipt reciept receipts payment payments gst tax bill billing pdf',
+  '/plans': 'plan plans tier pricing price entitlement entitlements',
+  '/feature-catalog': 'feature features module modules category',
+  '/qr-ordering': 'qr code table ordering guest menu',
+  '/ai-assistant': 'ai jaman assistant chatbot',
+  '/catalog': 'menu dish dishes item items food category master starter library',
+  '/activation-keys': 'activation key keys code terminal redeem',
+  '/payment-connections': 'payment gateway cashfree razorpay upi bank settlement',
+  '/applications': 'app apps release releases version update download installer',
+  '/devices': 'device devices terminal pos kds captain kiosk mdm lock wipe fleet',
+  '/sync-monitor': 'sync conflict conflicts offline queue',
+  '/backups': 'backup backups restore recovery snapshot',
+  '/system-health': 'health telemetry status uptime database latency',
+  '/sandboxes': 'staging sandbox test demo',
+  '/reports': 'report reports analytics chart sales export',
+  '/audit-logs': 'audit log logs history activity security',
+  '/offline-policy': 'offline policy emergency extension grace',
+  '/team': 'team staff admin admins role roles invite platform user users',
+  '/tickets': 'ticket tickets support help request',
+  '/support': 'support diagnostics diagnose inspect impersonate troubleshoot',
+  '/settings/platform': 'settings branding logo seller gstin pan company invoice details maintenance quotas defaults',
+  '/profile': 'profile password sessions sign out logout security account'
+};
+
 const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Platform Control Center',
@@ -278,6 +309,12 @@ export function ProtectedLayout() {
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!searchQuery.trim()) return;
+    // A page name wins over a restaurant search only when no restaurant, owner, device or key matched.
+    const anyData = !!searchResults && (searchResults.restaurants.length + searchResults.owners.length + searchResults.devices.length + searchResults.activationKeys.length > 0);
+    if (!anyData && pageMatches.length > 0) {
+      goToSearchResult(pageMatches[0].item.to);
+      return;
+    }
     navigate(`/restaurants?search=${encodeURIComponent(searchQuery.trim())}`);
   }
 
@@ -286,6 +323,19 @@ export function ProtectedLayout() {
   const visibleNavGroups = NAV_GROUPS
     .map((group) => ({ ...group, items: group.items.filter((item) => can(areaForRoute(item.to), 'read')) }))
     .filter((group) => group.items.length > 0);
+
+  // Pages (menu entries) matching what was typed: by name, section or keyword. Every typed word must match somewhere.
+  const pageMatches = (() => {
+    const words = searchQuery.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    if (words.length === 0 || searchQuery.trim().length < 2) return [];
+    return visibleNavGroups
+      .flatMap((g) => g.items.map((item) => ({ item, group: g.label })))
+      .filter(({ item, group }) => {
+        const hay = `${item.label} ${group} ${PAGE_KEYWORDS[item.to] ?? ''}`.toLowerCase();
+        return words.every((w) => hay.includes(w));
+      })
+      .slice(0, 6);
+  })();
   const currentArea = areaForRoute(location.pathname);
   const canOpenPage = can(currentArea, 'read');
   const isReadOnlyPage = canOpenPage && !can(currentArea, 'write');
@@ -419,9 +469,9 @@ export function ProtectedLayout() {
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search restaurants, owners, devices, activation keys…"
+                placeholder="Search pages, restaurants, owners, devices, keys…"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true); }}
                 onFocus={() => searchResults && setSearchOpen(true)}
                 onBlur={() => setTimeout(() => setSearchOpen(false), 150)}
                 className="header-search-input"
@@ -445,6 +495,26 @@ export function ProtectedLayout() {
                   overflowY: 'auto'
                 }}
               >
+                {pageMatches.length > 0 && (
+                  <div>
+                    <div style={{ padding: '8px 16px 4px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
+                      Pages
+                    </div>
+                    {pageMatches.map(({ item, group }) => (
+                      <button
+                        key={item.to}
+                        type="button"
+                        onMouseDown={() => goToSearchResult(item.to)}
+                        style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '8px 16px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontSize: 13, color: 'var(--jv-text)' }}
+                      >
+                        <item.icon className="w-4 h-4" />
+                        <span style={{ fontWeight: 600 }}>{item.label}</span>
+                        <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--jv-text-light)' }}>{group}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {searching && (
                   <div style={{ padding: '14px 16px', fontSize: 12, color: 'var(--jv-text-light)' }}>Searching…</div>
                 )}
@@ -454,7 +524,8 @@ export function ProtectedLayout() {
                     {searchResults.restaurants.length === 0 &&
                       searchResults.owners.length === 0 &&
                       searchResults.devices.length === 0 &&
-                      searchResults.activationKeys.length === 0 && (
+                      searchResults.activationKeys.length === 0 &&
+                      pageMatches.length === 0 && (
                         <div style={{ padding: '14px 16px', fontSize: 12, color: 'var(--jv-text-light)' }}>
                           No matches for "{searchQuery.trim()}"
                         </div>
