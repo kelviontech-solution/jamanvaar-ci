@@ -273,7 +273,7 @@ export function BackupsPage() {
               <div className="kpi-meta">
                 <span className="kpi-label">Total Snapshots</span>
                 <span className="kpi-value">{data.stats.total}</span>
-                <span className="kpi-sub">{data.stats.completed} Completed successfully</span>
+                <span className="kpi-sub">{data.stats.completed} completed, {data.stats.failed} failed</span>
               </div>
             </Card>
 
@@ -284,7 +284,9 @@ export function BackupsPage() {
               <div className="kpi-meta">
                 <span className="kpi-label">Storage Consumed</span>
                 <span className="kpi-value">{formatBytes(data.stats.totalBytes)}</span>
-                <span className="kpi-sub">Compressed (gzip) in the storage bucket</span>
+                <span className="kpi-sub">
+                  Compressed{data.stats.encryptionEnabled ? ' and encrypted' : ''}, {data.stats.storageMode === 's3' ? 'in the off-site bucket' : "on this server's disk"}
+                </span>
               </div>
             </Card>
 
@@ -310,7 +312,7 @@ export function BackupsPage() {
               <div className="kpi-meta">
                 <span className="kpi-label">Failed Alerts</span>
                 <span className="kpi-value">{data.stats.failed}</span>
-                <span className="kpi-sub">Requires operator investigation</span>
+                <span className="kpi-sub">{data.stats.failed > 0 ? 'Requires operator investigation' : 'No failed backups'}</span>
               </div>
             </Card>
           </>
@@ -392,7 +394,7 @@ export function BackupsPage() {
                       <td>
                         <div className="restaurant-cell">
                           <span className="font-bold">{b.restaurantName}</span>
-                          <span className="text-secondary text-xs">{b.restaurantCity ?? 'Main Location'}</span>
+                          <span className="text-secondary text-xs">{b.restaurantCity ?? '—'}</span>
                         </div>
                       </td>
                       <td>

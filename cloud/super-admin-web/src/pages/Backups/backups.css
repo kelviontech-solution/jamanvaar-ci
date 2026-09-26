@@ -49,6 +49,21 @@
   overflow: hidden;
 }
 
+/* A wide ledger scrolls sideways inside its card instead of clipping the last action buttons. */
+.backups-table-card .table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.backups-table-card .data-table {
+  min-width: 1180px;
+}
+
+.backups-table-card .data-table td:last-child,
+.backups-table-card .data-table th:last-child {
+  white-space: nowrap;
+}
+
 .restaurant-cell {
   display: flex;
   flex-direction: column;
