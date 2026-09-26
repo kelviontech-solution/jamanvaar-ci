@@ -37,6 +37,49 @@ interface MenuCategoriesModuleProps {
   }) => void;
 }
 
+/** Click a dish's price to change it right on the card: Enter saves, Esc cancels. The change syncs to every terminal like any other edit. */
+function InlinePrice({ item, onSaved }: { item: MenuItem; onSaved: (message: string) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(String(item.price));
+  const [error, setError] = useState('');
+  const start = () => { setValue(String(item.price)); setError(''); setEditing(true); };
+  const save = () => {
+    const n = Number(value);
+    if (!Number.isFinite(n) || n <= 0) { setError('Enter a price above 0'); return; }
+    if (n > 100000) { setError('Under ₹1,00,000'); return; }
+    if (n !== item.price) {
+      MenuRepository.updateMenuItem(item.id, { price: n });
+      AuditRepository.log({ action: 'MENU_ITEM_UPDATED', category: 'MENU', details: `Price of "${item.name}" changed from ₹${item.price} to ₹${n}`, username: 'Manager' });
+      onSaved(`${item.name}: price is now ₹${n}`);
+    }
+    setEditing(false);
+  };
+  if (!editing) {
+    return (
+      <button type="button" onClick={start} title="Click to change the price" className="font-mono font-black text-sm text-emerald-800 shrink-0 rounded-md px-1.5 -mr-1.5 hover:bg-emerald-50 cursor-text">
+        ₹{item.price}
+      </button>
+    );
+  }
+  return (
+    <span className="shrink-0 flex flex-col items-end">
+      <input
+        autoFocus
+        type="number"
+        inputMode="decimal"
+        min={1}
+        value={value}
+        onChange={(e) => { setValue(e.target.value); setError(''); }}
+        onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
+        onBlur={save}
+        aria-label={`New price for ${item.name}`}
+        className="w-20 text-right font-mono font-black text-sm text-emerald-900 border border-emerald-400 rounded-md px-1.5 py-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+      />
+      {error && <span className="text-[10px] text-rose-600 font-bold">{error}</span>}
+    </span>
+  );
+}
+
 export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
   categories,
   menuItems,
@@ -513,7 +556,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                     <h4 className="font-extrabold text-sm text-jaman-navy leading-tight group-hover:text-jaman-saffron transition-colors">
                       {item.name}
                     </h4>
-                    <span className="font-mono font-black text-sm text-emerald-800 shrink-0">₹{item.price}</span>
+                    <InlinePrice item={item} onSaved={(msg) => showToast(msg)} />
                   </div>
 
                   <p className="text-[11px] text-slate-500 line-clamp-2 mt-1">{item.description}</p>

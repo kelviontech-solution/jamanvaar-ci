@@ -165,9 +165,12 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       return;
     }
 
-    const nameCollision = db.menuItems.find(
-      (i) => i.name.trim().toLowerCase() === trimmedName.toLowerCase() && i.id !== itemToEdit?.id
-    );
+    // Only a NEW name can clash: saving a dish whose name did not change (a price edit, say) must never be blocked by another record
+    // that happens to share it.
+    const nameChanged = !itemToEdit || MenuRepository.normalizeDishName(itemToEdit.name) !== MenuRepository.normalizeDishName(trimmedName);
+    const nameCollision = nameChanged
+      ? db.menuItems.find((i) => MenuRepository.normalizeDishName(i.name) === MenuRepository.normalizeDishName(trimmedName) && i.id !== itemToEdit?.id)
+      : undefined;
     if (nameCollision) {
       setFormError(`"${trimmedName}" already exists on the menu — edit that dish instead of creating a duplicate.`);
       return;
