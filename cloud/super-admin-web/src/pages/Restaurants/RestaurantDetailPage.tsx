@@ -863,7 +863,10 @@ export function RestaurantDetailPage() {
                 </div>
                 <div style={{ margin: '8px 0 0 0', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 13, color: '#0B253A' }}>
                   <strong>Restaurant ID</strong>
-                  <code className="mono" style={{ fontSize: 12, background: '#fff', border: '1px solid #FDBA74', borderRadius: 8, padding: '3px 8px', wordBreak: 'break-all' }}>
+                  <code
+                    className="mono"
+                    style={{ fontSize: 12, background: '#fff', border: '1px solid #FDBA74', borderRadius: 8, padding: '3px 8px', wordBreak: 'break-all', userSelect: 'all' }}
+                  >
                     {restaurant.restaurantCode ?? 'Not yet assigned'}
                   </code>
                   {restaurant.restaurantCode && (
