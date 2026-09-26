@@ -1,6 +1,7 @@
 /** A short, human description of a browser from its User-Agent header, e.g. "Chrome 126 on Windows". */
 export function describeDevice(userAgent?: string | null): string {
-  if (!userAgent) return 'Unknown device';
+  // A sign-in that sent no User-Agent at all did not come from a web browser (a script, an API client or an integration test).
+  if (!userAgent) return 'API client (no browser)';
   const ua = userAgent;
 
   let browser = 'Browser';
@@ -21,5 +22,6 @@ export function describeDevice(userAgent?: string | null): string {
   else if (/CrOS/.test(ua)) os = 'ChromeOS';
   else if (/Linux/.test(ua)) os = 'Linux';
 
+  if (browser === 'Browser' && !os) return userAgent.length > 40 ? `${userAgent.slice(0, 40)}…` : userAgent; // unrecognised: show what it said
   return os ? `${browser} on ${os}` : browser;
 }
