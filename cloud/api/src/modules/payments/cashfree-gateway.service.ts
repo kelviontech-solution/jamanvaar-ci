@@ -155,6 +155,12 @@ export class CashfreeGatewayService {
     if (!secret) {
       throw new ServiceUnavailableException('CASHFREE_WEBHOOK_SECRET is not configured on this server');
     }
+    // A correctly signed but old delivery is a replay: refuse anything more than five minutes from now (timestamps are epoch ms or seconds).
+    const ts = Number(timestamp);
+    if (Number.isFinite(ts) && ts > 0) {
+      const ms = ts < 1e12 ? ts * 1000 : ts;
+      if (Math.abs(Date.now() - ms) > 5 * 60_000) return false;
+    }
     const expected = Buffer.from(createHmac('sha256', secret).update(timestamp + rawBody.toString('utf8')).digest('base64'));
     const actual = Buffer.from(signature);
     if (expected.length !== actual.length) return false;

@@ -15,3 +15,14 @@ describe('Branch Core pairing checks whose core it is (F-08)', () => {
     expect((await probeCore('192.168.1.10:5178', 1000, answer('rest-any'))).reachable).toBe(true);
   });
 });
+
+describe('certificate pinning (F-08)', () => {
+  const withFp = (fp: string) =>
+    (async () => new Response(JSON.stringify({ service: 'jamanvaar-branch-core', restaurantId: 'r', tls: true, tlsFingerprint: fp }), { status: 200 })) as unknown as typeof fetch;
+  it('refuses a core whose certificate differs from the one pinned', async () => {
+    expect((await probeCore('https://10.0.0.5:5178', 1000, withFp('AA:BB'), 'r', 'AA:BB')).reachable).toBe(true);
+    const r = await probeCore('https://10.0.0.5:5178', 1000, withFp('CC:DD'), 'r', 'AA:BB');
+    expect(r.reachable).toBe(false);
+    expect(r.error).toMatch(/different security certificate/);
+  });
+});

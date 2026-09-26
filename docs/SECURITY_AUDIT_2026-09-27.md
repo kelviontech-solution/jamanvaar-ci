@@ -191,11 +191,11 @@ Verified by tests: full cloud suite 105 files / 862 tests pass (run with a real 
 | F-03 orders declared paid | FIXED | only POS/POS_ADMIN may declare SUCCESS/REFUNDED; others need a settled payment transaction, else a `PAYMENT_UNVERIFIED` conflict; voids/refunds/status corrections audited |
 | F-04 weak secrets accepted | FIXED | production boot refuses placeholder/short/repeated JWT and QR secrets, localhost/* CORS, malformed backup key (`productionConfigProblems`) |
 | F-05 ANY code as admin console | FIXED | refused at redemption |
-| F-06 licence bound to restaurant | FIXED (client) | both POS and POS Admin pass the device's own restaurant id. Not fixed: clock rollback guard (needs a monotonic time source; documented residual) |
+| F-06 licence bound to restaurant | FIXED (client) | both POS and POS Admin pass the device's own restaurant id. Clock rollback: a high-water-mark clock (`trustedNow`) stops winding the clock back from reviving an expired certificate (test added). Clearing browser storage defeats it; the cloud stays the authority |
 | F-07 development signing key | FIXED (bundle) | `k2` is included only in non-production builds. **Action for you:** certificates must be signed with the production key (`k1` or a new one); the private key in the OneDrive-synced `cloud/api/.env` must be moved out of the synced folder and rotated. Cannot be done from code |
-| F-08 Branch Core identity | PARTLY | pairing now verifies the core belongs to this device's restaurant (test `probe_core_restaurant`). TLS fingerprint pinning and mandatory TLS are NOT implemented (residual, needs installation-flow decision) |
-| F-09 Branch Core credential at rest | PARTLY | data dir 0700 / files 0600 where the OS supports it. On Windows no change: OS-protected storage (DPAPI) not implemented |
-| F-10 staff roles client-only | PARTLY | manager override on kiosk is server-verified; POS/Captain roles remain enforced on the client (residual, large change) |
+| F-08 Branch Core identity | MOSTLY FIXED | pairing verifies the restaurant id and pins the core's certificate fingerprint (a changed certificate is refused). Tests `probe_core_restaurant`. Not done: forcing TLS on (plain HTTP still allowed on the LAN) |
+| F-09 Branch Core credential at rest | FIXED for copied files | token sealed with AES-256-GCM under a separate owner-only key file; dir 0700/files 0600 where supported; old plaintext values are re-sealed on start (test `branch_core_secret_seal`). Full access to the live data directory is not covered (needs the OS keystore) |
+| F-10 staff roles client-only | PARTLY (protocol change needed for the rest) | manager override on kiosk is server-verified; POS/Captain roles remain enforced on the client (residual, large change) |
 | F-11 public auth throttles | FIXED | `PublicAuthThrottle` on the six tenant auth routes and redemption |
 | F-12 QrCode RLS | WITHDRAWN | false positive |
 | F-13 body limits | FIXED | per-route limits; anonymous callers never get a large limit |
@@ -209,7 +209,7 @@ Verified by tests: full cloud suite 105 files / 862 tests pass (run with a real 
 | F-21 refresh rotation race | FIXED | atomic revoke, reuse detection ends all sessions |
 | F-22 restaurant-code enumeration | ACCEPTED | throttled; changing the code format is a product decision |
 | F-23 hygiene | FIXED | bcrypt cost 12, CORS default not applied in production, CSPRNG file names, CI `permissions: contents: read`, `@types/pg` moved to devDependencies. Action-tag pinning to commit SHAs NOT done (needs network lookup) |
-| F-24 webhook freshness | ACCEPTED | replay already neutralised |
+| F-24 webhook freshness | FIXED | signed deliveries older than 5 minutes are refused (test added) |
 
 ### What this does NOT prove
 Deployment configuration and secret rotation, dependency vulnerability scan (needs network), Rust/Tauri code and real hardware, TLS at the real edge, penetration testing of a running deployment.

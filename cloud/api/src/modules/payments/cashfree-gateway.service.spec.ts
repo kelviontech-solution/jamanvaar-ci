@@ -80,12 +80,12 @@ describe('CashfreeGatewayService', () => {
   it('verifyWebhookSignature accepts a correctly-signed payload', async () => {
     const service = await buildService(CONFIGURED_ENV);
     const rawBody = Buffer.from(JSON.stringify({ type: 'PAYMENT_SUCCESS_WEBHOOK' }));
-    const timestamp = '1700000000';
-    const signature = createHmac('sha256', CONFIGURED_ENV.CASHFREE_WEBHOOK_SECRET)
-      .update(timestamp + rawBody.toString('utf8'))
-      .digest('base64');
-
-    expect(service.verifyWebhookSignature(rawBody, timestamp, signature)).toBe(true);
+    const sign = (ts: string) => createHmac('sha256', CONFIGURED_ENV.CASHFREE_WEBHOOK_SECRET).update(ts + rawBody.toString('utf8')).digest('base64');
+    const fresh = String(Date.now());
+    expect(service.verifyWebhookSignature(rawBody, fresh, sign(fresh))).toBe(true);
+    // correctly signed but old: a replay
+    const stale = String(Date.now() - 10 * 60_000);
+    expect(service.verifyWebhookSignature(rawBody, stale, sign(stale))).toBe(false);
   });
 
   it('verifyWebhookSignature rejects a tampered payload', async () => {

@@ -7,6 +7,7 @@ import { CloudUplink, UplinkScheduler } from './uplink';
 import { startDiscoveryResponder, lanAddresses } from './discovery';
 import { BackupScheduler, createBackup, restoreBackup, listBackups } from './backup';
 import { Supervisor } from './supervisor';
+import { openSecret, sealSecret } from './secret-seal';
 
 export const APP_VERSION = process.env.JAMANVAAR_CORE_VERSION ?? '0.1.0';
 
@@ -52,7 +53,7 @@ export async function activate(dataDir: string, cloudBase: string, code: string)
   const store = openStore(dataDir);
   store.transaction(() => {
     store.setConfig('cloud_base', cloudBase.replace(/\/+$/, ''));
-    store.setConfig('device_token', data.deviceToken!);
+    store.setConfig('device_token', sealSecret(dataDir, data.deviceToken!));
     store.setConfig('device_id', data.device!.id);
     store.setConfig('restaurant_id', data.restaurantId ?? '');
     store.setConfig('branch_id', data.device!.branchId ?? '');
@@ -66,7 +67,10 @@ export interface RunOptions { tls?: { cert: string | Buffer; key: string | Buffe
 export async function run(dataDir: string, port: number, appDirs: Record<string, string>, runOpts: RunOptions = {}): Promise<{ stop(): Promise<void> }> {
   const store = openStore(dataDir);
   const cloudBase = store.getConfig('cloud_base');
-  const token = store.getConfig('device_token');
+  const storedToken = store.getConfig('device_token');
+  const token = storedToken ? openSecret(dataDir, storedToken) : null;
+  // A token saved before sealing existed is sealed now.
+  if (storedToken && token && !storedToken.startsWith('enc1:')) store.setConfig('device_token', sealSecret(dataDir, token));
   const restaurantId = store.getConfig('restaurant_id');
   const branchId = store.getConfig('branch_id');
   if (!cloudBase || !token || !restaurantId || !branchId) throw new Error('This Branch Core has not been activated yet (and must be bound to a branch).');

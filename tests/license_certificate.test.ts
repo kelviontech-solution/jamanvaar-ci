@@ -136,3 +136,24 @@ describe('License certificate verification (ENT-001 / SEC-002)', () => {
     expect(LicenseRepository.getLicense().validUntil).toBe(expiresAt);
   });
 });
+
+describe('clock rollback guard (F-06)', () => {
+  it('an expired certificate stays expired after the device clock is wound back', async () => {
+    const store: Record<string, string> = {};
+    const fake = { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => { store[k] = v; } };
+    const original = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+    Object.defineProperty(globalThis, 'localStorage', { value: fake, configurable: true });
+    try {
+      const soon = validPayload({ expiresAt: new Date(Date.now() + 3000).toISOString() });
+      const { payloadB64, signatureB64 } = signPayload(soon);
+      expect(await verifyLicenseCertificate(payloadB64, signatureB64, testPublicJwk)).not.toBeNull();
+      const realNow = Date.now;
+      Date.now = () => realNow() + 10_000; // time passes: expired, and the device remembers it saw this time
+      expect(await verifyLicenseCertificate(payloadB64, signatureB64, testPublicJwk)).toBeNull();
+      Date.now = realNow; // clock wound back
+      expect(await verifyLicenseCertificate(payloadB64, signatureB64, testPublicJwk)).toBeNull();
+    } finally {
+      if (original) Object.defineProperty(globalThis, 'localStorage', original); else delete (globalThis as { localStorage?: unknown }).localStorage;
+    }
+  });
+});

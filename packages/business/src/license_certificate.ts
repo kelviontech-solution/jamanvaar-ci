@@ -40,6 +40,25 @@ function importPublicKey(jwk: JsonWebKey): Promise<CryptoKey> {
   return globalThis.crypto.subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
 }
 
+const CLOCK_MARK_KEY = 'jamanvaar_license_clock_mark';
+
+/**
+ * The device clock, but never earlier than the latest time this device has already seen. Winding the clock back offline
+ * therefore cannot bring an expired certificate back to life. (A determined local attacker can still clear storage; the cloud
+ * remains the authority for paid features.)
+ */
+export function trustedNow(): number {
+  const now = Date.now();
+  try {
+    const mark = Number(globalThis.localStorage?.getItem(CLOCK_MARK_KEY));
+    const trusted = Number.isFinite(mark) && mark > now ? mark : now;
+    if (trusted === now) globalThis.localStorage?.setItem(CLOCK_MARK_KEY, String(now));
+    return trusted;
+  } catch {
+    return now;
+  }
+}
+
 /**
  * Verifies a certificate minted by cloud/api's LicensingService. Returns the
  * parsed, trustworthy payload only when the signature is valid under a trusted key,
@@ -75,7 +94,7 @@ export async function verifyLicenseCertificate(
     if (!valid) return null;
 
     if (!payload.restaurantId || !payload.tier || !payload.expiresAt) return null;
-    if (new Date(payload.expiresAt).getTime() < Date.now()) return null;
+    if (new Date(payload.expiresAt).getTime() < trustedNow()) return null;
 
     return payload;
   } catch {
