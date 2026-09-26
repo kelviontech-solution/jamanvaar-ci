@@ -58,3 +58,12 @@ describe('entity authority (F-01/F-02)', () => {
     expect(staffVisibleTo('POS_ADMIN', { roleId: 'role-cashier' })).toBe(true);
   });
 });
+
+describe('ticket attachments fit the request limit (base64 of a 2 MB file)', () => {
+  it('signed-in callers get room for both ticket routes, anonymous callers do not', () => {
+    for (const p of ['/api/v1/tenant/support-tickets/abc/attachments', '/api/v1/support-tickets/abc/attachments']) {
+      expect(bodyLimitFor(p, true)).toBeGreaterThanOrEqual(2.8 * 1024 * 1024);
+      expect(bodyLimitFor(p, false)).toBe(DEFAULT_BODY_LIMIT);
+    }
+  });
+});

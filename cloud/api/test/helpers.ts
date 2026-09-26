@@ -5,6 +5,7 @@ import request from 'supertest';
 import cookieParser from 'cookie-parser';
 import * as bcrypt from 'bcryptjs';
 import { AppModule } from '../src/app.module';
+import { installBodyParsers } from '../src/common/body-limits';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { EmailService } from '../src/modules/notifications/email.service';
 
@@ -17,7 +18,9 @@ export async function createTestApp(
   let builder = Test.createTestingModule({ imports: [AppModule] });
   if (configure) builder = configure(builder);
   const moduleRef = await builder.compile();
-  const app = moduleRef.createNestApplication();
+  // Same body parsers and size limits as the real server (see common/body-limits.ts).
+  const app = moduleRef.createNestApplication({ bodyParser: false });
+  installBodyParsers(app);
   app.use(cookieParser());
   await app.init();
 

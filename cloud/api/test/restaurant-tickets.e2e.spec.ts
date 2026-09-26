@@ -179,6 +179,13 @@ describe('Restaurant-raised support tickets (BUG-088)', () => {
     const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
     let attachmentId: string;
 
+    it('a real-size file (about 1.5 MB, sent as base64) is accepted, not rejected as too large', async () => {
+      const big = Buffer.concat([Buffer.from('%PDF-1.4 '), Buffer.alloc(1_500_000, 65)]).toString('base64');
+      const up = await tenant(A, 'post', `/api/v1/tenant/support-tickets/${ticketId}/attachments`).send({ fileName: 'report.pdf', mimeType: 'application/pdf', dataBase64: big });
+      expect(up.status, JSON.stringify(up.body).slice(0, 200)).toBe(201);
+      expect(up.body.sizeBytes).toBeGreaterThan(1_400_000);
+    });
+
     it('a restaurant attaches a screenshot; both sides can see and download it', async () => {
       const up = await tenant(A, 'post', `/api/v1/tenant/support-tickets/${ticketId}/attachments`).send({ fileName: 'printer.png', mimeType: 'image/png', dataBase64: png });
       expect(up.status).toBe(201);

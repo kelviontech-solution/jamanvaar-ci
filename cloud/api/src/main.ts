@@ -3,8 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { redactUrl, requestIdFrom } from './common/request-context';
-import { bodyLimitFor } from './common/body-limits';
-import { json, raw, urlencoded } from 'express';
+import { installBodyParsers } from './common/body-limits';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
@@ -21,16 +20,7 @@ async function bootstrap() {
   // body-parser's own "already parsed" check (req._body) then makes json()
   // skip this one path instead of double-consuming the request stream, so
   // every other route is unaffected.
-  app.use('/api/v1/payments/cashfree/webhook', raw({ type: '*/*', limit: '1mb' }));
-  // Body size depends on the route (see common/body-limits.ts): small by default, large only where pictures and backups really go.
-  const jsonParsers = new Map<number, ReturnType<typeof json>>();
-  app.use((req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) => {
-    const limit = bodyLimitFor(req.originalUrl ?? req.url ?? '', typeof req.headers.authorization === 'string' && req.headers.authorization.length > 0);
-    let parser = jsonParsers.get(limit);
-    if (!parser) { parser = json({ limit }); jsonParsers.set(limit, parser); }
-    parser(req, res, next);
-  });
-  app.use(urlencoded({ extended: true, limit: '64kb' }));
+  installBodyParsers(app);
   // Behind a reverse proxy the connecting address is the proxy's: say how many proxies there are so per-address limits see the real caller.
   // Never `true`: that would let any caller choose their own address.
   const trustProxy = app.get(ConfigService).get<string>('TRUST_PROXY');
