@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
 import { EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus } from '@jamanvaar/types';
+import { Platform } from '@jamanvaar/api';
 import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
 import {
   JamanvaarAuthLayout,
@@ -62,6 +63,12 @@ const ORDER_TYPE_LABEL: Record<string, string> = {
 
 export const App: React.FC = () => {
   const [kots, setKots] = useState<KOTRecord[]>(kdsDb.kots);
+
+  // A kitchen screen must never go to sleep mid-service (display port: wake lock in a browser, native in a shell).
+  useEffect(() => {
+    Platform.display.keepAwake(true);
+    return () => Platform.display.keepAwake(false);
+  }, []);
 
   // Device activation gate — same activation-key flow as POS/POS-admin.
   // Without a device token this terminal has no way to reach cloud/api at

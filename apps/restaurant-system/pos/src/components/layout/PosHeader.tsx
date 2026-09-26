@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
-import { BrandHeader, NotificationDrawerModal, sound, useAiAccess } from '@jamanvaar/ui';
+import { BrandHeader, NotificationDrawerModal, sound, useAiAccess, ConnectionBadge } from '@jamanvaar/ui';
 import {
   db,
   ShiftRepository,
@@ -252,6 +252,7 @@ export const PosHeader: React.FC = () => {
         {/* Printer alert — only rendered when something needs attention.
             Healthy printer status now lives inside the profile menu's
             System Health section instead of taking permanent header space. */}
+        <ConnectionBadge className="hidden lg:inline-flex" />
         {isPrinterOffline && (
           <button
             type="button"

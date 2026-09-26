@@ -81,11 +81,12 @@ import {
   JAMANVAARStartup,
   JamanvaarKioskAuthLayout,
   ActivationNoticeBanner,
-  ActivationHelpNote
+  ActivationHelpNote,
+  CachedImg
 } from '@jamanvaar/ui';
-import { formatDate, formatINR, formatSplitTax, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatSplitTax, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
-import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService } from '@jamanvaar/api';
+import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService, Platform } from '@jamanvaar/api';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncPromotions, syncFeedback, pushServiceMessages } from '@jamanvaar/sync';
 import { APP_CONSTANTS } from '@jamanvaar/config';
 import {
@@ -501,6 +502,12 @@ export default function KioskUserApp() {
     PrinterService.resumeCrashRecovery();
   }, []);
 
+  // A self-order kiosk must not sleep while it is on the welcome screen.
+  useEffect(() => {
+    Platform.display.keepAwake(true);
+    return () => Platform.display.keepAwake(false);
+  }, []);
+
   // Subscribe to Network Status
   useEffect(() => {
     const unsub = NetworkStatusService.subscribe((state) => {
@@ -508,6 +515,22 @@ export default function KioskUserApp() {
     });
     return unsub;
   }, []);
+
+  // Keep the menu pictures on this device, so the menu still shows them when the internet is down.
+  // Runs only when online and only does work when the set of pictures has changed.
+  const menuImageKey = useRef('');
+  useEffect(() => {
+    if (networkState !== 'ONLINE') return;
+    const urls = new Set<string>();
+    for (const i of db.menuItems) if (i.imageUrl) urls.add(i.imageUrl);
+    for (const c of db.categories as Array<{ imageUrl?: string }>) if (c.imageUrl) urls.add(c.imageUrl);
+    for (const c of db.combos ?? []) if (c.imageUrl) urls.add(c.imageUrl);
+    const list = [...urls].sort();
+    const key = list.join('|');
+    if (key === menuImageKey.current) return;
+    menuImageKey.current = key;
+    void ImageCache.sync(list);
+  }, [networkState, dbTick]);
 
   // Real-time Database Subscription
   useEffect(() => {
@@ -2275,7 +2298,7 @@ export default function KioskUserApp() {
                   <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 mb-1 border-2 border-transparent shadow-sm">
                     {/* Use cast to any to safely check imageUrl property if it exists, fallback to icon */}
                     {(cat as any).imageUrl ? (
-                      <img src={(cat as any).imageUrl} alt="" className="w-full h-full object-cover" />
+                      <CachedImg src={(cat as any).imageUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-jaman-ivory flex items-center justify-center text-jaman-saffron">
                         <CategoryIcon className="w-5 h-5" />
@@ -2385,7 +2408,7 @@ export default function KioskUserApp() {
                             onClick={() => handleSelectCombo(biryaniCombo)}
                             className="shrink-0 flex items-center gap-2.5 bg-[#FFF4ED] hover:bg-[#FFEAD9] border border-[#FDBA74] rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
                           >
-                            <img
+                            <CachedImg
                               src={biryaniCombo.imageUrl || 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=200&q=80'}
                               alt=""
                               className="w-11 h-11 rounded-xl object-cover shrink-0"
@@ -2405,7 +2428,7 @@ export default function KioskUserApp() {
                             onClick={() => handleSelectItem(thali)}
                             className="shrink-0 flex items-center gap-2.5 bg-[#F4EFE6] hover:bg-[#EFE7D8] border border-jaman-border rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
                           >
-                            <img
+                            <CachedImg
                               src={thali.imageUrl || 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=200&q=80'}
                               alt=""
                               className="w-11 h-11 rounded-xl object-cover shrink-0"
@@ -2422,7 +2445,7 @@ export default function KioskUserApp() {
                             onClick={() => handleSelectItem(coffee)}
                             className="shrink-0 hidden sm:flex items-center gap-2.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-2xl pl-2 pr-4 py-2 text-left transition-colors active:scale-95"
                           >
-                            <img
+                            <CachedImg
                               src={coffee.imageUrl || 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=200&q=80'}
                               alt=""
                               className="w-11 h-11 rounded-xl object-cover shrink-0"
@@ -2459,7 +2482,7 @@ export default function KioskUserApp() {
                           key={combo.id}
                           className="bg-white rounded-3xl p-5 border-2 border-jaman-border hover:border-jaman-saffron shadow-sm hover:shadow-xl transition-all duration-200 flex flex-col sm:flex-row gap-5 items-center justify-between"
                         >
-                          <img
+                          <CachedImg
                             src={combo.imageUrl}
                             alt={localizedName(combo, lang)}
                             className="w-full sm:w-36 h-36 rounded-2xl object-cover shadow-sm shrink-0"
@@ -2570,7 +2593,7 @@ export default function KioskUserApp() {
                       <div key={ci.cartItemId} className="py-4 first:pt-0 last:pb-0">
                         <div className="flex items-start gap-3 relative">
                           {ci.item.imageUrl && (
-                            <img src={ci.item.imageUrl} alt="" className="w-16 h-16 rounded-xl object-cover shrink-0 border border-[#F3EFE6]" />
+                            <CachedImg src={ci.item.imageUrl} alt="" className="w-16 h-16 rounded-xl object-cover shrink-0 border border-[#F3EFE6]" />
                           )}
                           <div className="flex-1 min-w-0 pr-6">
                             <h4 className="font-bold text-sm text-jaman-navy leading-snug">{localizedName(ci.item, lang)}</h4>
@@ -2634,7 +2657,7 @@ export default function KioskUserApp() {
                         {intelligentRecommendations.map((rec) => (
                           <div key={rec.item.id} className="p-3 bg-white rounded-xl border border-jaman-border flex items-center justify-between shadow-sm">
                             <div className="flex items-center gap-3 min-w-0 pr-2">
-                              <img src={rec.item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=60'} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#F3EFE6]" />
+                              <CachedImg src={rec.item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=60'} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#F3EFE6]" />
                               <div className="min-w-0">
                                 <h5 className="font-bold text-sm text-jaman-navy truncate">{rec.item.name}</h5>
                                 <span className="text-sm font-black text-jaman-saffron block">{formatINR(rec.item.price)}</span>
@@ -3310,7 +3333,7 @@ export default function KioskUserApp() {
                 with a modal whose whole point is helping a guest decide
                 what they're customizing. */}
             <div className="relative -mx-6 -mt-6">
-              <img
+              <CachedImg
                 src={customizingItem.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
                 alt={customizingItem.name}
                 className="w-full h-40 sm:h-48 object-cover"
@@ -3524,7 +3547,7 @@ export default function KioskUserApp() {
                           className="p-3 bg-white rounded-2xl border border-jaman-border shadow-sm flex items-center justify-between gap-3 hover:border-jaman-saffron/40 transition-all"
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <img
+                            <CachedImg
                               src={item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
                               alt={item.name}
                               className="w-14 h-14 rounded-xl object-cover border border-jaman-border shrink-0"

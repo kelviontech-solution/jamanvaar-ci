@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchSyncIssues, fetchDeviceFleet, fetchMenuVersion, publishMenu } from '../../cloud/cloudClient';
 import type { SyncIssue, FleetDevice } from '../../cloud/cloudClient';
+import { ConnectionPanel } from '@jamanvaar/ui';
 
 const SEVERITY_STYLE: Record<SyncIssue['severity'], string> = {
   high: 'bg-rose-50 text-rose-700 border-rose-200',
@@ -68,6 +69,11 @@ export function SyncHealthPanel({ showToast }: { showToast: (msg: string) => voi
       <div>
         <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Sync &amp; Devices</h1>
         <p className="text-sm text-[#4A5568] mt-1">Whether every terminal is in step with the cloud, and what needs your review.</p>
+      </div>
+
+      <div className="bg-white border border-jaman-border rounded-3xl p-5">
+        <h2 className="text-base font-extrabold text-jaman-navy mb-3">This device: connection &amp; diagnostics</h2>
+        <ConnectionPanel appVersion={typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0'} showToast={showToast} />
       </div>
 
       {loadError && <div role="alert" className="text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">{loadError}</div>}

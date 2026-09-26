@@ -10,3 +10,4 @@ export * from './clipboard';
 export * from './csv';
 export * from './print_safety';
 export * from './india_compliance';
+export * from './image_cache';

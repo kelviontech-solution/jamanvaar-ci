@@ -5,7 +5,7 @@ import { PLAN_DEFINITIONS, EntitlementService, applyLicenseCertificate } from '@
 import { PlanTier, PrinterRole } from '@jamanvaar/types';
 import { PosPrinterService } from '../../services/printerService';
 import { formatINR, slipHeader } from '@jamanvaar/utils';
-import { sound, type SoundVolume } from '@jamanvaar/ui';
+import { sound, ConnectionPanel, type SoundVolume } from '@jamanvaar/ui';
 import { DisplaySizeCard } from './DisplaySizeCard';
 import { DetectedPrintersPanel } from './DetectedPrintersPanel';
 import {
@@ -311,6 +311,12 @@ ESC/POS Command Engine Verified OK
         </div>
       )}
 
+      {activeSettingsTab === 'HARDWARE' && (
+        <div className="bg-white border border-jaman-border rounded-3xl p-5 shrink-0">
+          <h2 className="text-base font-extrabold text-jaman-navy mb-3">Connection &amp; Diagnostics</h2>
+          <ConnectionPanel appVersion={typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0'} />
+        </div>
+      )}
       {activeSettingsTab === 'HARDWARE' && <DisplaySizeCard />}
 
       {/* ─────────── SOUND SETTINGS CARD (always visible on HARDWARE tab) ─────────── */}
