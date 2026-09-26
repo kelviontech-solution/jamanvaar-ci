@@ -160,7 +160,9 @@ model Restaurant {
   syncEventLogs       SyncEventLog[]
   syncConflicts       SyncConflict[]
   offlineExtensions   OfflineExtension[]
-  qrTableLinks        QrTableLink[]
+  qrCodes             QrCode[]
+  qrSettings          QrSettings[]
+  qrEvents            QrEvent[]
   sandboxes           RestaurantSandbox[]
   restoreJobs         BackupRestoreJob[]
   applicationEntitlements ApplicationEntitlement[]
@@ -1343,37 +1345,86 @@ model SyncedOrder {
   syncVersion     Int        @default(1) // bumped on every push; lets a puller detect it missed an update
   /// Monotonic per-branch change sequence (see SyncSequence): the pull cursor. Null only for rows written before it existed.
   seq             Int?
+  /// POS | KIOSK | CAPTAIN | QR | ONLINE: the channel the order came from.
+  source          String     @default("POS")
+  /// Unguessable reference a guest tracks their order by; the internal id is never shown to customers.
+  publicOrderId   String?    @unique
+  qrCodeId        String?
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
   @@unique([restaurantId, externalOrderId])
+  @@index([restaurantId, branchId, source, createdAt])
   @@index([restaurantId, updatedAt])
   @@index([restaurantId, branchId, seq])
   @@index([deviceId])
   @@index([branchId])
 }
 
-/// A table's QR ordering token, kept as its own indexed row (BUG-119) rather than searched for inside
-/// SyncedEntity's per-tenant JSON payloads. A guest's phone knows only the token printed on the table — it has
-/// no restaurant/tenant context yet — so this is the one lookup in the whole sync bridge a request with no
-/// tenant identity is allowed to make, and it must resolve in one indexed read across the whole platform, not
-/// a cross-tenant scan. Kept in step with DINING_TABLE's own entity-sync push (EntitySyncService), never
-/// written to directly by a client.
-model QrTableLink {
+/// A QR code that customers scan (spec: QrCode). The token is minted by the server, unguessable, and tied to exactly
+/// one restaurant + branch (+ table for TABLE_ORDER). A guest's phone knows only the token: it has no tenant context,
+/// so this is the one lookup a request with no tenant identity may make, resolved in one indexed read.
+/// Status: ACTIVE | DISABLED | REVOKED. Regenerating revokes the old code in the same transaction.
+model QrCode {
+  id            String     @id @default(uuid())
+  publicToken   String     @unique
+  restaurantId  String
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branchId      String?
+  /// The table's id in the synced DINING_TABLE entity; null for a MENU_ONLY code.
+  tableId       String?
+  tableNumber   String?
+  status        String     @default("ACTIVE")
+  /// TABLE_ORDER | MENU_ONLY
+  mode          String     @default("TABLE_ORDER")
+  version       Int        @default(1)
+  revokedAt     DateTime?
+  lastScannedAt DateTime?
+  metadata      Json?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([restaurantId])
+  @@index([restaurantId, branchId])
+  @@index([restaurantId, tableId])
+}
+
+/// Per-restaurant (branchId null) or per-branch QR ordering switches. Database-backed, never hardcoded.
+model QrSettings {
+  id                   String     @id @default(uuid())
+  restaurantId         String
+  restaurant           Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branchId             String?
+  orderingEnabled      Boolean    @default(true)
+  tableOrderingEnabled Boolean    @default(true)
+  menuOnlyEnabled      Boolean    @default(false)
+  allowCustomerNotes   Boolean    @default(true)
+  allowModifiers       Boolean    @default(true)
+  allowCash            Boolean    @default(true)
+  allowOnlinePayment   Boolean    @default(false)
+  showOrderStatus      Boolean    @default(true)
+  autoAccept           Boolean    @default(false)
+  requireCustomerName  Boolean    @default(false)
+  requireCustomerPhone Boolean    @default(false)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+}
+
+/// Facts about guest behaviour (scan, menu view, cart, order started/placed/failed). Analytics are computed from
+/// these and from SyncedOrder.source = 'QR', never from numbers a client reports about itself.
+model QrEvent {
   id           String     @id @default(uuid())
-  qrToken      String     @unique
   restaurantId String
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   branchId     String?
-  tableId      String // the local app's own DiningTable.id
-  tableNumber  String
-  /// Mirrors DiningTable.qrStatus; a DISABLED or removed table is refused here even though the token itself
-  /// still resolves (so a stale sticker on a table gives a clear, honest answer, not a generic 404).
-  isActive     Boolean    @default(true)
+  qrCodeId     String?
+  sessionId    String?
+  type         String
+  metadata     Json?
   createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
 
-  @@index([restaurantId])
+  @@index([restaurantId, type, createdAt])
+  @@index([restaurantId, branchId, createdAt])
 }
 
 // A generic sync mirror for domains that don't (yet) need Order's dedicated

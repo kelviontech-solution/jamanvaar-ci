@@ -19,6 +19,42 @@ const TERMINAL_PAID_STATUSES: ReadonlySet<string> = new Set(['SUCCESS', 'REFUNDE
 /** Device types with real payment/refund authority — the only ones allowed to change a terminal payment status. */
 const PAYMENT_AUTHORITATIVE_DEVICE_TYPES: ReadonlySet<string> = new Set(['POS', 'POS_ADMIN']);
 
+
+/** The channel an order came from, recorded once at creation and never changed by later pushes. */
+export function orderSourceFor(deviceType: string, meta: unknown): string {
+  const declared = meta && typeof meta === 'object' ? (meta as { sourceType?: unknown }).sourceType : undefined;
+  if (declared === 'QR_TABLE') return 'QR';
+  if (declared === 'KIOSK' || declared === 'CAPTAIN' || declared === 'POS' || declared === 'ONLINE') return declared;
+  if (deviceType === 'KIOSK' || deviceType === 'CAPTAIN') return deviceType;
+  return 'POS';
+}
+
+export interface ServerOrderInput {
+  restaurantId: string;
+  branchId: string | null;
+  externalOrderId: string;
+  source: string;
+  publicOrderId?: string;
+  qrCodeId?: string;
+  orderType: string;
+  status: string;
+  tableId?: string | null;
+  tableLabel?: string | null;
+  items: unknown[];
+  subtotal: number;
+  taxAmount: number;
+  discountAmount: number;
+  totalAmount: number;
+  notes?: string | null;
+  paymentStatus: string;
+  paymentMethod: string;
+  meta: Record<string, unknown>;
+  /** Runs inside the same transaction, after the order is locked and known not to exist yet; throw to refuse. */
+  beforeCreate?: (tx: TxClient) => Promise<Record<string, unknown> | void>;
+  /** Take the restaurant-wide QR lock so a daily limit cannot be overshot by concurrent submits. */
+  serializeRestaurantLimit?: boolean;
+}
+
 export interface OrderSyncPushResult {
   externalOrderId: string;
   status: 'ok' | 'error';
@@ -193,6 +229,7 @@ export class OrderSyncService {
             paymentMethod: evt.paymentMethod,
             meta: (mergedMeta ?? undefined) as any
           };
+          const source = orderSourceFor(device.type, evt.meta);
 
           const seq = await nextSyncSequence(tx, device.restaurantId);
           latestSeq = seq;
@@ -202,7 +239,7 @@ export class OrderSyncService {
                 data: { ...data, syncVersion: existing.syncVersion + 1, seq }
               })
             // The order belongs to the branch of the terminal that first pushed it (BUG-048).
-            : await tx.syncedOrder.create({ data: { ...data, branchId: device.branchId, syncVersion: 1, seq } });
+            : await tx.syncedOrder.create({ data: { ...data, branchId: device.branchId, source, syncVersion: 1, seq } });
 
           await tx.syncEventLog.create({
             data: {
@@ -254,6 +291,77 @@ export class OrderSyncService {
       this.realtime.publish({ restaurantId: device.restaurantId, branchId: device.branchId, kind: 'orders', seq: latestSeq, originDeviceId: device.id });
     }
     return { results, serverTime: new Date().toISOString() };
+  }
+
+
+  /**
+   * Creates an order that originates on the server (a guest's QR order) through the SAME path every device order
+   * takes: per-order lock, sequence number, sync event log, realtime wake-up. It is therefore delivered by cursor,
+   * by realtime and through the Branch Core exactly like a POS order. There is no second order pipeline.
+   * Idempotent on (restaurantId, externalOrderId): a repeat returns the original order and creates nothing.
+   */
+  async ingestServerOrder(input: ServerOrderInput) {
+    const startedAt = Date.now();
+    const result = await this.prisma.runAsTenant(input.restaurantId, async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + input.restaurantId + ':' + input.externalOrderId}))`;
+      const existing = await tx.syncedOrder.findUnique({
+        where: { restaurantId_externalOrderId: { restaurantId: input.restaurantId, externalOrderId: input.externalOrderId } }
+      });
+      if (existing) return { order: existing, duplicate: true, seq: existing.seq ?? undefined };
+
+      if (input.serializeRestaurantLimit) {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-limit:' + input.restaurantId}))`;
+      }
+      const extraMeta = input.beforeCreate ? await input.beforeCreate(tx) : undefined;
+
+      const seq = await nextSyncSequence(tx, input.restaurantId);
+      const order = await tx.syncedOrder.create({
+        data: {
+          restaurantId: input.restaurantId,
+          branchId: input.branchId,
+          deviceId: null,
+          externalOrderId: input.externalOrderId,
+          source: input.source,
+          publicOrderId: input.publicOrderId,
+          qrCodeId: input.qrCodeId,
+          orderType: input.orderType,
+          status: input.status,
+          tableId: input.tableId ?? undefined,
+          tableLabel: input.tableLabel ?? undefined,
+          items: input.items as any,
+          subtotal: input.subtotal,
+          taxAmount: input.taxAmount,
+          discountAmount: input.discountAmount,
+          totalAmount: input.totalAmount,
+          notes: input.notes ?? undefined,
+          paymentStatus: input.paymentStatus,
+          paymentMethod: input.paymentMethod,
+          meta: { ...input.meta, ...(extraMeta ?? {}) } as any,
+          syncVersion: 1,
+          seq
+        }
+      });
+      await tx.syncEventLog.create({
+        data: {
+          restaurantId: input.restaurantId,
+          branchId: input.branchId,
+          entityType: 'ORDER',
+          entityId: input.externalOrderId,
+          traceId: input.externalOrderId,
+          action: 'CREATE',
+          status: 'SUCCESS',
+          latencyMs: Date.now() - startedAt,
+          payloadSize: JSON.stringify(input.items).length
+        }
+      });
+      return { order, duplicate: false, seq };
+    });
+
+    // After commit, so a woken device's pull always sees the order.
+    if (!result.duplicate) {
+      this.realtime.publish({ restaurantId: input.restaurantId, branchId: input.branchId, kind: 'orders', seq: result.seq });
+    }
+    return { order: result.order, duplicate: result.duplicate };
   }
 
   /** A failed event must stay retryable, so its claim is dropped rather than recorded as applied. */

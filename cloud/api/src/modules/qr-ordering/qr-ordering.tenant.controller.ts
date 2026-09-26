@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { QrOrderingService, QrUsageReportInput } from './qr-ordering.service';
+import { QrOrderingService } from './qr-ordering.service';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
 import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.decorator';
 
@@ -21,7 +21,7 @@ export class TenantQrOrderingController {
   }
 
   @Post('usage')
-  reportUsage(@CurrentTenantUser() user: User, @Body() body: QrUsageReportInput) {
+  reportUsage(@CurrentTenantUser() user: User, @Body() body: unknown) {
     return this.qrService.reportUsage(user, body);
   }
 }

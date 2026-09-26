@@ -18,6 +18,19 @@ export const ALL_APP_CODES: AppCode[] = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', '
  * mechanism exists (spec section 37) — Super Admin can already override per-subscription via
  * the `applications` param regardless.
  */
+export type EntitlementReason = 'OK' | 'RESTAURANT_INACTIVE' | 'NO_SUBSCRIPTION' | 'SUBSCRIPTION_EXPIRED' | 'NOT_INCLUDED' | 'DISABLED';
+
+export interface ResolvedEntitlement {
+  appCode: AppCode;
+  enabled: boolean;
+  reason: EntitlementReason;
+  /** PLAN: follows the plan's features. MANUAL_OVERRIDE: a Super Admin switched it for this restaurant only. */
+  source: 'PLAN' | 'MANUAL_OVERRIDE' | null;
+  limits: Record<string, unknown>;
+  validUntil: string | null;
+  planName: string | null;
+}
+
 export type FamilyTierKey = `${ProductFamily}:${PlanTier}`;
 export const DEFAULT_APPS_BY_FAMILY_TIER: Partial<Record<FamilyTierKey, AppCode[]>> = {
   'RESTAURANT:CORE': ['POS', 'POS_ADMIN'],
@@ -58,9 +71,10 @@ export class ApplicationEntitlementsService {
     subscriptionId: string,
     productFamily: ProductFamily,
     tier: PlanTier,
-    enabledApps?: AppCode[]
+    enabledApps?: AppCode[],
+    planEntitlements?: unknown
   ): Promise<void> {
-    const enabled = new Set(enabledApps ?? defaultAppsFor(productFamily, tier));
+    const enabled = new Set(enabledApps ?? (await this.appsForPlan(tx, productFamily, tier, planEntitlements)));
 
     await Promise.all(
       ALL_APP_CODES.map((appCode) =>
@@ -71,6 +85,73 @@ export class ApplicationEntitlementsService {
         })
       )
     );
+  }
+
+  /**
+   * The apps a plan includes. The (family, tier) table still gives each tier its long-standing bundle, and a plan
+   * that lists a feature as included ADDS that application to it (the Feature catalog says which flag key grants
+   * which application). QR ordering is the exception by design: it is granted only by the plan's own feature flag,
+   * never by a tier's name, so whether a restaurant has QR is a fact about its plan's feature list and about nothing
+   * else (not its name, tier or price).
+   */
+  async appsForPlan(tx: TxClient, productFamily: ProductFamily, tier: PlanTier, planEntitlements?: unknown): Promise<AppCode[]> {
+    const apps = new Set<AppCode>(defaultAppsFor(productFamily, tier).filter((a) => a !== 'QR_ORDERING'));
+    const flags = planEntitlements && typeof planEntitlements === 'object' && !Array.isArray(planEntitlements) ? (planEntitlements as Record<string, unknown>) : {};
+    const bridged = await tx.feature.findMany({
+      where: { isActive: true, appCode: { not: null }, legacyEntitlementKey: { not: null } },
+      select: { appCode: true, legacyEntitlementKey: true }
+    });
+    for (const f of bridged) {
+      if (f.appCode && flags[f.legacyEntitlementKey as string] === true) apps.add(f.appCode);
+    }
+    if (apps.has('KIOSK')) apps.add('KIOSK_ADMIN');
+    return [...apps];
+  }
+
+  /**
+   * THE entitlement question, answered in one place: is `appCode` usable for this restaurant right now, why or
+   * why not, where does the answer come from, and what limits apply. Frontends display this result; backends
+   * authorize with it; the Branch Core receives it in its roster. Nothing outside this method compares a plan name,
+   * tier or price. Fails closed.
+   */
+  async resolve(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<ResolvedEntitlement> {
+    const closed = (reason: EntitlementReason, extra: Partial<ResolvedEntitlement> = {}): ResolvedEntitlement => ({
+      appCode, enabled: false, reason, source: null, limits: {}, validUntil: null, planName: null, ...extra
+    });
+
+    const restaurant = await tx.restaurant.findFirst({ where: { id: restaurantId, deletedAt: null }, select: { status: true } });
+    if (!restaurant || restaurant.status !== 'ACTIVE') return closed('RESTAURANT_INACTIVE');
+
+    const now = new Date();
+    const subs = await tx.subscription.findMany({
+      where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] } },
+      include: { plan: { select: { name: true, tier: true, productFamily: true, entitlements: true } } },
+      orderBy: { createdAt: 'desc' }
+    });
+    if (subs.length === 0) return closed('NO_SUBSCRIPTION');
+    const current = subs.filter((s) => !s.expiresAt || s.expiresAt > now);
+    if (current.length === 0) return closed('SUBSCRIPTION_EXPIRED', { validUntil: subs[0].expiresAt?.toISOString() ?? null, planName: subs[0].plan.name });
+
+    const rows = await tx.applicationEntitlement.findMany({ where: { subscriptionId: { in: current.map((s) => s.id) }, appCode } });
+    const granting = rows.find((r) => r.enabled);
+    const owning = current.find((s) => s.id === (granting ?? rows[0])?.subscriptionId) ?? current[0];
+    const planFlags = owning.plan.entitlements && typeof owning.plan.entitlements === 'object' && !Array.isArray(owning.plan.entitlements) ? (owning.plan.entitlements as Record<string, unknown>) : {};
+    const rowConfig = granting?.config && typeof granting.config === 'object' && !Array.isArray(granting.config) ? (granting.config as Record<string, unknown>) : {};
+    const planDefault = (await this.appsForPlan(tx, owning.plan.productFamily, owning.plan.tier, owning.plan.entitlements)).includes(appCode);
+
+    if (!granting) {
+      return closed(rows.length > 0 && planDefault ? 'DISABLED' : 'NOT_INCLUDED', { planName: owning.plan.name, validUntil: owning.expiresAt?.toISOString() ?? null });
+    }
+    return {
+      appCode,
+      enabled: true,
+      reason: 'OK',
+      source: granting.enabled === planDefault ? 'PLAN' : 'MANUAL_OVERRIDE',
+      // The subscription's own row (a per-restaurant override) wins over the plan's default limits.
+      limits: { ...planFlags, ...rowConfig },
+      validUntil: owning.expiresAt?.toISOString() ?? null,
+      planName: owning.plan.name
+    };
   }
 
   private withSource<T extends { appCode: AppCode; enabled: boolean }>(

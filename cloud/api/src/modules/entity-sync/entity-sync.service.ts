@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -39,7 +40,7 @@ export class EntitySyncService {
     entityType: SyncableEntityType,
     events: EntitySyncEventDto[]
   ): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
-    return this.pushEventsForRestaurant(device.restaurantId, entityType, events, device.id);
+    return this.pushEventsForRestaurant(device.restaurantId, entityType, events, device.id, device.branchId);
   }
 
   /**
@@ -53,7 +54,8 @@ export class EntitySyncService {
     restaurantId: string,
     entityType: SyncableEntityType,
     events: EntitySyncEventDto[],
-    deviceId?: string
+    deviceId?: string,
+    deviceBranchId?: string | null
   ): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
     const results: EntitySyncPushResult[] = [];
 
@@ -110,7 +112,7 @@ export class EntitySyncService {
               });
 
           results.push({ externalId: evt.externalId, status: 'ok', syncVersion: saved.syncVersion });
-          if (entityType === 'DINING_TABLE') await this.syncQrTableLink(tx, restaurantId, evt);
+          if (entityType === 'DINING_TABLE') await this.syncQrTableLink(tx, restaurantId, evt, deviceBranchId ?? null);
         } catch (err: any) {
           results.push({ externalId: evt.externalId, status: 'error', error: err?.message ?? 'Unknown error' });
         }
@@ -121,37 +123,31 @@ export class EntitySyncService {
   }
 
   /**
-   * BUG-119: keeps QrTableLink's own indexed row (`qrToken` -> restaurant + table) in step with whatever a
-   * device just pushed for this table, so a guest scanning the printed QR code always resolves to the current
-   * state without a public request ever scanning tenant-scoped SyncedEntity data. A regenerated token
-   * (`regenerateTableQr`) leaves a NEW row here; the table's earlier token(s) are deactivated so an old,
-   * still-printed sticker gives an honest "no longer valid" instead of quietly still working.
+   * QR codes are cloud-authoritative: the server mints, versions, disables and revokes them (see the qr module), and a
+   * terminal can no longer create or change one. The single thing kept here is a compatibility mirror for codes
+   * printed before that change: an older Restaurant Admin still pushes the token it minted in the browser
+   * (`jv_qr_tbl_...`) with its table, and that token is recorded as an ACTIVE legacy code for THAT restaurant only.
+   * INSERT .. ON CONFLICT DO NOTHING means it can never overwrite or re-point an existing token, whichever
+   * restaurant owns it. Whether a table is still active is answered at scan time from the table's own record, so
+   * nothing here mirrors table state. Removed with the old clients (plan P12).
    */
-  private async syncQrTableLink(tx: Prisma.TransactionClient, restaurantId: string, evt: EntitySyncEventDto): Promise<void> {
+  private async syncQrTableLink(tx: Prisma.TransactionClient, restaurantId: string, evt: EntitySyncEventDto, branchId: string | null): Promise<void> {
     const payload = evt.payload as Record<string, unknown>;
-    const tableId = evt.externalId;
-
-    if (payload?.deleted === true) {
-      await tx.qrTableLink.updateMany({ where: { restaurantId, tableId }, data: { isActive: false } });
-      return;
-    }
-
+    if (payload?.deleted === true) return;
     const qrToken = typeof payload.qrToken === 'string' ? payload.qrToken : null;
-    const tableNumber = typeof payload.tableNumber === 'string' ? payload.tableNumber : tableId;
-    const isActive = payload.isActive !== false && payload.qrStatus !== 'DISABLED';
+    if (!qrToken || !/^jv_qr_tbl_[A-Za-z0-9_]{10,150}$/.test(qrToken)) return;
+    if (payload.qrStatus === 'DISABLED' || payload.isActive === false) return;
 
-    if (qrToken) {
-      await tx.qrTableLink.upsert({
-        where: { qrToken },
-        update: { restaurantId, tableId, tableNumber, isActive },
-        create: { qrToken, restaurantId, tableId, tableNumber, isActive }
-      });
-      // A regenerated token supersedes whatever this table's earlier token(s) were.
-      await tx.qrTableLink.updateMany({ where: { restaurantId, tableId, qrToken: { not: qrToken } }, data: { isActive: false } });
-    } else {
-      // The table itself was pushed with no token at all (QR never generated, or explicitly cleared).
-      await tx.qrTableLink.updateMany({ where: { restaurantId, tableId }, data: { isActive: false } });
+    const tableNumber = typeof payload.tableNumber === 'string' ? payload.tableNumber : evt.externalId;
+    let branch = typeof payload.branchId === 'string' ? (payload.branchId as string) : branchId;
+    if (!branch) {
+      const branches = await tx.branch.findMany({ where: { restaurantId }, select: { id: true }, take: 2 });
+      branch = branches.length === 1 ? branches[0].id : null;
     }
+    await tx.$executeRaw`
+      INSERT INTO "QrCode" ("id", "publicToken", "restaurantId", "branchId", "tableId", "tableNumber", "status", "mode", "version", "metadata", "createdAt", "updatedAt")
+      VALUES (${randomUUID()}, ${qrToken}, ${restaurantId}, ${branch}, ${evt.externalId}, ${tableNumber}, 'ACTIVE', 'TABLE_ORDER', 1, '{"legacy": true}'::jsonb, NOW(), NOW())
+      ON CONFLICT DO NOTHING`;
   }
 
   async catchUp(device: Device, entityType: SyncableEntityType, since?: string) {

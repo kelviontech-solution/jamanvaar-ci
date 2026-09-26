@@ -7,6 +7,7 @@ import { NumberLeasesService } from './number-leases.service';
 
 @Module({
   controllers: [OrderSyncController, NumberLeasesController],
-  providers: [OrderSyncService, NumberLeasesService, DeviceAuthGuard]
+  providers: [OrderSyncService, NumberLeasesService, DeviceAuthGuard],
+  exports: [OrderSyncService]
 })
 export class OrderSyncModule {}

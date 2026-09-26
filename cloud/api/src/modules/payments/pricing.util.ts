@@ -18,6 +18,8 @@ export interface MenuSnapshotItemLookup {
   name: string;
   basePrice: number; // paise
   taxRate: number; // basis points, e.g. 500 = 5.00%
+  /** True when the listed price already contains the tax (the tax is then extracted, not added). */
+  taxInclusive?: boolean;
   isAvailable: boolean;
   modifierGroups: ModifierGroupSnapshot[];
 }
@@ -76,7 +78,11 @@ export function priceCart(cartLines: CartLineInput[], menuItems: Map<string, Men
     const modifierSum = selectedOptions.reduce((sum, opt) => sum + opt.priceDelta, 0);
     const unitPrice = menuItem.basePrice + modifierSum;
     const lineSubtotal = unitPrice * line.quantity;
-    const lineTax = Math.round((lineSubtotal * menuItem.taxRate) / 10000);
+    // Tax-inclusive prices already contain the tax: it is extracted for the invoice, not added on top.
+    const lineTax = menuItem.taxInclusive
+      ? Math.round((lineSubtotal * menuItem.taxRate) / (10000 + menuItem.taxRate))
+      : Math.round((lineSubtotal * menuItem.taxRate) / 10000);
+    const lineTotal = menuItem.taxInclusive ? lineSubtotal : lineSubtotal + lineTax;
 
     return {
       externalItemId: line.externalItemId,
@@ -85,14 +91,15 @@ export function priceCart(cartLines: CartLineInput[], menuItems: Map<string, Men
       unitPrice,
       lineSubtotal,
       lineTax,
-      lineTotal: lineSubtotal + lineTax,
+      lineTotal,
       modifiers: selectedOptions
     };
   });
 
   const subtotal = lines.reduce((sum, l) => sum + l.lineSubtotal, 0);
   const taxAmount = lines.reduce((sum, l) => sum + l.lineTax, 0);
-  return { lines, subtotal, taxAmount, totalAmount: subtotal + taxAmount };
+  const totalAmount = lines.reduce((sum, l) => sum + l.lineTotal, 0);
+  return { lines, subtotal, taxAmount, totalAmount };
 }
 
 function resolveSelectedOptions(menuItem: MenuSnapshotItemLookup, selectedOptionIds: string[]): ModifierOptionSnapshot[] {

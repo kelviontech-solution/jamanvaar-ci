@@ -12,7 +12,7 @@ import { PrismaService } from '../src/prisma/prisma.service';
  * itself was broken. This proves the full tenant-report -> platform-read
  * round trip actually works now that pos-admin calls it.
  */
-describe('QR ordering usage: tenant report -> platform read', () => {
+describe('QR ordering usage is computed, not reported', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   const adminEmail = `test-qr-admin-${Date.now()}@example.com`;
@@ -64,17 +64,19 @@ describe('QR ordering usage: tenant report -> platform read', () => {
     expect(res.body.usage?.ordersToday ?? 0).toBe(0);
   });
 
-  it('a tenant-reported usage snapshot is immediately visible to Super Admin', async () => {
+  it('usage is measured by the server: a tenant that reports inflated numbers changes nothing', async () => {
     const reportRes = await authed('post', '/api/v1/tenant/qr-ordering/usage', ownerAccessToken).send({
       activeTables: 4,
       ordersToday: 17,
       revenueToday: 542300
     });
     expect(reportRes.status).toBe(201);
+    // The endpoint remains for older Restaurant Admin builds, but answers with what the server counts.
+    expect(reportRes.body).toMatchObject({ activeTables: 0, ordersToday: 0, revenueToday: 0 });
 
     const readRes = await authed('get', `/api/v1/qr-ordering/restaurants/${restaurantId}/usage`, platformToken);
     expect(readRes.status).toBe(200);
-    expect(readRes.body.usage).toMatchObject({ activeTables: 4, ordersToday: 17, revenueToday: 542300 });
+    expect(readRes.body.usage).toMatchObject({ activeTables: 0, ordersToday: 0, revenueToday: 0 });
   });
 
   it('a device/POS staff session cannot report usage for another restaurant (tenant isolation)', async () => {

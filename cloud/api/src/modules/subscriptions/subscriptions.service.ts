@@ -84,7 +84,8 @@ export class SubscriptionsService {
         sub.id,
         plan.productFamily,
         plan.tier,
-        dto.applications
+        dto.applications,
+        plan.entitlements
       );
 
       // Automatically generate first invoice for this subscription if plan price > 0 or status is ACTIVE
@@ -131,7 +132,7 @@ export class SubscriptionsService {
       // leaving the operator to remember to flip six switches by hand. A
       // restaurant-specific deviceQuota/config override on an existing row
       // is untouched either way (see ensureRowsForSubscription).
-      await this.appEntitlements.ensureRowsForSubscription(tx, existing.restaurantId, id, newPlan.productFamily, newPlan.tier);
+      await this.appEntitlements.ensureRowsForSubscription(tx, existing.restaurantId, id, newPlan.productFamily, newPlan.tier, undefined, newPlan.entitlements);
 
       await this.audit.log(
         {
