@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Category, MenuItem, ComboDeal } from '@jamanvaar/types';
 import { db, MenuRepository, ComboRepository, AuditRepository, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
 import { MenuBuilderService } from '@jamanvaar/business';
@@ -117,6 +117,16 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
     }
   };
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('ALL');
+  // The category strip scrolls sideways; whichever category is selected is brought into view (and centred) on its own.
+  const categoryStripRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const strip = categoryStripRef.current;
+    if (!strip) return;
+    const pill = strip.querySelector<HTMLElement>(`[data-cat-pill="${selectedCategoryFilter}"]`);
+    if (!pill) return;
+    const target = pill.offsetLeft - (strip.clientWidth - pill.offsetWidth) / 2;
+    strip.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+  }, [selectedCategoryFilter, categories.length]);
   const [dietaryFilter, setDietaryFilter] = useState<string>('ALL');
 
   // Combos & Meal Deals — the data layer (ComboRepository) already existed
@@ -336,8 +346,9 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
         </div>
 
         {/* Category Filter Strip */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-1 border-t border-slate-100">
+        <div ref={categoryStripRef} className="relative flex items-center gap-1.5 overflow-x-auto pt-1 pb-1 border-t border-slate-100" style={{ scrollBehavior: 'smooth' }}>
           <button
+            data-cat-pill="ALL"
             onClick={() => setSelectedCategoryFilter('ALL')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               selectedCategoryFilter === 'ALL'
@@ -349,7 +360,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
           </button>
 
           {[...categories].sort((a, b) => a.sortOrder - b.sortOrder).map((c: Category) => (
-            <div key={c.id} className="relative group shrink-0">
+            <div key={c.id} data-cat-pill={c.id} className="relative group shrink-0">
               <button
                 onClick={() => setSelectedCategoryFilter(c.id)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
@@ -365,16 +376,24 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                   {menuItems.filter(m => m.categoryId === c.id).length}
                 </span>
               </button>
-              {selectedCategoryFilter === c.id && (
-                <span className="absolute -top-2 right-0 flex gap-0.5 bg-white border border-jaman-border rounded-lg shadow-xs px-0.5">
-                  <button type="button" aria-label={`Move ${c.name} earlier`} onClick={() => { if (MenuRepository.moveCategory(c.id, -1)) onCategoriesChanged?.(); }} className="text-[10px] px-1 font-black text-slate-600">◀</button>
-                  <button type="button" aria-label={`Move ${c.name} later`} onClick={() => { if (MenuRepository.moveCategory(c.id, 1)) onCategoriesChanged?.(); }} className="text-[10px] px-1 font-black text-slate-600">▶</button>
-                  <button type="button" aria-label={`Edit ${c.name}`} onClick={() => onOpenCategoryModal(c)} className="text-[10px] px-1 font-black text-jaman-saffron">Edit</button>
-                </span>
-              )}
             </div>
           ))}
         </div>
+        {selectedCategoryFilter !== 'ALL' && categories.some((c: Category) => c.id === selectedCategoryFilter) && (
+          <div className="flex items-center justify-between pt-1 text-xs text-slate-500">
+            <span>
+              Showing {filteredMenuItems.length} dish{filteredMenuItems.length === 1 ? '' : 'es'} in{' '}
+              <strong className="text-jaman-navy">{categories.find((c: Category) => c.id === selectedCategoryFilter)?.name}</strong>
+            </span>
+            <button
+              type="button"
+              onClick={() => onOpenCategoryModal(categories.find((c: Category) => c.id === selectedCategoryFilter))}
+              className="font-bold text-jaman-saffron hover:underline cursor-pointer"
+            >
+              Edit this category
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Dishes Grid or Empty State */}
