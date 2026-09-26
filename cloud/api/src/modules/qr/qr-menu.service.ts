@@ -38,6 +38,8 @@ export interface QrMenu {
 export interface BuiltQrMenu extends QrMenu {
   /** Server-side pricing table (paise, tax basis points). Never sent to the customer. */
   lookup: Map<string, MenuSnapshotItemLookup>;
+  /** Kitchen station of each dish, so the order splits into the right tickets on every device. Never sent to the customer. */
+  stations: Map<string, string>;
 }
 
 type Payload = Record<string, unknown>;
@@ -100,6 +102,7 @@ export class QrMenuService {
 
     const items: QrMenuItem[] = [];
     const lookup = new Map<string, MenuSnapshotItemLookup>();
+    const stations = new Map<string, string>();
     const usedGroups = new Set<string>();
     for (const p of payloads('MENU_ITEM')) {
       const id = str(p.id);
@@ -133,6 +136,7 @@ export class QrMenuService {
         dietaryType: str(p.dietaryType),
         modifierGroupIds: groups.map((g) => g.id)
       });
+      if (str(p.kitchenStation)) stations.set(id, String(p.kitchenStation));
       lookup.set(id, { externalItemId: id, name: String(p.name ?? ''), basePrice: Math.round(price * 100), taxRate: tax.rateBp, taxInclusive: tax.inclusive, isAvailable: true, modifierGroups: groups });
     }
 
@@ -145,6 +149,6 @@ export class QrMenuService {
     const shownCategories = categories.filter((c) => usedCategoryIds.has(c.id));
     const body = { menuVersion: version, categories: shownCategories, items, modifierGroups };
     const etag = createHash('sha1').update(JSON.stringify(body)).digest('hex').slice(0, 16);
-    return { ...body, etag, ready: items.length > 0, lookup };
+    return { ...body, etag, ready: items.length > 0, lookup, stations };
   }
 }

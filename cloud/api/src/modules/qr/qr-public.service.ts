@@ -136,7 +136,7 @@ export class QrPublicService {
     const menu = await this.menus.build(ctx.restaurant.id, ctx.branch.id);
     if (!menu.ready) throw new QrUnavailableException('MENU_NOT_PUBLISHED');
     await this.track(ctx, QR_EVENT.MENU_VIEWED, sessionId);
-    const { lookup: _serverOnly, ...publicMenu } = menu;
+    const { lookup: _serverOnly, stations: _stations, ...publicMenu } = menu;
     return publicMenu;
   }
 
@@ -229,6 +229,7 @@ export class QrPublicService {
         unitPrice: line.unitPrice,
         modifiers: line.modifiers.map((m) => m.name),
         kitchenStatus: 'PENDING',
+        ...(menu.stations.get(line.externalItemId) ? { kitchenStation: menu.stations.get(line.externalItemId) } : {}),
         lineTotal: line.lineTotal,
         ...(dto.items.find((i) => i.itemId === line.externalItemId)?.note ? { specialInstructions: dto.items.find((i) => i.itemId === line.externalItemId)!.note } : {})
       })),
@@ -252,7 +253,8 @@ export class QrPublicService {
           VALUES (${ctx.restaurant.id}, ${ctx.branch.id}, 'QR', ${businessDate}, 2)
           ON CONFLICT ("restaurantId", "scope", "kind", "businessDate") DO UPDATE SET "next" = "NumberSequence"."next" + 1
           RETURNING "next"`;
-        return { tokenNumber: `QR-${Number(rows[0].next) - 1}` };
+        const number = `QR-${Number(rows[0].next) - 1}`;
+        return { tokenNumber: number, orderNumber: number };
       },
       meta: {
         sourceType: 'QR_TABLE',

@@ -1,4 +1,4 @@
-import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync, FeedbackSync, ShiftSync, CashMovementSync, type CollectionSync } from '@jamanvaar/database';
+import { MenuItemSync, CategorySync, ModifierGroupSync, TaxGroupSync, ComboSync, CouponSync, CustomerSync, FeedbackSync, ShiftSync, CashMovementSync, type CollectionSync } from '@jamanvaar/database';
 import { EntitySyncEngine } from './entity_sync';
 
 /** The server accepts at most this many records per push. */
@@ -36,6 +36,9 @@ export async function syncCollection<T extends { updatedAt?: string }>(entityTyp
 }
 
 async function runTick(push: boolean): Promise<void> {
+  // Tax and modifier groups first: a dish is only orderable by a guest once the groups it names are published too.
+  await syncCollection('TAX_GROUP', TaxGroupSync, push);
+  await syncCollection('MODIFIER_GROUP', ModifierGroupSync, push);
   await syncCollection('MENU_CATEGORY', CategorySync, push);
   await syncCollection('MENU_ITEM', MenuItemSync, push);
 }
@@ -68,7 +71,7 @@ export function syncFeedback(opts: { push: boolean }): Promise<void> {
 
 /** How many menu, category, combo and coupon changes have not reached the cloud yet (0 = everything is delivered). */
 export function pendingCatalogChanges(): number {
-  return MenuItemSync.collectSyncRecords().length + CategorySync.collectSyncRecords().length + ComboSync.collectSyncRecords().length + CouponSync.collectSyncRecords().length;
+  return MenuItemSync.collectSyncRecords().length + CategorySync.collectSyncRecords().length + ModifierGroupSync.collectSyncRecords().length + TaxGroupSync.collectSyncRecords().length + ComboSync.collectSyncRecords().length + CouponSync.collectSyncRecords().length;
 }
 
 /**

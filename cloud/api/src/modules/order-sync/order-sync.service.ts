@@ -210,6 +210,8 @@ export class OrderSyncService {
             existing || evt.meta || merge.foreignItemsKept
               ? { ...priorMeta, ...incomingMeta, ...(merge.foreignItemsKept ? { needsTotalsReview: true } : {}) }
               : undefined;
+          // Accepting an order is a claim: the first device to record it owns it, and a later claim cannot take it over.
+          if (mergedMeta && typeof priorMeta.acceptedBy === 'string') mergedMeta.acceptedBy = priorMeta.acceptedBy;
 
           const data = {
             restaurantId: device.restaurantId,

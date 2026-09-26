@@ -288,6 +288,8 @@ export class BranchCore {
     const prior = existing?.meta ?? {};
     const incoming = evt.meta ?? {};
     const meta = existing || evt.meta || merge.foreignItemsKept ? { ...prior, ...incoming, ...(merge.foreignItemsKept ? { needsTotalsReview: true } : {}) } : null;
+    // Accepting an order is a claim: the first device to record it owns it.
+    if (meta && typeof (prior as { acceptedBy?: unknown }).acceptedBy === 'string') (meta as Record<string, unknown>).acceptedBy = (prior as { acceptedBy: string }).acceptedBy;
 
     const next = {
       orderType: evt.orderType, status: evt.status, tableId: evt.tableId ?? existing?.tableId ?? null, tableLabel: evt.tableLabel ?? existing?.tableLabel ?? null,

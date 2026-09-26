@@ -1,5 +1,5 @@
 import { KeyValueStore } from './key_value_store';
-import type { CashMovement, Category, ComboDeal, Coupon, CustomerAccount, CustomerFeedback, MenuItem, ShiftRecord } from '@jamanvaar/types';
+import type { CashMovement, Category, ComboDeal, Coupon, CustomerAccount, CustomerFeedback, MenuItem, ModifierGroup, ShiftRecord, TaxGroup } from '@jamanvaar/types';
 import { db } from './db';
 
 /**
@@ -213,6 +213,23 @@ export class CollectionSync<T extends Syncable> {
 export const MenuItemSync = new CollectionSync<MenuItem>(
   'jamanvaar_menu_item_sync_v1',
   () => db.menuItems,
+  (r) => typeof r.name === 'string' && r.name.length > 0
+);
+
+/**
+ * A dish's modifier groups and its tax group are part of its price, so they travel with the menu. The guest ordering
+ * page prices from the restaurant's OWN groups and rates (never a platform-wide list), which means the restaurant has to
+ * publish them next to its dishes.
+ */
+export const ModifierGroupSync = new CollectionSync<ModifierGroup & { updatedAt?: string }>(
+  'jamanvaar_modifier_group_sync_v1',
+  () => db.modifierGroups as Array<ModifierGroup & { updatedAt?: string }>,
+  (r) => typeof r.name === 'string' && r.name.length > 0 && Array.isArray(r.options)
+);
+
+export const TaxGroupSync = new CollectionSync<TaxGroup & { updatedAt?: string }>(
+  'jamanvaar_tax_group_sync_v1',
+  () => db.taxGroups as Array<TaxGroup & { updatedAt?: string }>,
   (r) => typeof r.name === 'string' && r.name.length > 0
 );
 

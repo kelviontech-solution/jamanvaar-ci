@@ -32,6 +32,7 @@ export const orderSyncMetaSchema = z
     guestCount: z.number().int().min(0).max(1000).optional(),
     createdAt: z.string().optional(),
     sourceType: z.string().max(32).optional(),
+    acceptedBy: z.string().max(64).optional(),
     businessDayId: z.string().max(64).optional(),
     paymentTransactionId: z.string().max(128).optional(),
     tenderedAmountPaise: z.number().int().optional(),

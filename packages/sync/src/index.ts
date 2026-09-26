@@ -19,3 +19,4 @@ export * from './realtime_client';
 export * from './endpoint_resolver';
 export * from './command_signing';
 export * from './diagnostics';
+export * from './qr_order_desk';

@@ -37,6 +37,7 @@ export interface OrderSyncMeta {
   guestCount?: number;
   createdAt?: string;
   sourceType?: string;
+  acceptedBy?: string;
   businessDayId?: string;
   paymentTransactionId?: string;
   tenderedAmountPaise?: number;
@@ -185,6 +186,7 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
       guestCount: order.guestCount,
       createdAt: order.createdAt,
       sourceType: order.source_type,
+      acceptedBy: order.acceptedByDeviceId,
       businessDayId: order.businessDayId,
       paymentTransactionId: order.paymentTransactionId,
       tenderedAmountPaise: order.tenderedAmount !== undefined ? toPaise(order.tenderedAmount) : undefined,
@@ -219,8 +221,10 @@ function orderItemFromRemote(orderId: string, ri: OrderSyncPushItem): OrderItem 
     })) as OrderItem['modifiers'],
     specialInstructions: ri.specialInstructions,
     totalPrice: fromPaise(ri.lineTotal),
-    kitchenStatus: (ri.kitchenStatus as OrderItem['kitchenStatus']) || 'PENDING'
-  };
+    kitchenStatus: (ri.kitchenStatus as OrderItem['kitchenStatus']) || 'PENDING',
+    // The station travels with the item, so a pulled order splits into the same tickets on every device.
+    ...(ri.kitchenStation ? { kitchenStation: ri.kitchenStation } : {})
+  } as OrderItem;
 }
 
 function applyPaymentAndTotals(local: Order, remote: CloudSyncedOrder): void {
@@ -251,6 +255,7 @@ function applyPaymentAndTotals(local: Order, remote: CloudSyncedOrder): void {
 /** Merges a remote copy into an order this device already has locally. Returns true if items were added. */
 function applyRemoteToLocalOrder(local: Order, remote: CloudSyncedOrder): boolean {
   applyPaymentAndTotals(local, remote);
+  if (remote.meta?.acceptedBy) local.acceptedByDeviceId = remote.meta.acceptedBy;
   let addedItems = false;
   remote.items.forEach((ri) => {
     const li = local.items.find((i) => i.id === ri.externalItemId);
@@ -319,6 +324,7 @@ function buildLocalOrderFromRemote(remote: CloudSyncedOrder): Order {
     createdAt: m.createdAt || nowIso,
     updatedAt: nowIso,
     source_type: ((m.sourceType as Order['source_type']) || 'OTHER'),
+    acceptedByDeviceId: m.acceptedBy,
     customerNotes: remote.notes || undefined,
     syncStatus: 'SYNCED',
     isSynced: true
@@ -333,6 +339,18 @@ function buildLocalOrderFromRemote(remote: CloudSyncedOrder): Order {
  * or extra quantity added after the first KOT) produces a ticket for just the
  * new part. Orders that are already finished never get prep tickets.
  */
+/** Which round of tickets this is for the order (1 for the first, 2 for the first add-on round, ...), read from the tickets already made. */
+function qrKotIdentity(order: Order): { idBase: string; numberBase: string } {
+  const rounds = db.kots
+    .filter((k) => k.orderId === order.id)
+    .map((k) => /-r(\d+)(?:-|$)/.exec(k.id)?.[1])
+    .filter((n): n is string => !!n)
+    .map(Number);
+  const round = (rounds.length ? Math.max(...rounds) : 0) + 1;
+  const label = String(order.tokenNumber || order.orderNumber || order.id).replace(/[^A-Za-z0-9-]/g, '');
+  return { idBase: `kot-${order.id}-r${round}`, numberBase: round === 1 ? `KOT-${label}` : `KOT-${label}-R${round}` };
+}
+
 function ensureKotsForOrder(order: Order): void {
   if (['COMPLETED', 'CANCELLED', 'REFUNDED'].includes(order.orderStatus)) return;
 
@@ -351,7 +369,11 @@ function ensureKotsForOrder(order: Order): void {
     .filter((x) => x.qty > 0);
   if (missing.length === 0) return;
 
+  // A QR order's kitchen ticket is derived from the order itself, never from this device's clock or counters, so every
+  // POS, Kiosk and KDS that pulls the order builds the SAME ticket (same id, same number) and none can collide.
+  const qr = order.source_type === 'QR_TABLE' ? qrKotIdentity(order) : undefined;
   KOTRepository.generateKOT({
+    ...(qr ?? {}),
     orderId: order.id,
     orderNumber: order.orderNumber,
     tokenNumber: order.tokenNumber,
@@ -570,6 +592,9 @@ export class SyncOutboxEngine {
       for (const remote of orders) {
         const existing = db.orders.find((o) => o.id === remote.externalOrderId);
         if (existing) {
+          // Who accepted an order is a claim decided by the server (first accept wins), not by timestamps: adopt it
+          // even when this device's own copy is newer.
+          if (remote.meta?.acceptedBy && existing.acceptedByDeviceId !== remote.meta.acceptedBy) existing.acceptedByDeviceId = remote.meta.acceptedBy;
           if (new Date(remote.updatedAt).getTime() >= new Date(existing.updatedAt).getTime()) {
             const added = applyRemoteToLocalOrder(existing, remote);
             if (added || remote.status === 'PREPARING' || remote.status === 'NEW') ensureKotsForOrder(existing);

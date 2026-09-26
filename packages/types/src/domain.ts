@@ -282,6 +282,10 @@ export interface MenuItem {
   kitchenStation?: string;
   isDigitalMenuVisible?: boolean;
   isQrOrderingEnabled?: boolean;
+  /** Where this dish may be sold. When present it must include the channel; when absent the per-channel switches above apply. */
+  salesChannels?: Array<'POS' | 'KIOSK' | 'QR' | 'CAPTAIN'>;
+  /** Restrict the dish to these branches (empty or absent: every branch). */
+  branchIds?: string[];
   isKioskEnabled?: boolean;
   imagePrompt?: string;
   imageSource?: string;
@@ -583,6 +587,8 @@ export interface Order {
   updatedAt: string;
   pickupCounter?: string;
   source_type?: 'KIOSK' | 'POS' | 'CAPTAIN' | 'QR_TABLE' | 'ONLINE' | 'OTHER';
+  /** The device that accepted this order (QR orders wait for exactly one POS to accept them). First accept wins, everywhere. */
+  acceptedByDeviceId?: string;
   customerNotes?: string;
   kitchenRouting?: {
     stationBreakdown: Record<string, number>;

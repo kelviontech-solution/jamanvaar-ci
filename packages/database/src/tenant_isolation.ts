@@ -19,7 +19,7 @@ const CURSOR_KEYS = [
   'jamanvaar_inventory_ledger_cursor:core',
   'jamanvaar_menu_applied_version'
 ];
-const ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK', 'SHIFT', 'CASH_MOVEMENT'];
+const ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK', 'SHIFT', 'CASH_MOVEMENT'];
 
 export interface TenantEntry {
   /** True when data from another restaurant (or of unknown ownership) was removed. */

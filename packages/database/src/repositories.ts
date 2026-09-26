@@ -2427,6 +2427,9 @@ export class KOTRepository {
     cashierName: string;
     serverName?: string;
     orderNotes?: string;
+    /** When set, ticket ids and numbers derive from these instead of the clock and local counters (see qrKotIdentity). */
+    idBase?: string;
+    numberBase?: string;
   }): KOTRecord[] {
     return db.transaction(() => this.generateKOTInner(params));
   }
@@ -2443,6 +2446,9 @@ export class KOTRepository {
     cashierName: string;
     serverName?: string;
     orderNotes?: string;
+    /** When set, ticket ids and numbers derive from these instead of the clock and local counters (see qrKotIdentity). */
+    idBase?: string;
+    numberBase?: string;
   }): KOTRecord[] {
     const existingKots = this.getKOTsForOrder(params.orderId);
     const isFirst = existingKots.length === 0;
@@ -2464,10 +2470,16 @@ export class KOTRepository {
 
     let nextKotSeq = highestKotNum + 1;
 
+    const stationNames = Object.keys(stationMap).sort();
     Object.entries(stationMap).forEach(([stationName, stationItems]) => {
+      const stationSlug = stationName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const fixedId = params.idBase ? (stationNames.length > 1 ? `${params.idBase}-${stationSlug}` : params.idBase) : undefined;
+      // Deterministic tickets are idempotent: a device that already has this exact ticket does not make another.
+      if (fixedId && db.kots.some((k) => k.id === fixedId)) return;
       const kotRecord: KOTRecord = {
-        id: `kot-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+        id: fixedId ?? `kot-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
         kotNumber: (() => {
+          if (params.numberBase) return stationNames.length > 1 ? `${params.numberBase}-${stationNames.indexOf(stationName) + 1}` : params.numberBase;
           const allocated = NumberAllocator.next('KOT');
           if (allocated) return allocated;
           return `KOT-${String(nextKotSeq).padStart(2, '0')}`;

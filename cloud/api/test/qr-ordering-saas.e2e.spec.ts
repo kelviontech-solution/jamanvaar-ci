@@ -568,6 +568,21 @@ describe('QR ordering (SaaS)', () => {
         expect(row?.source).toBe('QR'); // a device update never changes the channel
       });
 
+      it('accepting a QR order is a claim: the first POS to record it owns it, a later claim cannot take it, and the ticket knows its kitchen station', async () => {
+        await push(F.A.console, 'MENU_ITEM', 'bar-a', { categoryId: 'cat-a', name: 'Mojito a', price: 90, isAvailable: true, taxGroupId: 'tax-a', modifierGroupIds: [], kitchenStation: 'Bar' });
+        const placed = await http().post(`/api/v1/public/qr/${tokenA12}/orders`).send(orderBody([{ itemId: 'bar-a', quantity: 1 }]));
+        const pull = await as('get', '/api/v1/orders/sync?afterSeq=0', F.A.pos1);
+        const order = pull.body.orders.find((o: any) => o.publicOrderId === placed.body.publicOrderId);
+        expect(order.items[0].kitchenStation).toBe('Bar');
+        expect(order.meta).toMatchObject({ sourceType: 'QR_TABLE', orderNumber: placed.body.orderNumber, tokenNumber: placed.body.orderNumber });
+        const claim = (token: string, by: string) =>
+          as('post', '/api/v1/orders/sync', token).send({ events: [{ externalOrderId: order.externalOrderId, orderType: 'DINE_IN', status: 'PREPARING', items: order.items, subtotal: order.subtotal, taxAmount: order.taxAmount, totalAmount: order.totalAmount, meta: { acceptedBy: by }, updatedAt: now() }] });
+        expect((await claim(F.A.pos1, 'pos-first')).status).toBe(201);
+        expect((await claim(F.A.pos1b, 'pos-second')).status).toBe(201);
+        const after = (await as('get', '/api/v1/orders/sync?afterSeq=0', F.A.pos1)).body.orders.find((o: any) => o.publicOrderId === placed.body.publicOrderId);
+        expect(after.meta.acceptedBy).toBe('pos-first');
+      });
+
       it('an order status link reveals nothing about any other order, and an unknown reference is a plain 404', async () => {
         expect((await http().get('/api/v1/public/qr/orders/JQ-AAAAAAAA')).status).toBe(404);
         expect((await http().get('/api/v1/public/qr/orders/1')).status).toBe(404);
