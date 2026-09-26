@@ -6,6 +6,8 @@ import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
 import { CurrentDevice } from '../../common/decorators/current-device.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { QrRateLimitInterceptor } from './qr-rate-limit';
+import { QrSessions } from './qr-session';
+import { QrBusyException } from './qr-resilience';
 import { QrAdminService, generateQrSchema, GenerateQr } from './qr-admin.service';
 import { QrPublicService, placeQrOrderSchema, PlaceQrOrder, quoteQrOrderSchema, QuoteQrOrder } from './qr-public.service';
 import { qrSettingsSchema, QrSettingsUpdate } from './qr-settings.service';
@@ -19,7 +21,14 @@ import { qrSettingsSchema, QrSettingsUpdate } from './qr-settings.service';
 @UseInterceptors(QrRateLimitInterceptor)
 @Controller('api/v1/public/qr')
 export class QrPublicController {
-  constructor(private readonly qr: QrPublicService) {}
+  constructor(private readonly qr: QrPublicService, private readonly sessions: QrSessions) {}
+
+  /** A signed customer session for this browser. Called once; the guest page keeps it and sends it back. */
+  @Post('session')
+  @HttpCode(200)
+  session() {
+    return { session: this.sessions.issue() };
+  }
 
   // Declared before ':token' routes so "orders" is never read as a token.
   @Get('orders/:publicOrderId')
@@ -28,13 +37,13 @@ export class QrPublicController {
   }
 
   @Get(':token')
-  describe(@Param('token') token: string, @Headers('x-qr-session') session?: string) {
-    return this.qr.describe(token, session);
+  describe(@Param('token') token: string, @Req() req: Request & { qrSession?: string }) {
+    return this.qr.describe(token, req.qrSession);
   }
 
   @Get(':token/menu')
-  async menu(@Param('token') token: string, @Headers('x-qr-session') session: string | undefined, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const menu = await this.qr.menu(token, session);
+  async menu(@Param('token') token: string, @Req() req: Request & { qrSession?: string }, @Res({ passthrough: true }) res: Response) {
+    const menu = await this.qr.menu(token, req.qrSession);
     res.setHeader('ETag', `"${menu.etag}"`);
     res.setHeader('Cache-Control', 'private, max-age=0, must-revalidate');
     if (req.headers['if-none-match'] === `"${menu.etag}"`) {
@@ -53,8 +62,13 @@ export class QrPublicController {
 
   @Post(':token/orders')
   @UsePipes(new ZodValidationPipe(placeQrOrderSchema))
-  place(@Param('token') token: string, @Body() body: PlaceQrOrder, @Headers('x-qr-session') session?: string) {
-    return this.qr.placeOrder(token, body, session);
+  async place(@Param('token') token: string, @Body() body: PlaceQrOrder, @Req() req: Request & { qrSession?: string }, @Res({ passthrough: true }) res: Response) {
+    try {
+      return await this.qr.placeOrder(token, body, req.qrSession);
+    } catch (e) {
+      if (e instanceof QrBusyException) res.setHeader('Retry-After', String(e.retryAfterSeconds));
+      throw e;
+    }
   }
 }
 

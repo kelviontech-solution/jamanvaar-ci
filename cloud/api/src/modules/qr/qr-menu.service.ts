@@ -59,8 +59,25 @@ export interface BuiltQrMenu extends QrMenu {
 export class QrMenuService {
   constructor(private readonly publications: MenuPublicationsService) {}
 
-  async build(restaurantId: string, branchId: string | null): Promise<BuiltQrMenu> {
-    const snap = await this.publications.currentSnapshot(restaurantId);
+  /** menu:{restaurantId}:{branchId}:{version}. A published version is immutable, so an entry is never stale; the key holds the tenant. */
+  private readonly built = new Map<string, BuiltQrMenu>();
+
+  /** The menu of the newest published version, or of `version` when a guest's older page is being checked. */
+  async build(restaurantId: string, branchId: string | null, version?: number): Promise<BuiltQrMenu> {
+    const latest = version ?? (await this.publications.latestVersion(restaurantId)) ?? 0;
+    const key = `menu:${restaurantId}:${branchId ?? ''}:${latest}`;
+    const hit = latest > 0 ? this.built.get(key) : undefined;
+    if (hit) return hit;
+    const menu = await this.compute(restaurantId, branchId, version);
+    if (menu.menuVersion > 0) {
+      this.built.set(`menu:${restaurantId}:${branchId ?? ''}:${menu.menuVersion}`, menu);
+      if (this.built.size > 500) this.built.delete(this.built.keys().next().value as string);
+    }
+    return menu;
+  }
+
+  private async compute(restaurantId: string, branchId: string | null, version?: number): Promise<BuiltQrMenu> {
+    const snap = version ? await this.publications.snapshotAt(restaurantId, version) : await this.publications.currentSnapshot(restaurantId);
     if (!snap) return { menuVersion: 0, etag: 'empty', ready: false, categories: [], items: [], modifierGroups: [], lookup: new Map(), stations: new Map() };
 
     const view = viewForBranch(snap.content, branchId);

@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { assessRlsRole } from './rls-role';
+import { transactionOptions, withPoolParams } from './pool-config';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -25,6 +26,12 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
+  private readonly txOptions = transactionOptions(process.env);
+
+  constructor() {
+    const url = withPoolParams(process.env.DATABASE_URL, process.env);
+    super(url && url !== process.env.DATABASE_URL ? { datasources: { db: { url } } } : undefined);
+  }
 
   async onModuleInit() {
     await this.$connect();
@@ -122,7 +129,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     return this.$transaction(async (tx) => {
       await tx.$executeRawUnsafe(`SET LOCAL app.is_platform_context = 'true'`);
       return fn(tx);
-    });
+    }, this.txOptions);
   }
 
   /** Runs `fn` scoped to exactly one restaurant's RLS context. */
@@ -136,6 +143,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     return this.$transaction(async (tx) => {
       await tx.$executeRawUnsafe(`SET LOCAL app.current_restaurant_id = '${restaurantId}'`);
       return fn(tx);
-    });
+    }, this.txOptions);
   }
 }

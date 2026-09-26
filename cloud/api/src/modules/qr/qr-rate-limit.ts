@@ -1,6 +1,10 @@
-import { CallHandler, ExecutionContext, HttpException, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, HttpException, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Prisma } from '@prisma/client';
+import { createHash } from 'node:crypto';
+import { Observable, catchError, from, mergeMap, throwError } from 'rxjs';
+import { PrismaService } from '../../prisma/prisma.service';
+import { QrSessions } from './qr-session';
 
 export interface QrRateLimits {
   /** Every public QR request from one address. Deliberately generous: one restaurant's guests share one Wi-Fi address. */
@@ -18,10 +22,10 @@ export interface QrRateLimits {
 }
 
 const DEFAULTS: QrRateLimits = {
-  ipRequestsPerMinute: 600,
+  ipRequestsPerMinute: 1200,
   ipFailedLookupsPerMinute: 30,
-  tokenRequestsPerMinute: 300,
-  tokenOrdersPerMinute: 12,
+  tokenRequestsPerMinute: 600,
+  tokenOrdersPerMinute: 60,
   sessionOrdersPerMinute: 6,
   orderStatusPerMinute: 120
 };
@@ -31,16 +35,19 @@ const WINDOW_MS = 60_000;
 /**
  * Abuse protection for the public QR endpoints. Limits are per address, per code, per session and per order (never
  * one blunt per-address number, which would either block a whole restaurant behind one router or let a script guess
- * tokens). Counters live in this process; running several API instances needs a shared store (the same note as the
- * realtime bus), and until then each instance limits on its own, which is still a real ceiling.
+ * tokens). Counters live in PostgreSQL (table RateCounter, one atomic upsert per request for all keys), so every API
+ * instance shares the same ceilings and a restart forgets nothing. Windows are fixed one-minute buckets; a bucket
+ * boundary can let through at most twice a limit for a moment, which is accepted for the simplicity and speed.
+ * If the counter store itself is unreachable the request is let through (the request needs the database anyway).
  */
 @Injectable()
 export class QrRateLimiter {
+  private readonly log = new Logger('QrRateLimiter');
   private limits: QrRateLimits;
-  private hits = new Map<string, number[]>();
-  private sweptAt = Date.now();
+  private epoch = '';
+  private sweptAt = 0;
 
-  constructor(config: ConfigService) {
+  constructor(config: ConfigService, private readonly prisma: PrismaService) {
     const n = (key: string, fallback: number) => {
       const v = Number(config.get<string>(key));
       return Number.isFinite(v) && v > 0 ? v : fallback;
@@ -55,76 +62,98 @@ export class QrRateLimiter {
     };
   }
 
-  configure(overrides: Partial<QrRateLimits>): void {
+  /**
+   * Changes limits (tests, operators) and starts every counter from zero: old counters are ignored, not deleted.
+   * Instances configured with the same `epoch` keep sharing counters.
+   */
+  configure(overrides: Partial<QrRateLimits>, epoch?: string): void {
     this.limits = { ...this.limits, ...overrides };
-    this.hits.clear();
+    this.epoch = epoch ?? Math.random().toString(36).slice(2, 8);
   }
 
-  private count(key: string, now: number): number {
-    const list = (this.hits.get(key) ?? []).filter((t) => now - t < WINDOW_MS);
-    this.hits.set(key, list);
-    return list.length;
+  private key(k: string): string {
+    return createHash('sha256').update(this.epoch + k).digest('base64url').slice(0, 22);
   }
 
-  private add(key: string, now: number): void {
-    const list = this.hits.get(key) ?? [];
-    list.push(now);
-    this.hits.set(key, list);
+  /** Adds `inc` to each counter for the current window in one round trip and returns the new counts, in order. */
+  private async bump(entries: Array<{ key: string; inc: number }>): Promise<number[]> {
+    const window = Math.floor(Date.now() / WINDOW_MS);
+    const rows = entries.map((e) => Prisma.sql`(${this.key(e.key)}, ${window}::bigint, ${e.inc}::int)`);
+    const res = await this.prisma.$queryRaw<Array<{ key: string; count: number }>>(Prisma.sql`
+      INSERT INTO "RateCounter" AS c ("key", "windowStart", "count") VALUES ${Prisma.join(rows)}
+      ON CONFLICT ("key", "windowStart") DO UPDATE SET "count" = c."count" + EXCLUDED."count"
+      RETURNING "key", "count"`);
+    const byKey = new Map(res.map((r) => [r.key, r.count]));
+    return entries.map((e) => byKey.get(this.key(e.key)) ?? 0);
   }
 
-  private sweep(now: number): void {
-    if (now - this.sweptAt < WINDOW_MS) return;
+  private sweep(): void {
+    const now = Date.now();
+    if (now - this.sweptAt < 5 * WINDOW_MS) return;
     this.sweptAt = now;
-    for (const [k, list] of this.hits) if (list.every((t) => now - t >= WINDOW_MS)) this.hits.delete(k);
+    const cutoff = Math.floor(now / WINDOW_MS) - 5;
+    void this.prisma.$executeRaw`DELETE FROM "RateCounter" WHERE "windowStart" < ${cutoff}::bigint`.catch(() => undefined);
+  }
+
+  private tooMany(): never {
+    throw new HttpException({ statusCode: 429, code: 'RATE_LIMITED', message: 'Too many requests. Please wait a moment and try again.' }, 429);
   }
 
   /** Throws 429 if any limit for this request is exhausted; otherwise counts the request. */
-  admit(req: { ip: string; token?: string; publicOrderId?: string; session?: string; isOrder: boolean }): void {
-    const now = Date.now();
-    this.sweep(now);
-    const over = (key: string, max: number) => {
-      if (this.count(key, now) >= max) throw new HttpException({ statusCode: 429, code: 'RATE_LIMITED', message: 'Too many requests. Please wait a moment and try again.' }, 429);
-    };
-    over(`ip-failed:${req.ip}`, this.limits.ipFailedLookupsPerMinute);
-    over(`ip:${req.ip}`, this.limits.ipRequestsPerMinute);
-    if (req.token) over(`tok:${req.token}`, this.limits.tokenRequestsPerMinute);
-    if (req.token && req.isOrder) over(`tok-order:${req.token}`, this.limits.tokenOrdersPerMinute);
-    if (req.session && req.isOrder) over(`sess-order:${req.session}`, this.limits.sessionOrdersPerMinute);
-    if (req.publicOrderId) over(`ord:${req.publicOrderId}`, this.limits.orderStatusPerMinute);
-
-    this.add(`ip:${req.ip}`, now);
-    if (req.token) this.add(`tok:${req.token}`, now);
-    if (req.token && req.isOrder) this.add(`tok-order:${req.token}`, now);
-    if (req.session && req.isOrder) this.add(`sess-order:${req.session}`, now);
-    if (req.publicOrderId) this.add(`ord:${req.publicOrderId}`, now);
+  async admit(req: { ip: string; token?: string; publicOrderId?: string; session?: string; isOrder: boolean }): Promise<void> {
+    this.sweep();
+    const checks: Array<{ key: string; inc: number; max: number }> = [
+      { key: `ip-failed:${req.ip}`, inc: 0, max: this.limits.ipFailedLookupsPerMinute },
+      { key: `ip:${req.ip}`, inc: 1, max: this.limits.ipRequestsPerMinute }
+    ];
+    if (req.token) checks.push({ key: `tok:${req.token}`, inc: 1, max: this.limits.tokenRequestsPerMinute });
+    if (req.token && req.isOrder) checks.push({ key: `tok-order:${req.token}`, inc: 1, max: this.limits.tokenOrdersPerMinute });
+    if (req.session && req.isOrder) checks.push({ key: `sess-order:${req.session}`, inc: 1, max: this.limits.sessionOrdersPerMinute });
+    if (req.publicOrderId) checks.push({ key: `ord:${req.publicOrderId}`, inc: 1, max: this.limits.orderStatusPerMinute });
+    let counts: number[];
+    try {
+      counts = await this.bump(checks);
+    } catch (e) {
+      this.log.warn(`rate counter store unavailable, letting the request through: ${(e as Error).message}`);
+      return;
+    }
+    // The request that reaches a limit is the last one allowed; the next is refused. The failed-lookup counter is read only.
+    if (counts.some((c, i) => (checks[i].inc === 0 ? c >= checks[i].max : c > checks[i].max))) this.tooMany();
   }
 
-  recordFailedLookup(ip: string): void {
-    this.add(`ip-failed:${ip}`, Date.now());
+  async recordFailedLookup(ip: string): Promise<void> {
+    await this.bump([{ key: `ip-failed:${ip}`, inc: 1 }]).catch(() => undefined);
   }
 }
 
 @Injectable()
 export class QrRateLimitInterceptor implements NestInterceptor {
-  constructor(private readonly limiter: QrRateLimiter) {}
+  constructor(private readonly limiter: QrRateLimiter, private readonly sessions: QrSessions) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    const req = context.switchToHttp().getRequest<{ ip?: string; method: string; params?: Record<string, string>; query?: Record<string, string>; body?: { token?: string }; headers: Record<string, string | undefined> }>();
+    const req = context.switchToHttp().getRequest<{ ip?: string; method: string; params?: Record<string, string>; query?: Record<string, string>; body?: { token?: string }; qrSession?: string; headers: Record<string, string | undefined> }>();
     const ip = (req.ip ?? 'unknown').replace(/^::ffff:/, '');
     const token = req.params?.token ?? (typeof req.query?.token === 'string' ? req.query.token : typeof req.body?.token === 'string' ? req.body.token : undefined);
-    this.limiter.admit({
-      ip,
-      token,
-      publicOrderId: req.params?.publicOrderId,
-      session: typeof req.headers['x-qr-session'] === 'string' ? (req.headers['x-qr-session'] as string) : undefined,
-      isOrder: req.method === 'POST'
-    });
-    return next.handle().pipe(
-      catchError((err) => {
-        const code = err instanceof HttpException ? (err.getResponse() as { code?: string })?.code : undefined;
-        if (code === 'QR_NOT_FOUND' || code === 'INVALID_QR') this.limiter.recordFailedLookup(ip);
-        return throwError(() => err);
+    // Only a session this system issued counts; a made-up one is ignored, so it cannot be used to dodge or to spoil limits.
+    req.qrSession = this.sessions.verify(req.headers['x-qr-session']);
+    return from(
+      this.limiter.admit({
+        ip,
+        token,
+        publicOrderId: req.params?.publicOrderId,
+        session: req.qrSession,
+        isOrder: req.method === 'POST'
       })
+    ).pipe(
+      mergeMap(() =>
+        next.handle().pipe(
+          catchError((err) => {
+            const code = err instanceof HttpException ? (err.getResponse() as { code?: string })?.code : undefined;
+            if (code === 'QR_NOT_FOUND' || code === 'INVALID_QR') void this.limiter.recordFailedLookup(ip);
+            return throwError(() => err);
+          })
+        )
+      )
     );
   }
 }

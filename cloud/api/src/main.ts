@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
+import { redactUrl, requestIdFrom } from './common/request-context';
 import { json, raw, urlencoded } from 'express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
@@ -39,8 +40,12 @@ async function bootstrap() {
   const httpLogger = new Logger('HTTP');
   app.use((req: import('express').Request, res: import('express').Response, next: () => void) => {
     const start = Date.now();
+    // Every request gets an id, returned to the caller so a support conversation can quote it and logs can be followed.
+    const requestId = requestIdFrom(req.headers['x-request-id']);
+    (req as unknown as { requestId: string }).requestId = requestId;
+    res.setHeader('X-Request-Id', requestId);
     res.on('finish', () => {
-      httpLogger.log(`${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - start}ms`);
+      httpLogger.log(`${requestId} ${req.method} ${redactUrl(req.originalUrl)} ${res.statusCode} ${Date.now() - start}ms`);
     });
     next();
   });

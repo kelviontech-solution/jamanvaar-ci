@@ -76,26 +76,51 @@ export class MenuPublicationsService {
     return { ...created, warnings };
   }
 
+  /** Published versions never change, so a bounded in-process cache keyed by restaurant and version is always correct. */
+  private readonly snapshots = new Map<string, LatestSnapshot>();
+
+  private remember(restaurantId: string, snap: LatestSnapshot): LatestSnapshot {
+    const key = `${restaurantId}:${snap.version}`;
+    this.snapshots.delete(key);
+    this.snapshots.set(key, snap);
+    if (this.snapshots.size > 200) this.snapshots.delete(this.snapshots.keys().next().value as string);
+    return snap;
+  }
+
+  /** One cheap indexed read: the newest published version number, or 0. */
+  async latestVersion(restaurantId: string): Promise<number> {
+    const row = await this.prisma.runAsTenant(restaurantId, (tx) => tx.menuSnapshot.findFirst({ where: { restaurantId }, orderBy: { version: 'desc' }, select: { version: true } }));
+    return row?.version ?? 0;
+  }
+
+  /** A specific published version (for checking what a guest was looking at). Null when that version does not exist. */
+  async snapshotAt(restaurantId: string, version: number): Promise<LatestSnapshot | null> {
+    const hit = this.snapshots.get(`${restaurantId}:${version}`);
+    if (hit) return hit;
+    const row = await this.prisma.runAsTenant(restaurantId, (tx) => tx.menuSnapshot.findUnique({ where: { restaurantId_version: { restaurantId, version } } }));
+    return row ? this.remember(restaurantId, { version: row.version, checksum: row.checksum, content: row.content as unknown as SnapshotContent }) : null;
+  }
+
   /**
    * The snapshot customers read. A restaurant that has synced a menu but never pressed Publish gets its first snapshot made
    * automatically, so a new restaurant is not blank; after that, guests only ever see what was published.
    */
   async currentSnapshot(restaurantId: string): Promise<LatestSnapshot | null> {
-    const read = (tx: Prisma.TransactionClient) => tx.menuSnapshot.findFirst({ where: { restaurantId }, orderBy: { version: 'desc' } });
-    const row = await this.prisma.runAsTenant(restaurantId, read);
-    if (row) return { version: row.version, checksum: row.checksum, content: row.content as unknown as SnapshotContent };
-    const first = await this.prisma.runAsTenant(restaurantId, async (tx) => {
-      const existing = await read(tx);
-      if (existing) return existing;
-      if ((await this.draftRows(tx, restaurantId)).length === 0) return null;
-      try {
-        await this.publishTx(tx, restaurantId, null, 'Automatic first publication');
-      } catch (e) {
-        if (e instanceof UnprocessableEntityException) return null;
-        throw e;
-      }
-      return read(tx);
-    });
-    return first ? { version: first.version, checksum: first.checksum, content: first.content as unknown as SnapshotContent } : null;
+    let version = await this.latestVersion(restaurantId);
+    if (version === 0) {
+      version = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+        const existing = await tx.menuSnapshot.findFirst({ where: { restaurantId }, orderBy: { version: 'desc' }, select: { version: true } });
+        if (existing) return existing.version;
+        if ((await this.draftRows(tx, restaurantId)).length === 0) return 0;
+        try {
+          return (await this.publishTx(tx, restaurantId, null, 'Automatic first publication')).created.version;
+        } catch (e) {
+          if (e instanceof UnprocessableEntityException) return 0;
+          throw e;
+        }
+      });
+      if (version === 0) return null;
+    }
+    return this.snapshotAt(restaurantId, version);
   }
 }

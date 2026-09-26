@@ -11,6 +11,8 @@ import { QrAdminService } from './qr-admin.service';
 import { QrMenuService } from './qr-menu.service';
 import { QrPublicService } from './qr-public.service';
 import { QrSettingsService } from './qr-settings.service';
+import { QrSessions } from './qr-session';
+import { QrAdmission } from './qr-resilience';
 import { QrRateLimiter, QrRateLimitInterceptor } from './qr-rate-limit';
 
 /**
@@ -20,7 +22,7 @@ import { QrRateLimiter, QrRateLimitInterceptor } from './qr-rate-limit';
 @Module({
   imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule],
   controllers: [QrPublicController, QrRestaurantController, QrLegacyGuestController],
-  providers: [QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor],
-  exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService]
+  providers: [QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission],
+  exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService, QrAdmission]
 })
 export class QrModule {}

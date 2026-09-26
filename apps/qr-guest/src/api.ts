@@ -54,6 +54,7 @@ async function call<T>(path: string, init: RequestInit & { session?: string } = 
 }
 
 export const QrApi = {
+  session: async () => (await call<{ session: string }>('/session', { method: 'POST' })).data as { session: string },
   describe: async (token: string, session: string) => (await call<Describe>(`/${encodeURIComponent(token)}`, { session })).data as Describe,
   menu: async (token: string, session: string, etag?: string | null): Promise<{ menu: Menu | null; etag: string | null }> => {
     const r = await call<Menu>(`/${encodeURIComponent(token)}/menu`, { session, headers: etag ? { 'If-None-Match': etag } : {} });

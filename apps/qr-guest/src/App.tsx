@@ -18,13 +18,21 @@ function tokenFromPath(): string | null {
   return m ? m[1] : null;
 }
 
-const sessionId = (() => {
-  try {
-    let s = sessionStorage.getItem('jv_qr_session');
-    if (!s) { s = randomId(16); sessionStorage.setItem('jv_qr_session', s); }
-    return s;
-  } catch { return randomId(16); }
-})();
+// The session is issued and signed by the server (once per browser tab); a made-up one would simply be ignored.
+let sessionId = '';
+// The menu version this guest is looking at; sent with the order so a menu published meanwhile is never charged silently.
+let seenMenuVersion: number | undefined;
+async function ensureSession(): Promise<string> {
+  if (sessionId) return sessionId;
+  try { sessionId = sessionStorage.getItem('jv_qr_session2') ?? ''; } catch { /* storage unavailable */ }
+  if (!sessionId) {
+    try {
+      sessionId = (await QrApi.session()).session;
+      try { sessionStorage.setItem('jv_qr_session2', sessionId); } catch { /* storage unavailable */ }
+    } catch { sessionId = ''; }
+  }
+  return sessionId;
+}
 
 type Screen = 'MENU' | 'CART' | 'CHECKOUT' | 'STATUS';
 
@@ -56,8 +64,10 @@ function Ordering({ token }: { token: string }) {
   const load = useCallback(async () => {
     setProblem(null);
     try {
+      await ensureSession();
       const [d, m] = await Promise.all([QrApi.describe(token, sessionId), QrApi.menu(token, sessionId)]);
       setInfo(d);
+      seenMenuVersion = m.menu?.menuVersion ?? seenMenuVersion;
       etag.current = m.etag;
       setMenu(m.menu);
     } catch (e) {
@@ -85,7 +95,7 @@ function Ordering({ token }: { token: string }) {
   useEffect(() => {
     if (screen === 'STATUS') return;
     const t = setInterval(() => {
-      QrApi.menu(token, sessionId, etag.current).then((m) => { if (m.menu) { etag.current = m.etag; setMenu(m.menu); } }).catch(() => undefined);
+      QrApi.menu(token, sessionId, etag.current).then((m) => { if (m.menu) { etag.current = m.etag; seenMenuVersion = m.menu.menuVersion; setMenu(m.menu); } }).catch(() => undefined);
     }, 60000);
     return () => clearInterval(t);
   }, [token, screen]);
@@ -287,6 +297,7 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
         items: toOrderItems(attempt),
         paymentMethod: 'CASH_AT_COUNTER',
         idempotencyKey: attempt.attemptKey,
+        ...(seenMenuVersion !== undefined ? { menuVersion: seenMenuVersion } : {}),
         ...(name.trim() ? { customerName: name.trim() } : {}),
         ...(phone.trim() ? { customerPhone: phone.trim() } : {}),
         ...(notes.trim() && s.allowCustomerNotes ? { orderNotes: notes.trim() } : {}),
@@ -294,8 +305,15 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
       }, sessionId);
       onPlaced(placed);
     } catch (e) {
-      // The same attempt key is kept: pressing again after a timeout returns the original order instead of a second one.
-      setError((e as ApiError).message);
+      const err = e as ApiError;
+      if (err.code === 'MENU_CHANGED') {
+        // The restaurant published a new menu with different prices: reload so the cart is checked against it, then the guest confirms.
+        setError(err.message);
+        setTimeout(() => window.location.reload(), 1800);
+      } else {
+        // The same attempt key is kept: pressing again after a timeout returns the original order instead of a second one.
+        setError(err.message);
+      }
     } finally {
       setBusy(false);
     }

@@ -115,4 +115,67 @@ describe('QR ordering: restaurant-controlled menu', () => {
       expect(after.items[0].modifierDetails[0]).toMatchObject({ optionName: 'Regular Cheese', priceDelta: 0, groupName: 'Cheese' });
     });
   });
+
+  describe('publishing controls what guests see', () => {
+    it('a draft edit is invisible to guests and reported as unpublished; publishing shows it', async () => {
+      const menu0 = (await http().get(`/api/v1/public/qr/${F.token1}/menu`)).body;
+      await push(F.console, 'MENU_ITEM', 'draft-dish', { categoryId: 'pizza', name: 'Draft Dish', price: 99, isAvailable: true, sortOrder: 5 });
+      expect((await http().get(`/api/v1/public/qr/${F.token1}/menu`)).body.items.map((i: any) => i.name)).not.toContain('Draft Dish');
+      const status = await as('get', '/api/v1/menu/draft-status', F.console);
+      expect(status.body).toMatchObject({ hasUnpublishedChanges: true, publishedVersion: menu0.menuVersion });
+      await publish(F.console, 'add dish');
+      const menu1 = (await http().get(`/api/v1/public/qr/${F.token1}/menu`)).body;
+      expect(menu1.items.map((i: any) => i.name)).toContain('Draft Dish');
+      expect(menu1.menuVersion).toBe(menu0.menuVersion + 1);
+      expect((await as('get', '/api/v1/menu/draft-status', F.console)).body.hasUnpublishedChanges).toBe(false);
+    });
+
+    it('a menu with a blocking problem cannot be published, and the last good menu stays live', async () => {
+      const before = (await http().get(`/api/v1/public/qr/${F.token1}/menu`)).body.menuVersion;
+      await push(F.console, 'MENU_ITEM', 'bad-price', { categoryId: 'pizza', name: 'Bad Price', price: -5, isAvailable: true });
+      const res = await publish(F.console, 'should fail');
+      expect(res.status).toBe(422);
+      expect(res.body.errors.join(' ')).toContain('Bad Price');
+      expect((await http().get(`/api/v1/public/qr/${F.token1}/menu`)).body.menuVersion).toBe(before);
+      await push(F.console, 'MENU_ITEM', 'bad-price', { categoryId: 'pizza', name: 'Bad Price', price: 5, isAvailable: true, deleted: true });
+      expect((await publish(F.console, 'fixed')).status).toBe(201);
+    });
+
+    it('dishes come in the restaurant own order, not database order', async () => {
+      await push(F.console, 'MENU_ITEM', 'z-first', { categoryId: 'pizza', name: 'Zzz First', price: 10, isAvailable: true, sortOrder: -1 });
+      await push(F.console, 'MENU_ITEM', 'a-last', { categoryId: 'pizza', name: 'Aaa Last', price: 10, isAvailable: true, sortOrder: 99 });
+      await publish(F.console, 'order');
+      const names = (await http().get(`/api/v1/public/qr/${F.token1}/menu`)).body.items.map((i: any) => i.name);
+      expect(names[0]).toBe('Zzz First');
+      expect(names[names.length - 1]).toBe('Aaa Last');
+    });
+
+    it('only Restaurant Admin sees draft status, and quantity limits set by the restaurant are enforced', async () => {
+      expect((await as('get', '/api/v1/menu/draft-status', F.pos1)).status).toBe(403);
+      await push(F.console, 'MENU_ITEM', 'thali', { categoryId: 'pizza', name: 'Party Thali', price: 100, isAvailable: true, sortOrder: 7, minQuantity: 2, maxQuantity: 4 });
+      await publish(F.console, 'thali');
+      const post = (quantity: number) => http().post(`/api/v1/public/qr/${F.token1}/orders`).send(order([{ itemId: 'thali', quantity }]));
+      expect((await post(1)).status).toBe(400);
+      expect((await post(5)).status).toBe(400);
+      expect((await post(2)).status).toBe(201);
+    });
+
+    it('an order placed against an older menu is refused with MENU_CHANGED only when the price would differ', async () => {
+      const seen = (await http().get(`/api/v1/public/qr/${F.token1}/menu`)).body.menuVersion as number;
+      // A change that does not touch the pizza: the guest's total is unchanged, the order goes through.
+      await push(F.console, 'MENU_ITEM', 'side', { categoryId: 'pizza', name: 'Side Salad', price: 60, isAvailable: true, sortOrder: 8 });
+      await publish(F.console, 'unrelated');
+      const ok = await http().post(`/api/v1/public/qr/${F.token1}/orders`).send(order([{ itemId: 'thali', quantity: 2 }], { menuVersion: seen }));
+      expect(ok.status, JSON.stringify(ok.body)).toBe(201);
+      // A price change on what they ordered: they must confirm.
+      await push(F.console, 'MENU_ITEM', 'thali', { categoryId: 'pizza', name: 'Party Thali', price: 120, isAvailable: true, sortOrder: 7, minQuantity: 2, maxQuantity: 4 });
+      await publish(F.console, 'thali price');
+      const refused = await http().post(`/api/v1/public/qr/${F.token1}/orders`).send(order([{ itemId: 'thali', quantity: 2 }], { menuVersion: seen }));
+      expect(refused.status).toBe(409);
+      expect(refused.body).toMatchObject({ code: 'MENU_CHANGED' });
+      const latest = (await http().get(`/api/v1/public/qr/${F.token1}/menu`)).body.menuVersion;
+      expect(refused.body.menuVersion).toBe(latest);
+      expect((await http().post(`/api/v1/public/qr/${F.token1}/orders`).send(order([{ itemId: 'thali', quantity: 2 }], { menuVersion: latest }))).status).toBe(201);
+    });
+  });
 });

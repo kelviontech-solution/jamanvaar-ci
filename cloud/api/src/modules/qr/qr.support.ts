@@ -75,15 +75,23 @@ export const QR_TOKEN_PATTERN = /^[A-Za-z0-9_-]{10,200}$/;
 
 const PUBLIC_ID_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O/1/I/L: readable at a counter
 
-/** A short public reference for a guest's order, e.g. JQ-8F72KX9M. Random, so it reveals nothing about volume or order. */
+/**
+ * The public reference of a guest's order, e.g. JQ-8F72KX9M4TQ2H6PZV3BN5WCD7Y. 26 random characters (about 128 bits), so it is
+ * a real capability: it cannot be guessed and reveals nothing about volume or order. The counter shows the short QR-n number.
+ * Earlier orders carry an 8-character reference, which still resolves.
+ */
 export function newPublicOrderId(): string {
-  const bytes = randomBytes(8);
   let out = '';
-  for (const b of bytes) out += PUBLIC_ID_ALPHABET[b % PUBLIC_ID_ALPHABET.length];
+  const limit = 256 - (256 % PUBLIC_ID_ALPHABET.length); // reject the top values so every character is equally likely
+  while (out.length < 26) {
+    for (const b of randomBytes(32)) {
+      if (b < limit && out.length < 26) out += PUBLIC_ID_ALPHABET[b % PUBLIC_ID_ALPHABET.length];
+    }
+  }
   return `JQ-${out}`;
 }
 
-export const PUBLIC_ORDER_ID_PATTERN = /^JQ-[A-Z2-9]{8}$/;
+export const PUBLIC_ORDER_ID_PATTERN = /^JQ-(?:[A-Z2-9]{8}|[A-Z2-9]{26})$/;
 
 /** The customer's four-step view of the canonical order status (there is no separate QR status model). */
 export type CustomerOrderStatus = 'RECEIVED' | 'PREPARING' | 'READY' | 'COMPLETED' | 'CANCELLED';

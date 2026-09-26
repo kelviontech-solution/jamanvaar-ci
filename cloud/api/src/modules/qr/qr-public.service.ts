@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, GoneException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, GoneException, Injectable, NotFoundException } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { QrCode } from '@prisma/client';
@@ -7,6 +7,7 @@ import { ApplicationEntitlementsService, ResolvedEntitlement } from '../applicat
 import { OrderSyncService } from '../order-sync/order-sync.service';
 import { priceCart, PriceValidationError } from '../payments/pricing.util';
 import { QrMenuService } from './qr-menu.service';
+import { QrAdmission } from './qr-resilience';
 import { QrSettingsService, QrSettingsView } from './qr-settings.service';
 import {
   businessDateIn, customerStatusFor, newPublicOrderId, PUBLIC_ORDER_ID_PATTERN, QR_APP_CODE, QR_EVENT, QR_MODE, QR_STATUS, QR_TOKEN_PATTERN,
@@ -36,6 +37,8 @@ export const placeQrOrderSchema = z
     /** Only for a MENU_ONLY code, where the guest says where they are sitting or that they are collecting. */
     orderType: z.enum(['DINE_IN', 'TAKEAWAY']).optional(),
     tableNumber: z.string().trim().max(20).optional(),
+    /** The menu version the guest was looking at. If the restaurant published since and the price would differ, the order is refused with MENU_CHANGED. */
+    menuVersion: z.number().int().min(0).optional(),
     idempotencyKey: z.string().trim().min(8).max(80)
   })
   .strict();
@@ -64,7 +67,8 @@ export class QrPublicService {
     private readonly entitlements: ApplicationEntitlementsService,
     private readonly menus: QrMenuService,
     private readonly settingsService: QrSettingsService,
-    private readonly orders: OrderSyncService
+    private readonly orders: OrderSyncService,
+    private readonly admission: QrAdmission
   ) {}
 
   // ------------------------------------------------------------------ resolution (spec 13, 14)
@@ -182,7 +186,7 @@ export class QrPublicService {
     // A code that cannot be resolved has nothing to record against; the refusal itself is the answer.
     const ctx = await this.resolve(rawToken);
     try {
-      return await this.createOrder(ctx, dto, sessionId);
+      return await this.admission.run(() => this.createOrder(ctx, dto, sessionId));
     } catch (e) {
       await this.track(ctx, QR_EVENT.ORDER_FAILED, sessionId, { reason: e instanceof Error ? e.constructor.name : 'ERROR' });
       throw e;
@@ -219,12 +223,23 @@ export class QrPublicService {
     await this.track(ctx, QR_EVENT.ORDER_STARTED, sessionId);
 
     const menu = await this.menus.build(ctx.restaurant.id, ctx.branch.id);
+    const cart = dto.items.map((i) => ({ externalItemId: i.itemId, quantity: i.quantity, selectedOptionIds: i.optionIds }));
     let priced;
     try {
-      priced = priceCart(dto.items.map((i) => ({ externalItemId: i.itemId, quantity: i.quantity, selectedOptionIds: i.optionIds })), menu.lookup);
+      priced = priceCart(cart, menu.lookup);
     } catch (err) {
-      if (err instanceof PriceValidationError) throw new BadRequestException(err.message);
+      if (err instanceof PriceValidationError) {
+        if (await this.menuMovedOn(ctx, dto, menu.menuVersion)) throw this.menuChanged(menu.menuVersion);
+        throw new BadRequestException(err.message);
+      }
       throw err;
+    }
+    // The guest was looking at an older menu: if what they would pay is not what they saw, they must confirm the new price first.
+    if (dto.menuVersion !== undefined && dto.menuVersion !== menu.menuVersion) {
+      const seen = await this.menus.build(ctx.restaurant.id, ctx.branch.id, dto.menuVersion).catch(() => null);
+      let seenTotal: number | null = null;
+      try { seenTotal = seen && seen.menuVersion === dto.menuVersion ? priceCart(cart, seen.lookup).totalAmount : null; } catch { seenTotal = null; }
+      if (seenTotal !== priced.totalAmount) throw this.menuChanged(menu.menuVersion);
     }
 
     // The client's key becomes a per-restaurant, per-code identifier: a repeat is the same order, and one guest can
@@ -296,6 +311,14 @@ export class QrPublicService {
 
     if (!duplicate) await this.track(ctx, QR_EVENT.ORDER_PLACED, sessionId, { totalPaise: order.totalAmount });
     return this.confirmation(order);
+  }
+
+  private async menuMovedOn(_ctx: QrContext, dto: PlaceQrOrder, currentVersion: number): Promise<boolean> {
+    return dto.menuVersion !== undefined && dto.menuVersion !== currentVersion;
+  }
+
+  private menuChanged(menuVersion: number) {
+    return new ConflictException({ statusCode: 409, code: 'MENU_CHANGED', message: 'The menu was updated. Please review your order and confirm the new prices.', menuVersion });
   }
 
   private confirmation(order: { publicOrderId: string | null; totalAmount: number; status: string; createdAt: Date; tableLabel: string | null; meta: unknown }) {

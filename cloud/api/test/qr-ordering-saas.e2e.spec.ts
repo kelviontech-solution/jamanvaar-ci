@@ -454,7 +454,7 @@ describe('QR ordering (SaaS)', () => {
         // (2 × (249+35)) + 120 = 688 ; 5% = 34.40 ; 722.40
         expect(res.body.total).toBe(722.4);
         expect(res.body).toMatchObject({ status: 'RECEIVED', table: '12' });
-        expect(res.body.publicOrderId).toMatch(/^JQ-[A-Z2-9]{8}$/);
+        expect(res.body.publicOrderId).toMatch(/^JQ-[A-Z2-9]{26}$/);
         expect(res.body.orderNumber).toMatch(/^QR-\d+$/);
       });
 
@@ -758,8 +758,17 @@ describe('QR ordering (SaaS)', () => {
 
         limiter().configure({ ...defaults, sessionOrdersPerMinute: 2 });
         const bySession = [];
-        for (let i = 0; i < 3; i++) bySession.push((await http().post(`/api/v1/public/qr/${tokenA12}/orders`).set('x-qr-session', 'one-browser-session').send(orderBody([{ itemId: 'coffee-a', quantity: 1 }]))).status);
+        const issued = (await http().post('/api/v1/public/qr/session')).body.session as string;
+        expect(issued).toMatch(/^qs1\./);
+        for (let i = 0; i < 3; i++) bySession.push((await http().post(`/api/v1/public/qr/${tokenA12}/orders`).set('x-qr-session', issued).send(orderBody([{ itemId: 'coffee-a', quantity: 1 }]))).status);
         expect(bySession).toEqual([201, 201, 429]);
+        // A made-up or altered session is ignored: it neither counts as a session nor lets a caller pick their own.
+        limiter().configure({ ...defaults, sessionOrdersPerMinute: 1 });
+        const forged = [];
+        for (let i = 0; i < 3; i++) forged.push((await http().post(`/api/v1/public/qr/${tokenA12}/orders`).set('x-qr-session', 'qs1.AAAAAAAAAAAAAAAA.AAAAAAAAAAAAAAAAAAAAAA').send(orderBody([{ itemId: 'coffee-a', quantity: 1 }]))).status);
+        expect(forged).toEqual([201, 201, 201]);
+        const tampered = issued.slice(0, -2) + (issued.endsWith('AA') ? 'BB' : 'AA');
+        expect((await http().post(`/api/v1/public/qr/${tokenA12}/orders`).set('x-qr-session', tampered).send(orderBody([{ itemId: 'coffee-a', quantity: 1 }]))).status).toBe(201);
         limiter().configure(defaults);
       });
 

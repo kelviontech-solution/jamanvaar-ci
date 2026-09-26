@@ -1585,6 +1585,16 @@ model SyncSequence {
 
 /// Human-readable order/KOT numbers are leased to devices in blocks, per branch and business day, so two
 /// terminals numbering offline can never produce the same number. `next` is the first unleased number.
+/// Shared request counters for rate limiting (PostgreSQL, no Redis). Not tenant data.
+model RateCounter {
+  key         String
+  windowStart BigInt
+  count       Int    @default(0)
+
+  @@id([key, windowStart])
+  @@index([windowStart])
+}
+
 model NumberSequence {
   restaurantId String
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
