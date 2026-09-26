@@ -2,6 +2,9 @@ export interface ModifierOptionSnapshot {
   id: string;
   name: string;
   priceDelta: number; // paise
+  /** Set when the option is resolved for a dish, so an order can record which group it was chosen from. */
+  groupId?: string;
+  groupName?: string;
 }
 
 export interface ModifierGroupSnapshot {
@@ -20,8 +23,13 @@ export interface MenuSnapshotItemLookup {
   taxRate: number; // basis points, e.g. 500 = 5.00%
   /** True when the listed price already contains the tax (the tax is then extracted, not added). */
   taxInclusive?: boolean;
+  taxGroupId?: string;
   isAvailable: boolean;
   modifierGroups: ModifierGroupSnapshot[];
+  /** Restaurant-set ordering rules, when the menu source has them (QR menu). */
+  minQuantity?: number;
+  maxQuantity?: number;
+  allowInstructions?: boolean;
 }
 
 export interface CartLineInput {
@@ -34,7 +42,12 @@ export interface PricedLine {
   externalItemId: string;
   name: string;
   quantity: number;
-  unitPrice: number; // paise
+  /** The dish's own price before options, paise. */
+  basePrice: number;
+  taxRate: number; // basis points
+  taxInclusive: boolean;
+  taxGroupId?: string;
+  unitPrice: number; // paise, including the chosen options
   lineSubtotal: number; // paise
   lineTax: number; // paise
   lineTotal: number; // paise
@@ -73,6 +86,9 @@ export function priceCart(cartLines: CartLineInput[], menuItems: Map<string, Men
     if (!menuItem.isAvailable) {
       throw new PriceValidationError(`Item is not available: ${menuItem.name}`);
     }
+    if (menuItem.minQuantity && line.quantity < menuItem.minQuantity) throw new PriceValidationError(`${menuItem.name} must be ordered in a quantity of at least ${menuItem.minQuantity}`);
+    if (menuItem.maxQuantity && line.quantity > menuItem.maxQuantity) throw new PriceValidationError(`${menuItem.name} can be ordered in a quantity of at most ${menuItem.maxQuantity}`);
+
 
     const selectedOptions = resolveSelectedOptions(menuItem, line.selectedOptionIds);
     const modifierSum = selectedOptions.reduce((sum, opt) => sum + opt.priceDelta, 0);
@@ -88,6 +104,10 @@ export function priceCart(cartLines: CartLineInput[], menuItems: Map<string, Men
       externalItemId: line.externalItemId,
       name: menuItem.name,
       quantity: line.quantity,
+      basePrice: menuItem.basePrice,
+      taxRate: menuItem.taxRate,
+      taxInclusive: menuItem.taxInclusive === true,
+      taxGroupId: menuItem.taxGroupId,
       unitPrice,
       lineSubtotal,
       lineTax,
@@ -116,7 +136,7 @@ function resolveSelectedOptions(menuItem: MenuSnapshotItemLookup, selectedOption
     if (group.maxSelections > 0 && selectedInGroup.length > group.maxSelections) {
       throw new PriceValidationError(`'${group.name}' allows at most ${group.maxSelections} selection(s) for ${menuItem.name}`);
     }
-    resolved.push(...selectedInGroup);
+    resolved.push(...selectedInGroup.map((o) => ({ ...o, groupId: group.id, groupName: group.name })));
   }
 
   const knownOptionIds = new Set(menuItem.modifierGroups.flatMap((g) => g.options.map((o) => o.id)));

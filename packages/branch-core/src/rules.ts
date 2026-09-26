@@ -37,7 +37,11 @@ export function mergeOrderItems<T extends MergeableItem>(
     const old = priorById.get(inc.externalItemId);
     const status =
       old && kitchenStatusRank(old.kitchenStatus) > kitchenStatusRank(inc.kitchenStatus) ? old.kitchenStatus : inc.kitchenStatus;
-    return { ...inc, kitchenStatus: status, originDeviceId: old?.originDeviceId ?? deviceId };
+    // The ordered-with configuration is written once, when the order is created, and outlives every later push.
+    const kept: Record<string, unknown> = {};
+    if (old?.snapshot && !inc.snapshot) kept.snapshot = old.snapshot;
+    if (old?.modifierDetails && !inc.modifierDetails) kept.modifierDetails = old.modifierDetails;
+    return { ...inc, ...kept, kitchenStatus: status, originDeviceId: old?.originDeviceId ?? deviceId };
   });
 
   let foreignItemsKept = false;

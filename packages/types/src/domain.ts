@@ -450,6 +450,8 @@ export interface OrderItem {
   itemDiscountAmount?: number;
   discountReason?: string;
   kitchenStatus?: 'PENDING' | 'PREPARING' | 'READY' | 'SERVED';
+  /** What this line was priced with when it was ordered (QR orders): never recalculated from the current menu. */
+  snapshot?: { menuVersion?: number; basePrice?: number; taxGroupId?: string; taxRateBp?: number; taxInclusive?: boolean; lineTax?: number };
 }
 
 export type BusinessDayStatus = 'OPEN' | 'CLOSING' | 'CLOSED' | 'REOPENED';

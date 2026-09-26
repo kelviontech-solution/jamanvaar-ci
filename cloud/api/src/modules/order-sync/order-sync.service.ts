@@ -36,6 +36,8 @@ export interface ServerOrderInput {
   source: string;
   publicOrderId?: string;
   qrCodeId?: string;
+  /** The published menu version the order was priced from. */
+  menuVersion?: number;
   orderType: string;
   status: string;
   tableId?: string | null;
@@ -326,6 +328,7 @@ export class OrderSyncService {
           source: input.source,
           publicOrderId: input.publicOrderId,
           qrCodeId: input.qrCodeId,
+          menuVersion: input.menuVersion,
           orderType: input.orderType,
           status: input.status,
           tableId: input.tableId ?? undefined,

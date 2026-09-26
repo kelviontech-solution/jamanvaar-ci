@@ -178,6 +178,7 @@ model Restaurant {
   numberSequences         NumberSequence[]
   inventoryMovements      InventoryMovement[]
   menuPublications        MenuPublication[]
+  menuSnapshots           MenuSnapshot[]
   syncedEntities          SyncedEntity[]
   aiAccess                RestaurantAiAccess?
   aiUsage                 AiUsageDaily[]
@@ -1350,6 +1351,8 @@ model SyncedOrder {
   /// Unguessable reference a guest tracks their order by; the internal id is never shown to customers.
   publicOrderId   String?    @unique
   qrCodeId        String?
+  /// The published menu version this order was priced from (null for orders that were not priced from a snapshot).
+  menuVersion     Int?
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
@@ -1630,6 +1633,21 @@ model MenuPublication {
   note                String?
   publishedByDeviceId String?
   createdAt           DateTime   @default(now())
+
+  @@unique([restaurantId, version])
+}
+
+/// The menu as it was when the restaurant published it. Customers read this, never the live draft entities.
+model MenuSnapshot {
+  id           String     @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  version      Int
+  checksum     String
+  content      Json
+  note         String?
+  publishedBy  String?
+  createdAt    DateTime   @default(now())
 
   @@unique([restaurantId, version])
 }

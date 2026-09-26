@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { AuditModule } from '../audit/audit.module';
 import { ApplicationEntitlementsModule } from '../application-entitlements/application-entitlements.module';
+import { MenuPublicationsModule } from '../menu-publications/menu-publications.module';
 import { OrderSyncModule } from '../order-sync/order-sync.module';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
 import { QrPublicController, QrRestaurantController } from './qr.controllers';
@@ -17,7 +18,7 @@ import { QrRateLimiter, QrRateLimitInterceptor } from './qr-rate-limit';
  * analytics events. It owns no order table, no menu, no sync protocol and no entitlement logic of its own.
  */
 @Module({
-  imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule],
+  imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule],
   controllers: [QrPublicController, QrRestaurantController, QrLegacyGuestController],
   providers: [QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor],
   exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService]

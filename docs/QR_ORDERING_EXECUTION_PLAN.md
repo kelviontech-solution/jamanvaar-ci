@@ -397,3 +397,225 @@ The order is fixed by dependency: entitlements (P1) and the data model (P2) must
 ## 6. Recommended first step
 
 **P0, then P1.** P0 is small and decides how bad A1-A3 really are. The most valuable single fix is A1 (QR orders missing from the sequence cursor), but it should not be patched in isolation: P5 fixes it properly through the shared ingest path after P1-P4 give it a sound entitlement check, token model and menu. If A1 or A3 is confirmed on the running system, a narrow hotfix (assign `seq`, publish the realtime event, and refuse token re-pointing) can be released ahead of P5 with tests, without changing the architecture.
+
+
+---
+
+# ADDENDUM (2026-09-26): restaurant-controlled menu, multi-customer tables and scale
+
+Source: `docs/qr-additinal .md` (both requirement sets). Findings: `docs/QR_ORDERING_AUDIT_RESTAURANT_CONTROL_AND_SCALE.md`. **Nothing in this addendum is implemented.** Payment (Razorpay, cash processing) is out of scope: no phase below adds a provider, credentials, checkout, webhook or settlement. `paymentStatus` stays separate from order creation. No EXE, APK or AAB.
+
+The two sets are planned as two tracks that share a foundation. **Track R** makes the restaurant the source of everything the guest sees. **Track S** makes the flow correct and fast under many phones, tables, branches and restaurants. Ordering across both is by dependency (section "Order of work" at the end).
+
+## Decisions binding on every phase below
+
+* **No second menu system.** The synced menu entities (`MENU_CATEGORY`, `MENU_ITEM`, `MODIFIER_GROUP`, `TAX_GROUP`, plus the new branch-override entity) remain the **draft**. **Publishing** writes an immutable **snapshot** of the effective menu; the customer reads snapshots only. The existing `MenuPublication` row becomes the snapshot's header (version, note, publisher) so there is one version counter.
+* **The server prices; the snapshot is what it prices from.** Orders are validated against the latest published snapshot for the branch (not the live draft), so a half-edited menu can never be ordered from, and the price the guest saw is the price checked (a guest holding an older version is told the menu changed).
+* **Orders are self-describing.** Every line carries the configuration it was ordered with (Track R phase R5). Historical orders are never recalculated.
+* **The tax and pricing engine stays the canonical one** (`priceCart`); no QR-only engine, no QR-only discounts.
+* **Tables stay the synced `DINING_TABLE` entity**, hardened (id, branch, state machine), rather than a new cloud table model, because a table must remain creatable with no internet. The QR code keeps referencing `(restaurantId, tableId)`.
+
+---
+
+## TRACK R: restaurant-controlled menu
+
+### R0. Baseline: failing tests for the audit findings
+* **Objective.** Turn each Part A finding into a test that fails today, so the work is measured.
+* **Sections.** Restaurant-control 26, 29, 30, 31, 32, 34.
+* **Files.** `cloud/api/test/qr-menu-control.e2e.spec.ts` (new), `tests/qr_order_snapshot.test.ts` (new).
+* **Tests required.** (1) after a QR order, change an option's price; the order still reports the old option price (fails: only names are stored); (2) a pulled QR order shows the option price on a device, not `+₹0` (fails); (3) items appear in `sortOrder` (fails: no ordering); (4) editing a draft price does not change what a guest sees until publish (fails: live read); (5) two branches, same dish, different price (fails: no override).
+* **Dependencies.** None. **Acceptance.** Every finding has a red test; the suite's existing tests stay green. **Risks.** None (tests only).
+
+### R1. Menu configuration contract (schema and defaults)
+* **Objective.** One validated, versioned shape for everything the guest can see, and removal of hardcoded defaults.
+* **Sections.** 1, 3, 4, 5, 6, 12, 15, 18, 19, 26, 33.
+* **Existing files.** `packages/types/src/domain.ts` (`Category`, `MenuItem`, `ModifierGroup`, `ModifierOption`, `TaxGroup`), `cloud/api/src/modules/entity-sync/dto/push-entity-sync.dto.ts`, `packages/database/src/repositories.ts` (`createMenuItem` default `tax-gst-5`), `ItemModal.tsx`.
+* **Database.** None yet (entity payloads); add zod schemas on the server for each entity type, rejecting impossible data (min > max, required group with no options, negative price, unknown tax group). Add fields: category `qrVisible`, `image`; item `minQuantity`, `maxQuantity`, `allowInstructions`, `salesChannels`, `branchIds`, `sortOrder`; group `description`, `displayOrder`, `isActive`, `defaultOptionIds`; option `description`, `imageUrl`, `isDefault`, `displayOrder`, `isActive`.
+* **API.** Entity-sync validation returns per-record errors the admin can show.
+* **Frontend.** None here.
+* **Entitlement.** None. **Sync.** Additive fields; old clients ignore them. **Security.** Payload size and string limits on every field.
+* **Tests.** Schema accept/reject matrix; old payloads still accepted with defaults.
+* **Dependencies.** R0. **Acceptance.** No default tax group or attach-all default remains in production code paths; documented semantics for `min`, `max`, `required`, `0 = unlimited`. **Risks.** A payload the new validation rejects would block sync of an old record: validate with warnings first, enforce at publish.
+
+### R2. Publish pipeline: draft entities, immutable published snapshots
+* **Objective.** Guests read a frozen, versioned menu; edits are visible to guests only after "Publish changes".
+* **Sections.** 22, 23, 27, 28, 29, 53.
+* **Existing files.** `menu-publications.service.ts`, `qr-menu.service.ts`, `packages/sync/src/menu_sync.ts` (`publishCatalogNow`, `pendingCatalogChanges`), Restaurant Admin publish control.
+* **Database.** `MenuSnapshot` (restaurantId, version, checksum, content JSON: categories, items, groups, tax groups, branch overrides, publishedAt, publishedBy; unique on restaurantId+version; RLS). `MenuPublication` keeps the version counter.
+* **API.** `POST /restaurant/menu/publish` builds the snapshot from the draft entities **on the server**, validates it (R1 rules, "every dish names a published tax group", "every required group has options"), returns a change summary and any blocking errors; `GET /restaurant/menu/draft-status` (pending changes, last published). The public menu endpoint reads only the latest snapshot for the branch.
+* **Frontend.** "Publish changes" with a visible pending count, change summary and validation errors in Restaurant Admin.
+* **Entitlement.** Publishing needs no QR entitlement (the menu serves every channel); the guest read does.
+* **Sync.** Devices keep syncing draft entities as today; a `menu` realtime wake-up is sent on publish. **Security.** Only the Restaurant Admin console publishes; snapshots immutable; checksum verified on read.
+* **Tests.** Edit without publish → guest unchanged; publish → guest sees it; concurrent publishes get consecutive versions; invalid draft cannot publish; guest with an old version placing an order gets a "menu changed" answer with the new version; requirement 29's exact sequence (₹249 → ₹279, add Extra Cheese +₹40 → +₹50).
+* **Dependencies.** R1. **Acceptance.** `menuVersion` in every public response is the snapshot version and identifies content exactly. **Risks.** Restaurants used to instant edits: default their first publish automatically at migration from the current draft; the guest menu never goes empty during the switch.
+
+### R3. Restaurant Admin authoring: modifier groups, options, tax, ordering, channels
+* **Objective.** Everything in requirement 34's first list is editable in Restaurant Admin.
+* **Sections.** 1, 4, 5, 6, 11, 12, 13, 16, 18, 19, 34.
+* **Existing files.** `MenuRepository`, `ItemModal.tsx`, `MenuCategoriesModule.tsx`, Kiosk Admin's tax editor (to share), `packages/database` menu repositories.
+* **Database.** Repository methods (no new tables): create / update / delete / reorder modifier groups and options; tax group create / edit; category and item reorder with stable `sortOrder`; per-item channel and branch settings.
+* **Frontend.** Modifier Groups screen (group name, description, required, min, max, order, active; options with name, price, default, order, active, image); item editor gains: tax group selector, channels and QR visibility (restoring the switch that was removed), branch restriction, min / max quantity, instructions on/off, drag or arrow reorder; category editor gains image, description, QR visibility, reorder. Deletion refuses (or archives) a group still attached to dishes.
+* **Entitlement.** None. **Sync.** Edits flow as draft entities. **Security.** Validation as R1.
+* **Tests.** Component/behaviour tests; a real-browser pass creating the requirement's Margherita example (Cheese required 1-1: Regular ₹0, Extra +₹40, Double +₹70; Toppings optional 0-5: Olives +₹30, Jalapeno +₹25, Mushroom +₹40).
+* **Dependencies.** R1 (can proceed in parallel with R2). **Acceptance.** All twenty-two administrator boxes in requirement 34 are demonstrably operable. **Risks.** Attach-all default removal changes what a new dish shows; existing dishes keep their attachments.
+
+### R4. Public menu contract v2 (deterministic, complete)
+* **Objective.** The guest receives every configured value, in the configured order, from the snapshot.
+* **Sections.** 12, 13, 14, 15, 20, 26, 27.
+* **Existing files.** `qr-menu.service.ts`, `qr-public.service.ts`, `apps/qr-guest/src/api.ts`.
+* **API.** Menu response includes category image / description, item order by `sortOrder` then name, option and group ordering, defaults, option descriptions and images, quantity rules, per-item instruction flag, effective (branch-overridden) prices and availability, restaurant currency and logo; nothing server-only. Ordering rules are total (ties broken by id) so the order never depends on database return order.
+* **Frontend.** None here (R7). **Tests.** Ordering is stable across requests; every field round-trips; server-only fields absent.
+* **Dependencies.** R2. **Acceptance.** Reordering categories/items/options in the admin and publishing changes the guest order with no code change. **Risks.** Response size grows: images move to object storage first or in the same release (R6).
+
+### R5. Order-time snapshot (historical immutability)
+* **Objective.** An order carries the configuration it was placed with; nothing about it is recomputed later.
+* **Sections.** 8, 9, 30.
+* **Existing files.** `qr-public.service.ts` (line build), `packages/sync/src/outbox.ts` (`orderItemFromRemote`, event build), `packages/branch-core/src/core.ts` (item schema already has `modifierDetails`), receipts.
+* **Database.** `SyncedOrder.items` lines gain `basePrice`, `modifierDetails[{groupId, groupName, optionId, optionName, priceDelta}]`, `taxGroupId`, `taxRateBp`, `lineTax`, `menuVersion` (line or order level), `pricingSnapshot` at order level. No table change (JSON), plus an order-level `menuVersion` column for querying.
+* **API.** The order response and status stay customer-safe; the restaurant order list shows the snapshot.
+* **Sync.** The cloud DTO, the Branch Core schema and the device event build/read carry the new fields; `orderItemFromRemote` uses `modifierDetails` and never invents `+₹0`. Old orders (no snapshot) render exactly as today.
+* **Tests.** The R0 tests turn green; change every price after ordering and re-read the order on cloud, Branch Core, POS and a receipt; requirement 30's exact numbers (Pizza ₹249 + Extra Cheese ₹40, later ₹279 / ₹50).
+* **Dependencies.** None on R2 (can ship first). **Acceptance.** No order line can be displayed with a price derived from today's menu. **Risks.** Line shape shared with every channel: additive fields only, verified by the existing chaos and sync suites.
+
+### R6. Images
+* **Objective.** Menu images are stored properly and referenced by URL.
+* **Sections.** 14, 26.
+* **Existing files.** `ItemModal.tsx` (base64 upload), `cloud/api/src/modules/backups` (existing S3-compatible client to reuse), category modal.
+* **Database.** `MenuImage` (restaurantId, id, content hash, variants, size, createdAt; RLS); items/categories reference the image id or URL.
+* **API.** `POST /restaurant/menu/images` (authenticated console, size and type limits, server-side resize to a few widths), served through a CDN-friendly URL with long cache and hash in the name; delete and replace.
+* **Frontend.** Upload, preview, remove; existing data-URL images migrated in the background.
+* **Security.** Content-type sniffing, size caps, no SVG scripts, per-restaurant quota.
+* **Tests.** Upload, replace, remove, oversize refused, cross-restaurant access refused, data-URL migration idempotent.
+* **Dependencies.** R1. **Acceptance.** No image bytes travel inside menu entities or the public menu response. **Risks.** Storage costs and a migration of existing data URLs; keep the old value until the new URL is confirmed.
+
+### R7. Customer application v2 (dynamic, configurable copy)
+* **Objective.** The customer app renders the specification's customisation experience and holds no restaurant-specific text or rules.
+* **Sections.** 2, 8, 18, 19, 20, 26.
+* **Existing files.** `apps/qr-guest/src/*`.
+* **Frontend.** The customisation sheet per requirement 20 (group title, Required/Optional badge, "Included" for ₹0, "+₹n" otherwise, defaults preselected, min/max messages, running total from the server quote); cart shows each selected option and its price; per-item quantity limits; special instructions per item when allowed; currency from the restaurant; configurable labels and status wording with system defaults (`QrBranding` block: logo, button and step labels).
+* **API.** A `branding` section in the describe response, database-backed.
+* **Tests.** Rendering from fixtures with different labels/currency; behaviour of min/max; real-browser run of the Margherita example.
+* **Dependencies.** R4. **Acceptance.** Grepping the app for restaurant-specific or currency literals finds none. **Risks.** Copy defaults must exist so a restaurant that configures nothing still gets a good page.
+
+### R8. Administrator preview
+* **Objective.** "What the customer will see", using the real renderer and data structure.
+* **Sections.** 21.
+* **Existing files.** `apps/qr-guest` components (extract a shared package `packages/qr-menu-view` used by both the customer app and Restaurant Admin).
+* **API.** `GET /restaurant/menu/preview?draft=true` builds the same contract as the public menu from the **draft** (or a chosen snapshot), authenticated.
+* **Frontend.** Preview panel in Restaurant Admin next to the editors; a banner "Preview of unpublished changes".
+* **Tests.** Preview equals the public response after publish for the same data; a draft never leaks to the public API.
+* **Dependencies.** R2, R4, R7. **Acceptance.** No separate preview implementation exists. **Risks.** Shared package must stay free of admin-only code.
+
+### R9. Branch-level overrides
+* **Objective.** Branch-specific price, availability and visibility.
+* **Sections.** Restaurant-control 32; restaurant-control 11.
+* **Database.** New synced entity `BRANCH_MENU_OVERRIDE` (restaurantId, branchId, itemId | categoryId, price?, isAvailable?, visible?), included in the snapshot.
+* **API / Frontend.** Admin screen per branch (price, availability, hide); the public menu applies the branch's overrides; the order snapshot records the effective price.
+* **Tests.** Same dish ₹250 at Branch 1 and ₹300 at Branch 2 via each branch's QR; hidden dish absent only in that branch; cross-branch isolation.
+* **Dependencies.** R2. **Acceptance.** Requirement 32 passes as written. **Risks.** POS/Kiosk pricing per branch is a separate concern; this phase only adds the entity and applies it to QR unless the owner asks for parity.
+
+### R10. Propagation and isolation tests
+* **Objective.** The requirement's own scenarios as automated tests.
+* **Sections.** 29, 30, 31, 32, 34.
+* **Tests.** The full "create → publish → guest sees → change price → publish → guest sees → add option → change option price" sequence; multi-restaurant (A ₹250/₹40, B ₹350/₹70); multi-branch; historical order; admin actions for every box in requirement 34, driven through the Restaurant Admin API (and a real-browser pass).
+* **Dependencies.** R2 to R9. **Acceptance.** All boxes in requirement 34 are checked by a test, not by assertion.
+
+---
+
+## TRACK S: multi-customer tables, concurrency and scale
+
+### S0. Load harness and baseline
+* **Objective.** Measure the current build before changing it, and keep a repeatable harness.
+* **Sections.** Multi-customer 47-51, 57.
+* **Existing files.** `cloud/api/test/sync-chaos.e2e.spec.ts` (pattern), `_live_fixture` tool.
+* **Tests / tooling.** A harness (`cloud/api/test/load/`, runnable as `npm run load:qr`, not part of the default suite) that starts one or more real API instances on the test database and drives: 100 simultaneous sessions, 100 simultaneous order submissions, 500 simultaneous menu requests, 1,000 simultaneous QR resolutions, 100 customers on one table, 50 tables × 20 customers, several restaurants at once. It records latency percentiles, error rate, duplicate count, lost-order count, database errors, transaction failures, pool waits, and prints a table. Correctness assertions are hard failures; latency numbers are recorded, not asserted, until targets are agreed.
+* **Dependencies.** None. **Acceptance.** A baseline report is committed; the known problems (rate limit, uncached menu, per-request transactions) show up in it. **Risks.** Shared CI database and time; runs on demand.
+
+### S1. Table model hardening and table management
+* **Objective.** Tables have real identity, a branch, controlled state, and are manageable next to their QR codes.
+* **Sections.** Multi-customer 1, 2, 3, 9, 10, 11, 12, 37, 38, 39, 44.
+* **Existing files.** `DiningTable` type, `TableRepository`, `FloorTablesModule`, `EntitySyncService` (DINING_TABLE), `qr-admin.service.ts`, QR console.
+* **Database.** `DiningTable` gains `branchId`, `name`, `qrEnabled`, `archivedAt`; new tables get ids `tbl_<ULID>`; server validation on push (branch belongs to the restaurant, display number unique within the branch, id unique in the restaurant; a colliding id from a second device is rejected with a clear error). No column migration for existing rows: they keep their ids and are assigned a branch by the administrator (single-branch restaurants automatically).
+* **API.** Server-validated table state machine (`AVAILABLE → ORDERING → PREPARING → SERVING → OCCUPIED → BILL_REQUESTED → BILLED → CLEANING → AVAILABLE`, `BLOCKED` for out-of-service), applied as a controlled transition (a stale device cannot overwrite a newer state); `GET /restaurant/qr/tables/:id/orders` (active QR and POS orders of the table, each separate, with a total from real orders); archive instead of delete when orders exist.
+* **Frontend.** Table management with branch selector inside the QR console (create, rename, capacity, activate, deactivate, archive, generate, regenerate, revoke, view, print one, **print selected**, print all, current orders and total, last scan).
+* **Entitlement.** Table management is available regardless of the QR plan; QR actions need it.
+* **Sync.** Tables continue to sync offline; state transitions are validated on receipt.
+* **Security.** Branch and restaurant checks on every table operation.
+* **Tests.** Same-millisecond creation on two devices does not collide; table in the wrong branch refused; state machine rejects illegal transitions and stale overwrites; **an occupied table still accepts QR orders** (guard test for requirement 11); deactivating a table refuses new orders and leaves existing ones; archived table with orders keeps them.
+* **Dependencies.** S0. **Acceptance.** Table management section covers every item in multi-customer requirement 2. **Risks.** Table changes reach every app: additive fields; POS/Captain state usage checked before the state machine is enforced (enforce first in the cloud, warn on devices).
+
+### S2. Customer sessions and order privacy
+* **Objective.** Server-issued anonymous sessions, per-order tracking tokens, no cross-customer visibility.
+* **Sections.** Multi-customer 5, 6, 7, 12, 13, 43, 45, 46.
+* **Existing files.** `qr-public.service.ts`, `apps/qr-guest/src/App.tsx`, `SyncedOrder`.
+* **Database.** `SyncedOrder.customerSessionId`, `SyncedOrder.trackingToken` (128-bit random, unique, indexed); the human `JQ-` reference stays for the receipt and the counter, but is no longer the lookup key.
+* **API.** `GET /public/qr/:token` issues a **stateless signed session** (HMAC over restaurant, code, random id and expiry; verifiable by any API instance, no server memory); orders record it; `GET /public/qr/orders/:trackingToken`; `GET /public/qr/:token/my-orders` returns only the session's own orders; a session can never authorize anything (restaurant, branch and table still come from the code).
+* **Frontend.** The cart is keyed by session, not shared between tabs; the page stores and sends the session and tracking token.
+* **Security.** Unknown tracking tokens count as failed lookups; tokens never appear in logs; a session from one code is rejected on another.
+* **Tests.** 10 phones at one table each see only their own carts/orders; a guessed or another guest's token returns 404; order status is per order (A preparing, B ready, C completed).
+* **Dependencies.** S0. **Acceptance.** Requirements 5-8, 12, 43, 45, 46 pass. **Risks.** Existing reference-based status links in the field: accept both for a documented period.
+
+### S3. Ordering durability, retry and backpressure
+* **Objective.** Every order request completes, fails clearly, or can be retried safely, under overload.
+* **Sections.** Multi-customer 14, 15, 29, 30, 34, 35, 36.
+* **Existing files.** `order-sync.service.ts` (`ingestServerOrder`), `qr-public.service.ts`.
+* **API.** Bounded retry (with jitter) of transient database errors (deadlock, serialization, connection reset) **only because the request has an idempotency key**; admission control: a bounded number of concurrent order transactions per restaurant and per branch, excess waits briefly then gets `503` with `Retry-After` and a stable error code the customer app understands; the customer app retries with the same key.
+* **Tests.** Injected transient failures still produce exactly one order; saturation returns 503 and never a lost or duplicated order; a restaurant at its ceiling does not delay another restaurant.
+* **Dependencies.** S0, S5. **Acceptance.** No accepted order disappears in any injected failure. **Risks.** Choosing limits: start from measured S0 numbers and make them configuration.
+
+### S4. Performance: caching and fewer round trips
+* **Objective.** Public reads are cheap; caches are tenant-safe and correct.
+* **Sections.** Multi-customer 18, 19, 51, 52, 53.
+* **Existing files.** `qr-menu.service.ts`, `qr-public.service.ts`, `application-entitlements.service.ts`.
+* **Design.** Snapshot cache keyed `menu:{restaurantId}:{branchId}:{version}` (immutable, so never stale); QR-resolution cache keyed by the **token** (restaurant and branch inside the value), short TTL, dropped on revoke / regenerate / table, branch, restaurant or settings change through a version stamp; entitlement snapshot cache with a short TTL and explicit invalidation when a subscription, plan or override changes; analytics events buffered and written in batches; `lastScannedAt` updated by a throttled background write; the resolve path collapsed into one transaction. Cache backend behind an interface (in-process first, shared backend in S6).
+* **Tests.** Two restaurants with the same table number never share a cache entry; revoke and downgrade take effect within the documented bound (or immediately through the stamp); the backend still rejects a stale price whatever the client cached; entitlement queries per request drop (asserted by counting statements).
+* **Dependencies.** R2 (snapshots make menu caching exact). **Acceptance.** S0 numbers improve; correctness tests unchanged. **Risks.** Every cache is a place where staleness can hide: each has an invalidation test.
+
+### S5. Database configuration and indexes
+* **Objective.** Pooling, timeouts and indexes are deliberate, environment-driven and reviewed.
+* **Sections.** Multi-customer 16, 22, 23.
+* **Existing files.** `prisma.service.ts`, `env.validation.ts`, `.env.example`.
+* **Work.** Environment settings for pool size, pool timeout, transaction `maxWait` and `timeout`, statement and lock timeouts; documented compatibility with a transaction-mode pooler (the code uses `SET LOCAL`, which is safe); `EXPLAIN` review of the hot queries (token resolve, menu snapshot read, order create, table orders, status lookup, daily-limit count); indexes justified by those plans (for example `QrCode(branchId, tableId)`, `SyncedOrder(trackingToken)`, order status where used) and no others.
+* **Tests.** Pool-exhaustion test (more concurrent requests than connections still all complete or fail with 503); a migration test for each new index; plans recorded in the docs.
+* **Dependencies.** S0. **Acceptance.** No default timeouts remain unexamined. **Risks.** Tuning is environment-specific; ship safe defaults.
+
+### S6. Horizontal scaling
+* **Objective.** Two or more API instances behave as one.
+* **Sections.** Multi-customer 24, 25, 26.
+* **Work.** Rate-limit counters behind an interface with a shared backend (Redis, or database counters where Redis is not wanted); realtime bus adapter for cross-instance wake-ups (Redis pub/sub or Postgres LISTEN/NOTIFY; devices still recover by cursor); sessions already stateless (S2); document that no sticky sessions are required.
+* **Tests.** Start three instances against one database behind a simple round-robin proxy in the harness: limits apply globally, idempotency holds across instances (the same key on different instances yields one order), a device wake-up published on one instance reaches a device connected to another, killing an instance mid-run loses no accepted order.
+* **Dependencies.** S2, S4. **Acceptance.** No correctness or limit behaviour depends on which instance answers. **Risks.** Adds an operational dependency (Redis) unless the database-counter option is chosen; decide with the owner.
+
+### S7. Rate-limit redesign
+* **Objective.** Limits that protect without blocking a busy table or a shared router.
+* **Sections.** Multi-customer 27, 28.
+* **Design.** Keys: address (failed lookups and coarse ceiling), QR code, **verified session** (signed, so it cannot be rotated freely), restaurant and branch ceilings, order status by tracking token; a burst allowance so 100 customers at one table can order within a short window (per-code order limit sized from S0, configurable), with the restaurant ceiling as the outer guard; payload size caps and quantity caps kept; unknown tracking tokens and unknown codes count as failed lookups.
+* **Tests.** 100 customers on one code succeed; a script rotating fake sessions is still limited by the code and address ceilings; one abusive restaurant cannot exhaust another's allowance; tuned defaults documented.
+* **Dependencies.** S2, S6. **Acceptance.** The existing "12 per code per minute" default is gone, replaced by justified numbers. **Risks.** Too generous invites spam: the restaurant ceiling and Decline are the controls.
+
+### S8. Observability and correlation
+* **Objective.** Every QR request is traceable from phone to kitchen screen.
+* **Sections.** Multi-customer 55, 56.
+* **Work.** Request-id middleware (`x-request-id`, generated when absent) returned on every response and logged; the id is written to the order (`meta.requestId`, sync event `traceId`) and follows the order through Branch Core events, POS pulls and KOT creation logs; structured JSON logs for QR resolution, scan, menu load, order created / failed, idempotency hit, duplicate, validation failure, sync failure, KOT created, KDS delivered (no personal or payment data); counters and latency histograms exposed on a protected metrics endpoint; a short runbook.
+* **Tests.** A traced order shows the same id in the response, the API log, the order record, the sync event and the device KOT log; logs contain no phone numbers or names.
+* **Dependencies.** S0. **Acceptance.** A production incident about one order can be traced end to end. **Risks.** Log volume: sample the noisy events.
+
+### S9. Failure recovery and load acceptance
+* **Objective.** Prove the definition of done under failure and load.
+* **Sections.** Multi-customer 47, 48, 49, 50, 51, 57, 58.
+* **Tests.** Using the S0 harness: the four required scale scenarios plus same-table (100), multi-table (50 × 20 = 1,000 orders, every order on the right table), multi-restaurant with a leakage check on menu, table, order, QR, branch and configuration; entitlement enforced under load (a downgrade mid-run stops new orders); failures during a run: API instance restart, Branch Core restart, POS restart, KDS restart, temporary database failure, network interruption, realtime disconnect, browser refresh, duplicate and timed-out requests, queue backlog. Every accepted order must be present exactly once with the right table after every failure. Latency, error rate, duplicate rate, database errors, transaction failures, backlog and pool waits are recorded.
+* **Dependencies.** S1 to S8. **Acceptance.** Zero lost, duplicated, mis-tabled or leaked orders in every scenario; numbers recorded and reviewed with the owner. **Risks.** A benchmark is not a capacity guarantee; the report says so.
+
+---
+
+## Order of work (by dependency)
+
+1. **R0 and S0** (tests and baseline only).
+2. **R5** first among implementations: it fixes data loss on every QR order placed today (option prices are not stored) and is additive.
+3. **R1, then R2**, with **R3** in parallel once R1 is done; **S1** and **S2** in parallel with them (independent code).
+4. **R4, R6, R7**, then **R8, R9**.
+5. **S5** (configuration and indexes), then **S3**, **S4** (needs R2), **S8**.
+6. **S6, S7** (need S2 and S4).
+7. **R10 and S9** last.
+
+Out of scope everywhere: payment, EXE/APK/AAB, LAN QR (phase 15 of the first plan is unchanged and still not built).

@@ -14,7 +14,21 @@ export const syncedOrderItemSchema = z.object({
   quantity: z.number().int().min(1).max(999),
   unitPrice: z.number().int().min(0),
   modifiers: z.array(z.string()).default([]),
-  modifierDetails: z.array(z.object({ optionName: z.string(), priceDelta: z.number().int() })).optional(),
+  /** What was chosen and what each choice cost when the order was placed (paise). Never recalculated from today's menu. */
+  modifierDetails: z
+    .array(z.object({ optionName: z.string(), priceDelta: z.number().int(), optionId: z.string().max(128).optional(), groupId: z.string().max(128).optional(), groupName: z.string().max(200).optional() }))
+    .optional(),
+  /** The pricing configuration the line was ordered with. */
+  snapshot: z
+    .object({
+      menuVersion: z.number().int().optional(),
+      basePrice: z.number().int().optional(),
+      taxGroupId: z.string().max(128).optional(),
+      taxRateBp: z.number().int().optional(),
+      taxInclusive: z.boolean().optional(),
+      lineTax: z.number().int().optional()
+    })
+    .optional(),
   kitchenStatus: z.string().optional(),
   kitchenStation: z.string().max(64).optional(),
   specialInstructions: z.string().max(500).optional(),

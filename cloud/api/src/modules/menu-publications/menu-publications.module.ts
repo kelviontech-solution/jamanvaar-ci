@@ -7,6 +7,7 @@ import { MenuPublicationsService } from './menu-publications.service';
 @Module({
   imports: [AuditModule],
   controllers: [MenuPublicationsController],
-  providers: [MenuPublicationsService, DeviceAuthGuard]
+  providers: [MenuPublicationsService, DeviceAuthGuard],
+  exports: [MenuPublicationsService]
 })
 export class MenuPublicationsModule {}

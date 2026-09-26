@@ -374,6 +374,7 @@ describe('QR ordering (SaaS)', () => {
 
     it('a dish restricted to one branch is shown only there (branch isolation of the menu)', async () => {
       await push(F.A.console, 'MENU_ITEM', 'branch-only-a', { categoryId: 'cat-a', name: 'Surat Special', price: 80, isAvailable: true, taxGroupId: 'tax-a', modifierGroupIds: [], branchIds: [F.A.b2] });
+      await as('post', '/api/v1/menu/publish', F.A.console).send({});
       const ahmedabad = (await http().get(`/api/v1/public/qr/${tokenA1}/menu`)).body.items.map((i: any) => i.name);
       const surat = (await http().get(`/api/v1/public/qr/${tokenS1}/menu`)).body.items.map((i: any) => i.name);
       expect(ahmedabad).not.toContain('Surat Special');
@@ -429,13 +430,19 @@ describe('QR ordering (SaaS)', () => {
       expect((await http().get(`/api/v1/public/qr/${token}`)).status).toBe(410);
     });
 
-    it('menu changes are reflected on the next request and the version follows publication', async () => {
+    it('a menu edit reaches guests only when the restaurant publishes it, and the version follows publication', async () => {
       const before = await http().get(`/api/v1/public/qr/${tokenA12}/menu`);
       await push(F.A.console, 'MENU_ITEM', 'coffee-a', { categoryId: 'cat-a', name: 'Cold Coffee a', price: 130, isAvailable: true, taxGroupId: 'tax-a', modifierGroupIds: [] });
+      const draft = await http().get(`/api/v1/public/qr/${tokenA12}/menu`);
+      expect(draft.body.items.find((i: any) => i.id === 'coffee-a').price).toBe(120); // a draft edit is not visible
+      expect(draft.body.etag).toBe(before.body.etag);
+      await as('post', '/api/v1/menu/publish', F.A.console).send({});
       const after = await http().get(`/api/v1/public/qr/${tokenA12}/menu`);
       expect(after.body.items.find((i: any) => i.id === 'coffee-a').price).toBe(130);
+      expect(after.body.menuVersion).toBe(before.body.menuVersion + 1);
       expect(after.body.etag).not.toBe(before.body.etag);
       await push(F.A.console, 'MENU_ITEM', 'coffee-a', { categoryId: 'cat-a', name: 'Cold Coffee a', price: 120, isAvailable: true, taxGroupId: 'tax-a', modifierGroupIds: [] });
+      await as('post', '/api/v1/menu/publish', F.A.console).send({});
     });
 
     // ------------------------------------------------------------ ordering (spec 18-21, 44, 45, 56, 58)
@@ -606,6 +613,7 @@ describe('QR ordering (SaaS)', () => {
 
       it('accepting a QR order is a claim: the first POS to record it owns it, a later claim cannot take it, and the ticket knows its kitchen station', async () => {
         await push(F.A.console, 'MENU_ITEM', 'bar-a', { categoryId: 'cat-a', name: 'Mojito a', price: 90, isAvailable: true, taxGroupId: 'tax-a', modifierGroupIds: [], kitchenStation: 'Bar' });
+        await as('post', '/api/v1/menu/publish', F.A.console).send({});
         const placed = await http().post(`/api/v1/public/qr/${tokenA12}/orders`).send(orderBody([{ itemId: 'bar-a', quantity: 1 }]));
         const pull = await as('get', '/api/v1/orders/sync?afterSeq=0', F.A.pos1);
         const order = pull.body.orders.find((o: any) => o.publicOrderId === placed.body.publicOrderId);

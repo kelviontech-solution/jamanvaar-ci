@@ -17,6 +17,11 @@ export class MenuPublicationsController {
     return this.menu.latest(device.restaurantId);
   }
 
+  @Get('draft-status')
+  draftStatus(@CurrentDevice() device: Device) {
+    return this.menu.draftStatus(device);
+  }
+
   @Post('publish')
   @UsePipes(new ZodValidationPipe(publishMenuSchema))
   publish(@Body() body: PublishMenuDto, @CurrentDevice() device: Device) {

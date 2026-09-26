@@ -123,3 +123,15 @@ Deploy in this order:
 4. **Deploy Restaurant Admin / POS / KDS** with `VITE_QR_ORDER_URL` on Restaurant Admin so old printed links forward to the new site. Restaurants open Restaurant Admin once so their modifier and tax groups publish.
 5. Restaurants **regenerate** codes at their convenience (old codes keep working until then, except predictable ones, which were revoked); remove the `/qr-guest` adapter when the count of scans through old codes reaches zero (`QrEvent` shows it).
 6. Super Admin reviews restaurants that kept QR through the PRO default, and turns it off where the plan should not include it.
+
+## Errata (added after the follow-up audit)
+
+`docs/QR_ORDERING_AUDIT_RESTAURANT_CONTROL_AND_SCALE.md` re-checked this work against the restaurant-control and multi-customer requirements and found that parts of the statuses above are too generous:
+
+* **Customer Ordering PASS** covers pricing, validation and delivery. It does **not** mean the restaurant controls what the customer sees: the customer's modifier data is read from the restaurant's records, but **no Restaurant Admin screen or API can create or edit a modifier group or option** (only seed data exists), items are not returned in their configured order, and publishing does not freeze the menu the guest reads.
+* Section 15 item 5 understates a regression: the first QR work **deleted the only editor of the per-dish QR switch** with the old module.
+* Orders do **not** yet preserve option prices, tax rate or menu version (only option names and the line's total), and a device that pulls the order shows the options as +₹0.
+* **Multi-Branch PASS** covers isolation; there is no branch-specific price.
+* **Sync / Security PASS** hold for correctness at small scale; the per-code order limit (12/min) would reject a 100-customer table, and no load test exists.
+
+The addendum to `QR_ORDERING_EXECUTION_PLAN.md` plans the fixes. These statuses are not upgraded until they are verified.

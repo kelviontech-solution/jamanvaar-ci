@@ -19,7 +19,9 @@ export interface OrderSyncPushItem {
   unitPrice: number;
   modifiers: string[];
   /** Full modifier lines so the kitchen ticket can be rebuilt exactly (price in paise). */
-  modifierDetails?: Array<{ optionName: string; priceDelta: number }>;
+  modifierDetails?: Array<{ optionName: string; priceDelta: number; optionId?: string; groupId?: string; groupName?: string }>;
+  /** What the order was priced with when it was placed; carried unchanged by every device. */
+  snapshot?: { menuVersion?: number; basePrice?: number; taxGroupId?: string; taxRateBp?: number; taxInclusive?: boolean; lineTax?: number };
   kitchenStatus?: string;
   kitchenStation?: string;
   specialInstructions?: string;
@@ -163,7 +165,8 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
       quantity: it.quantity,
       unitPrice: toPaise(it.unitPrice),
       modifiers: (it.modifiers || []).map((m) => m.optionName),
-      modifierDetails: (it.modifiers || []).map((m) => ({ optionName: m.optionName, priceDelta: toPaise(m.priceDelta) })),
+      modifierDetails: (it.modifiers || []).map((m) => ({ optionName: m.optionName, priceDelta: toPaise(m.priceDelta), ...(m.optionId && !m.optionId.startsWith('remote-') ? { optionId: m.optionId } : {}), ...(m.groupId && !m.groupId.startsWith('remote-') ? { groupId: m.groupId } : {}), ...(m.groupName ? { groupName: m.groupName } : {}) })),
+      ...(it.snapshot ? { snapshot: it.snapshot } : {}),
       kitchenStatus: it.kitchenStatus,
       kitchenStation: db.menuItems.find((m) => m.id === it.menuItemId)?.kitchenStation,
       specialInstructions: it.specialInstructions,
@@ -214,11 +217,13 @@ function orderItemFromRemote(orderId: string, ri: OrderSyncPushItem): OrderItem 
     quantity: ri.quantity,
     unitPrice: fromPaise(ri.unitPrice),
     modifiers: details.map((d, i) => ({
-      groupId: `remote-${i}`,
-      optionId: `remote-${i}`,
+      groupId: d.groupId ?? `remote-${i}`,
+      groupName: d.groupName ?? '',
+      optionId: d.optionId ?? `remote-${i}`,
       optionName: d.optionName,
       priceDelta: fromPaise(d.priceDelta)
     })) as OrderItem['modifiers'],
+    ...(ri.snapshot ? { snapshot: ri.snapshot } : {}),
     specialInstructions: ri.specialInstructions,
     totalPrice: fromPaise(ri.lineTotal),
     kitchenStatus: (ri.kitchenStatus as OrderItem['kitchenStatus']) || 'PENDING',
