@@ -14,6 +14,13 @@ import { onlyActiveBranchId } from '../tenant-auth/tenant-auth.service';
 import { PlatformRoleName, permissionsForRole } from '../../common/rbac/access';
 
 /** JMV-XXXX-XXXX-XXXX — human-relayable but drawn from a cryptographically random 96-bit value, not a counter or a guessable pattern. */
+/** The two admin consoles may serve a whole restaurant; every other terminal belongs to one branch. */
+const RESTAURANT_WIDE_TYPES: ReadonlySet<string> = new Set(['POS_ADMIN', 'KIOSK_ADMIN']);
+
+async function activeBranchCount(tx: { branch: { count: (args: any) => Promise<number> } }, restaurantId: string): Promise<number> {
+  return tx.branch.count({ where: { restaurantId, status: 'ACTIVE' } });
+}
+
 function generateCode(): string {
   const raw = randomBytes(12).toString('hex').toUpperCase(); // 24 hex chars
   const groups = raw.match(/.{1,4}/g) ?? [];
@@ -189,6 +196,32 @@ export class ActivationKeysService {
         if (!branch) throw new NotFoundException('Branch not found for this restaurant');
       }
 
+      // Re-binding a terminal: inherit what the old device was, and prove it belongs to this restaurant.
+      if (dto.replacesDeviceId) {
+        const old = await tx.device.findFirst({ where: { id: dto.replacesDeviceId, restaurantId: dto.restaurantId } });
+        if (!old) throw new NotFoundException('The device to replace was not found for this restaurant');
+        if (dto.allowedDeviceType !== 'ANY' && dto.allowedDeviceType !== old.type) {
+          throw new BadRequestException(`That device is a ${old.type}; the replacement key must be for ${old.type}`);
+        }
+        dto = { ...dto, allowedDeviceType: old.type, branchId: dto.branchId ?? old.branchId ?? undefined, label: dto.label ?? old.name ?? undefined };
+      }
+
+      // A terminal must know which branch it serves as soon as the restaurant has more than one. Only the two admin consoles
+      // may be restaurant-wide. (An 'ANY' key is checked again when it is redeemed and its type becomes known.)
+      if (!dto.branchId && dto.allowedDeviceType !== 'ANY' && !RESTAURANT_WIDE_TYPES.has(dto.allowedDeviceType)) {
+        if ((await activeBranchCount(tx, dto.restaurantId)) > 1) {
+          throw new BadRequestException('This restaurant has several branches: choose the branch this terminal belongs to.');
+        }
+      }
+
+      // Two live terminals (or pending keys) with the same name in one branch cannot be told apart on the fleet screen.
+      if (dto.label) {
+        const clash =
+          (await tx.device.findFirst({ where: { restaurantId: dto.restaurantId, name: dto.label, branchId: dto.branchId ?? null, status: { not: 'REVOKED' }, ...(dto.replacesDeviceId ? { id: { not: dto.replacesDeviceId } } : {}) }, select: { id: true } })) ??
+          (await tx.activationKey.findFirst({ where: { restaurantId: dto.restaurantId, label: dto.label, branchId: dto.branchId ?? null, status: 'ACTIVE' }, select: { id: true } }));
+        if (clash) throw new ConflictException(`A terminal or pending key named "${dto.label}" already exists${dto.branchId ? ' in this branch' : ''}. Use a different name.`);
+      }
+
       if (dto.subscriptionId) {
         const sub = await tx.subscription.findFirst({
           where: { id: dto.subscriptionId, restaurantId: dto.restaurantId }
@@ -217,7 +250,8 @@ export class ActivationKeysService {
               expiresAt: dto.expiresAt,
               branchId: dto.branchId,
               label: dto.label,
-              batchId: dto.batchId
+              batchId: dto.batchId,
+              replacesDeviceId: dto.replacesDeviceId
             },
             include: { restaurant: { select: { id: true, name: true } } }
           });
@@ -292,6 +326,22 @@ export class ActivationKeysService {
       // has nothing to check it against yet).
       await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, dto.deviceType as AppCode);
 
+      // Re-binding a terminal: the old record is revoked here, in the same transaction, so its seat is free for this device
+      // and there is never a moment with two live records for one terminal.
+      if (key.replacesDeviceId) {
+        const old = await tx.device.findFirst({ where: { id: key.replacesDeviceId, restaurantId: key.restaurantId } });
+        if (old && old.type !== dto.deviceType) throw new BadRequestException(`This key replaces a ${old.type}, not a ${dto.deviceType}`);
+        if (old && old.status !== 'REVOKED') {
+          await tx.device.update({ where: { id: old.id }, data: { status: 'REVOKED', deviceTokenHash: null } });
+          await tx.tenantRefreshToken.updateMany({ where: { deviceId: old.id, revokedAt: null }, data: { revokedAt: new Date() } });
+        }
+      }
+
+      const deviceBranchId = key.branchId ?? (await onlyActiveBranchId(tx, key.restaurantId));
+      if (!deviceBranchId && !RESTAURANT_WIDE_TYPES.has(dto.deviceType) && (await activeBranchCount(tx, key.restaurantId)) > 1) {
+        throw new BadRequestException('This restaurant has several branches: this activation key must name the branch the terminal belongs to.');
+      }
+
       // BUG-061 / Phase 2: the quota check is per-app now, not one global cap shared across
       // every device type and every subscription the restaurant holds (see
       // ApplicationEntitlementsService.assertDeviceQuotaAvailable's doc comment).
@@ -310,7 +360,7 @@ export class ActivationKeysService {
           appVersion: dto.appVersion,
           // BUG-048: the terminal belongs to the branch (and carries the name) its key was issued for.
           // With one active branch there is no doubt which one (BUG-155).
-          branchId: key.branchId ?? (await onlyActiveBranchId(tx, key.restaurantId)),
+          branchId: deviceBranchId,
           name: key.label,
           status: 'ACTIVE',
           activatedAt: new Date(),

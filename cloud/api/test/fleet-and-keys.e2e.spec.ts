@@ -27,8 +27,10 @@ describe('Activation keys and fleet lists (BUG-060/067/069/048)', () => {
   const api = (method: 'get' | 'post' | 'patch' | 'delete', url: string) => auth(request(app.getHttpServer())[method](url));
   const inDays = (d: number) => new Date(Date.now() + d * 86400_000).toISOString();
 
+  let homeBranchId: string;
   async function makeKey(extra: Record<string, unknown> = {}, rid = restaurantId) {
-    const res = await api('post', '/api/v1/activation-keys').send({ restaurantId: rid, allowedDeviceType: 'POS', expiresAt: inDays(7), ...extra });
+    // The main restaurant has several branches, so its terminals must name one.
+    const res = await api('post', '/api/v1/activation-keys').send({ restaurantId: rid, allowedDeviceType: 'POS', expiresAt: inDays(7), ...(rid === restaurantId && homeBranchId ? { branchId: homeBranchId } : {}), ...extra });
     expect(res.status, JSON.stringify(res.body)).toBe(201);
     return res.body as { id: string; code: string };
   }
@@ -47,6 +49,7 @@ describe('Activation keys and fleet lists (BUG-060/067/069/048)', () => {
     otherRestaurantId = await mk('b');
     lifecycleRestaurantId = await mk('c');
     branchId = (await api('post', '/api/v1/branches').send({ restaurantId, name: 'Fleet Branch', code: 'FB' })).body.id;
+    homeBranchId = (await api('post', '/api/v1/branches').send({ restaurantId, name: 'Fleet Home', code: 'FH' })).body.id;
 
     planId = (await api('post', '/api/v1/plans').send({
       tier: 'PRO', name: `TEST Fleet Plan ${stamp}`, priceMonthly: 700000, maxBranches: 5, maxDevices: 50, maxUsers: 20, entitlements: { posTerminal: true }

@@ -139,7 +139,7 @@ describe('audit probes: onboarding, devices, branches, concurrency', () => {
 
   // ------------------------------------------------------------------ requirements the code does NOT meet (defects confirmed by these probes)
 
-  it.fails('P-FAIL-1 (spec 20/21): the ORDER-level status cannot regress (READY, then a stale PREPARING with a fresh eventId)', async () => {
+  it('P-FIXED-1 (spec 20/21): the ORDER-level status cannot regress (READY, then a stale PREPARING with a fresh eventId)', async () => {
     await as('post', '/api/v1/orders/sync', F.posA).send({ events: [order('probe-status', 'NEW')] });
     await as('post', '/api/v1/orders/sync', F.kdsA).send({ events: [order('probe-status', 'READY')] });
     await as('post', '/api/v1/orders/sync', F.posA).send({ events: [order('probe-status', 'PREPARING', { updatedAt: new Date(Date.now() - 60000).toISOString() })] });
@@ -147,7 +147,7 @@ describe('audit probes: onboarding, devices, branches, concurrency', () => {
     expect(row.status).toBe('READY');
   });
 
-  it.fails('P-FAIL-2 (spec 32): concurrent activations cannot exceed the device quota', async () => {
+  it('P-FIXED-2 (spec 32): concurrent activations cannot exceed the device quota', async () => {
     const p = await plan({ maxDevices: 2 });
     const rid = await restaurant('AuditQuota', p);
     const keys = await Promise.all(Array.from({ length: 6 }, () => key(rid, 'POS')));
@@ -156,31 +156,29 @@ describe('audit probes: onboarding, devices, branches, concurrency', () => {
     expect(active).toBeLessThanOrEqual(2);
   });
 
-  it.fails('P-FAIL-3 (spec 36/41): a device cannot be activated without a branch in a restaurant that has several active branches', async () => {
+  it('P-FIXED-3 (spec 36/41): a device cannot be activated without a branch in a restaurant that has several active branches', async () => {
     const r = await redeem(F.rid, 'POS'); // key has no branch; the restaurant has two active branches
     expect(r.status).not.toBe(201);
   });
 
-  it.fails('P-FAIL-4 (spec 36): a branchless device does not see other branches\' orders', async () => {
-    // Created directly so this probe does not depend on P-FAIL-3.
-    const dev = await prisma.runAsPlatform((tx) => tx.device.findFirst({ where: { restaurantId: F.rid, branchId: null } }));
-    let token: string | undefined;
-    if (dev) {
-      // Reuse the device created by P-FAIL-3 only if it exists; otherwise redeem one.
-      token = undefined;
-    }
-    token = token ?? (await redeem(F.rid, 'POS')).token;
-    const seen = (await as('get', '/api/v1/orders/sync?afterSeq=0', token!)).body.orders.map((o: any) => o.externalOrderId);
-    expect(seen).not.toContain('probe-brA-1');
+  it('P-FIXED-4 (spec 36): only an admin console may be restaurant-wide; a branch terminal never sees another branch orders', async () => {
+    const admin = await redeem(F.rid, 'POS_ADMIN'); // no branch: allowed for a console
+    expect(admin.status).toBe(201);
+    expect(admin.device.branchId).toBeNull();
+    const consoleSees = (await as('get', '/api/v1/orders/sync?afterSeq=0', admin.token!)).body.orders.map((o: any) => o.externalOrderId);
+    expect(consoleSees).toContain('probe-brA-1');
+    const branchB = (await as('get', '/api/v1/orders/sync?afterSeq=0', F.posB)).body.orders.map((o: any) => o.externalOrderId);
+    expect(branchB).not.toContain('probe-brA-1');
+    expect((await redeem(F.rid, 'KIOSK')).status).not.toBe(201); // and a kiosk terminal is a branch terminal
   });
 
-  it.fails('P-FAIL-5 (spec 36/41): Branch B cannot pull Branch A\'s tables through entity sync', async () => {
+  it('P-FIXED-5 (spec 36/41): Branch B cannot pull Branch A\'s tables through entity sync', async () => {
     await as('post', '/api/v1/entity-sync/DINING_TABLE', F.posA).send({ events: [{ externalId: 'probe-tblA', payload: { id: 'probe-tblA', tableNumber: 'A-9', capacity: 2, status: 'AVAILABLE', isActive: true, branchId: F.brA, updatedAt: now() } }] });
     const pulled = await as('get', '/api/v1/entity-sync/DINING_TABLE', F.posB);
     expect(JSON.stringify(pulled.body)).not.toContain('A-9');
   });
 
-  it.fails('P-FAIL-6 (spec 34/31): Restaurant Admin sees the applications of EVERY active subscription (Restaurant + Kiosk family)', async () => {
+  it('P-FIXED-6 (spec 34/31): Restaurant Admin sees the applications of EVERY active subscription (Restaurant + Kiosk family)', async () => {
     const kp = await plan({ productFamily: 'KIOSK', tier: 'CORE', maxDevices: 3, entitlements: {} });
     const rp = await plan();
     const rid = await restaurant('AuditFamily', rp);

@@ -622,6 +622,9 @@ export interface Order {
     note?: string;
     actor?: string;
   }>;
+  /** The server's sequence number and version of this order as last received or acknowledged. Used to order changes without trusting any device clock. */
+  remoteSeq?: number;
+  remoteSyncVersion?: number;
   syncStatus?: 'SAVED_LOCALLY' | 'SYNCING' | 'SYNCED' | 'FAILED' | 'DEAD_LETTER';
   /** Failed push attempts since the last success; drives backoff and dead-lettering. */
   syncAttempts?: number;

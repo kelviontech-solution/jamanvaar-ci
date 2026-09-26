@@ -47,6 +47,8 @@ export const orderSyncMetaSchema = z
     createdAt: z.string().optional(),
     sourceType: z.string().max(32).optional(),
     acceptedBy: z.string().max(64).optional(),
+    /** A counter device (POS / POS Admin) deliberately correcting an order's state, e.g. re-opening a wrongly completed order. */
+    statusCorrection: z.boolean().optional(),
     businessDayId: z.string().max(64).optional(),
     paymentTransactionId: z.string().max(128).optional(),
     tenderedAmountPaise: z.number().int().optional(),
@@ -78,7 +80,12 @@ export const orderSyncEventSchema = z.object({
   paymentStatus: z.string().max(32).optional(),
   paymentMethod: z.string().max(32).optional(),
   meta: orderSyncMetaSchema.optional(),
-  updatedAt: z.string().datetime()
+  updatedAt: z.string().datetime(),
+  /**
+   * The syncVersion of this order the device last saw. When it is older than the server's, another device changed the order
+   * since: the server keeps its own header (totals, table, notes, type), still merges items, and flags the order for review.
+   */
+  baseSyncVersion: z.number().int().min(0).optional()
 });
 
 // The outer request only checks that events is a list. Each event is validated

@@ -109,7 +109,7 @@ describe('Sync reconciliation and tracing', () => {
   });
 
   it('a trace id ties one order\'s pushes, and any refusal, into a single timeline', async () => {
-    await as('post', '/api/v1/orders/sync', pos).send({ events: [order('recon-trace', { traceId: 'TRACE-ABC', eventId: 'POS-EVT-TR1' })] });
+    await as('post', '/api/v1/orders/sync', pos).send({ events: [order('recon-trace', { traceId: 'TRACE-ABC', eventId: 'POS-EVT-TR1', status: 'NEW' })] });
     await as('post', '/api/v1/orders/sync', pos).send({ events: [order('recon-trace', { traceId: 'TRACE-ABC', eventId: 'POS-EVT-TR2', status: 'READY' })] });
     const res = await platform('get', '/api/v1/platform/telemetry/trace/TRACE-ABC');
     expect(res.status).toBe(200);

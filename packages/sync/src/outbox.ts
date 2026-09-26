@@ -54,6 +54,8 @@ export interface OrderSyncMeta {
 export interface OrderSyncPushEvent {
   /** Identifies this exact version of the order: stable across retries, new whenever the order changes. The server applies it once. */
   eventId?: string;
+  /** The order's syncVersion this device last saw; a push against an older version cannot overwrite newer totals or table. */
+  baseSyncVersion?: number;
   externalOrderId: string;
   orderType: string;
   status: string;
@@ -96,6 +98,9 @@ export interface CloudSyncedOrder {
   paymentMethod?: string | null;
   meta?: OrderSyncMeta | null;
   updatedAt: string;
+  /** Assigned by the cloud: the gapless position of this order's latest change, and how many times it has changed. */
+  seq?: number;
+  syncVersion?: number;
 }
 
 /**
@@ -150,9 +155,26 @@ function markFailedAttempt(order: Order, error: string): void {
   order.syncLastError = error.slice(0, 300);
 }
 
+/** A short, stable fingerprint of what a push says. Same content -> same fingerprint (a retry is recognised); any real change -> a different one. */
+function contentFingerprint(order: Order): string {
+  const text = JSON.stringify([
+    order.orderStatus, order.tableId, order.paymentStatus, order.totalAmount, order.customerNotes,
+    order.items.map((i) => [i.id, i.quantity, i.unitPrice, i.kitchenStatus, i.specialInstructions])
+  ]);
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(36);
+}
+
 function toPushEvent(order: Order): OrderSyncPushEvent {
   return {
-    eventId: `${order.id}@${order.updatedAt}`,
+    // Unique per distinct change: the order, when it changed, and what it said. Two different changes that share a millisecond
+    // no longer collide (the second used to be dropped as a "duplicate"); a retry of the same change still carries the same id.
+    eventId: `${order.id}@${order.updatedAt}#${contentFingerprint(order)}`,
+    ...(order.remoteSyncVersion !== undefined ? { baseSyncVersion: order.remoteSyncVersion } : {}),
     externalOrderId: order.id,
     orderType: order.orderType,
     status: order.orderStatus,
@@ -514,6 +536,7 @@ export class SyncOutboxEngine {
             const res = byId.get(ord.id);
             if (res && res.status === 'ok') {
               markSynced(ord);
+              if (typeof res.syncVersion === 'number') ord.remoteSyncVersion = res.syncVersion;
               processed++;
             } else {
               markFailedAttempt(ord, res?.error ?? 'Not acknowledged by the server');
@@ -600,7 +623,17 @@ export class SyncOutboxEngine {
           // Who accepted an order is a claim decided by the server (first accept wins), not by timestamps: adopt it
           // even when this device's own copy is newer.
           if (remote.meta?.acceptedBy && existing.acceptedByDeviceId !== remote.meta.acceptedBy) existing.acceptedByDeviceId = remote.meta.acceptedBy;
-          if (new Date(remote.updatedAt).getTime() >= new Date(existing.updatedAt).getTime()) {
+          // Which copy is newer is decided by the cloud's sequence, never by comparing the cloud's clock with this device's. A device
+          // whose clock runs ahead used to ignore every server update. With unsent local changes the push goes first; the merged
+          // result comes back on the next pull. Older cloud rows without a sequence still use the timestamp.
+          const localPending = existing.syncStatus === 'SAVED_LOCALLY' || existing.syncStatus === 'SYNCING' || existing.syncStatus === 'FAILED';
+          const remoteIsNewer =
+            typeof remote.seq === 'number'
+              ? remote.seq > (existing.remoteSeq ?? 0) && !localPending
+              : new Date(remote.updatedAt).getTime() >= new Date(existing.updatedAt).getTime();
+          if (remoteIsNewer) {
+            if (typeof remote.seq === 'number') existing.remoteSeq = remote.seq;
+            if (typeof remote.syncVersion === 'number') existing.remoteSyncVersion = remote.syncVersion;
             const added = applyRemoteToLocalOrder(existing, remote);
             if (added || remote.status === 'PREPARING' || remote.status === 'NEW') ensureKotsForOrder(existing);
             if (existing.businessDayId) touchedDays.add(existing.businessDayId);
@@ -624,6 +657,8 @@ export class SyncOutboxEngine {
           }
         } else {
           const localOrder = buildLocalOrderFromRemote(remote);
+          if (typeof remote.seq === 'number') localOrder.remoteSeq = remote.seq;
+          if (typeof remote.syncVersion === 'number') localOrder.remoteSyncVersion = remote.syncVersion;
           db.orders.push(localOrder);
           ensureKotsForOrder(localOrder);
           if (localOrder.businessDayId) touchedDays.add(localOrder.businessDayId);

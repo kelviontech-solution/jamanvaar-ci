@@ -1,6 +1,6 @@
 # Restaurant onboarding and multi-application test report
 
-**Phase: architecture audit (complete). Fix and full-matrix execution phases: not started.**
+**Phase: audit complete; fixes for every confirmed defect implemented and re-tested (section 23). Sections 1-22 record the audit as found.**
 Plan and matrix: [RESTAURANT_ONBOARDING_AND_MULTI_APP_TEST_PLAN.md](RESTAURANT_ONBOARDING_AND_MULTI_APP_TEST_PLAN.md). Requirement: [RESTAURANT_ONBOARDING_MULTI_APP_TEST_SPECIFICATION.md](RESTAURANT_ONBOARDING_MULTI_APP_TEST_SPECIFICATION.md).
 
 Nothing in this report is marked passed unless it was executed. What was executed in this phase:
@@ -135,3 +135,28 @@ See plan section 8. In short: quota race, branch policy, order status rules, cli
 * Roughly half of the matrix (concurrency combinations CC-02..08, multi-KDS, per-app Branch Core failure, restart in a real browser, end-to-end field consistency) is **unexecuted**.
 * Several "by code" findings could turn out to be non-issues once probed; none is asserted as fact beyond its label.
 * Decisions pending from you: branchless device policy; server-side pricing of device orders; branch overrides on POS/Kiosk/Captain; server-assigned KDS stations; device re-registration policy.
+
+
+## 23. Fix phase results
+
+Decisions taken and per-defect changes are in plan section 9. Evidence:
+
+| Run | Result |
+|---|---|
+| `audit-probes` (19): the six former `it.fails` probes now assert the required behaviour as plain tests | 19 passed (quota, branch policy, order status, table isolation, admin list all fixed) |
+| `order-rules.unit` | 7 passed |
+| `onboarding-hardening.e2e` (order state, version precondition, price flags, origin device, two kitchens, re-binding, terminal names, floor plan by branch) | 10 passed |
+| `ecosystem.e2e` (54 terminals + QR, 2 restaurants x 2 branches, simultaneous) | 1 passed: 160 orders, none lost or duplicated, gapless sequence, correct branch and source, KDS scoping exact |
+| `multi_app_client_hardening` (root): clock skew, event ids, base version, inventory across consoles | 7 passed; 3 of the client tests **fail against the previous `outbox.ts`** (verified by restoring it), so they do test the fix |
+| Existing suites | see the final line of this section |
+
+Existing tests that encoded the old permissive behaviour were changed on purpose: `order-sync-and-suspension` (a branchless KDS is now refused; a console is restaurant-wide), `fleet-and-keys` and `device-updates` (terminals in multi-branch restaurants name their branch), `sync-reconciliation` (the trace test no longer pushes READY after COMPLETED). Two time-sensitive tests (`restaurant-sales`, the catch-up cursor test) were made deterministic: they depended on the database clock and this process agreeing to the millisecond and failed intermittently under load; the fixes did not cause that.
+
+### Bugs now closed
+BUG-01 to BUG-04 and BUG-06 to BUG-12 (BUG-05 by flagging, per decision). Migration added: `20260927030000_key_replaces_device`.
+
+### Remaining risks
+* Restart tests use in-process persistence, not a real browser or native shell restart.
+* Device order load was measured once (160 orders in 784 ms, development machine); no sustained run.
+* KDS station assignment remains client-side; branch overrides remain QR-only; four queries per device request remain.
+* The status rules govern the current status vocabulary; a status word the server does not know is never blocked, so a new status must be added to `order-rules.ts` to be governed.

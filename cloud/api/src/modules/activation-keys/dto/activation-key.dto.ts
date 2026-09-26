@@ -13,7 +13,9 @@ export const generateActivationKeySchema = z.object({
   /** Becomes the terminal's name, e.g. "Counter 1". */
   label: z.string().trim().min(1).max(80).optional(),
   /** Keys generated together (a welcome kit) share a batch. */
-  batchId: z.string().trim().min(1).max(60).optional()
+  batchId: z.string().trim().min(1).max(60).optional(),
+  /** Reinstall / replacement: the existing terminal this key re-binds. It is revoked when the key is redeemed and its seat is reused. */
+  replacesDeviceId: z.string().uuid().optional()
 });
 export type GenerateActivationKeyDto = z.infer<typeof generateActivationKeySchema>;
 

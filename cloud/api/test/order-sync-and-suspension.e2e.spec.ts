@@ -108,6 +108,7 @@ describe('Order sync bridge + suspension enforcement', () => {
     // to client-side Date.now() instead would race against the previous
     // test's write under load, since both run on the same clock but not
     // atomically relative to each other.
+    await new Promise((r) => setTimeout(r, 50)); // let the previous test's write settle behind the cursor on a busy machine
     const cursorRes = await authed('get', '/api/v1/orders/sync?since=2999-01-01T00:00:00.000Z', kdsToken);
     const cursor = cursorRes.body.serverTime;
 
@@ -143,20 +144,18 @@ describe('Order sync bridge + suspension enforcement', () => {
     const branchAPull = await authed('get', `/api/v1/orders/sync?since=${encodeURIComponent(cursor)}`, posATokenBranch);
     expect(branchAPull.body.orders.map((o: any) => o.externalOrderId)).toContain('branch-a-order');
 
-    // An unassigned device (branchId null) still sees everything. The restaurant now
-    // has 3 branches (its auto-created default, plus A and B), so a freshly-redeemed
-    // key with no explicit branchId gets no auto-assigned branch either (that only
-    // happens when the restaurant has exactly one active branch) — a real "no branch"
-    // device, unlike posToken/kdsToken from this file's beforeAll, which were redeemed
-    // back when the restaurant's own auto-created default branch was its only one.
+    // A kitchen or counter terminal without a branch is refused once the restaurant has several branches (it would see every
+    // branch). Only an admin console may be restaurant-wide, and it sees everything.
     const unassignedKey = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KDS', expiresAt: new Date(Date.now() + 86400000).toISOString() });
-    const unassignedRedeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: unassignedKey.body.code, deviceType: 'KDS' });
-    const unassignedToken = unassignedRedeem.body.deviceToken;
-    const unassignedDeviceRow = await prisma.runAsPlatform((tx) => tx.device.findUniqueOrThrow({ where: { id: unassignedRedeem.body.device.id } }));
-    expect(unassignedDeviceRow.branchId).toBeNull();
+    expect(unassignedKey.status).toBe(400);
 
-    const unassignedPull = await authed('get', `/api/v1/orders/sync?since=${encodeURIComponent(cursor)}`, unassignedToken);
-    expect(unassignedPull.body.orders.map((o: any) => o.externalOrderId)).toContain('branch-a-order');
+    const consoleKey = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'POS_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const consoleRedeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: consoleKey.body.code, deviceType: 'POS_ADMIN' });
+    expect(consoleRedeem.status).toBe(201);
+    const consoleRow = await prisma.runAsPlatform((tx) => tx.device.findUniqueOrThrow({ where: { id: consoleRedeem.body.device.id } }));
+    expect(consoleRow.branchId).toBeNull();
+    const consolePull = await authed('get', `/api/v1/orders/sync?since=${encodeURIComponent(cursor)}`, consoleRedeem.body.deviceToken);
+    expect(consolePull.body.orders.map((o: any) => o.externalOrderId)).toContain('branch-a-order');
   });
 
   /** security-audit HIGH-05: once an order is settled/refunded, only the settling device or a POS/POS_ADMIN device may change its payment status. */

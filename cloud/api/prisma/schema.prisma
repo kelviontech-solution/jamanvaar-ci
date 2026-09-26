@@ -465,6 +465,8 @@ model ActivationKey {
   expiresAt          DateTime
   redeemedAt         DateTime?
   redeemedByDeviceId String?
+  /// Set when this key re-binds an existing terminal (reinstall): redeeming it revokes that device and reuses its seat.
+  replacesDeviceId   String?
   /// BUG-048: the branch the terminal that redeems this key is bound to.
   branchId           String?
   branch             Branch?                 @relation(fields: [branchId], references: [id], onDelete: SetNull)

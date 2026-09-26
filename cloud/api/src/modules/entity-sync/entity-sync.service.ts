@@ -62,8 +62,12 @@ export class EntitySyncService {
     const results: EntitySyncPushResult[] = [];
 
     await this.prisma.runAsTenant(restaurantId, async (tx) => {
-      for (const evt of events) {
+      for (let evt of events) {
         try {
+          // A branch-owned record pushed by a branch-bound terminal is stamped with that branch, so other branches never receive it.
+          if (entityType === 'DINING_TABLE' && deviceBranchId && evt.payload.deleted !== true && typeof evt.payload.branchId !== 'string') {
+            evt = { ...evt, payload: { ...evt.payload, branchId: deviceBranchId } };
+          }
           const problem = menuEntityProblem(entityType, evt.payload);
           if (problem) {
             results.push({ externalId: evt.externalId, status: 'error', error: problem });
@@ -162,10 +166,14 @@ export class EntitySyncService {
   }
 
   async catchUp(device: Device, entityType: SyncableEntityType, since?: string) {
-    return this.catchUpForRestaurant(device.restaurantId, entityType, since);
+    return this.catchUpForRestaurant(device.restaurantId, entityType, since, entityType === 'DINING_TABLE' ? device.branchId : null);
   }
 
-  async catchUpForRestaurant(restaurantId: string, entityType: SyncableEntityType, since?: string) {
+  /**
+   * `branchId` scopes branch-owned records (the floor plan): a branch terminal receives its own branch's tables and any table
+   * that names no branch, never another branch's. Restaurant-wide types (menu, staff, customers) are not filtered.
+   */
+  async catchUpForRestaurant(restaurantId: string, entityType: SyncableEntityType, since?: string, branchId: string | null = null) {
     const sinceDate = since ? new Date(since) : new Date(Date.now() - CATCH_UP_DEFAULT_LOOKBACK_MS);
 
     // B2-029: same missing-filter bug as order-sync.service.ts — this returned every
@@ -179,6 +187,12 @@ export class EntitySyncService {
       })
     );
 
-    return { entities, serverTime: new Date().toISOString() };
+    const visible = branchId
+      ? entities.filter((e) => {
+          const b = (e.payload as { branchId?: unknown } | null)?.branchId;
+          return typeof b !== 'string' || b === branchId;
+        })
+      : entities;
+    return { entities: visible, serverTime: new Date().toISOString() };
   }
 }

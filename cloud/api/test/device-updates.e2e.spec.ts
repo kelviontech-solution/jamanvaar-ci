@@ -21,8 +21,10 @@ describe('Heartbeat delivers update offers and offline extensions (BUG-065/077)'
   const inDays = (d: number) => new Date(Date.now() + d * 86400_000).toISOString();
 
   const platform = (method: 'get' | 'post' | 'patch', url: string) => request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
+  let homeBranchId: string;
   async function enroll(type: string, extra: Record<string, unknown> = {}) {
-    const key = await platform('post', '/api/v1/activation-keys').send({ restaurantId, allowedDeviceType: type, expiresAt: inDays(1), ...extra });
+    // The restaurant has several branches, so a terminal must name its branch (a terminal without one is refused).
+    const key = await platform('post', '/api/v1/activation-keys').send({ restaurantId, allowedDeviceType: type, expiresAt: inDays(1), branchId: homeBranchId, ...extra });
     const red = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: type, appVersion: '1.0.0' });
     return { token: red.body.deviceToken as string, id: red.body.device.id as string };
   }
@@ -38,6 +40,7 @@ describe('Heartbeat delivers update offers and offline extensions (BUG-065/077)'
     token = (await platformLogin(app, email, password)).body.accessToken;
     restaurantId = (await platform('post', '/api/v1/restaurants').send({ name: `TEST Upd ${stamp}`, ownerName: 'Owner', ownerEmail: `upd-${stamp}@example.com` })).body.restaurant.id;
     branchId = (await platform('post', '/api/v1/branches').send({ restaurantId, name: 'Upd Branch', code: 'UB' })).body.id;
+    homeBranchId = (await platform('post', '/api/v1/branches').send({ restaurantId, name: 'Upd Home', code: 'UH' })).body.id;
     planId = (await platform('post', '/api/v1/plans').send({ tier: 'PRO', name: `TEST Upd Plan ${stamp}`, priceMonthly: 700000, maxBranches: 5, maxDevices: 50, maxUsers: 20, entitlements: { posTerminal: true } })).body.id;
     await platform('post', '/api/v1/subscriptions').send({ restaurantId, planId, status: 'ACTIVE', expiresAt: inDays(30) });
   }, 60_000);

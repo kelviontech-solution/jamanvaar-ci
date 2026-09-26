@@ -4,6 +4,7 @@ import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { nextSyncSequence } from '../../common/sync-sequence';
 import { mergeOrderItems } from './order-merge';
+import { decideStatus, integrityFlags } from './order-rules';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { OrderSyncEventDto, orderSyncEventSchema } from './dto/push-order-sync.dto';
 
@@ -215,23 +216,75 @@ export class OrderSyncService {
           // Accepting an order is a claim: the first device to record it owns it, and a later claim cannot take it over.
           if (mergedMeta && typeof priorMeta.acceptedBy === 'string') mergedMeta.acceptedBy = priorMeta.acceptedBy;
 
+          // The order's state follows rules, not arrival order: no going backwards, no leaving a terminal state, and a device
+          // type only sets the states it has authority over. A refused change is recorded; the rest of the push still merges.
+          const decision = decideStatus(existing?.status, evt.status, device.type, evt.meta as { statusCorrection?: unknown } | undefined);
+          if (!decision.apply) {
+            await tx.syncConflict.create({
+              data: {
+                restaurantId: device.restaurantId, branchId: device.branchId, deviceId: device.id, entityType: 'ORDER', entityId: evt.externalOrderId,
+                localVersion: { status: evt.status, updatedAt: evt.updatedAt } as any, cloudVersion: { status: existing?.status } as any,
+                reason: `${decision.reason}: ${decision.message}`
+              }
+            });
+          }
+
+          // A push based on an older version of the order must not overwrite header fields another device has since changed.
+          const staleHeader = !!existing && evt.baseSyncVersion !== undefined && evt.baseSyncVersion < existing.syncVersion;
+          if (staleHeader) {
+            await tx.syncConflict.create({
+              data: {
+                restaurantId: device.restaurantId, branchId: device.branchId, deviceId: device.id, entityType: 'ORDER', entityId: evt.externalOrderId,
+                localVersion: { baseSyncVersion: evt.baseSyncVersion, totalAmount: evt.totalAmount, tableId: evt.tableId } as any,
+                cloudVersion: { syncVersion: existing!.syncVersion, totalAmount: existing!.totalAmount, tableId: existing!.tableId } as any,
+                reason: `STALE_HEADER: ${device.type} pushed against version ${evt.baseSyncVersion}, the order is at ${existing!.syncVersion}; its totals, table and notes were kept as they were`
+              }
+            });
+          }
+          const header = staleHeader && existing
+            ? { orderType: existing.orderType, tableId: existing.tableId, tableLabel: existing.tableLabel, subtotal: existing.subtotal, taxAmount: existing.taxAmount, discountAmount: existing.discountAmount, totalAmount: existing.totalAmount, notes: existing.notes }
+            : { orderType: evt.orderType, tableId: evt.tableId, tableLabel: evt.tableLabel, subtotal: evt.subtotal, taxAmount: evt.taxAmount, discountAmount: evt.discountAmount, totalAmount: evt.totalAmount, notes: evt.notes };
+
+          // Device-priced orders are believed (devices work offline on an older menu) but checked; problems are flagged, never rejected.
+          let reviewFlags: string[] = [];
+          if (!existing) {
+            const ids = (evt.items as Array<{ externalItemId: string }>).map((i) => i.externalItemId);
+            const menuRows = await tx.syncedEntity.findMany({ where: { restaurantId: device.restaurantId, entityType: 'MENU_ITEM', externalId: { in: ids } }, select: { externalId: true, payload: true } });
+            const base = new Map<string, number>();
+            for (const r of menuRows) {
+              const p = r.payload as { price?: unknown; deleted?: unknown } | null;
+              if (p && p.deleted !== true && typeof p.price === 'number') base.set(r.externalId, Math.round(p.price * 100));
+            }
+            reviewFlags = integrityFlags(evt.items as any[], evt.subtotal, base);
+            if (reviewFlags.length > 0) {
+              await tx.syncConflict.create({
+                data: {
+                  restaurantId: device.restaurantId, branchId: device.branchId, deviceId: device.id, entityType: 'ORDER', entityId: evt.externalOrderId,
+                  localVersion: { subtotal: evt.subtotal, totalAmount: evt.totalAmount } as any, cloudVersion: {} as any,
+                  reason: `PRICE_REVIEW: ${reviewFlags.slice(0, 6).join('; ')}`
+                }
+              });
+            }
+          }
+          // Server-owned facts about the order live in meta and cannot be set by a device: who created it, and what needs review.
+          const serverMeta: Record<string, unknown> = {
+            originDeviceId: (priorMeta.originDeviceId as string | undefined) ?? device.id,
+            ...(reviewFlags.length > 0 ? { reviewFlags } : {}),
+            ...(staleHeader ? { needsTotalsReview: true } : {})
+          };
+          const finalMeta = { ...(mergedMeta ?? {}), ...serverMeta, ...(existing && Array.isArray(priorMeta.reviewFlags) && reviewFlags.length === 0 ? { reviewFlags: priorMeta.reviewFlags } : {}) };
+          delete (finalMeta as Record<string, unknown>).statusCorrection;
+
           const data = {
             restaurantId: device.restaurantId,
             deviceId: device.id,
             externalOrderId: evt.externalOrderId,
-            orderType: evt.orderType,
-            status: evt.status,
-            tableId: evt.tableId,
-            tableLabel: evt.tableLabel,
+            status: decision.status,
+            ...header,
             items: merge.items as any,
-            subtotal: evt.subtotal,
-            taxAmount: evt.taxAmount,
-            discountAmount: evt.discountAmount,
-            totalAmount: evt.totalAmount,
-            notes: evt.notes,
             paymentStatus: evt.paymentStatus,
             paymentMethod: evt.paymentMethod,
-            meta: (mergedMeta ?? undefined) as any
+            meta: finalMeta as any
           };
           const source = orderSourceFor(device.type, evt.meta);
 

@@ -640,7 +640,7 @@ export class OrderRepository {
         : (resolvedKioskId || 'Self-Order Kiosk');
 
     const newOrder: Order = {
-      id: orderData.id || `ord-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      id: orderData.id || `ord-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
       orderNumber,
       tokenNumber,
       businessDayId,
@@ -2501,7 +2501,7 @@ export class KOTRepository {
       // Deterministic tickets are idempotent: a device that already has this exact ticket does not make another.
       if (fixedId && db.kots.some((k) => k.id === fixedId)) return;
       const kotRecord: KOTRecord = {
-        id: fixedId ?? `kot-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+        id: fixedId ?? `kot-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
         kotNumber: (() => {
           if (params.numberBase) return stationNames.length > 1 ? `${params.numberBase}-${stationNames.indexOf(stationName) + 1}` : params.numberBase;
           const allocated = NumberAllocator.next('KOT');
@@ -3033,9 +3033,15 @@ export class InventoryRepository {
     return true;
   }
 
-  public static recordMovement(data: Omit<StockMovement, 'id' | 'timestamp'>): StockMovement {
+  public static recordMovement(data: Omit<StockMovement, 'id' | 'timestamp'> & { id?: string }): StockMovement {
+    // A movement with a caller-chosen id that this device already holds (booked locally, or received from the ledger as
+    // `remote:<id>`) is the same movement: it is not booked twice.
+    if (data.id) {
+      const held = db.stockMovements.find((m) => m.id === data.id || m.id === `remote:${data.id}`);
+      if (held) return held;
+    }
     const movement: StockMovement = {
-      id: uniqueStockId('sm'),
+      id: data.id ?? uniqueStockId('sm'),
       itemId: data.itemId,
       itemName: data.itemName,
       type: data.type,
@@ -3184,6 +3190,9 @@ export class InventoryRepository {
           }
           const qty = perPortion * Math.abs(delta);
           this.recordMovement({
+            // Derived from the order, the line, the ingredient and the step (already -> now), so two consoles reconciling the
+            // same order produce the same movement and the ledger counts it once.
+            id: `sale:${order.id}:${it.id}:${ing.inventoryItemId}:${already}>${it.quantity}`,
             itemId: ing.inventoryItemId,
             itemName: ing.inventoryItemName,
             type: delta > 0 ? 'SALE' : 'SALE_REVERSAL',

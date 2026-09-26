@@ -2,7 +2,7 @@
 
 Source requirement: [RESTAURANT_ONBOARDING_MULTI_APP_TEST_SPECIFICATION.md](RESTAURANT_ONBOARDING_MULTI_APP_TEST_SPECIFICATION.md) (the original 60-section brief; it was previously stored under this file's name). Findings and execution log: [RESTAURANT_ONBOARDING_MULTI_APP_TEST_REPORT.md](RESTAURANT_ONBOARDING_MULTI_APP_TEST_REPORT.md).
 
-**Status of this document: architecture audit only.** It records how the code actually works, the test matrix built from it, and which cells are verified. No production code was changed. The only code added is `cloud/api/test/audit-probes.e2e.spec.ts` (19 probes, described in section 6). Nothing here was packaged.
+**Status: audit complete and every confirmed defect fixed (section 9). Sections 1-8 are the audit as found.** It records how the code actually works, the test matrix built from it, and which cells are verified. No production code was changed. The only code added is `cloud/api/test/audit-probes.e2e.spec.ts` (19 probes, described in section 6). Nothing here was packaged.
 
 ## 1. Status legend (used in every matrix)
 
@@ -266,3 +266,51 @@ Section numbers follow the source specification. "Existing evidence" names the s
 8. Address D11-D15 and the device re-registration policy (D12).
 
 Decisions needed from you before steps 2, 5 and 8: branchless device policy; whether POS/Kiosk/Captain prices are validated server-side; whether branch price overrides apply to POS/Kiosk/Captain; whether a KDS is assigned a station by the server; device re-registration policy (re-bind an existing device vs new seat).
+
+
+## 9. Fix phase: decisions taken and results (current state)
+
+Sections 1-8 record the audit as found. This section is the current state after the fixes.
+
+### 9.1 Decisions (taken on the product owner's behalf, chosen to fit the SaaS flow)
+
+| Question | Decision | Why |
+|---|---|---|
+| Branchless devices | Refused when the restaurant has more than one active branch, at key generation and at redemption. Only the two admin consoles (POS_ADMIN, KIOSK_ADMIN) may be restaurant-wide, and they see all branches. | A terminal that does not know its branch would see every branch; a chain owner's console legitimately does. |
+| Server-side price checks for POS/Kiosk/Captain | Checked and **flagged, never rejected**: line total, subtotal, and price below the published menu price become `meta.reviewFlags` plus a recorded conflict for the operator. | Terminals work offline on an older menu; rejecting would lose real sales. Flagging makes discrepancies visible without breaking offline-first. |
+| Branch price overrides on POS/Kiosk/Captain | Stay a QR-menu feature. The device price check treats the restaurant-wide menu price as the floor. | Applying overrides on devices needs a device-side menu change across four apps; it is a separate feature, not a defect. Recorded as a known limit. |
+| KDS station assignment | Unchanged: chosen on the KDS screen, matched by station name; every KDS of a branch receives all branch orders. Two kitchens advancing their own items merge correctly (tested). | Server assignment is a new configuration product; the current model works and is now tested. |
+| Re-registration | A key may name the device it **replaces** (`replacesDeviceId`). Redeeming revokes the old record in the same transaction and reuses its seat; name and branch are inherited. | A reinstall must not cost a seat or leave two live records. |
+| Terminal names | Unique per branch among live terminals and pending keys. | Fleet screens need distinguishable terminals. |
+
+### 9.2 What was fixed (defect -> change -> proof)
+
+| Defect | Change | Proof |
+|---|---|---|
+| D1 quota race | `pg_advisory_xact_lock` per restaurant and app inside the quota check | `audit-probes` P-FIXED-2 (6 concurrent activations, quota 2, at most 2 succeed) |
+| D2 branchless | Branch required for non-console terminals when there is more than one branch; consoles may be restaurant-wide | P-FIXED-3, P-FIXED-4, `order-sync-and-suspension` (rewritten to the new rule) |
+| D3, D8 order state | `order-rules.ts`: forward-only status, terminal states stick, a kiosk cannot run the kitchen or counter, explicit `statusCorrection` for POS/POS Admin; refusals recorded as `SyncConflict`, the push still merges and is acknowledged; `baseSyncVersion` precondition keeps newer totals/table and flags review | `order-rules.unit` (7), `onboarding-hardening` (order state, version), P-FIXED-1 |
+| D4 tables | Tables stamped with the pushing terminal's branch; pull filters by branch; unbranded tables are shared | `onboarding-hardening` (floor plan), P-FIXED-5 |
+| D5 device prices | Integrity and price flags (see decision) | `onboarding-hardening` (price review), `order-rules.unit` |
+| D6 clock skew | The client applies a cloud order by the cloud sequence, not by comparing clocks; unsent local changes are pushed first | `multi_app_client_hardening` (fails against the old `outbox.ts`, passes now) |
+| D7 event ids | `orderId@updatedAt#fingerprint`: distinct changes get distinct ids, retries keep theirs | same file (fails against old code) |
+| D9 admin app list | Merged across all active subscriptions; source label uses the plan-flag-aware set | P-FIXED-6 |
+| D10 inventory | Stock movements for an order use a deterministic id (`sale:<order>:<line>:<ingredient>:<from>><to>`); a movement already held locally or received from the ledger is not booked again | `multi_app_client_hardening` (two consoles) |
+| D11 origin device | Server-owned `meta.originDeviceId` set at creation, never changed by clients | `onboarding-hardening` |
+| D12 re-registration | `replacesDeviceId` | `onboarding-hardening` (seat reuse, old credential dead, wrong type and other restaurant refused) |
+| D14 ids and names | Order/KOT id randomness widened; terminal names unique per branch | `onboarding-hardening`, root suite |
+
+### 9.3 New end-to-end evidence
+
+`cloud/api/test/ecosystem.e2e.spec.ts`: two restaurants, two branches each; per branch of restaurant A 5 POS + 5 Kiosk + 2 KDS + 10 Captain + QR (restaurant B smaller), all creating orders in the same instant (160 orders from 54 terminals plus QR guests, 784 ms on the development machine). Asserted on stored rows: nothing lost or duplicated, sequence numbers distinct and gapless, every order carries the right restaurant, branch and source, totals preserved exactly, QR order numbers unique per branch, every KDS receives exactly its branch's orders and none from the other branch or restaurant. This closes matrix rows OR-07 and CC-02 to CC-07 for the cloud path.
+
+### 9.4 Matrix rows still open
+
+| Row | State |
+|---|---|
+| DV-04 restart in a real browser or native shell | Not executed (tested with in-process persistence only) |
+| OF-04 per-application Branch Core outage matrix | Covered by `branch_core_*` and `endpoint_resolver` tests; no per-app table was written |
+| MN-04 branch overrides on devices | Known limit (decision above) |
+| D13 KDS server-assigned stations | Decision: unchanged |
+| D15 four queries per device request | Unchanged; correct, measure before optimising |
+| Sustained device order load | Not run beyond the ecosystem test |

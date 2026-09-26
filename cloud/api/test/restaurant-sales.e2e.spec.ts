@@ -28,7 +28,10 @@ describe('Restaurant sales report for Super Admin (BUG-041)', () => {
         data: {
           restaurantId, externalOrderId: `sales-${stamp}-${key}`, orderType: 'DINE_IN', status: 'COMPLETED',
           items: [{ name: 'Paneer Tikka', quantity: 2, lineTotal: 40000 }, { name: 'Tea', quantity: 1, lineTotal: 5000 }],
-          subtotal: 45000, taxAmount: 2250, discountAmount: 0, totalAmount: 47250, paymentStatus: 'SUCCESS', paymentMethod: 'CASH', ...over
+          subtotal: 45000, taxAmount: 2250, discountAmount: 0, totalAmount: 47250, paymentStatus: 'SUCCESS', paymentMethod: 'CASH',
+          // Set explicitly, a moment in the past: rows stamped by the database clock can land after the report's own `now` when the
+          // database and this process disagree by a few milliseconds, and would silently drop out of the range.
+          createdAt: new Date(Date.now() - 60_000), ...over
         } as never
       })
     );

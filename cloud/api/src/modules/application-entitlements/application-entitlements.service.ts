@@ -180,19 +180,27 @@ export class ApplicationEntitlementsService {
     });
   }
 
+  /** Every active subscription's applications, merged: an application is enabled when ANY active subscription enables it. */
   async listForRestaurant(restaurantId: string) {
     return this.prisma.runAsPlatform(async (tx) => {
-      const sub = await tx.subscription.findFirst({
+      const subs = await tx.subscription.findMany({
         where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] } },
         orderBy: { createdAt: 'desc' },
-        include: { plan: { select: { tier: true, productFamily: true } } }
+        include: { plan: { select: { tier: true, productFamily: true, entitlements: true } } }
       });
-      if (!sub) return [];
-      const rows = await tx.applicationEntitlement.findMany({
-        where: { subscriptionId: sub.id },
-        orderBy: { appCode: 'asc' }
-      });
-      return this.withSource(rows, sub.plan);
+      if (subs.length === 0) return [];
+      const merged = new Map<string, Record<string, unknown> & { appCode: AppCode; enabled: boolean }>();
+      for (const sub of subs) {
+        const rows = await tx.applicationEntitlement.findMany({ where: { subscriptionId: sub.id }, orderBy: { appCode: 'asc' } });
+        const defaults = new Set(await this.appsForPlan(tx, sub.plan.productFamily, sub.plan.tier, sub.plan.entitlements));
+        for (const row of rows) {
+          const withSource = { ...row, source: row.enabled === defaults.has(row.appCode) ? ('PLAN' as const) : ('MANUAL_OVERRIDE' as const) };
+          const prior = merged.get(row.appCode);
+          // An enabled row from any subscription wins; otherwise keep the newest subscription's row.
+          if (!prior || (!prior.enabled && row.enabled)) merged.set(row.appCode, withSource as never);
+        }
+      }
+      return [...merged.values()].sort((a, b) => a.appCode.localeCompare(b.appCode));
     });
   }
 
@@ -298,6 +306,9 @@ export class ApplicationEntitlementsService {
    * — assertAppEnabled is the gate for that; this only caps an app that's already allowed.
    */
   async assertDeviceQuotaAvailable(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<void> {
+    // Counting and then inserting is a race: N simultaneous activations would all count the same "free seats" and all succeed.
+    // The lock is held to the end of the caller's transaction, so the next activation counts AFTER this one's device exists.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'device-quota:' + restaurantId + ':' + appCode}))`;
     const subs = await tx.subscription.findMany({
       where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE'] } },
       select: { id: true, plan: { select: { maxDevices: true } } }
