@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
-import { EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages } from '@jamanvaar/sync';
+import { getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus } from '@jamanvaar/types';
 import { Platform } from '@jamanvaar/api';
 import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
@@ -139,12 +139,22 @@ export const App: React.FC = () => {
   const [isKdsLoggedIn, setIsKdsLoggedIn] = useState<boolean>(_kdsSession !== null);
   const [kdsPin, setKdsPin] = useState('');
   const [kdsStationSelection, setKdsStationSelection] = useState(
-    _kdsSession?.stationName || 'ALL'
+    getAssignedStation() || _kdsSession?.stationName || 'ALL'
   );
   // Initialize active station from session (so KDS resumes on correct station after refresh)
   const [selectedStation, setSelectedStation] = useState<string>(
-    _kdsSession?.stationName || 'ALL'
+    getAssignedStation() || _kdsSession?.stationName || 'ALL'
   );
+  // A station assigned by Restaurant Admin wins over what was picked on this screen, and follows a change made later.
+  useEffect(() => {
+    const follow = () => {
+      const assigned = getAssignedStation();
+      if (assigned) { setKdsStationSelection(assigned); setSelectedStation(assigned); }
+    };
+    follow();
+    const t = setInterval(follow, 5000);
+    return () => clearInterval(t);
+  }, []);
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PREPARING' | 'READY' | 'SERVED'>('ALL');
   const [currentTime, setCurrentTime] = useState<string>(
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })

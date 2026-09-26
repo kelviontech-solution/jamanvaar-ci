@@ -120,6 +120,31 @@ export interface HeartbeatAnswer {
   extension?: { payload: string; signature: string; validUntil?: string } | null;
   /** The restaurant's default display size in percent (BUG-008). */
   displayScalePercent?: number;
+  /** KDS only: the kitchen station Restaurant Admin assigned to this screen, or null when it chooses. */
+  station?: string | null;
+}
+
+const STATION_KEY = 'jamanvaar_assigned_kitchen_station_v1';
+
+/** The kitchen station the cloud assigned to this KDS screen (null when none: the screen chooses). Survives a restart. */
+let assignedMemory: string | null = null;
+
+export function getAssignedStation(): string | null {
+  try {
+    return KeyValueStore.get(STATION_KEY) || assignedMemory;
+  } catch {
+    return assignedMemory;
+  }
+}
+
+export function setAssignedStation(station: string | null): void {
+  assignedMemory = station; // in memory too, so a device without usable storage still follows the assignment this session
+  try {
+    if (station) KeyValueStore.set(STATION_KEY, station);
+    else KeyValueStore.remove(STATION_KEY);
+  } catch {
+    /* storage unavailable: the screen keeps its current choice */
+  }
 }
 
 export class DeviceGate {
@@ -313,6 +338,8 @@ export class DeviceGate {
     PlatformNotice.apply(body.notice);
     // ...and the restaurant's default display size (BUG-008).
     DisplayScale.setCloudDefault(body.displayScalePercent);
+    // ...and, for a KDS screen, the kitchen station Restaurant Admin assigned to it.
+    if (body.station !== undefined) setAssignedStation(body.station);
     // ...and whether a newer version of this app exists (BUG-065).
     AppUpdate.apply(body.update);
     if (body.locked) {

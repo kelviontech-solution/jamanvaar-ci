@@ -26,12 +26,13 @@ const OPERATIONAL_PREFIXES = [
   '/api/v1/sync/',
   '/api/v1/entity-sync/',
   '/api/v1/realtime/',
-  '/api/v1/menu/',
   '/api/v1/devices/me/heartbeat',
   '/api/v1/devices/me/commands',
-  '/api/v1/devices/me/fleet',
-  '/api/v1/devices/me/sync-issues'
+  '/api/v1/devices/me/fleet'
 ];
+// NOT operational, on purpose: the Branch Core does not serve /api/v1/menu/* (menu version, publishing) or /devices/me/sync-issues.
+// They were listed here, so with a core configured they went to it and got a 404 that the resolver rightly treats as a real answer
+// (no fallback). Those are cloud facts and go to the cloud.
 
 export function isOperationalPath(path: string): boolean {
   const p = path.split('?')[0];

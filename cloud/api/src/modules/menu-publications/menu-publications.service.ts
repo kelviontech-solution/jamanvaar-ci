@@ -193,6 +193,8 @@ export class MenuPublicationsService {
         create: { restaurantId, deviceId: device.id, entityType: 'BRANCH_MENU_OVERRIDE', externalId, payload },
         update: { payload, syncVersion: { increment: 1 } }
       });
+      // Touch the dish so the branch's terminals pull it again with the new price (they only pull records changed since their cursor).
+      await tx.syncedEntity.update({ where: { id: item.id }, data: { syncVersion: item.syncVersion + 1 } });
       await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId, action: 'MENU_BRANCH_OVERRIDE_SET', category: 'MENU', details: { branchId: dto.branchId, itemId: dto.itemId, price: dto.price ?? null, isAvailable: dto.isAvailable ?? null } }, tx);
       return payload;
     });

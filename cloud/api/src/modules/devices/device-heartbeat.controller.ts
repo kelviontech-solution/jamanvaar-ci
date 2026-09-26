@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Req, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Put, Req, UseGuards, UsePipes } from '@nestjs/common';
 import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { DevicesService } from './devices.service';
@@ -31,6 +31,13 @@ export class DeviceHeartbeatController {
    * list (BUG-132). It used to know only kiosks that happened to share its browser or LAN, so a real, online
    * kiosk showed as "No Kiosk Terminals Yet".
    */
+  /** Restaurant Admin assigns the kitchen station of a KDS screen. Body: { station: "Bar" } or { station: null } to clear. */
+  @Put('fleet/:targetId/station')
+  setStation(@Param('targetId') targetId: string, @Body() body: { station?: string | null }, @CurrentDevice() device: Device) {
+    const station = typeof body?.station === 'string' ? body.station.trim().slice(0, 40) || null : null;
+    return this.devices.setKitchenStation(device, targetId, station);
+  }
+
   @Get('kiosks')
   kiosks(@CurrentDevice() device: Device) {
     return this.devices.listKiosksForRestaurant(device.restaurantId);

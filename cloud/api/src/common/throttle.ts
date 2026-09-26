@@ -8,7 +8,10 @@ import { Throttle } from '@nestjs/throttler';
  * require a valid device credential, so a much higher ceiling is safe; everything else keeps the
  * strict global limit.
  */
-export const DEVICE_SYNC_REQUESTS_PER_MINUTE = 1500;
+// The limit is per ADDRESS, and a whole branch (POS, Kiosks, Captains, KDS) shares one. The sustained-load run (30 terminals, 267 requests
+// a second, far above real use) showed 1500 a minute is exhausted in seconds by one busy branch, so the ceiling is 12000 and is
+// configurable (DEVICE_SYNC_RPM) for very large sites or carrier-grade NAT.
+export const DEVICE_SYNC_REQUESTS_PER_MINUTE = Number(process.env.DEVICE_SYNC_RPM) > 0 ? Number(process.env.DEVICE_SYNC_RPM) : 12_000;
 
 export const DeviceSyncThrottle = () => Throttle({ default: { limit: DEVICE_SYNC_REQUESTS_PER_MINUTE, ttl: 60_000 } });
 

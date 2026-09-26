@@ -1,4 +1,4 @@
-import { ForbiddenException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Device, Prisma, PlatformUser } from '@prisma/client';
 import type { RestaurantIdentityDto } from './dto/heartbeat.dto';
 import { pageOf, parsePaging } from '../../common/paging';
@@ -289,6 +289,19 @@ export class DevicesService {
     });
   }
 
+  /** Restaurant Admin assigns (or clears) the kitchen station a KDS screen of its own restaurant serves. */
+  async setKitchenStation(console: Device, targetId: string, station: string | null) {
+    if (console.type !== 'POS_ADMIN') throw new ForbiddenException('Only Restaurant Admin can assign a kitchen station');
+    return this.prisma.runAsTenant(console.restaurantId, async (tx) => {
+      const target = await tx.device.findFirst({ where: { id: targetId, restaurantId: console.restaurantId } });
+      if (!target) throw new NotFoundException('Device not found');
+      if (target.type !== 'KDS') throw new BadRequestException('Only a KDS screen has a kitchen station');
+      const updated = await tx.device.update({ where: { id: target.id }, data: { kitchenStation: station } });
+      await this.audit.log({ actorType: 'TENANT', actorId: console.id, restaurantId: console.restaurantId, action: 'KDS_STATION_ASSIGNED', category: 'DEVICE', details: { deviceId: target.id, station } }, tx);
+      return { id: updated.id, name: updated.name, kitchenStation: updated.kitchenStation };
+    });
+  }
+
   async listKiosksForRestaurant(restaurantId: string) {
     const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.device.findMany({
@@ -382,6 +395,8 @@ export class DevicesService {
     return {
       ok: true,
       serverTime: new Date().toISOString(),
+      // The station this KDS screen was assigned by Restaurant Admin (null: it chooses).
+      station: updated.kitchenStation ?? null,
       // A deactivated branch locks its terminals just as an MDM lock does (BUG-048).
       locked: updated.isLocked || branchInactive,
       lockCode: updated.isLocked ? 'DEVICE_LOCKED' : branchInactive ? 'BRANCH_INACTIVE' : null,

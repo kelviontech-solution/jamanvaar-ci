@@ -530,6 +530,8 @@ model Device {
   syncError        String?
   /// The menu version this device last reported as fully applied (see MenuPublication).
   menuVersion      Int?
+  /// KDS only: the kitchen station this screen serves, assigned by Restaurant Admin. Null = the screen chooses (all stations).
+  kitchenStation   String?
 
   backups          Backup[]
   commands         DeviceCommand[]

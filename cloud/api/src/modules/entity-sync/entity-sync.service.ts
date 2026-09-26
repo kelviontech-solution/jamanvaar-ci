@@ -68,6 +68,16 @@ export class EntitySyncService {
           if (entityType === 'DINING_TABLE' && deviceBranchId && evt.payload.deleted !== true && typeof evt.payload.branchId !== 'string') {
             evt = { ...evt, payload: { ...evt.payload, branchId: deviceBranchId } };
           }
+          if (entityType === 'MENU_ITEM' && deviceBranchId && evt.payload.deleted !== true && typeof evt.payload.price === 'number') {
+            // A branch terminal that received this branch's price and pushes the dish back must not turn it into the base price.
+            const ov = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'BRANCH_MENU_OVERRIDE', externalId: `${deviceBranchId}:${evt.externalId}` } } });
+            const ovPayload = ov?.payload as { price?: number } | undefined;
+            if (ovPayload && typeof ovPayload.price === 'number' && ovPayload.price === evt.payload.price) {
+              const base = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'MENU_ITEM', externalId: evt.externalId } } });
+              const basePrice = (base?.payload as { price?: number } | undefined)?.price;
+              if (typeof basePrice === 'number') evt = { ...evt, payload: { ...evt.payload, price: basePrice } };
+            }
+          }
           const problem = menuEntityProblem(entityType, evt.payload);
           if (problem) {
             results.push({ externalId: evt.externalId, status: 'error', error: problem });
@@ -166,7 +176,7 @@ export class EntitySyncService {
   }
 
   async catchUp(device: Device, entityType: SyncableEntityType, since?: string) {
-    return this.catchUpForRestaurant(device.restaurantId, entityType, since, entityType === 'DINING_TABLE' ? device.branchId : null);
+    return this.catchUpForRestaurant(device.restaurantId, entityType, since, (entityType === 'DINING_TABLE' || entityType === 'MENU_ITEM') ? device.branchId : null);
   }
 
   /**
@@ -187,6 +197,23 @@ export class EntitySyncService {
       })
     );
 
+    if (entityType === 'MENU_ITEM' && branchId) {
+      // This branch's own price and availability, applied on the way out: POS, Kiosk and Captain of the branch receive the dish
+      // as the branch sells it, with no change to any device. The restaurant-wide record itself is never modified.
+      const overrides = await this.prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'BRANCH_MENU_OVERRIDE' }, select: { payload: true } }));
+      const mine = new Map<string, { price?: number; isAvailable?: boolean }>();
+      for (const o of overrides) {
+        const p = o.payload as { branchId?: string; itemId?: string; price?: number; isAvailable?: boolean } | null;
+        if (p && p.branchId === branchId && typeof p.itemId === 'string') mine.set(p.itemId, { price: p.price, isAvailable: p.isAvailable });
+      }
+      const applied = entities.map((e) => {
+        const o = mine.get(e.externalId);
+        const p = e.payload as Record<string, unknown> | null;
+        if (!o || !p || p.deleted === true) return e;
+        return { ...e, payload: { ...p, ...(typeof o.price === 'number' ? { price: o.price } : {}), ...(o.isAvailable === false ? { isAvailable: false } : {}) } };
+      });
+      return { entities: applied, serverTime: new Date().toISOString() };
+    }
     const visible = branchId
       ? entities.filter((e) => {
           const b = (e.payload as { branchId?: unknown } | null)?.branchId;

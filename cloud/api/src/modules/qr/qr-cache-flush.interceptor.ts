@@ -7,7 +7,7 @@ import { RealtimeBus } from '../../common/realtime/realtime-bus';
  * branch status, a platform QR override) is a platform-side write. After one succeeds, every cached QR resolution on every API
  * instance is dropped, so a downgrade or suspension takes effect at once rather than when the short cache entry expires.
  */
-const AFFECTS_QR = /^\/api\/v1\/(subscriptions|plans|restaurants|branches|application-entitlements|qr-ordering|tenant\/branches|tenant\/qr-ordering|restaurants\/[^/]+\/applications|subscriptions\/[^/]+\/applications)(\/|\?|$)/;
+const AFFECTS_QR = /^\/api\/v1\/(subscriptions|plans|restaurants|branches|application-entitlements|qr-ordering|activation-keys|devices\/(?!me(\/|\?|$))|devices\/me\/fleet|tenant\/branches|tenant\/qr-ordering|restaurants\/[^/]+\/applications|subscriptions\/[^/]+\/applications)(\/|\?|$)?/;
 
 @Injectable()
 export class QrCacheFlushInterceptor implements NestInterceptor {

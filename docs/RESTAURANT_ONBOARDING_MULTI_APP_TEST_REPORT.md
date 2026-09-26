@@ -160,3 +160,7 @@ BUG-01 to BUG-04 and BUG-06 to BUG-12 (BUG-05 by flagging, per decision). Migrat
 * Device order load was measured once (160 orders in 784 ms, development machine); no sustained run.
 * KDS station assignment remains client-side; branch overrides remain QR-only; four queries per device request remain.
 * The status rules govern the current status vocabulary; a status word the server does not know is never blocked, so a new status must be added to `order-rules.ts` to be governed.
+
+## 24. Second fix phase
+
+See plan section 10 for the closed rows (branch prices on devices, server-assigned KDS stations, device verdict cache, Branch Core outage matrix, real-browser restart, sustained load) and the two real defects they found (menu paths mis-routed to the Branch Core; terminal-sync ceiling too low for one busy branch). Suites at this point: cloud 103 files / 850 tests passed (2 opt-in load specs skipped), root 163 files / 1153 tests passed.
