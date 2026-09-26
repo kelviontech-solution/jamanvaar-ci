@@ -25,6 +25,8 @@ export const SETTING_SCHEMAS: Record<string, z.ZodTypeAny> = {
       country: z.string().trim().min(1).max(60),
       pincode: z.string().trim().regex(/^(\d{6})?$/, 'PIN code must be 6 digits'),
       gstin: z.string().trim().toUpperCase().refine((v) => v === '' || isValidGstinFormat(v), 'GSTIN is not a valid 15-character GST number'),
+      /** The seller's PAN (10 characters, e.g. AAACK7890F); optional. */
+      panNumber: z.string().trim().toUpperCase().regex(/^([A-Z]{5}[0-9]{4}[A-Z])?$/, 'PAN must look like AAACK7890F').optional().default(''),
       sacCode: z.string().trim().regex(/^\d{4,8}$/, 'SAC code must be 4 to 8 digits'),
       sacDescription: z.string().trim().max(160),
       bankName: z.string().trim().max(80),
@@ -77,6 +79,7 @@ export const SETTING_DEFAULTS: Record<string, Record<string, unknown>> = {
     country: 'India',
     pincode: '380060',
     gstin: '24AAACK7890F1ZT',
+    panNumber: '',
     sacCode: '997331',
     sacDescription: 'Cloud SaaS Platform Subscription & Technical Support',
     bankName: 'HDFC Bank Ltd',

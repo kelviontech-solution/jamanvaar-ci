@@ -55,7 +55,8 @@ export class TenantAuthGuard implements CanActivate {
     // Impersonation tokens are support's window into a restaurant for debugging (even a
     // suspended one), so they skip the restaurant/device state check; everything else must pass it.
     if (!payload.impersonatedBy) {
-      await assertSessionStillAllowed(this.prisma, payload.restaurantId, payload.did);
+      const path = ((request as Request).originalUrl ?? '').split('?')[0];
+      await assertSessionStillAllowed(this.prisma, payload.restaurantId, payload.did, { allowSuspended: path.startsWith('/api/v1/tenant/billing') });
     }
 
     (request as Request & { tenantUser: typeof user }).tenantUser = user;

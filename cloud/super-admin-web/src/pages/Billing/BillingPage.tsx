@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 // Deep import, not the '@jamanvaar/ui' barrel (see layout/ProtectedLayout.tsx).
 import { printElement } from '../../../../../packages/ui/src/printElement';
 import { api, ApiError } from '../../api/client';
-import type { Invoice, BillingSummary, RestaurantCore, Plan, PaymentMethod, ReceiptData } from '../../api/types';
+import type { Invoice, BillingSummary, RestaurantCore, Plan, PaymentMethod, ReceiptData, SellerInfo } from '../../api/types';
+import { JAMANVAAR_LOGOS } from '../../../../../packages/ui/src/assets';
 import {
   Card,
   EmptyState,
@@ -56,6 +57,30 @@ interface ReceivableRow {
 }
 
 const inr0 = (n: number) => `₹${n.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+
+
+/** The seller block at the top of an invoice or receipt. Everything comes from Platform Settings; an empty field is simply left out. */
+function SellerHeader({ seller, withPan }: { seller?: SellerInfo; withPan: boolean }) {
+  if (!seller) return null;
+  const place = [seller.address, seller.city, [seller.state, seller.pincode].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+  const ids = [
+    seller.gstin && <span key="g"><strong>GSTIN:</strong> {seller.gstin}</span>,
+    withPan && seller.pan && <span key="p"><strong>PAN:</strong> {seller.pan}</span>,
+    seller.sacCode && <span key="s"><strong>SAC:</strong> {seller.sacCode}</span>
+  ].filter(Boolean) as React.ReactNode[];
+  return (
+    <div>
+      <img src={JAMANVAAR_LOGOS.horizontal} alt={seller.name || 'JAMANVAAR'} style={{ height: 44, width: 'auto', display: 'block' }} />
+      <div className="doc-brand-tagline">{seller.legalName || seller.name}</div>
+      <div className="doc-brand-meta">
+        {place}
+        {place && <br />}
+        {ids.length > 0 && <>{ids.map((n, i) => <React.Fragment key={i}>{i > 0 && <>&nbsp;|&nbsp;</>}{n}</React.Fragment>)}<br /></>}
+        {seller.supportEmail && <><strong>Support:</strong> {seller.supportEmail}</>}
+      </div>
+    </div>
+  );
+}
 
 export function BillingPage() {
   const [summary, setSummary] = useState<BillingSummary | null>(null);
@@ -914,18 +939,7 @@ export function BillingPage() {
           <div className="doc-sheet print-surface" data-print-doc="platform-invoice">
             {/* Header / Brand */}
             <div className="doc-brand-header">
-              <div>
-                <div className="doc-brand-title">
-                  <Building2 className="w-7 h-7 text-amber-500" />
-                  <span>JAMANVAAR</span>
-                </div>
-                <div className="doc-brand-tagline">KELVIONTECH PRIVATE LIMITED</div>
-                <div className="doc-brand-meta">
-                  Plot 42, Science City Road, Sola, Ahmedabad, Gujarat 380060<br />
-                  <strong>GSTIN:</strong> 24AAACK7890F1ZT &nbsp;|&nbsp; <strong>PAN:</strong> AAACK7890F &nbsp;|&nbsp; <strong>SAC:</strong> 997331<br />
-                  <strong>Support:</strong> billing@kelviontech.com
-                </div>
-              </div>
+              <SellerHeader seller={viewInvoice.seller} withPan />
               <div className="doc-type-badge">
                 <div className="doc-type-title">TAX INVOICE</div>
                 <div style={{ marginTop: 6 }}>
@@ -1068,8 +1082,19 @@ export function BillingPage() {
               <div style={{ fontWeight: 700, marginBottom: 4, color: '#0f172a' }}>
                 Bank Remittance & UPI Payment Instructions:
               </div>
-              <div><strong>Beneficiary:</strong> KELVIONTECH PRIVATE LIMITED &nbsp;|&nbsp; <strong>Bank:</strong> HDFC Bank Ltd, Science City Branch</div>
-              <div><strong>A/C No:</strong> 50200084920194 &nbsp;|&nbsp; <strong>IFSC:</strong> HDFC0001248 &nbsp;|&nbsp; <strong>UPI ID:</strong> kelviontech@hdfcbank</div>
+              {viewInvoice.seller && (
+                <>
+                  <div>
+                    {viewInvoice.seller.bankAccountName && <><strong>Beneficiary:</strong> {viewInvoice.seller.bankAccountName}</>}
+                    {viewInvoice.seller.bankName && <>&nbsp;|&nbsp;<strong>Bank:</strong> {viewInvoice.seller.bankName}</>}
+                  </div>
+                  <div>
+                    {viewInvoice.seller.bankAccountNumber && <><strong>A/C No:</strong> {viewInvoice.seller.bankAccountNumber}</>}
+                    {viewInvoice.seller.bankIfsc && <>&nbsp;|&nbsp;<strong>IFSC:</strong> {viewInvoice.seller.bankIfsc}</>}
+                    {viewInvoice.seller.upiId && <>&nbsp;|&nbsp;<strong>UPI ID:</strong> {viewInvoice.seller.upiId}</>}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Payment History if exists */}
@@ -1091,8 +1116,8 @@ export function BillingPage() {
 
             {/* Footer */}
             <div className="doc-footer">
-              This is a computer-generated statutory GST invoice issued by KELVIONTECH PRIVATE LIMITED for the JAMANVAAR SaaS Platform.<br />
-              Thank you for partnering with JAMANVAAR. For billing queries, contact <strong>billing@kelviontech.com</strong>.
+              This is a computer-generated statutory GST invoice issued by {viewInvoice.seller?.legalName || 'the seller'} for the {viewInvoice.seller?.name || 'JAMANVAAR SaaS Platform'}.<br />
+              Thank you for partnering with JAMANVAAR. {viewInvoice.seller?.supportEmail && <>For billing queries, contact <strong>{viewInvoice.seller.supportEmail}</strong>.</>}
             </div>
           </div>
         </Modal>
@@ -1119,17 +1144,7 @@ export function BillingPage() {
         >
           <div className="doc-sheet print-surface" data-print-doc="platform-receipt">
             <div className="doc-brand-header">
-              <div>
-                <div className="doc-brand-title">
-                  <Building2 className="w-7 h-7 text-amber-500" />
-                  <span>JAMANVAAR</span>
-                </div>
-                <div className="doc-brand-tagline">KELVIONTECH PRIVATE LIMITED</div>
-                <div className="doc-brand-meta">
-                  Plot 42, Science City Road, Sola, Ahmedabad, Gujarat 380060<br />
-                  <strong>GSTIN:</strong> 24AAACK7890F1ZT &nbsp;|&nbsp; <strong>SAC:</strong> 997331
-                </div>
-              </div>
+              <SellerHeader seller={receiptData.seller} withPan />
               <div className="doc-type-badge">
                 <div className="doc-type-title" style={{ color: '#059669' }}>PAYMENT RECEIPT</div>
                 <div style={{ marginTop: 6 }}>
@@ -1239,7 +1254,7 @@ export function BillingPage() {
               <div style={{ textAlign: 'center', minWidth: 200 }}>
                 <div style={{ height: 36, borderBottom: '1px solid #94a3b8', marginBottom: 6 }} />
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155' }}>Authorized Accounts Officer</div>
-                <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>KELVIONTECH PRIVATE LIMITED</div>
+                <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>{receiptData.seller?.legalName}</div>
               </div>
             </div>
 

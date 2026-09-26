@@ -12,12 +12,14 @@ export async function assertSessionStillAllowed(
   prisma: PrismaService,
   restaurantId: string,
   deviceId?: string,
-  opts: { requireSubscription?: boolean } = {}
+  opts: { requireSubscription?: boolean; allowSuspended?: boolean } = {}
 ): Promise<void> {
   const restaurant = await prisma.runAsPlatform((tx) =>
     tx.restaurant.findUnique({ where: { id: restaurantId }, select: { status: true, deletedAt: true } })
   );
-  if (!restaurant || restaurant.deletedAt !== null || restaurant.status !== 'ACTIVE') {
+  // A suspended restaurant can still open its billing page: an unpaid invoice is often why it was suspended, and it must be able to pay.
+  const billingOnly = opts.allowSuspended === true && restaurant?.status === 'SUSPENDED' && restaurant.deletedAt === null;
+  if (!billingOnly && (!restaurant || restaurant.deletedAt !== null || restaurant.status !== 'ACTIVE')) {
     const suspended = restaurant?.status === 'SUSPENDED';
     throw new ForbiddenException({
       statusCode: 403,

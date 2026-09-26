@@ -12,6 +12,7 @@ const FIELDS = [
   { key: 'state', label: 'State', hint: 'Decides CGST + SGST (same state as the restaurant) or IGST' },
   { key: 'pincode', label: 'PIN code' },
   { key: 'gstin', label: 'GSTIN', hint: 'Its first two digits must match the state' },
+  { key: 'panNumber', label: 'PAN', hint: '10 characters, e.g. AAACK7890F (optional)' },
   { key: 'sacCode', label: 'SAC code' },
   { key: 'bankName', label: 'Bank' },
   { key: 'bankAccountName', label: 'Account name' },

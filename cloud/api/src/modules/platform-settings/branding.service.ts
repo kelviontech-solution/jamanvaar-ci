@@ -11,6 +11,7 @@ export interface SellerEntity {
   country: string;
   pincode: string;
   gstin: string;
+  pan: string;
   sacCode: string;
   sacDescription: string;
   supportEmail: string;
@@ -63,6 +64,7 @@ export class BrandingService {
       country: billing.country,
       pincode: billing.pincode,
       gstin: billing.gstin,
+      pan: billing.panNumber ?? '',
       sacCode: billing.sacCode,
       sacDescription: billing.sacDescription,
       supportEmail: billing.billingEmail || branding.supportEmail,

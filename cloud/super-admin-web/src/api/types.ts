@@ -666,6 +666,7 @@ export interface Invoice {
   subscription?: { id: string; status: string; expiresAt: string };
   payments?: Payment[];
   taxBreakup?: TaxBreakup;
+  seller?: SellerInfo;
   totalPaid?: number;
   balanceDue?: number;
   paymentStatus?: 'PAID' | 'PARTIALLY_PAID' | 'UNPAID';
@@ -685,6 +686,28 @@ export interface BillingSummary {
   /** Money collected over money billed. */
   collectionRatePercent?: number;
   ageing?: { '0-30': number; '31-60': number; '61-90': number; '90+': number };
+}
+
+/** The company issuing invoices and receipts, exactly as saved in Platform Settings (the API sends the current values). */
+export interface SellerInfo {
+  name: string;
+  legalName: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  pincode: string;
+  gstin: string;
+  pan: string;
+  sacCode: string;
+  sacDescription: string;
+  supportEmail: string;
+  supportPhone: string;
+  bankName: string;
+  bankAccountName: string;
+  bankAccountNumber: string;
+  bankIfsc: string;
+  upiId: string;
 }
 
 export interface ReceiptData {
@@ -715,18 +738,7 @@ export interface ReceiptData {
     ownerName: string;
     ownerEmail: string;
   };
-  seller: {
-    companyName: string;
-    tagline: string;
-    address: string;
-    city: string;
-    state: string;
-    pincode: string;
-    gstin: string;
-    pan: string;
-    sacCode: string;
-    supportEmail: string;
-  };
+  seller: SellerInfo;
   taxBreakup: TaxBreakup;
 }
 
