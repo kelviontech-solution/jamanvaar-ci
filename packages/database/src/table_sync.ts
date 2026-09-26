@@ -60,6 +60,7 @@ function save(): void {
 function signature(t: Partial<DiningTable>): string {
   return JSON.stringify([
     t.tableNumber,
+    t.branchId ?? null,
     t.capacity,
     t.zone,
     t.floor,
@@ -83,6 +84,7 @@ function toPayload(t: DiningTable): Record<string, unknown> {
   return {
     id: t.id,
     outletId: t.outletId,
+    ...(t.branchId ? { branchId: t.branchId } : {}),
     tableNumber: t.tableNumber,
     capacity: t.capacity,
     zone: t.zone,
@@ -187,6 +189,7 @@ export class TableSync {
     const incoming: DiningTable = {
       id,
       outletId: optional(remote.outletId) ?? db.outlet.id,
+      branchId: optional(remote.branchId),
       tableNumber: remote.tableNumber,
       capacity: typeof remote.capacity === 'number' && remote.capacity > 0 ? remote.capacity : 4,
       zone: optional(remote.zone) ?? 'Main Hall',
@@ -214,6 +217,8 @@ export class TableSync {
       // local, and QR details a remote copy lacks are not blanked.
       const merged: DiningTable = {
         ...incoming,
+        // The branch is set by the restaurant's console; a copy that lacks it must not erase it.
+        branchId: incoming.branchId ?? local.branchId,
         qrCodeUrl: incoming.qrCodeUrl ?? local.qrCodeUrl,
         qrShortCode: incoming.qrShortCode ?? local.qrShortCode,
         qrToken: incoming.qrToken ?? local.qrToken,

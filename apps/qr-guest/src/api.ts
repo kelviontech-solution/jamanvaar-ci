@@ -15,9 +15,9 @@ export interface Describe {
   };
 }
 
-export interface MenuItem { id: string; name: string; description?: string; categoryId: string; price: number; imageUrl?: string; dietaryType?: string; modifierGroupIds: string[] }
-export interface MenuGroup { id: string; name: string; isRequired: boolean; minSelections: number; maxSelections: number; options: Array<{ id: string; name: string; priceDelta: number }> }
-export interface Menu { menuVersion: number; etag: string; categories: Array<{ id: string; name: string; sortOrder: number }>; items: MenuItem[]; modifierGroups: MenuGroup[] }
+export interface MenuItem { id: string; name: string; description?: string; categoryId: string; price: number; imageUrl?: string; dietaryType?: string; modifierGroupIds: string[]; sortOrder?: number; minQuantity?: number; maxQuantity?: number; allowInstructions?: boolean }
+export interface MenuGroup { id: string; name: string; description?: string; isRequired: boolean; minSelections: number; maxSelections: number; options: Array<{ id: string; name: string; description?: string; imageUrl?: string; priceDelta: number; isDefault?: boolean }> }
+export interface Menu { menuVersion: number; etag: string; categories: Array<{ id: string; name: string; description?: string; imageUrl?: string; sortOrder: number }>; items: MenuItem[]; modifierGroups: MenuGroup[] }
 
 export interface Quote { lines: Array<{ itemId: string; name: string; quantity: number; unitPrice: number; lineTotal: number; options: string[] }>; subtotal: number; tax: number; total: number }
 export interface Placed { publicOrderId: string; orderNumber: string | null; status: 'RECEIVED' | 'PREPARING' | 'READY' | 'COMPLETED' | 'CANCELLED'; total: number; table: string | null; placedAt: string }

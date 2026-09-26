@@ -221,6 +221,8 @@ export interface Category {
   iconName?: string;
   sortOrder: number;
   isActive: boolean;
+  /** Whether QR guests see this category (default yes). */
+  qrVisible?: boolean;
   itemCount?: number;
   translations?: Record<string, { name: string; description?: string }>;
   /** When this category was last changed on any device (cross-device sync: the newer change wins). */
@@ -235,6 +237,8 @@ export interface ModifierOption {
   isDefault?: boolean;
   isAvailable: boolean;
   sortOrder: number;
+  description?: string;
+  imageUrl?: string;
   dietaryType?: DietaryType;
   translations?: Record<string, { name: string }>;
 }
@@ -282,6 +286,10 @@ export interface MenuItem {
   kitchenStation?: string;
   isDigitalMenuVisible?: boolean;
   isQrOrderingEnabled?: boolean;
+  /** Ordering rules a restaurant sets per dish (QR guests). Absent means 1 to 50, notes allowed. */
+  minQuantity?: number;
+  maxQuantity?: number;
+  allowInstructions?: boolean;
   /** Where this dish may be sold. When present it must include the channel; when absent the per-channel switches above apply. */
   salesChannels?: Array<'POS' | 'KIOSK' | 'QR' | 'CAPTAIN'>;
   /** Restrict the dish to these branches (empty or absent: every branch). */
@@ -367,6 +375,8 @@ export interface Coupon {
 export interface DiningTable {
   id: string;
   outletId: string;
+  /** The cloud branch this table belongs to, when the restaurant runs several. A QR code for the table can only open in this branch. */
+  branchId?: string;
   tableNumber: string;
   capacity: number;
   currentGuests?: number;

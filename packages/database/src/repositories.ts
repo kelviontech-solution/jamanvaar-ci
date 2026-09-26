@@ -338,7 +338,7 @@ export class MenuRepository {
   public static createMenuItem(itemData: Partial<MenuItem>): MenuItem {
     const newItem: MenuItem = {
       id: itemData.id || `item-${Date.now()}`,
-      categoryId: itemData.categoryId || db.categories[0]?.id || 'cat-starters',
+      categoryId: itemData.categoryId || db.categories[0]?.id || '',
       sku: itemData.sku || `SKU-${Math.floor(100 + Math.random() * 900)}`,
       name: itemData.name || 'New Dish',
       description: itemData.description || '',
@@ -354,8 +354,16 @@ export class MenuRepository {
       prepTimeMinutes: itemData.prepTimeMinutes || 15,
       allergens: itemData.allergens || [],
       modifierGroupIds: itemData.modifierGroupIds || [],
-      taxGroupId: itemData.taxGroupId || 'tax-gst-5',
-      sortOrder: itemData.sortOrder || db.menuItems.length + 1,
+      // The restaurant chooses the tax on a dish. When it has exactly one active tax group that is the obvious choice; with several
+      // (or none) nothing is guessed and the dish carries no tax group until one is picked.
+      taxGroupId: itemData.taxGroupId ?? (db.taxGroups.filter((t) => t.isActive).length === 1 ? db.taxGroups.find((t) => t.isActive)!.id : undefined),
+      ...(itemData.isQrOrderingEnabled !== undefined ? { isQrOrderingEnabled: itemData.isQrOrderingEnabled } : {}),
+      ...(itemData.salesChannels ? { salesChannels: itemData.salesChannels } : {}),
+      ...(itemData.branchIds ? { branchIds: itemData.branchIds } : {}),
+      ...(itemData.minQuantity !== undefined ? { minQuantity: itemData.minQuantity } : {}),
+      ...(itemData.maxQuantity !== undefined ? { maxQuantity: itemData.maxQuantity } : {}),
+      ...(itemData.allowInstructions !== undefined ? { allowInstructions: itemData.allowInstructions } : {}),
+      sortOrder: itemData.sortOrder ?? db.menuItems.length + 1,
       kitchenStation: itemData.kitchenStation || 'Main Kitchen'
     };
     db.menuItems.push(newItem);
@@ -1151,7 +1159,8 @@ export class TableRepository {
 
   public static createTable(tableData: Partial<DiningTable>): DiningTable {
     const newTable: DiningTable = {
-      id: tableData.id || `tbl-${Date.now()}`,
+      // Two devices (or two clicks in one millisecond) must never mint the same table id: it keys the table's QR code.
+      id: tableData.id || `tbl-${Date.now().toString(36)}-${globalThis.crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}`,
       outletId: tableData.outletId || db.outlet.id,
       tableNumber: tableData.tableNumber || `${db.tables.length + 1}`,
       capacity: tableData.capacity || 4,

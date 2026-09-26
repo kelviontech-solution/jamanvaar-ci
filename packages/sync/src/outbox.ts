@@ -205,7 +205,7 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
 }
 
 function orderItemFromRemote(orderId: string, ri: OrderSyncPushItem): OrderItem {
-  const details = ri.modifierDetails && ri.modifierDetails.length > 0
+  const details: NonNullable<OrderSyncPushItem['modifierDetails']> = ri.modifierDetails && ri.modifierDetails.length > 0
     ? ri.modifierDetails
     : (ri.modifiers || []).map((name) => ({ optionName: name, priceDelta: 0 }));
   return {

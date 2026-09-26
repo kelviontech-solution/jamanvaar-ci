@@ -33,6 +33,12 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   const [isFeatured, setIsFeatured] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [modifierGroupIds, setModifierGroupIds] = useState<string[]>([]);
+  const [taxGroupId, setTaxGroupId] = useState('');
+  const [sellOnQr, setSellOnQr] = useState(true);
+  const [sortOrder, setSortOrder] = useState('');
+  const [minQuantity, setMinQuantity] = useState('1');
+  const [maxQuantity, setMaxQuantity] = useState('50');
+  const [allowInstructions, setAllowInstructions] = useState(true);
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
@@ -50,11 +56,17 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       setIsPopular(!!itemToEdit.isPopular);
       setIsFeatured(!!itemToEdit.isFeatured);
       setModifierGroupIds(itemToEdit.modifierGroupIds || []);
+      setTaxGroupId(itemToEdit.taxGroupId || '');
+      setSellOnQr(itemToEdit.salesChannels ? itemToEdit.salesChannels.includes('QR') : itemToEdit.isQrOrderingEnabled !== false);
+      setSortOrder(String(itemToEdit.sortOrder ?? ''));
+      setMinQuantity(String(itemToEdit.minQuantity ?? 1));
+      setMaxQuantity(String(itemToEdit.maxQuantity ?? 50));
+      setAllowInstructions(itemToEdit.allowInstructions !== false);
     } else {
       setName('');
       setSku(`SKU-${Math.floor(100 + Math.random() * 900)}`);
       setPrice('');
-      setCategoryId(categories[0]?.id || 'cat-starters');
+      setCategoryId(categories[0]?.id || '');
       setKitchenStation('Main Kitchen');
       setDietaryType('VEG');
       setSpiceLevel('NONE');
@@ -63,7 +75,15 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       setIsAvailable(true);
       setIsPopular(false);
       setIsFeatured(false);
-      setModifierGroupIds(db.modifierGroups.map((g) => g.id));
+      // A new dish starts with NO customisations: the restaurant attaches the ones that belong to it.
+      setModifierGroupIds([]);
+      const activeTax = db.taxGroups.filter((t) => t.isActive);
+      setTaxGroupId(activeTax.length === 1 ? activeTax[0].id : '');
+      setSellOnQr(true);
+      setSortOrder('');
+      setMinQuantity('1');
+      setMaxQuantity('50');
+      setAllowInstructions(true);
     }
   }, [itemToEdit, categories, isOpen]);
 
@@ -125,6 +145,16 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       return;
     }
 
+    if (!categoryId) {
+      setFormError('Create a category first, then choose it for this dish.');
+      return;
+    }
+    const minQ = Math.floor(Number(minQuantity) || 1);
+    const maxQ = Math.floor(Number(maxQuantity) || 50);
+    if (minQ < 1 || maxQ < minQ || maxQ > 50) {
+      setFormError('Quantity limits must satisfy 1 ≤ minimum ≤ maximum ≤ 50.');
+      return;
+    }
     const numPrice = Number(price);
     if (isNaN(numPrice) || numPrice <= 0) {
       setFormError('Price must be a number greater than zero.');
@@ -157,6 +187,13 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         isAvailable,
         isPopular,
         isFeatured,
+        taxGroupId: taxGroupId || undefined,
+        isQrOrderingEnabled: sellOnQr,
+        ...(itemToEdit?.salesChannels ? { salesChannels: (sellOnQr ? Array.from(new Set([...itemToEdit.salesChannels, 'QR'])) : itemToEdit.salesChannels.filter((c) => c !== 'QR')) as MenuItem['salesChannels'] } : {}),
+        minQuantity: minQ,
+        maxQuantity: maxQ,
+        allowInstructions,
+        ...(sortOrder.trim() !== '' && Number.isFinite(Number(sortOrder)) ? { sortOrder: Number(sortOrder) } : {}),
         modifierGroupIds
       });
       AuditRepository.log({
@@ -179,6 +216,12 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         isAvailable,
         isPopular,
         isFeatured,
+        taxGroupId: taxGroupId || undefined,
+        isQrOrderingEnabled: sellOnQr,
+        minQuantity: minQ,
+        maxQuantity: maxQ,
+        allowInstructions,
+        ...(sortOrder.trim() !== '' && Number.isFinite(Number(sortOrder)) ? { sortOrder: Number(sortOrder) } : {}),
         modifierGroupIds
       });
       AuditRepository.log({
@@ -311,6 +354,40 @@ export const ItemModal: React.FC<ItemModalProps> = ({
             placeholder="e.g. Rich tomato cashew gravy with cottage cheese cubes & aromatic spices"
             className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-jaman-saffron"
           />
+        </div>
+
+        {/* Tax, QR ordering and ordering rules: the restaurant decides these per dish; nothing is assumed. */}
+        <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-2xl space-y-3">
+          <span className="text-xs font-bold text-slate-700">Tax, QR ordering &amp; rules</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-600 mb-1">Tax group</label>
+              <select value={taxGroupId} onChange={(e) => setTaxGroupId(e.target.value)} className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs">
+                <option value="">No tax (0%)</option>
+                {db.taxGroups.filter((t) => t.isActive || t.id === taxGroupId).map((t) => (
+                  <option key={t.id} value={t.id}>{t.name} ({t.igstPercent || t.cgstPercent + t.sgstPercent}%{t.isInclusive ? ', included in price' : ', added on top'})</option>
+                ))}
+              </select>
+              {db.taxGroups.length === 0 && <p className="text-[10px] text-amber-600 mt-1">No tax groups yet. Add one under Menu → Customisations &amp; Tax.</p>}
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-600 mb-1">Position in menu (lower shows first)</label>
+              <input type="number" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} placeholder="Automatic" className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-600 mb-1">Guests may order</label>
+              <div className="flex items-center gap-2 text-xs">
+                <input type="number" min={1} max={50} value={minQuantity} onChange={(e) => setMinQuantity(e.target.value)} className="w-16 bg-white border border-jaman-border rounded-lg px-2 py-1.5" />
+                <span>to</span>
+                <input type="number" min={1} max={50} value={maxQuantity} onChange={(e) => setMaxQuantity(e.target.value)} className="w-16 bg-white border border-jaman-border rounded-lg px-2 py-1.5" />
+                <span>at a time</span>
+              </div>
+            </div>
+            <div className="space-y-1.5 text-xs">
+              <label className="flex items-center gap-2"><input type="checkbox" checked={sellOnQr} onChange={(e) => setSellOnQr(e.target.checked)} /> Sell this dish through QR ordering</label>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={allowInstructions} onChange={(e) => setAllowInstructions(e.target.checked)} /> Let guests add a cooking note</label>
+            </div>
+          </div>
         </div>
 
         {/* Customization & Modifier Groups Selector */}

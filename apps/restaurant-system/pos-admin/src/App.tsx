@@ -72,7 +72,8 @@ import {
   ArrowRight,
   LifeBuoy,
   Truck,
-  RefreshCw
+  RefreshCw,
+  Sliders
 } from 'lucide-react';
 
 // Reusable Feature Modules
@@ -84,6 +85,7 @@ import { QrConsole } from './components/qrconsole/QrConsole';
 import { useQrEntitlement } from './components/qrconsole/useQrEntitlement';
 import { LegacyGuestRedirect } from './components/qrconsole/LegacyGuestRedirect';
 import { MenuCategoriesModule } from './components/menu/MenuCategoriesModule';
+import { MenuOptionsModule } from './components/menu/MenuOptionsModule';
 import { FloorTablesModule } from './components/tables/FloorTablesModule';
 import { ReservationsModule } from './components/reservations/ReservationsModule';
 import { BranchDirectoryModal } from './components/header/BranchDirectoryModal';
@@ -130,6 +132,7 @@ export type PosAdminTab =
   | 'ORDERS'
   | 'LIVE_KDS'
   | 'MENU'
+  | 'MENU_OPTIONS'
   | 'TABLES'
   | 'RESERVATIONS'
   | 'KITCHEN_KOT'
@@ -809,6 +812,7 @@ export default function PosAdminApp() {
                   section: 'MENU & INVENTORY',
                   items: [
                     { id: 'MENU', label: 'Menu & Categories', icon: UtensilsCrossed },
+                    { id: 'MENU_OPTIONS', label: 'Customisations & Tax', icon: Sliders },
                     { id: 'INVENTORY', label: 'Inventory & Recipes', icon: Package },
                     { id: 'INVENTORY_CONTROL', label: 'Purchasing & Stock Control', icon: Truck }
                   ]
@@ -1022,6 +1026,8 @@ export default function PosAdminApp() {
                 onRequestConfirm={setConfirmDialog}
               />
             )}
+
+            {activeTab === 'MENU_OPTIONS' && <MenuOptionsModule showToast={showToast} onRequestConfirm={setConfirmDialog} />}
 
             {/* TAB 7: FLOOR & TABLES */}
             {activeTab === 'TABLES' && (

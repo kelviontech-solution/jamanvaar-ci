@@ -17,6 +17,7 @@ export * from './image_library';
 export * from './tender';
 export * from './table_sync';
 export * from './collection_sync';
+export * from './menu_authoring';
 export * from './service_messages';
 export * from './pin';
 export * from './number_allocator';

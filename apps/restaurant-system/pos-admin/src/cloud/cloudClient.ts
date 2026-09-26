@@ -13,7 +13,7 @@ import type { PlanEntitlements, PlanTier } from '@jamanvaar/types';
  * the existing local mock (LicenseRepository) as its fallback.
  */
 
-import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData, pullRestaurantIdentity, pushRestaurantIdentity, type RestaurantIdentityFields, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
+import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData, pullRestaurantIdentity, pushRestaurantIdentity, type RestaurantIdentityFields, orderSyncPullQuery, EndpointResolver, publishCatalogNow } from '@jamanvaar/sync';
 import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository, LicenseRepository, TenantIsolation } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
@@ -1092,6 +1092,39 @@ export async function fetchDeviceFleet(): Promise<FleetDevice[]> {
 
 export async function fetchMenuVersion(): Promise<{ version: number; watermark: string | null }> {
   return jsonOrThrowCloud(await deviceFetch('/api/v1/menu/version'), 'Menu version');
+}
+
+export interface MenuDraftStatus {
+  publishedVersion: number;
+  hasUnpublishedChanges: boolean;
+  errors: string[];
+  warnings: string[];
+  counts: { categories: number; items: number; modifierGroups: number };
+}
+
+/** What guests see today versus what is being edited, and what would block or be hidden if published now. */
+export async function fetchMenuDraftStatus(): Promise<MenuDraftStatus> {
+  return jsonOrThrowCloud(await deviceFetch('/api/v1/menu/draft-status'), 'Menu status');
+}
+
+export class MenuPublishRefused extends Error {
+  constructor(message: string, public errors: string[]) {
+    super(message);
+  }
+}
+
+/**
+ * Publishes the menu to guests: first sends this console's unsent menu edits, then asks the cloud to freeze them as a new
+ * numbered version. Says so plainly when the edits could not be delivered or the menu has problems that block publishing.
+ */
+export async function publishMenuToGuests(note?: string): Promise<{ version: number; warnings: string[] }> {
+  const sent = await publishCatalogNow();
+  if (!sent.delivered) throw new CloudApiError(`${sent.pending} menu change(s) have not reached the cloud yet. Check your connection and try again.`, 0);
+  const res = await deviceFetch('/api/v1/menu/publish', { method: 'POST', body: JSON.stringify({ note }) });
+  const data = await parseJsonResponse(res);
+  if (res.status === 422) throw new MenuPublishRefused(data?.message ?? 'The menu has problems that must be fixed first', Array.isArray(data?.errors) ? data.errors : []);
+  if (!res.ok) throw new CloudApiError(data?.message ?? `Menu publish failed (${res.status})`, res.status);
+  return { version: data.version, warnings: Array.isArray(data.warnings) ? data.warnings : [] };
 }
 
 export async function publishMenu(note?: string): Promise<{ version: number }> {

@@ -139,7 +139,7 @@ function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { i
 
   const quickAdd = (item: MenuItem) => {
     // A dish with nothing to choose goes straight into the cart; one with options (or a required choice) opens the sheet.
-    const needsChoice = item.modifierGroupIds.some((id) => groups.get(id)?.isRequired || (info.ordering.settings.allowModifiers && !!groups.get(id)));
+    const needsChoice = (item.minQuantity ?? 1) > 1 || item.modifierGroupIds.some((id) => groups.get(id)?.isRequired || (info.ordering.settings.allowModifiers && !!groups.get(id)));
     if (needsChoice) return setPicking(item);
     setCart(addLine(cart, { itemId: item.id, name: item.name, unitPrice: item.price, quantity: 1, optionIds: [], optionNames: [] }));
   };
@@ -179,8 +179,11 @@ function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { i
 
 function Picker({ item, groups, allowMods, allowNotes, onClose, onAdd }: { item: MenuItem; groups: MenuGroup[]; allowMods: boolean; allowNotes: boolean; onClose: () => void; onAdd: (l: { itemId: string; name: string; unitPrice: number; quantity: number; optionIds: string[]; optionNames: string[]; note?: string }) => void }) {
   const shown = allowMods ? groups : groups.filter((g) => g.isRequired);
-  const [chosen, setChosen] = useState<Record<string, string[]>>({});
-  const [qty, setQty] = useState(1);
+  // Options the restaurant pre-selected start ticked; the guest can change them.
+  const [chosen, setChosen] = useState<Record<string, string[]>>(() => Object.fromEntries(shown.map((g) => [g.id, g.options.filter((o) => o.isDefault).slice(0, g.maxSelections > 0 ? g.maxSelections : undefined).map((o) => o.id)])));
+  const minQ = item.minQuantity ?? 1;
+  const maxQ = item.maxQuantity ?? 50;
+  const [qty, setQty] = useState(minQ);
   const [note, setNote] = useState('');
   const toggle = (g: MenuGroup, optionId: string) => {
     const cur = chosen[g.id] ?? [];
@@ -188,7 +191,15 @@ function Picker({ item, groups, allowMods, allowNotes, onClose, onAdd }: { item:
     const next = cur.includes(optionId) ? cur.filter((x) => x !== optionId) : single ? [optionId] : g.maxSelections > 0 && cur.length >= g.maxSelections ? cur : [...cur, optionId];
     setChosen({ ...chosen, [g.id]: next });
   };
-  const missing = shown.find((g) => (g.isRequired || g.minSelections > 0) && (chosen[g.id]?.length ?? 0) < Math.max(1, g.minSelections));
+  const needed = (g: MenuGroup) => (g.isRequired || g.minSelections > 0 ? Math.max(1, g.minSelections) : 0);
+  const missing = shown.find((g) => (chosen[g.id]?.length ?? 0) < needed(g));
+  const rule = (g: MenuGroup) => {
+    const n = needed(g);
+    if (g.maxSelections === 1) return n ? 'Choose 1 (required)' : 'Choose up to 1';
+    if (n && g.maxSelections > 0) return n === g.maxSelections ? `Choose ${n} (required)` : `Choose ${n} to ${g.maxSelections} (required)`;
+    if (n) return `Choose at least ${n} (required)`;
+    return g.maxSelections > 0 ? `Choose up to ${g.maxSelections}` : 'Choose any';
+  };
   const optionIds = Object.values(chosen).flat();
   const all = shown.flatMap((g) => g.options);
   const optionNames = optionIds.map((id) => all.find((o) => o.id === id)?.name ?? '');
@@ -200,17 +211,18 @@ function Picker({ item, groups, allowMods, allowNotes, onClose, onAdd }: { item:
         <h2>{item.name}</h2>
         {shown.map((g) => (
           <fieldset key={g.id}>
-            <legend>{g.name}{g.isRequired ? ' (required)' : g.maxSelections > 0 ? ` (up to ${g.maxSelections})` : ''}</legend>
+            <legend>{g.name} <span className="muted">{rule(g)}{(chosen[g.id]?.length ?? 0) > 0 && g.maxSelections > 1 ? ` · ${chosen[g.id]!.length} chosen` : ''}</span></legend>
+            {g.description && <p className="muted">{g.description}</p>}
             {g.options.map((o) => (
               <label key={o.id} className="opt">
                 <input type={g.maxSelections === 1 ? 'radio' : 'checkbox'} name={g.id} checked={(chosen[g.id] ?? []).includes(o.id)} onChange={() => toggle(g, o.id)} />
-                <span>{o.name}</span><span className="muted">{o.priceDelta ? `+${inr(o.priceDelta)}` : ''}</span>
+                <span>{o.name}{o.description ? <small className="muted"> {o.description}</small> : null}</span><span className="muted">{o.priceDelta ? `+${inr(o.priceDelta)}` : ''}</span>
               </label>
             ))}
           </fieldset>
         ))}
-        {allowNotes && <textarea placeholder="Special instructions (optional)" maxLength={200} value={note} onChange={(e) => setNote(e.target.value)} />}
-        <div className="qty"><button onClick={() => setQty(Math.max(1, qty - 1))} aria-label="Fewer">−</button><b>{qty}</b><button onClick={() => setQty(Math.min(50, qty + 1))} aria-label="More">+</button></div>
+        {allowNotes && item.allowInstructions !== false && <textarea placeholder="Special instructions (optional)" maxLength={200} value={note} onChange={(e) => setNote(e.target.value)} />}
+        <div className="qty"><button onClick={() => setQty(Math.max(minQ, qty - 1))} disabled={qty <= minQ} aria-label="Fewer">−</button><b>{qty}</b><button onClick={() => setQty(Math.min(maxQ, qty + 1))} disabled={qty >= maxQ} aria-label="More">+</button>{minQ > 1 && <span className="muted"> minimum {minQ}</span>}{maxQ < 50 && <span className="muted"> maximum {maxQ}</span>}</div>
         <button className="primary" disabled={!!missing} onClick={() => onAdd({ itemId: item.id, name: item.name, unitPrice: unit, quantity: qty, optionIds, optionNames, note: note.trim() || undefined })}>
           {missing ? `Choose ${missing.name}` : `Add ${qty} · ${inr(unit * qty)}`}
         </button>
