@@ -35,6 +35,14 @@ export function apiBase(): string | null {
   return import.meta.env.DEV ? 'http://localhost:4000' : null;
 }
 
+/** Pictures the restaurant uploaded are served by the API (cached for a year); web addresses are used as they are. */
+export function imageSrc(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  if (!url.startsWith('/api/')) return url;
+  const base = apiBase();
+  return base ? `${base}${url}` : undefined;
+}
+
 async function call<T>(path: string, init: RequestInit & { session?: string } = {}): Promise<{ data: T | null; status: number; etag: string | null }> {
   const base = apiBase();
   if (!base) throw new ApiError('This ordering page is not configured.', 0, 'NOT_CONFIGURED');

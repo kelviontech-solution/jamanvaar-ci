@@ -131,9 +131,11 @@ export class QrRateLimitInterceptor implements NestInterceptor {
   constructor(private readonly limiter: QrRateLimiter, private readonly sessions: QrSessions) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    const req = context.switchToHttp().getRequest<{ ip?: string; method: string; params?: Record<string, string>; query?: Record<string, string>; body?: { token?: string }; qrSession?: string; headers: Record<string, string | undefined> }>();
+    const req = context.switchToHttp().getRequest<{ ip?: string; url?: string; method: string; params?: Record<string, string>; query?: Record<string, string>; body?: { token?: string }; qrSession?: string; headers: Record<string, string | undefined> }>();
     const ip = (req.ip ?? 'unknown').replace(/^::ffff:/, '');
     const token = req.params?.token ?? (typeof req.query?.token === 'string' ? req.query.token : typeof req.body?.token === 'string' ? req.body.token : undefined);
+    // Pictures are content-addressed (the address is a SHA-256 nobody can guess) and cached for a year: they do not count against a guest's limits.
+    if (/\/images\/[a-f0-9]{64}$/.test(req.url ?? '')) return next.handle();
     // Only a session this system issued counts; a made-up one is ignored, so it cannot be used to dodge or to spoil limits.
     req.qrSession = this.sessions.verify(req.headers['x-qr-session']);
     return from(

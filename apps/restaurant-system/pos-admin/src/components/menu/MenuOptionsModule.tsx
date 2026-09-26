@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import type { ModifierGroup, ModifierOption, TaxGroup } from '@jamanvaar/types';
 import { db, ModifierAuthoring, TaxAuthoring, newAuthoringId } from '@jamanvaar/database';
 import { Plus, Trash2, Pencil, ArrowUp, ArrowDown, Send, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { fetchMenuDraftStatus, publishMenuToGuests, MenuPublishRefused, type MenuDraftStatus } from '../../cloud/cloudClient';
+import { fetchMenuDraftStatus, publishMenuToGuests, MenuPublishRefused, qrApi, type MenuDraftStatus } from '../../cloud/cloudClient';
 
 interface Props {
   showToast: (message: string) => void;
@@ -20,6 +20,18 @@ export const MenuPublishPanel: React.FC<{ showToast: (m: string) => void; change
   const [blocking, setBlocking] = useState<string[]>([]);
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
+  const [preview, setPreview] = useState<{ items: number; hidden: Array<{ name: string; reason: string }> } | null>(null);
+
+  const showPreview = async () => {
+    try {
+      const branches = await qrApi<Array<{ id: string; name: string; status: string }>>('/api/v1/restaurant/qr/branches');
+      const b = branches.find((x) => x.status === 'ACTIVE') ?? branches[0];
+      const r = await qrApi<{ items: unknown[]; hidden: Array<{ name: string; reason: string }> }>(`/api/v1/menu/preview${b ? `?branchId=${b.id}` : ''}`);
+      setPreview({ items: r.items.length, hidden: r.hidden });
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Could not build the preview');
+    }
+  };
 
   const load = useCallback(async () => {
     try {
@@ -80,6 +92,15 @@ export const MenuPublishPanel: React.FC<{ showToast: (m: string) => void; change
         <button type="button" disabled={busy} onClick={publish} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-jaman-saffron text-white text-sm font-bold disabled:opacity-60">
           <Send className="w-4 h-4" /> {busy ? 'Publishing…' : 'Publish to guests'}
         </button>
+      </div>
+      <div>
+        <button type="button" onClick={showPreview} className="text-xs font-bold text-jaman-saffron">Preview what guests will see</button>
+        {preview && (
+          <div className="mt-2 text-xs text-slate-600">
+            <p><b>{preview.items}</b> dishes would be shown to guests.</p>
+            {preview.hidden.length > 0 && <ul className="mt-1 space-y-0.5">{preview.hidden.map((h) => <li key={h.name}><b>{h.name}</b> is hidden: {h.reason}</li>)}</ul>}
+          </div>
+        )}
       </div>
       {status && !dirty && <p className="text-[11px] text-emerald-700 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> {status.counts.items} dishes in {status.counts.categories} categories are live.</p>}
     </div>
@@ -184,6 +205,65 @@ const TaxEditor: React.FC<{ tax: TaxGroup | null; onSaved: () => void; onCancel:
   );
 };
 
+
+/** A branch may sell a dish at its own price, or not at all. Draft until published; the dish's normal price applies where nothing is set. */
+const BranchMenuPanel: React.FC<{ showToast: (m: string) => void; onChanged: () => void }> = ({ showToast, onChanged }) => {
+  const [branches, setBranches] = useState<Array<{ id: string; name: string }>>([]);
+  const [branchId, setBranchId] = useState('');
+  const [rows, setRows] = useState<Record<string, { price?: number; isAvailable?: boolean }>>({});
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    qrApi<Array<{ id: string; name: string }>>('/api/v1/restaurant/qr/branches').then((b) => { setBranches(b); if (b.length > 1) setBranchId(b[0].id); }).catch((e) => setError(e instanceof Error ? e.message : 'Could not load branches'));
+  }, []);
+  useEffect(() => {
+    if (!branchId) return;
+    qrApi<{ overrides: Array<{ itemId: string; price?: number; isAvailable?: boolean }> }>(`/api/v1/menu/branch-overrides?branchId=${branchId}`)
+      .then((r) => { setRows(Object.fromEntries(r.overrides.map((o) => [o.itemId, { price: o.price, isAvailable: o.isAvailable }]))); setDrafts({}); })
+      .catch((e) => setError(e instanceof Error ? e.message : 'Could not load'));
+  }, [branchId]);
+
+  if (branches.length < 2) return null; // one branch: nothing to vary
+
+  const save = async (itemId: string, body: { price?: number | null; isAvailable?: boolean | null }) => {
+    try {
+      await qrApi(`/api/v1/menu/branch-overrides`, { method: 'PUT', body: JSON.stringify({ branchId, itemId, ...body }) });
+      setRows((r) => ({ ...r, [itemId]: { ...r[itemId], ...(body.price !== undefined ? { price: body.price ?? undefined } : {}), ...(body.isAvailable !== undefined ? { isAvailable: body.isAvailable ?? undefined } : {}) } }));
+      onChanged();
+      showToast('Saved. Publish to show it to guests.');
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Could not save');
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <h2 className="text-base font-extrabold text-jaman-navy">Branch prices &amp; availability</h2>
+      <div className={`${card} space-y-3`}>
+        <select className={input} value={branchId} onChange={(e) => setBranchId(e.target.value)}>
+          {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+        </select>
+        {error && <p role="alert" className="text-xs text-rose-700">{error}</p>}
+        <ul className="divide-y divide-jaman-border">
+          {db.menuItems.slice().sort((a, b) => a.name.localeCompare(b.name)).map((i) => {
+            const o = rows[i.id] ?? {};
+            const draft = drafts[i.id] ?? (o.price !== undefined ? String(o.price) : '');
+            return (
+              <li key={i.id} className="py-2 flex flex-wrap items-center gap-2 text-sm">
+                <span className="flex-1 min-w-[10rem] font-semibold text-jaman-navy">{i.name} <span className="text-xs text-slate-400">{inr(i.price)}</span></span>
+                <input type="number" min={0} step="0.5" className="w-28 bg-jaman-ivory border border-jaman-border rounded-xl px-2 py-1.5 text-sm" placeholder="Same price" value={draft} onChange={(e) => setDrafts((d) => ({ ...d, [i.id]: e.target.value }))}
+                  onBlur={() => { const v = draft.trim() === '' ? null : Number(draft); if ((v ?? undefined) !== o.price && (v === null || Number.isFinite(v))) void save(i.id, { price: v }); }} aria-label={`${i.name} price in this branch`} />
+                <label className="text-xs flex items-center gap-1"><input type="checkbox" checked={o.isAvailable !== false} onChange={(e) => void save(i.id, { isAvailable: e.target.checked ? null : false })} /> Sold here</label>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
 export const MenuOptionsModule: React.FC<Props> = ({ showToast, onRequestConfirm }) => {
   const [tick, setTick] = useState(0);
   const [editingGroup, setEditingGroup] = useState<ModifierGroup | 'new' | null>(null);
@@ -246,6 +326,8 @@ export const MenuOptionsModule: React.FC<Props> = ({ showToast, onRequestConfirm
           </div>
         ))}
       </div>
+
+      <BranchMenuPanel showToast={showToast} onChanged={bump} />
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">

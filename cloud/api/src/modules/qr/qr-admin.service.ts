@@ -238,6 +238,17 @@ export class QrAdminService {
     });
   }
 
+  /** Everything still open at one table (QR orders and staff orders alike), so a waiter can see the table's whole tab. */
+  async tableOrders(restaurantId: string, tableId: string) {
+    const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.syncedOrder.findMany({ where: { restaurantId, tableId, status: { notIn: ['COMPLETED', 'CANCELLED', 'REFUNDED'] } }, orderBy: { createdAt: 'asc' }, take: 200 })
+    );
+    return rows.map((o) => {
+      const meta = (o.meta ?? {}) as Record<string, unknown>;
+      return { orderNumber: typeof meta.orderNumber === 'string' ? meta.orderNumber : typeof meta.tokenNumber === 'string' ? meta.tokenNumber : null, source: o.source, status: o.status, paymentStatus: o.paymentStatus, total: o.totalAmount / 100, placedAt: o.createdAt.toISOString(), items: Array.isArray(o.items) ? (o.items as Array<Record<string, unknown>>).map((i) => ({ name: i.name, quantity: i.quantity, modifiers: i.modifiers })) : [] };
+    });
+  }
+
   async overview(restaurantId: string) {
     const entitlement = await this.entitlement(restaurantId);
     const data = await this.prisma.runAsTenant(restaurantId, async (tx) => {

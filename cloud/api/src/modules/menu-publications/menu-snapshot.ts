@@ -152,3 +152,77 @@ export function viewForBranch(content: SnapshotContent, branchId: string | null)
   const groups = content.groups.filter((g) => used.has(g.id)).sort(byOrder).map((g) => ({ ...g, options: [...g.options].sort(byOrder) }));
   return { categories: categories.filter((c) => items.some((i) => i.categoryId === c.id)), items, groups, taxGroups: content.taxGroups };
 }
+
+// ------------------------------------------------------------------------------------------ pictures
+
+export const MAX_MENU_IMAGE_BYTES = 1_000_000;
+export const IMAGE_REF = /^img:[a-f0-9]{64}$/;
+const DATA_URL = /^data:(image\/(?:png|jpeg|webp|gif));base64,([A-Za-z0-9+/=\s]+)$/;
+
+function sniff(bytes: Buffer): string | null {
+  if (bytes.length > 12 && bytes[0] === 0x89 && bytes.toString('ascii', 1, 4) === 'PNG') return 'image/png';
+  if (bytes.length > 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg';
+  if (bytes.length > 12 && bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP') return 'image/webp';
+  if (bytes.length > 6 && bytes.toString('ascii', 0, 3) === 'GIF') return 'image/gif';
+  return null;
+}
+
+export interface ExtractedImage { hash: string; contentType: string; data: Buffer }
+
+/**
+ * Pictures typed into the menu as inline data (base64) are moved out of the snapshot into their own store, and the snapshot
+ * keeps only `img:<sha256>`. Only real PNG/JPEG/WebP/GIF bytes under 1 MB are accepted (never SVG, which can carry script);
+ * anything else is dropped with a warning and the dish is shown without a picture. Web addresses are left as they are.
+ */
+export function extractImages(content: SnapshotContent): { content: SnapshotContent; images: ExtractedImage[]; warnings: string[] } {
+  const images = new Map<string, ExtractedImage>();
+  const warnings: string[] = [];
+  const convert = (url: string | undefined, label: string): string | undefined => {
+    if (!url || !url.startsWith('data:')) return url;
+    const m = DATA_URL.exec(url);
+    if (!m) { warnings.push(`${label}: the picture is not a PNG, JPEG, WebP or GIF, so it is not shown to guests.`); return undefined; }
+    const data = Buffer.from(m[2].replace(/\s+/g, ''), 'base64');
+    if (data.length > MAX_MENU_IMAGE_BYTES) { warnings.push(`${label}: the picture is larger than 1 MB, so it is not shown to guests. Use a smaller photo.`); return undefined; }
+    const type = sniff(data);
+    if (!type || type !== m[1]) { warnings.push(`${label}: the picture file is damaged or not what it claims to be, so it is not shown to guests.`); return undefined; }
+    const hash = createHash('sha256').update(data).digest('hex');
+    images.set(hash, { hash, contentType: type, data });
+    return `img:${hash}`;
+  };
+  const out: SnapshotContent = {
+    ...content,
+    categories: content.categories.map((c) => ({ ...c, imageUrl: convert(c.imageUrl, `Category "${c.name}"`) })),
+    items: content.items.map((i) => ({ ...i, imageUrl: convert(i.imageUrl, `Dish "${i.name}"`) })),
+    groups: content.groups.map((g) => ({ ...g, options: g.options.map((o) => ({ ...o, imageUrl: convert(o.imageUrl, `Option "${o.name}"`) })) }))
+  };
+  return { content: out, images: [...images.values()], warnings };
+}
+
+/** The address a guest's browser uses for a stored picture (relative to the API); web addresses pass through. */
+export function publicImageUrl(url: string | undefined): string | undefined {
+  return url && IMAGE_REF.test(url) ? `/api/v1/public/qr/images/${url.slice(4)}` : url;
+}
+
+/** Why each dish a guest cannot see is hidden, in words the restaurant can act on. Uses the same rules as `viewForBranch`. */
+export function explainHidden(content: SnapshotContent, branchId: string | null): Array<{ itemId: string; name: string; reason: string }> {
+  const view = viewForBranch(content, branchId);
+  const shown = new Set(view.items.map((i) => i.id));
+  const catOverride = (id: string) => content.overrides.find((o) => o.branchId === branchId && o.categoryId === id);
+  const itemOverride = (id: string) => content.overrides.find((o) => o.branchId === branchId && o.itemId === id);
+  const out: Array<{ itemId: string; name: string; reason: string }> = [];
+  for (const i of content.items) {
+    if (shown.has(i.id)) continue;
+    const o = itemOverride(i.id);
+    const cat = content.categories.find((c) => c.id === i.categoryId);
+    let reason = 'Hidden';
+    if (!i.available) reason = 'Marked unavailable';
+    else if (o?.available === false || o?.visible === false) reason = 'Switched off for this branch';
+    else if (i.salesChannels ? !i.salesChannels.includes('QR') : !i.qrEnabled) reason = 'Not sold through QR ordering';
+    else if (i.branchIds.length > 0 && (!branchId || !i.branchIds.includes(branchId))) reason = 'Not sold in this branch';
+    else if (!cat) reason = 'Its category is inactive or missing';
+    else if (!cat.qrVisible || catOverride(cat.id)?.visible === false) reason = 'Its category is hidden from QR ordering';
+    else if (i.taxGroupId && !content.taxGroups[i.taxGroupId]) reason = 'Its tax group is missing or not in use';
+    out.push({ itemId: i.id, name: i.name, reason });
+  }
+  return out;
+}

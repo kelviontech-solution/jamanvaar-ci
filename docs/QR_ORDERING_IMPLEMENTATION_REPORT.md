@@ -135,3 +135,47 @@ Deploy in this order:
 * **Sync / Security PASS** hold for correctness at small scale; the per-code order limit (12/min) would reject a 100-customer table, and no load test exists.
 
 The addendum to `QR_ORDERING_EXECUTION_PLAN.md` plans the fixes. These statuses are not upgraded until they are verified.
+
+## Restaurant control and scale: implementation status (added after the fixes)
+
+Everything below was verified by running the tests named next to it. Cloud suite: only the two failures that existed before this work remain (`rbac.e2e` activation-code leakage, `restaurant-identity-sync.e2e` old single-step login). Root suite: 159 files, 1119 tests pass. Typechecks: `cloud/api`, `pos-admin`, `qr-guest` clean; the 18 `tests/` type errors in `tsc -b` were present before this work.
+
+### Done and tested
+
+| Plan item | What now exists | Evidence |
+|---|---|---|
+| R2 published menu | `MenuSnapshot` table; publish builds, validates and freezes the menu (422 with reasons when a price is invalid or a group is inconsistent); guests read only the latest snapshot; a restaurant that never pressed Publish gets its first snapshot automatically; `GET /api/v1/menu/draft-status`; snapshots are immutable and cached by version | `qr-menu-control.e2e` (draft invisible until publish, unpublishable menu keeps the last good one live), `qr-ordering-saas.e2e` |
+| R4 deterministic menu | Categories, dishes, groups and options come in the restaurant's configured order, then name, then id; menu etag is derived from the snapshot | `qr-menu-control.e2e` ("restaurant's own order") |
+| R5 order-time snapshot | Each line keeps option id/name/group/price, base price, tax group, tax rate, inclusive flag, line tax and menu version; `SyncedOrder.menuVersion`; a device push without the snapshot cannot erase it; the device shows real option prices | `qr-menu-control.e2e` (price rise after ordering changes nothing), `packages/sync` mapping |
+| R2/R7 stale menu | The guest sends the menu version; if a newer publish changed what they would pay, the order is refused with `409 MENU_CHANGED`; if not, it goes through | `qr-menu-control.e2e` |
+| R3 (partly) authoring | Restaurant Admin: **Customisations & Tax** screen (modifier groups with priced, orderable, default-able options; tax groups; deletion safety), per-dish tax group, QR switch, position, min/max quantity, cooking-note switch; new dishes no longer get every group or a guessed GST; `Publish to guests` panel with draft status, blocking errors and warnings | `tests/menu_authoring.test.ts` (5), typecheck; the screens themselves were **not** exercised in a browser |
+| R6 images | Pictures typed into the menu are validated (real PNG/JPEG/WebP/GIF, ≤ 1 MB, no SVG), stored once by SHA-256, referenced as `img:<hash>` in the snapshot and served with a one-year immutable cache; bad pictures are dropped with a warning and the dish stays | `qr-menu-control.e2e` (pictures, pure snapshot test) |
+| R8 preview | `GET /api/v1/menu/preview?branchId=` returns what a branch guest would see from the draft and why each other dish is hidden; shown in the publish panel | `qr-menu-control.e2e` |
+| R9 branch overrides | `PUT/GET /api/v1/menu/branch-overrides` (console only): per-branch price and availability, draft until published, priced into orders; UI in Customisations & Tax (shown when the restaurant has 2+ branches) | `qr-menu-control.e2e` |
+| R7 (partly) guest app | Honours restaurant rules: pre-selected options, group help text, "Choose 1 to 3" wording, quantity limits, per-dish cooking-note switch, version sent with the order, MENU_CHANGED handling, picture addresses | typecheck only; **no browser test** |
+| S2 sessions/privacy | `POST /public/qr/session` issues a stateless HMAC-signed session; a made-up or altered session is ignored; order references are 26 random characters (~128 bits), old 8-character references still resolve | `qr-ordering-saas.e2e`, `qr-scale.e2e` |
+| S3 durability | Bounded jittered retry of transient database errors (safe because every order has an idempotency key); admission control with a wait limit that answers `503 BUSY` + `Retry-After` | `qr-scale.e2e` (unit-level plus 50 identical concurrent retries = one order) |
+| S4 caches (menu only) | Built menus cached per `menu:{restaurant}:{branch}:{version}` (immutable, so never stale, tenant in the key) | covered by the menu tests |
+| S5 pool | `DB_POOL_SIZE`, `DB_POOL_TIMEOUT_SECONDS`, `DB_TX_MAX_WAIT_MS`, `DB_TX_TIMEOUT_MS` | `qr-scale.e2e` (config functions) |
+| S6 counters (no Redis) | Rate limits live in PostgreSQL (`RateCounter`, one atomic upsert per request); two API instances enforce one shared limit; if the counter store is unreachable the guest is let through | `qr-scale.e2e` (two real app instances), fail-open test |
+| S7 limits | Defaults raised so a 100-guest table works (per code 60 orders/min, per address 1200/min); per-session limit counts only server-issued sessions; picture requests are not counted | `qr-ordering-saas.e2e`, `qr-scale.e2e` |
+| S8 (partly) | `X-Request-Id` on every response, and HTTP logs never contain a QR token or order reference | `qr-scale.e2e` (pure functions); **not** exercised through `main.ts` |
+| S9 (partly) acceptance | 100 concurrent orders on one table (all stored once, unique numbers, unique cursor positions, ~2.2 s on the test machine); 50 identical concurrent retries; 20 tables and two restaurants in parallel with no cross-restaurant or cross-branch landing; 500 menu reads in waves of 100 (~1.4 s) | `qr-scale.e2e` |
+| S1 (partly) | Table ids can no longer collide; tables carry an optional `branchId` that syncs and is never erased by a copy without it; `GET /restaurant/qr/tables/:tableId/orders` | `qr-menu-control.e2e`; types |
+
+The timing figures were measured against a local PostgreSQL on a development machine. They show the design does not serialise or lose orders under 100-way concurrency; they are **not** a production capacity claim.
+
+### Not done (do not treat as complete)
+
+* **R1** strict schemas for menu entities on entity-sync (the snapshot builder validates on publish, but entity push is still free-form).
+* **R3** category editor fields (image, description, QR visibility, reorder), dish-level instructions text and option images/descriptions in the editor, moving the tax-group editor out of Kiosk Admin (Restaurant Admin now has its own, Kiosk Admin's is unchanged).
+* **R7** restaurant-configurable copy, currency and a branding block; a real-browser walkthrough of the guest app and of the new Restaurant Admin screens.
+* **R10** a full propagation matrix (edit in Restaurant Admin → publish → guest → POS/KDS) across every device app.
+* **S0** a standalone load harness (only the in-suite acceptance tests exist).
+* **S1** table state machine, table management inside the QR console (create/edit/enable/disable), print selected.
+* **S4** resolution and entitlement caches (each scan still runs about eight small transactions).
+* **S5** index review against `EXPLAIN` output.
+* **S6** cross-instance realtime (the realtime bus is still in-process; only the counters are shared).
+* **S8** a metrics endpoint (admission statistics exist in memory only).
+* **S9** failure-injection beyond the counter store, 1000 concurrent resolutions, multi-hour soak.
+* Legacy table fields `qrToken/qrCodeUrl/qrShortCode` still sync between devices (they are no longer used for ordering).

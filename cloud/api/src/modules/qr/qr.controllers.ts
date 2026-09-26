@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, HttpCode, Param, Post, Put, Query, Req, Res, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, NotFoundException, StreamableFile, Param, Post, Put, Query, Req, Res, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { Device } from '@prisma/client';
 import type { Request, Response } from 'express';
@@ -7,6 +7,7 @@ import { CurrentDevice } from '../../common/decorators/current-device.decorator'
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { QrRateLimitInterceptor } from './qr-rate-limit';
 import { QrSessions } from './qr-session';
+import { MenuPublicationsService } from '../menu-publications/menu-publications.service';
 import { QrBusyException } from './qr-resilience';
 import { QrAdminService, generateQrSchema, GenerateQr } from './qr-admin.service';
 import { QrPublicService, placeQrOrderSchema, PlaceQrOrder, quoteQrOrderSchema, QuoteQrOrder } from './qr-public.service';
@@ -21,7 +22,18 @@ import { qrSettingsSchema, QrSettingsUpdate } from './qr-settings.service';
 @UseInterceptors(QrRateLimitInterceptor)
 @Controller('api/v1/public/qr')
 export class QrPublicController {
-  constructor(private readonly qr: QrPublicService, private readonly sessions: QrSessions) {}
+  constructor(private readonly qr: QrPublicService, private readonly sessions: QrSessions, private readonly publications: MenuPublicationsService) {}
+
+  /** A published menu picture. Its address is the hash of its bytes, so the browser may keep it for a year. */
+  @Get('images/:hash')
+  async image(@Param('hash') hash: string, @Res({ passthrough: true }) res: Response) {
+    const img = await this.publications.image(hash);
+    if (!img) throw new NotFoundException('Picture not found');
+    res.setHeader('Content-Type', img.contentType);
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.setHeader('ETag', `"${hash}"`);
+    return new StreamableFile(Buffer.from(img.data));
+  }
 
   /** A signed customer session for this browser. Called once; the guest page keeps it and sends it back. */
   @Post('session')
@@ -155,6 +167,12 @@ export class QrRestaurantController {
   orders(@CurrentDevice() device: Device, @Query('branchId') branchId?: string, @Query('limit') limit?: string) {
     this.qr.assertConsole(device);
     return this.qr.listOrders(device.restaurantId, { branchId, limit: limit ? Number(limit) : undefined });
+  }
+
+  @Get('tables/:tableId/orders')
+  tableOrders(@CurrentDevice() device: Device, @Param('tableId') tableId: string) {
+    this.qr.assertConsole(device);
+    return this.qr.tableOrders(device.restaurantId, tableId);
   }
 
   @Get('settings')

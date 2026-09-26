@@ -179,6 +179,7 @@ model Restaurant {
   inventoryMovements      InventoryMovement[]
   menuPublications        MenuPublication[]
   menuSnapshots           MenuSnapshot[]
+  menuImages              MenuImage[]
   syncedEntities          SyncedEntity[]
   aiAccess                RestaurantAiAccess?
   aiUsage                 AiUsageDaily[]
@@ -1645,6 +1646,20 @@ model MenuPublication {
   createdAt           DateTime   @default(now())
 
   @@unique([restaurantId, version])
+}
+
+/// A picture used by the published menu, addressed by the SHA-256 of its bytes.
+model MenuImage {
+  hash         String
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  contentType  String
+  size         Int
+  data         Bytes
+  createdAt    DateTime   @default(now())
+
+  @@id([restaurantId, hash])
+  @@index([hash])
 }
 
 /// The menu as it was when the restaurant published it. Customers read this, never the live draft entities.

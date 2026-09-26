@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import { MenuPublicationsService } from '../menu-publications/menu-publications.service';
-import { viewForBranch } from '../menu-publications/menu-snapshot';
+import { publicImageUrl, viewForBranch } from '../menu-publications/menu-snapshot';
 import type { MenuSnapshotItemLookup, ModifierGroupSnapshot } from '../payments/pricing.util';
 
 export interface QrMenuCategory {
@@ -97,7 +97,7 @@ export class QrMenuService {
         isAvailable: true, modifierGroups: groups, minQuantity: i.minQuantity, maxQuantity: i.maxQuantity, allowInstructions: i.allowInstructions
       });
       return {
-        id: i.id, name: i.name, description: i.description, categoryId: i.categoryId, price: i.effectivePricePaise / 100, imageUrl: i.imageUrl, dietaryType: i.dietaryType,
+        id: i.id, name: i.name, description: i.description, categoryId: i.categoryId, price: i.effectivePricePaise / 100, imageUrl: publicImageUrl(i.imageUrl), dietaryType: i.dietaryType,
         modifierGroupIds: groups.map((g) => g.id), sortOrder: i.sortOrder, minQuantity: i.minQuantity, maxQuantity: i.maxQuantity, allowInstructions: i.allowInstructions
       };
     });
@@ -107,9 +107,9 @@ export class QrMenuService {
       .filter((g) => usedGroups.has(g.id))
       .map((g) => ({
         id: g.id, name: g.name, description: g.description, isRequired: g.isRequired, minSelections: g.minSelections, maxSelections: g.maxSelections,
-        options: g.options.map((o) => ({ id: o.id, name: o.name, description: o.description, imageUrl: o.imageUrl, priceDelta: o.priceDelta / 100, isDefault: o.isDefault }))
+        options: g.options.map((o) => ({ id: o.id, name: o.name, description: o.description, imageUrl: publicImageUrl(o.imageUrl), priceDelta: o.priceDelta / 100, isDefault: o.isDefault }))
       }));
-    const categories: QrMenuCategory[] = view.categories.map((c) => ({ id: c.id, name: c.name, description: c.description, imageUrl: c.imageUrl, sortOrder: c.sortOrder }));
+    const categories: QrMenuCategory[] = view.categories.map((c) => ({ id: c.id, name: c.name, description: c.description, imageUrl: publicImageUrl(c.imageUrl), sortOrder: c.sortOrder }));
 
     const body = { menuVersion: snap.version, categories, items, modifierGroups };
     const etag = createHash('sha1').update(`${snap.checksum}:${branchId ?? ''}`).digest('hex').slice(0, 16);

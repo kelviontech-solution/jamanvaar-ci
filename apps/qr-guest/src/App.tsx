@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ApiError, QrApi, type Describe, type Menu, type MenuGroup, type MenuItem, type Placed, type Quote } from './api';
+import { ApiError, QrApi, imageSrc, type Describe, type Menu, type MenuGroup, type MenuItem, type Placed, type Quote } from './api';
 import { addLine, emptyCart, itemCount, parseCart, removeLine, setQuantity, toOrderItems, unavailableLines, withAttempt, estimatedSubtotal, type Cart } from './cart';
 
 /** Whole rupees stay whole (₹249); anything with paise shows both digits (₹40.40). */
@@ -157,7 +157,7 @@ function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { i
       <ul className="items">
         {visible.map((i) => (
           <li key={i.id} className="item">
-            {i.imageUrl && <img src={i.imageUrl} alt="" loading="lazy" />}
+            {imageSrc(i.imageUrl) && <img src={imageSrc(i.imageUrl)} alt="" loading="lazy" />}
             <div className="grow">
               <div className="iname">{i.name}</div>
               {i.description && <div className="idesc">{i.description}</div>}
