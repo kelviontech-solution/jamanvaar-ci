@@ -176,18 +176,19 @@ Route: `GET /api/v1/payments/platform-summary?restaurantId=&status=&from=&to=` o
 - Filters: restaurant (a searchable select, reusing the restaurant list already fetched by `PaymentConnectionsListPage`'s pattern or a lightweight new `GET /api/v1/restaurants?fields=id,name` — check whether the existing restaurants list endpoint already supports a lightweight projection before adding a new one), status, date range (from/to).
 - Below the tiles: the same paginated transactions table `RestaurantDetailPage.tsx`'s existing Payments tab already renders, reused as a shared component (`extract into cloud/super-admin-web/src/components/PaymentsTable.tsx` if not already generically written, or duplicated minimally if extraction is riskier — implementation-time judgment call, not a design ambiguity: prefer extraction, since the two views' row shape is identical) — now driven by `GET /api/v1/payments` with the platform-wide filters (no forced `restaurantId`).
 
-## Part D — Kiosk Admin revenue view
+## Part D — Kiosk Admin and Part E — Restaurant Admin (pos-admin) revenue views
 
-### Backend: `GET /api/v1/tenant/payments/summary`
+Kiosk Admin authenticates its Payment Gateway settings screen via a real tenant staff session (`TenantAuthGuard`, confirmed in `kiosk-payment-connection.controller.ts`), but `pos-admin` has no such staff-session layer at all — it authenticates purely as a device (`DeviceAuthGuard`, `deviceType: 'POS_ADMIN'`, confirmed by its `cloudClient.ts`'s existing `createRefund` call and the complete absence of any `tenantFetch`/`getTenantAccessToken`-equivalent in that file). A single tenant-session-gated endpoint would work for Kiosk Admin but not for `pos-admin`. Unifying on `DeviceAuthGuard` instead — restricted to a multi-device-type allow-list — works for both and matches the exact precedent `PaymentOrdersController.refund` already set (`device.type === 'POS' || device.type === 'POS_ADMIN'`). Revenue totals are also meaningfully less sensitive than the settlement bank/KYC details `TenantAuthGuard`'s OWNER/MANAGER gate exists to protect, so the lighter guard is proportionate, not a downgrade.
 
-New tenant-facing endpoint (device-authed, `TenantAuthModule`'s existing pattern — Kiosk Admin already has a real staff session per the earlier onboarding work), restricted to the caller's own `restaurantId` (never a query param):
+### Backend: `GET /api/v1/payments/tenant-summary`
+
+New method on `PaymentsService` (same module, reuses the module's own tenant-scoped Prisma pattern):
 
 ```typescript
-// payments.service.ts — new method, reuses the same aggregate shape as platformSummary but tenant-scoped
 async tenantSummary(restaurantId: string, filters: { from?: Date; to?: Date }) {
   return this.prisma.runAsTenant(restaurantId, async (tx) => {
     const where = { restaurantId, ...(filters.from || filters.to ? { createdAt: { gte: filters.from, lte: filters.to } } : {}) };
-    const [successAgg, refundAgg] = await Promise.all([
+    const [successAgg, failedCount] = await Promise.all([
       tx.paymentTransaction.aggregate({ where: { ...where, status: { in: ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED'] } }, _sum: { amount: true }, _count: true }),
       tx.paymentTransaction.count({ where: { ...where, status: 'FAILED' } })
     ]);
@@ -195,28 +196,34 @@ async tenantSummary(restaurantId: string, filters: { from?: Date; to?: Date }) {
     return {
       grossVolume: successAgg._sum.amount ?? 0,
       successfulCount: successAgg._count,
-      failedCount: refundAgg,
+      failedCount,
       refundedAmount: refunded._sum.amount ?? 0
     };
   });
 }
 ```
 
-Mounted on a new `TenantPaymentsController` (`TenantAuthGuard`, `api/v1/tenant/payments/summary`) — confirmed to match the exact guard `kiosk-payment-connection.controller.ts` already uses for Kiosk Admin's real staff session (`TenantAuthGuard`, mounted under `api/v1/tenant/...`), the same session Kiosk Admin's existing Payment Gateway settings screen already authenticates with.
+New route on the existing `PaymentOrdersController` (already `DeviceAuthGuard`):
 
-### Frontend
+```typescript
+@Get('tenant-summary')
+async tenantSummary(@CurrentDevice() device: Device, @Query('from') from?: string, @Query('to') to?: string) {
+  if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
+    throw new ForbiddenException('Only Kiosk Admin or POS Admin can read the payments summary');
+  }
+  return this.payments.tenantSummary(device.restaurantId, { from: from ? new Date(from) : undefined, to: to ? new Date(to) : undefined });
+}
+```
 
-A new small section in Kiosk Admin's existing "Payment Gateway" settings area (added in the Phase 2 onboarding sub-project) — three numbers (Today's Gross, Successful count, Refunded) fetched once on tab focus, no new tab/nav entry (this app is tab-based per its established structure, and Payment Gateway is already the natural home for anything payment-related to this restaurant).
+Declared above `@Get(':paymentId/status')` for the same route-ordering reason as the platform controller's `commission-config`.
 
-## Part E — Restaurant Admin (pos-admin) revenue view
+### Kiosk Admin frontend
 
-### Backend
+A new small section in Kiosk Admin's existing "Payment Gateway" settings area (added in the Phase 2 onboarding sub-project) — three numbers (Today's Gross, Successful count, Refunded), fetched via a new `getPaymentsSummary()` in `cloudClient.ts` using the same `deviceFetch`-style pattern this file already has for its device token (not `tenantFetch` — this route is device-authed, not tenant-session-authed). No new tab/nav entry — Payment Gateway is already the natural home for anything payment-related to this restaurant.
 
-Reuses Part D's exact `GET /api/v1/tenant/payments/summary` endpoint — Restaurant Admin (`pos-admin`) already has its own device/tenant credentials (confirmed: `pos-admin`'s `cloudClient.ts` already calls cloud endpoints for refunds). No new backend route needed.
+### Restaurant Admin (`pos-admin`) frontend
 
-### Frontend
-
-New section in `pos-admin`'s existing `components/reports/ReportsDashboard.tsx` (the natural home — this file already aggregates local sales figures) or a new small card, calling the same tenant-summary endpoint via `pos-admin`'s existing `cloudClient.ts` (add a `getPaymentsSummary()` function there, mirroring Kiosk Admin's new one) — showing Online Sales (Cashfree gross volume), Refunds, alongside whatever cash-sales figures this dashboard already computes locally, clearly labeled as two different sources (online vs. local/cash) rather than merged into one misleading total.
+New section in `pos-admin`'s existing `components/reports/ReportsDashboard.tsx` (the natural home — this file already aggregates local sales figures), calling a new `getPaymentsSummary()` added to `pos-admin`'s own `cloudClient.ts` (mirroring its existing `createRefund`'s device-fetch pattern) — showing Online Sales (Cashfree gross volume), Refunds, alongside whatever cash-sales figures this dashboard already computes locally, clearly labeled as two different sources (online vs. local/cash) rather than merged into one misleading total.
 
 ## Part F — Consolidated documentation
 
