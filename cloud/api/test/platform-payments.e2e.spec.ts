@@ -156,4 +156,44 @@ describe('Platform payments visibility', () => {
     const res = await request(app.getHttpServer()).get('/api/v1/payments/commission-config');
     expect(res.status).toBe(401);
   });
+
+  it('a FINANCE_ADMIN can read and write commission config (billing: write)', async () => {
+    const email = `test-platpay-finance-${Date.now()}@example.com`;
+    await createTestPlatformUser(prisma, { email, password: 'correct-horse-battery-staple', role: 'FINANCE_ADMIN' });
+    const loginRes = await platformLogin(app, email, 'correct-horse-battery-staple');
+    const token = loginRes.body.accessToken;
+
+    const getRes = await authed('get', '/api/v1/payments/commission-config', token);
+    expect(getRes.status).toBe(200);
+    const patchRes = await authed('patch', '/api/v1/payments/commission-config', token).send({ defaultBps: 100 });
+    expect(patchRes.status).toBe(200);
+
+    await prisma.platformUser.deleteMany({ where: { email } });
+  });
+
+  it('a READ_ONLY user can read but not write commission config (billing: read)', async () => {
+    const email = `test-platpay-readonly-${Date.now()}@example.com`;
+    await createTestPlatformUser(prisma, { email, password: 'correct-horse-battery-staple', role: 'READ_ONLY' });
+    const loginRes = await platformLogin(app, email, 'correct-horse-battery-staple');
+    const token = loginRes.body.accessToken;
+
+    const getRes = await authed('get', '/api/v1/payments/commission-config', token);
+    expect(getRes.status).toBe(200);
+    const patchRes = await authed('patch', '/api/v1/payments/commission-config', token).send({ defaultBps: 100 });
+    expect(patchRes.status).toBe(403);
+
+    await prisma.platformUser.deleteMany({ where: { email } });
+  });
+
+  it('a SUPPORT_ADMIN has no billing area access at all, not even read', async () => {
+    const email = `test-platpay-support-${Date.now()}@example.com`;
+    await createTestPlatformUser(prisma, { email, password: 'correct-horse-battery-staple', role: 'SUPPORT_ADMIN' });
+    const loginRes = await platformLogin(app, email, 'correct-horse-battery-staple');
+    const token = loginRes.body.accessToken;
+
+    const getRes = await authed('get', '/api/v1/payments/commission-config', token);
+    expect(getRes.status).toBe(403);
+
+    await prisma.platformUser.deleteMany({ where: { email } });
+  });
 });
