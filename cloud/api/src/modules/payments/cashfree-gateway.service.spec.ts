@@ -77,6 +77,44 @@ describe('CashfreeGatewayService', () => {
     ).rejects.toThrow(ServiceUnavailableException);
   });
 
+  it('createOrder includes order_splits when orderSplits is provided', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({ cf_order_id: '1', order_id: 'pay_1', payment_session_id: 'session_abc', order_status: 'ACTIVE' }),
+        { status: 200 }
+      )
+    );
+
+    await service.createOrder({
+      orderId: 'pay_1',
+      amountPaise: 10000,
+      currency: 'INR',
+      customerId: 'order_1',
+      orderSplits: [{ vendorId: 'rest_abc123', percentage: 98 }]
+    });
+
+    const [, init] = fetchSpy.mock.calls[0];
+    const body = JSON.parse(init!.body as string);
+    expect(body.order_splits).toEqual([{ vendor_id: 'rest_abc123', percentage: 98 }]);
+  });
+
+  it('createOrder omits order_splits entirely when orderSplits is not provided', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({ cf_order_id: '1', order_id: 'pay_1', payment_session_id: 'session_abc', order_status: 'ACTIVE' }),
+        { status: 200 }
+      )
+    );
+
+    await service.createOrder({ orderId: 'pay_1', amountPaise: 10000, currency: 'INR', customerId: 'order_1' });
+
+    const [, init] = fetchSpy.mock.calls[0];
+    const body = JSON.parse(init!.body as string);
+    expect(body.order_splits).toBeUndefined();
+  });
+
   it('verifyWebhookSignature accepts a correctly-signed payload', async () => {
     const service = await buildService(CONFIGURED_ENV);
     const rawBody = Buffer.from(JSON.stringify({ type: 'PAYMENT_SUCCESS_WEBHOOK' }));

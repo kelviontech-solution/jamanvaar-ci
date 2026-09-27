@@ -8,6 +8,7 @@ export interface CreateCashfreeOrderInput {
   currency: string;
   customerId: string;
   notifyUrl?: string;
+  orderSplits?: { vendorId: string; percentage: number }[];
 }
 
 export interface CashfreeOrderResult {
@@ -110,7 +111,10 @@ export class CashfreeGatewayService {
         order_amount: Number((input.amountPaise / 100).toFixed(2)),
         order_currency: input.currency,
         customer_details: { customer_id: input.customerId, customer_phone: PLACEHOLDER_CUSTOMER_PHONE },
-        ...(input.notifyUrl ? { order_meta: { notify_url: input.notifyUrl } } : {})
+        ...(input.notifyUrl ? { order_meta: { notify_url: input.notifyUrl } } : {}),
+        ...(input.orderSplits && input.orderSplits.length > 0
+          ? { order_splits: input.orderSplits.map((s) => ({ vendor_id: s.vendorId, percentage: s.percentage })) }
+          : {})
       })
     });
     const body = await res.json();
