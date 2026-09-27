@@ -14,7 +14,7 @@ describe('Platform payments visibility', () => {
   let restaurantId: string;
   let posToken: string;
 
-  const authed = (method: 'get' | 'post', url: string, token: string) =>
+  const authed = (method: 'get' | 'post' | 'patch', url: string, token: string) =>
     request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
 
   beforeAll(async () => {
@@ -48,6 +48,7 @@ describe('Platform payments visibility', () => {
   });
 
   afterAll(async () => {
+    await prisma.runAsPlatform((tx) => tx.platformSetting.deleteMany({ where: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS' } }));
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));
     await prisma.platformUser.deleteMany({ where: { email: adminEmail } });
     await app.close();
@@ -117,6 +118,42 @@ describe('Platform payments visibility', () => {
 
   it('a device token (not platform) is rejected', async () => {
     const res = await authed('get', `/api/v1/payments?restaurantId=${restaurantId}`, posToken);
+    expect(res.status).toBe(401);
+  });
+
+  it('GET /commission-config defaults to 0 when never set', async () => {
+    const res = await authed('get', '/api/v1/payments/commission-config', platformToken);
+    expect(res.status).toBe(200);
+    expect(typeof res.body.defaultBps).toBe('number');
+  });
+
+  it('PATCH /commission-config sets the platform default and it is reflected on GET', async () => {
+    const res = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 250 });
+    expect(res.status).toBe(200);
+    expect(res.body.defaultBps).toBe(250);
+
+    const getRes = await authed('get', '/api/v1/payments/commission-config', platformToken);
+    expect(getRes.body.defaultBps).toBe(250);
+  });
+
+  it('PATCH /commission-config rejects an out-of-range value', async () => {
+    const tooHigh = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 10001 });
+    expect(tooHigh.status).toBe(400);
+    const negative = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: -1 });
+    expect(negative.status).toBe(400);
+  });
+
+  it('PATCH /commission-config records an audit log entry', async () => {
+    await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 400 });
+    const entry = await prisma.runAsPlatform((tx) =>
+      tx.auditLog.findFirst({ where: { action: 'COMMISSION_CHANGED', category: 'PAYMENTS' }, orderBy: { createdAt: 'desc' } })
+    );
+    expect(entry).not.toBeNull();
+    expect((entry!.details as { scope?: string })?.scope).toBe('PLATFORM_DEFAULT');
+  });
+
+  it('a non-platform caller cannot read or change commission config', async () => {
+    const res = await request(app.getHttpServer()).get('/api/v1/payments/commission-config');
     expect(res.status).toBe(401);
   });
 });

@@ -1,12 +1,29 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
-import { PaymentTransactionStatus } from '@prisma/client';
+import { Body, Controller, Get, Param, Patch, Query, UseGuards, UsePipes } from '@nestjs/common';
+import { PaymentTransactionStatus, PlatformUser } from '@prisma/client';
 import { PlatformPaymentsService } from './platform-payments.service';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
+import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
+import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
+import { setCommissionConfigSchema, SetCommissionConfigDto } from './dto/commission-config.dto';
 
 @Controller('api/v1/payments')
 @UseGuards(PlatformAuthGuard)
 export class PlatformPaymentsController {
   constructor(private readonly platformPayments: PlatformPaymentsService) {}
+
+  // Declared above the :paymentId route below — NestJS matches routes in
+  // declaration order for the same HTTP method, and "commission-config"
+  // would otherwise be captured by the :paymentId param route.
+  @Get('commission-config')
+  getCommissionConfig() {
+    return this.platformPayments.getCommissionConfig();
+  }
+
+  @Patch('commission-config')
+  @UsePipes(new ZodValidationPipe(setCommissionConfigSchema))
+  setCommissionConfig(@Body() body: SetCommissionConfigDto, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.platformPayments.setDefaultCommissionBps(body.defaultBps, actor);
+  }
 
   @Get()
   list(
