@@ -19,6 +19,11 @@ export function PaymentConnectionsListPage() {
   const [confirmTarget, setConfirmTarget] = useState<PendingAction | null>(null);
   const [actionPending, setActionPending] = useState(false);
   const [refreshingId, setRefreshingId] = useState<string | null>(null);
+  const [defaultBps, setDefaultBps] = useState<number | null>(null);
+  const [defaultBpsInput, setDefaultBpsInput] = useState('');
+  const [savingDefault, setSavingDefault] = useState(false);
+  const [overrideEdits, setOverrideEdits] = useState<Record<string, string>>({});
+  const [savingOverrideId, setSavingOverrideId] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -36,6 +41,50 @@ export function PaymentConnectionsListPage() {
   }, []);
 
   useEffect(load, [load]);
+
+  useEffect(() => {
+    api.get<{ defaultBps: number }>('/api/v1/payments/commission-config').then((d) => {
+      setDefaultBps(d.defaultBps);
+      setDefaultBpsInput(String(d.defaultBps / 100));
+    }).catch(() => {});
+  }, []);
+
+  async function handleSaveDefaultCommission() {
+    const percent = Number(defaultBpsInput);
+    if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
+      showToast('Enter a percentage between 0 and 100');
+      return;
+    }
+    setSavingDefault(true);
+    try {
+      const result = await api.patch<{ defaultBps: number }>('/api/v1/payments/commission-config', { defaultBps: Math.round(percent * 100) });
+      setDefaultBps(result.defaultBps);
+      showToast(`Platform default commission set to ${percent}%`);
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : 'Failed to save default commission');
+    } finally {
+      setSavingDefault(false);
+    }
+  }
+
+  async function handleSaveOverride(c: PaymentConnection) {
+    const raw = overrideEdits[c.id];
+    const overrideBps = raw === undefined || raw === '' ? null : Math.round(Number(raw) * 100);
+    if (overrideBps !== null && (!Number.isFinite(overrideBps) || overrideBps < 0 || overrideBps > 10000)) {
+      showToast('Enter a percentage between 0 and 100, or leave blank to use the platform default');
+      return;
+    }
+    setSavingOverrideId(c.id);
+    try {
+      await api.patch(`/api/v1/restaurants/${c.restaurantId}/payment-connection/commission`, { overrideBps });
+      showToast(`${c.restaurant.name}: commission override saved`);
+      load();
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : 'Failed to save commission override');
+    } finally {
+      setSavingOverrideId(null);
+    }
+  }
 
   const filtered = useMemo(() => {
     if (!connections) return [];
@@ -90,6 +139,20 @@ export function PaymentConnectionsListPage() {
           <h1 className="page-title">Payment Gateways</h1>
           <p className="page-subtitle">Review and approve restaurants' Cashfree settlement connections.</p>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="muted" style={{ fontSize: 12 }}>Platform default commission</span>
+          <input
+            type="number"
+            min={0}
+            max={100}
+            step={0.01}
+            value={defaultBpsInput}
+            onChange={(e) => setDefaultBpsInput(e.target.value)}
+            style={{ width: 70 }}
+          />
+          <span className="muted" style={{ fontSize: 12 }}>%</span>
+          <Button size="sm" variant="ghost" disabled={savingDefault} onClick={handleSaveDefaultCommission}>Save</Button>
+        </div>
       </div>
 
       {error && (
@@ -142,6 +205,7 @@ export function PaymentConnectionsListPage() {
                     <th>Contact</th>
                     <th>Settlement</th>
                     <th>Cashfree</th>
+                    <th>Commission</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -170,6 +234,21 @@ export function PaymentConnectionsListPage() {
                             <Button size="sm" variant="ghost" icon={<RefreshCw className="w-3 h-3" />} disabled={refreshingId === c.id} onClick={() => handleRefreshStatus(c)} title="Refresh Cashfree status" />
                           </div>
                         ) : '—'}
+                      </td>
+                      <td style={{ fontSize: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <input
+                            type="number"
+                            min={0}
+                            max={100}
+                            step={0.01}
+                            placeholder={defaultBps !== null ? `${defaultBps / 100}% default` : '—'}
+                            value={overrideEdits[c.id] ?? (c.commissionOverrideBps !== null ? String(c.commissionOverrideBps / 100) : '')}
+                            onChange={(e) => setOverrideEdits((prev) => ({ ...prev, [c.id]: e.target.value }))}
+                            style={{ width: 60 }}
+                          />
+                          <Button size="sm" variant="ghost" disabled={savingOverrideId === c.id} onClick={() => handleSaveOverride(c)}>Save</Button>
+                        </div>
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: 6 }}>

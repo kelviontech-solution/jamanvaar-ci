@@ -1158,6 +1158,7 @@ export interface PaymentConnection {
   settlementUpiVpaMasked: string | null;
   cashfreeVendorId: string | null;
   cashfreeVendorStatus: string | null;
+  commissionOverrideBps: number | null;
   verifiedAt: string | null;
   lastWebhookAt: string | null;
   lastPaymentAt: string | null;
