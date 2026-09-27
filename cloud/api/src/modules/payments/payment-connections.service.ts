@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -309,6 +309,9 @@ export class PaymentConnectionsService {
   }
 
   async setCommissionOverride(restaurantId: string, overrideBps: number | null, actor: PlatformUser) {
+    if (overrideBps !== null && (!Number.isInteger(overrideBps) || overrideBps < 0 || overrideBps > 10000)) {
+      throw new BadRequestException('overrideBps must be null or an integer between 0 and 10000');
+    }
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
       if (!existing) throw new NotFoundException('No payment connection for this restaurant');

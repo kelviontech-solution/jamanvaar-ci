@@ -4,6 +4,7 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
+import { PaymentConnectionsService } from '../src/modules/payments/payment-connections.service';
 
 describe('Payment connection onboarding', () => {
   let app: INestApplication;
@@ -426,6 +427,12 @@ describe('Payment connection onboarding', () => {
   it('PATCH .../commission rejects an out-of-range value', async () => {
     const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 10001 });
     expect(res.status).toBe(400);
+  });
+
+  it('setCommissionOverride still rejects out-of-range values even if a future caller skips the Zod pipe (service-level defense in depth)', async () => {
+    const service = app.get(PaymentConnectionsService);
+    await expect(service.setCommissionOverride(restaurantId, 10001, { id: 'fake-actor' } as never)).rejects.toThrow();
+    await expect(service.setCommissionOverride(restaurantId, -1, { id: 'fake-actor' } as never)).rejects.toThrow();
   });
 
   it('PATCH .../commission for an unknown restaurant returns 404', async () => {

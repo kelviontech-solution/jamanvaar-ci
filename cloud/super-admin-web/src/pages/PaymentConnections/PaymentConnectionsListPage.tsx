@@ -21,6 +21,7 @@ export function PaymentConnectionsListPage() {
   const [refreshingId, setRefreshingId] = useState<string | null>(null);
   const [defaultBps, setDefaultBps] = useState<number | null>(null);
   const [defaultBpsInput, setDefaultBpsInput] = useState('');
+  const [defaultLoaded, setDefaultLoaded] = useState(false);
   const [savingDefault, setSavingDefault] = useState(false);
   const [overrideEdits, setOverrideEdits] = useState<Record<string, string>>({});
   const [savingOverrideId, setSavingOverrideId] = useState<string | null>(null);
@@ -46,6 +47,7 @@ export function PaymentConnectionsListPage() {
     api.get<{ defaultBps: number }>('/api/v1/payments/commission-config').then((d) => {
       setDefaultBps(d.defaultBps);
       setDefaultBpsInput(String(d.defaultBps / 100));
+      setDefaultLoaded(true);
     }).catch(() => {});
   }, []);
 
@@ -151,7 +153,7 @@ export function PaymentConnectionsListPage() {
             style={{ width: 70 }}
           />
           <span className="muted" style={{ fontSize: 12 }}>%</span>
-          <Button size="sm" variant="ghost" disabled={savingDefault} onClick={handleSaveDefaultCommission}>Save</Button>
+          <Button size="sm" variant="ghost" disabled={savingDefault || !defaultLoaded} onClick={handleSaveDefaultCommission}>Save</Button>
         </div>
       </div>
 
