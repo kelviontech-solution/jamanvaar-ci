@@ -1227,6 +1227,9 @@ model PaymentTransaction {
   paymentSessionId  String?
   providerResponse  Json? // sanitized webhook/API response, no secrets
   failureReason     String?
+  commissionBps     Int?    // basis points snapshot at order-creation time; frozen forever after — never recomputed on a later rate change
+  platformAmount    Int?    // paise, computed once at creation from commissionBps
+  restaurantAmount  Int?    // paise, computed once at creation; platformAmount + restaurantAmount == amount
   paidAt            DateTime?
   createdAt         DateTime                  @default(now())
   updatedAt         DateTime                  @updatedAt
@@ -1273,6 +1276,7 @@ model RestaurantPaymentConnection {
   verifiedAt                        DateTime?
   lastWebhookAt                     DateTime?
   lastPaymentAt                     DateTime?
+  commissionOverrideBps             Int?                    // basis points, 0-10000; null = use the platform default (PlatformSetting key PAYMENT_DEFAULT_COMMISSION_BPS)
   createdAt                         DateTime                @default(now())
   updatedAt                         DateTime                @updatedAt
 }
