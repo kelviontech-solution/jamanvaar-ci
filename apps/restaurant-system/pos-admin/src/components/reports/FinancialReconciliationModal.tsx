@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { db } from '@jamanvaar/database';
 import { CentralReportingService, PeriodReconciliationResult, CentralDatePreset } from '@jamanvaar/business';
 import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
@@ -36,6 +36,16 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
   const recon: PeriodReconciliationResult = useMemo(() => {
     return CentralReportingService.reconcilePeriod(db.orders, selectedPreset);
   }, [selectedPreset, refreshKey, db.orders.length]);
+
+  // Escape closes this dialog like any other in the app, not just its own Close Audit button.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -83,6 +93,7 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
             </button>
             <button
               onClick={onClose}
+              aria-label="Close"
               className="p-1.5 text-slate-400 hover:text-jaman-navy rounded-xl hover:bg-slate-100"
             >
               <X className="w-5 h-5" />

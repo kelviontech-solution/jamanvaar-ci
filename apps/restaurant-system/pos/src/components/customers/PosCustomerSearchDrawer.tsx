@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, CustomerRepository } from '@jamanvaar/database';
 import { CustomerAccount } from '@jamanvaar/types';
@@ -18,6 +18,16 @@ export const PosCustomerSearchDrawer: React.FC<PosCustomerSearchDrawerProps> = (
   const [isCreating, setIsCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
+
+  // Escape closes this dialog like any other in the app, not just its own Close button.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

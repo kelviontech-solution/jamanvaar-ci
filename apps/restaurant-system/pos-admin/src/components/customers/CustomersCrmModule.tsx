@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { CustomerAccount, Order } from '@jamanvaar/types';
 import { db, CustomerRepository, AuditRepository } from '@jamanvaar/database';
 import { LoyaltyProgramModal } from './LoyaltyProgramModal';
@@ -80,6 +80,16 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
   const [pointsAdjustInput, setPointsAdjustInput] = useState('50');
   const [isLoyaltyModalOpen, setIsLoyaltyModalOpen] = useState(false);
   const [isMarketingModalOpen, setIsMarketingModalOpen] = useState(false);
+
+  // Escape closes the Customer 360 drilldown like any other dialog in the app.
+  useEffect(() => {
+    if (!detailCustomer) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDetailCustomer(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [detailCustomer]);
 
   // Derive rich computed stats per customer by merging accounts with database orders
   const richCustomers = useMemo(() => {

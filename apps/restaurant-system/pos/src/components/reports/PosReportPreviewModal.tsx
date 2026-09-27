@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { PosReportDocument } from './PosReportDocument';
 import { ReportFullData, ReportDesign, PdfReportBuilder } from '../../services/pdfReportBuilder';
 import { PosPrinterService } from '../../services/printerService';
@@ -33,6 +33,16 @@ export const PosReportPreviewModal: React.FC<PosReportPreviewModalProps> = ({
   const [zoomLevel, setZoomLevel] = useState<number>(100);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [feedback, setFeedback] = useState('');
+
+  // Escape closes this dialog like any other in the app, not just its own Close button.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

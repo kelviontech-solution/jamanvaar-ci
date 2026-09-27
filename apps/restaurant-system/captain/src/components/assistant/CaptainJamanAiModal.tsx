@@ -1,4 +1,4 @@
-import React, { useState, useSyncExternalStore } from 'react';
+import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import { AiConfig } from '@jamanvaar/business';
 import { reportAiQueryNow } from '../../cloud/cloudClient';
 import { useCaptainStore } from '../../store/captainStore';
@@ -27,6 +27,15 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
 }) => {
   // What the platform allows this restaurant (BUG-057): OFF hides it, LOCKED shows why it does not answer.
   const aiState = useSyncExternalStore((cb) => AiConfig.subscribe(cb), () => AiConfig.getState(), () => AiConfig.getState());
+  // Escape closes this dialog like any other in the app.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
   if (!isOpen || aiState === 'OFF') return null;
   if (aiState === 'LOCKED') {
     return (

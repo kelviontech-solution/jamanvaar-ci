@@ -32,12 +32,18 @@ describe('The Restaurant ID can be found and copied (BUG-127)', () => {
     expect(panel).toMatch(/getStoredRestaurantId\(\)/);
   });
 
-  it.each([
-    ['Kiosk Admin', 'apps/kiosk-system/kiosk-admin/src/App.tsx'],
-    ['Captain', 'apps/restaurant-system/captain/src/App.tsx']
-  ])('the %s connect screen says where to find the ID', (_name, file) => {
-    const source = read(file);
+  it('the Kiosk Admin connect screen says where to find the Restaurant ID', () => {
+    const source = read('apps/kiosk-system/kiosk-admin/src/App.tsx');
     expect(source).not.toContain("From your restaurant's admin dashboard");
     expect(source).toMatch(/Super Admin[\s\S]{0,200}Restaurant ID|Restaurant ID[\s\S]{0,300}Super Admin/);
+  });
+
+  // Captain no longer asks for a Restaurant ID at all: it activates with the Welcome Kit key alone
+  // (like POS and KDS), the same way this file's own BUG-127 fix asks every OTHER screen to make an
+  // awkward manual field easy to find — the better fix here was removing the field.
+  it('the Captain connect screen asks only for the activation key, not a Restaurant ID', () => {
+    const source = read('apps/restaurant-system/captain/src/App.tsx');
+    expect(source).not.toMatch(/Restaurant ID/);
+    expect(source).toMatch(/Activation Key/);
   });
 });

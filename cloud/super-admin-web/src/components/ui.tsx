@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
+import { useEffect } from 'react';
 import { Sparkles, AlertCircle } from 'lucide-react';
 import './ui.css';
 
@@ -131,6 +132,15 @@ export function Modal({
   children: ReactNode;
   footer?: ReactNode;
 }) {
+  // The Escape key closes this dialog like any other on the platform, not just its own Close button.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>

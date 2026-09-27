@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Order } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
 import { JAMANVAAR_LOGOS, printElement } from '@jamanvaar/ui';
@@ -62,6 +62,16 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
 }) => {
   const [viewMode, setViewMode] = useState<'A4' | 'DESKTOP' | 'THERMAL'>('A4');
   const [isCopied, setIsCopied] = useState(false);
+
+  // Escape closes this dialog like any other in the app, not just its own Close button.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

@@ -67,6 +67,17 @@ export const PosCart: React.FC = () => {
     isInstantBillProcessing
   } = usePosStore();
 
+  // Which cart items show their "Less Spicy / No Onion / …" note chips. Collapsed by default so a
+  // full cart isn't wall-to-wall buttons — expand only the item you're actually noting.
+  const [notesExpandedFor, setNotesExpandedFor] = useState<Set<string>>(new Set());
+  const toggleNotesFor = (id: string) =>
+    setNotesExpandedFor((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
   const [discountInputOpen, setDiscountInputOpen] = useState(false);
   const [notesModalOpen, setNotesModalOpen] = useState(false);
   const [customerDrawerOpen, setCustomerDrawerOpen] = useState(false);
@@ -146,7 +157,7 @@ export const PosCart: React.FC = () => {
   const quickFavorites = db.menuItems.filter((i) => i.isAvailable !== false).slice(0, 4);
 
   return (
-    <div className="w-84 md:w-92 lg:w-96 min-w-[340px] max-w-[420px] bg-white border-l border-jaman-border flex flex-col h-full select-none shrink-0 shadow-lg z-10">
+    <div className="w-96 md:w-[26rem] lg:w-[28rem] min-w-[380px] max-w-[460px] bg-white border-l border-jaman-border flex flex-col h-full select-none shrink-0 shadow-lg z-10">
       {/* Active Order Header */}
       <div className="p-3 border-b border-jaman-border bg-slate-50/80 shrink-0 space-y-2">
         {/* Order Identifier & Clear Button */}
@@ -283,7 +294,7 @@ export const PosCart: React.FC = () => {
       </div>
 
       {/* Cart Items List or Rich Functional Empty State */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-jaman-cream/40">
+      <div className="flex-1 overflow-y-auto p-3.5 space-y-3 bg-jaman-cream/40">
         {hasItems ? (
           <>
             {stockShortages.length > 0 && (
@@ -294,27 +305,27 @@ export const PosCart: React.FC = () => {
             {cart.items.map((ci) => (
               <div
                 key={ci.cartItemId}
-                className="bg-white border border-jaman-border rounded-2xl p-2.5 shadow-2xs space-y-1.5 hover:border-slate-400 transition-colors"
+                className="bg-white border border-jaman-border rounded-2xl p-3.5 shadow-2xs space-y-2.5 hover:border-slate-400 transition-colors"
               >
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-start gap-2">
                       {/* Dietary Dot */}
                       <div
-                        className={`w-2 h-2 rounded-full shrink-0 ${
+                        className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${
                           ci.item.dietaryType === 'NON_VEG' ? 'bg-rose-600' : 'bg-emerald-600'
                         }`}
                       />
-                      <h4 className="font-bold text-xs text-jaman-deepNavy leading-tight truncate">
+                      <h4 className="font-bold text-[13px] text-jaman-deepNavy leading-snug">
                         {ci.item.name}
                       </h4>
                     </div>
 
                     {/* Modifiers summary */}
                     {ci.selectedModifiers && ci.selectedModifiers.length > 0 && (
-                      <div className="text-[10px] text-slate-500 pl-3 pt-0.5 space-y-0.2">
+                      <div className="text-[11px] text-slate-500 pl-4 pt-1 space-y-0.5">
                         {ci.selectedModifiers.map((m, idx) => (
-                          <div key={idx} className="truncate">
+                          <div key={idx}>
                             + {m.optionName} {m.priceDelta > 0 ? `(+₹${m.priceDelta})` : ''}
                           </div>
                         ))}
@@ -322,39 +333,58 @@ export const PosCart: React.FC = () => {
                     )}
 
                     {ci.specialInstructions && (
-                      <div className="text-[10px] text-amber-700 pl-3 font-medium truncate">
+                      <div className="text-[11px] text-amber-700 pl-4 pt-1 font-medium">
                         Note: {ci.specialInstructions}
                       </div>
                     )}
                   </div>
 
-                  <div className="text-right">
-                    <span className="font-bold text-xs text-jaman-deepNavy">₹{ci.itemTotal}</span>
-                    <span className="block text-[10px] text-slate-400 font-mono">
+                  <div className="text-right shrink-0">
+                    <span className="font-bold text-sm text-jaman-deepNavy">₹{ci.itemTotal}</span>
+                    <span className="block text-[10px] text-slate-400 font-mono mt-0.5">
                       @ ₹{ci.unitPrice}
                     </span>
                   </div>
                 </div>
 
-                {/* Quick Note Preset Chips */}
-                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none py-0.5">
-                  {['Less Spicy', 'No Onion', 'Extra Cheese', 'No Garlic'].map((preset) => (
+                {/* Quick Note toggle: collapsed by default so a full cart isn't wall-to-wall buttons */}
+                {notesExpandedFor.has(ci.cartItemId) ? (
+                  <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+                    {['Less Spicy', 'No Onion', 'Extra Cheese', 'No Garlic'].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => {
+                          const existing = ci.specialInstructions ? `${ci.specialInstructions}, ` : '';
+                          usePosStore.getState().updateItemSpecialInstructions(ci.cartItemId, `${existing}${preset}`);
+                          toggleNotesFor(ci.cartItemId);
+                        }}
+                        className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-600 text-[10px] font-semibold transition-colors shrink-0"
+                      >
+                        +{preset}
+                      </button>
+                    ))}
                     <button
-                      key={preset}
                       type="button"
-                      onClick={() => {
-                        const existing = ci.specialInstructions ? `${ci.specialInstructions}, ` : '';
-                        usePosStore.getState().updateItemSpecialInstructions(ci.cartItemId, `${existing}${preset}`);
-                      }}
-                      className="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-500 text-[9px] font-semibold transition-colors shrink-0"
+                      onClick={() => toggleNotesFor(ci.cartItemId)}
+                      className="text-[10px] text-slate-400 hover:text-slate-600 font-bold px-1.5 shrink-0"
                     >
-                      +{preset}
+                      Done
                     </button>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => toggleNotesFor(ci.cartItemId)}
+                    className="text-[11px] font-bold text-slate-400 hover:text-jaman-saffron flex items-center gap-1 cursor-pointer"
+                  >
+                    <MessageSquare className="w-3 h-3" />
+                    <span>Add note</span>
+                  </button>
+                )}
 
                 {/* Quantity Stepper (Comfortable 38x38px touch targets) */}
-                <div className="flex items-center justify-between pt-1.5 border-t border-slate-100">
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                   <button
                     type="button"
                     onClick={() => { sound.play('remove'); removeItemFromCart(ci.cartItemId); }}
@@ -363,7 +393,7 @@ export const PosCart: React.FC = () => {
                     Remove
                   </button>
 
-                  <div className="flex items-center gap-1.5 bg-slate-100 rounded-xl p-0.5 shadow-2xs">
+                  <div className="flex items-center gap-2 bg-slate-100 rounded-xl p-1 shadow-2xs">
                     <button
                       type="button"
                       onClick={() => { sound.play('remove'); updateItemQuantity(ci.cartItemId, -1); }}
@@ -372,7 +402,7 @@ export const PosCart: React.FC = () => {
                     >
                       <Minus className="w-4 h-4 stroke-[2.5]" />
                     </button>
-                    <span className="font-mono font-black text-sm text-jaman-deepNavy min-w-[28px] text-center">
+                    <span className="font-mono font-black text-sm text-jaman-deepNavy min-w-[32px] text-center">
                       {ci.quantity}
                     </span>
                     <button

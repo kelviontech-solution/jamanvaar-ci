@@ -274,6 +274,14 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
 
 function QrDialog({ row, onClose, showToast }: { row: QrTableRow; onClose: () => void; showToast: (m: string) => void }) {
   const url = row.qr!.url!;
+  // Escape closes this dialog like any other in the app.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-3xl p-6 w-full max-w-sm text-center" onClick={(e) => e.stopPropagation()}>

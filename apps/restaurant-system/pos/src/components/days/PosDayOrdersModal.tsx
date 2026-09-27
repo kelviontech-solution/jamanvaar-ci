@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect} from 'react';
 import { BusinessDay, Order, OrderStatus, OrderType, PaymentMethod } from '@jamanvaar/types';
 import { BusinessDayRepository } from '@jamanvaar/database';
 import { formatINR, formatSplitTax } from '@jamanvaar/utils';
@@ -73,6 +73,16 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
       return true;
     });
   }, [dayOrders, searchQuery, statusFilter, typeFilter, sourceFilter, paymentFilter]);
+
+  // Escape closes this dialog like any other in the app, not just its own Close button.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

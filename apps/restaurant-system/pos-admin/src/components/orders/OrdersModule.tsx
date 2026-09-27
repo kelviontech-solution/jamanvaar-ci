@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Order, OrderStatus } from '@jamanvaar/types';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 import {
@@ -89,6 +89,16 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
+
+  // Escape closes the thermal-bill print dialog like any other dialog in the app.
+  useEffect(() => {
+    if (!isReceiptModalOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsReceiptModalOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isReceiptModalOpen]);
 
   // Compute all Day Summaries based on current filter preset
   const daySummaries = useMemo(() => {

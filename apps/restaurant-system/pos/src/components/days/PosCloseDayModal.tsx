@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { BusinessDay } from '@jamanvaar/types';
 import { BusinessDayAccountingService, BusinessDaySummary } from '@jamanvaar/database';
 import { BusinessDayService } from '@jamanvaar/business';
@@ -46,6 +46,16 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [closedResult, setClosedResult] = useState<{ closedDay: BusinessDay; newDay: BusinessDay } | null>(null);
+
+  // Escape closes this dialog like any other in the app, not just its own Close button.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

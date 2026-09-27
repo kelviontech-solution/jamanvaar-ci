@@ -1,20 +1,16 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { db } from '@jamanvaar/database';
-import { Category } from '@jamanvaar/types';
-import { getCanonicalCategoryKey } from '@jamanvaar/business';
 import { sound } from '@jamanvaar/ui';
 import { PosProductCard } from './PosProductCard';
 import { PosCustomizationModal } from './PosCustomizationModal';
 import { PosMenuManagerModal } from './PosMenuManagerModal';
+import { useCategoryGroups } from './useCategoryGroups';
 import {
-  Sparkles,
   Utensils,
   Settings2,
   Zap,
   Plus,
-  ChevronLeft,
-  ChevronRight,
   Search,
   X
 } from 'lucide-react';
@@ -124,67 +120,10 @@ export const PosCatalog: React.FC = () => {
   } = usePosStore();
 
   const [isMenuManagerOpen, setIsMenuManagerOpen] = useState(false);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const categoryScrollRef = useRef<HTMLDivElement>(null);
 
-  // Group categories by canonical category key so identical categories are merged into ONE button
-  const displayCategoryGroups = useMemo(() => {
-    const groupMap = new Map<
-      string,
-      {
-        canonicalKey: string;
-        displayLabel: string;
-        categoryIds: string[];
-        primaryCategory: Category;
-        totalDishCount: number;
-      }
-    >();
-
-    const activeCategories = db.categories
-      .filter((c) => c.isActive)
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-
-    activeCategories.forEach((cat) => {
-      const canonicalKey = getCanonicalCategoryKey(cat.name);
-      const label = formatCategoryDisplayLabel(cat.name);
-      const existing = groupMap.get(canonicalKey);
-
-      if (existing) {
-        if (!existing.categoryIds.includes(cat.id)) {
-          existing.categoryIds.push(cat.id);
-        }
-        existing.totalDishCount = db.menuItems.filter(
-          (i) => existing.categoryIds.includes(i.categoryId)
-        ).length;
-      } else {
-        const matchingDishesCount = db.menuItems.filter((i) => i.categoryId === cat.id).length;
-        groupMap.set(canonicalKey, {
-          canonicalKey,
-          displayLabel: label,
-          categoryIds: [cat.id],
-          primaryCategory: cat,
-          totalDishCount: matchingDishesCount
-        });
-      }
-    });
-
-    return Array.from(groupMap.values());
-  }, [db.categories, db.menuItems]);
-
-  const checkScrollState = () => {
-    if (categoryScrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = categoryScrollRef.current;
-      setCanScrollLeft(scrollLeft > 6);
-      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 6);
-    }
-  };
-
-  useEffect(() => {
-    checkScrollState();
-    window.addEventListener('resize', checkScrollState);
-    return () => window.removeEventListener('resize', checkScrollState);
-  }, [displayCategoryGroups]);
+  // Categories are chosen in the sidebar (PosSidebar), not here; this hook is shared so both agree
+  // on the same grouping and dish counts.
+  const displayCategoryGroups = useCategoryGroups();
 
   const filteredMenuItems = useMemo(() => {
     return db.menuItems.filter((item) => {
@@ -249,104 +188,21 @@ export const PosCatalog: React.FC = () => {
     return sorted.slice(0, 5);
   }, [db.orders, db.menuItems]);
 
-  // Smooth Touchscreen Category Scrolling
-  const scrollCategories = (direction: 'LEFT' | 'RIGHT') => {
-    if (categoryScrollRef.current) {
-      const offset = direction === 'LEFT' ? -240 : 240;
-      categoryScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-      setTimeout(checkScrollState, 250);
-    }
-  };
+  // What the category rail in the sidebar has selected, shown here as a small heading so it's
+  // clear which list of dishes is on screen (the categories themselves live in PosSidebar now).
+  const selectedGroup = displayCategoryGroups.find(
+    (g) => g.canonicalKey === selectedCategory || g.categoryIds.includes(selectedCategory)
+  );
+  const currentCategoryLabel = selectedCategory === 'ALL' ? 'All Menu' : selectedGroup?.displayLabel ?? 'Menu';
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-jaman-cream p-2.5 space-y-2 select-none min-w-0">
-      {/* 1. VISIBLE & TACTILE TOUCHSCREEN CATEGORY NAVIGATION (Height: 44px, Bold 13-14px font) */}
-      <div className="relative flex items-center shrink-0 bg-white border border-jaman-border rounded-2xl p-1.5 shadow-2xs">
-        {/* Left Scroll Button (visible when scrollable) */}
-        {canScrollLeft && (
-          <button
-            type="button"
-            onClick={() => scrollCategories('LEFT')}
-            className="w-8 h-9 rounded-xl bg-jaman-cream hover:bg-orange-50 active:scale-95 text-slate-600 hover:text-jaman-saffron flex items-center justify-center transition-all shrink-0 mr-1.5 cursor-pointer border border-jaman-border z-10"
-            title="Scroll categories left"
-          >
-            <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
-          </button>
-        )}
-
-        {/* Scrollable Category Row */}
-        <div
-          ref={categoryScrollRef}
-          onScroll={checkScrollState}
-          className="flex-1 flex items-center gap-2 overflow-x-auto py-0.5 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-        >
-          {/* ALL MENU Main Button */}
-          <button
-            type="button"
-            onClick={() => { sound.play('click'); setSelectedCategory('ALL'); }}
-            className={`min-h-[42px] px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black whitespace-nowrap transition-all flex items-center gap-2 shrink-0 cursor-pointer active:scale-98 ${
-              selectedCategory === 'ALL'
-                ? 'bg-jaman-saffron text-white shadow-xs'
-                : 'bg-jaman-cream hover:bg-white border border-jaman-border text-jaman-navy hover:border-jaman-saffron/40'
-            }`}
-          >
-            <Sparkles className={`w-4 h-4 shrink-0 ${selectedCategory === 'ALL' ? 'text-white' : 'text-jaman-saffron'}`} />
-            <span>ALL MENU</span>
-            <span
-              className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md ${
-                selectedCategory === 'ALL'
-                  ? 'bg-black/20 text-white'
-                  : 'bg-white text-slate-600 border border-jaman-border'
-              }`}
-            >
-              {db.menuItems.length}
-            </span>
-          </button>
-
-          {/* Deduplicated Canonical Category Groups */}
-          {displayCategoryGroups.map((group) => {
-            const isSelected =
-              selectedCategory === group.canonicalKey ||
-              group.categoryIds.includes(selectedCategory);
-
-            return (
-              <button
-                key={group.canonicalKey}
-                type="button"
-                onClick={() => { sound.play('click'); setSelectedCategory(group.canonicalKey); }}
-                title={group.primaryCategory.name}
-                className={`min-h-[42px] px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2 shrink-0 cursor-pointer active:scale-98 ${
-                  isSelected
-                    ? 'bg-jaman-saffron text-white shadow-xs'
-                    : 'bg-jaman-cream hover:bg-white border border-jaman-border text-jaman-navy hover:border-jaman-saffron/40'
-                }`}
-              >
-                <span>{group.displayLabel}</span>
-                <span
-                  className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md ${
-                    isSelected
-                      ? 'bg-black/20 text-white'
-                      : 'bg-white text-slate-600 border border-jaman-border'
-                  }`}
-                >
-                  {group.totalDishCount}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Right Scroll Button (visible when scrollable) */}
-        {canScrollRight && (
-          <button
-            type="button"
-            onClick={() => scrollCategories('RIGHT')}
-            className="w-8 h-9 rounded-xl bg-jaman-cream hover:bg-orange-50 active:scale-95 text-slate-600 hover:text-jaman-saffron flex items-center justify-center transition-all shrink-0 ml-1.5 cursor-pointer border border-jaman-border z-10"
-            title="Scroll categories right"
-          >
-            <ChevronRight className="w-5 h-5 stroke-[2.5]" />
-          </button>
-        )}
+      {/* 1. CURRENT CATEGORY HEADING (the categories themselves are chosen in the left sidebar) */}
+      <div className="flex items-center justify-between shrink-0 bg-white border border-jaman-border rounded-2xl px-4 py-2.5 shadow-2xs">
+        <h2 className="font-black text-sm sm:text-base text-jaman-navy tracking-tight truncate">{currentCategoryLabel}</h2>
+        <span className="text-xs font-mono font-bold text-slate-500 bg-jaman-cream border border-jaman-border px-2 py-0.5 rounded-md shrink-0">
+          {filteredMenuItems.length} dish{filteredMenuItems.length === 1 ? '' : 'es'}
+        </span>
       </div>
 
       {/* 2. SECONDARY TOOLBAR: DIETARY FILTERS + QUICK ADD */}

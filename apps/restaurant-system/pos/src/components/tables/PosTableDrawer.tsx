@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, OrderRepository, TableRepository } from '@jamanvaar/database';
 import { DiningTable } from '@jamanvaar/types';
@@ -39,6 +39,15 @@ export const PosTableDrawer: React.FC<PosTableDrawerProps> = ({ table, onClose }
 
   const activeOrder = table.currentOrderId ? OrderRepository.getOrderById(table.currentOrderId) : null;
   const otherTables = db.tables.filter((t) => t.id !== table.id);
+
+  // Escape closes this drawer like any other dialog in the app.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
 
   const handleAddItems = () => {
     loadOrderFromTable(table);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db } from '@jamanvaar/database';
 import { Order } from '@jamanvaar/types';
@@ -20,6 +20,16 @@ export const PosRepeatOrderModal: React.FC<PosRepeatOrderModalProps> = ({ isOpen
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(
     recentOrders.length > 0 ? recentOrders[0] : null
   );
+
+  // Escape closes this dialog like any other in the app, not just its own Close button.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { usePosStore, PosTab } from '../../store/posStore';
 import { db, BusinessDayRepository } from '@jamanvaar/database';
+import { sound } from '@jamanvaar/ui';
+import { useCategoryGroups } from '../menu/useCategoryGroups';
 import {
   UtensilsCrossed,
   LayoutGrid,
@@ -15,7 +17,9 @@ import {
   CirclePause,
   Printer,
   Sparkles,
-  CalendarDays
+  CalendarDays,
+  ArrowLeft,
+  Menu as MenuIcon
 } from 'lucide-react';
 
 interface NavItem {
@@ -26,7 +30,24 @@ interface NavItem {
 }
 
 export const PosSidebar: React.FC = () => {
-  const { activeTab, setActiveTab, setIsPrintQueueOpen, setIsChatbotOpen, setIsHoldOrdersOpen } = usePosStore();
+  const {
+    activeTab,
+    setActiveTab,
+    setIsPrintQueueOpen,
+    setIsChatbotOpen,
+    setIsHoldOrdersOpen,
+    selectedCategory,
+    setSelectedCategory
+  } = usePosStore();
+
+  // On the Billing/Menu screen, the sidebar shows dish categories instead of the main navigation
+  // (there's no room, and no need, for both at once). The back arrow at the top brings the
+  // ordinary navigation back so the cashier can jump to another screen; picking "Billing / Menu"
+  // there returns to categories. Leaving the Menu tab for any other screen resets this, so the
+  // categories are always what greets a cashier coming back to billing.
+  const [showNavWhileOnMenu, setShowNavWhileOnMenu] = useState(false);
+  const showCategories = activeTab === 'MENU' && !showNavWhileOnMenu;
+  const categoryGroups = useCategoryGroups();
 
   // Calculate live badge counts for active business session
   const activeDay = BusinessDayRepository.getActiveBusinessDay();
@@ -56,60 +77,141 @@ export const PosSidebar: React.FC = () => {
     { id: 'SETTINGS', label: 'Settings', icon: Settings }
   ];
 
+  const goToTab = (id: PosTab) => {
+    setActiveTab(id);
+    setShowNavWhileOnMenu(false); // arriving anywhere (including back on Menu) always shows that screen's own content, not the nav overlay
+  };
+
   return (
     <aside className="w-16 lg:w-48 xl:w-52 bg-white border-r border-jaman-border flex flex-col justify-between select-none shrink-0 z-20 shadow-2xs">
-      {/* Primary Navigation Links */}
-      <nav className="p-2 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
+      {showCategories ? (
+        /* ---- CATEGORY RAIL: shown instead of the main nav while billing, so the categories a
+           cashier needs most are always one tap away on the left, exactly where the nav usually is. */
+        <nav className="p-2 space-y-1 overflow-y-auto flex-1 min-h-0">
+          <button
+            type="button"
+            onClick={() => setShowNavWhileOnMenu(true)}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs text-[#4A5568] hover:bg-jaman-cream hover:text-jaman-navy transition-all mb-1.5 cursor-pointer"
+            title="Back to the main menu"
+          >
+            <ArrowLeft className="w-4 h-4 shrink-0" />
+            <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap">Menu</span>
+          </button>
 
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs transition-all relative ${
-                isActive
-                  ? 'bg-jaman-saffron text-white shadow-sm shadow-jaman-saffron/25'
-                  : 'text-[#4A5568] hover:bg-jaman-cream hover:text-jaman-navy'
+          <div className="hidden lg:block px-3 pb-1 text-[10px] font-black uppercase tracking-wider text-slate-400">Categories</div>
+
+          <button
+            type="button"
+            onClick={() => { sound.play('click'); setSelectedCategory('ALL'); }}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-black text-xs transition-all relative ${
+              selectedCategory === 'ALL'
+                ? 'bg-jaman-saffron text-white shadow-sm shadow-jaman-saffron/25'
+                : 'text-jaman-navy bg-jaman-cream hover:bg-white border border-transparent hover:border-jaman-border'
+            }`}
+          >
+            <Sparkles className={`w-4 h-4 shrink-0 ${selectedCategory === 'ALL' ? 'text-white' : 'text-jaman-saffron'}`} />
+            <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap flex-1">All Menu</span>
+            <span
+              className={`hidden lg:inline-block text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-md shrink-0 ${
+                selectedCategory === 'ALL' ? 'bg-black/20 text-white' : 'bg-white text-slate-600 border border-jaman-border'
               }`}
             >
-              <Icon className="w-4 h-4 shrink-0" />
-              <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap">
-                {item.label}
-              </span>
-
-              {/* Dynamic Live Badge */}
-              {item.badge !== undefined && item.badge > 0 && (
-                <span
-                  className={`ml-auto text-[10px] font-black px-1.5 py-0.2 rounded-full ${
-                    isActive ? 'bg-white text-jaman-saffron' : 'bg-jaman-saffron text-white'
-                  }`}
-                >
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
-
-        {/* ✨ Dedicated AI ASSISTANT Navigation Trigger in Sidebar */}
-        <div className="pt-2 border-t border-jaman-border my-1">
-          <button
-            onClick={() => setIsChatbotOpen(true)}
-            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-black text-xs transition-all relative bg-gradient-to-r from-amber-500/10 via-jaman-saffron/10 to-amber-500/10 hover:from-amber-500/20 hover:to-jaman-saffron/20 border border-[#FED7AA] text-jaman-saffron shadow-2xs group cursor-pointer active:scale-98"
-            title="JAMAN AI Assistant (Voice & Conversational POS Actions)"
-          >
-            <Sparkles className="w-4 h-4 text-jaman-saffron group-hover:rotate-12 transition-transform shrink-0 animate-pulse" />
-            <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap font-extrabold">
-              JAMAN AI Assistant
-            </span>
-            <span className="hidden lg:inline-block ml-auto text-[9px] font-black bg-jaman-saffron text-white px-1.5 py-0.2 rounded-full uppercase">
-              AI
+              {db.menuItems.length}
             </span>
           </button>
-        </div>
-      </nav>
+
+          {categoryGroups.map((group) => {
+            const isSelected = selectedCategory === group.canonicalKey || group.categoryIds.includes(selectedCategory);
+            return (
+              <button
+                key={group.canonicalKey}
+                type="button"
+                onClick={() => { sound.play('click'); setSelectedCategory(group.canonicalKey); }}
+                title={group.primaryCategory.name}
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all relative ${
+                  isSelected
+                    ? 'bg-jaman-saffron text-white shadow-sm shadow-jaman-saffron/25'
+                    : 'text-[#4A5568] hover:bg-jaman-cream hover:text-jaman-navy'
+                }`}
+              >
+                <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap flex-1">{group.displayLabel}</span>
+                <span className="lg:hidden text-[10px] font-black truncate w-full text-center">{group.displayLabel.slice(0, 3)}</span>
+                <span
+                  className={`hidden lg:inline-block text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-md shrink-0 ${
+                    isSelected ? 'bg-black/20 text-white' : 'bg-white text-slate-600 border border-jaman-border'
+                  }`}
+                >
+                  {group.totalDishCount}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+      ) : (
+        /* Primary Navigation Links */
+        <nav className="p-2 space-y-1 overflow-y-auto">
+          {activeTab === 'MENU' && (
+            <button
+              type="button"
+              onClick={() => setShowNavWhileOnMenu(false)}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs text-jaman-saffron bg-[#FFF4ED] hover:bg-[#FFE8D6] transition-all mb-1.5 cursor-pointer"
+              title="Back to categories"
+            >
+              <MenuIcon className="w-4 h-4 shrink-0" />
+              <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap">Categories</span>
+            </button>
+          )}
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => goToTab(item.id)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs transition-all relative ${
+                  isActive
+                    ? 'bg-jaman-saffron text-white shadow-sm shadow-jaman-saffron/25'
+                    : 'text-[#4A5568] hover:bg-jaman-cream hover:text-jaman-navy'
+                }`}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap">
+                  {item.label}
+                </span>
+
+                {/* Dynamic Live Badge */}
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span
+                    className={`ml-auto text-[10px] font-black px-1.5 py-0.2 rounded-full ${
+                      isActive ? 'bg-white text-jaman-saffron' : 'bg-jaman-saffron text-white'
+                    }`}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+
+          {/* ✨ Dedicated AI ASSISTANT Navigation Trigger in Sidebar */}
+          <div className="pt-2 border-t border-jaman-border my-1">
+            <button
+              onClick={() => setIsChatbotOpen(true)}
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-black text-xs transition-all relative bg-gradient-to-r from-amber-500/10 via-jaman-saffron/10 to-amber-500/10 hover:from-amber-500/20 hover:to-jaman-saffron/20 border border-[#FED7AA] text-jaman-saffron shadow-2xs group cursor-pointer active:scale-98"
+              title="JAMAN AI Assistant (Voice & Conversational POS Actions)"
+            >
+              <Sparkles className="w-4 h-4 text-jaman-saffron group-hover:rotate-12 transition-transform shrink-0 animate-pulse" />
+              <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap font-extrabold">
+                JAMAN AI Assistant
+              </span>
+              <span className="hidden lg:inline-block ml-auto text-[9px] font-black bg-jaman-saffron text-white px-1.5 py-0.2 rounded-full uppercase">
+                AI
+              </span>
+            </button>
+          </div>
+        </nav>
+      )}
 
       {/* Bottom Area: Print Queue Trigger & Held Orders */}
       <div className="p-2 border-t border-jaman-border space-y-1.5 bg-jaman-cream/40">

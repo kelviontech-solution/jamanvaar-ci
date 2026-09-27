@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { usePosStore } from '../../store/posStore';
 import { X, MessageSquare, Plus, Check } from 'lucide-react';
 
@@ -23,6 +23,16 @@ const QUICK_CHEF_NOTES = [
 export const PosOrderNotesModal: React.FC<PosOrderNotesModalProps> = ({ isOpen, onClose }) => {
   const { orderNotes, setOrderNotes } = usePosStore();
   const [customText, setCustomText] = useState(orderNotes || '');
+
+  // Escape closes this dialog like any other in the app, not just its own Close button.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
