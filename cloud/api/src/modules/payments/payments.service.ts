@@ -9,6 +9,7 @@ import { MenuSyncService } from './menu-sync.service';
 import { priceCart, PriceValidationError, MenuSnapshotItemLookup } from './pricing.util';
 import { CreatePaymentOrderDto } from './dto/create-payment-order.dto';
 import { CreateRefundDto } from './dto/create-refund.dto';
+import { getDefaultCommissionBps } from './commission.util';
 
 const NON_TERMINAL_STATUSES = ['CREATED', 'PENDING', 'AUTHORIZED'];
 
@@ -23,6 +24,8 @@ export class PaymentsService {
   ) {}
 
   async createOrGetPaymentOrder(restaurantId: string, kioskId: string, dto: CreatePaymentOrderDto) {
+    const connection = await this.prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } }));
+
     const existingOrder = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.order.findUnique({
         where: { restaurantId_externalOrderId: { restaurantId, externalOrderId: dto.externalOrderId } },
@@ -36,11 +39,10 @@ export class PaymentsService {
         return this.toOrderResponse(existingOrder, latest);
       }
       // Every prior attempt is terminal-failed: open a fresh attempt at the same, already-validated total.
-      const payment = await this.createCashfreeAttempt(existingOrder.id, restaurantId, existingOrder.totalAmount, existingOrder.currency);
+      const payment = await this.createCashfreeAttempt(existingOrder.id, restaurantId, existingOrder.totalAmount, existingOrder.currency, connection);
       return this.toOrderResponse(existingOrder, payment);
     }
 
-    const connection = await this.prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } }));
     if (!connection || connection.status !== 'ACTIVE') {
       throw new ForbiddenException('Online payments are not active for this restaurant yet');
     }
@@ -84,14 +86,25 @@ export class PaymentsService {
       })
     );
 
-    const payment = await this.createCashfreeAttempt(order.id, restaurantId, order.totalAmount, order.currency);
+    const payment = await this.createCashfreeAttempt(order.id, restaurantId, order.totalAmount, order.currency, connection);
     return this.toOrderResponse(order, payment);
   }
 
-  private async createCashfreeAttempt(orderId: string, restaurantId: string, amount: number, currency: string) {
+  private async createCashfreeAttempt(
+    orderId: string,
+    restaurantId: string,
+    amount: number,
+    currency: string,
+    connection: { cashfreeVendorId: string | null; commissionOverrideBps: number | null } | null
+  ) {
+    const commissionBps = connection?.commissionOverrideBps ?? (await getDefaultCommissionBps(this.prisma));
+    const platformAmount = Math.round((amount * commissionBps) / 10000);
+    const restaurantAmount = amount - platformAmount;
+    const vendorPercentage = Number(((restaurantAmount / amount) * 100).toFixed(2));
+
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({
-        data: { orderId, restaurantId, providerOrderId: `pay_${randomUUID()}`, amount, currency, status: 'CREATED' }
+        data: { orderId, restaurantId, providerOrderId: `pay_${randomUUID()}`, amount, currency, status: 'CREATED', commissionBps, platformAmount, restaurantAmount }
       })
     );
 
@@ -100,7 +113,8 @@ export class PaymentsService {
       amountPaise: amount,
       currency,
       customerId: orderId,
-      notifyUrl: this.config.get<string>('CASHFREE_WEBHOOK_NOTIFY_URL')
+      notifyUrl: this.config.get<string>('CASHFREE_WEBHOOK_NOTIFY_URL'),
+      orderSplits: connection?.cashfreeVendorId ? [{ vendorId: connection.cashfreeVendorId, percentage: vendorPercentage }] : undefined
     });
 
     return this.prisma.runAsTenant(restaurantId, (tx) =>

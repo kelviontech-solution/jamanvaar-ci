@@ -84,6 +84,7 @@ describe('Payment order creation', () => {
   });
 
   afterAll(async () => {
+    await prisma.runAsPlatform((tx) => tx.platformSetting.deleteMany({ where: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS' } }));
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));
     if (planId) await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: planId } }));
     await prisma.platformUser.deleteMany({ where: { email: adminEmail } });
@@ -121,6 +122,106 @@ describe('Payment order creation', () => {
 
     const payments = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findMany({ where: { orderId: first.body.orderId } }));
     expect(payments.length).toBe(1);
+  });
+
+  it('sends a 100% vendor split when commission is 0% (no override, no platform default set)', async () => {
+    // PlatformSetting is a genuinely global, unscoped table (not restaurant-scoped like
+    // everything else this suite touches) — a prior run of this same file (e.g. this
+    // test's own "verify it fails" pass before implementation) can leave a real row
+    // behind. Delete it first so "no platform default set" is actually true here,
+    // regardless of test run history.
+    await prisma.runAsPlatform((tx) => tx.platformSetting.deleteMany({ where: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS' } }));
+    await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { cashfreeVendorId: 'rest_test_vendor' } })
+    );
+    const createOrderMock = app.get(CashfreeGatewayService).createOrder as ReturnType<typeof vi.fn>;
+    createOrderMock.mockClear();
+
+    const res = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: 'local-order-split-1', lines: validLines });
+    expect(res.status).toBe(201);
+
+    expect(createOrderMock).toHaveBeenCalledWith(
+      expect.objectContaining({ orderSplits: [{ vendorId: 'rest_test_vendor', percentage: 100 }] })
+    );
+
+    const payment = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: res.body.paymentId } }));
+    expect(payment.commissionBps).toBe(0);
+    expect(payment.platformAmount).toBe(0);
+    expect(payment.restaurantAmount).toBe(res.body.amount);
+  });
+
+  it('uses the restaurant commissionOverrideBps over the platform default', async () => {
+    await prisma.runAsPlatform((tx) =>
+      tx.platformSetting.upsert({
+        where: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS' },
+        create: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS', value: { bps: 500 }, category: 'PAYMENTS' },
+        update: { value: { bps: 500 } }
+      })
+    );
+    await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { cashfreeVendorId: 'rest_test_vendor', commissionOverrideBps: 200 } })
+    );
+    const createOrderMock = app.get(CashfreeGatewayService).createOrder as ReturnType<typeof vi.fn>;
+    createOrderMock.mockClear();
+
+    const res = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: 'local-order-split-2', lines: validLines });
+    expect(res.status).toBe(201);
+
+    // 54600 total, 2% commission -> 1092 platform, 53508 restaurant, vendor percentage exactly 98
+    expect(createOrderMock).toHaveBeenCalledWith(
+      expect.objectContaining({ orderSplits: [{ vendorId: 'rest_test_vendor', percentage: 98 }] })
+    );
+    const payment = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: res.body.paymentId } }));
+    expect(payment.commissionBps).toBe(200);
+    expect(payment.platformAmount).toBe(1092);
+    expect(payment.restaurantAmount).toBe(53508);
+  });
+
+  it('falls back to the platform default when no restaurant override is set', async () => {
+    await prisma.runAsPlatform((tx) =>
+      tx.platformSetting.upsert({
+        where: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS' },
+        create: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS', value: { bps: 300 }, category: 'PAYMENTS' },
+        update: { value: { bps: 300 } }
+      })
+    );
+    await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { cashfreeVendorId: 'rest_test_vendor', commissionOverrideBps: null } })
+    );
+
+    const res = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: 'local-order-split-3', lines: validLines });
+    expect(res.status).toBe(201);
+    const payment = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: res.body.paymentId } }));
+    expect(payment.commissionBps).toBe(300);
+  });
+
+  it('changing the platform default does not rewrite an already-created PaymentTransaction', async () => {
+    const first = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: 'local-order-split-4', lines: validLines });
+    const before = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: first.body.paymentId } }));
+
+    await prisma.runAsPlatform((tx) =>
+      tx.platformSetting.upsert({
+        where: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS' },
+        create: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS', value: { bps: 999 }, category: 'PAYMENTS' },
+        update: { value: { bps: 999 } }
+      })
+    );
+
+    const after = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: first.body.paymentId } }));
+    expect(after.commissionBps).toBe(before.commissionBps);
+  });
+
+  it('a retried order (prior attempt terminal-failed) also includes the vendor split', async () => {
+    const create = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: 'local-order-split-5', lines: validLines });
+    await prisma.runAsPlatform((tx) => tx.paymentTransaction.update({ where: { id: create.body.paymentId }, data: { status: 'FAILED' } }));
+
+    const createOrderMock = app.get(CashfreeGatewayService).createOrder as ReturnType<typeof vi.fn>;
+    createOrderMock.mockClear();
+
+    const retry = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: 'local-order-split-5', lines: validLines });
+    expect(retry.status).toBe(201);
+    expect(retry.body.orderId).toBe(create.body.orderId);
+    expect(createOrderMock).toHaveBeenCalledWith(expect.objectContaining({ orderSplits: expect.any(Array) }));
   });
 
   it('rejects a cart referencing an unknown menu item', async () => {
