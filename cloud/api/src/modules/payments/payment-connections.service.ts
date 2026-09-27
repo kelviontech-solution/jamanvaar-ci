@@ -308,6 +308,26 @@ export class PaymentConnectionsService {
     return this.transitionStatus(restaurantId, actor, ['ACTIVE', 'SUSPENDED', 'PENDING_VERIFICATION'], 'DISCONNECTED', 'PAYMENT_CONNECTION_DISCONNECTED');
   }
 
+  async setCommissionOverride(restaurantId: string, overrideBps: number | null, actor: PlatformUser) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const existing = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
+      if (!existing) throw new NotFoundException('No payment connection for this restaurant');
+      const updated = await tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { commissionOverrideBps: overrideBps } });
+      await this.audit.log(
+        {
+          actorType: 'PLATFORM',
+          actorId: actor.id,
+          restaurantId,
+          action: 'COMMISSION_CHANGED',
+          category: 'PAYMENTS',
+          details: { scope: 'RESTAURANT_OVERRIDE', oldBps: existing.commissionOverrideBps, newBps: overrideBps }
+        },
+        tx
+      );
+      return { commissionOverrideBps: updated.commissionOverrideBps };
+    });
+  }
+
   async refreshStatus(restaurantId: string) {
     // Same split as approve() and for the same reason: runAsPlatform opens a
     // real Postgres transaction, and holding one across the Cashfree network
@@ -355,6 +375,7 @@ export class PaymentConnectionsService {
     verifiedAt: Date | null;
     lastWebhookAt: Date | null;
     lastPaymentAt: Date | null;
+    commissionOverrideBps: number | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -391,6 +412,7 @@ export class PaymentConnectionsService {
       settlementUpiVpaMasked: maskLast4(connection.settlementUpiVpa),
       cashfreeVendorId: connection.cashfreeVendorId,
       cashfreeVendorStatus: connection.cashfreeVendorStatus,
+      commissionOverrideBps: connection.commissionOverrideBps,
       verifiedAt: connection.verifiedAt,
       lastWebhookAt: connection.lastWebhookAt,
       lastPaymentAt: connection.lastPaymentAt,

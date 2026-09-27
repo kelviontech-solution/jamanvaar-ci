@@ -406,4 +406,39 @@ describe('Payment connection onboarding', () => {
 
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: otherRestaurantId } }));
   });
+
+  it('PATCH .../commission sets a restaurant override and it appears on the platform detail view', async () => {
+    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 150 });
+    expect(res.status).toBe(200);
+    expect(res.body.commissionOverrideBps).toBe(150);
+
+    const detail = await authed('get', `/api/v1/restaurants/${restaurantId}/payment-connection`, platformToken);
+    expect(detail.body.commissionOverrideBps).toBe(150);
+  });
+
+  it('PATCH .../commission accepts null to clear the override, falling back to the platform default', async () => {
+    await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 150 });
+    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: null });
+    expect(res.status).toBe(200);
+    expect(res.body.commissionOverrideBps).toBeNull();
+  });
+
+  it('PATCH .../commission rejects an out-of-range value', async () => {
+    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 10001 });
+    expect(res.status).toBe(400);
+  });
+
+  it('PATCH .../commission for an unknown restaurant returns 404', async () => {
+    const res = await authed('patch', '/api/v1/restaurants/00000000-0000-0000-0000-000000000000/payment-connection/commission', platformToken).send({ overrideBps: 100 });
+    expect(res.status).toBe(404);
+  });
+
+  it('PATCH .../commission records an audit log entry with the restaurant scope', async () => {
+    await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 300 });
+    const entry = await prisma.runAsPlatform((tx) =>
+      tx.auditLog.findFirst({ where: { action: 'COMMISSION_CHANGED', category: 'PAYMENTS', restaurantId }, orderBy: { createdAt: 'desc' } })
+    );
+    expect(entry).not.toBeNull();
+    expect((entry!.details as { scope?: string })?.scope).toBe('RESTAURANT_OVERRIDE');
+  });
 });
