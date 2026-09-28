@@ -51,6 +51,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
     updateCartQuantity,
     removeCartItem,
     setCartItemCourse,
+    setCartItemSeat,
+    guestCount,
     clearCart,
     sendKOT,
     requestBill,
@@ -95,6 +97,17 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   const gst = priced.taxAmount;
   const roundOff = priced.roundOffAmount;
   const total = priced.totalAmount;
+
+  // Seats the waiter can give a dish to: the party size, but never fewer than the seats already used.
+  const usedSeats = cartItems.map((ci) => ci.seat ?? 0);
+  const seatCount = Math.min(10, Math.max(2, guestCount || 0, ...usedSeats));
+  // Bill by seat: what each seat has ordered so far, so the counter can settle each guest on their own.
+  const seatTotals = useMemo(() => {
+    const totals = new Map<number, number>();
+    billable.forEach((ci) => { if (ci.seat) totals.set(ci.seat, (totals.get(ci.seat) ?? 0) + ci.totalPrice); });
+    return [...totals.entries()].sort((a, b) => a[0] - b[0]);
+  }, [billable]);
+  const requestSplitBill = () => requestBill(table!.tableNumber, seatTotals.map(([seat, amount]) => `Seat ${seat} ${formatINR(amount)}`).join(', '));
 
   // What the kitchen is doing with each dish right now, read from the running order (each dish is its own order line).
   const liveOrder = table?.currentOrderId ? captainDb.orders.find((o) => o.id === table.currentOrderId) : undefined;
@@ -338,6 +351,19 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                     <button type="button" onClick={() => updateCartQuantity(item.id, -1)} aria-label="One less" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 font-black cursor-pointer">−</button>
                                     <button type="button" onClick={() => updateCartQuantity(item.id, 1)} aria-label="One more" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 font-black cursor-pointer">+</button>
                                   </div>
+                                  <span className="text-[10px] font-black uppercase text-slate-400 ml-1">Seat</span>
+                                  {Array.from({ length: seatCount }, (_, n) => n + 1).map((n) => (
+                                    <button
+                                      key={n}
+                                      type="button"
+                                      onClick={() => setCartItemSeat(item.id, item.seat === n ? undefined : n)}
+                                      aria-pressed={item.seat === n}
+                                      aria-label={`Seat ${n}`}
+                                      className={`w-9 h-9 rounded-lg text-[11px] font-black cursor-pointer ${item.seat === n ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'}`}
+                                    >
+                                      {n}
+                                    </button>
+                                  ))}
                                   <span className="text-[10px] font-black uppercase text-slate-400 ml-1">Course</span>
                                   {COURSES.map((c) => (
                                     <button
@@ -372,6 +398,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                   <span className={`font-extrabold text-sm break-words ${state === 'CANCELLED' ? 'line-through text-rose-700' : 'text-jaman-navy'}`}>{item.quantity}× {item.menuItem.name}</span>
                                   {stateChip(state)}
                                   {item.course && <span className="text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded">{COURSES.find((c) => c.id === item.course)?.label}</span>}
+                                  {item.seat && <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">Seat {item.seat}</span>}
                                 </div>
                                 {item.selectedModifiers && item.selectedModifiers.length > 0 && <p className="text-[11px] text-slate-500 font-medium">{item.selectedModifiers.map((m) => m.optionName).join(', ')}</p>}
                                 {item.specialNotes && <p className="text-[11px] text-amber-700 italic">Note: {item.specialNotes}</p>}
@@ -433,6 +460,12 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                     <span className="md:hidden">Request bill</span>
                     <span className="hidden md:inline">Send Bill Request to Counter POS</span>
                   </button>
+                  {seatTotals.length > 0 && (
+                    <button type="button" onClick={requestSplitBill} className="col-span-2 md:col-span-1 min-h-[44px] py-2.5 px-3 rounded-2xl bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                      <Receipt className="w-3.5 h-3.5" />
+                      <span>Request split bill by seat</span>
+                    </button>
+                  )}
                 </div>
 
                 {/* Only while nothing has been sent: clearing wipes the whole cart. */}

@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { createHash } from 'node:crypto';
+import { Logger } from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
 import { MenuPublicationsService } from '../menu-publications/menu-publications.service';
 import { publicImageUrl, viewForBranch } from '../menu-publications/menu-snapshot';
 import type { MenuSnapshotItemLookup, ModifierGroupSnapshot } from '../payments/pricing.util';
@@ -57,13 +59,58 @@ export interface BuiltQrMenu extends QrMenu {
  */
 @Injectable()
 export class QrMenuService {
-  constructor(private readonly publications: MenuPublicationsService) {}
+  private readonly log = new Logger(QrMenuService.name);
+
+  constructor(private readonly publications: MenuPublicationsService, private readonly prisma: PrismaService) {}
+
+  /** Dishes the restaurant has switched off since publishing (sold out by hand, or out of stock), per restaurant, kept for a few seconds. */
+  private readonly liveOff = new Map<string, { at: number; ids: Set<string> }>();
+  private liveTtlMs(): number {
+    const v = Number(process.env.QR_LIVE_AVAILABILITY_TTL_MS);
+    return Number.isFinite(v) && v >= 0 ? v : 5_000;
+  }
+
+  private async liveUnavailable(restaurantId: string): Promise<Set<string>> {
+    const hit = this.liveOff.get(restaurantId);
+    if (hit && Date.now() - hit.at < this.liveTtlMs()) return hit.ids;
+    try {
+      const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
+        tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'MENU_ITEM', payload: { path: ['isAvailable'], equals: false } }, select: { externalId: true } })
+      );
+      const ids = new Set(rows.map((r) => r.externalId));
+      this.liveOff.set(restaurantId, { at: Date.now(), ids });
+      if (this.liveOff.size > 1000) this.liveOff.delete(this.liveOff.keys().next().value as string);
+      return ids;
+    } catch (err) {
+      // A failed look-up must never stop ordering: show the published menu, the counter still refuses what it cannot make.
+      this.log.warn(`live availability unavailable for ${restaurantId}: ${(err as Error).message}`);
+      return hit?.ids ?? new Set();
+    }
+  }
+
+  /** The published menu minus anything switched off since. Guests and channels never offer a dish the counter has run out of. */
+  private async withLiveAvailability(restaurantId: string, menu: BuiltQrMenu): Promise<BuiltQrMenu> {
+    if (!menu.ready) return menu;
+    const off = await this.liveUnavailable(restaurantId);
+    if (off.size === 0 || !menu.items.some((i) => off.has(i.id))) return menu;
+    const lookup = new Map(menu.lookup);
+    for (const id of off) {
+      const entry = lookup.get(id);
+      if (entry) lookup.set(id, { ...entry, isAvailable: false });
+    }
+    const gone = menu.items.filter((i) => off.has(i.id)).map((i) => i.id).sort().join(',');
+    return { ...menu, items: menu.items.filter((i) => !off.has(i.id)), lookup, etag: createHash('sha1').update(`${menu.etag}:${gone}`).digest('hex').slice(0, 16) };
+  }
 
   /** menu:{restaurantId}:{branchId}:{version}. A published version is immutable, so an entry is never stale; the key holds the tenant. */
   private readonly built = new Map<string, BuiltQrMenu>();
 
   /** The menu of the newest published version, or of `version` when a guest's older page is being checked. */
   async build(restaurantId: string, branchId: string | null, version?: number): Promise<BuiltQrMenu> {
+    return this.withLiveAvailability(restaurantId, await this.buildFromSnapshot(restaurantId, branchId, version));
+  }
+
+  private async buildFromSnapshot(restaurantId: string, branchId: string | null, version?: number): Promise<BuiltQrMenu> {
     const latest = version ?? (await this.publications.latestVersion(restaurantId)) ?? 0;
     const key = `menu:${restaurantId}:${branchId ?? ''}:${latest}`;
     const hit = latest > 0 ? this.built.get(key) : undefined;

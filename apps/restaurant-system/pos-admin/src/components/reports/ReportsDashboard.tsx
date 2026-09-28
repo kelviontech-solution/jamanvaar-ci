@@ -15,6 +15,7 @@ import { getPaymentsSummary, type PaymentsSummary } from '../../cloud/cloudClien
 import { ReportExportService } from './reportExportService';
 import { ReportDesignSelectorModal } from './ReportDesignSelectorModal';
 import { ReportPreviewModal } from './ReportPreviewModal';
+import { LabourPanel, LossReportPanel, OwnerSummaryPanel, PrepTimePanel } from './OwnerInsightPanels';
 import {
   Search,
   Calendar,
@@ -90,7 +91,8 @@ const ALL_REPORTS: ReportDefinition[] = [
 
   // 3. FINANCIAL
   { id: 'GROSS_SALES', category: 'FINANCIAL', title: 'Gross Sales', subtitle: 'Unadjusted food sales before discounts and taxes', icon: DollarSign },
-  { id: 'DISCOUNTS_REPORT', category: 'FINANCIAL', title: 'Discounts & Offers', subtitle: 'Promotional markdowns, manager waivers, and coupons', icon: TrendingDown },
+  { id: 'DISCOUNTS_REPORT', category: 'FINANCIAL', title: 'Discounts & Offers', subtitle: 'Discounts given, by whom and why', icon: TrendingDown },
+  { id: 'OWNER_SUMMARY', category: 'FINANCIAL', title: 'Owner Summary (WhatsApp)', subtitle: 'The day in a few lines, ready to send to the owner', icon: Sparkles, isPopular: true },
   { id: 'TAXES_GST', category: 'FINANCIAL', title: 'Taxes / GST Report', subtitle: 'CGST 2.5% and SGST 2.5% filing figures', icon: FileText, isPopular: true },
   { id: 'NET_SALES', category: 'FINANCIAL', title: 'Total Billed (incl. GST)', subtitle: 'Everything billed, tax included; matches what was collected', icon: DollarSign },
   { id: 'PAYMENT_COLLECTION', category: 'FINANCIAL', title: 'Payment Collection', subtitle: 'Channel-wise settlement verification', icon: DollarSign, isPopular: true },
@@ -99,7 +101,7 @@ const ALL_REPORTS: ReportDefinition[] = [
   { id: 'CARD_REPORT', category: 'FINANCIAL', title: 'Card Report', subtitle: 'Credit/Debit swipe machine transactions', icon: DollarSign },
   { id: 'SPLIT_PAYMENT_REPORT', category: 'FINANCIAL', title: 'Split Payment Report', subtitle: 'Orders settled across multiple tender types', icon: Layers },
   { id: 'REFUND_REPORT', category: 'FINANCIAL', title: 'Refund Report', subtitle: 'Returned bills and payment reversals', icon: TrendingDown },
-  { id: 'CANCELLED_ORDERS', category: 'FINANCIAL', title: 'Void / Cancelled Orders', subtitle: 'Cancelled KOTs and waste audit tracking', icon: AlertTriangle },
+  { id: 'CANCELLED_ORDERS', category: 'FINANCIAL', title: 'Losses & Cancellations', subtitle: 'Cancelled dishes, voided bills, discounts and refunds, by staff', icon: AlertTriangle, isPopular: true },
   { id: 'EOD_SETTLEMENT', category: 'FINANCIAL', title: 'EOD Settlement (Z-Report)', subtitle: 'Official shift closing & cash drawer audit statement', icon: CheckCircle2, isPopular: true },
 
   // 4. OPERATIONS
@@ -108,7 +110,8 @@ const ALL_REPORTS: ReportDefinition[] = [
   { id: 'TABLE_UTILIZATION', category: 'OPERATIONS', title: 'Table Utilization', subtitle: 'Seat occupancy and dining duration', icon: Utensils },
   { id: 'TABLE_TURNOVER', category: 'OPERATIONS', title: 'Table Turnover', subtitle: 'Seating cycles per table during rush hour', icon: RotateCcw },
   { id: 'KOT_PERFORMANCE', category: 'OPERATIONS', title: 'KOT Performance', subtitle: 'Kitchen ticket transmission and completion stats', icon: Clock },
-  { id: 'KITCHEN_PREP_TIME', category: 'OPERATIONS', title: 'Kitchen Prep Time', subtitle: 'Average cook latency across food stations', icon: Clock, isPopular: true },
+  { id: 'KITCHEN_PREP_TIME', category: 'OPERATIONS', title: 'Kitchen Prep Time', subtitle: 'How long each dish and station really takes', icon: Clock, isPopular: true },
+  { id: 'LABOUR_COST', category: 'OPERATIONS', title: 'Staff Hours & Labour Cost', subtitle: 'Hours clocked, pay cost and share of sales', icon: Users, isPopular: true },
   { id: 'DELAYED_KOTS', category: 'OPERATIONS', title: 'Delayed KOTs', subtitle: 'Tickets exceeding 20 minutes preparation time', icon: AlertTriangle },
   { id: 'STATION_PERFORMANCE', category: 'OPERATIONS', title: 'Station Performance', subtitle: 'Main Kitchen, Tandoor, Curry, Beverage stats', icon: Layers },
   { id: 'CAPTAIN_PERFORMANCE', category: 'OPERATIONS', title: 'Captain Performance', subtitle: 'Table speed, upsell rate, and guest feedback', icon: Users },
@@ -958,6 +961,11 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
               </div>
             </div>
           )}
+
+          {(activeReportId === 'CANCELLED_ORDERS' || activeReportId === 'DISCOUNTS_REPORT') && <LossReportPanel range={dateRange} />}
+          {activeReportId === 'OWNER_SUMMARY' && <OwnerSummaryPanel range={dateRange} summary={summary} dishes={dishes} showToast={showToast} />}
+          {activeReportId === 'LABOUR_COST' && <LabourPanel range={dateRange} sales={summary.netSales.current} />}
+          {activeReportId === 'KITCHEN_PREP_TIME' && <PrepTimePanel range={dateRange} />}
 
           {/* 6. KITCHEN / OPERATIONS */}
           {(activeReportId === 'KITCHEN_PREP_TIME' || activeReportId === 'STATION_PERFORMANCE' || activeReportId === 'KOT_PERFORMANCE') && (

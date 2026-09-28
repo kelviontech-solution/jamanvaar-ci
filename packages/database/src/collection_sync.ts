@@ -1,5 +1,5 @@
 import { KeyValueStore } from './key_value_store';
-import type { CashMovement, Category, ComboDeal, Coupon, CustomerAccount, CustomerFeedback, MenuItem, ModifierGroup, ShiftRecord, TaxGroup } from '@jamanvaar/types';
+import type { CashMovement, Category, ComboDeal, Coupon, CustomerAccount, CustomerFeedback, MenuItem, ModifierGroup, Reservation, ShiftRecord, TaxGroup } from '@jamanvaar/types';
 import { db } from './db';
 
 /**
@@ -292,4 +292,11 @@ export const CashMovementSync = new CollectionSync<CashMovement>(
   'jamanvaar_cash_movement_sync_v1',
   () => db.cashMovements,
   (r) => typeof r.shiftId === 'string' && r.shiftId.length > 0
+);
+
+// Bookings: taken in Restaurant Admin, but the table hold has to show on the Captain's and the counter's floor too.
+export const ReservationSync = new CollectionSync<Reservation>(
+  'jamanvaar_reservation_sync_v1',
+  () => db.reservations,
+  (r) => typeof r.customerName === 'string' && typeof r.reservationTime === 'string'
 );

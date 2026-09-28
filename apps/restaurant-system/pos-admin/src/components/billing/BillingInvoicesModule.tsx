@@ -358,6 +358,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
   const handleVoidOrder = () => {
     if (!selectedOrder) return;
     selectedOrder.orderStatus = 'CANCELLED';
+    selectedOrder.updatedAt = new Date().toISOString();
     AuditRepository.log({
       action: 'ORDER_CANCELLED',
       category: 'ORDER',

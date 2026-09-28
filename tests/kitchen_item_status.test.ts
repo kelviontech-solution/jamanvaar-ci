@@ -170,6 +170,9 @@ describe('cancelling a dish that was already sent', () => {
     const l = order.items.find((i) => i.id === 'oi-a')!;
     expect(l).toMatchObject({ kitchenStatus: 'CANCELLED', cancelReason: 'Guest changed mind', unitPrice: 0, totalPrice: 0 });
     expect(l.statusRev).toBe(1);
+    // The line drops to zero, but what it was worth, who cancelled it and when are kept so the loss can be reported.
+    expect(l).toMatchObject({ cancelledAmount: 150, cancelledBy: 'Mona' });
+    expect(Number.isNaN(Date.parse(l.cancelledAt!))).toBe(false);
     expect(kot.items.find((i) => i.id === 'k-oi-a')).toMatchObject({ status: 'CANCELLED', cancelReason: 'Guest changed mind' });
     expect(kot.status).toBe('PREPARING'); // the other dish is still cooking
     expect(order.syncStatus).toBe('SAVED_LOCALLY');
@@ -228,6 +231,22 @@ describe('the new dish fields travel between devices', () => {
     await SyncOutboxEngine.processOutbox();
     const sent = pushed.find((e) => e.externalOrderId === order.id)!;
     expect(sent.items[0]).toMatchObject({ kitchenStatus: 'CANCELLED', statusRev: 2, course: 'COURSE_2', cancelReason: 'Out of stock' });
+  });
+
+  it('what a cancelled dish was worth travels in paise and comes back in rupees, with who cancelled it', async () => {
+    const order = OrderRepository.createOrder({
+      orderType: 'DINE_IN', tableNumber: '9', subtotal: 0, taxAmount: 0, totalAmount: 0, paymentMethod: 'CASH', paymentStatus: 'PENDING', orderStatus: 'PREPARING', syncStatus: 'SAVED_LOCALLY',
+      items: [{ id: 'oi-w', orderId: '', menuItemId: 'w', name: 'W', sku: 'w', quantity: 2, unitPrice: 0, totalPrice: 0, modifiers: [], kitchenStatus: 'CANCELLED' as const, statusRev: 1, cancelReason: 'Guest left', cancelledAmount: 240.5, cancelledBy: 'Mona', cancelledAt: '2026-09-28T10:00:00.000Z' }]
+    });
+    await SyncOutboxEngine.processOutbox();
+    const sent = pushed.find((e) => e.externalOrderId === order.id)!;
+    expect(sent.items[0]).toMatchObject({ cancelledAmount: 24050, cancelledBy: 'Mona', cancelledAt: '2026-09-28T10:00:00.000Z' });
+
+    cloud.set(order.id, { externalOrderId: order.id, orderType: 'DINE_IN', status: 'PREPARING', tableLabel: '9', subtotal: 0, taxAmount: 0, discountAmount: 0, totalAmount: 0, updatedAt: new Date().toISOString(), items: sent.items as never });
+    db.orders = db.orders.filter((o) => o.id !== order.id);
+    await SyncOutboxEngine.catchUpFromCloud();
+    const pulled = db.orders.find((o) => o.id === order.id)!;
+    expect(pulled.items[0]).toMatchObject({ cancelledAmount: 240.5, cancelledBy: 'Mona', cancelledAt: '2026-09-28T10:00:00.000Z', totalPrice: 0 });
     SyncOutboxEngine.configureTransport(null);
   });
 
@@ -272,5 +291,42 @@ describe('the new dish fields travel between devices', () => {
     expect(order.items[0]).toMatchObject({ kitchenStatus: 'PREPARING', statusRev: 1 });
     expect(ticket.status).toBe('PREPARING');
     SyncOutboxEngine.configureTransport(null);
+  });
+});
+
+describe('the real sent and ready times are kept on each order line', () => {
+  let order: Order;
+  let kot: KOTRecord;
+
+  beforeEach(() => {
+    db.resetToDefaultSeed();
+    db.kots = [];
+    db.orders = [];
+    order = OrderRepository.createOrder({
+      orderType: 'DINE_IN', tableNumber: '6', subtotal: 300, taxAmount: 15, totalAmount: 315, paymentMethod: 'CASH', paymentStatus: 'PENDING', orderStatus: 'PREPARING',
+      items: ['a', 'b'].map((id) => ({ id: `oi-${id}`, orderId: '', menuItemId: id, name: id.toUpperCase(), sku: id, quantity: 1, unitPrice: 150, totalPrice: 150, modifiers: [], kitchenStatus: 'PREPARING' as const }))
+    });
+    [kot] = KOTRepository.generateKOT({
+      orderId: order.id, orderNumber: order.orderNumber, tokenNumber: order.tokenNumber, tableNumber: '6', orderType: 'DINE_IN', cashierName: 'Ravi',
+      items: order.items.map((i) => ({ id: `k-${i.id}`, menuItemId: i.menuItemId, name: i.name, quantity: 1, modifiers: [], kitchenStation: 'Main Kitchen', status: 'PREPARING' as const, orderItemId: i.id }))
+    });
+  });
+
+  it('stamps the send time on every line when the ticket is made', () => {
+    for (const l of order.items) expect(l.sentAt).toBe(kot.createdAt);
+  });
+
+  it('stamps the done time on a dish when the cook marks it ready, and clears it when the cook undoes it', () => {
+    KOTRepository.setItemStatus(kot.id, 'k-oi-a', 'READY');
+    const a = order.items.find((i) => i.id === 'oi-a')!;
+    expect(Number.isNaN(Date.parse(a.readyAt!))).toBe(false);
+    expect(order.items.find((i) => i.id === 'oi-b')!.readyAt).toBeUndefined();
+    KOTRepository.setItemStatus(kot.id, 'k-oi-a', 'PREPARING');
+    expect(a.readyAt).toBeUndefined();
+  });
+
+  it('marking the whole ticket ready stamps every dish', () => {
+    KOTRepository.updateKOTStatus(kot.id, 'READY');
+    for (const l of order.items) expect(Number.isNaN(Date.parse(l.readyAt!))).toBe(false);
   });
 });

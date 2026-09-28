@@ -14,7 +14,7 @@ import {
   sound
 } from '@jamanvaar/ui';
 import { isDeviceConnected, activateCaptainWithKey, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
-import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, onAppResume } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncReservations, onAppResume } from '@jamanvaar/sync';
 
 // Captain Modular Layout & Views
 import { CaptainHeader } from './components/layout/CaptainHeader';
@@ -124,6 +124,7 @@ export const App: React.FC = () => {
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
     void syncMenuCatalog({ push: false });
+    void syncReservations({ push: false });
     void syncStaff();
     void syncDiningTables();
     void reportHeartbeat();
@@ -140,6 +141,7 @@ export const App: React.FC = () => {
     }, 4000);
     const interval = setInterval(() => {
       void syncMenuCatalog({ push: false });
+      void syncReservations({ push: false });
       void syncStaff();
       void reportHeartbeat();
     }, 15000);

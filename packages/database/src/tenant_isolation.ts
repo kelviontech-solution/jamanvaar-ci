@@ -79,6 +79,9 @@ export class TenantIsolation {
     db.heldOrders = [];
     db.managerOverrides = [];
     db.reservations = [];
+    db.staffPayRates = {};
+    db.staffSchedules = [];
+    db.attendanceRecords = [];
     db.waitlist = [];
     db.eodReports = [];
     db.feedbacks = [];

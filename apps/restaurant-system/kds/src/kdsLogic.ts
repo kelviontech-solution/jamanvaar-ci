@@ -88,4 +88,79 @@ export function sortForKitchen(kots: KOTRecord[]): KOTRecord[] {
   return [...kots].sort((a, b) => bucket(a) - bucket(b) || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 }
 
+export interface ExpoDish {
+  kotId: string;
+  itemId: string;
+  name: string;
+  quantity: number;
+  station: string;
+  status: KOTItem['status'];
+  course?: string;
+}
+
+export interface ExpoOrder {
+  orderId: string;
+  orderNumber: string;
+  tokenNumber: string;
+  tableNumber?: string;
+  orderType: string;
+  age: TicketAge;
+  dishes: ExpoDish[];
+  /** Dishes that are ready and waiting to be taken out / done being served. */
+  ready: number;
+  served: number;
+  /** Dishes not cancelled. */
+  total: number;
+  /** Every dish is ready or served, and at least one is waiting to go out: the runner can take the whole order. */
+  allReady: boolean;
+  /** Stations that are still cooking something for this order, with what: the reason the order is held up. */
+  waitingOn: Array<{ station: string; dishes: string[] }>;
+  ticketIds: string[];
+}
+
+/**
+ * One row per order across EVERY station, so the person at the pass sees a table's whole order come together: what is ready, what
+ * each station still owes, and when it can go out. Orders whose every dish is served or cancelled drop off. Orders that can go out
+ * now come first, then the ones waiting longest.
+ */
+export function buildExpoBoard(kots: KOTRecord[], nowMs: number, prepTimeOf: (menuItemId: string) => number | undefined): ExpoOrder[] {
+  const byOrder = new Map<string, KOTRecord[]>();
+  for (const kot of kots) {
+    if (kot.status === 'CANCELLED') continue;
+    byOrder.set(kot.orderId, [...(byOrder.get(kot.orderId) ?? []), kot]);
+  }
+
+  const board: ExpoOrder[] = [];
+  for (const [orderId, tickets] of byOrder) {
+    const dishes: ExpoDish[] = [];
+    for (const kot of tickets) {
+      for (const item of liveItems(kot)) {
+        dishes.push({ kotId: kot.id, itemId: item.id, name: item.name, quantity: item.quantity || 1, station: item.kitchenStation || kot.station || 'Main Kitchen', status: effectiveItemStatus(kot, item), course: item.course });
+      }
+    }
+    if (dishes.length === 0 || dishes.every((d) => d.status === 'SERVED')) continue;
+
+    const ready = dishes.filter((d) => d.status === 'READY').length;
+    const served = dishes.filter((d) => d.status === 'SERVED').length;
+    const cooking = dishes.filter((d) => kitchenRank(d.status) < 2);
+    const stations = new Map<string, string[]>();
+    for (const d of cooking) stations.set(d.station, [...(stations.get(d.station) ?? []), d.quantity > 1 ? `${d.quantity} x ${d.name}` : d.name]);
+
+    const open = tickets.filter((k) => k.status !== 'SERVED');
+    const oldest = [...open].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0] ?? tickets[0];
+    const prep = Math.max(...open.map((k) => prepMinutes(k, prepTimeOf)), 4);
+    const first = tickets[0];
+    board.push({
+      orderId, orderNumber: first.orderNumber, tokenNumber: first.tokenNumber, tableNumber: first.tableNumber, orderType: first.orderType,
+      age: ticketAge(oldest, nowMs, prep), dishes, ready, served, total: dishes.length,
+      allReady: cooking.length === 0 && ready > 0,
+      waitingOn: [...stations.entries()].map(([station, names]) => ({ station, dishes: names })),
+      ticketIds: open.map((k) => k.id)
+    });
+  }
+
+  const rank = (o: ExpoOrder) => (o.allReady ? 0 : o.age.level === 'late' ? 1 : o.age.level === 'warn' ? 2 : 3);
+  return board.sort((a, b) => rank(a) - rank(b) || b.age.mins - a.age.mins || b.age.secs - a.age.secs);
+}
+
 export { connectionLevel, type ConnectionLevel } from '@jamanvaar/sync';

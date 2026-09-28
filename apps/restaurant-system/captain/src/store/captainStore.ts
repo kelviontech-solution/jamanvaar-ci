@@ -51,6 +51,8 @@ export interface CartItemEntry {
   selectedModifiers: SelectedModifier[];
   specialNotes?: string;
   course?: Course;
+  /** Which guest at the table the dish is for, so the bill can be split by seat. */
+  seat?: number;
   isFired: boolean;
   kotId?: string;
   /** The order line this dish became when it was fired; needed to cancel it. */
@@ -287,7 +289,8 @@ interface CaptainState {
   /** The waiter delivered everything the kitchen finished for one table (BUG-148). Returns how many dishes were marked served. */
   serveReadyForTable: (tableNumber: string) => number;
   markEntireKotServed: (kotId: string) => void;
-  requestBill: (tableNumber: string) => boolean;
+  requestBill: (tableNumber: string, splitNote?: string) => boolean;
+  setCartItemSeat: (itemId: string, seat: number | undefined) => void;
 
   // Messaging & Requests
   sendMessage: (
@@ -502,6 +505,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
           selectedModifiers: it.modifiers || [],
           specialNotes: it.specialInstructions,
           course: (it.course as Course | undefined),
+          ...(it.seat ? { seat: it.seat } : {}),
           isFired: true,
           orderItemId: it.id,
           cancelReason: it.cancelReason,
@@ -799,6 +803,10 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     set({ cartItems: get().cartItems.map((ci) => (ci.id === itemId && !ci.isFired ? { ...ci, course } : ci)) });
   },
 
+  setCartItemSeat: (itemId, seat) => {
+    set({ cartItems: get().cartItems.map((ci) => (ci.id === itemId && !ci.isFired ? { ...ci, seat } : ci)) });
+  },
+
   clearCart: () => {
     set({ cartItems: [] });
   },
@@ -849,6 +857,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
         modifiers: ci.selectedModifiers,
         specialInstructions: ci.specialNotes,
         course: ci.course ?? 'COURSE_1',
+        ...(ci.seat ? { seat: ci.seat } : {}),
         totalPrice: ci.totalPrice,
         kitchenStatus: 'PREPARING' as const
       }));
@@ -889,6 +898,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
         modifiers: ci.selectedModifiers,
         specialInstructions: ci.specialNotes,
         course: ci.course ?? 'COURSE_1',
+        ...(ci.seat ? { seat: ci.seat } : {}),
         totalPrice: ci.totalPrice,
         kitchenStatus: 'PREPARING' as const
       }));
@@ -1071,7 +1081,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     pushNow();
   },
 
-  requestBill: (tableNumber) => {
+  requestBill: (tableNumber, splitNote) => {
     const tbl = captainDb.tables.find((t) => t.tableNumber === tableNumber);
     // There must be an order to bill. The table state travels to POS with the table sync, where the
     // counter sees it as "Billing" (BUG-099).
@@ -1089,7 +1099,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     AuditRepository.log({
       action: 'BILL_REQUESTED',
       category: 'ORDER',
-      details: `Bill requested for Table #${tableNumber} by ${get().currentCaptain?.name}`,
+      details: `Bill requested for Table #${tableNumber} by ${get().currentCaptain?.name}${splitNote ? ` (split: ${splitNote})` : ''}`,
       username: get().currentCaptain?.name || 'Captain'
     });
 
@@ -1097,7 +1107,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       kind: 'BILL_REQUEST',
       recipient: 'POS',
       senderName: get().currentCaptain?.name || 'Staff',
-      presetText: 'Bill requested',
+      presetText: splitNote ? `Bill requested: split by seat (${splitNote})` : 'Bill requested',
       tableNumber
     });
     lanMeshSync.broadcast('BILL_REQUESTED', {

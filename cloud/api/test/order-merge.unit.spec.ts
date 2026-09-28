@@ -77,6 +77,24 @@ describe('mergeOrderItems', () => {
     expect(items[0]).toMatchObject({ kitchenStatus: 'CANCELLED', statusRev: 1, cancelReason: 'Out of stock', unitPrice: 0, lineTotal: 0 });
   });
 
+  it('what a cancelled dish was worth is kept when a later push does not carry it', () => {
+    const existing = [item('a', { originDeviceId: 'CAPTAIN', kitchenStatus: 'CANCELLED', statusRev: 1, cancelledAmount: 24050, cancelledBy: 'Mona', cancelledAt: '2026-09-28T10:00:00.000Z', unitPrice: 0, lineTotal: 0 })];
+    const { items } = mergeOrderItems(existing, [item('a', { kitchenStatus: 'CANCELLED', statusRev: 1, unitPrice: 0, lineTotal: 0 })], 'CAPTAIN');
+    expect(items[0]).toMatchObject({ cancelledAmount: 24050, cancelledBy: 'Mona', cancelledAt: '2026-09-28T10:00:00.000Z' });
+  });
+
+  it('the time a dish was done is kept while it is done and dropped when a recall wins', () => {
+    const existing = [item('a', { originDeviceId: 'CAPTAIN', kitchenStatus: 'READY', readyAt: '2026-09-28T10:20:00.000Z', sentAt: '2026-09-28T10:00:00.000Z' })];
+    const stillReady = mergeOrderItems(existing, [item('a', { kitchenStatus: 'READY' })], 'KDS').items[0];
+    expect(stillReady).toMatchObject({ readyAt: '2026-09-28T10:20:00.000Z', sentAt: '2026-09-28T10:00:00.000Z' });
+    const recalled = mergeOrderItems(existing, [item('a', { kitchenStatus: 'PREPARING', statusRev: 1 })], 'KDS').items[0];
+    expect(recalled.kitchenStatus).toBe('PREPARING');
+    expect(recalled.readyAt).toBeUndefined();
+    const staleCopy = mergeOrderItems([item('a', { originDeviceId: 'CAPTAIN', kitchenStatus: 'PREPARING', statusRev: 1 })], [item('a', { kitchenStatus: 'READY', readyAt: '2026-09-28T09:00:00.000Z' })], 'CAPTAIN').items[0];
+    expect(staleCopy.kitchenStatus).toBe('PREPARING');
+    expect(staleCopy.readyAt).toBeUndefined();
+  });
+
   it('a push from an older client with no revision at all still moves a dish forward', () => {
     const existing = [item('a', { originDeviceId: 'POS', kitchenStatus: 'PREPARING' })];
     const { items } = mergeOrderItems(existing, [item('a', { kitchenStatus: 'READY' })], 'KDS');

@@ -346,7 +346,15 @@ function cartLinesToOrderItems(items: CartItem[], existing?: Order['items']): Or
       itemDiscountPercent: ci.itemDiscountPercent,
       itemDiscountAmount: ci.itemDiscountAmount,
       discountReason: ci.discountReason,
-      kitchenStatus: prior?.kitchenStatus || ('PREPARING' as const)
+      kitchenStatus: prior?.kitchenStatus || ('PREPARING' as const),
+      // What the kitchen, the Captain and a cancellation recorded on this line survives the counter re-saving the order.
+      ...(prior?.statusRev ? { statusRev: prior.statusRev } : {}),
+      ...(prior?.course ? { course: prior.course } : {}),
+      ...(prior?.sentAt ? { sentAt: prior.sentAt } : {}),
+      ...(prior?.readyAt ? { readyAt: prior.readyAt } : {}),
+      ...(prior?.cancelReason ? { cancelReason: prior.cancelReason } : {}),
+      ...(prior?.cancelledAmount !== undefined ? { cancelledAmount: prior.cancelledAmount, cancelledBy: prior.cancelledBy, cancelledAt: prior.cancelledAt } : {}),
+      ...((ci.seat ?? prior?.seat) ? { seat: (ci.seat ?? prior?.seat) as number } : {})
     };
   });
 }
@@ -1390,7 +1398,8 @@ export const usePosStore = create<PosState>((set, get) => {
           specialInstructions: oi.specialInstructions,
           itemTotal: oi.totalPrice,
           orderItemId: oi.id,
-          kotSentQty: oi.quantity
+          kotSentQty: oi.quantity,
+          ...(oi.seat ? { seat: oi.seat } : {})
         };
       });
 

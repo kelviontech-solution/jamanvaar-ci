@@ -35,6 +35,15 @@ export const syncedOrderItemSchema = z.object({
   /** 'COURSE_1' | 'COURSE_2' | 'COURSE_3': which part of the meal the dish belongs to. */
   course: z.string().max(16).optional(),
   cancelReason: z.string().max(120).optional(),
+  /** paise: what the dish was worth before it was cancelled (the line itself drops to zero). */
+  cancelledAmount: z.number().int().min(0).optional(),
+  cancelledBy: z.string().max(120).optional(),
+  cancelledAt: z.string().max(40).optional(),
+  /** The seat (or guest number) the dish was taken for. */
+  seat: z.number().int().min(1).max(99).optional(),
+  /** When the dish was sent to the kitchen and when the cook marked it done (ISO times). */
+  sentAt: z.string().max(40).optional(),
+  readyAt: z.string().max(40).optional(),
   kitchenStation: z.string().max(64).optional(),
   specialInstructions: z.string().max(500).optional(),
   lineTotal: z.number().int().min(0)

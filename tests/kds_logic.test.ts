@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { KOTItem, KOTRecord } from '@jamanvaar/types';
 import {
-  allergyText, connectionLevel, dishAllergy, effectiveItemStatus, orderProgress, prepMinutes, prepSummary, sortForKitchen, ticketAge
+  allergyText, buildExpoBoard, connectionLevel, dishAllergy, effectiveItemStatus, orderProgress, prepMinutes, prepSummary, sortForKitchen, ticketAge
 } from '../apps/restaurant-system/kds/src/kdsLogic';
 
 const item = (id: string, name: string, status: KOTItem['status'] = 'PREPARING', extra: Partial<KOTItem> = {}): KOTItem => ({
@@ -55,14 +55,16 @@ describe('how late a ticket is depends on how long its dishes should take', () =
   });
 
   it('is fine within the prep time, warns at it, and is late at one and a half times', () => {
+    // One instant for both sides: reading the clock twice made a 30-minute-old ticket 29.99 minutes old under load.
     const now = Date.now();
-    expect(ticketAge(at(5), now, 20).level).toBe('ok');
-    expect(ticketAge(at(20), now, 20).level).toBe('warn');
-    expect(ticketAge(at(29), now, 20).level).toBe('warn');
-    expect(ticketAge(at(30), now, 20).level).toBe('late');
+    const ago = (m: number) => ticket('t', [item('x', 'Naan')], { createdAt: new Date(now - m * 60_000).toISOString() });
+    expect(ticketAge(ago(5), now, 20).level).toBe('ok');
+    expect(ticketAge(ago(20), now, 20).level).toBe('warn');
+    expect(ticketAge(ago(29), now, 20).level).toBe('warn');
+    expect(ticketAge(ago(30), now, 20).level).toBe('late');
     // A 5-minute dish is late far sooner than a 25-minute one.
-    expect(ticketAge(at(8), now, 5).level).toBe('late');
-    expect(ticketAge(at(8), now, 25).level).toBe('ok');
+    expect(ticketAge(ago(8), now, 5).level).toBe('late');
+    expect(ticketAge(ago(8), now, 25).level).toBe('ok');
   });
 });
 
@@ -102,5 +104,37 @@ describe('the connection warning', () => {
     expect(connectionLevel(1000, false, 60000)).toBe('lost');
     expect(connectionLevel(null, true, 5000)).toBe('ok');
     expect(connectionLevel(null, true, 20000)).toBe('lost');
+  });
+});
+
+describe('the pass (expo): one row per order, across every station', () => {
+  const now = Date.now();
+  const at = (minsAgo: number) => new Date(now - minsAgo * 60_000).toISOString();
+  const noTargets = () => undefined;
+
+  it('brings the tickets of one table from two stations together and says which station is holding it up', () => {
+    const kitchen = ticket('k', [item('a', 'Paneer', 'READY'), item('b', 'Dal', 'PREPARING')], { createdAt: at(6), tableNumber: '4' });
+    const bar = ticket('b', [item('c', 'Lassi', 'PREPARING', { kitchenStation: 'Beverages Bar' })], { createdAt: at(5), station: 'Beverages Bar', tableNumber: '4' });
+    const [order] = buildExpoBoard([kitchen, bar], now, noTargets);
+    expect(order).toMatchObject({ tableNumber: '4', total: 3, ready: 1, served: 0, allReady: false });
+    expect(order.waitingOn).toEqual([{ station: 'Main Kitchen', dishes: ['Dal'] }, { station: 'Beverages Bar', dishes: ['Lassi'] }]);
+    expect(order.ticketIds.sort()).toEqual(['b', 'k']);
+    expect(order.age.mins).toBe(6);
+  });
+
+  it('marks an order that can go out now, puts it first, and drops orders that are fully served or cancelled', () => {
+    const cooking = ticket('c1', [item('a', 'Dal', 'PREPARING')], { orderId: 'o-cook', createdAt: at(20) });
+    const done = ticket('c2', [item('b', 'Naan', 'READY'), item('c', 'Rice', 'SERVED')], { orderId: 'o-done', createdAt: at(3) });
+    const served = ticket('c3', [item('d', 'Tea')], { orderId: 'o-served', status: 'SERVED', createdAt: at(30) });
+    const cancelled = ticket('c4', [item('e', 'Soup', 'CANCELLED')], { orderId: 'o-gone', status: 'CANCELLED' });
+    const board = buildExpoBoard([cooking, done, served, cancelled], now, noTargets);
+    expect(board.map((o) => o.orderId)).toEqual(['o-done', 'o-cook']);
+    expect(board[0]).toMatchObject({ allReady: true, ready: 1, served: 1 });
+    expect(board[1].age.level).toBe('late');
+  });
+
+  it('a cancelled dish is not counted, so the order can go out without it', () => {
+    const t = ticket('x', [item('a', 'Dal', 'READY'), item('b', 'Soup', 'CANCELLED')], { orderId: 'o1' });
+    expect(buildExpoBoard([t], now, noTargets)[0]).toMatchObject({ total: 1, allReady: true });
   });
 });

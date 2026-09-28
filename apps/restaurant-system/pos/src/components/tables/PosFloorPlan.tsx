@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { usePosStore } from "../../store/posStore";
 import { db, OrderRepository } from "@jamanvaar/database";
 import { DiningTable } from "@jamanvaar/types";
+import { holdLabel, tableHold } from "@jamanvaar/business";
 import { formatINR } from "@jamanvaar/utils";
 import { sound, EmptyState } from "@jamanvaar/ui";
 import { PosTableDrawer } from "./PosTableDrawer";
@@ -94,7 +95,9 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
   const isAvailable = table.status === "AVAILABLE";
   const isBillRequested = table.status === "BILL_REQUESTED";
   const isBilling = table.status === "BILLING" || table.status === "BILL_REQUESTED";
-  const isReserved = table.status === "RESERVED";
+  // A booking holds a free table from half an hour before the guests are due until they are 20 minutes late.
+  const hold = isAvailable && !activeOrder ? tableHold(db.reservations, table, new Date()) : undefined;
+  const isReserved = table.status === "RESERVED" || !!hold;
 
   return (
     <div
@@ -132,7 +135,7 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
           )}
         </div>
 
-        {isAvailable && (
+        {isAvailable && !hold && (
           <div className="flex items-center gap-1 text-[11px] text-emerald-600 font-semibold">
             <CheckCircle2 className="w-3 h-3" />
             <span>Vacant &amp; Ready</span>
@@ -141,7 +144,7 @@ const TableCard: React.FC<TableCardProps> = React.memo(({ table, onClick, onOpen
         {isReserved && (
           <div className="flex items-center gap-1 text-[11px] text-purple-600 font-semibold">
             <Calendar className="w-3 h-3" />
-            <span>Reserved</span>
+            <span>{hold ? holdLabel(hold) : "Reserved"}</span>
           </div>
         )}
         {isBillRequested && (

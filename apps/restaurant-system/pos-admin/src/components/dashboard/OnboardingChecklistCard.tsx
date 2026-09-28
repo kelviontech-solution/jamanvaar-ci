@@ -6,6 +6,8 @@ const DISMISS_KEY = 'jamanvaar_posadmin_onboarding_dismissed';
 export interface OnboardingChecklistItem {
   id: string;
   label: string;
+  /** What to do for this step, shown for the first step that is not done yet. */
+  hint?: string;
   done: boolean;
   onGo: () => void;
 }
@@ -35,6 +37,7 @@ export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = (
   if (dismissed || allDone) return null;
 
   const doneCount = items.filter((i) => i.done).length;
+  const next = items.find((i) => !i.done);
 
   const dismiss = () => {
     setDismissed(true);
@@ -71,6 +74,14 @@ export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = (
           style={{ width: `${(doneCount / items.length) * 100}%` }}
         />
       </div>
+
+      {next?.hint && (
+        <div className="mb-3 rounded-xl border border-[#FDBA74] bg-[#FFF4ED] px-3 py-2.5" data-testid="onboarding-next">
+          <p className="text-[11px] font-black uppercase tracking-wide text-jaman-saffron">Next step</p>
+          <p className="text-xs font-bold text-jaman-navy mt-0.5">{next.label}</p>
+          <p className="text-xs text-slate-600 mt-0.5">{next.hint}</p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {items.map((item) => (

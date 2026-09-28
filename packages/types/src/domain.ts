@@ -423,6 +423,8 @@ export interface CartItem {
   discountReason?: string;
   /** Id of the order line this cart line became when it was first sent to the kitchen. */
   orderItemId?: string;
+  /** The seat (or guest number) this dish was taken for. */
+  seat?: number;
   /** How many of this line's quantity have already been sent to the kitchen (KOT). */
   kotSentQty?: number;
 }
@@ -470,6 +472,15 @@ export interface OrderItem {
   course?: string;
   /** Why a sent dish was cancelled (the line stays on the order at no charge so the kitchen and the bill agree). */
   cancelReason?: string;
+  /** What the line was worth (rupees) before it was cancelled. The line itself drops to zero; this keeps the loss reportable. */
+  cancelledAmount?: number;
+  cancelledBy?: string;
+  cancelledAt?: string;
+  /** The seat (or guest number) the waiter took this dish for, so the bill can be split by seat. */
+  seat?: number;
+  /** When the dish was sent to the kitchen, and when the cook marked it done. Kept on the order line so every device (and the prep-time report) sees the real times. */
+  sentAt?: string;
+  readyAt?: string;
   /** What this line was priced with when it was ordered (QR orders): never recalculated from the current menu. */
   snapshot?: { menuVersion?: number; basePrice?: number; taxGroupId?: string; taxRateBp?: number; taxInclusive?: boolean; lineTax?: number };
 }
@@ -1290,6 +1301,8 @@ export interface Reservation {
   specialRequests?: string;
   depositAmount?: number;
   createdAt: string;
+  /** When the booking last changed; the newest change wins when devices sync it. */
+  updatedAt?: string;
 }
 
 export interface WaitlistEntry {

@@ -48,10 +48,23 @@ export function mergeOrderItems<T extends MergeableItem>(
     const kept: Record<string, unknown> = {};
     if (old?.snapshot && !inc.snapshot) kept.snapshot = old.snapshot;
     if (old?.modifierDetails && !inc.modifierDetails) kept.modifierDetails = old.modifierDetails;
+    // What a cancelled dish was worth is written once, when it is cancelled, and a stale copy never erases it.
+    if (old?.cancelledAmount !== undefined && inc.cancelledAmount === undefined) kept.cancelledAmount = old.cancelledAmount;
+    if (old?.cancelledBy !== undefined && inc.cancelledBy === undefined) kept.cancelledBy = old.cancelledBy;
+    if (old?.cancelledAt !== undefined && inc.cancelledAt === undefined) kept.cancelledAt = old.cancelledAt;
+    if (old?.seat !== undefined && inc.seat === undefined) kept.seat = old.seat;
+    if (old?.sentAt !== undefined && inc.sentAt === undefined) kept.sentAt = old.sentAt;
     // A copy that lost on revision must not carry its own price or cancellation details onto the winner.
     if (keepOld && old) {
       if (old.cancelReason !== undefined) kept.cancelReason = old.cancelReason;
       if (old.lineTotal !== undefined && old.kitchenStatus === 'CANCELLED') { kept.lineTotal = old.lineTotal; kept.unitPrice = old.unitPrice; }
+    }
+    // A done-time belongs to a dish only while it is done: a recall (the winning copy is not ready) drops it.
+    if (kitchenStatusRank(status) >= 2) {
+      const doneAt = keepOld ? old?.readyAt : (inc.readyAt ?? old?.readyAt);
+      if (doneAt !== undefined) kept.readyAt = doneAt;
+    } else {
+      kept.readyAt = undefined;
     }
     return { ...inc, ...kept, kitchenStatus: status, ...(statusRev > 0 ? { statusRev } : {}), originDeviceId: old?.originDeviceId ?? deviceId };
   });

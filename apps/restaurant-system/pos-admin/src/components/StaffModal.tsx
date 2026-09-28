@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User as UserType } from '@jamanvaar/types';
 import { Modal, Button } from '@jamanvaar/ui';
-import { StaffRepository } from '@jamanvaar/database';
+import { StaffRepository, StaffScheduleRepository } from '@jamanvaar/database';
 import { copyText } from '@jamanvaar/utils';
 import { Check, Copy, KeyRound } from 'lucide-react';
 
@@ -42,6 +42,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
   const [phone, setPhone] = useState('');
   const [roleId, setRoleId] = useState(leastPrivilegedRoleId);
   const [isActive, setIsActive] = useState(true);
+  const [hourlyPay, setHourlyPay] = useState('');
   const [formError, setFormError] = useState('');
   const [issuedPin, setIssuedPin] = useState<string | null>(null);
   const [pinCopied, setPinCopied] = useState(false);
@@ -56,6 +57,8 @@ export const StaffModal: React.FC<StaffModalProps> = ({
       setPhone(staffToEdit.phone || '');
       setRoleId(staffToEdit.roleId || leastPrivilegedRoleId);
       setIsActive(staffToEdit.isActive ?? true);
+      const rate = StaffScheduleRepository.getPayRates()[staffToEdit.id];
+      setHourlyPay(rate ? String(rate) : '');
     } else {
       setFullName('');
       setUsername('');
@@ -63,6 +66,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
       setPhone('');
       setRoleId(leastPrivilegedRoleId);
       setIsActive(true);
+      setHourlyPay('');
     }
   }, [staffToEdit, isOpen]);
 
@@ -111,6 +115,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
         roleId,
         isActive
       });
+      StaffScheduleRepository.setPayRate(staffToEdit.id, Number(hourlyPay));
       onSaved();
       onClose();
     } else {
@@ -124,6 +129,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
       });
       // Show the new PIN once instead of closing immediately — this is the only moment it
       // is ever available in plaintext, so the admin needs a chance to note it down.
+      StaffScheduleRepository.setPayRate(created.id, Number(hourlyPay));
       setIssuedPin(created.issuedPin ?? null);
       onSaved();
     }
@@ -230,6 +236,21 @@ export const StaffModal: React.FC<StaffModalProps> = ({
               className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-slate-600 mb-1">Pay per hour, in rupees (optional)</label>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            inputMode="decimal"
+            value={hourlyPay}
+            onChange={(e) => setHourlyPay(e.target.value)}
+            placeholder="e.g. 120"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+          />
+          <p className="text-[11px] text-slate-500 mt-1">Used only for the labour cost report. Kept on this computer; it is never sent to POS, Captain or KDS.</p>
         </div>
 
         <div className="flex items-center justify-between gap-2 pt-1">

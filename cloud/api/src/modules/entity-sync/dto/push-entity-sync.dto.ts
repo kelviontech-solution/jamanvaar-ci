@@ -22,7 +22,7 @@ import { z } from 'zod';
 // carried `modifierGroupIds`, referencing this collection, which nothing ever synced. Needed so a device that
 // never had the local menu (e.g. the cloud pricing a QR order) can still resolve what a dish's own options and
 // their prices actually are, not just its base price.
-export const SYNCABLE_ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK', 'SHIFT', 'CASH_MOVEMENT'] as const;
+export const SYNCABLE_ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION'] as const;
 export type SyncableEntityType = (typeof SYNCABLE_ENTITY_TYPES)[number];
 
 export const entitySyncEventSchema = z.object({

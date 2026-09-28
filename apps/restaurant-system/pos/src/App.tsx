@@ -3,7 +3,7 @@ import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, 
 import { usePosStore } from './store/posStore';
 import { db, CustomerRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
 import type { MenuItem, Category } from '@jamanvaar/types';
-import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, onAppResume } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, onAppResume } from '@jamanvaar/sync';
 import { sound } from '@jamanvaar/ui';
 import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
@@ -163,6 +163,7 @@ export const App: React.FC = () => {
     // Shift & Cash Drawer Ledger/Reconciliation/EOD Z-Report can see them. Only POS edits its own
     // shift, so this terminal always pushes.
     void syncShifts({ push: true });
+    void syncReservations({ push: true });
     void reportHeartbeat();
     void syncRestaurantIdentity();
 
@@ -180,6 +181,7 @@ export const App: React.FC = () => {
       void syncMenuCatalog({ push: true });
       void syncStaff();
       void syncShifts({ push: true });
+      void syncReservations({ push: true });
       void reportHeartbeat();
       void syncRestaurantIdentity();
     }, 15000);

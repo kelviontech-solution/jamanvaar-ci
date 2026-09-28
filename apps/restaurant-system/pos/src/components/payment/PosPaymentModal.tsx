@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { PaymentMethod, PaymentSplit } from '@jamanvaar/types';
-import { OrderRepository } from '@jamanvaar/database';
+import { AuditRepository, OrderRepository } from '@jamanvaar/database';
 import { formatINR, generateUUID } from '@jamanvaar/utils';
 import { sound } from '@jamanvaar/ui';
 import { PosDiscountModal } from '../cart/PosDiscountModal';
+import { PosSplitByGuestModal, type GuestSplitPlan } from './PosSplitByGuestModal';
 import {
   X,
   Banknote,
@@ -94,6 +95,10 @@ export const PosPaymentModal: React.FC = () => {
   // Is Split Mode active?
   const [isSplitMode, setIsSplitMode] = useState(false);
 
+  // Split by guest or seat: the shares chosen in the guest split screen, while they are in force.
+  const [isGuestSplitOpen, setIsGuestSplitOpen] = useState(false);
+  const [guestPlan, setGuestPlan] = useState<GuestSplitPlan | null>(null);
+
   // Active channel selected for direct keypad/focus
   const [activeChannel, setActiveChannel] = useState<PaymentChannel>('CASH');
 
@@ -138,6 +143,8 @@ export const PosPaymentModal: React.FC = () => {
       setCardConfirmed(false);
       setErrorMessage('');
       setIsSplitMode(false);
+      setGuestPlan(null);
+      setIsGuestSplitOpen(false);
       setActiveChannel('CASH');
     }
   }, [isPaymentOpen]);
@@ -197,6 +204,7 @@ export const PosPaymentModal: React.FC = () => {
 
   // Single Pay: Select payment method and assign 100% of the bill
   const handleSelectSingleMethod = (channel: PaymentChannel) => {
+    setGuestPlan(null);
     setIsSplitMode(false);
     setActiveChannel(channel);
     setAllocations({
@@ -214,6 +222,7 @@ export const PosPaymentModal: React.FC = () => {
 
   // Switch to Split Payment Card
   const handleSelectSplitModeCard = () => {
+    setGuestPlan(null);
     setIsSplitMode(true);
     // Split 50/50 Cash + UPI
     const half = Math.floor(totalPayable / 2);
@@ -314,6 +323,7 @@ export const PosPaymentModal: React.FC = () => {
 
   // Quick 50/50 Split Shortcut
   const handleSplit5050 = () => {
+    setGuestPlan(null);
     const half = Math.floor(totalPayable / 2);
     const rem = Number((totalPayable - half).toFixed(2));
     setAllocations({
@@ -328,6 +338,31 @@ export const PosPaymentModal: React.FC = () => {
     if (splitPrimaryChannel === 'CASH') {
       setCashReceivedInput(half.toString());
     }
+  };
+
+  const guestSplitLines = (cart?.items ?? []).map((ci) => ({ id: ci.cartItemId, name: ci.item.name, quantity: ci.quantity, amount: Number(ci.itemTotal) || 0, seat: ci.seat }));
+  const guestSplitBill = {
+    discountAmount: Number(cart?.discountAmount) || 0,
+    taxAmount: Number(cart?.taxAmount) || 0,
+    serviceChargeAmount: Number(cart?.serviceChargeAmount) || 0,
+    tipAmount: Number(cart?.tipAmount) || 0,
+    totalAmount: totalPayable
+  };
+
+  // The guests' shares become the bill's tenders: each way of paying gets the sum of the guests who chose it.
+  const applyGuestPlan = (plan: GuestSplitPlan) => {
+    setGuestPlan(plan);
+    setIsSplitMode(true);
+    setAllocations({ CASH: plan.amounts.CASH, UPI: plan.amounts.UPI, CARD: plan.amounts.CARD, WALLET: 0, HOUSE_ACCOUNT: 0 });
+    setCashReceivedInput(plan.amounts.CASH > 0 ? String(plan.amounts.CASH) : '');
+    setErrorMessage('');
+    setIsGuestSplitOpen(false);
+    AuditRepository.log({
+      action: 'BILL_SPLIT_BY_GUEST',
+      category: 'ORDER',
+      details: `Bill of ${formatINR(totalPayable)} split between ${plan.guests.length} guests: ${plan.guests.map((g) => `${g.label} ${formatINR(g.total)} (${g.method})`).join(', ')}`,
+      username: currentUser?.fullName || 'Cashier'
+    });
   };
 
   // Keyboard Shortcuts Listener
@@ -476,6 +511,8 @@ export const PosPaymentModal: React.FC = () => {
   const savedOrder = savedOrderId ? OrderRepository.getOrderById(savedOrderId) : undefined;
 
   return (
+    <>
+    <PosSplitByGuestModal isOpen={isGuestSplitOpen} onClose={() => setIsGuestSplitOpen(false)} lines={guestSplitLines} bill={guestSplitBill} onApply={applyGuestPlan} />
     <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 select-none animate-in fade-in duration-150 font-sans">
       <div className="bg-white border border-jaman-border rounded-3xl max-w-4xl w-full max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">
         
@@ -684,6 +721,16 @@ export const PosPaymentModal: React.FC = () => {
               </div>
             </div>
 
+            <button
+              type="button"
+              onClick={() => setIsGuestSplitOpen(true)}
+              disabled={guestSplitLines.filter((l) => l.amount > 0).length === 0}
+              className="w-full min-h-[44px] rounded-2xl border-2 border-dashed border-jaman-saffron/60 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-jaman-saffron text-sm font-black flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Split className="w-4 h-4" />
+              <span>{guestPlan ? `Split between ${guestPlan.guests.length} guests: change` : 'Split the bill by guest or seat'}</span>
+            </button>
+
             {/* SPLIT PAYMENT WORKSPACE: Two interactive linked inputs with auto-remaining calculation */}
             {isSplitMode ? (
               <div className="bg-jaman-cream border-2 border-jaman-border rounded-2xl p-4 sm:p-5 space-y-4 animate-in fade-in">
@@ -705,6 +752,18 @@ export const PosPaymentModal: React.FC = () => {
                   </button>
                 </div>
 
+                {guestPlan && (
+                  <ul className="space-y-1.5" aria-label="Guest shares">
+                    {guestPlan.guests.map((g) => (
+                      <li key={g.label} className="flex items-center justify-between bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy">
+                        <span>{g.label} <span className="text-slate-400 font-medium">pays by {g.method === 'CASH' ? 'cash' : g.method === 'UPI' ? 'UPI' : 'card'}</span></span>
+                        <span className="font-mono font-black">₹{g.total.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {!guestPlan && (<>
                 {/* Method 1 Input (e.g. Cash) */}
                 <div className="bg-white p-3.5 rounded-xl border border-jaman-border space-y-2">
                   <div className="flex items-center justify-between text-xs font-bold text-jaman-navy">
@@ -770,6 +829,8 @@ export const PosPaymentModal: React.FC = () => {
                     />
                   </div>
                 </div>
+
+                </>)}
 
                 {/* Cash Tendered / Change Calculator when Cash is in the split */}
                 {allocations.CASH > 0 && (
@@ -1182,5 +1243,6 @@ export const PosPaymentModal: React.FC = () => {
         />
       </div>
     </div>
+    </>
   );
 };

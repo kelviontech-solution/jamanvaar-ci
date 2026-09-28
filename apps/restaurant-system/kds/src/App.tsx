@@ -3,7 +3,8 @@ import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, Staf
 import { getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages, syncMenuCatalog, EndpointResolver, onAppResume } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus, KOTItem } from '@jamanvaar/types';
 import { KdsTicketCard } from './KdsTicketCard';
-import { connectionLevel, effectiveItemStatus, liveItems, orderProgress, prepMinutes, prepSummary, sortForKitchen, ticketAge } from './kdsLogic';
+import { KdsExpoBoard } from './KdsExpoBoard';
+import { buildExpoBoard, connectionLevel, effectiveItemStatus, liveItems, orderProgress, prepMinutes, prepSummary, sortForKitchen, ticketAge } from './kdsLogic';
 import { Platform } from '@jamanvaar/api';
 import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
 import {
@@ -234,7 +235,7 @@ export const App: React.FC = () => {
     const t = setInterval(follow, 5000);
     return () => clearInterval(t);
   }, []);
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PREPARING' | 'READY' | 'SERVED'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PREPARING' | 'READY' | 'SERVED' | 'EXPO'>('ALL');
   const [currentTime, setCurrentTime] = useState<string>(
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
   );
@@ -565,6 +566,31 @@ export const App: React.FC = () => {
     }
   }
 
+  // The pass looks at every station, whichever one this screen is set to.
+  const expoBoard = useMemo(
+    () => buildExpoBoard(kots, Date.now(), prepTimeOf),
+    // currentTime ticks every second, which keeps each order's age moving
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [kots, currentTime, prepTimeOf]
+  );
+
+  const serveOrder = (order: { orderId: string; tableNumber?: string; tokenNumber: string; ticketIds: string[] }) => {
+    const served: KOTRecord[] = [];
+    for (const id of order.ticketIds) {
+      const t = kdsDb.kots.find((k) => k.id === id);
+      if (!t) continue;
+      t.printed = true;
+      KOTRepository.updateKOTStatus(id, 'SERVED');
+      lanMeshSync.broadcast('KOT_STATUS_CHANGED', { kotId: t.id, status: 'SERVED' });
+      lanMeshSync.broadcast('ORDER_SERVED', { tableNumber: t.tableNumber, kotId: t.id, kotNumber: t.kotNumber });
+      served.push(t);
+    }
+    if (served.length === 0) return;
+    logKitchen('KOT_SERVED', `Order #${served[0].orderNumber} sent out from the pass (${served.length} ticket${served.length === 1 ? '' : 's'})`);
+    commit();
+    offerUndo(`${order.tableNumber ? `Table ${order.tableNumber}` : `Token ${order.tokenNumber}`} sent out`, () => { served.forEach((t) => KOTRepository.recallKot(t.id)); commit(); setUndo(null); });
+  };
+
   const retryNow = () => {
     void SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
     void SyncOutboxEngine.catchUpFromCloud();
@@ -744,7 +770,8 @@ export const App: React.FC = () => {
     { id: 'ALL', label: 'ACTIVE', short: 'Active', count: activePreparingCount + readyPickupCount + alertCount, icon: UtensilsCrossed },
     { id: 'PREPARING', label: 'COOKING', short: 'Cooking', count: activePreparingCount, icon: Flame },
     { id: 'READY', label: 'READY', short: 'Ready', count: readyPickupCount, icon: Bell },
-    { id: 'SERVED', label: 'SERVED', short: 'Served', count: servedCount, icon: CheckCheck }
+    { id: 'SERVED', label: 'SERVED', short: 'Served', count: servedCount, icon: CheckCheck },
+    { id: 'EXPO', label: 'EXPO (PASS)', short: 'Pass', count: expoBoard.length, icon: ArrowRight }
   ] as const;
 
   return (
@@ -879,7 +906,9 @@ export const App: React.FC = () => {
         {/* TICKETS */}
         <main className="flex-1 p-3 sm:p-5 overflow-y-auto min-h-0">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 max-w-[1920px] mx-auto items-start">
-            {filteredKots.map((kot) => {
+            {statusFilter === 'EXPO' && <KdsExpoBoard orders={expoBoard} orderTypeLabel={(t) => ORDER_TYPE_LABEL[t] || t} onServeOrder={serveOrder} />}
+
+            {statusFilter !== 'EXPO' && filteredKots.map((kot) => {
               const cashier = kot.cashierName ? `${kotTakenByLabel(kot)}: ${kot.cashierName}` : null;
               return (
                 <KdsTicketCard
@@ -899,7 +928,7 @@ export const App: React.FC = () => {
               );
             })}
 
-            {filteredKots.length === 0 && (
+            {statusFilter !== 'EXPO' && filteredKots.length === 0 && (
               <div className="col-span-full">
                 <EmptyState
                   icon={<ChefHat className="w-8 h-8" />}

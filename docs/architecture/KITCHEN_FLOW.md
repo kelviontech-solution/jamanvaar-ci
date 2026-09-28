@@ -63,3 +63,10 @@ The Captain is phone-first: the table workspace is full screen on a phone, the c
 - POS still builds its own tickets by dish name; per-dish precision applies to tickets the Captain creates and to every ticket a KDS builds from a synced order.
 - A held (unsent) dish lives on the tablet that took it, not in the cloud; another device does not see it until it is sent.
 - A cancelled dish stays on the order as a line at no charge. Reports that list or count order lines may show it (at zero) unless they filter on the line's status; this was not checked report by report.
+
+## The pass (expo) and dish timing
+
+- **Pass tab.** The kitchen screen has a Pass tab that ignores which station the screen is set to. It shows one card per order (table), with every dish across every station: ready, cooking (and at which station), and what is holding the table up. When every dish is ready the card can be sent out with one tap, which marks that order's tickets served. The tap can be undone for a few seconds.
+- **Sent and done times live on the order line.** `OrderItem.sentAt` is set when the dish's ticket is made; `OrderItem.readyAt` when the cook marks it done, and it is cleared if the cook undoes it. Both sync with the order (server: `order-merge.ts` keeps a done time only while the winning copy is done). The prep-time report in Restaurant Admin reads these, so it gives the same answer on every device instead of measuring when a screen happened to hear about a change.
+- **Cancelled dishes keep their value.** When a sent dish is cancelled its line drops to zero, but `cancelledAmount`, `cancelledBy` and `cancelledAt` stay on the line so the losses report can total what was lost.
+- **Seats.** `OrderItem.seat` is the seat the waiter took the dish for; the POS can split the bill by seat from it.

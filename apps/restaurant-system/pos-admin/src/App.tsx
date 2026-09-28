@@ -6,13 +6,14 @@ import {
   MenuRepository,
   NotificationRepository,
   RestaurantIdentityRepository,
+  ReservationRepository,
   StaffRepository
 } from '@jamanvaar/database';
 import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
 import { SyncHealthPanel } from './components/sync/SyncHealthPanel';
 import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements } from './cloud/cloudClient';
-import { EntitySyncEngine, SyncOutboxEngine, InventoryLedgerSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts } from '@jamanvaar/sync';
+import { EntitySyncEngine, SyncOutboxEngine, InventoryLedgerSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations } from '@jamanvaar/sync';
 import {
   Category,
   DiningTable,
@@ -475,6 +476,7 @@ export default function PosAdminApp() {
     // Ledger, Reconciliation and EOD Z-Report pages here actually see them. Restaurant Admin never
     // opens or edits a shift itself, so this device only ever pulls.
     void syncShifts({ push: false });
+    void syncReservations({ push: true });
     // B2-055: keeps LicenseRepository (plan tier, sidebar badges, JAMAN AI button) in step with a
     // Super Admin plan change regardless of which screen is open — was only ever refreshed when
     // the Subscription Plans screen itself happened to be mounted.
@@ -486,6 +488,9 @@ export default function PosAdminApp() {
       void syncCustomers({ push: true });
       void syncStaff();
       void syncShifts({ push: false });
+      // Guests who did not come free their table, then the change goes out with the rest.
+      ReservationRepository.releaseOverdue();
+      void syncReservations({ push: true });
       void refreshCloudEntitlementsIntoLicense();
       void reportDeviceHeartbeat();
       void syncRestaurantIdentity();
@@ -986,11 +991,31 @@ export default function PosAdminApp() {
                 setReportSubTab={setReportSubTab}
                 setIsReconModalOpen={setIsReconModalOpen}
                 onboardingItems={[
-                  { id: 'menu', label: 'Add dishes to your menu', done: menuItems.length > 0, onGo: () => setActiveTab('MENU') },
-                  { id: 'tables', label: 'Set up your floor & tables', done: tables.length > 0, onGo: () => setActiveTab('TABLES') },
-                  { id: 'printer', label: 'Connect a receipt printer', done: configuredPrinters.length > 0, onGo: () => setActiveTab('HARDWARE') },
-                  { id: 'staff', label: 'Add your team members', done: users.length > 1, onGo: () => setActiveTab('STAFF') },
-                  { id: 'first_order', label: 'Take your first order', done: orders.length > 0, onGo: () => setActiveTab('TABLES') }
+                  { id: 'menu', label: 'Add dishes to your menu', hint: 'Add your categories and dishes with prices, then press Publish so the Captain, POS and QR menu all show them.', done: menuItems.length > 0, onGo: () => setActiveTab('MENU') },
+                  { id: 'tables', label: 'Set up your floor & tables', hint: 'Add your tables (you can add many at once) so the Captain can open them and guests can scan their QR code.', done: tables.length > 0, onGo: () => setActiveTab('TABLES') },
+                  { id: 'printer', label: 'Connect a receipt printer', hint: 'Add the counter printer and any kitchen printers so bills and kitchen tickets print.', done: configuredPrinters.length > 0, onGo: () => setActiveTab('HARDWARE') },
+                  { id: 'staff', label: 'Add your team members', hint: 'Add each waiter, cashier and cook. Each gets a PIN to sign in on the Captain, POS and kitchen screen.', done: users.length > 1, onGo: () => setActiveTab('STAFF') },
+                  {
+                    id: 'captain_order',
+                    label: 'Take a practice order on a Captain tablet',
+                    hint: 'Open the Captain app, sign in with a staff PIN, pick a table, add a dish and press Send to kitchen. Then check the next step.',
+                    done: orders.some((o) => o.source_type === 'CAPTAIN'),
+                    onGo: () => setActiveTab('TABLES')
+                  },
+                  {
+                    id: 'kitchen_seen',
+                    label: 'See it on the kitchen screen and mark it ready',
+                    hint: 'The ticket appears on the kitchen screen by itself. Tap the dish when it is cooked; the Captain tablet buzzes to say it is ready.',
+                    done: db.kots.some((k) => !!k.readyAt || k.items.some((i) => !!i.readyAt) || k.status === 'READY' || k.status === 'SERVED'),
+                    onGo: () => setActiveTab('LIVE_KDS')
+                  },
+                  {
+                    id: 'first_order',
+                    label: 'Take your first payment at the counter',
+                    hint: 'On the POS, open that table and press Settle. When the bill is paid, your restaurant is ready for service.',
+                    done: orders.some((o) => o.orderStatus === 'COMPLETED' && o.paymentStatus === 'SUCCESS'),
+                    onGo: () => setActiveTab('BILLING_SALES')
+                  }
                 ]}
                 onRefresh={() => {
                   setDbTick((t) => t + 1);

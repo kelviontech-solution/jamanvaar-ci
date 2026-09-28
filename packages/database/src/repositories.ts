@@ -2644,6 +2644,9 @@ export class KOTRepository {
       nextKotSeq++;
       db.kots.unshift(kotRecord);
       generated.push(kotRecord);
+      // The real send time lives on the order line too, so it reaches every device and the prep-time report.
+      const sentOrder = db.orders.find((o) => o.id === params.orderId);
+      if (sentOrder) stationItems.forEach((item) => linesForKotItem(sentOrder, item).forEach((l) => { if (!l.sentAt) l.sentAt = kotRecord.createdAt; }));
     });
 
     AuditRepository.log({
@@ -2685,7 +2688,10 @@ export class KOTRepository {
     if (order) {
       kot.items.forEach((item) => {
         linesForKotItem(order, item).forEach((oi) => {
-          if (oi.kitchenStatus !== 'CANCELLED') oi.kitchenStatus = status as OrderItem['kitchenStatus'];
+          if (oi.kitchenStatus !== 'CANCELLED') {
+            oi.kitchenStatus = status as OrderItem['kitchenStatus'];
+            if ((status === 'READY' || status === 'SERVED') && !oi.readyAt) oi.readyAt = kot.readyAt ?? new Date().toISOString();
+          }
         });
       });
       followKitchenStage(order);
@@ -2726,6 +2732,8 @@ export class KOTRepository {
       if (l.kitchenStatus === 'CANCELLED') return;
       l.kitchenStatus = status;
       if (backwards) l.statusRev = rev;
+      if (status === 'READY') l.readyAt = now;
+      else if (status === 'PREPARING') l.readyAt = undefined;
     });
 
     refreshTicketFromItems(kot);
@@ -2776,6 +2784,9 @@ export class KOTRepository {
     line.kitchenStatus = 'CANCELLED';
     line.statusRev = rev;
     line.cancelReason = reason.slice(0, 120);
+    line.cancelledAmount = was.amount;
+    line.cancelledBy = (actorName || 'Staff').slice(0, 120);
+    line.cancelledAt = new Date().toISOString();
     line.unitPrice = 0;
     line.totalPrice = 0;
 
@@ -2853,7 +2864,7 @@ export class KOTRepository {
         if (kitchenRank(merged.status) < kitchenRank(item.status)) movedBack = true;
         item.status = merged.status as KOTItem['status'];
         item.rev = merged.rev;
-        if (item.status === 'READY' && !item.readyAt) item.readyAt = now;
+        if (item.status === 'READY' && !item.readyAt) item.readyAt = lines[0].readyAt ?? now;
         if (item.status === 'PREPARING') item.readyAt = undefined;
         if (item.status === 'CANCELLED' && lines[0].cancelReason) item.cancelReason = lines[0].cancelReason;
         touched = true;
@@ -3033,7 +3044,8 @@ export class ReservationRepository {
       status: res.status || 'CONFIRMED',
       specialRequests: res.specialRequests,
       depositAmount: res.depositAmount || 0,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     db.reservations.unshift(newRes);
@@ -3045,8 +3057,29 @@ export class ReservationRepository {
     const r = db.reservations.find((res) => res.id === id);
     if (!r) return null;
     r.status = status;
+    r.updatedAt = new Date().toISOString();
     db.notify();
     return r;
+  }
+
+  /**
+   * Frees the tables of guests who did not come. A booking past its grace time is marked NO_SHOW, unless the table has an
+   * order on it (the guests came and were seated without anyone pressing "seated"), in which case it is marked SEATED.
+   * Returns how many bookings changed.
+   */
+  public static releaseOverdue(now: Date = new Date(), graceAfterMinutes = 20): number {
+    let changed = 0;
+    for (const r of db.reservations) {
+      if (r.status !== 'CONFIRMED') continue;
+      const late = (now.getTime() - new Date(r.reservationTime).getTime()) / 60000;
+      if (late <= graceAfterMinutes) continue;
+      const table = db.tables.find((t) => (r.tableId ? t.id === r.tableId : !!r.tableNumber && t.tableNumber === r.tableNumber));
+      r.status = table?.currentOrderId ? 'SEATED' : 'NO_SHOW';
+      r.updatedAt = now.toISOString();
+      changed += 1;
+    }
+    if (changed > 0) db.notify();
+    return changed;
   }
 }
 
@@ -3904,7 +3937,7 @@ export class StaffScheduleRepository {
   }
 
   private static findOrCreateToday(userId: string, userName: string): AttendanceRecord {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = formatRestaurantDate(new Date(), 'ISO_DATE');
     let record = db.attendanceRecords.find((a) => a.userId === userId && a.date === today);
     if (!record) {
       record = { id: `att-${Date.now()}`, userId, userName, date: today, status: 'PRESENT' };
@@ -3923,13 +3956,24 @@ export class StaffScheduleRepository {
   }
 
   public static clockOut(userId: string, userName: string): AttendanceRecord | null {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = formatRestaurantDate(new Date(), 'ISO_DATE');
     const record = db.attendanceRecords.find((a) => a.userId === userId && a.date === today);
     if (!record) return null;
     record.clockOutAt = new Date().toISOString();
     AuditRepository.log({ action: 'STAFF_CLOCK_OUT', category: 'STAFF', details: `${userName} clocked out`, username: userName });
     db.notify();
     return record;
+  }
+
+  /** Hourly pay for one person, in rupees. Zero or blank removes it. Never leaves this device. */
+  public static setPayRate(userId: string, rate: number | undefined): void {
+    if (!rate || !Number.isFinite(rate) || rate <= 0) delete db.staffPayRates[userId];
+    else db.staffPayRates[userId] = Math.round(rate * 100) / 100;
+    db.notify();
+  }
+
+  public static getPayRates(): Record<string, number> {
+    return { ...db.staffPayRates };
   }
 
   public static markAttendance(userId: string, userName: string, date: string, status: AttendanceStatus, notes?: string): AttendanceRecord {

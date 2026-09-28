@@ -14,14 +14,14 @@ Method: five web searches on what leading restaurant systems offer (Toast, Squar
 | Installable phone app that opens offline | Was missing (no manifest, no service worker). Built today for Captain and KDS | Now meets it (needs HTTPS to install in production) |
 | Offline operation | Local database plus outbox, queued and sent when back | Meets it |
 | Table management: transfer, merge, zones, QR codes | Present. Bulk add was missing. Built today | Meets it |
-| Split bill (by item, seat, percent) | Split payments exist; by-item and by-seat splitting from the Captain not found | Verify, likely gap |
+| Split bill (by item, seat, percent) | Two-method split payment existed. Split by seat, by dish or equally now built (Captain notes the seat, POS settles) | Now meets it |
 | Aggregator orders (Zomato, Swiggy) into POS and KDS | Not found (only a suggestion string in the AI assistant) | Gap, and the biggest one for India |
 | Inventory auto-deduct and low-stock alert | Present (recipes, low stock) | Meets it |
-| Auto-86 a dish when stock runs out, live on every screen | Sold-out flag syncs; automatic 86 from stock not confirmed | Verify |
-| Owner mobile dashboard with alerts on voids, discounts, cancellations | Admin was unusable on a phone (fixed today). No cancellation and loss report or push alerts | Partial |
-| Staff scheduling, attendance, labour cost | Not found beyond a few mentions | Gap |
+| Auto-86 a dish when stock runs out, live on every screen | Already built for POS and Captain (stock hits zero: dish switches itself off, and back on when restocked). The QR menu read a frozen snapshot, so it kept offering the dish; now live | Now meets it |
+| Owner mobile dashboard with alerts on voids, discounts, cancellations | Admin fits a phone. Losses and cancellations report and a one-tap owner summary built. Automatic push at day end is not built | Mostly meets; push missing |
+| Staff scheduling, attendance, labour cost | Rota, clock in and out and attendance already existed (the first search missed them). Labour cost against sales now built | Now meets it |
 | Loyalty, feedback, WhatsApp bill | Present | Meets it |
-| Reservations | Present; automatic table hold before arrival not confirmed | Verify |
+| Reservations | Present. There was no table hold and bookings never left the Admin computer. Now synced; the table shows Reserved from 30 minutes before, and a no-show frees it | Now meets it |
 | GST reports and day-end (Z) report | Present | Meets it |
 
 ## Fixed in this pass
@@ -33,6 +33,26 @@ Method: five web searches on what leading restaurant systems offer (Toast, Squar
 5. Restaurant Admin on a phone: the menu is a slide-in drawer; the header fits; the content uses the full width.
 6. Add several tables at once (first number, how many, prefix; existing numbers are skipped and reported).
 7. Small: "TT1" label, "Order details syncing…" shown for a table with no order.
+
+## Second pass (same day): what was built for the remaining items
+
+| Item | What now exists | Where |
+| --- | --- | --- |
+| Split bill | Captain gives each dish a seat and can request a split bill; POS splits by seat, equally or by picking dishes. Shares add up to the bill to the paisa, a shared dish is divided, each guest pays cash, UPI or card | `packages/business/src/split_bill.ts`, POS payment screen, Captain table screen |
+| Losses and cancellations | Report of cancelled dishes (with what they were worth, who, why), voided bills, discounts and refunds, by staff and by reason, with "worth a look" flags. A cancelled dish now keeps its value, canceller and time on the order line | Restaurant Admin, Reports, Financial |
+| Owner summary | The day in a few lines with the loss figures; opens WhatsApp with the message ready (no key needed) | Restaurant Admin, Reports, Owner Summary |
+| KDS pass (expo) | New Pass tab: one card per table across every station, what each station still owes, "All ready: send out" | Kitchen screen |
+| Prep time per dish | Average, 9-in-10, slowest and on-time share against the menu's target, per dish and per station. The real send and done times are kept on each order line so every device agrees | Restaurant Admin, Reports, Operations |
+| Auto-86 | Verified; the QR menu now follows it within seconds and refuses an order for a dish that ran out | Cloud API, QR menu |
+| Labour cost | Hourly pay per person (kept on that computer only, never synced) and a report of hours, cost, cost as a share of sales, and sales per labour hour | Staff, Reports, Operations |
+| Reservation hold | Bookings sync to Captain and POS; a free table shows "Reserved 8:30 PM: Sharma (4)" from 30 minutes before; 20 minutes after the time the booking becomes a no-show (or seated, if the table already has an order) | Floor screens |
+| First-run wizard | Checklist now guides step by step, with a "Next step" hint, through menu, tables, printer, team, a practice Captain order, seeing it on the kitchen screen, and the first payment. It watches real activity, so no fake order is created | Restaurant Admin dashboard |
+
+### Still not built
+- **Zomato and Swiggy** (design only): see `docs/integrations/URBANPIPER_ZOMATO_SWIGGY_FLOW.md`.
+- **Automatic daily WhatsApp message.** The message and a one-tap send exist; sending it by itself at day end needs a WhatsApp business key and a server job. See `docs/integrations/WHATSAPP_ORDERING_PLAN_AND_PROMPT.md`.
+- **Phone push alerts** for a void or a big discount as it happens.
+- Split shares are settled through the counter's existing payment screen, so the receipt is one bill, not one per guest.
 
 ## Recommended next, in order
 

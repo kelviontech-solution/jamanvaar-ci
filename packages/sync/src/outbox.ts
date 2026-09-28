@@ -28,6 +28,13 @@ export interface OrderSyncPushItem {
   statusRev?: number;
   course?: string;
   cancelReason?: string;
+  /** paise: what the dish was worth before it was cancelled */
+  cancelledAmount?: number;
+  cancelledBy?: string;
+  cancelledAt?: string;
+  seat?: number;
+  sentAt?: string;
+  readyAt?: string;
   kitchenStation?: string;
   specialInstructions?: string;
   /** paise */
@@ -201,6 +208,12 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
       ...(it.statusRev ? { statusRev: it.statusRev } : {}),
       ...(it.course ? { course: it.course } : {}),
       ...(it.cancelReason ? { cancelReason: it.cancelReason } : {}),
+      ...(it.cancelledAmount !== undefined ? { cancelledAmount: toPaise(it.cancelledAmount) } : {}),
+      ...(it.cancelledBy ? { cancelledBy: it.cancelledBy } : {}),
+      ...(it.cancelledAt ? { cancelledAt: it.cancelledAt } : {}),
+      ...(it.seat ? { seat: it.seat } : {}),
+      ...(it.sentAt ? { sentAt: it.sentAt } : {}),
+      ...(it.readyAt ? { readyAt: it.readyAt } : {}),
       kitchenStation: db.menuItems.find((m) => m.id === it.menuItemId)?.kitchenStation,
       specialInstructions: it.specialInstructions,
       lineTotal: toPaise(it.totalPrice)
@@ -265,6 +278,12 @@ function orderItemFromRemote(orderId: string, ri: OrderSyncPushItem): OrderItem 
     ...(ri.statusRev ? { statusRev: ri.statusRev } : {}),
     ...(ri.course ? { course: ri.course } : {}),
     ...(ri.cancelReason ? { cancelReason: ri.cancelReason } : {}),
+    ...(ri.cancelledAmount !== undefined ? { cancelledAmount: fromPaise(ri.cancelledAmount) } : {}),
+    ...(ri.cancelledBy ? { cancelledBy: ri.cancelledBy } : {}),
+    ...(ri.cancelledAt ? { cancelledAt: ri.cancelledAt } : {}),
+    ...(ri.seat ? { seat: ri.seat } : {}),
+    ...(ri.sentAt ? { sentAt: ri.sentAt } : {}),
+    ...(ri.readyAt ? { readyAt: ri.readyAt } : {}),
     // The station travels with the item, so a pulled order splits into the same tickets on every device.
     ...(ri.kitchenStation ? { kitchenStation: ri.kitchenStation } : {})
   } as OrderItem;
@@ -310,9 +329,17 @@ function applyRemoteToLocalOrder(local: Order, remote: CloudSyncedOrder): boolea
       if (merged.status) li.kitchenStatus = merged.status as OrderItem['kitchenStatus'];
       if (merged.rev > 0) li.statusRev = merged.rev;
       if (ri.course && !li.course) li.course = ri.course;
+      if (ri.seat && !li.seat) li.seat = ri.seat;
+      if (ri.sentAt && !li.sentAt) li.sentAt = ri.sentAt;
+      // The time a dish was done belongs to it only while it is done; an undo clears it everywhere.
+      if (li.kitchenStatus === 'READY' || li.kitchenStatus === 'SERVED') li.readyAt = li.readyAt ?? ri.readyAt;
+      else li.readyAt = undefined;
       if (li.kitchenStatus === 'CANCELLED') {
         // A cancelled dish is at no charge on every device.
         li.cancelReason = ri.cancelReason ?? li.cancelReason;
+        if (ri.cancelledAmount !== undefined && li.cancelledAmount === undefined) li.cancelledAmount = fromPaise(ri.cancelledAmount);
+        li.cancelledBy = li.cancelledBy ?? ri.cancelledBy;
+        li.cancelledAt = li.cancelledAt ?? ri.cancelledAt;
         li.unitPrice = 0;
         li.totalPrice = 0;
       } else if (ri.quantity !== li.quantity) {

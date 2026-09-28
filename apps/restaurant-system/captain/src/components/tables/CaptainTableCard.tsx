@@ -1,6 +1,8 @@
 import React from 'react';
 import { DiningTable, Order } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
+import { captainDb } from '@jamanvaar/database';
+import { holdLabel, tableHold } from '@jamanvaar/business';
 import {
   Users,
   Flame,
@@ -39,6 +41,8 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
   const isBillReq = table.status === 'BILL_REQUESTED';
   const isOccupied = table.status === 'OCCUPIED' || table.status === 'BILLING' || !!activeOrder;
   const isAvailable = table.status === 'AVAILABLE' && !activeOrder;
+  // A booking holds a free table from half an hour before the guests are due until they are 20 minutes late.
+  const hold = isAvailable ? tableHold(captainDb.reservations, table, new Date()) : undefined;
 
   // Calculate elapsed time
   let elapsedMinutes = 0;
@@ -127,6 +131,11 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
               <Clock className="w-3 h-3 text-amber-600" />
               <span>{elapsedMinutes}m</span>
             </div>
+          </div>
+        ) : hold ? (
+          <div className="pt-1.5 border-t border-slate-100 text-[11px] text-purple-700 font-black flex items-center gap-1" data-testid="table-hold">
+            <Clock className="w-3.5 h-3.5" />
+            <span>{holdLabel(hold)}</span>
           </div>
         ) : (
           <div className="pt-1.5 border-t border-slate-100 text-[11px] text-emerald-700 font-bold flex items-center gap-1">

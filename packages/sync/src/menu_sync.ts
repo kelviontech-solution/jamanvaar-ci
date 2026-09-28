@@ -1,4 +1,4 @@
-import { MenuItemSync, CategorySync, ModifierGroupSync, TaxGroupSync, ComboSync, CouponSync, CustomerSync, FeedbackSync, ShiftSync, CashMovementSync, type CollectionSync } from '@jamanvaar/database';
+import { MenuItemSync, CategorySync, ModifierGroupSync, TaxGroupSync, ComboSync, CouponSync, CustomerSync, FeedbackSync, ShiftSync, CashMovementSync, ReservationSync, type CollectionSync } from '@jamanvaar/database';
 import { EntitySyncEngine } from './entity_sync';
 
 /** The server accepts at most this many records per push. */
@@ -114,4 +114,15 @@ export function syncShifts(opts: { push: boolean }): Promise<void> {
     })().finally(() => { shiftsInFlight = null; });
   }
   return shiftsInFlight;
+}
+
+/**
+ * Bookings: Restaurant Admin and the POS both edit them (a counter can seat a booking or mark it no-show), so both push;
+ * the Captain only reads them, to see which tables are being held.
+ */
+let reservationsInFlight: Promise<void> | null = null;
+
+export function syncReservations(opts: { push: boolean }): Promise<void> {
+  if (!reservationsInFlight) reservationsInFlight = syncCollection('RESERVATION', ReservationSync, opts.push).finally(() => { reservationsInFlight = null; });
+  return reservationsInFlight;
 }

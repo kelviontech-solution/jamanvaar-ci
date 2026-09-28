@@ -248,6 +248,8 @@ export class JamanvaarDatabase {
   // whether they actually showed up.
   public staffSchedules: StaffShiftSchedule[] = [];
   public attendanceRecords: AttendanceRecord[] = [];
+  /** Hourly pay by staff id (rupees). Kept on this device only: staff records sync to every terminal, and wages must not. */
+  public staffPayRates: Record<string, number> = {};
 
   // Marketing campaigns — previously only a per-customer, one-at-a-time
   // WhatsApp deep-link button with no saved segment or reusable message.
@@ -713,6 +715,7 @@ export class JamanvaarDatabase {
           loyaltyRewards: this.loyaltyRewards,
           staffSchedules: this.staffSchedules,
           attendanceRecords: this.attendanceRecords,
+          staffPayRates: this.staffPayRates,
           marketingCampaigns: this.marketingCampaigns,
           deliveryRiders: this.deliveryRiders,
           receiptConfig: this.receiptConfig,
@@ -1116,6 +1119,7 @@ export class JamanvaarDatabase {
       put('loyalty_rewards', this.loyaltyRewards);
       put('staff_schedules', this.staffSchedules);
       put('attendance_records', this.attendanceRecords);
+      put('staff_pay_rates', this.staffPayRates);
       put('marketing_campaigns', this.marketingCampaigns);
       put('delivery_riders', this.deliveryRiders);
       put('receipt_config', this.receiptConfig);
@@ -1271,6 +1275,9 @@ export class JamanvaarDatabase {
 
       const storedAttendanceRecords = localStorage.getItem(`${p}attendance_records`);
       if (storedAttendanceRecords) this.attendanceRecords = JSON.parse(storedAttendanceRecords);
+
+      const storedPayRates = localStorage.getItem(`${p}staff_pay_rates`);
+      if (storedPayRates) this.staffPayRates = JSON.parse(storedPayRates);
 
       const storedMarketingCampaigns = localStorage.getItem(`${p}marketing_campaigns`);
       if (storedMarketingCampaigns) this.marketingCampaigns = JSON.parse(storedMarketingCampaigns);
