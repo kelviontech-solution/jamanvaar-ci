@@ -109,14 +109,13 @@ export class TableSync {
       if (!baseline && sigs[t.id] !== sig) t.updatedAt = now;
       sigs[t.id] = sig;
     }
+    // A table missing from this device's list is NOT taken to mean "deleted": the list can be empty for reasons that have nothing to
+    // do with the restaurant's floor (a wiped or unreadable local copy, a re-activation), and pushing that as deletions would remove
+    // every table on every device. A deletion is only ever recorded by a person deleting a table (recordDeletion). Tables that are
+    // gone locally are simply forgotten here, and come back from the cloud on the next pull.
     if (!baseline) {
       const present = new Set(db.tables.map((t) => t.id));
-      for (const id of Object.keys(sigs)) {
-        if (!present.has(id)) {
-          state.tombstones[id] = state.tombstones[id] ?? now;
-          delete sigs[id];
-        }
-      }
+      for (const id of Object.keys(sigs)) if (!present.has(id)) delete sigs[id];
     }
     state.sigs = sigs;
     save();

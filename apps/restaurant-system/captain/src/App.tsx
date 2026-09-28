@@ -10,7 +10,8 @@ import {
   ActivationWelcomeScreen,
   useAiAccess,
   ActivationNoticeBanner,
-  ActivationHelpNote
+  ActivationHelpNote,
+  sound
 } from '@jamanvaar/ui';
 import { isDeviceConnected, activateCaptainWithKey, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
 import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, onAppResume } from '@jamanvaar/sync';
@@ -60,6 +61,14 @@ export const App: React.FC = () => {
     openTable,
     refreshState
   } = useCaptainStore();
+
+  // Browsers stay silent until the person has touched the screen once: warm the audio up on the first touch (the PIN keypad
+  // counts), so the first "food ready" of the shift is heard.
+  useEffect(() => {
+    const warm = () => sound.warmUp();
+    window.addEventListener('pointerdown', warm, { once: true });
+    return () => window.removeEventListener('pointerdown', warm);
+  }, []);
 
   // Local PIN keypad state for login
   const [pinInput, setPinInput] = useState('');

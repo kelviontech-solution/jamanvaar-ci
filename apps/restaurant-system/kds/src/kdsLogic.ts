@@ -88,13 +88,4 @@ export function sortForKitchen(kots: KOTRecord[]): KOTRecord[] {
   return [...kots].sort((a, b) => bucket(a) - bucket(b) || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 }
 
-export type ConnectionLevel = 'ok' | 'slow' | 'lost';
-
-/** Whether the screen is still hearing from the server. The screen polls every few seconds, so silence means trouble. */
-export function connectionLevel(msSinceContact: number | null, browserOnline: boolean, msSinceStart: number): ConnectionLevel {
-  if (!browserOnline) return 'lost';
-  if (msSinceContact === null) return msSinceStart < 15000 ? 'ok' : 'lost';
-  if (msSinceContact <= 12000) return 'ok';
-  if (msSinceContact <= 30000) return 'slow';
-  return 'lost';
-}
+export { connectionLevel, type ConnectionLevel } from '@jamanvaar/sync';

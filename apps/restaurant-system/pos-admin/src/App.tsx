@@ -167,6 +167,14 @@ export default function PosAdminApp() {
   const qrKnown = qr.state.status === 'ready';
   const qrLocked = qr.state.status === 'ready' && !qr.state.entitlement.enabled;
   const [dbTick, setDbTick] = useState(0);
+  // Below the large breakpoint the sidebar is a drawer that slides over the page instead of taking most of a phone's width.
+  const [navOpen, setNavOpen] = useState(false);
+  useEffect(() => {
+    if (!navOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setNavOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [navOpen]);
 
   // Sidebar sections are collapsible and remembered per install (localStorage)
   // — previously all 19 nav items across 5 sections were always fully
@@ -784,12 +792,19 @@ export default function PosAdminApp() {
           onOpenNotifDrawer={() => setIsNotifDrawerOpen(true)}
           unreadNotifsCount={unreadNotifsCount}
           onAdminLogout={handleAdminLogout}
+          onOpenNav={() => setNavOpen(true)}
         />
 
         {/* BODY WITH FULL SIDEBAR & MAIN CONTENT */}
         <div className="flex-1 flex overflow-hidden min-h-0">
-          {/* LEFT ADMIN SIDEBAR */}
-          <aside className="w-64 bg-[#FAF8F5]/95 backdrop-blur-md border-r border-[#EAE3D6] flex flex-col justify-between p-3.5 shrink-0 overflow-y-auto min-h-0 shadow-2xs select-none">
+          {/* Behind the open drawer: tap anywhere outside it to close it */}
+          {navOpen && <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setNavOpen(false)} aria-hidden="true" />}
+
+          {/* LEFT ADMIN SIDEBAR (a slide-in drawer below the large breakpoint) */}
+          <aside
+            aria-label="Main menu"
+            className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] transition-transform duration-200 ${navOpen ? 'translate-x-0' : '-translate-x-full'} lg:static lg:z-auto lg:w-64 lg:max-w-none lg:translate-x-0 bg-[#FAF8F5] lg:bg-[#FAF8F5]/95 backdrop-blur-md border-r border-[#EAE3D6] flex flex-col justify-between p-3.5 shrink-0 overflow-y-auto min-h-0 shadow-2xl lg:shadow-2xs select-none`}
+          >
             <div className="space-y-4">
               {[
                 {
@@ -885,7 +900,7 @@ export default function PosAdminApp() {
                       return (
                         <button
                           key={nav.id}
-                          onClick={() => setActiveTab(nav.id as PosAdminTab)}
+                          onClick={() => { setActiveTab(nav.id as PosAdminTab); setNavOpen(false); }}
                           title={isLockedPro ? 'Not included in your current plan — tap to see what it offers' : undefined}
                           className={`relative w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-xs sm:text-[13px] transition-all duration-150 cursor-pointer ${
                             isSelected
@@ -941,10 +956,18 @@ export default function PosAdminApp() {
                 );
               })}
             </div>
+
+            {/* The header actions that do not fit a phone's header live here on small screens */}
+            <div className="sm:hidden mt-4 pt-3 border-t border-[#EAE3D6] grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => { setNavOpen(false); setIsEodModalOpen(true); }} className="min-h-[44px] rounded-xl bg-[#FFF4ED] border border-[#FDBA74]/60 text-jaman-saffron text-xs font-bold cursor-pointer">EOD Report</button>
+              <button type="button" onClick={() => { setNavOpen(false); setIsReconModalOpen(true); }} className="min-h-[44px] rounded-xl bg-[#EFF6FF] border border-[#BFDBFE]/70 text-[#1E40AF] text-xs font-bold cursor-pointer">Reconciliation</button>
+              <button type="button" onClick={() => { setNavOpen(false); handleOpenAssistant(); }} className="min-h-[44px] rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold cursor-pointer">Assistant</button>
+              <button type="button" onClick={() => { setNavOpen(false); handleAdminLogout(); }} className="min-h-[44px] rounded-xl bg-white border border-jaman-border text-rose-700 text-xs font-bold cursor-pointer">Log out</button>
+            </div>
           </aside>
 
           {/* MAIN VIEW CONTENT AREA — ALL 18 PRODUCTION MODULES */}
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-jaman-cream min-h-0">
+          <main className="flex-1 overflow-y-auto p-3 sm:p-6 bg-jaman-cream min-h-0 min-w-0">
             {/* TAB 1: DASHBOARD */}
             {activeTab === 'DASHBOARD' && (
               <RestaurantDashboard
@@ -1255,7 +1278,7 @@ export default function PosAdminApp() {
           isOpen={isTableModalOpen}
           onClose={() => setIsTableModalOpen(false)}
           tableToEdit={tableToEdit}
-          onSaved={() => showToast(tableToEdit ? 'Table updated!' : 'Table created!')}
+          onSaved={(message) => showToast(message ?? (tableToEdit ? 'Table updated!' : 'Table created!'))}
         />
 
         <StaffModal

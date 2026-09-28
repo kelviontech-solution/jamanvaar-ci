@@ -131,7 +131,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
         ) : (
           <div className="pt-1.5 border-t border-slate-100 text-[11px] text-emerald-700 font-bold flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>{isAvailable ? 'Table ready for seating' : 'Order details syncing…'}</span>
+            <span>{isAvailable ? 'Table ready for seating' : table.currentOrderId ? 'Order details syncing…' : 'Seated, no order taken yet'}</span>
           </div>
         )}
 

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { DiningTable, TableStatus } from '@jamanvaar/types';
 import { Modal, Button } from '@jamanvaar/ui';
-import { TableRepository } from '@jamanvaar/database';
+import { TableRepository, planBulkTables } from '@jamanvaar/database';
 
 interface TableModalProps {
   isOpen: boolean;
   onClose: () => void;
   tableToEdit: DiningTable | null;
-  onSaved: () => void;
+  /** `message` says what happened when it is more than one table (for the toast). */
+  onSaved: (message?: string) => void;
 }
 
 export const TableModal: React.FC<TableModalProps> = ({
@@ -27,6 +28,10 @@ export const TableModal: React.FC<TableModalProps> = ({
   const [status, setStatus] = useState<TableStatus>('AVAILABLE');
   const [isActive, setIsActive] = useState(true);
   const [formError, setFormError] = useState('');
+  // Several tables at once: a first number, how many, and an optional prefix.
+  const [bulk, setBulk] = useState(false);
+  const [bulkCount, setBulkCount] = useState('10');
+  const [bulkPrefix, setBulkPrefix] = useState('');
 
   useEffect(() => {
     if (tableToEdit) {
@@ -38,6 +43,9 @@ export const TableModal: React.FC<TableModalProps> = ({
       setStatus(tableToEdit.status);
       setIsActive(tableToEdit.isActive ?? true);
     } else {
+      setBulk(false);
+      setBulkCount('10');
+      setBulkPrefix('');
       setTableNumber('');
       setCapacity('4');
       setZone(defaultZone);
@@ -64,6 +72,17 @@ export const TableModal: React.FC<TableModalProps> = ({
     // tickets, QR codes and printed receipts, none of which render through React's own escaping.
     if (/[<>]/.test(trimmedNumber)) {
       setFormError('Table number cannot contain < or > characters.');
+      return;
+    }
+    if (bulk && !tableToEdit) {
+      const plan = planBulkTables(trimmedNumber, Number(bulkCount), bulkPrefix, (n) => TableRepository.isTableNumberTaken(n));
+      if (plan.error) {
+        setFormError(plan.error);
+        return;
+      }
+      plan.create.forEach((number) => TableRepository.createTable({ tableNumber: number, capacity: Number(capacity) || 4, zone, floor: Number(floor) || 1, status, isActive }));
+      onSaved(`${plan.create.length} tables created${plan.skipped.length ? `, ${plan.skipped.length} skipped because they already exist (${plan.skipped.slice(0, 5).join(', ')}${plan.skipped.length > 5 ? '…' : ''})` : ''}`);
+      onClose();
       return;
     }
     if (TableRepository.isTableNumberTaken(trimmedNumber, tableToEdit?.id)) {
@@ -105,7 +124,7 @@ export const TableModal: React.FC<TableModalProps> = ({
       <form onSubmit={handleSubmit} className="space-y-4 py-1">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1">Table Number *</label>
+            <label className="block text-xs font-bold text-slate-600 mb-1">{bulk && !tableToEdit ? 'First Table Number *' : 'Table Number *'}</label>
             <input
               type="text"
               required
@@ -128,6 +147,30 @@ export const TableModal: React.FC<TableModalProps> = ({
             />
           </div>
         </div>
+
+        {!tableToEdit && (
+          <div className="rounded-xl border border-jaman-border bg-jaman-ivory p-3 space-y-2">
+            <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+              <input type="checkbox" checked={bulk} onChange={(e) => setBulk(e.target.checked)} className="rounded accent-jaman-saffron" />
+              <span>Add several tables at once</span>
+            </label>
+            {bulk && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">How many</label>
+                  <input type="number" min="1" max="50" value={bulkCount} onChange={(e) => setBulkCount(e.target.value)} className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron" />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Prefix (optional)</label>
+                  <input type="text" maxLength={6} value={bulkPrefix} onChange={(e) => setBulkPrefix(e.target.value)} placeholder="e.g. T" className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron" />
+                </div>
+                <p className="col-span-2 text-[11px] text-slate-500">
+                  Creates {bulkPrefix.trim()}{tableNumber.trim() || '1'}, {bulkPrefix.trim()}{(Number.parseInt(tableNumber.trim() || '1', 10) || 0) + 1}, … with the same seats, zone and floor. Numbers that already exist are skipped.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -202,7 +245,7 @@ export const TableModal: React.FC<TableModalProps> = ({
             type="submit"
             className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
           >
-            {tableToEdit ? 'Save Changes' : 'Create Table'}
+            {tableToEdit ? 'Save Changes' : bulk ? `Create ${Number(bulkCount) > 0 ? bulkCount : ''} Tables`.replace('  ', ' ') : 'Create Table'}
           </button>
         </div>
       </form>

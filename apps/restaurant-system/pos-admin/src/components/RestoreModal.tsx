@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button } from '@jamanvaar/ui';
-import { db, AuditRepository } from '@jamanvaar/database';
+import { db, AuditRepository, TableSync } from '@jamanvaar/database';
 import { Upload, AlertTriangle, CheckCircle2, FileText } from 'lucide-react';
 
 interface RestoreModalProps {
@@ -49,7 +49,13 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
       if (parsedData.outlet) db.outlet = { ...db.outlet, ...parsedData.outlet };
       if (Array.isArray(parsedData.menuItems)) db.menuItems = parsedData.menuItems;
       if (Array.isArray(parsedData.categories)) db.categories = parsedData.categories;
-      if (Array.isArray(parsedData.tables)) db.tables = parsedData.tables;
+      if (Array.isArray(parsedData.tables)) {
+        // A restore is a deliberate replacement of the floor: the tables it drops are deleted for every device (nothing else infers a deletion).
+        const kept = new Set((parsedData.tables as Array<{ id: string }>).map((t) => t.id));
+        db.tables.filter((t) => !kept.has(t.id)).forEach((t) => TableSync.recordDeletion(t.id));
+        db.tables = parsedData.tables;
+        db.floorPlanStartedEmpty = true;
+      }
       if (Array.isArray(parsedData.orders)) db.orders = parsedData.orders;
       if (Array.isArray(parsedData.inventoryItems)) db.inventoryItems = parsedData.inventoryItems;
       if (Array.isArray(parsedData.stockMovements)) db.stockMovements = parsedData.stockMovements;

@@ -1245,6 +1245,8 @@ export class TableRepository {
       isActive: tableData.isActive ?? true
     };
     db.tables.push(newTable);
+    // From now on the owner manages this floor: an empty list means "no tables", never "missing data, use the demo tables".
+    db.floorPlanStartedEmpty = true;
     AuditRepository.log({
       action: 'TABLE_CREATED',
       category: 'SETTINGS',
@@ -1312,6 +1314,7 @@ export class TableRepository {
     const deletedId = db.tables[idx].id;
     db.tables.splice(idx, 1);
     TableSync.recordDeletion(deletedId);
+    db.floorPlanStartedEmpty = true; // deleting the last table leaves an empty floor, not a reason to bring the demo tables back
     AuditRepository.log({
       action: 'TABLE_DELETED',
       category: 'SETTINGS',

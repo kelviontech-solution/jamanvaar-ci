@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { db, KeyValueStore, MenuRepository, RestaurantIdentityRepository, TableSync } from '@jamanvaar/database';
+import { db, KeyValueStore, MenuRepository, RestaurantIdentityRepository, TableRepository, TableSync } from '@jamanvaar/database';
 import { EntitySyncEngine } from '@jamanvaar/sync';
 
 /**
@@ -33,6 +33,35 @@ describe('re-activation on the same restaurant', () => {
 
     const deletions = TableSync.collectSyncRecords().filter((r) => r.payload.deleted === true);
     expect(deletions).toEqual([]);
+  });
+
+  it('an empty local floor never becomes deletions, whatever emptied it', () => {
+    TableSync.stampChanges();
+    const known = db.tables.length;
+    expect(known).toBeGreaterThan(0);
+
+    db.tables = []; // a wiped or unreadable local copy, not a decision by the owner
+    TableSync.stampChanges();
+    TableSync.stampChanges();
+
+    expect(TableSync.collectSyncRecords().filter((r) => r.payload.deleted === true)).toEqual([]);
+  });
+
+  it('deleting a table on purpose is still a deletion for everyone, and the last one deleted leaves an empty floor', () => {
+    TableSync.stampChanges();
+    const ids = db.tables.map((t) => t.id);
+    ids.forEach((id) => TableRepository.deleteTable(id));
+    TableSync.stampChanges();
+
+    const deleted = TableSync.collectSyncRecords().filter((r) => r.payload.deleted === true).map((r) => r.externalId).sort();
+    expect(deleted).toEqual([...ids].sort());
+    expect(db.floorPlanStartedEmpty).toBe(true);
+  });
+
+  it('creating a table marks the floor as the owner\'s, so an empty list is never replaced by the demo tables', () => {
+    db.floorPlanStartedEmpty = false;
+    TableRepository.createTable({ tableNumber: '31', capacity: 2 });
+    expect(db.floorPlanStartedEmpty).toBe(true);
   });
 
   it('still records a deletion when a person deletes a table', () => {

@@ -32,6 +32,7 @@ function pushNow(): void {
   void pushServiceMessages();
 }
 import { deviceFetch as captainDeviceFetch } from '../cloud/cloudClient';
+import { alertWaiter, isMyTable } from '../alerts';
 import { SessionPersistence, AuthStatus, priceOrderLines } from '@jamanvaar/business';
 
 export type Course = 'COURSE_1' | 'COURSE_2' | 'COURSE_3';
@@ -1166,6 +1167,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     const freshCalls = staffCalls.filter((m) => !knownRequestIds.has(`svc-${m.id}`));
 
     if (freshMessages.length === 0 && freshCalls.length === 0) return;
+    alertWaiter(freshCalls.length > 0 ? 'GUEST_HELP' : 'MESSAGE');
 
     set((s) => ({
       messages: [
@@ -1297,6 +1299,9 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     const previous = new Set(get().foodReadyItems.map((f) => f.id));
     const fresh = readyListPrimed ? foodReady.filter((f) => !previous.has(f.id)) : [];
     readyListPrimed = true;
+    // A plate is ready at one of this waiter's tables: sound and buzz, so it is noticed with the phone in a pocket.
+    const captainId = get().currentCaptain?.id;
+    if (fresh.some((f) => isMyTable(captainDb.tables.find((t) => t.tableNumber === f.tableNumber), captainId))) alertWaiter('FOOD_READY');
 
     set((s) => ({
       tables: [...captainDb.tables],

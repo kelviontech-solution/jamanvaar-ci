@@ -1,0 +1,17 @@
+{
+  "name": "JAMANVAAR Kitchen Display",
+  "short_name": "Kitchen",
+  "description": "Live kitchen tickets: cook, mark ready, undo, and see cancellations at once.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FBF8F2",
+  "theme_color": "#0B253A",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

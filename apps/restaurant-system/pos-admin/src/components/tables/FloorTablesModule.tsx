@@ -247,7 +247,7 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2.5">
                     <div className="w-10 h-10 rounded-xl bg-jaman-navy text-white flex items-center justify-center font-mono font-black text-sm shadow-2xs">
-                      T{tbl.tableNumber}
+                      {/^\d/.test(tbl.tableNumber) ? `T${tbl.tableNumber}` : tbl.tableNumber}
                     </div>
                     <div>
                       <span className="font-black text-sm text-jaman-navy block leading-tight">

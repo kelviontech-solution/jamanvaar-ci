@@ -18,6 +18,7 @@ export * from './device_commands';
 export * from './menu_version';
 export * from './realtime_client';
 export * from './resume';
+export * from './connection_level';
 export * from './endpoint_resolver';
 export * from './command_signing';
 export * from './diagnostics';

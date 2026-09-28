@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { BrandHeader } from '@jamanvaar/ui';
-import { lanMeshSync, type MeshPeerInfo } from '@jamanvaar/sync';
+import React, { useEffect, useRef, useState } from 'react';
+import { BrandHeader, sound } from '@jamanvaar/ui';
+import { lanMeshSync, EndpointResolver, connectionLevel, type ConnectionLevel } from '@jamanvaar/sync';
+import { isVibrationOn, setVibrationOn, alertWaiter } from '../../alerts';
 import { useCaptainStore, selectMyTables } from '../../store/captainStore';
 import { captainDb } from '@jamanvaar/database';
 import {
@@ -28,24 +29,27 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
   const { currentCaptain, logout, notifications } = useCaptainStore();
   const [isSyncInfoOpen, setIsSyncInfoOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  // Real mesh state, not the static "always connected" placeholder this
-  // panel used to show — getConnectedPeers() drops a peer after 18s with no
-  // heartbeat, so this genuinely reflects a dropped POS/KDS connection.
-  const [meshOnline, setMeshOnline] = useState(lanMeshSync.getIsOnline());
-  const [peers, setPeers] = useState<MeshPeerInfo[]>(lanMeshSync.getConnectedPeers());
+  // The real link to the server (how long since it last answered), not the same-browser mesh, which only ever sees other tabs.
+  const startedAt = useRef(Date.now());
+  const [conn, setConn] = useState<{ level: ConnectionLevel; ageSec: number | null }>({ level: 'ok', ageSec: null });
   const [pendingSyncCount, setPendingSyncCount] = useState(lanMeshSync.getOutboxCount());
+  const [soundOn, setSoundOn] = useState(() => sound.getSettings().enabled);
+  const [vibrateOn, setVibrateOn] = useState(() => isVibrationOn());
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setMeshOnline(lanMeshSync.getIsOnline());
-      setPeers(lanMeshSync.getConnectedPeers());
+    const tick = () => {
+      const since = EndpointResolver.msSinceLastContact();
+      const level = connectionLevel(since, typeof navigator === 'undefined' ? true : navigator.onLine !== false, Date.now() - startedAt.current);
+      const ageSec = since === null ? null : Math.floor(since / 1000);
+      setConn((prev) => (prev.level === level && prev.ageSec === ageSec ? prev : { level, ageSec }));
       setPendingSyncCount(lanMeshSync.getOutboxCount());
-    }, 3000);
+    };
+    tick();
+    const interval = setInterval(tick, 1500);
     return () => clearInterval(interval);
   }, []);
 
-  const posPeer = peers.find((p) => p.role === 'POS' || p.role === 'POS_ADMIN');
-  const kdsPeer = peers.find((p) => p.role === 'KDS');
+  const meshOnline = conn.level !== 'lost';
 
   const unreadNotifs = notifications.filter((n) => !n.isRead).length;
 
@@ -79,75 +83,87 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
 
         {/* Right: Realtime Connection + Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-          {/* Connection Status Pill */}
+          {/* Connection status: the real link to the server, and the alert switches */}
           <div className="relative">
             <button
               type="button"
               onClick={() => setIsSyncInfoOpen((prev) => !prev)}
-              className={`flex items-center gap-1.5 border px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-black tracking-wide shadow-2xs transition-all cursor-pointer ${
-                meshOnline ? 'bg-emerald-50 hover:bg-emerald-100/80 border-emerald-200 text-emerald-800' : 'bg-rose-50 hover:bg-rose-100/80 border-rose-200 text-rose-800'
+              data-testid="captain-connection-pill"
+              data-level={conn.level}
+              className={`flex items-center gap-1.5 border px-2.5 sm:px-3 min-h-[36px] rounded-full text-[11px] font-black tracking-wide shadow-2xs transition-all cursor-pointer ${
+                conn.level === 'ok'
+                  ? 'bg-emerald-50 hover:bg-emerald-100/80 border-emerald-200 text-emerald-800'
+                  : conn.level === 'slow'
+                  ? 'bg-amber-50 hover:bg-amber-100/80 border-amber-300 text-amber-900'
+                  : 'bg-rose-50 hover:bg-rose-100/80 border-rose-200 text-rose-800'
               }`}
-              title="Click to view Local Database & LAN Mesh Status"
+              title="Connection and alert settings"
+              aria-label="Connection and alert settings"
             >
-              <span className={`w-2 h-2 rounded-full ${meshOnline ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
-              <span className="hidden sm:inline">{meshOnline ? `LOCAL + SYNCED${pendingSyncCount > 0 ? ` (${pendingSyncCount})` : ''}` : 'OFFLINE'}</span>
-              <span className="sm:hidden">{meshOnline ? 'SYNCED' : 'OFFLINE'}</span>
+              <span className={`w-2 h-2 rounded-full ${conn.level === 'ok' ? 'bg-emerald-500 animate-pulse' : conn.level === 'slow' ? 'bg-amber-500' : 'bg-rose-500'}`} />
+              <span>
+                {conn.level === 'ok' ? (pendingSyncCount > 0 ? `SENDING (${pendingSyncCount})` : 'LIVE') : conn.level === 'slow' ? 'SLOW' : 'OFFLINE'}
+              </span>
               <ChevronDown className="w-3 h-3 opacity-60" />
             </button>
 
-            {/* Connection Detail Popover */}
             {isSyncInfoOpen && (
               <div
-                className="absolute right-0 mt-2 w-72 bg-white border border-jaman-border rounded-2xl shadow-xl p-3 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100 space-y-2.5"
+                className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-1.5rem)] bg-white border border-jaman-border rounded-2xl shadow-xl p-3 text-xs text-jaman-navy z-50 animate-in fade-in zoom-in-95 duration-100 space-y-2.5"
                 onMouseLeave={() => setIsSyncInfoOpen(false)}
               >
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <div className="flex items-center gap-1.5 font-black text-xs">
                     <Server className="w-3.5 h-3.5 text-jaman-saffron" />
-                    <span>Real-Time Mesh & Hardware Sync</span>
+                    <span>Connection and alerts</span>
                   </div>
-                  <button onClick={() => setIsSyncInfoOpen(false)} className="text-slate-400 hover:text-slate-600">
+                  <button onClick={() => setIsSyncInfoOpen(false)} aria-label="Close" className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50">
-                    <span className="font-semibold text-slate-600">This Device</span>
-                    <span
-                      className={`font-black px-2 py-0.5 rounded-md text-[10px] ${
-                        meshOnline ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100'
-                      }`}
-                    >
-                      {meshOnline ? `ONLINE${pendingSyncCount > 0 ? ` (${pendingSyncCount} pending)` : ''}` : 'OFFLINE'}
+                    <span className="font-semibold text-slate-600">Kitchen and counter link</span>
+                    <span className={`font-black px-2 py-0.5 rounded-md text-[10px] ${conn.level === 'ok' ? 'text-emerald-700 bg-emerald-100' : conn.level === 'slow' ? 'text-amber-800 bg-amber-100' : 'text-rose-700 bg-rose-100'}`}>
+                      {conn.level === 'ok' ? 'CONNECTED' : conn.level === 'slow' ? 'SLOW' : 'LOST'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50">
-                    <span className="font-semibold text-slate-600">POS Terminal Link</span>
-                    <span
-                      className={`font-black px-2 py-0.5 rounded-md text-[10px] ${
-                        posPeer ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100'
-                      }`}
-                    >
-                      {posPeer ? 'CONNECTED' : 'NOT DETECTED'}
-                    </span>
+                    <span className="font-semibold text-slate-600">Last update</span>
+                    <span className="font-mono text-[11px] text-slate-700">{conn.ageSec === null ? 'not yet' : `${conn.ageSec}s ago`}</span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50">
-                    <span className="font-semibold text-slate-600">KDS Kitchen Mesh</span>
-                    <span
-                      className={`font-black px-2 py-0.5 rounded-md text-[10px] ${
-                        kdsPeer ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100'
-                      }`}
-                    >
-                      {kdsPeer ? 'LIVE' : 'NOT DETECTED'}
-                    </span>
+                    <span className="font-semibold text-slate-600">Waiting to send</span>
+                    <span className="font-mono text-[11px] text-slate-700">{pendingSyncCount}</span>
                   </div>
                 </div>
 
+                <div className="space-y-1.5 pt-1 border-t border-slate-100">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={soundOn}
+                    onClick={() => { const next = !soundOn; sound.setEnabled(next); setSoundOn(next); if (next) alertWaiter('MESSAGE'); }}
+                    className="w-full min-h-[44px] flex items-center justify-between px-3 rounded-xl bg-slate-50 hover:bg-slate-100 font-semibold text-slate-700 cursor-pointer"
+                  >
+                    <span>Sound for food ready and messages</span>
+                    <span className={`font-black text-[10px] px-2 py-0.5 rounded-md ${soundOn ? 'text-emerald-700 bg-emerald-100' : 'text-slate-500 bg-slate-200'}`}>{soundOn ? 'ON' : 'OFF'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={vibrateOn}
+                    onClick={() => { const next = !vibrateOn; setVibrationOn(next); setVibrateOn(next); if (next) alertWaiter('FOOD_READY'); }}
+                    className="w-full min-h-[44px] flex items-center justify-between px-3 rounded-xl bg-slate-50 hover:bg-slate-100 font-semibold text-slate-700 cursor-pointer"
+                  >
+                    <span>Vibrate</span>
+                    <span className={`font-black text-[10px] px-2 py-0.5 rounded-md ${vibrateOn ? 'text-emerald-700 bg-emerald-100' : 'text-slate-500 bg-slate-200'}`}>{vibrateOn ? 'ON' : 'OFF'}</span>
+                  </button>
+                </div>
+
                 <p className="text-[10px] text-slate-400 text-center font-medium pt-1">
-                  {posPeer || kdsPeer
-                    ? 'Changes sync instantly across all floor handhelds & counter POS.'
-                    : 'No POS/KDS terminal detected on this network yet — orders will queue locally until one is found.'}
+                  {conn.level === 'ok' ? 'Orders reach the kitchen and counter within a second.' : 'Orders are kept on this phone and sent as soon as the connection is back.'}
                 </p>
               </div>
             )}

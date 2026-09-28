@@ -7,7 +7,8 @@ import {
   Bell,
   LogOut,
   Radio,
-  Building2
+  Building2,
+  Menu
 } from 'lucide-react';
 import { JAMANVAAR_LOGOS } from '@jamanvaar/ui';
 import { formatINR } from '@jamanvaar/utils';
@@ -30,6 +31,8 @@ export interface PosAdminHeaderProps {
   onOpenNotifDrawer: () => void;
   unreadNotifsCount: number;
   onAdminLogout: () => void;
+  /** Opens the navigation drawer; shown only where the sidebar is hidden (below the large breakpoint). */
+  onOpenNav?: () => void;
 }
 
 export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
@@ -45,18 +48,29 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
   onOpenAssistant,
   onOpenNotifDrawer,
   unreadNotifsCount,
-  onAdminLogout
+  onAdminLogout,
+  onOpenNav
 }) => {
   return (
-    <header className="h-18 sm:h-20 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#EAE3D6] px-4 sm:px-6 lg:px-8 flex items-center justify-between shadow-2xs sticky top-0 z-30 shrink-0 select-none">
+    <header className="h-16 sm:h-20 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#EAE3D6] px-2.5 sm:px-6 lg:px-8 flex items-center justify-between gap-2 shadow-2xs sticky top-0 z-30 shrink-0 select-none">
       {/* ── 1. Left: Premium Brand Identity Lockup ── */}
-      <div className="flex items-center gap-3 sm:gap-4 shrink-0 min-w-0">
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+        {onOpenNav && (
+          <button
+            type="button"
+            onClick={onOpenNav}
+            className="lg:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-white hover:bg-[#FAF8F5] text-jaman-navy border border-jaman-border shadow-2xs cursor-pointer shrink-0"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
         {/* Prominent High-DPI JAMANVAAR Logo */}
         <div className="shrink-0 flex items-center justify-center">
           <img
             src={JAMANVAAR_LOGOS.horizontal}
             alt="JAMANVAAR by KELVIONTECH"
-            className="h-10 sm:h-11 md:h-12 w-auto object-contain shrink-0"
+            className="h-7 sm:h-11 md:h-12 w-auto object-contain shrink-0"
             style={{
               imageRendering: '-webkit-optimize-contrast',
               filter:
@@ -68,7 +82,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         </div>
 
         {/* Elegant vertical hairline separator */}
-        <div className="h-8 w-px bg-[#E2D9C8] shrink-0" aria-hidden="true" />
+        <div className="hidden sm:block h-8 w-px bg-[#E2D9C8] shrink-0" aria-hidden="true" />
 
         {/* Secondary Restaurant Identity & Context */}
         <div className="flex flex-col justify-center min-w-0">
@@ -134,12 +148,12 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
       </div>
 
       {/* ── 3. Right: Operational Context Group & Core Actions ── */}
-      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         {/* Mobile Search Trigger */}
         <button
           type="button"
           onClick={onOpenGlobalSearch}
-          className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white hover:bg-[#FAF8F5] text-slate-600 border border-jaman-border transition-colors shadow-2xs cursor-pointer"
+          className="md:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-white hover:bg-[#FAF8F5] text-slate-600 border border-jaman-border transition-colors shadow-2xs cursor-pointer"
           title="Global Search"
           aria-label="Open search"
         >
@@ -177,7 +191,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         )}
 
         {/* 3B. Core Financial Actions (EOD Z-Report & Reconciliation) */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
           {/* EOD Z-Report */}
           <button
             type="button"
@@ -202,12 +216,12 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         </div>
 
         {/* 3C. Utilities Group (Assistant, Notifications, Local-First, Logout) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 pl-2 border-l border-jaman-border">
+        <div className="flex items-center gap-1.5 sm:gap-2 sm:pl-2 sm:border-l border-jaman-border">
           {/* JAMAN AI Assistant */}
           <button
             type="button"
             onClick={onOpenAssistant}
-            className="h-10 flex items-center gap-1.5 bg-white hover:bg-[#FAF8F5] text-jaman-navy border border-jaman-border px-3 rounded-xl text-xs font-bold shadow-2xs transition-all active:scale-95 cursor-pointer"
+            className="hidden sm:flex h-10 items-center gap-1.5 bg-white hover:bg-[#FAF8F5] text-jaman-navy border border-jaman-border px-3 rounded-xl text-xs font-bold shadow-2xs transition-all active:scale-95 cursor-pointer"
             title="JAMAN AI Operations Assistant"
           >
             <Bot className="w-4 h-4 text-jaman-saffron shrink-0" />
@@ -218,7 +232,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           <button
             type="button"
             onClick={onOpenNotifDrawer}
-            className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white hover:bg-[#FAF8F5] text-slate-600 hover:text-jaman-navy border border-jaman-border transition-colors shadow-2xs cursor-pointer"
+            className="relative flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-white hover:bg-[#FAF8F5] text-slate-600 hover:text-jaman-navy border border-jaman-border transition-colors shadow-2xs cursor-pointer"
             title="Notifications & System Events"
             aria-label="Notifications"
           >
@@ -244,7 +258,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
             type="button"
             onClick={onAdminLogout}
             title="Sign out of Restaurant Admin"
-            className="h-10 flex items-center gap-1.5 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-jaman-border hover:border-rose-200 px-3 rounded-xl text-xs font-semibold transition-all active:scale-95 shadow-2xs cursor-pointer"
+            className="hidden sm:flex h-10 items-center gap-1.5 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-jaman-border hover:border-rose-200 px-3 rounded-xl text-xs font-semibold transition-all active:scale-95 shadow-2xs cursor-pointer"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             <span className="hidden lg:inline">Logout</span>

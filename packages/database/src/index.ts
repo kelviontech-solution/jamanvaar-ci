@@ -32,4 +32,5 @@ export * from './key_value_store';
 export * from './tenant_isolation';
 export * from './sync_cursors';
 export * from './kitchen_status';
+export * from './table_bulk';
 export * from './kitchen_routing';
