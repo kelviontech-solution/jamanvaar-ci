@@ -70,6 +70,9 @@ const PLACEHOLDER_CUSTOMER_PHONE = '9999999999';
  * Thin wrapper over the Cashfree Payment Gateway REST API
  * (https://www.cashfree.com/docs/api-reference/payments/latest/overview).
  */
+/** Cashfree has not approved this feature (for example the server-to-server Order Pay API) on the merchant account. Nothing in this system can fix it: the merchant must ask Cashfree. */
+export class CashfreeFeatureNotEnabledException extends ServiceUnavailableException {}
+
 @Injectable()
 export class CashfreeGatewayService {
   constructor(private readonly config: ConfigService) {}
@@ -146,6 +149,8 @@ export class CashfreeGatewayService {
     });
     const body = await res.json();
     if (!res.ok) {
+      const notEnabled = body?.type === 'feature_not_enabled' || /not_approved|not_enabled/i.test(String(body?.code ?? ''));
+      if (notEnabled) throw new CashfreeFeatureNotEnabledException(`Cashfree QR creation failed: ${body?.message ?? res.statusText}`);
       throw new ServiceUnavailableException(`Cashfree QR creation failed: ${body?.message ?? res.statusText}`);
     }
     const payload = body?.data?.payload;

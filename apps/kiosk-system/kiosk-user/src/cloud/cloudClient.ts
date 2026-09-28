@@ -273,6 +273,8 @@ export interface PaymentQr {
   qrPayload: string;
   contentType: string | null;
   expiresAt: string;
+  /** UPI_QR: a UPI QR from Cashfree. CHECKOUT_PAGE: the address of our payment page, scanned with the phone camera. */
+  method?: 'UPI_QR' | 'CHECKOUT_PAGE';
 }
 
 /** Asks the server (which holds the Cashfree keys) for the UPI QR of one pending payment. */

@@ -88,7 +88,7 @@ import {
   ActivationHelpNote,
   CachedImg
 } from '@jamanvaar/ui';
-import { formatDate, formatINR, formatSplitTax, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatSplitTax, formatTime, generateIdempotencyKey, generateQrDataUrl, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
 import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService, Platform } from '@jamanvaar/api';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncPromotions, syncFeedback, pushServiceMessages } from '@jamanvaar/sync';
@@ -186,6 +186,8 @@ function formatActivationKeyInput(raw: string): string {
 function toQrImageSrc(payload: string, contentType: string | null): string | null {
   const trimmed = payload.trim();
   if (trimmed.startsWith('data:image/')) return trimmed;
+  // A web address (the payment page): drawn as a QR here, so it works with no image from the server.
+  if (/^https?:\/\//i.test(trimmed)) return generateQrDataUrl(trimmed);
   if (trimmed.length > 100 && /^[A-Za-z0-9+/=\s]+$/.test(trimmed)) {
     const mime = contentType && contentType.startsWith('image/') ? contentType : 'image/png';
     return `data:${mime};base64,${trimmed.replace(/\s+/g, '')}`;
@@ -453,6 +455,8 @@ export default function KioskUserApp() {
   const [qrExpiresAt, setQrExpiresAt] = useState<number | null>(null);
   const [qrSecondsLeft, setQrSecondsLeft] = useState(0);
   const [qrLoading, setQrLoading] = useState(false);
+  // True when the QR opens a payment page (scanned with the phone camera) rather than being a UPI QR any UPI app can scan.
+  const [qrOpensPage, setQrOpensPage] = useState(false);
   // Bounded window (from order creation) that background payment-status
   // polling keeps running past the visible countdown's expiry, so a UPI
   // payment that Cashfree confirms moments after the customer is told to
@@ -1134,6 +1138,7 @@ export default function KioskUserApp() {
       if (!src) throw new Error('Cashfree returned a QR the kiosk cannot display');
       const expires = new Date(qr.expiresAt).getTime();
       setQrImageSrc(src);
+      setQrOpensPage(qr.method === 'CHECKOUT_PAGE');
       setQrExpiresAt(expires);
       setQrSecondsLeft(Math.max(0, Math.round((expires - Date.now()) / 1000)));
       setPaymentStatus('WAITING_FOR_USER');
@@ -3089,8 +3094,9 @@ export default function KioskUserApp() {
                 {qrImageSrc ? (
                   <>
                     <p className="text-sm font-semibold text-[#4A5568]">
-                      Scan with any UPI app to pay <span className="font-black text-jaman-saffron">{formatINR(netTotalPayable)}</span>
+                      {qrOpensPage ? 'Scan with your phone camera to pay' : 'Scan with any UPI app to pay'} <span className="font-black text-jaman-saffron">{formatINR(netTotalPayable)}</span>
                     </p>
+                    {qrOpensPage && <p className="text-xs text-[#4A5568]">Open the link that appears, then choose GPay, PhonePe, Paytm or any UPI app.</p>}
                     <div className="mx-auto w-64 h-64 bg-white p-3 rounded-2xl border-2 border-slate-900 shadow-md flex items-center justify-center">
                       <img src={qrImageSrc} alt="UPI payment QR code" className="w-full h-full object-contain" />
                     </div>

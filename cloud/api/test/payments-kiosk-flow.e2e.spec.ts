@@ -151,6 +151,77 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     expect(row.status).toBe('PENDING');
   });
 
+  // ---------------- QR fallback: the account is not approved for server-to-server UPI QR ----------------
+
+  describe('when Cashfree has not approved the server-to-server UPI QR', () => {
+    const notApproved = async () => new (await import('../src/modules/payments/cashfree-gateway.service')).CashfreeFeatureNotEnabledException('POST/orders/pay is not enabled or approved');
+    const base = 'https://pay.example.test';
+
+    it('the QR carries the address of our payment page instead, and says how to scan it', async () => {
+      process.env.PAYMENT_PAGE_BASE_URL = base;
+      try {
+        const order = await createKioskOrder('kf-fb-1');
+        gateway.createUpiQr.mockRejectedValueOnce(await notApproved());
+        const res = await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+        expect(res.status).toBe(201);
+        expect(res.body).toMatchObject({ qrPayload: `${base}/api/v1/pay/${order.paymentId}`, contentType: 'text/uri-list', method: 'CHECKOUT_PAGE' });
+        // the normal path still says it is a UPI QR
+        const normal = await authed('post', `/api/v1/payments/${(await createKioskOrder('kf-fb-2')).paymentId}/qr`, kioskToken);
+        expect(normal.body.method).toBe('UPI_QR');
+      } finally {
+        delete process.env.PAYMENT_PAGE_BASE_URL;
+      }
+    });
+
+    it('with no public address configured there is nothing to point the QR at, so it stays a 503', async () => {
+      const saved = { page: process.env.PAYMENT_PAGE_BASE_URL, notify: process.env.CASHFREE_WEBHOOK_NOTIFY_URL };
+      process.env.PAYMENT_PAGE_BASE_URL = '';
+      process.env.CASHFREE_WEBHOOK_NOTIFY_URL = '';
+      try {
+        const order = await createKioskOrder('kf-fb-3');
+        gateway.createUpiQr.mockRejectedValueOnce(await notApproved());
+        expect((await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken)).status).toBe(503);
+      } finally {
+        if (saved.page === undefined) delete process.env.PAYMENT_PAGE_BASE_URL; else process.env.PAYMENT_PAGE_BASE_URL = saved.page;
+        if (saved.notify === undefined) delete process.env.CASHFREE_WEBHOOK_NOTIFY_URL; else process.env.CASHFREE_WEBHOOK_NOTIFY_URL = saved.notify;
+      }
+    });
+
+    it('the payment page shows the restaurant and amount, hands Cashfree the session, and needs no login', async () => {
+      const order = await createKioskOrder('kf-fb-4');
+      const res = await request(app.getHttpServer()).get(`/api/v1/pay/${order.paymentId}`);
+      expect(res.status).toBe(200);
+      expect(res.headers['content-type']).toMatch(/text\/html/);
+      expect(res.headers['cache-control']).toBe('no-store');
+      expect(res.text).toContain('₹100.00');
+      expect(res.text).toContain('"session_mock"');
+      expect(res.text).toContain('sdk.cashfree.com');
+    });
+
+    it('the page says "received" once paid, and is closed for unknown, malformed, expired, suspended and cancelled payments', async () => {
+      const order = await createKioskOrder('kf-fb-5');
+      expect((await request(app.getHttpServer()).get('/api/v1/pay/00000000-0000-0000-0000-000000000000')).status).toBe(410);
+      expect((await request(app.getHttpServer()).get('/api/v1/pay/not-an-id')).status).toBe(410);
+
+      await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { status: 'SUSPENDED' } }));
+      const suspended = await request(app.getHttpServer()).get(`/api/v1/pay/${order.paymentId}`);
+      expect(suspended.status).toBe(410);
+      expect(suspended.text).not.toContain('sdk.cashfree.com');
+      await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { status: 'ACTIVE' } }));
+
+      await prisma.runAsPlatform((tx) => tx.paymentTransaction.update({ where: { id: order.paymentId }, data: { createdAt: new Date(Date.now() - 31 * 60 * 1000) } }));
+      expect((await request(app.getHttpServer()).get(`/api/v1/pay/${order.paymentId}`)).status).toBe(410);
+      await prisma.runAsPlatform((tx) => tx.paymentTransaction.update({ where: { id: order.paymentId }, data: { createdAt: new Date(), status: 'FAILED' } }));
+      expect((await request(app.getHttpServer()).get(`/api/v1/pay/${order.paymentId}`)).status).toBe(410);
+
+      await prisma.runAsPlatform((tx) => tx.paymentTransaction.update({ where: { id: order.paymentId }, data: { status: 'SUCCESS', paidAt: new Date() } }));
+      const paid = await request(app.getHttpServer()).get(`/api/v1/pay/${order.paymentId}`);
+      expect(paid.status).toBe(200);
+      expect(paid.text).toContain('Payment received');
+      expect(paid.text).not.toContain('sdk.cashfree.com');
+    });
+  });
+
   // ---------------- Fulfilment ----------------
 
   it('a kiosk can only mark a payment fulfilled once it has really succeeded, and doing it twice is harmless', async () => {

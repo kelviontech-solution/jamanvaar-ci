@@ -31,3 +31,9 @@ Set `CASHFREE_CLIENT_ID`, `CASHFREE_CLIENT_SECRET`, `CASHFREE_WEBHOOK_SECRET`, `
 ## Before production
 
 Production credentials set separately from sandbox, HTTPS on the API, webhook URL registered, real bank details reviewed for at least one restaurant, and the manual checklist repeated against production with a small real amount.
+
+## If Cashfree answers `s2s_enabled_not_approved`
+
+The server-to-server Order Pay API (the UPI `qrcode` channel) must be approved by Cashfree on the merchant account; it is not a dashboard switch. Until it is approved the kiosk falls back automatically: `POST /payments/:id/qr` returns `method: "CHECKOUT_PAGE"` and a `qrPayload` that is the address of our page `GET /api/v1/pay/:paymentId`. The kiosk draws that address as a QR; the guest scans it with the phone camera; the page (restaurant name and amount only) opens Cashfree's own checkout with the payment session. Payment, webhook, split and refund handling are unchanged. It needs a public HTTPS address (`PAYMENT_PAGE_BASE_URL`, or the origin of `CASHFREE_WEBHOOK_NOTIFY_URL`); with neither, the QR request stays a 503 and the kiosk offers cash. Once Cashfree approves the feature, the kiosk shows the direct UPI QR again with no change.
+
+Checked live on 28 Sept 2026 with production keys: order created, QR shown, page opened on a phone-sized browser and handed over to `api.cashfree.com/checkout` showing the amount and UPI options (nothing was paid).

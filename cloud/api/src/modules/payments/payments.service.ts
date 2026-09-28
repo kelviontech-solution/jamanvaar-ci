@@ -4,7 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
-import { CashfreeGatewayService } from './cashfree-gateway.service';
+import { CashfreeFeatureNotEnabledException, CashfreeGatewayService } from './cashfree-gateway.service';
+import type { PaymentPageView } from './payment-page.util';
 import { MenuSyncService } from './menu-sync.service';
 import { priceCart, PriceValidationError, MenuSnapshotItemLookup } from './pricing.util';
 import { CreatePaymentOrderDto } from './dto/create-payment-order.dto';
@@ -174,8 +175,52 @@ export class PaymentsService {
     }
 
     const expiresAt = new Date(Date.now() + QR_TTL_SECONDS * 1000);
-    const qr = await this.cashfree.createUpiQr(payment.paymentSessionId, expiresAt.toISOString());
-    return { qrPayload: qr.qrPayload, contentType: qr.contentType, expiresAt: expiresAt.toISOString() };
+    try {
+      const qr = await this.cashfree.createUpiQr(payment.paymentSessionId, expiresAt.toISOString());
+      return { qrPayload: qr.qrPayload, contentType: qr.contentType, expiresAt: expiresAt.toISOString(), method: 'UPI_QR' as const };
+    } catch (err) {
+      // The account has not been approved for Cashfree's server-to-server UPI QR. The QR then carries the address of our payment page,
+      // which opens Cashfree's own checkout (approved on every account). The guest scans it with the phone camera and picks a UPI app.
+      const base = this.paymentPageBaseUrl();
+      if (!(err instanceof CashfreeFeatureNotEnabledException) || !base) throw err;
+      return { qrPayload: `${base}/api/v1/pay/${payment.id}`, contentType: 'text/uri-list', expiresAt: expiresAt.toISOString(), method: 'CHECKOUT_PAGE' as const };
+    }
+  }
+
+  /** The public address guests' phones can reach: PAYMENT_PAGE_BASE_URL, or the address Cashfree is told to call back (its origin). */
+  private paymentPageBaseUrl(): string | null {
+    const explicit = this.config.get<string>('PAYMENT_PAGE_BASE_URL')?.trim();
+    if (explicit) return explicit.replace(/\/+$/, '');
+    const notify = this.config.get<string>('CASHFREE_WEBHOOK_NOTIFY_URL')?.trim();
+    if (!notify) return null;
+    try {
+      return new URL(notify).origin;
+    } catch {
+      return null;
+    }
+  }
+
+  /** What the public payment page shows for one payment, read only by its unguessable id. Nothing here changes the payment. */
+  async paymentPageView(paymentId: string): Promise<PaymentPageView> {
+    if (!/^[0-9a-f-]{36}$/i.test(paymentId)) return { state: 'CLOSED', message: 'This payment link is not valid.' };
+    const found = await this.prisma.runAsPlatform(async (tx) => {
+      const payment = await tx.paymentTransaction.findUnique({ where: { id: paymentId } });
+      if (!payment) return null;
+      const [restaurant, connection] = await Promise.all([
+        tx.restaurant.findUnique({ where: { id: payment.restaurantId }, select: { name: true } }),
+        tx.restaurantPaymentConnection.findUnique({ where: { restaurantId: payment.restaurantId }, select: { status: true } })
+      ]);
+      return { payment, restaurantName: restaurant?.name ?? 'the restaurant', active: connection?.status === 'ACTIVE' };
+    });
+    if (!found) return { state: 'CLOSED', message: 'This payment link is not valid.' };
+    const { payment, restaurantName, active } = found;
+    const amountLabel = `₹${(payment.amount / 100).toFixed(2)}`;
+    if (PAID_STATUSES.includes(payment.status)) return { state: 'DONE', restaurantName, amountLabel };
+    if (!NON_TERMINAL_STATUSES.includes(payment.status) || !payment.paymentSessionId) return { state: 'CLOSED', message: 'It has expired or was cancelled.' };
+    if (!active) return { state: 'CLOSED', message: 'Online payments are paused for this restaurant.' };
+    // The kiosk's QR is good for a few minutes; a page opened long after is not a guest standing at the kiosk.
+    if (Date.now() - payment.createdAt.getTime() > 30 * 60 * 1000) return { state: 'CLOSED', message: 'It has expired.' };
+    return { state: 'PAY', restaurantName, amountLabel, paymentSessionId: payment.paymentSessionId, mode: this.config.get<string>('CASHFREE_ENVIRONMENT') === 'production' ? 'production' : 'sandbox' };
   }
 
   /**

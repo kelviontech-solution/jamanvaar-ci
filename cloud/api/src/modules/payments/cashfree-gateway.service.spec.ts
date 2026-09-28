@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { ServiceUnavailableException } from '@nestjs/common';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { CashfreeGatewayService } from './cashfree-gateway.service';
+import { CashfreeFeatureNotEnabledException, CashfreeGatewayService } from './cashfree-gateway.service';
 
 async function buildService(env: Record<string, string>): Promise<CashfreeGatewayService> {
   const moduleRef = await Test.createTestingModule({
@@ -267,6 +267,12 @@ describe('CashfreeGatewayService', () => {
     await expect(service.createUpiQr('s', '2026-09-28T10:00:00.000Z')).rejects.toThrow(ServiceUnavailableException);
     vi.spyOn(global, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({ cf_payment_id: 'x', data: {} }), { status: 200 }));
     await expect(service.createUpiQr('s', '2026-09-28T10:00:00.000Z')).rejects.toThrow(ServiceUnavailableException);
+  });
+
+  it('createUpiQr says so plainly when Cashfree has not approved the feature on the account', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({ code: 's2s_enabled_not_approved', type: 'feature_not_enabled', message: 'POST/orders/pay is not enabled or approved.' }), { status: 400 }));
+    await expect(service.createUpiQr('s', '2026-09-28T10:00:00.000Z')).rejects.toBeInstanceOf(CashfreeFeatureNotEnabledException);
   });
 
   it('the sandbox base-URL override is honoured in sandbox and can never redirect production traffic', async () => {
