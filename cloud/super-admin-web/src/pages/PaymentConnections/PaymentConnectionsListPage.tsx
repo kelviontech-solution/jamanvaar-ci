@@ -25,6 +25,8 @@ export function PaymentConnectionsListPage() {
   const [savingDefault, setSavingDefault] = useState(false);
   const [overrideEdits, setOverrideEdits] = useState<Record<string, string>>({});
   const [savingOverrideId, setSavingOverrideId] = useState<string | null>(null);
+  const [stepUpPassword, setStepUpPassword] = useState('');
+  const STEP_UP_ACTIONS: PendingAction['action'][] = ['approve', 'suspend', 'disconnect'];
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -57,9 +59,11 @@ export function PaymentConnectionsListPage() {
       showToast('Enter a percentage between 0 and 100');
       return;
     }
+    const password = window.prompt('Confirm your password to change the platform default commission') ?? '';
+    if (!password) return;
     setSavingDefault(true);
     try {
-      const result = await api.patch<{ defaultBps: number }>('/api/v1/payments/commission-config', { defaultBps: Math.round(percent * 100) });
+      const result = await api.patch<{ defaultBps: number }>('/api/v1/payments/commission-config', { defaultBps: Math.round(percent * 100), password });
       setDefaultBps(result.defaultBps);
       showToast(`Platform default commission set to ${percent}%`);
     } catch (err) {
@@ -76,9 +80,11 @@ export function PaymentConnectionsListPage() {
       showToast('Enter a percentage between 0 and 100, or leave blank to use the platform default');
       return;
     }
+    const password = window.prompt(`Confirm your password to change ${c.restaurant.name}'s commission`) ?? '';
+    if (!password) return;
     setSavingOverrideId(c.id);
     try {
-      await api.patch(`/api/v1/restaurants/${c.restaurantId}/payment-connection/commission`, { overrideBps });
+      await api.patch(`/api/v1/restaurants/${c.restaurantId}/payment-connection/commission`, { overrideBps, password });
       showToast(`${c.restaurant.name}: commission override saved`);
       load();
     } catch (err) {
@@ -110,9 +116,11 @@ export function PaymentConnectionsListPage() {
     if (!confirmTarget) return;
     setActionPending(true);
     try {
-      await api.patch(`/api/v1/restaurants/${confirmTarget.connection.restaurantId}/payment-connection/${confirmTarget.action}`);
+      const body = STEP_UP_ACTIONS.includes(confirmTarget.action) ? { password: stepUpPassword } : undefined;
+      await api.patch(`/api/v1/restaurants/${confirmTarget.connection.restaurantId}/payment-connection/${confirmTarget.action}`, body);
       showToast(`${confirmTarget.connection.restaurant.name}: ${confirmTarget.action} succeeded`);
       setConfirmTarget(null);
+      setStepUpPassword('');
       load();
     } catch (err) {
       showToast(err instanceof ApiError ? err.message : `${confirmTarget.action} failed`);
@@ -285,14 +293,28 @@ export function PaymentConnectionsListPage() {
           isOpen={true}
           title={`${confirmTarget.action[0].toUpperCase()}${confirmTarget.action.slice(1)} payment connection?`}
           message={
-            confirmTarget.action === 'approve'
-              ? `This creates a real Cashfree vendor for "${confirmTarget.connection.restaurant.name}" and lets their kiosk start accepting payments.`
-              : `This will ${confirmTarget.action} "${confirmTarget.connection.restaurant.name}"'s payment connection.`
+            <>
+              {confirmTarget.action === 'approve'
+                ? `This creates a real Cashfree vendor for "${confirmTarget.connection.restaurant.name}" and lets their kiosk start accepting payments.`
+                : `This will ${confirmTarget.action} "${confirmTarget.connection.restaurant.name}"'s payment connection.`}
+              {STEP_UP_ACTIONS.includes(confirmTarget.action) && (
+                <div style={{ marginTop: 12 }}>
+                  <label style={{ fontSize: 12, fontWeight: 600 }}>Confirm your password</label>
+                  <input
+                    type="password"
+                    value={stepUpPassword}
+                    onChange={(e) => setStepUpPassword(e.target.value)}
+                    style={{ width: '100%', marginTop: 4 }}
+                    autoFocus
+                  />
+                </div>
+              )}
+            </>
           }
           tone={confirmTarget.action === 'disconnect' ? 'danger' : 'primary'}
           isPending={actionPending}
           onConfirm={handleExecuteAction}
-          onClose={() => setConfirmTarget(null)}
+          onClose={() => { setConfirmTarget(null); setStepUpPassword(''); }}
         />
       )}
     </div>
