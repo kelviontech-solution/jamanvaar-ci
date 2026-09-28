@@ -194,6 +194,33 @@ describe('Platform payments visibility', () => {
     expect(right.status).toBe(200);
   });
 
+  it('GET /platform-summary returns zeroed aggregates for a restaurant with no payments', async () => {
+    const freshRes = await authed('post', '/api/v1/restaurants', platformToken).send({
+      name: `TEST Empty Summary Restaurant ${Date.now()}`, ownerName: 'Empty Owner', ownerEmail: `empty-owner-${Date.now()}@test.example.com`
+    });
+    const res = await authed('get', `/api/v1/payments/platform-summary?restaurantId=${freshRes.body.restaurant.id}`, platformToken);
+    expect(res.status).toBe(200);
+    expect(res.body.grossVolume).toBe(0);
+    expect(res.body.platformCommission).toBe(0);
+    expect(res.body.refundedAmount).toBe(0);
+    expect(res.body.successfulCount).toBe(0);
+    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: freshRes.body.restaurant.id } }));
+  });
+
+  it('GET /platform-summary aggregates gross volume across successful payments', async () => {
+    await seedPayment(10000, 'SUCCESS');
+    await seedPayment(20000, 'SUCCESS');
+    const res = await authed('get', `/api/v1/payments/platform-summary?restaurantId=${restaurantId}`, platformToken);
+    expect(res.status).toBe(200);
+    expect(res.body.grossVolume).toBeGreaterThanOrEqual(30000);
+    expect(typeof res.body.openReconciliationExceptions).toBe('number');
+  });
+
+  it('a device token cannot read the platform summary', async () => {
+    const res = await authed('get', `/api/v1/payments/platform-summary?restaurantId=${restaurantId}`, posToken);
+    expect(res.status).toBe(401);
+  });
+
   it('a SUPPORT_ADMIN has no billing area access at all, not even read', async () => {
     const email = `test-platpay-support-${Date.now()}@example.com`;
     await createTestPlatformUser(prisma, { email, password: 'correct-horse-battery-staple', role: 'SUPPORT_ADMIN' });

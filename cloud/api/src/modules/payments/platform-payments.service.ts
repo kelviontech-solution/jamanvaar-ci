@@ -85,6 +85,35 @@ export class PlatformPaymentsService {
     });
   }
 
+  async platformSummary(filters: { restaurantId?: string; status?: PaymentTransactionStatus; from?: Date; to?: Date }) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const where = {
+        ...(filters.restaurantId ? { restaurantId: filters.restaurantId } : {}),
+        ...(filters.status ? { status: filters.status } : {}),
+        ...(filters.from || filters.to ? { createdAt: { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lte: filters.to } : {}) } } : {})
+      };
+      const [successAgg, refundAgg, statusCounts, exceptionCount] = await Promise.all([
+        tx.paymentTransaction.aggregate({
+          where: { ...where, status: { in: ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED'] } },
+          _sum: { amount: true, platformAmount: true, restaurantAmount: true },
+          _count: true
+        }),
+        tx.refund.aggregate({ where: { status: 'SUCCESS', payment: where }, _sum: { amount: true } }),
+        tx.paymentTransaction.groupBy({ by: ['status'], where, _count: true }),
+        tx.reconciliationException.count({ where: { status: 'OPEN', ...(filters.restaurantId ? { restaurantId: filters.restaurantId } : {}) } })
+      ]);
+      return {
+        grossVolume: successAgg._sum.amount ?? 0,
+        platformCommission: successAgg._sum.platformAmount ?? 0,
+        restaurantShare: successAgg._sum.restaurantAmount ?? 0,
+        refundedAmount: refundAgg._sum.amount ?? 0,
+        successfulCount: successAgg._count,
+        statusCounts: Object.fromEntries(statusCounts.map((s) => [s.status, s._count])),
+        openReconciliationExceptions: exceptionCount
+      };
+    });
+  }
+
   async listReconciliationExceptions(filters: { restaurantId?: string; status?: 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED'; page: number; limit: number }) {
     return this.prisma.runAsPlatform(async (tx) => {
       const where = {

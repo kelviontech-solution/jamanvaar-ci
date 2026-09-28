@@ -129,6 +129,23 @@ export class PaymentsService {
     return { orderId: order.id, paymentId: payment.id, paymentSessionId: payment.paymentSessionId, amount: order.totalAmount, currency: order.currency, status: payment.status };
   }
 
+  async tenantSummary(restaurantId: string, filters: { from?: Date; to?: Date }) {
+    return this.prisma.runAsTenant(restaurantId, async (tx) => {
+      const where = { restaurantId, ...(filters.from || filters.to ? { createdAt: { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lte: filters.to } : {}) } } : {}) };
+      const [successAgg, failedCount, refunded] = await Promise.all([
+        tx.paymentTransaction.aggregate({ where: { ...where, status: { in: ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED'] } }, _sum: { amount: true }, _count: true }),
+        tx.paymentTransaction.count({ where: { ...where, status: 'FAILED' } }),
+        tx.refund.aggregate({ where: { status: 'SUCCESS', payment: { restaurantId } }, _sum: { amount: true } })
+      ]);
+      return {
+        grossVolume: successAgg._sum.amount ?? 0,
+        successfulCount: successAgg._count,
+        failedCount,
+        refundedAmount: refunded._sum.amount ?? 0
+      };
+    });
+  }
+
   async getPaymentStatus(restaurantId: string, paymentId: string) {
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, include: { order: true } })

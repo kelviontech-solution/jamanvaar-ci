@@ -242,6 +242,20 @@ describe('Payment order creation', () => {
     expect(res.body.amount).toBe(54600);
   });
 
+  it('GET /tenant-summary returns aggregates for a KIOSK_ADMIN device and rejects a plain KIOSK', async () => {
+    const keyRes = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const redeemRes = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: keyRes.body.code, deviceType: 'KIOSK_ADMIN' });
+    const adminToken = redeemRes.body.deviceToken;
+
+    const ok = await authed('get', '/api/v1/payments/tenant-summary', adminToken);
+    expect(ok.status).toBe(200);
+    expect(typeof ok.body.grossVolume).toBe('number');
+    expect(typeof ok.body.successfulCount).toBe('number');
+
+    const denied = await authed('get', '/api/v1/payments/tenant-summary', kioskToken);
+    expect(denied.status).toBe(403);
+  });
+
   it('returns the correct status shape for the owning kiosk', async () => {
     const create = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: 'local-order-6', lines: validLines });
     const res = await authed('get', `/api/v1/payments/${create.body.paymentId}/status`, kioskToken);

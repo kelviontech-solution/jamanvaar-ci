@@ -25,6 +25,16 @@ export class PlatformPaymentsController {
     return this.platformPayments.setDefaultCommissionBps(body.defaultBps, actor, body.password);
   }
 
+  @Get('platform-summary')
+  platformSummary(
+    @Query('restaurantId') restaurantId?: string,
+    @Query('status') status?: PaymentTransactionStatus,
+    @Query('from') from?: string,
+    @Query('to') to?: string
+  ) {
+    return this.platformPayments.platformSummary({ restaurantId, status, from: from ? new Date(from) : undefined, to: to ? new Date(to) : undefined });
+  }
+
   // Also declared above :paymentId — same route-ordering reason as commission-config.
   @Get('reconciliation-exceptions')
   listReconciliationExceptions(

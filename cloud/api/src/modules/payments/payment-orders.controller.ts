@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Get, Param, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { Device } from '@prisma/client';
 import { PaymentsService } from './payments.service';
 import { createPaymentOrderSchema, CreatePaymentOrderDto } from './dto/create-payment-order.dto';
@@ -19,6 +19,14 @@ export class PaymentOrdersController {
       throw new ForbiddenException('Only a Kiosk device can create a payment order');
     }
     return this.payments.createOrGetPaymentOrder(device.restaurantId, device.id, body);
+  }
+
+  @Get('tenant-summary')
+  async tenantSummary(@CurrentDevice() device: Device, @Query('from') from?: string, @Query('to') to?: string) {
+    if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
+      throw new ForbiddenException('Only Kiosk Admin or POS Admin can read the payments summary');
+    }
+    return this.payments.tenantSummary(device.restaurantId, { from: from ? new Date(from) : undefined, to: to ? new Date(to) : undefined });
   }
 
   @Get(':paymentId/status')
