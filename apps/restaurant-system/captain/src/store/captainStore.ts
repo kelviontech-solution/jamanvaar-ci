@@ -23,7 +23,14 @@ import {
   type ServiceMessage
 } from '@jamanvaar/database';
 import type { User } from '@jamanvaar/types';
-import { lanMeshSync, StaffSession } from '@jamanvaar/sync';
+import { lanMeshSync, StaffSession, SyncOutboxEngine, syncDiningTables, pushServiceMessages } from '@jamanvaar/sync';
+
+/** Sends what this tablet just changed to the cloud now, not at the next 4 s timer tick, so the kitchen and counter see it within a second. */
+function pushNow(): void {
+  SyncOutboxEngine.flush();
+  void syncDiningTables();
+  void pushServiceMessages();
+}
 import { deviceFetch as captainDeviceFetch } from '../cloud/cloudClient';
 import { SessionPersistence, AuthStatus, priceOrderLines } from '@jamanvaar/business';
 
@@ -487,6 +494,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       guestCount: guests,
       captainName: get().currentCaptain?.name || 'Captain'
     });
+    pushNow();
   },
 
   setGuestCount: (count) => {
@@ -552,6 +560,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       guestCount
     });
 
+    pushNow();
     return true;
   },
 
@@ -605,6 +614,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       guestCount: prim.currentGuests
     });
 
+    pushNow();
     return true;
   },
 
@@ -641,6 +651,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     });
 
     get().refreshState();
+    pushNow();
     return true;
   },
 
@@ -872,6 +883,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       guestCount: state.guestCount
     });
 
+    pushNow();
     return generatedKots;
   },
 
@@ -903,6 +915,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       foodReadyId,
       dishName: targetItem.dishName
     });
+    pushNow();
   },
 
   serveReadyForTable: (tableNumber) => {
@@ -935,6 +948,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       tableNumber: matchingItems[0]?.tableNumber,
       kotId
     });
+    pushNow();
   },
 
   requestBill: (tableNumber) => {
@@ -971,6 +985,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       captainName: get().currentCaptain?.name || 'Captain'
     });
 
+    pushNow();
     return true;
   },
 
@@ -1014,6 +1029,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       });
     }
     lanMeshSync.broadcast('INTERNAL_MESSAGE_SENT', newMsg);
+    pushNow();
   },
 
   receiveMessages: (incoming) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
 import { getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages, syncMenuCatalog } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus } from '@jamanvaar/types';
@@ -63,6 +63,18 @@ const ORDER_TYPE_LABEL: Record<string, string> = {
 
 export const App: React.FC = () => {
   const [kots, setKots] = useState<KOTRecord[]>(kdsDb.kots);
+
+  // A new ticket needs an audible cue: cooks are not watching the screen. Tickets normally arrive from the cloud (a Captain
+  // tablet or POS on another device), not over the same-browser mesh, so the cue follows the ticket list itself. One beep
+  // per batch of tickets not seen before; what was already on screen at start-up stays quiet.
+  const seenKotIds = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    const ids = new Set(kots.map((k) => k.id));
+    const seen = seenKotIds.current;
+    seenKotIds.current = ids;
+    if (seen === null) return;
+    if (kots.some((k) => !seen.has(k.id) && k.status !== 'READY' && k.status !== 'SERVED' && k.status !== 'CANCELLED')) sound.play('kot');
+  }, [kots]);
 
   // A kitchen screen must never go to sleep mid-service (display port: wake lock in a browser, native in a shell).
   useEffect(() => {
@@ -207,10 +219,6 @@ export const App: React.FC = () => {
         if (hasNew) {
           kdsDb.notify();
           setKots([...kdsDb.kots]);
-          // A new ticket landing on a kitchen wall display needs an audible
-          // cue — cooks aren't watching the screen continuously. Fires once
-          // per batch of genuinely-new KOTs, not per render.
-          sound.play('kot');
         }
       });
 
@@ -405,6 +413,8 @@ export const App: React.FC = () => {
       KOTRepository.updateKOTStatus(kotId, nextStatus);
       kdsDb.notify();
       setKots([...kdsDb.kots]);
+      // Tell the Captain and counter now ("food ready" must not wait for the 3 s timer).
+      SyncOutboxEngine.flush();
 
       AuditRepository.log({
         action: `KOT_${nextStatus}`,
