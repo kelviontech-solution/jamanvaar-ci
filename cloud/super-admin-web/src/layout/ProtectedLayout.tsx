@@ -91,6 +91,7 @@ const PAGE_KEYWORDS: Record<string, string> = {
   '/catalog': 'menu dish dishes item items food category master starter library',
   '/activation-keys': 'activation key keys code terminal redeem',
   '/payment-connections': 'payment gateway cashfree razorpay upi bank settlement',
+  '/platform-payments': 'platform payments volume commission revenue reconciliation cashfree',
   '/applications': 'app apps release releases version update download installer',
   '/devices': 'device devices terminal pos kds captain kiosk mdm lock wipe fleet',
   '/sync-monitor': 'sync conflict conflicts offline queue',
@@ -132,6 +133,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: '/catalog', label: 'Master Menu Catalog', icon: Utensils },
       { to: '/activation-keys', label: 'Activation Keys', icon: KeyRound },
       { to: '/payment-connections', label: 'Payment Gateways', icon: CreditCard },
+      { to: '/platform-payments', label: 'Platform Payments', icon: CreditCard },
       { to: '/applications', label: 'Applications & Releases', icon: Layers }
     ]
   },

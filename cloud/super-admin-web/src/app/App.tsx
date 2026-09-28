@@ -39,6 +39,7 @@ import { OfflinePolicyPage } from '../pages/OfflinePolicy/OfflinePolicyPage';
 import { SandboxesPage } from '../pages/Sandboxes/SandboxesPage';
 import { QrOrderingPage } from '../pages/QrOrdering/QrOrderingPage';
 import { PaymentConnectionsListPage } from '../pages/PaymentConnections/PaymentConnectionsListPage';
+import { PlatformPaymentsDashboardPage } from '../pages/PlatformPayments/PlatformPaymentsDashboardPage';
 
 /** Wraps a page element so a render crash on this one route can't blank the whole console. */
 function page(name: string, element: JSX.Element) {
@@ -80,6 +81,7 @@ export function App() {
               <Route path="/applications" element={page('Applications', <ApplicationsPage />)} />
               <Route path="/activation-keys" element={page('ActivationKeysList', <ActivationKeysListPage />)} />
               <Route path="/payment-connections" element={page('PaymentConnectionsList', <PaymentConnectionsListPage />)} />
+              <Route path="/platform-payments" element={page('PlatformPaymentsDashboard', <PlatformPaymentsDashboardPage />)} />
               <Route path="/devices" element={page('DevicesList', <DevicesListPage />)} />
               <Route path="/devices/:id" element={page('DeviceDetail', <DeviceDetailPage />)} />
               <Route path="/sync-monitor" element={page('SyncMonitor', <SyncMonitorPage />)} />
