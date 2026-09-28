@@ -25,6 +25,27 @@ export class PlatformPaymentsController {
     return this.platformPayments.setDefaultCommissionBps(body.defaultBps, actor, body.password);
   }
 
+  // Also declared above :paymentId — same route-ordering reason as commission-config.
+  @Get('reconciliation-exceptions')
+  listReconciliationExceptions(
+    @Query('restaurantId') restaurantId?: string,
+    @Query('status') status?: 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED',
+    @Query('page') page = '1',
+    @Query('limit') limit = '25'
+  ) {
+    return this.platformPayments.listReconciliationExceptions({
+      restaurantId,
+      status,
+      page: Math.max(1, Number(page) || 1),
+      limit: Math.min(100, Math.max(1, Number(limit) || 25))
+    });
+  }
+
+  @Patch('reconciliation-exceptions/:id/acknowledge')
+  acknowledgeReconciliationException(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.platformPayments.acknowledgeReconciliationException(id, actor);
+  }
+
   @Get()
   list(
     @Query('restaurantId') restaurantId?: string,

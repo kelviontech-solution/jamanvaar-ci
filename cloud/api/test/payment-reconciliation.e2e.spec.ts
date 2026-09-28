@@ -112,4 +112,29 @@ describe('Payment reconciliation', () => {
     const exception = await prisma.runAsPlatform((tx) => tx.reconciliationException.findFirst({ where: { paymentId: payment.id } }));
     expect(exception).toBeNull();
   });
+
+  it('GET /api/v1/payments/reconciliation-exceptions lists exceptions filterable by restaurantId and status', async () => {
+    const payment = await seedPayment({ providerOrderId: 'pay_list_1', amount: 4000, commissionBps: 0, platformAmount: 0, restaurantAmount: 4000 });
+    getOrderSplitDetailsMock.mockImplementation(async () => ({ splits: [] }));
+    await app.get(PaymentReconciliationService).reconcile();
+
+    const loginRes = await platformLogin(app, adminEmail, adminPassword);
+    const platformToken = loginRes.body.accessToken;
+    const res = await authed('get', `/api/v1/payments/reconciliation-exceptions?restaurantId=${restaurantId}&status=OPEN`, platformToken);
+    expect(res.status).toBe(200);
+    expect(res.body.rows.some((r: { paymentId: string }) => r.paymentId === payment.id)).toBe(true);
+  });
+
+  it('PATCH .../acknowledge marks an exception ACKNOWLEDGED', async () => {
+    const payment = await seedPayment({ providerOrderId: 'pay_ack_1', amount: 2000, commissionBps: 0, platformAmount: 0, restaurantAmount: 2000 });
+    getOrderSplitDetailsMock.mockImplementation(async () => ({ splits: [] }));
+    await app.get(PaymentReconciliationService).reconcile();
+    const exception = await prisma.runAsPlatform((tx) => tx.reconciliationException.findFirstOrThrow({ where: { paymentId: payment.id } }));
+
+    const loginRes = await platformLogin(app, adminEmail, adminPassword);
+    const platformToken = loginRes.body.accessToken;
+    const res = await authed('patch', `/api/v1/payments/reconciliation-exceptions/${exception.id}/acknowledge`, platformToken);
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('ACKNOWLEDGED');
+  });
 });

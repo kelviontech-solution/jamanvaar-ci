@@ -1,9 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Prisma, PaymentTransactionStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CashfreeGatewayService } from './cashfree-gateway.service';
 
 const LOOKBACK_DAYS = 7;
-const RECONCILABLE_STATUSES = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED'] as const;
+const RECONCILABLE_STATUSES: PaymentTransactionStatus[] = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED'];
 const KNOWN_GOOD_STATUSES = ['SETTLED', 'PENDING', 'PROCESSING'];
 
 @Injectable()
@@ -19,7 +20,7 @@ export class PaymentReconciliationService {
     const since = new Date(Date.now() - LOOKBACK_DAYS * 24 * 60 * 60 * 1000);
     const payments = await this.prisma.runAsPlatform((tx) =>
       tx.paymentTransaction.findMany({
-        where: { status: { in: RECONCILABLE_STATUSES as unknown as string[] }, createdAt: { gte: since }, commissionBps: { not: null } },
+        where: { status: { in: RECONCILABLE_STATUSES }, createdAt: { gte: since }, commissionBps: { not: null } },
         include: { reconciliationExceptions: { where: { status: 'OPEN' } } }
       })
     );
@@ -65,7 +66,7 @@ export class PaymentReconciliationService {
     details: Record<string, unknown>
   ) {
     await this.prisma.runAsPlatform((tx) =>
-      tx.reconciliationException.create({ data: { paymentId, restaurantId, type, details, status: 'OPEN' } })
+      tx.reconciliationException.create({ data: { paymentId, restaurantId, type, details: details as Prisma.InputJsonValue, status: 'OPEN' } })
     );
   }
 }

@@ -633,6 +633,18 @@ export interface PlatformPaymentPage {
   limit: number;
 }
 
+export interface ReconciliationException {
+  id: string;
+  restaurantId: string;
+  paymentId: string;
+  type: 'MISSING_AT_CASHFREE' | 'AMOUNT_MISMATCH' | 'SPLIT_MISMATCH' | 'UNEXPECTED_STATUS';
+  details: Record<string, unknown>;
+  status: 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED';
+  acknowledgedBy: string | null;
+  acknowledgedAt: string | null;
+  createdAt: string;
+}
+
 export interface Invoice {
   id: string;
   invoiceNumber: string;

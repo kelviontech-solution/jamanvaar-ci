@@ -84,4 +84,26 @@ export class PlatformPaymentsService {
       return { defaultBps: bps };
     });
   }
+
+  async listReconciliationExceptions(filters: { restaurantId?: string; status?: 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED'; page: number; limit: number }) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const where = {
+        ...(filters.restaurantId ? { restaurantId: filters.restaurantId } : {}),
+        ...(filters.status ? { status: filters.status } : {})
+      };
+      const [rows, total] = await Promise.all([
+        tx.reconciliationException.findMany({ where, orderBy: { createdAt: 'desc' }, skip: (filters.page - 1) * filters.limit, take: filters.limit }),
+        tx.reconciliationException.count({ where })
+      ]);
+      return { rows, total, page: filters.page, limit: filters.limit };
+    });
+  }
+
+  async acknowledgeReconciliationException(id: string, actor: PlatformUser) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const existing = await tx.reconciliationException.findUnique({ where: { id } });
+      if (!existing) throw new NotFoundException('Reconciliation exception not found');
+      return tx.reconciliationException.update({ where: { id }, data: { status: 'ACKNOWLEDGED', acknowledgedBy: actor.id, acknowledgedAt: new Date() } });
+    });
+  }
 }

@@ -14,7 +14,8 @@ import type {
   Backup,
   RestaurantReport,
   PlatformPayment,
-  PlatformPaymentPage
+  PlatformPaymentPage,
+  ReconciliationException
 } from '../../api/types';
 import { ENTITLEMENT_LABELS, type EntitlementKey } from '../../api/types';
 import { APP_CODES, APP_CODE_LABELS, type AppCode, type ApplicationEntitlement, type FeatureCatalog } from '../../api/types';
@@ -196,6 +197,7 @@ export function RestaurantDetailPage() {
   const [paymentsStatusFilter, setPaymentsStatusFilter] = useState<PlatformPayment['status'] | 'ALL'>('ALL');
   const [paymentsPage, setPaymentsPage] = useState(1);
   const [expandedPaymentId, setExpandedPaymentId] = useState<string | null>(null);
+  const [reconciliationExceptions, setReconciliationExceptions] = useState<ReconciliationException[] | null>(null);
   const [diagnostics, setDiagnostics] = useState<RestaurantDiagnostics | null>(null);
   const [diagnosticsLoading, setDiagnosticsLoading] = useState(false);
   const [diagnosticsError, setDiagnosticsError] = useState<string | null>(null);
@@ -360,6 +362,10 @@ export function RestaurantDetailPage() {
         .get<PlatformPaymentPage>(`/api/v1/payments?${params.toString()}`)
         .then(setPayments)
         .catch(() => setPayments({ rows: [], total: 0, page: 1, limit: 25 }));
+      api
+        .get<{ rows: ReconciliationException[]; total: number }>(`/api/v1/payments/reconciliation-exceptions?restaurantId=${id}&status=OPEN`)
+        .then((r) => setReconciliationExceptions(r.rows))
+        .catch(() => setReconciliationExceptions([]));
     }
     if (tab === 'support' && !diagnostics) {
       refreshDiagnostics();
@@ -1746,6 +1752,47 @@ export function RestaurantDetailPage() {
               </>
             )}
           </Card>
+
+          {reconciliationExceptions && reconciliationExceptions.length > 0 && (
+            <Card>
+              <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
+                <span>Reconciliation Exceptions ({reconciliationExceptions.length})</span>
+              </div>
+              <div style={{ padding: '0 22px 14px' }}>
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Details</th>
+                      <th>Created</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reconciliationExceptions.map((e) => (
+                      <tr key={e.id}>
+                        <td><Badge tone="warning">{e.type.replace(/_/g, ' ')}</Badge></td>
+                        <td style={{ fontSize: 12, fontFamily: 'monospace' }}>{JSON.stringify(e.details)}</td>
+                        <td style={{ fontSize: 12 }}>{new Date(e.createdAt).toLocaleString('en-IN')}</td>
+                        <td>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={async () => {
+                              await api.patch(`/api/v1/payments/reconciliation-exceptions/${e.id}/acknowledge`);
+                              setReconciliationExceptions((prev) => prev?.filter((x) => x.id !== e.id) ?? null);
+                            }}
+                          >
+                            Acknowledge
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          )}
         </div>
       )}
 
