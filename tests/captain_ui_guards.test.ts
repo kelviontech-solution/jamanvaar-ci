@@ -66,4 +66,11 @@ describe('Captain screens (BUG-104/105/107/108/114)', () => {
     const missing = dialogs.filter((f) => !/useEscapeToClose\(/.test(read(f)));
     expect(missing).toEqual([]);
   });
+  it('the menu never shows a blank grid: an empty menu explains itself, and a sold-out dish is marked and cannot be picked', () => {
+    const src = read('components/tables/CaptainTableWorkspaceModal.tsx');
+    expect(src).toContain('captain-empty-menu');
+    expect(src).toMatch(/isAvailable === false[\s\S]{0,400}Sold out/);
+    expect(src).toMatch(/if \(item\.isAvailable !== false\) setCustomizingItem\(item\)/);
+    expect(src).toMatch(/disabled=\{item\.isAvailable === false\}/);
+  });
 });

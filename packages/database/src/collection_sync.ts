@@ -202,6 +202,11 @@ export class CollectionSync<T extends Syncable> {
     db.notify();
   }
 
+  /** True when this device holds no record of this kind at all. */
+  public isEmpty(): boolean {
+    return this.list().length === 0;
+  }
+
   /** Forget all bookkeeping: the next stamp is a fresh baseline (used when a device is activated to a restaurant). */
   public reset(): void {
     this.memory = { pushed: {}, tombstones: {} };

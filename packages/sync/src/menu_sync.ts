@@ -22,8 +22,12 @@ export function syncMenuCatalog(opts: { push?: boolean } = {}): Promise<void> {
   return inFlight;
 }
 
+// Small catalogues only: an empty local copy means "start over", cheap for these. Not for shifts, customers or feedback, which can be large.
+const SELF_HEALING_TYPES = new Set(['MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP', 'COMBO', 'COUPON']);
+
 export async function syncCollection<T extends { updatedAt?: string }>(entityType: string, sync: CollectionSync<T>, push: boolean): Promise<void> {
   if (push) sync.stampChanges();
+  if (SELF_HEALING_TYPES.has(entityType) && sync.isEmpty()) EntitySyncEngine.restartFromBeginning(entityType);
   await EntitySyncEngine.catchUp(entityType, (remote) => sync.applyRemote(remote.payload));
   if (!push) return;
   const records = sync.collectSyncRecords();

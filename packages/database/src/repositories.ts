@@ -70,6 +70,7 @@ import {
 import { getOrderTenders, splitsMatchTotal } from './tender';
 import { generateOrderNumber, generateTokenNumber, generateUUID, normalizeIndianPhone, formatRestaurantDate, getRestaurantHour, getBusinessDayDisplayDate } from '@jamanvaar/utils';
 import { db } from './db';
+import { resetEntitySyncCursors } from './sync_cursors';
 import { TableSync } from './table_sync';
 import { canMoveTable } from './table_state';
 import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync } from './collection_sync';
@@ -94,6 +95,8 @@ export class MenuRepository {
     // fresh baseline and nothing is uploaded or deleted on account of it (BUG-149).
     MenuItemSync.reset();
     CategorySync.reset();
+    // The cursors must restart too, or re-activating a tablet for the restaurant it already served never re-downloads the menu.
+    resetEntitySyncCursors(['MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP']);
     AuditRepository.log({
       action: 'MENU_CLEARED_ON_ACTIVATION',
       category: 'MENU',
@@ -2085,6 +2088,9 @@ export class RestaurantIdentityRepository {
     // The demo combos and coupons were never this restaurant's: nothing about them is uploaded or deleted.
     ComboSync.reset();
     CouponSync.reset();
+    // The tables are cleared too: without this reset each one would read as "deleted here" and be deleted for every device.
+    TableSync.reset();
+    resetEntitySyncCursors(['COMBO', 'COUPON', 'DINING_TABLE']);
     AuditRepository.log({
       action: 'DEMO_OPERATIONS_CLEARED_ON_ACTIVATION',
       category: 'SETTINGS',

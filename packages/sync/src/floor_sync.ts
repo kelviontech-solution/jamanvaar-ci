@@ -29,6 +29,7 @@ async function runTick(): Promise<void> {
     else break;
   }
 
+  if (TableRepository.getAllTables().length === 0) EntitySyncEngine.restartFromBeginning('DINING_TABLE');
   await EntitySyncEngine.catchUp('DINING_TABLE', (remote) => TableSync.applyRemote(remote.payload));
   TableRepository.releaseSettledTables();
   // The release above is a local change, so record it now rather than one tick later.

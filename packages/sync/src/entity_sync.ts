@@ -54,6 +54,8 @@ function safeSet(key: string, value: string): void {
 import { KeyValueStore } from '@jamanvaar/database';
 import { EndpointResolver } from './endpoint_resolver';
 
+const restartedThisSession = new Set<string>();
+
 export class EntitySyncEngine {
   private static transport: EntitySyncTransport | null = null;
 
@@ -69,6 +71,23 @@ export class EntitySyncEngine {
       return { processed, failed: results.length - processed };
     } catch {
       return { processed: 0, failed: records.length };
+    }
+  }
+
+  /**
+   * Makes the next pull of this type ask for everything. A device that holds none of a kind of record but whose cursor sits
+   * at "now" (its local copy was wiped, e.g. the tablet was activated again) would otherwise never receive what the cloud
+   * already has.
+   */
+  public static restartFromBeginning(entityType: string): void {
+    // Once per session: an owner who really has none of these records should not re-download the whole history every tick.
+    if (restartedThisSession.has(entityType)) return;
+    restartedThisSession.add(entityType);
+    const cursorKey = EndpointResolver.cursorKey(`jamanvaar_entity_sync_cursor_${entityType}`, `/api/v1/entity-sync/${entityType}`);
+    try {
+      KeyValueStore.remove(cursorKey);
+    } catch {
+      // Storage unavailable: the next pull just uses whatever cursor it has.
     }
   }
 

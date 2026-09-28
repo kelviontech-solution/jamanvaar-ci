@@ -516,12 +516,22 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                 </div>
 
                 {/* Dish Cards Grid */}
-                <div className="flex-1 p-3 sm:p-4 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div className="flex-1 p-3 sm:p-4 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 content-start">
+                  {filteredMenuItems.length === 0 && (
+                    <div className="col-span-full text-center py-10 text-sm font-bold text-slate-500" data-testid="captain-empty-menu">
+                      {menuItems.length === 0
+                        ? 'No dishes yet. The menu loads from the cloud within a few seconds; if it stays empty, add dishes in Restaurant Admin.'
+                        : 'No dishes match this search or filter.'}
+                    </div>
+                  )}
                   {filteredMenuItems.map((item) => (
                     <div
                       key={item.id}
-                      onClick={() => setCustomizingItem(item)}
-                      className="bg-white border border-jaman-border hover:border-jaman-saffron rounded-2xl p-3 flex flex-col justify-between space-y-2 shadow-2xs hover:shadow-md transition-all active:scale-98 cursor-pointer"
+                      onClick={() => { if (item.isAvailable !== false) setCustomizingItem(item); }}
+                      aria-disabled={item.isAvailable === false}
+                      className={`bg-white border border-jaman-border rounded-2xl p-3 flex flex-col justify-between space-y-2 shadow-2xs transition-all ${
+                        item.isAvailable === false ? 'opacity-50 cursor-not-allowed' : 'hover:border-jaman-saffron hover:shadow-md active:scale-98 cursor-pointer'
+                      }`}
                     >
                       {/* Image preview */}
                       <div className="w-full h-24 rounded-xl bg-slate-100 overflow-hidden relative">
@@ -534,6 +544,9 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                           }}
                         />
                         <span className={`absolute top-1.5 left-1.5 w-2.5 h-2.5 rounded-full ${item.dietaryType === 'VEG' ? 'bg-emerald-500 ring-2 ring-white' : 'bg-rose-500 ring-2 ring-white'}`} />
+                        {item.isAvailable === false && (
+                          <span className="absolute inset-x-0 bottom-0 bg-rose-600 text-white text-[10px] font-black text-center py-0.5 uppercase">Sold out</span>
+                        )}
                       </div>
 
                       <div>
@@ -563,7 +576,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                             addItemToCart(item, [], '', 'COURSE_1', 1);
                           }}
                           className="w-7 h-7 rounded-lg bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center font-black text-xs hover:bg-jaman-saffron hover:text-white transition-colors cursor-pointer active:scale-90"
-                          title="Quick Add"
+                          title={item.isAvailable === false ? 'Sold out' : 'Quick Add'}
+                          disabled={item.isAvailable === false}
                         >
                           +
                         </button>

@@ -122,6 +122,17 @@ export class TableSync {
     save();
   }
 
+  /**
+   * Forgets what this device knew about the floor plan, so the next stamp is a fresh baseline. Must accompany any wipe of the
+   * local tables that is not a person deleting them: without it the missing tables read as deletions and are pushed to the
+   * cloud, removing the restaurant's floor plan from every other device.
+   */
+  public static reset(): void {
+    memory = { pushed: {}, tombstones: {} };
+    loaded = true;
+    save();
+  }
+
   /** Called by `TableRepository.deleteTable` so a deletion is never missed. */
   public static recordDeletion(id: string, now: string = new Date().toISOString()): void {
     const state = load();
@@ -228,8 +239,6 @@ export class TableSync {
 
   /** Test helper: forget all sync bookkeeping. */
   public static resetForTests(): void {
-    memory = { pushed: {}, tombstones: {} };
-    loaded = true;
-    save();
+    this.reset();
   }
 }
