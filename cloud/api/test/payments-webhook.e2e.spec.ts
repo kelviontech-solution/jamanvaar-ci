@@ -211,7 +211,9 @@ describe('Cashfree webhook processing', () => {
     // with the secret deleted from process.env *before* that instance compiles/initializes, so its
     // ConfigService genuinely sees it as unset.
     const savedSecret = process.env.CASHFREE_WEBHOOK_SECRET;
-    delete process.env.CASHFREE_WEBHOOK_SECRET;
+    // Empty, not deleted: Prisma re-reads the developer's .env whenever a client is built and would put a
+    // real secret back into a *deleted* variable, whereas an empty one is left alone (and means "unset").
+    process.env.CASHFREE_WEBHOOK_SECRET = '';
     let unconfiguredApp: INestApplication | undefined;
     try {
       unconfiguredApp = await createTestApp();

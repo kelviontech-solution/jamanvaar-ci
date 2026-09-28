@@ -240,6 +240,63 @@ describe('CashfreeGatewayService', () => {
     await expect(service.getOrderSplitDetails('pay_missing')).rejects.toThrow(ServiceUnavailableException);
   });
 
+  it('createUpiQr asks Cashfree Order Pay for a qrcode-channel UPI payment and returns the QR payload', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({ cf_payment_id: 'cfp_1', action: 'custom', channel: 'qrcode', data: { payload: 'BASE64IMG', content_type: 'image/png' } }),
+        { status: 200 }
+      )
+    );
+
+    const result = await service.createUpiQr('session_abc', '2026-09-28T10:00:00.000Z');
+
+    const [url, init] = fetchSpy.mock.calls[0];
+    expect(url).toBe('https://sandbox.cashfree.com/pg/orders/sessions');
+    expect(init?.method).toBe('POST');
+    const body = JSON.parse(init!.body as string);
+    expect(body.payment_session_id).toBe('session_abc');
+    expect(body.payment_method).toEqual({ upi: { channel: 'qrcode' } });
+    expect(body.transaction_expiry_time).toBe('2026-09-28T10:00:00.000Z');
+    expect(result).toEqual({ qrPayload: 'BASE64IMG', contentType: 'image/png', cfPaymentId: 'cfp_1' });
+  });
+
+  it('createUpiQr throws when Cashfree rejects the request or returns no payload', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({ message: 'session expired' }), { status: 400 }));
+    await expect(service.createUpiQr('s', '2026-09-28T10:00:00.000Z')).rejects.toThrow(ServiceUnavailableException);
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({ cf_payment_id: 'x', data: {} }), { status: 200 }));
+    await expect(service.createUpiQr('s', '2026-09-28T10:00:00.000Z')).rejects.toThrow(ServiceUnavailableException);
+  });
+
+  it('createUpiQr throws when unconfigured', async () => {
+    const service = await buildService({});
+    await expect(service.createUpiQr('s', '2026-09-28T10:00:00.000Z')).rejects.toThrow(ServiceUnavailableException);
+  });
+
+  it('settleVendorOnDemand posts an ON_DEMAND transfer with an idempotency key', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ settlement_id: 987, transfer_details: { transfer_amount: 250 } }), { status: 200 })
+    );
+
+    const result = await service.settleVendorOnDemand('rest_abc123', 25000, 'idem-1');
+
+    const [url, init] = fetchSpy.mock.calls[0];
+    expect(url).toBe('https://sandbox.cashfree.com/pg/easy-split/vendors/rest_abc123/transfer');
+    expect(init?.method).toBe('POST');
+    expect((init?.headers as Record<string, string>)['x-idempotency-key']).toBe('idem-1');
+    const body = JSON.parse(init!.body as string);
+    expect(body).toMatchObject({ transfer_from: 'VENDOR', transfer_type: 'ON_DEMAND', transfer_amount: 250 });
+    expect(result.settlementId).toBe('987');
+  });
+
+  it('settleVendorOnDemand throws when Cashfree refuses (e.g. balance below the minimum)', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify({ message: 'insufficient balance' }), { status: 400 }));
+    await expect(service.settleVendorOnDemand('rest_abc123', 25000, 'idem-2')).rejects.toThrow(ServiceUnavailableException);
+  });
+
   it('getVendorStatus fetches the vendor by id', async () => {
     const service = await buildService(CONFIGURED_ENV);
     const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(

@@ -1231,6 +1231,8 @@ model PaymentTransaction {
   commissionBps     Int?    // basis points snapshot at order-creation time; frozen forever after — never recomputed on a later rate change
   platformAmount    Int?    // paise, computed once at creation from commissionBps
   restaurantAmount  Int?    // paise, computed once at creation; platformAmount + restaurantAmount == amount
+  fulfilledAt         DateTime? // set once the kiosk has created the token/KOT for this paid order (or staff mark it fulfilled); null on a SUCCESS payment = "needs attention"
+  fulfilledByDeviceId String?
   paidAt            DateTime?
   createdAt         DateTime                  @default(now())
   updatedAt         DateTime                  @updatedAt
@@ -1241,6 +1243,7 @@ model PaymentTransaction {
   @@unique([provider, providerOrderId])
   @@unique([provider, providerPaymentId])
   @@index([restaurantId])
+  @@index([status, fulfilledAt])
   @@index([orderId])
   @@index([providerPaymentId])
 }

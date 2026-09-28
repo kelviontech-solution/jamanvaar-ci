@@ -124,6 +124,59 @@ export class CashfreeGatewayService {
     return { cfOrderId: body.cf_order_id, orderId: body.order_id, paymentSessionId: body.payment_session_id, orderStatus: body.order_status };
   }
 
+  /**
+   * Order Pay API with the UPI `qrcode` channel
+   * (https://www.cashfree.com/docs/api-reference/payments/latest/payments/pay):
+   * Cashfree returns the QR for this exact order and amount and the merchant
+   * (our kiosk) renders it, so the customer scans it with their own phone.
+   * `expiresAtIso` is sent as transaction_expiry_time so an old QR stops working.
+   */
+  async createUpiQr(paymentSessionId: string, expiresAtIso: string): Promise<{ qrPayload: string; contentType: string | null; cfPaymentId: string | null }> {
+    const res = await fetch(`${this.baseUrl()}/orders/sessions`, {
+      method: 'POST',
+      headers: this.headers(),
+      body: JSON.stringify({
+        payment_session_id: paymentSessionId,
+        payment_method: { upi: { channel: 'qrcode' } },
+        transaction_expiry_time: expiresAtIso
+      })
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new ServiceUnavailableException(`Cashfree QR creation failed: ${body?.message ?? res.statusText}`);
+    }
+    const payload = body?.data?.payload;
+    if (typeof payload !== 'string' || payload.length === 0) {
+      throw new ServiceUnavailableException('Cashfree did not return a QR code for this payment');
+    }
+    return { qrPayload: payload, contentType: body?.data?.content_type ?? null, cfPaymentId: body?.cf_payment_id ? String(body.cf_payment_id) : null };
+  }
+
+  /**
+   * On-demand vendor settlement
+   * (https://www.cashfree.com/docs/api-reference/payments/latest/easy-split/create-on-demand-transfer).
+   * Cashfree requires a vendor balance of at least Rs. 1000 and payments processed at least
+   * 15 minutes earlier; it answers with an error otherwise, which is surfaced as-is. The
+   * idempotency key makes a retried click safe.
+   */
+  async settleVendorOnDemand(vendorId: string, amountPaise: number, idempotencyKey: string): Promise<{ settlementId: string | null; raw: Record<string, unknown> }> {
+    const res = await fetch(`${this.baseUrl()}/easy-split/vendors/${encodeURIComponent(vendorId)}/transfer`, {
+      method: 'POST',
+      headers: { ...this.headers(), 'x-idempotency-key': idempotencyKey },
+      body: JSON.stringify({
+        transfer_from: 'VENDOR',
+        transfer_type: 'ON_DEMAND',
+        transfer_amount: Number((amountPaise / 100).toFixed(2)),
+        remark: 'JAMANVAAR on-demand settlement'
+      })
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new ServiceUnavailableException(`Cashfree on-demand settlement failed: ${body?.message ?? res.statusText}`);
+    }
+    return { settlementId: body?.settlement_id !== undefined && body?.settlement_id !== null ? String(body.settlement_id) : null, raw: body };
+  }
+
   async getOrderStatus(orderId: string): Promise<CashfreeOrderStatusResult> {
     const res = await fetch(`${this.baseUrl()}/orders/${encodeURIComponent(orderId)}`, { method: 'GET', headers: this.headers() });
     const body = await res.json();

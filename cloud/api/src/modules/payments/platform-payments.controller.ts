@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Param, Patch, Query, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { PaymentTransactionStatus, PlatformUser } from '@prisma/client';
 import { PlatformPaymentsService } from './platform-payments.service';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { setCommissionConfigSchema, SetCommissionConfigDto } from './dto/commission-config.dto';
+import { adminRefundSchema, AdminRefundDto } from './dto/admin-payment.dto';
 
 @Controller('api/v1/payments')
 @UseGuards(PlatformAuthGuard)
@@ -23,6 +24,27 @@ export class PlatformPaymentsController {
   @UsePipes(new ZodValidationPipe(setCommissionConfigSchema))
   setCommissionConfig(@Body() body: SetCommissionConfigDto, @CurrentPlatformUser() actor: PlatformUser) {
     return this.platformPayments.setDefaultCommissionBps(body.defaultBps, actor, body.password);
+  }
+
+  @Get('attention')
+  attention() {
+    return this.platformPayments.attention();
+  }
+
+  @Get('statement')
+  statement(@Query('restaurantId') restaurantId?: string, @Query('date') date?: string) {
+    return this.platformPayments.statement(restaurantId, date);
+  }
+
+  @Post(':paymentId/admin-refund')
+  @UsePipes(new ZodValidationPipe(adminRefundSchema))
+  adminRefund(@Param('paymentId') paymentId: string, @Body() body: AdminRefundDto, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.platformPayments.adminRefund(paymentId, body, actor, body.password);
+  }
+
+  @Post(':paymentId/admin-fulfilled')
+  adminFulfilled(@Param('paymentId') paymentId: string, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.platformPayments.adminMarkFulfilled(paymentId, actor);
   }
 
   @Get('platform-summary')

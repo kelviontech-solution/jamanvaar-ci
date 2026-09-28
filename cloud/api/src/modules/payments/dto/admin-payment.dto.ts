@@ -1,0 +1,17 @@
+import { z } from 'zod';
+
+// `password` is optional at the schema level and enforced by requireStepUpPassword() in the
+// service (see commission-config.dto.ts): missing and wrong are both a 403.
+export const adminRefundSchema = z.object({
+  amountPaise: z.number().int().min(1),
+  reason: z.string().trim().min(1).max(500),
+  password: z.string().min(1).optional()
+});
+export type AdminRefundDto = z.infer<typeof adminRefundSchema>;
+
+// Cashfree's on-demand transfer takes a minimum of Rs. 10.
+export const settleNowSchema = z.object({
+  amountPaise: z.number().int().min(1000),
+  password: z.string().min(1).optional()
+});
+export type SettleNowDto = z.infer<typeof settleNowSchema>;

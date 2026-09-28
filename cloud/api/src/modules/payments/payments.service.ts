@@ -10,8 +10,14 @@ import { priceCart, PriceValidationError, MenuSnapshotItemLookup } from './prici
 import { CreatePaymentOrderDto } from './dto/create-payment-order.dto';
 import { CreateRefundDto } from './dto/create-refund.dto';
 import { getDefaultCommissionBps } from './commission.util';
+import { buildDayStatement } from './payment-statement.util';
 
 const NON_TERMINAL_STATUSES = ['CREATED', 'PENDING', 'AUTHORIZED'];
+const PAID_STATUSES = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'];
+/** A UPI QR stops working after this long; the kiosk shows the same countdown. */
+export const QR_TTL_SECONDS = 180;
+/** A paid order with no token/KOT after this long is surfaced as needing attention. */
+export const ATTENTION_GRACE_MS = 3 * 60 * 1000;
 
 @Injectable()
 export class PaymentsService {
@@ -146,6 +152,98 @@ export class PaymentsService {
     });
   }
 
+  /**
+   * A UPI QR for one pending payment, rendered by the kiosk itself. The QR is only ever created for a
+   * payment that is still open and only while the restaurant's Cashfree connection is ACTIVE, so a
+   * suspended restaurant stops taking new payments immediately.
+   */
+  async createUpiQr(restaurantId: string, paymentId: string) {
+    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId } })
+    );
+    if (!payment) throw new NotFoundException('Payment not found');
+    if (!NON_TERMINAL_STATUSES.includes(payment.status)) {
+      throw new BadRequestException(`Cannot create a QR for a payment in status ${payment.status}`);
+    }
+    if (!payment.paymentSessionId) {
+      throw new ServiceUnavailableException('This payment has no Cashfree session yet');
+    }
+    const connection = await this.prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } }));
+    if (!connection || connection.status !== 'ACTIVE') {
+      throw new ForbiddenException('Online payments are not active for this restaurant');
+    }
+
+    const expiresAt = new Date(Date.now() + QR_TTL_SECONDS * 1000);
+    const qr = await this.cashfree.createUpiQr(payment.paymentSessionId, expiresAt.toISOString());
+    return { qrPayload: qr.qrPayload, contentType: qr.contentType, expiresAt: expiresAt.toISOString() };
+  }
+
+  /**
+   * Called once the token and KOT exist for a paid order (by the kiosk itself, or by staff clearing a
+   * stuck one). Idempotent: the first stamp wins. A SUCCESS payment that is never stamped is what the
+   * "needs attention" lists are built from.
+   */
+  async markFulfilled(restaurantId: string, paymentId: string, device: { id: string; type: string }) {
+    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId } })
+    );
+    if (!payment) throw new NotFoundException('Payment not found');
+    if (!PAID_STATUSES.includes(payment.status)) {
+      throw new BadRequestException(`Cannot mark a payment in status ${payment.status} as fulfilled`);
+    }
+    if (payment.fulfilledAt) return { fulfilledAt: payment.fulfilledAt };
+
+    const stamp = new Date();
+    await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      const changed = await tx.paymentTransaction.updateMany({ where: { id: paymentId, fulfilledAt: null }, data: { fulfilledAt: stamp, fulfilledByDeviceId: device.id } });
+      if (changed.count > 0 && device.type !== 'KIOSK') {
+        await this.audit.log(
+          { actorType: 'TENANT', actorId: device.id, restaurantId, action: 'PAYMENT_MARKED_FULFILLED', category: 'PAYMENTS', details: { paymentId, deviceType: device.type } },
+          tx
+        );
+      }
+    });
+    const after = await this.prisma.runAsTenant(restaurantId, (tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } }));
+    return { fulfilledAt: after.fulfilledAt };
+  }
+
+  /** The latest online payments for a restaurant, with the two things staff act on: paid-but-unserved and refundable balance. */
+  async tenantRecent(restaurantId: string, limit = 30) {
+    const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.findMany({
+        where: { restaurantId },
+        orderBy: { createdAt: 'desc' },
+        take: Math.min(100, Math.max(1, limit)),
+        include: { order: { select: { externalOrderId: true } }, refunds: { select: { amount: true, status: true } } }
+      })
+    );
+    const now = Date.now();
+    return {
+      rows: rows.map((p) => {
+        const refundedAmount = p.refunds.filter((r) => r.status === 'SUCCESS').reduce((s, r) => s + r.amount, 0);
+        const committed = p.refunds.filter((r) => r.status === 'SUCCESS' || r.status === 'PENDING').reduce((s, r) => s + r.amount, 0);
+        const paidAt = p.paidAt ?? p.createdAt;
+        return {
+          id: p.id,
+          externalOrderId: p.order.externalOrderId,
+          amount: p.amount,
+          status: p.status,
+          method: p.method,
+          paidAt: p.paidAt,
+          createdAt: p.createdAt,
+          fulfilledAt: p.fulfilledAt,
+          refundedAmount,
+          refundableAmount: p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED' ? Math.max(0, p.amount - committed) : 0,
+          needsAttention: p.status === 'SUCCESS' && !p.fulfilledAt && now - paidAt.getTime() > ATTENTION_GRACE_MS
+        };
+      })
+    };
+  }
+
+  async tenantStatement(restaurantId: string, date: string | undefined) {
+    return this.prisma.runAsTenant(restaurantId, (tx) => buildDayStatement(tx, restaurantId, date));
+  }
+
   async getPaymentStatus(restaurantId: string, paymentId: string) {
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, include: { order: true } })
@@ -154,7 +252,7 @@ export class PaymentsService {
     return { paymentId: payment.id, orderId: payment.orderId, status: payment.status, amount: payment.amount, currency: payment.currency, orderStatus: payment.order.status };
   }
 
-  async createRefund(restaurantId: string, paymentId: string, dto: CreateRefundDto, device: { id: string; type: string }) {
+  async createRefund(restaurantId: string, paymentId: string, dto: CreateRefundDto, device: { id: string; type: string }, actorType: 'TENANT' | 'PLATFORM' = 'TENANT') {
     // security-audit LOW-02: the status check, the remaining-balance
     // aggregate, and the refund insert used to be three separate
     // runAsTenant calls — three separate transactions — so two concurrent
@@ -200,7 +298,7 @@ export class PaymentsService {
 
       await this.audit.log(
         {
-          actorType: 'TENANT',
+          actorType,
           actorId: device.id,
           restaurantId,
           action: 'REFUND_REQUESTED',

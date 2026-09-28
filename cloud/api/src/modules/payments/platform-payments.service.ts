@@ -4,6 +4,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { requireStepUpPassword } from '../../common/security/step-up.util';
 import { PAYMENT_DEFAULT_COMMISSION_BPS_KEY, getDefaultCommissionBps } from './commission.util';
+import { buildDayStatement } from './payment-statement.util';
+import { ATTENTION_GRACE_MS, PaymentsService } from './payments.service';
 
 export interface PlatformPaymentFilters {
   restaurantId?: string;
@@ -16,7 +18,8 @@ export interface PlatformPaymentFilters {
 export class PlatformPaymentsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly payments: PaymentsService
   ) {}
 
   async list(filters: PlatformPaymentFilters) {
@@ -112,6 +115,56 @@ export class PlatformPaymentsService {
         openReconciliationExceptions: exceptionCount
       };
     });
+  }
+
+  /** Paid orders whose kiosk never confirmed the token/KOT (crash, offline, or a payment that landed after the QR expired). */
+  async attention() {
+    const cutoff = new Date(Date.now() - ATTENTION_GRACE_MS);
+    const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+    const rows = await this.prisma.runAsPlatform((tx) =>
+      tx.paymentTransaction.findMany({
+        where: { status: 'SUCCESS', fulfilledAt: null, paidAt: { lt: cutoff }, createdAt: { gte: since } },
+        orderBy: { paidAt: 'asc' },
+        take: 200,
+        include: { restaurant: { select: { id: true, name: true } }, order: { select: { externalOrderId: true } } }
+      })
+    );
+    const now = Date.now();
+    return {
+      rows: rows.map((p) => ({
+        id: p.id,
+        restaurant: p.restaurant,
+        externalOrderId: p.order.externalOrderId,
+        amount: p.amount,
+        paidAt: p.paidAt,
+        minutesWaiting: Math.floor((now - (p.paidAt ?? p.createdAt).getTime()) / 60_000)
+      }))
+    };
+  }
+
+  async statement(restaurantId: string | undefined, date: string | undefined) {
+    if (!restaurantId) throw new BadRequestException('restaurantId is required');
+    return this.prisma.runAsPlatform((tx) => buildDayStatement(tx, restaurantId, date));
+  }
+
+  /** A Super Admin refund: same server-side rules as any refund (remaining balance, one Cashfree call), plus the admin's password. */
+  async adminRefund(paymentId: string, dto: { amountPaise: number; reason: string }, actor: PlatformUser, password?: string) {
+    await requireStepUpPassword(actor, password);
+    const payment = await this.prisma.runAsPlatform((tx) => tx.paymentTransaction.findUnique({ where: { id: paymentId }, select: { restaurantId: true } }));
+    if (!payment) throw new NotFoundException('Payment not found');
+    return this.payments.createRefund(
+      payment.restaurantId,
+      paymentId,
+      { amountPaise: dto.amountPaise, reason: dto.reason, requestedBy: actor.email },
+      { id: actor.id, type: 'PLATFORM' },
+      'PLATFORM'
+    );
+  }
+
+  async adminMarkFulfilled(paymentId: string, actor: PlatformUser) {
+    const payment = await this.prisma.runAsPlatform((tx) => tx.paymentTransaction.findUnique({ where: { id: paymentId }, select: { restaurantId: true } }));
+    if (!payment) throw new NotFoundException('Payment not found');
+    return this.payments.markFulfilled(payment.restaurantId, paymentId, { id: `platform:${actor.id}`, type: 'PLATFORM' });
   }
 
   async listReconciliationExceptions(filters: { restaurantId?: string; status?: 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED'; page: number; limit: number }) {

@@ -29,16 +29,48 @@ export class PaymentOrdersController {
     return this.payments.tenantSummary(device.restaurantId, { from: from ? new Date(from) : undefined, to: to ? new Date(to) : undefined });
   }
 
+  @Get('tenant-recent')
+  async tenantRecent(@CurrentDevice() device: Device, @Query('limit') limit?: string) {
+    if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
+      throw new ForbiddenException('Only Kiosk Admin or POS Admin can list the restaurant\'s payments');
+    }
+    return this.payments.tenantRecent(device.restaurantId, Number(limit) || 30);
+  }
+
+  @Get('tenant-statement')
+  async tenantStatement(@CurrentDevice() device: Device, @Query('date') date?: string) {
+    if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
+      throw new ForbiddenException('Only Kiosk Admin or POS Admin can read the day statement');
+    }
+    return this.payments.tenantStatement(device.restaurantId, date);
+  }
+
   @Get(':paymentId/status')
   async getStatus(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
     return this.payments.getPaymentStatus(device.restaurantId, paymentId);
   }
 
+  @Post(':paymentId/qr')
+  async createQr(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
+    if (device.type !== 'KIOSK' && device.type !== 'KIOSK_ADMIN') {
+      throw new ForbiddenException('Only a Kiosk device can show a payment QR');
+    }
+    return this.payments.createUpiQr(device.restaurantId, paymentId);
+  }
+
+  @Post(':paymentId/fulfilled')
+  async fulfilled(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
+    if (device.type !== 'KIOSK' && device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
+      throw new ForbiddenException('This device cannot mark a payment fulfilled');
+    }
+    return this.payments.markFulfilled(device.restaurantId, paymentId, { id: device.id, type: device.type });
+  }
+
   @Post(':paymentId/refund')
   @UsePipes(new ZodValidationPipe(createRefundSchema))
   async refund(@Param('paymentId') paymentId: string, @Body() body: CreateRefundDto, @CurrentDevice() device: Device) {
-    if (device.type !== 'POS' && device.type !== 'POS_ADMIN') {
-      throw new ForbiddenException('Only a POS device can initiate a refund');
+    if (device.type !== 'POS' && device.type !== 'POS_ADMIN' && device.type !== 'KIOSK_ADMIN') {
+      throw new ForbiddenException('Only POS, POS Admin or Kiosk Admin can initiate a refund');
     }
     return this.payments.createRefund(device.restaurantId, paymentId, body, { id: device.id, type: device.type });
   }

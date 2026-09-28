@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PlatformUser } from '@prisma/client';
@@ -310,6 +311,31 @@ export class PaymentConnectionsService {
   async disconnect(restaurantId: string, actor: PlatformUser, password?: string) {
     await requireStepUpPassword(actor, password);
     return this.transitionStatus(restaurantId, actor, ['ACTIVE', 'SUSPENDED', 'PENDING_VERIFICATION'], 'DISCONNECTED', 'PAYMENT_CONNECTION_DISCONNECTED');
+  }
+
+  /**
+   * Pays a restaurant's Cashfree vendor balance out to its bank now, instead of waiting for the automatic
+   * schedule. Money-moving, so it needs the admin's password and is audited with Cashfree's settlement id.
+   * Cashfree enforces its own minimum balance / 15-minute processing rule and its refusal is passed through.
+   */
+  async settleNow(restaurantId: string, amountPaise: number, actor: PlatformUser, password?: string) {
+    await requireStepUpPassword(actor, password);
+    const connection = await this.prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } }));
+    if (!connection) throw new NotFoundException('No payment connection for this restaurant');
+    if (!connection.cashfreeVendorId) {
+      throw new ForbiddenException('This restaurant has no Cashfree vendor yet — approve its payment connection first');
+    }
+
+    const result = await this.cashfree.settleVendorOnDemand(connection.cashfreeVendorId, amountPaise, randomUUID());
+    await this.audit.log({
+      actorType: 'PLATFORM',
+      actorId: actor.id,
+      restaurantId,
+      action: 'PAYMENT_SETTLE_NOW',
+      category: 'PAYMENTS',
+      details: { vendorId: connection.cashfreeVendorId, amountPaise, settlementId: result.settlementId }
+    });
+    return { settlementId: result.settlementId, amountPaise };
   }
 
   async setCommissionOverride(restaurantId: string, overrideBps: number | null, actor: PlatformUser, password?: string) {

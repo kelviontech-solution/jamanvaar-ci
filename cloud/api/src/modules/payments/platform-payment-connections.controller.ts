@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Param, Patch, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { PaymentConnectionsService } from './payment-connections.service';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { setCommissionOverrideSchema, SetCommissionOverrideDto, stepUpPasswordSchema, StepUpPasswordDto } from './dto/commission-config.dto';
+import { settleNowSchema, SettleNowDto } from './dto/admin-payment.dto';
 
 @Controller()
 @UseGuards(PlatformAuthGuard)
@@ -47,6 +48,12 @@ export class PlatformPaymentConnectionsController {
   @Patch('api/v1/restaurants/:id/payment-connection/refresh-status')
   refreshStatus(@Param('id') id: string) {
     return this.connections.refreshStatus(id);
+  }
+
+  @Post('api/v1/restaurants/:id/payment-connection/settle-now')
+  @UsePipes(new ZodValidationPipe(settleNowSchema))
+  settleNow(@Param('id') id: string, @Body() body: SettleNowDto, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.connections.settleNow(id, body.amountPaise, actor, body.password);
   }
 
   @Patch('api/v1/restaurants/:id/payment-connection/commission')

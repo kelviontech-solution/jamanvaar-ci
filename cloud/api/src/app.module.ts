@@ -49,7 +49,9 @@ import { validateEnv } from './config/env.validation';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
+    // Under test, test/setup.ts has already loaded .env into process.env and then removed the developer's
+    // real payment keys; re-reading the file here would silently put them back.
+    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv, ignoreEnvFile: process.env.NODE_ENV === 'test' }),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
