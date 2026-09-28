@@ -85,6 +85,8 @@ import {
   requestPasswordResetOwner,
   resetPasswordOwner,
   getPaymentConnection,
+  getPaymentsSummary,
+  type PaymentsSummary,
   submitPaymentConnection,
   syncMenuToCloud,
   pushOrderSync,
@@ -542,6 +544,14 @@ export default function AdminApp() {
     accountType: 'BUSINESS', pan: '', contactName: '', contactEmail: '', contactPhone: ''
   });
   const [paymentSubmitting, setPaymentSubmitting] = useState(false);
+  const [paymentsSummary, setPaymentsSummary] = useState<PaymentsSummary | null>(null);
+  const [paymentsSummaryError, setPaymentsSummaryError] = useState(false);
+  useEffect(() => {
+    if (!isDeviceConnected()) return;
+    getPaymentsSummary()
+      .then((s) => { setPaymentsSummary(s); setPaymentsSummaryError(false); })
+      .catch(() => setPaymentsSummaryError(true));
+  }, []);
 
   // Extracted from the effect below so the error banner's Retry button can
   // re-run exactly the same fetch. Without it, a transient failure — most
@@ -3796,6 +3806,20 @@ export default function AdminApp() {
                       </div>
                     ) : (
                       <span className="text-[#8C9BAE]">Not connected yet — set up in Settings → Payment Gateway.</span>
+                    )}
+                  </div>
+
+                  <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border text-xs space-y-1.5">
+                    <div className="font-bold text-jaman-navy">Online revenue (Cashfree)</div>
+                    {paymentsSummary ? (
+                      <>
+                        <div className="flex justify-between"><span className="text-[#8C9BAE]">Gross collected</span><span className="font-bold">{formatINR(paymentsSummary.grossVolume / 100)}</span></div>
+                        <div className="flex justify-between"><span className="text-[#8C9BAE]">Successful payments</span><span className="font-bold">{paymentsSummary.successfulCount}</span></div>
+                        <div className="flex justify-between"><span className="text-[#8C9BAE]">Failed payments</span><span className="font-bold">{paymentsSummary.failedCount}</span></div>
+                        <div className="flex justify-between"><span className="text-[#8C9BAE]">Refunded</span><span className="font-bold">{formatINR(paymentsSummary.refundedAmount / 100)}</span></div>
+                      </>
+                    ) : (
+                      <span className="text-[#8C9BAE]">{paymentsSummaryError ? 'Revenue summary unavailable right now.' : 'Loading…'}</span>
                     )}
                   </div>
 

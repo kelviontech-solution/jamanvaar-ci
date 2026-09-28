@@ -848,6 +848,18 @@ async function jsonOrThrow<T>(res: Response, what: string): Promise<T> {
   return data as T;
 }
 
+export interface PaymentsSummary {
+  grossVolume: number;
+  successfulCount: number;
+  failedCount: number;
+  refundedAmount: number;
+}
+
+/** Online (Cashfree) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
+export async function getPaymentsSummary(): Promise<PaymentsSummary> {
+  return jsonOrThrow<PaymentsSummary>(await deviceFetch('/api/v1/payments/tenant-summary'), 'Payments summary');
+}
+
 export async function pushOrderSync(events: OrderSyncPushEvent[]): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
   return jsonOrThrow(await deviceFetch('/api/v1/orders/sync', { method: 'POST', body: JSON.stringify({ events }) }), 'Order sync push');
 }

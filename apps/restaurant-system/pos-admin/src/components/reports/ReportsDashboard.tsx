@@ -11,6 +11,7 @@ import {
   ReportFilterOptions,
   ReportDateRange
 } from './reportDataEngine';
+import { getPaymentsSummary, type PaymentsSummary } from '../../cloud/cloudClient';
 import { ReportExportService } from './reportExportService';
 import { ReportDesignSelectorModal } from './ReportDesignSelectorModal';
 import { ReportPreviewModal } from './ReportPreviewModal';
@@ -135,6 +136,13 @@ const ALL_REPORTS: ReportDefinition[] = [
 
 export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast }) => {
   // Navigation & Selection State
+  const [onlineSummary, setOnlineSummary] = useState<PaymentsSummary | null>(null);
+  const [onlineSummaryError, setOnlineSummaryError] = useState(false);
+  useEffect(() => {
+    getPaymentsSummary()
+      .then((s) => { setOnlineSummary(s); setOnlineSummaryError(false); })
+      .catch(() => setOnlineSummaryError(true));
+  }, []);
   const [selectedCategory, setSelectedCategory] = useState<ReportCategoryKey>('SALES');
   const [activeReportId, setActiveReportId] = useState<string>('DAILY_SALES');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -471,6 +479,24 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
               Clear All Filters
             </button>
           </div>
+        )}
+      </div>
+
+      {/* ONLINE PAYMENTS (CASHFREE) — server-side totals; a different source from the local sales figures below, so shown separately rather than merged */}
+      <div className="bg-white border border-jaman-border rounded-3xl p-5 sm:p-6 shadow-xs space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-black text-jaman-navy">Online Payments (Cashfree)</h2>
+          <span className="text-[10px] text-slate-500">All time · from cloud, not local sales</span>
+        </div>
+        {onlineSummary ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Online sales</div><div className="text-lg font-black text-jaman-navy">{formatINR(onlineSummary.grossVolume / 100)}</div></div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Successful</div><div className="text-lg font-black text-jaman-navy">{onlineSummary.successfulCount}</div></div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Failed</div><div className="text-lg font-black text-jaman-navy">{onlineSummary.failedCount}</div></div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Refunded</div><div className="text-lg font-black text-jaman-navy">{formatINR(onlineSummary.refundedAmount / 100)}</div></div>
+          </div>
+        ) : (
+          <p className="text-xs text-slate-500">{onlineSummaryError ? 'Online payment totals unavailable right now (offline or not connected to the cloud).' : 'Loading…'}</p>
         )}
       </div>
 

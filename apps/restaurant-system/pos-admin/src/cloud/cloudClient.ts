@@ -822,6 +822,21 @@ async function parseJsonResponse(res: Response): Promise<any> {
   return contentType.includes('application/json') ? res.json() : undefined;
 }
 
+export interface PaymentsSummary {
+  grossVolume: number;
+  successfulCount: number;
+  failedCount: number;
+  refundedAmount: number;
+}
+
+/** Online (Cashfree) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
+export async function getPaymentsSummary(): Promise<PaymentsSummary> {
+  const res = await deviceFetch('/api/v1/payments/tenant-summary');
+  const data = await parseJsonResponse(res);
+  if (!res.ok) throw new CloudApiError(data?.message ?? `Payments summary failed (${res.status})`, res.status);
+  return data as PaymentsSummary;
+}
+
 export async function pushOrderSync(
   events: OrderSyncPushEvent[]
 ): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
