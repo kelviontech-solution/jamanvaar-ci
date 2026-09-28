@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PaymentTransactionStatus, PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { requireStepUpPassword } from '../../common/security/step-up.util';
 import { PAYMENT_DEFAULT_COMMISSION_BPS_KEY, getDefaultCommissionBps } from './commission.util';
 
 export interface PlatformPaymentFilters {
@@ -63,10 +64,11 @@ export class PlatformPaymentsService {
     return { defaultBps: await getDefaultCommissionBps(this.prisma) };
   }
 
-  async setDefaultCommissionBps(bps: number, actor: PlatformUser) {
+  async setDefaultCommissionBps(bps: number, actor: PlatformUser, password?: string) {
     if (!Number.isInteger(bps) || bps < 0 || bps > 10000) {
       throw new BadRequestException('defaultBps must be an integer between 0 and 10000');
     }
+    await requireStepUpPassword(actor, password);
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.platformSetting.findUnique({ where: { key: PAYMENT_DEFAULT_COMMISSION_BPS_KEY } });
       const oldBps = (existing?.value as { bps?: number } | undefined)?.bps ?? 0;

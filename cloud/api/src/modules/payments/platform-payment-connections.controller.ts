@@ -4,7 +4,7 @@ import { PaymentConnectionsService } from './payment-connections.service';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import { setCommissionOverrideSchema, SetCommissionOverrideDto } from './dto/commission-config.dto';
+import { setCommissionOverrideSchema, SetCommissionOverrideDto, stepUpPasswordSchema, StepUpPasswordDto } from './dto/commission-config.dto';
 
 @Controller()
 @UseGuards(PlatformAuthGuard)
@@ -22,13 +22,15 @@ export class PlatformPaymentConnectionsController {
   }
 
   @Patch('api/v1/restaurants/:id/payment-connection/approve')
-  approve(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
-    return this.connections.approve(id, actor);
+  @UsePipes(new ZodValidationPipe(stepUpPasswordSchema))
+  approve(@Param('id') id: string, @Body() body: StepUpPasswordDto, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.connections.approve(id, actor, body.password);
   }
 
   @Patch('api/v1/restaurants/:id/payment-connection/suspend')
-  suspend(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
-    return this.connections.suspend(id, actor);
+  @UsePipes(new ZodValidationPipe(stepUpPasswordSchema))
+  suspend(@Param('id') id: string, @Body() body: StepUpPasswordDto, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.connections.suspend(id, actor, body.password);
   }
 
   @Patch('api/v1/restaurants/:id/payment-connection/reactivate')
@@ -37,8 +39,9 @@ export class PlatformPaymentConnectionsController {
   }
 
   @Patch('api/v1/restaurants/:id/payment-connection/disconnect')
-  disconnect(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
-    return this.connections.disconnect(id, actor);
+  @UsePipes(new ZodValidationPipe(stepUpPasswordSchema))
+  disconnect(@Param('id') id: string, @Body() body: StepUpPasswordDto, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.connections.disconnect(id, actor, body.password);
   }
 
   @Patch('api/v1/restaurants/:id/payment-connection/refresh-status')
@@ -49,6 +52,6 @@ export class PlatformPaymentConnectionsController {
   @Patch('api/v1/restaurants/:id/payment-connection/commission')
   @UsePipes(new ZodValidationPipe(setCommissionOverrideSchema))
   setCommission(@Param('id') id: string, @Body() body: SetCommissionOverrideDto, @CurrentPlatformUser() actor: PlatformUser) {
-    return this.connections.setCommissionOverride(id, body.overrideBps, actor);
+    return this.connections.setCommissionOverride(id, body.overrideBps, actor, body.password);
   }
 }

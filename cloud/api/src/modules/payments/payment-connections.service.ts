@@ -5,6 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { CashfreeGatewayService } from './cashfree-gateway.service';
 import { encryptCredential, decryptCredential } from '../../common/security/credential-encryption.util';
+import { requireStepUpPassword } from '../../common/security/step-up.util';
 import { SubmitPaymentConnectionDto } from './dto/payment-connection.dto';
 
 const RESUBMITTABLE_STATUSES = ['NOT_CONNECTED', 'PENDING_VERIFICATION', 'DISCONNECTED'];
@@ -170,7 +171,8 @@ export class PaymentConnectionsService {
     return this.toPlatformView(connection);
   }
 
-  async approve(restaurantId: string, actor: PlatformUser) {
+  async approve(restaurantId: string, actor: PlatformUser, password?: string) {
+    await requireStepUpPassword(actor, password);
     // Deliberately split into three phases rather than one runAsPlatform
     // transaction spanning the whole method: runAsPlatform wraps its
     // callback in a real Postgres transaction, and holding that open across
@@ -296,7 +298,8 @@ export class PaymentConnectionsService {
     });
   }
 
-  async suspend(restaurantId: string, actor: PlatformUser) {
+  async suspend(restaurantId: string, actor: PlatformUser, password?: string) {
+    await requireStepUpPassword(actor, password);
     return this.transitionStatus(restaurantId, actor, ['ACTIVE'], 'SUSPENDED', 'PAYMENT_CONNECTION_SUSPENDED');
   }
 
@@ -304,14 +307,16 @@ export class PaymentConnectionsService {
     return this.transitionStatus(restaurantId, actor, ['SUSPENDED'], 'ACTIVE', 'PAYMENT_CONNECTION_REACTIVATED');
   }
 
-  async disconnect(restaurantId: string, actor: PlatformUser) {
+  async disconnect(restaurantId: string, actor: PlatformUser, password?: string) {
+    await requireStepUpPassword(actor, password);
     return this.transitionStatus(restaurantId, actor, ['ACTIVE', 'SUSPENDED', 'PENDING_VERIFICATION'], 'DISCONNECTED', 'PAYMENT_CONNECTION_DISCONNECTED');
   }
 
-  async setCommissionOverride(restaurantId: string, overrideBps: number | null, actor: PlatformUser) {
+  async setCommissionOverride(restaurantId: string, overrideBps: number | null, actor: PlatformUser, password?: string) {
     if (overrideBps !== null && (!Number.isInteger(overrideBps) || overrideBps < 0 || overrideBps > 10000)) {
       throw new BadRequestException('overrideBps must be null or an integer between 0 and 10000');
     }
+    await requireStepUpPassword(actor, password);
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
       if (!existing) throw new NotFoundException('No payment connection for this restaurant');

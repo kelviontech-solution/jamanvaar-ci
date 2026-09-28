@@ -22,7 +22,7 @@ export class PlatformPaymentsController {
   @Patch('commission-config')
   @UsePipes(new ZodValidationPipe(setCommissionConfigSchema))
   setCommissionConfig(@Body() body: SetCommissionConfigDto, @CurrentPlatformUser() actor: PlatformUser) {
-    return this.platformPayments.setDefaultCommissionBps(body.defaultBps, actor);
+    return this.platformPayments.setDefaultCommissionBps(body.defaultBps, actor, body.password);
   }
 
   @Get()

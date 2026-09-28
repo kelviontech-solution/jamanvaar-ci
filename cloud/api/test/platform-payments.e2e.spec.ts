@@ -128,7 +128,7 @@ describe('Platform payments visibility', () => {
   });
 
   it('PATCH /commission-config sets the platform default and it is reflected on GET', async () => {
-    const res = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 250 });
+    const res = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 250, password: adminPassword });
     expect(res.status).toBe(200);
     expect(res.body.defaultBps).toBe(250);
 
@@ -144,7 +144,7 @@ describe('Platform payments visibility', () => {
   });
 
   it('PATCH /commission-config records an audit log entry', async () => {
-    await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 400 });
+    await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 400, password: adminPassword });
     const entry = await prisma.runAsPlatform((tx) =>
       tx.auditLog.findFirst({ where: { action: 'COMMISSION_CHANGED', category: 'PAYMENTS' }, orderBy: { createdAt: 'desc' } })
     );
@@ -165,7 +165,7 @@ describe('Platform payments visibility', () => {
 
     const getRes = await authed('get', '/api/v1/payments/commission-config', token);
     expect(getRes.status).toBe(200);
-    const patchRes = await authed('patch', '/api/v1/payments/commission-config', token).send({ defaultBps: 100 });
+    const patchRes = await authed('patch', '/api/v1/payments/commission-config', token).send({ defaultBps: 100, password: 'correct-horse-battery-staple' });
     expect(patchRes.status).toBe(200);
 
     await prisma.platformUser.deleteMany({ where: { email } });
@@ -183,6 +183,15 @@ describe('Platform payments visibility', () => {
     expect(patchRes.status).toBe(403);
 
     await prisma.platformUser.deleteMany({ where: { email } });
+  });
+
+  it('setDefaultCommissionBps requires the correct step-up password', async () => {
+    const wrong = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 150, password: 'wrong' });
+    expect(wrong.status).toBe(403);
+    const missing = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 150 });
+    expect(missing.status).toBe(403); // password is optional at the schema level; requireStepUpPassword rejects a missing one the same as a wrong one
+    const right = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 150, password: adminPassword });
+    expect(right.status).toBe(200);
   });
 
   it('a SUPPORT_ADMIN has no billing area access at all, not even read', async () => {
