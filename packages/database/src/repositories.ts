@@ -71,6 +71,7 @@ import { getOrderTenders, splitsMatchTotal } from './tender';
 import { generateOrderNumber, generateTokenNumber, generateUUID, normalizeIndianPhone, formatRestaurantDate, getRestaurantHour, getBusinessDayDisplayDate } from '@jamanvaar/utils';
 import { db } from './db';
 import { resetEntitySyncCursors } from './sync_cursors';
+import { kitchenRank, resolveKitchenState, deriveTicketStatus } from './kitchen_status';
 import { TableSync } from './table_sync';
 import { canMoveTable } from './table_state';
 import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync } from './collection_sync';
@@ -2489,11 +2490,58 @@ const PRE_READY_ORDER_STATUSES: ReadonlyArray<OrderStatus> = ['NEW', 'DRAFT', 'C
  */
 function followKitchenStage(order: Order): void {
   const status = order.orderStatus;
-  const lines = order.items;
+  // A cancelled dish is not waiting for the kitchen.
+  const lines = order.items.filter((i) => i.kitchenStatus !== 'CANCELLED');
   if (lines.length === 0) return;
   const allReady = lines.every((i) => i.kitchenStatus === 'READY' || i.kitchenStatus === 'SERVED');
   if (allReady && PRE_READY_ORDER_STATUSES.includes(status)) order.orderStatus = 'READY';
   else if (!allReady && status === 'READY') order.orderStatus = 'PREPARING';
+}
+
+/** The order moves forward to READY when every live dish is ready. It is never moved back: the cloud refuses an order going backwards. */
+function advanceOrderStage(order: Order): void {
+  const lines = order.items.filter((i) => i.kitchenStatus !== 'CANCELLED');
+  if (lines.length === 0) return;
+  const allReady = lines.every((i) => i.kitchenStatus === 'READY' || i.kitchenStatus === 'SERVED');
+  if (allReady && PRE_READY_ORDER_STATUSES.includes(order.orderStatus)) order.orderStatus = 'READY';
+}
+
+/** The order line(s) a ticket line cooks: the exact line when the ticket knows it, otherwise every line of that dish. */
+function linesForKotItem(order: Order, item: KOTItem): OrderItem[] {
+  if (item.orderItemId) {
+    const line = order.items.find((i) => i.id === item.orderItemId);
+    return line ? [line] : [];
+  }
+  return order.items.filter((oi) => oi.menuItemId === item.menuItemId);
+}
+
+const ORDER_SETTLED: ReadonlyArray<string> = ['COMPLETED', 'CANCELLED', 'REFUNDED'];
+
+/** Tickets made before per-dish status kept every dish at the ticket's own status; bring the dishes in line before working per dish. */
+function normalizeTicketItems(kot: KOTRecord): void {
+  const floor = kitchenRank(kot.status);
+  if (floor < 2 || floor > 3) return;
+  kot.items.forEach((i) => {
+    if (kitchenRank(i.status) < floor) i.status = kot.status;
+  });
+}
+
+/** Sets the ticket's own status (and timestamps) from what its dishes say. */
+function refreshTicketFromItems(kot: KOTRecord): void {
+  const derived = deriveTicketStatus(kot.items.map((i) => i.status));
+  if (!derived) return;
+  const now = new Date().toISOString();
+  kot.status = derived;
+  if (derived === 'PREPARING') {
+    kot.readyAt = undefined;
+    kot.servedAt = undefined;
+  } else if (derived === 'READY') {
+    if (!kot.readyAt) kot.readyAt = now;
+    kot.servedAt = undefined;
+  } else if (derived === 'SERVED') {
+    if (!kot.readyAt) kot.readyAt = now;
+    if (!kot.servedAt) kot.servedAt = now;
+  }
 }
 
 export class KOTRepository {
@@ -2624,13 +2672,18 @@ export class KOTRepository {
     // status change. KOT items and Order items are separate id spaces (see
     // posStore.ts's sendKOT, which mints them independently), so the match
     // has to go through menuItemId rather than id.
+    // Keep the ticket's dishes in step with the ticket (a cancelled dish stays cancelled).
+    kot.items.forEach((i) => {
+      if (i.status !== 'CANCELLED') i.status = status;
+      if (status === 'READY' && !i.readyAt && i.status === 'READY') i.readyAt = new Date().toISOString();
+    });
+
     const order = db.orders.find((o) => o.id === kot.orderId);
     if (order) {
-      const kotMenuItemIds = new Set(kot.items.map((i) => i.menuItemId));
-      order.items.forEach((oi) => {
-        if (kotMenuItemIds.has(oi.menuItemId)) {
-          oi.kitchenStatus = status as OrderItem['kitchenStatus'];
-        }
+      kot.items.forEach((item) => {
+        linesForKotItem(order, item).forEach((oi) => {
+          if (oi.kitchenStatus !== 'CANCELLED') oi.kitchenStatus = status as OrderItem['kitchenStatus'];
+        });
       });
       followKitchenStage(order);
       order.updatedAt = new Date().toISOString();
@@ -2639,6 +2692,110 @@ export class KOTRepository {
 
     db.notify();
     return kot;
+  }
+
+  /**
+   * The cook marks ONE dish on a ticket. When it is the last dish to reach a stage the ticket follows (READY, SERVED).
+   * Moving a dish backwards (undo) is allowed until the order is settled; it carries a higher revision so it beats any
+   * older copy on other devices. A cancelled dish cannot be changed.
+   */
+  public static setItemStatus(kotId: string, kotItemId: string, status: 'PREPARING' | 'READY' | 'SERVED'): boolean {
+    const kot = db.kots.find((k) => k.id === kotId);
+    const item = kot?.items.find((i) => i.id === kotItemId);
+    if (!kot || !item || item.status === 'CANCELLED' || kot.status === 'CANCELLED') return false;
+    const order = db.orders.find((o) => o.id === kot.orderId);
+
+    normalizeTicketItems(kot);
+    const backwards = kitchenRank(status) < kitchenRank(item.status);
+    if (backwards && order && ORDER_SETTLED.includes(order.orderStatus)) return false;
+    if (status === item.status) return true;
+
+    const lines = order ? linesForKotItem(order, item) : [];
+    let rev = item.rev ?? 0;
+    if (backwards) rev = Math.max(rev, ...lines.map((l) => l.statusRev ?? 0)) + 1;
+
+    const now = new Date().toISOString();
+    item.status = status;
+    item.rev = rev;
+    if (status === 'READY') item.readyAt = now;
+    else if (status === 'PREPARING') item.readyAt = undefined;
+    lines.forEach((l) => {
+      if (l.kitchenStatus === 'CANCELLED') return;
+      l.kitchenStatus = status;
+      if (backwards) l.statusRev = rev;
+    });
+
+    refreshTicketFromItems(kot);
+    if (order) {
+      advanceOrderStage(order);
+      order.updatedAt = now;
+      order.syncStatus = 'SAVED_LOCALLY';
+    }
+    db.notify();
+    return true;
+  }
+
+  /** Brings a whole ticket back to cooking (Ready or Served by mistake). Refused once the order is settled or the ticket cancelled. */
+  public static recallKot(kotId: string): boolean {
+    const kot = db.kots.find((k) => k.id === kotId);
+    if (!kot || kot.status === 'CANCELLED') return false;
+    const order = db.orders.find((o) => o.id === kot.orderId);
+    if (order && ORDER_SETTLED.includes(order.orderStatus)) return false;
+    normalizeTicketItems(kot);
+    let moved = false;
+    kot.items.forEach((i) => {
+      if (i.status !== 'CANCELLED' && kitchenRank(i.status) >= 2 && KOTRepository.setItemStatus(kot.id, i.id, 'PREPARING')) moved = true;
+    });
+    if (!moved && (kot.status === 'READY' || kot.status === 'SERVED')) {
+      // A ticket with no dishes to move still comes back.
+      kot.status = 'PREPARING';
+      kot.readyAt = undefined;
+      kot.servedAt = undefined;
+      db.notify();
+      return true;
+    }
+    return moved;
+  }
+
+  /**
+   * Cancels one dish that was already sent. The line stays on the order at no charge (so the kitchen screen and the bill agree
+   * and nothing can bring it back), marked CANCELLED with its reason. The caller re-prices the order from the live lines.
+   * Returns the order, or null when the dish is unknown, already served or already cancelled.
+   */
+  public static cancelOrderLine(orderId: string, orderItemId: string, reason: string, actorName?: string): Order | null {
+    const order = db.orders.find((o) => o.id === orderId);
+    const line = order?.items.find((i) => i.id === orderItemId);
+    if (!order || !line || line.kitchenStatus === 'CANCELLED' || line.kitchenStatus === 'SERVED') return null;
+    if (ORDER_SETTLED.includes(order.orderStatus)) return null;
+
+    const was = { name: line.name, quantity: line.quantity, amount: line.totalPrice };
+    const rev = (line.statusRev ?? 0) + 1;
+    line.kitchenStatus = 'CANCELLED';
+    line.statusRev = rev;
+    line.cancelReason = reason.slice(0, 120);
+    line.unitPrice = 0;
+    line.totalPrice = 0;
+
+    for (const kot of db.kots.filter((k) => k.orderId === order.id)) {
+      const item = kot.items.find((i) => i.orderItemId === line.id) ?? (kot.items.every((i) => !i.orderItemId) ? kot.items.find((i) => i.menuItemId === line.menuItemId && i.status !== 'SERVED' && i.status !== 'CANCELLED') : undefined);
+      if (!item) continue;
+      item.status = 'CANCELLED';
+      item.rev = rev;
+      item.cancelReason = line.cancelReason;
+      refreshTicketFromItems(kot);
+    }
+
+    if (order.items.every((i) => i.kitchenStatus === 'CANCELLED')) order.orderStatus = 'CANCELLED';
+    order.updatedAt = new Date().toISOString();
+    order.syncStatus = 'SAVED_LOCALLY';
+    AuditRepository.log({
+      action: 'ORDER_ITEM_CANCELLED',
+      category: 'ORDER',
+      details: `Cancelled ${was.quantity} x ${was.name} (₹${was.amount}) on order #${order.orderNumber}: ${line.cancelReason}`,
+      username: actorName || 'Staff'
+    });
+    db.notify();
+    return order;
   }
 
   /**
@@ -2651,29 +2808,59 @@ export class KOTRepository {
     let changed = 0;
     const now = new Date().toISOString();
     for (const kot of db.kots) {
-      if (kot.status === 'SERVED' || kot.status === 'CANCELLED') continue;
+      if (kot.status === 'CANCELLED') continue;
       const order = db.orders.find((o) => o.id === kot.orderId);
       if (!order) continue;
 
-      let next: KOTRecord['status'] | null = null;
-      if (order.orderStatus === 'CANCELLED') next = 'CANCELLED';
-      else if (order.orderStatus === 'COMPLETED' || order.orderStatus === 'REFUNDED') next = 'SERVED';
-      else {
-        const menuItemIds = new Set(kot.items.map((i) => i.menuItemId));
-        const lines = order.items.filter((oi) => menuItemIds.has(oi.menuItemId));
-        if (lines.length > 0) {
-          if (lines.every((l) => l.kitchenStatus === 'SERVED')) next = 'SERVED';
-          else if (lines.every((l) => l.kitchenStatus === 'READY' || l.kitchenStatus === 'SERVED')) next = 'READY';
+      if (order.orderStatus === 'CANCELLED') {
+        kot.status = 'CANCELLED';
+        kot.items.forEach((i) => { i.status = 'CANCELLED'; });
+        changed += 1;
+        continue;
+      }
+      if (order.orderStatus === 'COMPLETED' || order.orderStatus === 'REFUNDED') {
+        if (kot.status !== 'SERVED') {
+          kot.status = 'SERVED';
+          if (!kot.readyAt) kot.readyAt = now;
+          if (!kot.servedAt) kot.servedAt = now;
+          kot.items.forEach((i) => { if (i.status !== 'CANCELLED') i.status = 'SERVED'; });
+          changed += 1;
         }
+        continue;
       }
 
-      if (!next || KOT_STATUS_RANK[next] <= KOT_STATUS_RANK[kot.status]) continue;
-      kot.status = next;
-      if (next === 'READY' && !kot.readyAt) kot.readyAt = now;
-      if (next === 'SERVED') {
-        if (!kot.readyAt) kot.readyAt = now;
-        if (!kot.servedAt) kot.servedAt = now;
-        kot.items.forEach((i) => { i.status = 'SERVED'; });
+      // Each dish takes the state of the order line it cooks. A line with a higher revision (an undo or a cancellation on
+      // another device) replaces the ticket's copy even when that moves it backwards; otherwise dishes only move forward.
+      let touched = false;
+      let movedBack = false;
+      for (const item of kot.items) {
+        const lines = linesForKotItem(order, item);
+        if (lines.length === 0) continue;
+        let remote: { status?: string; rev?: number };
+        if (item.orderItemId) {
+          remote = { status: lines[0].kitchenStatus, rev: lines[0].statusRev };
+        } else {
+          // Older tickets: all lines of the dish must agree before the ticket line moves (and only ever forward).
+          const every = (pred: (s: string | undefined) => boolean) => lines.every((l) => pred(l.kitchenStatus));
+          remote = { status: every((s) => s === 'CANCELLED') ? 'CANCELLED' : every((s) => s === 'SERVED') ? 'SERVED' : every((s) => s === 'READY' || s === 'SERVED') ? 'READY' : undefined };
+        }
+        if (!remote.status) continue;
+        const merged = resolveKitchenState({ status: item.status, rev: item.rev }, remote);
+        if (merged.status === item.status && merged.rev === (item.rev ?? 0)) continue;
+        if (kitchenRank(merged.status) < kitchenRank(item.status)) movedBack = true;
+        item.status = merged.status as KOTItem['status'];
+        item.rev = merged.rev;
+        if (item.status === 'READY' && !item.readyAt) item.readyAt = now;
+        if (item.status === 'PREPARING') item.readyAt = undefined;
+        if (item.status === 'CANCELLED' && lines[0].cancelReason) item.cancelReason = lines[0].cancelReason;
+        touched = true;
+      }
+      if (!touched) continue;
+      const before = kot.status;
+      const derived = deriveTicketStatus(kot.items.map((i) => i.status));
+      if (derived && derived !== before && (movedBack || KOT_STATUS_RANK[derived] > KOT_STATUS_RANK[before])) {
+        refreshTicketFromItems(kot);
+        if (kot.status === 'SERVED') kot.items.forEach((i) => { if (i.status !== 'CANCELLED') i.status = 'SERVED'; });
       }
       changed += 1;
     }
@@ -2686,10 +2873,12 @@ export class KOTRepository {
     const nowMs = Date.now();
     const ready: FoodReadyItem[] = [];
     for (const kot of db.kots) {
-      if (kot.status !== 'READY' || !kot.tableNumber) continue;
+      if (!kot.tableNumber || kot.status === 'CANCELLED' || kot.status === 'SERVED') continue;
       for (const item of kot.items) {
-        if (item.status === 'SERVED') continue;
-        const readyAt = kot.readyAt || kot.createdAt;
+        if (item.status === 'SERVED' || item.status === 'CANCELLED') continue;
+        // A dish counts as ready when the cook marked it, or when its whole ticket is ready (older tickets).
+        if (item.status !== 'READY' && kot.status !== 'READY') continue;
+        const readyAt = item.readyAt || kot.readyAt || kot.createdAt;
         ready.push({
           id: `${kot.id}:${item.id}`,
           kotId: kot.id,
@@ -2717,27 +2906,14 @@ export class KOTRepository {
     const kot = db.kots.find((k) => k.id === kotId);
     const item = kot?.items.find((i) => i.id === kotItemId);
     if (!kot || !item) return false;
-    item.status = 'SERVED';
-
-    const order = db.orders.find((o) => o.id === kot.orderId);
-    if (order) {
-      order.items.forEach((oi) => {
-        if (oi.menuItemId === item.menuItemId) oi.kitchenStatus = 'SERVED';
-      });
-      followKitchenStage(order);
-      order.updatedAt = new Date().toISOString();
-      order.syncStatus = 'SAVED_LOCALLY';
-    }
-
-    if (kot.items.every((i) => i.status === 'SERVED')) KOTRepository.updateKOTStatus(kot.id, 'SERVED');
-    else db.notify();
-    return true;
+    if (item.status === 'CANCELLED') return false;
+    return KOTRepository.setItemStatus(kotId, kotItemId, 'SERVED');
   }
 
   public static markKotServed(kotId: string): boolean {
     const kot = db.kots.find((k) => k.id === kotId);
     if (!kot) return false;
-    kot.items.forEach((i) => { i.status = 'SERVED'; });
+    kot.items.forEach((i) => { if (i.status !== 'CANCELLED') i.status = 'SERVED'; });
     KOTRepository.updateKOTStatus(kot.id, 'SERVED');
     return true;
   }

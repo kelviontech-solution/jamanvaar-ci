@@ -57,6 +57,33 @@ describe('mergeOrderItems', () => {
     expect(kitchenStatusRank(undefined)).toBe(0);
   });
 
+  it('an undo carries a higher revision and beats the stored copy, even though it moves the dish backwards', () => {
+    const existing = [item('a', { originDeviceId: 'CAPTAIN', kitchenStatus: 'READY' })];
+    const { items } = mergeOrderItems(existing, [item('a', { kitchenStatus: 'PREPARING', statusRev: 1 })], 'KDS');
+    expect(items[0].kitchenStatus).toBe('PREPARING');
+    expect(items[0].statusRev).toBe(1);
+  });
+
+  it('a delayed copy from before the undo (lower revision) cannot undo the undo', () => {
+    const existing = [item('a', { originDeviceId: 'CAPTAIN', kitchenStatus: 'PREPARING', statusRev: 1 })];
+    const { items } = mergeOrderItems(existing, [item('a', { kitchenStatus: 'READY' })], 'CAPTAIN');
+    expect(items[0].kitchenStatus).toBe('PREPARING');
+    expect(items[0].statusRev).toBe(1);
+  });
+
+  it('a cancelled dish stays cancelled and at no charge when a stale push still carries its price', () => {
+    const existing = [item('a', { originDeviceId: 'CAPTAIN', kitchenStatus: 'CANCELLED', statusRev: 1, cancelReason: 'Out of stock', unitPrice: 0, lineTotal: 0 })];
+    const { items } = mergeOrderItems(existing, [item('a', { kitchenStatus: 'PREPARING', unitPrice: 15000, lineTotal: 15000 })], 'CAPTAIN');
+    expect(items[0]).toMatchObject({ kitchenStatus: 'CANCELLED', statusRev: 1, cancelReason: 'Out of stock', unitPrice: 0, lineTotal: 0 });
+  });
+
+  it('a push from an older client with no revision at all still moves a dish forward', () => {
+    const existing = [item('a', { originDeviceId: 'POS', kitchenStatus: 'PREPARING' })];
+    const { items } = mergeOrderItems(existing, [item('a', { kitchenStatus: 'READY' })], 'KDS');
+    expect(items[0].kitchenStatus).toBe('READY');
+    expect(items[0].statusRev).toBeUndefined();
+  });
+
   it('with no existing order the incoming items are simply adopted', () => {
     const { items, foreignItemsKept } = mergeOrderItems(undefined, [item('x'), item('y')], 'POS');
     expect(items).toHaveLength(2);

@@ -1,30 +1,28 @@
 import React, { useState, useMemo } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
-import { useCaptainStore, CartItemEntry } from '../../store/captainStore';
+import { useCaptainStore, CartItemEntry, COURSES, type Course } from '../../store/captainStore';
 import { DiningTable, MenuItem, SelectedModifier } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
 import { priceOrderLines } from '@jamanvaar/business';
 import { captainDb } from '@jamanvaar/database';
 import { EmptyState } from '@jamanvaar/ui';
 import { CaptainModifierModal } from '../modals/CaptainModifierModal';
+import { CaptainCancelDishModal } from '../modals/CaptainCancelDishModal';
 import {
   X,
   Plus,
-  Minus,
   Trash2,
   Receipt,
   MessageSquare,
-  Users,
   Flame,
   CheckCircle2,
-  ChefHat,
   Search,
   RotateCcw,
-  SlidersHorizontal,
-  Clock,
   ArrowRight,
   UtensilsCrossed,
-  Tag
+  ChevronUp,
+  ChevronDown,
+  Ban
 } from 'lucide-react';
 
 interface CaptainTableWorkspaceModalProps {
@@ -35,11 +33,12 @@ interface CaptainTableWorkspaceModalProps {
   onOpenSendMessage: (tableNumber: string) => void;
 }
 
+type DishState = 'PREPARING' | 'READY' | 'SERVED' | 'CANCELLED';
+
 export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProps> = ({
   table,
   isOpen,
   onClose,
-  onOpenTransferMerge,
   onOpenSendMessage
 }) => {
   useEscapeToClose(isOpen, onClose);
@@ -51,28 +50,26 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
     addItemToCart,
     updateCartQuantity,
     removeCartItem,
+    setCartItemCourse,
     clearCart,
     sendKOT,
     requestBill,
     repeatPreviousOrder,
-    serveReadyForTable
+    markItemServed
   } = useCaptainStore();
 
-  // A freshly-opened table with nothing ordered yet should land straight on
-  // the menu, not an empty "Order" tab the captain has to tap through —
-  // that extra step was pure friction on top of the mandatory guest-count
-  // modal already gating this screen.
-  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<'ORDER' | 'MENU'>(() =>
-    cartItems.length === 0 ? 'MENU' : 'ORDER'
-  );
+  // A freshly-opened table with nothing ordered yet should land straight on the menu.
+  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<'ORDER' | 'MENU'>(() => (cartItems.length === 0 ? 'MENU' : 'ORDER'));
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [dietaryFilter, setDietaryFilter] = useState<'ALL' | 'VEG' | 'JAIN' | 'NON_VEG'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
-  const [kotSuccessAlert, setKotSuccessAlert] = useState(false);
+  const [kotSuccessAlert, setKotSuccessAlert] = useState('');
   const [repeatOrderError, setRepeatOrderError] = useState('');
+  // On a phone the cart is a bar at the bottom of the menu; tap it to see the dishes.
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cancelling, setCancelling] = useState<{ orderItemId: string; name: string; quantity: number } | null>(null);
 
-  // Filtered Menu Items
   const filteredMenuItems = useMemo(() => {
     return menuItems.filter((item) => {
       if (selectedCategory !== 'ALL' && item.categoryId !== selectedCategory) return false;
@@ -86,257 +83,201 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
     });
   }, [menuItems, selectedCategory, dietaryFilter, searchQuery]);
 
+  const billable = cartItems.filter((ci) => ci.status !== 'CANCELLED');
   const unFiredCartItems = cartItems.filter((ci) => !ci.isFired);
   const firedCartItems = cartItems.filter((ci) => ci.isFired);
+  const unfiredByCourse = COURSES.map((c) => ({ ...c, items: unFiredCartItems.filter((i) => (i.course ?? 'COURSE_1') === c.id) })).filter((g) => g.items.length > 0);
+  const multiCourse = unfiredByCourse.length > 1;
 
-  // The same pricing rules as the order itself and POS (CGST + SGST, round-off).
-  const priced = priceOrderLines(cartItems.map((ci) => ({ unitPrice: ci.unitPrice, quantity: ci.quantity })));
+  // The same pricing rules as the order itself and POS (CGST + SGST, round-off). A cancelled dish is at no charge.
+  const priced = priceOrderLines(billable.map((ci) => ({ unitPrice: ci.unitPrice, quantity: ci.quantity })));
   const subtotal = priced.subtotal;
   const gst = priced.taxAmount;
   const roundOff = priced.roundOffAmount;
   const total = priced.totalAmount;
 
-  // What the kitchen is doing with each dish right now, read from the running order.
+  // What the kitchen is doing with each dish right now, read from the running order (each dish is its own order line).
   const liveOrder = table?.currentOrderId ? captainDb.orders.find((o) => o.id === table.currentOrderId) : undefined;
-  const kitchenStateOf = (menuItemId: string): 'READY' | 'SERVED' | 'COOKING' => {
-    const lines = liveOrder?.items.filter((oi) => oi.menuItemId === menuItemId) ?? [];
+  const dishState = (item: CartItemEntry): DishState => {
+    if (item.status === 'CANCELLED') return 'CANCELLED';
+    const line = item.orderItemId ? liveOrder?.items.find((i) => i.id === item.orderItemId) : undefined;
+    if (line?.kitchenStatus === 'CANCELLED' || line?.kitchenStatus === 'SERVED' || line?.kitchenStatus === 'READY') return line.kitchenStatus;
+    if (line) return 'PREPARING';
+    // Older orders: dishes were tracked by name only.
+    const lines = liveOrder?.items.filter((oi) => oi.menuItemId === item.menuItem.id) ?? [];
     if (lines.length > 0 && lines.every((l) => l.kitchenStatus === 'SERVED')) return 'SERVED';
     if (lines.length > 0 && lines.every((l) => l.kitchenStatus === 'READY' || l.kitchenStatus === 'SERVED')) return 'READY';
-    return 'COOKING';
+    return 'PREPARING';
   };
 
-  // Handle Send KOT action
-  const handleFireKot = () => {
-    const kots = sendKOT();
+  // The waiter takes ONE finished dish to the table: find its ticket line so only that dish is marked served.
+  const foodReadyIdFor = (item: CartItemEntry): string | undefined => {
+    if (!liveOrder) return undefined;
+    for (const kot of captainDb.kots) {
+      if (kot.orderId !== liveOrder.id) continue;
+      const ticketLine = item.orderItemId ? kot.items.find((i) => i.orderItemId === item.orderItemId) : kot.items.find((i) => i.menuItemId === item.menuItem.id && i.status !== 'SERVED' && i.status !== 'CANCELLED');
+      if (ticketLine) return `${kot.id}:${ticketLine.id}`;
+    }
+    return undefined;
+  };
+
+  const handleFireKot = (courses?: Course[]) => {
+    const kots = sendKOT(courses);
     if (kots) {
-      setKotSuccessAlert(true);
-      setTimeout(() => setKotSuccessAlert(false), 3000);
+      const label = courses ? courses.map((c) => COURSES.find((x) => x.id === c)?.label).join(', ') : 'Everything';
+      setKotSuccessAlert(`${label} sent to the kitchen.`);
+      setTimeout(() => setKotSuccessAlert(''), 3000);
       setActiveWorkspaceTab('ORDER');
     }
   };
 
   if (!isOpen || !table) return null;
 
+  const fireButtons = (
+    <>
+      {multiCourse && (
+        <div className="flex flex-wrap gap-1.5" aria-label="Send one course at a time">
+          {unfiredByCourse.map((g) => (
+            <button
+              key={g.id}
+              type="button"
+              onClick={() => handleFireKot([g.id])}
+              className="px-2.5 py-1.5 rounded-xl bg-white border border-jaman-saffron text-jaman-saffron text-[11px] font-black cursor-pointer min-h-[36px]"
+            >
+              Send {g.label} ({g.items.length})
+            </button>
+          ))}
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() => handleFireKot()}
+        disabled={unFiredCartItems.length === 0}
+        className="w-full min-h-[48px] py-3 px-4 rounded-2xl bg-gradient-to-r from-jaman-saffron to-[#EA580C] disabled:opacity-50 hover:brightness-105 text-white font-black text-sm shadow-md shadow-jaman-saffron/25 active:scale-98 transition-all cursor-pointer flex items-center justify-between"
+      >
+        <span className="flex items-center gap-2">
+          <Flame className="w-4 h-4 fill-white" />
+          {multiCourse ? `SEND ALL (${unFiredCartItems.length})` : `SEND KOT (${unFiredCartItems.length})`}
+        </span>
+        <ArrowRight className="w-4 h-4" />
+      </button>
+    </>
+  );
+
+  const stateChip = (s: DishState) =>
+    s === 'SERVED' ? (
+      <span className="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded">Served</span>
+    ) : s === 'READY' ? (
+      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-1.5 py-0.5 rounded">Ready to serve</span>
+    ) : s === 'CANCELLED' ? (
+      <span className="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-300 px-1.5 py-0.5 rounded">Cancelled</span>
+    ) : (
+      <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">In kitchen</span>
+    );
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4">
-      <div className="w-full max-w-5xl h-[92vh] bg-white rounded-3xl shadow-2xl border border-jaman-border flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        {/* ── 1. Workspace Top Header ── */}
-        <div className="bg-jaman-navy text-white p-3 sm:p-4 flex items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-jaman-saffron text-white flex items-center justify-center font-black text-lg shadow-sm">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-stretch sm:items-center justify-center sm:p-4">
+      <div className="w-full sm:max-w-5xl h-dvh sm:h-[92vh] bg-white sm:rounded-3xl shadow-2xl sm:border border-jaman-border flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        {/* Header */}
+        <div className="bg-jaman-navy text-white px-3 py-2.5 sm:p-4 flex items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-jaman-saffron text-white flex items-center justify-center font-black text-base sm:text-lg shadow-sm shrink-0">
               {table.tableNumber}
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg sm:text-xl font-black">TABLE {table.tableNumber}</h2>
-                <span className="bg-white/10 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
-                  {table.status}
-                </span>
+                <h2 className="text-base sm:text-xl font-black truncate">TABLE {table.tableNumber}</h2>
+                <span className="bg-white/10 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0">{table.status.replace('_', ' ')}</span>
               </div>
-              <p className="text-xs text-slate-300 font-medium">
-                {(table as any).section || table.zone || 'Main Dining'} • {table.currentGuests || 2} Guests • Captain {currentCaptain?.name}
+              <p className="text-[11px] sm:text-xs text-slate-300 font-medium truncate">
+                {(table as any).section || table.zone || 'Main Dining'} • {table.currentGuests || 2} guests<span className="hidden sm:inline"> • Captain {currentCaptain?.name}</span>
               </p>
             </div>
           </div>
 
-          {/* Quick Header Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               onClick={() => onOpenSendMessage(table.tableNumber)}
-              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="min-w-[40px] min-h-[40px] px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               title="Send note to kitchen or manager for this table"
+              aria-label="Send a note to the kitchen"
             >
-              <MessageSquare className="w-3.5 h-3.5 text-jaman-saffron" />
+              <MessageSquare className="w-4 h-4 text-jaman-saffron" />
               <span className="hidden sm:inline">Kitchen Note</span>
             </button>
-
             <button
               type="button"
               onClick={() => requestBill(table.tableNumber)}
-              className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+              className="min-w-[40px] min-h-[40px] px-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
               title="Request final bill from POS Cashier"
+              aria-label="Request the bill"
             >
-              <Receipt className="w-3.5 h-3.5" />
+              <Receipt className="w-4 h-4" />
               <span className="hidden sm:inline">Request Bill</span>
             </button>
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
-            >
+            <button type="button" onClick={onClose} aria-label="Close" className="min-w-[40px] min-h-[40px] rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center justify-center">
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* ── 2. Order Status Progress Stepper ── */}
-        <div className="bg-jaman-cream border-b border-jaman-border px-4 py-2 overflow-x-auto scrollbar-none shrink-0">
+        {/* Order status stepper: on a phone the table's status badge above says the same in one word */}
+        <div className="hidden md:block bg-jaman-cream border-b border-jaman-border px-4 py-2 overflow-x-auto scrollbar-none shrink-0">
           <div className="flex items-center justify-between min-w-[500px] text-[11px] font-bold text-slate-500">
-            <span className={`flex items-center gap-1 ${cartItems.length > 0 ? 'text-emerald-700 font-black' : ''}`}>
-              <span className="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[9px]">1</span>
-              Order Taken
-            </span>
-            <span className="text-slate-300">➔</span>
-            <span className={`flex items-center gap-1 ${firedCartItems.length > 0 ? 'text-emerald-700 font-black' : ''}`}>
-              <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] ${firedCartItems.length > 0 ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'}`}>2</span>
-              KOT Sent
-            </span>
-            <span className="text-slate-300">➔</span>
-            <span className="flex items-center gap-1">
-              <span className="w-4 h-4 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[9px]">3</span>
-              Cooking
-            </span>
-            <span className="text-slate-300">➔</span>
-            <span className="flex items-center gap-1">
-              <span className="w-4 h-4 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[9px]">4</span>
-              Food Ready
-            </span>
-            <span className="text-slate-300">➔</span>
-            <span className="flex items-center gap-1">
-              <span className="w-4 h-4 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[9px]">5</span>
-              Served
-            </span>
-            <span className="text-slate-300">➔</span>
-            <span className={`flex items-center gap-1 ${table.status === 'BILL_REQUESTED' ? 'text-purple-700 font-black' : ''}`}>
-              <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] ${table.status === 'BILL_REQUESTED' ? 'bg-purple-600 text-white' : 'bg-slate-200 text-slate-600'}`}>6</span>
-              Bill Requested
-            </span>
+            {['Order Taken', 'KOT Sent', 'Cooking', 'Food Ready', 'Served', 'Bill Requested'].map((label, i) => {
+              const done = i === 0 ? cartItems.length > 0 : i === 1 ? firedCartItems.length > 0 : i === 5 ? table.status === 'BILL_REQUESTED' : false;
+              return (
+                <React.Fragment key={label}>
+                  {i > 0 && <span className="text-slate-300">➔</span>}
+                  <span className={`flex items-center gap-1 ${done ? (i === 5 ? 'text-purple-700 font-black' : 'text-emerald-700 font-black') : ''}`}>
+                    <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] ${done ? (i === 5 ? 'bg-purple-600 text-white' : 'bg-emerald-600 text-white') : 'bg-slate-200 text-slate-600'}`}>{i + 1}</span>
+                    {label}
+                  </span>
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
 
-        {/* ── 3. Workspace Mode Switcher ── */}
-        <div className="px-4 py-2 border-b border-jaman-border bg-white flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setActiveWorkspaceTab('ORDER')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                activeWorkspaceTab === 'ORDER'
-                  ? 'bg-jaman-navy text-white shadow-xs'
-                  : 'bg-jaman-cream text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              Current Order & Bill ({cartItems.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveWorkspaceTab('MENU')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
-                activeWorkspaceTab === 'MENU'
-                  ? 'bg-jaman-saffron text-white shadow-xs'
-                  : 'bg-[#FFF4ED] text-jaman-saffron hover:bg-[#FFE8D6]'
-              }`}
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Take Order / Menu Catalog</span>
-            </button>
-          </div>
-
+        {/* Order / Menu switch */}
+        <div className="px-3 sm:px-4 py-2 border-b border-jaman-border bg-white flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => setActiveWorkspaceTab('ORDER')}
+            className={`flex-1 sm:flex-none min-h-[44px] px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${activeWorkspaceTab === 'ORDER' ? 'bg-jaman-navy text-white shadow-xs' : 'bg-jaman-cream text-slate-600 hover:bg-slate-100'}`}
+          >
+            <span className="sm:hidden">Order & Bill ({billable.length})</span>
+            <span className="hidden sm:inline">Current Order & Bill ({billable.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveWorkspaceTab('MENU')}
+            className={`flex-1 sm:flex-none min-h-[44px] px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeWorkspaceTab === 'MENU' ? 'bg-jaman-saffron text-white shadow-xs' : 'bg-[#FFF4ED] text-jaman-saffron hover:bg-[#FFE8D6]'}`}
+          >
+            <Plus className="w-4 h-4" />
+            <span className="sm:hidden">Menu</span>
+            <span className="hidden sm:inline">Take Order / Menu Catalog</span>
+          </button>
           {unFiredCartItems.length > 0 && activeWorkspaceTab === 'MENU' && (
-            <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg animate-pulse">
-              ⚡ {unFiredCartItems.length} new items ready to fire
-            </span>
+            <span className="hidden sm:inline ml-auto text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg animate-pulse">{unFiredCartItems.length} new dishes ready to send</span>
           )}
         </div>
 
-        {/* ── 4. Main Body: Split or Switch Views ── */}
-        <div className="flex-1 flex overflow-hidden">
+        {/* Body */}
+        <div className="flex-1 flex overflow-hidden min-h-0">
           {activeWorkspaceTab === 'ORDER' ? (
-            /* ── VIEW A: Current Order & Bill Details ── */
-            <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-              {/* Left Column: Fired & Pending Items List */}
-              <div className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-4">
+            <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
+              {/* Dishes */}
+              <div className="flex-1 p-3 sm:p-5 overflow-y-auto space-y-3 min-h-0">
                 {kotSuccessAlert && (
-                  <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>KOT Fired to Kitchen Stations successfully! KDS updated in real-time.</span>
+                  <div role="status" className="p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-bold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>{kotSuccessAlert} The kitchen screen is updated.</span>
                   </div>
                 )}
 
-                {/* Items List */}
-                {cartItems.length > 0 ? (
-                  <div className="space-y-2.5">
-                    {cartItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${
-                          item.isFired ? 'bg-white border-jaman-border' : 'bg-[#FFFBF7] border-[#FDBA74]'
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center font-black text-xs font-mono text-jaman-navy mt-0.5">
-                            {item.quantity}×
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-extrabold text-xs sm:text-sm text-jaman-navy">
-                                {item.menuItem.name}
-                              </span>
-                              {item.isFired ? (
-                                (() => {
-                                  const state = kitchenStateOf(item.menuItem.id);
-                                  return state === 'SERVED' ? (
-                                    <span className="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded">✓ Served</span>
-                                  ) : state === 'READY' ? (
-                                    <>
-                                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-1.5 py-0.2 rounded">🔔 Ready to serve</span>
-                                      {table && (
-                                        <button
-                                          type="button"
-                                          onClick={() => serveReadyForTable(table.tableNumber)}
-                                          className="text-[10px] font-black text-white bg-emerald-600 hover:bg-emerald-700 px-2 py-0.5 rounded cursor-pointer"
-                                          title="Mark the ready dishes on this table as delivered"
-                                        >
-                                          Mark served
-                                        </button>
-                                      )}
-                                    </>
-                                  ) : (
-                                    <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded">🔥 In Kitchen</span>
-                                  );
-                                })()
-                              ) : (
-                                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded animate-pulse">
-                                  ⚡ Pending Fire
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Modifiers & Notes */}
-                            {item.selectedModifiers && item.selectedModifiers.length > 0 && (
-                              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                                {item.selectedModifiers.map((m) => m.optionName).join(', ')}
-                              </p>
-                            )}
-                            {item.specialNotes && (
-                              <p className="text-[11px] text-amber-700 italic mt-0.5">
-                                Note: {item.specialNotes}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-3 shrink-0">
-                          <span className="font-black font-mono text-sm text-jaman-navy">
-                            {formatINR(item.totalPrice)}
-                          </span>
-
-                          {!item.isFired && (
-                            <button
-                              type="button"
-                              onClick={() => removeCartItem(item.id)}
-                              className="p-1 text-slate-400 hover:text-rose-600 transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
+                {cartItems.length === 0 ? (
                   <div className="space-y-3">
                     <EmptyState
                       icon={<UtensilsCrossed className="w-8 h-8" />}
@@ -348,154 +289,203 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                       <button
                         type="button"
                         onClick={() => {
-                          const repeated = repeatPreviousOrder(table.tableNumber);
-                          if (!repeated) {
+                          if (!repeatPreviousOrder(table.tableNumber)) {
                             setRepeatOrderError('No previous completed order found for this table.');
                             setTimeout(() => setRepeatOrderError(''), 3000);
                           }
                         }}
-                        className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-jaman-navy border border-jaman-border font-black text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                        className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-jaman-navy border border-jaman-border font-black text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 min-h-[44px]"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
                         <span>Repeat Previous Order</span>
                       </button>
                     </div>
-                    {repeatOrderError && (
-                      <p className="text-[11px] font-bold text-rose-600 text-center">{repeatOrderError}</p>
-                    )}
+                    {repeatOrderError && <p className="text-[11px] font-bold text-rose-600 text-center">{repeatOrderError}</p>}
                   </div>
+                ) : (
+                  <>
+                    {/* Not sent yet, grouped by course so a course can be held back and sent when the table is ready */}
+                    {unFiredCartItems.length > 0 && (
+                      <section aria-label="Not sent to the kitchen yet" className="space-y-2">
+                        <h3 className="text-[11px] font-black uppercase tracking-wider text-amber-700">Not sent yet</h3>
+                        {unfiredByCourse.map((g) => (
+                          <div key={g.id} className="rounded-2xl border border-[#FDBA74] bg-[#FFFBF7] p-2.5 space-y-2">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-xs font-black text-jaman-navy">{g.short} course: {g.label}</span>
+                              {multiCourse && (
+                                <button type="button" onClick={() => handleFireKot([g.id])} className="px-3 py-1.5 rounded-xl bg-jaman-saffron text-white text-[11px] font-black cursor-pointer min-h-[36px]">
+                                  Send now
+                                </button>
+                              )}
+                            </div>
+                            {g.items.map((item) => (
+                              <div key={item.id} className="p-2.5 rounded-xl bg-white border border-jaman-border space-y-2">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="min-w-0">
+                                    <p className="font-extrabold text-sm text-jaman-navy break-words">{item.quantity}× {item.menuItem.name}</p>
+                                    {item.selectedModifiers.length > 0 && <p className="text-[11px] text-slate-500 font-medium">{item.selectedModifiers.map((m: SelectedModifier) => m.optionName).join(', ')}</p>}
+                                    {item.specialNotes && <p className="text-[11px] text-amber-700 italic">Note: {item.specialNotes}</p>}
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <span className="font-black font-mono text-sm text-jaman-navy">{formatINR(item.totalPrice)}</span>
+                                    <button type="button" onClick={() => removeCartItem(item.id)} aria-label={`Remove ${item.menuItem.name}`} className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-rose-600 cursor-pointer">
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <div className="flex items-center gap-1">
+                                    <button type="button" onClick={() => updateCartQuantity(item.id, -1)} aria-label="One less" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 font-black cursor-pointer">−</button>
+                                    <button type="button" onClick={() => updateCartQuantity(item.id, 1)} aria-label="One more" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 font-black cursor-pointer">+</button>
+                                  </div>
+                                  <span className="text-[10px] font-black uppercase text-slate-400 ml-1">Course</span>
+                                  {COURSES.map((c) => (
+                                    <button
+                                      key={c.id}
+                                      type="button"
+                                      onClick={() => setCartItemCourse(item.id, c.id)}
+                                      aria-pressed={(item.course ?? 'COURSE_1') === c.id}
+                                      className={`px-2.5 h-9 rounded-lg text-[11px] font-black cursor-pointer ${(item.course ?? 'COURSE_1') === c.id ? 'bg-jaman-navy text-white' : 'bg-slate-100 text-slate-600'}`}
+                                    >
+                                      {c.short}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </section>
+                    )}
+
+                    {/* In the kitchen or done */}
+                    {firedCartItems.length > 0 && (
+                      <section aria-label="Sent to the kitchen" className="space-y-2">
+                        <h3 className="text-[11px] font-black uppercase tracking-wider text-slate-500">Sent to the kitchen</h3>
+                        {firedCartItems.map((item) => {
+                          const state = dishState(item);
+                          const serveId = state === 'READY' ? foodReadyIdFor(item) : undefined;
+                          return (
+                            <div key={item.id} className={`p-3 rounded-2xl border flex items-start justify-between gap-2 ${state === 'CANCELLED' ? 'bg-rose-50 border-rose-200' : state === 'READY' ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-jaman-border'}`}>
+                              <div className="min-w-0 space-y-1">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className={`font-extrabold text-sm break-words ${state === 'CANCELLED' ? 'line-through text-rose-700' : 'text-jaman-navy'}`}>{item.quantity}× {item.menuItem.name}</span>
+                                  {stateChip(state)}
+                                  {item.course && <span className="text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded">{COURSES.find((c) => c.id === item.course)?.label}</span>}
+                                </div>
+                                {item.selectedModifiers && item.selectedModifiers.length > 0 && <p className="text-[11px] text-slate-500 font-medium">{item.selectedModifiers.map((m) => m.optionName).join(', ')}</p>}
+                                {item.specialNotes && <p className="text-[11px] text-amber-700 italic">Note: {item.specialNotes}</p>}
+                                {state === 'CANCELLED' && item.cancelReason && <p className="text-[11px] font-bold text-rose-700">Cancelled: {item.cancelReason}</p>}
+                                <div className="flex items-center gap-2 pt-0.5 flex-wrap">
+                                  {serveId && (
+                                    <button type="button" onClick={() => markItemServed(serveId)} className="min-h-[40px] px-3 rounded-xl text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer" title="Mark this dish as delivered to the table">
+                                      Mark served
+                                    </button>
+                                  )}
+                                  {state !== 'SERVED' && state !== 'CANCELLED' && item.orderItemId && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setCancelling({ orderItemId: item.orderItemId!, name: item.menuItem.name, quantity: item.quantity })}
+                                      className="min-h-[40px] px-3 rounded-xl text-xs font-bold text-rose-700 bg-white border border-rose-200 hover:bg-rose-50 cursor-pointer flex items-center gap-1"
+                                    >
+                                      <Ban className="w-3.5 h-3.5" /> Cancel dish
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                              <span className={`font-black font-mono text-sm shrink-0 ${state === 'CANCELLED' ? 'text-rose-400' : 'text-jaman-navy'}`}>{formatINR(item.totalPrice)}</span>
+                            </div>
+                          );
+                        })}
+                      </section>
+                    )}
+                  </>
                 )}
               </div>
 
-              {/* Right Column: Bill Breakdown & Primary Dispatch Controls */}
-              <div className="w-full md:w-80 bg-jaman-cream border-t md:border-t-0 md:border-l border-jaman-border p-4 sm:p-5 flex flex-col justify-between space-y-4">
-                <div className="space-y-3">
-                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider">
-                    Table Financial Summary
-                  </h3>
-
+              {/* Bill and actions: a compact strip at the bottom on a phone, a side column on a tablet */}
+              <div className="w-full md:w-80 bg-jaman-cream border-t md:border-t-0 md:border-l border-jaman-border p-3 md:p-5 flex flex-col gap-2.5 md:gap-4 shrink-0 md:overflow-y-auto">
+                <div className="hidden md:block space-y-3">
+                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider">Table Financial Summary</h3>
                   <div className="space-y-2 text-xs font-semibold text-slate-600 bg-white p-3.5 rounded-2xl border border-jaman-border">
-                    <div className="flex justify-between">
-                      <span>Subtotal</span>
-                      <span className="font-mono text-jaman-navy">{formatINR(subtotal)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>GST (CGST 2.5% + SGST 2.5%)</span>
-                      <span className="font-mono text-jaman-navy">{formatINR(gst)}</span>
-                    </div>
+                    <div className="flex justify-between"><span>Subtotal</span><span className="font-mono text-jaman-navy">{formatINR(subtotal)}</span></div>
+                    <div className="flex justify-between"><span>GST (CGST 2.5% + SGST 2.5%)</span><span className="font-mono text-jaman-navy">{formatINR(gst)}</span></div>
                     {roundOff !== 0 && (
-                      <div className="flex justify-between">
-                        <span>Round Off</span>
-                        <span className="font-mono text-jaman-navy">{roundOff > 0 ? '+' : ''}{formatINR(roundOff)}</span>
-                      </div>
+                      <div className="flex justify-between"><span>Round Off</span><span className="font-mono text-jaman-navy">{roundOff > 0 ? '+' : ''}{formatINR(roundOff)}</span></div>
                     )}
-                    <div className="pt-2 border-t border-slate-100 flex justify-between text-sm font-black text-jaman-navy">
-                      <span>Total Payable</span>
-                      <span className="font-mono text-base text-jaman-navy">{formatINR(total)}</span>
-                    </div>
+                    <div className="pt-2 border-t border-slate-100 flex justify-between text-sm font-black text-jaman-navy"><span>Total Payable</span><span className="font-mono text-base">{formatINR(total)}</span></div>
                   </div>
                 </div>
-
-                {/* Dispatch / Fire KOT Button if unFired items exist */}
-                <div className="space-y-2">
-                  {unFiredCartItems.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={handleFireKot}
-                      className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-jaman-saffron to-[#EA580C] hover:brightness-105 text-white font-black text-xs sm:text-sm shadow-md shadow-jaman-saffron/25 active:scale-98 transition-all cursor-pointer flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Flame className="w-4 h-4 fill-white" />
-                        <span>SEND KOT ({unFiredCartItems.length} New)</span>
-                      </div>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveWorkspaceTab('MENU')}
-                    className="w-full py-3 px-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-black text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Add More Dishes to Order</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => requestBill(table.tableNumber)}
-                    className="w-full py-2.5 px-4 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-300 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-                  >
-                    <Receipt className="w-3.5 h-3.5" />
-                    <span>Send Bill Request to Counter POS</span>
-                  </button>
-
-                  {/* Only offered while nothing has been fired to the kitchen
-                      yet — clearCart() wipes the whole cart, so it would be
-                      unsafe to expose once items are already cooking. */}
-                  {firedCartItems.length === 0 && unFiredCartItems.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (window.confirm('Discard this unfired order and start over? Nothing has been sent to the kitchen yet.')) {
-                          clearCart();
-                        }
-                      }}
-                      className="w-full py-2 px-4 rounded-2xl bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Discard Order</span>
-                    </button>
-                  )}
+                <div className="md:hidden flex items-center justify-between text-sm font-black text-jaman-navy">
+                  <span>Total (incl. GST)</span>
+                  <span className="font-mono text-base">{formatINR(total)}</span>
                 </div>
+
+                {unFiredCartItems.length > 0 && <div className="space-y-2">{fireButtons}</div>}
+
+                <div className="grid grid-cols-2 md:grid-cols-1 gap-2">
+                  <button type="button" onClick={() => setActiveWorkspaceTab('MENU')} className="min-h-[44px] py-2.5 px-3 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-black text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                    <Plus className="w-4 h-4" />
+                    <span>Add dishes</span>
+                  </button>
+                  <button type="button" onClick={() => requestBill(table.tableNumber)} className="min-h-[44px] py-2.5 px-3 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-300 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                    <Receipt className="w-3.5 h-3.5" />
+                    <span className="md:hidden">Request bill</span>
+                    <span className="hidden md:inline">Send Bill Request to Counter POS</span>
+                  </button>
+                </div>
+
+                {/* Only while nothing has been sent: clearing wipes the whole cart. */}
+                {firedCartItems.length === 0 && unFiredCartItems.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm('Discard this unsent order and start over? Nothing has been sent to the kitchen yet.')) clearCart();
+                    }}
+                    className="min-h-[40px] py-2 px-4 rounded-2xl bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Discard order</span>
+                  </button>
+                )}
               </div>
             </div>
           ) : (
-            /* ── VIEW B: Fast Touch Menu Ordering Catalog ── */
-            <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-              {/* Menu Categories & Dish Cards */}
-              <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Search & Dietary Filters */}
-                <div className="p-3 bg-white border-b border-jaman-border flex items-center justify-between gap-2">
-                  <div className="relative flex-1 max-w-xs">
-                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            /* Menu: dishes on top, a compact cart at the bottom */
+            <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
+              <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+                <div className="p-2.5 sm:p-3 bg-white border-b border-jaman-border flex flex-wrap items-center gap-2">
+                  <div className="relative flex-1 min-w-[150px]">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
-                      type="text"
+                      type="search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search dish or SKU..."
-                      className="w-full pl-8 pr-3 py-1.5 bg-jaman-cream border border-jaman-border rounded-xl text-xs text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
+                      placeholder="Search dish or SKU"
+                      aria-label="Search dishes"
+                      className="w-full pl-9 pr-3 min-h-[44px] bg-jaman-cream border border-jaman-border rounded-xl text-sm text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
                     />
                   </div>
-
                   <div className="flex items-center gap-1">
                     {(['ALL', 'VEG', 'NON_VEG'] as const).map((diet) => (
                       <button
                         key={diet}
                         type="button"
                         onClick={() => setDietaryFilter(diet)}
-                        className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
-                          dietaryFilter === diet
-                            ? 'bg-jaman-navy text-white'
-                            : 'bg-jaman-cream text-slate-600 hover:bg-slate-100'
-                        }`}
+                        aria-pressed={dietaryFilter === diet}
+                        className={`px-3 min-h-[40px] rounded-xl text-[11px] font-bold transition-all cursor-pointer ${dietaryFilter === diet ? 'bg-jaman-navy text-white' : 'bg-jaman-cream text-slate-600 hover:bg-slate-100'}`}
                       >
-                        {diet === 'ALL' ? 'All' : diet === 'VEG' ? '🟢 Veg' : '🔴 Non-Veg'}
+                        {diet === 'ALL' ? 'All' : diet === 'VEG' ? 'Veg' : 'Non-Veg'}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Category Pills */}
-                <div className="px-3 py-2 bg-jaman-cream border-b border-jaman-border flex items-center gap-1.5 overflow-x-auto scrollbar-none shrink-0">
+                <div className="px-2.5 sm:px-3 py-2 bg-jaman-cream border-b border-jaman-border flex items-center gap-1.5 overflow-x-auto scrollbar-none shrink-0">
                   <button
                     type="button"
                     onClick={() => setSelectedCategory('ALL')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer shrink-0 ${
-                      selectedCategory === 'ALL'
-                        ? 'bg-jaman-saffron text-white shadow-xs'
-                        : 'bg-white text-slate-600 border border-jaman-border'
-                    }`}
+                    className={`px-3 min-h-[40px] rounded-xl text-xs font-black transition-all cursor-pointer shrink-0 ${selectedCategory === 'ALL' ? 'bg-jaman-saffron text-white shadow-xs' : 'bg-white text-slate-600 border border-jaman-border'}`}
                   >
                     All Dishes ({menuItems.length})
                   </button>
@@ -504,19 +494,14 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                       key={cat.id}
                       type="button"
                       onClick={() => setSelectedCategory(cat.id)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
-                        selectedCategory === cat.id
-                          ? 'bg-jaman-saffron text-white shadow-xs'
-                          : 'bg-white text-slate-600 border border-jaman-border'
-                      }`}
+                      className={`px-3 min-h-[40px] rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${selectedCategory === cat.id ? 'bg-jaman-saffron text-white shadow-xs' : 'bg-white text-slate-600 border border-jaman-border'}`}
                     >
                       {cat.name}
                     </button>
                   ))}
                 </div>
 
-                {/* Dish Cards Grid */}
-                <div className="flex-1 p-3 sm:p-4 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 content-start">
+                <div className="flex-1 p-2.5 sm:p-4 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 content-start min-h-0">
                   {filteredMenuItems.length === 0 && (
                     <div className="col-span-full text-center py-10 text-sm font-bold text-slate-500" data-testid="captain-empty-menu">
                       {menuItems.length === 0
@@ -524,129 +509,89 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                         : 'No dishes match this search or filter.'}
                     </div>
                   )}
-                  {filteredMenuItems.map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => { if (item.isAvailable !== false) setCustomizingItem(item); }}
-                      aria-disabled={item.isAvailable === false}
-                      className={`bg-white border border-jaman-border rounded-2xl p-3 flex flex-col justify-between space-y-2 shadow-2xs transition-all ${
-                        item.isAvailable === false ? 'opacity-50 cursor-not-allowed' : 'hover:border-jaman-saffron hover:shadow-md active:scale-98 cursor-pointer'
-                      }`}
-                    >
-                      {/* Image preview */}
-                      <div className="w-full h-24 rounded-xl bg-slate-100 overflow-hidden relative">
-                        <img
-                          src={item.imageUrl || '/assets/menu/common/fallback-dish.svg'}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = '/assets/menu/common/fallback-dish.svg';
-                          }}
-                        />
-                        <span className={`absolute top-1.5 left-1.5 w-2.5 h-2.5 rounded-full ${item.dietaryType === 'VEG' ? 'bg-emerald-500 ring-2 ring-white' : 'bg-rose-500 ring-2 ring-white'}`} />
-                        {item.isAvailable === false && (
-                          <span className="absolute inset-x-0 bottom-0 bg-rose-600 text-white text-[10px] font-black text-center py-0.5 uppercase">Sold out</span>
-                        )}
-                      </div>
-
-                      <div>
-                        <h4 className="font-extrabold text-xs text-jaman-navy line-clamp-2 leading-tight">
-                          {item.name}
-                        </h4>
-                        <span className="text-[10px] text-slate-400 font-bold block mt-0.5">
-                          {item.kitchenStation || 'Kitchen'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-1 border-t border-slate-100">
-                        <span className="font-black font-mono text-xs text-jaman-navy">
-                          {formatINR(item.price)}
-                        </span>
-                        {/* Direct-add with default options (no spice change,
-                            no Jain, no extras) — the same result a captain
-                            gets by opening Customize and tapping "Add to
-                            Order" without changing anything, so every dish
-                            no longer forces the modal open just to accept
-                            the defaults. Tapping the rest of the card still
-                            opens Customize for a real modifier change. */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            addItemToCart(item, [], '', 'COURSE_1', 1);
-                          }}
-                          className="w-7 h-7 rounded-lg bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center font-black text-xs hover:bg-jaman-saffron hover:text-white transition-colors cursor-pointer active:scale-90"
-                          title={item.isAvailable === false ? 'Sold out' : 'Quick Add'}
-                          disabled={item.isAvailable === false}
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Live Order Cart Column */}
-              <div className="w-full md:w-72 bg-jaman-cream border-t md:border-t-0 md:border-l border-jaman-border p-4 flex flex-col justify-between space-y-3 shrink-0">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-black text-slate-500 uppercase tracking-wider">
-                      Live Cart ({cartItems.length})
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setActiveWorkspaceTab('ORDER')}
-                      className="text-xs font-bold text-jaman-saffron hover:underline"
-                    >
-                      View Full Order
-                    </button>
-                  </div>
-
-                  <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">
-                    {cartItems.map((ci) => (
-                      <div key={ci.id} className="p-2.5 rounded-xl bg-white border border-jaman-border flex items-center justify-between text-xs">
-                        <div className="truncate mr-2">
-                          <span className="font-bold text-jaman-navy truncate block">{ci.menuItem.name}</span>
-                          <span className="text-[10px] font-mono text-slate-400">{formatINR(ci.unitPrice)} × {ci.quantity}</span>
+                  {filteredMenuItems.map((item) => {
+                    const soldOut = item.isAvailable === false;
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => { if (!soldOut) setCustomizingItem(item); }}
+                        aria-disabled={soldOut}
+                        className={`bg-white border border-jaman-border rounded-2xl p-2.5 sm:p-3 flex flex-col justify-between gap-1.5 shadow-2xs transition-all ${soldOut ? 'opacity-50 cursor-not-allowed' : 'hover:border-jaman-saffron hover:shadow-md active:scale-98 cursor-pointer'}`}
+                      >
+                        <div className="w-full h-14 sm:h-24 rounded-xl bg-slate-100 overflow-hidden relative">
+                          <img
+                            src={item.imageUrl || '/assets/menu/common/fallback-dish.svg'}
+                            alt={item.name}
+                            loading="lazy"
+                            className="w-full h-full object-cover"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/assets/menu/common/fallback-dish.svg'; }}
+                          />
+                          <span className={`absolute top-1.5 left-1.5 w-2.5 h-2.5 rounded-full ${item.dietaryType === 'VEG' ? 'bg-emerald-500 ring-2 ring-white' : 'bg-rose-500 ring-2 ring-white'}`} />
+                          {soldOut && <span className="absolute inset-x-0 bottom-0 bg-rose-600 text-white text-[10px] font-black text-center py-0.5 uppercase">Sold out</span>}
                         </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
+                        <div className="min-w-0">
+                          <h4 className="font-extrabold text-xs sm:text-sm text-jaman-navy line-clamp-2 leading-tight">{item.name}</h4>
+                          <span className="text-[10px] text-slate-400 font-bold block mt-0.5 truncate">{item.kitchenStation || 'Kitchen'}</span>
+                        </div>
+                        <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+                          <span className="font-black font-mono text-xs sm:text-sm text-jaman-navy">{formatINR(item.price)}</span>
+                          {/* Adds with the default options; tapping the card opens Customize for a real change. */}
                           <button
                             type="button"
-                            onClick={() => updateCartQuantity(ci.id, -1)}
-                            className="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center"
-                          >
-                            -
-                          </button>
-                          <span className="font-bold font-mono text-xs w-4 text-center">{ci.quantity}</span>
-                          <button
-                            type="button"
-                            onClick={() => updateCartQuantity(ci.id, 1)}
-                            className="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center"
+                            onClick={(e) => { e.stopPropagation(); addItemToCart(item, [], '', 'COURSE_1', 1); }}
+                            className="w-10 h-10 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center font-black text-base hover:bg-jaman-saffron hover:text-white transition-colors cursor-pointer active:scale-90 disabled:opacity-40"
+                            title={soldOut ? 'Sold out' : 'Quick Add'}
+                            aria-label={soldOut ? `${item.name} is sold out` : `Add ${item.name}`}
+                            disabled={soldOut}
                           >
                             +
                           </button>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
+              </div>
 
-                <div className="pt-2 border-t border-jaman-border space-y-2">
-                  <div className="flex justify-between text-xs font-bold text-slate-600">
+              {/* Cart: a bar at the bottom on a phone (tap to open), a side column on a tablet */}
+              <div className="w-full md:w-72 bg-jaman-cream border-t md:border-t-0 md:border-l border-jaman-border flex flex-col shrink-0 md:min-h-0">
+                <button
+                  type="button"
+                  onClick={() => setCartOpen((o) => !o)}
+                  aria-expanded={cartOpen}
+                  className="md:hidden min-h-[44px] px-3 flex items-center justify-between text-xs font-black text-slate-600 uppercase tracking-wider cursor-pointer"
+                >
+                  <span className="flex items-center gap-1.5">{cartOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />} Cart ({billable.length})</span>
+                  <span className="font-mono text-sm text-jaman-navy normal-case">{formatINR(total)}</span>
+                </button>
+                <div className="hidden md:flex items-center justify-between px-4 pt-4">
+                  <span className="text-xs font-black text-slate-500 uppercase tracking-wider">Live Cart ({billable.length})</span>
+                  <button type="button" onClick={() => setActiveWorkspaceTab('ORDER')} className="text-xs font-bold text-jaman-saffron hover:underline cursor-pointer">View Full Order</button>
+                </div>
+                <div className={`${cartOpen ? 'block' : 'hidden'} md:block px-3 md:px-4 py-2 space-y-2 overflow-y-auto max-h-[38dvh] md:max-h-none md:flex-1 min-h-0`}>
+                  {billable.length === 0 && <p className="text-xs text-slate-500 font-medium py-2">Nothing added yet.</p>}
+                  {billable.map((ci) => (
+                    <div key={ci.id} className="p-2.5 rounded-xl bg-white border border-jaman-border flex items-center justify-between text-xs gap-2">
+                      <div className="min-w-0">
+                        <span className="font-bold text-jaman-navy block truncate">{ci.menuItem.name}</span>
+                        <span className="text-[10px] font-mono text-slate-400">{formatINR(ci.unitPrice)} × {ci.quantity}{ci.isFired ? ' · sent' : ''}</span>
+                      </div>
+                      {!ci.isFired && (
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button type="button" onClick={() => updateCartQuantity(ci.id, -1)} aria-label="One less" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer">−</button>
+                          <span className="font-bold font-mono text-xs w-5 text-center">{ci.quantity}</span>
+                          <button type="button" onClick={() => updateCartQuantity(ci.id, 1)} aria-label="One more" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer">+</button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="p-3 md:p-4 md:border-t border-jaman-border space-y-2">
+                  <div className="hidden md:flex justify-between text-xs font-bold text-slate-600">
                     <span>Total:</span>
                     <span className="font-mono text-sm font-black text-jaman-navy">{formatINR(total)}</span>
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={handleFireKot}
-                    disabled={unFiredCartItems.length === 0}
-                    className="w-full py-3 px-3 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-50 text-white font-black text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                  >
-                    <Flame className="w-4 h-4 fill-white" />
-                    <span>FIRE KOT ({unFiredCartItems.length})</span>
-                  </button>
+                  {fireButtons}
                 </div>
               </div>
             </div>
@@ -654,7 +599,6 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
         </div>
       </div>
 
-      {/* Modifier / Customizer Modal */}
       <CaptainModifierModal
         item={customizingItem}
         isOpen={!!customizingItem}
@@ -664,6 +608,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
           setCustomizingItem(null);
         }}
       />
+
+      <CaptainCancelDishModal dish={cancelling} onClose={() => setCancelling(null)} onCancelled={() => setCancelling(null)} />
     </div>
   );
 };

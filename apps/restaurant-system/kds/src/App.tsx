@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
-import { getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages, syncMenuCatalog } from '@jamanvaar/sync';
-import { KOTRecord, KOTStatus } from '@jamanvaar/types';
+import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository, KeyValueStore } from '@jamanvaar/database';
+import { getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages, syncMenuCatalog, EndpointResolver, onAppResume } from '@jamanvaar/sync';
+import { KOTRecord, KOTStatus, KOTItem } from '@jamanvaar/types';
+import { KdsTicketCard } from './KdsTicketCard';
+import { connectionLevel, effectiveItemStatus, liveItems, orderProgress, prepMinutes, prepSummary, sortForKitchen, ticketAge } from './kdsLogic';
 import { Platform } from '@jamanvaar/api';
 import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
 import {
@@ -30,6 +32,7 @@ import {
   CheckCheck,
   LogOut,
   Zap,
+  WifiOff,
   Delete,
   AlertTriangle,
   RefreshCw,
@@ -75,6 +78,59 @@ export const App: React.FC = () => {
     if (seen === null) return;
     if (kots.some((k) => !seen.has(k.id) && k.status !== 'READY' && k.status !== 'SERVED' && k.status !== 'CANCELLED')) sound.play('kot');
   }, [kots]);
+
+  // A cancelled dish or ticket is an alarm, not a silent disappearance: it stays on screen in red until a cook dismisses it,
+  // and it makes a different (warning) sound the moment it arrives.
+  const DISMISSED_KEY = 'jamanvaar_kds_dismissed_cancelled';
+  const [dismissed, setDismissed] = useState<Set<string>>(() => {
+    try {
+      return new Set<string>(JSON.parse(KeyValueStore.get(DISMISSED_KEY) || '[]'));
+    } catch {
+      return new Set<string>();
+    }
+  });
+  const dismissCancelled = (kot: KOTRecord) => {
+    setDismissed((prev) => {
+      const next = new Set(prev).add(kot.id);
+      try {
+        KeyValueStore.set(DISMISSED_KEY, JSON.stringify([...next].slice(-200)));
+      } catch {
+        // Storage unavailable: the ticket stays dismissed until the screen reloads.
+      }
+      return next;
+    });
+  };
+  const seenCancelled = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    const now = new Set<string>();
+    kots.forEach((k) => {
+      if (k.status === 'CANCELLED') now.add(k.id);
+      k.items?.forEach((i) => { if (i.status === 'CANCELLED') now.add(`${k.id}:${i.id}`); });
+    });
+    const before = seenCancelled.current;
+    seenCancelled.current = now;
+    if (before === null) return;
+    if ([...now].some((id) => !before.has(id))) sound.play('warning');
+  }, [kots]);
+
+  // Is this screen still hearing from the server? Shown in the header and, when it is not, as a bar across the top.
+  const startedAt = useRef(Date.now());
+  const [conn, setConn] = useState<{ level: ReturnType<typeof connectionLevel>; ageSec: number | null }>({ level: 'ok', ageSec: null });
+  const [undo, setUndo] = useState<{ text: string; run?: () => void } | null>(null);
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const offerUndo = (text: string, run?: () => void) => {
+    setUndo({ text, run });
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    undoTimer.current = setTimeout(() => setUndo(null), 7000);
+  };
+
+  // A smaller logo on a phone-sized screen so the header does not eat the tickets' space.
+  const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && window.innerWidth < 640);
+  useEffect(() => {
+    const onResize = () => setNarrow(window.innerWidth < 640);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   // A kitchen screen must never go to sleep mid-service (display port: wake lock in a browser, native in a shell).
   useEffect(() => {
@@ -143,9 +199,17 @@ export const App: React.FC = () => {
       void reportHeartbeat();
     }, 15000);
 
+    // Waking the screen (tab visible again, network back, tablet unlocked) catches up at once: no refresh needed.
+    const stopResume = onAppResume(() => {
+      void SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+      void SyncOutboxEngine.catchUpFromCloud();
+      void syncServiceMessages('KDS');
+    });
+
     return () => {
       clearInterval(orderInterval);
       clearInterval(interval);
+      stopResume();
     };
   }, [isDeviceActivated]);
 
@@ -181,6 +245,9 @@ export const App: React.FC = () => {
       setCurrentTime(
         new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
       );
+      const since = EndpointResolver.msSinceLastContact();
+      const level = connectionLevel(since, typeof navigator === 'undefined' ? true : navigator.onLine !== false, Date.now() - startedAt.current);
+      setConn((prev) => (prev.level === level && prev.ageSec === (since === null ? null : Math.floor(since / 1000)) ? prev : { level, ageSec: since === null ? null : Math.floor(since / 1000) }));
     }, 1000);
     return () => clearInterval(timer);
   }, []);
@@ -384,86 +451,126 @@ export const App: React.FC = () => {
     return stationKots.filter((k) => k.status === 'SERVED').length;
   }, [stationKots]);
 
-  // Filtered KOTs for Active Screen
+  // A cancelled ticket stays in view (red) until a cook dismisses it, but not for ever.
+  const cancelledAlert = (k: KOTRecord) => k.status === 'CANCELLED' && !dismissed.has(k.id) && Date.now() - new Date(k.createdAt).getTime() < 12 * 60 * 60 * 1000;
+  const alertCount = useMemo(() => stationKots.filter(cancelledAlert).length,
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [stationKots, dismissed]);
+
+  // What is on screen for the chosen tab: cooking tickets oldest first (the one waiting longest is on top), then ready ones.
   const filteredKots = useMemo(() => {
-    return stationKots.filter((kot) => {
-      if (statusFilter === 'ALL') {
-        return kot.status !== 'SERVED' && kot.status !== 'CANCELLED';
-      }
+    if (statusFilter === 'SERVED') {
+      return stationKots
+        .filter((k) => k.status === 'SERVED')
+        .sort((a, b) => new Date(b.servedAt ?? b.createdAt).getTime() - new Date(a.servedAt ?? a.createdAt).getTime())
+        .slice(0, 60);
+    }
+    const picked = stationKots.filter((kot) => {
+      if (kot.status === 'CANCELLED') return statusFilter !== 'READY' && cancelledAlert(kot);
+      if (statusFilter === 'ALL') return kot.status !== 'SERVED';
       if (statusFilter === 'PREPARING') {
-        return (
-          kot.status === 'PREPARING' ||
-          kot.status === 'PENDING' ||
-          kot.status === 'ACCEPTED' ||
-          (kot.status as any) === 'COOKING'
-        );
+        return kot.status === 'PREPARING' || kot.status === 'PENDING' || kot.status === 'ACCEPTED' || (kot.status as any) === 'COOKING';
       }
       return kot.status === statusFilter;
     });
-  }, [stationKots, statusFilter]);
+    return sortForKitchen(picked);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stationKots, statusFilter, dismissed]);
 
-  // Action: Update KOT Status with LAN Broadcast
+  const toCook = useMemo(() => prepSummary(stationKots), [stationKots]);
+  const prepTimeOf = useMemo(() => {
+    const byId = new Map(db.menuItems.map((m) => [m.id, m.prepTimeMinutes] as const));
+    return (id: string) => byId.get(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [db.menuItems.length]);
+
+  // The person at the screen, for the audit trail (it used to say "Head Chef" for everyone).
+  const chefName = () => SessionPersistence.load('kds')?.fullName || 'Kitchen';
+  const logKitchen = (action: string, details: string) => AuditRepository.log({ action, category: 'ORDER', details, username: chefName() });
+  // Every change is pushed at once so the Captain and the counter see it within a second.
+  const commit = () => {
+    kdsDb.notify();
+    setKots([...kdsDb.kots]);
+    SyncOutboxEngine.flush();
+  };
+  const announceReady = (kot: KOTRecord) =>
+    lanMeshSync.broadcast('FOOD_READY', {
+      tableNumber: kot.tableNumber,
+      kotId: kot.id,
+      kotNumber: kot.kotNumber,
+      orderId: kot.orderId,
+      orderNumber: kot.orderNumber,
+      items: kot.items,
+      dishName: kot.items?.[0]?.name,
+      quantity: kot.items?.[0]?.quantity,
+      station: kot.station
+    });
+
+  // Ticket-level change (start cooking, served). Ready and undo go through the dish-level functions below.
   const updateStatus = (kotId: string, nextStatus: KOTStatus) => {
     const targetKot = kdsDb.kots.find((k) => k.id === kotId);
-    if (targetKot) {
-      targetKot.status = nextStatus;
-      if (nextStatus === 'SERVED') {
-        targetKot.printed = true;
-      }
-      KOTRepository.updateKOTStatus(kotId, nextStatus);
-      kdsDb.notify();
-      setKots([...kdsDb.kots]);
-      // Tell the Captain and counter now ("food ready" must not wait for the 3 s timer).
-      SyncOutboxEngine.flush();
-
-      AuditRepository.log({
-        action: `KOT_${nextStatus}`,
-        category: 'ORDER',
-        details: `KOT #${targetKot.kotNumber} status updated to ${nextStatus} on KDS`,
-        username: 'Head Chef'
-      });
-
-      // Broadcast the raw status change so POS's/Admin's own Kitchen views
-      // stay in sync for every transition, not just READY/SERVED.
-      lanMeshSync.broadcast('KOT_STATUS_CHANGED', { kotId: targetKot.id, status: nextStatus });
-
-      // Broadcast to Captain, POS & Admin
-      if (nextStatus === 'READY') {
-        lanMeshSync.broadcast('FOOD_READY', {
-          tableNumber: targetKot.tableNumber,
-          kotId: targetKot.id,
-          kotNumber: targetKot.kotNumber,
-          orderId: targetKot.orderId,
-          orderNumber: targetKot.orderNumber,
-          items: targetKot.items,
-          dishName: targetKot.items?.[0]?.name,
-          quantity: targetKot.items?.[0]?.quantity,
-          station: targetKot.station
-        });
-      } else if (nextStatus === 'SERVED') {
-        lanMeshSync.broadcast('ORDER_SERVED', {
-          tableNumber: targetKot.tableNumber,
-          kotId: targetKot.id,
-          kotNumber: targetKot.kotNumber
-        });
-      }
+    if (!targetKot) return;
+    if (nextStatus === 'SERVED') targetKot.printed = true;
+    KOTRepository.updateKOTStatus(kotId, nextStatus);
+    commit();
+    logKitchen(`KOT_${nextStatus}`, `KOT #${targetKot.kotNumber} status updated to ${nextStatus} on KDS`);
+    lanMeshSync.broadcast('KOT_STATUS_CHANGED', { kotId: targetKot.id, status: nextStatus });
+    if (nextStatus === 'READY') announceReady(targetKot);
+    else if (nextStatus === 'SERVED') {
+      lanMeshSync.broadcast('ORDER_SERVED', { tableNumber: targetKot.tableNumber, kotId: targetKot.id, kotNumber: targetKot.kotNumber });
+      offerUndo(`Ticket #${targetKot.tokenNumber} served`, () => recallTicket(targetKot));
     }
   };
 
-  // Elapsed Time Calculator
-  const getElapsedInfo = (createdAt: string) => {
-    const created = new Date(createdAt).getTime();
-    const now = Date.now();
-    const diffMs = Math.max(0, now - created);
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffSecs = Math.floor((diffMs % 60000) / 1000);
-
-    const isDelayed = diffMins >= 15;
-    const isWarning = diffMins >= 10 && !isDelayed;
-
-    const timeStr = `${diffMins.toString().padStart(2, '0')}:${diffSecs.toString().padStart(2, '0')}`;
-    return { timeStr, diffMins, isDelayed, isWarning };
+  const setDish = (kot: KOTRecord, item: KOTItem, next: 'PREPARING' | 'READY'): boolean => {
+    const live = kdsDb.kots.find((k) => k.id === kot.id);
+    if (!live || !KOTRepository.setItemStatus(kot.id, item.id, next)) return false;
+    logKitchen(next === 'READY' ? 'KOT_ITEM_READY' : 'KOT_ITEM_UNDONE', `${item.quantity} x ${item.name} on KOT #${kot.kotNumber} ${next === 'READY' ? 'marked ready' : 'put back to cooking'}`);
+    lanMeshSync.broadcast('KOT_STATUS_CHANGED', { kotId: kot.id, status: live.status });
+    if (next === 'READY' && live.status === 'READY') announceReady(live);
+    commit();
+    return true;
   };
+
+  // One tap on a dish: cooking -> ready, ready -> back to cooking. The ticket becomes ready by itself with its last dish.
+  const toggleDish = (kot: KOTRecord, item: KOTItem) => {
+    const next = effectiveItemStatus(kot, item) === 'READY' ? 'PREPARING' : 'READY';
+    if (!setDish(kot, item, next)) return;
+    if (next === 'READY') offerUndo(`${item.name} ready`, () => { setDish(kot, item, 'PREPARING'); setUndo(null); });
+  };
+
+  const markAllReady = (kot: KOTRecord) => {
+    const live = kdsDb.kots.find((k) => k.id === kot.id);
+    if (!live) return;
+    let moved = 0;
+    liveItems(live).forEach((i) => {
+      if (effectiveItemStatus(live, i) !== 'READY' && effectiveItemStatus(live, i) !== 'SERVED' && KOTRepository.setItemStatus(kot.id, i.id, 'READY')) moved += 1;
+    });
+    if (moved === 0) KOTRepository.updateKOTStatus(kot.id, 'READY');
+    logKitchen('KOT_READY', `KOT #${live.kotNumber} marked ready on KDS`);
+    lanMeshSync.broadcast('KOT_STATUS_CHANGED', { kotId: live.id, status: 'READY' });
+    announceReady(live);
+    commit();
+    offerUndo(`Ticket #${live.tokenNumber} ready`, () => recallTicket(live));
+  };
+
+  function recallTicket(kot: KOTRecord) {
+    if (KOTRepository.recallKot(kot.id)) {
+      logKitchen('KOT_RECALLED', `KOT #${kot.kotNumber} brought back to cooking on KDS`);
+      lanMeshSync.broadcast('KOT_STATUS_CHANGED', { kotId: kot.id, status: 'PREPARING' });
+      commit();
+      setUndo(null);
+    } else {
+      offerUndo('This ticket cannot be brought back: the order is already settled.');
+    }
+  }
+
+  const retryNow = () => {
+    void SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+    void SyncOutboxEngine.catchUpFromCloud();
+  };
+
+  const stationName = selectedStation === 'ALL' ? 'All stations' : selectedStation;
 
   // Device activation gate — this terminal has no cloud identity until an
   // activation code is redeemed. Runs before the PIN-login screen below,
@@ -632,72 +739,97 @@ export const App: React.FC = () => {
   // =========================================================================
   // 2. KDS MAIN OPERATIONS WORKSPACE
   // =========================================================================
+  const nowMs = Date.now();
+  const tabs = [
+    { id: 'ALL', label: 'ACTIVE', short: 'Active', count: activePreparingCount + readyPickupCount + alertCount, icon: UtensilsCrossed },
+    { id: 'PREPARING', label: 'COOKING', short: 'Cooking', count: activePreparingCount, icon: Flame },
+    { id: 'READY', label: 'READY', short: 'Ready', count: readyPickupCount, icon: Bell },
+    { id: 'SERVED', label: 'SERVED', short: 'Served', count: servedCount, icon: CheckCheck }
+  ] as const;
+
   return (
     <JAMANVAARStartup appName="Kitchen Display (KDS)" appType="KDS" subtitle="Kitchen Production & Expediter System">
-      <div className="min-h-screen bg-jaman-cream text-jaman-navy flex flex-col select-none font-sans">
-        {/* TOP HEADER: Brand, Station Selector, Live Clock, Switch Station */}
-        <header className="bg-white border-b border-jaman-border px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs shrink-0 z-10">
-          <div className="flex items-center gap-3">
-            <BrandHeader
-              app="KDS"
-              logoHeight={46}
-              badgeSize="sm"
-              showContext={false}
-            />
-            <div className="hidden lg:flex items-center gap-1.5 bg-[#FFF4ED] border border-[#FDBA74] px-3 py-1.5 rounded-xl text-xs font-bold text-jaman-saffron">
+      <div className="h-dvh bg-jaman-cream text-jaman-navy flex flex-col select-none font-sans overflow-hidden">
+        {/* CONNECTION BAR: shown only when this screen has stopped hearing from the server */}
+        {conn.level !== 'ok' && (
+          <div
+            role="alert"
+            data-testid="kds-connection-bar"
+            className={`shrink-0 px-3 sm:px-6 py-2 text-xs sm:text-sm font-black flex items-center justify-between gap-3 ${conn.level === 'lost' ? 'bg-rose-600 text-white' : 'bg-amber-400 text-amber-950'}`}
+          >
+            <span className="flex items-center gap-2 min-w-0">
+              <WifiOff className="w-4 h-4 shrink-0" />
+              <span className="min-w-0">
+                {conn.level === 'lost' ? 'Connection lost: new orders may be delayed. Reconnecting…' : 'Slow connection: orders may arrive late.'}
+                {conn.ageSec !== null && <span className="opacity-90 font-bold"> Last update {conn.ageSec}s ago.</span>}
+              </span>
+            </span>
+            <button type="button" onClick={retryNow} className="shrink-0 px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 font-black text-xs cursor-pointer">
+              Retry now
+            </button>
+          </div>
+        )}
+
+        {/* TOP HEADER: brand, live status, counters, station selector */}
+        <header className="bg-white border-b border-jaman-border px-3 sm:px-6 py-2 sm:py-3 flex flex-wrap items-center gap-x-3 gap-y-2 shadow-xs shrink-0 z-10">
+          <div className="flex items-center gap-3 min-w-0">
+            <BrandHeader app="KDS" logoHeight={narrow ? 32 : 46} badgeSize="sm" showContext={false} />
+            <div className="hidden xl:flex items-center gap-1.5 bg-[#FFF4ED] border border-[#FDBA74] px-3 py-1.5 rounded-xl text-xs font-bold text-jaman-saffron">
               <span>Station:</span>
-              <span className="font-black text-jaman-navy">{selectedStation}</span>
+              <span className="font-black text-jaman-navy">{stationName}</span>
             </div>
           </div>
 
-          {/* Center: Touch Station Selector Pills */}
-          <div className="flex items-center gap-1.5 bg-jaman-cream p-1 rounded-2xl border border-jaman-border overflow-x-auto">
-            {stationChoices.map((st) => (
-              <button
-                key={st.id}
-                type="button"
-                onClick={() => setSelectedStation(st.id)}
-                className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap active:scale-95 cursor-pointer ${
-                  selectedStation === st.id
-                    ? 'bg-jaman-navy text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-white hover:text-jaman-navy'
-                }`}
-              >
-                {st.label}
-              </button>
-            ))}
-          </div>
+          {/* Station pills: their own row on small screens, scrolling sideways */}
+          <nav aria-label="Kitchen station" className="order-last lg:order-none w-full lg:w-auto lg:flex-1 min-w-0 flex lg:justify-center">
+            <div className="flex items-center gap-1.5 bg-jaman-cream p-1 rounded-2xl border border-jaman-border overflow-x-auto max-w-full">
+              {stationChoices.map((st) => (
+                <button
+                  key={st.id}
+                  type="button"
+                  onClick={() => setSelectedStation(st.id)}
+                  className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap active:scale-95 cursor-pointer ${
+                    selectedStation === st.id ? 'bg-jaman-navy text-white shadow-xs' : 'text-slate-600 hover:bg-white hover:text-jaman-navy'
+                  }`}
+                >
+                  {st.label}
+                </button>
+              ))}
+            </div>
+          </nav>
 
-          {/* Right: KDS Live Clock & Counters & Switch Station */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Live Sync Clock */}
-            <div className="bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-800 flex items-center gap-2 font-mono shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="hidden sm:inline font-sans font-black text-[11px]">KDS LIVE</span>
-              <span className="text-emerald-300 hidden sm:inline">|</span>
-              <span>{currentTime}</span>
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
+            <div
+              data-testid="kds-live-pill"
+              data-level={conn.level}
+              className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 font-mono shadow-2xs border ${
+                conn.level === 'ok' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : conn.level === 'slow' ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-rose-50 border-rose-300 text-rose-800'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${conn.level === 'ok' ? 'bg-emerald-500 animate-pulse' : conn.level === 'slow' ? 'bg-amber-500' : 'bg-rose-500'}`} />
+              <span className="hidden sm:inline font-sans font-black text-[11px]">{conn.level === 'ok' ? 'LIVE' : conn.level === 'slow' ? 'SLOW' : 'OFFLINE'}</span>
+              <span className="hidden md:inline text-slate-300">|</span>
+              <span className="hidden md:inline">{currentTime}</span>
             </div>
 
-            {/* Cooking Counter */}
-            <div className="bg-[#FFF4ED] border border-[#FDBA74] px-3 py-1.5 rounded-xl text-xs font-bold text-jaman-saffron flex items-center gap-1.5 shadow-2xs">
+            <div className="bg-[#FFF4ED] border border-[#FDBA74] px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-jaman-saffron flex items-center gap-1.5 shadow-2xs" title="Tickets cooking">
               <Flame className="w-4 h-4 text-jaman-saffron" />
               <span className="font-mono font-black">{activePreparingCount}</span>
-              <span className="hidden md:inline font-bold text-[11px]">Cooking</span>
+              <span className="hidden lg:inline font-bold text-[11px]">Cooking</span>
             </div>
 
-            {/* Ready Counter */}
-            <div className="bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-700 flex items-center gap-1.5 shadow-2xs">
+            <div className="bg-emerald-50 border border-emerald-200 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-700 flex items-center gap-1.5 shadow-2xs" title="Tickets ready">
               <Bell className="w-4 h-4 text-emerald-600" />
               <span className="font-mono font-black">{readyPickupCount}</span>
-              <span className="hidden md:inline font-bold text-[11px]">Ready</span>
+              <span className="hidden lg:inline font-bold text-[11px]">Ready</span>
             </div>
 
-            {/* Switch Station / Logout */}
             <button
               type="button"
               onClick={handleKdsLogout}
               title="Switch kitchen station or logout"
-              className="flex items-center gap-1.5 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-jaman-border hover:border-rose-300 px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs cursor-pointer"
+              aria-label="Switch station or log out"
+              className="flex items-center gap-1.5 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-jaman-border hover:border-rose-300 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden xl:inline">Switch Station</span>
@@ -705,234 +837,92 @@ export const App: React.FC = () => {
           </div>
         </header>
 
-        {/* STATUS NAVIGATION BAR */}
-        <div className="bg-white border-b border-jaman-border px-4 sm:px-6 py-2.5 shrink-0 shadow-2xs">
-          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto max-w-[1920px] mx-auto">
-            {[
-              { id: 'ALL', label: 'ACTIVE TICKETS', count: activePreparingCount + readyPickupCount, icon: UtensilsCrossed },
-              { id: 'PREPARING', label: '🔥 COOKING', count: activePreparingCount, icon: Flame },
-              { id: 'READY', label: '🔔 FOOD READY', count: readyPickupCount, icon: Bell },
-              { id: 'SERVED', label: '✓ SERVED', count: servedCount, icon: CheckCheck }
-            ].map((tab) => {
+        {/* STATUS TABS */}
+        <div className="bg-white border-b border-jaman-border px-3 sm:px-6 py-2 shrink-0 shadow-2xs">
+          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto max-w-[1920px] mx-auto" role="tablist">
+            {tabs.map((tab) => {
               const isSelected = statusFilter === tab.id;
               return (
                 <button
                   key={tab.id}
                   type="button"
+                  role="tab"
+                  aria-selected={isSelected}
                   onClick={() => setStatusFilter(tab.id as any)}
-                  className={`min-h-[46px] px-4 sm:px-6 rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center gap-2.5 shrink-0 active:scale-95 cursor-pointer ${
-                    isSelected
-                      ? 'bg-jaman-saffron text-white shadow-md shadow-orange-500/25'
-                      : 'bg-jaman-cream border border-jaman-border text-slate-700 hover:bg-[#F0ECE1] hover:text-jaman-navy'
+                  className={`min-h-[44px] px-3 sm:px-5 rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 shrink-0 active:scale-95 cursor-pointer ${
+                    isSelected ? 'bg-jaman-saffron text-white shadow-md shadow-orange-500/25' : 'bg-jaman-cream border border-jaman-border text-slate-700 hover:bg-[#F0ECE1] hover:text-jaman-navy'
                   }`}
                 >
-                  <span>{tab.label}</span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-mono font-black ${
-                      isSelected
-                        ? 'bg-white text-jaman-saffron'
-                        : 'bg-white border border-jaman-border text-slate-600'
-                    }`}
-                  >
-                    {tab.count}
-                  </span>
+                  <tab.icon className="w-4 h-4 hidden sm:block" />
+                  <span className="sm:hidden">{tab.short}</span>
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-mono font-black ${isSelected ? 'bg-white text-jaman-saffron' : 'bg-white border border-jaman-border text-slate-600'}`}>{tab.count}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* MAIN KITCHEN DISPLAY TICKET GRID */}
-        <main className="flex-1 p-4 sm:p-6 overflow-y-auto min-h-0">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 max-w-[1920px] mx-auto">
+        {/* WHAT STILL HAS TO BE COOKED, summed across tickets, so a cook can batch */}
+        {(statusFilter === 'ALL' || statusFilter === 'PREPARING') && toCook.length > 0 && (
+          <div className="bg-white border-b border-jaman-border px-3 sm:px-6 py-2 shrink-0 flex items-center gap-2 overflow-x-auto" aria-label="Dishes still to cook" data-testid="kds-to-cook">
+            <span className="text-[11px] font-black uppercase tracking-wide text-slate-500 shrink-0">To cook</span>
+            {toCook.map((d) => (
+              <span key={d.name} className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-300 px-2.5 py-1 text-xs font-black text-amber-900">
+                <span className="font-mono text-sm">{d.qty}×</span>
+                {d.name}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* TICKETS */}
+        <main className="flex-1 p-3 sm:p-5 overflow-y-auto min-h-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 max-w-[1920px] mx-auto items-start">
             {filteredKots.map((kot) => {
-              const isReady = kot.status === 'READY';
-              const isPreparing = kot.status === 'PREPARING' || (kot.status as any) === 'COOKING';
-              const isServed = kot.status === 'SERVED';
-              const isPending = kot.status === 'PENDING' || kot.status === 'ACCEPTED';
-              const elapsed = getElapsedInfo(kot.createdAt);
-
+              const cashier = kot.cashierName ? `${kotTakenByLabel(kot)}: ${kot.cashierName}` : null;
               return (
-                <div
+                <KdsTicketCard
                   key={kot.id}
-                  className={`bg-white rounded-3xl border-2 transition-all shadow-xs hover:shadow-md flex flex-col justify-between overflow-hidden relative select-none ${
-                    isReady
-                      ? 'border-emerald-500 ring-2 ring-emerald-500/20'
-                      : isPreparing
-                      ? 'border-amber-400'
-                      : isServed
-                      ? 'border-slate-200 opacity-75'
-                      : 'border-jaman-border'
-                  }`}
-                >
-                  {/* State Accent Top Bar */}
-                  <div
-                    className={`h-2 w-full ${
-                      isReady
-                        ? 'bg-emerald-500'
-                        : isPreparing
-                        ? 'bg-amber-500'
-                        : isServed
-                        ? 'bg-slate-300'
-                        : 'bg-blue-400'
-                    }`}
-                  />
-
-                  {/* Header: Token, KOT Number, Table, Order Type & Elapsed Timer */}
-                  <div className="p-4 sm:p-5 space-y-3.5">
-                    <div className="flex items-start justify-between gap-2 border-b border-jaman-border pb-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl sm:text-3xl font-black font-mono text-jaman-navy">
-                            #{kot.tokenNumber}
-                          </span>
-                          <span className="text-xs font-black bg-jaman-saffron text-white px-2 py-0.5 rounded-md font-mono">
-                            {kot.kotNumber}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold mt-1">
-                          <span>{kot.tableNumber ? `Table ${kot.tableNumber}` : 'No table'}</span>
-                          <span>•</span>
-                          <span className="uppercase text-xs bg-slate-100 px-1.5 py-0.2 rounded font-black text-slate-700">
-                            {ORDER_TYPE_LABEL[kot.orderType] || kot.orderType}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Timer */}
-                      {!isServed && (
-                        <div>
-                          {elapsed.isDelayed ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-black bg-rose-50 text-rose-700 border border-rose-300 animate-pulse">
-                              <AlertTriangle className="w-3 h-3 text-rose-600" />
-                              Delayed: {elapsed.diffMins}m
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold text-slate-600 bg-jaman-cream border border-jaman-border font-mono">
-                              <Clock className="w-3 h-3 text-slate-400" />
-                              {elapsed.timeStr}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Order-level Chef Note (distinct from per-item specialInstructions) */}
-                    {kot.orderNotes && (
-                      <div className="px-2.5 py-1.5 rounded-xl bg-amber-100/80 text-amber-900 text-xs font-bold flex items-start gap-1.5 border border-amber-300/60">
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
-                        <span>{kot.orderNotes}</span>
-                      </div>
-                    )}
-
-                    {/* Food Items Ordered */}
-                    <div className="space-y-2.5">
-                      {kot.items.map((it: any, idx: number) => (
-                        <div
-                          key={idx}
-                          className="bg-jaman-cream p-3 rounded-2xl border border-jaman-border space-y-1"
-                        >
-                          <div className="flex items-start gap-2">
-                            <span className="font-mono font-black text-base sm:text-lg text-jaman-saffron leading-none shrink-0">
-                              {it.quantity}×
-                            </span>
-                            <div className="flex-1 min-w-0">
-                              <span className="font-black text-xs sm:text-sm text-jaman-navy leading-snug block">
-                                {it.name}
-                              </span>
-
-                              {/* Modifiers — deliberately NOT small: this is often
-                                  allergy/spice/prep-critical information read from
-                                  a few feet away in a busy kitchen, so it gets the
-                                  same weight/contrast as the dish name above it. */}
-                              {it.modifiers && it.modifiers.length > 0 && (
-                                <div className="text-sm font-bold text-slate-800 pt-0.5 space-y-0.5">
-                                  {it.modifiers.map((m: any, mIdx: number) => (
-                                    <span key={mIdx} className="block">
-                                      • {m.optionName || m}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-
-                              {/* Special Kitchen Notes */}
-                              {it.specialInstructions && (
-                                <div className="mt-1 px-2 py-0.5 rounded-lg bg-amber-100/80 text-amber-900 text-xs font-bold inline-flex items-center gap-1 border border-amber-300/60">
-                                  <AlertCircle className="w-3 h-3 text-amber-700 shrink-0" />
-                                  <span>{it.specialInstructions}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Card Footer & Large Touch Action Button (48px height) */}
-                  <div className="p-4 sm:p-5 bg-jaman-cream border-t border-jaman-border space-y-3">
-                    <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
-                      <span>{kot.cashierName ? <>{kotTakenByLabel(kot)}: <strong className="text-jaman-navy">{kot.cashierName}</strong></> : null}</span>
-                      <span className="font-mono text-slate-400">#{kot.id.slice(-5)}</span>
-                    </div>
-
-                    {/* Primary Action Trigger */}
-                    {isPending && (
-                      <button
-                        type="button"
-                        onClick={() => updateStatus(kot.id, 'PREPARING')}
-                        className="w-full min-h-[48px] rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-amber-500/25 active:scale-95 transition-all cursor-pointer"
-                      >
-                        <Flame className="w-4 h-4 text-white" />
-                        <span>START COOKING</span>
-                      </button>
-                    )}
-
-                    {isPreparing && (
-                      <button
-                        type="button"
-                        onClick={() => updateStatus(kot.id, 'READY')}
-                        className="w-full min-h-[48px] rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-emerald-600/25 active:scale-95 transition-all cursor-pointer"
-                      >
-                        <Bell className="w-4 h-4 text-white" />
-                        <span>MARK FOOD READY</span>
-                      </button>
-                    )}
-
-                    {isReady && (
-                      <button
-                        type="button"
-                        onClick={() => updateStatus(kot.id, 'SERVED')}
-                        className="w-full min-h-[48px] rounded-2xl bg-gradient-to-r from-jaman-navy to-jaman-darkBorder hover:from-jaman-darkBorder hover:to-[#2B4C63] text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-slate-900/20 active:scale-95 transition-all cursor-pointer"
-                      >
-                        <CheckCheck className="w-4 h-4 text-emerald-400" />
-                        <span>MARK SERVED ✓</span>
-                      </button>
-                    )}
-
-                    {isServed && (
-                      <div className="min-h-[44px] rounded-2xl bg-slate-100 text-slate-500 font-bold text-xs flex items-center justify-center gap-1.5">
-                        <Check className="w-4 h-4 text-emerald-600" />
-                        <span>Order Completed & Served</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  kot={kot}
+                  age={ticketAge(kot, nowMs, prepMinutes(kot, prepTimeOf))}
+                  progress={orderProgress(kdsDb.kots, kot.orderId)}
+                  orderTypeLabel={ORDER_TYPE_LABEL[kot.orderType] || kot.orderType}
+                  takenBy={cashier}
+                  onToggleDish={toggleDish}
+                  onStart={(k) => updateStatus(k.id, 'PREPARING')}
+                  onAllReady={markAllReady}
+                  onServe={(k) => updateStatus(k.id, 'SERVED')}
+                  onRecall={recallTicket}
+                  onDismiss={dismissCancelled}
+                />
               );
             })}
 
-            {/* Empty State */}
             {filteredKots.length === 0 && (
               <div className="col-span-full">
                 <EmptyState
                   icon={<ChefHat className="w-8 h-8" />}
-                  title="All Kitchen Orders Cleared"
-                  description="No tickets currently waiting for preparation at this station. New orders sent from POS terminals or Captain tablets will appear here instantly."
+                  title={statusFilter === 'SERVED' ? 'Nothing served yet' : 'All Kitchen Orders Cleared'}
+                  description={statusFilter === 'SERVED' ? 'Tickets you mark served appear here, and can be brought back if you tapped by mistake.' : 'No tickets currently waiting at this station. New orders from POS, Captain or the kiosk appear here by themselves, no refresh needed.'}
                 />
               </div>
             )}
           </div>
         </main>
+
+        {/* UNDO / NOTICE */}
+        {undo && (
+          <div role="status" data-testid="kds-undo" className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-[92vw] bg-jaman-navy text-white rounded-2xl px-4 py-3 shadow-2xl flex items-center gap-3 text-sm font-bold">
+            <span className="min-w-0 break-words">{undo.text}</span>
+            {undo.run && (
+              <button type="button" onClick={() => { undo.run?.(); setUndo(null); }} className="shrink-0 px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 font-black text-xs uppercase cursor-pointer">
+                Undo
+              </button>
+            )}
+            <button type="button" onClick={() => setUndo(null)} aria-label="Dismiss" className="shrink-0 text-white/70 hover:text-white cursor-pointer">×</button>
+          </div>
+        )}
 
         {/* Real-time Push Notifications for Kitchen Staff */}
         <NotificationToastContainer role="KDS" />

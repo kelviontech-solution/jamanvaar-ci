@@ -53,6 +53,7 @@ export class RealtimeClient {
   private running = false;
   private controller: AbortController | null = null;
   private timers = new Map<string, ReturnType<typeof setTimeout>>();
+  private pending = new Set<string>();
 
   constructor(private readonly opts: RealtimeOptions) {}
 
@@ -67,20 +68,30 @@ export class RealtimeClient {
     this.controller?.abort();
     this.timers.forEach((t) => clearTimeout(t));
     this.timers.clear();
+    this.pending.clear();
   }
 
   private sleep(ms: number): Promise<void> {
     return this.opts.sleep ? this.opts.sleep(ms) : new Promise((r) => setTimeout(r, ms));
   }
 
+  /**
+   * The first change of a burst wakes the device at once (an order must reach the kitchen in a fraction of a second, so no
+   * waiting to see whether more follow); changes that arrive within the window after it collapse into ONE more wake-up when
+   * the window ends, so a change committed while the first pull was running is never missed.
+   */
   private wake(kind: string): void {
-    const wait = this.opts.debounceMs ?? 300;
-    if (this.timers.has(kind)) return;
+    const wait = this.opts.debounceMs ?? 50;
+    if (this.timers.has(kind)) {
+      this.pending.add(kind);
+      return;
+    }
+    if (this.running) this.opts.onChange(kind);
     this.timers.set(
       kind,
       setTimeout(() => {
         this.timers.delete(kind);
-        if (this.running) this.opts.onChange(kind);
+        if (this.pending.delete(kind)) this.wake(kind);
       }, wait)
     );
   }

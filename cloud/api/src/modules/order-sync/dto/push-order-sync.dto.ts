@@ -30,6 +30,11 @@ export const syncedOrderItemSchema = z.object({
     })
     .optional(),
   kitchenStatus: z.string().optional(),
+  /** Raised by a deliberate step backwards (a recall) or a cancellation, so it beats older copies (see order-merge.ts). */
+  statusRev: z.number().int().min(0).max(1_000_000).optional(),
+  /** 'COURSE_1' | 'COURSE_2' | 'COURSE_3': which part of the meal the dish belongs to. */
+  course: z.string().max(16).optional(),
+  cancelReason: z.string().max(120).optional(),
   kitchenStation: z.string().max(64).optional(),
   specialInstructions: z.string().max(500).optional(),
   lineTotal: z.number().int().min(0)

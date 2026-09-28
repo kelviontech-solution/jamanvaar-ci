@@ -69,8 +69,20 @@ describe('Captain screens (BUG-104/105/107/108/114)', () => {
   it('the menu never shows a blank grid: an empty menu explains itself, and a sold-out dish is marked and cannot be picked', () => {
     const src = read('components/tables/CaptainTableWorkspaceModal.tsx');
     expect(src).toContain('captain-empty-menu');
-    expect(src).toMatch(/isAvailable === false[\s\S]{0,400}Sold out/);
-    expect(src).toMatch(/if \(item\.isAvailable !== false\) setCustomizingItem\(item\)/);
-    expect(src).toMatch(/disabled=\{item\.isAvailable === false\}/);
+    expect(src).toMatch(/const soldOut = item\.isAvailable === false/);
+    expect(src).toContain('Sold out');
+    expect(src).toMatch(/if \(!soldOut\) setCustomizingItem\(item\)/);
+    expect(src).toMatch(/disabled=\{soldOut\}/);
+  });
+
+  it('the table workspace fits a phone: full screen, tappable controls, and a collapsible cart', () => {
+    const src = read('components/tables/CaptainTableWorkspaceModal.tsx');
+    expect(src).toContain('h-dvh');
+    expect(src).toMatch(/hidden md:block[^"]*"[^>]*>\s*<div className="flex items-center justify-between min-w-\[500px\]/); // the stepper is skipped on a phone
+    expect(src).toContain('aria-expanded={cartOpen}');
+    // Every button a waiter presses with a thumb is at least 40px tall.
+    const buttons = src.match(/<button[\s\S]*?>/g) ?? [];
+    const tooSmall = buttons.filter((b) => /className="[^"]*\b(w-6 h-6|w-7 h-7|p-1\b)/.test(b));
+    expect(tooSmall).toEqual([]);
   });
 });

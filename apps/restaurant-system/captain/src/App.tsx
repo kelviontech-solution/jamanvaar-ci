@@ -13,7 +13,7 @@ import {
   ActivationHelpNote
 } from '@jamanvaar/ui';
 import { isDeviceConnected, activateCaptainWithKey, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
-import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, onAppResume } from '@jamanvaar/sync';
 
 // Captain Modular Layout & Views
 import { CaptainHeader } from './components/layout/CaptainHeader';
@@ -135,9 +135,17 @@ export const App: React.FC = () => {
       void reportHeartbeat();
     }, 15000);
 
+    // Waking the tablet (screen unlocked, network back, tab visible again) catches up at once: no refresh needed.
+    const stopResume = onAppResume(() => {
+      void SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+      void SyncOutboxEngine.catchUpFromCloud();
+      void syncDiningTables();
+    });
+
     return () => {
       clearInterval(orderInterval);
       clearInterval(interval);
+      stopResume();
     };
   }, [deviceConnected]);
 

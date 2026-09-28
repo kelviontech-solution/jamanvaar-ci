@@ -34,6 +34,13 @@ function pushNow(): void {
 import { deviceFetch as captainDeviceFetch } from '../cloud/cloudClient';
 import { SessionPersistence, AuthStatus, priceOrderLines } from '@jamanvaar/business';
 
+export type Course = 'COURSE_1' | 'COURSE_2' | 'COURSE_3';
+export const COURSES: ReadonlyArray<{ id: Course; label: string; short: string }> = [
+  { id: 'COURSE_1', label: 'Starters', short: '1st' },
+  { id: 'COURSE_2', label: 'Mains', short: '2nd' },
+  { id: 'COURSE_3', label: 'Dessert', short: '3rd' }
+];
+
 export interface CartItemEntry {
   id: string;
   menuItem: MenuItem;
@@ -42,10 +49,49 @@ export interface CartItemEntry {
   totalPrice: number;
   selectedModifiers: SelectedModifier[];
   specialNotes?: string;
-  course?: 'COURSE_1' | 'COURSE_2' | 'COURSE_3';
+  course?: Course;
   isFired: boolean;
   kotId?: string;
-  status: 'PENDING' | 'PREPARING' | 'READY' | 'SERVED';
+  /** The order line this dish became when it was fired; needed to cancel it. */
+  orderItemId?: string;
+  cancelReason?: string;
+  status: 'PENDING' | 'PREPARING' | 'READY' | 'SERVED' | 'CANCELLED';
+}
+
+/**
+ * Dishes taken but not yet sent to the kitchen (a course held back, or a table opened and closed again) belong to the table,
+ * not to the open screen: they are kept per table so closing the workspace, or a reload, does not lose them.
+ */
+const HELD_KEY = 'jamanvaar_captain_held_v1';
+function readHeld(): Record<string, CartItemEntry[]> {
+  try {
+    return JSON.parse(localStorage.getItem(HELD_KEY) ?? '{}') as Record<string, CartItemEntry[]>;
+  } catch {
+    return {};
+  }
+}
+function writeHeld(all: Record<string, CartItemEntry[]>): void {
+  try {
+    localStorage.setItem(HELD_KEY, JSON.stringify(all));
+  } catch {
+    // Storage unavailable: held dishes last until the screen is closed.
+  }
+}
+export function heldForTable(tableNumber: string): CartItemEntry[] {
+  return (readHeld()[tableNumber] ?? []).filter((ci) => !ci.isFired);
+}
+function saveHeld(tableNumber: string, items: CartItemEntry[]): void {
+  const all = readHeld();
+  if (items.length === 0) delete all[tableNumber];
+  else all[tableNumber] = items;
+  writeHeld(all);
+}
+function moveHeld(from: string, to: string): void {
+  const all = readHeld();
+  if (!all[from]?.length) return;
+  all[to] = [...(all[to] ?? []), ...all[from]];
+  delete all[from];
+  writeHeld(all);
 }
 
 export interface InternalMessage {
@@ -223,9 +269,17 @@ interface CaptainState {
   ) => void;
   updateCartQuantity: (itemId: string, delta: number) => void;
   removeCartItem: (itemId: string) => void;
+  /** Moves a dish that has not been sent yet to another course (1st starters, 2nd mains, 3rd dessert). */
+  setCartItemCourse: (itemId: string, course: Course) => void;
   clearCart: () => void;
   repeatPreviousOrder: (tableNumber: string) => boolean;
-  sendKOT: () => KOT[] | null;
+  /** Sends the dishes not yet sent to the kitchen: all of them, or only those of the given courses (the rest stay held). */
+  sendKOT: (courses?: Course[]) => KOT[] | null;
+  /**
+   * Cancels a dish that was already sent. Needs a manager: pass the manager's PIN unless the signed-in person is one.
+   * The dish stays on the bill at no charge and the kitchen screen shows it cancelled.
+   */
+  cancelDish: (orderItemId: string, reason: string, managerPin?: string) => Promise<{ ok: true } | { ok: false; error: string }>;
 
   // Food Ready & Bill Actions
   markItemServed: (foodReadyId: string) => void;
@@ -446,21 +500,30 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
           totalPrice: it.totalPrice,
           selectedModifiers: it.modifiers || [],
           specialNotes: it.specialInstructions,
+          course: (it.course as Course | undefined),
           isFired: true,
-          status: 'PREPARING'
+          orderItemId: it.id,
+          cancelReason: it.cancelReason,
+          status: it.kitchenStatus === 'CANCELLED' ? 'CANCELLED' : 'PREPARING'
         };
       });
     }
+
+    // A free table has nothing waiting for it; an occupied one gets back the dishes taken but not yet sent.
+    let held: CartItemEntry[] = [];
+    if (table.status === 'AVAILABLE' && !table.currentOrderId) saveHeld(table.tableNumber, []);
+    else held = heldForTable(table.tableNumber);
 
     set({
       selectedTable: table,
       selectedTableOrder: activeOrder,
       guestCount: table.currentGuests || 2,
-      cartItems: loadedCart
+      cartItems: [...loadedCart, ...held]
     });
   },
 
   openTable: (tableNumber, guests = 2) => {
+    saveHeld(tableNumber, []); // a new party never inherits the last one's unsent dishes
     const tbl = captainDb.tables.find((t) => t.tableNumber === tableNumber);
     if (tbl) {
       const captain = get().currentCaptain;
@@ -545,6 +608,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     }
 
     captainDb.notify();
+    moveHeld(fromTable, toTable);
     get().selectTable(to);
 
     AuditRepository.log({
@@ -599,6 +663,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     sec.currentOrderId = primaryOrder.id;
 
     captainDb.notify();
+    moveHeld(secondaryTable, primaryTable);
     get().selectTable(prim);
 
     AuditRepository.log({
@@ -621,6 +686,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   closeTable: (tableNumber: string) => {
     const tbl = captainDb.tables.find((t) => t.tableNumber === tableNumber);
     if (!tbl) return false;
+    saveHeld(tableNumber, []);
 
     tbl.status = 'AVAILABLE';
     tbl.currentGuests = undefined;
@@ -728,6 +794,10 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     });
   },
 
+  setCartItemCourse: (itemId, course) => {
+    set({ cartItems: get().cartItems.map((ci) => (ci.id === itemId && !ci.isFired ? { ...ci, course } : ci)) });
+  },
+
   clearCart: () => {
     set({ cartItems: [] });
   },
@@ -749,10 +819,14 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     return true;
   },
 
-  sendKOT: () => {
+  sendKOT: (courses) => {
     const state = get();
-    const unFiredItems = state.cartItems.filter((ci) => !ci.isFired);
+    const heldBack = (ci: CartItemEntry) => !!courses && !courses.includes(ci.course ?? 'COURSE_1');
+    const unFiredItems = state.cartItems.filter((ci) => !ci.isFired && !heldBack(ci));
     if (unFiredItems.length === 0) return null;
+    // Each fired dish becomes exactly one order line; the ticket line and the cart entry keep that line's id.
+    const stamp = Date.now();
+    const lineIdOf = new Map(unFiredItems.map((ci, idx) => [ci.id, `oi-${stamp}-${idx}-${Math.random().toString(36).slice(2, 6)}`] as const));
 
     // A ticket must say which table it is for: never guess one (used to default to table 1).
     const table = state.selectedTable;
@@ -763,8 +837,8 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     // 1. Create or Update Order in Database
     let order = state.selectedTableOrder;
     if (!order) {
-      const orderItems = state.cartItems.map((ci, idx) => ({
-        id: `oi-${Date.now()}-${idx}`,
+      const orderItems = unFiredItems.map((ci) => ({
+        id: lineIdOf.get(ci.id)!,
         orderId: '',
         menuItemId: ci.menuItem.id,
         name: ci.menuItem.name,
@@ -773,6 +847,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
         unitPrice: ci.unitPrice,
         modifiers: ci.selectedModifiers,
         specialInstructions: ci.specialNotes,
+        course: ci.course ?? 'COURSE_1',
         totalPrice: ci.totalPrice,
         kitchenStatus: 'PREPARING' as const
       }));
@@ -802,8 +877,8 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
         table.openedByName = captain?.name;
       }
     } else {
-      const newItems = unFiredItems.map((ci, idx) => ({
-        id: `oi-${Date.now()}-${idx}`,
+      const newItems = unFiredItems.map((ci) => ({
+        id: lineIdOf.get(ci.id)!,
         orderId: order!.id,
         menuItemId: ci.menuItem.id,
         name: ci.menuItem.name,
@@ -812,12 +887,14 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
         unitPrice: ci.unitPrice,
         modifiers: ci.selectedModifiers,
         specialInstructions: ci.specialNotes,
+        course: ci.course ?? 'COURSE_1',
         totalPrice: ci.totalPrice,
         kitchenStatus: 'PREPARING' as const
       }));
 
       order.items = [...(order.items || []), ...newItems];
-      Object.assign(order, priceOrderLines(order.items.map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity }))));
+      // Cancelled dishes are at no charge, so they add nothing to the bill.
+      Object.assign(order, priceOrderLines(order.items.filter((i) => i.kitchenStatus !== 'CANCELLED').map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity }))));
       order.captainName = order.captainName || captain?.name;
       order.orderStatus = 'PREPARING';
       order.updatedAt = new Date().toISOString();
@@ -829,14 +906,16 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
     // 2. Generate KOT strictly for newly fired items
     const kotItems = unFiredItems.map((ci, idx) => ({
-      id: `koti-${Date.now()}-${idx}`,
+      id: `koti-${stamp}-${idx}`,
       menuItemId: ci.menuItem.id,
       name: ci.menuItem.name,
       quantity: ci.quantity,
       modifiers: ci.selectedModifiers,
       specialInstructions: ci.specialNotes,
       kitchenStation: ci.menuItem.kitchenStation || 'Main Kitchen',
-      status: 'PREPARING' as const
+      status: 'PREPARING' as const,
+      orderItemId: lineIdOf.get(ci.id)!,
+      course: ci.course ?? 'COURSE_1'
     }));
 
     const generatedKots = KOTRepository.generateKOT({
@@ -851,11 +930,9 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     });
 
     // 3. Mark cart items as fired
-    const updatedCart = state.cartItems.map((ci) => ({
-      ...ci,
-      isFired: true,
-      status: 'PREPARING' as const
-    }));
+    const updatedCart = state.cartItems.map((ci) =>
+      lineIdOf.has(ci.id) ? { ...ci, isFired: true, orderItemId: lineIdOf.get(ci.id), status: 'PREPARING' as const } : ci
+    );
 
     set({
       selectedTableOrder: order,
@@ -885,6 +962,48 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
     pushNow();
     return generatedKots;
+  },
+
+  cancelDish: async (orderItemId, reason, managerPin) => {
+    const state = get();
+    const order = state.selectedTableOrder;
+    if (!order) return { ok: false, error: 'There is no running order on this table.' };
+    const line = order.items.find((i) => i.id === orderItemId);
+    if (!line) return { ok: false, error: 'That dish is not on this order.' };
+    if (line.kitchenStatus === 'SERVED') return { ok: false, error: 'This dish was already served and cannot be cancelled.' };
+    if (line.kitchenStatus === 'CANCELLED') return { ok: false, error: 'This dish is already cancelled.' };
+    const cleanReason = reason.trim();
+    if (cleanReason.length < 3) return { ok: false, error: 'Choose or type a reason.' };
+
+    // Taking a dish off a bill needs a manager: either the person signed in is one, or a manager keys in their PIN.
+    const me = state.currentCaptain ? db.users.find((u) => u.id === state.currentCaptain!.id) : undefined;
+    const signedInIsManager = me?.roleId === 'role-manager' || me?.roleId === 'role-super-admin';
+    let approver = state.currentCaptain?.name;
+    if (!signedInIsManager) {
+      if (!managerPin) return { ok: false, error: 'A manager must approve cancelling a dish that was already sent.' };
+      const verified = await StaffRepository.verifyPin(managerPin);
+      if (!verified?.isManager) return { ok: false, error: 'That is not a manager PIN.' };
+      approver = verified.user.fullName;
+      await StaffSession.approve(managerPin, captainDeviceFetch); // best effort: gives the server proof of who approved
+    }
+
+    const updated = KOTRepository.cancelOrderLine(order.id, orderItemId, cleanReason, `${approver ?? 'Manager'} (for ${state.currentCaptain?.name ?? 'Captain'})`);
+    if (!updated) return { ok: false, error: 'This dish can no longer be cancelled.' };
+    Object.assign(updated, priceOrderLines(updated.items.filter((i) => i.kitchenStatus !== 'CANCELLED').map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity }))));
+
+    set({
+      selectedTableOrder: updated,
+      cartItems: get().cartItems.map((ci) => (ci.orderItemId === orderItemId ? { ...ci, status: 'CANCELLED' as const, totalPrice: 0, cancelReason: cleanReason } : ci)),
+      kots: captainDb.kots
+    });
+    if (updated.orderStatus === 'CANCELLED' && state.selectedTable) {
+      // Nothing is left to cook or bill: the table is free again.
+      get().closeTable(state.selectedTable.tableNumber);
+    } else {
+      get().refreshState();
+      pushNow();
+    }
+    return { ok: true };
   },
 
   // Food Ready & Bill Actions
@@ -1203,6 +1322,12 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   }
   }; // end return
 }); // end create
+
+// Whatever is in the open table's cart and not yet sent is remembered for that table (see heldForTable).
+useCaptainStore.subscribe((state, prev) => {
+  if (state.cartItems === prev.cartItems || !state.selectedTable) return;
+  saveHeld(state.selectedTable.tableNumber, state.cartItems.filter((ci) => !ci.isFired));
+});
 
 // =========================================================================
 // REAL-TIME CLUSTER EVENT LISTENERS (CROSS-APP MESH)

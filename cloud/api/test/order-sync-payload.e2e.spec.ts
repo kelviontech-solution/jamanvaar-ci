@@ -124,6 +124,61 @@ describe('Order sync payload fidelity and per-order validation', () => {
     expect(order.items[0].specialInstructions).toBe('no onion please');
   });
 
+  describe('per-dish kitchen status: course, undo and cancellation', () => {
+    const dishOrder = (id: string, items: Array<Record<string, unknown>>) => ({
+      ...fullEvent(id), status: 'PREPARING', paymentStatus: 'PENDING', paymentMethod: 'CASH', meta: { orderNumber: `N-${id}`, tokenNumber: '1' },
+      items: items.map((i) => ({ menuItemId: 'm', name: 'Dish', quantity: 1, unitPrice: 10000, lineTotal: 10000, modifiers: [], ...i })),
+      subtotal: 10000 * items.length, taxAmount: 0, totalAmount: 10000 * items.length, updatedAt: new Date().toISOString()
+    });
+    const pullOrder = async (id: string) => {
+      const pull = await authed('get', '/api/v1/orders/sync', adminDeviceToken);
+      return pull.body.orders.find((o: { externalOrderId: string }) => o.externalOrderId === id);
+    };
+
+    it('carries the course and lets a dish be marked ready, then undone with a higher revision', async () => {
+      const id = `dish-ord-${Date.now()}`;
+      await authed('post', '/api/v1/orders/sync', posToken).send({ events: [dishOrder(id, [{ externalItemId: 'a', kitchenStatus: 'PREPARING', course: 'COURSE_2' }])] });
+      expect((await pullOrder(id)).items[0]).toMatchObject({ course: 'COURSE_2', kitchenStatus: 'PREPARING' });
+
+      // the kitchen marks it ready
+      await authed('post', '/api/v1/orders/sync', adminDeviceToken).send({ events: [dishOrder(id, [{ externalItemId: 'a', kitchenStatus: 'READY' }])] });
+      expect((await pullOrder(id)).items[0].kitchenStatus).toBe('READY');
+
+      // a delayed copy from before cannot bring it back
+      await authed('post', '/api/v1/orders/sync', posToken).send({ events: [dishOrder(id, [{ externalItemId: 'a', kitchenStatus: 'PREPARING' }])] });
+      expect((await pullOrder(id)).items[0].kitchenStatus).toBe('READY');
+
+      // a deliberate undo carries a higher revision and does
+      await authed('post', '/api/v1/orders/sync', adminDeviceToken).send({ events: [dishOrder(id, [{ externalItemId: 'a', kitchenStatus: 'PREPARING', statusRev: 1 }])] });
+      const undone = (await pullOrder(id)).items[0];
+      expect(undone).toMatchObject({ kitchenStatus: 'PREPARING', statusRev: 1 });
+
+      // and the older 'READY' copy still cannot undo the undo
+      await authed('post', '/api/v1/orders/sync', posToken).send({ events: [dishOrder(id, [{ externalItemId: 'a', kitchenStatus: 'READY' }])] });
+      expect((await pullOrder(id)).items[0]).toMatchObject({ kitchenStatus: 'PREPARING', statusRev: 1 });
+    });
+
+    it('a cancelled dish keeps its reason and its zero price against a stale push, and the order total follows the device that cancelled', async () => {
+      const id = `dish-cancel-${Date.now()}`;
+      await authed('post', '/api/v1/orders/sync', posToken).send({ events: [dishOrder(id, [{ externalItemId: 'a', kitchenStatus: 'PREPARING' }, { externalItemId: 'b', kitchenStatus: 'PREPARING' }])] });
+
+      const cancelled = dishOrder(id, [
+        { externalItemId: 'a', kitchenStatus: 'CANCELLED', statusRev: 1, cancelReason: 'Out of stock', unitPrice: 0, lineTotal: 0 },
+        { externalItemId: 'b', kitchenStatus: 'PREPARING' }
+      ]);
+      cancelled.subtotal = 10000; cancelled.totalAmount = 10000;
+      const push = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [cancelled] });
+      expect(push.body.results[0].status).toBe('ok');
+
+      // a stale copy that still has the dish cooking, at full price
+      await authed('post', '/api/v1/orders/sync', posToken).send({ events: [dishOrder(id, [{ externalItemId: 'a', kitchenStatus: 'PREPARING' }, { externalItemId: 'b', kitchenStatus: 'PREPARING' }])] });
+
+      const order = await pullOrder(id);
+      const a = order.items.find((i: { externalItemId: string }) => i.externalItemId === 'a');
+      expect(a).toMatchObject({ kitchenStatus: 'CANCELLED', cancelReason: 'Out of stock', unitPrice: 0, lineTotal: 0, statusRev: 1 });
+    });
+  });
+
   it('one malformed order does not block the valid orders in the same batch', async () => {
     const good = fullEvent('payload-ord-good');
     const bad = { ...fullEvent('payload-ord-bad'), items: [] }; // an order with no items is invalid

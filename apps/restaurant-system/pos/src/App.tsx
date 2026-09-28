@@ -3,7 +3,7 @@ import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, 
 import { usePosStore } from './store/posStore';
 import { db, CustomerRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
 import type { MenuItem, Category } from '@jamanvaar/types';
-import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, onAppResume } from '@jamanvaar/sync';
 import { sound } from '@jamanvaar/ui';
 import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
@@ -184,9 +184,17 @@ export const App: React.FC = () => {
       void syncRestaurantIdentity();
     }, 15000);
 
+    // Waking the terminal (screen unlocked, network back, tab visible again) catches up at once: no refresh needed.
+    const stopResume = onAppResume(() => {
+      void SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+      void SyncOutboxEngine.catchUpFromCloud();
+      void syncDiningTables();
+    });
+
     return () => {
       clearInterval(orderInterval);
       clearInterval(interval);
+      stopResume();
     };
   }, [isDeviceActivated]);
 

@@ -15,6 +15,7 @@ All technical specifications, operational runbooks, architecture designs, and ha
 | **[`architecture/SECURITY.md`](./architecture/SECURITY.md)** | Local security, session memory scrub, PIN protection & audit logs. |
 | **[`architecture/SYNC.md`](./architecture/SYNC.md)** | Sub-50ms local real-time sync engine & outbox reconciliation. |
 | **[`architecture/PRODUCT_FLOWS_AND_ARCHITECTURE.md`](./architecture/PRODUCT_FLOWS_AND_ARCHITECTURE.md)** | End-to-end product flows across the ecosystem's apps. |
+| **[`architecture/KITCHEN_FLOW.md`](./architecture/KITCHEN_FLOW.md)** | Order path from Captain/POS to the KDS and back, per-dish status, undo, cancel, courses, and screen sizes. |
 
 ### Product
 | Document | Purpose & Contents |

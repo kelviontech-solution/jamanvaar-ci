@@ -17,6 +17,7 @@ export * from './inventory_ledger_sync';
 export * from './device_commands';
 export * from './menu_version';
 export * from './realtime_client';
+export * from './resume';
 export * from './endpoint_resolver';
 export * from './command_signing';
 export * from './diagnostics';

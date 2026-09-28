@@ -9,6 +9,8 @@
 export interface MergeableItem {
   externalItemId: string;
   kitchenStatus?: string;
+  /** Raised by an undo or a cancellation; a higher revision replaces a lower one even when it moves the status backwards. */
+  statusRev?: number;
   originDeviceId?: string;
   [key: string]: unknown;
 }
@@ -36,13 +38,22 @@ export function mergeOrderItems<T extends MergeableItem>(
 
   const merged: T[] = incoming.map((inc) => {
     const old = priorById.get(inc.externalItemId);
-    const status =
-      old && kitchenStatusRank(old.kitchenStatus) > kitchenStatusRank(inc.kitchenStatus) ? old.kitchenStatus : inc.kitchenStatus;
+    // Revision first (a recall beats an older copy), then forward-only by rank.
+    const oldRev = old?.statusRev ?? 0;
+    const incRev = inc.statusRev ?? 0;
+    const keepOld = !!old && (oldRev > incRev || (oldRev === incRev && kitchenStatusRank(old.kitchenStatus) > kitchenStatusRank(inc.kitchenStatus)));
+    const status = keepOld ? old!.kitchenStatus : inc.kitchenStatus;
+    const statusRev = Math.max(oldRev, incRev);
     // The ordered-with configuration is written once, when the order is created, and outlives every later push.
     const kept: Record<string, unknown> = {};
     if (old?.snapshot && !inc.snapshot) kept.snapshot = old.snapshot;
     if (old?.modifierDetails && !inc.modifierDetails) kept.modifierDetails = old.modifierDetails;
-    return { ...inc, ...kept, kitchenStatus: status, originDeviceId: old?.originDeviceId ?? deviceId };
+    // A copy that lost on revision must not carry its own price or cancellation details onto the winner.
+    if (keepOld && old) {
+      if (old.cancelReason !== undefined) kept.cancelReason = old.cancelReason;
+      if (old.lineTotal !== undefined && old.kitchenStatus === 'CANCELLED') { kept.lineTotal = old.lineTotal; kept.unitPrice = old.unitPrice; }
+    }
+    return { ...inc, ...kept, kitchenStatus: status, ...(statusRev > 0 ? { statusRev } : {}), originDeviceId: old?.originDeviceId ?? deviceId };
   });
 
   let foreignItemsKept = false;

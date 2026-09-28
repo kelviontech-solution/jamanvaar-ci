@@ -58,7 +58,7 @@ describe('RealtimeClient', () => {
     expect([...seen].sort()).toEqual(['change:orders', 'command']);
   });
 
-  it('coalesces a burst of the same change into one wake-up', async () => {
+  it('wakes at once for the first change of a burst, then collapses the rest into a single follow-up', async () => {
     const seen: string[] = [];
     const burst = Array.from({ length: 5 }, () => 'event: change\ndata: {"kind":"orders"}\n\n');
     const client = new RealtimeClient({
@@ -68,7 +68,22 @@ describe('RealtimeClient', () => {
     client.start();
     await tick(120);
     client.stop();
-    expect(seen).toEqual(['orders']);
+    // 5 events: one immediate wake-up and one trailing one, not five.
+    expect(seen).toEqual(['orders', 'orders']);
+  });
+
+  it('does not make the first change wait for the debounce window', async () => {
+    const stamps: number[] = [];
+    const t0 = Date.now();
+    const client = new RealtimeClient({
+      apiBase: 'http://x', deviceToken: 't', fetchImpl: (async () => streamOf(['event: ready\ndata: {}\n\n', 'event: change\ndata: {"kind":"orders"}\n\n'], true)) as never,
+      onChange: () => stamps.push(Date.now() - t0), onCommand: () => {}, debounceMs: 400
+    });
+    client.start();
+    await tick(100);
+    client.stop();
+    expect(stamps).toHaveLength(1);
+    expect(stamps[0]).toBeLessThan(200);
   });
 
   it('reconnects with backoff after the stream drops, and gives up cleanly on stop', async () => {

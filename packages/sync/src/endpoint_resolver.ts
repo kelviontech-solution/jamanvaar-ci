@@ -61,6 +61,7 @@ export class EndpointResolver {
     this.coreUrl = null;
     this.health = { core: null, cloud: null };
     this.responder = null;
+    this.lastOkAt = null;
     this.now = opts.now ?? Date.now;
   }
 
@@ -111,9 +112,17 @@ export class EndpointResolver {
     return !!h && !h.ok && this.now() - h.at < COOL_DOWN_MS;
   }
 
+  private static lastOkAt: number | null = null;
+
+  /** Milliseconds since any server (cloud or branch core) last answered a request; null if none has answered yet this session. */
+  static msSinceLastContact(): number | null {
+    return this.lastOkAt === null ? null : Math.max(0, this.now() - this.lastOkAt);
+  }
+
   private static mark(r: Responder, ok: boolean): void {
     const changed = this.health[r]?.ok !== ok;
     this.health[r] = { ok, at: this.now() };
+    if (ok) this.lastOkAt = this.now();
     if (ok) this.responder = r;
     if (changed) this.emit();
     this.publishReachability();

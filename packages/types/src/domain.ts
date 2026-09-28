@@ -460,7 +460,16 @@ export interface OrderItem {
   itemDiscountPercent?: number;
   itemDiscountAmount?: number;
   discountReason?: string;
-  kitchenStatus?: 'PENDING' | 'PREPARING' | 'READY' | 'SERVED';
+  kitchenStatus?: 'PENDING' | 'PREPARING' | 'READY' | 'SERVED' | 'CANCELLED';
+  /**
+   * Counts how many times the kitchen status of this dish was deliberately moved backwards (a recall from Ready/Served) or
+   * cancelled. Progress otherwise only moves forward; a copy with a higher revision replaces one with a lower revision.
+   */
+  statusRev?: number;
+  /** Which course of the meal the dish belongs to ('COURSE_1' starters, 'COURSE_2' mains, 'COURSE_3' dessert). */
+  course?: string;
+  /** Why a sent dish was cancelled (the line stays on the order at no charge so the kitchen and the bill agree). */
+  cancelReason?: string;
   /** What this line was priced with when it was ordered (QR orders): never recalculated from the current menu. */
   snapshot?: { menuVersion?: number; basePrice?: number; taxGroupId?: string; taxRateBp?: number; taxInclusive?: boolean; lineTax?: number };
 }
@@ -1209,6 +1218,14 @@ export interface KOTItem {
   kitchenStation: string;
   status: KOTStatus;
   isDelta?: boolean;
+  /** The order line this ticket line cooks. Set for every ticket made from now on; older tickets are matched by menuItemId. */
+  orderItemId?: string;
+  course?: string;
+  /** Mirrors OrderItem.statusRev, so a recall on one device reaches the ticket on every other. */
+  rev?: number;
+  cancelReason?: string;
+  /** When the cook marked this dish done (per-dish status on the kitchen screen). */
+  readyAt?: string;
 }
 
 export interface KOTRecord {

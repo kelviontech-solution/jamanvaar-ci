@@ -2,7 +2,7 @@ import { StaffSession } from './staff_session';
 import { KeyValueStore } from '@jamanvaar/database';
 import { SyncEvent, SyncEventType, Order, OrderItem, PaymentSplit } from '@jamanvaar/types';
 import { generateUUID, splitTaxPaise } from '@jamanvaar/utils';
-import { db, KOTRepository, BusinessDayRepository, InventoryRepository, NumberAllocator, type NumberLease } from '@jamanvaar/database';
+import { db, KOTRepository, BusinessDayRepository, InventoryRepository, NumberAllocator, resolveKitchenState, type NumberLease } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 import { nextAttemptState } from './sync_protocol';
 import { EndpointResolver } from './endpoint_resolver';
@@ -24,6 +24,10 @@ export interface OrderSyncPushItem {
   /** What the order was priced with when it was placed; carried unchanged by every device. */
   snapshot?: { menuVersion?: number; basePrice?: number; taxGroupId?: string; taxRateBp?: number; taxInclusive?: boolean; lineTax?: number };
   kitchenStatus?: string;
+  /** Revision of the kitchen status: a recall or cancellation raises it so it beats older copies (see kitchen_status.ts). */
+  statusRev?: number;
+  course?: string;
+  cancelReason?: string;
   kitchenStation?: string;
   specialInstructions?: string;
   /** paise */
@@ -163,7 +167,7 @@ function markFailedAttempt(order: Order, error: string): void {
 function contentFingerprint(order: Order): string {
   const text = JSON.stringify([
     order.orderStatus, order.tableId, order.paymentStatus, order.totalAmount, order.customerNotes,
-    order.items.map((i) => [i.id, i.quantity, i.unitPrice, i.kitchenStatus, i.specialInstructions])
+    order.items.map((i) => [i.id, i.quantity, i.unitPrice, i.kitchenStatus, i.statusRev ?? 0, i.specialInstructions])
   ]);
   let h = 0x811c9dc5;
   for (let i = 0; i < text.length; i++) {
@@ -194,6 +198,9 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
       modifierDetails: (it.modifiers || []).map((m) => ({ optionName: m.optionName, priceDelta: toPaise(m.priceDelta), ...(m.optionId && !m.optionId.startsWith('remote-') ? { optionId: m.optionId } : {}), ...(m.groupId && !m.groupId.startsWith('remote-') ? { groupId: m.groupId } : {}), ...(m.groupName ? { groupName: m.groupName } : {}) })),
       ...(it.snapshot ? { snapshot: it.snapshot } : {}),
       kitchenStatus: it.kitchenStatus,
+      ...(it.statusRev ? { statusRev: it.statusRev } : {}),
+      ...(it.course ? { course: it.course } : {}),
+      ...(it.cancelReason ? { cancelReason: it.cancelReason } : {}),
       kitchenStation: db.menuItems.find((m) => m.id === it.menuItemId)?.kitchenStation,
       specialInstructions: it.specialInstructions,
       lineTotal: toPaise(it.totalPrice)
@@ -255,6 +262,9 @@ function orderItemFromRemote(orderId: string, ri: OrderSyncPushItem): OrderItem 
     specialInstructions: ri.specialInstructions,
     totalPrice: fromPaise(ri.lineTotal),
     kitchenStatus: (ri.kitchenStatus as OrderItem['kitchenStatus']) || 'PENDING',
+    ...(ri.statusRev ? { statusRev: ri.statusRev } : {}),
+    ...(ri.course ? { course: ri.course } : {}),
+    ...(ri.cancelReason ? { cancelReason: ri.cancelReason } : {}),
     // The station travels with the item, so a pulled order splits into the same tickets on every device.
     ...(ri.kitchenStation ? { kitchenStation: ri.kitchenStation } : {})
   } as OrderItem;
@@ -295,8 +305,17 @@ function applyRemoteToLocalOrder(local: Order, remote: CloudSyncedOrder): boolea
     if (li) {
       // Item-level kitchenStatus is what another device (KDS marking
       // PREPARING/READY, Captain marking SERVED) is actually changing.
-      if (ri.kitchenStatus) li.kitchenStatus = ri.kitchenStatus as OrderItem['kitchenStatus'];
-      if (ri.quantity !== li.quantity) {
+      // Progress only moves forward, except that a copy with a higher revision (an undo or a cancellation) replaces an older one.
+      const merged = resolveKitchenState({ status: li.kitchenStatus, rev: li.statusRev }, { status: ri.kitchenStatus, rev: ri.statusRev });
+      if (merged.status) li.kitchenStatus = merged.status as OrderItem['kitchenStatus'];
+      if (merged.rev > 0) li.statusRev = merged.rev;
+      if (ri.course && !li.course) li.course = ri.course;
+      if (li.kitchenStatus === 'CANCELLED') {
+        // A cancelled dish is at no charge on every device.
+        li.cancelReason = ri.cancelReason ?? li.cancelReason;
+        li.unitPrice = 0;
+        li.totalPrice = 0;
+      } else if (ri.quantity !== li.quantity) {
         li.quantity = ri.quantity;
         li.totalPrice = fromPaise(ri.lineTotal);
       }
@@ -387,12 +406,18 @@ function qrKotIdentity(order: Order): { idBase: string; numberBase: string } {
 function ensureKotsForOrder(order: Order): void {
   if (['COMPLETED', 'CANCELLED', 'REFUNDED'].includes(order.orderStatus)) return;
 
+  // A ticket line that knows its order line covers exactly that line; older ones cover by dish and quantity.
+  const coveredLineIds = new Set<string>();
   const covered = new Map<string, number>();
   db.kots
     .filter((k) => k.orderId === order.id)
-    .forEach((k) => k.items.forEach((i) => covered.set(i.menuItemId, (covered.get(i.menuItemId) || 0) + i.quantity)));
+    .forEach((k) => k.items.forEach((i) => {
+      if (i.orderItemId) coveredLineIds.add(i.orderItemId);
+      else if (i.status !== 'CANCELLED') covered.set(i.menuItemId, (covered.get(i.menuItemId) || 0) + i.quantity);
+    }));
 
   const missing = order.items
+    .filter((it) => it.kitchenStatus !== 'CANCELLED' && !coveredLineIds.has(it.id))
     .map((it) => {
       const already = covered.get(it.menuItemId) || 0;
       const take = Math.min(already, it.quantity);
@@ -425,7 +450,10 @@ function ensureKotsForOrder(order: Order): void {
         (it as OrderItem & { kitchenStation?: string }).kitchenStation ||
         db.menuItems.find((mi) => mi.id === it.menuItemId)?.kitchenStation ||
         'Main Kitchen',
-      status: it.kitchenStatus || 'PENDING'
+      status: it.kitchenStatus || 'PENDING',
+      orderItemId: it.id,
+      ...(it.course ? { course: it.course } : {}),
+      ...(it.statusRev ? { rev: it.statusRev } : {})
     })),
     cashierName: order.captainName || order.cashierName || '',
     serverName: order.captainName,
@@ -435,6 +463,8 @@ function ensureKotsForOrder(order: Order): void {
 
 export class SyncOutboxEngine {
   private static isSyncing = false;
+  private static runAgain = false;
+  private static leasing = false;
   private static transport: OrderSyncTransport | null = null;
   private static unsubscribeNetwork: (() => void) | null = null;
 
@@ -466,7 +496,17 @@ export class SyncOutboxEngine {
   /** Tops up the leased number blocks while online. A failure just means fallback numbering keeps working. */
   private static async refillNumberLeases(): Promise<void> {
     const t = this.transport;
-    if (!t?.leaseNumbers) return;
+    if (!t?.leaseNumbers || this.leasing) return; // one refill at a time, never two overlapping requests for the same block
+    this.leasing = true;
+    try {
+      await this.refillLeasesInner(t);
+    } finally {
+      this.leasing = false;
+    }
+  }
+
+  private static async refillLeasesInner(t: OrderSyncTransport): Promise<void> {
+    if (!t.leaseNumbers) return;
     for (const kind of ['ORDER', 'KOT'] as const) {
       if (NumberAllocator.isConfigured() && !NumberAllocator.needsRefill(kind)) continue;
       try {
@@ -506,8 +546,14 @@ export class SyncOutboxEngine {
   }
 
   public static async processOutbox(opts: { ignoreBackoff?: boolean } = {}): Promise<{ processed: number; failed: number }> {
-    if (this.isSyncing) return { processed: 0, failed: 0 };
+    if (this.isSyncing) {
+      // A change made while a push is in flight is not sent by it; remember to run again the moment it finishes
+      // instead of leaving that change (a dish marked ready, say) waiting for the next timer tick.
+      this.runAgain = true;
+      return { processed: 0, failed: 0 };
+    }
     this.isSyncing = true;
+    this.runAgain = false;
     NetworkStatusService.setNetworkState('SYNCING', NetworkStatusService.getLatency());
     void this.refillNumberLeases();
 
@@ -541,7 +587,10 @@ export class SyncOutboxEngine {
           for (const ord of pendingOrders) {
             const res = byId.get(ord.id);
             if (res && res.status === 'ok') {
-              markSynced(ord);
+              // While this push was in flight the order shows SYNCING. If it shows SAVED_LOCALLY now, something changed it
+              // after the push was built (a cook tapped another dish): that change is not in what the server just received,
+              // so the order must stay queued rather than be marked as delivered.
+              if (ord.syncStatus !== 'SAVED_LOCALLY') markSynced(ord);
               if (typeof res.syncVersion === 'number') ord.remoteSyncVersion = res.syncVersion;
               processed++;
             } else {
@@ -595,6 +644,11 @@ export class SyncOutboxEngine {
 
     db.notify();
     this.isSyncing = false;
+    // Run again only when a change really is waiting: the network-state change this function itself causes must not re-trigger it.
+    if (this.runAgain) {
+      this.runAgain = false;
+      if (db.orders.some((o) => o.syncStatus === 'SAVED_LOCALLY')) void this.processOutbox();
+    }
     return { processed, failed };
   }
 

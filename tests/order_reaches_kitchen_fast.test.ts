@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { db, StaffRepository, ServiceMessages } from '@jamanvaar/database';
+import { db, StaffRepository, ServiceMessages, OrderRepository } from '@jamanvaar/database';
 import { SyncOutboxEngine } from '@jamanvaar/sync';
 import { useCaptainStore } from '../apps/restaurant-system/captain/src/store/captainStore';
 
@@ -78,7 +78,49 @@ describe('KDS reacts at once', () => {
     expect(kds.match(/sound\.play\('kot'\)/g)?.length).toBe(2); // new ticket + message to the kitchen
   });
 
-  it('pushes a status change (cooking, ready, served) immediately', () => {
-    expect(kds).toMatch(/KOTRepository\.updateKOTStatus\(kotId, nextStatus\);[\s\S]{0,200}SyncOutboxEngine\.flush\(\)/);
+  it('pushes every change (start, one dish, all dishes, served, undo) immediately', () => {
+    expect(kds).toMatch(/const commit = \(\) => \{[\s\S]{0,200}SyncOutboxEngine\.flush\(\)/);
+    for (const fn of ['const updateStatus', 'const setDish', 'const markAllReady', 'function recallTicket']) {
+      const start = kds.indexOf(fn);
+      expect(start, fn).toBeGreaterThan(-1);
+      // The function ends where the next top-level declaration of the component starts.
+      const rest = kds.slice(start + fn.length);
+      const next = rest.search(/\n  (const|function) /);
+      expect(rest.slice(0, next), fn).toMatch(/commit\(\)/);
+    }
+  });
+});
+
+describe('the outbox never leaves a change waiting behind a push that was already running', () => {
+  it('a second flush during an in-flight push is sent as soon as the first finishes, not at the next timer tick', async () => {
+    db.resetToDefaultSeed();
+    db.orders = [];
+    const sent: string[][] = [];
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((r) => { release = r; });
+    SyncOutboxEngine.configureTransport({
+      push: async (events) => {
+        sent.push(events.map((e) => `${e.externalOrderId}:${e.items.map((i) => i.kitchenStatus).join(',')}`));
+        if (sent.length === 1) await gate;
+        return { results: events.map((e) => ({ externalOrderId: e.externalOrderId, status: 'ok' as const, syncVersion: 1 })), serverTime: new Date().toISOString() };
+      },
+      pull: async () => ({ orders: [], serverTime: new Date().toISOString() })
+    });
+    const order = OrderRepository.createOrder({
+      orderType: 'DINE_IN', tableNumber: '3', subtotal: 100, taxAmount: 5, totalAmount: 105, paymentMethod: 'CASH', paymentStatus: 'PENDING', orderStatus: 'PREPARING', syncStatus: 'SAVED_LOCALLY',
+      items: [{ id: 'oi-f', orderId: '', menuItemId: 'f', name: 'F', sku: 'f', quantity: 1, unitPrice: 100, totalPrice: 100, modifiers: [], kitchenStatus: 'PREPARING' as const }]
+    });
+    SyncOutboxEngine.flush();
+    await new Promise((r) => setTimeout(r, 10));
+    // The cook taps again while the first push is still on its way.
+    order.items[0].kitchenStatus = 'READY';
+    order.updatedAt = new Date(Date.now() + 1000).toISOString();
+    order.syncStatus = 'SAVED_LOCALLY';
+    SyncOutboxEngine.flush();
+    release();
+    await new Promise((r) => setTimeout(r, 50));
+    expect(sent).toHaveLength(2);
+    expect(sent[1][0]).toContain('READY');
+    SyncOutboxEngine.configureTransport(null);
   });
 });
