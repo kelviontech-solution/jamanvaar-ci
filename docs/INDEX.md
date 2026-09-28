@@ -16,6 +16,10 @@ All technical specifications, operational runbooks, architecture designs, and ha
 | **[`architecture/SYNC.md`](./architecture/SYNC.md)** | Sub-50ms local real-time sync engine & outbox reconciliation. |
 | **[`architecture/PRODUCT_FLOWS_AND_ARCHITECTURE.md`](./architecture/PRODUCT_FLOWS_AND_ARCHITECTURE.md)** | End-to-end product flows across the ecosystem's apps. |
 | **[`architecture/KITCHEN_FLOW.md`](./architecture/KITCHEN_FLOW.md)** | Order path from Captain/POS to the KDS and back, per-dish status, undo, cancel, courses, and screen sizes. |
+| **[`integrations/WHATSAPP_ORDERING_PLAN_AND_PROMPT.md`](./integrations/WHATSAPP_ORDERING_PLAN_AND_PROMPT.md)** | How the WhatsApp chatbot connects to POS and KDS, the connect-by-key flow, and the prompt for the chatbot repo. |
+| **[`integrations/WHATSAPP_API_KEY_GUIDE.md`](./integrations/WHATSAPP_API_KEY_GUIDE.md)** | How a restaurant gets a WhatsApp API key, in plain language. |
+| **[`integrations/URBANPIPER_ZOMATO_SWIGGY_FLOW.md`](./integrations/URBANPIPER_ZOMATO_SWIGGY_FLOW.md)** | Suggested Zomato and Swiggy flow through UrbanPiper (design only). |
+| **[`reports/MARKET_GAP_ANALYSIS_2026-09-28.md`](./reports/MARKET_GAP_ANALYSIS_2026-09-28.md)** | Feature comparison against the market and the fix list. |
 
 ### Product
 | Document | Purpose & Contents |
