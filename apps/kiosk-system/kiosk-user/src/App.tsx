@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { load as loadCashfree } from '@cashfreepayments/cashfree-js';
 import {
   activateKioskDevice,
   resolveRestaurantByCode,
@@ -9,6 +8,11 @@ import {
   getKioskDeviceId,
   getKioskRestaurantId,
   createPaymentOrder,
+  createPaymentQr,
+  markPaymentFulfilled,
+  savePendingPayment,
+  loadPendingPayment,
+  clearPendingPayment,
   getPaymentOrderStatus,
   sendReceipt,
   pushOrderSync,
@@ -172,6 +176,21 @@ function formatActivationKeyInput(raw: string): string {
   const clean = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
   const groups = [clean.slice(0, 3), clean.slice(3, 7), clean.slice(7, 11), clean.slice(11, 15)].filter(Boolean);
   return groups.join('-');
+}
+
+/**
+ * Cashfree returns the UPI QR as a base64 image (Order Pay API, `qrcode` channel). Accepts a ready-made
+ * data: URL or bare base64; anything else (for example a raw upi:// string, which this kiosk has no QR
+ * renderer for) is treated as unusable so the guest is offered cash at the counter instead of a blank box.
+ */
+function toQrImageSrc(payload: string, contentType: string | null): string | null {
+  const trimmed = payload.trim();
+  if (trimmed.startsWith('data:image/')) return trimmed;
+  if (trimmed.length > 100 && /^[A-Za-z0-9+/=\s]+$/.test(trimmed)) {
+    const mime = contentType && contentType.startsWith('image/') ? contentType : 'image/png';
+    return `data:${mime};base64,${trimmed.replace(/\s+/g, '')}`;
+  }
+  return null;
 }
 
 export default function KioskUserApp() {
@@ -429,6 +448,11 @@ export default function KioskUserApp() {
   const [localOrderIdForPayment, setLocalOrderIdForPayment] = useState<string | null>(null);
   const [cashfreeUnavailable, setCashfreeUnavailable] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  // The UPI QR shown on this screen for the pending payment (created by the server, rendered here).
+  const [qrImageSrc, setQrImageSrc] = useState<string | null>(null);
+  const [qrExpiresAt, setQrExpiresAt] = useState<number | null>(null);
+  const [qrSecondsLeft, setQrSecondsLeft] = useState(0);
+  const [qrLoading, setQrLoading] = useState(false);
   // Bounded window (from order creation) that background payment-status
   // polling keeps running past the visible countdown's expiry, so a UPI
   // payment that Cashfree confirms moments after the customer is told to
@@ -616,11 +640,11 @@ export default function KioskUserApp() {
   // ever reflects what GET /api/v1/payments/:paymentId/status already
   // recorded, never a client-side belief about success.
   useEffect(() => {
-    if (step !== 'CHECKOUT_PAYMENT' || paymentStatus === 'SUCCESS') return;
+    if (paymentStatus === 'SUCCESS') return;
     if (!realPaymentId) {
       // Cash-at-counter path: no real payment to poll, fall back to the
-      // plain visible countdown.
-      if (paymentStatus === 'EXPIRED') return;
+      // plain visible countdown (only while the payment screen is showing).
+      if (step !== 'CHECKOUT_PAYMENT' || paymentStatus === 'EXPIRED') return;
       const plainInterval = setInterval(() => {
         setPaymentTimeLeft((prev) => {
           if (prev <= 1) {
@@ -633,6 +657,8 @@ export default function KioskUserApp() {
       return () => clearInterval(plainInterval);
     }
 
+    // Deliberately NOT tied to the payment screen: a guest who taps Back or Cancel after scanning may
+    // still complete the payment on their phone, and that must still produce their token and KOT.
     const interval = setInterval(async () => {
       if (reconciliationDeadlineRef.current && Date.now() > reconciliationDeadlineRef.current) {
         clearInterval(interval);
@@ -642,18 +668,14 @@ export default function KioskUserApp() {
       try {
         const result = await getPaymentOrderStatus(realPaymentId);
         if (result.status === 'SUCCESS') {
-          setPaymentStatus('SUCCESS');
-          if (localOrderIdForPayment) {
-            OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Cashfree UPI');
-            const settledOrder = OrderRepository.getOrderById(localOrderIdForPayment);
-            if (settledOrder) {
-              proceedToConfirmation(settledOrder, networkState === 'ONLINE');
-            }
-          }
           clearInterval(interval);
+          if (localOrderIdForPayment) {
+            await finalizePaidOrder(realPaymentId, localOrderIdForPayment);
+          }
           return;
         }
         if (result.status === 'FAILED' || result.status === 'USER_DROPPED') {
+          clearPendingPayment();
           setCashfreeUnavailable(true);
           clearInterval(interval);
           return;
@@ -661,15 +683,7 @@ export default function KioskUserApp() {
       } catch (err) {
         console.error('Payment status poll failed:', err);
       }
-
-      setPaymentTimeLeft((prev) => {
-        if (prev <= 1) {
-          setPaymentStatus('EXPIRED');
-          return 0; // visible countdown stops; polling above continues silently until reconciliationDeadlineRef
-        }
-        return prev - 1;
-      });
-    }, 3000);
+    }, 2000);
 
     return () => clearInterval(interval);
     // `lang` must be a dependency: the polling interval's closure captures
@@ -681,6 +695,68 @@ export default function KioskUserApp() {
     // actually succeeds — this is what was causing the wrong-language
     // confirmation audio.
   }, [step, paymentStatus, realPaymentId, localOrderIdForPayment, lang]);
+
+  // Live countdown for the QR on screen; when it runs out the QR is hidden and a fresh one can be requested.
+  // Status polling above keeps going, so a payment made in the last seconds is still caught.
+  useEffect(() => {
+    if (!qrExpiresAt || paymentStatus === 'SUCCESS') return;
+    const tick = setInterval(() => {
+      const left = Math.max(0, Math.round((qrExpiresAt - Date.now()) / 1000));
+      setQrSecondsLeft(left);
+      if (left === 0) setPaymentStatus('EXPIRED');
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [qrExpiresAt, paymentStatus]);
+
+  // Crash / reload recovery. If this terminal was restarted after a QR was shown, check that payment now:
+  // if it succeeded, create the token and KOT that never got created; if it failed, forget it; if it is
+  // still open, keep watching it for a few minutes. Anything older is left to the server-side
+  // "needs attention" list, which staff see in Kiosk Admin and Super Admin.
+  useEffect(() => {
+    const pending = loadPendingPayment();
+    if (!pending || !isKioskDeviceConnected()) return;
+    let stopped = false;
+    const RESUME_WINDOW_MS = 6 * 60 * 1000;
+
+    const check = async (): Promise<boolean> => {
+      try {
+        const result = await getPaymentOrderStatus(pending.paymentId);
+        if (result.status === 'SUCCESS') {
+          await finalizePaidOrder(pending.paymentId, pending.localOrderId);
+          return true;
+        }
+        if (result.status === 'FAILED' || result.status === 'USER_DROPPED' || result.status === 'CANCELLED') {
+          clearPendingPayment();
+          return true;
+        }
+      } catch (err) {
+        console.error('Resuming pending payment failed:', err);
+      }
+      return false;
+    };
+
+    void (async () => {
+      if (await check()) return;
+      if (Date.now() - pending.startedAt > RESUME_WINDOW_MS) {
+        clearPendingPayment();
+        return;
+      }
+      const timer = setInterval(async () => {
+        if (stopped || Date.now() - pending.startedAt > RESUME_WINDOW_MS) {
+          clearInterval(timer);
+          if (!stopped) clearPendingPayment();
+          return;
+        }
+        if (await check()) clearInterval(timer);
+      }, 3000);
+    })();
+
+    return () => {
+      stopped = true;
+    };
+    // Runs once per app start on purpose.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-return to the Welcome screen after the confirmation screen has had
   // its receipt print attempt settle, AND its confirmation voice announcement 
@@ -1048,11 +1124,62 @@ export default function KioskUserApp() {
     showToast(t('couponApplied'));
   };
 
+  // Asks the server for the UPI QR of one pending payment and shows it. The server holds the Cashfree keys
+  // and only issues a QR for an open payment of an ACTIVE restaurant; anything else falls back to cash.
+  const showPaymentQr = async (paymentId: string) => {
+    setQrLoading(true);
+    try {
+      const qr = await createPaymentQr(paymentId);
+      const src = toQrImageSrc(qr.qrPayload, qr.contentType);
+      if (!src) throw new Error('Cashfree returned a QR the kiosk cannot display');
+      const expires = new Date(qr.expiresAt).getTime();
+      setQrImageSrc(src);
+      setQrExpiresAt(expires);
+      setQrSecondsLeft(Math.max(0, Math.round((expires - Date.now()) / 1000)));
+      setPaymentStatus('WAITING_FOR_USER');
+      // Keep watching for two minutes past this QR's expiry so a payment made in its last seconds is caught.
+      reconciliationDeadlineRef.current = expires + 2 * 60 * 1000;
+    } catch (err) {
+      console.error('Payment QR failed:', err);
+      setQrImageSrc(null);
+      setQrExpiresAt(null);
+      setCashfreeUnavailable(true);
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
+  // The guest backs out of the QR screen. The order is cancelled on this terminal and the payment is no
+  // longer watched; if they pay anyway the server lists it under "needs attention" for staff.
+  const handleCancelQr = () => {
+    SoundService.playTap();
+    const orderId = localOrderIdForPayment;
+    clearPendingPayment();
+    setRealPaymentId(null);
+    setQrImageSrc(null);
+    setQrExpiresAt(null);
+    setQrSecondsLeft(0);
+    setPaymentStatus('CREATED');
+    if (orderId) {
+      try {
+        OrderRepository.updateOrderStatus(orderId, 'CANCELLED', 'Kiosk Guest');
+      } catch (err) {
+        console.error('Could not cancel the pending order:', err);
+      }
+    }
+    setLocalOrderIdForPayment(null);
+    setStep('MENU');
+    setIsCartOpen(true);
+  };
+
   // Start Payment Process
   const handleProceedToPayment = async () => {
     SoundService.playTap();
     resetIdleTimer();
     if (cartItems.length === 0) return;
+    setQrImageSrc(null);
+    setQrExpiresAt(null);
+    setQrSecondsLeft(0);
 
     if (networkState === 'OFFLINE' && paymentMethod === 'UPI') {
       setPaymentMethod('CASH_AT_COUNTER');
@@ -1160,12 +1287,10 @@ export default function KioskUserApp() {
         return;
       }
 
-      const cashfree = await loadCashfree({ mode: import.meta.env.VITE_CASHFREE_MODE ?? 'sandbox' });
-      if (!cashfree) {
-        setCashfreeUnavailable(true);
-        return;
-      }
-      cashfree.checkout({ paymentSessionId: result.paymentSessionId, redirectTarget: '_modal' });
+      // Remember this payment on the terminal until its token/KOT are confirmed, so a crash or reload
+      // between "customer paid" and "token printed" is recovered on the next start.
+      savePendingPayment({ paymentId: result.paymentId, localOrderId: pendingOrder.id, startedAt: Date.now() });
+      await showPaymentQr(result.paymentId);
     } catch (err) {
       // A 403 here means this restaurant's Cashfree connection isn't ACTIVE
       // yet (payments.service.ts's own gate) — not a transient failure, so
@@ -1175,12 +1300,58 @@ export default function KioskUserApp() {
     }
   };
 
+  // Tells the server the token and KOT now exist for this paid order. Kept on the terminal until the server
+  // acknowledges, and retried, because the server treats a paid order with no acknowledgement as "needs
+  // attention" and staff would otherwise be asked to chase an order that was in fact served.
+  const acknowledgeFulfilled = async (paymentId: string) => {
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try {
+        await markPaymentFulfilled(paymentId);
+        clearPendingPayment();
+        return;
+      } catch (err) {
+        console.error('Could not confirm fulfilment yet:', err);
+        await new Promise((resolve) => setTimeout(resolve, 5000 * (attempt + 1)));
+      }
+    }
+  };
+
+  const finalizingRef = useRef(false);
+
+  // A UPI payment the server has confirmed: settle the local order, then create the token, KOT and receipt
+  // exactly once. Safe to call from the live poll and from crash recovery at the same time, and safe to
+  // repeat after a restart (a KOT that already exists is never created twice).
+  const finalizePaidOrder = async (paymentId: string, localOrderId: string) => {
+    if (finalizingRef.current) return;
+    finalizingRef.current = true;
+    try {
+      setPaymentStatus('SUCCESS');
+      let order = OrderRepository.getOrderById(localOrderId);
+      if (!order) {
+        // This terminal no longer has the order (storage cleared). The server still shows the paid
+        // order as needing attention, which is where staff will find it.
+        clearPendingPayment();
+        return;
+      }
+      if (order.paymentStatus !== 'SUCCESS') {
+        OrderRepository.settleOrder(localOrderId, 'UPI', undefined, paymentId, 'Cashfree UPI');
+        order = OrderRepository.getOrderById(localOrderId) ?? order;
+      }
+      if (KOTRepository.getKOTsForOrder(localOrderId).length > 0) {
+        await acknowledgeFulfilled(paymentId);
+        return;
+      }
+      await proceedToConfirmation(order, typeof navigator !== 'undefined' ? navigator.onLine : true, paymentId);
+    } finally {
+      finalizingRef.current = false;
+    }
+  };
+
   // Complete Order Creation (Truthful Status: Online vs Offline)
   // Shared confirmation/KOT/print/voice tail — runs once an order's real
   // payment is settled, whichever path settled it: cash at the counter
-  // (handleGetToken) or a Cashfree-confirmed UPI payment (the polling
-  // effect above).
-  const proceedToConfirmation = async (order: Order, isCurrentlyOnline: boolean) => {
+  // (handleGetToken) or a Cashfree-confirmed UPI payment (finalizePaidOrder).
+  const proceedToConfirmation = async (order: Order, isCurrentlyOnline: boolean, paymentId?: string) => {
     // Audio chime on successful order
     SoundService.playSuccess();
 
@@ -1193,26 +1364,30 @@ export default function KioskUserApp() {
     // on the KDS board grouped by kitchen station, exactly like a POS
     // order — previously the kiosk only printed a customer receipt and
     // never created KOT records, so kitchen staff never saw kiosk orders.
-    const kotItems = cartItems.map((ci, idx) => ({
+    // Built from the saved order, not the on-screen cart, so it also works after a restart when the cart is gone.
+    const kotItems = order.items.map((it, idx) => ({
       id: `koti-${Date.now()}-${idx}`,
-      menuItemId: ci.menuItemId,
-      name: ci.item.name,
-      quantity: ci.quantity,
-      modifiers: ci.selectedModifiers,
-      specialInstructions: ci.specialInstructions,
-      kitchenStation: ci.item.kitchenStation || 'Main Kitchen',
+      menuItemId: it.menuItemId,
+      name: it.name,
+      quantity: it.quantity,
+      modifiers: it.modifiers,
+      specialInstructions: it.specialInstructions,
+      kitchenStation: db.menuItems.find((m) => m.id === it.menuItemId)?.kitchenStation || 'Main Kitchen',
       status: 'PREPARING' as const
     }));
     const kots = KOTRepository.generateKOT({
       orderId: order.id,
       orderNumber: order.orderNumber,
       tokenNumber: order.tokenNumber,
-      tableNumber: selectedTable?.tableNumber,
-      orderType,
+      tableNumber: order.tableNumber ?? selectedTable?.tableNumber,
+      orderType: order.orderType ?? orderType,
       items: kotItems,
       cashierName: 'Kiosk Self-Order'
     });
     kots.forEach((kot) => PrinterService.printKOT(kot));
+
+    // The ticket now exists: tell the server, which stops flagging this paid order as needing attention.
+    if (paymentId) void acknowledgeFulfilled(paymentId);
 
     // If logged in, award points (10% back in points) & record order
     if (loggedInAccount) {
@@ -2883,29 +3058,54 @@ export default function KioskUserApp() {
                 <Clock className="w-16 h-16 text-rose-500 mx-auto" />
                 <h3 className="text-xl font-black text-jaman-navy">Payment Session Expired</h3>
                 <p className="text-sm text-[#4A5568]">
-                  This QR/payment session timed out. Nothing was charged — start again to get a fresh code.
+                  This QR timed out. If you already paid, please wait a few seconds — your token will still print. Otherwise get a fresh code.
                 </p>
                 <Button
                   variant="accent"
                   size="touch"
                   className="w-full"
+                  isLoading={qrLoading}
                   onClick={() => {
-                    setPaymentStatus('CREATED');
-                    setPaymentTimeLeft(60);
+                    if (realPaymentId) {
+                      void showPaymentQr(realPaymentId);
+                    } else {
+                      setPaymentStatus('CREATED');
+                      setPaymentTimeLeft(60);
+                    }
                   }}
                 >
                   Try Again
                 </Button>
+                {realPaymentId && (
+                  <Button variant="ghost" size="touch" className="w-full" onClick={handleCancelQr}>
+                    Cancel
+                  </Button>
+                )}
               </div>
             ) : (
               <>
             {paymentMethod === 'UPI' && !cashfreeUnavailable && (
               <div className="space-y-4">
-                <p className="text-sm font-semibold text-[#4A5568]">Complete your payment in the window that opened.</p>
-                <div className="text-xs text-[#8C9BAE] font-medium flex items-center justify-center gap-1.5">
-                  <Clock className="w-4 h-4 text-jaman-saffron" />
-                  <span>{t('paymentExpiresIn')}: <strong className="text-jaman-navy font-mono">{paymentTimeLeft * 3}s</strong></span>
-                </div>
+                {qrImageSrc ? (
+                  <>
+                    <p className="text-sm font-semibold text-[#4A5568]">
+                      Scan with any UPI app to pay <span className="font-black text-jaman-saffron">{formatINR(netTotalPayable)}</span>
+                    </p>
+                    <div className="mx-auto w-64 h-64 bg-white p-3 rounded-2xl border-2 border-slate-900 shadow-md flex items-center justify-center">
+                      <img src={qrImageSrc} alt="UPI payment QR code" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="text-xs text-[#8C9BAE] font-medium flex items-center justify-center gap-1.5">
+                      <Clock className="w-4 h-4 text-jaman-saffron" />
+                      <span>{t('paymentExpiresIn')}: <strong className="text-jaman-navy font-mono">{Math.floor(qrSecondsLeft / 60)}:{String(qrSecondsLeft % 60).padStart(2, '0')}</strong></span>
+                    </div>
+                    <p className="text-xs text-[#4A5568]">Waiting for your payment… your token prints automatically once it is received.</p>
+                    <Button variant="ghost" size="touch" className="w-full" onClick={handleCancelQr}>
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <p className="text-sm font-semibold text-[#4A5568]">{qrLoading ? 'Preparing your payment QR…' : 'Preparing…'}</p>
+                )}
               </div>
             )}
 

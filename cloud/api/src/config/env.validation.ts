@@ -55,6 +55,9 @@ const envSchema = z.object({
   // CASHFREE_CLIENT_SECRET.
   CASHFREE_WEBHOOK_SECRET: z.string().optional(),
   CASHFREE_WEBHOOK_NOTIFY_URL: z.string().optional(),
+  // Sandbox-only testing aid: send Cashfree calls to a local stand-in instead of sandbox.cashfree.com.
+  // Never honoured when CASHFREE_ENVIRONMENT=production.
+  CASHFREE_BASE_URL_OVERRIDE: z.string().optional(),
   // Optional: AES-256-GCM key (32 bytes, base64) for encrypting
   // RestaurantPaymentConnection settlement bank details at rest.
   PAYMENT_CREDENTIAL_ENCRYPTION_KEY: z.string().optional(),

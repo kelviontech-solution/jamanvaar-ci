@@ -269,6 +269,69 @@ export async function createPaymentOrder(externalOrderId: string, lines: CartLin
   return data;
 }
 
+export interface PaymentQr {
+  qrPayload: string;
+  contentType: string | null;
+  expiresAt: string;
+}
+
+/** Asks the server (which holds the Cashfree keys) for the UPI QR of one pending payment. */
+export async function createPaymentQr(paymentId: string): Promise<PaymentQr> {
+  const res = await deviceFetch(`/api/v1/payments/${paymentId}/qr`, { method: 'POST' });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Could not create the payment QR (${res.status})`, res.status);
+  }
+  return data;
+}
+
+/** Tells the server the token and KOT now exist for this paid order. Safe to repeat. */
+export async function markPaymentFulfilled(paymentId: string): Promise<void> {
+  const res = await deviceFetch(`/api/v1/payments/${paymentId}/fulfilled`, { method: 'POST' });
+  if (!res.ok) {
+    const data = await parseJsonResponse(res);
+    throw new CloudApiError(data?.message ?? `Could not confirm fulfilment (${res.status})`, res.status);
+  }
+}
+
+// A payment that has been started but whose token/KOT are not confirmed yet is remembered on this
+// terminal, so a crash, power cut or reload between "customer paid" and "token printed" is recovered
+// on the next start instead of leaving a paid order with no ticket.
+const PENDING_PAYMENT_KEY = 'jamanvaar.kiosk.pendingPayment';
+
+export interface PendingPayment {
+  paymentId: string;
+  localOrderId: string;
+  startedAt: number;
+}
+
+export function savePendingPayment(p: PendingPayment): void {
+  try {
+    localStorage.setItem(PENDING_PAYMENT_KEY, JSON.stringify(p));
+  } catch {
+    // storage unavailable: the server-side "needs attention" list is the safety net
+  }
+}
+
+export function loadPendingPayment(): PendingPayment | null {
+  try {
+    const raw = localStorage.getItem(PENDING_PAYMENT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return typeof parsed?.paymentId === 'string' && typeof parsed?.localOrderId === 'string' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearPendingPayment(): void {
+  try {
+    localStorage.removeItem(PENDING_PAYMENT_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 export async function getPaymentOrderStatus(paymentId: string): Promise<{ status: string; orderStatus: string }> {
   const res = await deviceFetch(`/api/v1/payments/${paymentId}/status`);
   const data = await parseJsonResponse(res);

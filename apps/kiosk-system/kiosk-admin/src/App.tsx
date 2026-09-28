@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { OnlinePaymentsPanel } from './components/OnlinePaymentsPanel';
 import { OnboardingChecklistCard } from './components/OnboardingChecklistCard';
 import { CategoryModal } from './components/CategoryModal';
 import { KioskForgotPasswordPanel } from './components/KioskForgotPasswordPanel';
@@ -3833,6 +3834,9 @@ export default function AdminApp() {
                   </Button>
                 </div>
               </div>
+
+              {/* Online (Cashfree) payments: recent payments, paid-but-not-served, refunds, day statement */}
+              {isDeviceConnected() && <OnlinePaymentsPanel />}
 
               {/* Transactional Print Queue Table (Sections 14-17) */}
               <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-sm">

@@ -855,6 +855,58 @@ export interface PaymentsSummary {
   refundedAmount: number;
 }
 
+export interface RecentPayment {
+  id: string;
+  externalOrderId: string;
+  amount: number; // paise
+  status: string;
+  method: string | null;
+  paidAt: string | null;
+  createdAt: string;
+  fulfilledAt: string | null;
+  refundedAmount: number;
+  refundableAmount: number;
+  needsAttention: boolean;
+}
+
+export interface DayStatement {
+  date: string;
+  paymentCount: number;
+  refundCount: number;
+  grossVolume: number;
+  refundedAmount: number;
+  platformCommission: number;
+  commissionReversed: number;
+  restaurantGross: number;
+  restaurantRefundImpact: number;
+  netPayableToRestaurant: number;
+  settlementNote: string;
+  rows: Array<{ id: string; externalOrderId: string; amount: number; platformAmount: number; restaurantAmount: number; method: string | null; paidAt: string | null }>;
+  rowsTruncated: boolean;
+}
+
+export async function getRecentPayments(): Promise<RecentPayment[]> {
+  const data = await jsonOrThrow<{ rows: RecentPayment[] }>(await deviceFetch('/api/v1/payments/tenant-recent'), 'Recent payments');
+  return data.rows;
+}
+
+/** A paid order the kiosk never produced a ticket for, marked as handled by staff. */
+export async function markPaymentHandled(paymentId: string): Promise<void> {
+  await jsonOrThrow(await deviceFetch(`/api/v1/payments/${paymentId}/fulfilled`, { method: 'POST' }), 'Mark payment handled');
+}
+
+/** Real Cashfree refund. The server re-checks the remaining refundable balance; Cashfree reverses the vendor share proportionally. */
+export async function refundPayment(paymentId: string, amountPaise: number, reason: string, requestedBy: string): Promise<void> {
+  await jsonOrThrow(
+    await deviceFetch(`/api/v1/payments/${paymentId}/refund`, { method: 'POST', body: JSON.stringify({ amountPaise, reason, requestedBy }) }),
+    'Refund'
+  );
+}
+
+export async function getDayStatement(date: string): Promise<DayStatement> {
+  return jsonOrThrow<DayStatement>(await deviceFetch(`/api/v1/payments/tenant-statement?date=${encodeURIComponent(date)}`), 'Day statement');
+}
+
 /** Online (Cashfree) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
 export async function getPaymentsSummary(): Promise<PaymentsSummary> {
   return jsonOrThrow<PaymentsSummary>(await deviceFetch('/api/v1/payments/tenant-summary'), 'Payments summary');

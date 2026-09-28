@@ -129,6 +129,27 @@ export function PaymentConnectionsListPage() {
     }
   }
 
+  // Pays the restaurant's Cashfree balance out to its bank now, instead of waiting for Cashfree's own
+  // schedule (default: next day 11:00 AM). Cashfree refuses it if the balance is under ₹1,000 or the
+  // payments are under 15 minutes old; that message is shown as-is.
+  async function handleSettleNow(c: PaymentConnection) {
+    const raw = window.prompt(`Settle how much to ${c.restaurant.name}'s bank now, in rupees? (Cashfree needs a balance of at least ₹1,000)`);
+    if (!raw) return;
+    const amountPaise = Math.round(Number(raw) * 100);
+    if (!Number.isFinite(amountPaise) || amountPaise < 1000) {
+      showToast('Enter an amount of at least ₹10');
+      return;
+    }
+    const password = window.prompt('Confirm your password to move money');
+    if (!password) return;
+    try {
+      const res = await api.post<{ settlementId: string | null }>(`/api/v1/restaurants/${c.restaurantId}/payment-connection/settle-now`, { amountPaise, password });
+      showToast(`${c.restaurant.name}: settlement started${res.settlementId ? ` (Cashfree id ${res.settlementId})` : ''}`);
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : 'Settlement failed');
+    }
+  }
+
   async function handleRefreshStatus(c: PaymentConnection) {
     setRefreshingId(c.id);
     try {
@@ -267,6 +288,7 @@ export function PaymentConnectionsListPage() {
                           )}
                           {c.status === 'ACTIVE' && (
                             <>
+                              {c.cashfreeVendorId && <Button size="sm" variant="ghost" onClick={() => handleSettleNow(c)}>Settle now</Button>}
                               <Button size="sm" variant="ghost" onClick={() => setConfirmTarget({ connection: c, action: 'suspend' })}>Suspend</Button>
                               <Button size="sm" variant="danger" onClick={() => setConfirmTarget({ connection: c, action: 'disconnect' })}>Disconnect</Button>
                             </>

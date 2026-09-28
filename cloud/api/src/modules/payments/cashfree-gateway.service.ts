@@ -83,9 +83,12 @@ export class CashfreeGatewayService {
   }
 
   private baseUrl(): string {
-    return this.config.get<string>('CASHFREE_ENVIRONMENT') === 'production'
-      ? 'https://api.cashfree.com/pg'
-      : 'https://sandbox.cashfree.com/pg';
+    if (this.config.get<string>('CASHFREE_ENVIRONMENT') === 'production') {
+      return 'https://api.cashfree.com/pg';
+    }
+    // Sandbox only: lets a developer point the API at a local stand-in for Cashfree to rehearse the whole
+    // flow without keys. Ignored in production, so live credentials can never be sent to another host.
+    return this.config.get<string>('CASHFREE_BASE_URL_OVERRIDE') || 'https://sandbox.cashfree.com/pg';
   }
 
   private headers(): Record<string, string> {

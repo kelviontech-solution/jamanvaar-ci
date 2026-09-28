@@ -269,6 +269,21 @@ describe('CashfreeGatewayService', () => {
     await expect(service.createUpiQr('s', '2026-09-28T10:00:00.000Z')).rejects.toThrow(ServiceUnavailableException);
   });
 
+  it('the sandbox base-URL override is honoured in sandbox and can never redirect production traffic', async () => {
+    const okBody = () => new Response(JSON.stringify({ cf_order_id: '1', order_id: 'o', payment_session_id: 's', order_status: 'ACTIVE' }), { status: 200 });
+    const input = { orderId: 'pay_1', amountPaise: 100, currency: 'INR', customerId: 'c' };
+
+    const sandbox = await buildService({ ...CONFIGURED_ENV, CASHFREE_BASE_URL_OVERRIDE: 'http://localhost:4900/pg' });
+    const spy = vi.spyOn(global, 'fetch').mockImplementation(async () => okBody());
+    await sandbox.createOrder(input);
+    expect(spy.mock.calls[0][0]).toBe('http://localhost:4900/pg/orders');
+
+    spy.mockClear();
+    const prod = await buildService({ ...CONFIGURED_ENV, CASHFREE_ENVIRONMENT: 'production', CASHFREE_BASE_URL_OVERRIDE: 'http://evil.example/pg' });
+    await prod.createOrder(input);
+    expect(spy.mock.calls[0][0]).toBe('https://api.cashfree.com/pg/orders');
+  });
+
   it('createUpiQr throws when unconfigured', async () => {
     const service = await buildService({});
     await expect(service.createUpiQr('s', '2026-09-28T10:00:00.000Z')).rejects.toThrow(ServiceUnavailableException);
