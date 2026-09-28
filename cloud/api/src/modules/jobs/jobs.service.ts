@@ -5,6 +5,7 @@ import { BackupsService } from '../backups/backups.service';
 import { InvoicesService } from '../billing/invoices.service';
 import { OfflinePolicyService } from '../offline-policy/offline-policy.service';
 import { PlatformNotificationsService } from '../platform-notifications/platform-notifications.service';
+import { PaymentReconciliationService } from '../payments/payment-reconciliation.service';
 
 export interface JobDefinition {
   name: string;
@@ -41,7 +42,8 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
     private readonly keys: ActivationKeysService,
     private readonly offline: OfflinePolicyService,
     private readonly backups: BackupsService,
-    private readonly notifications: PlatformNotificationsService
+    private readonly notifications: PlatformNotificationsService,
+    private readonly reconciliation: PaymentReconciliationService
   ) {}
 
   get schedulerEnabled(): boolean {
@@ -62,6 +64,7 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
       { name: 'backup-retention', description: 'Delete backups past their retention period', run: () => this.backups.applyRetention() },
       { name: 'scheduled-backups', description: 'Snapshot every active restaurant without a backup in the last 24 hours', run: () => this.backups.snapshotStaleRestaurants() as unknown as Promise<Record<string, unknown>> },
       { name: 'notifications', description: 'Announce what needs attention (expiring subscriptions, failed backups, overdue invoices, offline terminals…) to the team, once each', run: () => this.notifications.scan() as unknown as Promise<Record<string, unknown>> },
+      { name: 'payment-reconciliation', description: 'Compare recent successful payments against Cashfree\'s own split/settlement records', run: () => this.reconciliation.reconcile() },
       ...this.extra
     ];
   }

@@ -13,6 +13,7 @@ import { PaymentsService } from './payments.service';
 import { CashfreeGatewayService } from './cashfree-gateway.service';
 import { PaymentConnectionsService } from './payment-connections.service';
 import { PlatformPaymentsService } from './platform-payments.service';
+import { PaymentReconciliationService } from './payment-reconciliation.service';
 
 @Module({
   imports: [PrismaModule, AuditModule, TenantAuthModule],
@@ -24,7 +25,7 @@ import { PlatformPaymentsService } from './platform-payments.service';
     PlatformPaymentConnectionsController,
     PlatformPaymentsController
   ],
-  providers: [PaymentsService, CashfreeGatewayService, MenuSyncService, PaymentConnectionsService, PlatformPaymentsService],
-  exports: [PaymentsService, CashfreeGatewayService]
+  providers: [PaymentsService, CashfreeGatewayService, MenuSyncService, PaymentConnectionsService, PlatformPaymentsService, PaymentReconciliationService],
+  exports: [PaymentsService, CashfreeGatewayService, PaymentReconciliationService]
 })
 export class PaymentsModule {}

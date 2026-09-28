@@ -172,6 +172,7 @@ model Restaurant {
   paymentTransactions     PaymentTransaction[]
   paymentConnection       RestaurantPaymentConnection?
   refunds                 Refund[]
+  reconciliationExceptions ReconciliationException[]
   webhookEvents           WebhookEvent[]
   menuSnapshotItems       MenuSnapshotItem[]
   syncedOrders            SyncedOrder[]
@@ -1235,6 +1236,7 @@ model PaymentTransaction {
   updatedAt         DateTime                  @updatedAt
 
   refunds Refund[]
+  reconciliationExceptions ReconciliationException[]
 
   @@unique([provider, providerOrderId])
   @@unique([provider, providerPaymentId])
@@ -1321,6 +1323,39 @@ model WebhookEvent {
 
   @@unique([provider, providerEventKey])
   @@index([restaurantId])
+}
+
+enum ReconciliationExceptionType {
+  MISSING_AT_CASHFREE
+  AMOUNT_MISMATCH
+  SPLIT_MISMATCH
+  UNEXPECTED_STATUS
+}
+
+enum ReconciliationExceptionStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+// Compares recent successful payments against Cashfree's own split/settlement
+// records; a mismatch is recorded here for a human to investigate, never
+// auto-corrected on the PaymentTransaction it references.
+model ReconciliationException {
+  id             String                        @id @default(uuid())
+  restaurantId   String
+  restaurant     Restaurant                    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  paymentId      String
+  payment        PaymentTransaction            @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  type           ReconciliationExceptionType
+  details        Json
+  status         ReconciliationExceptionStatus @default(OPEN)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  createdAt      DateTime                      @default(now())
+
+  @@index([restaurantId])
+  @@index([status])
 }
 
 // ---------------------------------------------------------------------------

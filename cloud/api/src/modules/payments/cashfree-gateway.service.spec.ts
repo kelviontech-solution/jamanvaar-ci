@@ -219,6 +219,27 @@ describe('CashfreeGatewayService', () => {
     ).rejects.toThrow(ServiceUnavailableException);
   });
 
+  it('getOrderSplitDetails fetches split/settlement details by order id', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ splits: [{ vendor_id: 'rest_abc123', status: 'SETTLED' }] }), { status: 200 })
+    );
+
+    const result = await service.getOrderSplitDetails('pay_1');
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://sandbox.cashfree.com/pg/easy-split/orders/pay_1/split',
+      expect.objectContaining({ method: 'GET' })
+    );
+    expect(result.splits).toEqual([{ vendorId: 'rest_abc123', status: 'SETTLED' }]);
+  });
+
+  it('getOrderSplitDetails throws when Cashfree responds with a non-2xx status', async () => {
+    const service = await buildService(CONFIGURED_ENV);
+    vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify({ message: 'not found' }), { status: 404 }));
+    await expect(service.getOrderSplitDetails('pay_missing')).rejects.toThrow(ServiceUnavailableException);
+  });
+
   it('getVendorStatus fetches the vendor by id', async () => {
     const service = await buildService(CONFIGURED_ENV);
     const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(

@@ -242,6 +242,26 @@ export class CashfreeGatewayService {
     return { vendorId: body.vendor_id, status: body.status };
   }
 
+  /**
+   * Get Split and Settlement Details by Order ID
+   * (https://www.cashfree.com/docs/api-reference/payments/latest/split/configuration/split-after-payment)
+   * — what Cashfree actually recorded for an order's vendor split, used by
+   * PaymentReconciliationService to compare against this system's own
+   * PaymentTransaction snapshot.
+   */
+  async getOrderSplitDetails(providerOrderId: string): Promise<{ splits: { vendorId: string; status: string }[] }> {
+    const res = await fetch(`${this.baseUrl()}/easy-split/orders/${encodeURIComponent(providerOrderId)}/split`, {
+      method: 'GET',
+      headers: this.headers()
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new ServiceUnavailableException(`Cashfree split-details lookup failed: ${body?.message ?? res.statusText}`);
+    }
+    const splits = Array.isArray(body?.splits) ? body.splits : [];
+    return { splits: splits.map((s: { vendor_id: string; status: string }) => ({ vendorId: s.vendor_id, status: s.status })) };
+  }
+
   async getVendorStatus(vendorId: string): Promise<CashfreeVendorResult> {
     const res = await fetch(`${this.baseUrl()}/easy-split/vendors/${encodeURIComponent(vendorId)}`, {
       method: 'GET',
