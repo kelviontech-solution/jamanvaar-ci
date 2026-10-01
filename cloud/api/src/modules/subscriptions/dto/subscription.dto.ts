@@ -16,7 +16,7 @@ export const assignSubscriptionSchema = z.object({
   // step. Omit to fall back to the plan's (productFamily, tier) defaults (see
   // DEFAULT_APPS_BY_FAMILY_TIER in application-entitlements.service.ts) — every
   // subscription gets one ApplicationEntitlement row per AppCode either way.
-  applications: z.array(z.enum(['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING'])).optional()
+  applications: z.array(z.enum(['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING', 'WHATSAPP_ORDERING'])).optional()
 });
 export type AssignSubscriptionDto = z.infer<typeof assignSubscriptionSchema>;
 

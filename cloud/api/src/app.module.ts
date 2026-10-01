@@ -34,6 +34,8 @@ import { OfflinePolicyModule } from './modules/offline-policy/offline-policy.mod
 import { SandboxesModule } from './modules/sandboxes/sandboxes.module';
 import { AiAssistantModule } from './modules/ai-assistant/ai-assistant.module';
 import { QrOrderingModule } from './modules/qr-ordering/qr-ordering.module';
+import { WhatsAppChannelModule } from './modules/whatsapp-channel/whatsapp-channel.module';
+import { WhatsAppOrderingAdminModule } from './modules/whatsapp-ordering-admin/whatsapp-ordering-admin.module';
 import { QrModule } from './modules/qr/qr.module';
 import { ApplicationEntitlementsModule } from './modules/application-entitlements/application-entitlements.module';
 import { FeaturesModule } from './modules/features/features.module';
@@ -91,6 +93,8 @@ import { validateEnv } from './config/env.validation';
     AiAssistantModule,
     QrOrderingModule,
     QrModule,
+    WhatsAppChannelModule,
+    WhatsAppOrderingAdminModule,
     ApplicationEntitlementsModule,
     FeaturesModule,
     PaymentsModule,

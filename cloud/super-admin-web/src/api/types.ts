@@ -73,7 +73,7 @@ export interface PlanDetail extends Plan {
   subscriptions: Array<Subscription & { restaurant: { id: string; name: string; status: string } }>;
 }
 
-export const APP_CODES = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING'] as const;
+export const APP_CODES = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING', 'WHATSAPP_ORDERING'] as const;
 export type AppCode = (typeof APP_CODES)[number];
 
 export const APP_CODE_LABELS: Record<AppCode, string> = {
@@ -83,7 +83,8 @@ export const APP_CODE_LABELS: Record<AppCode, string> = {
   KDS: 'Kitchen Display (KDS)',
   KIOSK: 'Self-Ordering Kiosk',
   KIOSK_ADMIN: 'Kiosk Admin',
-  QR_ORDERING: 'QR Table Ordering'
+  QR_ORDERING: 'QR Table Ordering',
+  WHATSAPP_ORDERING: 'WhatsApp Ordering'
 };
 
 export interface ApplicationEntitlement {

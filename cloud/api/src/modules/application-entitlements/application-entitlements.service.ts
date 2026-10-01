@@ -7,7 +7,19 @@ import { getDependentsOf } from './feature-catalog';
 
 type TxClient = Prisma.TransactionClient;
 
-export const ALL_APP_CODES: AppCode[] = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING'];
+export const ALL_APP_CODES: AppCode[] = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING', 'WHATSAPP_ORDERING'];
+
+/**
+ * Every AppCode with a real corresponding DeviceType a restaurant can actually provision —
+ * QR_ORDERING and WHATSAPP_ORDERING are channel entitlements, not a device someone activates
+ * (a QR guest's browser and a WhatsApp customer's chat are never a `Device` row), so
+ * `DeviceType` has no member for either. Checked below before ever casting an AppCode into a
+ * `DeviceType`-typed query — found live (not by inspection): Prisma's client-side validation
+ * throws `Invalid value for argument type. Expected DeviceType.` for a bare `type:
+ * appCode as unknown as DeviceType` device-count query on either code, an unhandled exception
+ * surfacing as a 500 instead of the intended "0 devices affected" answer.
+ */
+const DEVICE_BACKED_APP_CODES = new Set<AppCode>(['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN']);
 
 /**
  * Which applications each (product family, plan tier) pair includes by default. Phase 2 let a
@@ -36,7 +48,7 @@ export const DEFAULT_APPS_BY_FAMILY_TIER: Partial<Record<FamilyTierKey, AppCode[
   'RESTAURANT:CORE': ['POS', 'POS_ADMIN'],
   'RESTAURANT:PRO': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS'],
   'RESTAURANT:QR': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'QR_ORDERING'],
-  'RESTAURANT:ENTERPRISE': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'QR_ORDERING'],
+  'RESTAURANT:ENTERPRISE': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'QR_ORDERING', 'WHATSAPP_ORDERING'],
   'KIOSK:CORE': ['KIOSK', 'KIOSK_ADMIN'],
   'KIOSK:PRO': ['KIOSK', 'KIOSK_ADMIN'],
   'KIOSK:ENTERPRISE': ['KIOSK', 'KIOSK_ADMIN']
@@ -90,12 +102,12 @@ export class ApplicationEntitlementsService {
   /**
    * The apps a plan includes. The (family, tier) table still gives each tier its long-standing bundle, and a plan
    * that lists a feature as included ADDS that application to it (the Feature catalog says which flag key grants
-   * which application). QR ordering is the exception by design: it is granted only by the plan's own feature flag,
-   * never by a tier's name, so whether a restaurant has QR is a fact about its plan's feature list and about nothing
-   * else (not its name, tier or price).
+   * which application). QR ordering and WhatsApp ordering are the exception by design: each is granted only by the
+   * plan's own feature flag, never by a tier's name, so whether a restaurant has either is a fact about its plan's
+   * feature list and about nothing else (not its name, tier or price).
    */
   async appsForPlan(tx: TxClient, productFamily: ProductFamily, tier: PlanTier, planEntitlements?: unknown): Promise<AppCode[]> {
-    const apps = new Set<AppCode>(defaultAppsFor(productFamily, tier).filter((a) => a !== 'QR_ORDERING'));
+    const apps = new Set<AppCode>(defaultAppsFor(productFamily, tier).filter((a) => a !== 'QR_ORDERING' && a !== 'WHATSAPP_ORDERING'));
     const flags = planEntitlements && typeof planEntitlements === 'object' && !Array.isArray(planEntitlements) ? (planEntitlements as Record<string, unknown>) : {};
     const bridged = await tx.feature.findMany({
       where: { isActive: true, appCode: { not: null }, legacyEntitlementKey: { not: null } },
@@ -223,7 +235,7 @@ export class ApplicationEntitlementsService {
         }
       }
 
-      if (dto.enabled === false && existing.enabled && !dto.acknowledgeDeviceImpact) {
+      if (dto.enabled === false && existing.enabled && !dto.acknowledgeDeviceImpact && DEVICE_BACKED_APP_CODES.has(appCode)) {
         const activeDevices = await tx.device.count({
           where: { restaurantId: existing.restaurantId, type: appCode as unknown as DeviceType, status: { not: 'REVOKED' } }
         });
@@ -306,6 +318,11 @@ export class ApplicationEntitlementsService {
    * — assertAppEnabled is the gate for that; this only caps an app that's already allowed.
    */
   async assertDeviceQuotaAvailable(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<void> {
+    // QR_ORDERING/WHATSAPP_ORDERING are never an activated Device's own type (see
+    // DEVICE_BACKED_APP_CODES above) — in practice this method is only ever called with a
+    // real device type (activation-key redemption), but guarded defensively so a future
+    // caller can't hit the same DeviceType cast crash this fixed elsewhere in this file.
+    if (!DEVICE_BACKED_APP_CODES.has(appCode)) return;
     // Counting and then inserting is a race: N simultaneous activations would all count the same "free seats" and all succeed.
     // The lock is held to the end of the caller's transaction, so the next activation counts AFTER this one's device exists.
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'device-quota:' + restaurantId + ':' + appCode}))`;

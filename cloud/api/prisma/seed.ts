@@ -86,7 +86,8 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     advancedCaptainReports: false,
     advancedServiceWorkflow: false,
     qrTableOrdering: false,
-    selfOrderKiosk: false
+    selfOrderKiosk: false,
+    whatsappOrdering: false
   };
 
   const proEntitlements = {
@@ -110,7 +111,12 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     advancedCaptainReports: true,
     advancedServiceWorkflow: true,
     qrTableOrdering: true,
-    selfOrderKiosk: true
+    selfOrderKiosk: true,
+    // Pilot-stage (see docs/integrations/JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md
+    // Phase 8): deliberately off even on the seeded PRO plan, unlike qrTableOrdering above —
+    // enabled per-restaurant via a manual entitlement override until the pilot graduates to
+    // a normal plan inclusion.
+    whatsappOrdering: false
   };
 
   // Phase 5: real annual pricing. priceMonthly is kept populated with the amortized
@@ -435,7 +441,8 @@ async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
     { code: 'kiosk', name: 'Self-Order Kiosk', description: 'Customer-facing self-ordering kiosk terminal and its Kiosk Admin management console.', sortOrder: 13 },
     { code: 'sync', name: 'Real-Time Multi-Machine Mesh Sync', description: 'POS/Captain/KDS/Kiosk real-time order, table, menu and availability synchronization.', sortOrder: 14 },
     { code: 'ai', name: 'JAMANVAAR AI Restaurant Assistant', description: 'Natural-language restaurant queries answered from local, offline data.', sortOrder: 15 },
-    { code: 'analytics', name: 'Advanced Analytics & CRM', description: 'Advanced sales analytics, channel performance, customer lifetime value and staff attribution.', sortOrder: 16 }
+    { code: 'analytics', name: 'Advanced Analytics & CRM', description: 'Advanced sales analytics, channel performance, customer lifetime value and staff attribution.', sortOrder: 16 },
+    { code: 'whatsapp_ordering', name: 'WhatsApp Ordering', description: 'Connects a restaurant to the Jamanvaar WhatsApp connector — customers order and pay from chat, orders land on POS/KDS only once paid.', sortOrder: 17 }
   ];
 
   const categoryIdByCode = new Map<string, string>();
@@ -453,7 +460,7 @@ async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
     name: string;
     description: string;
     categoryCode: string;
-    appCode?: 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'QR_ORDERING';
+    appCode?: 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'QR_ORDERING' | 'WHATSAPP_ORDERING';
     legacyEntitlementKey?: string;
   }
 
@@ -475,6 +482,7 @@ async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
     { code: 'restaurantAdmin', name: 'Restaurant Admin', description: 'Back-office console for managing menu, staff and settings.', categoryCode: 'restaurant_admin', appCode: 'POS_ADMIN', legacyEntitlementKey: 'restaurantAdmin' },
     { code: 'captainApp', name: 'Captain App', description: 'Waiter-facing tableside ordering app.', categoryCode: 'captain', appCode: 'CAPTAIN', legacyEntitlementKey: 'captainApp' },
     { code: 'qrTableOrdering', name: 'QR Table Ordering', description: "Guest self-ordering from a table's QR code.", categoryCode: 'qr_ordering', appCode: 'QR_ORDERING', legacyEntitlementKey: 'qrTableOrdering' },
+    { code: 'whatsappOrdering', name: 'WhatsApp Ordering', description: 'Customers order and pay from a WhatsApp chat via the Jamanvaar connector.', categoryCode: 'whatsapp_ordering', appCode: 'WHATSAPP_ORDERING', legacyEntitlementKey: 'whatsappOrdering' },
     { code: 'selfOrderKiosk', name: 'Self-Order Kiosk', description: 'Self-service ordering kiosk terminal.', categoryCode: 'kiosk', appCode: 'KIOSK', legacyEntitlementKey: 'selfOrderKiosk' },
     { code: 'KIOSK_ADMIN', name: 'Kiosk Admin', description: 'Back-office console for managing kiosk menu and settings.', categoryCode: 'kiosk', appCode: 'KIOSK_ADMIN' },
     { code: 'advancedServiceWorkflow', name: 'Real-Time Multi-Machine Mesh Sync', description: 'POS/Captain/KDS/Kiosk real-time order and table synchronization.', categoryCode: 'sync', legacyEntitlementKey: 'advancedServiceWorkflow' },

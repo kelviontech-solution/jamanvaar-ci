@@ -4,6 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { OrderSyncService } from '../order-sync/order-sync.service';
+import { WhatsAppOutboundWebhookService } from '../whatsapp-outbound/whatsapp-outbound-webhook.service';
+import { businessDateIn, newPublicOrderId } from '../qr/qr.support';
 import { CashfreeGatewayService } from './cashfree-gateway.service';
 import { MenuSyncService } from './menu-sync.service';
 import { priceCart, PriceValidationError, MenuSnapshotItemLookup } from './pricing.util';
@@ -11,6 +14,30 @@ import { CreatePaymentOrderDto } from './dto/create-payment-order.dto';
 import { CreateRefundDto } from './dto/create-refund.dto';
 import { getDefaultCommissionBps } from './commission.util';
 import { buildDayStatement } from './payment-statement.util';
+
+/**
+ * What WhatsAppChannelService.checkout() (see whatsapp-channel.service.ts, Phase 4 of
+ * docs/integrations/JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md) has already priced
+ * (via the same priceCart() QrMenuService feeds channels/menu/quote from) and hands to
+ * createChannelOrder to turn into a real Cashfree payment session. No POS/KDS-visible order
+ * is created here — only once the Cashfree webhook reports SUCCESS (see the `source ===
+ * 'WHATSAPP'` branch in processCashfreeWebhook below) does the order become visible to the
+ * restaurant, which is the whole point: a WhatsApp customer's order must never reach the
+ * kitchen before they've actually paid for it.
+ */
+export interface ChannelOrderInput {
+  externalOrderId: string;
+  source: string; // 'WHATSAPP'
+  branchId: string;
+  orderType: string; // 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
+  tableLabel: string | null;
+  customerName: string;
+  customerPhone: string;
+  items: unknown[];
+  subtotal: number;
+  taxAmount: number;
+  totalAmount: number;
+}
 
 const NON_TERMINAL_STATUSES = ['CREATED', 'PENDING', 'AUTHORIZED'];
 const PAID_STATUSES = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'];
@@ -26,7 +53,9 @@ export class PaymentsService {
     private readonly config: ConfigService,
     private readonly cashfree: CashfreeGatewayService,
     private readonly menuSync: MenuSyncService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly orderSync: OrderSyncService,
+    private readonly whatsappOutbound: WhatsAppOutboundWebhookService
   ) {}
 
   async createOrGetPaymentOrder(restaurantId: string, kioskId: string, dto: CreatePaymentOrderDto) {
@@ -96,6 +125,89 @@ export class PaymentsService {
     return this.toOrderResponse(order, payment);
   }
 
+  /**
+   * The WhatsApp connector's equivalent of createOrGetPaymentOrder above — same idempotency-by-
+   * externalOrderId, same "restaurant must have an ACTIVE Cashfree connection" gate, same
+   * createCashfreeAttempt for the actual Cashfree order + commission split. The only real
+   * difference: the caller (WhatsAppChannelService.checkout) has already priced the cart itself
+   * (from QrMenuService's lookup, not MenuSyncService's — see that method's own comment), so this
+   * takes the priced lines directly instead of pricing dto.lines here.
+   */
+  async createChannelOrder(restaurantId: string, input: ChannelOrderInput) {
+    const connection = await this.prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } }));
+
+    const existingOrder = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.order.findUnique({
+        where: { restaurantId_externalOrderId: { restaurantId, externalOrderId: input.externalOrderId } },
+        include: { paymentTransactions: { orderBy: { createdAt: 'desc' } } }
+      })
+    );
+
+    if (existingOrder) {
+      const latest = existingOrder.paymentTransactions[0];
+      if (existingOrder.status === 'PAID' || (latest && NON_TERMINAL_STATUSES.includes(latest.status))) {
+        return this.toChannelOrderResponse(existingOrder, latest);
+      }
+      const payment = await this.createCashfreeLinkAttempt(existingOrder.id, restaurantId, existingOrder.totalAmount, existingOrder.currency, input.customerName, input.customerPhone, connection);
+      return this.toChannelOrderResponse(existingOrder, payment);
+    }
+
+    if (!connection || connection.status !== 'ACTIVE') {
+      throw new ForbiddenException('Online payments are not active for this restaurant yet');
+    }
+
+    const order = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.order.create({
+        data: {
+          restaurantId,
+          kioskId: null,
+          externalOrderId: input.externalOrderId,
+          source: input.source,
+          branchId: input.branchId,
+          orderType: input.orderType,
+          tableLabel: input.tableLabel,
+          customerName: input.customerName,
+          customerPhone: input.customerPhone,
+          items: input.items as unknown as Prisma.InputJsonValue,
+          subtotal: input.subtotal,
+          taxAmount: input.taxAmount,
+          discountAmount: 0,
+          totalAmount: input.totalAmount,
+          status: 'PENDING_PAYMENT'
+        }
+      })
+    );
+
+    const payment = await this.createCashfreeLinkAttempt(order.id, restaurantId, order.totalAmount, order.currency, input.customerName, input.customerPhone, connection);
+    return this.toChannelOrderResponse(order, payment);
+  }
+
+  private toChannelOrderResponse(
+    order: { id: string; totalAmount: number; currency: string },
+    payment: { id: string; status: string; providerResponse: Prisma.JsonValue }
+  ) {
+    const linkUrl = payment.providerResponse && typeof payment.providerResponse === 'object' && !Array.isArray(payment.providerResponse)
+      ? (payment.providerResponse as Record<string, unknown>).linkUrl
+      : undefined;
+    return {
+      orderId: order.id,
+      paymentId: payment.id,
+      paymentLink: typeof linkUrl === 'string' ? linkUrl : null,
+      amount: order.totalAmount,
+      currency: order.currency,
+      status: payment.status
+    };
+  }
+
+  /** Shared by createCashfreeAttempt and createCashfreeLinkAttempt so both Cashfree products
+   *  (Orders and Payment Links) compute platform commission identically. */
+  private async commissionSplitFor(amount: number, connection: { commissionOverrideBps: number | null } | null) {
+    const commissionBps = connection?.commissionOverrideBps ?? (await getDefaultCommissionBps(this.prisma));
+    const platformAmount = Math.round((amount * commissionBps) / 10000);
+    const restaurantAmount = amount - platformAmount;
+    return { commissionBps, platformAmount, restaurantAmount };
+  }
+
   private async createCashfreeAttempt(
     orderId: string,
     restaurantId: string,
@@ -103,9 +215,7 @@ export class PaymentsService {
     currency: string,
     connection: { cashfreeVendorId: string | null; commissionOverrideBps: number | null } | null
   ) {
-    const commissionBps = connection?.commissionOverrideBps ?? (await getDefaultCommissionBps(this.prisma));
-    const platformAmount = Math.round((amount * commissionBps) / 10000);
-    const restaurantAmount = amount - platformAmount;
+    const { commissionBps, platformAmount, restaurantAmount } = await this.commissionSplitFor(amount, connection);
     const vendorPercentage = Number(((restaurantAmount / amount) * 100).toFixed(2));
 
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
@@ -125,6 +235,60 @@ export class PaymentsService {
 
     return this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.update({ where: { id: payment.id }, data: { paymentSessionId: cfOrder.paymentSessionId, status: 'PENDING' } })
+    );
+  }
+
+  /**
+   * The WhatsApp connector's payment-session creation — Payment Links, not Orders (see
+   * CashfreeGatewayService.createPaymentLink's own comment for why). providerOrderId holds
+   * Cashfree's link_id here (not an order_id): same column, same @@unique([provider,
+   * providerOrderId]) index Orders-based lookups already use, so processCashfreeWebhook's
+   * PAYMENT_LINK_EVENT branch can reuse the identical lookup-by-providerOrderId code path.
+   * The link's own linkUrl/cfLinkId/linkStatus are kept in providerResponse (no dedicated
+   * columns) and read back out by toChannelOrderResponse above.
+   */
+  private async createCashfreeLinkAttempt(
+    orderId: string,
+    restaurantId: string,
+    amount: number,
+    currency: string,
+    customerName: string,
+    customerPhone: string,
+    connection: { cashfreeVendorId: string | null; commissionOverrideBps: number | null } | null
+  ) {
+    const { commissionBps, platformAmount, restaurantAmount } = await this.commissionSplitFor(amount, connection);
+    const vendorPercentage = Number(((restaurantAmount / amount) * 100).toFixed(2));
+    // Cashfree's link_id allows alphanumeric plus '-'/'_' only, max 50 chars -- a UUID (hex
+    // and hyphens) is already within both constraints, no stripping/truncation needed.
+    const linkId = `wapay_${randomUUID()}`;
+
+    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.create({
+        data: { orderId, restaurantId, providerOrderId: linkId, amount, currency, status: 'CREATED', commissionBps, platformAmount, restaurantAmount }
+      })
+    );
+
+    // A stuck order is never worth chasing forever — matches QR_TTL_SECONDS's own reasoning,
+    // just on a food-order timescale (minutes, not the 24h default a generic payment link gets).
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+
+    const link = await this.cashfree.createPaymentLink({
+      linkId,
+      amountRupees: amount / 100,
+      currency,
+      purpose: `Order via WhatsApp`,
+      customerPhone,
+      customerName,
+      expiryIso: expiresAt.toISOString(),
+      notifyUrl: this.config.get<string>('CASHFREE_WEBHOOK_NOTIFY_URL'),
+      orderSplits: connection?.cashfreeVendorId ? [{ vendorId: connection.cashfreeVendorId, percentage: vendorPercentage }] : undefined
+    });
+
+    return this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.update({
+        where: { id: payment.id },
+        data: { status: 'PENDING', providerResponse: { cfLinkId: link.cfLinkId, linkUrl: link.linkUrl, linkStatus: link.linkStatus } as unknown as Prisma.InputJsonValue }
+      })
     );
   }
 
@@ -415,13 +579,32 @@ export class PaymentsService {
     // are still present there, verified against Cashfree's real refund
     // webhook payload docs, so the same PaymentTransaction lookup below
     // (by providerOrderId) works unchanged for refund events too.
+    // PAYMENT_LINK_EVENT (the WhatsApp connector's Cashfree product — see
+    // CashfreeGatewayService.createPaymentLink) is a third, differently-shaped payload:
+    // link_id/cf_link_id/link_status sit directly under `data`, not nested under
+    // `data.order`/`data.payment` the way Orders' own webhook nests them. providerOrderId
+    // holds the link_id for these PaymentTransaction rows (see createCashfreeLinkAttempt).
+    // A PAID link event ALSO carries a nested `data.order` — but that's Cashfree's own
+    // internal order id for the underlying transaction, not our link_id, and must never be
+    // used for this lookup: a blind `??` fallback across all three shapes picked it first
+    // (found live, not by inspection — see git history), so this event type is resolved
+    // explicitly instead of falling through the Orders/refund chain.
     const cfPaymentId: string | undefined = payload.data?.payment?.cf_payment_id ?? payload.data?.refund?.cf_payment_id;
-    const providerOrderId: string | undefined = payload.data?.order?.order_id ?? payload.data?.refund?.order_id;
+    const providerOrderId: string | undefined =
+      eventType === 'PAYMENT_LINK_EVENT' ? payload.data?.link_id : (payload.data?.order?.order_id ?? payload.data?.refund?.order_id);
     const cfRefundId: string | undefined = payload.data?.refund?.cf_refund_id;
-    // cf_refund_id is the most specific identifier available for a refund
-    // event — falling back to cfPaymentId/providerOrderId would collide
-    // dedup keys across multiple refunds on the same payment.
-    const providerEventKey = `${eventType}:${cfRefundId ?? cfPaymentId ?? providerOrderId ?? randomUUID()}`;
+    const cfLinkId: string | undefined = payload.data?.cf_link_id;
+    const linkStatus: string | undefined = payload.data?.link_status;
+    // cf_refund_id/cf_link_id+link_status are the most specific identifiers available for
+    // their event types — falling back to cfPaymentId/providerOrderId alone would collide
+    // dedup keys across multiple refunds on the same payment, or across a link's own status
+    // transitions (a link's cf_link_id never changes across its whole lifecycle, so without
+    // link_status in the key a genuine PARTIALLY_PAID -> PAID transition would be wrongly
+    // deduped as a repeat of the first delivery).
+    const providerEventKey =
+      eventType === 'PAYMENT_LINK_EVENT'
+        ? `PAYMENT_LINK_EVENT:${cfLinkId ?? providerOrderId ?? randomUUID()}:${linkStatus ?? 'UNKNOWN'}`
+        : `${eventType}:${cfRefundId ?? cfPaymentId ?? providerOrderId ?? randomUUID()}`;
 
     const existing = await this.prisma.runAsPlatform((tx) =>
       tx.webhookEvent.findUnique({ where: { provider_providerEventKey: { provider: 'CASHFREE', providerEventKey } } })
@@ -462,7 +645,7 @@ export class PaymentsService {
     }
 
     const payment = await this.prisma.runAsPlatform((tx) =>
-      tx.paymentTransaction.findUnique({ where: { provider_providerOrderId: { provider: 'CASHFREE', providerOrderId } } })
+      tx.paymentTransaction.findUnique({ where: { provider_providerOrderId: { provider: 'CASHFREE', providerOrderId } }, include: { order: true } })
     );
     if (!payment) {
       await this.markWebhookFailed(webhookEvent.id, `No PaymentTransaction found for providerOrderId ${providerOrderId}`);
@@ -473,6 +656,11 @@ export class PaymentsService {
 
     if (eventType === 'REFUND_STATUS_WEBHOOK') {
       await this.handleRefundWebhook(payment, payload, webhookEvent.id);
+      return;
+    }
+
+    if (eventType === 'PAYMENT_LINK_EVENT') {
+      await this.handlePaymentLinkWebhook(payment, payload, webhookEvent.id);
       return;
     }
 
@@ -493,6 +681,17 @@ export class PaymentsService {
 
     const TERMINAL_STATUSES = ['SUCCESS', 'REFUNDED', 'PARTIALLY_REFUNDED'];
     if (TERMINAL_STATUSES.includes(payment.status)) {
+      // Already settled by an earlier delivery. For a WhatsApp order this is also the retry
+      // path if that earlier delivery's KDS ingestion itself failed (see the catch below) —
+      // ingestWhatsAppOrderIfNeeded is safe to call again: ingestServerOrder dedupes on
+      // (restaurantId, externalOrderId), so a redelivery after a successful ingestion is a no-op.
+      if (payment.status === 'SUCCESS') {
+        const err = await this.ingestWhatsAppOrderIfNeeded(payment);
+        if (err) {
+          await this.markWebhookFailed(webhookEvent.id, err);
+          return;
+        }
+      }
       await this.markWebhookProcessed(webhookEvent.id);
       return;
     }
@@ -517,7 +716,127 @@ export class PaymentsService {
       });
     });
 
+    // Money is already recorded as settled above regardless of what happens next — this is a
+    // second, independent effect (make the order visible on POS/KDS), not part of that
+    // transaction, and its failure must never be reported back to Cashfree as a payment failure.
+    if (newStatus === 'SUCCESS') {
+      const err = await this.ingestWhatsAppOrderIfNeeded(payment);
+      if (err) {
+        await this.markWebhookFailed(webhookEvent.id, err);
+        return;
+      }
+    }
+
     await this.markWebhookProcessed(webhookEvent.id);
+  }
+
+  /**
+   * Makes a paid WhatsApp order appear on POS/KDS — and only a paid one: this is the single
+   * place that call happens, reached only from a payment already confirmed SUCCESS by Cashfree
+   * (fresh, or on a retried delivery — see the two call sites above). A restaurant-side order
+   * created at checkout time instead would mean the kitchen sees an order before anyone has
+   * actually paid for it, which is the one thing the user building this connector explicitly
+   * required never happen. Returns an error message string on failure (never throws), so a
+   * WebhookEvent can record the reason `markWebhookFailed` needs.
+   */
+  private async ingestWhatsAppOrderIfNeeded(payment: {
+    id: string;
+    restaurantId: string;
+    orderId: string;
+    order: {
+      externalOrderId: string;
+      source: string;
+      branchId: string | null;
+      orderType: string | null;
+      tableLabel: string | null;
+      customerName: string | null;
+      customerPhone: string | null;
+      items: Prisma.JsonValue;
+      subtotal: number;
+      taxAmount: number;
+      totalAmount: number;
+    } | null;
+  }): Promise<string | null> {
+    const order = payment.order;
+    if (!order || order.source !== 'WHATSAPP') return null;
+
+    try {
+      const [restaurant, connection] = await Promise.all([
+        this.prisma.runAsPlatform((tx) => tx.restaurant.findUnique({ where: { id: payment.restaurantId }, select: { timezone: true } })),
+        this.prisma.runAsTenant(payment.restaurantId, (tx) => tx.whatsAppChannelConnection.findUnique({ where: { restaurantId: payment.restaurantId }, select: { autoAccept: true } }))
+      ]);
+      const timezone = restaurant?.timezone ?? 'Asia/Kolkata';
+      const businessDate = businessDateIn(timezone);
+
+      const result = await this.orderSync.ingestServerOrder({
+        restaurantId: payment.restaurantId,
+        branchId: order.branchId,
+        externalOrderId: order.externalOrderId,
+        source: 'WHATSAPP',
+        publicOrderId: newPublicOrderId(),
+        orderType: order.orderType ?? 'TAKEAWAY',
+        status: connection?.autoAccept ? 'PREPARING' : 'NEW',
+        tableId: null,
+        tableLabel: order.tableLabel,
+        items: order.items as unknown[],
+        subtotal: order.subtotal,
+        taxAmount: order.taxAmount,
+        discountAmount: 0,
+        totalAmount: order.totalAmount,
+        notes: null,
+        // The whole reason this method only ever runs from a confirmed-SUCCESS payment.
+        paymentStatus: 'SUCCESS',
+        paymentMethod: 'CASHFREE',
+        meta: {
+          sourceType: 'WHATSAPP',
+          customerName: order.customerName,
+          customerPhone: order.customerPhone,
+          paymentTransactionId: payment.id,
+          cgstPaise: Math.round(order.taxAmount / 2),
+          sgstPaise: order.taxAmount - Math.round(order.taxAmount / 2)
+        },
+        beforeCreate: order.branchId
+          ? async (tx) => {
+              const rows = await tx.$queryRaw<Array<{ next: number }>>`
+                INSERT INTO "NumberSequence" ("restaurantId", "scope", "kind", "businessDate", "next")
+                VALUES (${payment.restaurantId}, ${order.branchId}, 'WHATSAPP', ${businessDate}, 2)
+                ON CONFLICT ("restaurantId", "scope", "kind", "businessDate") DO UPDATE SET "next" = "NumberSequence"."next" + 1
+                RETURNING "next"`;
+              const number = `WA-${Number(rows[0].next) - 1}`;
+              return { tokenNumber: number, orderNumber: number };
+            }
+          : undefined
+      });
+
+      // Only on a genuinely fresh ingestion, matching ingestServerOrder's own "only publish
+      // after commit if not a duplicate" rule — a redelivered webhook whose ingestion had
+      // already succeeded once must not send product/whatsapp a second order.confirmed for
+      // the same order. paymentId is the correlator: it's the same id checkout()'s response
+      // already gave product/whatsapp (JamanvaarFulfillmentSink stores it on
+      // Engagement.gateway_metadata.jamanvaar_payment_id), so no new kiosk-side field is
+      // needed to let product/whatsapp find its own record for this order.
+      if (!result.duplicate) {
+        // Isolated from the catch below on purpose: KDS ingestion (the part that matters
+        // for the "order reaches the kitchen only after payment" guarantee) already
+        // committed successfully by this point. enqueue() itself already durably records
+        // the delivery and retries on its own — a failure here is a bug worth logging, not
+        // a reason to make markWebhookFailed retry a webhook whose real job is done.
+        try {
+          await this.whatsappOutbound.enqueue(payment.restaurantId, 'order.confirmed', {
+            paymentId: payment.id,
+            orderId: payment.orderId,
+            publicOrderId: result.order.publicOrderId,
+            status: result.order.status
+          });
+        } catch {
+          // enqueue() only ever throws from the initial row-insert (its own delivery
+          // attempt already swallows and records failures) — nothing more to do here.
+        }
+      }
+      return null;
+    } catch (err) {
+      return err instanceof Error ? err.message : 'Unknown error ingesting WhatsApp order into POS/KDS';
+    }
   }
 
   private async handleRefundWebhook(
@@ -577,6 +896,93 @@ export class PaymentsService {
       }
       // FAILED: leave PaymentTransaction/Order status untouched — the money never left.
     });
+
+    await this.markWebhookProcessed(webhookEventId);
+  }
+
+  /**
+   * PAYMENT_LINK_EVENT — the WhatsApp connector's own Cashfree product (Payment Links, not
+   * Orders; see CashfreeGatewayService.createPaymentLink). Deliberately a separate method
+   * from the Orders-based SUCCESS/FAILED handling above rather than a shared one: the two
+   * payloads nest their fields completely differently (data.link_status/data.order.
+   * transaction_id here vs data.order.order_amount/data.payment.cf_payment_id there), and
+   * forcing one generic parser to cover both shapes would be harder to read than two
+   * parallel ones — the same reasoning handleRefundWebhook already exists as its own method
+   * alongside the main flow, not folded into it.
+   */
+  private async handlePaymentLinkWebhook(
+    payment: {
+      id: string;
+      restaurantId: string;
+      orderId: string;
+      amount: number;
+      currency: string;
+      status: string;
+      order: Parameters<PaymentsService['ingestWhatsAppOrderIfNeeded']>[0]['order'];
+    },
+    payload: Record<string, any>,
+    webhookEventId: string
+  ): Promise<void> {
+    const linkAmountRupees = payload.data?.link_amount;
+    const linkCurrency = payload.data?.link_currency;
+    const receivedAmountPaise = typeof linkAmountRupees === 'number' ? Math.round(linkAmountRupees * 100) : null;
+
+    if (receivedAmountPaise === null || receivedAmountPaise !== payment.amount || linkCurrency !== payment.currency) {
+      await this.markWebhookFailed(webhookEventId, `Amount/currency mismatch: expected ${payment.amount} ${payment.currency}, got ${receivedAmountPaise} ${linkCurrency}`);
+      return;
+    }
+
+    const TERMINAL_STATUSES = ['SUCCESS', 'REFUNDED', 'PARTIALLY_REFUNDED'];
+    if (TERMINAL_STATUSES.includes(payment.status)) {
+      // Same retry reasoning as the Orders-based branch above: a redelivery (or a later
+      // status webhook for a link that's already SUCCESS) still gets one more chance at
+      // KDS ingestion if an earlier delivery's ingestion itself failed.
+      if (payment.status === 'SUCCESS') {
+        const err = await this.ingestWhatsAppOrderIfNeeded(payment);
+        if (err) {
+          await this.markWebhookFailed(webhookEventId, err);
+          return;
+        }
+      }
+      await this.markWebhookProcessed(webhookEventId);
+      return;
+    }
+
+    const linkStatus: string | undefined = payload.data?.link_status;
+    const newStatus = linkStatus === 'PAID' ? 'SUCCESS' : linkStatus === 'EXPIRED' || linkStatus === 'CANCELLED' ? 'FAILED' : null;
+    if (!newStatus) {
+      // PARTIALLY_PAID (partial payments aren't enabled on links this connector creates,
+      // but handled defensively) — not a terminal outcome yet, nothing to finalize.
+      await this.markWebhookProcessed(webhookEventId);
+      return;
+    }
+
+    const cfTransactionId: string | undefined = payload.data?.order?.transaction_id;
+
+    await this.prisma.runAsTenant(payment.restaurantId, async (tx) => {
+      await tx.paymentTransaction.update({
+        where: { id: payment.id },
+        data: {
+          status: newStatus,
+          providerPaymentId: cfTransactionId,
+          providerResponse: payload as unknown as Prisma.InputJsonValue,
+          paidAt: newStatus === 'SUCCESS' ? new Date() : null
+        }
+      });
+      await tx.order.update({ where: { id: payment.orderId }, data: { status: newStatus === 'SUCCESS' ? 'PAID' : 'PAYMENT_FAILED' } });
+      await tx.restaurantPaymentConnection.updateMany({
+        where: { restaurantId: payment.restaurantId },
+        data: { lastWebhookAt: new Date(), ...(newStatus === 'SUCCESS' ? { lastPaymentAt: new Date() } : {}) }
+      });
+    });
+
+    if (newStatus === 'SUCCESS') {
+      const err = await this.ingestWhatsAppOrderIfNeeded(payment);
+      if (err) {
+        await this.markWebhookFailed(webhookEventId, err);
+        return;
+      }
+    }
 
     await this.markWebhookProcessed(webhookEventId);
   }

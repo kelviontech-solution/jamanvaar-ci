@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuditService } from '../audit/audit.service';
 import { StaffSessionService } from '../entity-sync/staff-session.service';
 import { MANAGER_ROLES } from '../entity-sync/entity-authority';
+import { WhatsAppOutboundWebhookService } from '../whatsapp-outbound/whatsapp-outbound-webhook.service';
 import { OrderSyncEventDto, orderSyncEventSchema } from './dto/push-order-sync.dto';
 
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000; // 24h
@@ -110,7 +111,8 @@ export class OrderSyncService {
     private readonly realtime: RealtimeBus,
     private readonly audit: AuditService,
     private readonly sessions: StaffSessionService,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
+    private readonly whatsappOutbound: WhatsAppOutboundWebhookService
   ) {}
 
   /**
@@ -122,6 +124,9 @@ export class OrderSyncService {
   async pushEvents(device: Device, rawEvents: unknown[]): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
     const results: OrderSyncPushResult[] = [];
     let latestSeq: number | undefined;
+    // Collected during the transaction below, dispatched only after it commits — see the
+    // collection point inside the loop for why.
+    const whatsappStatusChanges: Array<{ paymentId: string; orderId: string; publicOrderId: string | null; status: string; previousStatus: string }> = [];
 
     await this.prisma.runAsTenant(device.restaurantId, async (tx) => {
       // Serialise writers of the same order. Two devices creating or updating one order at once used to
@@ -381,6 +386,30 @@ export class OrderSyncService {
             // The order belongs to the branch of the terminal that first pushed it (BUG-048).
             : await tx.syncedOrder.create({ data: { ...data, branchId: device.branchId, source, syncVersion: 1, seq } });
 
+          // Phase 5 of the Jamanvaar<->WhatsApp connector: staff moving a WhatsApp order
+          // through its lifecycle on POS/KDS (accepted/preparing/ready/completed/...) is
+          // exactly what the customer needs to hear about. Only for an existing order
+          // (ingestServerOrder creates a WhatsApp order — see PaymentsService.
+          // ingestWhatsAppOrderIfNeeded — pushEvents only ever updates it afterward) whose
+          // status actually changed, and only collected here for dispatch AFTER the whole
+          // transaction commits (see below), same discipline as this method's own
+          // realtime.publish. paymentTransactionId (stashed in meta at ingestion time) is
+          // the correlator product/whatsapp already has from checkout()'s own response —
+          // see ingestWhatsAppOrderIfNeeded's identical reasoning for order.confirmed.
+          if (existing && existing.source === 'WHATSAPP' && existing.status !== saved.status) {
+            const existingMeta = existing.meta as Record<string, unknown> | null;
+            const paymentId = existingMeta && typeof existingMeta === 'object' ? existingMeta.paymentTransactionId : undefined;
+            if (typeof paymentId === 'string' && paymentId) {
+              whatsappStatusChanges.push({
+                paymentId,
+                orderId: saved.id,
+                publicOrderId: saved.publicOrderId,
+                status: saved.status,
+                previousStatus: existing.status
+              });
+            }
+          }
+
           await tx.syncEventLog.create({
             data: {
               restaurantId: device.restaurantId,
@@ -444,6 +473,12 @@ export class OrderSyncService {
     // Wake the branch only after the transaction has committed, so a woken device's pull always sees the change.
     if (results.some((r) => r.status === 'ok' && !r.duplicate)) {
       this.realtime.publish({ restaurantId: device.restaurantId, branchId: device.branchId, kind: 'orders', seq: latestSeq, originDeviceId: device.id });
+    }
+    for (const change of whatsappStatusChanges) {
+      // enqueue() durably records the delivery itself and retries on its own — a failure
+      // here is a bug worth logging, not a reason to fail the device's own push response
+      // (which has already succeeded at its actual job: recording the status change).
+      await this.whatsappOutbound.enqueue(device.restaurantId, 'order.status', change).catch(() => undefined);
     }
     return { results, serverTime: new Date().toISOString() };
   }

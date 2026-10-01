@@ -104,6 +104,7 @@ import { BackupRestoreModule } from './components/backup/BackupRestoreModule';
 import { SupportTicketsModule } from './components/support/SupportTicketsModule';
 import { InventoryControlModule } from './components/inventory/InventoryControlModule';
 import { TerminalDisplaySettings } from './components/settings/TerminalDisplaySettings';
+import { WhatsAppChannelPanel } from './components/settings/WhatsAppChannelPanel';
 import { PosAdminHeader } from './components/header/PosAdminHeader';
 
 // Specialized Modal Dialogs
@@ -1206,6 +1207,7 @@ export default function PosAdminApp() {
             {activeTab === 'SETTINGS' && (
               <>
                 <TerminalDisplaySettings showToast={showToast} />
+                <WhatsAppChannelPanel showToast={showToast} />
                 <ReportBrandingSettings
                   showToast={showToast}
                   onUpdated={() => setDbTick((t) => t + 1)}
