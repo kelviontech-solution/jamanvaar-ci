@@ -21,6 +21,12 @@ describe('production configuration gate (F-04)', () => {
     expect(() => validateEnv({ ...base, CORS_ALLOWED_ORIGINS: undefined })).toThrow(/CORS_ALLOWED_ORIGINS/);
     expect(productionConfigProblems({ ...base, BACKUP_ENCRYPTION_KEY_B64: 'AAAA' })).toHaveLength(1);
   });
+  it('production refuses the literal dev placeholder for the Jamanvaar connector secret, but is fine with it unset or strong (F-04 extended to JAMANVAAR_SERVICE_SECRET)', () => {
+    const base = { NODE_ENV: 'production', DATABASE_URL: 'postgres://x', JWT_ACCESS_SECRET: goodSecret, CORS_ALLOWED_ORIGINS: 'https://admin.example.com' };
+    expect(() => validateEnv(base)).not.toThrow(); // connector not configured at all -- fine, it's optional
+    expect(() => validateEnv({ ...base, JAMANVAAR_SERVICE_SECRET: 'dev-only-jamanvaar-whatsapp-shared-secret-change-in-prod' })).toThrow(/JAMANVAAR_SERVICE_SECRET/);
+    expect(() => validateEnv({ ...base, JAMANVAAR_SERVICE_SECRET: goodSecret })).not.toThrow();
+  });
   it('development is not gated', () => {
     expect(() => validateEnv({ NODE_ENV: 'development', DATABASE_URL: 'postgres://x', JWT_ACCESS_SECRET: 'x'.repeat(32) })).not.toThrow();
   });
