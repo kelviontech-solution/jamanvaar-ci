@@ -77,6 +77,18 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD:-}
       - SMTP_FROM_NAME=${SMTP_FROM_NAME:-}
       - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL:-}
+      # Read only by `prisma/seed.ts` (via `make seed`), never by the running server itself.
+      # All optional -- left unset, the seed falls back to a random Super Admin password
+      # (printed once) and skips the demo restaurant entirely (src/config/seed-options.ts:
+      # shouldSeedDemoData is off by default in production). Found missing on the real
+      # deploy, not assumed: these were set in .env but never referenced anywhere in this
+      # file, so `docker compose exec backend ...` never actually saw them.
+      - SEED_SUPER_ADMIN_EMAIL=${SEED_SUPER_ADMIN_EMAIL:-}
+      - SEED_SUPER_ADMIN_PASSWORD=${SEED_SUPER_ADMIN_PASSWORD:-}
+      - SEED_RESET_SUPER_ADMIN_PASSWORD=${SEED_RESET_SUPER_ADMIN_PASSWORD:-false}
+      - SEED_DEMO_DATA=${SEED_DEMO_DATA:-}
+      - SEED_DEMO_OWNER_PASSWORD=${SEED_DEMO_OWNER_PASSWORD:-}
+      - SEED_RESET_DEMO_OWNER_PASSWORD=${SEED_RESET_DEMO_OWNER_PASSWORD:-false}
     depends_on:
       db:
         condition: service_healthy
