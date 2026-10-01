@@ -13,16 +13,19 @@ describe('Payment reconciliation', () => {
   const adminEmail = `test-reconcile-admin-${Date.now()}@example.com`;
   const adminPassword = 'correct-horse-battery-staple';
   let getOrderSplitDetailsMock: ReturnType<typeof vi.fn>;
+  let getPaymentLinkDetailsMock: ReturnType<typeof vi.fn>;
 
   const authed = (method: 'get' | 'post' | 'patch', url: string, token: string) =>
     request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
 
   beforeAll(async () => {
     getOrderSplitDetailsMock = vi.fn();
+    getPaymentLinkDetailsMock = vi.fn();
     app = await createTestApp((builder) =>
       builder.overrideProvider(CashfreeGatewayService).useValue({
         isConfigured: () => true,
-        getOrderSplitDetails: getOrderSplitDetailsMock
+        getOrderSplitDetails: getOrderSplitDetailsMock,
+        getPaymentLinkDetails: getPaymentLinkDetailsMock
       })
     );
     prisma = app.get(PrismaService);
@@ -55,6 +58,58 @@ describe('Payment reconciliation', () => {
       })
     );
   };
+
+  /** Phase 8: a WHATSAPP-sourced order's payment, routed through reconcileLinkPayment
+   *  instead of the Orders-API split check (see reconcile()'s own branch). */
+  const seedWhatsAppPayment = async (opts: { providerOrderId: string; amount: number }) => {
+    const order = await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.order.create({ data: { restaurantId, externalOrderId: `reconcile-wa-${Date.now()}-${Math.random()}`, source: 'WHATSAPP', items: [], subtotal: opts.amount, taxAmount: 0, totalAmount: opts.amount, status: 'PAID' } })
+    );
+    return prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.create({
+        data: { orderId: order.id, restaurantId, providerOrderId: opts.providerOrderId, amount: opts.amount, currency: 'INR', status: 'SUCCESS', commissionBps: 0, platformAmount: 0, restaurantAmount: opts.amount }
+      })
+    );
+  };
+
+  it('a WhatsApp payment is checked via getPaymentLinkDetails, not the Orders-API split lookup', async () => {
+    const payment = await seedWhatsAppPayment({ providerOrderId: 'wapay_ok_1', amount: 50000 });
+    getPaymentLinkDetailsMock.mockImplementation(async () => ({ linkStatus: 'PAID', amountPaid: 500 })); // rupees, matches 50000 paise
+    getOrderSplitDetailsMock.mockClear();
+
+    const reconciliation = app.get(PaymentReconciliationService);
+    await reconciliation.reconcile();
+
+    expect(getPaymentLinkDetailsMock).toHaveBeenCalledWith('wapay_ok_1');
+    expect(getOrderSplitDetailsMock).not.toHaveBeenCalledWith('wapay_ok_1');
+    const exception = await prisma.runAsPlatform((tx) => tx.reconciliationException.findFirst({ where: { paymentId: payment.id } }));
+    expect(exception).toBeNull();
+  });
+
+  it('flags a WhatsApp payment whose Cashfree link never actually reached PAID', async () => {
+    const payment = await seedWhatsAppPayment({ providerOrderId: 'wapay_unpaid_1', amount: 20000 });
+    getPaymentLinkDetailsMock.mockImplementation(async () => ({ linkStatus: 'EXPIRED', amountPaid: 0 }));
+
+    const reconciliation = app.get(PaymentReconciliationService);
+    await reconciliation.reconcile();
+
+    const exception = await prisma.runAsPlatform((tx) => tx.reconciliationException.findFirst({ where: { paymentId: payment.id } }));
+    expect(exception).not.toBeNull();
+    expect(exception!.type).toBe('UNEXPECTED_STATUS');
+    expect((exception!.details as Record<string, unknown>).cashfreeLinkStatus).toBe('EXPIRED');
+  });
+
+  it('flags a WhatsApp payment whose paid amount at Cashfree disagrees with ours', async () => {
+    const payment = await seedWhatsAppPayment({ providerOrderId: 'wapay_amount_1', amount: 30000 }); // ₹300
+    getPaymentLinkDetailsMock.mockImplementation(async () => ({ linkStatus: 'PAID', amountPaid: 250 })); // ₹250 -- a real mismatch, not rounding noise
+
+    const reconciliation = app.get(PaymentReconciliationService);
+    await reconciliation.reconcile();
+
+    const exception = await prisma.runAsPlatform((tx) => tx.reconciliationException.findFirst({ where: { paymentId: payment.id } }));
+    expect(exception).not.toBeNull();
+    expect(exception!.type).toBe('AMOUNT_MISMATCH');
+  });
 
   it('creates a MISSING_AT_CASHFREE exception when Cashfree has no record of the split', async () => {
     const payment = await seedPayment({ providerOrderId: 'pay_missing_1', amount: 10000, commissionBps: 200, platformAmount: 200, restaurantAmount: 9800 });

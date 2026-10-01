@@ -1,5 +1,65 @@
 # Progress log — WhatsApp connector track
 
+## 2026-10-01 — Phase 8 (pilot readiness)
+
+Per the plan: "nothing new — this is rollout," except for one build item the plan itself
+flags as blocking: deciding the fate of `product/whatsapp`'s standalone POS/KDS pages for
+a Jamanvaar-connected restaurant. Investigated it properly rather than treating it as a
+pure opinion call, and found a second, related gap along the way that also had to close
+before a real pilot restaurant could safely connect.
+
+**The standalone-pages decision.** Read the actual code instead of guessing: both
+`product/whatsapp`'s unattended kitchen/POS tablet (`app/pos/[restaurantId]`, backed by
+`GET /pos/{restaurant_id}/orders`) and its staff dashboard Orders page query that
+platform's own `Order` table directly, with no awareness of `fulfillment_mode` at all.
+The moment a restaurant connects, `JamanvaarFulfillmentSink` takes over checkout and that
+table stops receiving new rows for it — an unattended tablet reading it would go silently
+stale, kitchen staff watching a frozen or empty board while real orders exist only in
+Jamanvaar's own KDS. That's not a judgment call between two equally valid UX options; a
+restaurant pilot really would have broken this way. Decision: neither hide the pages nor
+leave them unchanged — make them fail honest. `pos_list_orders` now returns 409 the
+moment `fulfillment_mode == JAMANVAAR`, with a clear frontend message replacing the blank
+board; the staff Orders page keeps its real historical pre-connection data but gains a
+persistent banner. New backend test:
+`test_pos_orders_refuses_once_the_restaurant_connects_to_jamanvaar`. The generic-engine
+`Engagement`-based Orders view needed no change — confirmed by reading
+`JamanvaarFulfillmentSink`'s own code that it still writes a local `Engagement` row
+(correlated via `jamanvaar_payment_id`) even for a connected restaurant, so that view was
+never actually going stale to begin with.
+
+**A second, related gap found while verifying the plan's own Phase 8 "Verify" line**
+("a week of daily reconciliation... applied to WhatsApp-sourced orders too"): kiosk's
+existing `PaymentReconciliationService.reconcile()` calls Cashfree's
+`/easy-split/orders/{id}/split` endpoint — Orders-API-specific — using
+`PaymentTransaction.providerOrderId`. For a WhatsApp-channel payment, that column holds a
+Cashfree Payment *Link* id (`createCashfreeLinkAttempt`'s `wapay_...`), not a real
+Cashfree order id; calling that endpoint with it would simply throw and be swallowed by
+the job's own per-payment `catch`-and-log. In other words: as built, every WhatsApp order's
+payment would have silently never been reconciled at all, for the entire pilot — the exact
+check the plan calls for would have run daily and found nothing, forever, with no error
+visible anywhere. Fixed with a dedicated `reconcileLinkPayment` path (branches on
+`Order.source === 'WHATSAPP'`): checks the link actually reached Cashfree's `PAID` status
+and that `amountPaid` (rupees, converted to paise with a ₹1 rounding tolerance) matches,
+reusing the existing `UNEXPECTED_STATUS`/`AMOUNT_MISMATCH` exception types rather than
+adding a new enum value. Deliberately narrower than the Orders-API check: Cashfree's
+Payment Link detail response doesn't expose a parsed per-vendor split-settlement status
+the way the Easy Split endpoint does, so the vendor-split settlement side of a WhatsApp
+order's commission isn't independently reconciled yet — flagged, not silently assumed
+fine. 3 new tests in `payment-reconciliation.e2e.spec.ts` (9 total, up from 6).
+
+**Verification:** `tsc --noEmit` clean on `cloud/api`; the whatsapp frontend's own
+`tsc --noEmit` also clean. `product/whatsapp`'s full backend suite: 756/760 passing, the 4
+failures a pre-existing, already-self-documented naive/aware-datetime bug in unrelated
+media-caching tests ("Same aware-column-vs-naive-cutoff bug as _media_message above," per
+that code's own comment) — confirmed unrelated before moving on, not assumed. Full
+`cloud/api` regression suite re-run after this phase's changes — see the run recorded
+alongside this entry.
+
+**What's left before a real pilot, and why none of it is something I can do from here:**
+onboarding one real restaurant and obtaining a real Meta WhatsApp Business API number are
+business actions, not engineering ones — this phase made the two things that needed fixing
+before that happened safe to happen, not the rollout itself.
+
 ## 2026-10-01 — Phase 7 (security hardening pass)
 
 Per the plan's own four build items: rate limiting per key/customer number, replay-window

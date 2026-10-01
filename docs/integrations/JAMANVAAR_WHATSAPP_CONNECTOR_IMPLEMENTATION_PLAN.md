@@ -195,10 +195,33 @@ Every phase ends with **both** an automated check and, where there's a UI or a r
 **Build:** nothing new — this is rollout. Decide the fate of `product/whatsapp`'s own standalone POS/KDS pages for Jamanvaar-mode tenants (hide vs. keep) before pilot, not after.
 **Verify:** one real restaurant, a real Meta number, a week of daily reconciliation (the existing reconciliation-exceptions feature, applied to WhatsApp-sourced orders too) before opening to more tenants.
 
+**The standalone-pages decision — made 2026-10-01, before any pilot restaurant connects:**
+investigated first rather than guessed: `product/whatsapp`'s unattended kitchen/POS tablet
+(`app/pos/[restaurantId]`, backed by `GET /pos/{restaurant_id}/orders`) and its staff
+dashboard Orders page both read this platform's own `Order` table directly, unconditional
+on `fulfillment_mode` — confirmed this is not a hypothetical, it's what they actually do.
+The moment a restaurant connects, `JamanvaarFulfillmentSink` takes over checkout and that
+table simply stops receiving new rows for it — an unattended tablet reading it would go
+silently stale, kitchen staff staring at a frozen or empty board while real orders exist
+only in Jamanvaar's own KDS. **Decision: neither "hide" nor "keep unchanged" — fail
+honest instead.** Hiding the page entirely is unnecessary (nothing wrong with looking at
+real historical pre-connection orders); keeping it silently wrong is a genuine safety
+hazard for a real pilot restaurant. Built: the kitchen-tablet endpoint now returns 409
+("managed through Jamanvaar now") instead of a quietly-empty list the moment
+`fulfillment_mode == JAMANVAAR`, and the tablet UI shows a clear full-screen message
+instead of a blank board; the staff Orders dashboard keeps showing real historical orders
+but with a persistent banner above them. New test:
+`test_pos_orders_refuses_once_the_restaurant_connects_to_jamanvaar` (proves the 409 fires
+on connect and that a still-LOCAL restaurant's token is completely unaffected). The
+generic-engine `Engagement`-based Orders view needed no change: `JamanvaarFulfillmentSink`
+still writes a local `Engagement` row (correlated via `jamanvaar_payment_id`) even for a
+connected restaurant, so that view was never actually stale to begin with — confirmed by
+reading the fulfillment sink's own code, not assumed from the model name alone.
+
 ---
 
 ## 7. What's still an open decision, not yet answered by this plan
 
 - Whether Captain (dine-in-by-table via WhatsApp) is in scope for the pilot or a later phase.
-- The exact fate of `product/whatsapp`'s standalone `displays` pages for Jamanvaar-connected tenants (§4.2, §8) — needs a product decision, not an engineering one.
+- ~~The exact fate of `product/whatsapp`'s standalone `displays` pages for Jamanvaar-connected tenants (§4.2, §8) — needs a product decision, not an engineering one.~~ **Resolved 2026-10-01** — see Phase 8's own entry above: neither hidden nor left unchanged, made to fail honest instead.
 - The local SQLite migration mechanism for `packages/database/src/schema.ts` (§3.1) — needs a five-minute conversation with whoever last touched that file before Phase 0's schema work starts.
