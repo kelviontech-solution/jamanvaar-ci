@@ -1,31 +1,28 @@
-# Build context is the REPO ROOT (see docker-compose.yml), not this directory --
-# super-admin-web's vite.config.ts aliases @jamanvaar/{config,types,utils,i18n,validation,
-# business,database,api,sync,ui} straight onto ../../packages/*/src, and many source files
-# actually import from most of those (confirmed by grepping src/, not assumed from the
-# alias list alone) -- not as resolved npm workspace dependencies, so copying only one of
-# them (as an earlier version of this file did, packages/ui alone, matching
-# ProtectedLayout.tsx's own comment about avoiding that barrel's side effect) would make
-# the build fail on every other file importing a sibling package. packages/ is ~35MB
-# total; copying all of it is simpler and safer than cherry-picking.
-# Copied whole, before `npm ci`, for the same reason: several packages/* directories are
-# themselves real npm workspace members (their own package.json) that package-lock.json's
-# resolution expects to find present.
+# Build context is the REPO ROOT (see docker-compose.yml), not this directory. Copies the
+# WHOLE repo (minus .dockerignore's exclusions -- node_modules, dist, Rust target/, .git,
+# env files) before `npm ci`, not a cherry-picked subset. Two real, successive failures on
+# the actual deploy proved cherry-picking wrong for this workspace specifically, not
+# assumed up front:
+#   1. super-admin-web/tsconfig.json extends the ROOT tsconfig.json for jsx/paths/strict --
+#      missing it doesn't error, it silently falls back to tsc's bare defaults, failing
+#      every .tsx file with "Cannot use JSX unless the '--jsx' flag is provided."
+#   2. Its own tsconfig.json's `include` is `["src", "../../packages/**/*"]` -- the ENTIRE
+#      packages/ tree, not just the @jamanvaar/* aliases this workspace's own code happens
+#      to import. That sweeps in packages/api/src/print_transport.ts (needs
+#      @tauri-apps/api, a Tauri-app-only dependency this workspace never declares) and
+#      src/__tests__/access-parity.test.ts (a deliberate relative import of
+#      ../../../api/src/common/rbac/access.ts -- an intentional frontend/backend RBAC
+#      parity check, not a mistake to work around). cloud/api has no Tauri dependency
+#      itself; the real fix is giving this build enough of the monorepo for both to
+#      resolve, same as local dev already has, not narrowing what gets type-checked.
+# Correctness over build-context size for this first deployment, same tradeoff already
+# made for the backend's full node_modules in its own Dockerfile.
 
 FROM node:24-alpine AS builder
 WORKDIR /repo
 
-# tsconfig.json too, not just package.json -- cloud/super-admin-web/tsconfig.json extends
-# this ROOT file (`"extends": "../../tsconfig.json"`) for its jsx/paths/strict settings.
-# Missing it doesn't fail the copy or npm ci, it fails LATER, silently falling back to
-# tsc's bare defaults (no jsx flag at all) -- reproduced for real on the actual deploy, not
-# assumed: `tsc --noEmit` errored on every single .tsx file with
-# "Cannot use JSX unless the '--jsx' flag is provided."
-COPY package.json package-lock.json tsconfig.json ./
-COPY packages ./packages
-COPY cloud/super-admin-web/package.json cloud/super-admin-web/package.json
+COPY . .
 RUN npm ci
-
-COPY cloud/super-admin-web ./cloud/super-admin-web
 
 # Relative (not absolute) so the built SPA calls same-origin /api/v1/... paths -- this
 # container's own nginx below proxies those to the backend container. See
