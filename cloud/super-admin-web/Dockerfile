@@ -14,7 +14,13 @@
 FROM node:24-alpine AS builder
 WORKDIR /repo
 
-COPY package.json package-lock.json ./
+# tsconfig.json too, not just package.json -- cloud/super-admin-web/tsconfig.json extends
+# this ROOT file (`"extends": "../../tsconfig.json"`) for its jsx/paths/strict settings.
+# Missing it doesn't fail the copy or npm ci, it fails LATER, silently falling back to
+# tsc's bare defaults (no jsx flag at all) -- reproduced for real on the actual deploy, not
+# assumed: `tsc --noEmit` errored on every single .tsx file with
+# "Cannot use JSX unless the '--jsx' flag is provided."
+COPY package.json package-lock.json tsconfig.json ./
 COPY packages ./packages
 COPY cloud/super-admin-web/package.json cloud/super-admin-web/package.json
 RUN npm ci
