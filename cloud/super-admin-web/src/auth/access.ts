@@ -31,6 +31,14 @@ const ROUTE_AREAS: Array<{ prefix: string; area: Area }> = [
   { prefix: '/support', area: 'support' },
   { prefix: '/tickets', area: 'support' },
   { prefix: '/qr-ordering', area: 'catalog' },
+  // Phase 6 of the Jamanvaar WhatsApp connector added the route and ProtectedLayout.tsx's
+  // nav entry but never registered it here -- areaForRoute() fails CLOSED on an unmapped
+  // route (hasAccess returns false for area === null, for every role), so the page was
+  // invisible in the sidebar and refused even to Platform Owner. Found by actually
+  // clicking through a real browser session, not by the entitlement/typecheck tests that
+  // had covered everything else about this feature up to this point. Mirrors
+  // /qr-ordering's own area exactly -- same kind of read-only connector-fleet page.
+  { prefix: '/whatsapp-ordering', area: 'catalog' },
   { prefix: '/ai-assistant', area: 'catalog' },
   { prefix: '/catalog', area: 'catalog' },
   { prefix: '/reports', area: 'reports' },
