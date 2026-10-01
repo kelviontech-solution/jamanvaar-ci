@@ -72,7 +72,7 @@ check:
 	@curl -sf -o /dev/null -w "%{http_code}" http://127.0.0.1:$$(grep -E '^BACKEND_PORT=' .env 2>/dev/null | cut -d '=' -f2 || echo 8010)/api/v1/restaurants | grep -qE "^(200|401)$$" && echo " -> Backend is UP (401/200 on an auth-gated route is correct)" || echo " -> Backend health check FAILED"
 	@echo ""
 	@echo "=== [3/3] Checking Frontend Web Access ==="
-	@curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:$$(grep -E '^PORT=' .env 2>/dev/null | cut -d '=' -f2 || echo 8090)/ | grep -q "200" && echo " -> Frontend is SERVING HTTP 200" || echo " -> Frontend response check FAILED"
+	@curl -s -o /dev/null -w "%{http_code}" http://$$(grep -E '^HOST_BIND_IP=' .env 2>/dev/null | cut -d '=' -f2 || echo 172.17.0.1):$$(grep -E '^PORT=' .env 2>/dev/null | cut -d '=' -f2 || echo 8090)/ | grep -q "200" && echo " -> Frontend is SERVING HTTP 200" || echo " -> Frontend response check FAILED"
 
 seed:
 	$(COMPOSE) exec backend npm run seed
