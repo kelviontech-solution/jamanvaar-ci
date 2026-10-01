@@ -11,6 +11,17 @@
 FROM node:24-alpine AS builder
 WORKDIR /repo
 
+# Prisma's engine binaries dynamically link against libssl and need `openssl` on the PATH to
+# correctly detect which OpenSSL ABI they're running against. Alpine 3.24 (this image's base)
+# ships OpenSSL 3.x (libssl.so.3) with no compat symlink for 1.1 -- without this package,
+# detection silently fails ("Prisma failed to detect the libssl/openssl version to use ...
+# Defaulting to openssl-1.1.x"), `prisma generate` picks the wrong engine binary (built for
+# 1.1, not 3.x), and every `prisma` invocation later breaks with a non-JSON engine response
+# ("Could not parse schema engine response"). Confirmed on the real deploy, not assumed: the
+# container had libssl.so.3 present the whole time, just under a SONAME Prisma's
+# wrongly-selected engine never asked for.
+RUN apk add --no-cache openssl
+
 COPY package.json package-lock.json ./
 # The whole cloud/api directory, not just its package.json, BEFORE `npm ci` -- its own
 # `postinstall` script (`prisma generate`) runs as part of `npm ci` itself and needs
@@ -27,6 +38,11 @@ RUN npm run build --workspace=@jamanvaar/cloud-api
 FROM node:24-alpine AS runner
 WORKDIR /repo
 ENV NODE_ENV=production
+
+# Same reason as the builder stage above: `prisma migrate deploy` runs in THIS stage at
+# container start (see entrypoint.sh), against this stage's own Alpine base, independently
+# of whatever the builder stage had.
+RUN apk add --no-cache openssl
 
 # node_modules (incl. the Prisma CLI) and the compiled app, straight from the builder --
 # no second `npm ci`, so the image can never drift from what was actually built and tested.
