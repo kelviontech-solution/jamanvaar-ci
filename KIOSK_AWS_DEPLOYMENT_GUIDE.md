@@ -139,31 +139,45 @@ specific, known login is wanted (e.g. for CI).
 
 ## 5. Going Live on `system.kelviontech.in`
 
-Mirrors [DEPLOYMENT_AWS_GUIDE.md](DEPLOYMENT_AWS_GUIDE.md) §4 Method B exactly, for a real
-domain instead of a free wildcard one:
+**Corrected after actually inspecting the live box** (2026-10-01): there is no host-level
+nginx here at all -- `systemctl status nginx` shows it `failed`/not running. The real
+shared front door on 80/443 is the **`kelviontech-nginx-1` Docker container**
+(`~/kelviontech/docker-compose.yml`), the same one already fronting amitkhatri, Wrench,
+restaurant, jamanwar, vartalaap and whatsapp-app, each via its own static conf file in
+`~/kelviontech/nginx/conf.d/`. system.kelviontech.in joins that same directory, not a
+separate host-level `/etc/nginx/sites-available/`. `sudo nginx -t`/`systemctl reload nginx`
+do not apply here -- use `docker exec kelviontech-nginx-1 nginx -t`/`-s reload` instead.
 
 1. **DNS first**: point `system.kelviontech.in` (A record) at `13.202.225.48`. Wait for
    propagation (`dig system.kelviontech.in` from your own machine) before continuing.
 2. **Bootstrap config** (before a certificate exists):
    ```bash
-   sudo cp nginx/system.kelviontech.in.bootstrap.conf /etc/nginx/sites-available/system.kelviontech.in.conf
-   sudo ln -s /etc/nginx/sites-available/system.kelviontech.in.conf /etc/nginx/sites-enabled/
-   sudo nginx -t && sudo systemctl reload nginx
+   cp ~/kiosk/nginx/system.kelviontech.in.bootstrap.conf ~/kelviontech/nginx/conf.d/system.kelviontech.in.conf
+   docker exec kelviontech-nginx-1 nginx -t && docker exec kelviontech-nginx-1 nginx -s reload
    ```
-3. **Issue the certificate**:
+   `nginx -t` tests **every** site's config on this shared container, not just this one --
+   if it fails, do not reload; every other live domain on this box is still running the
+   previous, working config until a reload actually happens.
+3. **Issue the certificate**, using the same certbot container every other subdomain here
+   already shares (not a bare `certbot` on the host -- there isn't one installed for this
+   purpose; the box's own `~/kelviontech/scripts/enable-ssl.sh` only covers kelviontech.in's
+   own bare domain + www + admin, not other projects' subdomains):
    ```bash
-   sudo certbot certonly --webroot -w /var/www/certbot -d system.kelviontech.in
+   cd ~/kelviontech
+   docker compose run --rm --entrypoint certbot certbot certonly \
+     --webroot -w /var/www/certbot -d system.kelviontech.in \
+     --email <your real email> --agree-tos --non-interactive
    ```
 4. **Switch to the real HTTPS config**:
    ```bash
-   sudo cp nginx/system.kelviontech.in.conf /etc/nginx/sites-available/system.kelviontech.in.conf
-   sudo nginx -t && sudo systemctl reload nginx
+   cp ~/kiosk/nginx/system.kelviontech.in.conf ~/kelviontech/nginx/conf.d/system.kelviontech.in.conf
+   docker exec kelviontech-nginx-1 nginx -t && docker exec kelviontech-nginx-1 nginx -s reload
    ```
 5. Open `https://system.kelviontech.in` — should show the Super Admin sign-in screen.
 
-Certbot's own renewal timer (already running for the other certs on this box, per
-`AWS_DEPLOYMENT_MASTER_PLAN.md`) picks this certificate up automatically; nothing extra
-needed per-domain.
+The `certbot` container already running in `~/kelviontech`'s own compose stack renews every
+cert in the shared `certbot_conf` volume automatically, including this one, twice a day;
+nothing extra needed per-domain.
 
 ---
 

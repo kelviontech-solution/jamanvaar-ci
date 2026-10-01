@@ -102,9 +102,13 @@ services:
     container_name: kiosk_frontend
     restart: unless-stopped
     # Defaults to 8090 -- avoids amitkhatri (8080), kelvion (3000/8000), restaurent
-    # (3001/8001) and Wrench (8085).
+    # (3001/8001) and Wrench (8085). Bound to the Docker bridge gateway (172.17.0.1), not
+    # 0.0.0.0 -- confirmed against the box's own real convention (amitkhatri-web-1 binds
+    # 172.17.0.1:8080, not a public 0.0.0.0) rather than assumed: the shared
+    # kelviontech-nginx-1 container is the only thing meant to reach this port, terminating
+    # real TLS first. Override HOST_BIND_IP only for a one-off direct-port smoke test.
     ports:
-      - "${HOST_BIND_IP:-0.0.0.0}:${PORT:-8090}:80"
+      - "${HOST_BIND_IP:-172.17.0.1}:${PORT:-8090}:80"
     depends_on:
       - backend
     networks:
