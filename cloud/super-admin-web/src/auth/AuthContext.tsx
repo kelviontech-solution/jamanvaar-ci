@@ -88,6 +88,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => onSessionEnded(null);
   }, []);
 
+  // B2-052 item 4: a role change made by the owner didn't reach an already-open session —
+  // the menu and permissions only updated on a manual reload, so a just-demoted user kept a
+  // full menu of things the server had already started refusing. Re-fetch the signed-in
+  // user's own record (role + permissions) periodically and whenever the tab regains focus,
+  // so a role change (or a disable, which the existing onSessionEnded 401 handling above
+  // already covers) reaches this session within a minute instead of never.
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    let cancelled = false;
+    const revalidate = () => {
+      api
+        .get<PlatformUser>('/api/v1/platform/me')
+        .then((me) => {
+          if (!cancelled) setUser(me);
+        })
+        .catch(() => {
+          // A failure here (network blip, mid-flight 401) is handled by onSessionEnded or
+          // the next successful poll — never clobber a good user with a transient error.
+        });
+    };
+    const intervalId = setInterval(revalidate, 45_000);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') revalidate();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', revalidate);
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', revalidate);
+    };
+  }, [status]);
+
   const logout = useCallback(async () => {
     try {
       await api.post('/api/v1/platform-auth/logout');

@@ -3,6 +3,7 @@ import { PlatformUser } from '@prisma/client';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { PlatformNotificationsService } from './platform-notifications.service';
+import type { PlatformRoleName } from '../../common/rbac/access';
 
 @Controller('api/v1/platform/notifications')
 @UseGuards(PlatformAuthGuard)
@@ -19,21 +20,21 @@ export class PlatformNotificationsController {
     @Query('type') type?: string,
     @Query('restaurantId') restaurantId?: string
   ) {
-    return this.notifications.list(actor.id, { page, pageSize, unread, severity, type, restaurantId });
+    return this.notifications.list(actor.id, actor.role as PlatformRoleName | null, { page, pageSize, unread, severity, type, restaurantId });
   }
 
   @Get('unread-count')
   unreadCount(@CurrentPlatformUser() actor: PlatformUser) {
-    return this.notifications.unreadCount(actor.id);
+    return this.notifications.unreadCount(actor.id, actor.role as PlatformRoleName | null);
   }
 
   @Post('read-all')
   readAll(@CurrentPlatformUser() actor: PlatformUser, @Body() body?: { restaurantId?: string }) {
-    return this.notifications.markAllRead(actor.id, body?.restaurantId);
+    return this.notifications.markAllRead(actor.id, actor.role as PlatformRoleName | null, body?.restaurantId);
   }
 
   @Post(':id/read')
   read(@CurrentPlatformUser() actor: PlatformUser, @Param('id') id: string) {
-    return this.notifications.markRead(actor.id, id);
+    return this.notifications.markRead(actor.id, actor.role as PlatformRoleName | null, id);
   }
 }

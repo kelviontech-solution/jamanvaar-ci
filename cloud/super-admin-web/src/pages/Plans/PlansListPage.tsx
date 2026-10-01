@@ -17,10 +17,14 @@ import {
 import { Package, Plus } from 'lucide-react';
 import '../../components/shared.css';
 import { PlanFormModal } from './PlanFormModal';
+import { useAuth } from '../../auth/AuthContext';
 
 type PlanStatusFilter = 'ALL' | 'ACTIVE' | 'INACTIVE';
 
 export function PlansListPage() {
+  // B2-052 item 2: Finance legitimately has subscriptions (plans) write; Read-Only/Support/Ops don't.
+  const { can } = useAuth();
+  const canWrite = can('subscriptions', 'write');
   const [plans, setPlans] = useState<Plan[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -105,7 +109,7 @@ export function PlansListPage() {
             Authoritative plans governing feature access, pricing, and hardware quotas — never hardcoded in client applications.
           </p>
         </div>
-        <Button variant="accent" onClick={() => setModal('create')}>
+        <Button variant="accent" onClick={() => setModal('create')} disabled={!canWrite}>
           <Plus className="w-4 h-4" />
           <span>Create Plan</span>
         </Button>
@@ -253,12 +257,13 @@ export function PlansListPage() {
                         </td>
                         <td>
                           <div className="row-actions">
-                            <Button size="sm" variant="ghost" onClick={() => setModal(p)}>
+                            <Button size="sm" variant="ghost" disabled={!canWrite} onClick={() => setModal(p)}>
                               Edit
                             </Button>
                             <Button
                               size="sm"
                               variant={p.status === 'ACTIVE' ? 'danger' : 'primary'}
+                              disabled={!canWrite}
                               onClick={() => setConfirmTarget({
                                 plan: p,
                                 action: p.status === 'ACTIVE' ? 'deactivate' : 'activate'

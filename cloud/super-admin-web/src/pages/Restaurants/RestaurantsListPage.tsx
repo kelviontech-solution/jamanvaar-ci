@@ -33,6 +33,7 @@ import {
 import { CreateRestaurantModal } from './CreateRestaurantModal';
 import { EditRestaurantModal } from './EditRestaurantModal';
 import { exportRowsToCsv } from '../../lib/csvExport';
+import { useAuth } from '../../auth/AuthContext';
 import './restaurants.css';
 import '../../components/card-grid.css';
 
@@ -47,6 +48,9 @@ type PlanFilter = 'ALL' | 'CORE' | 'PRO' | 'ENTERPRISE' | 'NO_PLAN';
 type SortOption = 'recent' | 'name_asc' | 'name_desc' | 'branches_desc' | 'devices_desc' | 'status';
 
 export function RestaurantsListPage() {
+  // B2-052 item 2: quick-create, onboard, suspend/reactivate are all restaurants-write actions.
+  const { can } = useAuth();
+  const canWrite = can('restaurants', 'write');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [restaurants, setRestaurants] = useState<RestaurantListItem[] | null>(null);
@@ -295,10 +299,10 @@ export function RestaurantsListPage() {
             <Download className="w-4 h-4" />
             <span>Export CSV</span>
           </Button>
-          <Button variant="ghost" onClick={() => setShowCreate(true)}>
+          <Button variant="ghost" onClick={() => setShowCreate(true)} disabled={!canWrite}>
             + Quick create
           </Button>
-          <Button variant="accent" onClick={() => navigate('/restaurants/onboard')}>
+          <Button variant="accent" onClick={() => navigate('/restaurants/onboard')} disabled={!canWrite}>
             <Plus className="w-4 h-4" />
             <span>Onboard Restaurant</span>
           </Button>
@@ -462,10 +466,10 @@ export function RestaurantsListPage() {
 
       {/* Bulk Actions Bar */}
       <BulkActionsBar selectedCount={selectedIds.size} onClear={() => setSelectedIds(new Set())}>
-        <Button size="sm" variant="danger" disabled={bulkPending} onClick={() => handleBulkAction('suspend')}>
+        <Button size="sm" variant="danger" disabled={bulkPending || !canWrite} onClick={() => handleBulkAction('suspend')}>
           Suspend Selected
         </Button>
-        <Button size="sm" variant="primary" disabled={bulkPending} onClick={() => handleBulkAction('reactivate')}>
+        <Button size="sm" variant="primary" disabled={bulkPending || !canWrite} onClick={() => handleBulkAction('reactivate')}>
           Activate Selected
         </Button>
       </BulkActionsBar>
@@ -611,7 +615,7 @@ export function RestaurantsListPage() {
                             <FileText className="w-3.5 h-3.5 text-slate-500" /><span>Audit Logs</span>
                           </button>
                           <div className="actions-dropdown-divider" />
-                          <button type="button" className={`actions-dropdown-item ${r.status === 'ACTIVE' ? 'is-danger' : ''}`} onClick={() => { setActiveMenuId(null); setConfirmingStatusRestaurant(r); }}>
+                          <button type="button" className={`actions-dropdown-item ${r.status === 'ACTIVE' ? 'is-danger' : ''}`} disabled={!canWrite} onClick={() => { setActiveMenuId(null); setConfirmingStatusRestaurant(r); }}>
                             <ShieldAlert className="w-3.5 h-3.5" /><span>{r.status === 'ACTIVE' ? 'Suspend Restaurant' : 'Reactivate'}</span>
                           </button>
                         </div>
@@ -802,6 +806,7 @@ export function RestaurantsListPage() {
                           <Button
                             size="sm"
                             variant={r.status === 'ACTIVE' ? 'ghost' : 'primary'}
+                            disabled={!canWrite}
                             onClick={() => setConfirmingStatusRestaurant(r)}
                           >
                             {r.status === 'ACTIVE' ? 'Suspend' : 'Activate'}

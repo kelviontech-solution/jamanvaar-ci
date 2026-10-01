@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { OFFLINE_WARN_AFTER_DAYS } from '../../common/device-health';
 import { pageOf, parsePaging } from '../../common/paging';
 import { PrismaService } from '../../prisma/prisma.service';
+import { type Area, type PlatformRoleName, permissionsForRole } from '../../common/rbac/access';
 
 export type NotificationSeverity = 'INFO' | 'WARNING' | 'CRITICAL';
 
@@ -37,6 +38,36 @@ const KEY_WARN_DAYS = 3;
 const OFFLINE_ALERT_AFTER_MS = HOUR_MS;
 
 const isoDay = (d = new Date()) => d.toISOString().slice(0, 10);
+
+// B2-052 item 5: a team-wide notification (backup failed, terminals offline, keys expiring…)
+// was counted for every platform user regardless of role, so e.g. Finance Admin (no
+// devices/ops access at all) saw an unread count made up mostly of notifications about pages
+// it gets a 403 on if it opens them. Same class of bug as B2-051/B2-053, same fix shape: gate
+// by the role's own area permissions, reusing the one shared table instead of a second one
+// that could drift from it. A notification addressed to one specific person (userId set) is
+// always visible to them regardless of area — it was deliberately sent to that person.
+const NOTIFICATION_TYPE_AREA: Record<string, Area> = {
+  SUBSCRIPTION_EXPIRING: 'subscriptions',
+  BACKUP_FAILED: 'ops',
+  INVOICE_OVERDUE: 'billing',
+  DEVICES_OFFLINE: 'devices',
+  KEYS_EXPIRING: 'devices',
+  SYNC_FAILING: 'devices',
+  RESTAURANT_SUSPENDED: 'restaurants'
+};
+
+/** Team-wide notification types this role CANNOT even open the linked page for — an explicit
+ *  deny-list, not an allow-list. That matters: a type with no entry in the map above (a
+ *  future notification type nobody has classified yet, e.g. TICKET_CREATED) must stay visible
+ *  to everyone by default. An allow-list would silently hide every unclassified type from any
+ *  role that isn't granted literally every area — caught by restaurant-tickets.e2e.spec.ts,
+ *  which expects a support-ticket notification to reach a role this map never mentions. */
+function deniedTeamTypesFor(role: PlatformRoleName | null | undefined): string[] {
+  const allTypes = Object.keys(NOTIFICATION_TYPE_AREA);
+  if (!role) return allTypes;
+  const perms = permissionsForRole(role);
+  return allTypes.filter((t) => !perms[NOTIFICATION_TYPE_AREA[t]]);
+}
 
 /**
  * The platform team's notification centre (BUG-064). Conditions that need attention (a subscription
@@ -75,23 +106,27 @@ export class PlatformNotificationsService {
     }
   }
 
-  /** What one person is allowed to see: team-wide notifications plus those addressed to them. */
-  private audience(userId: string): Prisma.PlatformNotificationWhereInput {
-    return { OR: [{ userId: null }, { userId }] };
+  /** What one person is allowed to see: team-wide notifications whose area their role can at
+   *  least read, plus anything addressed to them personally (always visible — it was sent to
+   *  that exact person on purpose, not broadcast). */
+  private audience(userId: string, role: PlatformRoleName | null | undefined): Prisma.PlatformNotificationWhereInput {
+    const denied = deniedTeamTypesFor(role);
+    const teamWide: Prisma.PlatformNotificationWhereInput = denied.length === 0 ? { userId: null } : { userId: null, type: { notIn: denied } };
+    return { OR: [teamWide, { userId }] };
   }
 
-  async list(userId: string, filters: NotificationFilters) {
+  async list(userId: string, role: PlatformRoleName | null | undefined, filters: NotificationFilters) {
     const paging = parsePaging(filters);
     const where: Prisma.PlatformNotificationWhereInput = {
       AND: [
-        this.audience(userId),
+        this.audience(userId, role),
         filters.severity ? { severity: filters.severity } : {},
         filters.type ? { type: filters.type } : {},
         filters.restaurantId ? { restaurantId: filters.restaurantId } : {},
         filters.unread === 'true' ? { reads: { none: { userId } } } : {}
       ]
     };
-    const scope: Prisma.PlatformNotificationWhereInput = { AND: [this.audience(userId), filters.restaurantId ? { restaurantId: filters.restaurantId } : {}] };
+    const scope: Prisma.PlatformNotificationWhereInput = { AND: [this.audience(userId, role), filters.restaurantId ? { restaurantId: filters.restaurantId } : {}] };
 
     const db = this.prisma.platformDb;
     const [rows, total, unreadCount, bySeverity] = await Promise.all([
@@ -112,9 +147,9 @@ export class PlatformNotificationsService {
     return paging.paged ? { ...pageOf(items, total, paging), unreadCount, severityCounts } : items;
   }
 
-  async unreadCount(userId: string) {
+  async unreadCount(userId: string, role: PlatformRoleName | null | undefined) {
     const db = this.prisma.platformDb;
-    const where = { AND: [this.audience(userId), { reads: { none: { userId } } }] };
+    const where = { AND: [this.audience(userId, role), { reads: { none: { userId } } }] };
     const [count, critical] = await Promise.all([
       db.platformNotification.count({ where }),
       db.platformNotification.count({ where: { AND: [where, { severity: 'CRITICAL' }] } })
@@ -122,8 +157,8 @@ export class PlatformNotificationsService {
     return { count, critical };
   }
 
-  async markRead(userId: string, id: string) {
-    const found = await this.prisma.platformDb.platformNotification.findFirst({ where: { AND: [{ id }, this.audience(userId)] }, select: { id: true } });
+  async markRead(userId: string, role: PlatformRoleName | null | undefined, id: string) {
+    const found = await this.prisma.platformDb.platformNotification.findFirst({ where: { AND: [{ id }, this.audience(userId, role)] }, select: { id: true } });
     if (!found) throw new NotFoundException('Notification not found');
     await this.prisma.platformDb.platformNotificationRead.upsert({
       where: { notificationId_userId: { notificationId: id, userId } },
@@ -133,9 +168,9 @@ export class PlatformNotificationsService {
     return { ok: true };
   }
 
-  async markAllRead(userId: string, restaurantId?: string) {
+  async markAllRead(userId: string, role: PlatformRoleName | null | undefined, restaurantId?: string) {
     const unread = await this.prisma.platformDb.platformNotification.findMany({
-      where: { AND: [this.audience(userId), restaurantId ? { restaurantId } : {}, { reads: { none: { userId } } }] },
+      where: { AND: [this.audience(userId, role), restaurantId ? { restaurantId } : {}, { reads: { none: { userId } } }] },
       select: { id: true }
     });
     if (unread.length) {
