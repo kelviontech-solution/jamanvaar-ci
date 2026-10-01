@@ -53,7 +53,9 @@ const NOTIFICATION_TYPE_AREA: Record<string, Area> = {
   DEVICES_OFFLINE: 'devices',
   KEYS_EXPIRING: 'devices',
   SYNC_FAILING: 'devices',
-  RESTAURANT_SUSPENDED: 'restaurants'
+  RESTAURANT_SUSPENDED: 'restaurants',
+  // Phase 7 of the Jamanvaar WhatsApp connector -- see notifyWhatsAppConnectionLocked below.
+  WHATSAPP_CONNECTION_LOCKED: 'ops'
 };
 
 /** Team-wide notification types this role CANNOT even open the linked page for — an explicit
@@ -104,6 +106,38 @@ export class PlatformNotificationsService {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') return false;
       throw err;
     }
+  }
+
+  /**
+   * Phase 7 of the Jamanvaar WhatsApp connector (docs/integrations/
+   * JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md) -- "alerting on invalid/expired
+   * connections." Called from WhatsAppChannelService.requireEntitled() the moment a real,
+   * customer-facing channel call (menu/quote/checkout/order-status) is refused because a
+   * restaurant that HAS a live, CONNECTED WhatsAppChannelConnection just lost its
+   * WHATSAPP_ORDERING entitlement -- a plan downgrade, an expired subscription, or a
+   * manual override, not a restaurant that was never connected in the first place (that's
+   * just an unconfigured integration, not an alert-worthy regression).
+   *
+   * Unlike every notification in scanAndNotify() below, this isn't found by a periodic
+   * scan -- it's raised inline, at the exact moment a real customer's order would
+   * otherwise have silently failed, so the team can reach out before the restaurant
+   * notices lost orders on its own. Deduped to once per restaurant per day so a customer
+   * repeatedly hitting a locked restaurant's menu can't spam the team with the same alert
+   * on every request.
+   */
+  async notifyWhatsAppConnectionLocked(restaurantId: string, reason: string): Promise<void> {
+    const restaurant = await this.prisma.platformDb.restaurant.findUnique({ where: { id: restaurantId }, select: { name: true } });
+    if (!restaurant) return; // deleted mid-request -- nothing left to alert anyone about
+    await this.notify({
+      type: 'WHATSAPP_CONNECTION_LOCKED',
+      severity: 'WARNING',
+      title: `${restaurant.name}: WhatsApp orders are being blocked`,
+      body: `A customer tried to use the WhatsApp channel, but it's locked (${reason}). The restaurant is still connected -- re-enable the entitlement to let orders through again.`,
+      restaurantId,
+      targetType: 'whatsapp-channel',
+      link: `/restaurants/${restaurantId}?tab=applications`,
+      dedupeKey: `whatsapp-locked:${restaurantId}:${isoDay()}`
+    });
   }
 
   /** What one person is allowed to see: team-wide notifications whose area their role can at

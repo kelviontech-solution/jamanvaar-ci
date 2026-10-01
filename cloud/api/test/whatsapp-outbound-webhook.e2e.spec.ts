@@ -65,6 +65,12 @@ describe('WhatsAppOutboundWebhookService — kiosk calling INTO product/whatsapp
   });
 
   afterAll(async () => {
+    // Phase 7 fix: this restaurant row (and, via onDelete: Cascade, every
+    // OutboundWebhookDelivery it owns) was never cleaned up here -- every run of this
+    // file left one more real, ACTIVE restaurant behind in the shared dev database.
+    // Found via snapshotStaleRestaurants() (backups-local.e2e.spec.ts's own BUG-072 test)
+    // failing against the real, accumulated orphans, not by inspection.
+    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } })).catch(() => undefined);
     delete process.env.WHATSAPP_CONNECTOR_BASE_URL;
     await app.close();
     await new Promise<void>((resolve) => receiver.close(() => resolve()));

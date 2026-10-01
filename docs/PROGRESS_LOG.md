@@ -1,5 +1,124 @@
 # Progress log — WhatsApp connector track
 
+## 2026-10-01 — Phase 7 (security hardening pass)
+
+Per the plan's own four build items: rate limiting per key/customer number, replay-window
+tightening, a PII retention policy decision, and alerting on invalid/expired connections.
+Verification step per the plan: re-run B2-029 (cross-tenant leak) and B2-051 (RBAC leak)
+against the new endpoints specifically.
+
+**Rate limiting.** The existing global `ThrottlerModule` default (120/min) is tracked per
+IP — correct everywhere else in this app, wrong here specifically: every connected
+restaurant's traffic for `channels/menu|quote|checkout|orders/:id` arrives from
+`product/whatsapp`'s one shared backend server, so an IP-keyed limit is really "every
+restaurant on the connector, combined" — one restaurant's bug or a single abusive actor
+could starve every other restaurant's requests. Added four named throttlers
+(`whatsappSvc`, `whatsappCheckout`, `whatsappCheckoutPerCustomer`, `whatsappValidateKey`)
+to `app.module.ts`, each registered with a deliberately enormous module-level default limit
+(1,000,000/min) and only overridden down to the real, tight limit via each specific route's
+own `@Throttle({name: {limit, ttl, getTracker}})` in
+`whatsapp-channel.service.controller.ts`. That inversion matters and was caught before
+shipping, not after: `@nestjs/throttler`'s global `ThrottlerGuard` (the app's single
+`APP_GUARD`) checks **every** registered named throttler against **every** route in the
+whole app unless that specific route overrides it — registering the real tight limit at
+the module level first (my first draft) would have rate-limited every other endpoint in
+the entire platform to the same tiny per-IP budget. `channels/menu|quote|orders/:id` are
+now capped per-restaurant at 90/min; `channels/checkout` adds its own tighter 20/min
+per-restaurant cap plus a 5-per-10-min cap keyed on restaurant+customer-phone specifically,
+so a bug or an abusive actor can't spam one real customer's WhatsApp with repeat Cashfree
+payment links even while the restaurant's overall budget has room left; `validate-key` (no
+restaurantId yet — that's what it resolves) keeps per-IP tracking with its own 30/min cap.
+
+**Replay window tightened from 5 minutes to 2**, identically on both verifiers
+(`ServiceSignatureGuard` on kiosk, `jamanvaar_signature.py` on `product/whatsapp`) so
+neither side starts rejecting the other's legitimately-timed requests — still generous for
+two NTP-synced cloud servers, but a meaningfully smaller window for a captured signature to
+be replayed in. Checked both test suites for any timestamp assumption closer than 2 minutes
+first; none existed (the one stale-timestamp test on each side uses a 10-minute offset).
+
+**Alerting on invalid/expired connections.** New `WHATSAPP_CONNECTION_LOCKED` platform
+notification type (`platform-notifications.service.ts`), fired from
+`WhatsAppChannelService.requireConnected()` the moment a real, customer-facing channel call
+is refused because a restaurant that **is** `CONNECTED` just lost its `WHATSAPP_ORDERING`
+entitlement — not a restaurant that was never connected (that's just an unconfigured
+integration, not a regression). Unlike every other notification type in this service, it
+isn't found by `scanAndNotify()`'s periodic scan; it's raised inline, at the exact moment a
+real order would otherwise have silently failed, deduped to once per restaurant per day.
+Deliberately **not** placed inside `ServiceSignatureGuard` itself: that guard has no
+database access at all in the common case, by design, specifically so a forged signature is
+rejected before any query runs — adding a notification write there would hand an attacker
+spraying forged signatures a way to turn each attempt into a database write.
+
+**PII retention policy — no narrow fix, on purpose.** Searched the whole `cloud/api`
+codebase first rather than assuming: there is no retention or anonymization policy anywhere
+in this platform for any order channel's customer PII (POS, QR, Captain or WhatsApp) — only
+`Backup` (30 days) and `PlatformNotification` (90 days) have purge jobs at all.
+`docs/SECURITY_AUDIT_2026-09-27.md`'s F-02 already flagged customer PII exposure as a
+platform-wide, pre-existing finding, not something this feature introduced. Building a
+retention/anonymization job that covered only WhatsApp orders would single out the newest
+channel while leaving every other channel's identical `Order.customerName`/`customerPhone`
+exposure untouched — that's worse than doing nothing, because it would look solved when
+roughly 0% of it is. This is a platform-wide product decision (how long, anonymize vs.
+hard-delete, which fields, applied to `Order` across every `source`), tracked as a
+dedicated follow-up rather than attempted piecemeal here.
+
+**B2-029 re-run against the new surface** (`test/whatsapp-channel-security.e2e.spec.ts`,
+new file, 4 tests): two connected restaurants, each with a different published menu item —
+`channels/menu` for one never lists the other's item; quoting one restaurant's cart with
+the other's `itemId` fails closed (400 from `priceCart`, not a cross-tenant price); an order
+created for restaurant A can't be fetched by pairing its real id with restaurant B's id
+(404) and can with its own (200). Also extended the existing Phase 6 downgrade test
+(`whatsapp-channel-entitlement.e2e.spec.ts`) to assert the new `WHATSAPP_CONNECTION_LOCKED`
+alert actually lands in the real database, not just that the 403 is returned.
+
+**Two more real bugs found by the full-suite run specifically** (neither caused by this
+phase's own code, both surfaced by actually running the whole suite rather than trusting
+the WhatsApp-specific files in isolation):
+1. `test/feature-catalog-model.e2e.spec.ts`'s "every legacy key and AppCode represented
+   exactly once" test hardcoded the pre-WhatsApp counts (21 legacy keys, 7 AppCodes) against
+   the live, shared Feature catalog — stale the moment Phase 6's real `whatsappOrdering`
+   feature (its own real, intentional `legacyEntitlementKey`, the same mechanism
+   `qrTableOrdering` already uses for the identical pilot-stage-flag-gating reason) landed in
+   the seed. Updated the two hardcoded expectations (21→22, AppCode set +`WHATSAPP_ORDERING`)
+   rather than the seed — the seed is correct, the test's snapshot of it was just out of date.
+2. `test/whatsapp-outbound-webhook.e2e.spec.ts` (Phase 5) creates a real `Restaurant` row
+   directly via Prisma but its `afterAll` never deleted it — ten real, `ACTIVE` orphans had
+   accumulated in the shared dev database (one per run of that file across this session,
+   including re-runs during today's own verification), each with no branch, no owner, nothing.
+   `test/backups-local.e2e.spec.ts`'s own `snapshotStaleRestaurants()` test (BUG-072, which
+   genuinely scans every `ACTIVE` restaurant platform-wide, by design) failed because 10 of
+   those scans hit one of these empty husks and errored. Fixed the leak (`afterAll` now
+   deletes the restaurant; `OutboundWebhookDelivery`'s `onDelete: Cascade` handles the rest),
+   and deleted the 10 existing orphans directly from the dev database.
+
+**Unrelated environment note, corrected before it caused any damage:** while chasing #2
+above, ran `pip install -r requirements.txt` against the global system Python in
+`product/whatsapp/backend` instead of that repo's own `.venv` — it silently downgraded
+several packages (`pillow`, `greenlet`, `bcrypt`, `cryptography`, `cachetools`, `reportlab`,
+`email-validator`, `alembic`) that other, unrelated local projects on this machine also
+depend on (`gevent`, `streamlit`, `langchain-community` all immediately flagged version
+conflicts). Reverted all eight to their exact prior versions before doing anything else, then
+re-ran the actual check through the repo's own `.venv` (which already had everything needed).
+No code was affected either way — this was a local pip environment, not the repo — but it's
+recorded here because it was a real, if caught-in-time, mistake, not because it changed any
+deliverable.
+
+**Verification:** `tsc --noEmit` clean on `cloud/api`. Full regression suite re-run after
+these changes (rate limiting is a global `APP_GUARD`, so every other module's tests are the
+real check that nothing else got throttled by accident, not just the WhatsApp-specific
+files): 1001/1011 passing. All 8 remaining failures are pre-existing and unrelated to this
+phase: 7 are the same long-documented `tenant-isolation.spec.ts` RLS/BYPASSRLS pattern this
+log has tracked since before this connector existed, and the 8th
+(`branch-core-uplink.e2e.spec.ts`) is a polling-timeout flake that only reproduces under the
+full suite's heavier concurrent load, already independently flagged as pre-existing in
+`BUG_LIST_2.md`'s B2-052 entry ("one `branch-core-uplink` test that didn't reproduce in
+isolation") during completely unrelated work — not something this phase introduced.
+`product/whatsapp`'s own
+`test_jamanvaar_connector.py`/`test_jamanvaar_webhooks.py`/`test_jamanvaar_catalog_switch.py`
+(21 tests, run through that repo's own `.venv`) all pass unchanged after the replay-window
+tightening. All WhatsApp-specific files pass: 42 + 6 + 4 = 52 tests across the six
+pre-existing files, plus 4 new ones in `whatsapp-channel-security.e2e.spec.ts`.
+
 ## 2026-09-30 — Phase 6 (entitlement & Super Admin visibility)
 
 Per the plan's own scope: a real, plan-checked `WHATSAPP_ORDERING` entitlement gating every

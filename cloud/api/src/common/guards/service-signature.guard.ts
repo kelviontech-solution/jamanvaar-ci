@@ -10,16 +10,25 @@ import { Request } from 'express';
  * session to check. Both sides share one secret (`JAMANVAAR_SERVICE_SECRET`, an
  * environment variable on both servers, never in a database or a client), and every
  * request is signed with it: `HMAC-SHA256(secret, METHOD\nPATH\nTIMESTAMP\nSHA256(BODY))`,
- * sent as `X-Signature` and `X-Timestamp` headers. A request older than 5 minutes, or
+ * sent as `X-Signature` and `X-Timestamp` headers. A request older than 2 minutes, or
  * whose exact signature has already been seen, is refused — the same replay-protection
  * shape as everywhere else a shared secret authenticates a machine in this codebase.
  *
  * Deliberately separate from every other guard in this folder: those all authenticate a
  * *person* or a *device* against this database. This authenticates *another server*, and
  * has no database lookup at all in the common case — a forged signature is rejected
- * before any query runs.
+ * before any query runs. That boundary stays even in this Phase 7 hardening pass:
+ * alerting on a rejected signature belongs in a layer that can afford a DB write per
+ * request, not here, where an attacker spraying forged signatures must never be able to
+ * turn each attempt into a database write of its own (see WhatsAppChannelService's own
+ * connection-level alerting instead, which only fires from already-authenticated traffic).
+ *
+ * Phase 7: tightened from 5 minutes to 2 -- still generous for two NTP-synced cloud
+ * servers, but a meaningfully smaller window for a captured signature to be replayed in,
+ * and matched exactly on product/whatsapp's own verifier (app/core/jamanvaar_signature.py)
+ * so neither side rejects the other's legitimately-timed requests.
  */
-const MAX_CLOCK_SKEW_MS = 5 * 60_000;
+const MAX_CLOCK_SKEW_MS = 2 * 60_000;
 const REPLAY_TTL_MS = MAX_CLOCK_SKEW_MS + 60_000; // outlive the timestamp window itself
 const seenSignatures = new Map<string, number>();
 setInterval(() => {

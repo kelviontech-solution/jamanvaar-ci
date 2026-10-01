@@ -41,9 +41,11 @@ describe('Jamanvaar WhatsApp connector — WHATSAPP_ORDERING entitlement', () =>
     return method === 'post' ? req.send(raw) : req;
   };
 
+  const createdRestaurantIds: string[] = [];
   async function newOwner(name: string, applications?: string[]) {
     const restRes = await platform('post', '/api/v1/restaurants').send({ name: `TEST WA Entitlement ${name} ${stamp}`, ownerName: 'Owner', ownerEmail: `wa-ent-${name}-${stamp}@example.com` });
     const restaurantId = restRes.body.restaurant.id;
+    createdRestaurantIds.push(restaurantId);
     const activationToken = restRes.body.activationToken;
     await http().post('/api/v1/tenant-auth/set-initial-password').send({ restaurantId, email: `wa-ent-${name}-${stamp}@example.com`, activationToken, newPassword: 'owner-correct-horse-battery' });
     const loginRes = await http().post('/api/v1/tenant-auth/login').send({ restaurantId, email: `wa-ent-${name}-${stamp}@example.com`, password: 'owner-correct-horse-battery' });
@@ -66,6 +68,7 @@ describe('Jamanvaar WhatsApp connector — WHATSAPP_ORDERING entitlement', () =>
   }, 60_000);
 
   afterAll(async () => {
+    await prisma.platformDb.platformNotification.deleteMany({ where: { type: 'WHATSAPP_CONNECTION_LOCKED', restaurantId: { in: createdRestaurantIds } } }).catch(() => undefined);
     await prisma.runAsPlatform((tx) => tx.whatsAppChannelConnection.deleteMany({ where: { restaurant: { name: { contains: `TEST WA Entitlement` } } } })).catch(() => undefined);
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { name: { contains: `TEST WA Entitlement ` } } }));
     if (planId) await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: planId } }));
@@ -145,6 +148,13 @@ describe('Jamanvaar WhatsApp connector — WHATSAPP_ORDERING entitlement', () =>
     const entRes = await http().get('/api/v1/tenant/whatsapp-channel/entitlement').set('Authorization', `Bearer ${ownerToken}`);
     expect(entRes.body.enabled).toBe(false);
     expect(entRes.body.reason).toBe('NOT_INCLUDED');
+
+    // Phase 7: the blocked call above must have raised a real, queryable alert for the
+    // platform team -- this restaurant IS connected, so this isn't an unconfigured
+    // integration, it's a live one silently failing a real customer's order right now.
+    const alert = await prisma.platformDb.platformNotification.findFirst({ where: { type: 'WHATSAPP_CONNECTION_LOCKED', restaurantId } });
+    expect(alert, 'expected a WHATSAPP_CONNECTION_LOCKED alert for the now-locked, still-connected restaurant').toBeTruthy();
+    expect(alert?.body).toContain('NOT_INCLUDED');
   });
 
   it('checkout and quote are also refused for a restaurant without the entitlement, even if otherwise connected', async () => {

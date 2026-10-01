@@ -7,9 +7,10 @@ import { TenantAuthModule } from '../tenant-auth/tenant-auth.module';
 import { QrModule } from '../qr/qr.module';
 import { PaymentsModule } from '../payments/payments.module';
 import { ApplicationEntitlementsModule } from '../application-entitlements/application-entitlements.module';
+import { PlatformNotificationsModule } from '../platform-notifications/platform-notifications.module';
 
 @Module({
-  imports: [AuditModule, TenantAuthModule, QrModule, PaymentsModule, ApplicationEntitlementsModule],
+  imports: [AuditModule, TenantAuthModule, QrModule, PaymentsModule, ApplicationEntitlementsModule, PlatformNotificationsModule],
   controllers: [TenantWhatsAppChannelController, ServiceWhatsAppChannelController],
   providers: [WhatsAppChannelService],
   exports: [WhatsAppChannelService]

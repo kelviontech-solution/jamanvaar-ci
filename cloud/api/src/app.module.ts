@@ -58,7 +58,23 @@ import { validateEnv } from './config/env.validation';
       {
         ttl: 60000,
         limit: 120
-      }
+      },
+      // Phase 7 of the Jamanvaar WhatsApp connector (docs/integrations/
+      // JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md): every NAMED throttler here is
+      // evaluated by the one global ThrottlerGuard (below) against EVERY route in the whole
+      // app, not just whatsapp-channel's -- a route that doesn't explicitly override a given
+      // name via its own @Throttle(...) still gets checked against it using this module-level
+      // limit/ttl and the default per-IP tracker. So each of these four is registered with a
+      // limit high enough to never realistically trip on an unrelated route, and only
+      // whatsapp-channel.service.controller.ts's own @Throttle({name: {limit, ttl, getTracker}})
+      // overrides it down to the real, tight, per-restaurant (or per-restaurant-per-customer-
+      // phone) cap described there. Getting this backwards -- registering the real tight limit
+      // here -- would rate-limit every other endpoint in the platform to the same tiny budget,
+      // tracked by IP, which is exactly the global-default problem this split was meant to fix.
+      { name: 'whatsappSvc', ttl: 60_000, limit: 1_000_000 },
+      { name: 'whatsappCheckout', ttl: 60_000, limit: 1_000_000 },
+      { name: 'whatsappCheckoutPerCustomer', ttl: 10 * 60_000, limit: 1_000_000 },
+      { name: 'whatsappValidateKey', ttl: 60_000, limit: 1_000_000 }
     ]),
     PrismaModule,
     NotificationsModule,

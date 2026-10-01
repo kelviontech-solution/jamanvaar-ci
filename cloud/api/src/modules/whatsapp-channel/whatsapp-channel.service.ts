@@ -8,6 +8,7 @@ import { QrMenuService, type BuiltQrMenu } from '../qr/qr-menu.service';
 import { PaymentsService } from '../payments/payments.service';
 import { priceCart, PriceValidationError } from '../payments/pricing.util';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
+import { PlatformNotificationsService } from '../platform-notifications/platform-notifications.service';
 
 const KEY_PREFIX = 'jmn_live_';
 const DEFAULT_PERMISSIONS = ['MENU_READ', 'ORDER_CREATE', 'ORDER_READ', 'ORDER_STATUS_READ'];
@@ -56,7 +57,8 @@ export class WhatsAppChannelService {
     private readonly audit: AuditService,
     private readonly qrMenu: QrMenuService,
     private readonly payments: PaymentsService,
-    private readonly entitlements: ApplicationEntitlementsService
+    private readonly entitlements: ApplicationEntitlementsService,
+    private readonly platformNotifications: PlatformNotificationsService
   ) {}
 
   /** Read-only: what pos-admin polls to decide whether to grey out the connector panel and
@@ -90,7 +92,19 @@ export class WhatsAppChannelService {
     if (!restaurantId) throw new NotFoundException('This restaurant is not connected to the WhatsApp channel');
     const connection = await this.prisma.runAsPlatform((tx) => tx.whatsAppChannelConnection.findUnique({ where: { restaurantId }, select: { status: true } }));
     if (!connection || connection.status !== 'CONNECTED') throw new NotFoundException('This restaurant is not connected to the WhatsApp channel');
-    await this.requireEntitled(restaurantId);
+    try {
+      await this.requireEntitled(restaurantId);
+    } catch (err) {
+      if (err instanceof ForbiddenException) {
+        // Phase 7: this restaurant genuinely has a live connection -- a real customer's
+        // order is being blocked right now, not just an integration that was never set
+        // up. Fire-and-forget: a notification failure must never mask the real 403 this
+        // call already has to return.
+        const reason = (err.getResponse() as { reason?: string })?.reason ?? 'UNKNOWN';
+        this.platformNotifications.notifyWhatsAppConnectionLocked(restaurantId, reason).catch(() => {});
+      }
+      throw err;
+    }
   }
 
   /** Same as requireConnected, but also refuses new orders while the restaurant has paused the
