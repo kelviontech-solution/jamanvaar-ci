@@ -1,5 +1,70 @@
 # Progress log — WhatsApp connector track
 
+## 2026-10-01 — Pre-pilot live audit (security, DB, browser) across Phases 0-8
+
+User asked to test everything built so far "even with browser if you have to," ahead of
+connecting a real restaurant with a real, already-live Meta WhatsApp number. Full pass
+across both repos: DB migration integrity, live adversarial HTTP checks, and real
+Playwright-driven browser sessions against all three frontends (pos-admin,
+super-admin-web, product/whatsapp) -- the actual gap every earlier phase had explicitly
+named and left open ("Playwright/chromium-cli isn't set up in this environment").
+Installed it into an isolated scratchpad directory for this pass.
+
+**Two real bugs found, both fixed and pushed, neither caught by any earlier test:**
+
+1. **Deployment-blocking: alembic revision ID collisions in `product/whatsapp`.**
+   `alembic current`/`alembic heads` warned "Revision ... is present more than once" for
+   two IDs. All three Jamanvaar migrations (Phases 0/2/5) had reused revision ids AND a
+   down_revision that already belonged to real, unrelated, pre-existing migrations
+   (`add_user_setup_token_columns`, `add_display_devices`), and branched off a stale
+   parent that already had a different real child. `dev.db` has no `alembic_version`
+   table at all (bootstrapped from the ORM models, confirmed, not assumed) and already has
+   the Jamanvaar columns from an earlier manual patch -- so this broken chain had never
+   actually been exercised by a real `alembic upgrade`, anywhere, until this check.
+   Deploying to a database with a real alembic history and running `upgrade head` would
+   hit a non-deterministic collision where either migration's DDL could silently never
+   run -- possibly the pre-existing, already-shipped one. Fixed by renumbering all three
+   to fresh ids and re-anchoring the chain onto the real current head. Full detail: the
+   commit itself in `product/whatsapp`.
+2. **Super Admin's WhatsApp Ordering page was invisible and refused to every role,
+   including Platform Owner.** Phase 6 added the route and nav entry but never registered
+   it in `super-admin-web`'s separate `auth/access.ts` route-to-area table, which fails
+   CLOSED on an unmapped route. Found only because this was the first time anyone (human
+   or automated) actually clicked the link in a real browser -- every earlier check of
+   this page was HTTP-level or `tsc --noEmit` only. Fixed with one line mirroring
+   `/qr-ordering`'s own area.
+
+**What else was checked live, all correct, zero bugs:** kiosk DB migration status (clean).
+pos-admin's full real-browser flow -- owner login, device activation, Settings, Generate
+Key, the real masked-key display, and the locked-entitlement state (Locked badge, correct
+message, Disconnect still enabled, Generate Key correctly absent once already connected).
+The full cross-repo connect, done for real: a key generated in one live browser session
+(pos-admin) pasted into a second live browser session (`product/whatsapp`'s own restaurant
+settings), producing a real signed service-to-service call between the two live dev
+servers and a genuine "Connected to ... on Jamanvaar" result with the right restaurant id
+and timestamp. The Phase 8 Orders-page banner and the kitchen-display 409 (confirmed by
+reading full response/console logs after an initial test script gave it too little time
+and looked stuck -- re-verified before concluding anything, not left as an open question).
+
+**Process notes, both corrected before they caused harm:**
+- Ran `pip install -r requirements.txt` against the global system Python instead of
+  `product/whatsapp/backend`'s own `.venv`, downgrading packages shared with unrelated
+  local projects (gevent, streamlit, langchain-community flagged conflicts immediately).
+  Reverted all 8 affected packages to their exact prior versions before doing anything
+  else; the repo's own `.venv` already had everything needed and was used for the rest.
+- Found and fixed a pre-existing, unrelated bug while seeding live test data: Phase 5's
+  `test/whatsapp-outbound-webhook.e2e.spec.ts` never deleted the restaurant it creates --
+  ten real orphans had accumulated in the shared dev database and were breaking
+  `backups-local.e2e.spec.ts`'s own stale-restaurant scan. Fixed the leak, removed the
+  orphans, and fixed `feature-catalog-model.e2e.spec.ts`'s stale hardcoded catalog counts
+  (Phase 6's real `whatsappOrdering` feature made the old numbers wrong, not the seed).
+
+**Verification:** full regression both repos after every fix. `cloud/api`: 1005/1014
+(7 pre-existing tenant-isolation.spec.ts RLS failures, unrelated). `product/whatsapp`
+backend: 756/760 (4 pre-existing, already-self-documented datetime-comparison failures in
+unrelated media-caching tests). All seeded audit data (restaurants, users, activation
+keys, display devices, both databases) removed afterward; confirmed zero rows remain.
+
 ## 2026-10-01 — Phase 8 (pilot readiness)
 
 Per the plan: "nothing new — this is rollout," except for one build item the plan itself
