@@ -44,16 +44,23 @@ ENV NODE_ENV=production
 # of whatever the builder stage had.
 RUN apk add --no-cache openssl
 
-# node_modules (incl. the Prisma CLI) and the compiled app, straight from the builder --
-# no second `npm ci`, so the image can never drift from what was actually built and tested.
-# Only what's needed to run: the compiled dist/, the Prisma schema + migrations (needed by
-# `prisma migrate deploy` at container start), and package.json -- not src/, test/, or any
-# other dev-time-only file.
+# node_modules (incl. the Prisma CLI and ts-node) and the compiled app, straight from the
+# builder -- no second `npm ci`, so the image can never drift from what was actually built
+# and tested. The compiled dist/ runs the real server; src/ + tsconfig.json below are only
+# for `npm run seed` (ts-node against source, see its own comment below) -- test/ is still
+# left out, nothing here runs it.
 COPY --from=builder /repo/node_modules ./node_modules
 COPY --from=builder /repo/package.json /repo/package-lock.json ./
 COPY --from=builder /repo/cloud/api/dist ./cloud/api/dist
 COPY --from=builder /repo/cloud/api/prisma ./cloud/api/prisma
 COPY --from=builder /repo/cloud/api/package.json ./cloud/api/package.json
+# `npm run seed` runs `ts-node prisma/seed.ts` directly against TypeScript SOURCE, not the
+# compiled dist/ -- found on the real deploy, not assumed: seed.ts imports
+# ../src/config/seed-options, which doesn't exist anywhere in this image without src/ and a
+# tsconfig.json for ts-node to resolve compilerOptions from. dist/ alone is enough to run the
+# compiled app (`node dist/src/main.js`) but not enough to run this one TS-source script.
+COPY --from=builder /repo/cloud/api/src ./cloud/api/src
+COPY --from=builder /repo/cloud/api/tsconfig.json ./cloud/api/tsconfig.json
 COPY cloud/api/entrypoint.sh ./cloud/api/entrypoint.sh
 
 WORKDIR /repo/cloud/api
