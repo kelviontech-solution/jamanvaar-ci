@@ -82,10 +82,15 @@ describe('Generic feature catalog model (Phase 10)', () => {
     expect(seeded.length).toBeGreaterThanOrEqual(22);
 
     const legacyKeys = new Set(features.map((f) => f.legacyEntitlementKey).filter((k): k is string => k !== null));
-    expect(legacyKeys.size).toBe(21); // every one of the 21 pre-existing Plan.entitlements keys, exactly once each
+    // The original 21 pre-existing Plan.entitlements keys, plus `whatsappOrdering` (the
+    // Jamanvaar WhatsApp connector's own pilot-stage flag, added the same way
+    // `qrTableOrdering` was before it -- off by default on every seeded plan, granted only
+    // by an explicit per-restaurant override, read via this exact legacyEntitlementKey
+    // mechanism in ApplicationEntitlementsService.appsForPlan()).
+    expect(legacyKeys.size).toBe(22);
 
     const appCodes = new Set(features.map((f) => f.appCode).filter((a) => a !== null).map((a) => a as string));
-    expect(appCodes).toEqual(new Set(['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING']));
+    expect(appCodes).toEqual(new Set(['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING', 'WHATSAPP_ORDERING']));
   });
 
   it('KIOSK_ADMIN depends on the KIOSK feature, and the dependency resolves to a real feature id', async () => {

@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { AuditModule } from '../audit/audit.module';
 import { TenantAuthModule } from '../tenant-auth/tenant-auth.module';
+import { OrderSyncModule } from '../order-sync/order-sync.module';
+import { WhatsAppOutboundWebhookModule } from '../whatsapp-outbound/whatsapp-outbound-webhook.module';
 import { MenuSyncController } from './menu-sync.controller';
 import { MenuSyncService } from './menu-sync.service';
 import { PaymentOrdersController } from './payment-orders.controller';
@@ -17,7 +19,7 @@ import { PlatformPaymentsService } from './platform-payments.service';
 import { PaymentReconciliationService } from './payment-reconciliation.service';
 
 @Module({
-  imports: [PrismaModule, AuditModule, TenantAuthModule],
+  imports: [PrismaModule, AuditModule, TenantAuthModule, OrderSyncModule, WhatsAppOutboundWebhookModule],
   controllers: [
     MenuSyncController,
     PaymentOrdersController,

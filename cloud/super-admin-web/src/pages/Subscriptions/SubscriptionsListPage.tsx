@@ -19,10 +19,14 @@ import '../../components/shared.css';
 import { AssignSubscriptionModal } from './AssignSubscriptionModal';
 import { RenewSubscriptionModal } from './RenewSubscriptionModal';
 import { ChangePlanModal } from './ChangePlanModal';
+import { useAuth } from '../../auth/AuthContext';
 
 type SubStatusFilter = 'ALL' | 'ACTIVE' | 'SUSPENDED' | 'TRIAL' | 'EXPIRED';
 
 export function SubscriptionsListPage() {
+  // B2-052 item 2: Finance legitimately has subscriptions write; Read-Only/Support/Ops don't.
+  const { can } = useAuth();
+  const canWrite = can('subscriptions', 'write');
   const [subs, setSubs] = useState<SubscriptionListItem[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -154,7 +158,7 @@ export function SubscriptionsListPage() {
             Every restaurant tenant's recurring SaaS plan — assigned, renewed, and upgraded directly from the platform control center.
           </p>
         </div>
-        <Button variant="accent" onClick={() => setShowAssign(true)}>
+        <Button variant="accent" onClick={() => setShowAssign(true)} disabled={!canWrite}>
           <Plus className="w-4 h-4" />
           <span>Assign Subscription</span>
         </Button>
@@ -227,10 +231,10 @@ export function SubscriptionsListPage() {
       {loading && !subs && <SkeletonTable rows={6} cols={6} />}
 
       <BulkActionsBar selectedCount={selectedIds.size} onClear={() => setSelectedIds(new Set())}>
-        <Button size="sm" variant="danger" disabled={bulkPending} onClick={() => handleBulkAction('suspend')}>
+        <Button size="sm" variant="danger" disabled={bulkPending || !canWrite} onClick={() => handleBulkAction('suspend')}>
           Suspend Selected
         </Button>
-        <Button size="sm" variant="primary" disabled={bulkPending} onClick={() => handleBulkAction('reactivate')}>
+        <Button size="sm" variant="primary" disabled={bulkPending || !canWrite} onClick={() => handleBulkAction('reactivate')}>
           Reactivate Selected
         </Button>
       </BulkActionsBar>
@@ -252,7 +256,7 @@ export function SubscriptionsListPage() {
                     Reset Filters
                   </Button>
                 ) : (
-                  <Button variant="accent" onClick={() => setShowAssign(true)}>
+                  <Button variant="accent" onClick={() => setShowAssign(true)} disabled={!canWrite}>
                     Assign First Subscription
                   </Button>
                 )
@@ -315,15 +319,16 @@ export function SubscriptionsListPage() {
                         </td>
                         <td>
                           <div className="row-actions">
-                            <Button size="sm" variant="ghost" onClick={() => setRenewTarget(s)}>
+                            <Button size="sm" variant="ghost" disabled={!canWrite} onClick={() => setRenewTarget(s)}>
                               Renew
                             </Button>
-                            <Button size="sm" variant="ghost" onClick={() => setChangePlanTarget(s)}>
+                            <Button size="sm" variant="ghost" disabled={!canWrite} onClick={() => setChangePlanTarget(s)}>
                               Change Tier
                             </Button>
                             <Button
                               size="sm"
                               variant={s.status === 'SUSPENDED' ? 'primary' : 'danger'}
+                              disabled={!canWrite}
                               onClick={() => setConfirmTarget({
                                 sub: s,
                                 action: s.status === 'SUSPENDED' ? 'reactivate' : 'suspend'

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "AppCode" ADD VALUE 'WHATSAPP_ORDERING';

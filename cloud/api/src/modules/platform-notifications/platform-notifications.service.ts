@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { OFFLINE_WARN_AFTER_DAYS } from '../../common/device-health';
 import { pageOf, parsePaging } from '../../common/paging';
 import { PrismaService } from '../../prisma/prisma.service';
+import { type Area, type PlatformRoleName, permissionsForRole } from '../../common/rbac/access';
 
 export type NotificationSeverity = 'INFO' | 'WARNING' | 'CRITICAL';
 
@@ -37,6 +38,38 @@ const KEY_WARN_DAYS = 3;
 const OFFLINE_ALERT_AFTER_MS = HOUR_MS;
 
 const isoDay = (d = new Date()) => d.toISOString().slice(0, 10);
+
+// B2-052 item 5: a team-wide notification (backup failed, terminals offline, keys expiring…)
+// was counted for every platform user regardless of role, so e.g. Finance Admin (no
+// devices/ops access at all) saw an unread count made up mostly of notifications about pages
+// it gets a 403 on if it opens them. Same class of bug as B2-051/B2-053, same fix shape: gate
+// by the role's own area permissions, reusing the one shared table instead of a second one
+// that could drift from it. A notification addressed to one specific person (userId set) is
+// always visible to them regardless of area — it was deliberately sent to that person.
+const NOTIFICATION_TYPE_AREA: Record<string, Area> = {
+  SUBSCRIPTION_EXPIRING: 'subscriptions',
+  BACKUP_FAILED: 'ops',
+  INVOICE_OVERDUE: 'billing',
+  DEVICES_OFFLINE: 'devices',
+  KEYS_EXPIRING: 'devices',
+  SYNC_FAILING: 'devices',
+  RESTAURANT_SUSPENDED: 'restaurants',
+  // Phase 7 of the Jamanvaar WhatsApp connector -- see notifyWhatsAppConnectionLocked below.
+  WHATSAPP_CONNECTION_LOCKED: 'ops'
+};
+
+/** Team-wide notification types this role CANNOT even open the linked page for — an explicit
+ *  deny-list, not an allow-list. That matters: a type with no entry in the map above (a
+ *  future notification type nobody has classified yet, e.g. TICKET_CREATED) must stay visible
+ *  to everyone by default. An allow-list would silently hide every unclassified type from any
+ *  role that isn't granted literally every area — caught by restaurant-tickets.e2e.spec.ts,
+ *  which expects a support-ticket notification to reach a role this map never mentions. */
+function deniedTeamTypesFor(role: PlatformRoleName | null | undefined): string[] {
+  const allTypes = Object.keys(NOTIFICATION_TYPE_AREA);
+  if (!role) return allTypes;
+  const perms = permissionsForRole(role);
+  return allTypes.filter((t) => !perms[NOTIFICATION_TYPE_AREA[t]]);
+}
 
 /**
  * The platform team's notification centre (BUG-064). Conditions that need attention (a subscription
@@ -75,23 +108,59 @@ export class PlatformNotificationsService {
     }
   }
 
-  /** What one person is allowed to see: team-wide notifications plus those addressed to them. */
-  private audience(userId: string): Prisma.PlatformNotificationWhereInput {
-    return { OR: [{ userId: null }, { userId }] };
+  /**
+   * Phase 7 of the Jamanvaar WhatsApp connector (docs/integrations/
+   * JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md) -- "alerting on invalid/expired
+   * connections." Called from WhatsAppChannelService.requireEntitled() the moment a real,
+   * customer-facing channel call (menu/quote/checkout/order-status) is refused because a
+   * restaurant that HAS a live, CONNECTED WhatsAppChannelConnection just lost its
+   * WHATSAPP_ORDERING entitlement -- a plan downgrade, an expired subscription, or a
+   * manual override, not a restaurant that was never connected in the first place (that's
+   * just an unconfigured integration, not an alert-worthy regression).
+   *
+   * Unlike every notification in scanAndNotify() below, this isn't found by a periodic
+   * scan -- it's raised inline, at the exact moment a real customer's order would
+   * otherwise have silently failed, so the team can reach out before the restaurant
+   * notices lost orders on its own. Deduped to once per restaurant per day so a customer
+   * repeatedly hitting a locked restaurant's menu can't spam the team with the same alert
+   * on every request.
+   */
+  async notifyWhatsAppConnectionLocked(restaurantId: string, reason: string): Promise<void> {
+    const restaurant = await this.prisma.platformDb.restaurant.findUnique({ where: { id: restaurantId }, select: { name: true } });
+    if (!restaurant) return; // deleted mid-request -- nothing left to alert anyone about
+    await this.notify({
+      type: 'WHATSAPP_CONNECTION_LOCKED',
+      severity: 'WARNING',
+      title: `${restaurant.name}: WhatsApp orders are being blocked`,
+      body: `A customer tried to use the WhatsApp channel, but it's locked (${reason}). The restaurant is still connected -- re-enable the entitlement to let orders through again.`,
+      restaurantId,
+      targetType: 'whatsapp-channel',
+      link: `/restaurants/${restaurantId}?tab=applications`,
+      dedupeKey: `whatsapp-locked:${restaurantId}:${isoDay()}`
+    });
   }
 
-  async list(userId: string, filters: NotificationFilters) {
+  /** What one person is allowed to see: team-wide notifications whose area their role can at
+   *  least read, plus anything addressed to them personally (always visible — it was sent to
+   *  that exact person on purpose, not broadcast). */
+  private audience(userId: string, role: PlatformRoleName | null | undefined): Prisma.PlatformNotificationWhereInput {
+    const denied = deniedTeamTypesFor(role);
+    const teamWide: Prisma.PlatformNotificationWhereInput = denied.length === 0 ? { userId: null } : { userId: null, type: { notIn: denied } };
+    return { OR: [teamWide, { userId }] };
+  }
+
+  async list(userId: string, role: PlatformRoleName | null | undefined, filters: NotificationFilters) {
     const paging = parsePaging(filters);
     const where: Prisma.PlatformNotificationWhereInput = {
       AND: [
-        this.audience(userId),
+        this.audience(userId, role),
         filters.severity ? { severity: filters.severity } : {},
         filters.type ? { type: filters.type } : {},
         filters.restaurantId ? { restaurantId: filters.restaurantId } : {},
         filters.unread === 'true' ? { reads: { none: { userId } } } : {}
       ]
     };
-    const scope: Prisma.PlatformNotificationWhereInput = { AND: [this.audience(userId), filters.restaurantId ? { restaurantId: filters.restaurantId } : {}] };
+    const scope: Prisma.PlatformNotificationWhereInput = { AND: [this.audience(userId, role), filters.restaurantId ? { restaurantId: filters.restaurantId } : {}] };
 
     const db = this.prisma.platformDb;
     const [rows, total, unreadCount, bySeverity] = await Promise.all([
@@ -112,9 +181,9 @@ export class PlatformNotificationsService {
     return paging.paged ? { ...pageOf(items, total, paging), unreadCount, severityCounts } : items;
   }
 
-  async unreadCount(userId: string) {
+  async unreadCount(userId: string, role: PlatformRoleName | null | undefined) {
     const db = this.prisma.platformDb;
-    const where = { AND: [this.audience(userId), { reads: { none: { userId } } }] };
+    const where = { AND: [this.audience(userId, role), { reads: { none: { userId } } }] };
     const [count, critical] = await Promise.all([
       db.platformNotification.count({ where }),
       db.platformNotification.count({ where: { AND: [where, { severity: 'CRITICAL' }] } })
@@ -122,8 +191,8 @@ export class PlatformNotificationsService {
     return { count, critical };
   }
 
-  async markRead(userId: string, id: string) {
-    const found = await this.prisma.platformDb.platformNotification.findFirst({ where: { AND: [{ id }, this.audience(userId)] }, select: { id: true } });
+  async markRead(userId: string, role: PlatformRoleName | null | undefined, id: string) {
+    const found = await this.prisma.platformDb.platformNotification.findFirst({ where: { AND: [{ id }, this.audience(userId, role)] }, select: { id: true } });
     if (!found) throw new NotFoundException('Notification not found');
     await this.prisma.platformDb.platformNotificationRead.upsert({
       where: { notificationId_userId: { notificationId: id, userId } },
@@ -133,9 +202,9 @@ export class PlatformNotificationsService {
     return { ok: true };
   }
 
-  async markAllRead(userId: string, restaurantId?: string) {
+  async markAllRead(userId: string, role: PlatformRoleName | null | undefined, restaurantId?: string) {
     const unread = await this.prisma.platformDb.platformNotification.findMany({
-      where: { AND: [this.audience(userId), restaurantId ? { restaurantId } : {}, { reads: { none: { userId } } }] },
+      where: { AND: [this.audience(userId, role), restaurantId ? { restaurantId } : {}, { reads: { none: { userId } } }] },
       select: { id: true }
     });
     if (unread.length) {

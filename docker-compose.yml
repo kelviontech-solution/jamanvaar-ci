@@ -1,0 +1,141 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: kiosk_db
+    restart: unless-stopped
+    environment:
+      # Bootstrap superuser only -- used by Postgres itself to initialize the cluster and
+      # by docker-init-app-role.sh to create the real app role below. The application
+      # itself NEVER connects as this user (see backend's own DATABASE_URL) -- it would
+      # bypass Row-Level Security, and cloud/api refuses to boot in production if it ever
+      # detects that it has (src/prisma/rls-role.ts).
+      POSTGRES_USER: ${POSTGRES_BOOTSTRAP_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_BOOTSTRAP_PASSWORD:?POSTGRES_BOOTSTRAP_PASSWORD must be set in .env}
+      POSTGRES_DB: postgres
+      # Read by docker-init-app-role.sh (below) the one time it runs, to create the real,
+      # non-superuser jamanvaar_app role the backend actually connects as.
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?APP_DB_PASSWORD must be set in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Runs exactly once, only the very first time this volume is empty -- the official
+      # postgres image's own documented behavior for anything in docker-entrypoint-initdb.d.
+      - ./cloud/api/prisma/docker-init-app-role.sh:/docker-entrypoint-initdb.d/init-app-role.sh:ro
+    networks:
+      - kiosk_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_BOOTSTRAP_USER:-postgres} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    mem_limit: 768m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Dedicated loopback port -- no conflict with the other projects' own DB containers
+    # (kelviontech.in 5432, restaurent.kelviontech.in 5433, Wrench 5435).
+    ports:
+      - "127.0.0.1:${DB_PORT:-5436}:5432"
+
+  backend:
+    build:
+      context: .
+      dockerfile: cloud/api/Dockerfile
+    container_name: kiosk_backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      # jamanvaar_app, not the bootstrap postgres superuser above -- see docker-init-app-role.sh.
+      - DATABASE_URL=postgresql://jamanvaar_app:${APP_DB_PASSWORD}@db:5432/jamanvaar?schema=public
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET must be set in .env -- see scripts/generate-production-env.js}
+      - JWT_ACCESS_TTL=${JWT_ACCESS_TTL:-15m}
+      - JWT_REFRESH_TTL_DAYS=${JWT_REFRESH_TTL_DAYS:-30}
+      - PRIVILEGED_REFRESH_TTL_DAYS=${PRIVILEGED_REFRESH_TTL_DAYS:-7}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:?CORS_ALLOWED_ORIGINS must list the real console origin(s) in production}
+      - TRUST_PROXY=${TRUST_PROXY:-2}
+      - QR_SESSION_SECRET=${QR_SESSION_SECRET:-}
+      - JAMANVAAR_SERVICE_SECRET=${JAMANVAAR_SERVICE_SECRET:-}
+      - WHATSAPP_CONNECTOR_BASE_URL=${WHATSAPP_CONNECTOR_BASE_URL:-}
+      - LICENSE_SIGNING_PRIVATE_KEY_B64=${LICENSE_SIGNING_PRIVATE_KEY_B64:-}
+      - LICENSE_SIGNING_KEY_ID=${LICENSE_SIGNING_KEY_ID:-}
+      - BACKUP_ENCRYPTION_KEY_B64=${BACKUP_ENCRYPTION_KEY_B64:-}
+      - BACKUP_S3_ENDPOINT=${BACKUP_S3_ENDPOINT:-}
+      - BACKUP_S3_REGION=${BACKUP_S3_REGION:-}
+      - BACKUP_S3_BUCKET=${BACKUP_S3_BUCKET:-}
+      - BACKUP_S3_ACCESS_KEY_ID=${BACKUP_S3_ACCESS_KEY_ID:-}
+      - BACKUP_S3_SECRET_ACCESS_KEY=${BACKUP_S3_SECRET_ACCESS_KEY:-}
+      - CASHFREE_CLIENT_ID=${CASHFREE_CLIENT_ID:-}
+      - CASHFREE_CLIENT_SECRET=${CASHFREE_CLIENT_SECRET:-}
+      - CASHFREE_WEBHOOK_SECRET=${CASHFREE_WEBHOOK_SECRET:-}
+      - CASHFREE_ENVIRONMENT=${CASHFREE_ENVIRONMENT:-sandbox}
+      - PAYMENT_CREDENTIAL_ENCRYPTION_KEY=${PAYMENT_CREDENTIAL_ENCRYPTION_KEY:-}
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME:-}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL:-}
+      # Read only by `prisma/seed.ts` (via `make seed`), never by the running server itself.
+      # All optional -- left unset, the seed falls back to a random Super Admin password
+      # (printed once) and skips the demo restaurant entirely (src/config/seed-options.ts:
+      # shouldSeedDemoData is off by default in production). Found missing on the real
+      # deploy, not assumed: these were set in .env but never referenced anywhere in this
+      # file, so `docker compose exec backend ...` never actually saw them.
+      - SEED_SUPER_ADMIN_EMAIL=${SEED_SUPER_ADMIN_EMAIL:-}
+      - SEED_SUPER_ADMIN_PASSWORD=${SEED_SUPER_ADMIN_PASSWORD:-}
+      - SEED_RESET_SUPER_ADMIN_PASSWORD=${SEED_RESET_SUPER_ADMIN_PASSWORD:-false}
+      - SEED_DEMO_DATA=${SEED_DEMO_DATA:-}
+      - SEED_DEMO_OWNER_PASSWORD=${SEED_DEMO_OWNER_PASSWORD:-}
+      - SEED_RESET_DEMO_OWNER_PASSWORD=${SEED_RESET_DEMO_OWNER_PASSWORD:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - kiosk_network
+    mem_limit: 768m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Dedicated loopback port for health checks / direct diagnosis -- the public path is
+    # always through the frontend container's own nginx (see below), never this port.
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8010}:4000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: cloud/super-admin-web/Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-}
+    container_name: kiosk_frontend
+    restart: unless-stopped
+    # Defaults to 8090 -- avoids amitkhatri (8080), kelvion (3000/8000), restaurent
+    # (3001/8001) and Wrench (8085). Bound to the Docker bridge gateway (172.17.0.1), not
+    # 0.0.0.0 -- confirmed against the box's own real convention (amitkhatri-web-1 binds
+    # 172.17.0.1:8080, not a public 0.0.0.0) rather than assumed: the shared
+    # kelviontech-nginx-1 container is the only thing meant to reach this port, terminating
+    # real TLS first. Override HOST_BIND_IP only for a one-off direct-port smoke test.
+    ports:
+      - "${HOST_BIND_IP:-172.17.0.1}:${PORT:-8090}:80"
+    depends_on:
+      - backend
+    networks:
+      - kiosk_network
+    mem_limit: 256m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  kiosk_network:
+    name: kiosk_network
+
+volumes:
+  postgres_data:
+    name: kiosk_postgres_data

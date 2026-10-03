@@ -6,6 +6,7 @@ import { InvoicesService } from '../billing/invoices.service';
 import { OfflinePolicyService } from '../offline-policy/offline-policy.service';
 import { PlatformNotificationsService } from '../platform-notifications/platform-notifications.service';
 import { PaymentReconciliationService } from '../payments/payment-reconciliation.service';
+import { WhatsAppOutboundWebhookService } from '../whatsapp-outbound/whatsapp-outbound-webhook.service';
 
 export interface JobDefinition {
   name: string;
@@ -43,7 +44,8 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
     private readonly offline: OfflinePolicyService,
     private readonly backups: BackupsService,
     private readonly notifications: PlatformNotificationsService,
-    private readonly reconciliation: PaymentReconciliationService
+    private readonly reconciliation: PaymentReconciliationService,
+    private readonly whatsappOutbound: WhatsAppOutboundWebhookService
   ) {}
 
   get schedulerEnabled(): boolean {
@@ -65,6 +67,9 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
       { name: 'scheduled-backups', description: 'Snapshot every active restaurant without a backup in the last 24 hours', run: () => this.backups.snapshotStaleRestaurants() as unknown as Promise<Record<string, unknown>> },
       { name: 'notifications', description: 'Announce what needs attention (expiring subscriptions, failed backups, overdue invoices, offline terminals…) to the team, once each', run: () => this.notifications.scan() as unknown as Promise<Record<string, unknown>> },
       { name: 'payment-reconciliation', description: 'Compare recent successful payments against Cashfree\'s own split/settlement records', run: () => this.reconciliation.reconcile() },
+      // Last-resort safety net -- the fast 20s interval inside WhatsAppOutboundWebhookService
+      // itself handles near-real-time retries; this only matters if that interval ever dies.
+      { name: 'whatsapp-outbound-webhook-retry', description: 'Retry any WhatsApp connector outbound webhook deliveries still pending after backoff', run: () => this.whatsappOutbound.retryDue() },
       ...this.extra
     ];
   }

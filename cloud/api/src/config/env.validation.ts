@@ -69,6 +69,21 @@ const envSchema = z.object({
   TRUST_PROXY: z.coerce.number().int().min(0).max(5).optional(),
   // Separate secret for QR guest session signatures; falls back to JWT_ACCESS_SECRET when unset.
   QR_SESSION_SECRET: z.string().min(32).optional(),
+  // JAMANVAAR_SERVICE_SECRET (the WhatsApp connector's service-to-service signing secret,
+  // see common/guards/service-signature.guard.ts) is deliberately NOT declared in this
+  // schema, unlike every other secret here -- adding it broke two outbound-webhook e2e
+  // tests, reproducibly, even run alone: those tests set
+  // process.env.JAMANVAAR_SERVICE_SECRET to their own value in beforeAll, before building
+  // a fresh app with createTestApp(), and WhatsAppOutboundWebhookService reads the secret
+  // via ConfigService.get(), not process.env directly. Undeclared, ConfigService.get()
+  // falls back to a live process.env read and sees the test's own value; declared here
+  // (even as plain z.string().optional(), no transform), it instead returned whatever
+  // value was present at some earlier point this file's own debugging didn't fully
+  // pin down -- confirmed only by reverting this exact addition and watching the tests
+  // pass again, not by a full trace of Zod/ConfigModule's internals. Until that's
+  // understood precisely, leave this one undeclared. Its production strength check lives
+  // in productionConfigProblems below regardless, which reads the raw passed-in config
+  // object directly and needs no schema entry to do that.
   // Requests of terminals sharing one address (a whole branch) per minute; see common/throttle.ts.
   DEVICE_SYNC_RPM: z.coerce.number().int().positive().optional()
 });
@@ -86,7 +101,14 @@ export function isStrongSecret(value: string | undefined): boolean {
 export function productionConfigProblems(config: Record<string, unknown>): string[] {
   const problems: string[] = [];
   if (!isStrongSecret(config.JWT_ACCESS_SECRET as string | undefined)) problems.push('JWT_ACCESS_SECRET must be a random secret of 32+ characters (not a placeholder).');
-  if (config.QR_SESSION_SECRET !== undefined && !isStrongSecret(config.QR_SESSION_SECRET as string)) problems.push('QR_SESSION_SECRET must be a random secret of 32+ characters.');
+  // `!== undefined` isn't enough to mean "actually configured": found on the real deploy,
+  // not assumed -- this project's own docker-compose.yml passes every optional secret
+  // through as `${VAR:-}`, so an unset .env value still arrives here as an empty string,
+  // never a genuinely absent key. Truthy checks (like BACKUP_ENCRYPTION_KEY_B64 below
+  // already does) treat '' the same as unset; these two didn't, and immediately refused to
+  // boot in production with no connector/QR feature configured at all.
+  if (config.QR_SESSION_SECRET && !isStrongSecret(config.QR_SESSION_SECRET as string)) problems.push('QR_SESSION_SECRET must be a random secret of 32+ characters.');
+  if (config.JAMANVAAR_SERVICE_SECRET && !isStrongSecret(config.JAMANVAAR_SERVICE_SECRET as string)) problems.push('JAMANVAAR_SERVICE_SECRET must be a random secret of 32+ characters (not the dev placeholder) if the WhatsApp connector is enabled.');
   const cors = String(config.CORS_ALLOWED_ORIGINS ?? '').trim();
   if (!cors) problems.push('CORS_ALLOWED_ORIGINS must list the console origins in production (an empty list would block every console).');
   else if (cors.split(',').some((o) => /localhost|127\.0\.0\.1/.test(o) || o.trim() === '*')) problems.push('CORS_ALLOWED_ORIGINS must not contain localhost or * in production.');

@@ -48,6 +48,7 @@ import {
   ShieldAlert,
   Sparkles,
   QrCode,
+  MessageCircle,
   ListChecks
 } from 'lucide-react';
 import './layout.css';
@@ -87,6 +88,7 @@ const PAGE_KEYWORDS: Record<string, string> = {
   '/plans': 'plan plans tier pricing price entitlement entitlements',
   '/feature-catalog': 'feature features module modules category',
   '/qr-ordering': 'qr code table ordering guest menu',
+  '/whatsapp-ordering': 'whatsapp chat bot order connector jamanvaar channel',
   '/ai-assistant': 'ai jaman assistant chatbot',
   '/catalog': 'menu dish dishes item items food category master starter library',
   '/activation-keys': 'activation key keys code terminal redeem',
@@ -129,6 +131,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: '/plans', label: 'Plans & Entitlements', icon: Package },
       { to: '/feature-catalog', label: 'Feature Catalog', icon: ListChecks },
       { to: '/qr-ordering', label: 'QR Ordering Suite', icon: QrCode },
+      { to: '/whatsapp-ordering', label: 'WhatsApp Ordering', icon: MessageCircle },
       { to: '/ai-assistant', label: 'JAMAN AI Engine', icon: Sparkles },
       { to: '/catalog', label: 'Master Menu Catalog', icon: Utensils },
       { to: '/activation-keys', label: 'Activation Keys', icon: KeyRound },

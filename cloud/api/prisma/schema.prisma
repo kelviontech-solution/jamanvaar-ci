@@ -171,6 +171,8 @@ model Restaurant {
   orders                  Order[]
   paymentTransactions     PaymentTransaction[]
   paymentConnection       RestaurantPaymentConnection?
+  whatsappChannelConnection WhatsAppChannelConnection?
+  outboundWebhookDeliveries OutboundWebhookDelivery[]
   refunds                 Refund[]
   reconciliationExceptions ReconciliationException[]
   webhookEvents           WebhookEvent[]
@@ -415,6 +417,7 @@ enum AppCode {
   KIOSK
   KIOSK_ADMIN
   QR_ORDERING
+  WHATSAPP_ORDERING
 }
 
 model ApplicationEntitlement {
@@ -1195,6 +1198,17 @@ model Order {
   kioskId         String?
   kiosk           Device?            @relation(fields: [kioskId], references: [id], onDelete: SetNull)
   externalOrderId String // correlates to the kiosk's local order id; doubles as the idempotency key
+  // Who created this payment-bookkeeping row — 'KIOSK' (default, the walk-up device flow) or
+  // 'WHATSAPP' (the connector's channels/checkout, see WhatsAppChannelService.checkout). Read by
+  // the Cashfree webhook handler to decide whether a SUCCESS payment must also create the
+  // POS/KDS-visible SyncedOrder (WhatsApp orders never create one at checkout time — only once
+  // paid, see JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md Phase 4).
+  source          String             @default("KIOSK")
+  branchId        String? // WHATSAPP only: which branch the order belongs to
+  orderType       String? // WHATSAPP only: 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
+  tableLabel      String? // WHATSAPP only, DINE_IN
+  customerName    String? // WHATSAPP only
+  customerPhone   String? // WHATSAPP only
   items           Json // [{ externalItemId, name, quantity, unitPrice, modifiers, lineTotal }]
   subtotal        Int // paise
   taxAmount       Int // paise
@@ -1284,6 +1298,67 @@ model RestaurantPaymentConnection {
   commissionOverrideBps             Int?                    // basis points, 0-10000; null = use the platform default (PlatformSetting key PAYMENT_DEFAULT_COMMISSION_BPS)
   createdAt                         DateTime                @default(now())
   updatedAt                         DateTime                @updatedAt
+}
+
+// Jamanvaar ↔ WhatsApp connector, Phase 0 (docs/integrations/JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md).
+// Scaffolding only — no endpoint reads or writes this yet. The raw key is never stored;
+// only its hash (so the owner can generate/revoke, but a database read alone can't forge
+// a connection) and a prefix (so a displayed "jmn_live_ab12••••" is recognisable without
+// revealing the rest) — same shape as an activation key's own redaction (B2-051/B2-053).
+model WhatsAppChannelConnection {
+  id              String                           @id @default(uuid())
+  restaurantId    String                           @unique
+  restaurant      Restaurant                       @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  keyPrefix       String // e.g. "jmn_live_ab12" — shown in Restaurant Admin so the owner recognises which key is connected, never the full key
+  keyHash         String                           @unique // SHA-256 of the raw key; the raw key itself is returned once at generation and never stored
+  status          WhatsAppChannelConnectionStatus  @default(PENDING)
+  permissions     Json                             @default("[]") // e.g. ["MENU_READ","ORDER_CREATE","ORDER_READ","ORDER_STATUS_READ"]
+  autoAccept      Boolean                          @default(false)
+  prepTimeMinutes Int?
+  pausedAt        DateTime? // "Pause online orders" — set, not a separate boolean, so Restaurant Admin can show when it was paused
+  connectedAt     DateTime? // set once product/whatsapp calls validate-key successfully
+  lastUsedAt      DateTime?
+  revokedAt       DateTime?
+  createdAt       DateTime                         @default(now())
+  updatedAt       DateTime                         @updatedAt
+
+  @@index([restaurantId])
+}
+
+enum WhatsAppChannelConnectionStatus {
+  PENDING // key generated, not yet validated by product/whatsapp
+  CONNECTED
+  REVOKED
+}
+
+// Phase 5 of the Jamanvaar<->WhatsApp connector: the outbound half of the relationship --
+// this platform calling INTO product/whatsapp (order.confirmed once a WhatsApp order is
+// paid and visible on POS/KDS; order.status on every later status change) -- the mirror
+// image of WebhookEvent above, which records the INBOUND half (Cashfree calling us).
+// A row is written durably before the first delivery attempt, so "retried on failure,
+// never lost" (the plan's own requirement) holds even if the process crashes mid-attempt.
+model OutboundWebhookDelivery {
+  id            String                        @id @default(uuid())
+  restaurantId  String
+  restaurant    Restaurant                    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  eventType     String // 'order.confirmed' | 'order.status'
+  payload       Json
+  status        OutboundWebhookDeliveryStatus @default(PENDING)
+  attempts      Int                           @default(0)
+  nextAttemptAt DateTime                      @default(now())
+  lastError     String?
+  deliveredAt   DateTime?
+  createdAt     DateTime                      @default(now())
+  updatedAt     DateTime                      @updatedAt
+
+  @@index([restaurantId])
+  @@index([status, nextAttemptAt])
+}
+
+enum OutboundWebhookDeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILED // attempts exhausted — visible for ops, no longer auto-retried
 }
 
 // Schema only in Phase 1 — no refund endpoint yet, so a later phase doesn't

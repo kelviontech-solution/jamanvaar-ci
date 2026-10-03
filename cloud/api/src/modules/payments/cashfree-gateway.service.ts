@@ -24,6 +24,25 @@ export interface CashfreeOrderStatusResult {
   orderAmount: number;
 }
 
+export interface CreateCashfreePaymentLinkInput {
+  linkId: string; // our own id (alphanumeric/underscore/hyphen, max 50 chars) — becomes Cashfree's link_id
+  amountRupees: number; // link_amount is rupees (2 decimals), unlike orders' amountPaise
+  currency: string;
+  purpose: string;
+  customerPhone: string;
+  customerName: string;
+  expiryIso: string;
+  notifyUrl?: string;
+  orderSplits?: { vendorId: string; percentage: number }[];
+}
+
+export interface CashfreePaymentLinkResult {
+  linkId: string;
+  cfLinkId: string;
+  linkUrl: string;
+  linkStatus: string;
+}
+
 export interface CreateCashfreeRefundInput {
   orderId: string;
   refundId: string;
@@ -183,6 +202,59 @@ export class CashfreeGatewayService {
       throw new ServiceUnavailableException(`Cashfree on-demand settlement failed: ${body?.message ?? res.statusText}`);
     }
     return { settlementId: body?.settlement_id !== undefined && body?.settlement_id !== null ? String(body.settlement_id) : null, raw: body };
+  }
+
+  /**
+   * Payment Links (https://www.cashfree.com/docs/api-reference/payments/latest/payment-links/create):
+   * a DIFFERENT Cashfree product from Orders/createOrder above, not a variant of it. Orders'
+   * payment_session_id has no plain, pasteable "open this to pay" URL at all — Cashfree's own
+   * hosted checkout only opens via their JS SDK (`cashfree.checkout({paymentSessionId})`) running
+   * on a real webpage, confirmed live (a hand-built `.../order/#/checkout?payment_session_id=...`
+   * URL this codebase tried first — see git history — 404s/errors in a browser). Payment Links is
+   * the product actually meant for a plain shareable URL in a chat message: it returns a real
+   * `link_url` a customer can open directly, and Cashfree documents this exact use (WhatsApp Link
+   * Setup) for it. Used only by the WhatsApp connector's checkout — kiosk's own device-based
+   * flow keeps using Orders + createUpiQr below unchanged, since a kiosk screen can run the JS SDK.
+   */
+  async createPaymentLink(input: CreateCashfreePaymentLinkInput): Promise<CashfreePaymentLinkResult> {
+    const res = await fetch(`${this.baseUrl()}/links`, {
+      method: 'POST',
+      headers: this.headers(),
+      body: JSON.stringify({
+        link_id: input.linkId,
+        link_amount: Number(input.amountRupees.toFixed(2)),
+        link_currency: input.currency,
+        link_purpose: input.purpose,
+        customer_details: { customer_phone: input.customerPhone, customer_name: input.customerName },
+        // Our own channel (the WhatsApp bot) sends the link in its own message -- Cashfree must
+        // never also independently SMS/email the customer about the same order.
+        link_notify: { send_sms: false, send_email: false },
+        link_expiry_time: input.expiryIso,
+        ...(input.notifyUrl ? { link_meta: { notify_url: input.notifyUrl } } : {}),
+        ...(input.orderSplits && input.orderSplits.length > 0
+          ? { order_splits: input.orderSplits.map((s) => ({ vendor_id: s.vendorId, percentage: s.percentage })) }
+          : {})
+      })
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new ServiceUnavailableException(`Cashfree payment link creation failed: ${body?.message ?? res.statusText}`);
+    }
+    return { linkId: body.link_id, cfLinkId: body.cf_link_id, linkUrl: body.link_url, linkStatus: body.link_status };
+  }
+
+  /**
+   * Get Payment Link Details (GET /pg/links/{link_id}) — the read-side counterpart to
+   * createPaymentLink above, useful independently of the webhook (e.g. a manual reconcile,
+   * or local testing with no webhook tunnel configured yet).
+   */
+  async getPaymentLinkDetails(linkId: string): Promise<{ linkStatus: string; amountPaid: number; raw: Record<string, unknown> }> {
+    const res = await fetch(`${this.baseUrl()}/links/${encodeURIComponent(linkId)}`, { method: 'GET', headers: this.headers() });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new ServiceUnavailableException(`Cashfree payment link lookup failed: ${body?.message ?? res.statusText}`);
+    }
+    return { linkStatus: body.link_status, amountPaid: body.link_amount_paid, raw: body };
   }
 
   async getOrderStatus(orderId: string): Promise<CashfreeOrderStatusResult> {

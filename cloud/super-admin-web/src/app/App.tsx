@@ -38,6 +38,7 @@ import { SyncMonitorPage } from '../pages/SyncMonitor/SyncMonitorPage';
 import { OfflinePolicyPage } from '../pages/OfflinePolicy/OfflinePolicyPage';
 import { SandboxesPage } from '../pages/Sandboxes/SandboxesPage';
 import { QrOrderingPage } from '../pages/QrOrdering/QrOrderingPage';
+import { WhatsAppOrderingPage } from '../pages/WhatsAppOrdering/WhatsAppOrderingPage';
 import { PaymentConnectionsListPage } from '../pages/PaymentConnections/PaymentConnectionsListPage';
 import { PlatformPaymentsDashboardPage } from '../pages/PlatformPayments/PlatformPaymentsDashboardPage';
 
@@ -71,6 +72,7 @@ export function App() {
               <Route path="/plans" element={page('PlansList', <PlansListPage />)} />
               <Route path="/plans/:id" element={page('PlanDetail', <PlanDetailPage />)} />
               <Route path="/qr-ordering" element={page('QrOrdering', <QrOrderingPage />)} />
+              <Route path="/whatsapp-ordering" element={page('WhatsAppOrdering', <WhatsAppOrderingPage />)} />
               <Route path="/ai-assistant" element={page('AiAssistant', <AiAssistantPage />)} />
               <Route path="/catalog" element={page('MasterCatalog', <MasterCatalogPage />)} />
               <Route path="/subscriptions" element={page('SubscriptionsList', <SubscriptionsListPage />)} />

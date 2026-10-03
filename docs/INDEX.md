@@ -17,6 +17,7 @@ All technical specifications, operational runbooks, architecture designs, and ha
 | **[`architecture/PRODUCT_FLOWS_AND_ARCHITECTURE.md`](./architecture/PRODUCT_FLOWS_AND_ARCHITECTURE.md)** | End-to-end product flows across the ecosystem's apps. |
 | **[`architecture/KITCHEN_FLOW.md`](./architecture/KITCHEN_FLOW.md)** | Order path from Captain/POS to the KDS and back, per-dish status, undo, cancel, courses, and screen sizes. |
 | **[`integrations/WHATSAPP_ORDERING_PLAN_AND_PROMPT.md`](./integrations/WHATSAPP_ORDERING_PLAN_AND_PROMPT.md)** | How the WhatsApp chatbot connects to POS and KDS, the connect-by-key flow, and the prompt for the chatbot repo. |
+| **[`integrations/JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md`](./integrations/JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md)** | Cross-repo execution plan: where the code goes in each repo, backend/DB/frontend changes, team split, and phase-by-phase build + verification gates. |
 | **[`integrations/WHATSAPP_API_KEY_GUIDE.md`](./integrations/WHATSAPP_API_KEY_GUIDE.md)** | How a restaurant gets a WhatsApp API key, in plain language. |
 | **[`integrations/URBANPIPER_ZOMATO_SWIGGY_FLOW.md`](./integrations/URBANPIPER_ZOMATO_SWIGGY_FLOW.md)** | Suggested Zomato and Swiggy flow through UrbanPiper (design only). |
 | **[`reports/MARKET_GAP_ANALYSIS_2026-09-28.md`](./reports/MARKET_GAP_ANALYSIS_2026-09-28.md)** | Feature comparison against the market and the fix list. |
@@ -62,5 +63,10 @@ All technical specifications, operational runbooks, architecture designs, and ha
 | **[`reports/ROLE_BASED_AUDIT_BUGS.md`](./reports/ROLE_BASED_AUDIT_BUGS.md)** | BUG-144…BUG-163, role-based audit findings. |
 | **[`reports/BUG_CHECKLIST.md`](./reports/BUG_CHECKLIST.md)** | Working checklist for tracked bugs. |
 | **[`reports/AUDIT_BRIEF.md`](./reports/AUDIT_BRIEF.md)** | Onboarding brief for whoever picks up the next audit/bug pass. |
+
+### Progress
+| Document | Purpose & Contents |
+| :--- | :--- |
+| **[`PROGRESS_LOG.md`](./PROGRESS_LOG.md)** | Dated, running log of what's actually been done on the WhatsApp connector track (including prerequisite bug fixes) — newest entry first, each says what changed and how it was verified. |
 
 For the current, authoritative security posture, see **[`security-audit/`](../security-audit/EXECUTIVE-SUMMARY.md)** at the repo root — the files above are historical.

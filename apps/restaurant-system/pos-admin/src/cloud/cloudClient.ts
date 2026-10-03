@@ -1048,6 +1048,54 @@ export async function saveDisplayScale(percent: number): Promise<number> {
   return (await request<{ displayScalePercent: number }>('/api/v1/tenant/me/display', { method: 'PATCH', body: { displayScalePercent: percent } })).displayScalePercent;
 }
 
+// ---- WhatsApp ordering connector (docs/integrations/JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md) ----
+
+export interface WhatsAppChannelStatus {
+  status: 'NOT_CONNECTED' | 'PENDING' | 'CONNECTED' | 'REVOKED';
+  keyPrefix?: string;
+  permissions?: string[];
+  autoAccept?: boolean;
+  prepTimeMinutes?: number | null;
+  pausedAt?: string | null;
+  connectedAt?: string | null;
+  lastUsedAt?: string | null;
+}
+
+/** The current WhatsApp connector state for this restaurant. NOT_CONNECTED means no key
+ *  has ever been generated. */
+export async function fetchWhatsAppChannelStatus(): Promise<WhatsAppChannelStatus> {
+  return request<WhatsAppChannelStatus>('/api/v1/tenant/whatsapp-channel/status');
+}
+
+/** Phase 6: whether this restaurant's plan actually includes WhatsApp Ordering right now —
+ *  same shape/role as QR ordering's own entitlement check. Polled alongside status so the
+ *  panel can grey out and explain why, the same way a plan downgrade locks QR ordering. */
+export interface WhatsAppChannelEntitlement {
+  enabled: boolean;
+  reason: 'OK' | 'RESTAURANT_INACTIVE' | 'NO_SUBSCRIPTION' | 'SUBSCRIPTION_EXPIRED' | 'NOT_INCLUDED' | 'DISABLED';
+  lockedMessage: string | null;
+  planName: string | null;
+}
+
+export async function fetchWhatsAppChannelEntitlement(): Promise<WhatsAppChannelEntitlement> {
+  return request<WhatsAppChannelEntitlement>('/api/v1/tenant/whatsapp-channel/entitlement');
+}
+
+/** Generates a fresh key, replacing any existing one. The raw key is returned exactly
+ *  once, here — the caller must show it to the owner immediately; it is never retrievable
+ *  again from any screen or API response. */
+export async function generateWhatsAppChannelKey(): Promise<{ key: string; keyPrefix: string }> {
+  return request<{ key: string; keyPrefix: string }>('/api/v1/tenant/whatsapp-channel/generate-key', { method: 'POST' });
+}
+
+export async function revokeWhatsAppChannelKey(): Promise<void> {
+  await request('/api/v1/tenant/whatsapp-channel/revoke', { method: 'POST' });
+}
+
+export async function updateWhatsAppChannelSettings(input: { autoAccept?: boolean; prepTimeMinutes?: number; paused?: boolean }): Promise<WhatsAppChannelStatus> {
+  return request<WhatsAppChannelStatus>('/api/v1/tenant/whatsapp-channel/settings', { method: 'PATCH', body: input });
+}
+
 /** Reserves a block of human order/KOT numbers for this device so offline terminals never issue the same number. */
 export async function leaseNumberBlock(kind: 'ORDER' | 'KOT', count: number): Promise<{ kind: 'ORDER' | 'KOT'; prefix: string; businessDate: string; start: number; count: number }> {
   const res = await deviceFetch('/api/v1/sync/number-leases', { method: 'POST', body: JSON.stringify({ kind, count }) });

@@ -42,6 +42,8 @@ import { GenerateActivationKeyModal } from '../ActivationKeys/GenerateActivation
 import { AssignSubscriptionModal } from '../Subscriptions/AssignSubscriptionModal';
 import { ChangePlanModal } from '../Subscriptions/ChangePlanModal';
 import { LicenseCertificatePanel } from './LicenseCertificatePanel';
+import { useAuth } from '../../auth/AuthContext';
+import type { Area } from '../../auth/access';
 import {
   Store,
   Users,
@@ -120,6 +122,25 @@ const TABS: Array<{ key: Tab; label: string; icon: React.ComponentType<{ classNa
   { key: 'menu', label: 'Menu', icon: Utensils }
 ];
 
+// B2-052 item 3: a tab not listed here is core restaurant info (overview/owner/branches)
+// and stays visible to anyone who can open this page at all. A tab listed here is hidden
+// entirely — not just its content refused — from a role that can't even read that area,
+// so e.g. Finance never sees "Devices & Keys" or "Backup & Recovery" in the tab bar.
+const TAB_AREA: Partial<Record<Tab, Area>> = {
+  subscription: 'subscriptions',
+  applications: 'ops',
+  plan: 'subscriptions',
+  entitlements: 'subscriptions',
+  devices: 'devices',
+  billing: 'billing',
+  payments: 'billing',
+  reports: 'reports',
+  activity: 'audit',
+  support: 'support',
+  backups: 'ops',
+  menu: 'catalog'
+};
+
 export function formatDeviceTypeLabel(type: string): string {
   switch (type) {
     case 'ANY':
@@ -166,13 +187,28 @@ function paymentStatusTone(status: PlatformPayment['status']): 'success' | 'warn
 
 export function RestaurantDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const { can } = useAuth();
+  // B2-052 item 2: these gate every write-triggering button on this page (disabled, not
+  // hidden — the label still explains what the action is, same as the rest of this app's
+  // read-only banners). The server already refuses the request either way; this stops a
+  // Read-Only/Support/Ops user from ever seeing the confirmation dialog open in the first place.
+  const canWriteRestaurants = can('restaurants', 'write');
+  const canWriteDevices = can('devices', 'write');
+  const canWriteOps = can('ops', 'write');
+  const canWriteCatalog = can('catalog', 'write');
+  const canWriteSubscriptions = can('subscriptions', 'write');
   const [restaurant, setRestaurant] = useState<RestaurantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // B2-052 item 3: hide a tab entirely once its area is unreadable for this role.
+  const visibleTabs = TABS.filter((t) => {
+    const area = TAB_AREA[t.key];
+    return !area || can(area, 'read');
+  });
   // The open tab lives in the URL (?tab=backups), so a notification or a shared link lands on the exact section.
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedTab = searchParams.get('tab');
-  const tab: Tab = TABS.some((t) => t.key === requestedTab) ? (requestedTab as Tab) : 'overview';
+  const tab: Tab = visibleTabs.some((t) => t.key === requestedTab) ? (requestedTab as Tab) : 'overview';
   const setTab = useCallback(
     (next: Tab) => {
       setSearchParams(
@@ -487,13 +523,13 @@ export function RestaurantDetailPage() {
     return (
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
         {(k.status === 'ACTIVE' || k.status === 'REDEEMED') && (
-          <Button size="sm" variant="danger" onClick={() => handleRevokeActivationKey(k.id, label, k.status === 'REDEEMED')}>Revoke</Button>
+          <Button size="sm" variant="danger" disabled={!canWriteDevices} onClick={() => handleRevokeActivationKey(k.id, label, k.status === 'REDEEMED')}>Revoke</Button>
         )}
         {k.status === 'REVOKED' && (
-          <Button size="sm" variant="primary" onClick={() => handleReactivateActivationKey(k.id, label, !!k.redeemedAt)}>Activate again</Button>
+          <Button size="sm" variant="primary" disabled={!canWriteDevices} onClick={() => handleReactivateActivationKey(k.id, label, !!k.redeemedAt)}>Activate again</Button>
         )}
         {k.status !== 'REDEEMED' && (
-          <Button size="sm" variant="ghost" onClick={() => handleDeleteActivationKey(k.id, label)}>Delete</Button>
+          <Button size="sm" variant="ghost" disabled={!canWriteDevices} onClick={() => handleDeleteActivationKey(k.id, label)}>Delete</Button>
         )}
       </div>
     );
@@ -743,17 +779,17 @@ export function RestaurantDetailPage() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-          <Button variant="accent" onClick={() => setModal('activation')}>
+          <Button variant="accent" onClick={() => setModal('activation')} disabled={!canWriteDevices}>
             <KeyRound className="w-4 h-4 mr-1" />
             <span>Generate Key</span>
           </Button>
-          <Button variant="ghost" onClick={() => setModal('edit')}>
+          <Button variant="ghost" onClick={() => setModal('edit')} disabled={!canWriteRestaurants}>
             Edit Restaurant
           </Button>
           <Button
             variant={restaurant.status === 'ACTIVE' ? 'danger' : 'primary'}
             onClick={handleToggleStatus}
-            disabled={actionPending}
+            disabled={actionPending || !canWriteRestaurants}
           >
             {restaurant.status === 'ACTIVE' ? 'Suspend Restaurant' : 'Reactivate Restaurant'}
           </Button>
@@ -768,7 +804,7 @@ export function RestaurantDetailPage() {
 
       {/* 12-Tab Navigation Bar */}
       <div className="tabs" style={{ overflowX: 'auto', whiteSpace: 'nowrap', marginBottom: 20 }}>
-        {TABS.map((t) => {
+        {visibleTabs.map((t) => {
           const IconComponent = t.icon;
           return (
             <button
@@ -893,7 +929,7 @@ export function RestaurantDetailPage() {
               </div>
 
               <div style={{ display: 'flex', gap: 8 }}>
-                <Button variant="accent" size="sm" onClick={() => setModal('activation')}>
+                <Button variant="accent" size="sm" onClick={() => setModal('activation')} disabled={!canWriteDevices}>
                   <Plus className="w-4 h-4 mr-1" />
                   <span>Generate Activation Key</span>
                 </Button>
@@ -977,6 +1013,7 @@ export function RestaurantDetailPage() {
                   <Button
                     size="sm"
                     variant="ghost"
+                    disabled={!canWriteRestaurants}
                     onClick={() => {
                       setResetPasswordUser({ id: owner.id, name: owner.fullName, email: owner.email });
                       setNewPasswordInput('');
@@ -1054,6 +1091,7 @@ export function RestaurantDetailPage() {
                       <Button
                         size="sm"
                         variant="ghost"
+                        disabled={!canWriteRestaurants}
                         onClick={() => {
                           setResetPasswordUser({ id: u.id, name: u.fullName, email: u.email });
                           setNewPasswordInput('');
@@ -1080,7 +1118,7 @@ export function RestaurantDetailPage() {
                 Manage physical store locations, billing counters, and local sync hubs.
               </p>
             </div>
-            <Button variant="accent" onClick={() => setModal('branch')}>
+            <Button variant="accent" onClick={() => setModal('branch')} disabled={!canWriteRestaurants}>
               <Plus className="w-4 h-4 mr-1" />
               <span>Create Branch</span>
             </Button>
@@ -1129,10 +1167,10 @@ export function RestaurantDetailPage() {
               </div>
 
               <div style={{ display: 'flex', gap: 8 }}>
-                <Button variant="ghost" onClick={handleExtendSubscription} disabled={actionPending || !activeSub}>
+                <Button variant="ghost" onClick={handleExtendSubscription} disabled={actionPending || !activeSub || !canWriteSubscriptions}>
                   {activeSub?.status === 'TRIAL' ? 'Extend Trial (+30 Days)' : 'Extend Subscription (+30 Days)'}
                 </Button>
-                <Button variant="accent" onClick={() => setModal('subscription')}>
+                <Button variant="accent" onClick={() => setModal('subscription')} disabled={!canWriteSubscriptions}>
                   Change Plan
                 </Button>
               </div>
@@ -1272,7 +1310,7 @@ export function RestaurantDetailPage() {
                     </div>
                     <Button
                       variant={enabled ? 'ghost' : 'primary'}
-                      disabled={saving}
+                      disabled={saving || !canWriteOps}
                       onClick={() => handleToggleApplication(code, !enabled)}
                       style={{ alignSelf: 'flex-start' }}
                     >
@@ -1429,7 +1467,7 @@ export function RestaurantDetailPage() {
                   Use these keys to onboard and bind terminals (Restaurant Admin, POS Counter, Captain Tablet, KDS).
                 </div>
               </div>
-              <Button variant="accent" onClick={() => setModal('activation')}>
+              <Button variant="accent" onClick={() => setModal('activation')} disabled={!canWriteDevices}>
                 <Plus className="w-4 h-4 mr-1" />
                 <span>Generate Key</span>
               </Button>
@@ -1535,13 +1573,14 @@ export function RestaurantDetailPage() {
                           <Button
                             size="sm"
                             variant="ghost"
+                            disabled={!canWriteDevices}
                             onClick={() => handleToggleDeviceLock(d.id, Boolean(d.isLocked))}
                           >
                             {d.isLocked ? <Unlock className="w-3.5 h-3.5 mr-1" /> : <Lock className="w-3.5 h-3.5 mr-1" />}
                             <span>{d.isLocked ? 'Unlock' : 'Lock'}</span>
                           </Button>
                           {d.status !== 'REVOKED' && (
-                            <Button size="sm" variant="danger" onClick={() => handleRevokeDevice(d.id, d.type)}>
+                            <Button size="sm" variant="danger" disabled={!canWriteDevices} onClick={() => handleRevokeDevice(d.id, d.type)}>
                               Revoke
                             </Button>
                           )}
@@ -2031,7 +2070,7 @@ export function RestaurantDetailPage() {
                 <Button
                   variant="accent"
                   onClick={handleTriggerManualBackup}
-                  disabled={triggeringBackup}
+                  disabled={triggeringBackup || !canWriteOps}
                 >
                   <HardDrive className={`w-4 h-4 mr-1 ${triggeringBackup ? 'animate-spin' : ''}`} />
                   <span>{triggeringBackup ? 'Triggering…' : 'Trigger Cloud Backup'}</span>
@@ -2200,7 +2239,7 @@ export function RestaurantDetailPage() {
               <Button type="button" variant="ghost" onClick={() => setResetPasswordUser(null)}>
                 Cancel
               </Button>
-              <Button type="submit" variant="primary" disabled={resettingPassword || newPasswordInput.trim().length < 4}>
+              <Button type="submit" variant="primary" disabled={resettingPassword || newPasswordInput.trim().length < 4 || !canWriteRestaurants}>
                 {resettingPassword ? 'Saving…' : 'Set New Password'}
               </Button>
             </div>
@@ -2255,7 +2294,7 @@ export function RestaurantDetailPage() {
                       : 'The restaurant admin may upload their own menu CSV from Restaurant Admin → Menu & Catalog.'}
                   </div>
                 </div>
-                <Button variant={menu?.selfUploadEnabled === false ? 'accent' : 'ghost'} onClick={handleToggleMenuPermission} disabled={!menu || menuPermissionSaving}>
+                <Button variant={menu?.selfUploadEnabled === false ? 'accent' : 'ghost'} onClick={handleToggleMenuPermission} disabled={!menu || menuPermissionSaving || !canWriteCatalog}>
                   {menuPermissionSaving ? 'Saving…' : menu?.selfUploadEnabled === false ? 'Allow Self-Upload' : 'Revoke Self-Upload'}
                 </Button>
               </div>

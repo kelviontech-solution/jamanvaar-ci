@@ -6,11 +6,12 @@ import { OfflinePolicyModule } from '../offline-policy/offline-policy.module';
 import { PlatformNotificationsModule } from '../platform-notifications/platform-notifications.module';
 import { PlatformAuthModule } from '../platform-auth/platform-auth.module';
 import { PaymentsModule } from '../payments/payments.module';
+import { WhatsAppOutboundWebhookModule } from '../whatsapp-outbound/whatsapp-outbound-webhook.module';
 import { JobsController } from './jobs.controller';
 import { JobsService } from './jobs.service';
 
 @Module({
-  imports: [PlatformAuthModule, BillingModule, ActivationKeysModule, OfflinePolicyModule, BackupsModule, PlatformNotificationsModule, PaymentsModule],
+  imports: [PlatformAuthModule, BillingModule, ActivationKeysModule, OfflinePolicyModule, BackupsModule, PlatformNotificationsModule, PaymentsModule, WhatsAppOutboundWebhookModule],
   controllers: [JobsController],
   providers: [JobsService],
   exports: [JobsService]
