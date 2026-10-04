@@ -691,7 +691,7 @@ export default function KioskUserApp() {
       } catch (err) {
         console.error('Payment status poll failed:', err);
       }
-    }, 2000);
+    }, 1000);
 
     return () => clearInterval(interval);
     // `lang` must be a dependency: the polling interval's closure captures
