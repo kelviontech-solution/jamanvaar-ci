@@ -34,6 +34,16 @@ describe('Razorpay webhook processing', () => {
       .send(rawBody);
   };
   const signedEvent = (payload: object, secret?: string) => signed(JSON.stringify(payload), secret);
+  const signedEventWithId = (payload: object, eventId: string) => {
+    const body = JSON.stringify(payload);
+    const signature = createHmac('sha256', WEBHOOK_SECRET).update(body).digest('hex');
+    return request(app.getHttpServer())
+      .post('/api/v1/payments/razorpay/webhook')
+      .set('Content-Type', 'application/json')
+      .set('x-razorpay-signature', signature)
+      .set('x-razorpay-event-id', eventId)
+      .send(body);
+  };
 
   const capturedEvent = (amount: number, ref = paymentRef, id = razorpayPaymentId) => ({
     event: 'payment.captured',
@@ -116,6 +126,16 @@ describe('Razorpay webhook processing', () => {
     const after = await payment();
     expect(after.updatedAt).toEqual(before.updatedAt);
     expect(after.status).toBe('SUCCESS');
+  });
+
+  it('the same Razorpay event id delivered twice is processed once, however many retries arrive', async () => {
+    const eventId = `evt_${Date.now()}`;
+    const payload = { event: 'payment.failed', payload: { payment: { entity: { id: `pay_dedupe_${Date.now()}`, amount: 21000, currency: 'INR', status: 'failed', notes: { payment_ref: paymentRef } } } } };
+    await signedEventWithId(payload, eventId);
+    await signedEventWithId(payload, eventId);
+    const rows = await prisma.runAsPlatform((tx) => tx.webhookEvent.findMany({ where: { provider: 'RAZORPAY', providerEventKey: `event:${eventId}` } }));
+    expect(rows.length).toBe(1);
+    expect(rows[0].processingStatus).toBe('IGNORED_DUPLICATE');
   });
 
   it('an unknown payment reference is recorded as a failed WebhookEvent without throwing', async () => {

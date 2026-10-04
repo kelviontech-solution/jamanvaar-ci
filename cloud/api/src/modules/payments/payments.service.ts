@@ -507,7 +507,7 @@ export class PaymentsService {
 
   }
 
-  async processRazorpayWebhook(rawBody: Buffer, signature: string | undefined): Promise<void> {
+  async processRazorpayWebhook(rawBody: Buffer, signature: string | undefined, eventId?: string): Promise<void> {
     const signatureValid = Boolean(signature && this.razorpay.verifyWebhookSignature(rawBody, signature));
     const parsed = this.safeParseJson(rawBody);
     if (!signatureValid || parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
@@ -530,7 +530,7 @@ export class PaymentsService {
     const payload = parsed as Record<string, any>;
     const eventType: string = payload.event;
     if (eventType === 'refund.processed' || eventType === 'refund.failed') {
-      await this.handleRazorpayRefundEvent(payload, eventType);
+      await this.handleRazorpayRefundEvent(payload, eventType, eventId);
       return;
     }
 
@@ -539,7 +539,8 @@ export class PaymentsService {
     const qrEntity = payload.payload?.qr_code?.entity;
     const paymentRef: string | undefined = linkEntity?.reference_id ?? paymentEntity?.notes?.payment_ref ?? qrEntity?.notes?.payment_ref;
     const razorpayPaymentId: string | undefined = paymentEntity?.id;
-    const providerEventKey = `${eventType}:${razorpayPaymentId ?? linkEntity?.id ?? qrEntity?.id ?? randomUUID()}`;
+    // Razorpay's X-Razorpay-Event-Id is unique per event and repeats on every retry, so it is the deduplication key.
+    const providerEventKey = eventId ? `event:${eventId}` : `${eventType}:${razorpayPaymentId ?? linkEntity?.id ?? qrEntity?.id ?? randomUUID()}`;
 
     const existing = await this.prisma.runAsPlatform((tx) =>
       tx.webhookEvent.findUnique({ where: { provider_providerEventKey: { provider: 'RAZORPAY', providerEventKey } } })
@@ -617,10 +618,10 @@ export class PaymentsService {
   }
 
   /** A refund that Razorpay confirms or rejects: updates the Refund row and the payment's refunded state. */
-  private async handleRazorpayRefundEvent(payload: Record<string, any>, eventType: string): Promise<void> {
+  private async handleRazorpayRefundEvent(payload: Record<string, any>, eventType: string, eventId?: string): Promise<void> {
     const refundEntity = payload.payload?.refund?.entity;
     const providerRefundId: string | undefined = refundEntity?.id;
-    const providerEventKey = `${eventType}:${providerRefundId ?? randomUUID()}`;
+    const providerEventKey = eventId ? `event:${eventId}` : `${eventType}:${providerRefundId ?? randomUUID()}`;
     const existing = await this.prisma.runAsPlatform((tx) =>
       tx.webhookEvent.findUnique({ where: { provider_providerEventKey: { provider: 'RAZORPAY', providerEventKey } } })
     );

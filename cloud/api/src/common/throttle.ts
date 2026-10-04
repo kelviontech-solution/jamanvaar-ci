@@ -1,4 +1,5 @@
 import { Throttle } from '@nestjs/throttler';
+import { createHash } from 'crypto';
 
 /**
  * Limit for the endpoints terminals poll (order, table, message and entity sync, heartbeat).
@@ -39,3 +40,9 @@ export const QrGuestOrderThrottle = () => Throttle({ default: { limit: QR_GUEST_
 export const PUBLIC_AUTH_REQUESTS_PER_MINUTE = Number(process.env.PUBLIC_AUTH_RPM) > 0 ? Number(process.env.PUBLIC_AUTH_RPM) : 20;
 
 export const PublicAuthThrottle = () => Throttle({ default: { limit: PUBLIC_AUTH_REQUESTS_PER_MINUTE, ttl: 60_000 } });
+
+/** One bucket per device credential, so a whole restaurant behind one IP does not share a single budget. */
+export function deviceTracker(req: Record<string, any>): string {
+  const auth = typeof req.headers?.authorization === 'string' ? req.headers.authorization : '';
+  return auth ? createHash('sha256').update(auth).digest('hex') : req.ip;
+}

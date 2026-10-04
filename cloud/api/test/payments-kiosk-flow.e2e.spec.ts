@@ -103,6 +103,17 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
 
   // ---------------- QR ----------------
 
+  it('one kiosk can ask for at most 20 QRs a minute; the 21st is refused with 429, and another kiosk is not affected', async () => {
+    const order = await createKioskOrder('kf-rate-qr');
+    const busyKiosk = await deviceFor(restaurantId, 'KIOSK');
+    const statuses: number[] = [];
+    for (let i = 0; i < 21; i += 1) statuses.push((await authed('post', `/api/v1/payments/${order.paymentId}/qr`, busyKiosk)).status);
+    expect(statuses.slice(0, 20).every((s) => s === 201)).toBe(true);
+    expect(statuses[20]).toBe(429);
+    const other = await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+    expect(other.status).toBe(201);
+  });
+
   it('asking again for the QR of a pending payment returns the same QR and creates no second Razorpay QR', async () => {
     const order = await createKioskOrder('kf-qr-same');
     gateway.createUpiQr.mockClear();

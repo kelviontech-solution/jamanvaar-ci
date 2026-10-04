@@ -11,9 +11,13 @@ export class RazorpayWebhookController {
 
   @Post()
   @HttpCode(200)
-  async handle(@Req() request: Request, @Headers('x-razorpay-signature') signature: string | undefined) {
+  async handle(
+    @Req() request: Request,
+    @Headers('x-razorpay-signature') signature: string | undefined,
+    @Headers('x-razorpay-event-id') eventId: string | undefined
+  ) {
     const rawBody = Buffer.isBuffer(request.body) ? request.body : Buffer.from(JSON.stringify(request.body ?? {}), 'utf8');
-    await this.payments.processRazorpayWebhook(rawBody, signature);
+    await this.payments.processRazorpayWebhook(rawBody, signature, eventId);
     return { received: true };
   }
 }
