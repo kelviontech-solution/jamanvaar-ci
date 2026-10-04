@@ -10,6 +10,7 @@ import {
   createPaymentOrder,
   createPaymentQr,
   markPaymentFulfilled,
+  claimKitchenTicket,
   savePendingPayment,
   loadPendingPayment,
   clearPendingPayment,
@@ -1392,7 +1393,17 @@ export default function KioskUserApp() {
       items: kotItems,
       cashierName: 'Kiosk Self-Order'
     });
-    kots.forEach((kot) => PrinterService.printKOT(kot));
+    // A prepaid order's tickets print only once, across every terminal. Online, the server decides who may print.
+    // If the server cannot be reached, the tickets print anyway: a missed kitchen ticket is worse than a rare repeat.
+    let printTickets = true;
+    if (paymentId && isCurrentlyOnline) {
+      try {
+        printTickets = (await claimKitchenTicket(paymentId)).claimed;
+      } catch (err) {
+        console.error('Kitchen ticket claim unavailable; printing locally:', err);
+      }
+    }
+    if (printTickets) kots.forEach((kot) => PrinterService.printKOT(kot));
 
     // The ticket now exists: tell the server, which stops flagging this paid order as needing attention.
     if (paymentId) void acknowledgeFulfilled(paymentId);

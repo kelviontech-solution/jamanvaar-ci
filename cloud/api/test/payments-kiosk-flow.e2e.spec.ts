@@ -103,6 +103,30 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
 
   // ---------------- QR ----------------
 
+  it('a kitchen ticket is claimed once: the first kiosk gets claimed, every later claim is refused', async () => {
+    const p = await seedPayment(restaurantId, { amount: 10000, status: 'SUCCESS' });
+    const first = await authed('post', `/api/v1/payments/${p.id}/kot-claim`, kioskToken);
+    const second = await authed('post', `/api/v1/payments/${p.id}/kot-claim`, kioskToken);
+    expect(first.status).toBe(201);
+    expect(first.body.claimed).toBe(true);
+    expect(second.body.claimed).toBe(false);
+    expect(second.body.claimedAt).not.toBeNull();
+  });
+
+  it('five kiosks claiming the same paid order at the same instant produce exactly one claim', async () => {
+    const p = await seedPayment(restaurantId, { amount: 10000, status: 'SUCCESS' });
+    const kiosks = await Promise.all([1, 2, 3, 4, 5].map(() => deviceFor(restaurantId, 'KIOSK')));
+    const results = await Promise.all(kiosks.map((t) => authed('post', `/api/v1/payments/${p.id}/kot-claim`, t)));
+    expect(results.filter((r) => r.body.claimed === true)).toHaveLength(1);
+  });
+
+  it('only a kiosk can claim a kitchen ticket, and an unpaid order cannot be claimed', async () => {
+    const paid = await seedPayment(restaurantId, { amount: 10000, status: 'SUCCESS' });
+    expect((await authed('post', `/api/v1/payments/${paid.id}/kot-claim`, posToken)).status).toBe(403);
+    const unpaid = await seedPayment(restaurantId, { amount: 10000, status: 'PENDING' });
+    expect((await authed('post', `/api/v1/payments/${unpaid.id}/kot-claim`, kioskToken)).status).toBe(400);
+  });
+
   it('one kiosk can ask for at most 20 QRs a minute; the 21st is refused with 429, and another kiosk is not affected', async () => {
     const order = await createKioskOrder('kf-rate-qr');
     const busyKiosk = await deviceFor(restaurantId, 'KIOSK');

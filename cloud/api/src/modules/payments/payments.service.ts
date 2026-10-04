@@ -341,6 +341,34 @@ export class PaymentsService {
    * stuck one). Idempotent: the first stamp wins. A SUCCESS payment that is never stamped is what the
    * "needs attention" lists are built from.
    */
+  /**
+   * The kitchen ticket claim for one paid kiosk order. Exactly one caller ever gets claimed: true, decided by an
+   * atomic conditional update, so two kiosks (or a retry) cannot both print the ticket for the same payment.
+   */
+  async claimKitchenTicket(restaurantId: string, paymentId: string, device: { id: string; type: string }) {
+    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, select: { id: true, status: true, kotClaimedAt: true } })
+    );
+    if (!payment) throw new NotFoundException('Payment not found');
+    if (!PAID_STATUSES.includes(payment.status)) {
+      throw new BadRequestException(`Cannot claim a kitchen ticket for a payment in status ${payment.status}`);
+    }
+    const claimedAt = new Date();
+    const changed = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.updateMany({ where: { id: paymentId, restaurantId, kotClaimedAt: null }, data: { kotClaimedAt: claimedAt } })
+    );
+    if (changed.count === 1) {
+      await this.prisma.runAsTenant(restaurantId, (tx) =>
+        this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId, action: 'KITCHEN_TICKET_CLAIMED', category: 'PAYMENTS', details: { paymentId, deviceType: device.type } }, tx)
+      );
+      return { claimed: true, claimedAt };
+    }
+    const existing = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId }, select: { kotClaimedAt: true } })
+    );
+    return { claimed: false, claimedAt: existing.kotClaimedAt };
+  }
+
   async markFulfilled(restaurantId: string, paymentId: string, device: { id: string; type: string }) {
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId } })

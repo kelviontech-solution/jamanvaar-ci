@@ -287,6 +287,19 @@ export async function createPaymentQr(paymentId: string): Promise<PaymentQr> {
   return data;
 }
 
+/**
+ * Asks the server for the right to print this paid order's kitchen tickets. Exactly one kiosk gets claimed: true.
+ * A refused claim means another terminal already printed the tickets for this payment.
+ */
+export async function claimKitchenTicket(paymentId: string): Promise<{ claimed: boolean; claimedAt: string | null }> {
+  const res = await deviceFetch(`/api/v1/payments/${paymentId}/kot-claim`, { method: 'POST' });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Could not claim the kitchen ticket (${res.status})`, res.status);
+  }
+  return data;
+}
+
 /** Tells the server the token and KOT now exist for this paid order. Safe to repeat. */
 export async function markPaymentFulfilled(paymentId: string): Promise<void> {
   const res = await deviceFetch(`/api/v1/payments/${paymentId}/fulfilled`, { method: 'POST' });

@@ -63,6 +63,14 @@ export class PaymentOrdersController {
     return this.payments.createUpiQr(device.restaurantId, paymentId);
   }
 
+  @Post(':paymentId/kot-claim')
+  async claimKitchenTicket(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
+    if (device.type !== 'KIOSK') {
+      throw new ForbiddenException('Only a kiosk can claim a kitchen ticket');
+    }
+    return this.payments.claimKitchenTicket(device.restaurantId, paymentId, { id: device.id, type: device.type });
+  }
+
   @Post(':paymentId/fulfilled')
   async fulfilled(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
     if (device.type !== 'KIOSK' && device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
