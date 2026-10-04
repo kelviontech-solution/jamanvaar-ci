@@ -151,6 +151,8 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
   it('a status check settles a payment whose money arrived on its own QR, and ignores other payments', async () => {
     const order = await createKioskOrder('kf-qr-settle');
     await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+    // Past the webhook grace period, so the status check is allowed to ask Razorpay directly.
+    await prisma.runAsPlatform((tx) => tx.paymentTransaction.update({ where: { id: order.paymentId }, data: { createdAt: new Date(Date.now() - 60_000) } }));
     gateway.listQrPayments.mockResolvedValueOnce([{ id: 'pay_other', amount: 999999, currency: 'INR', status: 'captured' }]);
     const notYet = await authed('get', `/api/v1/payments/${order.paymentId}/status`, kioskToken);
     expect(notYet.body.status).toBe('PENDING');

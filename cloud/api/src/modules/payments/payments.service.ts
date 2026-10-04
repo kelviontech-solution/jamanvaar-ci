@@ -53,6 +53,7 @@ const RAZORPAY_EVENT_STATUS: Record<string, 'SUCCESS' | 'FAILED'> = {
 };
 /** A UPI QR stops working after this long; the kiosk shows the same countdown. */
 export const QR_MIN_REMAINING_MS = 30_000;
+const STATUS_WEBHOOK_GRACE_MS = 15_000;
 const QR_TTL_SECONDS = 180;
 /** A paid order with no token/KOT after this long is surfaced as needing attention. */
 export const ATTENTION_GRACE_MS = 3 * 60 * 1000;
@@ -437,7 +438,9 @@ export class PaymentsService {
     if (!payment) throw new NotFoundException('Payment not found');
     const current = payment;
     const qrId = (current.providerResponse as { qr?: { id?: string } } | null)?.qr?.id;
-    if (current.provider === 'RAZORPAY' && qrId && NON_TERMINAL_STATUSES.includes(current.status)) {
+    // Give Razorpay's webhook a short head start: a confirmed payment then reaches the kiosk with no extra lookup.
+    const webhookGraceOver = Date.now() - current.createdAt.getTime() > STATUS_WEBHOOK_GRACE_MS;
+    if (current.provider === 'RAZORPAY' && qrId && webhookGraceOver && NON_TERMINAL_STATUSES.includes(current.status)) {
       const paid = (await this.razorpay.listQrPayments(qrId)).find((p) => p.status === 'captured' && p.amount === current.amount && p.currency === current.currency);
       if (paid) {
         await this.settleRazorpayPayment(current, 'SUCCESS', paid.id, paid, null, false);
