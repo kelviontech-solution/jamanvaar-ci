@@ -71,14 +71,19 @@ check:
 	@echo "=== [2/4] Checking Backend Health (direct, loopback-only) ==="
 	@curl -sf -o /dev/null -w "%{http_code}" http://127.0.0.1:$$(grep -E '^BACKEND_PORT=' .env 2>/dev/null | cut -d '=' -f2 || echo 8010)/api/v1/restaurants | grep -qE "^(200|401)$$" && echo " -> Backend is UP (401/200 on an auth-gated route is correct)" || echo " -> Backend health check FAILED"
 	@echo ""
-	@echo "=== [3/4] Checking Proxy (public, port 80 -- the only host-bound service on this box) ==="
-	@curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:80/ | grep -q "200" && echo " -> Proxy root (qr-guest) is SERVING HTTP 200" || echo " -> Proxy root check FAILED"
+	@echo "=== [3/4] Checking Super Admin Console (direct, bridge-gateway) ==="
+	@curl -s -o /dev/null -w "%{http_code}" http://$$(grep -E '^HOST_BIND_IP=' .env 2>/dev/null | cut -d '=' -f2 || echo 172.17.0.1):$$(grep -E '^PORT=' .env 2>/dev/null | cut -d '=' -f2 || echo 8090)/ | grep -q "200" && echo " -> super-admin-web is SERVING HTTP 200" || echo " -> super-admin-web check FAILED"
 	@echo ""
-	@echo "=== [4/4] Checking Each App Through the Proxy ==="
-	@for path in admin kiosk-admin kiosk pos pos-admin captain kds; do \
-		code=$$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:80/$$path/); \
-		echo " -> /$$path/ : $$code"; \
+	@echo "=== [4/4] Checking Each Terminal/Customer App (direct, bridge-gateway) ==="
+	@HBI=$$(grep -E '^HOST_BIND_IP=' .env 2>/dev/null | cut -d '=' -f2 || echo 172.17.0.1); \
+	for pair in "kiosk-admin:KIOSK_ADMIN_PORT:8091" "kiosk-user:KIOSK_USER_PORT:8092" "pos:POS_PORT:8093" "pos-admin:POS_ADMIN_PORT:8094" "captain:CAPTAIN_PORT:8095" "kds:KDS_PORT:8096" "qr-guest:QR_GUEST_PORT:8097"; do \
+		name=$$(echo $$pair | cut -d: -f1); var=$$(echo $$pair | cut -d: -f2); default=$$(echo $$pair | cut -d: -f3); \
+		port=$$(grep -E "^$${var}=" .env 2>/dev/null | cut -d '=' -f2 || echo $$default); \
+		code=$$(curl -s -o /dev/null -w "%{http_code}" http://$$HBI:$${port:-$$default}/); \
+		echo " -> $$name (port $${port:-$$default}): $$code"; \
 	done
+	@echo ""
+	@echo "Public routing lives at https://system.kelviontech.in/<admin|kiosk-admin|kiosk|pos|pos-admin|captain|kds|q>/ -- see nginx/system.kelviontech.in.conf. Reload the SHARED kelviontech-nginx-1 container after deploying this config, not this stack's own compose."
 
 seed:
 	$(COMPOSE) exec backend npm run seed

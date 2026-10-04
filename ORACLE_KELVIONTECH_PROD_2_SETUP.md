@@ -1,5 +1,17 @@
 # Oracle Cloud — `kelviontech-prod-2` Setup
 
+**Superseded 2026-10-04, same day:** the plan to deploy the full kiosk
+platform here was dropped mid-setup — SSH to this box became unreliable
+(dynamic ISP IP vs. the box's locked-down security list) and the user
+decided to deploy everything to the already-live AWS box instead (see
+`AWS_DEPLOYMENT_MASTER_PLAN.md` and the new terminal-app services in
+`docker-compose.yml` + `nginx/system.kelviontech.in.conf`). The instance
+infrastructure below (VCN, reserved IP, Docker) is still real and running,
+just not what the kiosk platform is actually deployed on. Kept for
+reference in case Oracle is revisited later.
+
+---
+
 Written 2026-10-04. Second Oracle Always Free account, set up because the
 original `kelviontech-prod` VM (on a different Oracle account/tenancy) was
 disabled for exceeding its Ampere Always Free allowance. This is separate
