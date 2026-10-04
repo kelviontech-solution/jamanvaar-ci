@@ -110,6 +110,7 @@ services:
       dockerfile: cloud/super-admin-web/Dockerfile
       args:
         - VITE_API_BASE_URL=${VITE_API_BASE_URL:-}
+        - VITE_ROUTER_BASENAME=${SUPER_ADMIN_BASE_PATH:-}
     container_name: kiosk_frontend
     restart: unless-stopped
     # Defaults to 8090 -- avoids amitkhatri (8080), kelvion (3000/8000), restaurent

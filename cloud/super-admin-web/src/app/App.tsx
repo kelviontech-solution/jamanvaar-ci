@@ -50,7 +50,10 @@ function page(name: string, element: JSX.Element) {
 export function App() {
   return (
     <ErrorBoundary boundaryName="root">
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <BrowserRouter
+        basename={import.meta.env.VITE_ROUTER_BASENAME || undefined}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
         <AuthProvider>
           <Routes>
             <Route path="/login" element={page('Login', <LoginPage />)} />
