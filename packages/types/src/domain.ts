@@ -1064,7 +1064,7 @@ export interface ReceiptConfig {
    *  Default (unset) is the JAMANVAAR brand orange. A physical thermal printout stays
    *  black-and-white regardless — thermal printer hardware cannot print color. */
   accentColor?: string;
-  /** A cash bill carries a light diagonal watermark (default word CASH) so a stack of bills can be sorted at a glance. On unless set to false. */
+  /** A cash bill can carry a faint diagonal watermark (word in cashWatermarkText). Off unless set to true. */
   showCashWatermark?: boolean;
   /** The word repeated in that watermark (default "CASH"). */
   cashWatermarkText?: string;

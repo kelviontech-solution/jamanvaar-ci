@@ -3512,16 +3512,16 @@ export default function AdminApp() {
                       <label className="flex items-start gap-2 text-xs font-semibold text-jaman-navy cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={receiptForm.showCashWatermark !== false}
+                          checked={receiptForm.showCashWatermark === true}
                           onChange={(e) => setReceiptForm({ ...receiptForm, showCashWatermark: e.target.checked })}
                           className="rounded text-jaman-saffron mt-0.5"
                         />
                         <span>
-                          Mark cash bills with a light diagonal watermark
+                          Mark cash bills with a faint diagonal watermark (off by default)
                           <span className="block font-normal text-slate-500 mt-0.5">Bills paid by cash at the counter show the word across the slip in four slanted lines, faint enough to read the bill through it. Card and UPI bills stay plain.</span>
                         </span>
                       </label>
-                      {receiptForm.showCashWatermark !== false && (
+                      {receiptForm.showCashWatermark === true && (
                         <div className="max-w-xs">
                           <label className="block text-[11px] font-bold text-jaman-navy mb-1">Watermark word</label>
                           <input

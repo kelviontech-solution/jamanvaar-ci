@@ -2,13 +2,12 @@ import React from 'react';
 import { Order, ReceiptConfig, KOTRecord } from '@jamanvaar/types';
 import { formatDate, formatINR, formatTime, splitTax } from '@jamanvaar/utils';
 import { JAMANVAAR_LOGOS } from './assets';
-import { CheckCircle2, Phone, Mail, QrCode } from 'lucide-react';
+import { CheckCircle2, Phone, Mail } from 'lucide-react';
 
 export interface ThermalReceiptViewProps {
   order: Order;
   config?: Partial<ReceiptConfig>;
   paperSize?: '80mm' | '58mm';
-  showQrCode?: boolean;
   onPrint?: () => void | Promise<void>;
   onWhatsApp?: () => void | Promise<void>;
   onDownload?: () => void | Promise<void>;
@@ -27,11 +26,32 @@ function friendlyTerminalLabel(kioskId: string | undefined): string {
 }
 
 
-/** Is this a cash bill that should carry the watermark? Settings decide (on by default); the word is editable in Kiosk Admin. */
+/** Is this a cash bill that should carry the watermark? Off unless the restaurant turns it on in Kiosk Admin. */
 export function cashWatermarkFor(order: { paymentMethod?: string }, config?: Partial<ReceiptConfig>): string | null {
   const isCash = order.paymentMethod === 'CASH_AT_COUNTER' || order.paymentMethod === 'CASH';
-  if (!isCash || config?.showCashWatermark === false) return null;
+  if (!isCash || config?.showCashWatermark !== true) return null;
   return (config?.cashWatermarkText || 'CASH').trim().toUpperCase().slice(0, 12) || 'CASH';
+}
+
+/** How a payment reads on a bill: a plain name, never the internal code. */
+export function paymentLabelFor(method: string | undefined): string {
+  switch (method) {
+    case 'CASH':
+    case 'CASH_AT_COUNTER':
+      return 'CASH';
+    case 'UPI':
+    case 'UPI_QR':
+      return 'UPI';
+    case 'CARD':
+    case 'CARD_TERMINAL':
+      return 'CARD';
+    case 'NET_BANKING':
+      return 'NET BANKING';
+    case 'WALLET':
+      return 'WALLET';
+    default:
+      return method ? method.replace(/_/g, ' ') : 'PAID';
+  }
 }
 
 /** Four slanted rows of the word, light enough to read the bill through it. */
@@ -71,7 +91,6 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
   order,
   config = {},
   paperSize = '80mm',
-  showQrCode = true,
   className = ''
 }) => {
   // Only what this restaurant has entered is printed; a missing detail is left out, never invented.
@@ -81,7 +100,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
   const gstin = config.gstin || '';
   const fssaiNumber = config.fssaiNumber || '';
   const thankYouMessage = config.thankYouMessage || 'Thank you for dining with us!';
-  const footerMessage = config.footerMessage || 'Visit again.';
+  const footerMessage = config.footerMessage || '';
   const is80mm = paperSize === '80mm';
   // Receipts are standard black and white on screen and on paper; the restaurant cannot change their colours.
   const watermark = cashWatermarkFor(order, config);
@@ -129,7 +148,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
         <div className="py-2.5 border-b border-dashed border-[#A0AEC0] space-y-1 text-[11px]">
           <div className="flex justify-between items-center pb-1 border-b border-slate-100">
             <span className="font-black text-xs text-black uppercase tracking-wide">
-              TAX INVOICE / RECEIPT
+              {gstin ? 'TAX INVOICE / RECEIPT' : 'BILL / RECEIPT'}
             </span>
             <span className="px-2 py-0.5 rounded font-black text-xs" style={{ backgroundColor: '#fff', color: '#000', border: '1.5px solid #000' }}>
               TOKEN #{order.tokenNumber}
@@ -171,6 +190,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
           <div className="flex justify-between font-bold text-[10px] text-[#718096] uppercase pb-1 border-b border-[#EDF2F7]">
             <span className="flex-1">ITEM</span>
             <span className="w-10 text-center">QTY</span>
+            <span className="w-14 text-right">RATE</span>
             <span className="w-14 text-right">AMT</span>
           </div>
 
@@ -180,6 +200,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
                 <div className="flex justify-between items-start">
                   <span className="flex-1 font-semibold text-[#1A202C]">{it.name}</span>
                   <span className="w-10 text-center font-bold">{it.quantity || 1}</span>
+                  <span className="w-14 text-right">₹{it.unitPrice}</span>
                   <span className="w-14 text-right font-bold">₹{it.totalPrice ?? (it.unitPrice * (it.quantity || 1))}</span>
                 </div>
                 {it.modifiers && it.modifiers.length > 0 && (
@@ -246,35 +267,25 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
         {/* Payment Confirmation — cash is marked by a heavier border than digital payments, so a
             cashier scanning a stack of receipts can tell which need to be reconciled against the
             cash drawer at a glance (on-screen/WhatsApp only; the printed slip is monochrome). */}
-        {(() => {
-          const isCash = order.paymentMethod === 'CASH_AT_COUNTER' || order.paymentMethod === 'CASH';
-          return (
-            <div className="py-2 border-b border-dashed border-[#A0AEC0] flex justify-between items-center text-[11px]">
-              <span className="font-bold text-[#4A5568]">PAID VIA:</span>
-              <span
-                className={`font-black uppercase px-2 py-0.5 rounded border ${
-                  isCash ? 'text-black bg-white border-black border-2' : 'text-black bg-white border-neutral-500'
-                }`}
-              >
-                {order.paymentMethod}
-              </span>
+        <div className="py-2 border-b border-dashed border-[#A0AEC0] space-y-1 text-[11px]">
+          <div className="flex justify-between items-center">
+            <span className="font-bold text-[#4A5568]">PAID VIA:</span>
+            <span className="font-black uppercase px-2 py-0.5 rounded border-2 border-black text-black bg-white">
+              {paymentLabelFor(order.paymentMethod)}
+            </span>
+          </div>
+          {order.paymentTransactionId && (
+            <div className="flex justify-between text-[10px] text-[#718096]">
+              <span>Payment ref:</span>
+              <span className="font-mono break-all text-right">{order.paymentTransactionId}</span>
             </div>
-          );
-        })()}
+          )}
+        </div>
 
         {/* Footer with Optional QR and Brand Credits */}
         <div className="text-center pt-3 text-[10px] space-y-1.5 text-[#718096]">
           <div className="font-bold text-[#2D3748]">{thankYouMessage}</div>
           <div>{footerMessage}</div>
-
-          {showQrCode && (
-            <div className="py-1 flex flex-col items-center">
-              <div className="w-16 h-16 bg-[#FAF7F2] border border-[#E2E8F0] rounded-lg p-1 flex items-center justify-center">
-                <QrCode className="w-full h-full text-black" />
-              </div>
-              <span className="text-[8px] text-[#A0AEC0] mt-0.5">Scan for E-Bill & Feedback</span>
-            </div>
-          )}
 
           <div className="pt-1 border-t border-slate-100">
             <span className="text-[9px] font-black text-black tracking-wider">
@@ -305,7 +316,7 @@ export function printThermalReceipt(
   const gstin = config?.gstin || '';
   const fssaiNumber = config?.fssaiNumber || '';
   const thankYouMessage = config?.thankYouMessage || 'Thank you for dining with us!';
-  const footerMessage = config?.footerMessage || 'Visit again.';
+  const footerMessage = config?.footerMessage || '';
 
   const watermark = cashWatermarkFor(order, config);
   const watermarkHtml = watermark
@@ -412,7 +423,7 @@ export function printThermalReceipt(
         <div class="divider"></div>
 
         <div class="text-center">
-          <div class="bold" style="font-size: 11px;">TAX INVOICE / CASH RECEIPT</div>
+          <div class="bold" style="font-size: 11px;">${gstin ? 'TAX INVOICE / RECEIPT' : 'BILL / RECEIPT'}</div>
           <div class="token-badge">TOKEN #${order.tokenNumber}</div>
         </div>
 
@@ -457,8 +468,9 @@ export function printThermalReceipt(
 
         <div class="row">
           <span>PAID VIA:</span>
-          <span class="bold">${order.paymentMethod || 'PAID'} (${order.paymentStatus || 'SUCCESS'})</span>
+          <span class="bold">${paymentLabelFor(order.paymentMethod)}</span>
         </div>
+        ${order.paymentTransactionId ? `<div class="row" style="font-size: 9px;"><span>Payment ref:</span><span>${order.paymentTransactionId}</span></div>` : ''}
 
         <div class="divider"></div>
 

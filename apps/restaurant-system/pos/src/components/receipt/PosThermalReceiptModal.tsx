@@ -201,7 +201,6 @@ export const PosThermalReceiptModal: React.FC = () => {
             order={order}
             config={config}
             paperSize={paperWidth}
-            showQrCode={true}
           />
         </div>
 
