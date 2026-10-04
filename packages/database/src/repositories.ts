@@ -2223,13 +2223,20 @@ export class ReceiptRepository {
     // print a stale/independently-seeded GSTIN, address or phone that
     // disagrees with what the owner actually saved (the "third
     // independently-hardcoded GSTIN" bug the QA audit found on the Kiosk).
+    const restaurantName = db.restaurant.name || db.receiptConfig.restaurantName;
+    // A stored "Thank you for dining at <name>!" that names some other restaurant is stale (left over from another
+    // install's settings): it follows the restaurant's current name instead of printing a stranger's name on the bill.
+    const thankYou = db.receiptConfig.thankYouMessage ?? '';
+    const named = thankYou.match(/^Thank you for dining at (.+?)!/);
+    const staleThankYou = Boolean(named && restaurantName && named[1].trim() !== restaurantName.trim());
     return {
       ...db.receiptConfig,
-      restaurantName: db.restaurant.name || db.receiptConfig.restaurantName,
+      restaurantName,
       address: db.restaurant.address || db.receiptConfig.address,
       phone: db.restaurant.phone || db.receiptConfig.phone,
       gstin: db.restaurant.gstin || db.receiptConfig.gstin,
-      fssaiNumber: db.restaurant.fssaiNumber || db.receiptConfig.fssaiNumber
+      fssaiNumber: db.restaurant.fssaiNumber || db.receiptConfig.fssaiNumber,
+      thankYouMessage: staleThankYou ? `Thank you for dining at ${restaurantName}! Please visit again.` : db.receiptConfig.thankYouMessage
     };
   }
 

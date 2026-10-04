@@ -100,7 +100,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
   const gstin = config.gstin || '';
   const fssaiNumber = config.fssaiNumber || '';
   const thankYouMessage = config.thankYouMessage || 'Thank you for dining with us!';
-  const footerMessage = config.footerMessage || 'Visit again.';
+  const footerMessage = config.footerMessage || '';
   const is80mm = paperSize === '80mm';
   // Receipts are standard black and white on screen and on paper; the restaurant cannot change their colours.
   const watermark = cashWatermarkFor(order, config);
@@ -148,7 +148,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
         <div className="py-2.5 border-b border-dashed border-[#A0AEC0] space-y-1 text-[11px]">
           <div className="flex justify-between items-center pb-1 border-b border-slate-100">
             <span className="font-black text-xs text-black uppercase tracking-wide">
-              TAX INVOICE / RECEIPT
+              {gstin ? 'TAX INVOICE / RECEIPT' : 'BILL / RECEIPT'}
             </span>
             <span className="px-2 py-0.5 rounded font-black text-xs" style={{ backgroundColor: '#fff', color: '#000', border: '1.5px solid #000' }}>
               TOKEN #{order.tokenNumber}
@@ -316,7 +316,7 @@ export function printThermalReceipt(
   const gstin = config?.gstin || '';
   const fssaiNumber = config?.fssaiNumber || '';
   const thankYouMessage = config?.thankYouMessage || 'Thank you for dining with us!';
-  const footerMessage = config?.footerMessage || 'Visit again.';
+  const footerMessage = config?.footerMessage || '';
 
   const watermark = cashWatermarkFor(order, config);
   const watermarkHtml = watermark
@@ -423,7 +423,7 @@ export function printThermalReceipt(
         <div class="divider"></div>
 
         <div class="text-center">
-          <div class="bold" style="font-size: 11px;">TAX INVOICE / RECEIPT</div>
+          <div class="bold" style="font-size: 11px;">${gstin ? 'TAX INVOICE / RECEIPT' : 'BILL / RECEIPT'}</div>
           <div class="token-badge">TOKEN #${order.tokenNumber}</div>
         </div>
 
