@@ -16,7 +16,7 @@ const path = require('path');
 const args = process.argv.slice(2);
 const kidIdx = args.indexOf('--kid');
 const kid = kidIdx >= 0 ? args[kidIdx + 1] : 'k3';
-const positional = args.filter((a, i) => !a.startsWith('--') && i !== kidIdx + 1);
+const positional = args.filter((a, i) => !a.startsWith('--') && (kidIdx < 0 || i !== kidIdx + 1));
 const out = path.resolve(positional[0] || path.join(os.homedir(), 'jamanvaar-production.env'));
 
 if (/onedrive|dropbox|google drive/i.test(out) || out.startsWith(path.resolve(__dirname, '..', '..', '..'))) {
