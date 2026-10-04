@@ -65,14 +65,20 @@ logs-db:
 	$(COMPOSE) logs -f db
 
 check:
-	@echo "=== [1/3] Checking Docker Container Status ==="
+	@echo "=== [1/4] Checking Docker Container Status ==="
 	@$(COMPOSE) ps
 	@echo ""
-	@echo "=== [2/3] Checking Backend Health (direct, loopback-only) ==="
+	@echo "=== [2/4] Checking Backend Health (direct, loopback-only) ==="
 	@curl -sf -o /dev/null -w "%{http_code}" http://127.0.0.1:$$(grep -E '^BACKEND_PORT=' .env 2>/dev/null | cut -d '=' -f2 || echo 8010)/api/v1/restaurants | grep -qE "^(200|401)$$" && echo " -> Backend is UP (401/200 on an auth-gated route is correct)" || echo " -> Backend health check FAILED"
 	@echo ""
-	@echo "=== [3/3] Checking Frontend Web Access ==="
-	@curl -s -o /dev/null -w "%{http_code}" http://$$(grep -E '^HOST_BIND_IP=' .env 2>/dev/null | cut -d '=' -f2 || echo 172.17.0.1):$$(grep -E '^PORT=' .env 2>/dev/null | cut -d '=' -f2 || echo 8090)/ | grep -q "200" && echo " -> Frontend is SERVING HTTP 200" || echo " -> Frontend response check FAILED"
+	@echo "=== [3/4] Checking Proxy (public, port 80 -- the only host-bound service on this box) ==="
+	@curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:80/ | grep -q "200" && echo " -> Proxy root (qr-guest) is SERVING HTTP 200" || echo " -> Proxy root check FAILED"
+	@echo ""
+	@echo "=== [4/4] Checking Each App Through the Proxy ==="
+	@for path in admin kiosk-admin kiosk pos pos-admin captain kds; do \
+		code=$$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:80/$$path/); \
+		echo " -> /$$path/ : $$code"; \
+	done
 
 seed:
 	$(COMPOSE) exec backend npm run seed

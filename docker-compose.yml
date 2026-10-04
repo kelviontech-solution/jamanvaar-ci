@@ -113,19 +113,192 @@ services:
         - VITE_API_BASE_URL=${VITE_API_BASE_URL:-}
     container_name: kiosk_frontend
     restart: unless-stopped
-    # Defaults to 8090 -- avoids amitkhatri (8080), kelvion (3000/8000), restaurent
-    # (3001/8001) and Wrench (8085). Bound to the Docker bridge gateway (172.17.0.1), not
-    # 0.0.0.0 -- confirmed against the box's own real convention (amitkhatri-web-1 binds
-    # 172.17.0.1:8080, not a public 0.0.0.0) rather than assumed: the shared
-    # kelviontech-nginx-1 container is the only thing meant to reach this port, terminating
-    # real TLS first. Override HOST_BIND_IP only for a one-off direct-port smoke test.
-    ports:
-      - "${HOST_BIND_IP:-172.17.0.1}:${PORT:-8090}:80"
+    # No host port here -- on kelviontech-prod-2 (Oracle, dedicated box, no shared
+    # kelviontech-nginx-1 in front of it), the `proxy` service below is the only thing
+    # bound to the host. Every app is reached through it, over the internal
+    # kiosk_network, by its Docker Compose service name -- see
+    # nginx/oracle-testing-proxy.conf. (On the AWS bridge box's shared-nginx pattern, this
+    # service WOULD publish to 172.17.0.1:8090 instead -- see AWS_DEPLOYMENT_MASTER_PLAN.md
+    # and nginx/system.kelviontech.in.conf for that production convention.)
     depends_on:
       - backend
     networks:
       - kiosk_network
     mem_limit: 256m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Terminal / customer-facing apps ─────────────────────────────────────────────────
+  # None of these existed as Docker images before this pass -- only cloud/api and
+  # cloud/super-admin-web were deployed anywhere (see AWS_DEPLOYMENT_MASTER_PLAN.md
+  # section 4). Added here so the whole platform can be exercised online on
+  # kelviontech-prod-2, not just the admin console. Each one calls cloud/api directly at
+  # an ABSOLUTE origin baked in at build time (VITE_CLOUD_API_BASE_URL -- see each app's
+  # src/cloud/cloudClient.ts or, for qr-guest, src/api.ts), unlike super-admin-web's
+  # same-origin relative-path pattern, because these are built to run as real terminal
+  # apps potentially on a different network than the API. PUBLIC_ORIGIN in .env must be
+  # this box's own reachable address (e.g. http://130.210.16.150) so those baked-in
+  # fetches land on the `proxy` service below and stay same-origin (no CORS needed).
+  kiosk-admin:
+    build:
+      context: .
+      dockerfile: apps/kiosk-system/kiosk-admin/Dockerfile
+      args:
+        - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
+    container_name: kiosk_kiosk_admin
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - kiosk_network
+    mem_limit: 128m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  kiosk-user:
+    build:
+      context: .
+      dockerfile: apps/kiosk-system/kiosk-user/Dockerfile
+      args:
+        - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
+    container_name: kiosk_kiosk_user
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - kiosk_network
+    mem_limit: 128m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  pos:
+    build:
+      context: .
+      dockerfile: apps/restaurant-system/pos/Dockerfile
+      args:
+        - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
+    container_name: kiosk_pos
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - kiosk_network
+    mem_limit: 128m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  pos-admin:
+    build:
+      context: .
+      dockerfile: apps/restaurant-system/pos-admin/Dockerfile
+      args:
+        - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
+        - VITE_QR_ORDER_URL=${PUBLIC_ORIGIN:-}
+    container_name: kiosk_pos_admin
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - kiosk_network
+    mem_limit: 128m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  captain:
+    build:
+      context: .
+      dockerfile: apps/restaurant-system/captain/Dockerfile
+      args:
+        - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
+    container_name: kiosk_captain
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - kiosk_network
+    mem_limit: 128m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  kds:
+    build:
+      context: .
+      dockerfile: apps/restaurant-system/kds/Dockerfile
+      args:
+        - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
+    container_name: kiosk_kds
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - kiosk_network
+    mem_limit: 128m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  qr-guest:
+    build:
+      context: .
+      dockerfile: apps/qr-guest/Dockerfile
+      args:
+        - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
+    container_name: kiosk_qr_guest
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - kiosk_network
+    mem_limit: 128m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Testing-only on this box -- see nginx/oracle-testing-proxy.conf's own header comment.
+  # The ONE thing bound to the host; everything above is internal-only on kiosk_network.
+  proxy:
+    image: nginx:1.25-alpine
+    container_name: kiosk_proxy
+    restart: unless-stopped
+    volumes:
+      - ./nginx/oracle-testing-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+      - kiosk-admin
+      - kiosk-user
+      - pos
+      - pos-admin
+      - captain
+      - kds
+      - qr-guest
+    networks:
+      - kiosk_network
+    mem_limit: 64m
     logging:
       driver: "json-file"
       options:
