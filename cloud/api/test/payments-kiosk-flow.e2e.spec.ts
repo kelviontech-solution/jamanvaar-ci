@@ -330,7 +330,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
 
   it('the day statement adds up gross, commission, refunds and the restaurant net using the original split', async () => {
     const a = await seedPayment(restaurantId, { amount: 10000, bps: 200, paidAt: jan15, fulfilled: true }); // platform 200, restaurant 9800
-    await seedPayment(restaurantId, { amount: 5000, bps: 0, paidAt: jan15, fulfilled: true }); // platform 0, restaurant 5000
+    await seedPayment(restaurantId, { amount: 5000, bps: 300, paidAt: jan15, fulfilled: true }); // platform 150, restaurant 4850
     await prisma.runAsTenant(restaurantId, (tx) =>
       tx.refund.create({ data: { paymentId: a.id, restaurantId, amount: 4000, status: 'SUCCESS', processedAt: jan15 } })
     );
@@ -348,11 +348,13 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
         refundCount: 1,
         grossVolume: 15000,
         refundedAmount: 4000,
-        platformCommission: 200,
+        platformCommission: 350,
+        cashfreeFee: 300,
+        platformNetCommission: 50,
         commissionReversed: 80,
-        restaurantGross: 14800,
+        restaurantGross: 14650,
         restaurantRefundImpact: 3920,
-        netPayableToRestaurant: 10880
+        netPayableToRestaurant: 10730
       });
       expect(res.body.rows.length).toBe(2);
     }

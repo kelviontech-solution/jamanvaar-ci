@@ -88,7 +88,7 @@ import {
   ActivationHelpNote,
   CachedImg
 } from '@jamanvaar/ui';
-import { formatDate, formatINR, formatSplitTax, formatTime, generateIdempotencyKey, generateQrDataUrl, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatSplitTax, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
 import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService, Platform } from '@jamanvaar/api';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncPromotions, syncFeedback, pushServiceMessages } from '@jamanvaar/sync';
@@ -186,8 +186,8 @@ function formatActivationKeyInput(raw: string): string {
 function toQrImageSrc(payload: string, contentType: string | null): string | null {
   const trimmed = payload.trim();
   if (trimmed.startsWith('data:image/')) return trimmed;
-  // A web address (the payment page): drawn as a QR here, so it works with no image from the server.
-  if (/^https?:\/\//i.test(trimmed)) return generateQrDataUrl(trimmed);
+  // Razorpay's QR image address: shown as is.
+  if (contentType === 'image/url' && /^https:\/\//i.test(trimmed)) return trimmed;
   if (trimmed.length > 100 && /^[A-Za-z0-9+/=\s]+$/.test(trimmed)) {
     const mime = contentType && contentType.startsWith('image/') ? contentType : 'image/png';
     return `data:${mime};base64,${trimmed.replace(/\s+/g, '')}`;
@@ -449,6 +449,8 @@ export default function KioskUserApp() {
   const [realPaymentId, setRealPaymentId] = useState<string | null>(null);
   const [localOrderIdForPayment, setLocalOrderIdForPayment] = useState<string | null>(null);
   const [cashfreeUnavailable, setCashfreeUnavailable] = useState(false);
+  // The restaurant's online payments are switched on only once its Cashfree vendor is verified. Until then the guest is told so.
+  const [onlinePaymentsPending, setOnlinePaymentsPending] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   // The UPI QR shown on this screen for the pending payment (created by the server, rendered here).
   const [qrImageSrc, setQrImageSrc] = useState<string | null>(null);
@@ -456,7 +458,6 @@ export default function KioskUserApp() {
   const [qrSecondsLeft, setQrSecondsLeft] = useState(0);
   const [qrLoading, setQrLoading] = useState(false);
   // True when the QR opens a payment page (scanned with the phone camera) rather than being a UPI QR any UPI app can scan.
-  const [qrOpensPage, setQrOpensPage] = useState(false);
   // Bounded window (from order creation) that background payment-status
   // polling keeps running past the visible countdown's expiry, so a UPI
   // payment that Cashfree confirms moments after the customer is told to
@@ -599,8 +600,10 @@ export default function KioskUserApp() {
     }
   };
 
+  const awaitingOnlinePayment = step === 'CHECKOUT_PAYMENT' && paymentMethod === 'UPI' && !cashfreeUnavailable && paymentStatus !== 'EXPIRED';
+
   useEffect(() => {
-    if (step === 'WELCOME' || step === 'LANGUAGE_SELECT') return;
+    if (step === 'WELCOME' || step === 'LANGUAGE_SELECT' || awaitingOnlinePayment) return;
 
     const interval = setInterval(() => {
       setIdleSeconds((prev) => {
@@ -613,7 +616,7 @@ export default function KioskUserApp() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [step, showIdleWarning]);
+  }, [step, showIdleWarning, awaitingOnlinePayment]);
 
   // Idle Countdown
   useEffect(() => {
@@ -1138,7 +1141,6 @@ export default function KioskUserApp() {
       if (!src) throw new Error('Cashfree returned a QR the kiosk cannot display');
       const expires = new Date(qr.expiresAt).getTime();
       setQrImageSrc(src);
-      setQrOpensPage(qr.method === 'CHECKOUT_PAGE');
       setQrExpiresAt(expires);
       setQrSecondsLeft(Math.max(0, Math.round((expires - Date.now()) / 1000)));
       setPaymentStatus('WAITING_FOR_USER');
@@ -1287,7 +1289,7 @@ export default function KioskUserApp() {
         showToast('Your order total was updated to match the latest price.');
       }
 
-      if (!result.paymentSessionId) {
+      if (!result.paymentId) {
         setCashfreeUnavailable(true);
         return;
       }
@@ -1301,6 +1303,7 @@ export default function KioskUserApp() {
       // yet (payments.service.ts's own gate) — not a transient failure, so
       // no retry is offered; fall straight to the cash-at-counter messaging.
       console.error('Payment order creation failed:', err);
+      setOnlinePaymentsPending(err instanceof CloudApiError && err.code === 'PAYMENTS_NOT_ACTIVE');
       setCashfreeUnavailable(true);
     }
   };
@@ -3020,7 +3023,7 @@ export default function KioskUserApp() {
                     text saying it was unavailable. Now marked the same way OFFLINE already is. */}
                 {(networkState === 'OFFLINE' || cashfreeUnavailable) && (
                   <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded">
-                    {networkState === 'OFFLINE' ? 'Requires Internet' : 'Unavailable'}
+                    {networkState === 'OFFLINE' ? 'Requires Internet' : onlinePaymentsPending ? 'Being set up' : 'Unavailable'}
                   </span>
                 )}
               </div>
@@ -3094,10 +3097,9 @@ export default function KioskUserApp() {
                 {qrImageSrc ? (
                   <>
                     <p className="text-sm font-semibold text-[#4A5568]">
-                      {qrOpensPage ? 'Scan with your phone camera to pay' : 'Scan with any UPI app to pay'} <span className="font-black text-jaman-saffron">{formatINR(netTotalPayable)}</span>
+                      Scan with any UPI app to pay <span className="font-black text-jaman-saffron">{formatINR(netTotalPayable)}</span>
                     </p>
-                    {qrOpensPage && <p className="text-xs text-[#4A5568]">Open the link that appears, then choose GPay, PhonePe, Paytm or any UPI app.</p>}
-                    <div className="mx-auto w-64 h-64 bg-white p-3 rounded-2xl border-2 border-slate-900 shadow-md flex items-center justify-center">
+                    <div className="mx-auto w-[min(88vw,520px)] h-[min(88vw,520px)] bg-white p-3 rounded-2xl border-2 border-slate-900 shadow-md flex items-center justify-center">
                       <img src={qrImageSrc} alt="UPI payment QR code" className="w-full h-full object-contain" />
                     </div>
                     <div className="text-xs text-[#8C9BAE] font-medium flex items-center justify-center gap-1.5">
@@ -3118,8 +3120,12 @@ export default function KioskUserApp() {
             {paymentMethod === 'UPI' && cashfreeUnavailable && (
               <div className="py-8 space-y-4">
                 <Coins className="w-16 h-16 text-jaman-saffron mx-auto" />
-                <h3 className="text-xl font-black text-jaman-navy">Online Payment Unavailable</h3>
-                <p className="text-sm text-[#4A5568]">Please pay cash at the counter instead — you'll get your token as soon as you confirm.</p>
+                <h3 className="text-xl font-black text-jaman-navy">{onlinePaymentsPending ? 'Online payment is being set up' : 'Online Payment Unavailable'}</h3>
+                <p className="text-sm text-[#4A5568]">
+                  {onlinePaymentsPending
+                    ? 'This restaurant is verifying its online payments. Please pay cash at the counter for now — you will get your token as soon as you confirm.'
+                    : "Please pay cash at the counter instead — you'll get your token as soon as you confirm."}
+                </p>
               </div>
             )}
 

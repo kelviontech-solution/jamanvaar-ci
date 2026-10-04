@@ -5,6 +5,8 @@ import { CloudApiError, cloudRequestPasswordResetOwner, cloudResetPasswordOwner 
 interface Props {
   defaultRestaurantCode?: string;
   onBack: () => void;
+  /** Opens the first-time activation screen, for an owner who has not set a password yet. */
+  onActivate: () => void;
   /** Called after the password was changed; the sign-in screen can say so. */
   onDone: () => void;
 }
@@ -14,7 +16,7 @@ interface Props {
  * 6-digit code emailed to the owner's recovery address (shown masked), enter the code with a
  * new password. The code expires in 15 minutes and works once.
  */
-export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '', onBack, onDone }) => {
+export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '', onBack, onActivate, onDone }) => {
   const [step, setStep] = useState<'RESTAURANT_ID' | 'CODE'>('RESTAURANT_ID');
   const [restaurantCode, setRestaurantCode] = useState(defaultRestaurantCode);
   const [otp, setOtp] = useState('');
@@ -32,7 +34,11 @@ export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '
     setError('');
     setBusy(true);
     try {
-      const { maskedEmail: masked } = await cloudRequestPasswordResetOwner(restaurantCode.trim());
+      const { maskedEmail: masked, activationRequired } = await cloudRequestPasswordResetOwner(restaurantCode.trim());
+      if (activationRequired) {
+        setError('This account is not activated yet. Activate it first with the invitation token from your welcome email.');
+        return;
+      }
       setMaskedEmail(masked);
       setStep('CODE');
     } catch (err) {
@@ -77,6 +83,11 @@ export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '
             <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">Restaurant ID *</label>
             <input type="text" value={restaurantCode} onChange={(e) => { setRestaurantCode(e.target.value); setError(''); }} placeholder="e.g. JM9876543210" autoFocus required className={`${inputClass} font-mono`} />
           </div>
+          {error && error.includes('not activated yet') && (
+            <button type="button" onClick={onActivate} className="w-full py-2.5 rounded-2xl bg-jaman-navy text-white text-xs font-bold cursor-pointer">
+              Activate account
+            </button>
+          )}
           {error && (
             <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5" role="alert">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />

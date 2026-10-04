@@ -37,6 +37,7 @@ export function bodyLimitFor(path: string, hasAuthorization: boolean): number {
 export function installBodyParsers(app: INestApplication): void {
   // The Cashfree webhook needs the exact raw bytes for its signature check; registered first so json() skips that one path.
   app.use('/api/v1/payments/cashfree/webhook', raw({ type: '*/*', limit: '1mb' }));
+  app.use('/api/v1/payments/razorpay/webhook', raw({ type: '*/*', limit: '1mb' }));
   const jsonParsers = new Map<number, ReturnType<typeof json>>();
   app.use((req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) => {
     const limit = bodyLimitFor(req.originalUrl ?? req.url ?? '', typeof req.headers.authorization === 'string' && req.headers.authorization.length > 0);

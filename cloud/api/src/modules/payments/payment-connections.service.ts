@@ -5,6 +5,7 @@ import { PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { CashfreeGatewayService } from './cashfree-gateway.service';
+import { MIN_COMMISSION_BPS } from './commission.util';
 import { encryptCredential, decryptCredential } from '../../common/security/credential-encryption.util';
 import { requireStepUpPassword } from '../../common/security/step-up.util';
 import { SubmitPaymentConnectionDto } from './dto/payment-connection.dto';
@@ -343,6 +344,7 @@ export class PaymentConnectionsService {
       throw new BadRequestException('overrideBps must be null or an integer between 0 and 10000');
     }
     await requireStepUpPassword(actor, password);
+    if (overrideBps !== null && overrideBps < MIN_COMMISSION_BPS) throw new BadRequestException("The commission must be at least 2%, because Cashfree's 2% fee is paid out of it.");
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
       if (!existing) throw new NotFoundException('No payment connection for this restaurant');

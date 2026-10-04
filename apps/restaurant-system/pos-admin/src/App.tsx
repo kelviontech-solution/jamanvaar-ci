@@ -10,6 +10,7 @@ import {
   StaffRepository
 } from '@jamanvaar/database';
 import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
+import { ActivateOwnerPanel } from './components/auth/ActivateOwnerPanel';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
 import { SyncHealthPanel } from './components/sync/SyncHealthPanel';
 import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements } from './cloud/cloudClient';
@@ -214,7 +215,17 @@ export default function PosAdminApp() {
 
   // Two-phase auth state: 'LOGIN' (enter email + password) or 'ACTIVATION_REQUIRED' (enter JMV key)
   const [passwordResetNotice, setPasswordResetNotice] = useState(false);
-  const [authScreenState, setAuthScreenState] = useState<'LOGIN' | 'ACTIVATION_REQUIRED' | 'FORGOT'>('LOGIN');
+  const [authScreenState, setAuthScreenState] = useState<'LOGIN' | 'ACTIVATION_REQUIRED' | 'FORGOT' | 'ACTIVATE'>('LOGIN');
+  const [activatePrefill, setActivatePrefill] = useState<{ code: string; email: string; token: string } | null>(null);
+
+  // The owner's welcome email links here with the Restaurant ID, email and token in the address. Read them once, then drop them from the address bar.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('activate') !== '1') return;
+    setActivatePrefill({ code: params.get('code') ?? '', email: params.get('email') ?? '', token: params.get('token') ?? '' });
+    setAuthScreenState('ACTIVATE');
+    window.history.replaceState({}, '', window.location.pathname);
+  }, []);
   const [activationSessionToken, setActivationSessionToken] = useState('');
   const [activationKeyInput, setActivationKeyInput] = useState('');
   const [activationBusy, setActivationBusy] = useState(false);
@@ -588,10 +599,29 @@ export default function PosAdminApp() {
           footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
         >
           <ActivationNoticeBanner />
-          {authScreenState === 'FORGOT' ? (
+          {authScreenState === 'ACTIVATE' ? (
+            <ActivateOwnerPanel
+              defaultRestaurantCode={activatePrefill?.code ?? authRestaurantCode}
+              defaultEmail={activatePrefill?.email ?? ''}
+              defaultToken={activatePrefill?.token ?? ''}
+              onBack={() => setAuthScreenState('LOGIN')}
+              onDone={(code) => {
+                setAuthRestaurantCode(code);
+                setAuthPassword('');
+                setActivatePrefill(null);
+                setAuthError('');
+                setPasswordResetNotice(true);
+                setAuthScreenState('LOGIN');
+              }}
+            />
+          ) : authScreenState === 'FORGOT' ? (
             <ForgotPasswordPanel
               defaultRestaurantCode={authRestaurantCode}
               onBack={() => setAuthScreenState('LOGIN')}
+              onActivate={() => {
+                setAuthError('');
+                setAuthScreenState('ACTIVATE');
+              }}
               onDone={() => {
                 setAuthPassword('');
                 setAuthScreenState('LOGIN');
@@ -686,6 +716,21 @@ export default function PosAdminApp() {
                 >
                   {loginBusy ? 'Signing In…' : 'Sign In to Admin'}
                 </button>
+
+                <div className="text-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthError('');
+                      setPasswordResetNotice(false);
+                      setActivatePrefill(null);
+                      setAuthScreenState('ACTIVATE');
+                    }}
+                    className="text-xs font-bold text-slate-500 hover:text-jaman-navy underline cursor-pointer"
+                  >
+                    First time? Activate account
+                  </button>
+                </div>
               </form>
             </>
           ) : (

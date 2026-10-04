@@ -9,6 +9,8 @@ import { MenuSyncService } from './menu-sync.service';
 import { PaymentOrdersController } from './payment-orders.controller';
 import { PaymentPageController } from './payment-page.controller';
 import { CashfreeWebhookController } from './cashfree-webhook.controller';
+import { RazorpayWebhookController } from './razorpay-webhook.controller';
+import { RazorpayGatewayService } from './razorpay-gateway.service';
 import { KioskPaymentConnectionController } from './kiosk-payment-connection.controller';
 import { PlatformPaymentConnectionsController } from './platform-payment-connections.controller';
 import { PlatformPaymentsController } from './platform-payments.controller';
@@ -25,11 +27,12 @@ import { PaymentReconciliationService } from './payment-reconciliation.service';
     PaymentOrdersController,
     PaymentPageController,
     CashfreeWebhookController,
+    RazorpayWebhookController,
     KioskPaymentConnectionController,
     PlatformPaymentConnectionsController,
     PlatformPaymentsController
   ],
-  providers: [PaymentsService, CashfreeGatewayService, MenuSyncService, PaymentConnectionsService, PlatformPaymentsService, PaymentReconciliationService],
-  exports: [PaymentsService, CashfreeGatewayService, PaymentReconciliationService]
+  providers: [PaymentsService, CashfreeGatewayService, RazorpayGatewayService, MenuSyncService, PaymentConnectionsService, PlatformPaymentsService, PaymentReconciliationService],
+  exports: [PaymentsService, CashfreeGatewayService, RazorpayGatewayService, PaymentReconciliationService]
 })
 export class PaymentsModule {}

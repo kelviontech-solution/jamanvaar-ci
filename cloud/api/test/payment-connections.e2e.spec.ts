@@ -409,16 +409,16 @@ describe('Payment connection onboarding', () => {
   });
 
   it('PATCH .../commission sets a restaurant override and it appears on the platform detail view', async () => {
-    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 150, password: adminPassword });
+    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 250, password: adminPassword });
     expect(res.status).toBe(200);
-    expect(res.body.commissionOverrideBps).toBe(150);
+    expect(res.body.commissionOverrideBps).toBe(250);
 
     const detail = await authed('get', `/api/v1/restaurants/${restaurantId}/payment-connection`, platformToken);
-    expect(detail.body.commissionOverrideBps).toBe(150);
+    expect(detail.body.commissionOverrideBps).toBe(250);
   });
 
   it('PATCH .../commission accepts null to clear the override, falling back to the platform default', async () => {
-    await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 150, password: adminPassword });
+    await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 250, password: adminPassword });
     const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: null, password: adminPassword });
     expect(res.status).toBe(200);
     expect(res.body.commissionOverrideBps).toBeNull();
@@ -436,12 +436,12 @@ describe('Payment connection onboarding', () => {
   });
 
   it('PATCH .../commission for an unknown restaurant returns 404', async () => {
-    const res = await authed('patch', '/api/v1/restaurants/00000000-0000-0000-0000-000000000000/payment-connection/commission', platformToken).send({ overrideBps: 100, password: adminPassword });
+    const res = await authed('patch', '/api/v1/restaurants/00000000-0000-0000-0000-000000000000/payment-connection/commission', platformToken).send({ overrideBps: 250, password: adminPassword });
     expect(res.status).toBe(404);
   });
 
   it('PATCH .../commission records an audit log entry with the restaurant scope', async () => {
-    await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 300, password: adminPassword });
+    await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 250, password: adminPassword });
     const entry = await prisma.runAsPlatform((tx) =>
       tx.auditLog.findFirst({ where: { action: 'COMMISSION_CHANGED', category: 'PAYMENTS', restaurantId }, orderBy: { createdAt: 'desc' } })
     );
@@ -457,7 +457,7 @@ describe('Payment connection onboarding', () => {
 
     const getRes = await authed('get', `/api/v1/restaurants/${restaurantId}/payment-connection`, token);
     expect(getRes.status).toBe(200);
-    const patchRes = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, token).send({ overrideBps: 50, password: 'correct-horse-battery-staple' });
+    const patchRes = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, token).send({ overrideBps: 250, password: 'correct-horse-battery-staple' });
     expect(patchRes.status).toBe(200);
 
     await prisma.platformUser.deleteMany({ where: { email } });

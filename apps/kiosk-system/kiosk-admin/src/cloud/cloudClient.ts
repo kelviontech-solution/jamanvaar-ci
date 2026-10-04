@@ -876,6 +876,8 @@ export interface DayStatement {
   grossVolume: number;
   refundedAmount: number;
   platformCommission: number;
+  cashfreeFee: number;
+  platformNetCommission: number;
   commissionReversed: number;
   restaurantGross: number;
   restaurantRefundImpact: number;

@@ -1098,6 +1098,7 @@ model BackupRestoreJob {
 
 enum PaymentProvider {
   CASHFREE
+  RAZORPAY
 }
 
 // Only PLATFORM_POOLED (Cashfree Easy Split, one JAMANVAAR-owned account) is
@@ -1232,7 +1233,7 @@ model PaymentTransaction {
   order             Order                     @relation(fields: [orderId], references: [id], onDelete: Cascade)
   restaurantId      String
   restaurant        Restaurant                @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  provider          PaymentProvider           @default(CASHFREE)
+  provider          PaymentProvider           @default(RAZORPAY)
   providerOrderId   String // the order_id we generate and send to Cashfree
   providerPaymentId String? // Cashfree's cf_payment_id, known once paid/failed
   amount            Int // paise
@@ -1274,7 +1275,7 @@ model RestaurantPaymentConnection {
   id                                String                  @id @default(uuid())
   restaurantId                      String                  @unique
   restaurant                        Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  provider                          PaymentProvider         @default(CASHFREE)
+  provider                          PaymentProvider         @default(RAZORPAY)
   connectionType                    PaymentConnectionType   @default(PLATFORM_POOLED)
   cashfreeVendorId                  String?
   accountType                       CashfreeAccountType?
@@ -1388,7 +1389,7 @@ model WebhookEvent {
   id               String                  @id @default(uuid())
   restaurantId     String?
   restaurant       Restaurant?             @relation(fields: [restaurantId], references: [id], onDelete: SetNull)
-  provider         PaymentProvider         @default(CASHFREE)
+  provider         PaymentProvider         @default(RAZORPAY)
   providerEventKey String // derived dedup key, e.g. `${type}:${cf_payment_id}` — Cashfree's payload carries no separate event id
   eventType        String
   rawPayload       Json

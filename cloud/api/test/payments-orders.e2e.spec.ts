@@ -124,13 +124,16 @@ describe('Payment order creation', () => {
     expect(payments.length).toBe(1);
   });
 
-  it('sends a 100% vendor split when commission is 0% (no override, no platform default set)', async () => {
-    // PlatformSetting is a genuinely global, unscoped table (not restaurant-scoped like
-    // everything else this suite touches) — a prior run of this same file (e.g. this
-    // test's own "verify it fails" pass before implementation) can leave a real row
-    // behind. Delete it first so "no platform default set" is actually true here,
-    // regardless of test run history.
-    await prisma.runAsPlatform((tx) => tx.platformSetting.deleteMany({ where: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS' } }));
+  it('sends a 98% vendor split when the platform default is the 2% minimum (Cashfree fee only)', async () => {
+    // PlatformSetting is global, not restaurant-scoped, so set the value explicitly rather than
+    // relying on whatever a previous run left behind.
+    await prisma.runAsPlatform((tx) =>
+      tx.platformSetting.upsert({
+        where: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS' },
+        create: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS', value: { bps: 200 }, category: 'PAYMENTS' },
+        update: { value: { bps: 200 } }
+      })
+    );
     await prisma.runAsTenant(restaurantId, (tx) =>
       tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { cashfreeVendorId: 'rest_test_vendor' } })
     );
@@ -141,13 +144,42 @@ describe('Payment order creation', () => {
     expect(res.status).toBe(201);
 
     expect(createOrderMock).toHaveBeenCalledWith(
-      expect.objectContaining({ orderSplits: [{ vendorId: 'rest_test_vendor', percentage: 100 }] })
+      expect.objectContaining({ orderSplits: [{ vendorId: 'rest_test_vendor', percentage: 98 }] })
     );
 
     const payment = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: res.body.paymentId } }));
-    expect(payment.commissionBps).toBe(0);
-    expect(payment.platformAmount).toBe(0);
-    expect(payment.restaurantAmount).toBe(res.body.amount);
+    expect(payment.commissionBps).toBe(200);
+    expect(payment.platformAmount).toBe(Math.round((res.body.amount * 200) / 10000));
+    expect(payment.restaurantAmount).toBe(res.body.amount - payment.platformAmount!);
+  });
+
+  it('takes 3% when nothing has been saved: the platform default is 3%, so the vendor gets 97%', async () => {
+    await prisma.runAsPlatform((tx) => tx.platformSetting.deleteMany({ where: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS' } }));
+    await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { cashfreeVendorId: 'rest_test_vendor', commissionOverrideBps: null } })
+    );
+    const createOrderMock = app.get(CashfreeGatewayService).createOrder as ReturnType<typeof vi.fn>;
+    createOrderMock.mockClear();
+
+    const res = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: 'local-order-default-3pct', lines: validLines });
+    expect(res.status).toBe(201);
+    expect(createOrderMock).toHaveBeenCalledWith(expect.objectContaining({ orderSplits: [{ vendorId: 'rest_test_vendor', percentage: 97 }] }));
+
+    const payment = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: res.body.paymentId } }));
+    expect(payment.commissionBps).toBe(300);
+    expect(payment.platformAmount).toBe(Math.round((res.body.amount * 300) / 10000));
+    expect((payment.platformAmount ?? 0) + (payment.restaurantAmount ?? 0)).toBe(res.body.amount);
+  });
+
+  it('a restaurant whose online payments are not switched on yet is refused with the stable PAYMENTS_NOT_ACTIVE code (the kiosk shows "being set up", not "broken")', async () => {
+    await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { status: 'PENDING_VERIFICATION' } }));
+    try {
+      const res = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: 'local-order-pending-1', lines: validLines });
+      expect(res.status).toBe(403);
+      expect(res.body.code).toBe('PAYMENTS_NOT_ACTIVE');
+    } finally {
+      await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { status: 'ACTIVE' } }));
+    }
   });
 
   it('uses the restaurant commissionOverrideBps over the platform default', async () => {

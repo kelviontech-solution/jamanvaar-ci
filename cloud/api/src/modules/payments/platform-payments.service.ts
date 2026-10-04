@@ -3,7 +3,7 @@ import { PaymentTransactionStatus, PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { requireStepUpPassword } from '../../common/security/step-up.util';
-import { PAYMENT_DEFAULT_COMMISSION_BPS_KEY, getDefaultCommissionBps } from './commission.util';
+import { CASHFREE_FEE_BPS, MIN_COMMISSION_BPS, PAYMENT_DEFAULT_COMMISSION_BPS_KEY, getDefaultCommissionBps } from './commission.util';
 import { buildDayStatement } from './payment-statement.util';
 import { ATTENTION_GRACE_MS, PaymentsService } from './payments.service';
 
@@ -72,6 +72,7 @@ export class PlatformPaymentsService {
       throw new BadRequestException('defaultBps must be an integer between 0 and 10000');
     }
     await requireStepUpPassword(actor, password);
+    if (bps < MIN_COMMISSION_BPS) throw new BadRequestException("The commission must be at least 2%, because Cashfree's 2% fee is paid out of it.");
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.platformSetting.findUnique({ where: { key: PAYMENT_DEFAULT_COMMISSION_BPS_KEY } });
       const oldBps = (existing?.value as { bps?: number } | undefined)?.bps ?? 0;
@@ -108,6 +109,8 @@ export class PlatformPaymentsService {
       return {
         grossVolume: successAgg._sum.amount ?? 0,
         platformCommission: successAgg._sum.platformAmount ?? 0,
+        cashfreeFee: Math.round(((successAgg._sum.amount ?? 0) * CASHFREE_FEE_BPS) / 10000),
+        platformNetCommission: (successAgg._sum.platformAmount ?? 0) - Math.round(((successAgg._sum.amount ?? 0) * CASHFREE_FEE_BPS) / 10000),
         restaurantShare: successAgg._sum.restaurantAmount ?? 0,
         refundedAmount: refundAgg._sum.amount ?? 0,
         successfulCount: successAgg._count,

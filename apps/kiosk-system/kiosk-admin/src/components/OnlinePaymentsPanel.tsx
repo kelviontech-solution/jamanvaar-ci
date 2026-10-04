@@ -47,7 +47,8 @@ function downloadCsv(statement: DayStatement) {
     '',
     `"Gross collected","${(statement.grossVolume / 100).toFixed(2)}"`,
     `"Refunds","${(statement.refundedAmount / 100).toFixed(2)}"`,
-    `"Platform commission (net of refunds)","${((statement.platformCommission - statement.commissionReversed) / 100).toFixed(2)}"`,
+    `"Cashfree fee (estimated 2%)","${(statement.cashfreeFee / 100).toFixed(2)}"`,
+    `"JAMANVAAR net commission (net of refunds)","${((statement.platformNetCommission - statement.commissionReversed) / 100).toFixed(2)}"`,
     `"Net payable to restaurant","${(statement.netPayableToRestaurant / 100).toFixed(2)}"`
   ];
   const blob = new Blob([[header.join(','), ...lines, ...summary].join('\n')], { type: 'text/csv;charset=utf-8' });
@@ -256,7 +257,9 @@ export function OnlinePaymentsPanel() {
           <div className="p-3 bg-jaman-ivory rounded-xl border border-jaman-border text-xs space-y-1">
             <div className="flex justify-between"><span className="text-[#8C9BAE]">Payments received ({statement.paymentCount})</span><span className="font-bold">{rupees(statement.grossVolume)}</span></div>
             <div className="flex justify-between"><span className="text-[#8C9BAE]">Refunds ({statement.refundCount})</span><span className="font-bold">− {rupees(statement.refundedAmount)}</span></div>
-            <div className="flex justify-between"><span className="text-[#8C9BAE]">JAMANVAAR commission (net of refunds)</span><span className="font-bold">− {rupees(statement.platformCommission - statement.commissionReversed)}</span></div>
+            <div className="flex justify-between"><span className="text-[#8C9BAE]">− Commission (3%)</span><span className="font-bold">{rupees(statement.platformCommission)}</span></div>
+            <div className="flex justify-between"><span className="text-[#8C9BAE]">   of which Cashfree fee (est. 2%)</span><span className="font-bold">{rupees(statement.cashfreeFee)}</span></div>
+            <div className="flex justify-between"><span className="text-[#8C9BAE]">   Your net commission (1%, after refunds)</span><span className="font-bold">{rupees(statement.platformNetCommission - statement.commissionReversed)}</span></div>
             <div className="flex justify-between border-t border-jaman-border pt-1"><span className="font-bold text-jaman-navy">Net payable to you</span><span className="font-black text-jaman-navy">{rupees(statement.netPayableToRestaurant)}</span></div>
             <div className="text-[10px] text-[#8C9BAE] pt-1">{statement.settlementNote} Day = calendar day in India time.</div>
           </div>

@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { CASHFREE_FEE_BPS } from './commission.util';
 
 const SUCCESS_FAMILY = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'] as const;
 const MAX_ROWS = 500;
@@ -39,10 +40,12 @@ export async function buildDayStatement(tx: Prisma.TransactionClient, restaurant
 
   let grossVolume = 0;
   let platformCommission = 0;
+  let cashfreeFee = 0;
   let restaurantGross = 0;
   for (const p of payments) {
     grossVolume += p.amount;
     platformCommission += p.platformAmount ?? 0;
+    cashfreeFee += Math.round((p.amount * CASHFREE_FEE_BPS) / 10000);
     restaurantGross += p.restaurantAmount ?? p.amount;
   }
 
@@ -62,6 +65,8 @@ export async function buildDayStatement(tx: Prisma.TransactionClient, restaurant
     grossVolume,
     refundedAmount,
     platformCommission,
+    cashfreeFee,
+    platformNetCommission: platformCommission - cashfreeFee,
     commissionReversed: refundedAmount - restaurantRefundImpact,
     restaurantGross,
     restaurantRefundImpact,

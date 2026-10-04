@@ -7,7 +7,8 @@ import { AuditService } from '../audit/audit.service';
 import { OrderSyncService } from '../order-sync/order-sync.service';
 import { WhatsAppOutboundWebhookService } from '../whatsapp-outbound/whatsapp-outbound-webhook.service';
 import { businessDateIn, newPublicOrderId } from '../qr/qr.support';
-import { CashfreeFeatureNotEnabledException, CashfreeGatewayService } from './cashfree-gateway.service';
+import { CashfreeGatewayService } from './cashfree-gateway.service';
+import { RazorpayGatewayService } from './razorpay-gateway.service';
 import type { PaymentPageView } from './payment-page.util';
 import { MenuSyncService } from './menu-sync.service';
 import { priceCart, PriceValidationError, MenuSnapshotItemLookup } from './pricing.util';
@@ -40,8 +41,15 @@ export interface ChannelOrderInput {
   totalAmount: number;
 }
 
+/** The restaurant's online payments are not switched on yet (its Cashfree vendor is still being verified, or it is suspended). Clients show this as pending, not as broken. */
+export const PAYMENTS_NOT_ACTIVE = 'PAYMENTS_NOT_ACTIVE';
 const NON_TERMINAL_STATUSES = ['CREATED', 'PENDING', 'AUTHORIZED'];
 const PAID_STATUSES = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'];
+const RAZORPAY_EVENT_STATUS: Record<string, 'SUCCESS' | 'FAILED'> = {
+  'payment.captured': 'SUCCESS',
+  'qr_code.credited': 'SUCCESS',
+  'payment.failed': 'FAILED'
+};
 /** A UPI QR stops working after this long; the kiosk shows the same countdown. */
 export const QR_TTL_SECONDS = 180;
 /** A paid order with no token/KOT after this long is surfaced as needing attention. */
@@ -53,6 +61,7 @@ export class PaymentsService {
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
     private readonly cashfree: CashfreeGatewayService,
+    private readonly razorpay: RazorpayGatewayService,
     private readonly menuSync: MenuSyncService,
     private readonly audit: AuditService,
     private readonly orderSync: OrderSyncService,
@@ -75,12 +84,12 @@ export class PaymentsService {
         return this.toOrderResponse(existingOrder, latest);
       }
       // Every prior attempt is terminal-failed: open a fresh attempt at the same, already-validated total.
-      const payment = await this.createCashfreeAttempt(existingOrder.id, restaurantId, existingOrder.totalAmount, existingOrder.currency, connection);
+      const payment = await this.createRazorpayAttempt(existingOrder.id, restaurantId, existingOrder.totalAmount, existingOrder.currency, connection);
       return this.toOrderResponse(existingOrder, payment);
     }
 
     if (!connection || connection.status !== 'ACTIVE') {
-      throw new ForbiddenException('Online payments are not active for this restaurant yet');
+      throw new ForbiddenException({ message: 'Online payments are not active for this restaurant yet', code: PAYMENTS_NOT_ACTIVE });
     }
 
     const menuItems = await this.menuSync.loadItemsByExternalIds(restaurantId, dto.lines.map((l) => l.externalItemId));
@@ -122,7 +131,7 @@ export class PaymentsService {
       })
     );
 
-    const payment = await this.createCashfreeAttempt(order.id, restaurantId, order.totalAmount, order.currency, connection);
+    const payment = await this.createRazorpayAttempt(order.id, restaurantId, order.totalAmount, order.currency, connection);
     return this.toOrderResponse(order, payment);
   }
 
@@ -154,7 +163,7 @@ export class PaymentsService {
     }
 
     if (!connection || connection.status !== 'ACTIVE') {
-      throw new ForbiddenException('Online payments are not active for this restaurant yet');
+      throw new ForbiddenException({ message: 'Online payments are not active for this restaurant yet', code: PAYMENTS_NOT_ACTIVE });
     }
 
     const order = await this.prisma.runAsTenant(restaurantId, (tx) =>
@@ -209,33 +218,13 @@ export class PaymentsService {
     return { commissionBps, platformAmount, restaurantAmount };
   }
 
-  private async createCashfreeAttempt(
-    orderId: string,
-    restaurantId: string,
-    amount: number,
-    currency: string,
-    connection: { cashfreeVendorId: string | null; commissionOverrideBps: number | null } | null
-  ) {
+  private async createRazorpayAttempt(orderId: string, restaurantId: string, amount: number, currency: string, connection: { commissionOverrideBps: number | null } | null) {
     const { commissionBps, platformAmount, restaurantAmount } = await this.commissionSplitFor(amount, connection);
-    const vendorPercentage = Number(((restaurantAmount / amount) * 100).toFixed(2));
-
-    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.create({
-        data: { orderId, restaurantId, providerOrderId: `pay_${randomUUID()}`, amount, currency, status: 'CREATED', commissionBps, platformAmount, restaurantAmount }
-      })
-    );
-
-    const cfOrder = await this.cashfree.createOrder({
-      orderId: payment.providerOrderId,
-      amountPaise: amount,
-      currency,
-      customerId: orderId,
-      notifyUrl: this.config.get<string>('CASHFREE_WEBHOOK_NOTIFY_URL'),
-      orderSplits: connection?.cashfreeVendorId ? [{ vendorId: connection.cashfreeVendorId, percentage: vendorPercentage }] : undefined
-    });
 
     return this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.update({ where: { id: payment.id }, data: { paymentSessionId: cfOrder.paymentSessionId, status: 'PENDING' } })
+      tx.paymentTransaction.create({
+        data: { orderId, restaurantId, provider: 'RAZORPAY', providerOrderId: randomUUID(), amount, currency, status: 'PENDING', commissionBps, platformAmount, restaurantAmount }
+      })
     );
   }
 
@@ -295,9 +284,9 @@ export class PaymentsService {
 
   private toOrderResponse(
     order: { id: string; totalAmount: number; currency: string },
-    payment: { id: string; paymentSessionId: string | null; status: string }
+    payment: { id: string; status: string }
   ) {
-    return { orderId: order.id, paymentId: payment.id, paymentSessionId: payment.paymentSessionId, amount: order.totalAmount, currency: order.currency, status: payment.status };
+    return { orderId: order.id, paymentId: payment.id, amount: order.totalAmount, currency: order.currency, status: payment.status };
   }
 
   async tenantSummary(restaurantId: string, filters: { from?: Date; to?: Date }) {
@@ -318,9 +307,9 @@ export class PaymentsService {
   }
 
   /**
-   * A UPI QR for one pending payment, rendered by the kiosk itself. The QR is only ever created for a
-   * payment that is still open and only while the restaurant's Cashfree connection is ACTIVE, so a
-   * suspended restaurant stops taking new payments immediately.
+   * A UPI QR for one pending payment, rendered by Razorpay and shown on the kiosk. The QR is only created for a
+   * payment that is still open and only while the restaurant's payment connection is ACTIVE, so a suspended
+   * restaurant stops taking new payments immediately.
    */
   async createUpiQr(restaurantId: string, paymentId: string) {
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
@@ -330,38 +319,20 @@ export class PaymentsService {
     if (!NON_TERMINAL_STATUSES.includes(payment.status)) {
       throw new BadRequestException(`Cannot create a QR for a payment in status ${payment.status}`);
     }
-    if (!payment.paymentSessionId) {
-      throw new ServiceUnavailableException('This payment has no Cashfree session yet');
-    }
     const connection = await this.prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } }));
     if (!connection || connection.status !== 'ACTIVE') {
-      throw new ForbiddenException('Online payments are not active for this restaurant');
+      throw new ForbiddenException({ message: 'Online payments are not active for this restaurant', code: PAYMENTS_NOT_ACTIVE });
     }
 
     const expiresAt = new Date(Date.now() + QR_TTL_SECONDS * 1000);
-    try {
-      const qr = await this.cashfree.createUpiQr(payment.paymentSessionId, expiresAt.toISOString());
-      return { qrPayload: qr.qrPayload, contentType: qr.contentType, expiresAt: expiresAt.toISOString(), method: 'UPI_QR' as const };
-    } catch (err) {
-      // The account has not been approved for Cashfree's server-to-server UPI QR. The QR then carries the address of our payment page,
-      // which opens Cashfree's own checkout (approved on every account). The guest scans it with the phone camera and picks a UPI app.
-      const base = this.paymentPageBaseUrl();
-      if (!(err instanceof CashfreeFeatureNotEnabledException) || !base) throw err;
-      return { qrPayload: `${base}/api/v1/pay/${payment.id}`, contentType: 'text/uri-list', expiresAt: expiresAt.toISOString(), method: 'CHECKOUT_PAGE' as const };
-    }
-  }
-
-  /** The public address guests' phones can reach: PAYMENT_PAGE_BASE_URL, or the address Cashfree is told to call back (its origin). */
-  private paymentPageBaseUrl(): string | null {
-    const explicit = this.config.get<string>('PAYMENT_PAGE_BASE_URL')?.trim();
-    if (explicit) return explicit.replace(/\/+$/, '');
-    const notify = this.config.get<string>('CASHFREE_WEBHOOK_NOTIFY_URL')?.trim();
-    if (!notify) return null;
-    try {
-      return new URL(notify).origin;
-    } catch {
-      return null;
-    }
+    const qr = await this.razorpay.createUpiQr({
+      paymentRef: payment.providerOrderId,
+      amountPaise: payment.amount,
+      closeByUnix: Math.floor(expiresAt.getTime() / 1000),
+      description: `Order ${payment.orderId.slice(0, 8)}`
+    });
+    if (!qr.imageUrl) throw new ServiceUnavailableException('Razorpay did not return a QR image for this payment');
+    return { qrPayload: qr.imageUrl, contentType: 'image/url', expiresAt: expiresAt.toISOString(), method: 'UPI_QR' as const };
   }
 
   /** What the public payment page shows for one payment, read only by its unguessable id. Nothing here changes the payment. */
@@ -454,10 +425,21 @@ export class PaymentsService {
   }
 
   async getPaymentStatus(restaurantId: string, paymentId: string) {
-    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
+    let payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, include: { order: true } })
     );
     if (!payment) throw new NotFoundException('Payment not found');
+    if (payment.provider === 'RAZORPAY' && NON_TERMINAL_STATUSES.includes(payment.status)) {
+      const fromUnix = Math.floor(payment.createdAt.getTime() / 1000) - 60;
+      const captured = await this.razorpay.findCapturedPaymentByRef(payment.providerOrderId, fromUnix);
+      if (captured && captured.amount === payment.amount && captured.currency === payment.currency) {
+        await this.settleRazorpayPayment(payment, 'SUCCESS', captured.id, captured, null, false);
+        payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
+          tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, include: { order: true } })
+        );
+        if (!payment) throw new NotFoundException('Payment not found');
+      }
+    }
     return { paymentId: payment.id, orderId: payment.orderId, status: payment.status, amount: payment.amount, currency: payment.currency, orderStatus: payment.order.status };
   }
 
@@ -773,6 +755,139 @@ export class PaymentsService {
     }
 
     await this.markWebhookProcessed(webhookEvent.id);
+  }
+
+  async processRazorpayWebhook(rawBody: Buffer, signature: string | undefined): Promise<void> {
+    const signatureValid = Boolean(signature && this.razorpay.verifyWebhookSignature(rawBody, signature));
+    const parsed = this.safeParseJson(rawBody);
+    if (!signatureValid || parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      await this.prisma.runAsPlatform((tx) =>
+        tx.webhookEvent.create({
+          data: {
+            provider: 'RAZORPAY',
+            providerEventKey: `REJECTED:${randomUUID()}`,
+            eventType: 'UNKNOWN',
+            rawPayload: this.safeParseJson(rawBody) ?? { unparsable: true },
+            signatureValid,
+            processingStatus: 'FAILED',
+            errorMessage: signatureValid ? 'Malformed webhook payload JSON' : 'Invalid or missing webhook signature'
+          }
+        })
+      );
+      return;
+    }
+
+    const payload = parsed as Record<string, any>;
+    const eventType: string = payload.event;
+    const entity = payload.payload?.payment?.entity;
+    const paymentRef: string | undefined = entity?.notes?.payment_ref ?? payload.payload?.qr_code?.entity?.notes?.payment_ref;
+    const razorpayPaymentId: string | undefined = entity?.id;
+    const providerEventKey = `${eventType}:${razorpayPaymentId ?? randomUUID()}`;
+
+    const existing = await this.prisma.runAsPlatform((tx) =>
+      tx.webhookEvent.findUnique({ where: { provider_providerEventKey: { provider: 'RAZORPAY', providerEventKey } } })
+    );
+    if (existing && existing.processingStatus !== 'FAILED') {
+      await this.prisma.runAsPlatform((tx) =>
+        tx.webhookEvent.update({ where: { id: existing.id }, data: { retryCount: { increment: 1 }, processingStatus: 'IGNORED_DUPLICATE' } })
+      );
+      return;
+    }
+    const webhookEvent = existing
+      ? await this.prisma.runAsPlatform((tx) =>
+          tx.webhookEvent.update({
+            where: { id: existing.id },
+            data: { rawPayload: payload, signatureValid: true, processingStatus: 'VERIFIED', errorMessage: null, retryCount: { increment: 1 } }
+          })
+        )
+      : await this.prisma.runAsPlatform((tx) =>
+          tx.webhookEvent.create({ data: { provider: 'RAZORPAY', providerEventKey, eventType, rawPayload: payload, signatureValid: true, processingStatus: 'VERIFIED' } })
+        );
+
+    const newStatus = RAZORPAY_EVENT_STATUS[eventType];
+    if (!newStatus) {
+      await this.markWebhookProcessed(webhookEvent.id);
+      return;
+    }
+    if (!paymentRef) {
+      await this.markWebhookFailed(webhookEvent.id, 'Missing payment_ref in webhook notes');
+      return;
+    }
+
+    const payment = await this.prisma.runAsPlatform((tx) =>
+      tx.paymentTransaction.findUnique({ where: { provider_providerOrderId: { provider: 'RAZORPAY', providerOrderId: paymentRef } }, include: { order: true } })
+    );
+    if (!payment) {
+      await this.markWebhookFailed(webhookEvent.id, `No PaymentTransaction found for payment_ref ${paymentRef}`);
+      return;
+    }
+    await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id: webhookEvent.id }, data: { restaurantId: payment.restaurantId } }));
+
+    if (entity?.amount !== payment.amount || entity?.currency !== payment.currency) {
+      await this.markWebhookFailed(webhookEvent.id, `Amount/currency mismatch: expected ${payment.amount} ${payment.currency}, got ${entity?.amount} ${entity?.currency}`);
+      return;
+    }
+
+    if (['SUCCESS', 'REFUNDED', 'PARTIALLY_REFUNDED'].includes(payment.status)) {
+      if (payment.status === 'SUCCESS') {
+        const err = await this.ingestWhatsAppOrderIfNeeded(payment);
+        if (err) {
+          await this.markWebhookFailed(webhookEvent.id, err);
+          return;
+        }
+      }
+      await this.markWebhookProcessed(webhookEvent.id);
+      return;
+    }
+
+    const err = await this.settleRazorpayPayment(payment, newStatus, razorpayPaymentId, payload, entity?.error_description ?? null, true);
+    if (err) {
+      await this.markWebhookFailed(webhookEvent.id, err);
+      return;
+    }
+    await this.markWebhookProcessed(webhookEvent.id);
+  }
+
+  /** Records a Razorpay outcome on the payment and its order. Returns an error message when the WhatsApp order could not be created. */
+  private async settleRazorpayPayment(
+    payment: {
+      id: string;
+      restaurantId: string;
+      orderId: string;
+      amount: number;
+      currency: string;
+      providerOrderId: string;
+      order: { externalOrderId: string; source: string; branchId: string | null; orderType: string | null; tableLabel: string | null; customerName: string | null; customerPhone: string | null; items: Prisma.JsonValue; subtotal: number; taxAmount: number; totalAmount: number } | null;
+    },
+    newStatus: 'SUCCESS' | 'FAILED',
+    razorpayPaymentId: string | undefined,
+    providerResponse: unknown,
+    failureReason: string | null,
+    fromWebhook: boolean
+  ): Promise<string | null> {
+    await this.prisma.runAsTenant(payment.restaurantId, async (tx) => {
+      await tx.paymentTransaction.update({
+        where: { id: payment.id },
+        data: {
+          status: newStatus,
+          providerPaymentId: razorpayPaymentId,
+          providerResponse: providerResponse as Prisma.InputJsonValue,
+          failureReason: newStatus === 'SUCCESS' ? null : failureReason,
+          paidAt: newStatus === 'SUCCESS' ? new Date() : null
+        }
+      });
+      await tx.order.update({ where: { id: payment.orderId }, data: { status: newStatus === 'SUCCESS' ? 'PAID' : 'PAYMENT_FAILED' } });
+      await tx.restaurantPaymentConnection.updateMany({
+        where: { restaurantId: payment.restaurantId },
+        data: {
+          ...(fromWebhook ? { lastWebhookAt: new Date() } : {}),
+          ...(newStatus === 'SUCCESS' ? { lastPaymentAt: new Date() } : {})
+        }
+      });
+    });
+
+    if (newStatus !== 'SUCCESS') return null;
+    return this.ingestWhatsAppOrderIfNeeded(payment);
   }
 
   /**
