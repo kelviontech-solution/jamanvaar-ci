@@ -52,7 +52,8 @@ const RAZORPAY_EVENT_STATUS: Record<string, 'SUCCESS' | 'FAILED'> = {
   'payment_link.cancelled': 'FAILED'
 };
 /** A UPI QR stops working after this long; the kiosk shows the same countdown. */
-export const QR_TTL_SECONDS = 180;
+export const QR_MIN_REMAINING_MS = 30_000;
+const QR_TTL_SECONDS = 180;
 /** A paid order with no token/KOT after this long is surfaced as needing attention. */
 export const ATTENTION_GRACE_MS = 3 * 60 * 1000;
 
@@ -310,15 +311,29 @@ export class PaymentsService {
       throw new ForbiddenException({ message: 'Online payments are not active for this restaurant', code: PAYMENTS_NOT_ACTIVE });
     }
 
-    const expiresAt = new Date(Date.now() + QR_TTL_SECONDS * 1000);
-    const qr = await this.razorpay.createUpiQr({
-      paymentRef: payment.providerOrderId,
-      amountPaise: payment.amount,
-      closeByUnix: Math.floor(expiresAt.getTime() / 1000),
-      description: `Order ${payment.orderId.slice(0, 8)}`
+    return this.prisma.runAsTenant(restaurantId, async (tx) => {
+      // One live QR per payment: the row is locked while a QR is created, so two taps cannot produce two QRs,
+      // and a QR that is still valid is returned instead of creating another.
+      const [locked] = await tx.$queryRaw<{ providerResponse: Prisma.JsonValue | null }[]>`
+        SELECT "providerResponse" FROM "PaymentTransaction" WHERE id = ${paymentId} AND "restaurantId" = ${restaurantId} FOR UPDATE
+      `;
+      const existing = (locked?.providerResponse ?? null) as { qr?: { id: string; imageUrl: string; expiresAt: string } } | null;
+      if (existing?.qr && Date.parse(existing.qr.expiresAt) - Date.now() > QR_MIN_REMAINING_MS) {
+        return { qrPayload: existing.qr.imageUrl, contentType: 'image/url', expiresAt: existing.qr.expiresAt, method: 'UPI_QR' as const };
+      }
+
+      const expiresAt = new Date(Date.now() + QR_TTL_SECONDS * 1000);
+      const qr = await this.razorpay.createUpiQr({
+        paymentRef: payment.providerOrderId,
+        amountPaise: payment.amount,
+        closeByUnix: Math.floor(expiresAt.getTime() / 1000),
+        description: `Order ${payment.orderId.slice(0, 8)}`
+      });
+      if (!qr.imageUrl) throw new ServiceUnavailableException('Razorpay did not return a QR image for this payment');
+      const stored = { qr: { id: qr.qrId, imageUrl: qr.imageUrl, expiresAt: expiresAt.toISOString() } };
+      await tx.paymentTransaction.update({ where: { id: paymentId }, data: { providerResponse: stored as unknown as Prisma.InputJsonValue } });
+      return { qrPayload: qr.imageUrl, contentType: 'image/url', expiresAt: expiresAt.toISOString(), method: 'UPI_QR' as const };
     });
-    if (!qr.imageUrl) throw new ServiceUnavailableException('Razorpay did not return a QR image for this payment');
-    return { qrPayload: qr.imageUrl, contentType: 'image/url', expiresAt: expiresAt.toISOString(), method: 'UPI_QR' as const };
   }
 
   /**
@@ -392,11 +407,12 @@ export class PaymentsService {
       tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, include: { order: true } })
     );
     if (!payment) throw new NotFoundException('Payment not found');
-    if (payment.provider === 'RAZORPAY' && NON_TERMINAL_STATUSES.includes(payment.status)) {
-      const fromUnix = Math.floor(payment.createdAt.getTime() / 1000) - 60;
-      const captured = await this.razorpay.findCapturedPaymentByRef(payment.providerOrderId, fromUnix);
-      if (captured && captured.amount === payment.amount && captured.currency === payment.currency) {
-        await this.settleRazorpayPayment(payment, 'SUCCESS', captured.id, captured, null, false);
+    const current = payment;
+    const qrId = (current.providerResponse as { qr?: { id?: string } } | null)?.qr?.id;
+    if (current.provider === 'RAZORPAY' && qrId && NON_TERMINAL_STATUSES.includes(current.status)) {
+      const paid = (await this.razorpay.listQrPayments(qrId)).find((p) => p.status === 'captured' && p.amount === current.amount && p.currency === current.currency);
+      if (paid) {
+        await this.settleRazorpayPayment(current, 'SUCCESS', paid.id, paid, null, false);
         payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
           tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, include: { order: true } })
         );

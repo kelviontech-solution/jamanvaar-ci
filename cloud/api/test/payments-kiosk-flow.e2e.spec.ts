@@ -19,7 +19,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
   let kioskAdminToken: string;
   let posAdminToken: string;
   let posToken: string;
-  let gateway: { createUpiQr: ReturnType<typeof vi.fn>; createRefund: ReturnType<typeof vi.fn>; findCapturedPaymentByRef: ReturnType<typeof vi.fn> };
+  let gateway: { createUpiQr: ReturnType<typeof vi.fn>; createRefund: ReturnType<typeof vi.fn>; listQrPayments: ReturnType<typeof vi.fn> };
 
   const authed = (method: 'get' | 'post' | 'patch', url: string, token: string) =>
     request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
@@ -54,7 +54,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     gateway = {
       createUpiQr: vi.fn().mockResolvedValue({ qrId: 'qr_kf_1', imageUrl: 'https://rzp.io/img/kf_1.png', status: 'active' }),
       createRefund: vi.fn().mockResolvedValue({ refundId: 'rfnd_kf_1', status: 'processed', amountPaise: 2500 }),
-      findCapturedPaymentByRef: vi.fn().mockResolvedValue(null)
+      listQrPayments: vi.fn().mockResolvedValue([])
     };
     app = await createTestApp((builder) => builder.overrideProvider(RazorpayGatewayService).useValue({ isConfigured: () => true, ...gateway }));
     prisma = app.get(PrismaService);
@@ -102,6 +102,28 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
   };
 
   // ---------------- QR ----------------
+
+  it('asking again for the QR of a pending payment returns the same QR and creates no second Razorpay QR', async () => {
+    const order = await createKioskOrder('kf-qr-same');
+    gateway.createUpiQr.mockClear();
+    const first = await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+    const second = await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+    expect(first.status).toBe(201);
+    expect(second.body.qrPayload).toBe(first.body.qrPayload);
+    expect(gateway.createUpiQr).toHaveBeenCalledTimes(1);
+  });
+
+  it('a status check settles a payment whose money arrived on its own QR, and ignores other payments', async () => {
+    const order = await createKioskOrder('kf-qr-settle');
+    await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+    gateway.listQrPayments.mockResolvedValueOnce([{ id: 'pay_other', amount: 999999, currency: 'INR', status: 'captured' }]);
+    const notYet = await authed('get', `/api/v1/payments/${order.paymentId}/status`, kioskToken);
+    expect(notYet.body.status).toBe('PENDING');
+    gateway.listQrPayments.mockResolvedValueOnce([{ id: 'pay_kf_qr_paid', amount: order.amount, currency: 'INR', status: 'captured' }]);
+    const paid = await authed('get', `/api/v1/payments/${order.paymentId}/status`, kioskToken);
+    expect(paid.body.status).toBe('SUCCESS');
+    expect(paid.body.orderStatus).toBe('PAID');
+  });
 
   it('a kiosk gets a Razorpay UPI QR for its own pending payment, with a 3 minute expiry', async () => {
     const order = await createKioskOrder('kf-qr-1');

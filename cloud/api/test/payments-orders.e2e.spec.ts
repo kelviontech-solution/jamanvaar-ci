@@ -43,7 +43,7 @@ describe('Payment order creation', () => {
       builder.overrideProvider(RazorpayGatewayService).useValue({
         isConfigured: () => true,
         createUpiQr: vi.fn(),
-        findCapturedPaymentByRef: vi.fn().mockResolvedValue(null)
+        listQrPayments: vi.fn().mockResolvedValue([])
       })
     );
     prisma = app.get(PrismaService);

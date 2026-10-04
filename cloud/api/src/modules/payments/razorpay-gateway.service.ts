@@ -66,21 +66,6 @@ export class RazorpayGatewayService {
     };
   }
 
-  /**
-   * The captured payment made against one of our references since `fromUnix`, found by its notes. Used when a
-   * kiosk asks for a payment's status, so a paid QR is recognised even before Razorpay's webhook is configured.
-   */
-  async findCapturedPaymentByRef(paymentRef: string, fromUnix: number): Promise<{ id: string; amount: number; currency: string } | null> {
-    const res = await fetch(`https://api.razorpay.com/v1/payments?from=${fromUnix}&count=100`, { method: 'GET', headers: this.headers() });
-    const body = await res.json();
-    if (!res.ok) {
-      throw new ServiceUnavailableException(`Razorpay payment lookup failed: ${body?.error?.description ?? res.statusText}`);
-    }
-    const items: { id: string; amount: number; currency: string; status: string; notes?: Record<string, string> }[] = Array.isArray(body?.items) ? body.items : [];
-    const match = items.find((p) => p.status === 'captured' && p.notes?.payment_ref === paymentRef);
-    return match ? { id: match.id, amount: match.amount, currency: match.currency } : null;
-  }
-
   /** A one-time payment link for a WhatsApp order (https://razorpay.com/docs/api/payments/payment-links/create/). Razorpay sends no SMS or email; the connector sends the link itself. */
   async createPaymentLink(input: { referenceId: string; amountPaise: number; description: string; customerName: string; customerPhone: string; expireByUnix: number }): Promise<{ linkId: string; shortUrl: string; status: string }> {
     const res = await fetch('https://api.razorpay.com/v1/payment_links', {
@@ -117,6 +102,16 @@ export class RazorpayGatewayService {
       throw new ServiceUnavailableException(`Razorpay refund failed: ${body?.error?.description ?? res.statusText}`);
     }
     return { refundId: body.id, status: body.status, amountPaise: body.amount };
+  }
+
+  /** Payments made on one QR code (https://razorpay.com/docs/api/qr-codes/fetch-payments/). Only this QR is looked at, never the whole account. */
+  async listQrPayments(qrId: string): Promise<{ id: string; amount: number; currency: string; status: string }[]> {
+    const res = await fetch(`https://api.razorpay.com/v1/payments/qr_codes/${encodeURIComponent(qrId)}/payments`, { method: 'GET', headers: this.headers() });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new ServiceUnavailableException(`Razorpay QR payment lookup failed: ${body?.error?.description ?? res.statusText}`);
+    }
+    return Array.isArray(body?.items) ? body.items : [];
   }
 
   /** Razorpay signs webhooks as hex(HMAC-SHA256(rawBody, webhookSecret)) in the X-Razorpay-Signature header. */
