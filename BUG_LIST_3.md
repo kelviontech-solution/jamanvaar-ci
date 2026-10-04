@@ -152,6 +152,52 @@ instruction not to risk real money.
 correctly, every validation rejection was clear and correct, and the payment safety
 boundary held.
 
+## Peak-hour concurrency simulation
+
+Real restaurants don't send requests one at a time — several terminals act at once
+during a rush. This round fired genuinely concurrent requests (bash background jobs,
+not a sequential loop) to look for race conditions the earlier pass couldn't surface.
+
+- **25 concurrent order-number leases**: 🔵 all 25 numbers came back unique and
+  sequential (2–26), no duplicates — the shared counter POS/KDS rely on is correctly
+  serialized under real concurrency.
+- **50 concurrent order creations**, mixed across POS/Kiosk/Captain tokens: 🔵 all 50
+  returned `201` in a 3.3s total window (avg 136ms, max 264ms per request), and all 50
+  showed up distinct and intact on a pull afterward — zero lost writes, zero
+  duplicates. Backend memory stayed at ~72MB (768MB limit), DB connections settled at
+  7 afterward, no errors/exceptions/timeouts/deadlocks in either container's logs for
+  the burst window, and no container restarted.
+- **True simultaneous conflicting order update** (POS cancels an order at the same
+  instant KDS tries to mark it `PREPARING`, both against the same base version): 🔵
+  resolved safely — the order's header correctly stayed `CANCELLED` (a terminal state
+  can't be reopened by a stale push, per `order-rules.ts`'s `decideStatus`), and the
+  conflict was recorded (`SyncConflict` row, reason `STATUS_TERMINAL`). **One real
+  finding, investigated and confirmed harmless**: the item's own `kitchenStatus` field
+  still got overwritten to `PREPARING` by the losing push (the code's own comment says
+  item/meta merging is deliberate — "the rest of the push is still merged, so nothing
+  else is lost" — only the order-level status is protected). In isolation this looks
+  like a kitchen could keep cooking for a cancelled order; 🔵 confirmed it can't in
+  practice — `KdsTicketCard.tsx` explicitly forces every item's *displayed* status to
+  `CANCELLED` whenever the parent order is cancelled, regardless of the item's own
+  stale field, with a "stop cooking this ticket" banner. POS Admin's billing/reports/
+  order-detail code was also checked and consistently keys off the order-level
+  `orderStatus`, never the item-level `kitchenStatus`, for every cancellation-sensitive
+  decision. **No fix applied** — the backend behavior is intentional and every real
+  consumer already guards against it; "fixing" the merge to also freeze item fields on
+  a terminal order would be surgery on a deliberate design for a state no UI actually
+  shows.
+- **Two devices updating the same dining table at the exact same instant** with
+  identical timestamps (Captain → `BILL_REQUESTED`, POS → `AVAILABLE`): 🔵 resolved to
+  a single, consistent final state (`BILL_REQUESTED`) — no corruption, no partial
+  write, no crash. A true timestamp tie's winner isn't meant to be predictable
+  (last-change-wins has no third criterion for an exact tie), and it wasn't — but it
+  was deterministic and whole, which is what matters.
+
+**No bugs required fixing from this round.** One finding (item-level `kitchenStatus`
+surviving under a cancelled order header) was investigated down to the actual UI code
+on both apps that would ever display it, and confirmed to have no real operational
+path — logged here for the record, not as an open item.
+
 ## Test footprint left on the demo restaurant
 
 Everything below is test data created during this pass, on restaurant
