@@ -16,7 +16,7 @@
 | **Kiosk (customer)** (`apps/kiosk-system/kiosk-user`) | Multi-language ordering journey, cart, payment, receipt, real-time order-status badge, lockdown/maintenance enforcement | Functionally complete |
 | **Captain** (`apps/restaurant-system/captain`) | Table floor plan, order-taking, KOT firing, bill requests, diner requests, messages | Functionally complete; no settle/close by design (financial control stays in POS) |
 | **KDS** (`apps/restaurant-system/kds`) | Full ticket status ladder, station filters, real order intake with catch-up on reconnect | Functionally complete |
-| **Cloud API** (`cloud/api`) | Multi-tenant Postgres + Prisma, Row-Level Security, device auth, order/entity sync bridge, payments (Cashfree), real S3-compatible backups, suspension enforcement | Functionally complete, e2e-tested |
+| **Cloud API** (`cloud/api`) | Multi-tenant Postgres + Prisma, Row-Level Security, device auth, order/entity sync bridge, payments (Razorpay), real S3-compatible backups, suspension enforcement | Functionally complete, e2e-tested |
 
 ---
 

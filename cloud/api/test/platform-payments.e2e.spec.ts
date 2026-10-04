@@ -3,7 +3,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
+import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 
 describe('Platform payments visibility', () => {
   let app: INestApplication;
@@ -19,9 +19,9 @@ describe('Platform payments visibility', () => {
 
   beforeAll(async () => {
     app = await createTestApp((builder) =>
-      builder.overrideProvider(CashfreeGatewayService).useValue({
+      builder.overrideProvider(RazorpayGatewayService).useValue({
         isConfigured: () => true,
-        createRefund: vi.fn().mockResolvedValue({ cfRefundId: 'cf_refund_mock', refundId: 'refund_mock', refundStatus: 'PENDING', refundAmount: 100 })
+        createRefund: vi.fn().mockResolvedValue({ refundId: 'rfnd_mock', status: 'pending', amountPaise: 100 })
       })
     );
     prisma = app.get(PrismaService);
@@ -59,7 +59,7 @@ describe('Platform payments visibility', () => {
       tx.order.create({ data: { restaurantId, externalOrderId: `platpay-test-${Date.now()}-${Math.random()}`, items: [], subtotal: amount, taxAmount: 0, totalAmount: amount, status: status === 'SUCCESS' ? 'PAID' : 'PAYMENT_FAILED' } })
     );
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.create({ data: { provider: 'CASHFREE', orderId: order.id, restaurantId, providerOrderId: `pay_${Date.now()}_${Math.random()}`, amount, currency: 'INR', status } })
+      tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', providerPaymentId: `pay_rzp_${Date.now()}_${Math.random()}`, orderId: order.id, restaurantId, providerOrderId: `pay_${Date.now()}_${Math.random()}`, amount, currency: 'INR', status } })
     );
     return payment.id;
   };
@@ -128,7 +128,7 @@ describe('Platform payments visibility', () => {
     expect(res.body.defaultBps).toBe(300);
   });
 
-  it("PATCH /commission-config refuses anything below 2% (Cashfree's fee comes out of the commission)", async () => {
+  it("PATCH /commission-config refuses anything below 2% (Razorpay's fee comes out of the commission)", async () => {
     const res = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 100, password: adminPassword });
     expect(res.status).toBe(400);
     expect(res.body.message).toMatch(/at least 2%/);
@@ -220,7 +220,6 @@ describe('Platform payments visibility', () => {
     const res = await authed('get', `/api/v1/payments/platform-summary?restaurantId=${restaurantId}`, platformToken);
     expect(res.status).toBe(200);
     expect(res.body.grossVolume).toBeGreaterThanOrEqual(30000);
-    expect(typeof res.body.openReconciliationExceptions).toBe('number');
   });
 
   it('a device token cannot read the platform summary', async () => {

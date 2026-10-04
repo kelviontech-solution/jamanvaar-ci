@@ -613,7 +613,7 @@ export interface PlatformPayment {
   id: string;
   orderId: string;
   restaurantId: string;
-  provider: 'CASHFREE';
+  provider: 'RAZORPAY';
   providerOrderId: string;
   providerPaymentId: string | null;
   amount: number; // paise
@@ -632,18 +632,6 @@ export interface PlatformPaymentPage {
   total: number;
   page: number;
   limit: number;
-}
-
-export interface ReconciliationException {
-  id: string;
-  restaurantId: string;
-  paymentId: string;
-  type: 'MISSING_AT_CASHFREE' | 'AMOUNT_MISMATCH' | 'SPLIT_MISMATCH' | 'UNEXPECTED_STATUS';
-  details: Record<string, unknown>;
-  status: 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED';
-  acknowledgedBy: string | null;
-  acknowledgedAt: string | null;
-  createdAt: string;
 }
 
 export interface Invoice {
@@ -1148,7 +1136,7 @@ export interface QrAuditEntry {
 }
 
 // ---------------------------------------------------------------------------
-// Payment Connections (Cashfree)
+// Payment Connections (Razorpay Route)
 // ---------------------------------------------------------------------------
 
 export interface PaymentConnection {
@@ -1169,8 +1157,6 @@ export interface PaymentConnection {
   settlementAccountNumberMasked: string | null;
   settlementIfsc: string | null;
   settlementUpiVpaMasked: string | null;
-  cashfreeVendorId: string | null;
-  cashfreeVendorStatus: string | null;
   commissionOverrideBps: number | null;
   verifiedAt: string | null;
   lastWebhookAt: string | null;

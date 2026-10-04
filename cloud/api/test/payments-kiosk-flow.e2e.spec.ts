@@ -3,7 +3,6 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
 import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 
 const APPS = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN'];
@@ -20,7 +19,6 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
   let kioskAdminToken: string;
   let posAdminToken: string;
   let posToken: string;
-  let cashfreeGateway: { settleVendorOnDemand: ReturnType<typeof vi.fn> };
   let gateway: { createUpiQr: ReturnType<typeof vi.fn>; createRefund: ReturnType<typeof vi.fn>; findCapturedPaymentByRef: ReturnType<typeof vi.fn> };
 
   const authed = (method: 'get' | 'post' | 'patch', url: string, token: string) =>
@@ -58,16 +56,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
       createRefund: vi.fn().mockResolvedValue({ refundId: 'rfnd_kf_1', status: 'processed', amountPaise: 2500 }),
       findCapturedPaymentByRef: vi.fn().mockResolvedValue(null)
     };
-    cashfreeGateway = {
-      settleVendorOnDemand: vi.fn().mockResolvedValue({ settlementId: '555', raw: {} })
-    };
-    app = await createTestApp((builder) =>
-      builder
-        .overrideProvider(RazorpayGatewayService)
-        .useValue({ isConfigured: () => true, ...gateway })
-        .overrideProvider(CashfreeGatewayService)
-        .useValue({ isConfigured: () => true, isEnabled: () => true, ...cashfreeGateway })
-    );
+    app = await createTestApp((builder) => builder.overrideProvider(RazorpayGatewayService).useValue({ isConfigured: () => true, ...gateway }));
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
     platformToken = (await platformLogin(app, adminEmail, adminPassword)).body.accessToken;
@@ -88,7 +77,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     posAdminToken = await deviceFor(restaurantId, 'POS_ADMIN');
     posToken = await deviceFor(restaurantId, 'POS');
 
-    await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.create({ data: { restaurantId, status: 'ACTIVE', cashfreeVendorId: 'rest_kflow_vendor' } }));
+    await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.create({ data: { restaurantId, status: 'ACTIVE' } }));
     await prisma.runAsTenant(restaurantId, (tx) =>
       tx.menuSnapshotItem.upsert({
         where: { restaurantId_externalItemId: { restaurantId, externalItemId: 'thali-1' } },
@@ -291,7 +280,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
         grossVolume: 15000,
         refundedAmount: 4000,
         platformCommission: 350,
-        cashfreeFee: 300,
+        razorpayFee: 300,
         platformNetCommission: 50,
         commissionReversed: 80,
         restaurantGross: 14650,
@@ -311,30 +300,4 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     expect((await authed('get', '/api/v1/payments/tenant-statement?date=2026-01-15', kioskToken)).status).toBe(403);
   });
 
-  // ---------------- Settle now ----------------
-
-  it('Settle now requires the admin password, a vendor, and an amount of at least Rs. 10, then audits the settlement id', async () => {
-    const url = `/api/v1/restaurants/${restaurantId}/payment-connection/settle-now`;
-    expect((await authed('post', url, platformToken).send({ amountPaise: 500000 })).status).toBe(403);
-    expect((await authed('post', url, platformToken).send({ amountPaise: 500000, password: 'wrong' })).status).toBe(403);
-    expect((await authed('post', url, platformToken).send({ amountPaise: 500, password: adminPassword })).status).toBe(400);
-
-    cashfreeGateway.settleVendorOnDemand.mockClear();
-    const ok = await authed('post', url, platformToken).send({ amountPaise: 500000, password: adminPassword });
-    expect(ok.status).toBe(201);
-    expect(ok.body.settlementId).toBe('555');
-    expect(cashfreeGateway.settleVendorOnDemand).toHaveBeenCalledWith('rest_kflow_vendor', 500000, expect.any(String));
-    const audit = await prisma.runAsPlatform((tx) => tx.auditLog.findFirst({ where: { action: 'PAYMENT_SETTLE_NOW', restaurantId }, orderBy: { createdAt: 'desc' } }));
-    expect((audit!.details as { settlementId?: string }).settlementId).toBe('555');
-  });
-
-  it('Settle now surfaces a Cashfree refusal and is blocked for a restaurant with no Cashfree vendor', async () => {
-    const url = `/api/v1/restaurants/${restaurantId}/payment-connection/settle-now`;
-    cashfreeGateway.settleVendorOnDemand.mockRejectedValueOnce(new (await import('@nestjs/common')).ServiceUnavailableException('balance below minimum'));
-    expect((await authed('post', url, platformToken).send({ amountPaise: 500000, password: adminPassword })).status).toBe(503);
-
-    await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { cashfreeVendorId: null } }));
-    expect((await authed('post', url, platformToken).send({ amountPaise: 500000, password: adminPassword })).status).toBe(403);
-    await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { cashfreeVendorId: 'rest_kflow_vendor' } }));
-  });
 });

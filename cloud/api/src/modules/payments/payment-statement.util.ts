@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { CASHFREE_FEE_BPS } from './commission.util';
+import { RAZORPAY_FEE_BPS } from './commission.util';
 
 const SUCCESS_FAMILY = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'] as const;
 const MAX_ROWS = 500;
@@ -18,7 +18,7 @@ export function istDayRange(date: string | undefined): { start: Date; end: Date;
 }
 
 /**
- * One restaurant's online-payment day statement. Cashfree reverses a refund from the vendor and the
+ * One restaurant's online-payment day statement. Razorpay reverses a refund from the vendor and the
  * platform in proportion to the original split, so the refund's effect on the restaurant's share is
  * derived from that payment's own snapshot (restaurantAmount / amount), never from today's rate.
  * Payments without a snapshot (created before splits existed) count fully to the restaurant.
@@ -40,12 +40,12 @@ export async function buildDayStatement(tx: Prisma.TransactionClient, restaurant
 
   let grossVolume = 0;
   let platformCommission = 0;
-  let cashfreeFee = 0;
+  let razorpayFee = 0;
   let restaurantGross = 0;
   for (const p of payments) {
     grossVolume += p.amount;
     platformCommission += p.platformAmount ?? 0;
-    cashfreeFee += Math.round((p.amount * CASHFREE_FEE_BPS) / 10000);
+    razorpayFee += Math.round((p.amount * RAZORPAY_FEE_BPS) / 10000);
     restaurantGross += p.restaurantAmount ?? p.amount;
   }
 
@@ -65,13 +65,13 @@ export async function buildDayStatement(tx: Prisma.TransactionClient, restaurant
     grossVolume,
     refundedAmount,
     platformCommission,
-    cashfreeFee,
-    platformNetCommission: platformCommission - cashfreeFee,
+    razorpayFee,
+    platformNetCommission: platformCommission - razorpayFee,
     commissionReversed: refundedAmount - restaurantRefundImpact,
     restaurantGross,
     restaurantRefundImpact,
     netPayableToRestaurant: restaurantGross - restaurantRefundImpact,
-    settlementNote: 'Cashfree pays the restaurant automatically (default: next day 11:00 AM, unless another schedule is set on the vendor).',
+    settlementNote: 'Settlement to the restaurant needs Razorpay Route linked accounts, which are not enabled yet.',
     rows: payments.slice(0, MAX_ROWS).map((p) => ({
       id: p.id,
       externalOrderId: p.order.externalOrderId,

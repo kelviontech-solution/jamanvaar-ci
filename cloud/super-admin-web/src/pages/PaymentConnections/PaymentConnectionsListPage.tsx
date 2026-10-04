@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import type { PaymentConnection } from '../../api/types';
 import { Badge, Button, Card, ConfirmModal, EmptyState, FilterTabs, SearchBar, SkeletonTable, statusTone } from '../../components/ui';
-import { CreditCard, RefreshCw } from 'lucide-react';
+import { CreditCard } from 'lucide-react';
 import '../../components/shared.css';
 
 type StatusFilter = 'ALL' | 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DISCONNECTED' | 'NOT_CONNECTED';
@@ -18,7 +18,6 @@ export function PaymentConnectionsListPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
   const [confirmTarget, setConfirmTarget] = useState<PendingAction | null>(null);
   const [actionPending, setActionPending] = useState(false);
-  const [refreshingId, setRefreshingId] = useState<string | null>(null);
   const [defaultBps, setDefaultBps] = useState<number | null>(null);
   const [defaultBpsInput, setDefaultBpsInput] = useState('');
   const [defaultLoaded, setDefaultLoaded] = useState(false);
@@ -129,46 +128,12 @@ export function PaymentConnectionsListPage() {
     }
   }
 
-  // Pays the restaurant's Cashfree balance out to its bank now, instead of waiting for Cashfree's own
-  // schedule (default: next day 11:00 AM). Cashfree refuses it if the balance is under ₹1,000 or the
-  // payments are under 15 minutes old; that message is shown as-is.
-  async function handleSettleNow(c: PaymentConnection) {
-    const raw = window.prompt(`Settle how much to ${c.restaurant.name}'s bank now, in rupees? (Cashfree needs a balance of at least ₹1,000)`);
-    if (!raw) return;
-    const amountPaise = Math.round(Number(raw) * 100);
-    if (!Number.isFinite(amountPaise) || amountPaise < 1000) {
-      showToast('Enter an amount of at least ₹10');
-      return;
-    }
-    const password = window.prompt('Confirm your password to move money');
-    if (!password) return;
-    try {
-      const res = await api.post<{ settlementId: string | null }>(`/api/v1/restaurants/${c.restaurantId}/payment-connection/settle-now`, { amountPaise, password });
-      showToast(`${c.restaurant.name}: settlement started${res.settlementId ? ` (Cashfree id ${res.settlementId})` : ''}`);
-    } catch (err) {
-      showToast(err instanceof ApiError ? err.message : 'Settlement failed');
-    }
-  }
-
-  async function handleRefreshStatus(c: PaymentConnection) {
-    setRefreshingId(c.id);
-    try {
-      await api.patch(`/api/v1/restaurants/${c.restaurantId}/payment-connection/refresh-status`);
-      showToast(`${c.restaurant.name}: Cashfree status refreshed`);
-      load();
-    } catch (err) {
-      showToast(err instanceof ApiError ? err.message : 'Refresh failed');
-    } finally {
-      setRefreshingId(null);
-    }
-  }
-
   return (
     <div>
       <div className="page-header">
         <div>
           <h1 className="page-title">Payment Gateways</h1>
-          <p className="page-subtitle">Review and approve restaurants' Cashfree settlement connections.</p>
+          <p className="page-subtitle">Review restaurants' settlement connections. Approval needs Razorpay Route, which is not enabled yet.</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span className="muted" style={{ fontSize: 12 }}>Platform default commission</span>
@@ -235,7 +200,6 @@ export function PaymentConnectionsListPage() {
                     <th>Status</th>
                     <th>Contact</th>
                     <th>Settlement</th>
-                    <th>Cashfree</th>
                     <th>Commission</th>
                     <th>Actions</th>
                   </tr>
@@ -259,14 +223,6 @@ export function PaymentConnectionsListPage() {
                         {c.settlementUpiVpaMasked ? c.settlementUpiVpaMasked : c.settlementAccountNumberMasked ? `${c.settlementAccountNumberMasked} (${c.settlementIfsc ?? ''})` : '—'}
                       </td>
                       <td style={{ fontSize: 12 }}>
-                        {c.cashfreeVendorId ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <span>{c.cashfreeVendorStatus ?? 'unknown'}</span>
-                            <Button size="sm" variant="ghost" icon={<RefreshCw className="w-3 h-3" />} disabled={refreshingId === c.id} onClick={() => handleRefreshStatus(c)} title="Refresh Cashfree status" />
-                          </div>
-                        ) : '—'}
-                      </td>
-                      <td style={{ fontSize: 12 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                           <input
                             type="number"
@@ -288,7 +244,6 @@ export function PaymentConnectionsListPage() {
                           )}
                           {c.status === 'ACTIVE' && (
                             <>
-                              {c.cashfreeVendorId && <Button size="sm" variant="ghost" onClick={() => handleSettleNow(c)}>Settle now</Button>}
                               <Button size="sm" variant="ghost" onClick={() => setConfirmTarget({ connection: c, action: 'suspend' })}>Suspend</Button>
                               <Button size="sm" variant="danger" onClick={() => setConfirmTarget({ connection: c, action: 'disconnect' })}>Disconnect</Button>
                             </>
@@ -317,7 +272,7 @@ export function PaymentConnectionsListPage() {
           message={
             <>
               {confirmTarget.action === 'approve'
-                ? `This creates a real Cashfree vendor for "${confirmTarget.connection.restaurant.name}" and lets their kiosk start accepting payments.`
+                ? `Approving "${confirmTarget.connection.restaurant.name}" needs Razorpay Route linked accounts, which are not enabled yet, so the server will refuse it.`
                 : `This will ${confirmTarget.action} "${confirmTarget.connection.restaurant.name}"'s payment connection.`}
               {STEP_UP_ACTIONS.includes(confirmTarget.action) && (
                 <div style={{ marginTop: 12 }}>

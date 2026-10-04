@@ -81,6 +81,30 @@ export class RazorpayGatewayService {
     return match ? { id: match.id, amount: match.amount, currency: match.currency } : null;
   }
 
+  /** A one-time payment link for a WhatsApp order (https://razorpay.com/docs/api/payments/payment-links/create/). Razorpay sends no SMS or email; the connector sends the link itself. */
+  async createPaymentLink(input: { referenceId: string; amountPaise: number; description: string; customerName: string; customerPhone: string; expireByUnix: number }): Promise<{ linkId: string; shortUrl: string; status: string }> {
+    const res = await fetch('https://api.razorpay.com/v1/payment_links', {
+      method: 'POST',
+      headers: this.headers(),
+      body: JSON.stringify({
+        amount: input.amountPaise,
+        currency: 'INR',
+        accept_partial: false,
+        description: input.description,
+        reference_id: input.referenceId,
+        customer: { name: input.customerName, contact: input.customerPhone },
+        notify: { sms: false, email: false },
+        reminder_enable: false,
+        expire_by: input.expireByUnix
+      })
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new ServiceUnavailableException(`Razorpay payment link creation failed: ${body?.error?.description ?? res.statusText}`);
+    }
+    return { linkId: body.id, shortUrl: body.short_url, status: body.status };
+  }
+
   /** A refund of part or all of one captured Razorpay payment (https://razorpay.com/docs/api/refunds/create-normal/). */
   async createRefund(input: { razorpayPaymentId: string; amountPaise: number; receipt: string; notes?: Record<string, string> }): Promise<{ refundId: string; status: string; amountPaise: number }> {
     const res = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(input.razorpayPaymentId)}/refund`, {

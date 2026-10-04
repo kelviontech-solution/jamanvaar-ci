@@ -35,4 +35,4 @@ The audit brief listed an eighth possible app, "POS Admin," as distinct from "Re
 
 ## External integrations found in source
 
-Cashfree (payments, sandbox/production toggle via env), MSG91 + Meta WhatsApp Cloud (SMS/WhatsApp receipts), SMTP (transactional email, optional), S3-compatible storage (backups, optional — any of AWS S3/R2/B2/MinIO), Google Fonts (runtime CSS import in several frontends, no SRI).
+Razorpay (payments, sandbox/production toggle via env), MSG91 + Meta WhatsApp Cloud (SMS/WhatsApp receipts), SMTP (transactional email, optional), S3-compatible storage (backups, optional — any of AWS S3/R2/B2/MinIO), Google Fonts (runtime CSS import in several frontends, no SRI).

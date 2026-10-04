@@ -320,7 +320,7 @@ export const PosBillsView: React.FC = () => {
       `Process Refund on Invoice #${bill.orderNumber}`,
       `Refunding ₹${amt} on settled bill #${bill.orderNumber}`,
       async (mgr) => {
-        // Only a real Cashfree UPI payment has a paymentTransactionId that
+        // Only a real Razorpay UPI payment has a paymentTransactionId that
         // matches a cloud PaymentTransaction — a locally-generated cash
         // receipt id never does, so cash/card orders fall straight through
         // to the existing local-only refund, unchanged.

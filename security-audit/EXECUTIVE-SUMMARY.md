@@ -53,7 +53,7 @@ Ten passes, each producing a detailed report in `security-audit/_work/`:
 | # | Slice | File | Covers |
 |---|---|---|---|
 | 1 | Cloud API — auth/sessions | `api-auth.md` | JWT, login, refresh, password reset, RBAC table, platform team management |
-| 2 | Cloud API — licensing/billing | `api-license-billing.md` | Activation keys, plans, subscriptions, invoices, payments, Cashfree, backups, master-catalog uploads |
+| 2 | Cloud API — licensing/billing | `api-license-billing.md` | Activation keys, plans, subscriptions, invoices, payments, Razorpay, backups, master-catalog uploads |
 | 3 | Cloud API — devices/sync | `api-device-sync.md` | Device auth, remote MDM commands, order-sync, entity-sync, telemetry, QR ordering |
 | 4 | Cloud API — data layer | `api-data.md` | Prisma schema, RLS coverage, raw SQL, seed script, reports, AI assistant, support tickets |
 | 5 | Super Admin web | `super-admin-web.md` | React SPA — token storage, XSS, UI-vs-API authority mapping, uploads, exports |

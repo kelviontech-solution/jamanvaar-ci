@@ -132,7 +132,7 @@ convention:
   payment's `SUCCESS` refunds, if any), using `SkeletonTable` while loading
   and `EmptyState` when `rows.length === 0`.
 - Clicking a row expands inline (no navigation, no modal) to show: full
-  Cashfree IDs (`providerOrderId`/`providerPaymentId`), failure reason (if
+  Razorpay IDs (`providerOrderId`/`providerPaymentId`), failure reason (if
   any), and each refund's id/amount/status/reason/timestamps. This matches
   how `AuditLogPage`'s `selectedLog` modal already surfaces "everything about
   one row" without leaving the tab — except inline expansion is enough detail

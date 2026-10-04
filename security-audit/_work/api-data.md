@@ -203,7 +203,7 @@ Missing-RLS tables (derived from migrations): see table in AD-04.
 - Migrations contain no seeded users/passwords and no data-destroying DDL beyond the intentional session backfill (`20260919183000_platform_sessions`).
 - Seed: no hardcoded default password; random 9-byte password when unset; existing super-admin never reset without both flags; demo tenant off when `NODE_ENV=production` or `SEED_DEMO_DATA=false` (`seed-options.spec.ts`).
 - Idempotency keys exist where they matter for sync: `@@unique([restaurantId, externalOrderId])` on `Order` and `SyncedOrder`, `@@unique([restaurantId, entityType, externalId])` on `SyncedEntity`, `@@unique([provider, providerOrderId])`, `@@unique([provider, providerEventKey])` on `WebhookEvent`, unique `Payment.receiptNumber`, `InvoiceCounter` atomic counter.
-- Body limit is 20 MB globally with the Cashfree webhook on a raw 1 MB parser (`main.ts:19-20`); helmet enabled; CORS is an explicit origin list.
+- Body limit is 20 MB globally with the Razorpay webhook on a raw 1 MB parser (`main.ts:19-20`); helmet enabled; CORS is an explicit origin list.
 
 ## Not verified / limits
 - No live database: RLS/FORCE/ownership state, role attributes and schema drift vs migrations are inferred from files; production DB user, `NODE_ENV`, `BACKUP_ENCRYPTION_KEY_B64`, SMTP/signing key provenance are UNVERIFIABLE (no deployment manifests in the repo).

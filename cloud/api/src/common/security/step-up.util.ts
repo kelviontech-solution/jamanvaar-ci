@@ -3,7 +3,7 @@ import * as bcrypt from 'bcryptjs';
 
 /**
  * A handful of payment actions (approving/suspending/disconnecting a
- * restaurant's Cashfree connection, changing platform or per-restaurant
+ * restaurant's Razorpay connection, changing platform or per-restaurant
  * commission) require the acting platform user to re-enter their own
  * password, on top of the RBAC check PlatformAuthGuard already performed.
  * Reuses the same bcrypt comparison platform-auth.service.ts's login flow

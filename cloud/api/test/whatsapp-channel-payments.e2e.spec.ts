@@ -4,21 +4,21 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
+import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 
 /**
  * Jamanvaar ↔ WhatsApp connector, Phase 4 (see
  * docs/integrations/JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md): channels/quote,
  * channels/checkout and the payment→KDS ingestion this whole phase exists for — a WhatsApp
- * order must reach POS/KDS only once Cashfree actually confirms payment, never at checkout.
+ * order must reach POS/KDS only once Razorpay actually confirms payment, never at checkout.
  *
- * No real Cashfree call is ever made here. `createPaymentLink` (the one method that would
- * actually reach Cashfree's API — this connector uses Payment Links, not Orders; see
- * CashfreeGatewayService's own comment on why) is mocked; every other CashfreeGatewayService
+ * No real Razorpay call is ever made here. `createPaymentLink` (the one method that would
+ * actually reach Razorpay's API — this connector uses Payment Links, not Orders; see
+ * RazorpayGatewayService's own comment on why) is mocked; every other RazorpayGatewayService
  * method — including `verifyWebhookSignature` — runs for real, pure local HMAC verification
  * with no network call and no secret ever printed. The "payment succeeded" side of every test
- * is a hand-signed webhook POST to this server's own `/api/v1/payments/cashfree/webhook`,
- * exactly like payments-webhook.e2e.spec.ts — never a call to Cashfree itself, never real money.
+ * is a hand-signed webhook POST to this server's own `/api/v1/payments/razorpay/webhook`,
+ * exactly like payments-webhook.e2e.spec.ts — never a call to Razorpay itself, never real money.
  */
 describe('Jamanvaar WhatsApp connector — channels/quote, channels/checkout, payment→KDS ingestion', () => {
   let app: INestApplication;
@@ -26,7 +26,7 @@ describe('Jamanvaar WhatsApp connector — channels/quote, channels/checkout, pa
   const stamp = Date.now();
   const adminEmail = `test-wa-pay-admin-${stamp}@example.com`;
   const SERVICE_SECRET = 'test-jamanvaar-service-secret-for-payments-e2e';
-  const WEBHOOK_SECRET = 'test-cashfree-webhook-secret-for-wa-payments-e2e';
+  const WEBHOOK_SECRET = 'test-razorpay-webhook-secret-for-wa-payments-e2e';
   let platformToken: string;
   let restaurantId: string;
   let branchId: string;
@@ -55,47 +55,39 @@ describe('Jamanvaar WhatsApp connector — channels/quote, channels/checkout, pa
 
   const signedWebhook = (payload: object) => {
     const rawBody = JSON.stringify(payload);
-    const timestamp = String(Math.floor(Date.now() / 1000));
-    const signature = createHmac('sha256', WEBHOOK_SECRET).update(timestamp + rawBody).digest('base64');
-    return http().post('/api/v1/payments/cashfree/webhook').set('x-webhook-signature', signature).set('x-webhook-timestamp', timestamp).send(payload);
+    const signature = createHmac('sha256', WEBHOOK_SECRET).update(rawBody).digest('hex');
+    return http().post('/api/v1/payments/razorpay/webhook').set('Content-Type', 'application/json').set('x-razorpay-signature', signature).send(rawBody);
   };
-  // PAYMENT_LINK_EVENT, not PAYMENT_SUCCESS_WEBHOOK -- the WhatsApp connector's checkout
-  // creates a Cashfree Payment Link (see CashfreeGatewayService.createPaymentLink), which
-  // has its own, differently-shaped webhook payload (link_id/link_status directly under
-  // `data`, order/transaction details nested under `data.order`), confirmed against
-  // Cashfree's own Payment Link Webhooks docs.
-  const webhookLinkPayload = (linkId: string, amountRupees: number, linkStatus: 'PAID' | 'EXPIRED' | 'CANCELLED') => ({
-    type: 'PAYMENT_LINK_EVENT',
-    event_time: new Date().toISOString(),
-    data: {
-      link_id: linkId,
-      cf_link_id: `cf_link_wa_${stamp}_${++cfCounter}`,
-      link_status: linkStatus,
-      link_amount: amountRupees,
-      link_amount_paid: linkStatus === 'PAID' ? amountRupees : 0,
-      link_currency: 'INR',
-      order: linkStatus === 'PAID' ? { order_id: `cforder_${stamp}_${cfCounter}`, order_amount: amountRupees, transaction_id: `txn_${stamp}_${cfCounter}`, transaction_status: 'SUCCESS' } : null
+  // A Razorpay Payment Link event: payment_link.paid carries the payment too; expired and cancelled do not.
+  const webhookLinkPayload = (referenceId: string, amountRupees: number, linkStatus: 'PAID' | 'EXPIRED' | 'CANCELLED') => {
+    const amountPaise = Math.round(amountRupees * 100);
+    const linkEntity = { id: `plink_${referenceId}`, reference_id: referenceId, amount: amountPaise, currency: 'INR', status: linkStatus === 'PAID' ? 'paid' : linkStatus.toLowerCase() };
+    if (linkStatus !== 'PAID') {
+      return { event: linkStatus === 'EXPIRED' ? 'payment_link.expired' : 'payment_link.cancelled', created_at: Math.floor(Date.now() / 1000), payload: { payment_link: { entity: linkEntity } } };
     }
-  });
+    return {
+      event: 'payment_link.paid',
+      created_at: Math.floor(Date.now() / 1000),
+      payload: {
+        payment_link: { entity: linkEntity },
+        payment: { entity: { id: `pay_${referenceId}`, amount: amountPaise, currency: 'INR', status: 'captured' } }
+      }
+    };
+  };
 
   beforeAll(async () => {
     process.env.JAMANVAAR_SERVICE_SECRET = SERVICE_SECRET;
-    process.env.CASHFREE_WEBHOOK_SECRET = WEBHOOK_SECRET;
+    process.env.RAZORPAY_WEBHOOK_SECRET = WEBHOOK_SECRET;
     app = await createTestApp();
     prisma = app.get(PrismaService);
 
-    // The only Cashfree method that would ever make a real HTTP call is mocked; everything
-    // else (verifyWebhookSignature) is left real. The WhatsApp connector uses Payment Links
-    // (createPaymentLink), not Orders (createOrder) — see CashfreeGatewayService's own
-    // comment on createPaymentLink for why: Orders' payment_session_id has no plain,
-    // pasteable checkout URL at all (confirmed live, not assumed), only Payment Links does.
-    const cashfree = app.get(CashfreeGatewayService);
-    vi.spyOn(cashfree, 'isConfigured').mockReturnValue(true);
-    vi.spyOn(cashfree, 'createPaymentLink').mockImplementation(async (input) => ({
-      linkId: input.linkId,
-      cfLinkId: `cf_link_${++cfCounter}`,
-      linkUrl: `https://payments-test.cashfree.com/links/mock_${cfCounter}`,
-      linkStatus: 'ACTIVE'
+    // The only Razorpay method that would make a real HTTP call (creating the payment link) is mocked; the
+    // webhook signature check runs for real.
+    const razorpay = app.get(RazorpayGatewayService);
+    vi.spyOn(razorpay, 'createPaymentLink').mockImplementation(async (input) => ({
+      linkId: `plink_${input.referenceId}`,
+      shortUrl: `https://rzp.io/i/mock_${++cfCounter}`,
+      status: 'created'
     }));
 
     await createTestPlatformUser(prisma, { email: adminEmail, password: 'correct-horse-battery-staple' });
@@ -131,7 +123,7 @@ describe('Jamanvaar WhatsApp connector — channels/quote, channels/checkout, pa
   }, 120_000);
 
   afterAll(async () => {
-    delete process.env.CASHFREE_WEBHOOK_SECRET;
+    delete process.env.RAZORPAY_WEBHOOK_SECRET;
     await prisma.runAsPlatform((tx) => tx.whatsAppChannelConnection.deleteMany({ where: { restaurantId } }));
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));
     await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: planId } }));
@@ -181,7 +173,7 @@ describe('Jamanvaar WhatsApp connector — channels/quote, channels/checkout, pa
       expect(res.status).toBe(400);
     });
 
-    it('creates a payment-bookkeeping Order + Cashfree session, returns a hosted checkout link, and creates no SyncedOrder', async () => {
+    it('creates a payment-bookkeeping Order + Razorpay session, returns a hosted checkout link, and creates no SyncedOrder', async () => {
       const quote = await asService('post', `/api/v1/service/whatsapp-channel/channels/quote?restaurantId=${restaurantId}`, { branchId, cart });
 
       const res = await asService('post', `/api/v1/service/whatsapp-channel/channels/checkout?restaurantId=${restaurantId}`, {
@@ -195,7 +187,7 @@ describe('Jamanvaar WhatsApp connector — channels/quote, channels/checkout, pa
       expect(res.status, JSON.stringify(res.body)).toBe(201);
       expect(res.body.amount).toBe(quote.body.total);
       expect(res.body.status).toBe('PENDING');
-      expect(res.body.paymentLink).toMatch(/^https:\/\/payments-test\.cashfree\.com\/links\/mock_/);
+      expect(res.body.paymentLink).toMatch(/^https:\/\/rzp\.io\/i\/mock_/);
 
       const order = await prisma.runAsPlatform((tx) => tx.order.findUniqueOrThrow({ where: { id: res.body.orderId } }));
       expect(order.source).toBe('WHATSAPP');
@@ -254,7 +246,7 @@ describe('Jamanvaar WhatsApp connector — channels/quote, channels/checkout, pa
       expect(status.body.kitchenStatus).toBeNull();
     });
 
-    it('a signed Cashfree PAYMENT_SUCCESS_WEBHOOK creates the SyncedOrder (status NEW, autoAccept is off) and getOrderStatus reflects it', async () => {
+    it('a signed Razorpay payment_link.paid webhook creates the SyncedOrder (status NEW, autoAccept is off) and getOrderStatus reflects it', async () => {
       const checkout = await asService('post', `/api/v1/service/whatsapp-channel/channels/checkout?restaurantId=${restaurantId}`, {
         branchId, cart, idempotencyKey: `wa-checkout-4-${stamp}`, customer: { name: 'Divya', phone: '9876500005' }, orderType: 'DELIVERY', externalOrderId: `wa-order-4-${stamp}`
       });

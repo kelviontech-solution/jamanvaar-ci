@@ -876,7 +876,7 @@ export interface DayStatement {
   grossVolume: number;
   refundedAmount: number;
   platformCommission: number;
-  cashfreeFee: number;
+  razorpayFee: number;
   platformNetCommission: number;
   commissionReversed: number;
   restaurantGross: number;
@@ -897,7 +897,7 @@ export async function markPaymentHandled(paymentId: string): Promise<void> {
   await jsonOrThrow(await deviceFetch(`/api/v1/payments/${paymentId}/fulfilled`, { method: 'POST' }), 'Mark payment handled');
 }
 
-/** Real Cashfree refund. The server re-checks the remaining refundable balance; Cashfree reverses the vendor share proportionally. */
+/** Real Razorpay refund. The server re-checks the remaining refundable balance; Razorpay reverses the vendor share proportionally. */
 export async function refundPayment(paymentId: string, amountPaise: number, reason: string, requestedBy: string): Promise<void> {
   await jsonOrThrow(
     await deviceFetch(`/api/v1/payments/${paymentId}/refund`, { method: 'POST', body: JSON.stringify({ amountPaise, reason, requestedBy }) }),
@@ -909,7 +909,7 @@ export async function getDayStatement(date: string): Promise<DayStatement> {
   return jsonOrThrow<DayStatement>(await deviceFetch(`/api/v1/payments/tenant-statement?date=${encodeURIComponent(date)}`), 'Day statement');
 }
 
-/** Online (Cashfree) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
+/** Online (Razorpay) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
 export async function getPaymentsSummary(): Promise<PaymentsSummary> {
   return jsonOrThrow<PaymentsSummary>(await deviceFetch('/api/v1/payments/tenant-summary'), 'Payments summary');
 }

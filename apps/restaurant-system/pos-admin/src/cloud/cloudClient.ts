@@ -829,7 +829,7 @@ export interface PaymentsSummary {
   refundedAmount: number;
 }
 
-/** Online (Cashfree) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
+/** Online (Razorpay) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
 export async function getPaymentsSummary(): Promise<PaymentsSummary> {
   const res = await deviceFetch('/api/v1/payments/tenant-summary');
   const data = await parseJsonResponse(res);

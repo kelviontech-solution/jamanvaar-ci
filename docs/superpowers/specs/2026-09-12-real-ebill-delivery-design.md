@@ -31,11 +31,11 @@ This spec builds a **template-driven** integration: cloud/api sends whatever tem
 
 ## Architecture
 
-**Why server-side:** `packages/api` is imported directly into Tauri desktop apps shipped to end-user machines. A WhatsApp Cloud API access token or MSG91 auth key embedded in that bundle would be extractable by anyone with the installed `.exe`. Every other secret-holding integration in this codebase (Cashfree order creation, vendor onboarding, refunds) already routes through `cloud/api`, which holds the real credentials as server env vars — this follows the same pattern.
+**Why server-side:** `packages/api` is imported directly into Tauri desktop apps shipped to end-user machines. A WhatsApp Cloud API access token or MSG91 auth key embedded in that bundle would be extractable by anyone with the installed `.exe`. Every other secret-holding integration in this codebase (Razorpay order creation, vendor onboarding, refunds) already routes through `cloud/api`, which holds the real credentials as server env vars — this follows the same pattern.
 
 **New backend module: `cloud/api/src/modules/notifications/`**
 
-- `notification-gateway.service.ts` — thin wrapper over WhatsApp Cloud API and MSG91, mirroring `CashfreeGatewayService`'s exact shape (`isConfigured()`, plain `fetch`, `ConfigService`, `ServiceUnavailableException` when unconfigured):
+- `notification-gateway.service.ts` — thin wrapper over WhatsApp Cloud API and MSG91, mirroring `RazorpayGatewayService`'s exact shape (`isConfigured()`, plain `fetch`, `ConfigService`, `ServiceUnavailableException` when unconfigured):
 
 ```typescript
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
@@ -260,7 +260,7 @@ export async function sendReceipt(
 
 ## Testing
 
-- Backend e2e (`cloud/api/test/receipts.e2e.spec.ts`), overriding `NotificationGatewayService` the same way `payments-refund.e2e.spec.ts` overrides `CashfreeGatewayService`:
+- Backend e2e (`cloud/api/test/receipts.e2e.spec.ts`), overriding `NotificationGatewayService` the same way `payments-refund.e2e.spec.ts` overrides `RazorpayGatewayService`:
   - A KIOSK device can send a WHATSAPP receipt; mocked gateway returns success; response is `{ success: true, providerMessageId }`.
   - A POS device can send an SMS receipt; mocked gateway returns success.
   - An invalid phone number (e.g. `12345`) is rejected 400 before the gateway mock is ever called.

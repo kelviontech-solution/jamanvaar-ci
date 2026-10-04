@@ -485,10 +485,10 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
         )}
       </div>
 
-      {/* ONLINE PAYMENTS (CASHFREE) — server-side totals; a different source from the local sales figures below, so shown separately rather than merged */}
+      {/* ONLINE PAYMENTS (RAZORPAY) — server-side totals; a different source from the local sales figures below, so shown separately rather than merged */}
       <div className="bg-white border border-jaman-border rounded-3xl p-5 sm:p-6 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-black text-jaman-navy">Online Payments (Cashfree)</h2>
+          <h2 className="text-sm font-black text-jaman-navy">Online Payments (Razorpay)</h2>
           <span className="text-[10px] text-slate-500">All time · from cloud, not local sales</span>
         </div>
         {onlineSummary ? (

@@ -20,7 +20,7 @@ export const submitPaymentConnectionSchema = z
     (data) => {
       const hasUpi = Boolean(data.settlementUpiVpa);
       const hasBank = Boolean(data.settlementAccountNumber && data.settlementIfsc && data.settlementAccountName);
-      return hasUpi !== hasBank; // exactly one, matching Cashfree's own bank-XOR-upi vendor requirement
+      return hasUpi !== hasBank; // exactly one, matching the bank-or-UPI payout rule of Razorpay Route
     },
     { message: 'Provide either a UPI VPA, or a settlement account name + account number + IFSC — not both' }
   );

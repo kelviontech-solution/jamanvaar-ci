@@ -3,7 +3,7 @@ import { PaymentTransactionStatus, PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { requireStepUpPassword } from '../../common/security/step-up.util';
-import { CASHFREE_FEE_BPS, MIN_COMMISSION_BPS, PAYMENT_DEFAULT_COMMISSION_BPS_KEY, getDefaultCommissionBps } from './commission.util';
+import { RAZORPAY_FEE_BPS, MIN_COMMISSION_BPS, PAYMENT_DEFAULT_COMMISSION_BPS_KEY, getDefaultCommissionBps } from './commission.util';
 import { buildDayStatement } from './payment-statement.util';
 import { ATTENTION_GRACE_MS, PaymentsService } from './payments.service';
 
@@ -72,7 +72,7 @@ export class PlatformPaymentsService {
       throw new BadRequestException('defaultBps must be an integer between 0 and 10000');
     }
     await requireStepUpPassword(actor, password);
-    if (bps < MIN_COMMISSION_BPS) throw new BadRequestException("The commission must be at least 2%, because Cashfree's 2% fee is paid out of it.");
+    if (bps < MIN_COMMISSION_BPS) throw new BadRequestException("The commission must be at least 2%, because Razorpay's 2% fee is paid out of it.");
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.platformSetting.findUnique({ where: { key: PAYMENT_DEFAULT_COMMISSION_BPS_KEY } });
       const oldBps = (existing?.value as { bps?: number } | undefined)?.bps ?? 0;
@@ -96,26 +96,24 @@ export class PlatformPaymentsService {
         ...(filters.status ? { status: filters.status } : {}),
         ...(filters.from || filters.to ? { createdAt: { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lte: filters.to } : {}) } } : {})
       };
-      const [successAgg, refundAgg, statusCounts, exceptionCount] = await Promise.all([
+      const [successAgg, refundAgg, statusCounts] = await Promise.all([
         tx.paymentTransaction.aggregate({
           where: { ...where, status: { in: ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED'] } },
           _sum: { amount: true, platformAmount: true, restaurantAmount: true },
           _count: true
         }),
         tx.refund.aggregate({ where: { status: 'SUCCESS', payment: where }, _sum: { amount: true } }),
-        tx.paymentTransaction.groupBy({ by: ['status'], where, _count: true }),
-        tx.reconciliationException.count({ where: { status: 'OPEN', ...(filters.restaurantId ? { restaurantId: filters.restaurantId } : {}) } })
+        tx.paymentTransaction.groupBy({ by: ['status'], where, _count: true })
       ]);
       return {
         grossVolume: successAgg._sum.amount ?? 0,
         platformCommission: successAgg._sum.platformAmount ?? 0,
-        cashfreeFee: Math.round(((successAgg._sum.amount ?? 0) * CASHFREE_FEE_BPS) / 10000),
-        platformNetCommission: (successAgg._sum.platformAmount ?? 0) - Math.round(((successAgg._sum.amount ?? 0) * CASHFREE_FEE_BPS) / 10000),
+        razorpayFee: Math.round(((successAgg._sum.amount ?? 0) * RAZORPAY_FEE_BPS) / 10000),
+        platformNetCommission: (successAgg._sum.platformAmount ?? 0) - Math.round(((successAgg._sum.amount ?? 0) * RAZORPAY_FEE_BPS) / 10000),
         restaurantShare: successAgg._sum.restaurantAmount ?? 0,
         refundedAmount: refundAgg._sum.amount ?? 0,
         successfulCount: successAgg._count,
-        statusCounts: Object.fromEntries(statusCounts.map((s) => [s.status, s._count])),
-        openReconciliationExceptions: exceptionCount
+        statusCounts: Object.fromEntries(statusCounts.map((s) => [s.status, s._count]))
       };
     });
   }
@@ -150,7 +148,7 @@ export class PlatformPaymentsService {
     return this.prisma.runAsPlatform((tx) => buildDayStatement(tx, restaurantId, date));
   }
 
-  /** A Super Admin refund: same server-side rules as any refund (remaining balance, one Cashfree call), plus the admin's password. */
+  /** A Super Admin refund: same server-side rules as any refund (remaining balance, one Razorpay call), plus the admin's password. */
   async adminRefund(paymentId: string, dto: { amountPaise: number; reason: string }, actor: PlatformUser, password?: string) {
     await requireStepUpPassword(actor, password);
     const payment = await this.prisma.runAsPlatform((tx) => tx.paymentTransaction.findUnique({ where: { id: paymentId }, select: { restaurantId: true } }));
@@ -168,27 +166,5 @@ export class PlatformPaymentsService {
     const payment = await this.prisma.runAsPlatform((tx) => tx.paymentTransaction.findUnique({ where: { id: paymentId }, select: { restaurantId: true } }));
     if (!payment) throw new NotFoundException('Payment not found');
     return this.payments.markFulfilled(payment.restaurantId, paymentId, { id: `platform:${actor.id}`, type: 'PLATFORM' });
-  }
-
-  async listReconciliationExceptions(filters: { restaurantId?: string; status?: 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED'; page: number; limit: number }) {
-    return this.prisma.runAsPlatform(async (tx) => {
-      const where = {
-        ...(filters.restaurantId ? { restaurantId: filters.restaurantId } : {}),
-        ...(filters.status ? { status: filters.status } : {})
-      };
-      const [rows, total] = await Promise.all([
-        tx.reconciliationException.findMany({ where, orderBy: { createdAt: 'desc' }, skip: (filters.page - 1) * filters.limit, take: filters.limit }),
-        tx.reconciliationException.count({ where })
-      ]);
-      return { rows, total, page: filters.page, limit: filters.limit };
-    });
-  }
-
-  async acknowledgeReconciliationException(id: string, actor: PlatformUser) {
-    return this.prisma.runAsPlatform(async (tx) => {
-      const existing = await tx.reconciliationException.findUnique({ where: { id } });
-      if (!existing) throw new NotFoundException('Reconciliation exception not found');
-      return tx.reconciliationException.update({ where: { id }, data: { status: 'ACKNOWLEDGED', acknowledgedBy: actor.id, acknowledgedAt: new Date() } });
-    });
   }
 }

@@ -241,7 +241,7 @@ export async function syncRestaurantIdentity(): Promise<void> {
   await pullRestaurantIdentity({ apiBase: API_BASE, deviceToken, restaurantId });
 }
 
-// --- Real Cashfree Payment (Phase 3) ---
+// --- Real Razorpay Payment (Phase 3) ---
 
 export interface PaymentOrderResult {
   orderId: string;
@@ -277,7 +277,7 @@ export interface PaymentQr {
   method?: 'UPI_QR';
 }
 
-/** Asks the server (which holds the Cashfree keys) for the UPI QR of one pending payment. */
+/** Asks the server (which holds the Razorpay keys) for the UPI QR of one pending payment. */
 export async function createPaymentQr(paymentId: string): Promise<PaymentQr> {
   const res = await deviceFetch(`/api/v1/payments/${paymentId}/qr`, { method: 'POST' });
   const data = await parseJsonResponse(res);

@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@cashfreepayments/cashfree-js": "^1.0.7",
     "@jamanvaar/api": "*",
     "@jamanvaar/business": "*",
     "@jamanvaar/config": "*",

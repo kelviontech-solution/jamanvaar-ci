@@ -1,10 +1,9 @@
 import { randomUUID } from 'crypto';
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
-import { CashfreeGatewayService } from './cashfree-gateway.service';
 import { MIN_COMMISSION_BPS } from './commission.util';
 import { encryptCredential, decryptCredential } from '../../common/security/credential-encryption.util';
 import { requireStepUpPassword } from '../../common/security/step-up.util';
@@ -22,7 +21,6 @@ export class PaymentConnectionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
-    private readonly cashfree: CashfreeGatewayService,
     private readonly audit: AuditService
   ) {}
 
@@ -66,11 +64,6 @@ export class PaymentConnectionsService {
         settlementUpiVpa: dto.settlementUpiVpa ?? null,
         // A resubmission is by definition not yet verified — clear the old
         // timestamp so a pending-re-review connection can't read as verified.
-        // cashfreeVendorId is deliberately RETAINED: approve() reuses it to
-        // PATCH the existing Cashfree vendor rather than re-creating one.
-        // cashfreeVendorStatus is likewise left alone — it still reflects the
-        // real last-known Cashfree state, and approve()'s phase-3 write
-        // overwrites it on the next successful approval.
         verifiedAt: null,
         status: 'PENDING_VERIFICATION' as const
       };
@@ -118,7 +111,6 @@ export class PaymentConnectionsService {
     settlementAccountName: string | null;
     settlementIfsc: string | null;
     settlementUpiVpa: string | null;
-    cashfreeVendorId: string | null;
     verifiedAt: Date | null;
   }) {
     // Deliberately never includes the settlement account number, even
@@ -147,7 +139,6 @@ export class PaymentConnectionsService {
       settlementAccountName: connection.settlementAccountName,
       settlementIfsc: connection.settlementIfsc,
       settlementUpiVpa: connection.settlementUpiVpa,
-      cashfreeVendorId: connection.cashfreeVendorId,
       verifiedAt: connection.verifiedAt
     };
   }
@@ -173,115 +164,13 @@ export class PaymentConnectionsService {
     return this.toPlatformView(connection);
   }
 
+  /**
+   * Activation pays each restaurant's share into its own account through Razorpay Route linked accounts. Until Route is
+   * enabled on the platform account, activating would send restaurant money to the platform's account, so it is refused.
+   */
   async approve(restaurantId: string, actor: PlatformUser, password?: string) {
     await requireStepUpPassword(actor, password);
-    // Deliberately split into three phases rather than one runAsPlatform
-    // transaction spanning the whole method: runAsPlatform wraps its
-    // callback in a real Postgres transaction, and holding that open across
-    // the Cashfree network round-trip below risks statement/idle-in-tx
-    // timeouts turning a slow-but-legitimate call into a spurious failure,
-    // plus a narrow window where Cashfree creates the vendor but our own
-    // commit then fails, leaving us with no record of a vendor that exists.
-    // Phase 1 (read-only) gathers everything needed for the Cashfree call;
-    // phase 2 makes that call with no transaction open; phase 3 re-checks
-    // status (guarding a status change that raced phases 1-2, e.g. a
-    // concurrent disconnect or a second concurrent approve) before writing.
-    const prepared = await this.prisma.runAsPlatform(async (tx) => {
-      const connection = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
-      if (!connection) throw new NotFoundException('No payment connection for this restaurant');
-      if (connection.status !== 'PENDING_VERIFICATION') {
-        throw new ForbiddenException(`Cannot approve a connection in status ${connection.status}`);
-      }
-      if (!connection.pan || !connection.accountType || !connection.contactName || !connection.contactEmail || !connection.contactPhone) {
-        throw new ForbiddenException('Submission is incomplete — missing required KYC/contact fields');
-      }
-
-      const vendorId = `rest_${restaurantId.replace(/-/g, '')}`;
-      // Null only on the first-ever approval. Once set, it is stable for the
-      // life of the connection across any number of disconnect/resubmit/
-      // re-approve cycles, and phase 2 updates that vendor instead of
-      // creating a second one under the same deterministic id.
-      const existingVendorId = connection.cashfreeVendorId;
-      const bank =
-        connection.settlementAccountNumberEncrypted && connection.settlementIfsc && connection.settlementAccountName
-          ? {
-              accountNumber: decryptCredential(connection.settlementAccountNumberEncrypted, this.encryptionKey()),
-              accountHolder: connection.settlementAccountName,
-              ifsc: connection.settlementIfsc
-            }
-          : undefined;
-      const upi =
-        !bank && connection.settlementUpiVpa
-          ? { vpa: connection.settlementUpiVpa, accountHolder: connection.settlementAccountName ?? connection.contactName }
-          : undefined;
-
-      return {
-        vendorId,
-        existingVendorId,
-        bank,
-        upi,
-        name: connection.contactName,
-        email: connection.contactEmail,
-        phone: connection.contactPhone,
-        accountType: connection.accountType as 'BUSINESS' | 'INDIVIDUAL',
-        businessType: connection.businessType ?? undefined,
-        pan: connection.pan,
-        gst: connection.gst ?? undefined,
-        cin: connection.cin ?? undefined,
-        uidai: connection.uidai ?? undefined
-      };
-    });
-
-    // Phase 2: the Cashfree network call, made with no DB transaction open.
-    // Create is only ever reached once per restaurant (the first approval);
-    // every later approval PATCHes the vendor that already exists, so this
-    // never depends on Cashfree's undocumented duplicate-create behaviour.
-    const vendorInput = {
-      status: 'ACTIVE' as const,
-      name: prepared.name,
-      email: prepared.email,
-      phone: prepared.phone,
-      kycDetails: {
-        accountType: prepared.accountType,
-        businessType: prepared.businessType,
-        pan: prepared.pan,
-        gst: prepared.gst,
-        cin: prepared.cin,
-        uidai: prepared.uidai
-      },
-      bank: prepared.bank,
-      upi: prepared.upi
-    };
-    const result = prepared.existingVendorId
-      ? await this.cashfree.updateVendor(prepared.existingVendorId, vendorInput)
-      : await this.cashfree.createVendor({ vendorId: prepared.vendorId, ...vendorInput });
-
-    // Phase 3: re-check status before writing — it may have changed while
-    // phase 2 was in flight (a concurrent disconnect, or a second concurrent
-    // approve). If so, the Cashfree vendor from phase 2 was already created;
-    // cleaning that up at Cashfree is out of scope here, so we simply refuse
-    // to overwrite whatever the connection's current state now is.
-    return this.prisma.runAsPlatform(async (tx) => {
-      const connection = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
-      if (!connection) throw new NotFoundException('No payment connection for this restaurant');
-      if (connection.status !== 'PENDING_VERIFICATION') {
-        throw new ForbiddenException(
-          `Connection moved to ${connection.status} while contacting Cashfree — a vendor (${result.vendorId}) may already exist at Cashfree; resolve manually before retrying`
-        );
-      }
-
-      const updated = await tx.restaurantPaymentConnection.update({
-        where: { restaurantId },
-        data: { status: 'ACTIVE', cashfreeVendorId: result.vendorId, cashfreeVendorStatus: result.status, verifiedAt: new Date() }
-      });
-
-      await this.audit.log(
-        { actorType: 'PLATFORM', actorId: actor.id, restaurantId, action: 'PAYMENT_CONNECTION_APPROVED', category: 'PAYMENTS', details: { vendorId: result.vendorId } },
-        tx
-      );
-
-      return { status: updated.status, cashfreeVendorId: updated.cashfreeVendorId };
-    });
+    throw new ConflictException('Restaurant payouts need Razorpay Route linked accounts, which are not enabled on this platform yet. Online payments stay off until they are.');
   }
 
   private async transitionStatus(restaurantId: string, actor: PlatformUser, allowedFrom: string[], to: string, auditAction: string) {
@@ -314,37 +203,12 @@ export class PaymentConnectionsService {
     return this.transitionStatus(restaurantId, actor, ['ACTIVE', 'SUSPENDED', 'PENDING_VERIFICATION'], 'DISCONNECTED', 'PAYMENT_CONNECTION_DISCONNECTED');
   }
 
-  /**
-   * Pays a restaurant's Cashfree vendor balance out to its bank now, instead of waiting for the automatic
-   * schedule. Money-moving, so it needs the admin's password and is audited with Cashfree's settlement id.
-   * Cashfree enforces its own minimum balance / 15-minute processing rule and its refusal is passed through.
-   */
-  async settleNow(restaurantId: string, amountPaise: number, actor: PlatformUser, password?: string) {
-    await requireStepUpPassword(actor, password);
-    const connection = await this.prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } }));
-    if (!connection) throw new NotFoundException('No payment connection for this restaurant');
-    if (!connection.cashfreeVendorId) {
-      throw new ForbiddenException('This restaurant has no Cashfree vendor yet — approve its payment connection first');
-    }
-
-    const result = await this.cashfree.settleVendorOnDemand(connection.cashfreeVendorId, amountPaise, randomUUID());
-    await this.audit.log({
-      actorType: 'PLATFORM',
-      actorId: actor.id,
-      restaurantId,
-      action: 'PAYMENT_SETTLE_NOW',
-      category: 'PAYMENTS',
-      details: { vendorId: connection.cashfreeVendorId, amountPaise, settlementId: result.settlementId }
-    });
-    return { settlementId: result.settlementId, amountPaise };
-  }
-
   async setCommissionOverride(restaurantId: string, overrideBps: number | null, actor: PlatformUser, password?: string) {
     if (overrideBps !== null && (!Number.isInteger(overrideBps) || overrideBps < 0 || overrideBps > 10000)) {
       throw new BadRequestException('overrideBps must be null or an integer between 0 and 10000');
     }
     await requireStepUpPassword(actor, password);
-    if (overrideBps !== null && overrideBps < MIN_COMMISSION_BPS) throw new BadRequestException("The commission must be at least 2%, because Cashfree's 2% fee is paid out of it.");
+    if (overrideBps !== null && overrideBps < MIN_COMMISSION_BPS) throw new BadRequestException("The commission must be at least 2%, because Razorpay's 2% fee is paid out of it.");
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
       if (!existing) throw new NotFoundException('No payment connection for this restaurant');
@@ -361,30 +225,6 @@ export class PaymentConnectionsService {
         tx
       );
       return { commissionOverrideBps: updated.commissionOverrideBps };
-    });
-  }
-
-  async refreshStatus(restaurantId: string) {
-    // Same split as approve() and for the same reason: runAsPlatform opens a
-    // real Postgres transaction, and holding one across the Cashfree network
-    // round-trip risks idle-in-transaction/statement timeouts. No
-    // re-check-before-write is needed here (unlike approve()) — this only
-    // ever writes one field to a value Cashfree just reported, and never
-    // transitions our own `status`, so there is no TOCTOU window that matters.
-    const connection = await this.prisma.runAsPlatform((tx) =>
-      tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } })
-    );
-    if (!connection) throw new NotFoundException('No payment connection for this restaurant');
-    if (!connection.cashfreeVendorId) {
-      throw new ForbiddenException('No Cashfree vendor exists yet for this connection — approve it first');
-    }
-    const result = await this.cashfree.getVendorStatus(connection.cashfreeVendorId);
-    return this.prisma.runAsPlatform(async (tx) => {
-      const updated = await tx.restaurantPaymentConnection.update({
-        where: { restaurantId },
-        data: { cashfreeVendorStatus: result.status }
-      });
-      return { cashfreeVendorStatus: updated.cashfreeVendorStatus };
     });
   }
 
@@ -406,8 +246,6 @@ export class PaymentConnectionsService {
     settlementAccountNumberEncrypted: string | null;
     settlementIfsc: string | null;
     settlementUpiVpa: string | null;
-    cashfreeVendorId: string | null;
-    cashfreeVendorStatus: string | null;
     verifiedAt: Date | null;
     lastWebhookAt: Date | null;
     lastPaymentAt: Date | null;
@@ -446,8 +284,6 @@ export class PaymentConnectionsService {
       // A UPI VPA is a complete, valid settlement destination — masked here
       // for the same reason as the bank account number and the KYC ids.
       settlementUpiVpaMasked: maskLast4(connection.settlementUpiVpa),
-      cashfreeVendorId: connection.cashfreeVendorId,
-      cashfreeVendorStatus: connection.cashfreeVendorStatus,
       commissionOverrideBps: connection.commissionOverrideBps,
       verifiedAt: connection.verifiedAt,
       lastWebhookAt: connection.lastWebhookAt,

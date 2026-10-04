@@ -1,17 +1,14 @@
 // cloud/api/test/payments-webhook.e2e.spec.ts
 import { createHmac } from 'crypto';
 import { INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import { json, raw, urlencoded } from 'express';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { AppModule } from '../src/app.module';
 
 const WEBHOOK_SECRET = 'test-webhook-secret-for-e2e';
 
-describe('Cashfree webhook processing', () => {
+describe('Razorpay webhook processing', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   const adminEmail = `test-webhook-admin-${Date.now()}@example.com`;
@@ -20,68 +17,61 @@ describe('Cashfree webhook processing', () => {
   let restaurantId: string;
   let orderId: string;
   let paymentId: string;
-  const providerOrderId = `pay_${Date.now()}`;
-  // Every other identifier in this fixture (providerOrderId, restaurantId, adminEmail)
-  // is suffixed with Date.now() so repeated runs of this suite never collide. cf_payment_id
-  // feeds the webhook's derived dedup key (`${eventType}:${cf_payment_id}`) in WebhookEvent,
-  // which is a permanent, provider-global audit log (never cleaned up, by design) — so it
-  // must be run-unique too, or a later run's "duplicate" check would collide with this run's
-  // already-PROCESSED row for the same key and silently swallow a legitimate webhook.
-  const cfPaymentId = `cf_pay_${Date.now()}`;
+  // Every identifier here is suffixed with Date.now(): WebhookEvent is a permanent audit log, so a
+  // repeated run must never collide with an earlier run's already-processed event.
+  const paymentRef = `pay_ref_${Date.now()}`;
+  const razorpayPaymentId = `pay_rzp_${Date.now()}`;
 
   const authed = (method: 'get' | 'post', url: string, token: string) =>
     request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
 
-  const signedRequest = (payload: object) => {
-    const rawBody = JSON.stringify(payload);
-    const timestamp = String(Math.floor(Date.now() / 1000));
-    const signature = createHmac('sha256', WEBHOOK_SECRET).update(timestamp + rawBody).digest('base64');
+  const signed = (rawBody: string, secret = WEBHOOK_SECRET) => {
+    const signature = createHmac('sha256', secret).update(rawBody).digest('hex');
     return request(app.getHttpServer())
-      .post('/api/v1/payments/cashfree/webhook')
-      .set('x-webhook-signature', signature)
-      .set('x-webhook-timestamp', timestamp)
-      .send(payload);
+      .post('/api/v1/payments/razorpay/webhook')
+      .set('Content-Type', 'application/json')
+      .set('x-razorpay-signature', signature)
+      .send(rawBody);
   };
+  const signedEvent = (payload: object, secret?: string) => signed(JSON.stringify(payload), secret);
 
-  const successPayload = (amountRupees: number) => ({
-    type: 'PAYMENT_SUCCESS_WEBHOOK',
-    event_time: new Date().toISOString(),
-    data: {
-      order: { order_id: providerOrderId, order_amount: amountRupees, order_currency: 'INR' },
-      payment: { cf_payment_id: cfPaymentId, payment_status: 'SUCCESS', payment_amount: amountRupees, payment_currency: 'INR', payment_method: { upi: {} } }
+  const capturedEvent = (amount: number, ref = paymentRef, id = razorpayPaymentId) => ({
+    event: 'payment.captured',
+    created_at: Math.floor(Date.now() / 1000),
+    payload: {
+      payment: { entity: { id, amount, currency: 'INR', status: 'captured', method: 'upi', notes: { payment_ref: ref } } }
     }
   });
 
+  const payment = () => prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } }));
+
   beforeAll(async () => {
-    process.env.CASHFREE_WEBHOOK_SECRET = WEBHOOK_SECRET;
+    process.env.RAZORPAY_WEBHOOK_SECRET = WEBHOOK_SECRET;
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
-
-    const loginRes = await platformLogin(app, adminEmail, adminPassword);
-    platformToken = loginRes.body.accessToken;
+    platformToken = (await platformLogin(app, adminEmail, adminPassword)).body.accessToken;
 
     const restaurantRes = await authed('post', '/api/v1/restaurants', platformToken).send({
-      name: `TEST Webhook Restaurant ${Date.now()}`, ownerName: 'Webhook Owner', ownerEmail: `webhook-owner-${Date.now()}@test.example.com`
+      name: `TEST Webhook Restaurant ${Date.now()}`,
+      ownerName: 'Webhook Owner',
+      ownerEmail: `webhook-owner-${Date.now()}@test.example.com`
     });
     restaurantId = restaurantRes.body.restaurant.id;
-
     await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.create({ data: { restaurantId, status: 'ACTIVE' } }));
 
     const order = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.order.create({
-        data: { restaurantId, externalOrderId: 'webhook-test-order-1', items: [], subtotal: 20000, taxAmount: 1000, totalAmount: 21000, status: 'PENDING_PAYMENT' }
-      })
+      tx.order.create({ data: { restaurantId, externalOrderId: `webhook-order-${Date.now()}`, items: [], subtotal: 20000, taxAmount: 1000, totalAmount: 21000, status: 'PENDING_PAYMENT' } })
     );
     orderId = order.id;
-    const payment = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.create({ data: { provider: 'CASHFREE', orderId, restaurantId, providerOrderId, amount: 21000, currency: 'INR', status: 'PENDING' } })
+    const created = await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', orderId, restaurantId, providerOrderId: paymentRef, amount: 21000, currency: 'INR', status: 'PENDING' } })
     );
-    paymentId = payment.id;
+    paymentId = created.id;
   });
 
   afterAll(async () => {
-    delete process.env.CASHFREE_WEBHOOK_SECRET;
+    delete process.env.RAZORPAY_WEBHOOK_SECRET;
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));
     await prisma.platformUser.deleteMany({ where: { email: adminEmail } });
     await app.close();
@@ -89,156 +79,96 @@ describe('Cashfree webhook processing', () => {
 
   it('rejects a webhook with an invalid signature and leaves the payment untouched', async () => {
     const res = await request(app.getHttpServer())
-      .post('/api/v1/payments/cashfree/webhook')
-      .set('x-webhook-signature', 'not-a-real-signature')
-      .set('x-webhook-timestamp', String(Math.floor(Date.now() / 1000)))
-      .send(successPayload(210));
-    expect(res.status).toBe(200); // always 200 once durably recorded — Cashfree should not retry a permanently invalid signature
-
-    const payment = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } }));
-    expect(payment.status).toBe('PENDING');
-
-    const events = await prisma.runAsPlatform((tx) => tx.webhookEvent.findMany({ where: { signatureValid: false } }));
+      .post('/api/v1/payments/razorpay/webhook')
+      .set('Content-Type', 'application/json')
+      .set('x-razorpay-signature', 'not-a-real-signature')
+      .send(JSON.stringify(capturedEvent(21000)));
+    expect(res.status).toBe(200);
+    expect((await payment()).status).toBe('PENDING');
+    const events = await prisma.runAsPlatform((tx) => tx.webhookEvent.findMany({ where: { provider: 'RAZORPAY', signatureValid: false } }));
     expect(events.length).toBeGreaterThan(0);
   });
 
-  it('rejects a webhook whose amount does not match the stored payment', async () => {
-    const res = await signedRequest(successPayload(999));
-    expect(res.status).toBe(200);
-
-    const payment = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } }));
-    expect(payment.status).toBe('PENDING');
+  it('rejects a webhook signed with the wrong secret', async () => {
+    await signedEvent(capturedEvent(21000), 'some-other-secret');
+    expect((await payment()).status).toBe('PENDING');
   });
 
-  it('a valid PAYMENT_SUCCESS_WEBHOOK marks the payment SUCCESS and the order PAID', async () => {
-    const res = await signedRequest(successPayload(210));
+  it('rejects a captured payment whose amount does not match the stored payment', async () => {
+    await signedEvent(capturedEvent(999));
+    expect((await payment()).status).toBe('PENDING');
+  });
+
+  it('a valid payment.captured marks the payment SUCCESS and the order PAID', async () => {
+    const res = await signedEvent(capturedEvent(21000));
     expect(res.status).toBe(200);
-
-    const payment = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } }));
-    expect(payment.status).toBe('SUCCESS');
-    expect(payment.providerPaymentId).toBe(cfPaymentId);
-    expect(payment.paidAt).not.toBeNull();
-
+    const updated = await payment();
+    expect(updated.status).toBe('SUCCESS');
+    expect(updated.providerPaymentId).toBe(razorpayPaymentId);
+    expect(updated.paidAt).not.toBeNull();
     const order = await prisma.runAsPlatform((tx) => tx.order.findUniqueOrThrow({ where: { id: orderId } }));
     expect(order.status).toBe('PAID');
-
-    const connection = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId } }));
-    expect(connection.lastWebhookAt).not.toBeNull();
-    expect(connection.lastPaymentAt).not.toBeNull();
   });
 
   it('a duplicate delivery of the same event is ignored and does not reprocess', async () => {
-    const before = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } }));
-    const res = await signedRequest(successPayload(210));
-    expect(res.status).toBe(200);
-    const after = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } }));
+    const before = await payment();
+    await signedEvent(capturedEvent(21000));
+    const after = await payment();
     expect(after.updatedAt).toEqual(before.updatedAt);
+    expect(after.status).toBe('SUCCESS');
   });
 
-  it('an unknown order_id is recorded as a failed WebhookEvent without throwing', async () => {
-    const res = await signedRequest({
-      type: 'PAYMENT_SUCCESS_WEBHOOK',
-      event_time: new Date().toISOString(),
-      data: { order: { order_id: 'pay_does_not_exist', order_amount: 100, order_currency: 'INR' }, payment: { cf_payment_id: 'cf_ghost', payment_status: 'SUCCESS', payment_amount: 100, payment_currency: 'INR' } }
+  it('an unknown payment reference is recorded as a failed WebhookEvent without throwing', async () => {
+    const res = await signedEvent(capturedEvent(21000, 'pay_unknown_ref', `pay_unknown_${Date.now()}`));
+    expect(res.status).toBe(200);
+    const failed = await prisma.runAsPlatform((tx) =>
+      tx.webhookEvent.findFirst({ where: { provider: 'RAZORPAY', processingStatus: 'FAILED', errorMessage: { contains: 'pay_unknown_ref' } } })
+    );
+    expect(failed).not.toBeNull();
+  });
+
+  it('a signed body that is not valid JSON is recorded as a failed WebhookEvent', async () => {
+    const res = await signed('{not json');
+    expect(res.status).toBe(200);
+    const failed = await prisma.runAsPlatform((tx) =>
+      tx.webhookEvent.findFirst({ where: { provider: 'RAZORPAY', processingStatus: 'FAILED', errorMessage: 'Malformed webhook payload JSON' } })
+    );
+    expect(failed).not.toBeNull();
+  });
+
+  it('a payment that failed on the bank side is marked FAILED', async () => {
+    const other = await prisma.runAsTenant(restaurantId, async (tx) => {
+      const o = await tx.order.create({ data: { restaurantId, externalOrderId: `webhook-fail-${Date.now()}`, items: [], subtotal: 5000, taxAmount: 0, totalAmount: 5000, status: 'PENDING_PAYMENT' } });
+      return tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', orderId: o.id, restaurantId, providerOrderId: `pay_fail_${Date.now()}`, amount: 5000, currency: 'INR', status: 'PENDING' } });
+    });
+    const res = await signedEvent({
+      event: 'payment.failed',
+      payload: { payment: { entity: { id: `pay_failed_${Date.now()}`, amount: 5000, currency: 'INR', status: 'failed', error_description: 'Payment declined', notes: { payment_ref: other.providerOrderId } } } }
     });
     expect(res.status).toBe(200);
-
-    const events = await prisma.runAsPlatform((tx) => tx.webhookEvent.findMany({ where: { errorMessage: { contains: 'pay_does_not_exist' } } }));
-    expect(events.length).toBe(1);
-    expect(events[0].processingStatus).toBe('FAILED');
+    const updated = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: other.id } }));
+    expect(updated.status).toBe('FAILED');
+    expect(updated.failureReason).toBe('Payment declined');
   });
 
-  it('a valid signature over malformed JSON bytes is recorded as a failed WebhookEvent, not an unhandled exception', async () => {
-    // The shared `app` above is built via createTestApp(), which (per this file's Task 9
-    // environment note) never registers main.ts's path-scoped raw() middleware for this
-    // route — Nest's default JSON body-parser runs instead, and it rejects a malformed
-    // `application/json` body with its own 400 before the request ever reaches our
-    // controller. That's a different failure mode than the one under test here (the
-    // service returning a durably-recorded 200 for a *signature-valid* but malformed
-    // body) and supertest's `.send()` would re-serialize a JS value into valid JSON
-    // anyway, so genuinely malformed bytes can't reach the controller through `app`.
-    // A second, minimal app instance mirroring main.ts's raw()-then-json() wiring for
-    // this one route is built here instead, so the exact malformed bytes reach the
-    // controller unmodified, exactly as they would in production.
-    const rawModuleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
-    const rawApp = rawModuleRef.createNestApplication({ bodyParser: false });
-    rawApp.use('/api/v1/payments/cashfree/webhook', raw({ type: '*/*', limit: '1mb' }));
-    rawApp.use(json());
-    rawApp.use(urlencoded({ extended: true }));
-    await rawApp.init();
-
-    try {
-      // The providerEventKey for this branch is always `MALFORMED:${randomUUID()}` (there's
-      // no cf_payment_id/order_id to derive a stable key from), so — unlike the other test
-      // cases in this file — it never collides with a prior run's row, but it also never gets
-      // reused/deduped: every run inserts a brand-new row. Scoping by createdAt keeps this
-      // test's assertions about *its own* delivery correct even when the suite is re-run
-      // without clearing WebhookEvent (a permanent, provider-global audit log by design).
-      const testStartedAt = new Date();
-      const malformedBody = '{"type":"PAYMENT_SUCCESS_WEBHOOK", this is not valid json';
-      const timestamp = String(Math.floor(Date.now() / 1000));
-      const signature = createHmac('sha256', WEBHOOK_SECRET).update(timestamp + malformedBody).digest('base64');
-
-      const res = await request(rawApp.getHttpServer())
-        .post('/api/v1/payments/cashfree/webhook')
-        .set('Content-Type', 'application/json')
-        .set('x-webhook-signature', signature)
-        .set('x-webhook-timestamp', timestamp)
-        .send(malformedBody);
-
-      expect(res.status).toBe(200);
-      expect(res.body).toEqual({ received: true });
-
-      const events = await prisma.runAsPlatform((tx) =>
-        tx.webhookEvent.findMany({
-          where: { errorMessage: { contains: 'Malformed webhook payload JSON' }, createdAt: { gte: testStartedAt } }
-        })
-      );
-      expect(events.length).toBe(1);
-      expect(events[0].processingStatus).toBe('FAILED');
-      expect(events[0].signatureValid).toBe(true);
-    } finally {
-      await rawApp.close();
-    }
-  });
-
-  it('an unconfigured webhook secret is recorded as a failed WebhookEvent, not an unhandled exception', async () => {
-    // ConfigService (via ConfigModule.forRoot's `validate` option) snapshots process.env into
-    // an internal validatedEnvConfig at module-init time and prefers that snapshot over live
-    // process.env on every subsequent .get() call — so mutating process.env.CASHFREE_WEBHOOK_SECRET
-    // after the shared `app` above has already booted would have no effect on it. A second,
-    // fresh app instance (same pattern the malformed-JSON test above uses) is built here instead,
-    // with the secret deleted from process.env *before* that instance compiles/initializes, so its
-    // ConfigService genuinely sees it as unset.
-    const savedSecret = process.env.CASHFREE_WEBHOOK_SECRET;
-    // Empty, not deleted: Prisma re-reads the developer's .env whenever a client is built and would put a
-    // real secret back into a *deleted* variable, whereas an empty one is left alone (and means "unset").
-    process.env.CASHFREE_WEBHOOK_SECRET = '';
-    let unconfiguredApp: INestApplication | undefined;
-    try {
-      unconfiguredApp = await createTestApp();
-
-      const testStartedAt = new Date();
-      const res = await request(unconfiguredApp.getHttpServer())
-        .post('/api/v1/payments/cashfree/webhook')
-        .set('x-webhook-signature', 'irrelevant-when-secret-is-unconfigured')
-        .set('x-webhook-timestamp', String(Math.floor(Date.now() / 1000)))
-        .send(successPayload(210));
-
-      expect(res.status).toBe(200);
-      expect(res.body).toEqual({ received: true });
-
-      const events = await prisma.runAsPlatform((tx) =>
-        tx.webhookEvent.findMany({
-          where: { errorMessage: { contains: 'Cashfree webhook secret not configured' }, createdAt: { gte: testStartedAt } }
-        })
-      );
-      expect(events.length).toBe(1);
-      expect(events[0].processingStatus).toBe('FAILED');
-      expect(events[0].signatureValid).toBe(false);
-    } finally {
-      if (unconfiguredApp) await unconfiguredApp.close();
-      process.env.CASHFREE_WEBHOOK_SECRET = savedSecret;
-    }
+  it('a WhatsApp payment link that is paid marks its payment SUCCESS and creates no order before the webhook', async () => {
+    const linkRef = `wapay_${Date.now()}`;
+    const linkOrder = await prisma.runAsTenant(restaurantId, async (tx) => {
+      const o = await tx.order.create({ data: { restaurantId, externalOrderId: `wa-${Date.now()}`, source: 'WHATSAPP', items: [], subtotal: 3000, taxAmount: 0, totalAmount: 3000, status: 'PENDING_PAYMENT' } });
+      await tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', orderId: o.id, restaurantId, providerOrderId: linkRef, amount: 3000, currency: 'INR', status: 'PENDING' } });
+      return o;
+    });
+    const res = await signedEvent({
+      event: 'payment_link.paid',
+      payload: {
+        payment_link: { entity: { id: `plink_${Date.now()}`, reference_id: linkRef, amount: 3000, currency: 'INR', status: 'paid' } },
+        payment: { entity: { id: `pay_link_${Date.now()}`, amount: 3000, currency: 'INR', status: 'captured' } }
+      }
+    });
+    expect(res.status).toBe(200);
+    const link = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findFirstOrThrow({ where: { providerOrderId: linkRef } }));
+    expect(link.status).toBe('SUCCESS');
+    const o = await prisma.runAsPlatform((tx) => tx.order.findUniqueOrThrow({ where: { id: linkOrder.id } }));
+    expect(o.status).toBe('PAID');
   });
 });

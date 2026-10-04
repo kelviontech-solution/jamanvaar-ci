@@ -8,14 +8,14 @@ Read in full (cloud/api/src):
 - `modules/activation-keys/*` (service, both controllers, dto)
 - `modules/licensing/*`, `modules/plans/*` (incl. entitlements.ts), `modules/subscriptions/*`, `modules/application-entitlements/*`, `modules/applications/*`
 - `modules/billing/*` (invoices.service 1-929, both controllers, dto)
-- `modules/payments/*` (payments.service, cashfree-gateway.service, webhook controller, payment-orders controller, payment-connections.service, kiosk/platform controllers, menu-sync, pricing.util, dtos)
+- `modules/payments/*` (payments.service, razorpay-gateway.service, webhook controller, payment-orders controller, payment-connections.service, kiosk/platform controllers, menu-sync, pricing.util, dtos)
 - `modules/offline-policy/*`, `modules/notifications/*` (receipts controller, gateway, email service/templates), `modules/platform-notifications/*` (controller + first 160 lines of service; rest grep-checked for raw SQL)
 - `modules/master-catalog/*`, `modules/backups/*` (service, storage, 4 controllers), `modules/jobs/*`
 - `common/guards/{platform,tenant,device}-auth.guard.ts`, `entitlement.guard.ts`, `common/rbac/access.ts`, `common/security/{token.util,session-state,credential-encryption.util}.ts`, `prisma/prisma.service.ts`, `main.ts`, `app.module.ts`, `config/env.validation.ts`
 - `prisma/schema.prisma` models: Plan, Subscription, ApplicationEntitlement, ActivationKey, Device, Invoice, Payment, AppRelease, Backup, Order, PaymentTransaction, RestaurantPaymentConnection, Refund, WebhookEvent, PlatformNotification
 - Cross-slice, only to verify old claims: `modules/tenant-auth/tenant-auth.service.ts:370-520` (activateDevice), `modules/reports/{controller,service}` CSV export, `packages/business/src/license_certificate.ts`, `cloud/super-admin-web/src/lib/csvExport.ts` + device/audit export pages, `apps/restaurant-system/pos-admin` pay caller.
 
-NOT covered: RLS policy SQL in `prisma/migrations/*` (assumed FORCE RLS as described; I only saw the wrapper), tenant-auth other routes, support impersonation, order-sync/entity-sync, ai-assistant, qr-ordering, devices module, clients beyond the callers noted, deployment/static hosting of super-admin-web, real env values (CASHFREE_*, BACKUP_*), proxy/`trust proxy` effect on the throttler IP key. No runtime reproduction of the races (would need Postgres + server); they are code-traced.
+NOT covered: RLS policy SQL in `prisma/migrations/*` (assumed FORCE RLS as described; I only saw the wrapper), tenant-auth other routes, support impersonation, order-sync/entity-sync, ai-assistant, qr-ordering, devices module, clients beyond the callers noted, deployment/static hosting of super-admin-web, real env values (RAZORPAY_*, BACKUP_*), proxy/`trust proxy` effect on the throttler IP key. No runtime reproduction of the races (would need Postgres + server); they are code-traced.
 
 ## Inventory (endpoints / entry points in my slice)
 
@@ -33,7 +33,7 @@ Global: `ThrottlerGuard` 120 req/60 s per IP (app.module.ts). No global Validati
 | `/api/v1/invoices[...]` incl. `POST :id/payments`, `PATCH :id/status`, `POST check-renewals` | Platform | area `billing` (FINANCE write) | manual payment recording |
 | `GET/POST /api/v1/tenant/billing/*` incl. `POST invoices/:id/pay` | Tenant JWT, NO role check | any tenant user of the restaurant | LB-01 |
 | `POST /api/v1/payments/orders`, `GET /payments/:id/status`, `POST /payments/:id/refund` | Device | orders: KIOSK/KIOSK_ADMIN; refund: POS/POS_ADMIN; status: any device | restaurant-scoped via runAsTenant |
-| `POST /api/v1/payments/cashfree/webhook` | HMAC signature only, `@SkipThrottle` | n/a | raw body 1 MB |
+| `POST /api/v1/payments/razorpay/webhook` | HMAC signature only, `@SkipThrottle` | n/a | raw body 1 MB |
 | `GET /api/v1/payments[/:id]` (platform) | Platform | area `billing` | returns raw providerResponse |
 | `GET/POST /api/v1/tenant/payment-connection` | Tenant JWT | OWNER/MANAGER only (in-controller) | KYC |
 | `GET/PATCH /api/v1/payment-connections`, `/restaurants/:id/payment-connection[/approve...]` | Platform | area `billing` | masked view |
@@ -55,8 +55,8 @@ Global: `ThrottlerGuard` 120 req/60 s per IP (app.module.ts). No global Validati
 | F-001 | CONFIRMED | `billing/tenant-billing.controller.ts:11,40-48` (only `TenantAuthGuard`, no role); `billing/invoices.service.ts:816-917` (amount `:828`, COMPLETED payment `:832-844`, PAID `:850-862`, sub `ACTIVE`+`expiresAt` `:865-872`); `common/security/session-state.ts:31-33`; real UI caller `pos-admin/src/cloud/cloudClient.ts:608-614`, `SubscriptionPlansView.tsx:186` | Still fully exploitable. No gateway call. Worse than described: also un-suspends a SUSPENDED subscription (LB-01). |
 | F-011 | CONFIRMED (race: yes; plaintext: yes, but low) | `activation-keys/activation-keys.service.ts:246-314` (findUnique `:248`, unconditional `update({where:{id}})` `:311-314`, plain `READ COMMITTED` via `prisma.service.ts:76-81`); plaintext `schema.prisma` ActivationKey.code, `service:203-215`, audit `:434,:461` | Race real for both `redeem` and `activateDevice` (LB-02). Plaintext storage real but code is by design shown to operators; downgrade to hardening. Entropy is fine (96-bit CSPRNG, `:15-19`). |
 | F-013 | CONFIRMED | `tenant-auth/tenant-auth.service.ts:403-520` has no `maxDevices` lookup at all (compare `activation-keys.service.ts:273-287`); POS_ADMIN accepts any key type `:441-444` | (LB-03). Requires a platform-issued unredeemed key for that restaurant. |
-| F-016 | CONFIRMED (narrower than claimed) | `payments/payment-orders.controller.ts:31-36` (device type POS/POS_ADMIN only, no staff identity); `payments.service.ts:124-184` (no audit, `requestedBy` never set, aggregate-then-create not locked `:137-153`) | Refund goes back to the original payer, so it is revenue-loss/fraud-by-collusion, not theft. Over-refund also capped by Cashfree and by `REFUND_PENDING` status gate `:130`. (LB-08) |
-| F-017 | CONFIRMED | `payments/cashfree-webhook.controller.ts:10` (`@SkipThrottle`); `payments.service.ts:212-227` writes `INVALID:<uuid>` WebhookEvent with attacker JSON (up to 1 MB, `main.ts:18`) before any auth; no retention job (`jobs.service.ts:56-66`) | Unauthenticated DB growth. (LB-07) |
+| F-016 | CONFIRMED (narrower than claimed) | `payments/payment-orders.controller.ts:31-36` (device type POS/POS_ADMIN only, no staff identity); `payments.service.ts:124-184` (no audit, `requestedBy` never set, aggregate-then-create not locked `:137-153`) | Refund goes back to the original payer, so it is revenue-loss/fraud-by-collusion, not theft. Over-refund also capped by Razorpay and by `REFUND_PENDING` status gate `:130`. (LB-08) |
+| F-017 | CONFIRMED | `payments/razorpay-webhook.controller.ts:10` (`@SkipThrottle`); `payments.service.ts:212-227` writes `INVALID:<uuid>` WebhookEvent with attacker JSON (up to 1 MB, `main.ts:18`) before any auth; no retention job (`jobs.service.ts:56-66`) | Unauthenticated DB growth. (LB-07) |
 | F-018 | CONFIRMED at code level; impact bounded (Low) | `master-catalog/master-catalog.service.ts:250-281` (SVG allowed, ext taken from user `fileName` `:265-267`, no magic-byte check, writes into `../super-admin-web/public/...`) | Path traversal is NOT possible (ext starts at last `.`, so cannot contain `..`). Attacker must hold catalog-write (OWNER/SUPER_ADMIN only, `access.ts:45,49`), and whether the file is ever served depends on deployment (UNVERIFIABLE). (LB-11) |
 | F-020 | CONFIRMED | `backups/tenant-backups.controller.ts:9-38` (`TenantAuthGuard` only) | Any tenant role can create/list/download backups. (LB-06) |
 | F-035 | CONFIRMED | `common/rbac/access.ts:54-57,61-66` (SUPPORT_ADMIN/READ_ONLY `ops:'read'`), `:69` (backups path -> `ops`), `backups/platform-backups.controller.ts:22-37` | GET = read, so read-only roles get presigned URL or the decrypted `/file` (LB-05). |
@@ -72,10 +72,10 @@ Global: `ThrottlerGuard` 120 req/60 s per IP (app.module.ts). No global Validati
 - Component + file:line(s): `cloud/api/src/modules/billing/tenant-billing.controller.ts:11,40-48`; `billing/invoices.service.ts:816-917` (esp. `:828` amount, `:832-844` payment row, `:865-872` subscription update); same pattern in platform `recordPayment` `:413-420`
 - Attacker / precondition: any authenticated user of a restaurant (STAFF, CASHIER, anyone that can log in; a lapsed restaurant can still log in on purpose, `session-state.ts:31-33`).
 - Repro (code-trace): `POST /api/v1/tenant/billing/invoices/<own invoice id>/pay` with `{}` (method defaults `UPI`, amount defaults `invoice.totalAmount`, referenceNumber auto `TXN-UPI-<ts>`). Service inserts a `COMPLETED` Payment, sets invoice `PAID`, then `subscription.update({status:'ACTIVE', expiresAt: invoice.billingPeriodEnd})`. Renewal invoices are auto-created 7 days before expiry (`checkAndGenerateRenewals` `:623-717`) so this repeats forever.
-- Expected vs actual: payment state must come only from a verified provider event (Cashfree webhook/server-side status) or a platform finance user; actual: client-asserted.
+- Expected vs actual: payment state must come only from a verified provider event (Razorpay webhook/server-side status) or a platform finance user; actual: client-asserted.
 - Impact: unlimited free service; falsified revenue/collection records (`method: GATEWAY` also accepted, `referenceNumber` free text); also flips `SUSPENDED` (platform action for abuse/non-payment) back to `ACTIVE` because the update forces `status:'ACTIVE'`; can also pay `VOID`/`REFUNDED` invoices (only `PAID` is rejected, `:824`).
 - Root cause: endpoint implements "pay" as a database write with no gateway, no role check, no amount bound (`amount` accepted `.positive()` only), no invoice-state check.
-- Recommended fix: delete `POST tenant/billing/invoices/:id/pay` (or make it create a Cashfree order and return a payment session); settle invoices only from the verified webhook handler; gate any tenant billing route to OWNER; in the settle path do not touch `SUSPENDED`, reject non-`ISSUED/PAST_DUE` invoices, and compare paid amount to remaining balance.
+- Recommended fix: delete `POST tenant/billing/invoices/:id/pay` (or make it create a Razorpay order and return a payment session); settle invoices only from the verified webhook handler; gate any tenant billing route to OWNER; in the settle path do not touch `SUSPENDED`, reject non-`ISSUED/PAST_DUE` invoices, and compare paid amount to remaining balance.
 - Suggested regression test: STAFF token -> `/pay` returns 403/404 and invoice/subscription unchanged; webhook-only settlement test; suspended subscription stays suspended after any payment call.
 
 ### LB-02 Activation-key redemption is not atomic: one key yields several devices, device limit is racy, key revocation misses orphaned devices (F-011)
@@ -136,12 +136,12 @@ Global: `ThrottlerGuard` 120 req/60 s per IP (app.module.ts). No global Validati
 - Recommended fix: OWNER/MANAGER only for create/list/download; per-restaurant daily count and total-bytes cap; restrict device backups to the device's own type and rate; refuse cloud restore for backups whose `deviceId` is set/tenant-uploaded.
 - Suggested regression test: STAFF -> 403 on all four routes; 101st backup in a day -> 429/409.
 
-### LB-07 Cashfree webhook: unauthenticated payloads persisted, unthrottled, no retention; no timestamp freshness (F-017)
+### LB-07 Razorpay webhook: unauthenticated payloads persisted, unthrottled, no retention; no timestamp freshness (F-017)
 - Severity: medium (storage DoS) ; Class: CONFIRMED
 - CWE/OWASP: CWE-770, CWE-294; OWASP API4
-- Component + file:line(s): `payments/cashfree-webhook.controller.ts:10`; `payments.service.ts:196-227` (both the "secret not configured" and "bad signature" branches persist `rawPayload` of attacker's choosing); `main.ts:18` (1 MB raw); `cashfree-gateway.service.ts:153-162` (HMAC over `timestamp+body`, timestamp not checked for age); no cleanup of `WebhookEvent` in `jobs.service.ts`.
+- Component + file:line(s): `payments/razorpay-webhook.controller.ts:10`; `payments.service.ts:196-227` (both the "secret not configured" and "bad signature" branches persist `rawPayload` of attacker's choosing); `main.ts:18` (1 MB raw); `razorpay-gateway.service.ts:153-162` (HMAC over `timestamp+body`, timestamp not checked for age); no cleanup of `WebhookEvent` in `jobs.service.ts`.
 - Attacker / precondition: anonymous network access.
-- Repro: loop `POST /api/v1/payments/cashfree/webhook` with any 1 MB JSON and no signature -> one row per request forever (no throttle, no dedup for `INVALID:` keys).
+- Repro: loop `POST /api/v1/payments/razorpay/webhook` with any 1 MB JSON and no signature -> one row per request forever (no throttle, no dedup for `INVALID:` keys).
 - Expected vs actual: reject before storing; actual: stored. Replay of a captured valid webhook is accepted indefinitely, but replays are neutralised by the dedup key (`:265-278`) and terminal-status check (`:335-339`), so this is hardening only.
 - Impact: DB growth/cost, log pollution.
 - Root cause: "always record" design applied before authentication.
@@ -153,7 +153,7 @@ Global: `ThrottlerGuard` 120 req/60 s per IP (app.module.ts). No global Validati
 - CWE/OWASP: CWE-862, CWE-778, CWE-362; OWASP API5
 - Component + file:line(s): `payment-orders.controller.ts:31-36`; `payments.service.ts:124-184` (no `audit.log`, `Refund.requestedBy` never populated, aggregate `:137-153` then insert not locked)
 - Attacker / precondition: holder of a POS/POS_ADMIN device token (any cashier at the terminal, or a stolen token; tokens do not expire).
-- Repro: `POST /api/v1/payments/<paymentId>/refund {amountPaise, reason}` for any SUCCESS kiosk payment of that restaurant; two concurrent calls both pass the remaining-balance check (Cashfree caps total refund, and `REFUND_PENDING` status `:130,:179-181` narrows but does not close the window).
+- Repro: `POST /api/v1/payments/<paymentId>/refund {amountPaise, reason}` for any SUCCESS kiosk payment of that restaurant; two concurrent calls both pass the remaining-balance check (Razorpay caps total refund, and `REFUND_PENDING` status `:130,:179-181` narrows but does not close the window).
 - Impact: unattributed, unaudited refunds; money returns to the payer so this is collusion/fraud exposure and revenue loss, not theft.
 - Root cause: refund authority modelled at device level.
 - Recommended fix: require a manager/staff authorisation (tenant JWT with OWNER/MANAGER, or PIN token) and write `requestedBy` + an audit row; wrap balance check + insert in one tx with `FOR UPDATE` on the PaymentTransaction.
@@ -175,9 +175,9 @@ Global: `ThrottlerGuard` 120 req/60 s per IP (app.module.ts). No global Validati
 - Attacker / precondition: a MANAGER (lower than the KYC subject) or anyone holding an OWNER/MANAGER session token/XSS.
 - Impact: Aadhaar (UIDAI) exposure in API responses and DB dumps; DPDP/Aadhaar-regulation exposure.
 - Root cause: `toOwnView` mirrors the stored row.
-- Recommended fix: return masked values (last 4) in `toOwnView` and never re-return Aadhaar; encrypt `pan/uidai/cin` with the existing credential util (or do not persist Aadhaar, forward to Cashfree only); validate formats.
+- Recommended fix: return masked values (last 4) in `toOwnView` and never re-return Aadhaar; encrypt `pan/uidai/cin` with the existing credential util (or do not persist Aadhaar, forward to Razorpay only); validate formats.
 - Suggested regression test: MANAGER GET returns `••••` forms only; DB row for uidai is ciphertext.
-- Side note (low, SUSPECTED): resubmit is allowed in `PENDING_VERIFICATION` (`:10,:37`), so a MANAGER can change bank/KYC between the platform's `approve` phase 1 read and phase 3 write (`:171-266`); the row then reads ACTIVE with data Cashfree never received.
+- Side note (low, SUSPECTED): resubmit is allowed in `PENDING_VERIFICATION` (`:10,:37`), so a MANAGER can change bank/KYC between the platform's `approve` phase 1 read and phase 3 write (`:171-266`); the row then reads ACTIVE with data Razorpay never received.
 
 ### LB-11 Master-catalog image upload trusts client extension and allows SVG (F-018)
 - Severity: low (owner-level attacker; serving-dependent) ; Class: CONFIRMED
@@ -210,7 +210,7 @@ Global: `ThrottlerGuard` 120 req/60 s per IP (app.module.ts). No global Validati
 ### LB-14 Webhook/refund state machine gaps
 - Severity: low ; Class: CONFIRMED (edge cases)
 - Component + file:line(s): `payments.service.ts:335-354` (TERMINAL_STATUSES omits `REFUND_PENDING`, `FAILED`, `USER_DROPPED`; a late/duplicate failure webhook can overwrite `paymentTransaction.status` and set `Order.status=PAYMENT_FAILED` even after a successful attempt/refund started); `:404-420` (refund `FAILED` leaves the payment in `REFUND_PENDING` forever and `createRefund` rejects that status `:130`, so a failed refund can never be retried).
-- Impact: order/payment state corruption, stuck refunds. No attacker control beyond Cashfree ordering.
+- Impact: order/payment state corruption, stuck refunds. No attacker control beyond Razorpay ordering.
 - Recommended fix: monotonic transitions (`SUCCESS`/`REFUND_*` never regress; only move `Order` from non-`PAID`); on refund FAILED restore prior status when no other refund is pending; cross-check with `getOrderStatus` for money-moving transitions.
 
 ### LB-15 Platform invoice payment recording: overpay, double-record, void invoices, no separation of duties
@@ -262,11 +262,11 @@ Global: `ThrottlerGuard` 120 req/60 s per IP (app.module.ts). No global Validati
 - Expiry enforced by date at redeem, not only status (`:253`); revoke cascades to the device and its refresh tokens (`:355-362`).
 - `DeviceAuthGuard` re-checks device status, restaurant status, live subscription (`expiresAt > now`), per-app entitlement, branch and MDM lock on every device request (`device-auth.guard.ts:71-125`).
 - Platform RBAC is deny-by-default; URL case tricks yield `null` area -> owner-only (`platform-auth.guard.ts:66-72`, `access.ts:99-104`).
-- Cashfree webhook: HMAC-SHA256 over exact raw bytes, `timingSafeEqual` (`cashfree-gateway.service.ts:153-162`, `main.ts:18`); amount and currency compared to the stored transaction (`payments.service.ts:326-333`); dedup key + terminal-status check give replay/idempotency for success; status only changed by webhook, refund sync response is informational (`:168-172`).
+- Razorpay webhook: HMAC-SHA256 over exact raw bytes, `timingSafeEqual` (`razorpay-gateway.service.ts:153-162`, `main.ts:18`); amount and currency compared to the stored transaction (`payments.service.ts:326-333`); dedup key + terminal-status check give replay/idempotency for success; status only changed by webhook, refund sync response is informational (`:168-172`).
 - Kiosk cart priced server-side from `MenuSnapshotItem` with modifier validation; client cannot send amounts (`create-payment-order.dto.ts`, `pricing.util.ts:55-98`); payment order creation limited to KIOSK types (`payment-orders.controller.ts:18`).
 - Payment lookups scoped by restaurant via `runAsTenant` + `restaurantId` filter (`payments.service.ts:117-126`); tenant invoice/receipt reads scoped (`invoices.service.ts:788,921-925`).
 - Settlement account number AES-256-GCM encrypted and never returned; platform view masked (`payment-connections.service.ts:54-56,116-118,347-380`); payment-connection routes now OWNER/MANAGER only (`kiosk-payment-connection.controller.ts:22-34`).
-- Cashfree base URL fixed by env (no SSRF) (`cashfree-gateway.service.ts:84-88`); vendor id derived from UUID.
+- Razorpay base URL fixed by env (no SSRF) (`razorpay-gateway.service.ts:84-88`); vendor id derived from UUID.
 - License certificate: tier/entitlements read from DB, ECDSA P-256 signed server-side, `kid` support (`licensing.service.ts:57-97`); private key only from env.
 - Backups: local path traversal guarded (`backup-storage.service.ts:118-123`); storage key server-generated from DB UUID; AES-256-GCM with tag verification (`:126-140`); snapshot excludes password hashes/tokens/device credentials (`backups.service.ts:42-48`); tenant reads scoped by RLS context and `restaurantId` (`:200-202,210-212`); restore job claim is atomic (`:441-445`) and takes a safety snapshot first.
 - Upload-image: extension cannot contain `..` (derived from last `.`), so no path traversal out of the upload dir (`master-catalog.service.ts:265-278`).
@@ -278,5 +278,5 @@ Global: `ThrottlerGuard` 120 req/60 s per IP (app.module.ts). No global Validati
 ## Not verified / limits
 - No runtime reproduction: the redemption/refund/invoice races (LB-02, LB-08, LB-15) are code-traced against Postgres READ COMMITTED semantics; `$transaction` is called without an isolation level (`prisma.service.ts:76-81`).
 - RLS policies in migrations were not read; conclusions on tenant isolation rely on the `runAsTenant`/`runAsPlatform` wrappers plus explicit `restaurantId` filters. Note `DeviceAuthGuard` and billing use `runAsPlatform` then filter in code.
-- Whether super-admin-web `public/assets/uploads/catalog` is publicly served in production (LB-11), real Cashfree behaviour for over-refund/duplicate refund, actual env values (backup encryption key, webhook secret set in prod), reverse-proxy IP handling for the throttler, and how the kiosk client uses payment status vs order-sync (LB-13) are UNVERIFIABLE from source.
+- Whether super-admin-web `public/assets/uploads/catalog` is publicly served in production (LB-11), real Razorpay behaviour for over-refund/duplicate refund, actual env values (backup encryption key, webhook secret set in prod), reverse-proxy IP handling for the throttler, and how the kiosk client uses payment status vs order-sync (LB-13) are UNVERIFIABLE from source.
 - Not audited: tenant-auth (beyond `activateDevice`), support impersonation minting, entity/order sync, ai-assistant, qr-ordering, platform-settings, devices module, super-admin-web beyond CSV export.

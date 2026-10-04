@@ -94,19 +94,19 @@ never actually going stale to begin with.
 
 **A second, related gap found while verifying the plan's own Phase 8 "Verify" line**
 ("a week of daily reconciliation... applied to WhatsApp-sourced orders too"): kiosk's
-existing `PaymentReconciliationService.reconcile()` calls Cashfree's
+existing `PaymentReconciliationService.reconcile()` calls Razorpay's
 `/easy-split/orders/{id}/split` endpoint — Orders-API-specific — using
 `PaymentTransaction.providerOrderId`. For a WhatsApp-channel payment, that column holds a
-Cashfree Payment *Link* id (`createCashfreeLinkAttempt`'s `wapay_...`), not a real
-Cashfree order id; calling that endpoint with it would simply throw and be swallowed by
+Razorpay Payment *Link* id (`createRazorpayLinkAttempt`'s `wapay_...`), not a real
+Razorpay order id; calling that endpoint with it would simply throw and be swallowed by
 the job's own per-payment `catch`-and-log. In other words: as built, every WhatsApp order's
 payment would have silently never been reconciled at all, for the entire pilot — the exact
 check the plan calls for would have run daily and found nothing, forever, with no error
 visible anywhere. Fixed with a dedicated `reconcileLinkPayment` path (branches on
-`Order.source === 'WHATSAPP'`): checks the link actually reached Cashfree's `PAID` status
+`Order.source === 'WHATSAPP'`): checks the link actually reached Razorpay's `PAID` status
 and that `amountPaid` (rupees, converted to paise with a ₹1 rounding tolerance) matches,
 reusing the existing `UNEXPECTED_STATUS`/`AMOUNT_MISMATCH` exception types rather than
-adding a new enum value. Deliberately narrower than the Orders-API check: Cashfree's
+adding a new enum value. Deliberately narrower than the Orders-API check: Razorpay's
 Payment Link detail response doesn't expose a parsed per-vendor split-settlement status
 the way the Easy Split endpoint does, so the vendor-split settlement side of a WhatsApp
 order's commission isn't independently reconciled yet — flagged, not silently assumed
@@ -150,7 +150,7 @@ the module level first (my first draft) would have rate-limited every other endp
 the entire platform to the same tiny per-IP budget. `channels/menu|quote|orders/:id` are
 now capped per-restaurant at 90/min; `channels/checkout` adds its own tighter 20/min
 per-restaurant cap plus a 5-per-10-min cap keyed on restaurant+customer-phone specifically,
-so a bug or an abusive actor can't spam one real customer's WhatsApp with repeat Cashfree
+so a bug or an abusive actor can't spam one real customer's WhatsApp with repeat Razorpay
 payment links even while the restaurant's overall budget has room left; `validate-key` (no
 restaurantId yet — that's what it resolves) keeps per-IP tracking with its own 30/min cap.
 
@@ -369,7 +369,7 @@ already-built auto-accept/prep-time/pause settings unchanged.
 besides Prisma — both `PaymentsModule` and `OrderSyncModule` need to inject it, and
 `WhatsAppChannelModule` already imports `PaymentsModule`, so putting it there would create
 a cycle):**
-- The outbound mirror of `WebhookEvent` (which records the *inbound* half, Cashfree calling
+- The outbound mirror of `WebhookEvent` (which records the *inbound* half, Razorpay calling
   us) and of `ServiceSignatureGuard` (which verifies product/whatsapp's calls *into* kiosk).
   A row is written durably *before* the first delivery attempt, so "retried on failure,
   never lost" (the plan's own requirement) holds even across a process crash mid-delivery.
@@ -489,25 +489,25 @@ rows are queryable directly for now). Also does not yet cover every possible kio
 added later would need a corresponding `_STATUS_MAP`/`_KIOSK_STATUS_MESSAGE` entry on this
 side to actually reach the customer).
 
-## 2026-09-30 — Phase 4b: real Cashfree sandbox testing found and fixed a real bug in Phase 4
+## 2026-09-30 — Phase 4b: real Razorpay sandbox testing found and fixed a real bug in Phase 4
 
-After Phase 4 shipped (below) with full mocked test coverage, the user set up a real Cashfree
+After Phase 4 shipped (below) with full mocked test coverage, the user set up a real Razorpay
 sandbox merchant account (test-mode keys, zero real money — see that product's own docs) so
-the connector could be verified against Cashfree for real instead of only via mocks. This
+the connector could be verified against Razorpay for real instead of only via mocks. This
 caught something the mocked tests structurally could not: **`hostedCheckoutUrl()` — the
 function that built the "payment link" the WhatsApp bot sends — was a fabricated URL
-pattern that doesn't exist.** Cashfree's Orders API (`createOrder`/`payment_session_id`,
+pattern that doesn't exist.** Razorpay's Orders API (`createOrder`/`payment_session_id`,
 what kiosk's own device flow correctly uses) has no plain, pasteable checkout URL at all;
-their real hosted checkout only opens via a JS SDK call (`cashfree.checkout({paymentSessionId})`)
+their real hosted checkout only opens via a JS SDK call (`razorpay.checkout({paymentSessionId})`)
 running on a real webpage. A mocked `createOrder` call can never catch a wrong *downstream
 URL format* built from its result — the mock returns whatever the test told it to, and the
 test asserted against that same invented pattern. Only opening the real link in a real
-browser surfaced it (a real Cashfree "Oops! Well, this is embarrassing" error page) —
-confirmed via Cashfree's own docs (fetched live, not assumed) once the live failure pointed
-at it: `www.cashfree.com/docs/docs/web-integration-create-order`.
+browser surfaced it (a real Razorpay "Oops! Well, this is embarrassing" error page) —
+confirmed via Razorpay's own docs (fetched live, not assumed) once the live failure pointed
+at it: `www.razorpay.com/docs/docs/web-integration-create-order`.
 
-**The fix — switched to Cashfree's Payment Links product** (`POST /links`), which does
-return a real, plain, shareable `link_url`, and which Cashfree explicitly documents for
+**The fix — switched to Razorpay's Payment Links product** (`POST /links`), which does
+return a real, plain, shareable `link_url`, and which Razorpay explicitly documents for
 this exact WhatsApp use case (`payments/no-code/whatsapp-payment-links`). Confirmed via
 `payments/latest/payment-links/webhooks` and the general PG webhook-signature docs that its
 webhook uses the identical `x-webhook-signature`/`x-webhook-timestamp` HMAC-SHA256 scheme
@@ -515,25 +515,25 @@ already implemented, just a different, previously-unhandled event type (`PAYMENT
 with fields (`link_id`/`cf_link_id`/`link_status`) directly under `data`, not nested under
 `data.order`/`data.payment` the way Orders' webhook is.
 
-- `CashfreeGatewayService`: `hostedCheckoutUrl()` removed entirely (it was simply wrong, not
+- `RazorpayGatewayService`: `hostedCheckoutUrl()` removed entirely (it was simply wrong, not
   salvageable); added `createPaymentLink()` and `getPaymentLinkDetails()` (the read-side
   counterpart — a manual reconcile path independent of the webhook, useful for exactly the
   no-tunnel local-testing situation this was built and verified under).
-- `PaymentsService`: `createChannelOrder` now calls a new `createCashfreeLinkAttempt` instead
-  of the Orders-based `createCashfreeAttempt` (kiosk's own device flow keeps using the
+- `PaymentsService`: `createChannelOrder` now calls a new `createRazorpayLinkAttempt` instead
+  of the Orders-based `createRazorpayAttempt` (kiosk's own device flow keeps using the
   latter, completely unchanged — a kiosk screen can run the JS SDK, so Orders was always the
-  right product there). `providerOrderId` holds Cashfree's `link_id` for these rows — same
+  right product there). `providerOrderId` holds Razorpay's `link_id` for these rows — same
   column, same `@@unique([provider, providerOrderId])` index Orders-based lookups already
   use, deliberately reused rather than adding a schema migration for a second identifier
-  column. `commissionSplitFor()` factored out of `createCashfreeAttempt` so both Cashfree
+  column. `commissionSplitFor()` factored out of `createRazorpayAttempt` so both Razorpay
   products compute platform commission identically.
-- `processCashfreeWebhook`: a new `handlePaymentLinkWebhook` branch, parallel to the existing
+- `processRazorpayWebhook`: a new `handlePaymentLinkWebhook` branch, parallel to the existing
   `handleRefundWebhook` (deliberately not unified into one generic parser — the two payload
   shapes are different enough that one function covering both would be harder to read).
   **A second real bug, this one caught by the test suite, not live**: the `providerOrderId`
   extraction used a blind `?? ` fallback chain across all three payload shapes
   (`data.order.order_id ?? data.refund.order_id ?? data.link_id`) — but a PAID link event
-  *also* carries a nested `data.order` (Cashfree's own internal order id for the underlying
+  *also* carries a nested `data.order` (Razorpay's own internal order id for the underlying
   transaction, not our link_id), so the chain silently picked the wrong field and the lookup
   always failed. Fixed by resolving `providerOrderId` explicitly per event type instead of
   falling through. The event-key dedup also needed `link_status` folded in
@@ -545,13 +545,13 @@ with fields (`link_id`/`cf_link_id`/`link_status`) directly under `data`, not ne
   Phase 4 tests plus the full regression suite (977/987, same pre-existing RLS-only
   failures as always) pass.
 
-**Live-verified twice against Cashfree's real sandbox, still zero real money**: once by
+**Live-verified twice against Razorpay's real sandbox, still zero real money**: once by
 calling the real `channels/checkout` endpoint end-to-end (real HMAC-signed request, real
-Cashfree Payment Link created, real `link_url` returned) and once by the user actually
+Razorpay Payment Link created, real `link_url` returned) and once by the user actually
 opening that link in a browser and deliberately failing a test payment on it — a real,
-correctly-branded Cashfree checkout page, a real CF Link ID, a real "Payment Failed" result
-page. Also confirmed via `getPaymentLinkDetails` against Cashfree's real API afterward: a
-failed attempt leaves the link `link_status: ACTIVE` (not a terminal failure) — Cashfree
+correctly-branded Razorpay checkout page, a real CF Link ID, a real "Payment Failed" result
+page. Also confirmed via `getPaymentLinkDetails` against Razorpay's real API afterward: a
+failed attempt leaves the link `link_status: ACTIVE` (not a terminal failure) — Razorpay
 lets the customer retry the *same* link rather than requiring a new one, and
 `handlePaymentLinkWebhook`'s logic already matches that (a non-PAID/EXPIRED/CANCELLED status
 correctly falls through as "not terminal yet," not mis-handled as a failure).
@@ -565,8 +565,8 @@ just the API call succeeding) caught that "success" in isolation (a 201 with a `
 it) doesn't mean the *link itself* works — the API call succeeding and the resulting URL
 being genuinely openable turned out to be two different things worth checking separately.
 
-Real Cashfree sandbox credentials are now in `cloud/api/.env` (test-mode only, never
-committed, never printed in any Claude output this session). `CASHFREE_WEBHOOK_NOTIFY_URL`
+Real Razorpay sandbox credentials are now in `cloud/api/.env` (test-mode only, never
+committed, never printed in any Claude output this session). `RAZORPAY_WEBHOOK_NOTIFY_URL`
 is still empty — no tunnel set up (the user is going straight to a real AWS domain instead of
 ngrok, which needs no tunnel at all once the server has a real public address). Until then,
 a real payment's success/failure won't auto-update this dev DB — `getPaymentLinkDetails` is
@@ -575,7 +575,7 @@ the manual fallback proven above.
 ## 2026-09-30 — Phase 4 (quote, checkout, payment→KDS gating)
 
 The highest-stakes phase (real payment code, both repos) — built under the user's explicit
-constraints: never share real Cashfree credentials, never move real money (test/mocked
+constraints: never share real Razorpay credentials, never move real money (test/mocked
 gateway only), and the specific product requirement that drove the whole phase's design —
 the payment link must reach the customer's WhatsApp screen right after they confirm, and
 the order must reach the restaurant's POS/KDS **only after** payment is confirmed, never
@@ -591,19 +591,19 @@ before.
   applying this one cleanly (that unrelated drift again) — killed the stuck process rather
   than answering it, confirmed via `prisma migrate status` that exactly the one intended
   migration applied and nothing else was created.
-- `CashfreeGatewayService.hostedCheckoutUrl(paymentSessionId)`: pure string-builder for
-  Cashfree's hosted checkout redirect URL (sandbox vs production host, same conditional as
+- `RazorpayGatewayService.hostedCheckoutUrl(paymentSessionId)`: pure string-builder for
+  Razorpay's hosted checkout redirect URL (sandbox vs production host, same conditional as
   `baseUrl()`) — no network call, so always safe including in tests.
 - `PaymentsService.createChannelOrder()`: the WhatsApp-connector twin of
   `createOrGetPaymentOrder` — same idempotency-by-`externalOrderId`, same
-  `RestaurantPaymentConnection` ACTIVE gate, same `createCashfreeAttempt` reuse (commission
+  `RestaurantPaymentConnection` ACTIVE gate, same `createRazorpayAttempt` reuse (commission
   split unchanged) — but takes an already-priced cart (the caller priced it from
   `QrMenuService`'s lookup, not `MenuSyncService`'s, for consistency with `channels/menu`)
   and stamps the new `source`/`branchId`/`orderType`/`tableLabel`/`customerName`/
   `customerPhone` fields. Creates **no** `SyncedOrder` — only the payment-bookkeeping `Order`.
-- `PaymentsService.processCashfreeWebhook()`'s SUCCESS handling now calls a new
+- `PaymentsService.processRazorpayWebhook()`'s SUCCESS handling now calls a new
   `ingestWhatsAppOrderIfNeeded(payment)` — the one place a WhatsApp order becomes visible on
-  POS/KDS, reached only once Cashfree confirms `SUCCESS`. Calls
+  POS/KDS, reached only once Razorpay confirms `SUCCESS`. Calls
   `OrderSyncService.ingestServerOrder()` with `paymentStatus: 'SUCCESS'`,
   `status: connection.autoAccept ? 'PREPARING' : 'NEW'`, `meta.paymentTransactionId` (so the
   existing payment-violation guard rail ties the order to its transaction the same way QR
@@ -617,8 +617,8 @@ before.
   route through the same idempotent method (`ingestServerOrder` dedupes on
   `(restaurantId, externalOrderId)`, so a redelivery after a successful ingestion is a
   proven-safe no-op — covered by a dedicated test). Ingestion failure is recorded as a
-  `FAILED` `WebhookEvent` (visible for ops, naturally retried on the next Cashfree
-  redelivery) but never reported back to Cashfree as a payment failure — the money is
+  `FAILED` `WebhookEvent` (visible for ops, naturally retried on the next Razorpay
+  redelivery) but never reported back to Razorpay as a payment failure — the money is
   already correctly settled by that point regardless of what happens to the KDS side.
 - `WhatsAppChannelService.quote()`/`checkout()`/`getOrderStatus()`: real now (were 501
   stubs). `checkout()` maps `'PICKUP'` (product/whatsapp's vocabulary) to `'TAKEAWAY'`
@@ -636,7 +636,7 @@ before.
 - New `test/whatsapp-channel-payments.e2e.spec.ts` (12 tests): quote pricing/rejections,
   checkout creates the payment order + hosted-checkout link and **no** `SyncedOrder`,
   idempotent retry, paused-channel refusal, pre-payment `getOrderStatus`, a signed
-  simulated Cashfree webhook creating the `SyncedOrder` (status `NEW`, `autoAccept` off),
+  simulated Razorpay webhook creating the `SyncedOrder` (status `NEW`, `autoAccept` off),
   duplicate webhook delivery not double-ingesting, `autoAccept` on landing in `PREPARING`,
   and a `FAILED` payment never creating a `SyncedOrder`. `test/whatsapp-channel.e2e.spec.ts`'s
   now-stale "`channels/orders/:id` is 501" test rewritten to prove it fails closed (404, not
@@ -644,13 +644,13 @@ before.
   `restaurantId` query param 500'd instead of 404ing (Prisma choking on `undefined`, not a
   guarded `NotFoundException`) — fixed by making `requireConnected`/`requireOrderable`
   refuse a missing `restaurantId` explicitly before ever reaching Prisma.
-- **No real Cashfree call anywhere in this phase's tests**: `CashfreeGatewayService.createOrder`
-  is the only method that would ever reach Cashfree's API, and it's the only one mocked (via
+- **No real Razorpay call anywhere in this phase's tests**: `RazorpayGatewayService.createOrder`
+  is the only method that would ever reach Razorpay's API, and it's the only one mocked (via
   `vi.spyOn`, not a full provider replacement) — `verifyWebhookSignature` and
   `hostedCheckoutUrl` run for real (pure local logic, no network, no secret ever printed).
   "Payment succeeded" is simulated the same way `payments-webhook.e2e.spec.ts` always has: a
   hand-signed POST to this server's own webhook endpoint with a test-only
-  `CASHFREE_WEBHOOK_SECRET`, never a call to Cashfree.
+  `RAZORPAY_WEBHOOK_SECRET`, never a call to Razorpay.
 - Full `cloud/api` suite re-run: 978 passed, only the same pre-existing, already-tracked
   (B2-029/BUG-075) `tenant-isolation.spec.ts` failures remain — **not a Phase 4 regression**,
   confirmed by `git log` showing that file untouched since a September commit predating this
@@ -685,7 +685,7 @@ before.
   sinks are built once and selected per call, never stored on `self`.
 - `_create_engagement`'s money-bearing branch: a JAMANVAAR engagement's payment link comes
   straight from what the sink already put on `engagement.gateway_metadata["payment_link_url"]`
-  (Jamanvaar's own Cashfree session) — the Razorpay `create_payment_link` call is skipped
+  (Jamanvaar's own Razorpay session) — the Razorpay `create_payment_link` call is skipped
   entirely for this mode, not just its result ignored.
 - **The one deliberate behavioral change beyond wiring the sink in**: `notify_business` (the
   WhatsApp message to the restaurant's own staff number) is now skipped for a JAMANVAAR
@@ -705,7 +705,7 @@ before.
   `notify_business` never called.
 - Full `app/tests/` suite re-run: 748 passed, no regressions.
 
-**Live cross-repo check (both dev servers, real HTTP, no real Cashfree anywhere):**
+**Live cross-repo check (both dev servers, real HTTP, no real Razorpay anywhere):**
 Started `cloud-api` fresh (killed/regenerated Prisma client earlier this session for the
 migration, so it needed restarting anyway) — `product/whatsapp`'s `uvicorn` was already
 running from an earlier session and untouched. Seeded one throwaway restaurant + branch +
@@ -733,11 +733,11 @@ three real bugs in Phase 3.
   `product/whatsapp` backend was already running and untouched throughout.
 
 **What Phase 4 does NOT yet do — a real, acknowledged gap, not a silent omission**: once
-Cashfree confirms payment, the *kiosk* side correctly makes the order visible on POS/KDS,
+Razorpay confirms payment, the *kiosk* side correctly makes the order visible on POS/KDS,
 but nothing currently calls back into *product/whatsapp* to tell the bot the payment
 succeeded — so a customer who doesn't check back gets no automatic "your order is
 confirmed!" WhatsApp follow-up message. The two systems' payment confirmation paths are
-completely separate (Cashfree's webhook lands on kiosk's backend, never
+completely separate (Razorpay's webhook lands on kiosk's backend, never
 product/whatsapp's) by design — closing this gap means either product/whatsapp polling
 `channels/orders/:id` (built, real, unused so far) or kiosk calling a new outbound webhook
 into product/whatsapp once `ingestWhatsAppOrderIfNeeded` succeeds. Deliberately out of
@@ -1194,7 +1194,7 @@ Dashboard page's widget-loading 403 noise for restricted roles, noted above.
 
 Wrote [`JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md`](integrations/JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md)
 after pulling 29 commits that included a prior design doc
-(`WHATSAPP_ORDERING_PLAN_AND_PROMPT.md`) and the Cashfree payment/commission-split
+(`WHATSAPP_ORDERING_PLAN_AND_PROMPT.md`) and the Razorpay payment/commission-split
 infrastructure the plan depends on. See that file for the full phase-by-phase plan; see
 [[whatsapp-ordering-integration-plan]] memory for the architecture decisions behind it
 (push-order/pull-menu, industry-pattern research, the `FulfillmentSink`/`CatalogProvider`

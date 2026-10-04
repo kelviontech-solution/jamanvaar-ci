@@ -47,7 +47,7 @@ function downloadCsv(statement: DayStatement) {
     '',
     `"Gross collected","${(statement.grossVolume / 100).toFixed(2)}"`,
     `"Refunds","${(statement.refundedAmount / 100).toFixed(2)}"`,
-    `"Cashfree fee (estimated 2%)","${(statement.cashfreeFee / 100).toFixed(2)}"`,
+    `"Razorpay fee (estimated 2%)","${(statement.razorpayFee / 100).toFixed(2)}"`,
     `"JAMANVAAR net commission (net of refunds)","${((statement.platformNetCommission - statement.commissionReversed) / 100).toFixed(2)}"`,
     `"Net payable to restaurant","${(statement.netPayableToRestaurant / 100).toFixed(2)}"`
   ];
@@ -61,8 +61,8 @@ function downloadCsv(statement: DayStatement) {
 }
 
 /**
- * The restaurant's own view of its online (Cashfree) payments: what was paid, anything paid but never
- * served, refunds, and the day statement that should match the bank credit Cashfree makes.
+ * The restaurant's own view of its online (Razorpay) payments: what was paid, anything paid but never
+ * served, refunds, and the day statement that should match the bank credit Razorpay makes.
  */
 export function OnlinePaymentsPanel() {
   const staff = getStaffUser();
@@ -131,7 +131,7 @@ export function OnlinePaymentsPanel() {
     setMessage('');
     try {
       await refundPayment(refundFor.id, paise, refundReason.trim(), staff?.fullName ?? 'Kiosk Admin');
-      setMessage(`Refund of ${rupees(paise)} requested. It shows as refunded once Cashfree confirms it.`);
+      setMessage(`Refund of ${rupees(paise)} requested. It shows as refunded once Razorpay confirms it.`);
       setRefundFor(null);
       setRefundReason('');
       load();
@@ -149,7 +149,7 @@ export function OnlinePaymentsPanel() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-bold text-jaman-navy">Online payments</h3>
-          <p className="text-xs text-[#4A5568]">Kiosk QR payments received through Cashfree</p>
+          <p className="text-xs text-[#4A5568]">Kiosk QR payments received through Razorpay</p>
         </div>
         <Button variant="ghost" size="sm" onClick={load}>Refresh</Button>
       </div>
@@ -258,7 +258,7 @@ export function OnlinePaymentsPanel() {
             <div className="flex justify-between"><span className="text-[#8C9BAE]">Payments received ({statement.paymentCount})</span><span className="font-bold">{rupees(statement.grossVolume)}</span></div>
             <div className="flex justify-between"><span className="text-[#8C9BAE]">Refunds ({statement.refundCount})</span><span className="font-bold">− {rupees(statement.refundedAmount)}</span></div>
             <div className="flex justify-between"><span className="text-[#8C9BAE]">− Commission (3%)</span><span className="font-bold">{rupees(statement.platformCommission)}</span></div>
-            <div className="flex justify-between"><span className="text-[#8C9BAE]">   of which Cashfree fee (est. 2%)</span><span className="font-bold">{rupees(statement.cashfreeFee)}</span></div>
+            <div className="flex justify-between"><span className="text-[#8C9BAE]">   of which Razorpay fee (est. 2%)</span><span className="font-bold">{rupees(statement.razorpayFee)}</span></div>
             <div className="flex justify-between"><span className="text-[#8C9BAE]">   Your net commission (1%, after refunds)</span><span className="font-bold">{rupees(statement.platformNetCommission - statement.commissionReversed)}</span></div>
             <div className="flex justify-between border-t border-jaman-border pt-1"><span className="font-bold text-jaman-navy">Net payable to you</span><span className="font-black text-jaman-navy">{rupees(statement.netPayableToRestaurant)}</span></div>
             <div className="text-[10px] text-[#8C9BAE] pt-1">{statement.settlementNote} Day = calendar day in India time.</div>

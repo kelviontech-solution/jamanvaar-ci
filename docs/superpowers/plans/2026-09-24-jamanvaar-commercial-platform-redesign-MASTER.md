@@ -99,7 +99,7 @@ Already built and NOT to be duplicated: `plans/` (CRUD + `entitlements.ts` flat 
 `subscriptions/`, `application-entitlements/` (tier-default inheritance — see below),
 `activation-keys/` (+ `activation-redeem.controller.ts` for the unauthenticated device-side
 redeem), `devices/` (+ heartbeat), `restaurants/`, `branches/`, `owners/`, `billing/`
-(invoices), `payments/` (Cashfree), `qr-ordering/` (controller + tenant controller + service),
+(invoices), `payments/` (Razorpay), `qr-ordering/` (controller + tenant controller + service),
 `licensing/`, `applications/` (release matrix), `audit-query/`, `support/` (tickets),
 `backups/`, `offline-policy/`, `sandboxes/`, `master-catalog/`, `ai-assistant/`,
 `sync-observability/`, `notifications/`, `order-sync/`, `entity-sync/`.
