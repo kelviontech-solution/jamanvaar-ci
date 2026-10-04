@@ -43,6 +43,8 @@ const envSchema = z.object({
   // Optional: Cashfree Payment Gateway (see modules/payments). Degrades to a
   // clear 503 on any payment operation when unset, rather than silently
   // pretending a payment gateway is configured.
+  // Off by default: payments run on Razorpay. Set to 'true' to use the Cashfree code paths again.
+  CASHFREE_ENABLED: z.enum(['true', 'false']).default('false'),
   CASHFREE_CLIENT_ID: z.string().optional(),
   CASHFREE_CLIENT_SECRET: z.string().optional(),
   CASHFREE_ENVIRONMENT: z.enum(['sandbox', 'production']).default('sandbox'),

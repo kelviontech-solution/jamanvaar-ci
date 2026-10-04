@@ -16,6 +16,7 @@ async function buildService(env: Record<string, string>): Promise<CashfreeGatewa
 }
 
 const CONFIGURED_ENV = {
+  CASHFREE_ENABLED: 'true',
   CASHFREE_CLIENT_ID: 'test-client',
   CASHFREE_CLIENT_SECRET: 'test-secret',
   CASHFREE_WEBHOOK_SECRET: 'test-secret',

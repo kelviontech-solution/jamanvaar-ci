@@ -75,7 +75,7 @@ describe('Cashfree webhook processing', () => {
     );
     orderId = order.id;
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.create({ data: { orderId, restaurantId, providerOrderId, amount: 21000, currency: 'INR', status: 'PENDING' } })
+      tx.paymentTransaction.create({ data: { provider: 'CASHFREE', orderId, restaurantId, providerOrderId, amount: 21000, currency: 'INR', status: 'PENDING' } })
     );
     paymentId = payment.id;
   });

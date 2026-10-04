@@ -15,6 +15,8 @@ for (const key of ['CASHFREE_CLIENT_ID', 'CASHFREE_CLIENT_SECRET', 'CASHFREE_WEB
   delete process.env[key];
 }
 process.env.CASHFREE_ENVIRONMENT = 'sandbox';
+// Cashfree is off in production (see CASHFREE_ENABLED in env.validation.ts); its code paths stay covered by the suites here.
+process.env.CASHFREE_ENABLED = 'true';
 
 // Tests must never send real email, whatever SMTP settings the developer's .env holds.
 process.env.SMTP_HOST = '';

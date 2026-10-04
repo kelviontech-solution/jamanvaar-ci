@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -254,7 +254,7 @@ export class PaymentsService {
 
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({
-        data: { orderId, restaurantId, providerOrderId: linkId, amount, currency, status: 'CREATED', commissionBps, platformAmount, restaurantAmount }
+        data: { orderId, restaurantId, provider: 'CASHFREE', providerOrderId: linkId, amount, currency, status: 'CREATED', commissionBps, platformAmount, restaurantAmount }
       })
     );
 
@@ -452,9 +452,9 @@ export class PaymentsService {
     // transaction that takes a row lock on the PaymentTransaction first
     // (`FOR UPDATE`), so a second concurrent request blocks until the first
     // commits and then sees its refund in the aggregate.
-    const { refund, providerOrderId } = await this.prisma.runAsTenant(restaurantId, async (tx) => {
-      const locked = await tx.$queryRaw<{ id: string; status: string; amount: number; providerOrderId: string }[]>`
-        SELECT id, status, amount, "providerOrderId" FROM "PaymentTransaction" WHERE id = ${paymentId} AND "restaurantId" = ${restaurantId} FOR UPDATE
+    const { refund, providerOrderId, provider, providerPaymentId } = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      const locked = await tx.$queryRaw<{ id: string; status: string; amount: number; providerOrderId: string; provider: string; providerPaymentId: string | null }[]>`
+        SELECT id, status, amount, "providerOrderId", provider::text AS provider, "providerPaymentId" FROM "PaymentTransaction" WHERE id = ${paymentId} AND "restaurantId" = ${restaurantId} FOR UPDATE
       `;
       const payment = locked[0];
       if (!payment) throw new NotFoundException('Payment not found');
@@ -499,8 +499,32 @@ export class PaymentsService {
         tx
       );
 
-      return { refund: created, providerOrderId: payment.providerOrderId };
+      return { refund: created, providerOrderId: payment.providerOrderId, provider: payment.provider, providerPaymentId: payment.providerPaymentId };
     });
+
+    if (provider === 'RAZORPAY') {
+      if (!providerPaymentId) {
+        await this.prisma.runAsTenant(restaurantId, (tx) => tx.refund.update({ where: { id: refund.id }, data: { status: 'FAILED' } }));
+        throw new ConflictException('This payment has no Razorpay payment id to refund against');
+      }
+      let rzp;
+      try {
+        rzp = await this.razorpay.createRefund({ razorpayPaymentId: providerPaymentId, amountPaise: dto.amountPaise, receipt: refund.id, notes: { refund_id: refund.id } });
+      } catch (err) {
+        await this.prisma.runAsTenant(restaurantId, (tx) => tx.refund.update({ where: { id: refund.id }, data: { status: 'FAILED' } }));
+        throw err;
+      }
+      const rzpStatus = rzp.status === 'processed' ? 'SUCCESS' : 'PENDING';
+      await this.prisma.runAsTenant(restaurantId, async (tx) => {
+        await tx.refund.update({ where: { id: refund.id }, data: { providerRefundId: rzp.refundId, status: rzpStatus } });
+        const done = await tx.refund.aggregate({ where: { paymentId, status: 'SUCCESS' }, _sum: { amount: true } });
+        const refundedSoFar = done._sum.amount ?? 0;
+        const payment = await tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } });
+        const nextStatus = rzpStatus === 'PENDING' ? 'REFUND_PENDING' : refundedSoFar >= payment.amount ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
+        await tx.paymentTransaction.update({ where: { id: paymentId }, data: { status: nextStatus } });
+      });
+      return { refundId: refund.id, providerRefundId: rzp.refundId, status: rzp.status, amount: dto.amountPaise };
+    }
 
     let result;
     try {

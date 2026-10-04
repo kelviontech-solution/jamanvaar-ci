@@ -59,7 +59,7 @@ describe('Refund webhook processing', () => {
     );
     orderId = order.id;
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.create({ data: { orderId, restaurantId, providerOrderId, amount: 10000, currency: 'INR', status: 'SUCCESS' } })
+      tx.paymentTransaction.create({ data: { provider: 'CASHFREE', orderId, restaurantId, providerOrderId, amount: 10000, currency: 'INR', status: 'SUCCESS' } })
     );
     paymentId = payment.id;
     await prisma.runAsTenant(restaurantId, (tx) =>
@@ -101,7 +101,7 @@ describe('Refund webhook processing', () => {
       tx.order.create({ data: { restaurantId, externalOrderId: `refund-mismatch-${Date.now()}`, items: [], subtotal: 5000, taxAmount: 0, totalAmount: 5000, status: 'PAID' } })
     );
     const mismatchPayment = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.create({ data: { orderId: mismatchOrder.id, restaurantId, providerOrderId: `pay_mismatch_${Date.now()}`, amount: 5000, currency: 'INR', status: 'SUCCESS' } })
+      tx.paymentTransaction.create({ data: { provider: 'CASHFREE', orderId: mismatchOrder.id, restaurantId, providerOrderId: `pay_mismatch_${Date.now()}`, amount: 5000, currency: 'INR', status: 'SUCCESS' } })
     );
     const mismatchRefundId = `cf_refund_mismatch_${Date.now()}`;
     await prisma.runAsTenant(restaurantId, (tx) =>

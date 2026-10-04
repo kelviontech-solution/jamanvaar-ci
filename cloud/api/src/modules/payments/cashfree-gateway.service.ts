@@ -96,8 +96,14 @@ export class CashfreeFeatureNotEnabledException extends ServiceUnavailableExcept
 export class CashfreeGatewayService {
   constructor(private readonly config: ConfigService) {}
 
+  /** Cashfree is switched off by default; payments run on Razorpay. Set CASHFREE_ENABLED=true to bring this code back into use. */
+  isEnabled(): boolean {
+    return this.config.get<string>('CASHFREE_ENABLED') === 'true';
+  }
+
   isConfigured(): boolean {
     return Boolean(
+      this.isEnabled() &&
       this.config.get<string>('CASHFREE_CLIENT_ID') &&
         this.config.get<string>('CASHFREE_CLIENT_SECRET') &&
         this.config.get<string>('CASHFREE_WEBHOOK_SECRET')
@@ -114,6 +120,9 @@ export class CashfreeGatewayService {
   }
 
   private headers(): Record<string, string> {
+    if (!this.isEnabled()) {
+      throw new ServiceUnavailableException('Cashfree is switched off on this server; payments run on Razorpay');
+    }
     if (!this.isConfigured()) {
       throw new ServiceUnavailableException(
         'Cashfree is not configured on this server (set CASHFREE_CLIENT_ID, CASHFREE_CLIENT_SECRET, CASHFREE_WEBHOOK_SECRET, and optionally CASHFREE_ENVIRONMENT / CASHFREE_API_VERSION)'
@@ -288,6 +297,9 @@ export class CashfreeGatewayService {
    * (https://www.cashfree.com/docs/api-reference/vrs/webhook-signature-verification).
    */
   verifyWebhookSignature(rawBody: Buffer, timestamp: string, signature: string): boolean {
+    if (!this.isEnabled()) {
+      throw new ServiceUnavailableException('Cashfree is switched off on this server; payments run on Razorpay');
+    }
     const secret = this.config.get<string>('CASHFREE_WEBHOOK_SECRET');
     if (!secret) {
       throw new ServiceUnavailableException('CASHFREE_WEBHOOK_SECRET is not configured on this server');

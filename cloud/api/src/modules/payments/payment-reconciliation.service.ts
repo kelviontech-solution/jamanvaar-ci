@@ -26,10 +26,11 @@ export class PaymentReconciliationService {
   ) {}
 
   async reconcile(): Promise<{ checked: number; exceptionsCreated: number }> {
+    if (!this.cashfree.isEnabled()) return { checked: 0, exceptionsCreated: 0 };
     const since = new Date(Date.now() - LOOKBACK_DAYS * 24 * 60 * 60 * 1000);
     const payments = await this.prisma.runAsPlatform((tx) =>
       tx.paymentTransaction.findMany({
-        where: { status: { in: RECONCILABLE_STATUSES }, createdAt: { gte: since }, commissionBps: { not: null } },
+        where: { provider: 'CASHFREE', status: { in: RECONCILABLE_STATUSES }, createdAt: { gte: since }, commissionBps: { not: null } },
         include: { reconciliationExceptions: { where: { status: 'OPEN' } }, order: { select: { source: true } } }
       })
     );

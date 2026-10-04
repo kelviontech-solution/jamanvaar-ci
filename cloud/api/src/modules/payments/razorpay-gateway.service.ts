@@ -81,6 +81,20 @@ export class RazorpayGatewayService {
     return match ? { id: match.id, amount: match.amount, currency: match.currency } : null;
   }
 
+  /** A refund of part or all of one captured Razorpay payment (https://razorpay.com/docs/api/refunds/create-normal/). */
+  async createRefund(input: { razorpayPaymentId: string; amountPaise: number; receipt: string; notes?: Record<string, string> }): Promise<{ refundId: string; status: string; amountPaise: number }> {
+    const res = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(input.razorpayPaymentId)}/refund`, {
+      method: 'POST',
+      headers: this.headers(),
+      body: JSON.stringify({ amount: input.amountPaise, receipt: input.receipt, ...(input.notes ? { notes: input.notes } : {}) })
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new ServiceUnavailableException(`Razorpay refund failed: ${body?.error?.description ?? res.statusText}`);
+    }
+    return { refundId: body.id, status: body.status, amountPaise: body.amount };
+  }
+
   /** Razorpay signs webhooks as hex(HMAC-SHA256(rawBody, webhookSecret)) in the X-Razorpay-Signature header. */
   verifyWebhookSignature(rawBody: Buffer, signature: string): boolean {
     const secret = this.config.get<string>('RAZORPAY_WEBHOOK_SECRET');

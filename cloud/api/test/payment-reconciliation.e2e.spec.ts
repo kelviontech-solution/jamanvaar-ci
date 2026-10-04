@@ -23,6 +23,7 @@ describe('Payment reconciliation', () => {
     getPaymentLinkDetailsMock = vi.fn();
     app = await createTestApp((builder) =>
       builder.overrideProvider(CashfreeGatewayService).useValue({
+        isEnabled: () => true,
         isConfigured: () => true,
         getOrderSplitDetails: getOrderSplitDetailsMock,
         getPaymentLinkDetails: getPaymentLinkDetailsMock
@@ -52,7 +53,7 @@ describe('Payment reconciliation', () => {
     return prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({
         data: {
-          orderId: order.id, restaurantId, providerOrderId: opts.providerOrderId, amount: opts.amount, currency: 'INR', status: 'SUCCESS',
+          provider: 'CASHFREE', orderId: order.id, restaurantId, providerOrderId: opts.providerOrderId, amount: opts.amount, currency: 'INR', status: 'SUCCESS',
           commissionBps: opts.commissionBps, platformAmount: opts.platformAmount, restaurantAmount: opts.restaurantAmount
         }
       })
@@ -67,7 +68,7 @@ describe('Payment reconciliation', () => {
     );
     return prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({
-        data: { orderId: order.id, restaurantId, providerOrderId: opts.providerOrderId, amount: opts.amount, currency: 'INR', status: 'SUCCESS', commissionBps: 0, platformAmount: 0, restaurantAmount: opts.amount }
+        data: { provider: 'CASHFREE', orderId: order.id, restaurantId, providerOrderId: opts.providerOrderId, amount: opts.amount, currency: 'INR', status: 'SUCCESS', commissionBps: 0, platformAmount: 0, restaurantAmount: opts.amount }
       })
     );
   };
@@ -158,7 +159,7 @@ describe('Payment reconciliation', () => {
       tx.order.create({ data: { restaurantId, externalOrderId: `reconcile-premig-${Date.now()}`, items: [], subtotal: 3000, taxAmount: 0, totalAmount: 3000, status: 'PAID' } })
     );
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.create({ data: { orderId: order.id, restaurantId, providerOrderId: `pay_premig_${Date.now()}`, amount: 3000, currency: 'INR', status: 'SUCCESS' } })
+      tx.paymentTransaction.create({ data: { provider: 'CASHFREE', orderId: order.id, restaurantId, providerOrderId: `pay_premig_${Date.now()}`, amount: 3000, currency: 'INR', status: 'SUCCESS' } })
     );
 
     const reconciliation = app.get(PaymentReconciliationService);

@@ -59,7 +59,7 @@ describe('Platform payments visibility', () => {
       tx.order.create({ data: { restaurantId, externalOrderId: `platpay-test-${Date.now()}-${Math.random()}`, items: [], subtotal: amount, taxAmount: 0, totalAmount: amount, status: status === 'SUCCESS' ? 'PAID' : 'PAYMENT_FAILED' } })
     );
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.create({ data: { orderId: order.id, restaurantId, providerOrderId: `pay_${Date.now()}_${Math.random()}`, amount, currency: 'INR', status } })
+      tx.paymentTransaction.create({ data: { provider: 'CASHFREE', orderId: order.id, restaurantId, providerOrderId: `pay_${Date.now()}_${Math.random()}`, amount, currency: 'INR', status } })
     );
     return payment.id;
   };
