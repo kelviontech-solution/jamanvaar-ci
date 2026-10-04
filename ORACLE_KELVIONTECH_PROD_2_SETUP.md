@@ -1,14 +1,17 @@
 # Oracle Cloud — `kelviontech-prod-2` Setup
 
-**Superseded 2026-10-04, same day:** the plan to deploy the full kiosk
-platform here was dropped mid-setup — SSH to this box became unreliable
-(dynamic ISP IP vs. the box's locked-down security list) and the user
-decided to deploy everything to the already-live AWS box instead (see
-`AWS_DEPLOYMENT_MASTER_PLAN.md` and the new terminal-app services in
-`docker-compose.yml` + `nginx/system.kelviontech.in.conf`). The instance
-infrastructure below (VCN, reserved IP, Docker) is still real and running,
-just not what the kiosk platform is actually deployed on. Kept for
-reference in case Oracle is revisited later.
+**Plan history, 2026-10-04 (same day, settled by end of day):** briefly
+considered deploying the full platform to the AWS box instead (SSH to
+this box was unreliable mid-session, dynamic ISP IP vs. the locked-down
+security list) — but the AWS box is shared with amitkhatri/Wrench/
+kelviontech.in/the WhatsApp connector and was down to ~824MB free RAM /
+9.9GB free disk, too tight to safely build 7 more images there without
+risking those other live sites. **Settled back on this Oracle box**:
+dedicated, empty, isolated — a full independent stack (its own db +
+backend + all 8 frontend apps) deploys here with zero risk to AWS. See
+`docker-compose.yml`'s `proxy` service (Compose profile `oracle`) and
+`nginx/oracle-testing-proxy.conf` for the resulting path-based routing
+scheme on this box's bare reserved IP.
 
 ---
 

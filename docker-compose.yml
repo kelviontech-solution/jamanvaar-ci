@@ -297,6 +297,41 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  # Only for a dedicated box with no shared front-door nginx (e.g. kelviontech-prod-2 on
+  # Oracle) -- see nginx/oracle-testing-proxy.conf. Gated behind the `oracle` Compose
+  # profile (COMPOSE_PROFILES=oracle in .env) so it never starts on the AWS box, where
+  # binding host port 80 would collide with the separate kelviontech-nginx-1 container
+  # that already owns it. Reaches every app above over the internal kiosk_network by
+  # Compose service name -- their own 172.17.0.1:<port> publishes above are irrelevant to
+  # this path and stay harmlessly unused when this profile is active.
+  proxy:
+    profiles: ["oracle"]
+    image: nginx:1.25-alpine
+    container_name: kiosk_proxy
+    restart: unless-stopped
+    volumes:
+      - ./nginx/oracle-testing-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+      - kiosk-admin
+      - kiosk-user
+      - pos
+      - pos-admin
+      - captain
+      - kds
+      - qr-guest
+    networks:
+      - kiosk_network
+    mem_limit: 64m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 networks:
   kiosk_network:
     name: kiosk_network
