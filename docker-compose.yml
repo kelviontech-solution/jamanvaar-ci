@@ -112,13 +112,15 @@ services:
         - VITE_API_BASE_URL=${VITE_API_BASE_URL:-}
     container_name: kiosk_frontend
     restart: unless-stopped
-    # No host port here -- on kelviontech-prod-2 (Oracle, dedicated box, no shared
-    # kelviontech-nginx-1 in front of it), the `proxy` service below is the only thing
-    # bound to the host. Every app is reached through it, over the internal
-    # kiosk_network, by its Docker Compose service name -- see
-    # nginx/oracle-testing-proxy.conf. (On the AWS bridge box's shared-nginx pattern, this
-    # service WOULD publish to 172.17.0.1:8090 instead -- see AWS_DEPLOYMENT_MASTER_PLAN.md
-    # and nginx/system.kelviontech.in.conf for that production convention.)
+    # Defaults to 8090 -- avoids amitkhatri (8080), kelvion (3000/8000), restaurent
+    # (3001/8001) and Wrench (8085). Bound to the Docker bridge gateway (172.17.0.1), not
+    # 0.0.0.0 -- the shared kelviontech-nginx-1 container (a SEPARATE Compose project) is
+    # the only thing meant to reach this port, terminating real TLS for
+    # system.kelviontech.in first (see nginx/system.kelviontech.in.conf's `location /`,
+    # which also still handles every app's /api/v1/* calls by forwarding them here, since
+    # this container's own nginx.conf proxies /api/v1/* onward to the backend container).
+    ports:
+      - "${HOST_BIND_IP:-172.17.0.1}:${PORT:-8090}:80"
     depends_on:
       - backend
     networks:
@@ -132,15 +134,20 @@ services:
 
   # ── Terminal / customer-facing apps ─────────────────────────────────────────────────
   # None of these existed as Docker images before this pass -- only cloud/api and
-  # cloud/super-admin-web were deployed anywhere (see AWS_DEPLOYMENT_MASTER_PLAN.md
-  # section 4). Added here so the whole platform can be exercised online on
-  # kelviontech-prod-2, not just the admin console. Each one calls cloud/api directly at
-  # an ABSOLUTE origin baked in at build time (VITE_CLOUD_API_BASE_URL -- see each app's
-  # src/cloud/cloudClient.ts or, for qr-guest, src/api.ts), unlike super-admin-web's
-  # same-origin relative-path pattern, because these are built to run as real terminal
-  # apps potentially on a different network than the API. PUBLIC_ORIGIN in .env must be
-  # this box's own reachable address (e.g. http://130.210.16.150) so those baked-in
-  # fetches land on the `proxy` service below and stay same-origin (no CORS needed).
+  # cloud/super-admin-web were ever deployed anywhere (see AWS_DEPLOYMENT_MASTER_PLAN.md
+  # section 4). Added here so the whole platform can be exercised online, not just the
+  # admin console -- same shared-nginx-front-door pattern as `frontend` above, each on
+  # its own 172.17.0.1 port (new nginx/system.kelviontech.in.conf location blocks map
+  # /kiosk-admin/, /kiosk/, /pos/, /pos-admin/, /captain/, /kds/, /q/ to these).
+  #
+  # Each one calls cloud/api at the box's real public origin, baked in at build time
+  # (VITE_CLOUD_API_BASE_URL -- see each app's src/cloud/cloudClient.ts or, for qr-guest,
+  # src/api.ts), unlike super-admin-web's same-origin relative-path pattern -- these are
+  # built to run as real terminal apps potentially on a different network than the API,
+  # so none of them have a same-origin-relative fallback. PUBLIC_ORIGIN in .env must be
+  # https://system.kelviontech.in -- since every app above and below shares that one
+  # origin regardless of its own subpath, these absolute fetches stay same-origin (no
+  # CORS) exactly like a relative path would.
   kiosk-admin:
     build:
       context: .
@@ -149,6 +156,8 @@ services:
         - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
     container_name: kiosk_kiosk_admin
     restart: unless-stopped
+    ports:
+      - "${HOST_BIND_IP:-172.17.0.1}:${KIOSK_ADMIN_PORT:-8091}:80"
     depends_on:
       - backend
     networks:
@@ -168,6 +177,8 @@ services:
         - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
     container_name: kiosk_kiosk_user
     restart: unless-stopped
+    ports:
+      - "${HOST_BIND_IP:-172.17.0.1}:${KIOSK_USER_PORT:-8092}:80"
     depends_on:
       - backend
     networks:
@@ -187,6 +198,8 @@ services:
         - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
     container_name: kiosk_pos
     restart: unless-stopped
+    ports:
+      - "${HOST_BIND_IP:-172.17.0.1}:${POS_PORT:-8093}:80"
     depends_on:
       - backend
     networks:
@@ -204,9 +217,12 @@ services:
       dockerfile: apps/restaurant-system/pos-admin/Dockerfile
       args:
         - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
+        # Bare origin, not .../q -- LegacyGuestRedirect.tsx appends /q/<token> itself.
         - VITE_QR_ORDER_URL=${PUBLIC_ORIGIN:-}
     container_name: kiosk_pos_admin
     restart: unless-stopped
+    ports:
+      - "${HOST_BIND_IP:-172.17.0.1}:${POS_ADMIN_PORT:-8094}:80"
     depends_on:
       - backend
     networks:
@@ -226,6 +242,8 @@ services:
         - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
     container_name: kiosk_captain
     restart: unless-stopped
+    ports:
+      - "${HOST_BIND_IP:-172.17.0.1}:${CAPTAIN_PORT:-8095}:80"
     depends_on:
       - backend
     networks:
@@ -245,6 +263,8 @@ services:
         - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
     container_name: kiosk_kds
     restart: unless-stopped
+    ports:
+      - "${HOST_BIND_IP:-172.17.0.1}:${KDS_PORT:-8096}:80"
     depends_on:
       - backend
     networks:
@@ -264,6 +284,8 @@ services:
         - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
     container_name: kiosk_qr_guest
     restart: unless-stopped
+    ports:
+      - "${HOST_BIND_IP:-172.17.0.1}:${QR_GUEST_PORT:-8097}:80"
     depends_on:
       - backend
     networks:
@@ -275,9 +297,15 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # Testing-only on this box -- see nginx/oracle-testing-proxy.conf's own header comment.
-  # The ONE thing bound to the host; everything above is internal-only on kiosk_network.
+  # Only for a dedicated box with no shared front-door nginx (e.g. kelviontech-prod-2 on
+  # Oracle) -- see nginx/oracle-testing-proxy.conf. Gated behind the `oracle` Compose
+  # profile (COMPOSE_PROFILES=oracle in .env) so it never starts on the AWS box, where
+  # binding host port 80 would collide with the separate kelviontech-nginx-1 container
+  # that already owns it. Reaches every app above over the internal kiosk_network by
+  # Compose service name -- their own 172.17.0.1:<port> publishes above are irrelevant to
+  # this path and stay harmlessly unused when this profile is active.
   proxy:
+    profiles: ["oracle"]
     image: nginx:1.25-alpine
     container_name: kiosk_proxy
     restart: unless-stopped
