@@ -3,7 +3,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
+import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 
 describe('Platform payments visibility', () => {
   let app: INestApplication;
@@ -19,9 +19,9 @@ describe('Platform payments visibility', () => {
 
   beforeAll(async () => {
     app = await createTestApp((builder) =>
-      builder.overrideProvider(CashfreeGatewayService).useValue({
+      builder.overrideProvider(RazorpayGatewayService).useValue({
         isConfigured: () => true,
-        createRefund: vi.fn().mockResolvedValue({ cfRefundId: 'cf_refund_mock', refundId: 'refund_mock', refundStatus: 'PENDING', refundAmount: 100 })
+        createRefund: vi.fn().mockResolvedValue({ refundId: 'rfnd_mock', status: 'pending', amountPaise: 100 })
       })
     );
     prisma = app.get(PrismaService);
@@ -59,7 +59,7 @@ describe('Platform payments visibility', () => {
       tx.order.create({ data: { restaurantId, externalOrderId: `platpay-test-${Date.now()}-${Math.random()}`, items: [], subtotal: amount, taxAmount: 0, totalAmount: amount, status: status === 'SUCCESS' ? 'PAID' : 'PAYMENT_FAILED' } })
     );
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.create({ data: { orderId: order.id, restaurantId, providerOrderId: `pay_${Date.now()}_${Math.random()}`, amount, currency: 'INR', status } })
+      tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', providerPaymentId: `pay_rzp_${Date.now()}_${Math.random()}`, orderId: order.id, restaurantId, providerOrderId: `pay_${Date.now()}_${Math.random()}`, amount, currency: 'INR', status } })
     );
     return payment.id;
   };
@@ -121,10 +121,17 @@ describe('Platform payments visibility', () => {
     expect(res.status).toBe(401);
   });
 
-  it('GET /commission-config defaults to 0 when never set', async () => {
+  it('GET /commission-config defaults to 3% when never set', async () => {
+    await prisma.runAsPlatform((tx) => tx.platformSetting.deleteMany({ where: { key: 'PAYMENT_DEFAULT_COMMISSION_BPS' } }));
     const res = await authed('get', '/api/v1/payments/commission-config', platformToken);
     expect(res.status).toBe(200);
-    expect(typeof res.body.defaultBps).toBe('number');
+    expect(res.body.defaultBps).toBe(300);
+  });
+
+  it("PATCH /commission-config refuses anything below 2% (Razorpay's fee comes out of the commission)", async () => {
+    const res = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 100, password: adminPassword });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/at least 2%/);
   });
 
   it('PATCH /commission-config sets the platform default and it is reflected on GET', async () => {
@@ -165,7 +172,7 @@ describe('Platform payments visibility', () => {
 
     const getRes = await authed('get', '/api/v1/payments/commission-config', token);
     expect(getRes.status).toBe(200);
-    const patchRes = await authed('patch', '/api/v1/payments/commission-config', token).send({ defaultBps: 100, password: 'correct-horse-battery-staple' });
+    const patchRes = await authed('patch', '/api/v1/payments/commission-config', token).send({ defaultBps: 250, password: 'correct-horse-battery-staple' });
     expect(patchRes.status).toBe(200);
 
     await prisma.platformUser.deleteMany({ where: { email } });
@@ -186,11 +193,11 @@ describe('Platform payments visibility', () => {
   });
 
   it('setDefaultCommissionBps requires the correct step-up password', async () => {
-    const wrong = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 150, password: 'wrong' });
+    const wrong = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 250, password: 'wrong' });
     expect(wrong.status).toBe(403);
     const missing = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 150 });
     expect(missing.status).toBe(403); // password is optional at the schema level; requireStepUpPassword rejects a missing one the same as a wrong one
-    const right = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 150, password: adminPassword });
+    const right = await authed('patch', '/api/v1/payments/commission-config', platformToken).send({ defaultBps: 250, password: adminPassword });
     expect(right.status).toBe(200);
   });
 
@@ -213,7 +220,6 @@ describe('Platform payments visibility', () => {
     const res = await authed('get', `/api/v1/payments/platform-summary?restaurantId=${restaurantId}`, platformToken);
     expect(res.status).toBe(200);
     expect(res.body.grossVolume).toBeGreaterThanOrEqual(30000);
-    expect(typeof res.body.openReconciliationExceptions).toBe('number');
   });
 
   it('a device token cannot read the platform summary', async () => {

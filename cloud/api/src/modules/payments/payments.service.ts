@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -7,7 +7,7 @@ import { AuditService } from '../audit/audit.service';
 import { OrderSyncService } from '../order-sync/order-sync.service';
 import { WhatsAppOutboundWebhookService } from '../whatsapp-outbound/whatsapp-outbound-webhook.service';
 import { businessDateIn, newPublicOrderId } from '../qr/qr.support';
-import { CashfreeGatewayService } from './cashfree-gateway.service';
+import { RazorpayGatewayService } from './razorpay-gateway.service';
 import { MenuSyncService } from './menu-sync.service';
 import { priceCart, PriceValidationError, MenuSnapshotItemLookup } from './pricing.util';
 import { CreatePaymentOrderDto } from './dto/create-payment-order.dto';
@@ -19,9 +19,9 @@ import { buildDayStatement } from './payment-statement.util';
  * What WhatsAppChannelService.checkout() (see whatsapp-channel.service.ts, Phase 4 of
  * docs/integrations/JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md) has already priced
  * (via the same priceCart() QrMenuService feeds channels/menu/quote from) and hands to
- * createChannelOrder to turn into a real Cashfree payment session. No POS/KDS-visible order
- * is created here — only once the Cashfree webhook reports SUCCESS (see the `source ===
- * 'WHATSAPP'` branch in processCashfreeWebhook below) does the order become visible to the
+ * createChannelOrder to turn into a real Razorpay payment session. No POS/KDS-visible order
+ * is created here — only once the Razorpay webhook reports SUCCESS (see the `source ===
+ * 'WHATSAPP'` branch in processRazorpayWebhook below) does the order become visible to the
  * restaurant, which is the whole point: a WhatsApp customer's order must never reach the
  * kitchen before they've actually paid for it.
  */
@@ -39,10 +39,21 @@ export interface ChannelOrderInput {
   totalAmount: number;
 }
 
+/** The restaurant's online payments are not switched on yet (its Razorpay vendor is still being verified, or it is suspended). Clients show this as pending, not as broken. */
+export const PAYMENTS_NOT_ACTIVE = 'PAYMENTS_NOT_ACTIVE';
 const NON_TERMINAL_STATUSES = ['CREATED', 'PENDING', 'AUTHORIZED'];
 const PAID_STATUSES = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'];
+const RAZORPAY_EVENT_STATUS: Record<string, 'SUCCESS' | 'FAILED'> = {
+  'payment.captured': 'SUCCESS',
+  'qr_code.credited': 'SUCCESS',
+  'payment.failed': 'FAILED',
+  'payment_link.paid': 'SUCCESS',
+  'payment_link.expired': 'FAILED',
+  'payment_link.cancelled': 'FAILED'
+};
 /** A UPI QR stops working after this long; the kiosk shows the same countdown. */
-export const QR_TTL_SECONDS = 180;
+export const QR_MIN_REMAINING_MS = 30_000;
+const QR_TTL_SECONDS = 180;
 /** A paid order with no token/KOT after this long is surfaced as needing attention. */
 export const ATTENTION_GRACE_MS = 3 * 60 * 1000;
 
@@ -51,7 +62,7 @@ export class PaymentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
-    private readonly cashfree: CashfreeGatewayService,
+    private readonly razorpay: RazorpayGatewayService,
     private readonly menuSync: MenuSyncService,
     private readonly audit: AuditService,
     private readonly orderSync: OrderSyncService,
@@ -74,12 +85,12 @@ export class PaymentsService {
         return this.toOrderResponse(existingOrder, latest);
       }
       // Every prior attempt is terminal-failed: open a fresh attempt at the same, already-validated total.
-      const payment = await this.createCashfreeAttempt(existingOrder.id, restaurantId, existingOrder.totalAmount, existingOrder.currency, connection);
+      const payment = await this.createRazorpayAttempt(existingOrder.id, restaurantId, existingOrder.totalAmount, existingOrder.currency, connection);
       return this.toOrderResponse(existingOrder, payment);
     }
 
     if (!connection || connection.status !== 'ACTIVE') {
-      throw new ForbiddenException('Online payments are not active for this restaurant yet');
+      throw new ForbiddenException({ message: 'Online payments are not active for this restaurant yet', code: PAYMENTS_NOT_ACTIVE });
     }
 
     const menuItems = await this.menuSync.loadItemsByExternalIds(restaurantId, dto.lines.map((l) => l.externalItemId));
@@ -121,14 +132,14 @@ export class PaymentsService {
       })
     );
 
-    const payment = await this.createCashfreeAttempt(order.id, restaurantId, order.totalAmount, order.currency, connection);
+    const payment = await this.createRazorpayAttempt(order.id, restaurantId, order.totalAmount, order.currency, connection);
     return this.toOrderResponse(order, payment);
   }
 
   /**
    * The WhatsApp connector's equivalent of createOrGetPaymentOrder above — same idempotency-by-
-   * externalOrderId, same "restaurant must have an ACTIVE Cashfree connection" gate, same
-   * createCashfreeAttempt for the actual Cashfree order + commission split. The only real
+   * externalOrderId, same "restaurant must have an ACTIVE Razorpay connection" gate, same
+   * createRazorpayAttempt for the actual Razorpay order + commission split. The only real
    * difference: the caller (WhatsAppChannelService.checkout) has already priced the cart itself
    * (from QrMenuService's lookup, not MenuSyncService's — see that method's own comment), so this
    * takes the priced lines directly instead of pricing dto.lines here.
@@ -148,12 +159,12 @@ export class PaymentsService {
       if (existingOrder.status === 'PAID' || (latest && NON_TERMINAL_STATUSES.includes(latest.status))) {
         return this.toChannelOrderResponse(existingOrder, latest);
       }
-      const payment = await this.createCashfreeLinkAttempt(existingOrder.id, restaurantId, existingOrder.totalAmount, existingOrder.currency, input.customerName, input.customerPhone, connection);
+      const payment = await this.createRazorpayLinkAttempt(existingOrder.id, restaurantId, existingOrder.totalAmount, existingOrder.currency, input.customerName, input.customerPhone, connection);
       return this.toChannelOrderResponse(existingOrder, payment);
     }
 
     if (!connection || connection.status !== 'ACTIVE') {
-      throw new ForbiddenException('Online payments are not active for this restaurant yet');
+      throw new ForbiddenException({ message: 'Online payments are not active for this restaurant yet', code: PAYMENTS_NOT_ACTIVE });
     }
 
     const order = await this.prisma.runAsTenant(restaurantId, (tx) =>
@@ -178,7 +189,7 @@ export class PaymentsService {
       })
     );
 
-    const payment = await this.createCashfreeLinkAttempt(order.id, restaurantId, order.totalAmount, order.currency, input.customerName, input.customerPhone, connection);
+    const payment = await this.createRazorpayLinkAttempt(order.id, restaurantId, order.totalAmount, order.currency, input.customerName, input.customerPhone, connection);
     return this.toChannelOrderResponse(order, payment);
   }
 
@@ -199,8 +210,7 @@ export class PaymentsService {
     };
   }
 
-  /** Shared by createCashfreeAttempt and createCashfreeLinkAttempt so both Cashfree products
-   *  (Orders and Payment Links) compute platform commission identically. */
+  /** Shared by the kiosk QR and WhatsApp payment paths so both compute platform commission identically. */
   private async commissionSplitFor(amount: number, connection: { commissionOverrideBps: number | null } | null) {
     const commissionBps = connection?.commissionOverrideBps ?? (await getDefaultCommissionBps(this.prisma));
     const platformAmount = Math.round((amount * commissionBps) / 10000);
@@ -208,95 +218,62 @@ export class PaymentsService {
     return { commissionBps, platformAmount, restaurantAmount };
   }
 
-  private async createCashfreeAttempt(
-    orderId: string,
-    restaurantId: string,
-    amount: number,
-    currency: string,
-    connection: { cashfreeVendorId: string | null; commissionOverrideBps: number | null } | null
-  ) {
+  private async createRazorpayAttempt(orderId: string, restaurantId: string, amount: number, currency: string, connection: { commissionOverrideBps: number | null } | null) {
     const { commissionBps, platformAmount, restaurantAmount } = await this.commissionSplitFor(amount, connection);
-    const vendorPercentage = Number(((restaurantAmount / amount) * 100).toFixed(2));
-
-    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.create({
-        data: { orderId, restaurantId, providerOrderId: `pay_${randomUUID()}`, amount, currency, status: 'CREATED', commissionBps, platformAmount, restaurantAmount }
-      })
-    );
-
-    const cfOrder = await this.cashfree.createOrder({
-      orderId: payment.providerOrderId,
-      amountPaise: amount,
-      currency,
-      customerId: orderId,
-      notifyUrl: this.config.get<string>('CASHFREE_WEBHOOK_NOTIFY_URL'),
-      orderSplits: connection?.cashfreeVendorId ? [{ vendorId: connection.cashfreeVendorId, percentage: vendorPercentage }] : undefined
-    });
 
     return this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.update({ where: { id: payment.id }, data: { paymentSessionId: cfOrder.paymentSessionId, status: 'PENDING' } })
+      tx.paymentTransaction.create({
+        data: { orderId, restaurantId, provider: 'RAZORPAY', providerOrderId: randomUUID(), amount, currency, status: 'PENDING', commissionBps, platformAmount, restaurantAmount }
+      })
     );
   }
 
   /**
-   * The WhatsApp connector's payment-session creation — Payment Links, not Orders (see
-   * CashfreeGatewayService.createPaymentLink's own comment for why). providerOrderId holds
-   * Cashfree's link_id here (not an order_id): same column, same @@unique([provider,
-   * providerOrderId]) index Orders-based lookups already use, so processCashfreeWebhook's
-   * PAYMENT_LINK_EVENT branch can reuse the identical lookup-by-providerOrderId code path.
-   * The link's own linkUrl/cfLinkId/linkStatus are kept in providerResponse (no dedicated
-   * columns) and read back out by toChannelOrderResponse above.
+   * The WhatsApp connector's payment link (https://razorpay.com/docs/api/payments/payment-links/create/). The link id
+   * is our own reference, stored as providerOrderId, so webhook events can find this payment.
    */
-  private async createCashfreeLinkAttempt(
+  private async createRazorpayLinkAttempt(
     orderId: string,
     restaurantId: string,
     amount: number,
     currency: string,
     customerName: string,
     customerPhone: string,
-    connection: { cashfreeVendorId: string | null; commissionOverrideBps: number | null } | null
+    connection: { commissionOverrideBps: number | null } | null
   ) {
     const { commissionBps, platformAmount, restaurantAmount } = await this.commissionSplitFor(amount, connection);
-    const vendorPercentage = Number(((restaurantAmount / amount) * 100).toFixed(2));
-    // Cashfree's link_id allows alphanumeric plus '-'/'_' only, max 50 chars -- a UUID (hex
-    // and hyphens) is already within both constraints, no stripping/truncation needed.
-    const linkId = `wapay_${randomUUID()}`;
+    const reference = `wapay_${randomUUID()}`;
 
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({
-        data: { orderId, restaurantId, providerOrderId: linkId, amount, currency, status: 'CREATED', commissionBps, platformAmount, restaurantAmount }
+        data: { orderId, restaurantId, provider: 'RAZORPAY', providerOrderId: reference, amount, currency, status: 'CREATED', commissionBps, platformAmount, restaurantAmount }
       })
     );
 
-    // A stuck order is never worth chasing forever — matches QR_TTL_SECONDS's own reasoning,
-    // just on a food-order timescale (minutes, not the 24h default a generic payment link gets).
+    // A stuck order is never worth chasing forever: 30 minutes, not the 24h default of a generic payment link.
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
-
-    const link = await this.cashfree.createPaymentLink({
-      linkId,
-      amountRupees: amount / 100,
-      currency,
-      purpose: `Order via WhatsApp`,
-      customerPhone,
+    const link = await this.razorpay.createPaymentLink({
+      referenceId: reference,
+      amountPaise: amount,
+      description: 'Order via WhatsApp',
       customerName,
-      expiryIso: expiresAt.toISOString(),
-      notifyUrl: this.config.get<string>('CASHFREE_WEBHOOK_NOTIFY_URL'),
-      orderSplits: connection?.cashfreeVendorId ? [{ vendorId: connection.cashfreeVendorId, percentage: vendorPercentage }] : undefined
+      customerPhone,
+      expireByUnix: Math.floor(expiresAt.getTime() / 1000)
     });
 
     return this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.update({
         where: { id: payment.id },
-        data: { status: 'PENDING', providerResponse: { cfLinkId: link.cfLinkId, linkUrl: link.linkUrl, linkStatus: link.linkStatus } as unknown as Prisma.InputJsonValue }
+        data: { status: 'PENDING', providerResponse: { linkId: link.linkId, linkUrl: link.shortUrl, linkStatus: link.status } as unknown as Prisma.InputJsonValue }
       })
     );
   }
 
   private toOrderResponse(
     order: { id: string; totalAmount: number; currency: string },
-    payment: { id: string; paymentSessionId: string | null; status: string }
+    payment: { id: string; status: string }
   ) {
-    return { orderId: order.id, paymentId: payment.id, paymentSessionId: payment.paymentSessionId, amount: order.totalAmount, currency: order.currency, status: payment.status };
+    return { orderId: order.id, paymentId: payment.id, amount: order.totalAmount, currency: order.currency, status: payment.status };
   }
 
   async tenantSummary(restaurantId: string, filters: { from?: Date; to?: Date }) {
@@ -317,9 +294,9 @@ export class PaymentsService {
   }
 
   /**
-   * A UPI QR for one pending payment, rendered by the kiosk itself. The QR is only ever created for a
-   * payment that is still open and only while the restaurant's Cashfree connection is ACTIVE, so a
-   * suspended restaurant stops taking new payments immediately.
+   * A UPI QR for one pending payment, rendered by Razorpay and shown on the kiosk. The QR is only created for a
+   * payment that is still open and only while the restaurant's payment connection is ACTIVE, so a suspended
+   * restaurant stops taking new payments immediately.
    */
   async createUpiQr(restaurantId: string, paymentId: string) {
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
@@ -329,17 +306,34 @@ export class PaymentsService {
     if (!NON_TERMINAL_STATUSES.includes(payment.status)) {
       throw new BadRequestException(`Cannot create a QR for a payment in status ${payment.status}`);
     }
-    if (!payment.paymentSessionId) {
-      throw new ServiceUnavailableException('This payment has no Cashfree session yet');
-    }
     const connection = await this.prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } }));
     if (!connection || connection.status !== 'ACTIVE') {
-      throw new ForbiddenException('Online payments are not active for this restaurant');
+      throw new ForbiddenException({ message: 'Online payments are not active for this restaurant', code: PAYMENTS_NOT_ACTIVE });
     }
 
-    const expiresAt = new Date(Date.now() + QR_TTL_SECONDS * 1000);
-    const qr = await this.cashfree.createUpiQr(payment.paymentSessionId, expiresAt.toISOString());
-    return { qrPayload: qr.qrPayload, contentType: qr.contentType, expiresAt: expiresAt.toISOString() };
+    return this.prisma.runAsTenant(restaurantId, async (tx) => {
+      // One live QR per payment: the row is locked while a QR is created, so two taps cannot produce two QRs,
+      // and a QR that is still valid is returned instead of creating another.
+      const [locked] = await tx.$queryRaw<{ providerResponse: Prisma.JsonValue | null }[]>`
+        SELECT "providerResponse" FROM "PaymentTransaction" WHERE id = ${paymentId} AND "restaurantId" = ${restaurantId} FOR UPDATE
+      `;
+      const existing = (locked?.providerResponse ?? null) as { qr?: { id: string; imageUrl: string; expiresAt: string } } | null;
+      if (existing?.qr && Date.parse(existing.qr.expiresAt) - Date.now() > QR_MIN_REMAINING_MS) {
+        return { qrPayload: existing.qr.imageUrl, contentType: 'image/url', expiresAt: existing.qr.expiresAt, method: 'UPI_QR' as const };
+      }
+
+      const expiresAt = new Date(Date.now() + QR_TTL_SECONDS * 1000);
+      const qr = await this.razorpay.createUpiQr({
+        paymentRef: payment.providerOrderId,
+        amountPaise: payment.amount,
+        closeByUnix: Math.floor(expiresAt.getTime() / 1000),
+        description: `Order ${payment.orderId.slice(0, 8)}`
+      });
+      if (!qr.imageUrl) throw new ServiceUnavailableException('Razorpay did not return a QR image for this payment');
+      const stored = { qr: { id: qr.qrId, imageUrl: qr.imageUrl, expiresAt: expiresAt.toISOString() } };
+      await tx.paymentTransaction.update({ where: { id: paymentId }, data: { providerResponse: stored as unknown as Prisma.InputJsonValue } });
+      return { qrPayload: qr.imageUrl, contentType: 'image/url', expiresAt: expiresAt.toISOString(), method: 'UPI_QR' as const };
+    });
   }
 
   /**
@@ -347,6 +341,34 @@ export class PaymentsService {
    * stuck one). Idempotent: the first stamp wins. A SUCCESS payment that is never stamped is what the
    * "needs attention" lists are built from.
    */
+  /**
+   * The kitchen ticket claim for one paid kiosk order. Exactly one caller ever gets claimed: true, decided by an
+   * atomic conditional update, so two kiosks (or a retry) cannot both print the ticket for the same payment.
+   */
+  async claimKitchenTicket(restaurantId: string, paymentId: string, device: { id: string; type: string }) {
+    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, select: { id: true, status: true, kotClaimedAt: true } })
+    );
+    if (!payment) throw new NotFoundException('Payment not found');
+    if (!PAID_STATUSES.includes(payment.status)) {
+      throw new BadRequestException(`Cannot claim a kitchen ticket for a payment in status ${payment.status}`);
+    }
+    const claimedAt = new Date();
+    const changed = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.updateMany({ where: { id: paymentId, restaurantId, kotClaimedAt: null }, data: { kotClaimedAt: claimedAt } })
+    );
+    if (changed.count === 1) {
+      await this.prisma.runAsTenant(restaurantId, (tx) =>
+        this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId, action: 'KITCHEN_TICKET_CLAIMED', category: 'PAYMENTS', details: { paymentId, deviceType: device.type } }, tx)
+      );
+      return { claimed: true, claimedAt };
+    }
+    const existing = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId }, select: { kotClaimedAt: true } })
+    );
+    return { claimed: false, claimedAt: existing.kotClaimedAt };
+  }
+
   async markFulfilled(restaurantId: string, paymentId: string, device: { id: string; type: string }) {
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId } })
@@ -409,10 +431,22 @@ export class PaymentsService {
   }
 
   async getPaymentStatus(restaurantId: string, paymentId: string) {
-    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
+    let payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, include: { order: true } })
     );
     if (!payment) throw new NotFoundException('Payment not found');
+    const current = payment;
+    const qrId = (current.providerResponse as { qr?: { id?: string } } | null)?.qr?.id;
+    if (current.provider === 'RAZORPAY' && qrId && NON_TERMINAL_STATUSES.includes(current.status)) {
+      const paid = (await this.razorpay.listQrPayments(qrId)).find((p) => p.status === 'captured' && p.amount === current.amount && p.currency === current.currency);
+      if (paid) {
+        await this.settleRazorpayPayment(current, 'SUCCESS', paid.id, paid, null, false);
+        payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
+          tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, include: { order: true } })
+        );
+        if (!payment) throw new NotFoundException('Payment not found');
+      }
+    }
     return { paymentId: payment.id, orderId: payment.orderId, status: payment.status, amount: payment.amount, currency: payment.currency, orderStatus: payment.order.status };
   }
 
@@ -425,9 +459,9 @@ export class PaymentsService {
     // transaction that takes a row lock on the PaymentTransaction first
     // (`FOR UPDATE`), so a second concurrent request blocks until the first
     // commits and then sees its refund in the aggregate.
-    const { refund, providerOrderId } = await this.prisma.runAsTenant(restaurantId, async (tx) => {
-      const locked = await tx.$queryRaw<{ id: string; status: string; amount: number; providerOrderId: string }[]>`
-        SELECT id, status, amount, "providerOrderId" FROM "PaymentTransaction" WHERE id = ${paymentId} AND "restaurantId" = ${restaurantId} FOR UPDATE
+    const { refund, providerOrderId, provider, providerPaymentId } = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      const locked = await tx.$queryRaw<{ id: string; status: string; amount: number; providerOrderId: string; provider: string; providerPaymentId: string | null }[]>`
+        SELECT id, status, amount, "providerOrderId", provider::text AS provider, "providerPaymentId" FROM "PaymentTransaction" WHERE id = ${paymentId} AND "restaurantId" = ${restaurantId} FOR UPDATE
       `;
       const payment = locked[0];
       if (!payment) throw new NotFoundException('Payment not found');
@@ -472,160 +506,79 @@ export class PaymentsService {
         tx
       );
 
-      return { refund: created, providerOrderId: payment.providerOrderId };
+      return { refund: created, providerOrderId: payment.providerOrderId, provider: payment.provider, providerPaymentId: payment.providerPaymentId };
     });
 
-    let result;
-    try {
-      result = await this.cashfree.createRefund({
-        orderId: providerOrderId,
-        refundId: refund.id,
-        amountPaise: dto.amountPaise,
-        note: dto.reason
+    if (provider === 'RAZORPAY') {
+      if (!providerPaymentId) {
+        await this.prisma.runAsTenant(restaurantId, (tx) => tx.refund.update({ where: { id: refund.id }, data: { status: 'FAILED' } }));
+        throw new ConflictException('This payment has no Razorpay payment id to refund against');
+      }
+      let rzp;
+      try {
+        rzp = await this.razorpay.createRefund({ razorpayPaymentId: providerPaymentId, amountPaise: dto.amountPaise, receipt: refund.id, notes: { refund_id: refund.id } });
+      } catch (err) {
+        await this.prisma.runAsTenant(restaurantId, (tx) => tx.refund.update({ where: { id: refund.id }, data: { status: 'FAILED' } }));
+        throw err;
+      }
+      const rzpStatus = rzp.status === 'processed' ? 'SUCCESS' : 'PENDING';
+      await this.prisma.runAsTenant(restaurantId, async (tx) => {
+        await tx.refund.update({ where: { id: refund.id }, data: { providerRefundId: rzp.refundId, status: rzpStatus } });
+        const done = await tx.refund.aggregate({ where: { paymentId, status: 'SUCCESS' }, _sum: { amount: true } });
+        const refundedSoFar = done._sum.amount ?? 0;
+        const payment = await tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } });
+        const nextStatus = rzpStatus === 'PENDING' ? 'REFUND_PENDING' : refundedSoFar >= payment.amount ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
+        await tx.paymentTransaction.update({ where: { id: paymentId }, data: { status: nextStatus } });
       });
-    } catch (err) {
-      await this.prisma.runAsTenant(restaurantId, (tx) => tx.refund.update({ where: { id: refund.id }, data: { status: 'FAILED' } }));
-      throw err;
+      return { refundId: refund.id, providerRefundId: rzp.refundId, status: rzp.status, amount: dto.amountPaise };
     }
 
-    // The synchronous response is informational only — store whatever
-    // Cashfree reports on the Refund row itself, but never let it flip
-    // PaymentTransaction/Order to a final refunded state. Only the
-    // REFUND_STATUS_WEBHOOK handler does that.
-    const informationalStatus = result.refundStatus === 'SUCCESS' ? 'SUCCESS' : result.refundStatus === 'FAILED' ? 'FAILED' : 'PENDING';
-    await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.refund.update({
-        where: { id: refund.id },
-        data: { providerRefundId: result.cfRefundId, status: informationalStatus }
-      })
-    );
-    await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.update({ where: { id: paymentId }, data: { status: 'REFUND_PENDING' } })
-    );
-
-    return { refundId: refund.id, providerRefundId: result.cfRefundId, status: result.refundStatus, amount: dto.amountPaise };
   }
 
-  async processCashfreeWebhook(rawBody: Buffer, signature: string | undefined, timestamp: string | undefined): Promise<void> {
-    let signatureValid: boolean;
-    try {
-      signatureValid = Boolean(signature && timestamp && this.cashfree.verifyWebhookSignature(rawBody, timestamp, signature));
-    } catch (err) {
-      if (!(err instanceof ServiceUnavailableException)) throw err;
-      // CASHFREE_WEBHOOK_SECRET isn't configured on this server. Every other failure branch
-      // in this method durably records a WebhookEvent and returns so the controller always
-      // responds 200 (per Cashfree's at-least-once delivery expectations) — this path must
-      // do the same rather than propagate and surface as an unhandled 500.
-      await this.prisma.runAsPlatform((tx) =>
-        tx.webhookEvent.create({
-          data: {
-            provider: 'CASHFREE',
-            providerEventKey: `UNCONFIGURED:${randomUUID()}`,
-            eventType: 'UNKNOWN',
-            rawPayload: this.safeParseJson(rawBody) ?? { unparsable: true },
-            signatureValid: false,
-            processingStatus: 'FAILED',
-            errorMessage: 'Cashfree webhook secret not configured on this server'
-          }
-        })
-      );
-      return;
-    }
-
-    if (!signatureValid) {
-      await this.prisma.runAsPlatform((tx) =>
-        tx.webhookEvent.create({
-          data: {
-            provider: 'CASHFREE',
-            providerEventKey: `INVALID:${randomUUID()}`,
-            eventType: 'UNKNOWN',
-            rawPayload: this.safeParseJson(rawBody) ?? { unparsable: true },
-            signatureValid: false,
-            processingStatus: 'FAILED',
-            errorMessage: 'Invalid or missing webhook signature'
-          }
-        })
-      );
-      return;
-    }
-
-    // A valid signature only proves the sender holds the shared secret over these exact
-    // bytes — it says nothing about whether those bytes are well-formed JSON. Reuse
-    // safeParseJson (rather than a bare JSON.parse that would throw uncaught here) so a
-    // malformed body is recorded as a FAILED WebhookEvent and answered with the same
-    // durably-recorded 200 every other failure branch in this method uses, instead of an
-    // unhandled exception surfacing as a 500.
+  async processRazorpayWebhook(rawBody: Buffer, signature: string | undefined, eventId?: string): Promise<void> {
+    const signatureValid = Boolean(signature && this.razorpay.verifyWebhookSignature(rawBody, signature));
     const parsed = this.safeParseJson(rawBody);
-    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    if (!signatureValid || parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
       await this.prisma.runAsPlatform((tx) =>
         tx.webhookEvent.create({
           data: {
-            provider: 'CASHFREE',
-            providerEventKey: `MALFORMED:${randomUUID()}`,
+            provider: 'RAZORPAY',
+            providerEventKey: `REJECTED:${randomUUID()}`,
             eventType: 'UNKNOWN',
-            rawPayload: { unparsable: true },
-            signatureValid: true,
+            rawPayload: this.safeParseJson(rawBody) ?? { unparsable: true },
+            signatureValid,
             processingStatus: 'FAILED',
-            errorMessage: 'Malformed webhook payload JSON'
+            errorMessage: signatureValid ? 'Malformed webhook payload JSON' : 'Invalid or missing webhook signature'
           }
         })
       );
       return;
     }
+
     const payload = parsed as Record<string, any>;
-    const eventType: string = payload.type;
-    // REFUND_STATUS_WEBHOOK nests everything under data.refund instead of
-    // data.payment/data.order — both order_id and a payment-identifying id
-    // are still present there, verified against Cashfree's real refund
-    // webhook payload docs, so the same PaymentTransaction lookup below
-    // (by providerOrderId) works unchanged for refund events too.
-    // PAYMENT_LINK_EVENT (the WhatsApp connector's Cashfree product — see
-    // CashfreeGatewayService.createPaymentLink) is a third, differently-shaped payload:
-    // link_id/cf_link_id/link_status sit directly under `data`, not nested under
-    // `data.order`/`data.payment` the way Orders' own webhook nests them. providerOrderId
-    // holds the link_id for these PaymentTransaction rows (see createCashfreeLinkAttempt).
-    // A PAID link event ALSO carries a nested `data.order` — but that's Cashfree's own
-    // internal order id for the underlying transaction, not our link_id, and must never be
-    // used for this lookup: a blind `??` fallback across all three shapes picked it first
-    // (found live, not by inspection — see git history), so this event type is resolved
-    // explicitly instead of falling through the Orders/refund chain.
-    const cfPaymentId: string | undefined = payload.data?.payment?.cf_payment_id ?? payload.data?.refund?.cf_payment_id;
-    const providerOrderId: string | undefined =
-      eventType === 'PAYMENT_LINK_EVENT' ? payload.data?.link_id : (payload.data?.order?.order_id ?? payload.data?.refund?.order_id);
-    const cfRefundId: string | undefined = payload.data?.refund?.cf_refund_id;
-    const cfLinkId: string | undefined = payload.data?.cf_link_id;
-    const linkStatus: string | undefined = payload.data?.link_status;
-    // cf_refund_id/cf_link_id+link_status are the most specific identifiers available for
-    // their event types — falling back to cfPaymentId/providerOrderId alone would collide
-    // dedup keys across multiple refunds on the same payment, or across a link's own status
-    // transitions (a link's cf_link_id never changes across its whole lifecycle, so without
-    // link_status in the key a genuine PARTIALLY_PAID -> PAID transition would be wrongly
-    // deduped as a repeat of the first delivery).
-    const providerEventKey =
-      eventType === 'PAYMENT_LINK_EVENT'
-        ? `PAYMENT_LINK_EVENT:${cfLinkId ?? providerOrderId ?? randomUUID()}:${linkStatus ?? 'UNKNOWN'}`
-        : `${eventType}:${cfRefundId ?? cfPaymentId ?? providerOrderId ?? randomUUID()}`;
+    const eventType: string = payload.event;
+    if (eventType === 'refund.processed' || eventType === 'refund.failed') {
+      await this.handleRazorpayRefundEvent(payload, eventType, eventId);
+      return;
+    }
+
+    const paymentEntity = payload.payload?.payment?.entity;
+    const linkEntity = payload.payload?.payment_link?.entity;
+    const qrEntity = payload.payload?.qr_code?.entity;
+    const paymentRef: string | undefined = linkEntity?.reference_id ?? paymentEntity?.notes?.payment_ref ?? qrEntity?.notes?.payment_ref;
+    const razorpayPaymentId: string | undefined = paymentEntity?.id;
+    // Razorpay's X-Razorpay-Event-Id is unique per event and repeats on every retry, so it is the deduplication key.
+    const providerEventKey = eventId ? `event:${eventId}` : `${eventType}:${razorpayPaymentId ?? linkEntity?.id ?? qrEntity?.id ?? randomUUID()}`;
 
     const existing = await this.prisma.runAsPlatform((tx) =>
-      tx.webhookEvent.findUnique({ where: { provider_providerEventKey: { provider: 'CASHFREE', providerEventKey } } })
+      tx.webhookEvent.findUnique({ where: { provider_providerEventKey: { provider: 'RAZORPAY', providerEventKey } } })
     );
     if (existing && existing.processingStatus !== 'FAILED') {
-      // A prior delivery under this derived key already completed (successfully
-      // processed, or deliberately skipped as irrelevant/already-terminal) — this
-      // is a genuine duplicate delivery, not a retry of a failed attempt.
       await this.prisma.runAsPlatform((tx) =>
         tx.webhookEvent.update({ where: { id: existing.id }, data: { retryCount: { increment: 1 }, processingStatus: 'IGNORED_DUPLICATE' } })
       );
       return;
     }
-
-    // Either no WebhookEvent exists yet for this key, or the only one we have
-    // FAILED (e.g. an earlier delivery under the same cf_payment_id carried a bad
-    // or missing amount). The (provider, providerEventKey) unique constraint means
-    // a failed row can't simply be superseded by a new one, so it is reused here —
-    // otherwise a corrected/legitimate retry would be silently swallowed forever as
-    // an "IGNORED_DUPLICATE" of its own earlier failure, permanently blocking a real
-    // payment from ever reaching SUCCESS.
     const webhookEvent = existing
       ? await this.prisma.runAsPlatform((tx) =>
           tx.webhookEvent.update({
@@ -634,57 +587,38 @@ export class PaymentsService {
           })
         )
       : await this.prisma.runAsPlatform((tx) =>
-          tx.webhookEvent.create({
-            data: { provider: 'CASHFREE', providerEventKey, eventType, rawPayload: payload, signatureValid: true, processingStatus: 'VERIFIED' }
-          })
+          tx.webhookEvent.create({ data: { provider: 'RAZORPAY', providerEventKey, eventType, rawPayload: payload, signatureValid: true, processingStatus: 'VERIFIED' } })
         );
 
-    if (!providerOrderId) {
-      await this.markWebhookFailed(webhookEvent.id, 'Missing order_id in webhook payload');
+    const newStatus = RAZORPAY_EVENT_STATUS[eventType];
+    if (!newStatus) {
+      await this.markWebhookProcessed(webhookEvent.id);
+      return;
+    }
+    if (!paymentRef) {
+      await this.markWebhookFailed(webhookEvent.id, 'Missing payment reference in webhook');
       return;
     }
 
     const payment = await this.prisma.runAsPlatform((tx) =>
-      tx.paymentTransaction.findUnique({ where: { provider_providerOrderId: { provider: 'CASHFREE', providerOrderId } }, include: { order: true } })
+      tx.paymentTransaction.findUnique({ where: { provider_providerOrderId: { provider: 'RAZORPAY', providerOrderId: paymentRef } }, include: { order: true } })
     );
     if (!payment) {
-      await this.markWebhookFailed(webhookEvent.id, `No PaymentTransaction found for providerOrderId ${providerOrderId}`);
+      await this.markWebhookFailed(webhookEvent.id, `No PaymentTransaction found for payment reference ${paymentRef}`);
       return;
     }
-
     await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id: webhookEvent.id }, data: { restaurantId: payment.restaurantId } }));
 
-    if (eventType === 'REFUND_STATUS_WEBHOOK') {
-      await this.handleRefundWebhook(payment, payload, webhookEvent.id);
-      return;
+    if (newStatus === 'SUCCESS') {
+      const amount = paymentEntity?.amount ?? linkEntity?.amount;
+      const currency = paymentEntity?.currency ?? linkEntity?.currency;
+      if (amount !== payment.amount || currency !== payment.currency) {
+        await this.markWebhookFailed(webhookEvent.id, `Amount/currency mismatch: expected ${payment.amount} ${payment.currency}, got ${amount} ${currency}`);
+        return;
+      }
     }
 
-    if (eventType === 'PAYMENT_LINK_EVENT') {
-      await this.handlePaymentLinkWebhook(payment, payload, webhookEvent.id);
-      return;
-    }
-
-    const RELEVANT_TYPES = ['PAYMENT_SUCCESS_WEBHOOK', 'PAYMENT_FAILED_WEBHOOK', 'PAYMENT_USER_DROPPED_WEBHOOK'];
-    if (!RELEVANT_TYPES.includes(eventType)) {
-      await this.markWebhookProcessed(webhookEvent.id);
-      return;
-    }
-
-    const orderAmountRupees = payload.data?.order?.order_amount;
-    const orderCurrency = payload.data?.order?.order_currency;
-    const receivedAmountPaise = typeof orderAmountRupees === 'number' ? Math.round(orderAmountRupees * 100) : null;
-
-    if (receivedAmountPaise === null || receivedAmountPaise !== payment.amount || orderCurrency !== payment.currency) {
-      await this.markWebhookFailed(webhookEvent.id, `Amount/currency mismatch: expected ${payment.amount} ${payment.currency}, got ${receivedAmountPaise} ${orderCurrency}`);
-      return;
-    }
-
-    const TERMINAL_STATUSES = ['SUCCESS', 'REFUNDED', 'PARTIALLY_REFUNDED'];
-    if (TERMINAL_STATUSES.includes(payment.status)) {
-      // Already settled by an earlier delivery. For a WhatsApp order this is also the retry
-      // path if that earlier delivery's KDS ingestion itself failed (see the catch below) —
-      // ingestWhatsAppOrderIfNeeded is safe to call again: ingestServerOrder dedupes on
-      // (restaurantId, externalOrderId), so a redelivery after a successful ingestion is a no-op.
+    if (['SUCCESS', 'REFUNDED', 'PARTIALLY_REFUNDED'].includes(payment.status)) {
       if (payment.status === 'SUCCESS') {
         const err = await this.ingestWhatsAppOrderIfNeeded(payment);
         if (err) {
@@ -696,43 +630,114 @@ export class PaymentsService {
       return;
     }
 
-    const newStatus = eventType === 'PAYMENT_SUCCESS_WEBHOOK' ? 'SUCCESS' : eventType === 'PAYMENT_USER_DROPPED_WEBHOOK' ? 'USER_DROPPED' : 'FAILED';
+    const err = await this.settleRazorpayPayment(
+      payment,
+      newStatus,
+      razorpayPaymentId,
+      payload,
+      paymentEntity?.error_description ?? (newStatus === 'FAILED' ? linkEntity?.status ?? null : null),
+      true
+    );
+    if (err) {
+      await this.markWebhookFailed(webhookEvent.id, err);
+      return;
+    }
+    await this.markWebhookProcessed(webhookEvent.id);
+  }
 
+  /** A refund that Razorpay confirms or rejects: updates the Refund row and the payment's refunded state. */
+  private async handleRazorpayRefundEvent(payload: Record<string, any>, eventType: string, eventId?: string): Promise<void> {
+    const refundEntity = payload.payload?.refund?.entity;
+    const providerRefundId: string | undefined = refundEntity?.id;
+    const providerEventKey = eventId ? `event:${eventId}` : `${eventType}:${providerRefundId ?? randomUUID()}`;
+    const existing = await this.prisma.runAsPlatform((tx) =>
+      tx.webhookEvent.findUnique({ where: { provider_providerEventKey: { provider: 'RAZORPAY', providerEventKey } } })
+    );
+    if (existing && existing.processingStatus !== 'FAILED') {
+      await this.prisma.runAsPlatform((tx) =>
+        tx.webhookEvent.update({ where: { id: existing.id }, data: { retryCount: { increment: 1 }, processingStatus: 'IGNORED_DUPLICATE' } })
+      );
+      return;
+    }
+    const webhookEvent = existing
+      ? await this.prisma.runAsPlatform((tx) =>
+          tx.webhookEvent.update({ where: { id: existing.id }, data: { rawPayload: payload, signatureValid: true, processingStatus: 'VERIFIED', errorMessage: null } })
+        )
+      : await this.prisma.runAsPlatform((tx) =>
+          tx.webhookEvent.create({ data: { provider: 'RAZORPAY', providerEventKey, eventType, rawPayload: payload, signatureValid: true, processingStatus: 'VERIFIED' } })
+        );
+
+    const refund = providerRefundId
+      ? await this.prisma.runAsPlatform((tx) => tx.refund.findFirst({ where: { providerRefundId }, include: { payment: true } }))
+      : null;
+    if (!refund) {
+      await this.markWebhookFailed(webhookEvent.id, `No Refund found for ${providerRefundId ?? 'missing id'}`);
+      return;
+    }
+    await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id: webhookEvent.id }, data: { restaurantId: refund.restaurantId } }));
+    if (refundEntity?.amount !== refund.amount) {
+      await this.markWebhookFailed(webhookEvent.id, `Refund amount mismatch: expected ${refund.amount}, got ${refundEntity?.amount}`);
+      return;
+    }
+
+    const refundStatus = eventType === 'refund.processed' ? 'SUCCESS' : 'FAILED';
+    await this.prisma.runAsTenant(refund.restaurantId, async (tx) => {
+      await tx.refund.update({ where: { id: refund.id }, data: { status: refundStatus } });
+      const done = await tx.refund.aggregate({ where: { paymentId: refund.paymentId, status: 'SUCCESS' }, _sum: { amount: true } });
+      const pending = await tx.refund.count({ where: { paymentId: refund.paymentId, status: 'PENDING' } });
+      const refundedSoFar = done._sum.amount ?? 0;
+      const nextStatus = pending > 0 ? 'REFUND_PENDING' : refundedSoFar >= refund.payment.amount ? 'REFUNDED' : refundedSoFar > 0 ? 'PARTIALLY_REFUNDED' : 'SUCCESS';
+      await tx.paymentTransaction.update({ where: { id: refund.paymentId }, data: { status: nextStatus } });
+      await tx.order.update({ where: { id: refund.payment.orderId }, data: { status: nextStatus === 'REFUNDED' ? 'REFUNDED' : 'PAID' } });
+    });
+    await this.markWebhookProcessed(webhookEvent.id);
+  }
+
+  /** Records a Razorpay outcome on the payment and its order. Returns an error message when the WhatsApp order could not be created. */
+  private async settleRazorpayPayment(
+    payment: {
+      id: string;
+      restaurantId: string;
+      orderId: string;
+      amount: number;
+      currency: string;
+      providerOrderId: string;
+      order: { externalOrderId: string; source: string; branchId: string | null; orderType: string | null; tableLabel: string | null; customerName: string | null; customerPhone: string | null; items: Prisma.JsonValue; subtotal: number; taxAmount: number; totalAmount: number } | null;
+    },
+    newStatus: 'SUCCESS' | 'FAILED',
+    razorpayPaymentId: string | undefined,
+    providerResponse: unknown,
+    failureReason: string | null,
+    fromWebhook: boolean
+  ): Promise<string | null> {
     await this.prisma.runAsTenant(payment.restaurantId, async (tx) => {
       await tx.paymentTransaction.update({
         where: { id: payment.id },
         data: {
           status: newStatus,
-          providerPaymentId: cfPaymentId,
-          providerResponse: payload as unknown as Prisma.InputJsonValue,
-          failureReason: newStatus === 'SUCCESS' ? null : (payload.data?.payment?.payment_message ?? null),
+          providerPaymentId: razorpayPaymentId,
+          providerResponse: providerResponse as Prisma.InputJsonValue,
+          failureReason: newStatus === 'SUCCESS' ? null : failureReason,
           paidAt: newStatus === 'SUCCESS' ? new Date() : null
         }
       });
       await tx.order.update({ where: { id: payment.orderId }, data: { status: newStatus === 'SUCCESS' ? 'PAID' : 'PAYMENT_FAILED' } });
       await tx.restaurantPaymentConnection.updateMany({
         where: { restaurantId: payment.restaurantId },
-        data: { lastWebhookAt: new Date(), ...(newStatus === 'SUCCESS' ? { lastPaymentAt: new Date() } : {}) }
+        data: {
+          ...(fromWebhook ? { lastWebhookAt: new Date() } : {}),
+          ...(newStatus === 'SUCCESS' ? { lastPaymentAt: new Date() } : {})
+        }
       });
     });
 
-    // Money is already recorded as settled above regardless of what happens next — this is a
-    // second, independent effect (make the order visible on POS/KDS), not part of that
-    // transaction, and its failure must never be reported back to Cashfree as a payment failure.
-    if (newStatus === 'SUCCESS') {
-      const err = await this.ingestWhatsAppOrderIfNeeded(payment);
-      if (err) {
-        await this.markWebhookFailed(webhookEvent.id, err);
-        return;
-      }
-    }
-
-    await this.markWebhookProcessed(webhookEvent.id);
+    if (newStatus !== 'SUCCESS') return null;
+    return this.ingestWhatsAppOrderIfNeeded(payment);
   }
 
   /**
    * Makes a paid WhatsApp order appear on POS/KDS — and only a paid one: this is the single
-   * place that call happens, reached only from a payment already confirmed SUCCESS by Cashfree
+   * place that call happens, reached only from a payment already confirmed SUCCESS by Razorpay
    * (fresh, or on a retried delivery — see the two call sites above). A restaurant-side order
    * created at checkout time instead would mean the kitchen sees an order before anyone has
    * actually paid for it, which is the one thing the user building this connector explicitly
@@ -786,7 +791,7 @@ export class PaymentsService {
         notes: null,
         // The whole reason this method only ever runs from a confirmed-SUCCESS payment.
         paymentStatus: 'SUCCESS',
-        paymentMethod: 'CASHFREE',
+        paymentMethod: 'RAZORPAY',
         meta: {
           sourceType: 'WHATSAPP',
           customerName: order.customerName,
@@ -837,154 +842,6 @@ export class PaymentsService {
     } catch (err) {
       return err instanceof Error ? err.message : 'Unknown error ingesting WhatsApp order into POS/KDS';
     }
-  }
-
-  private async handleRefundWebhook(
-    payment: { id: string; orderId: string; restaurantId: string; amount: number },
-    payload: Record<string, any>,
-    webhookEventId: string
-  ): Promise<void> {
-    const refundData = payload.data?.refund;
-    const cfRefundId: string | undefined = refundData?.cf_refund_id;
-    const refundStatus: string | undefined = refundData?.refund_status;
-    const refundAmountRupees = refundData?.refund_amount;
-    const receivedRefundAmountPaise = typeof refundAmountRupees === 'number' ? Math.round(refundAmountRupees * 100) : null;
-
-    if (!cfRefundId || receivedRefundAmountPaise === null) {
-      await this.markWebhookFailed(webhookEventId, 'Missing refund id or amount in REFUND_STATUS_WEBHOOK payload');
-      return;
-    }
-
-    const refund = await this.prisma.runAsPlatform((tx) => tx.refund.findFirst({ where: { paymentId: payment.id, providerRefundId: cfRefundId } }));
-    if (!refund) {
-      await this.markWebhookFailed(webhookEventId, `No Refund found for cf_refund_id ${cfRefundId}`);
-      return;
-    }
-
-    if (receivedRefundAmountPaise !== refund.amount) {
-      await this.markWebhookFailed(webhookEventId, `Refund amount mismatch: expected ${refund.amount}, got ${receivedRefundAmountPaise}`);
-      return;
-    }
-
-    if (refund.status === 'SUCCESS' || refund.status === 'FAILED') {
-      // Already terminal — a resent webhook for an already-processed refund.
-      await this.markWebhookProcessed(webhookEventId);
-      return;
-    }
-
-    const newRefundStatus = refundStatus === 'SUCCESS' ? 'SUCCESS' : refundStatus === 'FAILED' || refundStatus === 'CANCELLED' ? 'FAILED' : null;
-    if (!newRefundStatus) {
-      // Still processing at Cashfree's end — nothing final to record yet.
-      await this.markWebhookProcessed(webhookEventId);
-      return;
-    }
-
-    await this.prisma.runAsTenant(payment.restaurantId, async (tx) => {
-      await tx.refund.update({ where: { id: refund.id }, data: { status: newRefundStatus, processedAt: new Date() } });
-
-      if (newRefundStatus === 'SUCCESS') {
-        const totalRefunded = await tx.refund.aggregate({
-          where: { paymentId: payment.id, status: 'SUCCESS' },
-          _sum: { amount: true }
-        });
-        const refundedSoFar = totalRefunded._sum.amount ?? 0;
-        const isFullyRefunded = refundedSoFar >= payment.amount;
-        const finalStatus = isFullyRefunded ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
-
-        await tx.paymentTransaction.update({ where: { id: payment.id }, data: { status: finalStatus } });
-        await tx.order.update({ where: { id: payment.orderId }, data: { status: finalStatus } });
-      }
-      // FAILED: leave PaymentTransaction/Order status untouched — the money never left.
-    });
-
-    await this.markWebhookProcessed(webhookEventId);
-  }
-
-  /**
-   * PAYMENT_LINK_EVENT — the WhatsApp connector's own Cashfree product (Payment Links, not
-   * Orders; see CashfreeGatewayService.createPaymentLink). Deliberately a separate method
-   * from the Orders-based SUCCESS/FAILED handling above rather than a shared one: the two
-   * payloads nest their fields completely differently (data.link_status/data.order.
-   * transaction_id here vs data.order.order_amount/data.payment.cf_payment_id there), and
-   * forcing one generic parser to cover both shapes would be harder to read than two
-   * parallel ones — the same reasoning handleRefundWebhook already exists as its own method
-   * alongside the main flow, not folded into it.
-   */
-  private async handlePaymentLinkWebhook(
-    payment: {
-      id: string;
-      restaurantId: string;
-      orderId: string;
-      amount: number;
-      currency: string;
-      status: string;
-      order: Parameters<PaymentsService['ingestWhatsAppOrderIfNeeded']>[0]['order'];
-    },
-    payload: Record<string, any>,
-    webhookEventId: string
-  ): Promise<void> {
-    const linkAmountRupees = payload.data?.link_amount;
-    const linkCurrency = payload.data?.link_currency;
-    const receivedAmountPaise = typeof linkAmountRupees === 'number' ? Math.round(linkAmountRupees * 100) : null;
-
-    if (receivedAmountPaise === null || receivedAmountPaise !== payment.amount || linkCurrency !== payment.currency) {
-      await this.markWebhookFailed(webhookEventId, `Amount/currency mismatch: expected ${payment.amount} ${payment.currency}, got ${receivedAmountPaise} ${linkCurrency}`);
-      return;
-    }
-
-    const TERMINAL_STATUSES = ['SUCCESS', 'REFUNDED', 'PARTIALLY_REFUNDED'];
-    if (TERMINAL_STATUSES.includes(payment.status)) {
-      // Same retry reasoning as the Orders-based branch above: a redelivery (or a later
-      // status webhook for a link that's already SUCCESS) still gets one more chance at
-      // KDS ingestion if an earlier delivery's ingestion itself failed.
-      if (payment.status === 'SUCCESS') {
-        const err = await this.ingestWhatsAppOrderIfNeeded(payment);
-        if (err) {
-          await this.markWebhookFailed(webhookEventId, err);
-          return;
-        }
-      }
-      await this.markWebhookProcessed(webhookEventId);
-      return;
-    }
-
-    const linkStatus: string | undefined = payload.data?.link_status;
-    const newStatus = linkStatus === 'PAID' ? 'SUCCESS' : linkStatus === 'EXPIRED' || linkStatus === 'CANCELLED' ? 'FAILED' : null;
-    if (!newStatus) {
-      // PARTIALLY_PAID (partial payments aren't enabled on links this connector creates,
-      // but handled defensively) — not a terminal outcome yet, nothing to finalize.
-      await this.markWebhookProcessed(webhookEventId);
-      return;
-    }
-
-    const cfTransactionId: string | undefined = payload.data?.order?.transaction_id;
-
-    await this.prisma.runAsTenant(payment.restaurantId, async (tx) => {
-      await tx.paymentTransaction.update({
-        where: { id: payment.id },
-        data: {
-          status: newStatus,
-          providerPaymentId: cfTransactionId,
-          providerResponse: payload as unknown as Prisma.InputJsonValue,
-          paidAt: newStatus === 'SUCCESS' ? new Date() : null
-        }
-      });
-      await tx.order.update({ where: { id: payment.orderId }, data: { status: newStatus === 'SUCCESS' ? 'PAID' : 'PAYMENT_FAILED' } });
-      await tx.restaurantPaymentConnection.updateMany({
-        where: { restaurantId: payment.restaurantId },
-        data: { lastWebhookAt: new Date(), ...(newStatus === 'SUCCESS' ? { lastPaymentAt: new Date() } : {}) }
-      });
-    });
-
-    if (newStatus === 'SUCCESS') {
-      const err = await this.ingestWhatsAppOrderIfNeeded(payment);
-      if (err) {
-        await this.markWebhookFailed(webhookEventId, err);
-        return;
-      }
-    }
-
-    await this.markWebhookProcessed(webhookEventId);
   }
 
   private async markWebhookProcessed(id: string): Promise<void> {

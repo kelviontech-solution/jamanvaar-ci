@@ -3,7 +3,6 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
 import { PaymentConnectionsService } from '../src/modules/payments/payment-connections.service';
 
 describe('Payment connection onboarding', () => {
@@ -14,8 +13,6 @@ describe('Payment connection onboarding', () => {
   let platformToken: string;
   let restaurantId: string;
   let ownerToken: string;
-  let createVendorMock: ReturnType<typeof vi.fn>;
-  let updateVendorMock: ReturnType<typeof vi.fn>;
 
   const authed = (method: 'get' | 'post' | 'patch', url: string, token: string) =>
     request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
@@ -62,19 +59,7 @@ describe('Payment connection onboarding', () => {
     // tests — specifically the phase-3 race test below — can swap in a
     // one-time implementation via mockImplementationOnce and have it fall
     // back to this default afterwards.
-    createVendorMock = vi.fn().mockResolvedValue({ vendorId: 'rest_mocked', status: 'IN_BENE_CREATION' });
-    // Every approval after the first PATCHes the vendor that already exists
-    // rather than re-creating it, so this mock echoes back whichever
-    // vendor_id approve() targeted.
-    updateVendorMock = vi.fn().mockImplementation(async (vendorId: string) => ({ vendorId, status: 'ACTIVE' }));
-    app = await createTestApp((builder) =>
-      builder.overrideProvider(CashfreeGatewayService).useValue({
-        isConfigured: () => true,
-        createVendor: createVendorMock,
-        updateVendor: updateVendorMock,
-        getVendorStatus: vi.fn().mockResolvedValue({ vendorId: 'rest_mocked', status: 'ACTIVE' })
-      })
-    );
+    app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
 
@@ -242,40 +227,23 @@ describe('Payment connection onboarding', () => {
     expect(res.body.status).toBe('PENDING_VERIFICATION');
   });
 
+  const activateForTest = (rid: string) =>
+    prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.update({ where: { restaurantId: rid }, data: { status: 'ACTIVE' } }));
+
   it('suspend/reactivate/disconnect are rejected from the wrong starting status', async () => {
     const suspendRes = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/suspend`, platformToken).send({ password: adminPassword });
     expect(suspendRes.status).toBe(403); // still PENDING_VERIFICATION, not ACTIVE
   });
 
-  it('approve calls CashfreeGatewayService.createVendor and moves the connection to ACTIVE', async () => {
+  it('approve is refused for an already ACTIVE connection too', async () => {
+    await activateForTest(restaurantId);
     const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/approve`, platformToken).send({ password: adminPassword });
-    expect(res.status).toBe(200);
-    expect(res.body.status).toBe('ACTIVE');
-    expect(res.body.cashfreeVendorId).toBe('rest_mocked');
-
-    const row = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId } }));
-    expect(row.status).toBe('ACTIVE');
-    expect(row.verifiedAt).not.toBeNull();
-  });
-
-  it('cannot approve twice — already ACTIVE is rejected', async () => {
-    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/approve`, platformToken).send({ password: adminPassword });
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(409);
   });
 
   it('cannot resubmit while ACTIVE', async () => {
     const res = await authed('post', '/api/v1/tenant/payment-connection', ownerToken).send(validSubmission);
     expect(res.status).toBe(403);
-  });
-
-  it('refresh-status calls getVendorStatus and stores the raw Cashfree status without changing our own status', async () => {
-    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/refresh-status`, platformToken);
-    expect(res.status).toBe(200);
-    expect(res.body.cashfreeVendorStatus).toBe('ACTIVE');
-
-    const row = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId } }));
-    expect(row.status).toBe('ACTIVE'); // unchanged — our own status is a separate concept from Cashfree's
-    expect(row.cashfreeVendorStatus).toBe('ACTIVE');
   });
 
   it('suspend then reactivate works from ACTIVE, and disconnect works from SUSPENDED', async () => {
@@ -301,91 +269,6 @@ describe('Payment connection onboarding', () => {
     expect(res.body.status).toBe('PENDING_VERIFICATION');
   });
 
-  it('approve refuses to overwrite if the connection status changed while Cashfree was being contacted', async () => {
-    // approve() is split into three phases specifically so the Cashfree
-    // network call runs with no DB transaction open; this simulates a
-    // concurrent disconnect racing that in-flight call, by mutating the row
-    // from inside the mocked vendor-call implementation itself.
-    //
-    // By this point the shared restaurant already went through one
-    // approve() earlier in this file (see "approve calls
-    // CashfreeGatewayService.createVendor...") followed by disconnect +
-    // resubmit ("can resubmit after DISCONNECTED"), so it already carries a
-    // cashfreeVendorId — this second approve() call takes the updateVendor
-    // branch, not createVendor, so the race must be injected there.
-    updateVendorMock.mockImplementationOnce(async () => {
-      await prisma.runAsPlatform((tx) =>
-        tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { status: 'DISCONNECTED' } })
-      );
-      return { vendorId: 'rest_raced', status: 'IN_BENE_CREATION' };
-    });
-
-    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/approve`, platformToken).send({ password: adminPassword });
-    expect(res.status).toBe(403);
-
-    const row = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId } }));
-    expect(row.status).toBe('DISCONNECTED'); // not silently overwritten back to ACTIVE
-    expect(row.cashfreeVendorId).not.toBe('rest_raced'); // the raced vendor write was refused
-  });
-
-  it('approve leaves the connection unchanged if Cashfree rejects the vendor call', async () => {
-    const { restaurantId: rid, token } = await createRestaurantWithOwner('approve-fail');
-    const submitRes = await authed('post', '/api/v1/tenant/payment-connection', token).send(validSubmission);
-    expect(submitRes.status).toBe(201);
-
-    createVendorMock.mockRejectedValueOnce(new ServiceUnavailableException('Cashfree unavailable'));
-    const approveRes = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken).send({ password: adminPassword });
-    expect(approveRes.status).toBe(503);
-
-    const row = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId: rid } }));
-    expect(row.status).toBe('PENDING_VERIFICATION'); // never a silent partial success
-    expect(row.cashfreeVendorId).toBeNull();
-
-    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
-  });
-
-  it('reconnecting after DISCONNECTED updates the existing Cashfree vendor instead of creating a new one', async () => {
-    const { restaurantId: rid, token } = await createRestaurantWithOwner('reconnect');
-
-    const firstSubmit = await authed('post', '/api/v1/tenant/payment-connection', token).send(validSubmission);
-    expect(firstSubmit.status).toBe(201);
-
-    const createCallsBeforeFirst = createVendorMock.mock.calls.length;
-    const firstApprove = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken).send({ password: adminPassword });
-    expect(firstApprove.status).toBe(200);
-    expect(createVendorMock.mock.calls.length).toBe(createCallsBeforeFirst + 1);
-    const firstVendorId = firstApprove.body.cashfreeVendorId;
-    expect(firstVendorId).toBeTruthy();
-
-    const disconnectRes = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/disconnect`, platformToken).send({ password: adminPassword });
-    expect(disconnectRes.status).toBe(200);
-
-    const newBankSubmission = {
-      ...validSubmission,
-      settlementAccountName: 'New Bank Name',
-      settlementAccountNumber: '9998887770',
-      settlementIfsc: 'ICIC0000002'
-    };
-    const secondSubmit = await authed('post', '/api/v1/tenant/payment-connection', token).send(newBankSubmission);
-    expect(secondSubmit.status).toBe(201);
-    expect(secondSubmit.body.status).toBe('PENDING_VERIFICATION');
-
-    const createCallsBeforeSecond = createVendorMock.mock.calls.length;
-    const updateCallsBeforeSecond = updateVendorMock.mock.calls.length;
-    const secondApprove = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken).send({ password: adminPassword });
-    expect(secondApprove.status).toBe(200);
-    // Same vendor_id as the first approval — never a fresh create.
-    expect(secondApprove.body.cashfreeVendorId).toBe(firstVendorId);
-    expect(createVendorMock.mock.calls.length).toBe(createCallsBeforeSecond); // not called again
-    expect(updateVendorMock.mock.calls.length).toBe(updateCallsBeforeSecond + 1);
-
-    const lastUpdateCall = updateVendorMock.mock.calls[updateVendorMock.mock.calls.length - 1];
-    expect(lastUpdateCall[0]).toBe(firstVendorId); // vendor_id passed as the path param
-    expect(lastUpdateCall[1].bank.accountNumber).toBe('9998887770'); // carries the NEW bank details
-
-    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
-  });
-
   it('a tenant from another restaurant cannot see or act on this connection', async () => {
     const otherOwnerEmail = `payconn-other-owner-${Date.now()}@test.example.com`;
     const otherOwnerPassword = 'other-correct-horse-battery';
@@ -409,16 +292,16 @@ describe('Payment connection onboarding', () => {
   });
 
   it('PATCH .../commission sets a restaurant override and it appears on the platform detail view', async () => {
-    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 150, password: adminPassword });
+    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 250, password: adminPassword });
     expect(res.status).toBe(200);
-    expect(res.body.commissionOverrideBps).toBe(150);
+    expect(res.body.commissionOverrideBps).toBe(250);
 
     const detail = await authed('get', `/api/v1/restaurants/${restaurantId}/payment-connection`, platformToken);
-    expect(detail.body.commissionOverrideBps).toBe(150);
+    expect(detail.body.commissionOverrideBps).toBe(250);
   });
 
   it('PATCH .../commission accepts null to clear the override, falling back to the platform default', async () => {
-    await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 150, password: adminPassword });
+    await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 250, password: adminPassword });
     const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: null, password: adminPassword });
     expect(res.status).toBe(200);
     expect(res.body.commissionOverrideBps).toBeNull();
@@ -436,12 +319,12 @@ describe('Payment connection onboarding', () => {
   });
 
   it('PATCH .../commission for an unknown restaurant returns 404', async () => {
-    const res = await authed('patch', '/api/v1/restaurants/00000000-0000-0000-0000-000000000000/payment-connection/commission', platformToken).send({ overrideBps: 100, password: adminPassword });
+    const res = await authed('patch', '/api/v1/restaurants/00000000-0000-0000-0000-000000000000/payment-connection/commission', platformToken).send({ overrideBps: 250, password: adminPassword });
     expect(res.status).toBe(404);
   });
 
   it('PATCH .../commission records an audit log entry with the restaurant scope', async () => {
-    await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 300, password: adminPassword });
+    await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 250, password: adminPassword });
     const entry = await prisma.runAsPlatform((tx) =>
       tx.auditLog.findFirst({ where: { action: 'COMMISSION_CHANGED', category: 'PAYMENTS', restaurantId }, orderBy: { createdAt: 'desc' } })
     );
@@ -457,7 +340,7 @@ describe('Payment connection onboarding', () => {
 
     const getRes = await authed('get', `/api/v1/restaurants/${restaurantId}/payment-connection`, token);
     expect(getRes.status).toBe(200);
-    const patchRes = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, token).send({ overrideBps: 50, password: 'correct-horse-battery-staple' });
+    const patchRes = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, token).send({ overrideBps: 250, password: 'correct-horse-battery-staple' });
     expect(patchRes.status).toBe(200);
 
     await prisma.platformUser.deleteMany({ where: { email } });
@@ -498,7 +381,20 @@ describe('Payment connection onboarding', () => {
     const missing = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken);
     expect(missing.status).toBe(403);
     const right = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken).send({ password: adminPassword });
-    expect(right.status).toBe(200);
+    expect(right.status).toBe(409);
+
+    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
+  });
+
+  it('approve is refused until Razorpay Route is enabled, and the connection stays pending', async () => {
+    const { restaurantId: rid, token } = await createRestaurantWithOwner('route-pending');
+    await authed('post', '/api/v1/tenant/payment-connection', token).send(validSubmission);
+
+    const res = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken).send({ password: adminPassword });
+    expect(res.status).toBe(409);
+    expect(res.body.message).toContain('Razorpay Route');
+    const row = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId: rid } }));
+    expect(row.status).toBe('PENDING_VERIFICATION');
 
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
   });
@@ -506,7 +402,7 @@ describe('Payment connection onboarding', () => {
   it('suspend and disconnect reject a wrong step-up password', async () => {
     const { restaurantId: rid, token } = await createRestaurantWithOwner('stepup-suspend');
     await authed('post', '/api/v1/tenant/payment-connection', token).send(validSubmission);
-    await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken).send({ password: adminPassword });
+    await activateForTest(rid);
 
     const wrongSuspend = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/suspend`, platformToken).send({ password: 'wrong' });
     expect(wrongSuspend.status).toBe(403);
@@ -521,16 +417,14 @@ describe('Payment connection onboarding', () => {
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
   });
 
-  it('reactivate and refresh-status do NOT require a step-up password (deliberately excluded)', async () => {
+  it('reactivate does NOT require a step-up password (deliberately excluded)', async () => {
     const { restaurantId: rid, token } = await createRestaurantWithOwner('stepup-reactivate');
     await authed('post', '/api/v1/tenant/payment-connection', token).send(validSubmission);
-    await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken).send({ password: adminPassword });
+    await activateForTest(rid);
     await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/suspend`, platformToken).send({ password: adminPassword });
 
     const reactivateRes = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/reactivate`, platformToken);
     expect(reactivateRes.status).toBe(200);
-    const refreshRes = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/refresh-status`, platformToken);
-    expect(refreshRes.status).toBe(200);
 
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
   });

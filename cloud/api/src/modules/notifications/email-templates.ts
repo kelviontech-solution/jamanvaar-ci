@@ -21,6 +21,8 @@ export function ownerInviteEmail(params: {
   initialPassword?: string;
   /** The one-time invitation token, when the owner sets their own password. */
   activationToken?: string;
+  /** Opens the Restaurant Admin app's set-password screen with the restaurant, email and token already filled in. */
+  setupLink?: string;
   expiresAt?: Date;
 }): { subject: string; html: string } {
   const expiry = params.expiresAt ? params.expiresAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
@@ -33,7 +35,9 @@ export function ownerInviteEmail(params: {
   ].join('');
   const steps = params.initialPassword
     ? `<p>Open the Restaurant Admin app, choose &ldquo;Restaurant Owner? Sign in with your JAMANVAAR Cloud account&rdquo;, and sign in with the details above. <strong>Please change this password after your first sign-in.</strong></p>`
-    : `<p>Open the Restaurant Admin app, choose &ldquo;Restaurant Owner? Sign in with your JAMANVAAR Cloud account&rdquo;, then &ldquo;First time? Set your password&rdquo;, and enter the details above.</p>`;
+    : params.setupLink
+      ? `<p style="margin: 22px 0;"><a href="${esc(params.setupLink)}" style="background: #e8650f; color: #ffffff; padding: 12px 22px; border-radius: 10px; text-decoration: none; font-weight: bold; display: inline-block;">Set your password</a></p><p>Click the button on this device to choose your password. If the button does not open, open the Restaurant Admin app, choose &ldquo;First time? Activate account&rdquo;, and enter the details above.</p>`
+      : `<p>Open the Restaurant Admin app and choose &ldquo;First time? Activate account&rdquo;, then enter the details above.</p>`;
   return {
     subject: `Your JAMANVAAR account for ${params.restaurantName}`,
     html: `

@@ -6,7 +6,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
+import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 
 /**
  * Jamanvaar <-> WhatsApp connector, Phase 5: the outbound half — order.confirmed fires once
@@ -25,7 +25,7 @@ describe('Jamanvaar WhatsApp connector — outbound order.confirmed / order.stat
   let received: Array<{ headers: IncomingMessage['headers']; rawBody: string }> = [];
   const stamp = Date.now();
   const SERVICE_SECRET = 'test-jamanvaar-service-secret-for-outbound-hooks-e2e';
-  const WEBHOOK_SECRET = 'test-cashfree-webhook-secret-for-outbound-hooks-e2e';
+  const WEBHOOK_SECRET = 'test-razorpay-webhook-secret-for-outbound-hooks-e2e';
   let platformToken: string;
   let restaurantId: string;
   let branchId: string;
@@ -55,23 +55,20 @@ describe('Jamanvaar WhatsApp connector — outbound order.confirmed / order.stat
 
   const signedWebhook = (payload: object) => {
     const rawBody = JSON.stringify(payload);
-    const timestamp = String(Math.floor(Date.now() / 1000));
-    const signature = createHmac('sha256', WEBHOOK_SECRET).update(timestamp + rawBody).digest('base64');
-    return http_().post('/api/v1/payments/cashfree/webhook').set('x-webhook-signature', signature).set('x-webhook-timestamp', timestamp).send(payload);
+    const signature = createHmac('sha256', WEBHOOK_SECRET).update(rawBody).digest('hex');
+    return http_().post('/api/v1/payments/razorpay/webhook').set('Content-Type', 'application/json').set('x-razorpay-signature', signature).send(rawBody);
   };
-  const webhookLinkPayload = (linkId: string, amountRupees: number) => ({
-    type: 'PAYMENT_LINK_EVENT',
-    event_time: new Date().toISOString(),
-    data: {
-      link_id: linkId,
-      cf_link_id: `cf_link_hooks_${stamp}_${++cfCounter}`,
-      link_status: 'PAID',
-      link_amount: amountRupees,
-      link_amount_paid: amountRupees,
-      link_currency: 'INR',
-      order: { order_id: `cforder_hooks_${stamp}_${cfCounter}`, order_amount: amountRupees, transaction_id: `txn_hooks_${stamp}_${cfCounter}`, transaction_status: 'SUCCESS' }
-    }
-  });
+  const webhookLinkPayload = (referenceId: string, amountRupees: number) => {
+    const amountPaise = Math.round(amountRupees * 100);
+    return {
+      event: 'payment_link.paid',
+      created_at: Math.floor(Date.now() / 1000),
+      payload: {
+        payment_link: { entity: { id: `plink_${referenceId}`, reference_id: referenceId, amount: amountPaise, currency: 'INR', status: 'paid' } },
+        payment: { entity: { id: `pay_hooks_${referenceId}`, amount: amountPaise, currency: 'INR', status: 'captured' } }
+      }
+    };
+  };
 
   async function waitUntil<T>(check: () => Promise<T | undefined | null | false>, timeoutMs = 3000, intervalMs = 25): Promise<T> {
     const deadline = Date.now() + timeoutMs;
@@ -97,18 +94,16 @@ describe('Jamanvaar WhatsApp connector — outbound order.confirmed / order.stat
     receiverPort = (receiver.address() as AddressInfo).port;
 
     process.env.JAMANVAAR_SERVICE_SECRET = SERVICE_SECRET;
-    process.env.CASHFREE_WEBHOOK_SECRET = WEBHOOK_SECRET;
+    process.env.RAZORPAY_WEBHOOK_SECRET = WEBHOOK_SECRET;
     process.env.WHATSAPP_CONNECTOR_BASE_URL = `http://127.0.0.1:${receiverPort}`;
     app = await createTestApp();
     prisma = app.get(PrismaService);
 
-    const cashfree = app.get(CashfreeGatewayService);
-    vi.spyOn(cashfree, 'isConfigured').mockReturnValue(true);
-    vi.spyOn(cashfree, 'createPaymentLink').mockImplementation(async (input) => ({
-      linkId: input.linkId,
-      cfLinkId: `cf_link_${++cfCounter}`,
-      linkUrl: `https://payments-test.cashfree.com/links/mock_${cfCounter}`,
-      linkStatus: 'ACTIVE'
+    const razorpay = app.get(RazorpayGatewayService);
+    vi.spyOn(razorpay, 'createPaymentLink').mockImplementation(async (input) => ({
+      linkId: `plink_${input.referenceId}`,
+      shortUrl: `https://rzp.io/i/mock_${++cfCounter}`,
+      status: 'created'
     }));
 
     await createTestPlatformUser(prisma, { email: `test-outbound-hooks-admin-${stamp}@example.com`, password: 'correct-horse-battery-staple' });
@@ -147,7 +142,7 @@ describe('Jamanvaar WhatsApp connector — outbound order.confirmed / order.stat
   });
 
   afterAll(async () => {
-    delete process.env.CASHFREE_WEBHOOK_SECRET;
+    delete process.env.RAZORPAY_WEBHOOK_SECRET;
     delete process.env.WHATSAPP_CONNECTOR_BASE_URL;
     await prisma.runAsPlatform((tx) => tx.whatsAppChannelConnection.deleteMany({ where: { restaurantId } }));
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));

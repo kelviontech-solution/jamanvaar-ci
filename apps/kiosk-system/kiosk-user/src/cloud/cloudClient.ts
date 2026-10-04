@@ -27,7 +27,8 @@ export const RESTAURANT_CODE_RE = /^JM[6-9][0-9]{9}$/;
 export class CloudApiError extends Error {
   constructor(
     message: string,
-    public status: number
+    public status: number,
+    public code?: string
   ) {
     super(message);
   }
@@ -240,12 +241,11 @@ export async function syncRestaurantIdentity(): Promise<void> {
   await pullRestaurantIdentity({ apiBase: API_BASE, deviceToken, restaurantId });
 }
 
-// --- Real Cashfree Payment (Phase 3) ---
+// --- Real Razorpay Payment (Phase 3) ---
 
 export interface PaymentOrderResult {
   orderId: string;
   paymentId: string;
-  paymentSessionId: string | null;
   amount: number; // paise
   currency: string;
   status: string;
@@ -264,7 +264,7 @@ export async function createPaymentOrder(externalOrderId: string, lines: CartLin
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
-    throw new CloudApiError(data?.message ?? `Payment order creation failed (${res.status})`, res.status);
+    throw new CloudApiError(data?.message ?? `Payment order creation failed (${res.status})`, res.status, data?.code);
   }
   return data;
 }
@@ -273,14 +273,29 @@ export interface PaymentQr {
   qrPayload: string;
   contentType: string | null;
   expiresAt: string;
+  /** A UPI QR from Razorpay. */
+  method?: 'UPI_QR';
 }
 
-/** Asks the server (which holds the Cashfree keys) for the UPI QR of one pending payment. */
+/** Asks the server (which holds the Razorpay keys) for the UPI QR of one pending payment. */
 export async function createPaymentQr(paymentId: string): Promise<PaymentQr> {
   const res = await deviceFetch(`/api/v1/payments/${paymentId}/qr`, { method: 'POST' });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
     throw new CloudApiError(data?.message ?? `Could not create the payment QR (${res.status})`, res.status);
+  }
+  return data;
+}
+
+/**
+ * Asks the server for the right to print this paid order's kitchen tickets. Exactly one kiosk gets claimed: true.
+ * A refused claim means another terminal already printed the tickets for this payment.
+ */
+export async function claimKitchenTicket(paymentId: string): Promise<{ claimed: boolean; claimedAt: string | null }> {
+  const res = await deviceFetch(`/api/v1/payments/${paymentId}/kot-claim`, { method: 'POST' });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Could not claim the kitchen ticket (${res.status})`, res.status);
   }
   return data;
 }

@@ -39,7 +39,7 @@ Key existing pieces this reuses (do not rebuild):
 - **pos-admin tenant cloud pattern**: `src/cloud/cloudClient.ts` already has a rich set of tenant-authenticated fetchers (`fetchEntitlements`, `fetchTenantAiConfig`, `fetchTenantBillingSummary`, etc.) — this is the exact precedent for the new `fetchPublishedKioskTemplates()` / `fetchKioskTemplateAssignment()` / `setKioskTemplateAssignment()` calls.
 - **kiosk-admin existing Welcome Settings panel**: `apps/kiosk-system/kiosk-admin/src/App.tsx` (~line 4210–4300) already has a live "Welcome Screen Settings" section reading/writing `WelcomeScreenSettingsRepository` (headingText, subtitleText, showHeritageArtwork, showPromoBanner, etc.) — the new "choose a template" control is added **into this existing panel**, not a new page.
 - **kiosk-admin cloud connectivity**: `apps/kiosk-system/kiosk-admin/src/cloud/cloudClient.ts` already does `connectDeviceStep1/2` + `staffLogin` (tenant auth) — this app already has a real, authenticated `restaurantId` and session, unlike kiosk-user.
-- **kiosk-user's current isolation**: `apps/kiosk-system/kiosk-user/src/cloud/cloudClient.ts` only ever calls `activation/redeem` and Cashfree payment endpoints — zero visual/config data comes from the cloud today. This is the one place genuinely new plumbing is required (Phase C).
+- **kiosk-user's current isolation**: `apps/kiosk-system/kiosk-user/src/cloud/cloudClient.ts` only ever calls `activation/redeem` and Razorpay payment endpoints — zero visual/config data comes from the cloud today. This is the one place genuinely new plumbing is required (Phase C).
 
 ---
 
@@ -182,7 +182,7 @@ Both apps get the same conceptual capability; implement kiosk-admin first (it al
 
 This is the part most likely to be under-designed if left purely as "future work," so it's spelled out concretely even though it's not being built now.
 
-**The core problem**: kiosk-user is currently a fully local, offline-first app for its visuals — no network call exists for Welcome/Language screen content, and its only real cloud identity is a `deviceToken` + `restaurantId` obtained once at device activation (`activateKioskDevice` in `cloudClient.ts`), used today only for Cashfree payments.
+**The core problem**: kiosk-user is currently a fully local, offline-first app for its visuals — no network call exists for Welcome/Language screen content, and its only real cloud identity is a `deviceToken` + `restaurantId` obtained once at device activation (`activateKioskDevice` in `cloudClient.ts`), used today only for Razorpay payments.
 
 **The bridge**: the activation flow already resolves a real `Device → Restaurant` relationship server-side — this is the identity anchor Phase C needs, no new identity concept required.
 

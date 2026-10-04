@@ -40,24 +40,10 @@ const envSchema = z.object({
   BACKUP_ENCRYPTION_KEY_B64: z.string().optional(),
   // 'off' disables the automatic per-restaurant snapshots (BUG-072/074). Off under test.
   BACKUP_SCHEDULE: z.string().optional(),
-  // Optional: Cashfree Payment Gateway (see modules/payments). Degrades to a
-  // clear 503 on any payment operation when unset, rather than silently
-  // pretending a payment gateway is configured.
-  CASHFREE_CLIENT_ID: z.string().optional(),
-  CASHFREE_CLIENT_SECRET: z.string().optional(),
-  CASHFREE_ENVIRONMENT: z.enum(['sandbox', 'production']).default('sandbox'),
-  CASHFREE_API_VERSION: z.string().default('2025-01-01'),
-  // Cashfree signs webhooks with your account secret key
-  // (https://www.cashfree.com/docs/api-reference/vrs/webhook-signature-verification).
-  // Stored as its own var (rather than reusing CASHFREE_CLIENT_SECRET) so it
-  // can be rotated independently if Cashfree issues a dedicated webhook
-  // signing secret later — today, set it to the same value as
-  // CASHFREE_CLIENT_SECRET.
-  CASHFREE_WEBHOOK_SECRET: z.string().optional(),
-  CASHFREE_WEBHOOK_NOTIFY_URL: z.string().optional(),
-  // Sandbox-only testing aid: send Cashfree calls to a local stand-in instead of sandbox.cashfree.com.
-  // Never honoured when CASHFREE_ENVIRONMENT=production.
-  CASHFREE_BASE_URL_OVERRIDE: z.string().optional(),
+  // Optional: Razorpay payment gateway (see modules/payments). Payment operations return a clear 503 while unset.
+  RAZORPAY_KEY_ID: z.string().optional(),
+  RAZORPAY_KEY_SECRET: z.string().optional(),
+  RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
   // Optional: AES-256-GCM key (32 bytes, base64) for encrypting
   // RestaurantPaymentConnection settlement bank details at rest.
   PAYMENT_CREDENTIAL_ENCRYPTION_KEY: z.string().optional(),

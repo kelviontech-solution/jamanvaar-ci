@@ -91,7 +91,7 @@ Fill in, at minimum, everything `.env.example` marks `:?...must be set`:
   the terminal history. Copy what it generates into `.env`.
 - `CORS_ALLOWED_ORIGINS=https://system.kelviontech.in`
 
-Everything else in `.env.example` (Cashfree, SMTP, backups, the WhatsApp connector,
+Everything else in `.env.example` (Razorpay, SMTP, backups, the WhatsApp connector,
 license signing) is genuinely optional — cloud/api degrades each one to a clear, logged
 "not configured" state rather than crashing, until a restaurant on this deployment
 actually needs it.

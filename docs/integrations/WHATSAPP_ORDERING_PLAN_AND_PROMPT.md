@@ -63,11 +63,11 @@ Customer's WhatsApp            Chatbot service                  This repo (Cloud
       |----------------------------->|-- POST quote (cart) ------------->|                             |
       |  "Total Rs 428, Pay?"        |<-- exact server price ------------|                             |
       |<-----------------------------|                                   |                             |
-      |  taps Pay                    |-- POST checkout ----------------->|-- create Cashfree order     |
+      |  taps Pay                    |-- POST checkout ----------------->|-- create Razorpay order     |
       |  payment link                |<-- payment link ------------------|                             |
       |<-----------------------------|                                   |                             |
       |  pays in UPI app             |                                   |                             |
-      |                              |                Cashfree webhook ->|-- verify signature + amount |
+      |                              |                Razorpay webhook ->|-- verify signature + amount |
       |                              |                                   |-- create the order (once) ->| appears, beep
       |  "Order #W-104 confirmed"    |<-- order.confirmed (signed) ------|                             |
       |<-----------------------------|                                   |            kitchen taps Ready
@@ -79,8 +79,8 @@ Customer's WhatsApp            Chatbot service                  This repo (Cloud
 
 1. **The menu is pulled from this repo, not copied.** The restaurant already edits the menu in one place. If the chatbot kept a copy, the two would drift apart, and a customer would pay for a dish that is finished. The chatbot asks for the menu with a version number, keeps it for reuse, and this repo tells it "menu changed" (a signed `menu.published` call) so it fetches again. Sold-out is checked at **quote** time as well, so a dish that ran out while the customer was deciding is caught before they pay.
 2. **The price is computed here, in whole paise, from the published menu.** The customer's phone and the chatbot only say "2 of dish A, with option B". This is the same rule the QR ordering already follows, and it is why nobody can pay ₹1 for a ₹400 dish.
-3. **The payment is created and confirmed here, not in the chatbot.** Reasons: (a) this repo already has the verified Cashfree webhook, the amount check and crash-safe order creation; (b) the restaurant's money goes through **Cashfree Easy Split** to that restaurant's own vendor account, which only works from the platform's Cashfree account; a separate Cashfree account in the chatbot cannot split to the restaurant; (c) the order is created only after this repo has verified the payment itself, so a wrong or forged "paid" message from the chatbot cannot create a free order. If you keep the chatbot's own Cashfree for now, see section 8, "Option B", and its risks.
-4. **The order is created exactly once**, keyed on the payment id. Cashfree and the chatbot may both retry; a repeat changes nothing.
+3. **The payment is created and confirmed here, not in the chatbot.** Reasons: (a) this repo already has the verified Razorpay webhook, the amount check and crash-safe order creation; (b) the restaurant's money goes through **Razorpay Easy Split** to that restaurant's own vendor account, which only works from the platform's Razorpay account; a separate Razorpay account in the chatbot cannot split to the restaurant; (c) the order is created only after this repo has verified the payment itself, so a wrong or forged "paid" message from the chatbot cannot create a free order. If you keep the chatbot's own Razorpay for now, see section 8, "Option B", and its risks.
+4. **The order is created exactly once**, keyed on the payment id. Razorpay and the chatbot may both retry; a repeat changes nothing.
 5. **The order reaches POS and KDS through the same path a QR order uses** (server order, sequence number, live push to devices). That is why it shows up on the counter within a second and needs no special screen.
 6. **Status goes back to the customer through a signed call from this repo to the chatbot.** The kitchen taps Ready on the KDS, this repo sees the change, tells the chatbot, the chatbot sends the WhatsApp message.
 
@@ -130,9 +130,9 @@ Cases to handle on purpose:
 
 ## 8. Payment options
 
-**Option A (recommended): this repo owns the payment.** The chatbot calls `checkout`; this repo creates the Cashfree order (with Easy Split to the restaurant's vendor), returns a payment link; Cashfree's webhook comes to this repo; this repo creates the order. Strongest: server price, verified webhook, split works, refunds work from Restaurant Admin and Super Admin.
+**Option A (recommended): this repo owns the payment.** The chatbot calls `checkout`; this repo creates the Razorpay order (with Easy Split to the restaurant's vendor), returns a payment link; Razorpay's webhook comes to this repo; this repo creates the order. Strongest: server price, verified webhook, split works, refunds work from Restaurant Admin and Super Admin.
 
-**Option B (works today, weaker): the chatbot keeps its own Cashfree** and calls this repo with "paid" plus the payment reference. Then this repo cannot verify the payment by itself (the money is in a different Cashfree account), so it would have to trust the chatbot's word. If you choose B: authenticate the calls with secret B, require the amount to equal the server quote to the paisa, refuse when the payment reference has been used before, and keep a daily reconciliation list. You lose Easy Split and the shared refund screen. Treat B as a stepping stone.
+**Option B (works today, weaker): the chatbot keeps its own Razorpay** and calls this repo with "paid" plus the payment reference. Then this repo cannot verify the payment by itself (the money is in a different Razorpay account), so it would have to trust the chatbot's word. If you choose B: authenticate the calls with secret B, require the amount to equal the server quote to the paisa, refuse when the payment reference has been used before, and keep a daily reconciliation list. You lose Easy Split and the shared refund screen. Treat B as a stepping stone.
 
 ## 9. What this repo needs (built after you say go)
 
@@ -142,7 +142,7 @@ Cloud API (all signed with secret B, except the first group):
 
 - Restaurant Admin (device login): `POST /api/v1/restaurant/whatsapp/connect`, `GET …/status`, `POST …/disconnect`, `POST …/test-message`, `PUT …/settings` (pause online orders, prep time, delivery radius and charge, auto-accept).
 - Channel: `GET /api/v1/channels/menu`, `POST /api/v1/channels/quote`, `POST /api/v1/channels/checkout`, `GET /api/v1/channels/orders/:id`.
-- Payments: reuse the Cashfree order, webhook and fulfilment code, extended so the order can come from a channel rather than a kiosk.
+- Payments: reuse the Razorpay order, webhook and fulfilment code, extended so the order can come from a channel rather than a kiosk.
 - Outbound to chatbot: `menu.published`, `order.confirmed`, `order.status` (accepted, preparing, ready, out for delivery, completed, cancelled, refunded).
 
 POS and KDS:

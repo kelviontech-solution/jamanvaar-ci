@@ -2,21 +2,21 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Wire the already-built `CashfreeGatewayService.createRefund()` to a real, webhook-confirmed refund endpoint, give POS a real device identity so it can reach it, and replace the local-only refund status flip in POS and POS Admin with a real Cashfree refund for UPI-paid orders.
+**Goal:** Wire the already-built `RazorpayGatewayService.createRefund()` to a real, webhook-confirmed refund endpoint, give POS a real device identity so it can reach it, and replace the local-only refund status flip in POS and POS Admin with a real Razorpay refund for UPI-paid orders.
 
-**Architecture:** A new `POST /api/v1/payments/:paymentId/refund` route (device-authed, `POS`/`POS_ADMIN` only) creates a `Refund` row and calls Cashfree synchronously, but treats that response as provisional — only `REFUND_STATUS_WEBHOOK` (extending the existing single-endpoint webhook handler) ever writes a final `REFUNDED`/`PARTIALLY_REFUNDED` state. POS gets device activation via the already-recognized `deviceType: 'POS'`; POS Admin already has credentials and needs no new activation work.
+**Architecture:** A new `POST /api/v1/payments/:paymentId/refund` route (device-authed, `POS`/`POS_ADMIN` only) creates a `Refund` row and calls Razorpay synchronously, but treats that response as provisional — only `REFUND_STATUS_WEBHOOK` (extending the existing single-endpoint webhook handler) ever writes a final `REFUNDED`/`PARTIALLY_REFUNDED` state. POS gets device activation via the already-recognized `deviceType: 'POS'`; POS Admin already has credentials and needs no new activation work.
 
-**Tech Stack:** NestJS/Prisma (`cloud/api`), React/Tauri (`apps/restaurant-system/pos`, `apps/restaurant-system/pos-admin`), Cashfree Refunds API.
+**Tech Stack:** NestJS/Prisma (`cloud/api`), React/Tauri (`apps/restaurant-system/pos`, `apps/restaurant-system/pos-admin`), Razorpay Refunds API.
 
 **Spec:** docs/superpowers/specs/2026-09-11-phase4-refunds-design.md
 
 ## Global Constraints
 
-- **Never trust the synchronous Cashfree refund response for final state.** `createRefund()`'s handler may only ever set `PaymentTransaction.status` to `REFUND_PENDING` — never `REFUNDED`/`PARTIALLY_REFUNDED`. Only the `REFUND_STATUS_WEBHOOK` handler writes those.
+- **Never trust the synchronous Razorpay refund response for final state.** `createRefund()`'s handler may only ever set `PaymentTransaction.status` to `REFUND_PENDING` — never `REFUNDED`/`PARTIALLY_REFUNDED`. Only the `REFUND_STATUS_WEBHOOK` handler writes those.
 - **The refundable-amount check counts `PENDING` refunds too**, not just `SUCCESS` ones — a second refund request issued before the first's webhook lands must not be approved against the same remaining balance.
 - **Money amounts are integer paise** everywhere in `cloud/api`, matching every other payment code in this codebase. The local domain model (POS) is rupees — conversion points are explicit below.
 - **Do not use `prisma migrate diff --shadow-database-url` against the real `DATABASE_URL`.** The one schema change in this plan (adding `PARTIALLY_REFUNDED`/`REFUNDED` to `OrderPaymentStatus`) is applied via hand-written SQL + `psql`, exactly like every prior migration in this project.
-- **Cash/card-only orders are untouched.** `OrderRepository.refundOrder()`'s existing local-only behavior for orders with no real Cashfree transaction (`paymentMethod !== 'UPI'` or no `paymentTransactionId`) does not change at all.
+- **Cash/card-only orders are untouched.** `OrderRepository.refundOrder()`'s existing local-only behavior for orders with no real Razorpay transaction (`paymentMethod !== 'UPI'` or no `paymentTransactionId`) does not change at all.
 
 ---
 
@@ -95,7 +95,7 @@ In `cloud/api/src/modules/payments/payments.service.ts`, add the import at the t
 import { CreateRefundDto } from './dto/create-refund.dto';
 ```
 
-Add this method to the `PaymentsService` class, after `getPaymentStatus` (currently ending around line 121) and before `processCashfreeWebhook`:
+Add this method to the `PaymentsService` class, after `getPaymentStatus` (currently ending around line 121) and before `processRazorpayWebhook`:
 
 ```typescript
 async createRefund(restaurantId: string, paymentId: string, dto: CreateRefundDto) {
@@ -131,7 +131,7 @@ async createRefund(restaurantId: string, paymentId: string, dto: CreateRefundDto
 
   let result;
   try {
-    result = await this.cashfree.createRefund({
+    result = await this.razorpay.createRefund({
       orderId: payment.providerOrderId,
       refundId: refund.id,
       amountPaise: dto.amountPaise,
@@ -143,7 +143,7 @@ async createRefund(restaurantId: string, paymentId: string, dto: CreateRefundDto
   }
 
   // The synchronous response is informational only — store whatever
-  // Cashfree reports on the Refund row itself, but never let it flip
+  // Razorpay reports on the Refund row itself, but never let it flip
   // PaymentTransaction/Order to a final refunded state. Only the
   // REFUND_STATUS_WEBHOOK handler (Task 2) does that.
   const informationalStatus = result.refundStatus === 'SUCCESS' ? 'SUCCESS' : result.refundStatus === 'FAILED' ? 'FAILED' : 'PENDING';
@@ -207,7 +207,7 @@ export class PaymentOrdersController {
 
 - [ ] **Step 5: Write the e2e tests**
 
-Create `cloud/api/test/payments-refund.e2e.spec.ts`, following `test/payments-orders.e2e.spec.ts`'s exact setup pattern (restaurant + plan + subscription + activation-key + redeem) and mocking `CashfreeGatewayService`:
+Create `cloud/api/test/payments-refund.e2e.spec.ts`, following `test/payments-orders.e2e.spec.ts`'s exact setup pattern (restaurant + plan + subscription + activation-key + redeem) and mocking `RazorpayGatewayService`:
 
 ```typescript
 import { INestApplication } from '@nestjs/common';
@@ -215,7 +215,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
+import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 
 describe('Refund creation', () => {
   let app: INestApplication;
@@ -234,7 +234,7 @@ describe('Refund creation', () => {
   beforeAll(async () => {
     createRefundMock = vi.fn().mockResolvedValue({ cfRefundId: 'cf_refund_mock', refundId: 'refund_mock', refundStatus: 'PENDING', refundAmount: 100 });
     app = await createTestApp((builder) =>
-      builder.overrideProvider(CashfreeGatewayService).useValue({
+      builder.overrideProvider(RazorpayGatewayService).useValue({
         isConfigured: () => true,
         createRefund: createRefundMock
       })
@@ -368,7 +368,7 @@ git commit -m "feat(payments): add refund creation endpoint (webhook confirms, n
 
 - [ ] **Step 1: Fix the shared payload-extraction to be refund-aware**
 
-The existing `providerEventKey` derivation (`payments.service.ts`, inside `processCashfreeWebhook`, currently reads `payload.data?.payment?.cf_payment_id` and `payload.data?.order?.order_id`) doesn't know about `REFUND_STATUS_WEBHOOK`'s payload shape, which nests everything under `payload.data.refund` instead of `payload.data.payment`/`payload.data.order`. Without this fix, every refund webhook would fall through to `randomUUID()` for its dedup key, breaking idempotency entirely (a resent refund webhook would be treated as a brand-new event every time).
+The existing `providerEventKey` derivation (`payments.service.ts`, inside `processRazorpayWebhook`, currently reads `payload.data?.payment?.cf_payment_id` and `payload.data?.order?.order_id`) doesn't know about `REFUND_STATUS_WEBHOOK`'s payload shape, which nests everything under `payload.data.refund` instead of `payload.data.payment`/`payload.data.order`. Without this fix, every refund webhook would fall through to `randomUUID()` for its dedup key, breaking idempotency entirely (a resent refund webhook would be treated as a brand-new event every time).
 
 Find this block (currently around line 189-193):
 
@@ -387,7 +387,7 @@ Replace it with:
     const eventType: string = payload.type;
     // REFUND_STATUS_WEBHOOK nests everything under data.refund instead of
     // data.payment/data.order — both order_id and a payment-identifying id
-    // are still present there, verified against Cashfree's real refund
+    // are still present there, verified against Razorpay's real refund
     // webhook payload docs, so the same PaymentTransaction lookup below
     // (by providerOrderId) works unchanged for refund events too.
     const cfPaymentId: string | undefined = payload.data?.payment?.cf_payment_id ?? payload.data?.refund?.cf_payment_id;
@@ -434,7 +434,7 @@ Replace it with:
 
 - [ ] **Step 3: Add `handleRefundWebhook`**
 
-Add this private method to `PaymentsService`, right after `processCashfreeWebhook` ends (before `markWebhookProcessed`):
+Add this private method to `PaymentsService`, right after `processRazorpayWebhook` ends (before `markWebhookProcessed`):
 
 ```typescript
   private async handleRefundWebhook(
@@ -472,7 +472,7 @@ Add this private method to `PaymentsService`, right after `processCashfreeWebhoo
 
     const newRefundStatus = refundStatus === 'SUCCESS' ? 'SUCCESS' : refundStatus === 'FAILED' || refundStatus === 'CANCELLED' ? 'FAILED' : null;
     if (!newRefundStatus) {
-      // Still processing at Cashfree's end — nothing final to record yet.
+      // Still processing at Razorpay's end — nothing final to record yet.
       await this.markWebhookProcessed(webhookEventId);
       return;
     }
@@ -532,7 +532,7 @@ describe('Refund webhook processing', () => {
     const timestamp = String(Math.floor(Date.now() / 1000));
     const signature = createHmac('sha256', WEBHOOK_SECRET).update(timestamp + rawBody).digest('base64');
     return request(app.getHttpServer())
-      .post('/api/v1/payments/cashfree/webhook')
+      .post('/api/v1/payments/razorpay/webhook')
       .set('x-webhook-signature', signature)
       .set('x-webhook-timestamp', timestamp)
       .send(payload);
@@ -547,7 +547,7 @@ describe('Refund webhook processing', () => {
   });
 
   beforeAll(async () => {
-    process.env.CASHFREE_WEBHOOK_SECRET = WEBHOOK_SECRET;
+    process.env.RAZORPAY_WEBHOOK_SECRET = WEBHOOK_SECRET;
     app = await createTestApp();
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
@@ -574,7 +574,7 @@ describe('Refund webhook processing', () => {
   });
 
   afterAll(async () => {
-    delete process.env.CASHFREE_WEBHOOK_SECRET;
+    delete process.env.RAZORPAY_WEBHOOK_SECRET;
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));
     await prisma.platformUser.deleteMany({ where: { email: adminEmail } });
     await app.close();
@@ -870,7 +870,7 @@ In `apps/restaurant-system/pos/src/components/bills/PosBillsView.tsx`, add to th
 import { createRefund, CloudApiError } from '../../cloud/cloudClient';
 ```
 
-- [ ] **Step 2: Make `handleConfirmRefund` reach the cloud for real Cashfree payments**
+- [ ] **Step 2: Make `handleConfirmRefund` reach the cloud for real Razorpay payments**
 
 Find the existing `handleConfirmRefund` (confirmed at `PosBillsView.tsx:297-318`):
 
@@ -914,7 +914,7 @@ const handleConfirmRefund = (e: React.FormEvent) => {
     `Process Refund on Invoice #${bill.orderNumber}`,
     `Refunding ₹${amt} on settled bill #${bill.orderNumber}`,
     async (mgr) => {
-      // Only a real Cashfree UPI payment has a paymentTransactionId that
+      // Only a real Razorpay UPI payment has a paymentTransactionId that
       // matches a cloud PaymentTransaction — a locally-generated cash
       // receipt id never does, so cash/card orders fall straight through
       // to the existing local-only refund, unchanged.
@@ -955,7 +955,7 @@ Expected: clean. Manually verify: a cash-settled bill's refund flow is unchanged
 
 ```bash
 git add apps/restaurant-system/pos/src/components/bills/PosBillsView.tsx
-git commit -m "feat(pos): wire refund UI to the real Cashfree-backed endpoint for UPI orders"
+git commit -m "feat(pos): wire refund UI to the real Razorpay-backed endpoint for UPI orders"
 ```
 
 ---
@@ -1063,5 +1063,5 @@ Expected: clean.
 
 ```bash
 git add apps/restaurant-system/pos-admin/src/cloud/cloudClient.ts apps/restaurant-system/pos-admin/src/components/OrderDetailModal.tsx
-git commit -m "feat(pos-admin): wire refund UI to the real Cashfree-backed endpoint for UPI orders"
+git commit -m "feat(pos-admin): wire refund UI to the real Razorpay-backed endpoint for UPI orders"
 ```

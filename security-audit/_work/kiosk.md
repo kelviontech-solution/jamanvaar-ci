@@ -53,7 +53,7 @@ Not read this pass: the remaining ~2425 lines of `kiosk-user/App.tsx` (rest of t
 
 ## Controls verified OK
 - No `dangerouslySetInnerHTML`, `.innerHTML =`, or `eval(` anywhere in either kiosk app's source (repo-wide grep across `kiosk-user/src` and `kiosk-admin/src`) — no first-party XSS sink found.
-- Kiosk payment flow never trusts a client-side "success" belief: `getPaymentOrderStatus` polling only reflects the server's own recorded Cashfree status, and the local order total is reconciled to the cloud's authoritative price before checkout proceeds (`App.tsx:1021-1025`).
+- Kiosk payment flow never trusts a client-side "success" belief: `getPaymentOrderStatus` polling only reflects the server's own recorded Razorpay status, and the local order total is reconciled to the cloud's authoritative price before checkout proceeds (`App.tsx:1021-1025`).
 - `handleFullSessionReset` (lines 616-663) is thorough — clears cart, customer account, staff override, feedback, chat, E-Bill state, and cancels any in-flight speech synthesis, on both idle timeout and post-confirmation, which is the right control for "no customer data leaks between guests" (the code's own comment references this intent).
 - `handleStaffPinVerify` does correctly gate the discount behind `verified?.isManager` (not just any valid PIN) and logs both success and failure to `AuditRepository` — the finding above (KIOSK-03) is about missing rate-limiting, not a missing role check (that part is sound).
 - `kiosk-admin`'s `staffLogin` correctly sends `adminOnly: true` on tenant login (`cloudClient.ts:335`) — unlike `pos-admin`'s equivalent call (see `pos-admin.md` POSADMIN-01), this restricts the login to OWNER/MANAGER roles server-side.

@@ -74,7 +74,12 @@ import { validateEnv } from './config/env.validation';
       { name: 'whatsappSvc', ttl: 60_000, limit: 1_000_000 },
       { name: 'whatsappCheckout', ttl: 60_000, limit: 1_000_000 },
       { name: 'whatsappCheckoutPerCustomer', ttl: 10 * 60_000, limit: 1_000_000 },
-      { name: 'whatsappValidateKey', ttl: 60_000, limit: 1_000_000 }
+      { name: 'whatsappValidateKey', ttl: 60_000, limit: 1_000_000 },
+      // Payment routes: tightened per route with @Throttle, keyed by device token (see common/throttle.ts).
+      { name: 'paymentOrder', ttl: 60_000, limit: 1_000_000 },
+      { name: 'paymentQr', ttl: 60_000, limit: 1_000_000 },
+      { name: 'paymentStatus', ttl: 60_000, limit: 1_000_000 },
+      { name: 'paymentRefund', ttl: 60_000, limit: 1_000_000 }
     ]),
     PrismaModule,
     NotificationsModule,

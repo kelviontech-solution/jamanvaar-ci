@@ -21,7 +21,7 @@ Bug IDs (BUG-001 … BUG-022) refer to the numbered findings in `FULL_ECOSYSTEM_
 - **Real tenant isolation**: every tenant-owned table carries `restaurantId`, is indexed on it, and — per the schema's own header comment — is protected by actual Postgres Row-Level Security with `FORCE ROW LEVEL SECURITY` (the detail that matters: Postgres exempts table-owner roles from RLS by default, and the app's DB role owns these tables, so `FORCE` is what makes the policies real rather than decorative — whoever wrote this understood the failure mode).
 - **Real platform/tenant identity separation**: `PlatformUser` (Super Admin staff) and `User` (restaurant staff) are structurally distinct tables with no code path that can confuse one for the other.
 - **Real entitlement model**: `Plan → Subscription → ApplicationEntitlement` — one row per `(subscription, appCode)`, which is the actual gating mechanism for POS/Captain/KDS/Kiosk/Kiosk Admin/POS Admin access, more granular than the legacy flat-boolean `Plan.entitlements` JSON it supersedes.
-- **Real billing**: `Invoice`/`Payment` for platform→tenant SaaS billing, kept deliberately distinct from `Order`/`PaymentTransaction`/`Refund` (customer-facing Cashfree payments), which have real idempotency keys, webhook signature verification, and dedup (`WebhookEvent.providerEventKey`).
+- **Real billing**: `Invoice`/`Payment` for platform→tenant SaaS billing, kept deliberately distinct from `Order`/`PaymentTransaction`/`Refund` (customer-facing Razorpay payments), which have real idempotency keys, webhook signature verification, and dedup (`WebhookEvent.providerEventKey`).
 - **Real device fleet/MDM**: `Device`, `DeviceCommand` (lock/unlock/force-logout/wipe/etc. with a status lifecycle), `ActivationKey`.
 - **Sync observability tables exist**: `SyncEventLog`, `SyncConflict` — built to receive real sync telemetry. (They're empty in practice — see 1.3.)
 
@@ -121,7 +121,7 @@ This is the highest-priority domain. Five apps each maintain an independent view
 | POS payment → **Customers CRM** (with customer explicitly attached) | 🔴 BROKEN — decisively confirmed | Completed a full real paid order with Attach Customer used; CRM's guest count and lifetime spend were byte-for-byte unchanged afterward. Proven, not inferred. |
 | Shift & Cash Drawer (open/close, expected-vs-actual variance) | 🟡 PARTIAL | Well-designed feature, explicitly labelled "Local SQLite Ledger" in its own UI — the concrete on-screen evidence for the disconnect above. |
 | Platform (SaaS) billing: Super Admin Invoices & Billing | 🟢 WORKS | Real, correctly tied to real tenants (this is the `cloud/api` `Invoice`/`Payment` model — genuinely wired). |
-| Cashfree payment gateway connection (per-restaurant) | 🟢 WORKS (as designed) | Real onboarding form, real vendor status tracking — Phase 1 `PLATFORM_POOLED` model, cloud-side. |
+| Razorpay payment gateway connection (per-restaurant) | 🟢 WORKS (as designed) | Real onboarding form, real vendor status tracking — Phase 1 `PLATFORM_POOLED` model, cloud-side. |
 | Super Admin **Reports & Analytics** (MRR, active restaurants, subscriptions) | 🔴 BROKEN | All-zero despite the same Super Admin app's own Restaurants/Billing/Applications pages showing real, non-zero data for the same tenants at the same time (BUG-018). |
 | Kiosk Admin **Reports & Export** | 🔴 BROKEN | Same self-contradicting pattern as Payments & Split — third independent occurrence, strongly suggesting one shared root cause worth fixing once, not three separate patches. |
 

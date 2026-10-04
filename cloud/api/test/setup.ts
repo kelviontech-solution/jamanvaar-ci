@@ -8,13 +8,12 @@ import '@prisma/client';
 // configured. It is owned by a non-superuser role, so row-level security is genuinely enforced.
 if (process.env.TEST_DATABASE_URL) process.env.DATABASE_URL = process.env.TEST_DATABASE_URL;
 
-// Tests must never see (or spend) the developer's real Cashfree keys, whatever their .env holds: the
+// Tests must never see (or spend) the developer's real Razorpay keys, whatever their .env holds: the
 // payment suites mock the gateway or set their own throw-away secrets. Removed here, and the app's
 // ConfigModule skips the .env file under test (see app.module.ts), so it cannot put them back.
-for (const key of ['CASHFREE_CLIENT_ID', 'CASHFREE_CLIENT_SECRET', 'CASHFREE_WEBHOOK_SECRET', 'CASHFREE_WEBHOOK_NOTIFY_URL']) {
+for (const key of ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET', 'RAZORPAY_WEBHOOK_SECRET']) {
   delete process.env[key];
 }
-process.env.CASHFREE_ENVIRONMENT = 'sandbox';
 
 // Tests must never send real email, whatever SMTP settings the developer's .env holds.
 process.env.SMTP_HOST = '';

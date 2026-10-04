@@ -2,11 +2,11 @@
 
 Status: Approved for planning
 Date: 2026-09-10
-Scope: Prerequisite sub-project for Cashfree Payment Gateway Phase 2 (payment-connection onboarding UI). This spec covers only the login replacement; the payment-connection UI is a separate spec/plan that depends on this one.
+Scope: Prerequisite sub-project for Razorpay Payment Gateway Phase 2 (payment-connection onboarding UI). This spec covers only the login replacement; the payment-connection UI is a separate spec/plan that depends on this one.
 
 ## Context
 
-Phase 1 of the Cashfree integration (already shipped) added `DeviceAuthGuard`-protected
+Phase 1 of the Razorpay integration (already shipped) added `DeviceAuthGuard`-protected
 endpoints that Kiosk Admin calls using its one-time device bearer token (the same
 credential used for Task 6's menu-sync). Phase 2 was going to reuse that same device
 token to gate submission of the restaurant's payment settlement/KYC details — but

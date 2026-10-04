@@ -108,7 +108,7 @@ export const PosOrdersView: React.FC = () => {
 
   const handleSettleCounterCash = async (order: Order) => {
     const isUnconfirmedKioskUpi = order.paymentMethod === 'UPI' && order.paymentStatus === 'PENDING';
-    // A UPI attempt may have landed at Cashfree moments after the kiosk gave
+    // A UPI attempt may have landed at Razorpay moments after the kiosk gave
     // up waiting — check the real cloud status before trusting the customer's
     // word, so cash is never collected on top of a payment that already went
     // through.
@@ -117,7 +117,7 @@ export const PosOrdersView: React.FC = () => {
       try {
         const result = await getPaymentStatus(order.paymentTransactionId);
         if (result.status === 'SUCCESS') {
-          OrderRepository.settleOrder(order.id, 'UPI', undefined, order.paymentTransactionId, 'Cashfree UPI (reconciled at counter)');
+          OrderRepository.settleOrder(order.id, 'UPI', undefined, order.paymentTransactionId, 'Razorpay UPI (reconciled at counter)');
           const updated = OrderRepository.getOrderById(order.id);
           if (updated) {
             setLastCompletedOrder(updated);
@@ -317,7 +317,7 @@ export const PosOrdersView: React.FC = () => {
               // and staff need to be able to collect cash for it too.
               const isCounterCashPending = order.paymentStatus === 'PENDING';
               // This specific order attempted a real UPI payment first —
-              // Cashfree's webhook (or this kiosk's own background
+              // Razorpay's webhook (or this kiosk's own background
               // reconciliation) may still confirm it after the visible
               // countdown gave up, so staff should check with the customer
               // before accepting cash for exactly this case.

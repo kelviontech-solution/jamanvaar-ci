@@ -233,9 +233,9 @@ export class WhatsAppChannelService {
   }
 
   /**
-   * Creates a Cashfree payment session for this cart and returns a link the WhatsApp bot sends
+   * Creates a Razorpay payment session for this cart and returns a link the WhatsApp bot sends
    * straight to the customer's chat — but creates NO order the restaurant can see yet. That only
-   * happens once Cashfree's webhook reports the payment as SUCCESS (see
+   * happens once Razorpay's webhook reports the payment as SUCCESS (see
    * PaymentsService.ingestWhatsAppOrderIfNeeded), by design: a WhatsApp order must reach the
    * kitchen only after it's actually been paid for, never before.
    */
@@ -291,8 +291,8 @@ export class WhatsAppChannelService {
       orderId: result.orderId,
       paymentId: result.paymentId,
       // What the WhatsApp bot actually sends to the customer's chat right after they confirm —
-      // a plain link (Cashfree's hosted checkout), not a QR image, so it needs no media upload
-      // through WhatsApp's API. Never null once a Cashfree session exists.
+      // a plain link (Razorpay's hosted checkout), not a QR image, so it needs no media upload
+      // through WhatsApp's API. Never null once a Razorpay session exists.
       paymentLink: result.paymentLink,
       amount: result.amount / 100,
       currency: result.currency,

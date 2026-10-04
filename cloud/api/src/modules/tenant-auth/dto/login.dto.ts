@@ -89,6 +89,14 @@ export const setInitialPasswordSchema = z.object({
 });
 export type SetInitialPasswordDto = z.infer<typeof setInitialPasswordSchema>;
 
+export const activateOwnerSchema = z.object({
+  restaurantCode: z.string().trim().toUpperCase().min(1, 'Restaurant ID is required'),
+  email: z.string().trim().toLowerCase().email(),
+  activationToken: z.string().trim().min(1, 'Invitation token is required'),
+  newPassword: strongPassword
+});
+export type ActivateOwnerDto = z.infer<typeof activateOwnerSchema>;
+
 export const tenantChangePasswordSchema = z.object({
   currentPassword: z.string().min(1),
   newPassword: strongPassword

@@ -10,6 +10,7 @@ import {
   createPaymentOrder,
   createPaymentQr,
   markPaymentFulfilled,
+  claimKitchenTicket,
   savePendingPayment,
   loadPendingPayment,
   clearPendingPayment,
@@ -179,13 +180,15 @@ function formatActivationKeyInput(raw: string): string {
 }
 
 /**
- * Cashfree returns the UPI QR as a base64 image (Order Pay API, `qrcode` channel). Accepts a ready-made
+ * Razorpay returns the UPI QR as a base64 image (Order Pay API, `qrcode` channel). Accepts a ready-made
  * data: URL or bare base64; anything else (for example a raw upi:// string, which this kiosk has no QR
  * renderer for) is treated as unusable so the guest is offered cash at the counter instead of a blank box.
  */
 function toQrImageSrc(payload: string, contentType: string | null): string | null {
   const trimmed = payload.trim();
   if (trimmed.startsWith('data:image/')) return trimmed;
+  // Razorpay's QR image address: shown as is.
+  if (contentType === 'image/url' && /^https:\/\//i.test(trimmed)) return trimmed;
   if (trimmed.length > 100 && /^[A-Za-z0-9+/=\s]+$/.test(trimmed)) {
     const mime = contentType && contentType.startsWith('image/') ? contentType : 'image/png';
     return `data:${mime};base64,${trimmed.replace(/\s+/g, '')}`;
@@ -446,16 +449,19 @@ export default function KioskUserApp() {
   const [paymentTimeLeft, setPaymentTimeLeft] = useState<number>(180);
   const [realPaymentId, setRealPaymentId] = useState<string | null>(null);
   const [localOrderIdForPayment, setLocalOrderIdForPayment] = useState<string | null>(null);
-  const [cashfreeUnavailable, setCashfreeUnavailable] = useState(false);
+  const [onlinePaymentUnavailable, setRazorpayUnavailable] = useState(false);
+  // The restaurant's online payments are switched on only once its Razorpay vendor is verified. Until then the guest is told so.
+  const [onlinePaymentsPending, setOnlinePaymentsPending] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   // The UPI QR shown on this screen for the pending payment (created by the server, rendered here).
   const [qrImageSrc, setQrImageSrc] = useState<string | null>(null);
   const [qrExpiresAt, setQrExpiresAt] = useState<number | null>(null);
   const [qrSecondsLeft, setQrSecondsLeft] = useState(0);
   const [qrLoading, setQrLoading] = useState(false);
+  // True when the QR opens a payment page (scanned with the phone camera) rather than being a UPI QR any UPI app can scan.
   // Bounded window (from order creation) that background payment-status
   // polling keeps running past the visible countdown's expiry, so a UPI
-  // payment that Cashfree confirms moments after the customer is told to
+  // payment that Razorpay confirms moments after the customer is told to
   // pay cash still gets caught and settled automatically.
   const reconciliationDeadlineRef = useRef<number | null>(null);
 
@@ -595,8 +601,10 @@ export default function KioskUserApp() {
     }
   };
 
+  const awaitingOnlinePayment = step === 'CHECKOUT_PAYMENT' && paymentMethod === 'UPI' && !onlinePaymentUnavailable && paymentStatus !== 'EXPIRED';
+
   useEffect(() => {
-    if (step === 'WELCOME' || step === 'LANGUAGE_SELECT') return;
+    if (step === 'WELCOME' || step === 'LANGUAGE_SELECT' || awaitingOnlinePayment) return;
 
     const interval = setInterval(() => {
       setIdleSeconds((prev) => {
@@ -609,7 +617,7 @@ export default function KioskUserApp() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [step, showIdleWarning]);
+  }, [step, showIdleWarning, awaitingOnlinePayment]);
 
   // Idle Countdown
   useEffect(() => {
@@ -626,16 +634,16 @@ export default function KioskUserApp() {
     return () => clearInterval(interval);
   }, [showIdleWarning]);
 
-  // B2-023: once Cashfree is known unavailable, don't leave the guest sitting on a UPI selection
+  // B2-023: once Razorpay is known unavailable, don't leave the guest sitting on a UPI selection
   // the screen itself says can't be used — switch to the one method that always works, the same
   // way the OFFLINE case already does in handleProceedToPayment.
   useEffect(() => {
-    if (cashfreeUnavailable && paymentMethod === 'UPI') {
+    if (onlinePaymentUnavailable && paymentMethod === 'UPI') {
       setPaymentMethod('CASH_AT_COUNTER');
     }
-  }, [cashfreeUnavailable, paymentMethod]);
+  }, [onlinePaymentUnavailable, paymentMethod]);
 
-  // Payment Countdown + real-payment polling. The Cashfree webhook (handled
+  // Payment Countdown + real-payment polling. The Razorpay webhook (handled
   // entirely server-side) is what actually confirms payment — this only
   // ever reflects what GET /api/v1/payments/:paymentId/status already
   // recorded, never a client-side belief about success.
@@ -676,7 +684,7 @@ export default function KioskUserApp() {
         }
         if (result.status === 'FAILED' || result.status === 'USER_DROPPED') {
           clearPendingPayment();
-          setCashfreeUnavailable(true);
+          setRazorpayUnavailable(true);
           clearInterval(interval);
           return;
         }
@@ -834,7 +842,7 @@ export default function KioskUserApp() {
     setPaymentStatus('CREATED');
     setRealPaymentId(null);
     setLocalOrderIdForPayment(null);
-    setCashfreeUnavailable(false);
+    setRazorpayUnavailable(false);
     setPlacedOrder(null);
     setShowIdleWarning(false);
     setIdleSeconds(0);
@@ -1124,14 +1132,14 @@ export default function KioskUserApp() {
     showToast(t('couponApplied'));
   };
 
-  // Asks the server for the UPI QR of one pending payment and shows it. The server holds the Cashfree keys
+  // Asks the server for the UPI QR of one pending payment and shows it. The server holds the Razorpay keys
   // and only issues a QR for an open payment of an ACTIVE restaurant; anything else falls back to cash.
   const showPaymentQr = async (paymentId: string) => {
     setQrLoading(true);
     try {
       const qr = await createPaymentQr(paymentId);
       const src = toQrImageSrc(qr.qrPayload, qr.contentType);
-      if (!src) throw new Error('Cashfree returned a QR the kiosk cannot display');
+      if (!src) throw new Error('Razorpay returned a QR the kiosk cannot display');
       const expires = new Date(qr.expiresAt).getTime();
       setQrImageSrc(src);
       setQrExpiresAt(expires);
@@ -1143,7 +1151,7 @@ export default function KioskUserApp() {
       console.error('Payment QR failed:', err);
       setQrImageSrc(null);
       setQrExpiresAt(null);
-      setCashfreeUnavailable(true);
+      setRazorpayUnavailable(true);
     } finally {
       setQrLoading(false);
     }
@@ -1190,7 +1198,7 @@ export default function KioskUserApp() {
     setStep('CHECKOUT_PAYMENT');
     setPaymentTimeLeft(60);
     setPaymentStatus('WAITING_FOR_USER');
-    setCashfreeUnavailable(false);
+    setRazorpayUnavailable(false);
 
     const effectiveMethod = networkState === 'OFFLINE' ? 'CASH_AT_COUNTER' : paymentMethod;
 
@@ -1254,7 +1262,7 @@ export default function KioskUserApp() {
 
     const restaurantId = getKioskRestaurantId();
     if (!restaurantId) {
-      setCashfreeUnavailable(true);
+      setRazorpayUnavailable(true);
       return;
     }
 
@@ -1270,7 +1278,7 @@ export default function KioskUserApp() {
       reconciliationDeadlineRef.current = Date.now() + 5 * 60 * 1000; // 5 minutes total from order creation
 
       // The cloud prices independently from MenuSnapshotItem — reconcile the
-      // local order to match whatever Cashfree will actually charge, so the
+      // local order to match whatever Razorpay will actually charge, so the
       // KOT, receipt, and revenue reports never disagree with the real
       // payment. This can legitimately differ if a kiosk-admin price edit
       // reached the cloud before it reached this terminal's own local menu
@@ -1282,8 +1290,8 @@ export default function KioskUserApp() {
         showToast('Your order total was updated to match the latest price.');
       }
 
-      if (!result.paymentSessionId) {
-        setCashfreeUnavailable(true);
+      if (!result.paymentId) {
+        setRazorpayUnavailable(true);
         return;
       }
 
@@ -1292,11 +1300,12 @@ export default function KioskUserApp() {
       savePendingPayment({ paymentId: result.paymentId, localOrderId: pendingOrder.id, startedAt: Date.now() });
       await showPaymentQr(result.paymentId);
     } catch (err) {
-      // A 403 here means this restaurant's Cashfree connection isn't ACTIVE
+      // A 403 here means this restaurant's Razorpay connection isn't ACTIVE
       // yet (payments.service.ts's own gate) — not a transient failure, so
       // no retry is offered; fall straight to the cash-at-counter messaging.
       console.error('Payment order creation failed:', err);
-      setCashfreeUnavailable(true);
+      setOnlinePaymentsPending(err instanceof CloudApiError && err.code === 'PAYMENTS_NOT_ACTIVE');
+      setRazorpayUnavailable(true);
     }
   };
 
@@ -1334,7 +1343,7 @@ export default function KioskUserApp() {
         return;
       }
       if (order.paymentStatus !== 'SUCCESS') {
-        OrderRepository.settleOrder(localOrderId, 'UPI', undefined, paymentId, 'Cashfree UPI');
+        OrderRepository.settleOrder(localOrderId, 'UPI', undefined, paymentId, 'Razorpay UPI');
         order = OrderRepository.getOrderById(localOrderId) ?? order;
       }
       if (KOTRepository.getKOTsForOrder(localOrderId).length > 0) {
@@ -1350,7 +1359,7 @@ export default function KioskUserApp() {
   // Complete Order Creation (Truthful Status: Online vs Offline)
   // Shared confirmation/KOT/print/voice tail — runs once an order's real
   // payment is settled, whichever path settled it: cash at the counter
-  // (handleGetToken) or a Cashfree-confirmed UPI payment (finalizePaidOrder).
+  // (handleGetToken) or a Razorpay-confirmed UPI payment (finalizePaidOrder).
   const proceedToConfirmation = async (order: Order, isCurrentlyOnline: boolean, paymentId?: string) => {
     // Audio chime on successful order
     SoundService.playSuccess();
@@ -1384,7 +1393,17 @@ export default function KioskUserApp() {
       items: kotItems,
       cashierName: 'Kiosk Self-Order'
     });
-    kots.forEach((kot) => PrinterService.printKOT(kot));
+    // A prepaid order's tickets print only once, across every terminal. Online, the server decides who may print.
+    // If the server cannot be reached, the tickets print anyway: a missed kitchen ticket is worse than a rare repeat.
+    let printTickets = true;
+    if (paymentId && isCurrentlyOnline) {
+      try {
+        printTickets = (await claimKitchenTicket(paymentId)).claimed;
+      } catch (err) {
+        console.error('Kitchen ticket claim unavailable; printing locally:', err);
+      }
+    }
+    if (printTickets) kots.forEach((kot) => PrinterService.printKOT(kot));
 
     // The ticket now exists: tell the server, which stops flagging this paid order as needing attention.
     if (paymentId) void acknowledgeFulfilled(paymentId);
@@ -2986,14 +3005,14 @@ export default function KioskUserApp() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* UPI Payment (real, via Cashfree) */}
+            {/* UPI Payment (real, via Razorpay) */}
             <button
               onClick={() => {
                 if (networkState === 'OFFLINE') {
                   showToast('Internet required for UPI. Please choose Pay Cash at Counter.');
                   return;
                 }
-                if (cashfreeUnavailable) {
+                if (onlinePaymentUnavailable) {
                   showToast('Online payment is unavailable right now. Please choose Pay Cash at Counter.');
                   return;
                 }
@@ -3004,18 +3023,18 @@ export default function KioskUserApp() {
                 paymentMethod === 'UPI'
                   ? 'bg-white border-jaman-saffron shadow-xl'
                   : 'bg-jaman-ivory border-jaman-border hover:bg-white'
-              } ${networkState === 'OFFLINE' || cashfreeUnavailable ? 'opacity-50 cursor-not-allowed' : ''}`}
+              } ${networkState === 'OFFLINE' || onlinePaymentUnavailable ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <div className="flex items-center justify-between">
                 <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center">
                   <QrCode className="w-8 h-8" />
                 </div>
-                {/* B2-023: previously this tile stayed fully selectable even when Cashfree had
+                {/* B2-023: previously this tile stayed fully selectable even when Razorpay had
                     already failed, so the guest saw a live "UPI QR Payment" option directly above
                     text saying it was unavailable. Now marked the same way OFFLINE already is. */}
-                {(networkState === 'OFFLINE' || cashfreeUnavailable) && (
+                {(networkState === 'OFFLINE' || onlinePaymentUnavailable) && (
                   <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded">
-                    {networkState === 'OFFLINE' ? 'Requires Internet' : 'Unavailable'}
+                    {networkState === 'OFFLINE' ? 'Requires Internet' : onlinePaymentsPending ? 'Being set up' : 'Unavailable'}
                   </span>
                 )}
               </div>
@@ -3053,7 +3072,7 @@ export default function KioskUserApp() {
           </div>
 
           <div className="bg-white rounded-3xl p-8 border border-jaman-border shadow-lg max-w-xl mx-auto w-full text-center space-y-6">
-            {paymentStatus === 'EXPIRED' && !cashfreeUnavailable ? (
+            {paymentStatus === 'EXPIRED' && !onlinePaymentUnavailable ? (
               <div className="py-8 space-y-4">
                 <Clock className="w-16 h-16 text-rose-500 mx-auto" />
                 <h3 className="text-xl font-black text-jaman-navy">Payment Session Expired</h3>
@@ -3084,14 +3103,14 @@ export default function KioskUserApp() {
               </div>
             ) : (
               <>
-            {paymentMethod === 'UPI' && !cashfreeUnavailable && (
+            {paymentMethod === 'UPI' && !onlinePaymentUnavailable && (
               <div className="space-y-4">
                 {qrImageSrc ? (
                   <>
                     <p className="text-sm font-semibold text-[#4A5568]">
                       Scan with any UPI app to pay <span className="font-black text-jaman-saffron">{formatINR(netTotalPayable)}</span>
                     </p>
-                    <div className="mx-auto w-64 h-64 bg-white p-3 rounded-2xl border-2 border-slate-900 shadow-md flex items-center justify-center">
+                    <div className="mx-auto w-[min(88vw,520px)] h-[min(88vw,520px)] bg-white p-3 rounded-2xl border-2 border-slate-900 shadow-md flex items-center justify-center">
                       <img src={qrImageSrc} alt="UPI payment QR code" className="w-full h-full object-contain" />
                     </div>
                     <div className="text-xs text-[#8C9BAE] font-medium flex items-center justify-center gap-1.5">
@@ -3109,11 +3128,15 @@ export default function KioskUserApp() {
               </div>
             )}
 
-            {paymentMethod === 'UPI' && cashfreeUnavailable && (
+            {paymentMethod === 'UPI' && onlinePaymentUnavailable && (
               <div className="py-8 space-y-4">
                 <Coins className="w-16 h-16 text-jaman-saffron mx-auto" />
-                <h3 className="text-xl font-black text-jaman-navy">Online Payment Unavailable</h3>
-                <p className="text-sm text-[#4A5568]">Please pay cash at the counter instead — you'll get your token as soon as you confirm.</p>
+                <h3 className="text-xl font-black text-jaman-navy">{onlinePaymentsPending ? 'Online payment is being set up' : 'Online Payment Unavailable'}</h3>
+                <p className="text-sm text-[#4A5568]">
+                  {onlinePaymentsPending
+                    ? 'This restaurant is verifying its online payments. Please pay cash at the counter for now — you will get your token as soon as you confirm.'
+                    : "Please pay cash at the counter instead — you'll get your token as soon as you confirm."}
+                </p>
               </div>
             )}
 

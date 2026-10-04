@@ -536,7 +536,7 @@ export default function AdminApp() {
   // Voice Configuration Form
   const [voiceForm, setVoiceForm] = useState(VoiceService.getConfig());
 
-  // Payment Gateway Connection (Settings tab) — restaurant's own Cashfree
+  // Payment Gateway Connection (Settings tab) — restaurant's own Razorpay
   // settlement/KYC submission, reviewed by JAMANVAAR before going live.
   const [paymentConnection, setPaymentConnection] = useState<PaymentConnectionStatus | null>(null);
   const [paymentConnectionLoading, setPaymentConnectionLoading] = useState(false);
@@ -3781,7 +3781,7 @@ export default function AdminApp() {
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-jaman-navy">Payment Gateway Connection</h3>
-                      <p className="text-xs text-[#4A5568]">Cashfree settlement account for kiosk payments</p>
+                      <p className="text-xs text-[#4A5568]">Razorpay settlement account for kiosk payments</p>
                     </div>
                   </div>
 
@@ -3811,7 +3811,7 @@ export default function AdminApp() {
                   </div>
 
                   <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border text-xs space-y-1.5">
-                    <div className="font-bold text-jaman-navy">Online revenue (Cashfree)</div>
+                    <div className="font-bold text-jaman-navy">Online revenue (Razorpay)</div>
                     {paymentsSummary ? (
                       <>
                         <div className="flex justify-between"><span className="text-[#8C9BAE]">Gross collected</span><span className="font-bold">{formatINR(paymentsSummary.grossVolume / 100)}</span></div>
@@ -3835,7 +3835,7 @@ export default function AdminApp() {
                 </div>
               </div>
 
-              {/* Online (Cashfree) payments: recent payments, paid-but-not-served, refunds, day statement */}
+              {/* Online (Razorpay) payments: recent payments, paid-but-not-served, refunds, day statement */}
               {isDeviceConnected() && <OnlinePaymentsPanel />}
 
               {/* Transactional Print Queue Table (Sections 14-17) */}
@@ -4519,7 +4519,7 @@ export default function AdminApp() {
                 <div>
                   <h4 className="font-bold text-jaman-navy">Payment Gateway</h4>
                   <p className="text-xs text-[#4A5568]">
-                    Connect your restaurant's own Cashfree settlement account to receive kiosk payments.
+                    Connect your restaurant's own Razorpay settlement account to receive kiosk payments.
                     Your submission is reviewed by JAMANVAAR before it goes live.
                   </p>
                 </div>

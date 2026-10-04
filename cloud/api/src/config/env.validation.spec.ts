@@ -6,29 +6,22 @@ const baseEnv = {
   JWT_ACCESS_SECRET: 'a'.repeat(32)
 };
 
-describe('env.validation — Cashfree/payment vars', () => {
-  it('boots successfully with none of the Cashfree/payment vars set', () => {
+describe('env.validation: Razorpay and payment vars', () => {
+  it('boots successfully with none of the Razorpay/payment vars set', () => {
     const result = validateEnv(baseEnv);
-    expect(result.CASHFREE_ENVIRONMENT).toBe('sandbox');
-    expect(result.CASHFREE_API_VERSION).toBe('2025-01-01');
-    expect(result.CASHFREE_CLIENT_ID).toBeUndefined();
+    expect(result.RAZORPAY_KEY_ID).toBeUndefined();
     expect(result.PAYMENT_CREDENTIAL_ENCRYPTION_KEY).toBeUndefined();
   });
 
-  it('accepts a full Cashfree configuration', () => {
+  it('accepts a full Razorpay configuration', () => {
     const result = validateEnv({
       ...baseEnv,
-      CASHFREE_CLIENT_ID: 'test-client-id',
-      CASHFREE_CLIENT_SECRET: 'test-secret',
-      CASHFREE_ENVIRONMENT: 'production',
-      CASHFREE_WEBHOOK_SECRET: 'test-webhook-secret',
+      RAZORPAY_KEY_ID: 'rzp_test_key',
+      RAZORPAY_KEY_SECRET: 'test-secret',
+      RAZORPAY_WEBHOOK_SECRET: 'test-webhook-secret',
       PAYMENT_CREDENTIAL_ENCRYPTION_KEY: 'base64-key-value'
     });
-    expect(result.CASHFREE_ENVIRONMENT).toBe('production');
-    expect(result.CASHFREE_CLIENT_ID).toBe('test-client-id');
-  });
-
-  it('rejects an invalid CASHFREE_ENVIRONMENT value', () => {
-    expect(() => validateEnv({ ...baseEnv, CASHFREE_ENVIRONMENT: 'staging' })).toThrow();
+    expect(result.RAZORPAY_KEY_ID).toBe('rzp_test_key');
+    expect(result.RAZORPAY_WEBHOOK_SECRET).toBe('test-webhook-secret');
   });
 });

@@ -1,4 +1,5 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PlatformUser, RestaurantStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
@@ -26,7 +27,8 @@ export class RestaurantsService {
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
     private readonly email: EmailService,
-    private readonly entitySync: EntitySyncService
+    private readonly entitySync: EntitySyncService,
+    private readonly config: ConfigService
   ) {}
 
   /**
@@ -148,7 +150,13 @@ export class RestaurantsService {
           email: result.owner.email,
           restaurantCode: result.restaurant.restaurantCode,
           // A password Super Admin chose is mailed as the first-time password; otherwise the owner gets the token to set their own.
-          ...(dto.ownerPassword ? { initialPassword: dto.ownerPassword } : { activationToken: result.activationToken, expiresAt: result.activationTokenExpiresAt })
+          ...(dto.ownerPassword
+            ? { initialPassword: dto.ownerPassword }
+            : {
+                activationToken: result.activationToken,
+                setupLink: this.ownerSetupLink(result.restaurant.restaurantCode, result.owner.email, result.activationToken),
+                expiresAt: result.activationTokenExpiresAt
+              })
         });
         emailSent = await this.email.send(result.owner.email, subject, html);
       } catch (err) {
@@ -157,6 +165,13 @@ export class RestaurantsService {
     }
 
     return { ...result, emailSent };
+  }
+
+  private ownerSetupLink(restaurantCode: string | null, email: string, token: string): string | undefined {
+    const base = this.config.get<string>('RESTAURANT_ADMIN_URL')?.trim().replace(/\/+$/, '');
+    if (!base || !restaurantCode) return undefined;
+    const query = new URLSearchParams({ activate: '1', code: restaurantCode, email, token });
+    return `${base}/?${query.toString()}`;
   }
 
   async listRestaurants() {

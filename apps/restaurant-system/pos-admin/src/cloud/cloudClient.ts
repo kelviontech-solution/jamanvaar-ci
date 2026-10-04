@@ -460,8 +460,8 @@ export async function cloudResetPassword(email: string, otp: string, newPassword
  * all (it's only set inside cloudLogin/cloudLoginOwner on success), so the operator types the
  * Restaurant ID directly here instead.
  */
-export async function cloudRequestPasswordResetOwner(restaurantCode: string): Promise<{ maskedEmail: string }> {
-  return request<{ maskedEmail: string }>('/api/v1/tenant-auth/forgot-password-owner', {
+export async function cloudRequestPasswordResetOwner(restaurantCode: string): Promise<{ maskedEmail: string; activationRequired: boolean }> {
+  return request<{ maskedEmail: string; activationRequired: boolean }>('/api/v1/tenant-auth/forgot-password-owner', {
     method: 'POST',
     body: { restaurantCode },
     skipAuthRetry: true
@@ -829,7 +829,7 @@ export interface PaymentsSummary {
   refundedAmount: number;
 }
 
-/** Online (Cashfree) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
+/** Online (Razorpay) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
 export async function getPaymentsSummary(): Promise<PaymentsSummary> {
   const res = await deviceFetch('/api/v1/payments/tenant-summary');
   const data = await parseJsonResponse(res);
@@ -1197,4 +1197,14 @@ export async function publishMenu(note?: string): Promise<{ version: number }> {
 /** A JSON call to the cloud as this Restaurant Admin console (its device credential). Throws CloudApiError with the server's own message. */
 export async function qrApi<T>(path: string, init: RequestInit = {}): Promise<T> {
   return jsonOrThrowCloud<T>(await deviceFetch(path, init), 'QR ordering');
+}
+
+/** First-time activation: the Restaurant ID, the owner's email, the invitation token from the welcome email, and the password they choose. */
+export async function cloudActivateOwner(input: { restaurantCode: string; email: string; activationToken: string; newPassword: string }): Promise<void> {
+  await request('/api/v1/tenant-auth/activate-owner', { method: 'POST', body: input, skipAuthRetry: true });
+}
+
+/** Signed-in owner changes their own password. */
+export async function cloudChangeOwnerPassword(currentPassword: string, newPassword: string): Promise<void> {
+  await request('/api/v1/tenant/me/password', { method: 'PATCH', body: { currentPassword, newPassword } });
 }

@@ -42,7 +42,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
+import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 
 describe('Platform payments visibility', () => {
   let app: INestApplication;
@@ -58,7 +58,7 @@ describe('Platform payments visibility', () => {
 
   beforeAll(async () => {
     app = await createTestApp((builder) =>
-      builder.overrideProvider(CashfreeGatewayService).useValue({
+      builder.overrideProvider(RazorpayGatewayService).useValue({
         isConfigured: () => true,
         createRefund: vi.fn().mockResolvedValue({ cfRefundId: 'cf_refund_mock', refundId: 'refund_mock', refundStatus: 'PENDING', refundAmount: 100 })
       })
@@ -332,7 +332,7 @@ export interface PlatformPayment {
   id: string;
   orderId: string;
   restaurantId: string;
-  provider: 'CASHFREE';
+  provider: 'RAZORPAY';
   providerOrderId: string;
   providerPaymentId: string | null;
   amount: number; // paise
@@ -436,7 +436,7 @@ Add this block immediately after the closing `)}` of the existing `{tab === 'bil
               <div>
                 <span>Payments &amp; Refunds ({payments?.total ?? 0})</span>
                 <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
-                  Real Cashfree-backed payment transactions and refunds for this restaurant.
+                  Real Razorpay-backed payment transactions and refunds for this restaurant.
                 </p>
               </div>
             </div>
@@ -501,8 +501,8 @@ Add this block immediately after the closing `)}` of the existing `{tab === 'bil
                             <tr>
                               <td colSpan={6} style={{ background: '#f8fafc', padding: '14px 22px', fontSize: 12.5 }}>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
-                                  <div><strong>Cashfree Order ID:</strong> {p.providerOrderId}</div>
-                                  <div><strong>Cashfree Payment ID:</strong> {p.providerPaymentId ?? '—'}</div>
+                                  <div><strong>Razorpay Order ID:</strong> {p.providerOrderId}</div>
+                                  <div><strong>Razorpay Payment ID:</strong> {p.providerPaymentId ?? '—'}</div>
                                   {p.failureReason && <div><strong>Failure Reason:</strong> {p.failureReason}</div>}
                                 </div>
                                 {p.refunds.length > 0 && (
@@ -577,7 +577,7 @@ Start the backend (`cd cloud/api && npm run start:dev`) and the super-admin web 
 - The summary strip renders with correct totals.
 - The status `FilterTabs` filters the table and resets to page 1.
 - Pagination `Prev`/`Next` buttons work and disable correctly at the boundaries.
-- Clicking an order id expands the row inline showing Cashfree IDs and any refunds; clicking again collapses it.
+- Clicking an order id expands the row inline showing Razorpay IDs and any refunds; clicking again collapses it.
 - A restaurant with zero payments shows the `EmptyState`, not an error or infinite skeleton.
 
 - [ ] **Step 8: Commit**

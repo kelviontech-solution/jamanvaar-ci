@@ -10,7 +10,6 @@ interface PlatformSummary {
   refundedAmount: number;
   successfulCount: number;
   statusCounts: Record<string, number>;
-  openReconciliationExceptions: number;
 }
 
 interface AttentionRow {
@@ -135,7 +134,7 @@ export function PlatformPaymentsDashboardPage() {
     setBusy(true);
     try {
       await api.post(`/api/v1/payments/${refundTarget.id}/admin-refund`, { amountPaise: paise, reason: refundReason.trim(), password: refundPassword });
-      showToast(`Refund of ${formatRupees(paise)} requested; it completes when Cashfree confirms it`);
+      showToast(`Refund of ${formatRupees(paise)} requested; it completes when Razorpay confirms it`);
       setRefundTarget(null);
       setRefundPassword('');
       setRefundReason('');
@@ -174,7 +173,7 @@ export function PlatformPaymentsDashboardPage() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Platform Payments</h1>
-          <p className="page-subtitle">Cross-restaurant Cashfree payment volume, commission, and what needs attention.</p>
+          <p className="page-subtitle">Cross-restaurant Razorpay payment volume, commission, and what needs attention.</p>
         </div>
       </div>
 
@@ -207,10 +206,6 @@ export function PlatformPaymentsDashboardPage() {
             {tile('Successful Payments', summary.successfulCount)}
             <Card>
               <div style={{ padding: 16 }}>
-                <div className="muted" style={{ fontSize: 12 }}>Open Reconciliation Exceptions</div>
-                <div style={{ fontSize: 24, fontWeight: 700 }}>
-                  {summary.openReconciliationExceptions > 0 ? <Badge tone="warning">{summary.openReconciliationExceptions}</Badge> : 0}
-                </div>
               </div>
             </Card>
           </div>

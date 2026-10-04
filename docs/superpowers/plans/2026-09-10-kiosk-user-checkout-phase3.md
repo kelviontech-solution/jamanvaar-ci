@@ -2,21 +2,21 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Give kiosk-user (the customer-facing kiosk app) a real device identity and a real Cashfree UPI payment flow at checkout, replacing its hardcoded single-kiosk assumption and its unconditional fake `paymentStatus: 'SUCCESS'`.
+**Goal:** Give kiosk-user (the customer-facing kiosk app) a real device identity and a real Razorpay UPI payment flow at checkout, replacing its hardcoded single-kiosk assumption and its unconditional fake `paymentStatus: 'SUCCESS'`.
 
-**Architecture:** kiosk-user activates itself via the existing generic activation-key system (`deviceType: 'KIOSK'`), consuming the device token directly from the redeem response — no login layer needed, since a walk-up kiosk has no staff credentials to attach. At checkout, kiosk-user creates its local order `PENDING` first (for a stable id), calls Phase 1's already-built `POST /api/v1/payments/orders` (backend prices from `MenuSnapshotItem`, never trusts the client), renders Cashfree's own hosted checkout via `cashfree.js`, and polls `GET /api/v1/payments/:paymentId/status` — the Cashfree webhook (already idempotent, signature-verified) is what actually confirms payment, polling only reflects it. Kiosk Admin gains one new call to the existing (currently unused) menu-sync endpoint so `MenuSnapshotItem` has real data to price against.
+**Architecture:** kiosk-user activates itself via the existing generic activation-key system (`deviceType: 'KIOSK'`), consuming the device token directly from the redeem response — no login layer needed, since a walk-up kiosk has no staff credentials to attach. At checkout, kiosk-user creates its local order `PENDING` first (for a stable id), calls Phase 1's already-built `POST /api/v1/payments/orders` (backend prices from `MenuSnapshotItem`, never trusts the client), renders Razorpay's own hosted checkout via `razorpay.js`, and polls `GET /api/v1/payments/:paymentId/status` — the Razorpay webhook (already idempotent, signature-verified) is what actually confirms payment, polling only reflects it. Kiosk Admin gains one new call to the existing (currently unused) menu-sync endpoint so `MenuSnapshotItem` has real data to price against.
 
-**Tech Stack:** React + Vite + Tauri (kiosk-user, kiosk-admin), `@jamanvaar/database` (shared local store), `@cashfreepayments/cashfree-js` (new dependency), existing NestJS/Prisma `cloud/api`.
+**Tech Stack:** React + Vite + Tauri (kiosk-user, kiosk-admin), `@jamanvaar/database` (shared local store), `@razorpaypayments/razorpay-js` (new dependency), existing NestJS/Prisma `cloud/api`.
 
 **Spec:** docs/superpowers/specs/2026-09-10-kiosk-user-checkout-phase3-design.md
 
 ## Global Constraints
 
-- **Never fabricate payment success.** An order's `paymentStatus` is `'PENDING'` until either Cashfree's webhook-confirmed `SUCCESS` (verified via `GET /api/v1/payments/:paymentId/status`, which only ever reflects what the webhook already recorded) or a staff member actually collects cash and calls `OrderRepository.settleOrder(...)`. No code path in this plan sets `paymentStatus: 'SUCCESS'` speculatively.
+- **Never fabricate payment success.** An order's `paymentStatus` is `'PENDING'` until either Razorpay's webhook-confirmed `SUCCESS` (verified via `GET /api/v1/payments/:paymentId/status`, which only ever reflects what the webhook already recorded) or a staff member actually collects cash and calls `OrderRepository.settleOrder(...)`. No code path in this plan sets `paymentStatus: 'SUCCESS'` speculatively.
 - **Never trust a client-computed price.** `POST /api/v1/payments/orders` is called with cart lines only (`externalItemId`, `quantity`, `selectedOptionIds`) — never an amount. This endpoint already exists and already enforces this (`createPaymentOrderSchema` has no amount field, by design).
 - **All new money amounts sent to `cloud/api` are integer paise**, matching every other payment code in this codebase. The local domain model (`packages/types/src/domain.ts`) stores rupee amounts — every conversion point below is explicit about the `* 100` / rounding.
 - **Device tokens are `Authorization: Bearer <token>` headers**, verified by `DeviceAuthGuard` against `Device.deviceTokenHash` — identical pattern to every other device-authed call in this codebase (confirmed directly in `cloud/api/src/common/guards/device-auth.guard.ts`).
-- **`cloud/api`'s CSP for kiosk-user is unrestricted** (`src-tauri/tauri.conf.json`'s `"csp": null`) — loading Cashfree's checkout script needs no CSP change.
+- **`cloud/api`'s CSP for kiosk-user is unrestricted** (`src-tauri/tauri.conf.json`'s `"csp": null`) — loading Razorpay's checkout script needs no CSP change.
 - Do not modify `apps/kiosk-system/kiosk-admin/src/App.tsx`'s existing menu-management logic beyond adding the two sync trigger call sites in Task 1 — this file also carries unrelated, pre-existing, uncommitted local work (a Hindi/Gujarati menu-translation feature) from earlier in this project. If a task's diff touches this file, verify with `git diff -- apps/kiosk-system/kiosk-admin/src/App.tsx` that only the intended lines changed before committing; if unrelated uncommitted changes are still present in the working tree, they must not be swept into this task's commit (use `git add -p` or the git blob-staging technique documented in this project's earlier task ledgers if a plain `git add` would include them).
 
 ---
@@ -357,7 +357,7 @@ git commit -m "feat(kiosk-user): add real device activation, remove hardcoded ki
 
 ---
 
-## Task 3: kiosk-user — real UPI checkout via Cashfree
+## Task 3: kiosk-user — real UPI checkout via Razorpay
 
 **Files:**
 - Modify: `apps/kiosk-system/kiosk-user/src/cloud/cloudClient.ts`
@@ -368,11 +368,11 @@ git commit -m "feat(kiosk-user): add real device activation, remove hardcoded ki
 - Consumes: `POST /api/v1/payments/orders` (existing, `DeviceAuthGuard`, gates on `device.type === 'KIOSK'` — already true after Task 2) body `{ externalOrderId, lines: [{ externalItemId, quantity, selectedOptionIds }] }`, response `{ orderId, paymentId, paymentSessionId, amount, currency, status }`. `GET /api/v1/payments/:paymentId/status`, response `{ paymentId, orderId, status, amount, currency, orderStatus }`. Task 2's `deviceFetch`, `getKioskRestaurantId`.
 - Produces: `createPaymentOrder(externalOrderId, lines)`, `getPaymentOrderStatus(paymentId)` in `cloudClient.ts` — consumed by Task 5's extended polling.
 
-- [ ] **Step 1: Add the Cashfree JS SDK dependency**
+- [ ] **Step 1: Add the Razorpay JS SDK dependency**
 
 ```bash
 cd apps/kiosk-system/kiosk-user
-npm install @cashfreepayments/cashfree-js
+npm install @razorpaypayments/razorpay-js
 ```
 
 - [ ] **Step 2: Add payment-order functions to cloudClient.ts**
@@ -380,7 +380,7 @@ npm install @cashfreepayments/cashfree-js
 Append to `apps/kiosk-system/kiosk-user/src/cloud/cloudClient.ts`:
 
 ```typescript
-// --- Real Cashfree Payment (Phase 3) ---
+// --- Real Razorpay Payment (Phase 3) ---
 
 export interface PaymentOrderResult {
   orderId: string;
@@ -423,14 +423,14 @@ export async function getPaymentOrderStatus(paymentId: string): Promise<{ status
 
 - [ ] **Step 3: Replace the UPI path in `handleProceedToPayment`/`handleFinalizePayment`**
 
-In `apps/kiosk-system/kiosk-user/src/App.tsx`, import `createPaymentOrder`, `getPaymentOrderStatus`, `getKioskRestaurantId`, `CartLinePayload` from `./cloud/cloudClient`, and `load` (as `loadCashfree`) from `@cashfreepayments/cashfree-js`.
+In `apps/kiosk-system/kiosk-user/src/App.tsx`, import `createPaymentOrder`, `getPaymentOrderStatus`, `getKioskRestaurantId`, `CartLinePayload` from `./cloud/cloudClient`, and `load` (as `loadRazorpay`) from `@razorpaypayments/razorpay-js`.
 
 Add new state near the other payment-related state (`paymentTxId`, etc.):
 
 ```typescript
 const [realPaymentId, setRealPaymentId] = useState<string | null>(null);
 const [localOrderIdForPayment, setLocalOrderIdForPayment] = useState<string | null>(null);
-const [cashfreeUnavailable, setCashfreeUnavailable] = useState(false);
+const [razorpayUnavailable, setRazorpayUnavailable] = useState(false);
 ```
 
 Replace `handleProceedToPayment` (currently lines 695-731) with a version that branches on `paymentMethod`. The existing mock `PaymentService.startPayment` call is removed entirely for the `UPI_QR` case (renamed `'UPI'` in the button/state below) and replaced with:
@@ -450,7 +450,7 @@ const handleProceedToPayment = async () => {
   setStep('CHECKOUT_PAYMENT');
   setPaymentTimeLeft(180);
   setPaymentStatus('WAITING_FOR_USER');
-  setCashfreeUnavailable(false);
+  setRazorpayUnavailable(false);
 
   const effectiveMethod = networkState === 'OFFLINE' ? 'CASH_AT_COUNTER' : paymentMethod;
 
@@ -507,7 +507,7 @@ const handleProceedToPayment = async () => {
 
   const restaurantId = getKioskRestaurantId();
   if (!restaurantId) {
-    setCashfreeUnavailable(true);
+    setRazorpayUnavailable(true);
     return;
   }
 
@@ -522,23 +522,23 @@ const handleProceedToPayment = async () => {
     setRealPaymentId(result.paymentId);
 
     if (!result.paymentSessionId) {
-      setCashfreeUnavailable(true);
+      setRazorpayUnavailable(true);
       return;
     }
 
-    const cashfree = await loadCashfree({ mode: import.meta.env.VITE_CASHFREE_MODE ?? 'sandbox' });
-    if (!cashfree) {
-      setCashfreeUnavailable(true);
+    const razorpay = await loadRazorpay({ mode: import.meta.env.VITE_RAZORPAY_MODE ?? 'sandbox' });
+    if (!razorpay) {
+      setRazorpayUnavailable(true);
       return;
     }
-    cashfree.checkout({ paymentSessionId: result.paymentSessionId, redirectTarget: '_modal' });
+    razorpay.checkout({ paymentSessionId: result.paymentSessionId, redirectTarget: '_modal' });
   } catch (err) {
-    // A 403 here means this restaurant's Cashfree connection isn't ACTIVE
+    // A 403 here means this restaurant's Razorpay connection isn't ACTIVE
     // yet (payments.service.ts's own gate) — not a transient failure, so no
     // retry is offered; fall straight to the cash-at-counter messaging the
-    // render below already shows when cashfreeUnavailable is true.
+    // render below already shows when razorpayUnavailable is true.
     console.error('Payment order creation failed:', err);
-    setCashfreeUnavailable(true);
+    setRazorpayUnavailable(true);
   }
 };
 ```
@@ -560,12 +560,12 @@ useEffect(() => {
         if (result.status === 'SUCCESS') {
           setPaymentStatus('SUCCESS');
           if (localOrderIdForPayment) {
-            OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Cashfree UPI');
+            OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Razorpay UPI');
           }
           return;
         }
         if (result.status === 'FAILED' || result.status === 'USER_DROPPED') {
-          setCashfreeUnavailable(true);
+          setRazorpayUnavailable(true);
           setPaymentTimeLeft(0);
           setPaymentStatus('EXPIRED');
           return;
@@ -598,9 +598,9 @@ In `handleProceedToPayment` (Step 3 above), `setPaymentTimeLeft(180)` was a coun
 <span>{t('paymentExpiresIn')}: <strong className="text-[#0B253A] font-mono">{paymentTimeLeft * 3}s</strong></span>
 ```
 
-- [ ] **Step 6: Manual verification (Cashfree sandbox)**
+- [ ] **Step 6: Manual verification (Razorpay sandbox)**
 
-With `cloud/api` running against a restaurant whose `RestaurantPaymentConnection.status === 'ACTIVE'` (Phase 2's flow) and `CASHFREE_ENVIRONMENT` set to sandbox, and Task 1's menu-sync having populated `MenuSnapshotItem` for at least one item: activate a kiosk-user instance (Task 2), add that item to cart, choose UPI, confirm the Cashfree modal checkout opens, complete a sandbox test payment, and confirm the local order transitions to `paymentStatus: 'SUCCESS'` with a real `paymentTransactionId` (Cashfree's `cf_payment_id`, not a generated UUID). This end-to-end path cannot be exercised by an automated test in this environment (no test runner for this app, and a real/sandbox Cashfree round-trip needs live network + a configured merchant) — document the honest result of this manual pass rather than claiming automated coverage.
+With `cloud/api` running against a restaurant whose `RestaurantPaymentConnection.status === 'ACTIVE'` (Phase 2's flow) and `RAZORPAY_ENVIRONMENT` set to sandbox, and Task 1's menu-sync having populated `MenuSnapshotItem` for at least one item: activate a kiosk-user instance (Task 2), add that item to cart, choose UPI, confirm the Razorpay modal checkout opens, complete a sandbox test payment, and confirm the local order transitions to `paymentStatus: 'SUCCESS'` with a real `paymentTransactionId` (Razorpay's `cf_payment_id`, not a generated UUID). This end-to-end path cannot be exercised by an automated test in this environment (no test runner for this app, and a real/sandbox Razorpay round-trip needs live network + a configured merchant) — document the honest result of this manual pass rather than claiming automated coverage.
 
 Run `npx tsc --noEmit` in `apps/kiosk-system/kiosk-user`, confirm clean.
 
@@ -608,7 +608,7 @@ Run `npx tsc --noEmit` in `apps/kiosk-system/kiosk-user`, confirm clean.
 
 ```bash
 git add apps/kiosk-system/kiosk-user/src/cloud/cloudClient.ts apps/kiosk-system/kiosk-user/src/App.tsx apps/kiosk-system/kiosk-user/package.json apps/kiosk-system/kiosk-user/package-lock.json
-git commit -m "feat(kiosk-user): real UPI payment via Cashfree, replacing mocked checkout"
+git commit -m "feat(kiosk-user): real UPI payment via Razorpay, replacing mocked checkout"
 ```
 
 ---
@@ -628,12 +628,12 @@ In the `CHECKOUT_PAYMENT` render block (`apps/kiosk-system/kiosk-user/src/App.ts
 
 Rename the first button's method value and copy from `'UPI_QR'` to `'UPI'` throughout this render block and its `onClick` (`setPaymentMethod('UPI')`), matching the state values Task 3 introduced. Update the button label copy (`t('upiQr')`/`t('upiSubtitle')`) to reflect a real payment rather than a QR scan if those translation keys' current text implies a static QR image — this is a copy-only change; if the existing i18n keys already read generically enough ("Pay via UPI"), leave them as-is rather than inventing new keys for this task.
 
-- [ ] **Step 2: Replace the fake QR-image block with the real Cashfree wait state**
+- [ ] **Step 2: Replace the fake QR-image block with the real Razorpay wait state**
 
 Replace the `paymentMethod === 'UPI_QR'` block (currently lines 1995-2012, showing a static `QrCode` icon) with:
 
 ```tsx
-{paymentMethod === 'UPI' && !cashfreeUnavailable && (
+{paymentMethod === 'UPI' && !razorpayUnavailable && (
   <div className="space-y-4">
     <p className="text-sm font-semibold text-[#4A5568]">Complete your payment in the window that opened.</p>
     <div className="text-xs text-[#8C9BAE] font-medium flex items-center justify-center gap-1.5">
@@ -643,7 +643,7 @@ Replace the `paymentMethod === 'UPI_QR'` block (currently lines 1995-2012, showi
   </div>
 )}
 
-{paymentMethod === 'UPI' && cashfreeUnavailable && (
+{paymentMethod === 'UPI' && razorpayUnavailable && (
   <div className="py-8 space-y-4">
     <Coins className="w-16 h-16 text-[#E66817] mx-auto" />
     <h3 className="text-xl font-black text-[#0B253A]">Online Payment Unavailable</h3>
@@ -652,11 +652,11 @@ Replace the `paymentMethod === 'UPI_QR'` block (currently lines 1995-2012, showi
 )}
 ```
 
-(Cashfree's own modal checkout, opened by Task 3's `cashfree.checkout(...)` call, is what the customer actually interacts with — this block is only the kiosk screen behind/after that modal.)
+(Razorpay's own modal checkout, opened by Task 3's `razorpay.checkout(...)` call, is what the customer actually interacts with — this block is only the kiosk screen behind/after that modal.)
 
 - [ ] **Step 3: Remove the manual "Simulate Payment Success" confirm button for the UPI path**
 
-The existing confirm button (currently lines 2030-2040) calls `handleFinalizePayment` for every method, labeled `'Simulate Payment Success'` for non-cash methods — this was always fake. For `UPI`, there is no manual confirm anymore (Task 3's polling `useEffect` transitions `paymentStatus` to `'SUCCESS'` on its own once Cashfree/the webhook actually confirms). Change the button to only render for `CASH_AT_COUNTER`:
+The existing confirm button (currently lines 2030-2040) calls `handleFinalizePayment` for every method, labeled `'Simulate Payment Success'` for non-cash methods — this was always fake. For `UPI`, there is no manual confirm anymore (Task 3's polling `useEffect` transitions `paymentStatus` to `'SUCCESS'` on its own once Razorpay/the webhook actually confirms). Change the button to only render for `CASH_AT_COUNTER`:
 
 ```tsx
 {paymentMethod === 'CASH_AT_COUNTER' && (
@@ -767,11 +767,11 @@ const handleGetToken = async () => {
 
 `kioskId` here is Task 2 Step 4's real device id (replacing the original's hardcoded `'KIOSK-01'` in the audit log call). The `idempotencyKey`/`IdempotencyManager` duplicate-creation guard the original function opened with is no longer needed here — creation now happens once, in `handleProceedToPayment`, not on every tap of this confirm button; the button's existing `isLoading={isProcessingPayment}` already prevents a double-tap from calling this handler twice.
 
-Now update Task 3 Step 4's polling `useEffect` (the block ending in `OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Cashfree UPI');`) — that line alone leaves the UI on the payment screen forever and never prints a KOT. Replace that single line with:
+Now update Task 3 Step 4's polling `useEffect` (the block ending in `OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Razorpay UPI');`) — that line alone leaves the UI on the payment screen forever and never prints a KOT. Replace that single line with:
 
 ```typescript
 if (localOrderIdForPayment) {
-  OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Cashfree UPI');
+  OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Razorpay UPI');
   const settledOrder = OrderRepository.getOrderById(localOrderIdForPayment);
   if (settledOrder) {
     proceedToConfirmation(settledOrder, networkState === 'ONLINE');
@@ -848,7 +848,7 @@ useEffect(() => {
       if (result.status === 'SUCCESS') {
         setPaymentStatus('SUCCESS');
         if (localOrderIdForPayment) {
-          OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Cashfree UPI');
+          OrderRepository.settleOrder(localOrderIdForPayment, 'UPI', undefined, realPaymentId, 'Razorpay UPI');
           const settledOrder = OrderRepository.getOrderById(localOrderIdForPayment);
           if (settledOrder) {
             proceedToConfirmation(settledOrder, networkState === 'ONLINE');
@@ -858,7 +858,7 @@ useEffect(() => {
         return;
       }
       if (result.status === 'FAILED' || result.status === 'USER_DROPPED') {
-        setCashfreeUnavailable(true);
+        setRazorpayUnavailable(true);
         clearInterval(interval);
         return;
       }
@@ -879,7 +879,7 @@ useEffect(() => {
 }, [step, paymentStatus, realPaymentId, localOrderIdForPayment]);
 ```
 
-The visible "Online Payment Unavailable — please pay cash" message (Task 4 Step 2, gated on `cashfreeUnavailable`) already covers the customer-facing UI once `paymentStatus === 'EXPIRED'` — this step only keeps the background reconciliation alive for the extra window so a late webhook still settles the order automatically, without changing what the customer sees.
+The visible "Online Payment Unavailable — please pay cash" message (Task 4 Step 2, gated on `razorpayUnavailable`) already covers the customer-facing UI once `paymentStatus === 'EXPIRED'` — this step only keeps the background reconciliation alive for the extra window so a late webhook still settles the order automatically, without changing what the customer sees.
 
 - [ ] **Step 2: Add the counter-staff safety warning in POS**
 
@@ -897,7 +897,7 @@ Place this immediately above the existing "Settle Cash" button for that order ro
 
 - [ ] **Step 3: Verify and commit**
 
-Manually verify: start a UPI checkout, let the visible countdown expire without completing payment (so `cashfreeUnavailable` shows), confirm the order still appears in POS's kiosk order list with the new warning copy, still `PENDING`. Separately, verify that if the Cashfree sandbox payment is completed shortly after the visible countdown expires (within the 5-minute window), the local order transitions to `SUCCESS` on its own without staff action. Run `npx tsc --noEmit` in both `apps/kiosk-system/kiosk-user` and `apps/restaurant-system/pos`.
+Manually verify: start a UPI checkout, let the visible countdown expire without completing payment (so `razorpayUnavailable` shows), confirm the order still appears in POS's kiosk order list with the new warning copy, still `PENDING`. Separately, verify that if the Razorpay sandbox payment is completed shortly after the visible countdown expires (within the 5-minute window), the local order transitions to `SUCCESS` on its own without staff action. Run `npx tsc --noEmit` in both `apps/kiosk-system/kiosk-user` and `apps/restaurant-system/pos`.
 
 ```bash
 git add apps/kiosk-system/kiosk-user/src/App.tsx apps/restaurant-system/pos/src/components/orders/PosOrdersView.tsx

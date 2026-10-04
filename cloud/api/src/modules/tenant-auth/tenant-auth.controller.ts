@@ -22,6 +22,8 @@ import { TenantAuthService } from './tenant-auth.service';
 import {
   createTenantStaffUserSchema,
   setInitialPasswordSchema,
+  activateOwnerSchema,
+  ActivateOwnerDto,
   forgotPasswordSchema,
   resetPasswordSchema,
   setTenantUserStatusSchema,
@@ -73,6 +75,16 @@ export class TenantAuthController {
     @Body() body: { restaurantId: string; email: string; activationToken: string; newPassword: string }
   ) {
     await this.authService.setInitialPassword(body.restaurantId, body.email, body.activationToken, body.newPassword);
+    return { success: true };
+  }
+
+  /** First-time activation by Restaurant ID and the invitation token from the owner's welcome email. */
+  @Post('activate-owner')
+  @HttpCode(200)
+  @PublicAuthThrottle()
+  @UsePipes(new ZodValidationPipe(activateOwnerSchema))
+  async activateOwner(@Body() body: ActivateOwnerDto) {
+    await this.authService.activateOwner(body);
     return { success: true };
   }
 

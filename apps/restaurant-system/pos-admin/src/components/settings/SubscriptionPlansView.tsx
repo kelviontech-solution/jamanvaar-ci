@@ -1,3 +1,4 @@
+import { ChangeOwnerPasswordForm } from './ChangeOwnerPasswordForm';
 import React, { useEffect, useState } from 'react';
 import { printElement } from '@jamanvaar/ui';
 import { LicenseRepository } from '@jamanvaar/database';
@@ -378,6 +379,7 @@ export const SubscriptionPlansView: React.FC<SubscriptionPlansViewProps> = ({
 
       {activeSubTab === 'MY_PLAN' && (
       <>
+      {cloudConnected && cloudLoggedIn && <ChangeOwnerPasswordForm />}
       {/* CLOUD SUBSCRIPTION STATUS — additive, optional; everything below keeps working offline regardless */}
       <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-2xs space-y-3">
         {!cloudConnected ? (

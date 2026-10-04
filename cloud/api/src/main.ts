@@ -14,8 +14,8 @@ async function bootstrap() {
   // backup upload (see modules/backups) — bodyParser: false + manual json()
   // lets that one route accept up to 20MB while everything else is unaffected.
   const app = await NestFactory.create(AppModule, { bodyParser: false });
-  // The Cashfree webhook needs the exact raw request bytes for HMAC signature
-  // verification (see CashfreeGatewayService.verifyWebhookSignature) — this
+  // The Razorpay webhook needs the exact raw request bytes for HMAC signature
+  // verification (see RazorpayGatewayService.verifyWebhookSignature) — this
   // path-scoped raw() must be registered before the blanket json() below.
   // body-parser's own "already parsed" check (req._body) then makes json()
   // skip this one path instead of double-consuming the request stream, so

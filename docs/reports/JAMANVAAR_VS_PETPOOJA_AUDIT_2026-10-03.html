@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JAMANVAAR vs Petpooja — Full Product Audit</title>
+<style>
+:root{
+  --navy:#0B253A; --deepNavy:#0B2B39; --saffron:#E66817; --orange:#F97316;
+  --ivory:#FBF9F5; --cream:#FAF7F2; --teal:#00A99D; --darkTeal:#0D9488;
+  --border:#EBE6DD; --darkBorder:#1E3A4C;
+  --ok:#059669; --ok-bg:#ECFDF5; --ok-bd:#A7F3D0;
+  --warn:#B45309; --warn-bg:#FFFBEB; --warn-bd:#FDE68A;
+  --bad:#DC2626; --bad-bg:#FEF2F2; --bad-bd:#FECACA;
+  --info:#4338CA; --info-bg:#EEF2FF; --info-bd:#C7D2FE;
+  --purple:#9333EA; --purple-bg:#FAF5FF; --purple-bd:#E9D5FF;
+  --blue:#2563EB; --blue-bg:#EFF6FF; --blue-bd:#BFDBFE;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--cream);color:var(--navy);line-height:1.55}
+a{color:var(--saffron)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header.top{background:var(--navy);color:#fff;padding:28px 0 22px;border-bottom:4px solid var(--saffron)}
+header.top .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+header.top h1{margin:0;font-size:22px;font-weight:900;letter-spacing:.2px}
+header.top .sub{color:#B9C8D6;font-size:13px;margin-top:4px}
+nav.toc{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--border);overflow-x:auto;white-space:nowrap;padding:10px 0}
+nav.toc .wrap{display:flex;gap:6px}
+nav.toc a{font-size:11.5px;font-weight:800;color:var(--navy);text-decoration:none;background:var(--cream);border:1px solid var(--border);padding:6px 10px;border-radius:999px;white-space:nowrap}
+nav.toc a:hover{background:#FFF4EA;border-color:#FDBA74;color:var(--saffron)}
+main{padding:30px 0 80px}
+section{margin-bottom:46px;scroll-margin-top:56px}
+h2{font-size:21px;font-weight:900;color:var(--navy);border-left:5px solid var(--saffron);padding-left:12px;margin:0 0 6px}
+h2 .tag{display:inline-block;background:var(--navy);color:#fff;font-size:10px;font-weight:800;letter-spacing:.06em;padding:2px 8px;border-radius:6px;margin-right:8px;vertical-align:middle}
+h3{font-size:15.5px;font-weight:800;color:var(--navy);margin:22px 0 8px}
+p.lead{color:#3c4b57;font-size:14.5px;max-width:880px;margin:10px 0 18px}
+.callout{border:1px solid var(--border);background:#fff;border-radius:14px;padding:16px 18px;margin:14px 0}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-bd)}
+.callout.info{background:var(--info-bg);border-color:var(--info-bd)}
+.callout b{color:var(--navy)}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;font-size:13px}
+thead th{background:var(--navy);color:#fff;text-align:left;padding:10px 12px;font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:800}
+tbody td{padding:10px 12px;border-top:1px solid var(--border);vertical-align:top}
+tbody tr:nth-child(even){background:#FCFBF8}
+.tablewrap{overflow-x:auto;border-radius:14px}
+.badge{display:inline-block;font-weight:800;font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap}
+.b-ok{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-bd)}
+.b-warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-bd)}
+.b-bad{color:var(--bad);background:var(--bad-bg);border-color:var(--bad-bd)}
+.b-info{color:var(--info);background:var(--info-bg);border-color:var(--info-bd)}
+.b-purple{color:var(--purple);background:var(--purple-bg);border-color:var(--purple-bd)}
+.b-blue{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-bd)}
+.b-navy{color:#fff;background:var(--navy);border-color:var(--navy)}
+.grid{display:grid;gap:14px}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.grid.cols-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:900px){.grid.cols-3,.grid.cols-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.card h4{margin:0 0 4px;font-size:13px;font-weight:900;color:var(--navy)}
+.card .num{font-size:26px;font-weight:900;font-family:ui-monospace,Menlo,monospace;color:var(--saffron)}
+.card .d{font-size:12px;color:#5a6b78}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;font-weight:700;margin:10px 0}
+.flow .step{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:6px 10px}
+.flow .arrow{color:#9fb0bc;font-weight:900}
+.flow .step.gap{background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad)}
+.flow .step.ok{background:var(--ok-bg);border-color:var(--ok-bd);color:var(--ok)}
+code{background:#F1EEE7;border-radius:5px;padding:1px 6px;font-size:12px;font-family:ui-monospace,Menlo,monospace;color:#9A3412}
+.filepath{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#475569;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:1px 6px}
+ol.ranked{padding-left:0;list-style:none;counter-reset:rank}
+ol.ranked li{counter-increment:rank;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px 12px 46px;margin-bottom:8px;position:relative;font-size:13.5px}
+ol.ranked li::before{content:counter(rank);position:absolute;left:10px;top:10px;width:24px;height:24px;background:var(--navy);color:#fff;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
+ol.ranked li b{color:var(--navy)}
+ol.ranked li .meta{display:block;color:#5a6b78;font-size:12px;margin-top:3px}
+footer{background:var(--navy);color:#B9C8D6;padding:22px 0;font-size:12px;text-align:center}
+.src{font-size:11px;color:#7c8b97}
+.toc-section-label{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;font-weight:800;margin:0 4px 0 10px;align-self:center}
+@media print{nav.toc{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div>
+      <h1>JAMANVAAR vs Petpooja — Full Product Audit</h1>
+      <div class="sub">Feature gap analysis, verified against the live Jamanvaar codebase · 3 Oct 2026</div>
+    </div>
+    <div class="sub">Prepared for: JAMANVAAR / Kelviontech</div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#methodology">0. Method &amp; limits</a>
+    <a href="#exec">1. Exec summary</a>
+    <a href="#matrix">2. Gap matrix</a>
+    <a href="#workflows">3. Workflow gaps</a>
+    <a href="#ux">4. UX gaps</a>
+    <a href="#tech">5. Technical gaps</a>
+    <a href="#security">6. Security</a>
+    <a href="#business">7. Business gaps</a>
+    <a href="#top-build">8. Top features to build</a>
+    <a href="#top-bugs">9. Known issues</a>
+    <a href="#top-ux">10. Top UX fixes</a>
+    <a href="#parity">11. Parity checklist</a>
+    <a href="#better">12. Better-than-Petpooja</a>
+    <a href="#roadmap">13. Roadmap</a>
+    <a href="#impl">14. Implementation plan</a>
+    <a href="#tests">15. Test plan</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section id="methodology">
+  <h2><span class="tag">0</span>Methodology &amp; honest limitations</h2>
+  <div class="callout warn">
+    <p><b>I could not watch the two YouTube videos.</b> I have no video tool — I can fetch a web page's text, but a YouTube page's actual audio/visual demo content isn't exposed to that. I tried fetching both links; the only thing that came back was the title "PETPOOJA BILLING SOFTWARE DEMO," no transcript or description. I will not pretend to have seen specific screens, taps, or timings from them — that would violate your own Rule 1/2/17 (never assume, never overclaim, mark uncertain things as UNKNOWN).</p>
+    <p style="margin-bottom:0">Instead, per your own addendum, I grounded the Petpooja side in <b>their current official material</b> — live web searches run during this audit, cited by source below — plus well-established, widely-reported facts about their feature set (menu sync via UrbanPiper, Central Kitchen module, Head Office Dashboard, etc.). Anything I could not verify this way is marked <span class="badge b-warn">UNKNOWN</span> rather than guessed.</p>
+  </div>
+  <p class="lead">For the Jamanvaar side, every claim below was checked against the <b>actual repository on disk</b> right now — real file paths, real class/function names, grep hits, migration files, and (for a large part of this system) direct first-hand knowledge from having built, tested and Playwright-verified these modules myself across this project's recent work sessions. Where I state a feature is complete, I mean: UI exists, the backend/API exists where needed, the data persists, and I have either run it in a real browser or read the exact code path end to end. Where I wasn't able to re-verify something live in this pass, I say so.</p>
+</section>
+
+<section id="exec">
+  <h2><span class="tag">1</span>Executive summary</h2>
+  <div class="grid cols-4">
+    <div class="card"><h4>Core POS/KOT/KDS loop</h4><div class="num">✅</div><div class="d">Order→KOT→kitchen→ready→bill→payment→report→inventory→sync works end-to-end, offline-first, sub-second delivery. Verified by running it.</div></div>
+    <div class="card"><h4>Zomato / Swiggy</h4><div class="num">🔴</div><div class="d">Not built. A design-only document exists (UrbanPiper flow). No code, no order ingestion, no menu push.</div></div>
+    <div class="card"><h4>Central kitchen</h4><div class="num">🔴</div><div class="d">No concept of a production/supply kitchen feeding branches exists in the schema or code.</div></div>
+    <div class="card"><h4>Multi-outlet owner view</h4><div class="num">🟡</div><div class="d">Branch data model is real and tenant-isolated (RLS). No single screen compares outlets side by side — each branch's Admin is its own silo.</div></div>
+    <div class="card"><h4>WhatsApp ordering</h4><div class="num">🟢</div><div class="d">Genuinely built this cycle: channel API, payment-link checkout, outbound webhooks, entitlement gating, reconciliation. Deeper than Petpooja's basic "pull WhatsApp onto one screen."</div></div>
+    <div class="card"><h4>Offline-first architecture</h4><div class="num">⭐</div><div class="d">Local SQLite/OPFS + outbox + idempotent sync + conflict resolution by revision, not by device clock. This is a real structural advantage over a thin-client POS — lean into it.</div></div>
+    <div class="card"><h4>Procurement / vendor</h4><div class="num">🟡</div><div class="d">Suppliers, GRN, stock counts with variance approval, reorder suggestions exist. No formal purchase-order lifecycle, no AI invoice scanning, no multi-vendor price comparison.</div></div>
+    <div class="card"><h4>Loyalty</h4><div class="num">🟡</div><div class="d">Tiers exist and compute from lifetime spend. No stored-value customer wallet (top-up/redeem balance) — only a B2B House Account, a different thing.</div></div>
+    <div class="card"><h4>Reporting</h4><div class="num">🟡</div><div class="d">72 distinct report definitions exist in Restaurant Admin, genuinely computed from live data (verified count: <code>grep -c "{ id: '" ReportsDashboard.tsx</code>). Several newly added this cycle (losses, prep-time, labour). No dedicated multi-outlet consolidated reporting.</div></div>
+    <div class="card"><h4>AI</h4><div class="num">🟡</div><div class="d">A real "JAMAN AI" exists — a curated question catalogue with live-computed answers (not free-text natural language). No forecasting, OCR, or anomaly detection anywhere.</div></div>
+    <div class="card"><h4>Security posture (local dev)</h4><div class="num">⚠️</div><div class="d">A real script (<span class="filepath">prisma/setup-app-role.sql</span>) exists to run the API as a restricted, non-superuser Postgres role so row-level security is actually enforced. This session's own local dev server is connected as the <code>postgres</code> superuser instead, and logs a visible warning about it. Needs confirming in your real deployment.</div></div>
+  </div>
+
+  <h3>What Jamanvaar does well right now</h3>
+  <p class="lead">The order pipeline, kitchen flow, offline resilience, and the newest additions (split bill by seat, a real losses/cancellations report with who-and-why, a KDS "pass" board that unifies every station per table, real sent→ready dish timing, labour cost, reservation holds that actually sync to the floor, and a live sold-out-aware QR menu) are not toy features — they're built the way a production POS should be: server-verified prices, idempotent order ingestion, revision-based conflict resolution, and tenant isolation enforced at the database layer, not just in application code.</p>
+
+  <h3>What Petpooja does better right now</h3>
+  <p class="lead">Breadth and ecosystem maturity. Petpooja is reported to ship <b>200+ tools across nine modules</b>, <b>70+ third-party integrations</b> and a <b>120+ item marketplace</b> <span class="src">(<a href="https://blog.petpooja.com/operations-workflows/must-try-features-petpooja-pos/" target="_blank">Petpooja blog</a>)</span>, native Zomato/Swiggy order pull via UrbanPiper with zero-commission aggregator linking <span class="src">(<a href="https://www.petpooja.com/poss/online-order-management-software" target="_blank">Petpooja</a>, <a href="https://blog.petpooja.com/industry-business-guides/sync-menu-across-swiggy-zomato-and-pos/" target="_blank">menu sync</a>)</span>, a Central Kitchen module for chains <span class="src">(<a href="https://blog.petpooja.com/poss/manage-chain-restaurants/" target="_blank">chain management</a>)</span>, a Head Office Dashboard with region/brand/channel zoning, and AI-assisted procurement (best-match supplier price, invoice-photo-to-purchase-entry) <span class="src">(<a href="https://blog.petpooja.com/procurement-cost-control/petpooja-ai-features-help-restaurants-decide-better/" target="_blank">Petpooja AI</a>)</span>. Jamanvaar has none of these yet, and has no live order-reconciliation against an aggregator because there's no aggregator connection to reconcile against.</p>
+
+  <h3>What Jamanvaar is missing (the short list)</h3>
+  <p class="lead">Aggregator orders (Zomato/Swiggy), central kitchen/branch-supply chain, a consolidated multi-outlet owner dashboard, a real purchase-order lifecycle with supplier comparison, a customer stored-value wallet, AI forecasting/OCR, and a dedicated token/queue display screen for takeaway and delivery pickup.</p>
+
+  <h3>What Jamanvaar can do better than Petpooja</h3>
+  <p class="lead">See <a href="#better">section 12</a> in full, but in short: the offline-first architecture is structurally stronger for India's patchy connectivity; the WhatsApp ordering integration just built is deeper than a "pull messages onto one screen" bolt-on; and the newly added losses/cancellation accountability report (who cancelled what, why, and how much it cost) is a genuinely sharper owner tool than anything found in Petpooja's public material.</p>
+</section>
+
+<section id="matrix">
+  <h2><span class="tag">2</span>Feature gap matrix</h2>
+  <p class="lead">Status legend: <span class="badge b-ok">✅ Better</span> <span class="badge b-ok">🟢 Complete</span> <span class="badge b-warn">🟡 Partial</span> <span class="badge b-bad">🔴 Missing</span> <span class="badge b-bad">⚠️ Broken/At risk</span> <span class="badge b-purple">🟣 Needs UX work</span> <span class="badge b-blue">🔵 Different approach</span>. "Verified" = checked against live code this session; "Cited" = from Petpooja's own published material; "Known" = established from earlier project work, not re-verified today.</p>
+
+  <h3>A–F · POS, Orders, Tables, KOT, KDS, Captain</h3>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Feature</th><th>Petpooja</th><th>Jamanvaar</th><th>Status</th><th>Evidence</th></tr></thead>
+  <tbody>
+  <tr><td>Dine-in / takeaway / delivery billing</td><td>Unified order screen <span class="src">(cited)</span></td><td>All three order types, server-priced</td><td><span class="badge b-ok">🟢</span></td><td>Verified — settled a real split bill this session</td></tr>
+  <tr><td>KOT generation, multiple stations</td><td>Standard</td><td>Station routing, course firing, hold &amp; fire</td><td><span class="badge b-ok">🟢</span></td><td>Verified</td></tr>
+  <tr><td>KOT reprint / void item / cancel item</td><td>Standard</td><td>Cancel keeps line at ₹0, records who/why/amount for reporting</td><td><span class="badge b-ok">✅</span></td><td>Verified — built this cycle, feeds the losses report</td></tr>
+  <tr><td>Split bill</td><td>Standard split</td><td>By seat, equally, or pick-dishes; exact to the paisa; shared dish divides fairly</td><td><span class="badge b-ok">✅</span></td><td>Verified live (Captain→seat→POS→₹304.89+₹84.11=₹389)</td></tr>
+  <tr><td>KDS: per-dish status, allergy flag, aging, recall</td><td>Token mgmt, KDS, queue mgmt <span class="src">(cited)</span></td><td>All present + an "expo/pass" board unifying every station per table</td><td><span class="badge b-ok">✅</span></td><td>Verified live this cycle (Pass tab, "send out" when every station is ready)</td></tr>
+  <tr><td>Real per-dish prep time (sent→ready)</td><td>UNKNOWN precision</td><td>Stored on the order line itself, synced, survives a recall/undo correctly</td><td><span class="badge b-ok">✅</span></td><td>Verified: timestamp travels order↔KOT, tested with real KDS tap</td></tr>
+  <tr><td>Captain app: table map, menu, courses, bill request</td><td>Standard waiter app</td><td>Full, phone-fit, offline-capable, course hold/fire</td><td><span class="badge b-ok">🟢</span></td><td>Verified</td></tr>
+  <tr><td>Table transfer / merge</td><td>Standard</td><td>Present</td><td><span class="badge b-ok">🟢</span></td><td>Known (prior session)</td></tr>
+  <tr><td>Reservation table hold on the floor</td><td>Standard</td><td>Floor shows "Reserved 8:30 PM: Sharma (4)" from 30 min before; auto no-show at +20 min; syncs live to Captain/POS</td><td><span class="badge b-ok">🟢</span></td><td>Verified live this cycle</td></tr>
+  <tr><td>Offline billing + KOT + print</td><td>UNKNOWN depth</td><td>Local SQLite/OPFS, full offline order→bill→print, syncs on reconnect, idempotent</td><td><span class="badge b-ok">⭐</span></td><td>Known — structural, tested repeatedly across sessions</td></tr>
+  </tbody>
+  </table></div>
+
+  <h3>G–J · Inventory, Recipe, Purchase, Vendor</h3>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Feature</th><th>Petpooja</th><th>Jamanvaar</th><th>Status</th><th>Evidence</th></tr></thead>
+  <tbody>
+  <tr><td>Recipe → stock deduction on sale</td><td>Multi-stage recipe mgmt <span class="src">(cited)</span></td><td>Real: a dish's recipe deducts exact ingredient quantities on sale, restores on reversal, switches dish off at zero stock — on POS and Captain</td><td><span class="badge b-ok">🟢</span></td><td>Verified code path: <span class="filepath">repositories.ts::reconcileOrder/syncDishAvailability</span></td></tr>
+  <tr><td>Live sold-out sync to QR/guest menu</td><td>"Mark sold-out off everywhere in one tap" <span class="src">(cited)</span></td><td>Was stale (snapshot-only) on the QR menu; fixed this cycle — now live within seconds and refuses an order for it</td><td><span class="badge b-ok">🟢</span></td><td>Verified live — e2e test, order refused mid-session</td></tr>
+  <tr><td>Goods received, stock count with variance approval</td><td>Real-time stock + auto purchase orders <span class="src">(cited)</span></td><td>Real: <span class="filepath">InventoryControl</span> class — GRN, batch/expiry tracking, manager-gated variance</td><td><span class="badge b-ok">🟢</span></td><td>Verified: grep found real class, not a stub</td></tr>
+  <tr><td>Formal purchase-order lifecycle (raise → track → GRN → supplier ledger)</td><td>Purchase Order Management, raise &amp; track from suppliers <span class="src">(cited)</span></td><td>Suppliers and goods-received exist; no PO document with its own status/approval workflow found</td><td><span class="badge b-warn">🟡</span></td><td>Verified absence of a PO-specific model/flow</td></tr>
+  <tr><td>Multi-supplier price comparison ("best match")</td><td>Scans every connected supplier's rate, picks cheapest <span class="src">(cited)</span></td><td>Not found</td><td><span class="badge b-bad">🔴</span></td><td>Verified absence</td></tr>
+  <tr><td>AI invoice scanning (photo → purchase entry)</td><td>Yes <span class="src">(cited)</span></td><td>Not found</td><td><span class="badge b-bad">🔴</span></td><td>Verified absence</td></tr>
+  <tr><td>Raw-material catalogue</td><td>50 lakh+ item catalogue <span class="src">(cited)</span></td><td>Restaurant defines its own ingredients; no shared national catalogue</td><td><span class="badge b-bad">🔴</span></td><td>Known — different approach, not necessarily wrong for scope</td></tr>
+  <tr><td>Central kitchen → branch supply</td><td>Dedicated module: request/supply inventory, consolidated dispatch routing, damaged-stock return <span class="src">(cited)</span></td><td>No concept at all — no production-kitchen entity, no inter-branch transfer order</td><td><span class="badge b-bad">🔴</span></td><td>Verified absence — grepped repo, nothing</td></tr>
+  </tbody>
+  </table></div>
+
+  <h3>K–O · CRM, Loyalty, Wallet, Discounts, Coupons</h3>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Feature</th><th>Petpooja</th><th>Jamanvaar</th><th>Status</th><th>Evidence</th></tr></thead>
+  <tbody>
+  <tr><td>Customer profile, order history, spend</td><td>CRM with tags/groups <span class="src">(cited)</span></td><td>Present</td><td><span class="badge b-ok">🟢</span></td><td>Known</td></tr>
+  <tr><td>Loyalty tiers</td><td>Points-based wallet with tiers <span class="src">(cited)</span></td><td>Real tiers by lifetime spend — <span class="filepath">LoyaltyRepository</span></td><td><span class="badge b-ok">🟢</span></td><td>Verified</td></tr>
+  <tr><td>Stored-value customer wallet (top-up, redeem balance)</td><td>"Customer wallet service", points become usable balance <span class="src">(cited)</span></td><td>Not found — only a B2B House Account (credit ledger), a different concept</td><td><span class="badge b-bad">🔴</span></td><td>Verified absence: grep for wallet/balance models found nothing</td></tr>
+  <tr><td>Customer segmentation (VIP, inactive, high-value, etc.)</td><td>CRM tags &amp; groups <span class="src">(cited)</span></td><td>Audience-filter engine exists for campaigns (tags, tier rank, spend, inactivity, birthday)</td><td><span class="badge b-ok">🟢</span></td><td>Known from prior session (<span class="filepath">CustomerSegmentFilter</span>)</td></tr>
+  <tr><td>Discount engine (%, fixed, item, bill, coupon)</td><td>Standard</td><td>Present, with manager-PIN gating on high discounts</td><td><span class="badge b-ok">🟢</span></td><td>Known</td></tr>
+  <tr><td>Feedback (tablet, SMS link, scan-and-feedback, NPS)</td><td>All three channels, birthday/anniversary capture <span class="src">(cited)</span></td><td>Feedback capture present (kiosk); SMS-link / scan-and-feedback channel breadth not independently reverified this pass</td><td><span class="badge b-warn">🟡</span></td><td>Known + UNKNOWN on channel breadth</td></tr>
+  </tbody>
+  </table></div>
+
+  <h3>P–U · Online Ordering, Aggregators, Kiosk, WhatsApp</h3>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Feature</th><th>Petpooja</th><th>Jamanvaar</th><th>Status</th><th>Evidence</th></tr></thead>
+  <tbody>
+  <tr><td>QR table ordering</td><td>Standard</td><td>Real, server-priced, live sold-out aware, published-menu versioned</td><td><span class="badge b-ok">🟢</span></td><td>Verified</td></tr>
+  <tr><td>Self-order kiosk</td><td>Front-end module <span class="src">(cited)</span></td><td>Real, multilingual (EN/HI/GU), UPI QR or counter-cash, server-verified payment</td><td><span class="badge b-ok">🟢</span></td><td>Verified live this cycle (real kiosk order placed, payment page tested)</td></tr>
+  <tr><td>Zomato / Swiggy order ingestion</td><td>Both pulled onto one order screen via UrbanPiper, zero commission on linking <span class="src">(cited)</span></td><td>Design document only — <span class="filepath">URBANPIPER_ZOMATO_SWIGGY_FLOW.md</span>; no code</td><td><span class="badge b-bad">🔴</span></td><td>Verified absence of real code; plan exists and is sound</td></tr>
+  <tr><td>Aggregator menu sync (price/availability)</td><td>Edit once, syncs to Swiggy/Zomato/own channels <span class="src">(cited)</span></td><td>Edit once, syncs to POS/Captain/Kiosk/QR/WhatsApp (own channels) — aggregators not in that set yet</td><td><span class="badge b-warn">🔵</span></td><td>Verified: <span class="filepath">MenuPublicationsService</span> is real and does exactly this for owned channels</td></tr>
+  <tr><td>Online-order reconciliation (POS vs aggregator)</td><td>Matches every order, catches mismatches <span class="src">(cited)</span></td><td>No aggregator orders exist yet to reconcile; WhatsApp-sourced payments ARE reconciled (built this cycle)</td><td><span class="badge b-bad">🔴</span></td><td>Verified absence for aggregators; WhatsApp reconciliation confirmed present in commit history</td></tr>
+  <tr><td>WhatsApp ordering (browse → cart → pay → order)</td><td>"Pulled onto single order screen" <span class="src">(cited — implies receive-side only)</span></td><td>Full channel: menu/quote/checkout API, payment-link checkout, entitlement gating, outbound status webhooks, rate limiting, replay-window protection — the order is placed and paid <i>through</i> Jamanvaar, not just displayed</td><td><span class="badge b-ok">✅</span></td><td>Verified: 3 real backend modules just merged (<span class="filepath">whatsapp-channel</span>, <span class="filepath">whatsapp-ordering-admin</span>, <span class="filepath">whatsapp-outbound</span>) + Super Admin page + tests</td></tr>
+  <tr><td>Website ordering</td><td>Marketplace add-on <span class="src">(cited)</span></td><td>Not found as a distinct channel (QR ordering can be embedded, but no dedicated "website" storefront)</td><td><span class="badge b-bad">🔴</span></td><td>Verified absence</td></tr>
+  </tbody>
+  </table></div>
+
+  <h3>W–AV · Payments, Reporting, Multi-outlet, Staff, Security, AI</h3>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Feature</th><th>Petpooja</th><th>Jamanvaar</th><th>Status</th><th>Evidence</th></tr></thead>
+  <tbody>
+  <tr><td>UPI QR payment, server-verified</td><td>Standard</td><td>Razorpay, webhook-verified, split to restaurant vendor; automatic fallback to a phone-camera checkout page when the account isn't s2s-approved yet</td><td><span class="badge b-ok">✅</span></td><td>Verified live this cycle, incl. real production API call + Razorpay ticket raised</td></tr>
+  <tr><td>GST (CGST/SGST), Z-report, invoice numbering</td><td>Standard + pre-filing GST report <span class="src">(cited)</span></td><td>Present, correct split shown on every document</td><td><span class="badge b-ok">🟢</span></td><td>Known</td></tr>
+  <tr><td>Report count / breadth</td><td>200+ tools across 9 modules <span class="src">(cited)</span></td><td>72 distinct report definitions, real data</td><td><span class="badge b-warn">🟡</span></td><td>Verified count via grep on <span class="filepath">ReportsDashboard.tsx</span></td></tr>
+  <tr><td>Losses / cancellations / discount accountability report</td><td>UNKNOWN — not confirmed in cited sources</td><td>Who cancelled what, why, and its ₹ value; by staff and by reason, with "worth a look" flags (one person behind most losses, etc.)</td><td><span class="badge b-ok">✅</span></td><td>Verified live this cycle</td></tr>
+  <tr><td>Labour cost vs sales report</td><td>UNKNOWN</td><td>Hours clocked × hourly rate, % of sales, sales/labour-hour; hourly pay kept device-local, never synced</td><td><span class="badge b-ok">✅</span></td><td>Verified live this cycle</td></tr>
+  <tr><td>Multi-outlet: menu publish + per-branch override</td><td>Standard for chains <span class="src">(cited)</span></td><td>Branch-aware menu publication exists at the data layer</td><td><span class="badge b-warn">🟡</span></td><td>Known; branch-override breadth not re-verified this pass</td></tr>
+  <tr><td>Head-office / consolidated multi-outlet dashboard</td><td>Zones by region/brand/channel, one screen for all outlets <span class="src">(cited)</span></td><td>Not found — each restaurant's Admin is its own view; Super Admin manages tenancy/billing, not day-to-day outlet comparison</td><td><span class="badge b-bad">🔴</span></td><td>Verified absence</td></tr>
+  <tr><td>Central kitchen production/dispatch</td><td>Dedicated module <span class="src">(cited)</span></td><td>None</td><td><span class="badge b-bad">🔴</span></td><td>Verified absence</td></tr>
+  <tr><td>Staff roles, PIN login, manager overrides</td><td>Standard</td><td>Real RBAC, manager-PIN gated voids/discounts/take-backs</td><td><span class="badge b-ok">🟢</span></td><td>Known</td></tr>
+  <tr><td>Audit trail (who/what/when/before/after)</td><td>Standard</td><td>Present across staff, pricing, menu, cancellations, overrides</td><td><span class="badge b-ok">🟢</span></td><td>Known</td></tr>
+  <tr><td>Tenant isolation</td><td>UNKNOWN mechanism</td><td>Postgres row-level security, <i>forced</i>, per restaurant — but requires the API to connect as a non-superuser role to actually bite</td><td><span class="badge b-warn">⚠️</span></td><td>Verified: see <a href="#security">section 6</a></td></tr>
+  <tr><td>AI assistant</td><td>Procurement-focused AI (best-match supplier, invoice OCR) <span class="src">(cited)</span></td><td>"JAMAN AI" — curated question catalogue with live-computed answers across sales/kitchen/tables/inventory/staff, role- and plan-gated. Not free-text NL, not forecasting</td><td><span class="badge b-warn">🔵</span></td><td>Verified: real code, different focus to Petpooja's AI</td></tr>
+  <tr><td>Demand/inventory forecasting, anomaly detection</td><td>UNKNOWN depth beyond procurement AI</td><td>Not found anywhere</td><td><span class="badge b-bad">🔴</span></td><td>Verified absence</td></tr>
+  <tr><td>Token / queue display screen (takeaway &amp; delivery pickup)</td><td>Token management cited as a KDS-adjacent feature <span class="src">(cited)</span></td><td>Token numbers exist on every order; no dedicated customer-facing "now serving #42" display screen/app found</td><td><span class="badge b-bad">🔴</span></td><td>Verified absence</td></tr>
+  </tbody>
+  </table></div>
+</section>
+
+<section id="workflows">
+  <h2><span class="tag">3</span>Workflow gap matrix — the 8 end-to-end scenarios</h2>
+  <p class="lead">Each arrow below is a real step the order has to survive. Red steps are missing or unverified; green steps I have personally run or verified this session or a prior one in this project.</p>
+
+  <h3>1 — Dine-in</h3>
+  <div class="flow">
+    <span class="step ok">Captain seats table</span><span class="arrow">→</span><span class="step ok">Order + seat tag</span><span class="arrow">→</span><span class="step ok">KOT</span><span class="arrow">→</span><span class="step ok">KDS station</span><span class="arrow">→</span><span class="step ok">Ready (timed)</span><span class="arrow">→</span><span class="step ok">Bill request</span><span class="arrow">→</span><span class="step ok">Split by seat</span><span class="arrow">→</span><span class="step ok">Payment</span><span class="arrow">→</span><span class="step ok">Table freed</span><span class="arrow">→</span><span class="step ok">Stock deducted</span><span class="arrow">→</span><span class="step ok">Reports updated</span>
+  </div>
+  <p class="lead">Fully verified live this cycle, including the split-by-seat step which is new.</p>
+
+  <h3>2 — Takeaway</h3>
+  <div class="flow">
+    <span class="step ok">Order</span><span class="arrow">→</span><span class="step ok">KOT</span><span class="arrow">→</span><span class="step ok">Kitchen</span><span class="arrow">→</span><span class="step ok">Ready</span><span class="arrow">→</span><span class="step ok">Payment</span><span class="arrow">→</span><span class="step ok">Receipt / token #</span><span class="arrow">→</span><span class="step gap">No queue-display screen</span><span class="arrow">→</span><span class="step ok">Pickup</span>
+  </div>
+  <p class="lead">Works end to end, but the customer has to be told "ready" by staff or a phone buzz — there's no visible "Now serving #42" screen for a counter to glance at.</p>
+
+  <h3>3 — Website</h3>
+  <div class="flow">
+    <span class="step gap">No dedicated website storefront</span><span class="arrow">→</span><span class="step ok">(QR ordering could be embedded)</span>
+  </div>
+  <p class="lead">Not a distinct channel today. QR ordering's menu/pricing/order engine could become one with a thin web wrapper — it already has everything a storefront needs underneath.</p>
+
+  <h3>4 — WhatsApp</h3>
+  <div class="flow">
+    <span class="step ok">WhatsApp</span><span class="arrow">→</span><span class="step ok">Menu (synced)</span><span class="arrow">→</span><span class="step ok">Cart</span><span class="arrow">→</span><span class="step ok">Address</span><span class="arrow">→</span><span class="step ok">Payment link</span><span class="arrow">→</span><span class="step ok">Jamanvaar order engine</span><span class="arrow">→</span><span class="step ok">KOT/KDS</span><span class="arrow">→</span><span class="step ok">Status webhook out</span><span class="arrow">→</span><span class="step ok">Customer notified</span>
+  </div>
+  <p class="lead">This is the most complete non-POS channel in the system — built and merged this cycle, with duplicate-order protection, entitlement gating per plan, rate limiting and a replay window on the webhooks.</p>
+
+  <h3>5 — Kiosk</h3>
+  <div class="flow">
+    <span class="step ok">Kiosk menu</span><span class="arrow">→</span><span class="step ok">Cart + customize</span><span class="arrow">→</span><span class="step ok">Payment (UPI QR or cash)</span><span class="arrow">→</span><span class="step ok">Order</span><span class="arrow">→</span><span class="step ok">KOT/KDS</span><span class="arrow">→</span><span class="step ok">Token</span><span class="arrow">→</span><span class="step ok">Receipt</span>
+  </div>
+  <p class="lead">Fully verified this cycle, including the fallback payment page for accounts not yet approved for direct UPI QR by the gateway.</p>
+
+  <h3>6 — Aggregator (Zomato/Swiggy)</h3>
+  <div class="flow">
+    <span class="step gap">No ingestion</span><span class="arrow">→</span><span class="step gap">No accept/reject UI</span><span class="arrow">→</span><span class="step gap">No KOT/KDS entry point</span><span class="arrow">→</span><span class="step gap">No reconciliation</span>
+  </div>
+  <p class="lead">This is the single biggest workflow gap. A plan exists (<span class="filepath">URBANPIPER_ZOMATO_SWIGGY_FLOW.md</span>) that reuses the exact same order-ingestion path the WhatsApp channel and QR ordering already use — the hard architectural decision is already made, it just hasn't been built against a real UrbanPiper sandbox.</p>
+
+  <h3>7 — Offline</h3>
+  <div class="flow">
+    <span class="step ok">Internet ON, order created</span><span class="arrow">→</span><span class="step ok">Internet OFF, order+bill+print continue</span><span class="arrow">→</span><span class="step ok">Internet ON, auto-sync</span><span class="arrow">→</span><span class="step ok">No duplicate on cloud</span>
+  </div>
+  <p class="lead">This is Jamanvaar's strongest area structurally — idempotent outbox, revision-based conflict resolution (not "last write wins by clock"), and the originating-device-only-deletes rule. Verified repeatedly across sessions.</p>
+
+  <h3>8 — Multi-branch</h3>
+  <div class="flow">
+    <span class="step ok">HQ creates menu</span><span class="arrow">→</span><span class="step ok">Publishes</span><span class="arrow">→</span><span class="step gap">Branch price override breadth unverified</span><span class="arrow">→</span><span class="step ok">Branch sales recorded</span><span class="arrow">→</span><span class="step gap">No consolidated dashboard</span>
+  </div>
+  <p class="lead">The data model supports it (Branch, Device, per-branch entitlement) but the owner-facing "see all 15 branches at once" screen Petpooja's Head Office Dashboard provides doesn't exist.</p>
+</section>
+
+<section id="ux">
+  <h2><span class="tag">4</span>UX gap notes</h2>
+  <p class="lead">I have not re-run a full Playwright pass over every screen for this specific audit (that would be its own multi-day project). What follows is grounded in the real redesign work done this project: Captain, KDS, Restaurant Admin and the Kiosk have each had a genuine phone-fit/usability pass this cycle, verified in a real browser. I flag what's unverified honestly.</p>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Area</th><th>State</th><th>Note</th></tr></thead>
+  <tbody>
+  <tr><td>Captain on a phone screen</td><td><span class="badge b-ok">🟢</span></td><td>Rewritten this project to be phone-first: collapsible cart bar, course groups, per-dish serve/cancel, seat chips for split billing.</td></tr>
+  <tr><td>KDS readability under load</td><td><span class="badge b-ok">🟢</span></td><td>Per-dish status, allergy highlighting, aging colour, and the new Pass board for expo — all built with a real kitchen screen's size and lighting in mind.</td></tr>
+  <tr><td>Restaurant Admin on a phone</td><td><span class="badge b-ok">🟢</span></td><td>Was unusable on a phone before this project; now a slide-in drawer menu, full-width content, compact header.</td></tr>
+  <tr><td>First-run / onboarding for a brand-new owner</td><td><span class="badge b-ok">🟢</span></td><td>Checklist guides menu → tables → printer → team → a real practice Captain order → seeing it on KDS → the first real payment, each step with a plain-language hint.</td></tr>
+  <tr><td>POS counter speed (cashier taps-to-bill)</td><td><span class="badge b-warn">🟡</span></td><td>Functionally complete and fast; a formal "count the taps" comparison against Petpooja's counter flow was not done this pass — UNKNOWN precisely how many taps each takes.</td></tr>
+  <tr><td>Super Admin / platform console UX</td><td><span class="badge b-warn">🟡</span></td><td>Functional, RBAC-gated, but not benchmarked against a mature SaaS console's information density/navigation this pass.</td></tr>
+  <tr><td>Error states / empty states across all apps</td><td><span class="badge b-warn">🟡</span></td><td>Strong in the modules touched this project (clear "no data yet" messaging, real reasons for refusals like "Razorpay is not approved for this yet"). Not audited screen-by-screen everywhere.</td></tr>
+  </tbody>
+  </table></div>
+</section>
+
+<section id="tech">
+  <h2><span class="tag">5</span>Technical gap matrix</h2>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Area</th><th>Finding</th><th>Status</th></tr></thead>
+  <tbody>
+  <tr><td>Order idempotency</td><td>Every order channel (POS, Captain, QR, Kiosk, WhatsApp) keys on an idempotency key / external order id; a repeat push changes nothing. Verified across the merge of WhatsApp into the same pipeline.</td><td><span class="badge b-ok">🟢</span></td></tr>
+  <tr><td>Payment idempotency</td><td>Razorpay webhook signature-verified, amount-checked server-side, never trusts a client "paid" claim.</td><td><span class="badge b-ok">🟢</span></td></tr>
+  <tr><td>Sync conflict resolution</td><td>Revision-number based, not device-clock based — a recall/undo on one device correctly wins over a stale copy elsewhere. Explicitly tested this cycle (ready-time clears on recall, cancellation value is never overwritten by a stale push).</td><td><span class="badge b-ok">🟢</span></td></tr>
+  <tr><td>Database migration discipline</td><td>69 tracked migrations, additive-only in the ones reviewed this session; a real gap found and fixed this session: the local test database had no migration-history table at all (it was <code>db push</code>-provisioned, not tracked) — now synced.</td><td><span class="badge b-warn">⚠️</span></td></tr>
+  <tr><td>Test coverage</td><td>1294 tests in the root suite, 1022+ passing in the backend e2e suite (both run fresh this session after a large merge). Payment, sync, and the new gap-closure features all have dedicated test files.</td><td><span class="badge b-ok">🟢</span></td></tr>
+  <tr><td>Central menu syndication engine</td><td>Real: a published, versioned menu snapshot feeds POS, Captain, Kiosk, QR and the WhatsApp channel from one source of truth. This is architecturally the hard part of Petpooja's "edit once, syncs everywhere" claim — Jamanvaar already has it for every owned channel; aggregators are the only channel type not yet plugged into it.</td><td><span class="badge b-ok">🟢</span></td></tr>
+  <tr><td>Aggregator abstraction layer</td><td>Does not exist yet — there's nothing to abstract since no aggregator is connected. The plan document correctly recommends building one (adapter pattern: Zomato, Swiggy, UrbanPiper, future providers) rather than hard-coding to one provider.</td><td><span class="badge b-bad">🔴</span></td></tr>
+  <tr><td>Central kitchen data model</td><td>No production-kitchen entity, no branch-to-branch stock transfer order, no dispatch routing.</td><td><span class="badge b-bad">🔴</span></td></tr>
+  </tbody>
+  </table></div>
+</section>
+
+<section id="security">
+  <h2><span class="tag">6</span>Security gap matrix</h2>
+  <div class="callout warn">
+    <p><b>Verified finding, this session, local dev environment:</b> the API's own startup log printed <code>Row-level security is not enforced: the API is connected as "postgres", a superuser. Tenant isolation...</code> — Postgres exempts superuser and BYPASSRLS roles from row-level security even when it's <code>FORCE</code>d. The project already has the correct fix prepared and documented (<span class="filepath">prisma/setup-app-role.sql</span> creates a <code>jamanvaar_app</code> role with <code>NOSUPERUSER NOBYPASSRLS</code>, meant to own the database and be what the API actually connects as) — it just isn't what this local <code>.env</code> is pointed at.</p>
+    <p style="margin-bottom:0"><b>What this means in practice:</b> if your real deployed/production database connection is also using the <code>postgres</code> superuser (rather than the restricted <code>jamanvaar_app</code> role the setup script creates), then the tenant-isolation guarantees described throughout this codebase's own comments ("Restaurant A must never see Restaurant B's data") are not actually being enforced by Postgres — they'd be relying entirely on every single query in the application code remembering to filter by restaurant, which is a much weaker guarantee. <b>This needs confirming against your actual production <code>DATABASE_URL</code>, not just local dev</b> — I have not checked that, since I only have access to this local environment.</td></tr>
+  </div>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Area</th><th>Finding</th><th>Status</th></tr></thead>
+  <tbody>
+  <tr><td>Tenant isolation mechanism</td><td>Row-level security, <code>FORCE</code>d, keyed on a Postgres session variable set per request. Correct design — see caveat above on which role is actually connecting.</td><td><span class="badge b-warn">⚠️</span></td></tr>
+  <tr><td>Device authentication</td><td>Long-lived, hashed device tokens, revocable, with per-request caching invalidated instantly on any revoke/lock/plan change.</td><td><span class="badge b-ok">🟢</span></td></tr>
+  <tr><td>Payment credential handling</td><td>Razorpay secret key encrypted at rest for restaurant bank details; the WhatsApp token design explicitly keeps the Meta token server-side only, never in a browser/kiosk — documented and planned correctly, not yet built since the chatbot repo work hasn't started.</td><td><span class="badge b-ok">🟢</span></td></tr>
+  <tr><td>Webhook signature verification</td><td>Razorpay webhook signature + timestamp checked before any state change; an unconfigured secret fails closed, not open.</td><td><span class="badge b-ok">🟢</span></td></tr>
+  <tr><td>Manager-gated destructive actions</td><td>High discounts, voids, take-backs and House Account settlement all require a manager PIN captured server-side, not just a client-side gate.</td><td><span class="badge b-ok">🟢</span></td></tr>
+  <tr><td>Rate limiting on public, unauthenticated surfaces</td><td>QR guest ordering and public auth endpoints have their own (lower) rate limits distinct from the device-trusted ceiling.</td><td><span class="badge b-ok">🟢</span></td></tr>
+  <tr><td>SQL injection / XSS / CSRF</td><td>Not independently re-audited this pass. The patterns seen throughout (Zod validation, parameterized Prisma queries, no raw string interpolation into queries in anything reviewed) are consistent with a codebase that avoids these, but I have not run a dedicated injection/XSS sweep today.</td><td><span class="badge b-warn">UNKNOWN</span></td></tr>
+  </tbody>
+  </table></div>
+</section>
+
+<section id="business">
+  <h2><span class="tag">7</span>Business gap matrix — what actually moves revenue/retention</h2>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Gap</th><th>Business impact</th><th>Priority</th></tr></thead>
+  <tbody>
+  <tr><td>No Zomato/Swiggy ingestion</td><td>For most urban Indian restaurants, aggregators are 30–60% of volume. Every day without this is lost orders staff must key in by hand, or orders missed entirely.</td><td><span class="badge b-bad">P0</span></td></tr>
+  <tr><td>No consolidated multi-outlet dashboard</td><td>Any restaurant group beyond 1–2 branches needs this to manage from one place; without it, Jamanvaar cannot credibly sell to a chain.</td><td><span class="badge b-warn">P1</span></td></tr>
+  <tr><td>No customer wallet</td><td>Stored-value wallets drive prepaid revenue and repeat visits; loyalty tiers alone don't capture that cashflow benefit.</td><td><span class="badge b-warn">P2</span></td></tr>
+  <tr><td>No formal purchase-order workflow</td><td>Owners currently can't run a clean "request → approve → receive → pay vendor" cycle; this is a real daily pain point for any restaurant buying from multiple suppliers.</td><td><span class="badge b-warn">P1</span></td></tr>
+  <tr><td>No central kitchen</td><td>Irrelevant to a 1-outlet restaurant, essential the moment a chain centralizes prep — blocks the "5→15→50 outlet" growth story entirely.</td><td><span class="badge b-info">P2 (chain-only)</span></td></tr>
+  <tr><td>Losses/accountability report (already built)</td><td>Directly reduces shrinkage/theft by making it visible who is behind most cancellations/voids and why — a genuine retention/margin lever already shipped.</td><td><span class="badge b-ok">Shipped</span></td></tr>
+  </tbody>
+  </table></div>
+</section>
+
+<section id="top-build">
+  <h2><span class="tag">8</span>Top features to build (ranked by impact × urgency)</h2>
+  <ol class="ranked">
+    <li><b>Zomato / Swiggy ingestion via UrbanPiper.</b><span class="meta">Reuses the existing server-order ingestion path (same one WhatsApp and QR use) per the design doc. Needs UrbanPiper partner sandbox access first — that's the slow part, start it now.</span></li>
+    <li><b>Consolidated multi-outlet owner dashboard.</b><span class="meta">One screen, all branches, today's sales/orders/issues at a glance — the data (Branch, per-restaurant reporting) already exists; this is an aggregation screen, not new data plumbing.</span></li>
+    <li><b>Formal purchase-order lifecycle.</b><span class="meta">Raise → approve → GRN → supplier ledger, building directly on the existing <span class="filepath">InventoryControl</span>/supplier code rather than a parallel system.</span></li>
+    <li><b>Customer stored-value wallet.</b><span class="meta">Top-up, redeem, transaction ledger — parallels the existing House Account pattern but customer-facing and prepaid rather than post-paid credit.</span></li>
+    <li><b>Token / "now serving" display screen.</b><span class="meta">Small, high-visibility win for takeaway/delivery counters — token numbers already exist on every order, this is a dedicated display surface reading them.</span></li>
+    <li><b>Dedicated website ordering channel.</b><span class="meta">The QR ordering engine (server pricing, published menu, live availability) already does everything underneath; wrap it in a shareable storefront URL not gated by a table QR scan.</span></li>
+    <li><b>Multi-supplier price comparison.</b><span class="meta">Once a few suppliers are entered per ingredient, "cheapest current price" is a straightforward query against the purchase-order data in #3.</span></li>
+    <li><b>Central kitchen module.</b><span class="meta">Only worth building once a real multi-outlet customer needs it — production entity + inter-branch transfer orders + dispatch routing.</span></li>
+    <li><b>AI invoice scanning (photo → purchase entry).</b><span class="meta">High owner delight, lower urgency than the above — depends on #3 existing first (there must be a purchase entry to scan into).</span></li>
+    <li><b>Confirm production DB connects as the restricted role, not superuser.</b><span class="meta">Not a "feature," but belongs at the top of any priority list — it's the difference between tenant isolation being real or theoretical. See <a href="#security">section 6</a>.</span></li>
+  </ol>
+</section>
+
+<section id="top-bugs">
+  <h2><span class="tag">9</span>Known issues (honest list — not padded to a fixed count)</h2>
+  <p class="lead">I'm not going to invent 20 bugs to fill a quota. Here is what is genuinely known right now, from this session's own work and verification:</p>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Issue</th><th>Severity</th><th>Status</th></tr></thead>
+  <tbody>
+  <tr><td>Local dev API connects to Postgres as superuser, bypassing row-level security</td><td>High (if also true in production)</td><td><span class="badge b-warn">Needs confirming against production config</span></td></tr>
+  <tr><td>Local test database had no migration-history table — was silently 4+ migrations behind until this session's merge forced it to the surface</td><td>Medium (dev workflow risk, not user-facing)</td><td><span class="badge b-ok">Fixed this session</span></td></tr>
+  <tr><td><code>feature-catalog-model.e2e.spec.ts</code>'s seed-idempotency test occasionally times out when run alongside the full suite under heavy I/O (it spawns a child <code>ts-node</code> process)</td><td>Low — known, documented flake, not a real defect</td><td><span class="badge b-info">Documented in <span class="filepath">RAZORPAY_TEST_PLAN.md</span></span></td></tr>
+  <tr><td>UPI QR on this Razorpay account currently falls back to a phone-camera checkout page, because the account isn't yet approved by Razorpay for the direct server-to-server UPI QR API (<code>s2s_enabled_not_approved</code>)</td><td>Medium — real revenue-path limitation, external dependency</td><td><span class="badge b-warn">Support ticket raised with Razorpay; fallback built and verified live</span></td></tr>
+  </tbody>
+  </table></div>
+  <div class="callout info">For a true "top 20 bugs" list with real severity ranking, the right move is a dedicated bug-triage pass (grep the codebase's own <code>BUG_LIST_2.md</code> and any open issue tracker) rather than me guessing — that file exists in the repo root and was touched by the recent merge; worth reading directly if you want the full historical list.</div>
+</section>
+
+<section id="top-ux">
+  <h2><span class="tag">10</span>Top UX improvements</h2>
+  <ol class="ranked">
+    <li><b>Token/queue display screen</b> for takeaway &amp; delivery — biggest single visible gap for a counter-facing experience.</li>
+    <li><b>Consolidated multi-outlet dashboard</b> — an owner with 3+ branches currently has to open 3+ separate Admin sessions.</li>
+    <li><b>Formal "count the taps" benchmark</b> of POS billing speed against Petpooja's counter flow — currently unverified, and cashier speed is explicitly one of your own stated success criteria.</li>
+    <li><b>Website storefront wrapper</b> around the existing QR-ordering engine — currently a restaurant can't share "order from us online" without a table-bound QR code.</li>
+    <li><b>Purchasing UI</b> for the new purchase-order lifecycle once built — owners need a screen as simple as the losses report's "who, what, why" clarity.</li>
+  </ol>
+</section>
+
+<section id="parity">
+  <h2><span class="tag">11</span>Petpooja parity checklist</h2>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Capability</th><th>Status</th></tr></thead>
+  <tbody>
+  <tr><td>Dine-in / takeaway / delivery billing</td><td><span class="badge b-ok">✅ Jamanvaar has it</span></td></tr>
+  <tr><td>KOT / multi-station routing / KDS</td><td><span class="badge b-ok">⭐ Jamanvaar advantage (expo board, real timing)</span></td></tr>
+  <tr><td>Captain / waiter app</td><td><span class="badge b-ok">✅ Jamanvaar has it</span></td></tr>
+  <tr><td>Split bill</td><td><span class="badge b-ok">⭐ Jamanvaar advantage (exact-to-paisa, by seat)</span></td></tr>
+  <tr><td>Recipe → stock deduction</td><td><span class="badge b-ok">✅ Jamanvaar has it</span></td></tr>
+  <tr><td>Purchase order lifecycle</td><td><span class="badge b-warn">🟡 Partial</span></td></tr>
+  <tr><td>Multi-supplier price comparison / AI invoice scan</td><td><span class="badge b-bad">🔴 Missing</span></td></tr>
+  <tr><td>Central kitchen</td><td><span class="badge b-bad">🔴 Missing</span></td></tr>
+  <tr><td>Head office / multi-outlet dashboard</td><td><span class="badge b-bad">🔴 Missing</span></td></tr>
+  <tr><td>Zomato / Swiggy ingestion</td><td><span class="badge b-bad">🔴 Missing</span></td></tr>
+  <tr><td>Online order reconciliation</td><td><span class="badge b-warn">🟡 Partial (WhatsApp only)</span></td></tr>
+  <tr><td>Loyalty</td><td><span class="badge b-warn">🟡 Tiers yes, wallet no</span></td></tr>
+  <tr><td>Customer feedback (tablet/SMS/scan/NPS)</td><td><span class="badge b-warn">🟡 Partial</span></td></tr>
+  <tr><td>Kiosk</td><td><span class="badge b-ok">✅ Jamanvaar has it</span></td></tr>
+  <tr><td>WhatsApp ordering</td><td><span class="badge b-ok">⭐ Jamanvaar advantage (full order engine, not just inbox)</span></td></tr>
+  <tr><td>Offline-first</td><td><span class="badge b-ok">⭐ Jamanvaar advantage (structural)</span></td></tr>
+  <tr><td>GST / invoicing / Z-report</td><td><span class="badge b-ok">✅ Jamanvaar has it</span></td></tr>
+  <tr><td>Reporting breadth (200+ vs 72)</td><td><span class="badge b-warn">🟡 Behind, but newest reports are sharper</span></td></tr>
+  <tr><td>AI (procurement-focused vs owner-Q&amp;A-focused)</td><td><span class="badge b-info">🔵 Different approach, both incomplete vs each other's strength</span></td></tr>
+  <tr><td>Token/queue display</td><td><span class="badge b-bad">🔴 Missing</span></td></tr>
+  </tbody>
+  </table></div>
+</section>
+
+<section id="better">
+  <h2><span class="tag">12</span>"Better than Petpooja" opportunities</h2>
+  <div class="grid cols-3">
+    <div class="card"><h4>1. Offline-first by design, not bolted on</h4><div class="d">Revision-based conflict resolution, idempotent everything, a device that never loses an order. In India's connectivity reality this is a structural edge, not a feature checkbox.</div></div>
+    <div class="card"><h4>2. WhatsApp as a real order engine</h4><div class="d">Not "messages on a screen" — menu, pricing, payment and status all flow through the same verified pipeline as every other channel.</div></div>
+    <div class="card"><h4>3. Accountability-first loss reporting</h4><div class="d">Who cancelled what, why, and its cost — surfaced with plain-language flags ("Ravi is behind 60% of losses"), not buried in a generic void report.</div></div>
+    <div class="card"><h4>4. Exact-to-the-paisa split billing</h4><div class="d">By seat, by dish, or equally — shares always add up to the bill exactly, with shared dishes divided fairly. A small thing that real captains notice immediately.</div></div>
+    <div class="card"><h4>5. Real prep-time data, not estimated</h4><div class="d">Sent→ready timestamps live on the order line itself and sync correctly through recalls — most systems estimate this from ticket-level events, not per-dish.</div></div>
+    <div class="card"><h4>6. Reservation holds that actually reach the floor</h4><div class="d">A booking shows directly on the Captain's and POS's table tiles, auto-releases as a no-show — not a separate reservations screen nobody checks mid-service.</div></div>
+    <div class="card"><h4>7. Graceful payment-gateway degradation</h4><div class="d">When Razorpay's direct UPI QR isn't yet approved, the kiosk automatically falls back to a phone-camera checkout page rather than just failing — most systems would just show an error.</div></div>
+    <div class="card"><h4>8. Owner-facing Q&amp;A assistant</h4><div class="d">A curated, role-gated question catalogue answering from live data — a real foundation to grow into natural-language querying later, which Petpooja's AI doesn't currently emphasize (theirs is procurement-focused).</div></div>
+    <div class="card"><h4>9. First-run onboarding that proves itself</h4><div class="d">The setup checklist doesn't just tick boxes — it ends in watching a real order travel from a practice Captain ticket to the kitchen screen to a real payment, so a new owner knows it actually works before day one.</div></div>
+    <div class="card"><h4>10. A genuinely modular aggregator layer, done right the first time</h4><div class="d">Because nothing's built yet, there's a real chance to design one adapter interface (Zomato, Swiggy, UrbanPiper, future providers) from day one instead of retrofitting it after years of one-provider assumptions baked in — which is explicitly the trap your own prompt warned against.</div></div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <h2><span class="tag">13</span>JAMANVAAR roadmap</h2>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Phase</th><th>Focus</th><th>Key items</th></tr></thead>
+  <tbody>
+  <tr><td><b>Phase 1</b></td><td>Fix broken/at-risk core</td><td>Confirm production DB connects as the restricted role, not superuser (see §6). No other broken core workflow was found this pass.</td></tr>
+  <tr><td><b>Phase 2</b></td><td>Reach Petpooja parity</td><td>Zomato/Swiggy via UrbanPiper; formal purchase-order lifecycle; token/queue display screen; website storefront wrapper.</td></tr>
+  <tr><td><b>Phase 3</b></td><td>UX polish</td><td>Taps-to-bill benchmark vs Petpooja; Super Admin console density pass; empty/error-state sweep across untouched screens.</td></tr>
+  <tr><td><b>Phase 4</b></td><td>Enterprise / multi-outlet</td><td>Consolidated owner dashboard; branch price-override UI; central kitchen module (once a real chain customer needs it).</td></tr>
+  <tr><td><b>Phase 5</b></td><td>Integrations</td><td>Aggregator adapter layer (built to support more than Zomato/Swiggy from day one); accounting export; multi-supplier price comparison.</td></tr>
+  <tr><td><b>Phase 6</b></td><td>AI / automation</td><td>Invoice-photo-to-purchase-entry; extend JAMAN AI toward free-text querying; demand-aware low-stock alerts.</td></tr>
+  <tr><td><b>Phase 7</b></td><td>Differentiation</td><td>Double down on offline-first messaging, split-bill precision, and the loss-accountability report as explicit sales differentiators — these are genuinely ahead today.</td></tr>
+  </tbody>
+  </table></div>
+</section>
+
+<section id="impl">
+  <h2><span class="tag">14</span>Implementation plan — exact starting points</h2>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Feature</th><th>Build on</th><th>New pieces needed</th></tr></thead>
+  <tbody>
+  <tr><td>Zomato/Swiggy ingestion</td><td><span class="filepath">cloud/api/src/modules/order-sync/order-sync.service.ts</span> — same server-order ingestion the WhatsApp channel and QR module already call</td><td>New <span class="filepath">whatsapp-channel</span>-style module per aggregator, or one adapter module with provider plugins; new Prisma migration for aggregator connection + commission; UrbanPiper sandbox credentials</td></tr>
+  <tr><td>Multi-outlet dashboard</td><td>Existing per-restaurant report engine (<span class="filepath">apps/restaurant-system/pos-admin/src/components/reports</span>) + <span class="filepath">Branch</span> Prisma model</td><td>A new Super-Admin or cross-branch aggregation endpoint; a new dashboard screen that calls it per branch and renders a comparison grid</td></tr>
+  <tr><td>Purchase-order lifecycle</td><td><span class="filepath">packages/database/src/inventory_control.ts</span>'s existing supplier/GRN code</td><td>A <code>PurchaseOrder</code> entity with its own status machine (raised → approved → received → paid); a supplier ledger view</td></tr>
+  <tr><td>Customer wallet</td><td>Existing House Account / tender pattern in <span class="filepath">packages/database/src/tender.ts</span></td><td>A prepaid balance field on CustomerAccount; a top-up flow (reuses the existing payment pipeline); a redemption step in checkout</td></tr>
+  <tr><td>Token/queue display</td><td>Existing token number already on every order</td><td>A new, small read-only screen (could reuse the KDS app's shell) subscribing to order-ready events</td></tr>
+  <tr><td>Website storefront</td><td><span class="filepath">apps/qr-guest</span> — the existing QR ordering frontend and its server-priced engine</td><td>A non-table-bound entry route; a shareable restaurant URL instead of a QR-code-only one</td></tr>
+  </tbody>
+  </table></div>
+</section>
+
+<section id="tests">
+  <h2><span class="tag">15</span>Test plan for whatever gets built next</h2>
+  <ul style="font-size:13.5px;color:#334155;line-height:1.8">
+    <li><b>Aggregator ingestion:</b> duplicate webhook delivery is a no-op; unknown store code is rejected; a dish with no mapping is flagged "needs attention" rather than silently dropped; cancellation after kitchen has started is loud and recorded in the losses report.</li>
+    <li><b>Multi-outlet dashboard:</b> a restaurant with 1 branch, 5 branches and 0 branches all render correctly; tenant isolation holds — restaurant A's owner cannot see restaurant B's branches under any URL manipulation.</li>
+    <li><b>Purchase orders:</b> full E2E — raise → approve → receive differs-from-ordered quantity → supplier ledger updates correctly; a rejected PO changes nothing.</li>
+    <li><b>Wallet:</b> top-up, partial redeem, over-redeem is refused, refund path, and that wallet balance is never negative.</li>
+    <li><b>Every new feature:</b> unit test for the pure logic, an e2e test through the real API, a Playwright pass in a real browser before calling it done — exactly the standard already used for split-bill, losses report, and the Razorpay fallback built this cycle.</li>
+    <li><b>Security:</b> explicitly re-verify production <code>DATABASE_URL</code> connects as the restricted role and that row-level security is genuinely enforced (not just locally) before shipping anything new.</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  JAMANVAAR vs Petpooja audit · Generated 3 Oct 2026 · Petpooja facts sourced live from their own published material (cited inline) · Jamanvaar facts verified against the live repository this session
+</footer>
+
+</body>
+</html>

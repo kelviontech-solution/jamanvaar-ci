@@ -3,7 +3,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { CashfreeGatewayService } from '../src/modules/payments/cashfree-gateway.service';
+import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 
 const APPS = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN'];
 
@@ -19,7 +19,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
   let kioskAdminToken: string;
   let posAdminToken: string;
   let posToken: string;
-  let gateway: { createOrder: ReturnType<typeof vi.fn>; createUpiQr: ReturnType<typeof vi.fn>; createRefund: ReturnType<typeof vi.fn>; settleVendorOnDemand: ReturnType<typeof vi.fn> };
+  let gateway: { createUpiQr: ReturnType<typeof vi.fn>; createRefund: ReturnType<typeof vi.fn>; listQrPayments: ReturnType<typeof vi.fn> };
 
   const authed = (method: 'get' | 'post' | 'patch', url: string, token: string) =>
     request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
@@ -42,7 +42,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     return prisma.runAsTenant(rid, (tx) =>
       tx.paymentTransaction.create({
         data: {
-          orderId: order.id, restaurantId: rid, providerOrderId: opts.providerOrderId ?? `pay_kf_${Date.now()}_${Math.random()}`, amount: opts.amount, currency: 'INR',
+          orderId: order.id, restaurantId: rid, providerOrderId: opts.providerOrderId ?? `pay_kf_${Date.now()}_${Math.random()}`, providerPaymentId: `pay_rzp_${Date.now()}_${Math.random()}`, amount: opts.amount, currency: 'INR',
           status: (opts.status ?? 'SUCCESS') as never, paidAt: opts.paidAt ?? new Date(), commissionBps: bps, platformAmount, restaurantAmount: opts.amount - platformAmount,
           fulfilledAt: opts.fulfilled ? new Date() : null
         }
@@ -52,12 +52,11 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
 
   beforeAll(async () => {
     gateway = {
-      createOrder: vi.fn().mockResolvedValue({ cfOrderId: 'cf_1', orderId: 'pay_mock', paymentSessionId: 'session_mock', orderStatus: 'ACTIVE' }),
-      createUpiQr: vi.fn().mockResolvedValue({ qrPayload: 'BASE64QR', contentType: 'image/png', cfPaymentId: 'cfp_1' }),
-      createRefund: vi.fn().mockResolvedValue({ cfRefundId: 'cf_refund_1', refundId: 'r1', refundStatus: 'PENDING', refundAmount: 100 }),
-      settleVendorOnDemand: vi.fn().mockResolvedValue({ settlementId: '555', raw: {} })
+      createUpiQr: vi.fn().mockResolvedValue({ qrId: 'qr_kf_1', imageUrl: 'https://rzp.io/img/kf_1.png', status: 'active' }),
+      createRefund: vi.fn().mockResolvedValue({ refundId: 'rfnd_kf_1', status: 'processed', amountPaise: 2500 }),
+      listQrPayments: vi.fn().mockResolvedValue([])
     };
-    app = await createTestApp((builder) => builder.overrideProvider(CashfreeGatewayService).useValue({ isConfigured: () => true, ...gateway }));
+    app = await createTestApp((builder) => builder.overrideProvider(RazorpayGatewayService).useValue({ isConfigured: () => true, ...gateway }));
     prisma = app.get(PrismaService);
     await createTestPlatformUser(prisma, { email: adminEmail, password: adminPassword });
     platformToken = (await platformLogin(app, adminEmail, adminPassword)).body.accessToken;
@@ -78,7 +77,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     posAdminToken = await deviceFor(restaurantId, 'POS_ADMIN');
     posToken = await deviceFor(restaurantId, 'POS');
 
-    await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.create({ data: { restaurantId, status: 'ACTIVE', cashfreeVendorId: 'rest_kflow_vendor' } }));
+    await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.create({ data: { restaurantId, status: 'ACTIVE' } }));
     await prisma.runAsTenant(restaurantId, (tx) =>
       tx.menuSnapshotItem.upsert({
         where: { restaurantId_externalItemId: { restaurantId, externalItemId: 'thali-1' } },
@@ -104,17 +103,75 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
 
   // ---------------- QR ----------------
 
-  it('a kiosk gets a UPI QR for its own pending payment, with a 3 minute expiry sent to Cashfree', async () => {
+  it('a kitchen ticket is claimed once: the first kiosk gets claimed, every later claim is refused', async () => {
+    const p = await seedPayment(restaurantId, { amount: 10000, status: 'SUCCESS' });
+    const first = await authed('post', `/api/v1/payments/${p.id}/kot-claim`, kioskToken);
+    const second = await authed('post', `/api/v1/payments/${p.id}/kot-claim`, kioskToken);
+    expect(first.status).toBe(201);
+    expect(first.body.claimed).toBe(true);
+    expect(second.body.claimed).toBe(false);
+    expect(second.body.claimedAt).not.toBeNull();
+  });
+
+  it('five kiosks claiming the same paid order at the same instant produce exactly one claim', async () => {
+    const p = await seedPayment(restaurantId, { amount: 10000, status: 'SUCCESS' });
+    const kiosks = await Promise.all([1, 2, 3, 4, 5].map(() => deviceFor(restaurantId, 'KIOSK')));
+    const results = await Promise.all(kiosks.map((t) => authed('post', `/api/v1/payments/${p.id}/kot-claim`, t)));
+    expect(results.filter((r) => r.body.claimed === true)).toHaveLength(1);
+  });
+
+  it('only a kiosk can claim a kitchen ticket, and an unpaid order cannot be claimed', async () => {
+    const paid = await seedPayment(restaurantId, { amount: 10000, status: 'SUCCESS' });
+    expect((await authed('post', `/api/v1/payments/${paid.id}/kot-claim`, posToken)).status).toBe(403);
+    const unpaid = await seedPayment(restaurantId, { amount: 10000, status: 'PENDING' });
+    expect((await authed('post', `/api/v1/payments/${unpaid.id}/kot-claim`, kioskToken)).status).toBe(400);
+  });
+
+  it('one kiosk can ask for at most 20 QRs a minute; the 21st is refused with 429, and another kiosk is not affected', async () => {
+    const order = await createKioskOrder('kf-rate-qr');
+    const busyKiosk = await deviceFor(restaurantId, 'KIOSK');
+    const statuses: number[] = [];
+    for (let i = 0; i < 21; i += 1) statuses.push((await authed('post', `/api/v1/payments/${order.paymentId}/qr`, busyKiosk)).status);
+    expect(statuses.slice(0, 20).every((s) => s === 201)).toBe(true);
+    expect(statuses[20]).toBe(429);
+    const other = await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+    expect(other.status).toBe(201);
+  });
+
+  it('asking again for the QR of a pending payment returns the same QR and creates no second Razorpay QR', async () => {
+    const order = await createKioskOrder('kf-qr-same');
+    gateway.createUpiQr.mockClear();
+    const first = await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+    const second = await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+    expect(first.status).toBe(201);
+    expect(second.body.qrPayload).toBe(first.body.qrPayload);
+    expect(gateway.createUpiQr).toHaveBeenCalledTimes(1);
+  });
+
+  it('a status check settles a payment whose money arrived on its own QR, and ignores other payments', async () => {
+    const order = await createKioskOrder('kf-qr-settle');
+    await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+    gateway.listQrPayments.mockResolvedValueOnce([{ id: 'pay_other', amount: 999999, currency: 'INR', status: 'captured' }]);
+    const notYet = await authed('get', `/api/v1/payments/${order.paymentId}/status`, kioskToken);
+    expect(notYet.body.status).toBe('PENDING');
+    gateway.listQrPayments.mockResolvedValueOnce([{ id: 'pay_kf_qr_paid', amount: order.amount, currency: 'INR', status: 'captured' }]);
+    const paid = await authed('get', `/api/v1/payments/${order.paymentId}/status`, kioskToken);
+    expect(paid.body.status).toBe('SUCCESS');
+    expect(paid.body.orderStatus).toBe('PAID');
+  });
+
+  it('a kiosk gets a Razorpay UPI QR for its own pending payment, with a 3 minute expiry', async () => {
     const order = await createKioskOrder('kf-qr-1');
     gateway.createUpiQr.mockClear();
     const before = Date.now();
     const res = await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
     expect(res.status).toBe(201);
-    expect(res.body.qrPayload).toBe('BASE64QR');
-    expect(res.body.contentType).toBe('image/png');
+    expect(res.body.qrPayload).toBe('https://rzp.io/img/kf_1.png');
+    expect(res.body.contentType).toBe('image/url');
+    expect(res.body.method).toBe('UPI_QR');
     expect(new Date(res.body.expiresAt).getTime()).toBeGreaterThan(before + 170_000);
     expect(new Date(res.body.expiresAt).getTime()).toBeLessThan(before + 200_000);
-    expect(gateway.createUpiQr).toHaveBeenCalledWith('session_mock', expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/));
+    expect(gateway.createUpiQr).toHaveBeenCalledWith(expect.objectContaining({ amountPaise: order.amount, closeByUnix: expect.any(Number) }));
   });
 
   it('QR is refused for a POS device, another restaurant, an unknown payment, and a payment that is no longer pending', async () => {
@@ -142,14 +199,16 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { status: 'ACTIVE' } }));
   });
 
-  it('a Cashfree failure while creating the QR surfaces as 503 and leaves the payment untouched', async () => {
+  it('a Razorpay failure while creating the QR surfaces as 503 and leaves the payment untouched', async () => {
     const order = await createKioskOrder('kf-qr-4');
-    gateway.createUpiQr.mockRejectedValueOnce(new (await import('@nestjs/common')).ServiceUnavailableException('Cashfree down'));
+    gateway.createUpiQr.mockRejectedValueOnce(new (await import('@nestjs/common')).ServiceUnavailableException('Razorpay down'));
     const res = await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
     expect(res.status).toBe(503);
     const row = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: order.paymentId } }));
     expect(row.status).toBe('PENDING');
   });
+
+  // ---------------- QR fallback: the account is not approved for server-to-server UPI QR ----------------
 
   // ---------------- Fulfilment ----------------
 
@@ -209,7 +268,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     const p = await seedPayment(restaurantId, { amount: 10000, fulfilled: true });
     const res = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskAdminToken).send({ amountPaise: 2500, reason: 'wrong dish', requestedBy: 'Owner' });
     expect(res.status).toBe(201);
-    expect(gateway.createRefund).toHaveBeenCalledWith(expect.objectContaining({ amountPaise: 2500, orderId: p.providerOrderId }));
+    expect(gateway.createRefund).toHaveBeenCalledWith(expect.objectContaining({ amountPaise: 2500, razorpayPaymentId: p.providerPaymentId }));
     // a plain kiosk (customer-facing) still can not
     const denied = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskToken).send({ amountPaise: 100, reason: 'x', requestedBy: 'x' });
     expect(denied.status).toBe(403);
@@ -259,7 +318,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
 
   it('the day statement adds up gross, commission, refunds and the restaurant net using the original split', async () => {
     const a = await seedPayment(restaurantId, { amount: 10000, bps: 200, paidAt: jan15, fulfilled: true }); // platform 200, restaurant 9800
-    await seedPayment(restaurantId, { amount: 5000, bps: 0, paidAt: jan15, fulfilled: true }); // platform 0, restaurant 5000
+    await seedPayment(restaurantId, { amount: 5000, bps: 300, paidAt: jan15, fulfilled: true }); // platform 150, restaurant 4850
     await prisma.runAsTenant(restaurantId, (tx) =>
       tx.refund.create({ data: { paymentId: a.id, restaurantId, amount: 4000, status: 'SUCCESS', processedAt: jan15 } })
     );
@@ -277,11 +336,13 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
         refundCount: 1,
         grossVolume: 15000,
         refundedAmount: 4000,
-        platformCommission: 200,
+        platformCommission: 350,
+        razorpayFee: 300,
+        platformNetCommission: 50,
         commissionReversed: 80,
-        restaurantGross: 14800,
+        restaurantGross: 14650,
         restaurantRefundImpact: 3920,
-        netPayableToRestaurant: 10880
+        netPayableToRestaurant: 10730
       });
       expect(res.body.rows.length).toBe(2);
     }
@@ -296,30 +357,4 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     expect((await authed('get', '/api/v1/payments/tenant-statement?date=2026-01-15', kioskToken)).status).toBe(403);
   });
 
-  // ---------------- Settle now ----------------
-
-  it('Settle now requires the admin password, a vendor, and an amount of at least Rs. 10, then audits the settlement id', async () => {
-    const url = `/api/v1/restaurants/${restaurantId}/payment-connection/settle-now`;
-    expect((await authed('post', url, platformToken).send({ amountPaise: 500000 })).status).toBe(403);
-    expect((await authed('post', url, platformToken).send({ amountPaise: 500000, password: 'wrong' })).status).toBe(403);
-    expect((await authed('post', url, platformToken).send({ amountPaise: 500, password: adminPassword })).status).toBe(400);
-
-    gateway.settleVendorOnDemand.mockClear();
-    const ok = await authed('post', url, platformToken).send({ amountPaise: 500000, password: adminPassword });
-    expect(ok.status).toBe(201);
-    expect(ok.body.settlementId).toBe('555');
-    expect(gateway.settleVendorOnDemand).toHaveBeenCalledWith('rest_kflow_vendor', 500000, expect.any(String));
-    const audit = await prisma.runAsPlatform((tx) => tx.auditLog.findFirst({ where: { action: 'PAYMENT_SETTLE_NOW', restaurantId }, orderBy: { createdAt: 'desc' } }));
-    expect((audit!.details as { settlementId?: string }).settlementId).toBe('555');
-  });
-
-  it('Settle now surfaces a Cashfree refusal and is blocked for a restaurant with no Cashfree vendor', async () => {
-    const url = `/api/v1/restaurants/${restaurantId}/payment-connection/settle-now`;
-    gateway.settleVendorOnDemand.mockRejectedValueOnce(new (await import('@nestjs/common')).ServiceUnavailableException('balance below minimum'));
-    expect((await authed('post', url, platformToken).send({ amountPaise: 500000, password: adminPassword })).status).toBe(503);
-
-    await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { cashfreeVendorId: null } }));
-    expect((await authed('post', url, platformToken).send({ amountPaise: 500000, password: adminPassword })).status).toBe(403);
-    await prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { cashfreeVendorId: 'rest_kflow_vendor' } }));
-  });
 });

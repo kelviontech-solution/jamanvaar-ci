@@ -6,12 +6,15 @@ import { createRefundSchema, CreateRefundDto } from './dto/create-refund.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
 import { CurrentDevice } from '../../common/decorators/current-device.decorator';
+import { Throttle } from '@nestjs/throttler';
+import { deviceTracker } from '../../common/throttle';
 
 @Controller('api/v1/payments')
 @UseGuards(DeviceAuthGuard)
 export class PaymentOrdersController {
   constructor(private readonly payments: PaymentsService) {}
 
+  @Throttle({ paymentOrder: { limit: 30, ttl: 60_000, getTracker: deviceTracker } })
   @Post('orders')
   @UsePipes(new ZodValidationPipe(createPaymentOrderSchema))
   async createOrder(@Body() body: CreatePaymentOrderDto, @CurrentDevice() device: Device) {
@@ -45,17 +48,27 @@ export class PaymentOrdersController {
     return this.payments.tenantStatement(device.restaurantId, date);
   }
 
+  @Throttle({ paymentStatus: { limit: 120, ttl: 60_000, getTracker: deviceTracker } })
   @Get(':paymentId/status')
   async getStatus(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
     return this.payments.getPaymentStatus(device.restaurantId, paymentId);
   }
 
+  @Throttle({ paymentQr: { limit: 20, ttl: 60_000, getTracker: deviceTracker } })
   @Post(':paymentId/qr')
   async createQr(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
     if (device.type !== 'KIOSK' && device.type !== 'KIOSK_ADMIN') {
       throw new ForbiddenException('Only a Kiosk device can show a payment QR');
     }
     return this.payments.createUpiQr(device.restaurantId, paymentId);
+  }
+
+  @Post(':paymentId/kot-claim')
+  async claimKitchenTicket(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
+    if (device.type !== 'KIOSK') {
+      throw new ForbiddenException('Only a kiosk can claim a kitchen ticket');
+    }
+    return this.payments.claimKitchenTicket(device.restaurantId, paymentId, { id: device.id, type: device.type });
   }
 
   @Post(':paymentId/fulfilled')
@@ -66,6 +79,7 @@ export class PaymentOrdersController {
     return this.payments.markFulfilled(device.restaurantId, paymentId, { id: device.id, type: device.type });
   }
 
+  @Throttle({ paymentRefund: { limit: 10, ttl: 60_000, getTracker: deviceTracker } })
   @Post(':paymentId/refund')
   @UsePipes(new ZodValidationPipe(createRefundSchema))
   async refund(@Param('paymentId') paymentId: string, @Body() body: CreateRefundDto, @CurrentDevice() device: Device) {

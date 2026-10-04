@@ -42,59 +42,59 @@ enum PlatformRole {
 }
 
 model PlatformUser {
-  id           String             @id @default(uuid())
-  email        String             @unique
-  passwordHash String?            // null until a PENDING_ACTIVATION teammate sets their own password
-  fullName     String
-  role         PlatformRole       @default(SUPER_ADMIN)
-  status       PlatformUserStatus @default(ACTIVE)
-  invitedAt    DateTime?
-  activatedAt  DateTime?
+  id                       String             @id @default(uuid())
+  email                    String             @unique
+  passwordHash             String? // null until a PENDING_ACTIVATION teammate sets their own password
+  fullName                 String
+  role                     PlatformRole       @default(SUPER_ADMIN)
+  status                   PlatformUserStatus @default(ACTIVE)
+  invitedAt                DateTime?
+  activatedAt              DateTime?
   // One-time invitation credential for activate() — same shape as
   // User.activationTokenHash (SEC-001): only the sha256 hash is stored, the
   // plaintext token is returned once, at invite time.
   activationTokenHash      String?
   activationTokenExpiresAt DateTime?
-  lastLoginAt  DateTime?
+  lastLoginAt              DateTime?
   // B2-030: per-account login lockout, independent of the shared per-IP throttle.
   failedLoginAttempts      Int                @default(0)
   lockedUntil              DateTime?
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  createdAt                DateTime           @default(now())
+  updatedAt                DateTime           @updatedAt
 
   // Login OTP (second factor, required on every sign-in): only the HMAC-keyed hash of the
   // 6-digit code is ever stored, matching User.passwordResetHash's pattern.
-  loginOtpHash       String?
-  loginOtpExpiresAt  DateTime?
-  loginOtpSentAt     DateTime?
-  loginOtpAttempts   Int                @default(0)
+  loginOtpHash      String?
+  loginOtpExpiresAt DateTime?
+  loginOtpSentAt    DateTime?
+  loginOtpAttempts  Int       @default(0)
 
-  refreshTokens    PlatformRefreshToken[]
-  assignedTickets  SupportTicket[]
-  createdTickets   SupportTicket[] @relation("SupportTicketCreatedBy")
-  ticketComments   TicketComment[]
+  refreshTokens   PlatformRefreshToken[]
+  assignedTickets SupportTicket[]
+  createdTickets  SupportTicket[]        @relation("SupportTicketCreatedBy")
+  ticketComments  TicketComment[]
 }
 
 model PlatformRefreshToken {
-  id             String    @id @default(uuid())
-  platformUserId String
-  platformUser   PlatformUser @relation(fields: [platformUserId], references: [id], onDelete: Cascade)
-  tokenHash      String    @unique
-  expiresAt      DateTime
+  id               String       @id @default(uuid())
+  platformUserId   String
+  platformUser     PlatformUser @relation(fields: [platformUserId], references: [id], onDelete: Cascade)
+  tokenHash        String       @unique
+  expiresAt        DateTime
   /// Set when this token is rotated (every login renewal) - not the same as the session ending.
-  revokedAt      DateTime?
-  createdAt      DateTime  @default(now())
+  revokedAt        DateTime?
+  createdAt        DateTime     @default(now())
   /// One id per login. Refresh-token rotation keeps it, so the session list shows one row per login.
-  sessionId      String    @default(uuid())
-  sessionStartedAt DateTime @default(now())
-  lastUsedAt     DateTime  @default(now())
+  sessionId        String       @default(uuid())
+  sessionStartedAt DateTime     @default(now())
+  lastUsedAt       DateTime     @default(now())
   /// Set on every row of a session when the session is ended on purpose (revoke, logout, password change).
   /// The request guard rejects access tokens whose session has this set, so it takes effect at once.
-  terminatedAt   DateTime?
-  userAgent      String?
-  ip             String?
+  terminatedAt     DateTime?
+  userAgent        String?
+  ip               String?
   /// Approximate place of the sign-in (see common/security/geo.ts).
-  location       String?
+  location         String?
 
   @@index([platformUserId])
   @@index([sessionId])
@@ -113,82 +113,81 @@ enum RestaurantStatus {
 
 model Restaurant {
   /// Default display size (percent) for this restaurant's terminals; each terminal can override it (BUG-008).
-  displayScalePercent Int @default(100)
-  id              String           @id @default(uuid())
-  name            String
-  legalName       String?
-  gstin           String?
-  fssaiNumber     String?
-  address         String?
-  city            String?
-  state           String?
-  country         String           @default("India")
-  timezone        String           @default("Asia/Kolkata")
-  currency        String           @default("INR")
-  defaultLanguage String           @default("en")
+  displayScalePercent      Int              @default(100)
+  id                       String           @id @default(uuid())
+  name                     String
+  legalName                String?
+  gstin                    String?
+  fssaiNumber              String?
+  address                  String?
+  city                     String?
+  state                    String?
+  country                  String           @default("India")
+  timezone                 String           @default("Asia/Kolkata")
+  currency                 String           @default("INR")
+  defaultLanguage          String           @default("en")
   /// Registered/verified mobile number this restaurant's customer-facing Restaurant ID is
   /// derived from. Editable (a restaurant's phone can change) — restaurantCode is NOT
   /// recomputed when this changes; it stays immutable once generated (spec section 3).
-  mobile          String?
+  mobile                   String?
   /// Customer-facing Restaurant ID ("JM" + 10-digit mobile, e.g. JM9876543210). Immutable
   /// after creation. Null only for legacy rows not yet backfilled (see the Phase 1 backfill
   /// script) — every restaurant created after this migration always has one.
-  restaurantCode  String?          @unique
+  restaurantCode           String?          @unique
   /// True when this code came from the migration-safe fallback path (no valid mobile found
   /// during backfill) rather than a real registered number — Super Admin should review and
   /// correct these (spec section 44).
-  restaurantCodeIsFallback Boolean @default(false)
-  status          RestaurantStatus @default(ACTIVE)
+  restaurantCodeIsFallback Boolean          @default(false)
+  status                   RestaurantStatus @default(ACTIVE)
   /// BUG-015: whether the Restaurant Admin may upload their own menu CSV. Super Admin can
   /// always upload for the restaurant regardless of this flag.
-  selfMenuUploadEnabled Boolean    @default(true)
+  selfMenuUploadEnabled    Boolean          @default(true)
   /// The owner's choice to show the JAMAN AI button on this restaurant's terminals (Restaurant Admin > Settings).
-  showJamanAi     Boolean          @default(true)
-  deletedAt       DateTime?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  showJamanAi              Boolean          @default(true)
+  deletedAt                DateTime?
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
 
-  branches      Branch[]
-  users         User[]
-  devices       Device[]
-  subscriptions Subscription[]
-  activationKeys ActivationKey[]
-  invoices      Invoice[]
-  payments      Payment[]
-  backups       Backup[]
-  supportTickets SupportTicket[]
-  deviceCommands      DeviceCommand[]
-  menuSyndications    RestaurantMenuSyndication[]
-  syncEventLogs       SyncEventLog[]
-  syncConflicts       SyncConflict[]
-  offlineExtensions   OfflineExtension[]
-  qrCodes             QrCode[]
-  qrSettings          QrSettings[]
-  qrEvents            QrEvent[]
-  sandboxes           RestaurantSandbox[]
-  restoreJobs         BackupRestoreJob[]
-  applicationEntitlements ApplicationEntitlement[]
-  orders                  Order[]
-  paymentTransactions     PaymentTransaction[]
-  paymentConnection       RestaurantPaymentConnection?
+  branches                  Branch[]
+  users                     User[]
+  devices                   Device[]
+  subscriptions             Subscription[]
+  activationKeys            ActivationKey[]
+  invoices                  Invoice[]
+  payments                  Payment[]
+  backups                   Backup[]
+  supportTickets            SupportTicket[]
+  deviceCommands            DeviceCommand[]
+  menuSyndications          RestaurantMenuSyndication[]
+  syncEventLogs             SyncEventLog[]
+  syncConflicts             SyncConflict[]
+  offlineExtensions         OfflineExtension[]
+  qrCodes                   QrCode[]
+  qrSettings                QrSettings[]
+  qrEvents                  QrEvent[]
+  sandboxes                 RestaurantSandbox[]
+  restoreJobs               BackupRestoreJob[]
+  applicationEntitlements   ApplicationEntitlement[]
+  orders                    Order[]
+  paymentTransactions       PaymentTransaction[]
+  paymentConnection         RestaurantPaymentConnection?
   whatsappChannelConnection WhatsAppChannelConnection?
   outboundWebhookDeliveries OutboundWebhookDelivery[]
-  refunds                 Refund[]
-  reconciliationExceptions ReconciliationException[]
-  webhookEvents           WebhookEvent[]
-  menuSnapshotItems       MenuSnapshotItem[]
-  syncedOrders            SyncedOrder[]
-  processedSyncEvents     ProcessedSyncEvent[]
-  syncSequences           SyncSequence[]
-  numberSequences         NumberSequence[]
-  inventoryMovements      InventoryMovement[]
-  menuPublications        MenuPublication[]
-  menuSnapshots           MenuSnapshot[]
-  menuImages              MenuImage[]
-  qrBranding              QrBranding?
-  syncedEntities          SyncedEntity[]
-  aiAccess                RestaurantAiAccess?
-  aiUsage                 AiUsageDaily[]
+  refunds                   Refund[]
+  webhookEvents             WebhookEvent[]
+  menuSnapshotItems         MenuSnapshotItem[]
+  syncedOrders              SyncedOrder[]
+  processedSyncEvents       ProcessedSyncEvent[]
+  syncSequences             SyncSequence[]
+  numberSequences           NumberSequence[]
+  inventoryMovements        InventoryMovement[]
+  menuPublications          MenuPublication[]
+  menuSnapshots             MenuSnapshot[]
+  menuImages                MenuImage[]
+  qrBranding                QrBranding?
+  syncedEntities            SyncedEntity[]
+  aiAccess                  RestaurantAiAccess?
+  aiUsage                   AiUsageDaily[]
 }
 
 enum BranchStatus {
@@ -208,8 +207,8 @@ model Branch {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  users   User[]
-  devices Device[]
+  users          User[]
+  devices        Device[]
   activationKeys ActivationKey[]
 
   @@unique([restaurantId, code])
@@ -229,19 +228,19 @@ enum TenantUserStatus {
 }
 
 model User {
-  id           String            @id @default(uuid())
-  restaurantId String
-  restaurant   Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  branchId     String?
-  branch       Branch?           @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  email        String
-  phone        String?
-  passwordHash String?           // null until a PENDING_ACTIVATION owner sets their own password
-  fullName     String
-  role         TenantUserRole    @default(STAFF)
-  status       TenantUserStatus  @default(PENDING_ACTIVATION)
-  invitedAt    DateTime?
-  activatedAt  DateTime?
+  id                       String           @id @default(uuid())
+  restaurantId             String
+  restaurant               Restaurant       @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branchId                 String?
+  branch                   Branch?          @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  email                    String
+  phone                    String?
+  passwordHash             String? // null until a PENDING_ACTIVATION owner sets their own password
+  fullName                 String
+  role                     TenantUserRole   @default(STAFF)
+  status                   TenantUserStatus @default(PENDING_ACTIVATION)
+  invitedAt                DateTime?
+  activatedAt              DateTime?
   // One-time invitation credential for setInitialPassword (SEC-001). Only the
   // sha256 hash is stored — the plaintext token is returned once, at creation
   // time, the same way ActivationKey.code is. Both must be cleared/consumed
@@ -254,12 +253,12 @@ model User {
   passwordResetHash        String?
   passwordResetExpiresAt   DateTime?
   passwordResetSentAt      DateTime?
-  passwordResetAttempts    Int               @default(0)
+  passwordResetAttempts    Int              @default(0)
   // B2-030: per-account login lockout, independent of the shared per-IP throttle.
-  failedLoginAttempts      Int               @default(0)
+  failedLoginAttempts      Int              @default(0)
   lockedUntil              DateTime?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
 
   refreshTokens TenantRefreshToken[]
 
@@ -349,23 +348,23 @@ model Feature {
 }
 
 model Plan {
-  id           String     @id @default(uuid())
-  tier         PlanTier
+  id            String        @id @default(uuid())
+  tier          PlanTier
   /// Which commercial product line this plan belongs to. A restaurant may hold one active
   /// subscription per family at once (see SubscriptionsService.assign) — e.g. a RESTAURANT
   /// Core/Pro/QR plan plus a separate KIOSK Standard/Pro add-on, concurrently.
   productFamily ProductFamily @default(RESTAURANT)
-  name         String
-  description  String?
-  priceMonthly Int // paise, avoids float rounding
-  priceYearly  Int?
-  maxBranches  Int
-  maxDevices   Int
-  maxUsers     Int
-  entitlements Json
-  status       PlanStatus @default(ACTIVE)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  name          String
+  description   String?
+  priceMonthly  Int // paise, avoids float rounding
+  priceYearly   Int?
+  maxBranches   Int
+  maxDevices    Int
+  maxUsers      Int
+  entitlements  Json
+  status        PlanStatus    @default(ACTIVE)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   subscriptions Subscription[]
   invoices      Invoice[]
@@ -392,8 +391,8 @@ model Subscription {
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
 
-  activationKeys ActivationKey[]
-  invoices       Invoice[]
+  activationKeys          ActivationKey[]
+  invoices                Invoice[]
   applicationEntitlements ApplicationEntitlement[]
 
   @@index([restaurantId])
@@ -466,7 +465,7 @@ model ActivationKey {
   restaurant         Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   subscriptionId     String?
   subscription       Subscription?           @relation(fields: [subscriptionId], references: [id])
-  allowedDeviceType  ActivationKeyDeviceType  @default(ANY)
+  allowedDeviceType  ActivationKeyDeviceType @default(ANY)
   status             ActivationKeyStatus     @default(ACTIVE)
   expiresAt          DateTime
   redeemedAt         DateTime?
@@ -504,49 +503,49 @@ enum DeviceStatus {
 }
 
 model Device {
-  id           String       @id @default(uuid())
-  restaurantId String
-  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  branchId     String?
-  branch       Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  type         DeviceType
-  publicKey    String?      // populated once the keypair activation flow (later phase) ships
-  appVersion   String?
-  status       DeviceStatus @default(PENDING)
-  lastSeenAt   DateTime?
-  lastSyncAt   DateTime?    // last time this device's local runtime successfully synced
-  lastBackupAt DateTime?    // last time this device reported a completed local backup
-  syncStatus   String?      // free-form status string reported by the device (e.g. "ok", "stale", "error: <reason>")
+  id              String       @id @default(uuid())
+  restaurantId    String
+  restaurant      Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branchId        String?
+  branch          Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  type            DeviceType
+  publicKey       String? // populated once the keypair activation flow (later phase) ships
+  appVersion      String?
+  status          DeviceStatus @default(PENDING)
+  lastSeenAt      DateTime?
+  lastSyncAt      DateTime? // last time this device's local runtime successfully synced
+  lastBackupAt    DateTime? // last time this device reported a completed local backup
+  syncStatus      String? // free-form status string reported by the device (e.g. "ok", "stale", "error: <reason>")
   // sha256 hash of the opaque bearer credential issued once at activation-redeem
   // time (DeviceAuthGuard). Never store the plaintext — same pattern as
   // TenantRefreshToken.tokenHash and User.activationTokenHash.
-  deviceTokenHash String?  @unique
-  activatedAt  DateTime?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  deviceTokenHash String?      @unique
+  activatedAt     DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 
   name             String?
   ipAddress        String?
   macAddress       String?
   osPlatform       String?
-  isLocked         Boolean         @default(false)
+  isLocked         Boolean   @default(false)
   lockReason       String?
   lockedAt         DateTime?
-  pendingSyncCount Int             @default(0)
+  pendingSyncCount Int       @default(0)
   syncError        String?
   /// The menu version this device last reported as fully applied (see MenuPublication).
   menuVersion      Int?
   /// KDS only: the kitchen station this screen serves, assigned by Restaurant Admin. Null = the screen chooses (all stations).
   kitchenStation   String?
 
-  backups          Backup[]
-  commands         DeviceCommand[]
-  syncEventLogs    SyncEventLog[]
-  syncConflicts    SyncConflict[]
+  backups           Backup[]
+  commands          DeviceCommand[]
+  syncEventLogs     SyncEventLog[]
+  syncConflicts     SyncConflict[]
   offlineExtensions OfflineExtension[]
-  orders           Order[]
-  syncedOrders     SyncedOrder[]
-  syncedEntities   SyncedEntity[]
+  orders            Order[]
+  syncedOrders      SyncedOrder[]
+  syncedEntities    SyncedEntity[]
 
   @@index([restaurantId])
   @@index([branchId])
@@ -599,33 +598,33 @@ enum TicketPriority {
 }
 
 model SupportTicket {
-  id           String         @id @default(uuid())
+  id             String         @id @default(uuid())
   /// Human-quotable number (shown as TKT-000123). Auto-incrementing, never reused.
-  number       Int            @unique @default(autoincrement())
-  restaurantId String? // null = platform-wide issue, not tied to one tenant
-  restaurant   Restaurant?    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  subject      String
-  description  String
-  status       TicketStatus   @default(OPEN)
-  priority     TicketPriority @default(MEDIUM)
-  assignedToId String?
-  assignedTo   PlatformUser?  @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+  number         Int            @unique @default(autoincrement())
+  restaurantId   String? // null = platform-wide issue, not tied to one tenant
+  restaurant     Restaurant?    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  subject        String
+  description    String
+  status         TicketStatus   @default(OPEN)
+  priority       TicketPriority @default(MEDIUM)
+  assignedToId   String?
+  assignedTo     PlatformUser?  @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
   /// Set when platform staff raised it; null when the restaurant did (see source / raisedBy*).
-  createdById  String?
-  createdBy    PlatformUser?  @relation("SupportTicketCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  createdById    String?
+  createdBy      PlatformUser?  @relation("SupportTicketCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
   /// PLATFORM (staff raised it) or RESTAURANT (raised from Restaurant Admin).
-  source       String         @default("PLATFORM")
+  source         String         @default("PLATFORM")
   /// BILLING, SYNC, HARDWARE, ONBOARDING, FEATURE_REQUEST, OTHER
-  category     String         @default("OTHER")
+  category       String         @default("OTHER")
   raisedByUserId String?
   raisedByName   String?
   raisedByEmail  String?
-  branchId     String?
-  deviceId     String?
-  slaDueAt     DateTime
-  resolvedAt   DateTime?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  branchId       String?
+  deviceId       String?
+  slaDueAt       DateTime
+  resolvedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   comments    TicketComment[]
   events      TicketEvent[]
@@ -638,52 +637,52 @@ model SupportTicket {
 }
 
 model TicketComment {
-  id        String        @id @default(uuid())
-  ticketId  String
-  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  authorId  String?
-  author    PlatformUser? @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id         String        @id @default(uuid())
+  ticketId   String
+  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId   String?
+  author     PlatformUser? @relation(fields: [authorId], references: [id], onDelete: Cascade)
   /// PLATFORM or RESTAURANT; for a restaurant reply authorId is null and authorName says who.
-  authorType String       @default("PLATFORM")
+  authorType String        @default("PLATFORM")
   authorName String?
   /// Internal notes are for the platform team only and never shown to the restaurant.
-  internal  Boolean       @default(false)
-  body      String
-  createdAt DateTime      @default(now())
+  internal   Boolean       @default(false)
+  body       String
+  createdAt  DateTime      @default(now())
 
   @@index([ticketId])
 }
 
 /// The ticket's history: who changed what and when.
 model TicketEvent {
-  id        String        @id @default(uuid())
-  ticketId  String
-  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  id                  String        @id @default(uuid())
+  ticketId            String
+  ticket              SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   /// CREATED, STATUS, PRIORITY, ASSIGNEE, ATTACHMENT
-  type      String
-  actorType String        @default("PLATFORM")
-  actorName String?
-  fromValue String?
-  toValue   String?
+  type                String
+  actorType           String        @default("PLATFORM")
+  actorName           String?
+  fromValue           String?
+  toValue             String?
   /// Restaurant-visible? Assignee changes are internal.
-  visibleToRestaurant Boolean @default(true)
-  createdAt DateTime      @default(now())
+  visibleToRestaurant Boolean       @default(true)
+  createdAt           DateTime      @default(now())
 
   @@index([ticketId, createdAt])
 }
 
 /// Small screenshots / documents, stored in the database (limited to a few per ticket and a couple of MB each).
 model TicketAttachment {
-  id         String        @id @default(uuid())
-  ticketId   String
-  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  fileName   String
-  mimeType   String
-  sizeBytes  Int
-  data       Bytes
-  uploadedByType String    @default("PLATFORM")
+  id             String        @id @default(uuid())
+  ticketId       String
+  ticket         SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  fileName       String
+  mimeType       String
+  sizeBytes      Int
+  data           Bytes
+  uploadedByType String        @default("PLATFORM")
   uploadedByName String?
-  createdAt  DateTime      @default(now())
+  createdAt      DateTime      @default(now())
 
   @@index([ticketId])
 }
@@ -726,9 +725,9 @@ model Invoice {
   subscription       Subscription? @relation(fields: [subscriptionId], references: [id])
   planId             String?
   plan               Plan?         @relation(fields: [planId], references: [id])
-  amount             Int           // in paise
-  taxAmount          Int           // in paise (GST 18%)
-  totalAmount        Int           // in paise
+  amount             Int // in paise
+  taxAmount          Int // in paise (GST 18%)
+  totalAmount        Int // in paise
   currency           String        @default("INR")
   status             InvoiceStatus @default(ISSUED)
   billingPeriodStart DateTime
@@ -759,7 +758,7 @@ model Payment {
   invoice         Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   restaurantId    String
   restaurant      Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  amount          Int           // in paise
+  amount          Int // in paise
   method          PaymentMethod @default(BANK_TRANSFER)
   referenceNumber String?
   receiptNumber   String?       @unique
@@ -782,17 +781,17 @@ enum AppReleaseChannel {
 }
 
 model AppRelease {
-  id                  String             @id @default(uuid())
-  appCode             String             // POS, RESTAURANT_ADMIN, CAPTAIN, KDS, KIOSK, KIOSK_ADMIN
-  version             String             // e.g. "2.4.0"
-  channel             AppReleaseChannel  @default(STABLE)
+  id                  String            @id @default(uuid())
+  appCode             String // POS, RESTAURANT_ADMIN, CAPTAIN, KDS, KIOSK, KIOSK_ADMIN
+  version             String // e.g. "2.4.0"
+  channel             AppReleaseChannel @default(STABLE)
   minSupportedVersion String?
-  supportedPlatforms  Json               // ["windows", "android", "web", "electron"]
+  supportedPlatforms  Json // ["windows", "android", "web", "electron"]
   releaseNotes        String?
   downloadUrl         String?
-  isMandatory         Boolean            @default(false)
-  releasedAt          DateTime           @default(now())
-  createdAt           DateTime           @default(now())
+  isMandatory         Boolean           @default(false)
+  releasedAt          DateTime          @default(now())
+  createdAt           DateTime          @default(now())
 
   @@unique([appCode, version])
   @@index([appCode])
@@ -830,25 +829,25 @@ enum BackupStatus {
 }
 
 model Backup {
-  id                 String             @id @default(uuid())
+  id                 String       @id @default(uuid())
   restaurantId       String
-  restaurant         Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurant         Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   deviceId           String?
-  device             Device?            @relation(fields: [deviceId], references: [id], onDelete: SetNull)
-  method             BackupMethod       @default(MANUAL)
-  status             BackupStatus       @default(COMPLETED)
+  device             Device?      @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  method             BackupMethod @default(MANUAL)
+  status             BackupStatus @default(COMPLETED)
   sizeBytes          Int
-  storageKey         String             // object key within the configured bucket
+  storageKey         String // object key within the configured bucket
   checksumSha256     String
   errorMessage       String?
-  verificationStatus String?            @default("UNVERIFIED") // UNVERIFIED, VERIFIED, CORRUPT
+  verificationStatus String?      @default("UNVERIFIED") // UNVERIFIED, VERIFIED, CORRUPT
   verifiedAt         DateTime?
-  retentionDays      Int                @default(30)
+  retentionDays      Int          @default(30)
   /// BUG-074: true when the stored object is AES-256-GCM encrypted (see BackupStorageService).
-  encrypted          Boolean            @default(false)
-  createdAt          DateTime           @default(now())
+  encrypted          Boolean      @default(false)
+  createdAt          DateTime     @default(now())
 
-  restoreJobs        BackupRestoreJob[]
+  restoreJobs BackupRestoreJob[]
 
   @@index([restaurantId])
   @@index([deviceId])
@@ -936,12 +935,12 @@ model MasterMenuItem {
   name                   String
   description            String?
   imageUrl               String?
-  basePrice              Int                         // in paise
+  basePrice              Int // in paise
   preparationTimeMinutes Int                         @default(15)
   dietaryType            String                      @default("VEG") // VEG, NON_VEG, VEGAN, JAIN, SWAMINARAYAN
   isAvailable            Boolean                     @default(true)
-  allergens              Json?                       // string[]
-  tags                   Json?                       // string[]
+  allergens              Json? // string[]
+  tags                   Json? // string[]
   taxRate                Int                         @default(500) // 5.00% (500 paise basis points)
   hsnCode                String?                     @default("996331")
   recipe                 Json?
@@ -958,7 +957,7 @@ model RestaurantMenuSyndication {
   restaurant   Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   masterItemId String
   masterItem   MasterMenuItem @relation(fields: [masterItemId], references: [id], onDelete: Cascade)
-  customPrice  Int?           // overridden restaurant price in paise
+  customPrice  Int? // overridden restaurant price in paise
   customName   String?
   isCustomized Boolean        @default(false)
   autoSync     Boolean        @default(true)
@@ -982,13 +981,13 @@ model SyncEventLog {
   branchId     String?
   deviceId     String?
   device       Device?    @relation(fields: [deviceId], references: [id], onDelete: SetNull)
-  entityType   String     // ORDER, MENU, INVENTORY, CUSTOMER
+  entityType   String // ORDER, MENU, INVENTORY, CUSTOMER
   entityId     String?
   /// Ties one journey (device -> server -> conflicts) together for support; defaults to the order id.
   traceId      String?
   eventId      String?
-  action       String     // CREATE, UPDATE, DELETE
-  status       String     // SUCCESS, FAILED, PENDING
+  action       String // CREATE, UPDATE, DELETE
+  status       String // SUCCESS, FAILED, PENDING
   latencyMs    Int        @default(0)
   payloadSize  Int        @default(0)
   errorMessage String?
@@ -1076,7 +1075,7 @@ model BackupRestoreJob {
   backup         Backup     @relation(fields: [backupId], references: [id], onDelete: Cascade)
   restaurantId   String
   restaurant     Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  targetType     String     // STAGING_PREVIEW, PRODUCTION_RESTORE
+  targetType     String // STAGING_PREVIEW, PRODUCTION_RESTORE
   status         String     @default("PENDING") // PENDING, PREVIEW_READY, RESTORING, COMPLETED, FAILED
   previewSummary Json?
   errorMessage   String?
@@ -1090,22 +1089,18 @@ model BackupRestoreJob {
 }
 
 // ---------------------------------------------------------------------------
-// Cashfree Payment Gateway — Phase 1 (see docs/superpowers/specs/2026-09-09-
-// cashfree-payment-phase1-design.md). Distinct model/enum names from the
+// Online payments through Razorpay. Distinct model/enum names from the
 // existing Payment/PaymentMethod/PaymentStatus above, which are platform
 // subscription billing, not customer-order payments.
 // ---------------------------------------------------------------------------
 
 enum PaymentProvider {
-  CASHFREE
+  RAZORPAY
 }
 
-// Only PLATFORM_POOLED (Cashfree Easy Split, one JAMANVAAR-owned account) is
-// implemented in Phase 1. A true per-restaurant merchant-account mode would
-// be added later via `ALTER TYPE ... ADD VALUE`, the same way AppCode and
-// ActivationKeyDeviceType were extended in the application-entitlements
-// migration — it requires Cashfree Partner/Platform approval JAMANVAAR does
-// not have yet.
+// Only PLATFORM_POOLED (one JAMANVAAR-owned account, with each restaurant's share routed through Razorpay Route linked accounts) is
+// implemented. A per-restaurant merchant-account mode would be added later
+// via `ALTER TYPE ... ADD VALUE`.
 enum PaymentConnectionType {
   PLATFORM_POOLED
 }
@@ -1200,7 +1195,7 @@ model Order {
   externalOrderId String // correlates to the kiosk's local order id; doubles as the idempotency key
   // Who created this payment-bookkeeping row — 'KIOSK' (default, the walk-up device flow) or
   // 'WHATSAPP' (the connector's channels/checkout, see WhatsAppChannelService.checkout). Read by
-  // the Cashfree webhook handler to decide whether a SUCCESS payment must also create the
+  // the Razorpay webhook handler to decide whether a SUCCESS payment must also create the
   // POS/KDS-visible SyncedOrder (WhatsApp orders never create one at checkout time — only once
   // paid, see JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md Phase 4).
   source          String             @default("KIOSK")
@@ -1227,32 +1222,31 @@ model Order {
 }
 
 model PaymentTransaction {
-  id                String                    @id @default(uuid())
-  orderId           String
-  order             Order                     @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  restaurantId      String
-  restaurant        Restaurant                @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  provider          PaymentProvider           @default(CASHFREE)
-  providerOrderId   String // the order_id we generate and send to Cashfree
-  providerPaymentId String? // Cashfree's cf_payment_id, known once paid/failed
-  amount            Int // paise
-  currency          String                    @default("INR")
-  status            PaymentTransactionStatus  @default(CREATED)
-  method            PaymentTransactionMethod?
-  paymentSessionId  String?
-  providerResponse  Json? // sanitized webhook/API response, no secrets
-  failureReason     String?
-  commissionBps     Int?    // basis points snapshot at order-creation time; frozen forever after — never recomputed on a later rate change
-  platformAmount    Int?    // paise, computed once at creation from commissionBps
-  restaurantAmount  Int?    // paise, computed once at creation; platformAmount + restaurantAmount == amount
+  id                  String                    @id @default(uuid())
+  orderId             String
+  order               Order                     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  restaurantId        String
+  restaurant          Restaurant                @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  provider            PaymentProvider           @default(RAZORPAY)
+  providerOrderId     String // the order_id we generate and send to Razorpay
+  providerPaymentId   String? // Razorpay's cf_payment_id, known once paid/failed
+  amount              Int // paise
+  currency            String                    @default("INR")
+  status              PaymentTransactionStatus  @default(CREATED)
+  method              PaymentTransactionMethod?
+  providerResponse    Json? // sanitized webhook/API response, no secrets
+  failureReason       String?
+  commissionBps       Int? // basis points snapshot at order-creation time; frozen forever after — never recomputed on a later rate change
+  platformAmount      Int? // paise, computed once at creation from commissionBps
+  restaurantAmount    Int? // paise, computed once at creation; platformAmount + restaurantAmount == amount
   fulfilledAt         DateTime? // set once the kiosk has created the token/KOT for this paid order (or staff mark it fulfilled); null on a SUCCESS payment = "needs attention"
+  kotClaimedAt        DateTime?
   fulfilledByDeviceId String?
-  paidAt            DateTime?
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
+  paidAt              DateTime?
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
 
   refunds Refund[]
-  reconciliationExceptions ReconciliationException[]
 
   @@unique([provider, providerOrderId])
   @@unique([provider, providerPaymentId])
@@ -1262,42 +1256,38 @@ model PaymentTransaction {
   @@index([providerPaymentId])
 }
 
-// One per restaurant. Represents the Cashfree Easy Split vendor
-// registration for Phase 1 (PLATFORM_POOLED) — settlement bank/UPI details,
-// not independent API credentials.
-enum CashfreeAccountType {
+// One per restaurant. Settlement bank/UPI details for PLATFORM_POOLED, not independent API credentials.
+enum PayoutAccountType {
   BUSINESS
   INDIVIDUAL
 }
 
 model RestaurantPaymentConnection {
-  id                                String                  @id @default(uuid())
-  restaurantId                      String                  @unique
-  restaurant                        Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  provider                          PaymentProvider         @default(CASHFREE)
-  connectionType                    PaymentConnectionType   @default(PLATFORM_POOLED)
-  cashfreeVendorId                  String?
-  accountType                       CashfreeAccountType?
-  businessType                      String? // free text, passed through to Cashfree verbatim — see plan's Global Constraints
-  pan                               String?
-  gst                               String?
-  cin                               String?
-  uidai                             String? // Aadhar, stored as String (not a number) to avoid precision/leading-zero loss
-  contactName                       String?
-  contactEmail                      String?
-  contactPhone                      String?
-  cashfreeVendorStatus              String? // Cashfree's own async verification status (IN_BENE_CREATION/ACTIVE/ACTION_REQUIRED/...), distinct from our own `status` field
-  status                            PaymentConnectionStatus @default(NOT_CONNECTED)
-  settlementAccountName             String?
-  settlementAccountNumberEncrypted  String? // encrypted via credential-encryption.util
-  settlementIfsc                    String?
-  settlementUpiVpa                  String?
-  verifiedAt                        DateTime?
-  lastWebhookAt                     DateTime?
-  lastPaymentAt                     DateTime?
-  commissionOverrideBps             Int?                    // basis points, 0-10000; null = use the platform default (PlatformSetting key PAYMENT_DEFAULT_COMMISSION_BPS)
-  createdAt                         DateTime                @default(now())
-  updatedAt                         DateTime                @updatedAt
+  id                               String                  @id @default(uuid())
+  restaurantId                     String                  @unique
+  restaurant                       Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  provider                         PaymentProvider         @default(RAZORPAY)
+  connectionType                   PaymentConnectionType   @default(PLATFORM_POOLED)
+  accountType                      PayoutAccountType?
+  businessType                     String? // free text, passed through to Razorpay verbatim — see plan's Global Constraints
+  pan                              String?
+  gst                              String?
+  cin                              String?
+  uidai                            String? // Aadhar, stored as String (not a number) to avoid precision/leading-zero loss
+  contactName                      String?
+  contactEmail                     String?
+  contactPhone                     String?
+  status                           PaymentConnectionStatus @default(NOT_CONNECTED)
+  settlementAccountName            String?
+  settlementAccountNumberEncrypted String? // encrypted via credential-encryption.util
+  settlementIfsc                   String?
+  settlementUpiVpa                 String?
+  verifiedAt                       DateTime?
+  lastWebhookAt                    DateTime?
+  lastPaymentAt                    DateTime?
+  commissionOverrideBps            Int? // basis points, 0-10000; null = use the platform default (PlatformSetting key PAYMENT_DEFAULT_COMMISSION_BPS)
+  createdAt                        DateTime                @default(now())
+  updatedAt                        DateTime                @updatedAt
 }
 
 // Jamanvaar ↔ WhatsApp connector, Phase 0 (docs/integrations/JAMANVAAR_WHATSAPP_CONNECTOR_IMPLEMENTATION_PLAN.md).
@@ -1306,21 +1296,21 @@ model RestaurantPaymentConnection {
 // a connection) and a prefix (so a displayed "jmn_live_ab12••••" is recognisable without
 // revealing the rest) — same shape as an activation key's own redaction (B2-051/B2-053).
 model WhatsAppChannelConnection {
-  id              String                           @id @default(uuid())
-  restaurantId    String                           @unique
-  restaurant      Restaurant                       @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  id              String                          @id @default(uuid())
+  restaurantId    String                          @unique
+  restaurant      Restaurant                      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   keyPrefix       String // e.g. "jmn_live_ab12" — shown in Restaurant Admin so the owner recognises which key is connected, never the full key
-  keyHash         String                           @unique // SHA-256 of the raw key; the raw key itself is returned once at generation and never stored
-  status          WhatsAppChannelConnectionStatus  @default(PENDING)
-  permissions     Json                             @default("[]") // e.g. ["MENU_READ","ORDER_CREATE","ORDER_READ","ORDER_STATUS_READ"]
-  autoAccept      Boolean                          @default(false)
+  keyHash         String                          @unique // SHA-256 of the raw key; the raw key itself is returned once at generation and never stored
+  status          WhatsAppChannelConnectionStatus @default(PENDING)
+  permissions     Json                            @default("[]") // e.g. ["MENU_READ","ORDER_CREATE","ORDER_READ","ORDER_STATUS_READ"]
+  autoAccept      Boolean                         @default(false)
   prepTimeMinutes Int?
   pausedAt        DateTime? // "Pause online orders" — set, not a separate boolean, so Restaurant Admin can show when it was paused
   connectedAt     DateTime? // set once product/whatsapp calls validate-key successfully
   lastUsedAt      DateTime?
   revokedAt       DateTime?
-  createdAt       DateTime                         @default(now())
-  updatedAt       DateTime                         @updatedAt
+  createdAt       DateTime                        @default(now())
+  updatedAt       DateTime                        @updatedAt
 
   @@index([restaurantId])
 }
@@ -1334,7 +1324,7 @@ enum WhatsAppChannelConnectionStatus {
 // Phase 5 of the Jamanvaar<->WhatsApp connector: the outbound half of the relationship --
 // this platform calling INTO product/whatsapp (order.confirmed once a WhatsApp order is
 // paid and visible on POS/KDS; order.status on every later status change) -- the mirror
-// image of WebhookEvent above, which records the INBOUND half (Cashfree calling us).
+// image of WebhookEvent above, which records the INBOUND half (Razorpay calling us).
 // A row is written durably before the first delivery attempt, so "retried on failure,
 // never lost" (the plan's own requirement) holds even if the process crashes mid-attempt.
 model OutboundWebhookDelivery {
@@ -1364,18 +1354,18 @@ enum OutboundWebhookDeliveryStatus {
 // Schema only in Phase 1 — no refund endpoint yet, so a later phase doesn't
 // need its own migration.
 model Refund {
-  id               String        @id @default(uuid())
+  id               String             @id @default(uuid())
   paymentId        String
   payment          PaymentTransaction @relation(fields: [paymentId], references: [id], onDelete: Cascade)
   restaurantId     String
-  restaurant       Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurant       Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   providerRefundId String?
   amount           Int // paise
   reason           String?
-  status           RefundStatus  @default(PENDING)
+  status           RefundStatus       @default(PENDING)
   requestedBy      String?
   processedAt      DateTime?
-  createdAt        DateTime      @default(now())
+  createdAt        DateTime           @default(now())
 
   @@index([restaurantId])
   @@index([paymentId])
@@ -1388,8 +1378,8 @@ model WebhookEvent {
   id               String                  @id @default(uuid())
   restaurantId     String?
   restaurant       Restaurant?             @relation(fields: [restaurantId], references: [id], onDelete: SetNull)
-  provider         PaymentProvider         @default(CASHFREE)
-  providerEventKey String // derived dedup key, e.g. `${type}:${cf_payment_id}` — Cashfree's payload carries no separate event id
+  provider         PaymentProvider         @default(RAZORPAY)
+  providerEventKey String // derived dedup key, e.g. `${type}:${cf_payment_id}` — the payload carries no separate event id
   eventType        String
   rawPayload       Json
   signatureValid   Boolean
@@ -1403,42 +1393,9 @@ model WebhookEvent {
   @@index([restaurantId])
 }
 
-enum ReconciliationExceptionType {
-  MISSING_AT_CASHFREE
-  AMOUNT_MISMATCH
-  SPLIT_MISMATCH
-  UNEXPECTED_STATUS
-}
-
-enum ReconciliationExceptionStatus {
-  OPEN
-  ACKNOWLEDGED
-  RESOLVED
-}
-
-// Compares recent successful payments against Cashfree's own split/settlement
-// records; a mismatch is recorded here for a human to investigate, never
-// auto-corrected on the PaymentTransaction it references.
-model ReconciliationException {
-  id             String                        @id @default(uuid())
-  restaurantId   String
-  restaurant     Restaurant                    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  paymentId      String
-  payment        PaymentTransaction            @relation(fields: [paymentId], references: [id], onDelete: Cascade)
-  type           ReconciliationExceptionType
-  details        Json
-  status         ReconciliationExceptionStatus @default(OPEN)
-  acknowledgedBy String?
-  acknowledgedAt DateTime?
-  createdAt      DateTime                      @default(now())
-
-  @@index([restaurantId])
-  @@index([status])
-}
-
 // ---------------------------------------------------------------------------
 // Order-sync bridge (POS/KDS/Captain). Distinct from `Order` above, which is
-// the Kiosk/Cashfree checkout model — this is the general dine-in/takeaway
+// the Kiosk/Razorpay checkout model — this is the general dine-in/takeaway
 // order created at any terminal and pushed/pulled by any device on the same
 // tenant so POS, KDS and Captain converge on one cloud copy instead of each
 // only seeing what happened to reach it over LAN mesh or shared localStorage.
@@ -1585,8 +1542,6 @@ model SyncedEntity {
   @@index([deviceId])
 }
 
-
-
 // ---------------------------------------------------------------------------
 // JAMAN AI (BUG-055..058): the question catalogue, per-restaurant access and real usage live in the
 // database, not in the API process's memory. The global thresholds are a PlatformSetting ("ai.settings").
@@ -1675,7 +1630,6 @@ model PlatformNotificationRead {
   @@id([notificationId, userId])
   @@index([userId])
 }
-
 
 // ---------------------------------------------------------------------------
 // Sync redesign: exactly-once event application and a monotonic pull cursor.

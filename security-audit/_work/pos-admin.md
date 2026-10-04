@@ -200,7 +200,7 @@ pos-admin is a **local-first React app** (Vite, also packaged as Tauri v2 "JAMAN
 - Server-side owner-only checks for creating/disabling tenant logins: `tenant-auth.service.ts:670,725`; password-reset OTP hashed, 5 attempts, 15 min, constant-time compare, non-enumerating: `tenant-auth.service.ts:799-895`.
 - DeviceAuthGuard denies revoked/suspended/locked devices and lapsed subscriptions on every device call: `device-auth.guard.ts:52-118`.
 - Refund endpoint limited to POS/POS_ADMIN device types (improvement over old audit): `payment-orders.controller.ts:32`.
-- No secrets/API keys/integration credentials in the pos-admin bundle or tauri.conf; payment-gateway credentials are not handled by this app (grep for key/secret/webhook/razorpay/cashfree in src = none).
+- No secrets/API keys/integration credentials in the pos-admin bundle or tauri.conf; payment-gateway credentials are not handled by this app (grep for key/secret/webhook/razorpay/razorpay in src = none).
 - No `withGlobalTauri`, no capabilities granted to `tauri-plugin-shell`, so plugin commands are not exposed.
 
 ## Not verified / limits
