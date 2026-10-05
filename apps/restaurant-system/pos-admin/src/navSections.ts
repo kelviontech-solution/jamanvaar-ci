@@ -38,12 +38,12 @@ export const NAV_SECTIONS: Array<GatedNavSection<NavSectionItem>> = [
     section: 'OPERATIONS',
     items: [
       { id: 'DASHBOARD', label: 'Dashboard', icon: LayoutDashboard },
-      { id: 'BILLING_SALES', label: 'Billing / Invoices', icon: DollarSign },
-      { id: 'ORDERS', label: 'Orders', icon: ShoppingBag },
-      { id: 'LIVE_KDS', label: 'Live Orders / KDS', icon: Flame },
-      { id: 'TABLES', label: 'Floor / Tables', icon: Grid },
-      { id: 'RESERVATIONS', label: 'Reservations', icon: CalendarClock },
-      { id: 'KITCHEN_KOT', label: 'Kitchen / KOT', icon: Activity }
+      { id: 'BILLING_SALES', label: 'Billing / Invoices', icon: DollarSign, requiresApp: 'POS_ADMIN' },
+      { id: 'ORDERS', label: 'Orders', icon: ShoppingBag, requiresApp: 'POS_ADMIN' },
+      { id: 'LIVE_KDS', label: 'Live Orders / KDS', icon: Flame, requiresApp: 'POS_ADMIN' },
+      { id: 'TABLES', label: 'Floor / Tables', icon: Grid, requiresApp: 'POS_ADMIN' },
+      { id: 'RESERVATIONS', label: 'Reservations', icon: CalendarClock, requiresApp: 'POS_ADMIN' },
+      { id: 'KITCHEN_KOT', label: 'Kitchen / KOT', icon: Activity, requiresApp: 'POS_ADMIN' }
     ]
   },
   {
@@ -53,20 +53,20 @@ export const NAV_SECTIONS: Array<GatedNavSection<NavSectionItem>> = [
   {
     section: 'MENU & INVENTORY',
     items: [
-      { id: 'MENU', label: 'Menu & Categories', icon: UtensilsCrossed },
-      { id: 'MENU_OPTIONS', label: 'Customisations & Tax', icon: Sliders },
-      { id: 'INVENTORY', label: 'Inventory & Recipes', icon: Package },
-      { id: 'INVENTORY_CONTROL', label: 'Purchasing & Stock Control', icon: Truck }
+      { id: 'MENU', label: 'Menu & Categories', icon: UtensilsCrossed, requiresApp: 'POS_ADMIN' },
+      { id: 'MENU_OPTIONS', label: 'Customisations & Tax', icon: Sliders, requiresApp: 'POS_ADMIN' },
+      { id: 'INVENTORY', label: 'Inventory & Recipes', icon: Package, requiresApp: 'POS_ADMIN' },
+      { id: 'INVENTORY_CONTROL', label: 'Purchasing & Stock Control', icon: Truck, requiresApp: 'POS_ADMIN' }
     ]
   },
   {
     section: 'PEOPLE & CASH',
     items: [
-      { id: 'CUSTOMERS', label: 'Customers CRM', icon: Heart },
-      { id: 'STAFF', label: 'Staff & Roles (RBAC)', icon: Users },
-      { id: 'PAYMENTS', label: 'Payments & Split', icon: CreditCard },
+      { id: 'CUSTOMERS', label: 'Customers CRM', icon: Heart, requiresApp: 'POS_ADMIN' },
+      { id: 'STAFF', label: 'Staff & Roles (RBAC)', icon: Users, requiresApp: 'POS_ADMIN' },
+      { id: 'PAYMENTS', label: 'Payments & Split', icon: CreditCard, requiresApp: 'POS_ADMIN' },
       { id: 'COUPONS', label: 'Offers & Coupons', icon: Tag },
-      { id: 'SHIFTS', label: 'Shift & Cash Drawer', icon: Coins }
+      { id: 'SHIFTS', label: 'Shift & Cash Drawer', icon: Coins, requiresApp: 'POS_ADMIN' }
     ]
   },
   {
