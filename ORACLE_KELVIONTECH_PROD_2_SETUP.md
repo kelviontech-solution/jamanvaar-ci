@@ -1,5 +1,30 @@
 # Oracle Cloud — `kelviontech-prod-2` Setup
 
+**2026-10-05: this is now the real production target.** DNS for
+`system.kelviontech.in` was switched from the AWS bridge box to this
+Oracle box's reserved IP (`130.210.16.150`) — completing the plan
+`AWS_DEPLOYMENT_MASTER_PLAN.md` stated from the start ("This AWS
+account is not meant to be permanent"). A real Let's Encrypt
+certificate was issued (`docker compose run --rm certbot certonly
+--webroot ...`, HTTP-01 challenge via the proxy's own
+`/.well-known/acme-challenge/` location) and `nginx/oracle-testing-proxy.conf`
+now serves HTTPS directly (redirect-from-HTTP included), replacing the
+separate `-ssl.conf` variant that briefly existed. `.env`'s
+`PUBLIC_ORIGIN`/`CORS_ALLOWED_ORIGINS` were updated to
+`https://system.kelviontech.in` and every frontend app was rebuilt
+(that origin is baked in at build time, not runtime-configurable).
+Certificate renewal is on a daily cron (`17 3 * * *`, certbot's own
+`renew` is a safe no-op outside its 30-day renewal window). The bare
+IP still works too (confirmed live: `https://130.210.16.150/` returns
+200 with `-k`, `http://` redirects to the domain over HTTPS) — nginx
+falls back to its only server block as the default when nothing
+matches `server_name` by SNI/Host, so there's no real access-path
+distinction between the IP and the domain. Browsers will show a cert
+mismatch warning on the bare IP (the cert is issued for the domain
+name only), so use the domain for anything user-facing regardless.
+
+---
+
 **Plan history, 2026-10-04 (same day, settled by end of day):** briefly
 considered deploying the full platform to the AWS box instead (SSH to
 this box was unreliable mid-session, dynamic ISP IP vs. the locked-down
