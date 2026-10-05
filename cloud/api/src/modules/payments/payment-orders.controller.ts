@@ -1,6 +1,7 @@
 import { Body, Controller, ForbiddenException, Get, Param, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { Device } from '@prisma/client';
 import { PaymentsService } from './payments.service';
+import { RestaurantPayoutsService } from './restaurant-payouts.service';
 import { createPaymentOrderSchema, CreatePaymentOrderDto } from './dto/create-payment-order.dto';
 import { createRefundSchema, CreateRefundDto } from './dto/create-refund.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
@@ -13,7 +14,10 @@ import { deviceTracker } from '../../common/throttle';
 @Controller('api/v1/payments')
 @UseGuards(DeviceAuthGuard, DeviceSignatureGuard)
 export class PaymentOrdersController {
-  constructor(private readonly payments: PaymentsService) {}
+  constructor(
+    private readonly payments: PaymentsService,
+    private readonly payouts: RestaurantPayoutsService
+  ) {}
 
   @Throttle({ paymentOrder: { limit: 30, ttl: 60_000, getTracker: deviceTracker } })
   @Post('orders')
@@ -47,6 +51,23 @@ export class PaymentOrdersController {
       throw new ForbiddenException('Only Kiosk Admin or POS Admin can read the day statement');
     }
     return this.payments.tenantStatement(device.restaurantId, date);
+  }
+
+  /** Gross collection, Jamanvaar's fee, net payable, and how much of that is still pending payout vs already paid. */
+  @Get('payout-summary')
+  async payoutSummary(@CurrentDevice() device: Device) {
+    if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
+      throw new ForbiddenException('Only Kiosk Admin or POS Admin can read the payout summary');
+    }
+    return this.payouts.restaurantSummary(device.restaurantId);
+  }
+
+  @Get('payout-history')
+  async payoutHistory(@CurrentDevice() device: Device, @Query('page') page = '1', @Query('limit') limit = '25') {
+    if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
+      throw new ForbiddenException('Only Kiosk Admin or POS Admin can read the payout history');
+    }
+    return this.payouts.restaurantPayoutHistory(device.restaurantId, Math.max(1, Number(page) || 1), Math.min(100, Math.max(1, Number(limit) || 25)));
   }
 
   @Throttle({ paymentStatus: { limit: 120, ttl: 60_000, getTracker: deviceTracker } })

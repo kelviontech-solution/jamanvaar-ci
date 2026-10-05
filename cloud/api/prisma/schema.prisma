@@ -170,6 +170,7 @@ model Restaurant {
   applicationEntitlements   ApplicationEntitlement[]
   orders                    Order[]
   paymentTransactions       PaymentTransaction[]
+  restaurantPayouts         RestaurantPayout[]
   paymentConnection         RestaurantPaymentConnection?
   whatsappChannelConnection WhatsAppChannelConnection?
   outboundWebhookDeliveries OutboundWebhookDelivery[]
@@ -1113,6 +1114,13 @@ enum PaymentConnectionStatus {
   DISCONNECTED
 }
 
+enum BankVerificationStatus {
+  NOT_ADDED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
 enum OrderPaymentStatus {
   DRAFT
   PENDING_PAYMENT
@@ -1243,6 +1251,10 @@ model PaymentTransaction {
   kotClaimedAt        DateTime?
   fulfilledByDeviceId String?
   paidAt              DateTime?
+  // Set exactly once, by an atomic claim (WHERE payoutId IS NULL), when a manual EOD payout batch collects this
+  // payment's restaurantAmount — the DB-level guarantee that one payment is never paid out to the restaurant twice.
+  payoutId            String?
+  payout              RestaurantPayout?         @relation(fields: [payoutId], references: [id], onDelete: SetNull)
   createdAt           DateTime                  @default(now())
   updatedAt           DateTime                  @updatedAt
 
@@ -1254,6 +1266,7 @@ model PaymentTransaction {
   @@index([status, fulfilledAt])
   @@index([orderId])
   @@index([providerPaymentId])
+  @@index([payoutId])
 }
 
 // One per restaurant. Settlement bank/UPI details for PLATFORM_POOLED, not independent API credentials.
@@ -1282,6 +1295,12 @@ model RestaurantPaymentConnection {
   settlementAccountNumberEncrypted String? // encrypted via credential-encryption.util
   settlementIfsc                   String?
   settlementUpiVpa                 String?
+  // Separate from `status` above (whether the restaurant can take online payments at all): this is specifically
+  // whether a Super Admin has checked the bank details are real, which the manual payout batch requires before
+  // including this restaurant (see RestaurantPayoutsService). A restaurant can never set its own to VERIFIED.
+  bankVerificationStatus           BankVerificationStatus  @default(NOT_ADDED)
+  bankVerifiedAt                   DateTime?
+  bankVerifiedByPlatformUserId     String?
   verifiedAt                       DateTime?
   lastWebhookAt                    DateTime?
   lastPaymentAt                    DateTime?
@@ -1391,6 +1410,52 @@ model WebhookEvent {
 
   @@unique([provider, providerEventKey])
   @@index([restaurantId])
+}
+
+// ---------------------------------------------------------------------------
+// Manual payout batches (temporary, until Razorpay Route is active). See
+// RestaurantPayoutsService — the EOD batch claims PaymentTransaction rows into one of these
+// per (restaurant, business day); the actual bank transfer happens outside this system, and a
+// Super Admin records it here with a UTR once it has genuinely happened.
+// ---------------------------------------------------------------------------
+
+enum RestaurantPayoutStatus {
+  PENDING
+  APPROVED
+  PROCESSING
+  PAID
+  ON_HOLD
+  FAILED
+}
+
+model RestaurantPayout {
+  id                   String                 @id @default(uuid())
+  restaurantId         String
+  restaurant           Restaurant             @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  // YYYYMMDD in the restaurant's own timezone (businessDateIn) — together with restaurantId this is the EOD
+  // batch's idempotency key: running the job twice for the same day can never create a second payout.
+  businessDate         String
+  status               RestaurantPayoutStatus @default(PENDING)
+  grossAmount          Int // paise, SUM(PaymentTransaction.amount) of the claimed payments — a frozen snapshot, never recomputed
+  feeAmount            Int // paise, SUM(PaymentTransaction.platformAmount) of the claimed payments
+  netAmount            Int // paise, grossAmount - feeAmount == SUM(PaymentTransaction.restaurantAmount); what is actually owed
+  paymentCount         Int // how many PaymentTransaction rows this batch claimed, for the admin screen and for audit
+  // Snapshot of the settlement details at the moment this batch was created, so a bank-detail edit afterwards
+  // never rewrites what an already-created payout says it will pay into.
+  bankAccountMasked    String?
+  bankIfsc             String?
+  utr                  String?
+  paidAt               DateTime?
+  paidByPlatformUserId String?
+  holdReason           String?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+
+  payments PaymentTransaction[]
+
+  @@unique([restaurantId, businessDate])
+  @@index([restaurantId])
+  @@index([status])
 }
 
 // ---------------------------------------------------------------------------

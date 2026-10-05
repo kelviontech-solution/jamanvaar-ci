@@ -12,7 +12,7 @@ import { MenuSyncService } from './menu-sync.service';
 import { priceCart, PriceValidationError, MenuSnapshotItemLookup } from './pricing.util';
 import { CreatePaymentOrderDto } from './dto/create-payment-order.dto';
 import { CreateRefundDto } from './dto/create-refund.dto';
-import { getDefaultCommissionBps } from './commission.util';
+import { getDefaultCommissionBps, splitCommission } from './commission.util';
 import { buildDayStatement } from './payment-statement.util';
 
 /**
@@ -87,6 +87,7 @@ export class PaymentsService {
       }
       // Every prior attempt is terminal-failed: open a fresh attempt at the same, already-validated total.
       const payment = await this.createRazorpayAttempt(existingOrder.id, restaurantId, existingOrder.totalAmount, existingOrder.currency, connection);
+      this.prewarmUpiQr(restaurantId, payment.id);
       return this.toOrderResponse(existingOrder, payment);
     }
 
@@ -134,7 +135,23 @@ export class PaymentsService {
     );
 
     const payment = await this.createRazorpayAttempt(order.id, restaurantId, order.totalAmount, order.currency, connection);
+    this.prewarmUpiQr(restaurantId, payment.id);
     return this.toOrderResponse(order, payment);
+  }
+
+  /**
+   * Fires the real QR creation (createUpiQr's own locking makes this safe to race against the kiosk's own
+   * /qr request) the moment an order is created, instead of waiting for the guest to reach the payment-method
+   * screen. Razorpay's own API call is the slow part of createUpiQr (roughly a second, measured) — overlapping
+   * it with the screen transitions the kiosk UI already takes between "order created" and "show QR" means the
+   * guest's own /qr request usually finds the QR already cached and returns near-instantly. Deliberately
+   * fire-and-forget: a failure here is not reported to the kiosk, which will create the QR for real (and see
+   * any real error) when it actually asks.
+   */
+  private prewarmUpiQr(restaurantId: string, paymentId: string): void {
+    void this.createUpiQr(restaurantId, paymentId).catch(() => {
+      // Swallowed on purpose — see this method's own doc comment.
+    });
   }
 
   /**
@@ -214,8 +231,7 @@ export class PaymentsService {
   /** Shared by the kiosk QR and WhatsApp payment paths so both compute platform commission identically. */
   private async commissionSplitFor(amount: number, connection: { commissionOverrideBps: number | null } | null) {
     const commissionBps = connection?.commissionOverrideBps ?? (await getDefaultCommissionBps(this.prisma));
-    const platformAmount = Math.round((amount * commissionBps) / 10000);
-    const restaurantAmount = amount - platformAmount;
+    const { platformAmount, restaurantAmount } = splitCommission(amount, commissionBps);
     return { commissionBps, platformAmount, restaurantAmount };
   }
 
