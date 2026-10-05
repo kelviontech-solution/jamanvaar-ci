@@ -20,7 +20,7 @@
  * devices real and countable, which only the activation path delivers.
  */
 
-import { DeviceGate, PlatformNotice, type PlatformNoticeData, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
+import { DeviceGate, PlatformNotice, type PlatformNoticeData, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver, getDevicePublicKeyJwk, signDeviceRequest } from '@jamanvaar/sync';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, EntitySyncEvent, EntitySyncPushResult, CloudSyncedEntity } from '@jamanvaar/sync';
 import { db, LicenseRepository, MenuRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
 
@@ -211,6 +211,9 @@ export async function connectDeviceStep2(
   ownerLabel: string,
   restaurantName?: string
 ): Promise<void> {
+  // Generated (or loaded, if this profile already has one) before the request, so the server can bind the device
+  // to it from the very first activation — see @jamanvaar/sync's device_identity.ts.
+  const publicKeyJwk = await getDevicePublicKeyJwk('KIOSK_ADMIN').catch(() => null);
   const res = await fetch(`${API_BASE}/api/v1/tenant-auth/activate-device`, {
     method: 'POST',
     credentials: 'include',
@@ -219,7 +222,8 @@ export async function connectDeviceStep2(
       activationSessionToken,
       activationKey: activationKey.trim(),
       deviceType: 'KIOSK_ADMIN',
-      deviceName: 'Kiosk Admin Terminal'
+      deviceName: 'Kiosk Admin Terminal',
+      ...(publicKeyJwk ? { publicKeyJwk } : {})
     })
   });
 
@@ -842,6 +846,27 @@ function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
   });
 }
 
+/** Like deviceFetch, but also signs the request with this terminal's device-bound key, for payment routes. */
+async function signedDeviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const token = getDeviceToken();
+  if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
+  const method = (init.method ?? 'GET').toUpperCase();
+  const body = typeof init.body === 'string' ? init.body : '';
+  const signed = await signDeviceRequest('KIOSK_ADMIN', method, path, body).catch((err) => {
+    console.error('Could not sign device request; sending unsigned:', err);
+    return null;
+  });
+  return DeviceGate.gatedFetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...(signed ? { 'x-device-signature': signed.signature, 'x-device-timestamp': signed.timestamp } : {}),
+      ...(init.headers ?? {})
+    }
+  });
+}
+
 async function jsonOrThrow<T>(res: Response, what: string): Promise<T> {
   const data = await parseJsonResponse(res);
   if (!res.ok) throw new CloudApiError(data?.message ?? `${what} failed (${res.status})`, res.status);
@@ -888,30 +913,30 @@ export interface DayStatement {
 }
 
 export async function getRecentPayments(): Promise<RecentPayment[]> {
-  const data = await jsonOrThrow<{ rows: RecentPayment[] }>(await deviceFetch('/api/v1/payments/tenant-recent'), 'Recent payments');
+  const data = await jsonOrThrow<{ rows: RecentPayment[] }>(await signedDeviceFetch('/api/v1/payments/tenant-recent'), 'Recent payments');
   return data.rows;
 }
 
 /** A paid order the kiosk never produced a ticket for, marked as handled by staff. */
 export async function markPaymentHandled(paymentId: string): Promise<void> {
-  await jsonOrThrow(await deviceFetch(`/api/v1/payments/${paymentId}/fulfilled`, { method: 'POST' }), 'Mark payment handled');
+  await jsonOrThrow(await signedDeviceFetch(`/api/v1/payments/${paymentId}/fulfilled`, { method: 'POST' }), 'Mark payment handled');
 }
 
 /** Real Razorpay refund. The server re-checks the remaining refundable balance; Razorpay reverses the vendor share proportionally. */
 export async function refundPayment(paymentId: string, amountPaise: number, reason: string, requestedBy: string): Promise<void> {
   await jsonOrThrow(
-    await deviceFetch(`/api/v1/payments/${paymentId}/refund`, { method: 'POST', body: JSON.stringify({ amountPaise, reason, requestedBy }) }),
+    await signedDeviceFetch(`/api/v1/payments/${paymentId}/refund`, { method: 'POST', body: JSON.stringify({ amountPaise, reason, requestedBy }) }),
     'Refund'
   );
 }
 
 export async function getDayStatement(date: string): Promise<DayStatement> {
-  return jsonOrThrow<DayStatement>(await deviceFetch(`/api/v1/payments/tenant-statement?date=${encodeURIComponent(date)}`), 'Day statement');
+  return jsonOrThrow<DayStatement>(await signedDeviceFetch(`/api/v1/payments/tenant-statement?date=${encodeURIComponent(date)}`), 'Day statement');
 }
 
 /** Online (Razorpay) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
 export async function getPaymentsSummary(): Promise<PaymentsSummary> {
-  return jsonOrThrow<PaymentsSummary>(await deviceFetch('/api/v1/payments/tenant-summary'), 'Payments summary');
+  return jsonOrThrow<PaymentsSummary>(await signedDeviceFetch('/api/v1/payments/tenant-summary'), 'Payments summary');
 }
 
 export async function pushOrderSync(events: OrderSyncPushEvent[]): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {

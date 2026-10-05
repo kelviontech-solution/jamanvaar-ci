@@ -59,13 +59,18 @@ export const resetPasswordOwnerSchema = z.object({
 });
 export type ResetPasswordOwnerDto = z.infer<typeof resetPasswordOwnerSchema>;
 
+// A device-bound ECDSA P-256 public key (https://www.w3.org/TR/WebCryptoAPI/), generated on the device itself and
+// never leaving it as a private key (see packages/sync's device_identity.ts and DeviceSignatureGuard).
+const devicePublicKeyJwkSchema = z.object({ kty: z.literal('EC'), crv: z.literal('P-256'), x: z.string(), y: z.string() }).passthrough();
+
 export const activateDeviceSchema = z.object({
   activationSessionToken: z.string().min(1, 'Activation session token is required'),
   activationKey: z.string().trim().min(1, 'Activation key is required'),
   deviceId: z.string().optional(),
   deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN', 'KIOSK_ADMIN']).default('POS_ADMIN'),
   deviceName: z.string().optional(),
-  appVersion: z.string().optional()
+  appVersion: z.string().optional(),
+  publicKeyJwk: devicePublicKeyJwkSchema.optional()
 });
 export type ActivateDeviceDto = z.infer<typeof activateDeviceSchema>;
 

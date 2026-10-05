@@ -372,9 +372,9 @@ export class ActivationKeysService {
           activatedAt: new Date(),
           lastSeenAt: new Date(),
           deviceTokenHash: hashOpaqueToken(deviceToken),
-          // Device-bound key (Kiosk only today): the private half never leaves the terminal, so a copied
-          // bearer token alone cannot pass DeviceSignatureGuard on payment routes once this is set.
-          publicKey: dto.deviceType === 'KIOSK' && dto.publicKeyJwk ? JSON.stringify(dto.publicKeyJwk) : null
+          // Device-bound key: the private half never leaves the terminal, so a copied bearer token alone cannot
+          // pass DeviceSignatureGuard on payment routes once this is set.
+          publicKey: dto.publicKeyJwk ? JSON.stringify(dto.publicKeyJwk) : null
         }
       });
 

@@ -14,7 +14,7 @@ import type {
   CloudSyncedEntity
 } from '@jamanvaar/sync';
 
-import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
+import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver, getDevicePublicKeyJwk, signDeviceRequest } from '@jamanvaar/sync';
 import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
@@ -81,10 +81,13 @@ export function resetTerminal(): void {
 }
 
 export async function activatePosDevice(code: string): Promise<void> {
+  // Generated (or loaded, if this profile already has one) before the request, so the server can bind the device
+  // to it from the very first activation — see @jamanvaar/sync's device_identity.ts.
+  const publicKeyJwk = await getDevicePublicKeyJwk('POS').catch(() => null);
   const res = await fetch(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code: code.trim(), deviceType: 'POS', appVersion: '1.0.0' })
+    body: JSON.stringify({ code: code.trim(), deviceType: 'POS', appVersion: '1.0.0', ...(publicKeyJwk ? { publicKeyJwk } : {}) })
   });
 
   const data = await parseJsonResponse(res);
@@ -122,8 +125,29 @@ export function deviceFetch(path: string, init: RequestInit = {}): Promise<Respo
   });
 }
 
+/** Like deviceFetch, but also signs the request with this terminal's device-bound key, for payment routes. */
+async function signedDeviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const token = getPosDeviceToken();
+  if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
+  const method = (init.method ?? 'GET').toUpperCase();
+  const body = typeof init.body === 'string' ? init.body : '';
+  const signed = await signDeviceRequest('POS', method, path, body).catch((err) => {
+    console.error('Could not sign device request; sending unsigned:', err);
+    return null;
+  });
+  return EndpointResolver.fetch(path, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...(signed ? { 'x-device-signature': signed.signature, 'x-device-timestamp': signed.timestamp } : {}),
+      ...(init.headers ?? {})
+    }
+  });
+}
+
 export async function getPaymentStatus(paymentId: string): Promise<{ status: string; orderStatus: string }> {
-  const res = await deviceFetch(`/api/v1/payments/${paymentId}/status`);
+  const res = await signedDeviceFetch(`/api/v1/payments/${paymentId}/status`);
   const data = await parseJsonResponse(res);
   if (!res.ok) {
     throw new CloudApiError(data?.message ?? `Payment status check failed (${res.status})`, res.status);
@@ -132,7 +156,7 @@ export async function getPaymentStatus(paymentId: string): Promise<{ status: str
 }
 
 export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
-  const res = await deviceFetch(`/api/v1/payments/${paymentId}/refund`, {
+  const res = await signedDeviceFetch(`/api/v1/payments/${paymentId}/refund`, {
     method: 'POST',
     body: JSON.stringify({ amountPaise, reason, requestedBy })
   });

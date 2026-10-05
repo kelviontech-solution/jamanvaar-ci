@@ -7,9 +7,8 @@
  * other app's frontend) is used directly.
  */
 
-import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
+import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver, getDevicePublicKeyJwk, signDeviceRequest } from '@jamanvaar/sync';
 import { MenuRepository, PrinterRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
-import { getDevicePublicKeyJwk, signDeviceRequest } from './deviceKeys';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 // Operational traffic goes to the restaurant's Branch Core when one is configured and reachable; the cloud otherwise.
@@ -126,7 +125,7 @@ export async function resolveRestaurantByCode(code: string): Promise<ResolvedRes
 export async function activateKioskDevice(code: string): Promise<ActivationResult> {
   // Generated (or loaded, if this profile already has one) before the request, so the server can bind the device
   // to it from the very first activation — see deviceKeys.ts for why only the public half is ever sent.
-  const publicKeyJwk = await getDevicePublicKeyJwk().catch(() => null);
+  const publicKeyJwk = await getDevicePublicKeyJwk('KIOSK').catch(() => null);
   const res = await fetch(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -177,7 +176,7 @@ async function signedDeviceFetch(path: string, init: RequestInit = {}): Promise<
   if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
   const method = (init.method ?? 'GET').toUpperCase();
   const body = typeof init.body === 'string' ? init.body : '';
-  const signed = await signDeviceRequest(method, path, body).catch((err) => {
+  const signed = await signDeviceRequest('KIOSK', method, path, body).catch((err) => {
     console.error('Could not sign device request; sending unsigned:', err);
     return null;
   });

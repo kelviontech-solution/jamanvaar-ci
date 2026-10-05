@@ -14,10 +14,11 @@ setInterval(() => {
 
 /**
  * Runs after DeviceAuthGuard, which has already attached `request.device`. A copied bearer token lets an attacker
- * reach this guard, but a payment request from a key-bound Kiosk also needs a signature only the original device's
- * private key (generated on-device, never sent anywhere — see kiosk-user's deviceKeys.ts) can produce.
+ * reach this guard, but a payment request from a key-bound terminal — Kiosk, Kiosk Admin, POS or POS Admin, any
+ * device type that can reach a payment route — also needs a signature only the original device's private key
+ * (generated on-device, never sent anywhere — see packages/sync's device_identity.ts) can produce.
  *
- * A Kiosk with no registered key (not yet re-activated since this shipped) is let through unsigned, so existing
+ * A device with no registered key (not yet re-activated since this shipped) is let through unsigned, so existing
  * terminals keep working; device.publicKey being set is what turns the requirement on for that one device.
  */
 @Injectable()
@@ -25,7 +26,7 @@ export class DeviceSignatureGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request & { device: Device; rawBody?: Buffer }>();
     const device = request.device;
-    if (!device || device.type !== 'KIOSK' || !device.publicKey) return true;
+    if (!device || !device.publicKey) return true;
 
     const signature = request.headers['x-device-signature'];
     const timestamp = request.headers['x-device-timestamp'];
