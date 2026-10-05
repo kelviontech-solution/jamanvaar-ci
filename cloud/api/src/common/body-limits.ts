@@ -42,7 +42,9 @@ export function installBodyParsers(app: INestApplication): void {
     const limit = bodyLimitFor(req.originalUrl ?? req.url ?? '', typeof req.headers.authorization === 'string' && req.headers.authorization.length > 0);
     let parser = jsonParsers.get(limit);
     if (!parser) {
-      parser = json({ limit });
+      // The exact bytes are kept alongside the parsed body: DeviceSignatureGuard hashes them to verify a kiosk's
+      // request signature, which must cover what was actually sent, not a re-serialization of the parsed object.
+      parser = json({ limit, verify: (verifyReq, _res, buf) => { (verifyReq as unknown as { rawBody?: Buffer }).rawBody = buf; } });
       jsonParsers.set(limit, parser);
     }
     parser(req, res, next);

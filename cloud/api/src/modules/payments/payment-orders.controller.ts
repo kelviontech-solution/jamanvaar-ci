@@ -5,12 +5,13 @@ import { createPaymentOrderSchema, CreatePaymentOrderDto } from './dto/create-pa
 import { createRefundSchema, CreateRefundDto } from './dto/create-refund.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
+import { DeviceSignatureGuard } from '../../common/guards/device-signature.guard';
 import { CurrentDevice } from '../../common/decorators/current-device.decorator';
 import { Throttle } from '@nestjs/throttler';
 import { deviceTracker } from '../../common/throttle';
 
 @Controller('api/v1/payments')
-@UseGuards(DeviceAuthGuard)
+@UseGuards(DeviceAuthGuard, DeviceSignatureGuard)
 export class PaymentOrdersController {
   constructor(private readonly payments: PaymentsService) {}
 
