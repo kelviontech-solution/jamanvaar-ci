@@ -7,7 +7,7 @@
  * other app's frontend) is used directly.
  */
 
-import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
+import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver, getDevicePublicKeyJwk, signDeviceRequest } from '@jamanvaar/sync';
 import { MenuRepository, PrinterRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
@@ -123,10 +123,13 @@ export async function resolveRestaurantByCode(code: string): Promise<ResolvedRes
 }
 
 export async function activateKioskDevice(code: string): Promise<ActivationResult> {
+  // Generated (or loaded, if this profile already has one) before the request, so the server can bind the device
+  // to it from the very first activation — see deviceKeys.ts for why only the public half is ever sent.
+  const publicKeyJwk = await getDevicePublicKeyJwk('KIOSK').catch(() => null);
   const res = await fetch(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code: code.trim(), deviceType: 'KIOSK', appVersion: '1.0.0' })
+    body: JSON.stringify({ code: code.trim(), deviceType: 'KIOSK', appVersion: '1.0.0', ...(publicKeyJwk ? { publicKeyJwk } : {}) })
   });
 
   const data = await parseJsonResponse(res);
@@ -160,6 +163,31 @@ export function deviceFetch(path: string, init: RequestInit = {}): Promise<Respo
   return EndpointResolver.fetch(path, {
     ...init,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
+  });
+}
+
+/**
+ * Like deviceFetch, but also signs the request with this terminal's device-bound key (see deviceKeys.ts) when one
+ * exists. Used only for payment routes, which DeviceSignatureGuard enforces the signature on for a key-registered
+ * Kiosk; every other route still works through deviceFetch alone, unsigned.
+ */
+async function signedDeviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const token = getKioskDeviceToken();
+  if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
+  const method = (init.method ?? 'GET').toUpperCase();
+  const body = typeof init.body === 'string' ? init.body : '';
+  const signed = await signDeviceRequest('KIOSK', method, path, body).catch((err) => {
+    console.error('Could not sign device request; sending unsigned:', err);
+    return null;
+  });
+  return EndpointResolver.fetch(path, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...(signed ? { 'x-device-signature': signed.signature, 'x-device-timestamp': signed.timestamp } : {}),
+      ...(init.headers ?? {})
+    }
   });
 }
 
@@ -258,7 +286,7 @@ export interface CartLinePayload {
 }
 
 export async function createPaymentOrder(externalOrderId: string, lines: CartLinePayload[]): Promise<PaymentOrderResult> {
-  const res = await deviceFetch('/api/v1/payments/orders', {
+  const res = await signedDeviceFetch('/api/v1/payments/orders', {
     method: 'POST',
     body: JSON.stringify({ externalOrderId, lines })
   });
@@ -279,7 +307,7 @@ export interface PaymentQr {
 
 /** Asks the server (which holds the Razorpay keys) for the UPI QR of one pending payment. */
 export async function createPaymentQr(paymentId: string): Promise<PaymentQr> {
-  const res = await deviceFetch(`/api/v1/payments/${paymentId}/qr`, { method: 'POST' });
+  const res = await signedDeviceFetch(`/api/v1/payments/${paymentId}/qr`, { method: 'POST' });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
     throw new CloudApiError(data?.message ?? `Could not create the payment QR (${res.status})`, res.status);
@@ -292,7 +320,7 @@ export async function createPaymentQr(paymentId: string): Promise<PaymentQr> {
  * A refused claim means another terminal already printed the tickets for this payment.
  */
 export async function claimKitchenTicket(paymentId: string): Promise<{ claimed: boolean; claimedAt: string | null }> {
-  const res = await deviceFetch(`/api/v1/payments/${paymentId}/kot-claim`, { method: 'POST' });
+  const res = await signedDeviceFetch(`/api/v1/payments/${paymentId}/kot-claim`, { method: 'POST' });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
     throw new CloudApiError(data?.message ?? `Could not claim the kitchen ticket (${res.status})`, res.status);
@@ -302,7 +330,7 @@ export async function claimKitchenTicket(paymentId: string): Promise<{ claimed: 
 
 /** Tells the server the token and KOT now exist for this paid order. Safe to repeat. */
 export async function markPaymentFulfilled(paymentId: string): Promise<void> {
-  const res = await deviceFetch(`/api/v1/payments/${paymentId}/fulfilled`, { method: 'POST' });
+  const res = await signedDeviceFetch(`/api/v1/payments/${paymentId}/fulfilled`, { method: 'POST' });
   if (!res.ok) {
     const data = await parseJsonResponse(res);
     throw new CloudApiError(data?.message ?? `Could not confirm fulfilment (${res.status})`, res.status);
@@ -348,7 +376,7 @@ export function clearPendingPayment(): void {
 }
 
 export async function getPaymentOrderStatus(paymentId: string): Promise<{ status: string; orderStatus: string }> {
-  const res = await deviceFetch(`/api/v1/payments/${paymentId}/status`);
+  const res = await signedDeviceFetch(`/api/v1/payments/${paymentId}/status`);
   const data = await parseJsonResponse(res);
   if (!res.ok) {
     throw new CloudApiError(data?.message ?? `Payment status check failed (${res.status})`, res.status);
@@ -368,6 +396,23 @@ export async function sendReceipt(
   const data = await parseJsonResponse(res);
   if (!res.ok) {
     throw new CloudApiError(data?.message ?? `Receipt send failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
+/**
+ * Emails the guest their own order's real bill as a PDF, generated and sent server-side. `orderId`
+ * is the kiosk's own local order id (same one every order already has, online or cash-at-counter) —
+ * the server resolves it to either the online payment or the cash order's synced record.
+ */
+export async function emailReceipt(orderId: string, email: string): Promise<{ success: boolean }> {
+  const res = await deviceFetch('/api/v1/receipts/email', {
+    method: 'POST',
+    body: JSON.stringify({ orderId, email })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Emailing the bill failed (${res.status})`, res.status);
   }
   return data;
 }

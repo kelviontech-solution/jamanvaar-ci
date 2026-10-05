@@ -20,6 +20,11 @@ const ROUTE_AREAS: Array<{ prefix: string; area: Area }> = [
   { prefix: '/feature-catalog', area: 'subscriptions' },
   { prefix: '/billing', area: 'billing' },
   { prefix: '/payment-connections', area: 'billing' },
+  // BUG: like /whatsapp-ordering above, these two routes existed in App.tsx and ProtectedLayout.tsx's nav
+  // but were never added here -- areaForRoute() failed CLOSED, so both pages showed "no access" for every
+  // role, including Platform Owner, despite being in the sidebar (or, for /payouts, about to be added to it).
+  { prefix: '/platform-payments', area: 'billing' },
+  { prefix: '/payouts', area: 'billing' },
   { prefix: '/activation-keys', area: 'devices' },
   { prefix: '/devices', area: 'devices' },
   { prefix: '/applications', area: 'ops' },

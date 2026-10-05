@@ -13,7 +13,7 @@ import type { PlanEntitlements, PlanTier } from '@jamanvaar/types';
  * the existing local mock (LicenseRepository) as its fallback.
  */
 
-import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData, pullRestaurantIdentity, pushRestaurantIdentity, type RestaurantIdentityFields, orderSyncPullQuery, EndpointResolver, publishCatalogNow } from '@jamanvaar/sync';
+import { DeviceGate, sendHeartbeat, PlatformNotice, type PlatformNoticeData, pullRestaurantIdentity, pushRestaurantIdentity, type RestaurantIdentityFields, orderSyncPullQuery, EndpointResolver, publishCatalogNow, getDevicePublicKeyJwk, signDeviceRequest } from '@jamanvaar/sync';
 import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository, LicenseRepository, TenantIsolation } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
@@ -392,6 +392,7 @@ export async function cloudActivateDevice(
   restaurant: CloudRestaurantProfile;
   deviceId: string;
 }> {
+  const publicKeyJwk = await getDevicePublicKeyJwk('POS_ADMIN').catch(() => null);
   const result = await request<{
     status: 'LOGIN_SUCCESS';
     requiresActivation: false;
@@ -406,7 +407,8 @@ export async function cloudActivateDevice(
       activationSessionToken,
       activationKey,
       deviceType: 'POS_ADMIN',
-      deviceName: 'Restaurant Admin Console'
+      deviceName: 'Restaurant Admin Console',
+      ...(publicKeyJwk ? { publicKeyJwk } : {})
     }
   });
 
@@ -817,6 +819,27 @@ function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
   });
 }
 
+/** Like deviceFetch, but also signs the request with this terminal's device-bound key, for payment routes. */
+async function signedDeviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const token = getStoredDeviceToken();
+  if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
+  const method = (init.method ?? 'GET').toUpperCase();
+  const body = typeof init.body === 'string' ? init.body : '';
+  const signed = await signDeviceRequest('POS_ADMIN', method, path, body).catch((err) => {
+    console.error('Could not sign device request; sending unsigned:', err);
+    return null;
+  });
+  return DeviceGate.gatedFetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...(signed ? { 'x-device-signature': signed.signature, 'x-device-timestamp': signed.timestamp } : {}),
+      ...(init.headers ?? {})
+    }
+  });
+}
+
 async function parseJsonResponse(res: Response): Promise<any> {
   const contentType = res.headers.get('content-type') ?? '';
   return contentType.includes('application/json') ? res.json() : undefined;
@@ -831,7 +854,7 @@ export interface PaymentsSummary {
 
 /** Online (Razorpay) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
 export async function getPaymentsSummary(): Promise<PaymentsSummary> {
-  const res = await deviceFetch('/api/v1/payments/tenant-summary');
+  const res = await signedDeviceFetch('/api/v1/payments/tenant-summary');
   const data = await parseJsonResponse(res);
   if (!res.ok) throw new CloudApiError(data?.message ?? `Payments summary failed (${res.status})`, res.status);
   return data as PaymentsSummary;
@@ -930,10 +953,20 @@ export async function createRefund(paymentId: string, amountPaise: number, reaso
   const token = getStoredDeviceToken();
   if (!token) throw new CloudApiError('Device not activated', 401);
 
-  const res = await fetch(`${API_BASE}/api/v1/payments/${paymentId}/refund`, {
+  const path = `/api/v1/payments/${paymentId}/refund`;
+  const body = JSON.stringify({ amountPaise, reason, requestedBy });
+  const signed = await signDeviceRequest('POS_ADMIN', 'POST', path, body).catch((err) => {
+    console.error('Could not sign device request; sending unsigned:', err);
+    return null;
+  });
+  const res = await fetch(`${API_BASE}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ amountPaise, reason, requestedBy })
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...(signed ? { 'x-device-signature': signed.signature, 'x-device-timestamp': signed.timestamp } : {})
+    },
+    body
   });
   const contentType = res.headers.get('content-type') ?? '';
   const data = contentType.includes('application/json') ? await res.json() : undefined;

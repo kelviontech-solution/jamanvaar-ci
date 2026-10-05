@@ -32,6 +32,19 @@ export class EBillService {
     return false;
   }
 
+  /** A simple, permissive check — the server validates for real before sending anything. */
+  public static validateEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  }
+
+  /** Mask an email for display, e.g. priya.sharma@gmail.com -> p***a@gmail.com */
+  public static maskEmail(email: string): string {
+    const [local, domain] = email.trim().split('@');
+    if (!local || !domain) return email;
+    const masked = local.length <= 2 ? `${local[0]}***` : `${local[0]}***${local[local.length - 1]}`;
+    return `${masked}@${domain}`;
+  }
+
   /**
    * Build professional WhatsApp receipt text template
    */
@@ -163,6 +176,94 @@ export class EBillService {
       success: true,
       record,
       message: `WhatsApp e-bill dispatched to ${masked}`
+    };
+  }
+
+  /**
+   * Email the real bill as a PDF, generated and sent entirely server-side from the restaurant's
+   * own order/payment rows — `sendFn` is the app's device-authed call to cloud/api's POST
+   * /api/v1/receipts/email (see receipt-email.service.ts). Works for a cash-at-counter order just
+   * as well as an online one: the server resolves `order.id` (the same local order id every kiosk
+   * order already has) to whichever of its own tables actually has that order.
+   */
+  public static async sendEmailEBill(
+    order: Order,
+    email: string,
+    sendFn: (orderId: string, email: string) => Promise<{ success: boolean }>
+  ): Promise<{ success: boolean; record: ReceiptRecord; message: string }> {
+    if (!this.validateEmail(email)) {
+      return {
+        success: false,
+        record: {
+          id: `rec-err-${Date.now()}`,
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          tokenNumber: order.tokenNumber,
+          deliveryMethod: 'EMAIL',
+          deliveryStatus: 'FAILED',
+          recipient: email,
+          content: '',
+          createdAt: new Date().toISOString(),
+          errorMessage: 'Invalid email address'
+        },
+        message: 'Please enter a valid email address'
+      };
+    }
+
+    const masked = this.maskEmail(email);
+    let sendResult: { success: boolean; errorMessage?: string };
+    try {
+      sendResult = await sendFn(order.id, email);
+    } catch (err: any) {
+      sendResult = { success: false, errorMessage: err?.message || 'Failed to reach the notification service' };
+    }
+
+    if (!sendResult.success) {
+      const record: ReceiptRecord = {
+        id: `rec-err-${Date.now()}`,
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        tokenNumber: order.tokenNumber,
+        deliveryMethod: 'EMAIL',
+        deliveryStatus: 'FAILED',
+        recipient: masked,
+        content: '',
+        createdAt: new Date().toISOString(),
+        errorMessage: sendResult.errorMessage || 'Email send failed'
+      };
+      order.eBillMethod = 'EMAIL';
+      order.eBillStatus = 'FAILED';
+      order.eBillRecipient = masked;
+      db.notify();
+      return {
+        success: false,
+        record,
+        message: `Invoice email not sent — ${sendResult.errorMessage || 'send failed'}`
+      };
+    }
+
+    const record: ReceiptRecord = {
+      id: `rec-${Date.now()}`,
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      tokenNumber: order.tokenNumber,
+      deliveryMethod: 'EMAIL',
+      deliveryStatus: 'SENT',
+      recipient: masked,
+      content: '',
+      createdAt: new Date().toISOString(),
+      sentAt: new Date().toISOString()
+    };
+
+    order.eBillMethod = 'EMAIL';
+    order.eBillStatus = 'SENT';
+    order.eBillRecipient = masked;
+    db.notify();
+
+    return {
+      success: true,
+      record,
+      message: `Invoice emailed to ${masked}`
     };
   }
 

@@ -371,7 +371,10 @@ export class ActivationKeysService {
           status: 'ACTIVE',
           activatedAt: new Date(),
           lastSeenAt: new Date(),
-          deviceTokenHash: hashOpaqueToken(deviceToken)
+          deviceTokenHash: hashOpaqueToken(deviceToken),
+          // Device-bound key: the private half never leaves the terminal, so a copied bearer token alone cannot
+          // pass DeviceSignatureGuard on payment routes once this is set.
+          publicKey: dto.publicKeyJwk ? JSON.stringify(dto.publicKeyJwk) : null
         }
       });
 

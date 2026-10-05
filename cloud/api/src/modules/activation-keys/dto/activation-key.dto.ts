@@ -22,10 +22,15 @@ export type GenerateActivationKeyDto = z.infer<typeof generateActivationKeySchem
 // A device redeeming a code isn't authenticated yet (that's the whole point of
 // this endpoint) — 'ANY' is deliberately excluded here since it's only a valid
 // *allowance* on the key, never a real device's own identity.
+// A device-bound ECDSA P-256 public key (https://www.w3.org/TR/WebCryptoAPI/), generated on the device itself and
+// never leaving it as a private key. Only a Kiosk registers one today (see DeviceSignatureGuard).
+const devicePublicKeyJwkSchema = z.object({ kty: z.literal('EC'), crv: z.literal('P-256'), x: z.string(), y: z.string() }).passthrough();
+
 export const redeemActivationKeySchema = z.object({
   code: z.string().trim().min(1),
   deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN', 'KIOSK_ADMIN']),
-  appVersion: z.string().optional()
+  appVersion: z.string().optional(),
+  publicKeyJwk: devicePublicKeyJwkSchema.optional()
 });
 export type RedeemActivationKeyDto = z.infer<typeof redeemActivationKeySchema>;
 

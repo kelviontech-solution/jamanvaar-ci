@@ -16,6 +16,7 @@ import {
   clearPendingPayment,
   getPaymentOrderStatus,
   sendReceipt,
+  emailReceipt,
   pushOrderSync,
   pullOrderSync,
   reportHeartbeat,
@@ -118,7 +119,6 @@ import {
   Lock,
   Mail,
   MessageCircle,
-  MessageSquare,
   Minus,
   PackagePlus,
   PhoneCall,
@@ -481,9 +481,9 @@ export default function KioskUserApp() {
   const [speechSettled, setSpeechSettled] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Digital E-Bill & WhatsApp Receipt States (Sections 130-152)
+  // Digital E-Bill & Email Receipt States (Sections 130-152)
   const [isEBillModalOpen, setIsEBillModalOpen] = useState(false);
-  const [eBillPhoneInput, setEBillPhoneInput] = useState('');
+  const [eBillEmailInput, setEBillEmailInput] = useState('');
   const [eBillSuccessMessage, setEBillSuccessMessage] = useState<string | null>(null);
 
   // Modals for Extra Features
@@ -852,7 +852,7 @@ export default function KioskUserApp() {
     setFeedbackSubmitted(false);
     setFeedbackRating(0);
     setFeedbackTags([]);
-    setEBillPhoneInput('');
+    setEBillEmailInput('');
     setIsChatbotOpen(false);
     setIsEBillModalOpen(false);
     setEBillSuccessMessage(null);
@@ -1487,13 +1487,15 @@ export default function KioskUserApp() {
     await proceedToConfirmation(order, networkState === 'ONLINE');
   };
 
-  // Dispatch WhatsApp E-Bill (the kiosk's only digital delivery channel — SMS receipt was removed
-  // per owner request in favor of WhatsApp, which carries the same tax invoice for free).
+  // Dispatch the e-bill by email — a real, server-generated PDF tax invoice, replacing the old
+  // WhatsApp e-bill (which only ever forwarded display text to a notification API, never an
+  // actual invoice). Works for a cash order too — the server resolves placedOrder.id to whichever
+  // of its own tables (online payment or the cash order's synced record) actually has it.
   const handleDispatchEBill = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!placedOrder || !eBillPhoneInput) return;
+    if (!placedOrder || !eBillEmailInput) return;
 
-    const res = await EBillService.sendWhatsAppEBill(placedOrder, eBillPhoneInput, receiptConfig, sendReceipt);
+    const res = await EBillService.sendEmailEBill(placedOrder, eBillEmailInput, emailReceipt);
     ReceiptRepository.addRecord(res.record);
     if (res.success) {
       setEBillSuccessMessage(res.message);
@@ -3273,13 +3275,13 @@ export default function KioskUserApp() {
                     <span className="text-[11px] font-bold text-jaman-navy">Print Receipt</span>
                   </button>
 
-                  {/* Option 1: WhatsApp E-Bill */}
+                  {/* Option 1: Email E-Bill (PDF invoice) */}
                   <button
                     onClick={() => setIsEBillModalOpen(true)}
                     className="p-3 rounded-2xl bg-jaman-ivory border border-jaman-border hover:bg-emerald-50 hover:border-emerald-500 flex flex-col items-center gap-1.5 transition-all active:scale-95"
                   >
-                    <MessageSquare className="w-5 h-5 text-emerald-600" />
-                    <span className="text-[11px] font-bold text-jaman-navy">WhatsApp E-Bill</span>
+                    <Mail className="w-5 h-5 text-emerald-600" />
+                    <span className="text-[11px] font-bold text-jaman-navy">Email Bill</span>
                   </button>
 
                   {/* Option 2: Scannable QR Code */}
@@ -3474,31 +3476,27 @@ export default function KioskUserApp() {
         </div>
       )}
 
-      {/* MODAL: DIGITAL E-BILL & WHATSAPP DELIVERY */}
+      {/* MODAL: DIGITAL E-BILL & EMAIL DELIVERY */}
       <Modal
         isOpen={isEBillModalOpen}
         onClose={() => setIsEBillModalOpen(false)}
-        title="Send WhatsApp E-Bill"
+        title="Email Your Bill"
       >
         <form onSubmit={handleDispatchEBill} className="space-y-4 py-2">
           <p className="text-xs text-[#4A5568]">
-            Enter your 10-digit mobile number to receive your official JAMANVAAR tax invoice with live tracking.
+            Enter your email address to receive your official JAMANVAAR tax invoice as a PDF.
           </p>
 
           <div>
-            <label className="block text-xs font-bold text-jaman-navy mb-1">Mobile Number</label>
-            <div className="flex gap-2">
-              <span className="bg-jaman-ivory border border-jaman-border px-3 py-2 rounded-xl text-xs font-bold flex items-center">+91</span>
-              <input
-                type="tel"
-                maxLength={10}
-                required
-                value={eBillPhoneInput}
-                onChange={(e) => setEBillPhoneInput(e.target.value.replace(/\D/g, ''))}
-                placeholder="Enter 10-digit number"
-                className="flex-1 bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy"
-              />
-            </div>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">Email Address</label>
+            <input
+              type="email"
+              required
+              value={eBillEmailInput}
+              onChange={(e) => setEBillEmailInput(e.target.value)}
+              placeholder="you@example.com"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+            />
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
@@ -3506,7 +3504,7 @@ export default function KioskUserApp() {
               Cancel
             </Button>
             <Button variant="accent" type="submit" leftIcon={<Send className="w-3.5 h-3.5" />}>
-              Send WhatsApp Bill
+              Email My Bill
             </Button>
           </div>
         </form>

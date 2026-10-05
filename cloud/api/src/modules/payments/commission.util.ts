@@ -16,3 +16,16 @@ export async function getDefaultCommissionBps(prisma: PrismaService): Promise<nu
   const value = row?.value as { bps?: number } | undefined;
   return typeof value?.bps === 'number' ? value.bps : DEFAULT_COMMISSION_BPS;
 }
+
+/**
+ * The one rounding rule for splitting a gross amount between the platform and the restaurant, in integer paise —
+ * used identically by order creation (commissionSplitFor in payments.service.ts), the restaurant ledger (every
+ * PaymentTransaction's own platformAmount/restaurantAmount), and the manual payout batch (which only ever sums
+ * these already-frozen values, never recomputes them). `platformAmount + restaurantAmount` always equals
+ * `grossAmountPaise` exactly, by construction — the restaurant's share is gross minus whatever the platform fee
+ * rounded to, not an independently rounded value, so the two can never silently drift apart.
+ */
+export function splitCommission(grossAmountPaise: number, commissionBps: number): { platformAmount: number; restaurantAmount: number } {
+  const platformAmount = Math.round((grossAmountPaise * commissionBps) / 10000);
+  return { platformAmount, restaurantAmount: grossAmountPaise - platformAmount };
+}

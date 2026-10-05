@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -165,12 +165,25 @@ export class PaymentConnectionsService {
   }
 
   /**
-   * Activation pays each restaurant's share into its own account through Razorpay Route linked accounts. Until Route is
-   * enabled on the platform account, activating would send restaurant money to the platform's account, so it is refused.
+   * Activation while Razorpay Route is pending: online payments switch on today, collected into the platform's
+   * account and tracked per-restaurant exactly as before (PaymentTransaction.platformAmount/restaurantAmount).
+   * The restaurant's share reaches it through the temporary manual payout path (RestaurantPayoutsService) instead
+   * of an automatic Route transfer — see that service's own doc comment for the full design. Submitting bank
+   * details here is what makes a restaurant eligible for that path once a Super Admin verifies them
+   * (bankVerificationStatus); approval itself does not require them yet.
    */
   async approve(restaurantId: string, actor: PlatformUser, password?: string) {
     await requireStepUpPassword(actor, password);
-    throw new ConflictException('Restaurant payouts need Razorpay Route linked accounts, which are not enabled on this platform yet. Online payments stay off until they are.');
+    return this.prisma.runAsPlatform(async (tx) => {
+      const connection = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
+      if (!connection) throw new NotFoundException('No payment connection for this restaurant');
+      if (connection.status !== 'PENDING_VERIFICATION') {
+        throw new ForbiddenException(`Cannot approve from status ${connection.status}`);
+      }
+      const updated = await tx.restaurantPaymentConnection.update({ where: { restaurantId }, data: { status: 'ACTIVE', verifiedAt: new Date() } });
+      await this.audit.log({ actorType: 'PLATFORM', actorId: actor.id, restaurantId, action: 'PAYMENT_CONNECTION_APPROVED', category: 'PAYMENTS', details: {} }, tx);
+      return { status: updated.status };
+    });
   }
 
   private async transitionStatus(restaurantId: string, actor: PlatformUser, allowedFrom: string[], to: string, auditAction: string) {
@@ -250,6 +263,7 @@ export class PaymentConnectionsService {
     lastWebhookAt: Date | null;
     lastPaymentAt: Date | null;
     commissionOverrideBps: number | null;
+    bankVerificationStatus: string;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -285,6 +299,7 @@ export class PaymentConnectionsService {
       // for the same reason as the bank account number and the KYC ids.
       settlementUpiVpaMasked: maskLast4(connection.settlementUpiVpa),
       commissionOverrideBps: connection.commissionOverrideBps,
+      bankVerificationStatus: connection.bankVerificationStatus,
       verifiedAt: connection.verifiedAt,
       lastWebhookAt: connection.lastWebhookAt,
       lastPaymentAt: connection.lastPaymentAt,

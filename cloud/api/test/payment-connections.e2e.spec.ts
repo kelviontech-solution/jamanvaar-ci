@@ -238,7 +238,7 @@ describe('Payment connection onboarding', () => {
   it('approve is refused for an already ACTIVE connection too', async () => {
     await activateForTest(restaurantId);
     const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/approve`, platformToken).send({ password: adminPassword });
-    expect(res.status).toBe(409);
+    expect(res.status).toBe(403);
   });
 
   it('cannot resubmit while ACTIVE', async () => {
@@ -381,20 +381,25 @@ describe('Payment connection onboarding', () => {
     const missing = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken);
     expect(missing.status).toBe(403);
     const right = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken).send({ password: adminPassword });
-    expect(right.status).toBe(409);
+    expect(right.status).toBe(200);
+    expect(right.body.status).toBe('ACTIVE');
 
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
   });
 
-  it('approve is refused until Razorpay Route is enabled, and the connection stays pending', async () => {
+  it('approve activates the connection even while Razorpay Route is pending (manual payout mode)', async () => {
     const { restaurantId: rid, token } = await createRestaurantWithOwner('route-pending');
     await authed('post', '/api/v1/tenant/payment-connection', token).send(validSubmission);
 
     const res = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken).send({ password: adminPassword });
-    expect(res.status).toBe(409);
-    expect(res.body.message).toContain('Razorpay Route');
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('ACTIVE');
     const row = await prisma.runAsPlatform((tx) => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId: rid } }));
-    expect(row.status).toBe('PENDING_VERIFICATION');
+    expect(row.status).toBe('ACTIVE');
+    expect(row.verifiedAt).not.toBeNull();
+    // Approval switches payments on; it does not by itself make the restaurant payout-eligible — that still needs
+    // a Super Admin to verify the bank details (see RestaurantPayoutsService.setBankVerification).
+    expect(row.bankVerificationStatus).toBe('NOT_ADDED');
 
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
   });

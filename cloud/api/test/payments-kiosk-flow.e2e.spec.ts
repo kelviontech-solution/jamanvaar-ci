@@ -202,9 +202,14 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
   });
 
   it('a Razorpay failure while creating the QR surfaces as 503 and leaves the payment untouched', async () => {
+    // createKioskOrder triggers a background prewarm QR call as soon as the order exists, so a single
+    // mockRejectedValueOnce can be consumed by that background call before this test's own explicit POST
+    // ever runs. Rejecting persistently (then restoring the default) makes both calls fail identically,
+    // which is what actually proves the endpoint surfaces 503 when Razorpay is down.
+    gateway.createUpiQr.mockRejectedValue(new (await import('@nestjs/common')).ServiceUnavailableException('Razorpay down'));
     const order = await createKioskOrder('kf-qr-4');
-    gateway.createUpiQr.mockRejectedValueOnce(new (await import('@nestjs/common')).ServiceUnavailableException('Razorpay down'));
     const res = await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+    gateway.createUpiQr.mockResolvedValue({ qrId: 'qr_kf_1', imageUrl: 'https://rzp.io/img/kf_1.png', status: 'active' });
     expect(res.status).toBe(503);
     const row = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: order.paymentId } }));
     expect(row.status).toBe('PENDING');

@@ -6,6 +6,7 @@ import { InvoicesService } from '../billing/invoices.service';
 import { OfflinePolicyService } from '../offline-policy/offline-policy.service';
 import { PlatformNotificationsService } from '../platform-notifications/platform-notifications.service';
 import { WhatsAppOutboundWebhookService } from '../whatsapp-outbound/whatsapp-outbound-webhook.service';
+import { RestaurantPayoutsService } from '../payments/restaurant-payouts.service';
 
 export interface JobDefinition {
   name: string;
@@ -43,7 +44,8 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
     private readonly offline: OfflinePolicyService,
     private readonly backups: BackupsService,
     private readonly notifications: PlatformNotificationsService,
-    private readonly whatsappOutbound: WhatsAppOutboundWebhookService
+    private readonly whatsappOutbound: WhatsAppOutboundWebhookService,
+    private readonly payouts: RestaurantPayoutsService
   ) {}
 
   get schedulerEnabled(): boolean {
@@ -67,6 +69,9 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
       // Last-resort safety net -- the fast 20s interval inside WhatsAppOutboundWebhookService
       // itself handles near-real-time retries; this only matters if that interval ever dies.
       { name: 'whatsapp-outbound-webhook-retry', description: 'Retry any WhatsApp connector outbound webhook deliveries still pending after backoff', run: () => this.whatsappOutbound.retryDue() },
+      // Manual payout mode (Route pending): claims each restaurant's unpaid, unrefunded collections into a PENDING
+      // payout batch. Creates no bank transfer — a Super Admin still has to pay it and record the UTR.
+      { name: 'restaurant-payouts-eod', description: "Batch each restaurant's unclaimed collections into a payout for Super Admin to pay manually", run: () => this.payouts.runEodBatch() },
       ...this.extra
     ];
   }

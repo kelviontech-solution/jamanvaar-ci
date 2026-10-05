@@ -3499,11 +3499,11 @@ export default function AdminApp() {
                       <label className="flex items-center gap-2 p-3 bg-jaman-ivory border border-jaman-border rounded-xl text-xs font-semibold text-jaman-navy cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={receiptForm.enableWhatsApp}
-                          onChange={(e) => setReceiptForm({ ...receiptForm, enableWhatsApp: e.target.checked })}
+                          checked={receiptForm.enableEmail}
+                          onChange={(e) => setReceiptForm({ ...receiptForm, enableEmail: e.target.checked })}
                           className="rounded text-jaman-saffron"
                         />
-                        WhatsApp Bill
+                        Email Bill (PDF)
                       </label>
                     </div>
 

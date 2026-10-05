@@ -3,12 +3,16 @@ import { Button } from '@jamanvaar/ui';
 import { formatINR } from '@jamanvaar/utils';
 import {
   getDayStatement,
+  getPayoutHistory,
+  getPayoutSummary,
   getRecentPayments,
   getStaffUser,
   markPaymentHandled,
   refundPayment,
   type DayStatement,
-  type RecentPayment
+  type PayoutSummary,
+  type RecentPayment,
+  type RestaurantPayout
 } from '../cloud/cloudClient';
 
 /** Business day in India (IST), as YYYY-MM-DD. */
@@ -33,6 +37,19 @@ function statusLabel(p: RecentPayment): { text: string; cls: string } {
       return { text: 'Not paid', cls: 'bg-slate-100 text-slate-600' };
     default:
       return { text: 'Waiting', cls: 'bg-slate-100 text-slate-600' };
+  }
+}
+
+function payoutStatusLabel(status: RestaurantPayout['status']): { text: string; cls: string } {
+  switch (status) {
+    case 'PAID':
+      return { text: 'Paid', cls: 'bg-green-100 text-green-700' };
+    case 'ON_HOLD':
+      return { text: 'On hold', cls: 'bg-rose-100 text-rose-700' };
+    case 'FAILED':
+      return { text: 'Failed', cls: 'bg-rose-100 text-rose-700' };
+    default:
+      return { text: 'Pending', cls: 'bg-amber-100 text-amber-700' };
   }
 }
 
@@ -78,6 +95,9 @@ export function OnlinePaymentsPanel() {
   const [date, setDate] = useState(todayIst());
   const [statement, setStatement] = useState<DayStatement | null>(null);
   const [statementError, setStatementError] = useState('');
+  const [payoutSummary, setPayoutSummary] = useState<PayoutSummary | null>(null);
+  const [payoutHistory, setPayoutHistory] = useState<RestaurantPayout[] | null>(null);
+  const [payoutError, setPayoutError] = useState('');
 
   const load = useCallback(() => {
     getRecentPayments()
@@ -88,9 +108,20 @@ export function OnlinePaymentsPanel() {
       .catch((e) => setError(e instanceof Error ? e.message : 'Could not load payments'));
   }, []);
 
+  const loadPayouts = useCallback(() => {
+    Promise.all([getPayoutSummary(), getPayoutHistory(1, 10)])
+      .then(([summary, history]) => {
+        setPayoutSummary(summary);
+        setPayoutHistory(history.rows);
+        setPayoutError('');
+      })
+      .catch((e) => setPayoutError(e instanceof Error ? e.message : 'Could not load payouts'));
+  }, []);
+
   useEffect(() => {
     load();
-  }, [load]);
+    loadPayouts();
+  }, [load, loadPayouts]);
 
   const loadStatement = useCallback((d: string) => {
     setStatementError('');
@@ -151,11 +182,72 @@ export function OnlinePaymentsPanel() {
           <h3 className="text-lg font-bold text-jaman-navy">Online payments</h3>
           <p className="text-xs text-[#4A5568]">Kiosk QR payments received through Razorpay</p>
         </div>
-        <Button variant="ghost" size="sm" onClick={load}>Refresh</Button>
+        <Button variant="ghost" size="sm" onClick={() => { load(); loadPayouts(); }}>Refresh</Button>
       </div>
 
       {error && <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">{error}</div>}
       {message && <div className="text-xs text-jaman-navy bg-jaman-ivory border border-jaman-border rounded-xl p-3">{message}</div>}
+      {payoutError && <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">{payoutError}</div>}
+
+      {payoutSummary && (
+        <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border space-y-2">
+          <div className="text-xs font-bold text-jaman-navy">Your money, step by step</div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-[#4A5568]">Gross Collection</span>
+            <span className="font-bold text-jaman-navy">{rupees(payoutSummary.grossCollection)}</span>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-[#4A5568]">
+              − Jamanvaar Fee{payoutSummary.grossCollection > 0 ? ` (${((payoutSummary.platformFee / payoutSummary.grossCollection) * 100).toFixed(1)}%)` : ''}
+            </span>
+            <span className="font-bold text-rose-700">− {rupees(payoutSummary.platformFee)}</span>
+          </div>
+          <div className="flex items-center justify-between text-xs border-t border-jaman-border pt-2">
+            <span className="font-bold text-jaman-navy">= Net Payable</span>
+            <span className="font-black text-jaman-navy">{rupees(payoutSummary.netPayable)}</span>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-[#8C9BAE]">Already paid to your bank</span>
+            <span className="font-bold text-green-700">{rupees(payoutSummary.paidPayout)}</span>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-[#8C9BAE]">Pending (not yet transferred)</span>
+            <span className="font-bold text-amber-700">{rupees(payoutSummary.pendingPayout)}</span>
+          </div>
+          <div className="text-[10px] text-[#8C9BAE] pt-1">
+            Razorpay Route is pending, so Jamanvaar collects payments on your behalf and pays your net amount to your bank by manual
+            transfer once verified — this is not money already in your account.
+          </div>
+        </div>
+      )}
+
+      {payoutHistory && payoutHistory.length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="text-left text-[#8C9BAE]">
+                <th className="py-1.5 pr-3">Business date</th>
+                <th className="py-1.5 pr-3">Net amount</th>
+                <th className="py-1.5 pr-3">Status</th>
+                <th className="py-1.5">Reference</th>
+              </tr>
+            </thead>
+            <tbody>
+              {payoutHistory.map((p) => {
+                const label = payoutStatusLabel(p.status);
+                return (
+                  <tr key={p.id} className="border-t border-jaman-border">
+                    <td className="py-2 pr-3">{p.businessDate}</td>
+                    <td className="py-2 pr-3 font-bold">{rupees(p.netAmount)}</td>
+                    <td className="py-2 pr-3"><span className={`px-2 py-0.5 rounded-full font-bold ${label.cls}`}>{label.text}</span></td>
+                    <td className="py-2 font-mono">{p.utr ?? '—'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {attentionCount > 0 && (
         <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">

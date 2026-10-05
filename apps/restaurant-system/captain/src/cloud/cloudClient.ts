@@ -18,7 +18,7 @@ import type {
   CloudSyncedEntity
 } from '@jamanvaar/sync';
 
-import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver } from '@jamanvaar/sync';
+import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver, getDevicePublicKeyJwk } from '@jamanvaar/sync';
 import { MenuRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
@@ -118,10 +118,13 @@ function persistConnection(restaurantId: string, label: string, deviceId?: strin
  * the key alone identifies the restaurant, so nothing else is asked.
  */
 export async function activateCaptainWithKey(code: string): Promise<void> {
+  // Generated (or loaded, if this profile already has one) before the request, so the server can bind the device
+  // to it from the very first activation — see @jamanvaar/sync's device_identity.ts.
+  const publicKeyJwk = await getDevicePublicKeyJwk('CAPTAIN').catch(() => null);
   const res = await fetch(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code: code.trim(), deviceType: 'CAPTAIN', appVersion: '1.0.0' })
+    body: JSON.stringify({ code: code.trim(), deviceType: 'CAPTAIN', appVersion: '1.0.0', ...(publicKeyJwk ? { publicKeyJwk } : {}) })
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {

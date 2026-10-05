@@ -50,7 +50,12 @@ export class EmailService {
   }
 
   /** Returns whether a message actually left the server — never a silent guess. */
-  async send(to: string, subject: string, html: string): Promise<boolean> {
+  async send(
+    to: string,
+    subject: string,
+    html: string,
+    attachments?: Array<{ filename: string; content: Buffer; contentType: string }>
+  ): Promise<boolean> {
     if (!this.configured) {
       this.logger.warn(`Email not sent (SMTP not configured on this server): "${subject}" to ${to}`);
       return false;
@@ -58,7 +63,7 @@ export class EmailService {
     const fromName = this.config.get<string>('SMTP_FROM_NAME') ?? 'JAMANVAAR';
     const fromEmail = this.config.get<string>('SMTP_FROM_EMAIL') ?? this.config.get<string>('SMTP_USER');
     const footer = await this.branding.emailFooter();
-    await this.getTransporter().sendMail({ from: `"${fromName}" <${fromEmail}>`, to, subject, html: html + footer });
+    await this.getTransporter().sendMail({ from: `"${fromName}" <${fromEmail}>`, to, subject, html: html + footer, attachments });
     return true;
   }
 }

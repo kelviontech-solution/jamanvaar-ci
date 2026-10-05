@@ -49,7 +49,8 @@ import {
   Sparkles,
   QrCode,
   MessageCircle,
-  ListChecks
+  ListChecks,
+  Wallet
 } from 'lucide-react';
 import './layout.css';
 
@@ -94,6 +95,7 @@ const PAGE_KEYWORDS: Record<string, string> = {
   '/activation-keys': 'activation key keys code terminal redeem',
   '/payment-connections': 'payment gateway razorpay upi bank settlement',
   '/platform-payments': 'platform payments volume commission revenue',
+  '/payouts': 'payout payouts bank transfer utr manual route eod settle settlement',
   '/applications': 'app apps release releases version update download installer',
   '/devices': 'device devices terminal pos kds captain kiosk mdm lock wipe fleet',
   '/sync-monitor': 'sync conflict conflicts offline queue',
@@ -137,6 +139,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: '/activation-keys', label: 'Activation Keys', icon: KeyRound },
       { to: '/payment-connections', label: 'Payment Gateways', icon: CreditCard },
       { to: '/platform-payments', label: 'Platform Payments', icon: CreditCard },
+      { to: '/payouts', label: 'Restaurant Payouts', icon: Wallet },
       { to: '/applications', label: 'Applications & Releases', icon: Layers }
     ]
   },
