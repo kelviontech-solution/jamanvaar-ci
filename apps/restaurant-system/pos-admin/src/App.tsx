@@ -40,6 +40,7 @@ import {
   ActivationNoticeBanner
 } from '@jamanvaar/ui';
 import { lanMeshSync } from '@jamanvaar/sync';
+import { useEntitlements, filterNavSections } from './hooks/useEntitlements';
 import {
   CentralReportingService,
   ReportGeneratorService,
@@ -165,6 +166,8 @@ export default function PosAdminApp() {
   }
 
   const [activeTab, setActiveTab] = useState<PosAdminTab>('DASHBOARD');
+  // Which AppCodes (e.g. KIOSK_ADMIN) this restaurant has enabled, to gate nav sections below.
+  const { hasApp } = useEntitlements();
   // Whether QR Ordering is in this restaurant's plan, as the server says (cached for a week offline).
   const qr = useQrEntitlement();
   const qrKnown = qr.state.status === 'ready';
@@ -857,7 +860,7 @@ export default function PosAdminApp() {
             className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] transition-transform duration-200 ${navOpen ? 'translate-x-0' : '-translate-x-full'} lg:static lg:z-auto lg:w-64 lg:max-w-none lg:translate-x-0 bg-[#FAF8F5] lg:bg-[#FAF8F5]/95 backdrop-blur-md border-r border-[#EAE3D6] flex flex-col justify-between p-3.5 shrink-0 overflow-y-auto min-h-0 shadow-2xl lg:shadow-2xs select-none`}
           >
             <div className="space-y-4">
-              {[
+              {filterNavSections([
                 {
                   section: 'OPERATIONS',
                   items: [
@@ -905,7 +908,7 @@ export default function PosAdminApp() {
                     { id: 'SUPPORT', label: 'Help & Support', icon: LifeBuoy }
                   ]
                 }
-              ].map((grp) => {
+              ], hasApp).map((grp) => {
                 const hasActiveTab = grp.items.some((it) => it.id === activeTab);
                 // A section holding the currently-open tab always shows,
                 // regardless of its remembered collapse state — you should

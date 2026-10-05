@@ -27,9 +27,10 @@ describe('pos-admin payment connection client', () => {
   });
 
   // This file's first dynamic import of cloudClient.ts (a large module) measured ~5.7s even
-  // in isolation, and the default 5000ms per-test timeout flakes under the full suite's load
-  // (CPU contention across ~180 parallel test files) without failing the underlying behavior —
-  // give both tests real headroom rather than chasing a timing budget that was never the point.
+  // in isolation, and flakes past 20000ms under this machine's heavier load (observed: OneDrive's
+  // background sync competing for disk/CPU inside this repo's own OneDrive-synced folder) without
+  // failing the underlying behavior — give both tests real headroom rather than chasing a timing
+  // budget that was never the point.
   it('omits empty-string optional fields from the submitted body', async () => {
     let capturedBody: any = null;
     global.fetch = vi.fn().mockImplementation(async (_url: string, init: RequestInit) => {
@@ -57,7 +58,7 @@ describe('pos-admin payment connection client', () => {
     expect(capturedBody).not.toHaveProperty('settlementAccountNumber');
     expect(capturedBody).not.toHaveProperty('settlementIfsc');
     expect(capturedBody.pan).toBe('ABCDE1234F');
-  }, 20000);
+  }, 60000);
 
   it('returns the parsed status from GET', async () => {
     // A fresh Response per call, not a shared instance: a Response body can only be
@@ -76,5 +77,5 @@ describe('pos-admin payment connection client', () => {
     const result = await getPaymentConnection();
     expect(result.status).toBe('ACTIVE');
     expect(result.settlementUpiVpa).toBe('asha@upi');
-  }, 20000);
+  }, 60000);
 });

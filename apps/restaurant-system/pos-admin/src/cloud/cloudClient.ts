@@ -47,6 +47,9 @@ export interface CloudRestaurantProfile {
   state?: string | null;
 }
 
+/** Mirrors cloud/api's Prisma AppCode enum (ALL_APP_CODES in application-entitlements.service.ts). */
+export type AppCode = 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'QR_ORDERING' | 'WHATSAPP_ORDERING';
+
 export interface CloudEntitlementsResponse {
   subscriptionStatus: 'TRIAL' | 'ACTIVE' | 'PAST_DUE' | 'SUSPENDED' | 'EXPIRED' | null;
   /** When the current subscription ends. */
@@ -597,6 +600,12 @@ export async function fetchCloudBranches(): Promise<CloudBranch[]> {
  * down) falls back to the last cached response instead of throwing — this
  * screen must never hard-fail just because the network is unavailable.
  */
+/** Which AppCodes (POS_ADMIN, KIOSK_ADMIN, ...) this restaurant has enabled right now — used to gate this console's own nav. */
+export async function fetchMyEnabledApps(): Promise<AppCode[]> {
+  const data = await request<{ enabledApps: AppCode[] }>('/api/v1/tenant/me/applications');
+  return data.enabledApps;
+}
+
 export async function fetchEntitlements(): Promise<{ data: CloudEntitlementsResponse | null; syncedAt: string | null; stale: boolean }> {
   if (!isCloudConnected()) {
     return { data: null, syncedAt: null, stale: false };
