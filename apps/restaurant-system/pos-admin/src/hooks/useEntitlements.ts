@@ -37,8 +37,25 @@ export function filterNavSections<T extends GatedNavItem>(
     .filter((group) => group.items.length > 0);
 }
 
-export function useEntitlements(): { hasApp: (app: AppCode) => boolean; loading: boolean } {
+/**
+ * `refreshKey` lets the caller force a re-fetch — required because this hook mounts as part of
+ * the whole app shell, which happens before a fresh device activation has a token at all. A
+ * `useEffect([])` fetch taken at that moment always 401s and (found via live verification) never
+ * retries, so the Kiosk tab (or any gated section) stayed hidden until a full page reload. Pass a
+ * value that changes when auth state does (e.g. `cloudConnected`) — mirrors how this app already
+ * re-fetches `refreshCloudEntitlementsIntoLicense` keyed on that same signal.
+ */
+export function useEntitlements(refreshKey?: unknown): { hasApp: (app: AppCode) => boolean; loading: boolean; refetch: () => void } {
   const [enabledApps, setEnabledApps] = useState<AppCode[] | null>(null);
+
+  const load = () => {
+    fetchMyEnabledApps()
+      .then((apps) => setEnabledApps(apps))
+      .catch(() => {
+        // Fail closed: an error hides gated tabs rather than guessing them open.
+        setEnabledApps([]);
+      });
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -47,16 +64,17 @@ export function useEntitlements(): { hasApp: (app: AppCode) => boolean; loading:
         if (!cancelled) setEnabledApps(apps);
       })
       .catch(() => {
-        // Fail closed: an error hides gated tabs rather than guessing them open.
         if (!cancelled) setEnabledApps([]);
       });
     return () => {
       cancelled = true;
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshKey]);
 
   return {
     loading: enabledApps === null,
-    hasApp: (app: AppCode) => (enabledApps ?? []).includes(app)
+    hasApp: (app: AppCode) => (enabledApps ?? []).includes(app),
+    refetch: load
   };
 }

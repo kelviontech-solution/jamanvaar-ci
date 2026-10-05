@@ -178,8 +178,6 @@ export default function PosAdminApp() {
   }
 
   const [activeTab, setActiveTab] = useState<PosAdminTab>('DASHBOARD');
-  // Which AppCodes (e.g. KIOSK_ADMIN) this restaurant has enabled, to gate nav sections below.
-  const { hasApp } = useEntitlements();
   const [kiosks, setKiosks] = useState<CloudKiosk[]>([]);
   const coupons = CouponRepository.getAllCoupons();
   const [isAddCouponModalOpen, setIsAddCouponModalOpen] = useState(false);
@@ -260,6 +258,10 @@ export default function PosAdminApp() {
   } | null>(null);
   const [loginBusy, setLoginBusy] = useState(false);
   const [cloudConnected, setCloudConnected] = useState(() => isCloudConnected());
+  // Which AppCodes (e.g. KIOSK_ADMIN) this restaurant has enabled, to gate nav sections below.
+  // Keyed on cloudConnected so a fresh device activation (which flips this true after this hook's
+  // own initial mount-time fetch already 401'd) re-fetches instead of staying wrong until reload.
+  const { hasApp, refetch: refetchEntitlements } = useEntitlements(cloudConnected);
 
   const completeLogin = (
     user: { id: string; fullName: string; role: string; restaurantId: string },
@@ -515,6 +517,7 @@ export default function PosAdminApp() {
     // Super Admin plan change regardless of which screen is open — was only ever refreshed when
     // the Subscription Plans screen itself happened to be mounted.
     void refreshCloudEntitlementsIntoLicense();
+    refetchEntitlements();
     void reportDeviceHeartbeat();
     void syncRestaurantIdentity();
     const interval = setInterval(() => {
@@ -526,6 +529,9 @@ export default function PosAdminApp() {
       ReservationRepository.releaseOverdue();
       void syncReservations({ push: true });
       void refreshCloudEntitlementsIntoLicense();
+      // Same self-healing reason: picks up a Super Admin entitlement change made while this
+      // console is already open, not just the fresh-activation case the cloudConnected key covers.
+      refetchEntitlements();
       void reportDeviceHeartbeat();
       void syncRestaurantIdentity();
     }, 15000);

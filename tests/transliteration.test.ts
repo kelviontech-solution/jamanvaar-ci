@@ -46,6 +46,15 @@ describe('transliterateToDevanagari', () => {
     expect(transliterateToDevanagari('t')).toBe('त');
     expect(transliterateToDevanagari('T')).toBe('ट');
   });
+
+  // Found via live browser verification: 'p' was missing from the consonants table entirely
+  // (only 'ph'/'f' -> फ existed), so "paneer" -- the exact example text this app's own keyboard
+  // hint shows ('e.g. "paneer tikka"') -- never transliterated past its own first letter.
+  it('resolves the plain "p" consonant distinctly from its aspirated "ph" form', () => {
+    expect(transliterateToDevanagari('p')).toBe('प');
+    expect(transliterateToDevanagari('ph')).toBe('फ');
+    expect(transliterateToDevanagari('paneer')).toBe('पनेएर'); // mechanical, not a dictionary spelling -- but no literal leading 'p'
+  });
 });
 
 describe('devanagariToGujarati / transliterateToGujarati', () => {
@@ -100,6 +109,12 @@ describe('transliterateToTelugu', () => {
   it('passes through spaces and digits untouched', () => {
     expect(transliterateToTelugu('paneer 2 pcs')).toContain(' 2 ');
   });
+
+  // Same bug as Devanagari (found via live browser verification): 'p' was missing, only 'ph'/'f'.
+  it('resolves the plain "p" consonant distinctly from its aspirated "ph" form', () => {
+    expect(transliterateToTelugu('p')).toBe('ప');
+    expect(transliterateToTelugu('ph')).toBe('ఫ');
+  });
 });
 
 describe('transliterateToKannada', () => {
@@ -124,6 +139,12 @@ describe('transliterateToKannada', () => {
   it('handles retroflex vs dental consonants distinctly by capitalization', () => {
     expect(transliterateToKannada('t')).toBe('ತ');
     expect(transliterateToKannada('T')).toBe('ಟ');
+  });
+
+  // Same bug as Devanagari/Telugu (found via live browser verification): 'p' was missing, only 'ph'/'f'.
+  it('resolves the plain "p" consonant distinctly from its aspirated "ph" form', () => {
+    expect(transliterateToKannada('p')).toBe('ಪ');
+    expect(transliterateToKannada('ph')).toBe('ಫ');
   });
 });
 
