@@ -33,6 +33,7 @@ describe('pos-admin NAV_SECTIONS gating (real data)', () => {
     'COUPONS',
     'REPORTS',
     'HARDWARE',
+    'RECEIPTS',
     'SYNC',
     'SETTINGS',
     'LICENSE',

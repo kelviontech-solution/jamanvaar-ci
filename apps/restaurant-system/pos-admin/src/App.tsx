@@ -107,6 +107,7 @@ import { ShiftCashDrawerModule } from './components/shifts/ShiftCashDrawerModule
 import { PrintersDevicesModule } from './components/hardware/PrintersDevicesModule';
 import { KitchenPrinterRoutingPanel } from './components/hardware/KitchenPrinterRoutingPanel';
 import { PrintQueuePanel } from './components/hardware/PrintQueuePanel';
+import { ReceiptEBillPanel } from './components/receipts/ReceiptEBillPanel';
 import { FeedbackPanel } from './components/kiosk/FeedbackPanel';
 import { ReportBrandingSettings } from './components/settings/ReportBrandingSettings';
 import { SubscriptionPlansView } from './components/settings/SubscriptionPlansView';
@@ -165,7 +166,8 @@ export type PosAdminTab =
   | 'SUPPORT'
   | 'INVENTORY_CONTROL'
   | 'KIOSKS'
-  | 'COUPONS';
+  | 'COUPONS'
+  | 'RECEIPTS';
 
 export default function PosAdminApp() {
   const ai = useAiAccess();
@@ -1401,6 +1403,11 @@ export default function PosAdminApp() {
                 <KitchenPrinterRoutingPanel showToast={showToast} />
                 <PrintQueuePanel showToast={showToast} />
               </div>
+            )}
+
+            {/* TAB: RECEIPT & E-BILL SETTINGS (relocated from kiosk-admin, not kiosk-specific) */}
+            {activeTab === 'RECEIPTS' && (
+              <ReceiptEBillPanel showToast={showToast} onGoToSettings={() => setActiveTab('SETTINGS')} />
             )}
 
             {/* TAB 15: SETTINGS & BRANDING */}

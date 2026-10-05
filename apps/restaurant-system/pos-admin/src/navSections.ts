@@ -14,6 +14,7 @@ import {
   Package,
   Printer,
   QrCode,
+  Receipt,
   RefreshCw,
   Settings,
   ShieldCheck,
@@ -78,6 +79,7 @@ export const NAV_SECTIONS: Array<GatedNavSection<NavSectionItem>> = [
     items: [
       { id: 'REPORTS', label: 'Reports & Analytics', icon: TrendingUp },
       { id: 'HARDWARE', label: 'Printers & Devices', icon: Printer },
+      { id: 'RECEIPTS', label: 'Receipt & E-Bill', icon: Receipt },
       { id: 'SYNC', label: 'Sync & Devices', icon: RefreshCw },
       { id: 'SETTINGS', label: 'Restaurant Settings', icon: Settings },
       { id: 'LICENSE', label: 'Subscription Plans', icon: Award },
