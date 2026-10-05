@@ -2823,7 +2823,7 @@ export default function KioskUserApp() {
                             <button
                               onClick={() => updateCartItemQuantity(ci.cartItemId, -1)}
                               className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center active:bg-gray-200 transition-colors"
-                              aria-label={`Decrease quantity of ${ci.item.name}`}
+                              aria-label={`Decrease quantity of ${localizedName(ci.item, lang)}`}
                             >
                               <Minus className="w-4 h-4 text-jaman-navy" />
                             </button>
@@ -2831,7 +2831,7 @@ export default function KioskUserApp() {
                             <button
                               onClick={() => updateCartItemQuantity(ci.cartItemId, 1)}
                               className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center active:bg-gray-200 transition-colors"
-                              aria-label={`Increase quantity of ${ci.item.name}`}
+                              aria-label={`Increase quantity of ${localizedName(ci.item, lang)}`}
                             >
                               <Plus className="w-4 h-4 text-jaman-navy" />
                             </button>
@@ -2857,7 +2857,7 @@ export default function KioskUserApp() {
                             <div className="flex items-center gap-3 min-w-0 pr-2">
                               <CachedImg src={rec.item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=60'} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#F3EFE6]" />
                               <div className="min-w-0">
-                                <h5 className="font-bold text-sm text-jaman-navy truncate">{rec.item.name}</h5>
+                                <h5 className="font-bold text-sm text-jaman-navy truncate">{localizedName(rec.item, lang)}</h5>
                                 <span className="text-sm font-black text-jaman-saffron block">{formatINR(rec.item.price)}</span>
                               </div>
                             </div>
@@ -3771,7 +3771,7 @@ export default function KioskUserApp() {
                           <div className="flex items-center gap-3 min-w-0">
                             <CachedImg
                               src={item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
-                              alt={item.name}
+                              alt={localizedName(item, lang)}
                               className="w-14 h-14 rounded-xl object-cover border border-jaman-border shrink-0"
                             />
                             <div className="min-w-0">
@@ -3783,7 +3783,7 @@ export default function KioskUserApp() {
                                   </span>
                                 )}
                               </div>
-                              <h5 className="font-bold text-xs text-jaman-navy truncate mt-0.5">{item.name}</h5>
+                              <h5 className="font-bold text-xs text-jaman-navy truncate mt-0.5">{localizedName(item, lang)}</h5>
                               <span className="text-xs font-black text-jaman-saffron">{formatINR(item.price)}</span>
                             </div>
                           </div>
@@ -3815,8 +3815,8 @@ export default function KioskUserApp() {
                             <span className="text-[10px] uppercase font-black tracking-wider text-amber-700 bg-amber-200/60 px-2 py-0.5 rounded-full inline-block">
                               Save ₹{combo.savingsAmount} Deal
                             </span>
-                            <h5 className="font-bold text-xs text-jaman-navy mt-1">{combo.name}</h5>
-                            <p className="text-[10px] text-[#4A5568] line-clamp-1 mt-0.5">{combo.description}</p>
+                            <h5 className="font-bold text-xs text-jaman-navy mt-1">{localizedName(combo, lang)}</h5>
+                            <p className="text-[10px] text-[#4A5568] line-clamp-1 mt-0.5">{localizedDescription(combo, lang)}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-xs font-black text-jaman-saffron">{formatINR(combo.basePrice)}</span>
                               <span className="text-[10px] text-[#8C9BAE] line-through">{formatINR(combo.originalPrice)}</span>
