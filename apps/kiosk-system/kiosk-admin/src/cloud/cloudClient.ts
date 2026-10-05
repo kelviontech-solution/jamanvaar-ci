@@ -934,6 +934,43 @@ export async function getDayStatement(date: string): Promise<DayStatement> {
   return jsonOrThrow<DayStatement>(await signedDeviceFetch(`/api/v1/payments/tenant-statement?date=${encodeURIComponent(date)}`), 'Day statement');
 }
 
+/**
+ * Lifetime gross collection / Jamanvaar fee / net payable, and how much of that net is still pending vs
+ * already paid out by bank transfer. Temporary manual-payout view while Razorpay Route is pending — see
+ * RestaurantPayoutsService on the server for the batching rules. All amounts in paise.
+ */
+export interface PayoutSummary {
+  grossCollection: number;
+  platformFee: number;
+  netPayable: number;
+  pendingPayout: number;
+  paidPayout: number;
+}
+
+export interface RestaurantPayout {
+  id: string;
+  businessDate: string;
+  status: 'PENDING' | 'APPROVED' | 'PROCESSING' | 'PAID' | 'ON_HOLD' | 'FAILED';
+  grossAmount: number;
+  feeAmount: number;
+  netAmount: number;
+  paymentCount: number;
+  bankAccountMasked: string | null;
+  bankIfsc: string | null;
+  utr: string | null;
+  paidAt: string | null;
+  holdReason: string | null;
+  createdAt: string;
+}
+
+export async function getPayoutSummary(): Promise<PayoutSummary> {
+  return jsonOrThrow<PayoutSummary>(await signedDeviceFetch('/api/v1/payments/payout-summary'), 'Payout summary');
+}
+
+export async function getPayoutHistory(page = 1, limit = 25): Promise<{ rows: RestaurantPayout[]; total: number; page: number; limit: number }> {
+  return jsonOrThrow(await signedDeviceFetch(`/api/v1/payments/payout-history?page=${page}&limit=${limit}`), 'Payout history');
+}
+
 /** Online (Razorpay) revenue totals for this restaurant, in paise — device-authed, restaurant-scoped by the server. */
 export async function getPaymentsSummary(): Promise<PaymentsSummary> {
   return jsonOrThrow<PaymentsSummary>(await signedDeviceFetch('/api/v1/payments/tenant-summary'), 'Payments summary');
