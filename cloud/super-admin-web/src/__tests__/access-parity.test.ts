@@ -7,7 +7,8 @@ import { areaForPath, ROLE_ACCESS } from '../../../api/src/common/rbac/access';
 const ROUTES: Array<[string, string]> = [
   ['/restaurants', '/api/v1/restaurants'], ['/owners', '/api/v1/owners'], ['/branches', '/api/v1/branches'],
   ['/subscriptions', '/api/v1/subscriptions'], ['/plans', '/api/v1/plans'], ['/billing', '/api/v1/invoices'],
-  ['/payment-connections', '/api/v1/payment-connections'], ['/activation-keys', '/api/v1/activation-keys'],
+  ['/payment-connections', '/api/v1/payment-connections'], ['/platform-payments', '/api/v1/payments/platform-summary'],
+  ['/payouts', '/api/v1/payments/payouts'], ['/activation-keys', '/api/v1/activation-keys'],
   ['/devices', '/api/v1/devices'], ['/applications', '/api/v1/applications'], ['/support', '/api/v1/support'],
   ['/tickets', '/api/v1/support-tickets'], ['/qr-ordering', '/api/v1/qr-ordering'], ['/ai-assistant', '/api/v1/ai-assistant'],
   ['/catalog', '/api/v1/master-catalog'], ['/audit-logs', '/api/v1/audit-logs'], ['/team', '/api/v1/platform-users'],

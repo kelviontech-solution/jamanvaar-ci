@@ -263,6 +263,7 @@ export class PaymentConnectionsService {
     lastWebhookAt: Date | null;
     lastPaymentAt: Date | null;
     commissionOverrideBps: number | null;
+    bankVerificationStatus: string;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -298,6 +299,7 @@ export class PaymentConnectionsService {
       // for the same reason as the bank account number and the KYC ids.
       settlementUpiVpaMasked: maskLast4(connection.settlementUpiVpa),
       commissionOverrideBps: connection.commissionOverrideBps,
+      bankVerificationStatus: connection.bankVerificationStatus,
       verifiedAt: connection.verifiedAt,
       lastWebhookAt: connection.lastWebhookAt,
       lastPaymentAt: connection.lastPaymentAt,

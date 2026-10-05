@@ -1158,6 +1158,7 @@ export interface PaymentConnection {
   settlementIfsc: string | null;
   settlementUpiVpaMasked: string | null;
   commissionOverrideBps: number | null;
+  bankVerificationStatus: 'NOT_ADDED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
   verifiedAt: string | null;
   lastWebhookAt: string | null;
   lastPaymentAt: string | null;
