@@ -580,12 +580,37 @@ export class TenantAuthService {
       // compatibility bypass above notwithstanding — compatibility with a
       // specific key's allowedDeviceType and entitlement to the app itself
       // are two different questions.
-      await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, dto.deviceType as AppCode);
+      //
+      // Kiosk Admin was merged into this same console (pos-admin), which always sends
+      // deviceType POS_ADMIN — but a restaurant holding only the KIOSK-family subscription
+      // (no Restaurant-family plan at all) was then hard-rejected here with "POS_ADMIN is
+      // not enabled", unable to open the one console it needs to manage its Kiosk Terminals
+      // or Receipt settings (found via live Playwright verification). A POS_ADMIN console
+      // request is now allowed through on EITHER entitlement; the device itself is still
+      // recorded as type POS_ADMIN either way (one console, one device record).
+      const appCodeForEntitlementCheck = dto.deviceType as AppCode;
+      if (appCodeForEntitlementCheck === 'POS_ADMIN') {
+        const [posAdminEnabled, kioskAdminEnabled] = await Promise.all([
+          this.appEntitlements.isAppEnabled(tx, key.restaurantId, 'POS_ADMIN'),
+          this.appEntitlements.isAppEnabled(tx, key.restaurantId, 'KIOSK_ADMIN')
+        ]);
+        if (!posAdminEnabled && !kioskAdminEnabled) {
+          throw new ForbiddenException(
+            "Neither POS_ADMIN nor KIOSK_ADMIN is enabled on this restaurant's current subscription. Enable one under Applications before provisioning a device."
+          );
+        }
+        // Quota is counted against whichever app actually grants access (POS_ADMIN takes
+        // priority when a restaurant holds both, matching ApplicationEntitlementsService's
+        // own "normally exactly one granting row" assumption elsewhere).
+        await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, posAdminEnabled ? 'POS_ADMIN' : 'KIOSK_ADMIN');
+      } else {
+        await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, appCodeForEntitlementCheck);
 
-      // security-audit MED-02 (F-013) / Phase 2: per-app quota, not one global cap shared
-      // across every device type and every subscription the restaurant holds (see
-      // ApplicationEntitlementsService.assertDeviceQuotaAvailable's doc comment).
-      await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, dto.deviceType as AppCode);
+        // security-audit MED-02 (F-013) / Phase 2: per-app quota, not one global cap shared
+        // across every device type and every subscription the restaurant holds (see
+        // ApplicationEntitlementsService.assertDeviceQuotaAvailable's doc comment).
+        await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, appCodeForEntitlementCheck);
+      }
 
       const deviceToken = generateOpaqueToken();
 

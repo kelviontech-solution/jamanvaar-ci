@@ -602,4 +602,75 @@ describe('Tenant authentication + authorization', () => {
       expect(res.status).toBe(400);
     });
   });
+
+  /**
+   * Found via live Playwright verification of the kiosk-admin merge: pos-admin's client
+   * always sends deviceType POS_ADMIN when activating, so a restaurant holding ONLY the
+   * KIOSK-family subscription (POS_ADMIN not enabled at all) was hard-rejected at
+   * activate-device and could never open the one console it needs to manage its Kiosk
+   * Terminals or Receipt settings — even though the nav itself correctly hides every
+   * Restaurant-only tab for such a restaurant once inside.
+   */
+  describe('POS_ADMIN console activation across plan families', () => {
+    const setUpRestaurant = async (applications: string[]) => {
+      const email = `test-posadmin-family-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`;
+      const createRes = await authed('post', '/api/v1/restaurants', platformToken).send({
+        name: `TEST POS_ADMIN Family ${Date.now()}`,
+        ownerName: 'Family Owner',
+        ownerEmail: email
+      });
+      const famRestaurantId = createRes.body.restaurant.id as string;
+      const password = 'family-correct-horse-battery';
+      await request(app.getHttpServer()).post('/api/v1/tenant-auth/set-initial-password').send({
+        restaurantId: famRestaurantId, email, activationToken: createRes.body.activationToken, newPassword: password
+      });
+      const planRes = await authed('post', '/api/v1/plans', platformToken).send({
+        tier: 'CORE', productFamily: 'KIOSK',
+        name: `TEST POS_ADMIN Family Plan ${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        priceMonthly: 100000, maxBranches: 1, maxDevices: 5, maxUsers: 5, entitlements: {}
+      });
+      await authed('post', '/api/v1/subscriptions', platformToken).send({
+        restaurantId: famRestaurantId, planId: planRes.body.id, status: 'ACTIVE',
+        expiresAt: new Date(Date.now() + 30 * 86400000).toISOString(), applications
+      });
+      const loginRes = await request(app.getHttpServer()).post('/api/v1/tenant-auth/login-owner').send({
+        restaurantId: famRestaurantId, password, deviceType: 'POS_ADMIN'
+      });
+      expect(loginRes.body.requiresActivation).toBe(true);
+      // A Super Admin issuing a key for a Kiosk-only restaurant would never pick allowedDeviceType
+      // POS_ADMIN (that app isn't enabled, so activation-keys' own generate() would refuse it) —
+      // 'ANY' is the real-world choice here, same as activation-device's own isCompatible check
+      // already special-cases "any valid key for this restaurant" for a POS_ADMIN console request.
+      const keyRes = await authed('post', '/api/v1/activation-keys', platformToken).send({
+        restaurantId: famRestaurantId, allowedDeviceType: 'ANY', expiresAt: new Date(Date.now() + 86400000).toISOString()
+      });
+      return { famRestaurantId, planId: planRes.body.id as string, activationSessionToken: loginRes.body.activationSessionToken as string, activationKey: keyRes.body.code as string };
+    };
+
+    it('a restaurant with only KIOSK_ADMIN enabled (no POS_ADMIN) can still activate a POS_ADMIN console', async () => {
+      const { famRestaurantId, planId: famPlanId, activationSessionToken, activationKey } = await setUpRestaurant(['KIOSK', 'KIOSK_ADMIN']);
+
+      const activateRes = await request(app.getHttpServer()).post('/api/v1/tenant-auth/activate-device').send({
+        activationSessionToken, activationKey, deviceType: 'POS_ADMIN'
+      });
+      expect(activateRes.status, JSON.stringify(activateRes.body)).toBe(200);
+      expect(activateRes.body.deviceToken).toBeTypeOf('string');
+
+      await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: famRestaurantId } }));
+      await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: famPlanId } }));
+    });
+
+    it('a restaurant with neither POS_ADMIN nor KIOSK_ADMIN enabled is rejected from activating a POS_ADMIN console', async () => {
+      const { famRestaurantId, planId: famPlanId, activationSessionToken, activationKey } = await setUpRestaurant([]);
+
+      const activateRes = await request(app.getHttpServer()).post('/api/v1/tenant-auth/activate-device').send({
+        activationSessionToken, activationKey, deviceType: 'POS_ADMIN'
+      });
+      expect(activateRes.status).toBe(403);
+      expect(activateRes.body.message).toContain('Neither POS_ADMIN nor KIOSK_ADMIN is enabled');
+
+      await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: famRestaurantId } }));
+      await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: famPlanId } }));
+    });
+  });
 });
