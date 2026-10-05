@@ -9,7 +9,10 @@ export const sendReceiptSchema = z.object({
 export type SendReceiptDto = z.infer<typeof sendReceiptSchema>;
 
 export const emailReceiptSchema = z.object({
-  paymentId: z.string().min(1),
+  // The local/external order id every kiosk order already carries, online or cash — see
+  // ReceiptEmailService for how this resolves to either an online PaymentTransaction or a
+  // cash-at-counter SyncedOrder row.
+  orderId: z.string().min(1),
   email: z.string().trim().toLowerCase().email('Must be a valid email address').max(200)
 });
 

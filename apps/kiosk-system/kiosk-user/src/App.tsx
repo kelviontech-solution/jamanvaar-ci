@@ -1489,17 +1489,13 @@ export default function KioskUserApp() {
 
   // Dispatch the e-bill by email — a real, server-generated PDF tax invoice, replacing the old
   // WhatsApp e-bill (which only ever forwarded display text to a notification API, never an
-  // actual invoice). Needs the real cloud payment id, since that's what the server looks the
-  // order up by — a cash-only order with no online payment never has one.
+  // actual invoice). Works for a cash order too — the server resolves placedOrder.id to whichever
+  // of its own tables (online payment or the cash order's synced record) actually has it.
   const handleDispatchEBill = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!placedOrder || !eBillEmailInput) return;
-    if (!realPaymentId) {
-      alert('This order has no online payment to attach an invoice to.');
-      return;
-    }
 
-    const res = await EBillService.sendEmailEBill(placedOrder, realPaymentId, eBillEmailInput, emailReceipt);
+    const res = await EBillService.sendEmailEBill(placedOrder, eBillEmailInput, emailReceipt);
     ReceiptRepository.addRecord(res.record);
     if (res.success) {
       setEBillSuccessMessage(res.message);

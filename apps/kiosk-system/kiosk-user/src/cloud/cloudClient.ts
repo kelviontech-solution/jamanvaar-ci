@@ -400,11 +400,15 @@ export async function sendReceipt(
   return data;
 }
 
-/** Emails the guest their own order's real tax invoice as a PDF, generated and sent server-side. */
-export async function emailReceipt(paymentId: string, email: string): Promise<{ success: boolean }> {
+/**
+ * Emails the guest their own order's real bill as a PDF, generated and sent server-side. `orderId`
+ * is the kiosk's own local order id (same one every order already has, online or cash-at-counter) —
+ * the server resolves it to either the online payment or the cash order's synced record.
+ */
+export async function emailReceipt(orderId: string, email: string): Promise<{ success: boolean }> {
   const res = await deviceFetch('/api/v1/receipts/email', {
     method: 'POST',
-    body: JSON.stringify({ paymentId, email })
+    body: JSON.stringify({ orderId, email })
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {

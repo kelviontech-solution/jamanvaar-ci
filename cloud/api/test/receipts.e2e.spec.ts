@@ -74,23 +74,29 @@ describe('Receipt e-bill delivery', () => {
     const kdsRedeemRes = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: kdsKeyRes.body.code, deviceType: 'KDS' });
     kdsToken = kdsRedeemRes.body.deviceToken;
 
-    paidPaymentId = (await seedPayment('SUCCESS')).id;
-    pendingPaymentId = (await seedPayment('PENDING')).id;
+    paidOrderId = await seedOnlinePayment('SUCCESS');
+    pendingOrderId = await seedOnlinePayment('PENDING');
+    cashOrderId = await seedCashOrder('CONFIRMED');
+    cancelledCashOrderId = await seedCashOrder('CANCELLED');
 
     // Creating the restaurant above sent the owner a real welcome email through this same mock —
     // clear that call now so it doesn't count against any test's own assertions.
     emailSendMock.mockClear();
   });
 
-  let paidPaymentId: string;
-  let pendingPaymentId: string;
+  let paidOrderId: string;
+  let pendingOrderId: string;
+  let cashOrderId: string;
+  let cancelledCashOrderId: string;
 
-  async function seedPayment(status: 'SUCCESS' | 'PENDING') {
+  /** An online (Razorpay/UPI) order — lands in Order + PaymentTransaction. Returns the kiosk's own externalOrderId. */
+  async function seedOnlinePayment(status: 'SUCCESS' | 'PENDING'): Promise<string> {
+    const externalOrderId = `receipt-email-${status}-${Date.now()}-${Math.random()}`;
     const order = await prisma.runAsTenant(restaurantId, (tx) =>
       tx.order.create({
         data: {
           restaurantId,
-          externalOrderId: `receipt-email-${status}-${Date.now()}-${Math.random()}`,
+          externalOrderId,
           items: [{ externalItemId: 'itm-1', name: 'Paneer Tikka', quantity: 2, unitPrice: 25000, lineTotal: 50000 }],
           subtotal: 50000,
           taxAmount: 2500,
@@ -99,7 +105,7 @@ describe('Receipt e-bill delivery', () => {
         }
       })
     );
-    return prisma.runAsTenant(restaurantId, (tx) =>
+    await prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({
         data: {
           orderId: order.id,
@@ -112,6 +118,30 @@ describe('Receipt e-bill delivery', () => {
         }
       })
     );
+    return externalOrderId;
+  }
+
+  /** A cash-at-counter order — never touches Order/PaymentTransaction, only the generic order-sync mirror. */
+  async function seedCashOrder(status: 'CONFIRMED' | 'CANCELLED'): Promise<string> {
+    const externalOrderId = `receipt-email-cash-${status}-${Date.now()}-${Math.random()}`;
+    await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.syncedOrder.create({
+        data: {
+          restaurantId,
+          externalOrderId,
+          orderType: 'TOKEN_QR',
+          status,
+          items: [{ externalItemId: 'itm-1', name: 'Masala Dosa', quantity: 1, unitPrice: 15000, lineTotal: 15000 }],
+          subtotal: 15000,
+          taxAmount: 750,
+          totalAmount: 15750,
+          paymentMethod: 'CASH_AT_COUNTER',
+          paymentStatus: 'PENDING',
+          source: 'KIOSK'
+        }
+      })
+    );
+    return externalOrderId;
   }
 
   afterAll(async () => {
@@ -172,8 +202,8 @@ describe('Receipt e-bill delivery', () => {
       emailSendMock.mockClear();
     });
 
-    it('a KIOSK device can email a real, paid order as a PDF invoice', async () => {
-      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ paymentId: paidPaymentId, email: 'Guest@Example.com' });
+    it('a KIOSK device can email a real, paid online order as a PDF invoice', async () => {
+      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: paidOrderId, email: 'Guest@Example.com' });
       expect(res.status).toBe(201);
       expect(res.body).toEqual({ success: true });
 
@@ -191,36 +221,52 @@ describe('Receipt e-bill delivery', () => {
       expect(attachments[0].content.subarray(0, 4).toString()).toBe('%PDF');
     });
 
+    it('a cash-at-counter order (no online payment at all) can also be emailed as a PDF bill', async () => {
+      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: cashOrderId, email: 'guest@example.com' });
+      expect(res.status).toBe(201);
+      expect(res.body).toEqual({ success: true });
+
+      expect(emailSendMock).toHaveBeenCalledTimes(1);
+      const [, , , attachments] = emailSendMock.mock.calls[0];
+      expect(attachments[0].content.subarray(0, 4).toString()).toBe('%PDF');
+    });
+
     it('rejects a malformed email address before building anything', async () => {
-      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ paymentId: paidPaymentId, email: 'not-an-email' });
+      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: paidOrderId, email: 'not-an-email' });
       expect(res.status).toBe(400);
       expect(emailSendMock).not.toHaveBeenCalled();
     });
 
-    it('404s for a payment id that does not exist', async () => {
-      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ paymentId: 'no-such-payment', email: 'guest@example.com' });
+    it('404s for an order id that does not exist (online or cash)', async () => {
+      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: 'no-such-order', email: 'guest@example.com' });
       expect(res.status).toBe(404);
     });
 
-    it('refuses to email an invoice for a payment that never succeeded', async () => {
-      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ paymentId: pendingPaymentId, email: 'guest@example.com' });
+    it('refuses to email an invoice for an online order that never paid', async () => {
+      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: pendingOrderId, email: 'guest@example.com' });
+      expect(res.status).toBe(400);
+      expect(emailSendMock).not.toHaveBeenCalled();
+    });
+
+    it('refuses to email an invoice for a cancelled cash order', async () => {
+      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: cancelledCashOrderId, email: 'guest@example.com' });
       expect(res.status).toBe(400);
       expect(emailSendMock).not.toHaveBeenCalled();
     });
 
     it('a KDS device cannot email a bill (403)', async () => {
-      const res = await authed('post', '/api/v1/receipts/email', kdsToken).send({ paymentId: paidPaymentId, email: 'guest@example.com' });
+      const res = await authed('post', '/api/v1/receipts/email', kdsToken).send({ orderId: paidOrderId, email: 'guest@example.com' });
       expect(res.status).toBe(403);
     });
 
     it('surfaces 503 when SMTP is not configured on this server', async () => {
       emailConfiguredSpy.mockReturnValueOnce(false);
-      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ paymentId: paidPaymentId, email: 'guest@example.com' });
+      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: paidOrderId, email: 'guest@example.com' });
       expect(res.status).toBe(503);
     });
 
     it('no device token at all is rejected 401', async () => {
-      const res = await request(app.getHttpServer()).post('/api/v1/receipts/email').send({ paymentId: paidPaymentId, email: 'guest@example.com' });
+      const res = await request(app.getHttpServer()).post('/api/v1/receipts/email').send({ orderId: paidOrderId, email: 'guest@example.com' });
       expect(res.status).toBe(401);
     });
   });

@@ -180,16 +180,16 @@ export class EBillService {
   }
 
   /**
-   * Email the real tax invoice as a PDF, generated and sent entirely server-side from the
-   * restaurant's own order/payment rows — `sendFn` is the app's device-authed call to cloud/api's
-   * POST /api/v1/receipts/email (see receipt-email.service.ts). Needs the real cloud payment id
-   * (not just the local order), since that's what the server looks the order up by.
+   * Email the real bill as a PDF, generated and sent entirely server-side from the restaurant's
+   * own order/payment rows — `sendFn` is the app's device-authed call to cloud/api's POST
+   * /api/v1/receipts/email (see receipt-email.service.ts). Works for a cash-at-counter order just
+   * as well as an online one: the server resolves `order.id` (the same local order id every kiosk
+   * order already has) to whichever of its own tables actually has that order.
    */
   public static async sendEmailEBill(
     order: Order,
-    paymentId: string,
     email: string,
-    sendFn: (paymentId: string, email: string) => Promise<{ success: boolean }>
+    sendFn: (orderId: string, email: string) => Promise<{ success: boolean }>
   ): Promise<{ success: boolean; record: ReceiptRecord; message: string }> {
     if (!this.validateEmail(email)) {
       return {
@@ -213,7 +213,7 @@ export class EBillService {
     const masked = this.maskEmail(email);
     let sendResult: { success: boolean; errorMessage?: string };
     try {
-      sendResult = await sendFn(paymentId, email);
+      sendResult = await sendFn(order.id, email);
     } catch (err: any) {
       sendResult = { success: false, errorMessage: err?.message || 'Failed to reach the notification service' };
     }
