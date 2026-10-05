@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import {
   AuditRepository,
+  CouponRepository,
   db,
   LicenseRepository,
   MenuRepository,
@@ -17,6 +18,7 @@ import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateD
 import { EntitySyncEngine, SyncOutboxEngine, InventoryLedgerSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations } from '@jamanvaar/sync';
 import {
   Category,
+  Coupon,
   DiningTable,
   InventoryItem,
   MenuItem,
@@ -174,6 +176,12 @@ export default function PosAdminApp() {
   // Which AppCodes (e.g. KIOSK_ADMIN) this restaurant has enabled, to gate nav sections below.
   const { hasApp } = useEntitlements();
   const [kiosks, setKiosks] = useState<CloudKiosk[]>([]);
+  const coupons = CouponRepository.getAllCoupons();
+  const [isAddCouponModalOpen, setIsAddCouponModalOpen] = useState(false);
+  const [newCouponCode, setNewCouponCode] = useState('');
+  const [newCouponValue, setNewCouponValue] = useState<number>(50);
+  const [newCouponMin, setNewCouponMin] = useState<number>(200);
+  const [newCouponUsageLimit, setNewCouponUsageLimit] = useState('');
   // Whether QR Ordering is in this restaurant's plan, as the server says (cached for a week offline).
   const qr = useQrEntitlement();
   const qrKnown = qr.state.status === 'ready';
@@ -550,6 +558,44 @@ export default function PosAdminApp() {
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // Relocated from kiosk-admin -- not kiosk-specific, this app simply had no coupon
+  // management UI despite already reading coupon data in reports/dashboard.
+  const handleCreateCoupon = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCouponCode) return;
+
+    const usageLimit = newCouponUsageLimit.trim() ? Number(newCouponUsageLimit) : undefined;
+    const cpn: Coupon = {
+      id: `cpn-${Date.now()}`,
+      code: newCouponCode.toUpperCase(),
+      description: `Get ₹${newCouponValue} discount on orders above ₹${newCouponMin}`,
+      discountType: 'FLAT',
+      discountValue: Number(newCouponValue),
+      minOrderValue: Number(newCouponMin),
+      validFrom: new Date().toISOString(),
+      validUntil: '2027-12-31T23:59:59Z',
+      usageCount: 0,
+      usageLimit,
+      isActive: true
+    };
+
+    CouponRepository.createCoupon(cpn);
+
+    AuditRepository.log({
+      username: 'admin',
+      action: 'COUPON_CREATED',
+      category: 'OFFERS',
+      details: `Created promo coupon "${cpn.code}"${usageLimit ? ` (usage limit: ${usageLimit})` : ''}`
+    });
+
+    showToast(`Created coupon: ${cpn.code}`);
+    setIsAddCouponModalOpen(false);
+    setNewCouponCode('');
+    setNewCouponValue(50);
+    setNewCouponMin(200);
+    setNewCouponUsageLimit('');
   };
 
   // Synchronized Data Sources
@@ -1312,6 +1358,61 @@ export default function PosAdminApp() {
               </div>
             )}
 
+            {/* TAB: OFFERS & COUPONS (relocated from kiosk-admin -- not kiosk-specific, ungated) */}
+            {activeTab === 'COUPONS' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Offers & Promo Coupons</h1>
+                    <p className="text-sm text-[#4A5568] mt-1">Manage customer discounts and threshold promotions.</p>
+                  </div>
+                  <Button variant="accent" size="sm" onClick={() => setIsAddCouponModalOpen(true)}>
+                    + Add Coupon Code
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {coupons.map((c) => (
+                    <div key={c.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-lg font-black text-jaman-saffron bg-jaman-saffron/10 px-3 py-1 rounded-xl border border-jaman-saffron/20">
+                            {c.code}
+                          </span>
+                          <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                            ACTIVE
+                          </span>
+                        </div>
+                        <p className="text-sm font-semibold text-jaman-navy mt-3">{c.description}</p>
+                        <div className="text-xs text-[#8C9BAE] mt-2 space-y-1">
+                          <div>Min Order Value: ₹{c.minOrderValue}</div>
+                          <div>Times Used: {c.usageCount}{c.usageLimit ? ` / ${c.usageLimit}` : ' (unlimited)'}</div>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() =>
+                          setConfirmDialog({
+                            isOpen: true,
+                            title: 'Delete coupon?',
+                            message: `Delete coupon ${c.code}? This cannot be undone.`,
+                            confirmText: 'Delete',
+                            isDanger: true,
+                            onConfirm: () => {
+                              if (CouponRepository.deleteCoupon(c.id)) showToast(`Removed coupon ${c.code}`);
+                            }
+                          })
+                        }
+                        className="mt-4 text-xs font-semibold text-rose-600 hover:text-rose-800 self-end"
+                      >
+                        Delete Coupon
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* TAB 12: FINANCIAL & SALES REPORTS */}
             {activeTab === 'REPORTS' && <ReportsDashboard showToast={showToast} />}
 
@@ -1532,6 +1633,72 @@ export default function PosAdminApp() {
           confirmText={confirmDialog.confirmText}
           isDanger={confirmDialog.isDanger}
         />
+
+        <Modal
+          isOpen={isAddCouponModalOpen}
+          onClose={() => setIsAddCouponModalOpen(false)}
+          title="Create Promotional Coupon"
+        >
+          <form onSubmit={handleCreateCoupon} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-600 mb-1">Promo Code *</label>
+              <input
+                type="text"
+                required
+                value={newCouponCode}
+                onChange={(e) => setNewCouponCode(e.target.value.toUpperCase())}
+                placeholder="E.g., FESTIVE100, WELCOME20"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Discount Amount (₹)</label>
+                <input
+                  type="number"
+                  required
+                  min={5}
+                  value={newCouponValue}
+                  onChange={(e) => setNewCouponValue(Number(e.target.value))}
+                  className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Min Order (₹)</label>
+                <input
+                  type="number"
+                  required
+                  min={0}
+                  value={newCouponMin}
+                  onChange={(e) => setNewCouponMin(Number(e.target.value))}
+                  className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 mb-1">Usage Limit (optional)</label>
+              <input
+                type="number"
+                min={1}
+                value={newCouponUsageLimit}
+                onChange={(e) => setNewCouponUsageLimit(e.target.value)}
+                placeholder="Blank = unlimited"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
+              <Button variant="outline" size="sm" type="button" onClick={() => setIsAddCouponModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="accent" size="sm" type="submit">
+                Create Coupon
+              </Button>
+            </div>
+          </form>
+        </Modal>
 
         {isBulkPriceModalOpen && (
           <Modal
