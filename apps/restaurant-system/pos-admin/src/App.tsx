@@ -111,6 +111,7 @@ import { BackupRestoreModule } from './components/backup/BackupRestoreModule';
 import { SupportTicketsModule } from './components/support/SupportTicketsModule';
 import { InventoryControlModule } from './components/inventory/InventoryControlModule';
 import { TerminalDisplaySettings } from './components/settings/TerminalDisplaySettings';
+import { KioskDisplaySettingsPanel } from './components/settings/KioskDisplaySettingsPanel';
 import { WhatsAppChannelPanel } from './components/settings/WhatsAppChannelPanel';
 import { PosAdminHeader } from './components/header/PosAdminHeader';
 
@@ -1450,6 +1451,7 @@ export default function PosAdminApp() {
                   showToast={showToast}
                   onUpdated={() => setDbTick((t) => t + 1)}
                 />
+                {hasApp('KIOSK_ADMIN') && <KioskDisplaySettingsPanel showToast={showToast} />}
               </>
             )}
 
