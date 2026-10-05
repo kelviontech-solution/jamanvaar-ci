@@ -400,6 +400,19 @@ export async function sendReceipt(
   return data;
 }
 
+/** Emails the guest their own order's real tax invoice as a PDF, generated and sent server-side. */
+export async function emailReceipt(paymentId: string, email: string): Promise<{ success: boolean }> {
+  const res = await deviceFetch('/api/v1/receipts/email', {
+    method: 'POST',
+    body: JSON.stringify({ paymentId, email })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Emailing the bill failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
 /** Reserves a block of human order/KOT numbers for this device so offline terminals never issue the same number. */
 export async function leaseNumberBlock(kind: 'ORDER' | 'KOT', count: number): Promise<{ kind: 'ORDER' | 'KOT'; prefix: string; businessDate: string; start: number; count: number }> {
   const res = await deviceFetch('/api/v1/sync/number-leases', { method: 'POST', body: JSON.stringify({ kind, count }) });

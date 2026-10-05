@@ -7,3 +7,10 @@ export const sendReceiptSchema = z.object({
 });
 
 export type SendReceiptDto = z.infer<typeof sendReceiptSchema>;
+
+export const emailReceiptSchema = z.object({
+  paymentId: z.string().min(1),
+  email: z.string().trim().toLowerCase().email('Must be a valid email address').max(200)
+});
+
+export type EmailReceiptDto = z.infer<typeof emailReceiptSchema>;
