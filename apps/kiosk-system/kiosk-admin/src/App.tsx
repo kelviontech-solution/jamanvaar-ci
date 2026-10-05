@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { OnlinePaymentsPanel } from './components/OnlinePaymentsPanel';
 import { OnboardingChecklistCard } from './components/OnboardingChecklistCard';
 import { CategoryModal } from './components/CategoryModal';
+import { TableModal } from './components/TableModal';
 import { KioskForgotPasswordPanel } from './components/KioskForgotPasswordPanel';
 import {
   AuditRepository,
@@ -398,6 +399,9 @@ export default function AdminApp() {
   const [isAddComboModalOpen, setIsAddComboModalOpen] = useState(false);
   const [isAddCouponModalOpen, setIsAddCouponModalOpen] = useState(false);
   const [isDiagModalOpen, setIsDiagModalOpen] = useState(false);
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [tableToEdit, setTableToEdit] = useState<DiningTable | null>(null);
+  const [tableZoneFilter, setTableZoneFilter] = useState<string>('ALL');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Smart Prebuilt Menu Library & Menu Builder Modals
@@ -3088,51 +3092,130 @@ export default function AdminApp() {
           {/* TAB 5: TABLES */}
           {activeTab === 'TABLES' && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Dining Table Management</h1>
-                <p className="text-sm text-[#4A5568] mt-1">
-                  Live floor plan, occupancy status, and table QR code generation.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Dining Table Management</h1>
+                  <p className="text-sm text-[#4A5568] mt-1">
+                    Add, edit and remove dining tables, and track live occupancy.
+                  </p>
+                </div>
+                <Button
+                  variant="accent"
+                  onClick={() => {
+                    setTableToEdit(null);
+                    setIsTableModalOpen(true);
+                  }}
+                  leftIcon={<Plus className="w-4 h-4" />}
+                >
+                  Add Dining Table
+                </Button>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                {tables.map((t) => (
-                  <div
-                    key={t.id}
-                    className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
-                      t.status === 'OCCUPIED'
-                        ? 'bg-amber-50 border-amber-300'
-                        : 'bg-white border-jaman-border'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xl font-black text-jaman-navy">T-{t.tableNumber}</span>
-                        <span
-                          className={`w-2.5 h-2.5 rounded-full ${
-                            t.status === 'OCCUPIED' ? 'bg-amber-500' : 'bg-emerald-500'
-                          }`}
-                        ></span>
+              {/* Zone filter strip */}
+              {tables.length > 0 && (
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 bg-white p-2 rounded-2xl border border-jaman-border">
+                  {[{ id: 'ALL', label: 'All Sections' }, ...TableRepository.getZones().map((z) => ({ id: z, label: z }))].map((z) => {
+                    const count = z.id === 'ALL' ? tables.length : tables.filter((t) => t.zone === z.id).length;
+                    return (
+                      <button
+                        key={z.id}
+                        onClick={() => setTableZoneFilter(z.id)}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+                          tableZoneFilter === z.id ? 'bg-jaman-navy text-white' : 'text-[#4A5568] hover:bg-jaman-ivory'
+                        }`}
+                      >
+                        <span>{z.label}</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${tableZoneFilter === z.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}`}>{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {tables.filter((t) => tableZoneFilter === 'ALL' || t.zone === tableZoneFilter).length === 0 ? (
+                <EmptyState
+                  icon={<Grid className="w-6 h-6 text-slate-400" />}
+                  title={tables.length === 0 ? 'No Dining Tables Yet' : 'No Tables in this Section'}
+                  description="Add your restaurant's dining tables to track floor occupancy from this screen."
+                  actionText="Add Dining Table"
+                  onAction={() => {
+                    setTableToEdit(null);
+                    setIsTableModalOpen(true);
+                  }}
+                />
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                  {tables
+                    .filter((t) => tableZoneFilter === 'ALL' || t.zone === tableZoneFilter)
+                    .map((t) => (
+                      <div
+                        key={t.id}
+                        className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
+                          t.status === 'OCCUPIED' ? 'bg-amber-50 border-amber-300' : 'bg-white border-jaman-border'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xl font-black text-jaman-navy">T-{t.tableNumber}</span>
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => {
+                                  setTableToEdit(t);
+                                  setIsTableModalOpen(true);
+                                }}
+                                className="p-1 hover:bg-jaman-ivory rounded-lg text-[#8C9BAE] hover:text-jaman-saffron transition-colors"
+                                title="Edit Table"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (window.confirm(`Delete Table ${t.tableNumber}? This cannot be undone.`)) {
+                                    TableRepository.deleteTable(t.id);
+                                    showToast(`Deleted Table ${t.tableNumber}`);
+                                  }
+                                }}
+                                className="p-1 hover:bg-rose-50 rounded-lg text-[#8C9BAE] hover:text-rose-600 transition-colors"
+                                title="Delete Table"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                          <p className="text-xs text-[#4A5568] mt-1">{t.zone}</p>
+                          <p className="text-[11px] text-[#8C9BAE] mt-0.5 flex items-center gap-1">
+                            <Users className="w-3 h-3" /> Capacity: {t.capacity} Guests
+                          </p>
+                        </div>
+
+                        <select
+                          value={t.status}
+                          onChange={(e) => {
+                            const newStat = e.target.value as DiningTable['status'];
+                            const updated = TableRepository.updateTableStatus(t.id, newStat);
+                            if (updated) showToast(`Table ${t.tableNumber} is now ${newStat}`);
+                          }}
+                          className="mt-4 w-full py-1.5 rounded-xl text-xs font-bold bg-white border border-jaman-border hover:bg-slate-50 text-jaman-navy focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                        >
+                          <option value="AVAILABLE">🟢 Available</option>
+                          <option value="OCCUPIED">🟠 Occupied</option>
+                          <option value="RESERVED">🔵 Reserved</option>
+                          <option value="CLEANING">🟡 Cleaning</option>
+                        </select>
                       </div>
-                      <p className="text-xs text-[#4A5568] mt-1">{t.zone}</p>
-                      <p className="text-[11px] text-[#8C9BAE] mt-0.5">Capacity: {t.capacity} Guests</p>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        const newStat = t.status === 'AVAILABLE' ? 'OCCUPIED' : 'AVAILABLE';
-                        TableRepository.updateTableStatus(t.id, newStat);
-                        showToast(`Table ${t.tableNumber} is now ${newStat}`);
-                      }}
-                      className="mt-4 w-full py-1.5 rounded-xl text-xs font-bold bg-white border border-jaman-border hover:bg-slate-50 text-jaman-navy"
-                    >
-                      {t.status === 'AVAILABLE' ? 'Mark Occupied' : 'Clear Table'}
-                    </button>
-                  </div>
-                ))}
-              </div>
+                    ))}
+                </div>
+              )}
             </div>
           )}
+
+          {/* MODAL: ADD/EDIT DINING TABLE */}
+          <TableModal
+            isOpen={isTableModalOpen}
+            onClose={() => setIsTableModalOpen(false)}
+            tableToEdit={tableToEdit}
+            onSaved={(message) => showToast(message ?? (tableToEdit ? `Updated Table ${tableToEdit.tableNumber}` : 'Table created'))}
+          />
 
           {/* TAB 6: KIOSK TERMINALS */}
           {activeTab === 'KIOSKS' && (
