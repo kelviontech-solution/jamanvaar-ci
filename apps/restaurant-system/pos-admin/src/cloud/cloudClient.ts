@@ -1241,3 +1241,49 @@ export async function cloudActivateOwner(input: { restaurantCode: string; email:
 export async function cloudChangeOwnerPassword(currentPassword: string, newPassword: string): Promise<void> {
   await request('/api/v1/tenant/me/password', { method: 'PATCH', body: { currentPassword, newPassword } });
 }
+
+// --- Payment Connection (self-service online payments) ---
+
+export interface PaymentConnectionFields {
+  accountType: 'BUSINESS' | 'INDIVIDUAL';
+  businessType?: string;
+  pan: string;
+  gst?: string;
+  cin?: string;
+  uidai?: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  settlementAccountName?: string;
+  settlementAccountNumber?: string;
+  settlementIfsc?: string;
+  settlementUpiVpa?: string;
+}
+
+export interface PaymentConnectionStatus {
+  status: 'NOT_CONNECTED' | 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DISCONNECTED';
+  accountType?: string | null;
+  businessType?: string | null;
+  pan?: string | null;
+  gst?: string | null;
+  cin?: string | null;
+  uidai?: string | null;
+  contactName?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  settlementAccountName?: string | null;
+  settlementIfsc?: string | null;
+  settlementUpiVpa?: string | null;
+  bankVerificationStatus?: 'NOT_ADDED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
+}
+
+export async function getPaymentConnection(): Promise<PaymentConnectionStatus> {
+  return request<PaymentConnectionStatus>('/api/v1/tenant/payment-connection', { method: 'GET' });
+}
+
+export async function submitPaymentConnection(fields: PaymentConnectionFields): Promise<PaymentConnectionStatus> {
+  // The form always holds every field, including optional ones the admin cleared back to ''.
+  // The API's optional string fields carry .min(1), so an empty string is a 400 — omit them.
+  const cleaned = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== '')) as PaymentConnectionFields;
+  return request<PaymentConnectionStatus>('/api/v1/tenant/payment-connection', { method: 'POST', body: cleaned });
+}
