@@ -3,6 +3,14 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
+  // Relative, not Vite's default absolute '/' -- this console is served at the domain
+  // root in production (system.kelviontech.in) but under a path prefix on a dedicated
+  // testing box (e.g. /admin/ -- see nginx/oracle-testing-proxy.conf). A relative base
+  // resolves correctly either way, same pattern every other app in this monorepo
+  // already uses (apps/*/vite.config.ts). Confirmed live, not assumed: absolute '/'
+  // asset paths 404'd under /admin/ on kelviontech-prod-2 since they resolved against
+  // the proxy's root instead of the subpath the HTML was actually served from.
+  base: './',
   plugins: [react()],
   resolve: {
     alias: {
