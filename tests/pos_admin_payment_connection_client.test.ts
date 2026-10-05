@@ -26,6 +26,10 @@ describe('pos-admin payment connection client', () => {
     global.fetch = originalFetch;
   });
 
+  // This file's first dynamic import of cloudClient.ts (a large module) measured ~5.7s even
+  // in isolation, and the default 5000ms per-test timeout flakes under the full suite's load
+  // (CPU contention across ~180 parallel test files) without failing the underlying behavior —
+  // give both tests real headroom rather than chasing a timing budget that was never the point.
   it('omits empty-string optional fields from the submitted body', async () => {
     let capturedBody: any = null;
     global.fetch = vi.fn().mockImplementation(async (_url: string, init: RequestInit) => {
@@ -53,19 +57,24 @@ describe('pos-admin payment connection client', () => {
     expect(capturedBody).not.toHaveProperty('settlementAccountNumber');
     expect(capturedBody).not.toHaveProperty('settlementIfsc');
     expect(capturedBody.pan).toBe('ABCDE1234F');
-  });
+  }, 20000);
 
   it('returns the parsed status from GET', async () => {
-    global.fetch = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ status: 'ACTIVE', settlementUpiVpa: 'asha@upi' }), {
-        status: 200,
-        headers: { 'content-type': 'application/json' }
-      })
+    // A fresh Response per call, not a shared instance: a Response body can only be
+    // read once, and mockResolvedValue(sameInstance) breaks if this module's request()
+    // ever calls fetch more than once in a single test run (e.g. under the full suite,
+    // where this file's module cache can be shared across test files in the same worker).
+    global.fetch = vi.fn().mockImplementation(
+      async () =>
+        new Response(JSON.stringify({ status: 'ACTIVE', settlementUpiVpa: 'asha@upi' }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
     ) as unknown as typeof fetch;
 
     const { getPaymentConnection } = await import('../apps/restaurant-system/pos-admin/src/cloud/cloudClient');
     const result = await getPaymentConnection();
     expect(result.status).toBe('ACTIVE');
     expect(result.settlementUpiVpa).toBe('asha@upi');
-  });
+  }, 20000);
 });

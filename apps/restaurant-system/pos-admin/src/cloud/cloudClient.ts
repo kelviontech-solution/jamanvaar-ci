@@ -1287,3 +1287,95 @@ export async function submitPaymentConnection(fields: PaymentConnectionFields): 
   const cleaned = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== '')) as PaymentConnectionFields;
   return request<PaymentConnectionStatus>('/api/v1/tenant/payment-connection', { method: 'POST', body: cleaned });
 }
+
+// --- Online payments dashboard (ported from kiosk-admin; device-authed via the existing
+// signedDeviceFetch/POS_ADMIN signing this file already has for getPaymentsSummary) ---
+
+export interface RecentPayment {
+  id: string;
+  externalOrderId: string;
+  amount: number; // paise
+  status: string;
+  method: string | null;
+  paidAt: string | null;
+  createdAt: string;
+  fulfilledAt: string | null;
+  refundedAmount: number;
+  refundableAmount: number;
+  needsAttention: boolean;
+}
+
+export interface DayStatement {
+  date: string;
+  paymentCount: number;
+  refundCount: number;
+  grossVolume: number;
+  refundedAmount: number;
+  platformCommission: number;
+  razorpayFee: number;
+  platformNetCommission: number;
+  commissionReversed: number;
+  restaurantGross: number;
+  restaurantRefundImpact: number;
+  netPayableToRestaurant: number;
+  settlementNote: string;
+  rows: Array<{ id: string; externalOrderId: string; amount: number; platformAmount: number; restaurantAmount: number; method: string | null; paidAt: string | null }>;
+  rowsTruncated: boolean;
+}
+
+export interface PayoutSummary {
+  grossCollection: number;
+  platformFee: number;
+  netPayable: number;
+  pendingPayout: number;
+  paidPayout: number;
+}
+
+export interface RestaurantPayout {
+  id: string;
+  businessDate: string;
+  status: 'PENDING' | 'APPROVED' | 'PROCESSING' | 'PAID' | 'ON_HOLD' | 'FAILED';
+  grossAmount: number;
+  feeAmount: number;
+  netAmount: number;
+  paymentCount: number;
+  bankAccountMasked: string | null;
+  bankIfsc: string | null;
+  utr: string | null;
+  paidAt: string | null;
+  holdReason: string | null;
+  createdAt: string;
+}
+
+async function signedJsonOrThrow<T>(res: Response, what: string): Promise<T> {
+  const data = await parseJsonResponse(res);
+  if (!res.ok) throw new CloudApiError(data?.message ?? `${what} failed (${res.status})`, res.status);
+  return data as T;
+}
+
+export async function getRecentPayments(): Promise<RecentPayment[]> {
+  const data = await signedJsonOrThrow<{ rows: RecentPayment[] }>(await signedDeviceFetch('/api/v1/payments/tenant-recent'), 'Recent payments');
+  return data.rows;
+}
+
+/** A paid order the kiosk never produced a ticket for, marked as handled by staff. */
+export async function markPaymentHandled(paymentId: string): Promise<void> {
+  await signedJsonOrThrow(await signedDeviceFetch(`/api/v1/payments/${paymentId}/fulfilled`, { method: 'POST' }), 'Mark payment handled');
+}
+
+export async function getDayStatement(date: string): Promise<DayStatement> {
+  return signedJsonOrThrow<DayStatement>(await signedDeviceFetch(`/api/v1/payments/tenant-statement?date=${encodeURIComponent(date)}`), 'Day statement');
+}
+
+/**
+ * Lifetime gross collection / Jamanvaar fee / net payable, and how much of that net is still pending vs
+ * already paid out by bank transfer. Temporary manual-payout view while Razorpay Route is pending — see
+ * RestaurantPayoutsService on the server for the batching rules. All amounts in paise.
+ */
+export async function getPayoutSummary(): Promise<PayoutSummary> {
+  return signedJsonOrThrow<PayoutSummary>(await signedDeviceFetch('/api/v1/payments/payout-summary'), 'Payout summary');
+}
+
+export async function getPayoutHistory(page = 1, limit = 25): Promise<{ rows: RestaurantPayout[]; total: number; page: number; limit: number }> {
+  return signedJsonOrThrow(await signedDeviceFetch(`/api/v1/payments/payout-history?page=${page}&limit=${limit}`), 'Payout history');
+}

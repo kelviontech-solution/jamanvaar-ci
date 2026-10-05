@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Order } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
 import {
@@ -10,6 +10,9 @@ import {
   TrendingUp,
   Receipt
 } from 'lucide-react';
+import { PaymentConnectionPanel } from './PaymentConnectionPanel';
+import { OnlinePaymentsPanel } from './OnlinePaymentsPanel';
+import type { PaymentConnectionStatus } from '../../cloud/cloudClient';
 
 interface PaymentsSplitModuleProps {
   orders: Order[];
@@ -34,9 +37,13 @@ export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
   showToast
 }) => {
   const settledOrders = orders.filter((o) => o.paymentStatus === 'SUCCESS');
+  const [connectionStatus, setConnectionStatus] = useState<PaymentConnectionStatus | null>(null);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      <PaymentConnectionPanel onStatusChange={setConnectionStatus} />
+      {(connectionStatus?.status === 'ACTIVE' || connectionStatus?.status === 'PENDING_VERIFICATION') && <OnlinePaymentsPanel />}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
