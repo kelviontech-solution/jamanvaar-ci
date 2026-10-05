@@ -1187,6 +1187,51 @@ async function jsonOrThrowCloud<T>(res: Response, what: string): Promise<T> {
   return data as T;
 }
 
+// --- Kiosk fleet management (ported from kiosk-admin) ---
+
+export interface CloudKiosk {
+  id: string;
+  name: string;
+  appVersion: string | null;
+  lastSeenAt: string | null;
+  health: 'online' | 'degraded' | 'offline' | 'revoked' | 'pending' | 'never_seen';
+  isLocked: boolean;
+  lockReason: string | null;
+  branchName: string | null;
+  pendingSyncCount: number;
+  syncError: string | null;
+  lastSyncAt: string | null;
+}
+
+/** The self-order kiosks this restaurant has really activated: health, backlog and errors. */
+export async function fetchCloudKiosks(): Promise<CloudKiosk[]> {
+  const data = await jsonOrThrowCloud<{
+    devices: Array<{
+      id: string; type: string; name: string | null; appVersion: string | null; lastSeenAt: string | null; lastSyncAt: string | null;
+      health: CloudKiosk['health']; isLocked: boolean; lockReason: string | null; pendingSyncCount: number | null;
+      syncError: string | null; branch: { name: string } | null;
+    }>;
+  }>(await deviceFetch('/api/v1/devices/me/fleet'), 'Kiosk fleet');
+  return data.devices
+    .filter((d) => d.type === 'KIOSK')
+    .map((d) => ({
+      id: d.id, name: d.name ?? 'Kiosk', appVersion: d.appVersion, lastSeenAt: d.lastSeenAt, health: d.health,
+      isLocked: d.isLocked, lockReason: d.lockReason, branchName: d.branch?.name ?? null,
+      pendingSyncCount: d.pendingSyncCount ?? 0, syncError: d.syncError, lastSyncAt: d.lastSyncAt
+    }));
+}
+
+export type KioskCommandType = 'REQUEST_SYNC' | 'REQUEST_DIAGNOSTICS' | 'RESTART_APP' | 'CLEAR_CACHE' | 'LOCK' | 'UNLOCK';
+
+/** Sends a command to one kiosk through the cloud, delivered on its next heartbeat. A unique key per click makes a retried send harmless. */
+export async function sendKioskCommand(kioskId: string, commandType: KioskCommandType, payload?: Record<string, unknown>): Promise<void> {
+  const idempotencyKey = `${commandType}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  await jsonOrThrowCloud(
+    await deviceFetch(`/api/v1/devices/${kioskId}/commands`, { method: 'POST', body: JSON.stringify({ type: commandType, payload, idempotencyKey }) }),
+    'Kiosk command'
+  );
+}
+
 export async function fetchSyncIssues(): Promise<SyncIssue[]> {
   return (await jsonOrThrowCloud<{ issues: SyncIssue[] }>(await deviceFetch('/api/v1/devices/me/sync-issues'), 'Sync issues')).issues;
 }

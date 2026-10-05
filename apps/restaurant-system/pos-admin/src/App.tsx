@@ -13,7 +13,7 @@ import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
 import { ActivateOwnerPanel } from './components/auth/ActivateOwnerPanel';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
 import { SyncHealthPanel } from './components/sync/SyncHealthPanel';
-import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements } from './cloud/cloudClient';
+import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements, fetchCloudKiosks, sendKioskCommand, type CloudKiosk } from './cloud/cloudClient';
 import { EntitySyncEngine, SyncOutboxEngine, InventoryLedgerSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations } from '@jamanvaar/sync';
 import {
   Category,
@@ -76,7 +76,10 @@ import {
   LifeBuoy,
   Truck,
   RefreshCw,
-  Sliders
+  Sliders,
+  Tablet,
+  Unlock,
+  Tag
 } from 'lucide-react';
 
 // Reusable Feature Modules
@@ -153,7 +156,9 @@ export type PosAdminTab =
   | 'AUDIT'
   | 'BACKUP'
   | 'SUPPORT'
-  | 'INVENTORY_CONTROL';
+  | 'INVENTORY_CONTROL'
+  | 'KIOSKS'
+  | 'COUPONS';
 
 export default function PosAdminApp() {
   const ai = useAiAccess();
@@ -168,6 +173,7 @@ export default function PosAdminApp() {
   const [activeTab, setActiveTab] = useState<PosAdminTab>('DASHBOARD');
   // Which AppCodes (e.g. KIOSK_ADMIN) this restaurant has enabled, to gate nav sections below.
   const { hasApp } = useEntitlements();
+  const [kiosks, setKiosks] = useState<CloudKiosk[]>([]);
   // Whether QR Ordering is in this restaurant's plan, as the server says (cached for a week offline).
   const qr = useQrEntitlement();
   const qrKnown = qr.state.status === 'ready';
@@ -516,6 +522,30 @@ export default function PosAdminApp() {
       SyncOutboxEngine.configureTransport(null);
     };
   }, [cloudConnected]);
+
+  // Kiosk fleet polling for the Kiosk Terminals tab. Deliberately its own effect, not merged into
+  // the sync effect above: that effect already calls SyncOutboxEngine/EntitySyncEngine
+  // .configureTransport once for this console's own order/menu sync -- calling it again here (as
+  // kiosk-admin's original fleet-polling code did, for ITS OWN sync needs) would silently
+  // overwrite this console's already-configured transport.
+  useEffect(() => {
+    if (!hasApp('KIOSK_ADMIN')) return;
+    let cancelled = false;
+    const refresh = async () => {
+      try {
+        const fleet = await fetchCloudKiosks();
+        if (!cancelled) setKiosks(fleet);
+      } catch {
+        // Fleet view just stays on its last-known data; this is a background refresh, not a user action.
+      }
+    };
+    void refresh();
+    const kioskInterval = setInterval(refresh, 30000);
+    return () => {
+      cancelled = true;
+      clearInterval(kioskInterval);
+    };
+  }, [hasApp]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -892,7 +922,14 @@ export default function PosAdminApp() {
                     { id: 'CUSTOMERS', label: 'Customers CRM', icon: Heart },
                     { id: 'STAFF', label: 'Staff & Roles (RBAC)', icon: Users },
                     { id: 'PAYMENTS', label: 'Payments & Split', icon: CreditCard },
+                    { id: 'COUPONS', label: 'Offers & Coupons', icon: Tag },
                     { id: 'SHIFTS', label: 'Shift & Cash Drawer', icon: Coins }
+                  ]
+                },
+                {
+                  section: 'KIOSK',
+                  items: [
+                    { id: 'KIOSKS', label: 'Kiosk Terminals', icon: Tablet, requiresApp: 'KIOSK_ADMIN' as const }
                   ]
                 },
                 {
@@ -1221,6 +1258,58 @@ export default function PosAdminApp() {
                 onSelectOrderDetail={(ord) => setSelectedOrderDetail(ord)}
                 showToast={showToast}
               />
+            )}
+
+            {/* TAB: KIOSK TERMINAL FLEET (relocated from kiosk-admin, gated on KIOSK_ADMIN) */}
+            {activeTab === 'KIOSKS' && (
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Kiosk Terminal Control</h1>
+                  <p className="text-sm text-[#4A5568] mt-1">Manage self-ordering stations, lockdown states, and maintenance modes.</p>
+                </div>
+                {kiosks.length === 0 && (
+                  <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm text-xs text-[#8C9BAE]">
+                    No Kiosk Terminals yet. A terminal appears here the moment it's activated with a real activation code and joins this restaurant's network.
+                  </div>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {kiosks.map((k) => (
+                    <div key={k.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-bold text-jaman-navy">{k.name}</h3>
+                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">{k.health}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs bg-jaman-ivory p-3 rounded-xl border border-jaman-border">
+                        <div>
+                          <span className="text-[#8C9BAE]">Pending changes:</span>
+                          <div className="font-semibold text-jaman-navy font-mono">{k.pendingSyncCount}</div>
+                        </div>
+                        <div>
+                          <span className="text-[#8C9BAE]">App version:</span>
+                          <div className="font-semibold text-jaman-navy font-mono">{k.appVersion ?? '—'}</div>
+                        </div>
+                      </div>
+                      {k.syncError && (
+                        <div role="alert" className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">
+                          {k.syncError}
+                        </div>
+                      )}
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" onClick={() => void sendKioskCommand(k.id, 'REQUEST_SYNC')}>Sync now</Button>
+                        <Button variant="outline" size="sm" onClick={() => void sendKioskCommand(k.id, 'REQUEST_DIAGNOSTICS')}>Diagnostics</Button>
+                        <Button
+                          variant={k.isLocked ? 'accent' : 'outline'}
+                          size="sm"
+                          leftIcon={k.isLocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                          onClick={() => void sendKioskCommand(k.id, k.isLocked ? 'UNLOCK' : 'LOCK')}
+                        >
+                          {k.isLocked ? 'Unlock' : 'Lockdown'}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* TAB 12: FINANCIAL & SALES REPORTS */}
