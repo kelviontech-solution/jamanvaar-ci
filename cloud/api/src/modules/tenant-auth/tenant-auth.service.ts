@@ -746,6 +746,14 @@ export class TenantAuthService {
    * byte-identical output. `subscriptions` and `effectiveEntitlements` are new and additive,
    * for callers that need the full multi-subscription picture.
    */
+  /** Every AppCode this restaurant has enabled right now — see ApplicationEntitlementsService.listEnabledAppCodesForTenant. */
+  async getMyApplications(restaurantId: string): Promise<{ enabledApps: AppCode[] }> {
+    const enabledApps = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      this.appEntitlements.listEnabledAppCodesForTenant(tx, restaurantId)
+    );
+    return { enabledApps };
+  }
+
   async getEntitlements(restaurantId: string) {
     return this.prisma.runAsTenant(restaurantId, async (tx) => {
       const subscriptions = await tx.subscription.findMany({

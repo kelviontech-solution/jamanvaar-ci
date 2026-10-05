@@ -297,6 +297,27 @@ export class ApplicationEntitlementsService {
     return row !== null;
   }
 
+  /**
+   * Every AppCode this restaurant currently has enabled, across all its active subscriptions —
+   * the tenant-facing counterpart to isAppEnabled's per-code question, used by a restaurant's own
+   * admin console to decide which of its own nav sections to show (e.g. pos-admin gating its Kiosk
+   * Terminals tab on KIOSK_ADMIN) without needing a Super-Admin-scoped call it has no token for.
+   */
+  async listEnabledAppCodesForTenant(tx: TxClient, restaurantId: string): Promise<AppCode[]> {
+    const subs = await tx.subscription.findMany({
+      where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] } },
+      select: { id: true }
+    });
+    if (subs.length === 0) return [];
+
+    const rows = await tx.applicationEntitlement.findMany({
+      where: { subscriptionId: { in: subs.map((s) => s.id) }, enabled: true },
+      select: { appCode: true },
+      distinct: ['appCode']
+    });
+    return rows.map((r) => r.appCode);
+  }
+
   /** Throws a clear 403 instead of a bare boolean when the caller wants to fail the request outright. */
   async assertAppEnabled(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<void> {
     const ok = await this.isAppEnabled(tx, restaurantId, appCode);

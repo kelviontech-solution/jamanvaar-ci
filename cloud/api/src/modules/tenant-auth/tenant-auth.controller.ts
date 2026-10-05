@@ -283,6 +283,12 @@ export class TenantMeController {
     return this.authService.getEntitlements(user.restaurantId);
   }
 
+  /** Which AppCodes (POS_ADMIN, KIOSK_ADMIN, ...) this restaurant has enabled right now — used by a terminal's own admin console to gate its nav. */
+  @Get('me/applications')
+  myApplications(@CurrentTenantUser() user: User) {
+    return this.authService.getMyApplications(user.restaurantId);
+  }
+
   @Patch('me/password')
   @UsePipes(new ZodValidationPipe(tenantChangePasswordSchema))
   async changePassword(
