@@ -1,14 +1,41 @@
 import React, { useState } from 'react';
 import { Delete, Space, X, CornerDownLeft } from 'lucide-react';
-import { transliterateToDevanagari, transliterateToGujarati } from '@jamanvaar/utils';
+import {
+  transliterateToDevanagari,
+  transliterateToGujarati,
+  transliterateToMarathi,
+  transliterateToTamil,
+  transliterateToTelugu,
+  transliterateToKannada
+} from '@jamanvaar/utils';
+
+export type VirtualKeyboardLanguage = 'en' | 'hi' | 'gu' | 'mr' | 'ta' | 'te' | 'kn';
+
+const TRANSLITERATORS: Record<Exclude<VirtualKeyboardLanguage, 'en'>, (input: string) => string> = {
+  hi: transliterateToDevanagari,
+  gu: transliterateToGujarati,
+  mr: transliterateToMarathi,
+  ta: transliterateToTamil,
+  te: transliterateToTelugu,
+  kn: transliterateToKannada
+};
+
+const KEYBOARD_TITLES: Record<VirtualKeyboardLanguage, string> = {
+  en: 'English Keyboard',
+  hi: 'हिन्दी Keyboard (phonetic)',
+  gu: 'ગુજરાતી Keyboard (phonetic)',
+  mr: 'मराठी Keyboard (phonetic)',
+  ta: 'தமிழ் Keyboard (phonetic)',
+  te: 'తెలుగు Keyboard (phonetic)',
+  kn: 'ಕನ್ನಡ Keyboard (phonetic)'
+};
 
 export interface VirtualKeyboardProps {
-  /** 'en' inserts Latin characters directly. 'hi'/'gu' treat every key as
-   *  phonetic Roman input and live-convert it to Devanagari/Gujarati — the
-   *  same approach tools like Google Input Tools use, so an admin without
-   *  a native-script keyboard can still type a reasonable translation
-   *  (reviewable in the field itself before saving, never assumed exact). */
-  language: 'en' | 'hi' | 'gu';
+  /** 'en' inserts Latin characters directly. Every other language treats each key as phonetic
+   *  Roman input and live-converts it to that language's native script — the same approach tools
+   *  like Google Input Tools use, so an admin without a native-script keyboard can still type a
+   *  reasonable translation (reviewable in the field itself before saving, never assumed exact). */
+  language: VirtualKeyboardLanguage;
   /** Current value of the field this keyboard is typing into. */
   value: string;
   onChange: (next: string) => void;
@@ -20,24 +47,21 @@ const ROW_1 = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
 const ROW_2 = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
 const ROW_3 = ['z', 'x', 'c', 'v', 'b', 'n', 'm'];
 
-const PHONETIC_HINTS: Array<{ latin: string; result: string }> = [
-  { latin: 'ka', result: 'क' },
-  { latin: 'kha', result: 'ख' },
-  { latin: 'ga', result: 'ग' },
-  { latin: 'cha', result: 'च' },
-  { latin: 'ta', result: 'त' },
-  { latin: 'Ta', result: 'ट (retroflex)' },
-  { latin: 'da', result: 'द' },
-  { latin: 'Da', result: 'ड (retroflex)' },
-  { latin: 'na', result: 'न' },
-  { latin: 'pa', result: 'प' },
-  { latin: 'ma', result: 'म' },
-  { latin: 'ra', result: 'र' },
-  { latin: 'la', result: 'ल' },
-  { latin: 'sha', result: 'श' },
-  { latin: 'aa / A', result: 'ा (long a)' },
-  { latin: 'ii / I', result: 'ी (long i)' }
-];
+/**
+ * Generated live from whichever language's own transliterate() is active, instead of a Devanagari-
+ * only static table — so the examples shown are always the actual script being typed, for every
+ * language this keyboard supports, and can never drift out of sync with the real tables.
+ */
+function phoneticHintsFor(transliterate: (input: string) => string): Array<{ latin: string; result: string }> {
+  const syllables = ['ka', 'kha', 'ga', 'cha', 'ta', 'Ta', 'da', 'Da', 'na', 'pa', 'ma', 'ra', 'la', 'sha'];
+  const hints = syllables.map((latin) => ({
+    latin: latin === 'Ta' || latin === 'Da' ? `${latin} (retroflex)` : latin,
+    result: transliterate(latin)
+  }));
+  hints.push({ latin: 'aa / A (long a)', result: transliterate('aa') });
+  hints.push({ latin: 'ii / I (long i)', result: transliterate('ii') });
+  return hints;
+}
 
 /**
  * On-screen keyboard for kiosk-admin's Add Dish form. Hindi/Gujarati modes
@@ -57,7 +81,8 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ language, valu
   const [isShift, setIsShift] = useState(false);
   const [showHints, setShowHints] = useState(false);
 
-  const transliterate = language === 'hi' ? transliterateToDevanagari : transliterateToGujarati;
+  const transliterate = language === 'en' ? (s: string) => s : TRANSLITERATORS[language];
+  const hints = language === 'en' ? [] : phoneticHintsFor(transliterate);
 
   const commit = (nextTail: string) => {
     setPhoneticTail(nextTail);
@@ -97,7 +122,7 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ language, valu
         <div className="flex items-center justify-between">
           <div>
             <h4 className="font-black text-sm text-[#0B253A]">
-              {title || (language === 'en' ? 'English Keyboard' : language === 'hi' ? 'हिन्दी Keyboard (phonetic)' : 'ગુજરાતી Keyboard (phonetic)')}
+              {title || KEYBOARD_TITLES[language]}
             </h4>
             {language !== 'en' && (
               <p className="text-[11px] text-[#8C9BAE]">
@@ -127,7 +152,7 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ language, valu
 
         {showHints && language !== 'en' && (
           <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 p-2.5 bg-white rounded-xl border border-[#EBE6DD] text-[11px]">
-            {PHONETIC_HINTS.map((h) => (
+            {hints.map((h) => (
               <div key={h.latin} className="text-center">
                 <div className="font-mono font-bold text-[#0B253A]">{h.latin}</div>
                 <div className="text-[#E66817]">{h.result}</div>

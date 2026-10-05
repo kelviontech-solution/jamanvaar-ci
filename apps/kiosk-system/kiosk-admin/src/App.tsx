@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { OnlinePaymentsPanel } from './components/OnlinePaymentsPanel';
 import { OnboardingChecklistCard } from './components/OnboardingChecklistCard';
 import { CategoryModal } from './components/CategoryModal';
+import { TableModal } from './components/TableModal';
+import { StaffModal } from './components/StaffModal';
 import { KioskForgotPasswordPanel } from './components/KioskForgotPasswordPanel';
 import {
   AuditRepository,
@@ -41,7 +43,8 @@ import {
   ReceiptPaperSize,
   ReceiptRecord,
   ServiceRequest,
-  SpiceLevel
+  SpiceLevel,
+  User
 } from '@jamanvaar/types';
 import { formatDate, formatINR, formatSplitTax, formatTime, SoundService, isValidGstinFormat, isValidFssaiFormat, isValidIndianPhone } from '@jamanvaar/utils';
 import {
@@ -64,6 +67,7 @@ import {
   ActivationHelpNote,
   JAMANVAARStartup,
   VirtualKeyboard,
+  type VirtualKeyboardLanguage,
   ActivationWelcomeScreen,
   printElement
 } from '@jamanvaar/ui';
@@ -226,6 +230,16 @@ const WELCOME_BACKGROUND_GALLERY: Array<{ label: string; url: string }> = [
   { label: 'Fine Dining Setting', url: 'https://images.unsplash.com/photo-1570560258879-af7f8e1447ac?auto=format&fit=crop&w=1800&q=80' },
   { label: 'Contemporary Dining', url: 'https://images.unsplash.com/photo-1636405189493-181ecf851006?auto=format&fit=crop&w=1800&q=80' }
 ];
+
+const KIOSK_LANGUAGE_LABELS: Record<string, string> = {
+  en: 'English',
+  hi: 'हिन्दी (Hindi)',
+  gu: 'ગુજરાતી (Gujarati)',
+  mr: 'मराठी (Marathi)',
+  ta: 'தமிழ் (Tamil)',
+  te: 'తెలుగు (Telugu)',
+  kn: 'ಕನ್ನಡ (Kannada)'
+};
 
 export default function AdminApp() {
   const [activeTab, setActiveTab] = useState<AdminTab>('DASHBOARD');
@@ -398,6 +412,11 @@ export default function AdminApp() {
   const [isAddComboModalOpen, setIsAddComboModalOpen] = useState(false);
   const [isAddCouponModalOpen, setIsAddCouponModalOpen] = useState(false);
   const [isDiagModalOpen, setIsDiagModalOpen] = useState(false);
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [tableToEdit, setTableToEdit] = useState<DiningTable | null>(null);
+  const [tableZoneFilter, setTableZoneFilter] = useState<string>('ALL');
+  const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
+  const [staffToEdit, setStaffToEdit] = useState<User | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Smart Prebuilt Menu Library & Menu Builder Modals
@@ -472,17 +491,15 @@ export default function AdminApp() {
   const [newItemDesc, setNewItemDesc] = useState('');
   const [newItemDietary, setNewItemDietary] = useState<DietaryType>('VEG');
   const [newItemSpice, setNewItemSpice] = useState<SpiceLevel>('NONE');
-  // Hindi/Gujarati translations for the dish being created — there was
-  // previously no way at all to set these when adding an item, so every
-  // admin-added dish showed in English regardless of the kiosk's selected
-  // language. The virtual keyboard lets an admin without a native-script
-  // keyboard type these phonetically (see @jamanvaar/ui VirtualKeyboard).
-  const [newItemNameHi, setNewItemNameHi] = useState('');
-  const [newItemDescHi, setNewItemDescHi] = useState('');
-  const [newItemNameGu, setNewItemNameGu] = useState('');
-  const [newItemDescGu, setNewItemDescGu] = useState('');
+  // Translations for the dish being created, one entry per non-English language this kiosk has
+  // enabled (Settings > Customer Kiosk Language) — there was previously no way at all to set
+  // these when adding an item, so every admin-added dish showed in English regardless of the
+  // kiosk's selected language. The virtual keyboard lets an admin without a native-script
+  // keyboard type these phonetically in any of the seven supported languages (see
+  // @jamanvaar/ui VirtualKeyboard).
+  const [newItemTranslations, setNewItemTranslations] = useState<Record<string, { name: string; description: string }>>({});
   const [activeKeyboardField, setActiveKeyboardField] = useState<
-    null | { lang: 'hi' | 'gu'; field: 'name' | 'description' }
+    null | { lang: VirtualKeyboardLanguage; field: 'name' | 'description' }
   >(null);
 
   // Form states for Combo — mainItemIds/etc. used to be hardcoded to
@@ -861,6 +878,7 @@ export default function AdminApp() {
   const combos = ComboRepository.getAllCombos();
   const orders = OrderRepository.getAllOrders();
   const tables = TableRepository.getAllTables();
+  const staffUsers = StaffRepository.getAllUsers();
   const kiosks = KioskRepository.getAllKiosks();
   const coupons = CouponRepository.getAllCoupons();
   const serviceRequests = ServiceRequestRepository.getAll();
@@ -1002,8 +1020,9 @@ export default function AdminApp() {
     if (!newItemName || !newItemPrice) return;
 
     const translations: MenuItem['translations'] = {};
-    if (newItemNameHi.trim()) translations.hi = { name: newItemNameHi.trim(), description: newItemDescHi.trim() || undefined };
-    if (newItemNameGu.trim()) translations.gu = { name: newItemNameGu.trim(), description: newItemDescGu.trim() || undefined };
+    for (const [code, t] of Object.entries(newItemTranslations)) {
+      if (t.name.trim()) translations[code] = { name: t.name.trim(), description: t.description.trim() || undefined };
+    }
 
     const created = MenuRepository.createMenuItem({
       name: newItemName,
@@ -1033,10 +1052,7 @@ export default function AdminApp() {
     setNewItemName('');
     setNewItemSku('');
     setNewItemDesc('');
-    setNewItemNameHi('');
-    setNewItemDescHi('');
-    setNewItemNameGu('');
-    setNewItemDescGu('');
+    setNewItemTranslations({});
   };
 
   const toggleComboItem = (
@@ -3088,51 +3104,130 @@ export default function AdminApp() {
           {/* TAB 5: TABLES */}
           {activeTab === 'TABLES' && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Dining Table Management</h1>
-                <p className="text-sm text-[#4A5568] mt-1">
-                  Live floor plan, occupancy status, and table QR code generation.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Dining Table Management</h1>
+                  <p className="text-sm text-[#4A5568] mt-1">
+                    Add, edit and remove dining tables, and track live occupancy.
+                  </p>
+                </div>
+                <Button
+                  variant="accent"
+                  onClick={() => {
+                    setTableToEdit(null);
+                    setIsTableModalOpen(true);
+                  }}
+                  leftIcon={<Plus className="w-4 h-4" />}
+                >
+                  Add Dining Table
+                </Button>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                {tables.map((t) => (
-                  <div
-                    key={t.id}
-                    className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
-                      t.status === 'OCCUPIED'
-                        ? 'bg-amber-50 border-amber-300'
-                        : 'bg-white border-jaman-border'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xl font-black text-jaman-navy">T-{t.tableNumber}</span>
-                        <span
-                          className={`w-2.5 h-2.5 rounded-full ${
-                            t.status === 'OCCUPIED' ? 'bg-amber-500' : 'bg-emerald-500'
-                          }`}
-                        ></span>
+              {/* Zone filter strip */}
+              {tables.length > 0 && (
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 bg-white p-2 rounded-2xl border border-jaman-border">
+                  {[{ id: 'ALL', label: 'All Sections' }, ...TableRepository.getZones().map((z) => ({ id: z, label: z }))].map((z) => {
+                    const count = z.id === 'ALL' ? tables.length : tables.filter((t) => t.zone === z.id).length;
+                    return (
+                      <button
+                        key={z.id}
+                        onClick={() => setTableZoneFilter(z.id)}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+                          tableZoneFilter === z.id ? 'bg-jaman-navy text-white' : 'text-[#4A5568] hover:bg-jaman-ivory'
+                        }`}
+                      >
+                        <span>{z.label}</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${tableZoneFilter === z.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}`}>{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {tables.filter((t) => tableZoneFilter === 'ALL' || t.zone === tableZoneFilter).length === 0 ? (
+                <EmptyState
+                  icon={<Grid className="w-6 h-6 text-slate-400" />}
+                  title={tables.length === 0 ? 'No Dining Tables Yet' : 'No Tables in this Section'}
+                  description="Add your restaurant's dining tables to track floor occupancy from this screen."
+                  actionText="Add Dining Table"
+                  onAction={() => {
+                    setTableToEdit(null);
+                    setIsTableModalOpen(true);
+                  }}
+                />
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                  {tables
+                    .filter((t) => tableZoneFilter === 'ALL' || t.zone === tableZoneFilter)
+                    .map((t) => (
+                      <div
+                        key={t.id}
+                        className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
+                          t.status === 'OCCUPIED' ? 'bg-amber-50 border-amber-300' : 'bg-white border-jaman-border'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xl font-black text-jaman-navy">T-{t.tableNumber}</span>
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => {
+                                  setTableToEdit(t);
+                                  setIsTableModalOpen(true);
+                                }}
+                                className="p-1 hover:bg-jaman-ivory rounded-lg text-[#8C9BAE] hover:text-jaman-saffron transition-colors"
+                                title="Edit Table"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (window.confirm(`Delete Table ${t.tableNumber}? This cannot be undone.`)) {
+                                    TableRepository.deleteTable(t.id);
+                                    showToast(`Deleted Table ${t.tableNumber}`);
+                                  }
+                                }}
+                                className="p-1 hover:bg-rose-50 rounded-lg text-[#8C9BAE] hover:text-rose-600 transition-colors"
+                                title="Delete Table"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                          <p className="text-xs text-[#4A5568] mt-1">{t.zone}</p>
+                          <p className="text-[11px] text-[#8C9BAE] mt-0.5 flex items-center gap-1">
+                            <Users className="w-3 h-3" /> Capacity: {t.capacity} Guests
+                          </p>
+                        </div>
+
+                        <select
+                          value={t.status}
+                          onChange={(e) => {
+                            const newStat = e.target.value as DiningTable['status'];
+                            const updated = TableRepository.updateTableStatus(t.id, newStat);
+                            if (updated) showToast(`Table ${t.tableNumber} is now ${newStat}`);
+                          }}
+                          className="mt-4 w-full py-1.5 rounded-xl text-xs font-bold bg-white border border-jaman-border hover:bg-slate-50 text-jaman-navy focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                        >
+                          <option value="AVAILABLE">🟢 Available</option>
+                          <option value="OCCUPIED">🟠 Occupied</option>
+                          <option value="RESERVED">🔵 Reserved</option>
+                          <option value="CLEANING">🟡 Cleaning</option>
+                        </select>
                       </div>
-                      <p className="text-xs text-[#4A5568] mt-1">{t.zone}</p>
-                      <p className="text-[11px] text-[#8C9BAE] mt-0.5">Capacity: {t.capacity} Guests</p>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        const newStat = t.status === 'AVAILABLE' ? 'OCCUPIED' : 'AVAILABLE';
-                        TableRepository.updateTableStatus(t.id, newStat);
-                        showToast(`Table ${t.tableNumber} is now ${newStat}`);
-                      }}
-                      className="mt-4 w-full py-1.5 rounded-xl text-xs font-bold bg-white border border-jaman-border hover:bg-slate-50 text-jaman-navy"
-                    >
-                      {t.status === 'AVAILABLE' ? 'Mark Occupied' : 'Clear Table'}
-                    </button>
-                  </div>
-                ))}
-              </div>
+                    ))}
+                </div>
+              )}
             </div>
           )}
+
+          {/* MODAL: ADD/EDIT DINING TABLE */}
+          <TableModal
+            isOpen={isTableModalOpen}
+            onClose={() => setIsTableModalOpen(false)}
+            tableToEdit={tableToEdit}
+            onSaved={(message) => showToast(message ?? (tableToEdit ? `Updated Table ${tableToEdit.tableNumber}` : 'Table created'))}
+          />
 
           {/* TAB 6: KIOSK TERMINALS */}
           {activeTab === 'KIOSKS' && (
@@ -4181,35 +4276,120 @@ export default function AdminApp() {
           {/* TAB 12: STAFF & ROLES */}
           {activeTab === 'STAFF' && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Staff & RBAC Permissions</h1>
-                <p className="text-sm text-[#4A5568] mt-1">
-                  Manage operators, managers, cashiers, and granular access control rules.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Staff & RBAC Permissions</h1>
+                  <p className="text-sm text-[#4A5568] mt-1">
+                    Add staff, assign their role, and control which PINs can open this kiosk.
+                  </p>
+                </div>
+                <Button
+                  variant="accent"
+                  onClick={() => {
+                    setStaffToEdit(null);
+                    setIsStaffModalOpen(true);
+                  }}
+                  leftIcon={<Plus className="w-4 h-4" />}
+                >
+                  Add Staff
+                </Button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {db.users.map((u) => (
-                  <div key={u.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-jaman-navy text-white flex items-center justify-center font-bold">
-                          {u.fullName[0]}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-1">
+                  <span className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider">Total Staff</span>
+                  <div className="text-2xl font-black text-jaman-navy">{staffUsers.length}</div>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-1">
+                  <span className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider">Can Use This Kiosk</span>
+                  <div className="text-2xl font-black text-emerald-700">
+                    {staffUsers.filter((u) => StaffRepository.canUseTerminal(u.roleId, 'KIOSK')).length}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-1">
+                  <span className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider">Inactive</span>
+                  <div className="text-2xl font-black text-rose-600">{staffUsers.filter((u) => !u.isActive).length}</div>
+                </div>
+              </div>
+
+              {staffUsers.length === 0 ? (
+                <EmptyState
+                  title="No Staff Yet"
+                  description="Add your first staff member — creating one issues a working PIN for this kiosk, POS, Captain and KDS."
+                  actionText="Add Staff"
+                  onAction={() => {
+                    setStaffToEdit(null);
+                    setIsStaffModalOpen(true);
+                  }}
+                />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {staffUsers.map((u) => {
+                    const kioskAccess = StaffRepository.canUseTerminal(u.roleId, 'KIOSK');
+                    return (
+                      <div key={u.id} className="bg-white rounded-2xl p-5 border border-jaman-border shadow-sm space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-full bg-jaman-navy text-white flex items-center justify-center font-bold shrink-0">
+                              {u.fullName[0]}
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="font-bold text-jaman-navy truncate">{u.fullName}</h4>
+                              <p className="text-xs text-[#8C9BAE] truncate">@{u.username}{u.phone ? ` • ${u.phone}` : ''}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              onClick={() => {
+                                setStaffToEdit(u);
+                                setIsStaffModalOpen(true);
+                              }}
+                              className="p-1.5 hover:bg-jaman-ivory rounded-lg text-[#8C9BAE] hover:text-jaman-saffron transition-colors"
+                              title="Edit Staff"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (window.confirm(`Remove staff access for "${u.fullName}"? Their PIN will stop working everywhere.`)) {
+                                  StaffRepository.deleteUser(u.id);
+                                  showToast(`Staff removed: ${u.fullName}`);
+                                }
+                              }}
+                              className="p-1.5 hover:bg-rose-50 rounded-lg text-[#8C9BAE] hover:text-rose-600 transition-colors"
+                              title="Remove Staff"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-bold text-jaman-navy">{u.fullName}</h4>
-                          <p className="text-xs text-[#8C9BAE]">@{u.username} • {u.email}</p>
+
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] font-bold bg-jaman-ivory text-jaman-navy px-2 py-0.5 rounded-md border border-jaman-border uppercase tracking-wide">
+                            {StaffRepository.getRoleName(u.roleId)}
+                          </span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${u.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                            {u.isActive ? 'ACTIVE' : 'INACTIVE'}
+                          </span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${kioskAccess ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-slate-100 text-slate-400 border-slate-200'}`}>
+                            {kioskAccess ? '✓ Kiosk access' : 'No kiosk access'}
+                          </span>
                         </div>
                       </div>
-                      <span className="text-xs font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-200">
-                        ACTIVE
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
+
+          {/* MODAL: ADD/EDIT STAFF */}
+          <StaffModal
+            isOpen={isStaffModalOpen}
+            onClose={() => setIsStaffModalOpen(false)}
+            staffToEdit={staffToEdit}
+            onSaved={() => showToast(staffToEdit ? `Updated ${staffToEdit.fullName}` : 'Staff member created')}
+          />
 
           {/* TAB 13: NETWORK & SYNC CENTER DASHBOARD (Sections 154-158) */}
           {activeTab === 'SYNC' && (
@@ -4389,34 +4569,29 @@ export default function AdminApp() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
-                  {(
-                    [
-                      { code: 'en', label: 'English' },
-                      { code: 'hi', label: 'हिन्दी (Hindi)' },
-                      { code: 'gu', label: 'ગુજરાતી (Gujarati)' }
-                    ] as const
-                  ).map((opt) => {
+                  {(Object.keys(KIOSK_LANGUAGE_LABELS) as Array<keyof typeof KIOSK_LANGUAGE_LABELS>).map((code) => {
+                    const label = KIOSK_LANGUAGE_LABELS[code];
                     const settings = KioskDisplaySettingsRepository.getSettings();
-                    const isEnabled = settings.enabledLanguages.includes(opt.code);
+                    const isEnabled = settings.enabledLanguages.includes(code as any);
                     return (
-                      <label key={opt.code} className="flex items-center gap-2 text-xs font-bold text-jaman-navy">
+                      <label key={code} className="flex items-center gap-2 text-xs font-bold text-jaman-navy">
                         <input
                           type="checkbox"
                           checked={isEnabled}
                           onChange={() => {
                             const current = KioskDisplaySettingsRepository.getSettings();
                             const nextEnabled = isEnabled
-                              ? current.enabledLanguages.filter((l) => l !== opt.code)
-                              : [...current.enabledLanguages, opt.code];
+                              ? current.enabledLanguages.filter((l) => l !== code)
+                              : [...current.enabledLanguages, code as any];
                             try {
                               KioskDisplaySettingsRepository.updateSettings({ enabledLanguages: nextEnabled });
-                              showToast(`${opt.label} ${isEnabled ? 'disabled' : 'enabled'} on the customer kiosk.`);
+                              showToast(`${label} ${isEnabled ? 'disabled' : 'enabled'} on the customer kiosk.`);
                             } catch (err) {
                               showToast(err instanceof Error ? err.message : 'Could not update kiosk languages');
                             }
                           }}
                         />
-                        {opt.label}
+                        {label}
                       </label>
                     );
                   })}
@@ -4438,7 +4613,7 @@ export default function AdminApp() {
                       className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
                     >
                       {KioskDisplaySettingsRepository.getSettings().enabledLanguages.map((l) => (
-                        <option key={l} value={l}>{l === 'en' ? 'English' : l === 'hi' ? 'हिन्दी (Hindi)' : 'ગુજરાતી (Gujarati)'}</option>
+                        <option key={l} value={l}>{KIOSK_LANGUAGE_LABELS[l] ?? l}</option>
                       ))}
                     </select>
                   </div>
@@ -5795,85 +5970,61 @@ export default function AdminApp() {
             />
           </div>
 
-          {/* Hindi/Gujarati translations — previously there was no way at
-              all to set these, so every admin-added dish showed only in
-              English on the customer kiosk regardless of selected
-              language. The keyboard button opens a phonetic on-screen
-              keyboard for admins without a native-script keyboard. */}
+          {/* Translations — one card per non-English language this kiosk has enabled (Settings >
+              Customer Kiosk Language), not hardcoded to Hindi/Gujarati — previously there was no
+              way at all to set these, so every admin-added dish showed only in English on the
+              customer kiosk regardless of selected language. The keyboard button opens a phonetic
+              on-screen keyboard for admins without a native-script keyboard. */}
           <div className="pt-2 border-t border-[#F3EFE6] space-y-3">
             <p className="text-xs font-bold text-jaman-navy">Translations (optional, shown when a customer selects that language)</p>
 
-            <div className="space-y-2 p-3 bg-jaman-ivory rounded-xl border border-jaman-border">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-jaman-navy">हिन्दी Name</label>
-                <button
-                  type="button"
-                  onClick={() => setActiveKeyboardField({ lang: 'hi', field: 'name' })}
-                  className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
-                >
-                  ⌨ Keyboard
-                </button>
-              </div>
-              <input
-                type="text"
-                value={newItemNameHi}
-                onChange={(e) => setNewItemNameHi(e.target.value)}
-                placeholder="e.g. पनीर टिक्का"
-                className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
-              />
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-jaman-navy">हिन्दी Description</label>
-                <button
-                  type="button"
-                  onClick={() => setActiveKeyboardField({ lang: 'hi', field: 'description' })}
-                  className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
-                >
-                  ⌨ Keyboard
-                </button>
-              </div>
-              <textarea
-                rows={2}
-                value={newItemDescHi}
-                onChange={(e) => setNewItemDescHi(e.target.value)}
-                className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
-              />
-            </div>
+            {KioskDisplaySettingsRepository.getSettings().enabledLanguages.filter((code) => code !== 'en').length === 0 && (
+              <p className="text-xs text-[#8C9BAE]">No other languages are enabled on this kiosk yet — turn one on from Settings → Customer Kiosk Language to add a translation here.</p>
+            )}
 
-            <div className="space-y-2 p-3 bg-jaman-ivory rounded-xl border border-jaman-border">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-jaman-navy">ગુજરાતી Name</label>
-                <button
-                  type="button"
-                  onClick={() => setActiveKeyboardField({ lang: 'gu', field: 'name' })}
-                  className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
-                >
-                  ⌨ Keyboard
-                </button>
-              </div>
-              <input
-                type="text"
-                value={newItemNameGu}
-                onChange={(e) => setNewItemNameGu(e.target.value)}
-                placeholder="e.g. પનીર ટિક્કા"
-                className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
-              />
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-jaman-navy">ગુજરાતી Description</label>
-                <button
-                  type="button"
-                  onClick={() => setActiveKeyboardField({ lang: 'gu', field: 'description' })}
-                  className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
-                >
-                  ⌨ Keyboard
-                </button>
-              </div>
-              <textarea
-                rows={2}
-                value={newItemDescGu}
-                onChange={(e) => setNewItemDescGu(e.target.value)}
-                className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
-              />
-            </div>
+            {KioskDisplaySettingsRepository.getSettings().enabledLanguages.filter((code) => code !== 'en').map((code) => {
+              const lang = code as VirtualKeyboardLanguage;
+              const current = newItemTranslations[lang] ?? { name: '', description: '' };
+              const setCurrent = (next: Partial<{ name: string; description: string }>) =>
+                setNewItemTranslations((prev) => ({ ...prev, [lang]: { ...current, ...next } }));
+              return (
+                <div key={lang} className="space-y-2 p-3 bg-jaman-ivory rounded-xl border border-jaman-border">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-jaman-navy">{KIOSK_LANGUAGE_LABELS[lang]} Name</label>
+                    <button
+                      type="button"
+                      onClick={() => setActiveKeyboardField({ lang, field: 'name' })}
+                      className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
+                    >
+                      ⌨ Keyboard
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={current.name}
+                    onChange={(e) => setCurrent({ name: e.target.value })}
+                    placeholder={`${KIOSK_LANGUAGE_LABELS[lang]} dish name`}
+                    className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
+                  />
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-jaman-navy">{KIOSK_LANGUAGE_LABELS[lang]} Description</label>
+                    <button
+                      type="button"
+                      onClick={() => setActiveKeyboardField({ lang, field: 'description' })}
+                      className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
+                    >
+                      ⌨ Keyboard
+                    </button>
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={current.description}
+                    onChange={(e) => setCurrent({ description: e.target.value })}
+                    className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
+                  />
+                </div>
+              );
+            })}
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
@@ -5887,25 +6038,18 @@ export default function AdminApp() {
         </form>
       </Modal>
 
-      {/* Phonetic virtual keyboard for the Hindi/Gujarati translation
-          fields above — bound to whichever field was last opened. */}
+      {/* Phonetic virtual keyboard for the translation fields above — bound to whichever
+          language/field was last opened. */}
       {activeKeyboardField && (
         <VirtualKeyboard
           language={activeKeyboardField.lang}
-          value={
-            activeKeyboardField.lang === 'hi'
-              ? activeKeyboardField.field === 'name' ? newItemNameHi : newItemDescHi
-              : activeKeyboardField.field === 'name' ? newItemNameGu : newItemDescGu
+          value={(newItemTranslations[activeKeyboardField.lang] ?? { name: '', description: '' })[activeKeyboardField.field]}
+          onChange={(next) =>
+            setNewItemTranslations((prev) => ({
+              ...prev,
+              [activeKeyboardField.lang]: { ...(prev[activeKeyboardField.lang] ?? { name: '', description: '' }), [activeKeyboardField.field]: next }
+            }))
           }
-          onChange={(next) => {
-            if (activeKeyboardField.lang === 'hi') {
-              if (activeKeyboardField.field === 'name') setNewItemNameHi(next);
-              else setNewItemDescHi(next);
-            } else {
-              if (activeKeyboardField.field === 'name') setNewItemNameGu(next);
-              else setNewItemDescGu(next);
-            }
-          }}
           onClose={() => setActiveKeyboardField(null)}
         />
       )}

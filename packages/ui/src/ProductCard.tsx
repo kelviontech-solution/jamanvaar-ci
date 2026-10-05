@@ -58,7 +58,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       <div className="relative w-full h-52 sm:h-60 bg-[#F4EFE6] overflow-hidden">
         <img
           src={item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
-          alt={item.name}
+          alt={displayName || item.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
           onError={(e) => {
@@ -129,7 +129,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 }}
                 className="px-4 h-10 rounded-full border-[1.5px] border-[#E66817] text-[#E66817] bg-white hover:bg-[#FFF4ED] text-sm font-bold whitespace-nowrap transition-colors active:scale-95"
                 title="Customize"
-                aria-label={`Customize ${item.name}`}
+                aria-label={`Customize ${displayName || item.name}`}
               >
                 Customize
               </button>
@@ -144,7 +144,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               }}
               className="w-10 h-10 rounded-full bg-[#E66817] hover:bg-[#F27A2B] active:bg-[#D1560D] text-white flex items-center justify-center shadow-sm shadow-[#E66817]/25 transition-transform active:scale-90 shrink-0"
               title="Add to Cart"
-              aria-label={`Add ${item.name} to cart`}
+              aria-label={`Add ${displayName || item.name} to cart`}
             >
               <Plus className="w-5 h-5 stroke-[2.5]" />
             </button>

@@ -63,7 +63,8 @@ import {
   OrderType,
   PaymentMethod,
   PaymentStatus,
-  SelectedModifier
+  SelectedModifier,
+  VoiceLanguage
 } from '@jamanvaar/types';
 import {
   calculateCart,
@@ -169,8 +170,23 @@ type KioskStep =
 const LANGUAGE_OPTIONS: Array<{ code: SupportedLanguage; label: string; native: string }> = [
   { code: 'en', label: 'English', native: 'English' },
   { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
-  { code: 'gu', label: 'Gujarati', native: 'ગુજરાતી' }
+  { code: 'gu', label: 'Gujarati', native: 'ગુજરાતી' },
+  { code: 'mr', label: 'Marathi', native: 'मराठी' },
+  { code: 'ta', label: 'Tamil', native: 'தமிழ்' },
+  { code: 'te', label: 'Telugu', native: 'తెలుగు' },
+  { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ' }
 ];
+
+/**
+ * VoiceService only has verified browser speech-synthesis support for en/hi/gu (its own
+ * langMap in packages/api/src/services/voice.ts). The newer text-only languages (Marathi,
+ * Tamil, Telugu, Kannada) have real i18n/UI support but no verified TTS voice for their locale,
+ * so the spoken prompts fall back to English for those rather than guessing at an unverified
+ * voice — never silently claiming voice support this app hasn't actually confirmed works.
+ */
+function toVoiceLanguage(lang: SupportedLanguage): VoiceLanguage {
+  return lang === 'en' || lang === 'hi' || lang === 'gu' ? lang : 'en';
+}
 
 /** Every real activation key is JMV-XXXX-XXXX-XXXX (see activation-keys.service.ts's own generator) — reformats as the installer types so they don't have to type the dashes themselves. */
 function formatActivationKeyInput(raw: string): string {
@@ -582,9 +598,9 @@ export default function KioskUserApp() {
           const readyMsg = VoiceService.getReadyMessage(
             updatedOrder.tokenNumber,
             updatedOrder.pickupCounter || '1',
-            lang
+            toVoiceLanguage(lang)
           );
-          VoiceService.speak(readyMsg, lang);
+          VoiceService.speak(readyMsg, toVoiceLanguage(lang));
           showToast(`🔔 TOKEN #${updatedOrder.tokenNumber} IS READY AT COUNTER 1!`);
         }
       }
@@ -1457,12 +1473,12 @@ export default function KioskUserApp() {
     // 2. Trigger audio chime and spoken confirmation in selected language (Hindi/Gujarati/English)
     const voiceMsg = VoiceService.getConfirmationMessage(
       order.tokenNumber,
-      lang,
+      toVoiceLanguage(lang),
       'STANDARD',
       isCurrentlyOnline
     );
-    
-    const voicePromise = VoiceService.speak(voiceMsg, lang);
+
+    const voicePromise = VoiceService.speak(voiceMsg, toVoiceLanguage(lang));
     const watchdogPromise = new Promise(resolve => setTimeout(resolve, 15000));
     Promise.race([voicePromise, watchdogPromise]).finally(() => {
       setSpeechSettled(true);
@@ -1999,7 +2015,7 @@ export default function KioskUserApp() {
                     : 'text-[#4A5568] hover:text-jaman-navy'
                 }`}
               >
-                {l === 'en' ? 'EN' : l === 'hi' ? 'हिन्दी' : 'ગુજરાતી'}
+                {l === 'en' ? 'EN' : LANGUAGE_OPTIONS.find((opt) => opt.code === l)?.native ?? l}
               </button>
             ))}
           </div>
@@ -2823,7 +2839,7 @@ export default function KioskUserApp() {
                             <button
                               onClick={() => updateCartItemQuantity(ci.cartItemId, -1)}
                               className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center active:bg-gray-200 transition-colors"
-                              aria-label={`Decrease quantity of ${ci.item.name}`}
+                              aria-label={`Decrease quantity of ${localizedName(ci.item, lang)}`}
                             >
                               <Minus className="w-4 h-4 text-jaman-navy" />
                             </button>
@@ -2831,7 +2847,7 @@ export default function KioskUserApp() {
                             <button
                               onClick={() => updateCartItemQuantity(ci.cartItemId, 1)}
                               className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center active:bg-gray-200 transition-colors"
-                              aria-label={`Increase quantity of ${ci.item.name}`}
+                              aria-label={`Increase quantity of ${localizedName(ci.item, lang)}`}
                             >
                               <Plus className="w-4 h-4 text-jaman-navy" />
                             </button>
@@ -2857,7 +2873,7 @@ export default function KioskUserApp() {
                             <div className="flex items-center gap-3 min-w-0 pr-2">
                               <CachedImg src={rec.item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=60'} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#F3EFE6]" />
                               <div className="min-w-0">
-                                <h5 className="font-bold text-sm text-jaman-navy truncate">{rec.item.name}</h5>
+                                <h5 className="font-bold text-sm text-jaman-navy truncate">{localizedName(rec.item, lang)}</h5>
                                 <span className="text-sm font-black text-jaman-saffron block">{formatINR(rec.item.price)}</span>
                               </div>
                             </div>
@@ -3771,7 +3787,7 @@ export default function KioskUserApp() {
                           <div className="flex items-center gap-3 min-w-0">
                             <CachedImg
                               src={item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
-                              alt={item.name}
+                              alt={localizedName(item, lang)}
                               className="w-14 h-14 rounded-xl object-cover border border-jaman-border shrink-0"
                             />
                             <div className="min-w-0">
@@ -3783,7 +3799,7 @@ export default function KioskUserApp() {
                                   </span>
                                 )}
                               </div>
-                              <h5 className="font-bold text-xs text-jaman-navy truncate mt-0.5">{item.name}</h5>
+                              <h5 className="font-bold text-xs text-jaman-navy truncate mt-0.5">{localizedName(item, lang)}</h5>
                               <span className="text-xs font-black text-jaman-saffron">{formatINR(item.price)}</span>
                             </div>
                           </div>
@@ -3815,8 +3831,8 @@ export default function KioskUserApp() {
                             <span className="text-[10px] uppercase font-black tracking-wider text-amber-700 bg-amber-200/60 px-2 py-0.5 rounded-full inline-block">
                               Save ₹{combo.savingsAmount} Deal
                             </span>
-                            <h5 className="font-bold text-xs text-jaman-navy mt-1">{combo.name}</h5>
-                            <p className="text-[10px] text-[#4A5568] line-clamp-1 mt-0.5">{combo.description}</p>
+                            <h5 className="font-bold text-xs text-jaman-navy mt-1">{localizedName(combo, lang)}</h5>
+                            <p className="text-[10px] text-[#4A5568] line-clamp-1 mt-0.5">{localizedDescription(combo, lang)}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-xs font-black text-jaman-saffron">{formatINR(combo.basePrice)}</span>
                               <span className="text-[10px] text-[#8C9BAE] line-through">{formatINR(combo.originalPrice)}</span>
