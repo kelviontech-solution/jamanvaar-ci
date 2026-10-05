@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -60,6 +60,15 @@ export const ATTENTION_GRACE_MS = 3 * 60 * 1000;
 
 @Injectable()
 export class PaymentsService {
+  /**
+   * Structured lifecycle logging for one payment's journey: each line is tagged `event=<name>` plus whatever
+   * id/status is known at that point (paymentId doubles as the correlation id — the same value a kiosk, Super
+   * Admin, and Razorpay's own dashboard all already use to refer to this payment). Never logs card data, tokens,
+   * passwords, or raw webhook payloads — only ids, amounts, statuses, and (for failures) Razorpay's own
+   * human-readable error description.
+   */
+  private readonly logger = new Logger(PaymentsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
@@ -238,11 +247,15 @@ export class PaymentsService {
   private async createRazorpayAttempt(orderId: string, restaurantId: string, amount: number, currency: string, connection: { commissionOverrideBps: number | null } | null) {
     const { commissionBps, platformAmount, restaurantAmount } = await this.commissionSplitFor(amount, connection);
 
-    return this.prisma.runAsTenant(restaurantId, (tx) =>
+    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({
         data: { orderId, restaurantId, provider: 'RAZORPAY', providerOrderId: randomUUID(), amount, currency, status: 'PENDING', commissionBps, platformAmount, restaurantAmount }
       })
     );
+    // No separate Razorpay "order" API call happens for the kiosk/QR path — the UPI QR created in createUpiQr
+    // below is itself the provider-side artifact, so that event doubles as razorpay_order_created for this path.
+    this.logger.log(`event=payment_attempt_created paymentId=${payment.id} orderId=${orderId} restaurantId=${restaurantId} amount=${amount}`);
+    return payment;
   }
 
   /**
@@ -266,6 +279,7 @@ export class PaymentsService {
         data: { orderId, restaurantId, provider: 'RAZORPAY', providerOrderId: reference, amount, currency, status: 'CREATED', commissionBps, platformAmount, restaurantAmount }
       })
     );
+    this.logger.log(`event=payment_attempt_created paymentId=${payment.id} orderId=${orderId} restaurantId=${restaurantId} amount=${amount}`);
 
     // A stuck order is never worth chasing forever: 30 minutes, not the 24h default of a generic payment link.
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
@@ -277,6 +291,7 @@ export class PaymentsService {
       customerPhone,
       expireByUnix: Math.floor(expiresAt.getTime() / 1000)
     });
+    this.logger.log(`event=razorpay_order_created paymentId=${payment.id} provider=RAZORPAY_LINK linkId=${link.linkId}`);
 
     return this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.update({
@@ -336,19 +351,23 @@ export class PaymentsService {
       `;
       const existing = (locked?.providerResponse ?? null) as { qr?: { id: string; imageUrl: string; expiresAt: string } } | null;
       if (existing?.qr && Date.parse(existing.qr.expiresAt) - Date.now() > QR_MIN_REMAINING_MS) {
+        this.logger.log(`event=qr_generated paymentId=${paymentId} cached=true`);
         return { qrPayload: existing.qr.imageUrl, contentType: 'image/url', expiresAt: existing.qr.expiresAt, method: 'UPI_QR' as const };
       }
 
       const expiresAt = new Date(Date.now() + QR_TTL_SECONDS * 1000);
+      const startedAt = Date.now();
       const qr = await this.razorpay.createUpiQr({
         paymentRef: payment.providerOrderId,
         amountPaise: payment.amount,
         closeByUnix: Math.floor(expiresAt.getTime() / 1000),
         description: `Order ${payment.orderId.slice(0, 8)}`
       });
+      const razorpayCallMs = Date.now() - startedAt;
       if (!qr.imageUrl) throw new ServiceUnavailableException('Razorpay did not return a QR image for this payment');
       const stored = { qr: { id: qr.qrId, imageUrl: qr.imageUrl, expiresAt: expiresAt.toISOString() } };
       await tx.paymentTransaction.update({ where: { id: paymentId }, data: { providerResponse: stored as unknown as Prisma.InputJsonValue } });
+      this.logger.log(`event=qr_generated paymentId=${paymentId} cached=false qrId=${qr.qrId} razorpayCallMs=${razorpayCallMs}`);
       return { qrPayload: qr.imageUrl, contentType: 'image/url', expiresAt: expiresAt.toISOString(), method: 'UPI_QR' as const };
     });
   }
@@ -378,6 +397,7 @@ export class PaymentsService {
       await this.prisma.runAsTenant(restaurantId, (tx) =>
         this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId, action: 'KITCHEN_TICKET_CLAIMED', category: 'PAYMENTS', details: { paymentId, deviceType: device.type } }, tx)
       );
+      this.logger.log(`event=kot_created paymentId=${paymentId} restaurantId=${restaurantId} deviceType=${device.type}`);
       return { claimed: true, claimedAt };
     }
     const existing = await this.prisma.runAsTenant(restaurantId, (tx) =>
@@ -459,6 +479,7 @@ export class PaymentsService {
     if (current.provider === 'RAZORPAY' && qrId && webhookGraceOver && NON_TERMINAL_STATUSES.includes(current.status)) {
       const paid = (await this.razorpay.listQrPayments(qrId)).find((p) => p.status === 'captured' && p.amount === current.amount && p.currency === current.currency);
       if (paid) {
+        this.logger.log(`event=reconciliation_settled paymentId=${paymentId} source=poll razorpayPaymentId=${paid.id}`);
         await this.settleRazorpayPayment(current, 'SUCCESS', paid.id, paid, null, false);
         payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
           tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, include: { order: true } })
@@ -466,6 +487,7 @@ export class PaymentsService {
         if (!payment) throw new NotFoundException('Payment not found');
       }
     }
+    this.logger.log(`event=payment_status_checked paymentId=${payment.id} status=${payment.status}`);
     return { paymentId: payment.id, orderId: payment.orderId, status: payment.status, amount: payment.amount, currency: payment.currency, orderStatus: payment.order.status };
   }
 
@@ -558,6 +580,7 @@ export class PaymentsService {
     const signatureValid = Boolean(signature && this.razorpay.verifyWebhookSignature(rawBody, signature));
     const parsed = this.safeParseJson(rawBody);
     if (!signatureValid || parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      const errorMessage = signatureValid ? 'Malformed webhook payload JSON' : 'Invalid or missing webhook signature';
       await this.prisma.runAsPlatform((tx) =>
         tx.webhookEvent.create({
           data: {
@@ -567,15 +590,17 @@ export class PaymentsService {
             rawPayload: this.safeParseJson(rawBody) ?? { unparsable: true },
             signatureValid,
             processingStatus: 'FAILED',
-            errorMessage: signatureValid ? 'Malformed webhook payload JSON' : 'Invalid or missing webhook signature'
+            errorMessage
           }
         })
       );
+      this.logger.warn(`event=webhook_received signatureValid=${signatureValid} rejected=true reason=${errorMessage}`);
       return;
     }
 
     const payload = parsed as Record<string, any>;
     const eventType: string = payload.event;
+    this.logger.log(`event=webhook_received eventType=${eventType} eventId=${eventId ?? 'none'}`);
     if (eventType === 'refund.processed' || eventType === 'refund.failed') {
       await this.handleRazorpayRefundEvent(payload, eventType, eventId);
       return;
@@ -611,11 +636,11 @@ export class PaymentsService {
 
     const newStatus = RAZORPAY_EVENT_STATUS[eventType];
     if (!newStatus) {
-      await this.markWebhookProcessed(webhookEvent.id);
+      await this.markWebhookProcessed(webhookEvent.id, eventType);
       return;
     }
     if (!paymentRef) {
-      await this.markWebhookFailed(webhookEvent.id, 'Missing payment reference in webhook');
+      await this.markWebhookFailed(webhookEvent.id, 'Missing payment reference in webhook', eventType);
       return;
     }
 
@@ -623,7 +648,7 @@ export class PaymentsService {
       tx.paymentTransaction.findUnique({ where: { provider_providerOrderId: { provider: 'RAZORPAY', providerOrderId: paymentRef } }, include: { order: true } })
     );
     if (!payment) {
-      await this.markWebhookFailed(webhookEvent.id, `No PaymentTransaction found for payment reference ${paymentRef}`);
+      await this.markWebhookFailed(webhookEvent.id, `No PaymentTransaction found for payment reference ${paymentRef}`, eventType);
       return;
     }
     await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id: webhookEvent.id }, data: { restaurantId: payment.restaurantId } }));
@@ -632,7 +657,7 @@ export class PaymentsService {
       const amount = paymentEntity?.amount ?? linkEntity?.amount;
       const currency = paymentEntity?.currency ?? linkEntity?.currency;
       if (amount !== payment.amount || currency !== payment.currency) {
-        await this.markWebhookFailed(webhookEvent.id, `Amount/currency mismatch: expected ${payment.amount} ${payment.currency}, got ${amount} ${currency}`);
+        await this.markWebhookFailed(webhookEvent.id, `Amount/currency mismatch: expected ${payment.amount} ${payment.currency}, got ${amount} ${currency}`, eventType);
         return;
       }
     }
@@ -641,11 +666,11 @@ export class PaymentsService {
       if (payment.status === 'SUCCESS') {
         const err = await this.ingestWhatsAppOrderIfNeeded(payment);
         if (err) {
-          await this.markWebhookFailed(webhookEvent.id, err);
+          await this.markWebhookFailed(webhookEvent.id, err, eventType);
           return;
         }
       }
-      await this.markWebhookProcessed(webhookEvent.id);
+      await this.markWebhookProcessed(webhookEvent.id, eventType);
       return;
     }
 
@@ -658,10 +683,10 @@ export class PaymentsService {
       true
     );
     if (err) {
-      await this.markWebhookFailed(webhookEvent.id, err);
+      await this.markWebhookFailed(webhookEvent.id, err, eventType);
       return;
     }
-    await this.markWebhookProcessed(webhookEvent.id);
+    await this.markWebhookProcessed(webhookEvent.id, eventType);
   }
 
   /** A refund that Razorpay confirms or rejects: updates the Refund row and the payment's refunded state. */
@@ -690,12 +715,12 @@ export class PaymentsService {
       ? await this.prisma.runAsPlatform((tx) => tx.refund.findFirst({ where: { providerRefundId }, include: { payment: true } }))
       : null;
     if (!refund) {
-      await this.markWebhookFailed(webhookEvent.id, `No Refund found for ${providerRefundId ?? 'missing id'}`);
+      await this.markWebhookFailed(webhookEvent.id, `No Refund found for ${providerRefundId ?? 'missing id'}`, eventType);
       return;
     }
     await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id: webhookEvent.id }, data: { restaurantId: refund.restaurantId } }));
     if (refundEntity?.amount !== refund.amount) {
-      await this.markWebhookFailed(webhookEvent.id, `Refund amount mismatch: expected ${refund.amount}, got ${refundEntity?.amount}`);
+      await this.markWebhookFailed(webhookEvent.id, `Refund amount mismatch: expected ${refund.amount}, got ${refundEntity?.amount}`, eventType);
       return;
     }
 
@@ -709,7 +734,7 @@ export class PaymentsService {
       await tx.paymentTransaction.update({ where: { id: refund.paymentId }, data: { status: nextStatus } });
       await tx.order.update({ where: { id: refund.payment.orderId }, data: { status: nextStatus === 'REFUNDED' ? 'REFUNDED' : 'PAID' } });
     });
-    await this.markWebhookProcessed(webhookEvent.id);
+    await this.markWebhookProcessed(webhookEvent.id, eventType);
   }
 
   /** Records a Razorpay outcome on the payment and its order. Returns an error message when the WhatsApp order could not be created. */
@@ -749,6 +774,14 @@ export class PaymentsService {
         }
       });
     });
+
+    const source = fromWebhook ? 'webhook' : 'reconciliation';
+    if (newStatus === 'SUCCESS') {
+      this.logger.log(`event=payment_verified paymentId=${payment.id} source=${source} razorpayPaymentId=${razorpayPaymentId ?? 'unknown'}`);
+      this.logger.log(`event=order_marked_paid orderId=${payment.orderId} paymentId=${payment.id}`);
+    } else {
+      this.logger.warn(`event=payment_failed paymentId=${payment.id} source=${source} reason=${failureReason ?? 'unknown'}`);
+    }
 
     if (newStatus !== 'SUCCESS') return null;
     return this.ingestWhatsAppOrderIfNeeded(payment);
@@ -863,12 +896,14 @@ export class PaymentsService {
     }
   }
 
-  private async markWebhookProcessed(id: string): Promise<void> {
+  private async markWebhookProcessed(id: string, eventType?: string): Promise<void> {
     await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id }, data: { processingStatus: 'PROCESSED', processedAt: new Date() } }));
+    this.logger.log(`event=webhook_processed webhookEventId=${id} eventType=${eventType ?? 'unknown'}`);
   }
 
-  private async markWebhookFailed(id: string, errorMessage: string): Promise<void> {
+  private async markWebhookFailed(id: string, errorMessage: string, eventType?: string): Promise<void> {
     await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id }, data: { processingStatus: 'FAILED', errorMessage, processedAt: new Date() } }));
+    this.logger.warn(`event=webhook_failed webhookEventId=${id} eventType=${eventType ?? 'unknown'} reason=${errorMessage}`);
   }
 
   /** Returns the parsed JSON value, or `null` if `rawBody` isn't valid JSON — callers that
