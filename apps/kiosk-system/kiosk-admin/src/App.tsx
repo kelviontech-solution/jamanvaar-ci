@@ -3,6 +3,7 @@ import { OnlinePaymentsPanel } from './components/OnlinePaymentsPanel';
 import { OnboardingChecklistCard } from './components/OnboardingChecklistCard';
 import { CategoryModal } from './components/CategoryModal';
 import { TableModal } from './components/TableModal';
+import { StaffModal } from './components/StaffModal';
 import { KioskForgotPasswordPanel } from './components/KioskForgotPasswordPanel';
 import {
   AuditRepository,
@@ -42,7 +43,8 @@ import {
   ReceiptPaperSize,
   ReceiptRecord,
   ServiceRequest,
-  SpiceLevel
+  SpiceLevel,
+  User
 } from '@jamanvaar/types';
 import { formatDate, formatINR, formatSplitTax, formatTime, SoundService, isValidGstinFormat, isValidFssaiFormat, isValidIndianPhone } from '@jamanvaar/utils';
 import {
@@ -402,6 +404,8 @@ export default function AdminApp() {
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
   const [tableToEdit, setTableToEdit] = useState<DiningTable | null>(null);
   const [tableZoneFilter, setTableZoneFilter] = useState<string>('ALL');
+  const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
+  const [staffToEdit, setStaffToEdit] = useState<User | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Smart Prebuilt Menu Library & Menu Builder Modals
@@ -865,6 +869,7 @@ export default function AdminApp() {
   const combos = ComboRepository.getAllCombos();
   const orders = OrderRepository.getAllOrders();
   const tables = TableRepository.getAllTables();
+  const staffUsers = StaffRepository.getAllUsers();
   const kiosks = KioskRepository.getAllKiosks();
   const coupons = CouponRepository.getAllCoupons();
   const serviceRequests = ServiceRequestRepository.getAll();
@@ -4264,35 +4269,120 @@ export default function AdminApp() {
           {/* TAB 12: STAFF & ROLES */}
           {activeTab === 'STAFF' && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Staff & RBAC Permissions</h1>
-                <p className="text-sm text-[#4A5568] mt-1">
-                  Manage operators, managers, cashiers, and granular access control rules.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Staff & RBAC Permissions</h1>
+                  <p className="text-sm text-[#4A5568] mt-1">
+                    Add staff, assign their role, and control which PINs can open this kiosk.
+                  </p>
+                </div>
+                <Button
+                  variant="accent"
+                  onClick={() => {
+                    setStaffToEdit(null);
+                    setIsStaffModalOpen(true);
+                  }}
+                  leftIcon={<Plus className="w-4 h-4" />}
+                >
+                  Add Staff
+                </Button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {db.users.map((u) => (
-                  <div key={u.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-jaman-navy text-white flex items-center justify-center font-bold">
-                          {u.fullName[0]}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-1">
+                  <span className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider">Total Staff</span>
+                  <div className="text-2xl font-black text-jaman-navy">{staffUsers.length}</div>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-1">
+                  <span className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider">Can Use This Kiosk</span>
+                  <div className="text-2xl font-black text-emerald-700">
+                    {staffUsers.filter((u) => StaffRepository.canUseTerminal(u.roleId, 'KIOSK')).length}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-jaman-border space-y-1">
+                  <span className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider">Inactive</span>
+                  <div className="text-2xl font-black text-rose-600">{staffUsers.filter((u) => !u.isActive).length}</div>
+                </div>
+              </div>
+
+              {staffUsers.length === 0 ? (
+                <EmptyState
+                  title="No Staff Yet"
+                  description="Add your first staff member — creating one issues a working PIN for this kiosk, POS, Captain and KDS."
+                  actionText="Add Staff"
+                  onAction={() => {
+                    setStaffToEdit(null);
+                    setIsStaffModalOpen(true);
+                  }}
+                />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {staffUsers.map((u) => {
+                    const kioskAccess = StaffRepository.canUseTerminal(u.roleId, 'KIOSK');
+                    return (
+                      <div key={u.id} className="bg-white rounded-2xl p-5 border border-jaman-border shadow-sm space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-full bg-jaman-navy text-white flex items-center justify-center font-bold shrink-0">
+                              {u.fullName[0]}
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="font-bold text-jaman-navy truncate">{u.fullName}</h4>
+                              <p className="text-xs text-[#8C9BAE] truncate">@{u.username}{u.phone ? ` • ${u.phone}` : ''}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              onClick={() => {
+                                setStaffToEdit(u);
+                                setIsStaffModalOpen(true);
+                              }}
+                              className="p-1.5 hover:bg-jaman-ivory rounded-lg text-[#8C9BAE] hover:text-jaman-saffron transition-colors"
+                              title="Edit Staff"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (window.confirm(`Remove staff access for "${u.fullName}"? Their PIN will stop working everywhere.`)) {
+                                  StaffRepository.deleteUser(u.id);
+                                  showToast(`Staff removed: ${u.fullName}`);
+                                }
+                              }}
+                              className="p-1.5 hover:bg-rose-50 rounded-lg text-[#8C9BAE] hover:text-rose-600 transition-colors"
+                              title="Remove Staff"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-bold text-jaman-navy">{u.fullName}</h4>
-                          <p className="text-xs text-[#8C9BAE]">@{u.username} • {u.email}</p>
+
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] font-bold bg-jaman-ivory text-jaman-navy px-2 py-0.5 rounded-md border border-jaman-border uppercase tracking-wide">
+                            {StaffRepository.getRoleName(u.roleId)}
+                          </span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${u.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                            {u.isActive ? 'ACTIVE' : 'INACTIVE'}
+                          </span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${kioskAccess ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-slate-100 text-slate-400 border-slate-200'}`}>
+                            {kioskAccess ? '✓ Kiosk access' : 'No kiosk access'}
+                          </span>
                         </div>
                       </div>
-                      <span className="text-xs font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-200">
-                        ACTIVE
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
+
+          {/* MODAL: ADD/EDIT STAFF */}
+          <StaffModal
+            isOpen={isStaffModalOpen}
+            onClose={() => setIsStaffModalOpen(false)}
+            staffToEdit={staffToEdit}
+            onSaved={() => showToast(staffToEdit ? `Updated ${staffToEdit.fullName}` : 'Staff member created')}
+          />
 
           {/* TAB 13: NETWORK & SYNC CENTER DASHBOARD (Sections 154-158) */}
           {activeTab === 'SYNC' && (
