@@ -1207,7 +1207,7 @@ export default function AdminApp() {
             {connectStep === 'CREDENTIALS' ? (
               <>
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Connect this Terminal</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-jaman-navy tracking-tight">Connect this Terminal</h2>
                   <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
                     One-time setup — enter your Restaurant ID and the owner's password.
                   </p>
@@ -1246,7 +1246,7 @@ export default function AdminApp() {
                   <button
                     type="submit"
                     disabled={connectBusy}
-                    className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-bold text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <span>{connectBusy ? 'Connecting…' : 'Continue'}</span>
                     {!connectBusy && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
@@ -1256,7 +1256,7 @@ export default function AdminApp() {
             ) : (
               <>
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Activate this Terminal</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-jaman-navy tracking-tight">Activate this Terminal</h2>
                   <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
                     Signed in to <strong>{connectRestaurantName}</strong>. Enter the Kiosk Admin activation key from your Super Admin welcome kit to finish binding this terminal.
                   </p>
@@ -1287,7 +1287,7 @@ export default function AdminApp() {
                   <button
                     type="submit"
                     disabled={connectBusy}
-                    className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-bold text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <span>{connectBusy ? 'Activating…' : 'Activate Terminal'}</span>
                     {!connectBusy && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
@@ -1397,7 +1397,7 @@ export default function AdminApp() {
           <button
             type="submit"
             disabled={authBusy}
-            className="w-full py-3.5 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full py-3.5 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {authBusy ? 'Signing in...' : 'Sign In'}
           </button>
@@ -1423,7 +1423,7 @@ export default function AdminApp() {
         <div className="print:hidden min-h-screen bg-jaman-ivory flex flex-col select-none">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 bg-jaman-navy text-white px-5 py-3 rounded-2xl shadow-xl border border-white/10 flex items-center gap-3 animate-bounce">
+        <div className="fixed top-5 right-5 z-50 bg-jaman-navy text-white px-5 py-3 rounded-2xl shadow-md border border-white/10 flex items-center gap-3 animate-bounce">
           <CheckCircle2 className="w-5 h-5 text-[#16A34A]" />
           <span className="font-semibold text-sm">{toastMessage}</span>
         </div>
@@ -1567,7 +1567,7 @@ export default function AdminApp() {
             </div>
             <div className="hidden sm:block text-left leading-tight">
               <div className="text-xs font-bold text-jaman-navy">Manager</div>
-              <div className="text-[10px] uppercase tracking-wider text-[#8C9BAE] font-semibold">KIOSK ADMIN</div>
+              <div className="text-[11px] uppercase tracking-wider text-[#8C9BAE] font-semibold">KIOSK ADMIN</div>
             </div>
 
             {/* Logout Button */}
@@ -1615,7 +1615,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('DASHBOARD')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'DASHBOARD'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1627,7 +1627,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('MENU')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'MENU'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1639,7 +1639,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('COMBOS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'COMBOS'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1651,7 +1651,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('ORDERS_KDS')}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'ORDERS_KDS'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1661,12 +1661,12 @@ export default function AdminApp() {
               </div>
               <div className="flex items-center gap-1.5">
                 {newOrdersCount > 0 && (
-                  <span className="bg-rose-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full animate-bounce">
+                  <span className="bg-rose-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full animate-bounce">
                     🔴 {newOrdersCount} NEW
                   </span>
                 )}
                 {pendingKOT > 0 && newOrdersCount === 0 && (
-                  <span className="bg-jaman-saffron text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                  <span className="bg-jaman-saffron text-white text-[11px] font-bold px-1.5 py-0.5 rounded-full">
                     {pendingKOT}
                   </span>
                 )}
@@ -1677,7 +1677,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('TABLES')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'TABLES'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1689,7 +1689,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('KIOSKS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'KIOSKS'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1701,7 +1701,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('COUPONS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'COUPONS'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1713,7 +1713,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('RECEIPTS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'RECEIPTS'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1725,7 +1725,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('HARDWARE')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'HARDWARE'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1737,7 +1737,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('FEEDBACK')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'FEEDBACK'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1749,7 +1749,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('REPORTS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'REPORTS'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1761,7 +1761,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('STAFF')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'STAFF'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1773,7 +1773,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('SYNC')}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'SYNC'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1782,7 +1782,7 @@ export default function AdminApp() {
                 <span>Sync Center</span>
               </div>
               {syncStats.pendingCount > 0 && (
-                <span className="bg-amber-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                <span className="bg-amber-500 text-white text-[11px] font-bold px-1.5 py-0.5 rounded-full">
                   {syncStats.pendingCount}
                 </span>
               )}
@@ -1792,7 +1792,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('AUDIT')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'AUDIT'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1804,7 +1804,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('LICENSE')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'LICENSE'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1816,7 +1816,7 @@ export default function AdminApp() {
               onClick={() => setActiveTab('SETTINGS')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition-all ${
                 activeTab === 'SETTINGS'
-                  ? 'bg-jaman-navy text-white shadow-md shadow-jaman-navy/20'
+                  ? 'bg-jaman-saffron/10 text-jaman-navy ring-1 ring-jaman-saffron/40'
                   : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
               }`}
             >
@@ -1832,7 +1832,7 @@ export default function AdminApp() {
               <span>JAMANVAAR Kiosk Admin</span>
               <span className="text-jaman-saffron">v1.0.0</span>
             </div>
-            <p className="text-[10px] text-[#8C9BAE]">Kelviontech Systems</p>
+            <p className="text-[11px] text-[#8C9BAE]">Kelviontech Systems</p>
           </div>
         </aside>
 
@@ -1844,7 +1844,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">
                     Restaurant Operations Overview
                   </h1>
                   <p className="text-sm text-[#4A5568] mt-1">
@@ -1905,7 +1905,7 @@ export default function AdminApp() {
                     <div>
                       <div className="flex items-center gap-2">
                         <TrendingUp className="w-5 h-5 text-jaman-saffron" />
-                        <h2 className="text-lg font-black text-jaman-navy">Hourly Sales Velocity & Dining Rush</h2>
+                        <h2 className="text-lg font-bold text-jaman-navy">Hourly Sales Velocity & Dining Rush</h2>
                       </div>
                       <p className="text-xs text-[#8C9BAE] mt-0.5">Live order velocity throughout the day • Lunch (1-3 PM) & Dinner (7-10 PM)</p>
                     </div>
@@ -1921,7 +1921,7 @@ export default function AdminApp() {
                       {hourlyBars.map((bar, idx) => (
                         <div key={idx} className="flex-1 flex flex-col items-center gap-1 group relative">
                           {/* Tooltip on hover */}
-                          <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-jaman-navy text-white text-[10px] font-bold px-2 py-0.5 rounded shadow pointer-events-none transition-opacity whitespace-nowrap z-20">
+                          <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-jaman-navy text-white text-[11px] font-bold px-2 py-0.5 rounded shadow pointer-events-none transition-opacity whitespace-nowrap z-20">
                             {bar.hour}: ₹{bar.amount}
                           </div>
                           <div className="w-full bg-[#F4EFE6] rounded-t-lg h-36 flex items-end overflow-hidden">
@@ -1934,7 +1934,7 @@ export default function AdminApp() {
                               }`}
                             ></div>
                           </div>
-                          <span className="text-[9px] sm:text-[10px] font-bold text-[#8C9BAE] mt-1 group-hover:text-jaman-navy">
+                          <span className="text-[9px] sm:text-[11px] font-bold text-[#8C9BAE] mt-1 group-hover:text-jaman-navy">
                             {bar.hour}
                           </span>
                         </div>
@@ -1963,7 +1963,7 @@ export default function AdminApp() {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
                         <CreditCard className="w-5 h-5 text-jaman-saffron" />
-                        <h2 className="text-lg font-black text-jaman-navy">Payment Channels</h2>
+                        <h2 className="text-lg font-bold text-jaman-navy">Payment Channels</h2>
                       </div>
                       <span className="text-xs text-[#8C9BAE]">Real-time Split</span>
                     </div>
@@ -1976,7 +1976,7 @@ export default function AdminApp() {
                             <QrCode className="w-4 h-4 text-[#16A34A]" />
                             <span>UPI Dynamic QR</span>
                           </div>
-                          <span className="text-emerald-700 font-black">{upiPct}% ({formatINR(upiRevenue)})</span>
+                          <span className="text-emerald-700 font-bold">{upiPct}% ({formatINR(upiRevenue)})</span>
                         </div>
                         <div className="w-full h-2 rounded-full bg-jaman-border overflow-hidden">
                           <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${upiPct}%` }}></div>
@@ -1990,7 +1990,7 @@ export default function AdminApp() {
                             <CreditCard className="w-4 h-4 text-[#3B82F6]" />
                             <span>Card EDC Terminal</span>
                           </div>
-                          <span className="text-blue-700 font-black">{cardPct}% ({formatINR(cardRevenue)})</span>
+                          <span className="text-blue-700 font-bold">{cardPct}% ({formatINR(cardRevenue)})</span>
                         </div>
                         <div className="w-full h-2 rounded-full bg-jaman-border overflow-hidden">
                           <div className="h-full bg-blue-500 rounded-full" style={{ width: `${cardPct}%` }}></div>
@@ -2004,7 +2004,7 @@ export default function AdminApp() {
                             <Coins className="w-4 h-4 text-jaman-saffron" />
                             <span>Cash at Counter</span>
                           </div>
-                          <span className="text-jaman-saffron font-black">{cashPct}% ({formatINR(cashRevenue)})</span>
+                          <span className="text-jaman-saffron font-bold">{cashPct}% ({formatINR(cashRevenue)})</span>
                         </div>
                         <div className="w-full h-2 rounded-full bg-jaman-border overflow-hidden">
                           <div className="h-full bg-jaman-saffron rounded-full" style={{ width: `${cashPct}%` }}></div>
@@ -2049,7 +2049,7 @@ export default function AdminApp() {
                           <StatusBadge status={k.status} type="kiosk" />
                         </div>
                         <p className="text-xs text-[#4A5568] mt-1">{k.locationDescription}</p>
-                        <p className="text-[10px] text-[#8C9BAE] font-mono mt-0.5">v{k.appVersion}</p>
+                        <p className="text-[11px] text-[#8C9BAE] font-mono mt-0.5">v{k.appVersion}</p>
                       </div>
 
                       <div className="flex flex-col gap-1">
@@ -2091,7 +2091,7 @@ export default function AdminApp() {
                     <div key={order.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-black text-jaman-navy">{order.orderNumber}</span>
+                          <span className="font-bold text-jaman-navy">{order.orderNumber}</span>
                           <span className="bg-jaman-saffron/10 text-jaman-saffron font-bold text-xs px-2 py-0.5 rounded">
                             TOKEN #{order.tokenNumber}
                           </span>
@@ -2100,7 +2100,7 @@ export default function AdminApp() {
                           </span>
                           <StatusBadge status={order.orderStatus} />
                           {order.syncStatus === 'SAVED_LOCALLY' && (
-                            <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                            <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
                               Offline Queued
                             </span>
                           )}
@@ -2111,7 +2111,7 @@ export default function AdminApp() {
                       </div>
 
                       <div className="flex items-center gap-3 self-end sm:self-center">
-                        <span className="text-base font-black text-jaman-saffron">{formatINR(order.totalAmount)}</span>
+                        <span className="text-base font-bold text-jaman-saffron">{formatINR(order.totalAmount)}</span>
                         <Button
                           variant="secondary"
                           size="sm"
@@ -2157,9 +2157,9 @@ export default function AdminApp() {
               <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-jaman-border shadow-sm">
                 <div>
                   <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-black text-jaman-navy">Menu & Catalog Builder</h1>
+                    <h1 className="text-2xl font-bold text-jaman-navy">Menu & Catalog Builder</h1>
                     <span
-                      className={`text-xs font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+                      className={`text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
                         isMenuDraft
                           ? 'bg-amber-100 text-amber-800 border border-amber-300'
                           : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
@@ -2180,8 +2180,8 @@ export default function AdminApp() {
                   title="Click to view and fix missing data"
                 >
                   <div className="text-right">
-                    <span className="text-[10px] font-bold text-[#8C9BAE] uppercase block">Completeness</span>
-                    <span className="text-sm font-black text-jaman-navy">{completenessReport.score}% Ready</span>
+                    <span className="text-[11px] font-bold text-[#8C9BAE] uppercase block">Completeness</span>
+                    <span className="text-sm font-bold text-jaman-navy">{completenessReport.score}% Ready</span>
                   </div>
                   <div className="w-24 bg-slate-200 h-2.5 rounded-full overflow-hidden">
                     <div
@@ -2196,7 +2196,7 @@ export default function AdminApp() {
                     />
                   </div>
                   {completenessReport.issues.length > 0 && (
-                    <span className="text-[10px] bg-rose-500 text-white font-bold px-1.5 py-0.5 rounded-full">
+                    <span className="text-[11px] bg-rose-500 text-white font-bold px-1.5 py-0.5 rounded-full">
                       {completenessReport.issues.length}
                     </span>
                   )}
@@ -2430,7 +2430,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Combos & Value Meal Deals</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Combos & Value Meal Deals</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Manage multi-item combo packages, bundle pricing, savings badges, and kiosk promotions.
                   </p>
@@ -2446,7 +2446,7 @@ export default function AdminApp() {
                     <div>
                       <div className="flex items-start justify-between">
                         <div>
-                          <span className="text-[10px] font-black uppercase text-jaman-saffron bg-jaman-saffron/10 px-2 py-0.5 rounded">
+                          <span className="text-[11px] font-bold uppercase text-jaman-saffron bg-jaman-saffron/10 px-2 py-0.5 rounded">
                             SAVE ₹{combo.savingsAmount}
                           </span>
                           <h3 className="text-lg font-bold text-jaman-navy mt-2">{combo.name}</h3>
@@ -2454,7 +2454,7 @@ export default function AdminApp() {
                         </div>
                         <div className="text-right">
                           <span className="text-xs text-[#8C9BAE] line-through">₹{combo.originalPrice}</span>
-                          <div className="text-xl font-black text-jaman-saffron">{formatINR(combo.basePrice)}</div>
+                          <div className="text-xl font-bold text-jaman-saffron">{formatINR(combo.basePrice)}</div>
                         </div>
                       </div>
                     </div>
@@ -2494,13 +2494,13 @@ export default function AdminApp() {
 
           {/* REAL-TIME NEW ORDER ARRIVAL ALERT BANNER */}
           {newOrderArrivalAlert && (
-            <div className="bg-gradient-to-r from-rose-600 via-jaman-saffron to-amber-600 text-white p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4 animate-bounce border-2 border-white/20">
+            <div className="bg-gradient-to-r from-rose-600 via-jaman-saffron to-amber-600 text-white p-4 rounded-2xl shadow-md flex items-center justify-between gap-4 animate-bounce border-2 border-white/20">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl shrink-0">
                   🔔
                 </div>
                 <div>
-                  <h4 className="font-black text-sm uppercase tracking-wide flex items-center gap-2">
+                  <h4 className="font-bold text-sm uppercase tracking-wide flex items-center gap-2">
                     <span>New Order Arrived From {newOrderArrivalAlert.kioskId || 'KIOSK-01'}!</span>
                     <span className="bg-white text-rose-700 text-xs px-2 py-0.5 rounded-full font-bold">
                       Token #{newOrderArrivalAlert.tokenNumber}
@@ -2518,7 +2518,7 @@ export default function AdminApp() {
                     setSelectedOrderDetail(newOrderArrivalAlert);
                     setNewOrderArrivalAlert(null);
                   }}
-                  className="px-4 py-2 bg-white text-jaman-navy rounded-xl text-xs font-black hover:bg-slate-100 shadow-md transition-all active:scale-95"
+                  className="px-4 py-2 bg-white text-jaman-navy rounded-xl text-xs font-bold hover:bg-slate-100 shadow-md transition-all active:scale-95"
                 >
                   👁️ View Order
                 </button>
@@ -2528,7 +2528,7 @@ export default function AdminApp() {
                     setNewOrderArrivalAlert(null);
                     showToast(`✓ Order #${newOrderArrivalAlert.tokenNumber} Acknowledged!`);
                   }}
-                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-black shadow-md transition-all active:scale-95"
+                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md transition-all active:scale-95"
                 >
                   ✓ Acknowledge
                 </button>
@@ -2549,8 +2549,8 @@ export default function AdminApp() {
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-jaman-border shadow-sm">
                 <div>
                   <div className="flex items-center gap-3">
-                    <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Orders & Kitchen Display (KDS)</h1>
-                    <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full border border-emerald-300 flex items-center gap-1.5 shadow-xs">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Orders & Kitchen Display (KDS)</h1>
+                    <span className="text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full border border-emerald-300 flex items-center gap-1.5 shadow-xs">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                       Local Realtime Active (:5178)
                     </span>
@@ -2622,7 +2622,7 @@ export default function AdminApp() {
                   >
                     <span>{st.label}</span>
                     <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
+                      className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
                         orderStatusFilter === st.id ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'
                       }`}
                     >
@@ -2728,7 +2728,7 @@ export default function AdminApp() {
                         <div className="p-4 border-b border-black/5 flex items-center justify-between bg-white/80">
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="text-xl font-black text-jaman-navy">#{order.tokenNumber}</span>
+                              <span className="text-xl font-bold text-jaman-navy">#{order.tokenNumber}</span>
                               <span className="text-xs font-bold text-[#4A5568]">{order.orderNumber}</span>
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
@@ -2742,13 +2742,13 @@ export default function AdminApp() {
                           </div>
                           <div className="flex flex-col items-end gap-1">
                             {isNew ? (
-                              <span className="text-[11px] font-black px-2.5 py-1 rounded-full bg-rose-600 text-white shadow-xs animate-bounce">
+                              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-rose-600 text-white shadow-xs animate-bounce">
                                 🔴 NEW ORDER
                               </span>
                             ) : (
                               <StatusBadge status={order.orderStatus} />
                             )}
-                            <span className="text-[10px] font-bold text-slate-500">
+                            <span className="text-[11px] font-bold text-slate-500">
                               {formatTime(order.createdAt)}
                             </span>
                           </div>
@@ -2760,7 +2760,7 @@ export default function AdminApp() {
                             <div key={it.id} className="border-b border-slate-100 pb-2 last:border-0 last:pb-0">
                               <div className="flex items-start justify-between">
                                 <span className="font-bold text-sm text-jaman-navy">
-                                  <span className="text-jaman-saffron font-black mr-1.5">{it.quantity}×</span>
+                                  <span className="text-jaman-saffron font-bold mr-1.5">{it.quantity}×</span>
                                   {it.name}
                                 </span>
                                 <span className="text-xs font-bold text-jaman-navy">{formatINR(it.totalPrice)}</span>
@@ -2786,7 +2786,7 @@ export default function AdminApp() {
                               ✓ PAID ({order.paymentMethod})
                             </span>
                           </div>
-                          <div className="text-right font-black text-sm text-jaman-navy">
+                          <div className="text-right font-bold text-sm text-jaman-navy">
                             Total: {formatINR(order.totalAmount)}
                           </div>
                         </div>
@@ -2885,7 +2885,7 @@ export default function AdminApp() {
                 <div className="bg-[#FAF8F5] p-4 rounded-2xl border border-jaman-border flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl font-black text-jaman-saffron">Token #{selectedOrderDetail.tokenNumber}</span>
+                      <span className="text-2xl font-bold text-jaman-saffron">Token #{selectedOrderDetail.tokenNumber}</span>
                       <StatusBadge status={selectedOrderDetail.orderStatus} />
                     </div>
                     <p className="text-xs text-[#4A5568] mt-1 font-medium">
@@ -2894,7 +2894,7 @@ export default function AdminApp() {
                   </div>
                   <div className="text-right">
                     <div className="text-xs font-bold text-[#8C9BAE]">Order Type</div>
-                    <div className="text-sm font-black text-jaman-navy">
+                    <div className="text-sm font-bold text-jaman-navy">
                       {selectedOrderDetail.orderType} {selectedOrderDetail.tableNumber ? `(Table ${selectedOrderDetail.tableNumber})` : ''}
                     </div>
                   </div>
@@ -2905,7 +2905,7 @@ export default function AdminApp() {
                   <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider">Itemized Breakdown</h4>
                   <div className="border border-jaman-border rounded-2xl overflow-hidden">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-700 font-bold uppercase text-[10px]">
+                      <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-700 font-bold uppercase text-[11px]">
                         <tr>
                           <th className="py-2.5 px-3">Item Details</th>
                           <th className="py-2.5 px-3 text-center">Qty</th>
@@ -2918,7 +2918,7 @@ export default function AdminApp() {
                           <tr key={it.id} className="hover:bg-slate-50/50">
                             <td className="py-2.5 px-3">
                               <div className="font-bold text-jaman-navy">{it.name}</div>
-                              <div className="text-[10px] text-slate-500 font-mono">{it.sku}</div>
+                              <div className="text-[11px] text-slate-500 font-mono">{it.sku}</div>
                               {it.modifiers && it.modifiers.length > 0 && (
                                 <div className="text-[11px] text-slate-500 mt-0.5">
                                   {it.modifiers.map((m) => `+ ${m.optionName}`).join(', ')}
@@ -2932,7 +2932,7 @@ export default function AdminApp() {
                             </td>
                             <td className="py-2.5 px-3 text-center font-bold">{it.quantity}</td>
                             <td className="py-2.5 px-3 text-right text-slate-600">{formatINR(it.unitPrice)}</td>
-                            <td className="py-2.5 px-3 text-right font-black text-jaman-navy">{formatINR(it.totalPrice)}</td>
+                            <td className="py-2.5 px-3 text-right font-bold text-jaman-navy">{formatINR(it.totalPrice)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -2961,7 +2961,7 @@ export default function AdminApp() {
                     <span>SGST @ 2.5%:</span>
                     <span>{formatSplitTax(selectedOrderDetail.taxAmount ?? 0, selectedOrderDetail.cgstAmount, selectedOrderDetail.sgstAmount).sgst}</span>
                   </div>
-                  <div className="flex justify-between font-black text-sm text-jaman-navy pt-2 border-t border-slate-200">
+                  <div className="flex justify-between font-bold text-sm text-jaman-navy pt-2 border-t border-slate-200">
                     <span>Total Amount:</span>
                     <span className="text-jaman-saffron">{formatINR(selectedOrderDetail.totalAmount)}</span>
                   </div>
@@ -2970,18 +2970,18 @@ export default function AdminApp() {
                 {/* Payment & Audit Info */}
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div className="p-3 bg-white border border-jaman-border rounded-xl">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Payment Method</span>
+                    <span className="text-[11px] text-slate-400 font-bold uppercase block">Payment Method</span>
                     <span className="font-bold text-emerald-700">✓ {selectedOrderDetail.paymentMethod} (PAID)</span>
-                    <span className="text-[10px] text-slate-500 font-mono block mt-0.5">
+                    <span className="text-[11px] text-slate-500 font-mono block mt-0.5">
                       TxID: {selectedOrderDetail.paymentTransactionId || 'OFFLINE_TX_OK'}
                     </span>
                   </div>
                   <div className="p-3 bg-white border border-jaman-border rounded-xl">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Customer & Counter</span>
+                    <span className="text-[11px] text-slate-400 font-bold uppercase block">Customer & Counter</span>
                     <span className="font-bold text-jaman-navy">
                       {selectedOrderDetail.customerPhone ? `📞 ${selectedOrderDetail.customerPhone}` : 'Walk-in Guest'}
                     </span>
-                    <span className="text-[10px] text-slate-500 block mt-0.5">
+                    <span className="text-[11px] text-slate-500 block mt-0.5">
                       Pickup: {selectedOrderDetail.pickupCounter || 'Counter 1'}
                     </span>
                   </div>
@@ -3013,7 +3013,7 @@ export default function AdminApp() {
                         <div className="w-2.5 h-2.5 rounded-full bg-jaman-saffron mt-1 shrink-0"></div>
                         <div className="flex-1">
                           <div className="font-bold text-jaman-navy">{event.title}</div>
-                          <div className="text-[10px] text-slate-500">
+                          <div className="text-[11px] text-slate-500">
                             {formatDate(event.timestamp)} {formatTime(event.timestamp)} {event.actor ? `• By ${event.actor}` : ''}
                           </div>
                         </div>
@@ -3106,7 +3106,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Dining Table Management</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Dining Table Management</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Add, edit and remove dining tables, and track live occupancy.
                   </p>
@@ -3137,7 +3137,7 @@ export default function AdminApp() {
                         }`}
                       >
                         <span>{z.label}</span>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${tableZoneFilter === z.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}`}>{count}</span>
+                        <span className={`text-[11px] px-1.5 py-0.5 rounded-md ${tableZoneFilter === z.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}`}>{count}</span>
                       </button>
                     );
                   })}
@@ -3168,7 +3168,7 @@ export default function AdminApp() {
                       >
                         <div>
                           <div className="flex items-center justify-between">
-                            <span className="text-xl font-black text-jaman-navy">T-{t.tableNumber}</span>
+                            <span className="text-xl font-bold text-jaman-navy">T-{t.tableNumber}</span>
                             <div className="flex items-center gap-1">
                               <button
                                 onClick={() => {
@@ -3233,7 +3233,7 @@ export default function AdminApp() {
           {activeTab === 'KIOSKS' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Kiosk Terminal Control</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Kiosk Terminal Control</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Manage self-ordering stations, lockdown states, maintenance modes, and idle timeouts.
                 </p>
@@ -3362,7 +3362,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Offers & Promo Coupons</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Offers & Promo Coupons</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Manage customer discounts, threshold promotions, and kiosk exclusive promo codes.
                   </p>
@@ -3377,7 +3377,7 @@ export default function AdminApp() {
                   <div key={c.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="font-mono text-lg font-black text-jaman-saffron bg-jaman-saffron/10 px-3 py-1 rounded-xl border border-jaman-saffron/20">
+                        <span className="font-mono text-lg font-bold text-jaman-saffron bg-jaman-saffron/10 px-3 py-1 rounded-xl border border-jaman-saffron/20">
                           {c.code}
                         </span>
                         <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
@@ -3411,7 +3411,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Receipt & E-Bill System</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Receipt & E-Bill System</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Configure thermal paper dimensions (58mm vs 80mm), WhatsApp digital receipt templates, and audit history.
                   </p>
@@ -3442,7 +3442,7 @@ export default function AdminApp() {
                           onChange={(e) => setReceiptForm({ ...receiptForm, phone: e.target.value })}
                           className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy ${receiptFormErrors.phone ? 'border-rose-400' : 'border-jaman-border'}`}
                         />
-                        {receiptFormErrors.phone && <span className="text-[10px] text-rose-600 font-bold mt-0.5 block">{receiptFormErrors.phone}</span>}
+                        {receiptFormErrors.phone && <span className="text-[11px] text-rose-600 font-bold mt-0.5 block">{receiptFormErrors.phone}</span>}
                       </div>
                     </div>
 
@@ -3455,7 +3455,7 @@ export default function AdminApp() {
                           onChange={(e) => setReceiptForm({ ...receiptForm, gstin: e.target.value })}
                           className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy ${receiptFormErrors.gstin ? 'border-rose-400' : 'border-jaman-border'}`}
                         />
-                        {receiptFormErrors.gstin && <span className="text-[10px] text-rose-600 font-bold mt-0.5 block">{receiptFormErrors.gstin}</span>}
+                        {receiptFormErrors.gstin && <span className="text-[11px] text-rose-600 font-bold mt-0.5 block">{receiptFormErrors.gstin}</span>}
                       </div>
                       <div>
                         <label className="block text-xs font-bold text-jaman-navy mb-1">FSSAI License</label>
@@ -3465,7 +3465,7 @@ export default function AdminApp() {
                           onChange={(e) => setReceiptForm({ ...receiptForm, fssaiNumber: e.target.value })}
                           className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy ${receiptFormErrors.fssaiNumber ? 'border-rose-400' : 'border-jaman-border'}`}
                         />
-                        {receiptFormErrors.fssaiNumber && <span className="text-[10px] text-rose-600 font-bold mt-0.5 block">{receiptFormErrors.fssaiNumber}</span>}
+                        {receiptFormErrors.fssaiNumber && <span className="text-[11px] text-rose-600 font-bold mt-0.5 block">{receiptFormErrors.fssaiNumber}</span>}
                       </div>
                     </div>
 
@@ -3514,7 +3514,7 @@ export default function AdminApp() {
                           {receiptForm.logoUrl ? (
                             <img src={receiptForm.logoUrl} alt="Receipt logo" className="w-full h-full object-contain" />
                           ) : (
-                            <span className="text-[10px] text-[#8C9BAE] text-center px-1">No logo</span>
+                            <span className="text-[11px] text-[#8C9BAE] text-center px-1">No logo</span>
                           )}
                         </div>
                         <div className="flex-1 space-y-2">
@@ -3624,7 +3624,7 @@ export default function AdminApp() {
                             onChange={(e) => setReceiptForm({ ...receiptForm, cashWatermarkText: e.target.value.slice(0, 12) })}
                             placeholder="CASH"
                             maxLength={12}
-                            className="w-full bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-black tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                            className="w-full bg-white border border-jaman-border rounded-xl px-3 py-1.5 text-xs font-bold tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                           />
                         </div>
                       )}
@@ -3692,7 +3692,7 @@ export default function AdminApp() {
                             <td className="py-3 px-4 font-mono font-bold text-jaman-navy">{rec.recipient}</td>
                             <td className="py-3 px-4 text-[#8C9BAE]">{formatTime(rec.createdAt)}</td>
                             <td className="py-3 px-4">
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700">
+                              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700">
                                 {rec.deliveryStatus}
                               </span>
                             </td>
@@ -3711,7 +3711,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Hardware Diagnostics & Monitoring</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Hardware Diagnostics & Monitoring</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Manage ESC/POS thermal printers, payment terminals, touch calibration, and hardware diagnostic self-tests.
                   </p>
@@ -3976,7 +3976,7 @@ export default function AdminApp() {
                             <td className="py-3 px-4 font-mono font-bold text-jaman-navy">{job.id.substring(0, 14)}...</td>
                             <td className="py-3 px-4 font-bold text-jaman-navy">#{job.orderNumber} (TOKEN #{job.tokenNumber})</td>
                             <td className="py-3 px-4">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
                                 job.status === 'PRINTED'
                                   ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                   : job.status === 'RETRYING'
@@ -4014,7 +4014,7 @@ export default function AdminApp() {
           {activeTab === 'FEEDBACK' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Customer Experience & Feedback</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Customer Experience & Feedback</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Real-time ratings, service speed impressions, and customer reviews submitted via kiosks.
                 </p>
@@ -4084,7 +4084,7 @@ export default function AdminApp() {
             <div data-print-doc="kiosk-report" className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Financial & Operations Reports</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Financial & Operations Reports</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Export real transaction records, item sales, and tax metrics directly to CSV or printable document.
                   </p>
@@ -4224,19 +4224,19 @@ export default function AdminApp() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="p-4 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs text-[#8C9BAE] font-semibold">Total Revenue:</span>
-                  <div className="text-xl font-black text-jaman-navy mt-1">{formatINR(currentReport.summaryMetrics.totalRevenue)}</div>
+                  <div className="text-xl font-bold text-jaman-navy mt-1">{formatINR(currentReport.summaryMetrics.totalRevenue)}</div>
                 </div>
                 <div className="p-4 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs text-[#8C9BAE] font-semibold">Orders Count:</span>
-                  <div className="text-xl font-black text-jaman-navy mt-1">{currentReport.summaryMetrics.totalOrders}</div>
+                  <div className="text-xl font-bold text-jaman-navy mt-1">{currentReport.summaryMetrics.totalOrders}</div>
                 </div>
                 <div className="p-4 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs text-[#8C9BAE] font-semibold">Total Discounts:</span>
-                  <div className="text-xl font-black text-emerald-600 mt-1">{formatINR(currentReport.summaryMetrics.totalDiscount)}</div>
+                  <div className="text-xl font-bold text-emerald-600 mt-1">{formatINR(currentReport.summaryMetrics.totalDiscount)}</div>
                 </div>
                 <div className="p-4 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs text-[#8C9BAE] font-semibold">GST Collected (5%):</span>
-                  <div className="text-xl font-black text-jaman-saffron mt-1">{formatINR(currentReport.summaryMetrics.totalTax)}</div>
+                  <div className="text-xl font-bold text-jaman-saffron mt-1">{formatINR(currentReport.summaryMetrics.totalTax)}</div>
                 </div>
               </div>
 
@@ -4278,7 +4278,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Staff & RBAC Permissions</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Staff & RBAC Permissions</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Add staff, assign their role, and control which PINs can open this kiosk.
                   </p>
@@ -4396,7 +4396,7 @@ export default function AdminApp() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Network & Cloud Sync Center</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Network & Cloud Sync Center</h1>
                   <p className="text-sm text-[#4A5568] mt-1">
                     Live transactional outbox, retry queues, cloud latency telemetry, and conflict replay engine.
                   </p>
@@ -4420,26 +4420,26 @@ export default function AdminApp() {
                   <span className="text-xs font-semibold text-[#8C9BAE]">Cloud API Status:</span>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`w-3 h-3 rounded-full ${networkState === 'ONLINE' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
-                    <span className="text-lg font-black text-jaman-navy">{networkState}</span>
+                    <span className="text-lg font-bold text-jaman-navy">{networkState}</span>
                   </div>
                   <span className="text-[11px] text-[#8C9BAE]">Round-trip: {networkLatency}ms</span>
                 </div>
 
                 <div className="p-5 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs font-semibold text-[#8C9BAE]">Pending Outbox:</span>
-                  <div className="text-2xl font-black text-amber-600 mt-1">{syncStats.pendingCount}</div>
+                  <div className="text-2xl font-bold text-amber-600 mt-1">{syncStats.pendingCount}</div>
                   <span className="text-[11px] text-[#8C9BAE]">Queued for cloud upload</span>
                 </div>
 
                 <div className="p-5 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs font-semibold text-[#8C9BAE]">Fully Synced Orders:</span>
-                  <div className="text-2xl font-black text-emerald-600 mt-1">{syncStats.syncedCount}</div>
+                  <div className="text-2xl font-bold text-emerald-600 mt-1">{syncStats.syncedCount}</div>
                   <span className="text-[11px] text-[#8C9BAE]">Stored safely on central POS</span>
                 </div>
 
                 <div className="p-5 bg-white rounded-2xl border border-jaman-border">
                   <span className="text-xs font-semibold text-[#8C9BAE]">Failed Exceptions:</span>
-                  <div className="text-2xl font-black text-rose-600 mt-1">{syncStats.failedCount}</div>
+                  <div className="text-2xl font-bold text-rose-600 mt-1">{syncStats.failedCount}</div>
                   <span className="text-[11px] text-[#8C9BAE]">Auto-retry on reconnect</span>
                 </div>
               </div>
@@ -4472,7 +4472,7 @@ export default function AdminApp() {
           {activeTab === 'AUDIT' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Audit Trail & Security Logs</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Audit Trail & Security Logs</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Immutable tamper-evident record of all menu, price, order, and device state transitions.
                 </p>
@@ -4483,8 +4483,8 @@ export default function AdminApp() {
                   <div key={log.id} className="py-3 flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-jaman-navy">{log.action}</span>
-                        <span className="text-[10px] uppercase font-bold text-jaman-saffron bg-jaman-saffron/10 px-1.5 py-0.5 rounded">
+                        <span className="text-xs font-bold text-jaman-navy">{log.action}</span>
+                        <span className="text-[11px] uppercase font-bold text-jaman-saffron bg-jaman-saffron/10 px-1.5 py-0.5 rounded">
                           {log.category}
                         </span>
                         <span className="text-xs text-[#8C9BAE]">by @{log.username || 'system'}</span>
@@ -4504,7 +4504,7 @@ export default function AdminApp() {
           {activeTab === 'LICENSE' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">License & Terminal Entitlements</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">License & Terminal Entitlements</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Enterprise franchise plan entitlements, authorized device capacity, and security certificates.
                 </p>
@@ -4514,7 +4514,7 @@ export default function AdminApp() {
                 <div className="flex items-start justify-between">
                   <div>
                     <span className="text-xs font-bold text-jaman-saffron uppercase tracking-wider">Plan Subscription</span>
-                    <h3 className="text-2xl font-black text-jaman-navy mt-1">{license.planName}</h3>
+                    <h3 className="text-2xl font-bold text-jaman-navy mt-1">{license.planName}</h3>
                     <p className="text-xs text-[#4A5568] mt-0.5">Tier: {license.tier} • Certified for Windows 10/11 Touch Kiosks</p>
                   </div>
                   <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
@@ -4526,13 +4526,13 @@ export default function AdminApp() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-[#F3EFE6]">
                   <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
                     <span className="text-xs text-[#8C9BAE] font-semibold">Active Kiosks:</span>
-                    <div className="text-xl font-black text-jaman-navy mt-1">
+                    <div className="text-xl font-bold text-jaman-navy mt-1">
                       {license.activeDevicesCount} / {license.allowedDevicesCount}
                     </div>
                   </div>
                   <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
                     <span className="text-xs text-[#8C9BAE] font-semibold">Valid Until:</span>
-                    <div className="text-base font-black text-jaman-navy mt-1">
+                    <div className="text-base font-bold text-jaman-navy mt-1">
                       {license.validUntil ? formatDate(license.validUntil) : 'Sign in to see it'}
                     </div>
                   </div>
@@ -4551,7 +4551,7 @@ export default function AdminApp() {
           {activeTab === 'SETTINGS' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">System Settings & Backup</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">System Settings & Backup</h1>
                 <p className="text-sm text-[#4A5568] mt-1">
                   Brand configuration, GST taxation settings, and complete database backup & restore.
                 </p>
@@ -4648,9 +4648,9 @@ export default function AdminApp() {
                 <div className="flex items-center justify-between gap-3 bg-jaman-ivory rounded-xl p-4 border border-jaman-border">
                   <div>
                     <p className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider">Next Kiosk Token</p>
-                    <p className="text-2xl font-black text-jaman-navy">{OrderRepository.nextTokenNumber('K')}</p>
+                    <p className="text-2xl font-bold text-jaman-navy">{OrderRepository.nextTokenNumber('K')}</p>
                     {TokenSequenceRepository.getLastReset('K') && (
-                      <p className="text-[10px] text-[#8C9BAE] mt-0.5">
+                      <p className="text-[11px] text-[#8C9BAE] mt-0.5">
                         Last reset {new Date(TokenSequenceRepository.getLastReset('K')!).toLocaleString()}
                       </p>
                     )}
@@ -4876,7 +4876,7 @@ export default function AdminApp() {
                       <button
                         type="submit"
                         disabled={paymentSubmitting}
-                        className="py-3 px-6 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs uppercase tracking-wider disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="py-3 px-6 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs uppercase tracking-wider disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         {paymentSubmitting ? 'Submitting…' : 'Submit for Review'}
                       </button>
@@ -5294,9 +5294,9 @@ export default function AdminApp() {
 
       {/* DRAWER: ADMIN INTELLIGENCE BOT (JAMANVAAR Assistant - 100% Preloaded Direct Operations) */}
       {isAssistantOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/50 backdrop-blur-xs animate-fadeIn">
+        <div className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/50  animate-fadeIn">
           <div className="fixed inset-0" onClick={() => setIsAssistantOpen(false)} />
-          <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col justify-between z-10">
+          <div className="relative w-full max-w-lg bg-white h-full shadow-md flex flex-col justify-between z-10">
             {/* Assistant Header with Database Sync Badge */}
             <div className="p-4 sm:p-5 border-b border-jaman-border bg-jaman-navy text-white flex items-center justify-between shadow-md">
               <div className="flex items-center gap-3">
@@ -5306,7 +5306,7 @@ export default function AdminApp() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-base text-white">JAMANVAAR Assistant</h3>
-                    <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold border border-emerald-500/30 flex items-center gap-1">
+                    <span className="text-[11px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold border border-emerald-500/30 flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                       DB Live
                     </span>
@@ -5361,7 +5361,7 @@ export default function AdminApp() {
 
                     {msg.actionLink && (
                       <div className="mt-3 pt-2.5 border-t border-jaman-border flex items-center justify-between">
-                        <span className="text-[10px] text-[#8C9BAE] font-medium">Quick Navigation:</span>
+                        <span className="text-[11px] text-[#8C9BAE] font-medium">Quick Navigation:</span>
                         <button
                           onClick={() => {
                             setActiveTab(msg.actionLink as AdminTab);
@@ -5426,28 +5426,28 @@ export default function AdminApp() {
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">💰 Today's Live Sales</span>
-                      <span className="text-[10px] text-[#8C9BAE]">Gross revenue & tickets</span>
+                      <span className="text-[11px] text-[#8C9BAE]">Gross revenue & tickets</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show payment breakdown')}
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">💳 Payment Methods</span>
-                      <span className="text-[10px] text-[#8C9BAE]">UPI vs Card vs Cash</span>
+                      <span className="text-[11px] text-[#8C9BAE]">UPI vs Card vs Cash</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show GST and taxes')}
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🧾 GST 5% Taxes</span>
-                      <span className="text-[10px] text-[#8C9BAE]">CGST/SGST ledger</span>
+                      <span className="text-[11px] text-[#8C9BAE]">CGST/SGST ledger</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show promotional coupons')}
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🎁 Promo Coupons</span>
-                      <span className="text-[10px] text-[#8C9BAE]">Active discounts & deals</span>
+                      <span className="text-[11px] text-[#8C9BAE]">Active discounts & deals</span>
                     </button>
                   </>
                 )}
@@ -5459,28 +5459,28 @@ export default function AdminApp() {
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🏆 Top 5 Best Sellers</span>
-                      <span className="text-[10px] text-[#8C9BAE]">Most popular dishes</span>
+                      <span className="text-[11px] text-[#8C9BAE]">Most popular dishes</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show live kitchen KDS status')}
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">👨‍🍳 Active Kitchen KOTs</span>
-                      <span className="text-[10px] text-[#8C9BAE]">Preparing tokens & queue</span>
+                      <span className="text-[11px] text-[#8C9BAE]">Preparing tokens & queue</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show 86 sold out items')}
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🚫 Out of Stock (86)</span>
-                      <span className="text-[10px] text-[#8C9BAE]">Unavailable dish list</span>
+                      <span className="text-[11px] text-[#8C9BAE]">Unavailable dish list</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show menu catalog summary')}
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🍽️ Menu Catalog</span>
-                      <span className="text-[10px] text-[#8C9BAE]">Total items & combos</span>
+                      <span className="text-[11px] text-[#8C9BAE]">Total items & combos</span>
                     </button>
                   </>
                 )}
@@ -5492,28 +5492,28 @@ export default function AdminApp() {
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🖥️ Kiosk Matrix Health</span>
-                      <span className="text-[10px] text-[#8C9BAE]">Online terminals & IPs</span>
+                      <span className="text-[11px] text-[#8C9BAE]">Online terminals & IPs</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show thermal printer status')}
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🖨️ Thermal Printer</span>
-                      <span className="text-[10px] text-[#8C9BAE]">80mm ESC/POS hardware</span>
+                      <span className="text-[11px] text-[#8C9BAE]">80mm ESC/POS hardware</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show table occupancy')}
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🪑 Dining Tables</span>
-                      <span className="text-[10px] text-[#8C9BAE]">Occupied & free tables</span>
+                      <span className="text-[11px] text-[#8C9BAE]">Occupied & free tables</span>
                     </button>
                     <button
                       onClick={() => handleSendAssistantQuery('Show cancelled and refunded orders')}
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">⚠️ Cancelled & Refunds</span>
-                      <span className="text-[10px] text-[#8C9BAE]">Voided order tickets</span>
+                      <span className="text-[11px] text-[#8C9BAE]">Voided order tickets</span>
                     </button>
                   </>
                 )}
@@ -5527,7 +5527,7 @@ export default function AdminApp() {
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">📊 Open Reports Tab</span>
-                      <span className="text-[10px] text-[#8C9BAE]">Daily audit & PDF print</span>
+                      <span className="text-[11px] text-[#8C9BAE]">Daily audit & PDF print</span>
                     </button>
                     <button
                       onClick={() => {
@@ -5538,7 +5538,7 @@ export default function AdminApp() {
                       className="p-2.5 bg-jaman-ivory hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border rounded-xl text-left transition-all group"
                     >
                       <span className="font-bold text-xs text-jaman-navy group-hover:text-jaman-saffron block">🖨️ Print Daily Report</span>
-                      <span className="text-[10px] text-[#8C9BAE]">Instant official export</span>
+                      <span className="text-[11px] text-[#8C9BAE]">Instant official export</span>
                     </button>
                     <button
                       onClick={() => {
@@ -5549,7 +5549,7 @@ export default function AdminApp() {
                       className="p-2.5 bg-rose-50 hover:bg-rose-100 hover:border-rose-300 border border-rose-200 rounded-xl text-left transition-all group col-span-2"
                     >
                       <span className="font-bold text-xs text-rose-900 block">🧹 Clear Today's Test Transactions</span>
-                      <span className="text-[10px] text-rose-700">Flush demo orders & reset ledger to clean zero</span>
+                      <span className="text-[11px] text-rose-700">Flush demo orders & reset ledger to clean zero</span>
                     </button>
                   </>
                 )}
@@ -5565,11 +5565,11 @@ export default function AdminApp() {
           {/* Animated Speech Bubble Prompt */}
           <div
             onClick={() => setIsAssistantOpen(true)}
-            className="hidden sm:flex items-center gap-2 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-jaman-border text-xs font-bold text-jaman-navy cursor-pointer hover:shadow-2xl hover:border-jaman-saffron transition-all group"
+            className="hidden sm:flex items-center gap-2 bg-white/95  px-4 py-2.5 rounded-2xl shadow-md border border-jaman-border text-xs font-bold text-jaman-navy cursor-pointer hover:shadow-md hover:border-jaman-saffron transition-all group"
           >
             <Sparkles className="w-4 h-4 text-jaman-saffron animate-pulse" />
             <span>Operations Intelligence • Ask AI</span>
-            <span className="text-[10px] bg-jaman-saffron/10 text-jaman-saffron px-2 py-0.5 rounded-full font-black">
+            <span className="text-[11px] bg-jaman-saffron/10 text-jaman-saffron px-2 py-0.5 rounded-full font-bold">
               24x7
             </span>
           </div>
@@ -5577,7 +5577,7 @@ export default function AdminApp() {
           {/* Floating Action Button */}
           <button
             onClick={() => setIsAssistantOpen(true)}
-            className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-tr from-jaman-navy to-[#163e5e] hover:from-jaman-saffron hover:to-[#f07d33] text-white flex items-center justify-center shadow-2xl border-2 border-white/30 hover:scale-105 active:scale-95 transition-all relative group"
+            className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-tr from-jaman-navy to-[#163e5e] hover:from-jaman-saffron hover:to-[#f07d33] text-white flex items-center justify-center shadow-md border-2 border-white/30 hover:scale-105 active:scale-95 transition-all relative group"
             title="JAMANVAAR Operations Assistant"
           >
             <Bot className="w-7 h-7 sm:w-8 sm:h-8 group-hover:rotate-12 transition-transform" />
@@ -5598,7 +5598,7 @@ export default function AdminApp() {
           <div className="bg-jaman-navy text-white p-5 rounded-2xl flex items-center justify-between">
             <div>
               <span className="text-xs text-amber-400 font-bold uppercase tracking-wider">Official Store Settlement</span>
-              <h3 className="text-xl font-black mt-0.5">JAMANVAAR Restaurant #01</h3>
+              <h3 className="text-xl font-bold mt-0.5">JAMANVAAR Restaurant #01</h3>
               <p className="text-xs text-white/70">Terminal Matrix: 3 Kiosks • Shift: All Day</p>
             </div>
             <div className="text-right">
@@ -5613,7 +5613,7 @@ export default function AdminApp() {
           <div className="grid grid-cols-3 gap-3">
             <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
               <span className="text-xs text-emerald-800 font-bold">UPI Dynamic QR</span>
-              <div className="text-lg font-black text-emerald-950 mt-1">
+              <div className="text-lg font-bold text-emerald-950 mt-1">
                 {formatINR(orders.filter(o => o.paymentMethod === 'UPI_QR' && o.paymentStatus === 'SUCCESS').reduce((s, o) => s + o.totalAmount, 0))}
               </div>
               <span className="text-[11px] text-emerald-700">Direct Bank Settlement</span>
@@ -5621,7 +5621,7 @@ export default function AdminApp() {
 
             <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
               <span className="text-xs text-blue-800 font-bold">Card POS Terminal</span>
-              <div className="text-lg font-black text-blue-950 mt-1">
+              <div className="text-lg font-bold text-blue-950 mt-1">
                 {formatINR(orders.filter(o => o.paymentMethod === 'CARD_TERMINAL' && o.paymentStatus === 'SUCCESS').reduce((s, o) => s + o.totalAmount, 0))}
               </div>
               <span className="text-[11px] text-blue-700">PineLabs / EDC Batch</span>
@@ -5629,7 +5629,7 @@ export default function AdminApp() {
 
             <div className="p-4 rounded-xl bg-amber-50 border border-amber-200">
               <span className="text-xs text-amber-800 font-bold">Cash at Counter</span>
-              <div className="text-lg font-black text-amber-950 mt-1">
+              <div className="text-lg font-bold text-amber-950 mt-1">
                 {formatINR(orders.filter(o => o.paymentMethod === 'CASH_AT_COUNTER' && o.paymentStatus === 'SUCCESS').reduce((s, o) => s + o.totalAmount, 0))}
               </div>
               <span className="text-[11px] text-amber-700">Cash Drawer Total</span>
@@ -5650,7 +5650,7 @@ export default function AdminApp() {
               <span className="text-[#4A5568]">CGST (2.5%) + SGST (2.5%):</span>
               <span className="font-bold text-jaman-saffron">{formatINR(Math.round(orders.reduce((s, o) => s + (o.taxAmount || 0), 0)))}</span>
             </div>
-            <div className="flex justify-between py-1 text-sm font-black text-jaman-navy">
+            <div className="flex justify-between py-1 text-sm font-bold text-jaman-navy">
               <span>Net Store Revenue:</span>
               <span>{formatINR(orders.reduce((s, o) => s + o.totalAmount, 0))}</span>
             </div>
@@ -5994,7 +5994,7 @@ export default function AdminApp() {
                     <button
                       type="button"
                       onClick={() => setActiveKeyboardField({ lang, field: 'name' })}
-                      className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
+                      className="text-[11px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
                     >
                       ⌨ Keyboard
                     </button>
@@ -6011,7 +6011,7 @@ export default function AdminApp() {
                     <button
                       type="button"
                       onClick={() => setActiveKeyboardField({ lang, field: 'description' })}
-                      className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
+                      className="text-[11px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
                     >
                       ⌨ Keyboard
                     </button>
@@ -6176,9 +6176,9 @@ export default function AdminApp() {
                 >
                   <div>
                     <span className="font-bold text-jaman-navy block">{it.name}</span>
-                    <span className="text-[10px] text-[#8C9BAE]">SKU: {it.sku} • {it.dietaryType}</span>
+                    <span className="text-[11px] text-[#8C9BAE]">SKU: {it.sku} • {it.dietaryType}</span>
                   </div>
-                  <span className="font-black text-jaman-saffron">{formatINR(it.price)}</span>
+                  <span className="font-bold text-jaman-saffron">{formatINR(it.price)}</span>
                 </div>
               ))}
 
@@ -6197,9 +6197,9 @@ export default function AdminApp() {
                 >
                   <div>
                     <span className="font-bold text-jaman-navy block">{ord.orderNumber} (TOKEN #{ord.tokenNumber})</span>
-                    <span className="text-[10px] text-[#8C9BAE]">{ord.orderType} • {formatTime(ord.createdAt)}</span>
+                    <span className="text-[11px] text-[#8C9BAE]">{ord.orderType} • {formatTime(ord.createdAt)}</span>
                   </div>
-                  <span className="font-black text-emerald-600">{formatINR(ord.totalAmount)}</span>
+                  <span className="font-bold text-emerald-600">{formatINR(ord.totalAmount)}</span>
                 </div>
               ))}
 
@@ -6218,7 +6218,7 @@ export default function AdminApp() {
                 >
                   <div>
                     <span className="font-bold font-mono text-jaman-navy block">COUPON: {cpn.code}</span>
-                    <span className="text-[10px] text-[#8C9BAE]">{cpn.description}</span>
+                    <span className="text-[11px] text-[#8C9BAE]">{cpn.description}</span>
                   </div>
                   <span className="text-xs font-bold text-indigo-600">₹{cpn.discountValue} OFF</span>
                 </div>
@@ -6244,7 +6244,7 @@ export default function AdminApp() {
           <div className="flex items-center justify-between pb-3 border-b border-jaman-border">
             <div className="flex items-center gap-2">
               <span
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                   templateStep === 'SELECT' ? 'bg-jaman-saffron text-white' : 'bg-emerald-100 text-emerald-800'
                 }`}
               >
@@ -6255,7 +6255,7 @@ export default function AdminApp() {
             <div className="w-12 h-0.5 bg-jaman-border" />
             <div className="flex items-center gap-2">
               <span
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                   templateStep === 'PREVIEW'
                     ? 'bg-jaman-saffron text-white'
                     : templateStep === 'IMPORT_OPTIONS'
@@ -6270,7 +6270,7 @@ export default function AdminApp() {
             <div className="w-12 h-0.5 bg-jaman-border" />
             <div className="flex items-center gap-2">
               <span
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                   templateStep === 'IMPORT_OPTIONS' ? 'bg-jaman-saffron text-white' : 'bg-slate-100 text-slate-400'
                 }`}
               >
@@ -6346,14 +6346,14 @@ export default function AdminApp() {
                             {tpl.icon}
                           </div>
                           {tpl.badge && (
-                            <span className="text-[9px] font-black uppercase tracking-wider text-jaman-saffron bg-jaman-saffron/10 px-2 py-0.5 rounded-full">
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-jaman-saffron bg-jaman-saffron/10 px-2 py-0.5 rounded-full">
                               {tpl.badge}
                             </span>
                           )}
                         </div>
 
                         <h4 className="font-bold text-sm text-jaman-navy mt-2.5">{tpl.name}</h4>
-                        <span className="text-[10px] font-semibold text-[#8C9BAE] block">{tpl.cuisine}</span>
+                        <span className="text-[11px] font-semibold text-[#8C9BAE] block">{tpl.cuisine}</span>
                         <p className="text-[11px] text-[#4A5568] line-clamp-2 mt-1.5">{tpl.description}</p>
                       </div>
 
@@ -6362,7 +6362,7 @@ export default function AdminApp() {
                           {tpl.categoryCount} Cats • ~{tpl.approxItemCount} Dishes
                         </span>
                         <span
-                          className={`font-black text-xs ${
+                          className={`font-bold text-xs ${
                             isSelected ? 'text-jaman-saffron' : 'text-slate-400'
                           }`}
                         >
@@ -6440,9 +6440,9 @@ export default function AdminApp() {
                               >
                                 <div>
                                   <span className="font-semibold text-jaman-navy block">{it.name}</span>
-                                  <span className="text-[10px] text-[#8C9BAE]">{it.dietaryType} • {it.prepTimeMinutes}m prep</span>
+                                  <span className="text-[11px] text-[#8C9BAE]">{it.dietaryType} • {it.prepTimeMinutes}m prep</span>
                                 </div>
-                                <span className="font-black text-jaman-saffron">₹{it.suggestedPrice}</span>
+                                <span className="font-bold text-jaman-saffron">₹{it.suggestedPrice}</span>
                               </div>
                             ))}
                           </div>
@@ -6549,7 +6549,7 @@ export default function AdminApp() {
                       />
                       <div>
                         <strong className="block">Keep Existing Dishes</strong>
-                        <span className="text-[10px] text-[#8C9BAE]">Do not overwrite items with matching names</span>
+                        <span className="text-[11px] text-[#8C9BAE]">Do not overwrite items with matching names</span>
                       </div>
                     </label>
                     <label className="flex items-start gap-2 cursor-pointer text-jaman-navy">
@@ -6562,7 +6562,7 @@ export default function AdminApp() {
                       />
                       <div>
                         <strong className="block">Update / Overwrite Duplicates</strong>
-                        <span className="text-[10px] text-[#8C9BAE]">Replace details with the template version</span>
+                        <span className="text-[11px] text-[#8C9BAE]">Replace details with the template version</span>
                       </div>
                     </label>
                     <label className="flex items-start gap-2 cursor-pointer text-jaman-navy">
@@ -6575,7 +6575,7 @@ export default function AdminApp() {
                       />
                       <div>
                         <strong className="block">Import All as New Dishes</strong>
-                        <span className="text-[10px] text-[#8C9BAE]">Assign unique SKUs and append</span>
+                        <span className="text-[11px] text-[#8C9BAE]">Assign unique SKUs and append</span>
                       </div>
                     </label>
                   </div>
@@ -6740,11 +6740,11 @@ export default function AdminApp() {
                   className="w-12 h-12 rounded-xl object-cover border border-jaman-saffron/30 shadow-xs"
                 />
                 <div>
-                  <h4 className="text-xs font-black text-jaman-navy">{selectedImageTargetItem.name}</h4>
+                  <h4 className="text-xs font-bold text-jaman-navy">{selectedImageTargetItem.name}</h4>
                   <p className="text-[11px] text-[#4A5568]">{selectedImageTargetItem.description}</p>
                 </div>
               </div>
-              <span className="text-xs font-black text-jaman-saffron shrink-0">{formatINR(selectedImageTargetItem.price)}</span>
+              <span className="text-xs font-bold text-jaman-saffron shrink-0">{formatINR(selectedImageTargetItem.price)}</span>
             </div>
           )}
 
@@ -6831,7 +6831,7 @@ export default function AdminApp() {
                     />
                     <div className="text-center">
                       <p className="text-xs font-bold text-emerald-800">✓ Image Ready: {uploadedFileName || 'Custom Photo'}</p>
-                      <p className="text-[10px] text-[#8C9BAE]">Click box to change or choose a different image file</p>
+                      <p className="text-[11px] text-[#8C9BAE]">Click box to change or choose a different image file</p>
                     </div>
                   </div>
                 ) : (
@@ -6926,7 +6926,7 @@ export default function AdminApp() {
                     />
                     <div>
                       <span className="text-xs font-bold text-emerald-800 block">✓ Live Image Preview</span>
-                      <p className="text-[10px] text-[#8C9BAE] truncate max-w-sm">{customImageUrlInput.trim()}</p>
+                      <p className="text-[11px] text-[#8C9BAE] truncate max-w-sm">{customImageUrlInput.trim()}</p>
                     </div>
                   </div>
                 )}
@@ -7028,7 +7028,7 @@ export default function AdminApp() {
                     <div className="p-2.5">
                       <span className="text-[11px] font-bold text-jaman-navy block truncate">{img.title}</span>
                       <span className="text-[9px] text-[#8C9BAE] block">{img.category} • {img.cuisine}</span>
-                      <button className="w-full mt-2 py-1 bg-jaman-navy group-hover:bg-jaman-saffron text-white text-[10px] font-bold rounded-lg transition-colors">
+                      <button className="w-full mt-2 py-1 bg-jaman-navy group-hover:bg-jaman-saffron text-white text-[11px] font-bold rounded-lg transition-colors">
                         {selectedImageTargetItem ? 'Assign to Dish' : 'Select Photo'}
                       </button>
                     </div>
@@ -7069,7 +7069,7 @@ export default function AdminApp() {
               </span>
             </div>
             <div className="text-right">
-              <span className="text-2xl font-black text-jaman-navy">{completenessReport.score}%</span>
+              <span className="text-2xl font-bold text-jaman-navy">{completenessReport.score}%</span>
             </div>
           </div>
 
@@ -7089,7 +7089,7 @@ export default function AdminApp() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-xs text-jaman-navy">{issue.itemName}</span>
-                      <span className="text-[10px] bg-slate-100 text-[#8C9BAE] px-2 py-0.5 rounded font-semibold">
+                      <span className="text-[11px] bg-slate-100 text-[#8C9BAE] px-2 py-0.5 rounded font-semibold">
                         {issue.categoryName}
                       </span>
                     </div>
@@ -7184,14 +7184,14 @@ export default function AdminApp() {
                     />
                     <div className="mt-2 flex items-center gap-1.5">
                       <StatusBadge status={item.dietaryType} type="dietary" />
-                      <span className="text-[10px] text-[#8C9BAE]">{item.prepTimeMinutes}m</span>
+                      <span className="text-[11px] text-[#8C9BAE]">{item.prepTimeMinutes}m</span>
                     </div>
                     <h5 className="font-bold text-xs text-jaman-navy mt-1">{item.name}</h5>
-                    <p className="text-[10px] text-[#4A5568] line-clamp-2 mt-0.5">{item.description}</p>
+                    <p className="text-[11px] text-[#4A5568] line-clamp-2 mt-0.5">{item.description}</p>
                   </div>
                   <div className="flex items-center justify-between pt-2 border-t border-jaman-border">
-                    <span className="text-xs font-black text-jaman-saffron">{formatINR(item.price)}</span>
-                    <button className="px-2.5 py-1 bg-jaman-saffron text-white text-[10px] font-bold rounded-lg opacity-80">
+                    <span className="text-xs font-bold text-jaman-saffron">{formatINR(item.price)}</span>
+                    <button className="px-2.5 py-1 bg-jaman-saffron text-white text-[11px] font-bold rounded-lg opacity-80">
                       + Add
                     </button>
                   </div>
@@ -7372,7 +7372,7 @@ export default function AdminApp() {
           <div className="bg-jaman-navy text-white p-5 rounded-2xl space-y-3">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div>
-                <h3 className="font-black text-lg text-[#FED7AA]">JAMANVAAR DAILY Z-REPORT</h3>
+                <h3 className="font-bold text-lg text-[#FED7AA]">JAMANVAAR DAILY Z-REPORT</h3>
                 <p className="text-xs text-white/70">{db.outlet.name || db.restaurant.name || ''} • {formatDate(new Date())}</p>
               </div>
               <span className="text-xs font-mono bg-white/10 px-2.5 py-1 rounded font-bold">
@@ -7383,11 +7383,11 @@ export default function AdminApp() {
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="bg-white/5 p-3 rounded-xl">
                 <span className="text-white/60 block">Gross Sales:</span>
-                <span className="text-lg font-black text-white">{formatINR(todayRevenue)}</span>
+                <span className="text-lg font-bold text-white">{formatINR(todayRevenue)}</span>
               </div>
               <div className="bg-white/5 p-3 rounded-xl">
                 <span className="text-white/60 block">Total Orders:</span>
-                <span className="text-lg font-black text-white">{todayOrders} tickets</span>
+                <span className="text-lg font-bold text-white">{todayOrders} tickets</span>
               </div>
               <div className="bg-white/5 p-3 rounded-xl">
                 <span className="text-white/60 block">UPI Direct:</span>
@@ -7450,7 +7450,7 @@ export default function AdminApp() {
 
           <div>
             <label className="block text-xs font-bold text-jaman-navy mb-1">
-              Type <span className="font-mono text-rose-600 font-black">CONFIRM</span> to proceed:
+              Type <span className="font-mono text-rose-600 font-bold">CONFIRM</span> to proceed:
             </label>
             <input
               type="text"
@@ -7692,24 +7692,24 @@ export default function AdminApp() {
         <div className="flex items-center gap-4">
           <JamanvaarLogo variant="horizontal" size="lg" imgStyle={{ height: '52px', width: 'auto' }} />
           <div>
-            <h1 className="text-xl font-black text-jaman-navy tracking-tight">{db.restaurant.legalName || db.restaurant.name || ''}</h1>
+            <h1 className="text-xl font-bold text-jaman-navy tracking-tight">{db.restaurant.legalName || db.restaurant.name || ''}</h1>
             <p className="text-xs text-gray-600">{db.outlet.name} • {db.outlet.address}, {db.outlet.city}</p>
             <p className="text-[11px] font-mono text-gray-500 mt-0.5">GSTIN: {db.restaurant.gstin} • FSSAI: {restForm.fssai || '10020021000123'}</p>
           </div>
         </div>
         <div className="text-right">
-          <span className="inline-block bg-jaman-navy text-white text-[10px] font-black uppercase px-3 py-1 rounded">
+          <span className="inline-block bg-jaman-navy text-white text-[11px] font-bold uppercase px-3 py-1 rounded">
             {activeReportType === 'MONTHLY_SALES' ? '30-Day Monthly Audit' : 'Daily Sales Audit'}
           </span>
           <p className="text-xs font-bold text-gray-800 mt-1">Generated: {formatDate(new Date())} {formatTime(new Date())}</p>
-          <p className="text-[10px] font-mono text-gray-500">Ref: AUD-{Date.now().toString().slice(-8)}</p>
+          <p className="text-[11px] font-mono text-gray-500">Ref: AUD-{Date.now().toString().slice(-8)}</p>
         </div>
       </div>
 
       {/* Report Title Banner */}
       <div className="bg-[#F8F6F0] p-3.5 rounded-xl border border-gray-200 flex items-center justify-between">
         <div>
-          <h2 className="text-base font-black text-jaman-navy">{currentReport.title}</h2>
+          <h2 className="text-base font-bold text-jaman-navy">{currentReport.title}</h2>
           <p className="text-xs text-gray-600">Period: {formatDate(currentReport.dateFrom)} to {formatDate(currentReport.dateTo)}</p>
         </div>
         <div className="text-right">
@@ -7720,20 +7720,20 @@ export default function AdminApp() {
       {/* Financial KPI Summary Cards */}
       <div className="grid grid-cols-4 gap-3 page-break-avoid">
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-          <span className="text-[10px] font-bold uppercase text-gray-500 block">Gross Revenue</span>
-          <span className="text-lg font-black text-jaman-navy">{formatINR(currentReport.summaryMetrics.totalRevenue)}</span>
+          <span className="text-[11px] font-bold uppercase text-gray-500 block">Gross Revenue</span>
+          <span className="text-lg font-bold text-jaman-navy">{formatINR(currentReport.summaryMetrics.totalRevenue)}</span>
         </div>
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-          <span className="text-[10px] font-bold uppercase text-gray-500 block">Completed Orders</span>
-          <span className="text-lg font-black text-jaman-navy">{currentReport.summaryMetrics.totalOrders}</span>
+          <span className="text-[11px] font-bold uppercase text-gray-500 block">Completed Orders</span>
+          <span className="text-lg font-bold text-jaman-navy">{currentReport.summaryMetrics.totalOrders}</span>
         </div>
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-          <span className="text-[10px] font-bold uppercase text-gray-500 block">Discounts & Promos</span>
-          <span className="text-lg font-black text-emerald-700">{formatINR(currentReport.summaryMetrics.totalDiscount)}</span>
+          <span className="text-[11px] font-bold uppercase text-gray-500 block">Discounts & Promos</span>
+          <span className="text-lg font-bold text-emerald-700">{formatINR(currentReport.summaryMetrics.totalDiscount)}</span>
         </div>
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-          <span className="text-[10px] font-bold uppercase text-gray-500 block">GST Collected (5%)</span>
-          <span className="text-lg font-black text-jaman-saffron">{formatINR(currentReport.summaryMetrics.totalTax)}</span>
+          <span className="text-[11px] font-bold uppercase text-gray-500 block">GST Collected (5%)</span>
+          <span className="text-lg font-bold text-jaman-saffron">{formatINR(currentReport.summaryMetrics.totalTax)}</span>
         </div>
       </div>
 
@@ -7742,7 +7742,7 @@ export default function AdminApp() {
         <div className="grid grid-cols-2 gap-4 page-break-avoid">
           {/* Hourly Rush Chart */}
           <div className="p-4 border border-gray-200 rounded-xl bg-white">
-            <h4 className="text-xs font-black text-jaman-navy mb-2 uppercase tracking-wide">
+            <h4 className="text-xs font-bold text-jaman-navy mb-2 uppercase tracking-wide">
               📊 Dining Velocity & Peak Rush (Lunch 1-3 PM & Dinner 7-10 PM)
             </h4>
             <div className="h-28 flex items-end justify-between gap-1 border-b border-gray-200 pb-1">
@@ -7765,7 +7765,7 @@ export default function AdminApp() {
 
           {/* Payment Channel Split */}
           <div className="p-4 border border-gray-200 rounded-xl bg-white flex flex-col justify-between">
-            <h4 className="text-xs font-black text-jaman-navy mb-2 uppercase tracking-wide">
+            <h4 className="text-xs font-bold text-jaman-navy mb-2 uppercase tracking-wide">
               💳 Payment Channels Distribution
             </h4>
             <div className="space-y-2">
@@ -7804,7 +7804,7 @@ export default function AdminApp() {
       {/* Tabular Records */}
       <div className="border border-gray-200 rounded-xl overflow-hidden page-break-avoid">
         <table className="w-full text-left text-xs">
-          <thead className="bg-gray-100 border-b border-gray-200 text-gray-700 font-bold uppercase text-[10px]">
+          <thead className="bg-gray-100 border-b border-gray-200 text-gray-700 font-bold uppercase text-[11px]">
             <tr>
               <th className="py-2.5 px-3">Item / Order ID</th>
               <th className="py-2.5 px-3">Type / Category</th>
@@ -7818,7 +7818,7 @@ export default function AdminApp() {
               <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'}>
                 <td className="py-2.5 px-3 font-bold text-gray-900">{row.label}</td>
                 <td className="py-2.5 px-3 text-gray-600">{row.metric1}</td>
-                <td className="py-2.5 px-3 font-black text-jaman-navy">{row.metric2}</td>
+                <td className="py-2.5 px-3 font-bold text-jaman-navy">{row.metric2}</td>
                 <td className="py-2.5 px-3 font-bold text-gray-700">{row.metric3}</td>
                 <td className="py-2.5 px-3 text-gray-600">{row.metric4 || 'COMPLETED'}</td>
               </tr>
@@ -7833,12 +7833,12 @@ export default function AdminApp() {
           <p className="text-[11px] text-gray-500 leading-relaxed">
             This is an official certified sales audit report generated directly from JAMANVAAR Cloud POS Terminal. All statutory taxes have been computed per Section 9(5) CGST/SGST regulations.
           </p>
-          <p className="text-[10px] font-mono text-gray-400 mt-2">Verification Ref: {`JMN-AUTH-${Date.now().toString(16).toUpperCase()}`}</p>
+          <p className="text-[11px] font-mono text-gray-400 mt-2">Verification Ref: {`JMN-AUTH-${Date.now().toString(16).toUpperCase()}`}</p>
         </div>
         <div className="text-right space-y-4">
           <div className="inline-block text-center border-t-2 border-gray-700 pt-1.5 px-10">
             <span className="text-xs font-bold text-gray-900 block">Authorized Restaurant Manager</span>
-            <span className="text-[10px] text-gray-500">{db.outlet.name || db.restaurant.name || ''}</span>
+            <span className="text-[11px] text-gray-500">{db.outlet.name || db.restaurant.name || ''}</span>
           </div>
         </div>
       </div>
