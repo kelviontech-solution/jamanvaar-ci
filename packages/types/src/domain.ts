@@ -698,7 +698,15 @@ export interface QrOrderingSettings {
 }
 
 export type VoiceStyle = 'STANDARD' | 'SHORT' | 'DISABLED';
+/** Browser speech synthesis/recognition is only verified for these three locales so far. */
 export type VoiceLanguage = 'en' | 'hi' | 'gu';
+/**
+ * Every written language the kiosk's own i18n dictionary (packages/i18n) covers — broader than
+ * VoiceLanguage, since adding a language to text browsing/ordering doesn't require (and isn't
+ * gated on) verified voice-assistant support for it. Duplicated here rather than importing
+ * @jamanvaar/i18n's own SupportedLanguage, since packages/types stays dependency-free.
+ */
+export type DisplayLanguage = 'en' | 'hi' | 'gu' | 'mr' | 'ta' | 'te' | 'kn';
 
 /**
  * Kiosk Admin/Super Admin-configurable customer-kiosk behavior — previously
@@ -711,8 +719,8 @@ export type VoiceLanguage = 'en' | 'hi' | 'gu';
  * just create two conflicting sources of truth for the same text.
  */
 export interface KioskDisplaySettings {
-  enabledLanguages: VoiceLanguage[];
-  defaultLanguage: VoiceLanguage;
+  enabledLanguages: DisplayLanguage[];
+  defaultLanguage: DisplayLanguage;
   /** Seconds of no touch/interaction before the idle warning appears. */
   idleWarningAfterSeconds: number;
   /** Seconds the idle warning counts down before the session resets. */

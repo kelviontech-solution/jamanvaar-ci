@@ -230,6 +230,16 @@ const WELCOME_BACKGROUND_GALLERY: Array<{ label: string; url: string }> = [
   { label: 'Contemporary Dining', url: 'https://images.unsplash.com/photo-1636405189493-181ecf851006?auto=format&fit=crop&w=1800&q=80' }
 ];
 
+const KIOSK_LANGUAGE_LABELS: Record<string, string> = {
+  en: 'English',
+  hi: 'हिन्दी (Hindi)',
+  gu: 'ગુજરાતી (Gujarati)',
+  mr: 'मराठी (Marathi)',
+  ta: 'தமிழ் (Tamil)',
+  te: 'తెలుగు (Telugu)',
+  kn: 'ಕನ್ನಡ (Kannada)'
+};
+
 export default function AdminApp() {
   const [activeTab, setActiveTab] = useState<AdminTab>('DASHBOARD');
   // The nav sidebar used to always render at its full 256px desktop width,
@@ -4562,34 +4572,29 @@ export default function AdminApp() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
-                  {(
-                    [
-                      { code: 'en', label: 'English' },
-                      { code: 'hi', label: 'हिन्दी (Hindi)' },
-                      { code: 'gu', label: 'ગુજરાતી (Gujarati)' }
-                    ] as const
-                  ).map((opt) => {
+                  {(Object.keys(KIOSK_LANGUAGE_LABELS) as Array<keyof typeof KIOSK_LANGUAGE_LABELS>).map((code) => {
+                    const label = KIOSK_LANGUAGE_LABELS[code];
                     const settings = KioskDisplaySettingsRepository.getSettings();
-                    const isEnabled = settings.enabledLanguages.includes(opt.code);
+                    const isEnabled = settings.enabledLanguages.includes(code as any);
                     return (
-                      <label key={opt.code} className="flex items-center gap-2 text-xs font-bold text-jaman-navy">
+                      <label key={code} className="flex items-center gap-2 text-xs font-bold text-jaman-navy">
                         <input
                           type="checkbox"
                           checked={isEnabled}
                           onChange={() => {
                             const current = KioskDisplaySettingsRepository.getSettings();
                             const nextEnabled = isEnabled
-                              ? current.enabledLanguages.filter((l) => l !== opt.code)
-                              : [...current.enabledLanguages, opt.code];
+                              ? current.enabledLanguages.filter((l) => l !== code)
+                              : [...current.enabledLanguages, code as any];
                             try {
                               KioskDisplaySettingsRepository.updateSettings({ enabledLanguages: nextEnabled });
-                              showToast(`${opt.label} ${isEnabled ? 'disabled' : 'enabled'} on the customer kiosk.`);
+                              showToast(`${label} ${isEnabled ? 'disabled' : 'enabled'} on the customer kiosk.`);
                             } catch (err) {
                               showToast(err instanceof Error ? err.message : 'Could not update kiosk languages');
                             }
                           }}
                         />
-                        {opt.label}
+                        {label}
                       </label>
                     );
                   })}
@@ -4611,7 +4616,7 @@ export default function AdminApp() {
                       className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none"
                     >
                       {KioskDisplaySettingsRepository.getSettings().enabledLanguages.map((l) => (
-                        <option key={l} value={l}>{l === 'en' ? 'English' : l === 'hi' ? 'हिन्दी (Hindi)' : 'ગુજરાતી (Gujarati)'}</option>
+                        <option key={l} value={l}>{KIOSK_LANGUAGE_LABELS[l] ?? l}</option>
                       ))}
                     </select>
                   </div>

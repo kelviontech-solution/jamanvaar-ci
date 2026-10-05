@@ -63,7 +63,8 @@ import {
   OrderType,
   PaymentMethod,
   PaymentStatus,
-  SelectedModifier
+  SelectedModifier,
+  VoiceLanguage
 } from '@jamanvaar/types';
 import {
   calculateCart,
@@ -169,8 +170,23 @@ type KioskStep =
 const LANGUAGE_OPTIONS: Array<{ code: SupportedLanguage; label: string; native: string }> = [
   { code: 'en', label: 'English', native: 'English' },
   { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
-  { code: 'gu', label: 'Gujarati', native: 'ગુજરાતી' }
+  { code: 'gu', label: 'Gujarati', native: 'ગુજરાતી' },
+  { code: 'mr', label: 'Marathi', native: 'मराठी' },
+  { code: 'ta', label: 'Tamil', native: 'தமிழ்' },
+  { code: 'te', label: 'Telugu', native: 'తెలుగు' },
+  { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ' }
 ];
+
+/**
+ * VoiceService only has verified browser speech-synthesis support for en/hi/gu (its own
+ * langMap in packages/api/src/services/voice.ts). The newer text-only languages (Marathi,
+ * Tamil, Telugu, Kannada) have real i18n/UI support but no verified TTS voice for their locale,
+ * so the spoken prompts fall back to English for those rather than guessing at an unverified
+ * voice — never silently claiming voice support this app hasn't actually confirmed works.
+ */
+function toVoiceLanguage(lang: SupportedLanguage): VoiceLanguage {
+  return lang === 'en' || lang === 'hi' || lang === 'gu' ? lang : 'en';
+}
 
 /** Every real activation key is JMV-XXXX-XXXX-XXXX (see activation-keys.service.ts's own generator) — reformats as the installer types so they don't have to type the dashes themselves. */
 function formatActivationKeyInput(raw: string): string {
@@ -582,9 +598,9 @@ export default function KioskUserApp() {
           const readyMsg = VoiceService.getReadyMessage(
             updatedOrder.tokenNumber,
             updatedOrder.pickupCounter || '1',
-            lang
+            toVoiceLanguage(lang)
           );
-          VoiceService.speak(readyMsg, lang);
+          VoiceService.speak(readyMsg, toVoiceLanguage(lang));
           showToast(`🔔 TOKEN #${updatedOrder.tokenNumber} IS READY AT COUNTER 1!`);
         }
       }
@@ -1457,12 +1473,12 @@ export default function KioskUserApp() {
     // 2. Trigger audio chime and spoken confirmation in selected language (Hindi/Gujarati/English)
     const voiceMsg = VoiceService.getConfirmationMessage(
       order.tokenNumber,
-      lang,
+      toVoiceLanguage(lang),
       'STANDARD',
       isCurrentlyOnline
     );
-    
-    const voicePromise = VoiceService.speak(voiceMsg, lang);
+
+    const voicePromise = VoiceService.speak(voiceMsg, toVoiceLanguage(lang));
     const watchdogPromise = new Promise(resolve => setTimeout(resolve, 15000));
     Promise.race([voicePromise, watchdogPromise]).finally(() => {
       setSpeechSettled(true);
@@ -1999,7 +2015,7 @@ export default function KioskUserApp() {
                     : 'text-[#4A5568] hover:text-jaman-navy'
                 }`}
               >
-                {l === 'en' ? 'EN' : l === 'hi' ? 'हिन्दी' : 'ગુજરાતી'}
+                {l === 'en' ? 'EN' : LANGUAGE_OPTIONS.find((opt) => opt.code === l)?.native ?? l}
               </button>
             ))}
           </div>
