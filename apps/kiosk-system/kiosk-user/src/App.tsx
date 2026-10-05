@@ -3893,8 +3893,14 @@ export default function KioskUserApp() {
                     variant="accent"
                     size="sm"
                     onClick={() => {
+                      // B2-XXX: this used to jump straight to the CHECKOUT_PAYMENT step without
+                      // ever calling handleProceedToPayment — no order was created, no payment QR
+                      // was ever requested, so the guest landed on a payment screen that was stuck
+                      // on "Preparing…" forever with nothing actually happening server-side. This
+                      // quick-access button now does the exact same thing the cart's own "Proceed
+                      // to Payment" button does.
                       setIsChatbotOpen(false);
-                      setStep('CHECKOUT_PAYMENT');
+                      void handleProceedToPayment();
                     }}
                     className="font-bold shadow-md"
                   >
