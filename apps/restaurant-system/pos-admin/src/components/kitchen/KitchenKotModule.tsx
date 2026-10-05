@@ -286,6 +286,9 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
                         {kot.station || 'Main Kitchen'}
                       </span>
                     </div>
+                    {kot.orderType === 'KIOSK' && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 uppercase">Kiosk</span>
+                    )}
                   </div>
 
                   {/* Cook Timer */}

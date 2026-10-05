@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { fetchMyEnabledApps, type AppCode } from '../cloud/cloudClient';
 
 export interface GatedNavItem {
   id: string;
   /** When set, this item is hidden unless the restaurant's enabled apps include it. */
   requiresApp?: AppCode;
+}
+
+/** A real sidebar nav item: GatedNavItem plus the label/icon the UI actually renders. */
+export interface NavSectionItem extends GatedNavItem {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 export interface GatedNavSection<T extends GatedNavItem> {

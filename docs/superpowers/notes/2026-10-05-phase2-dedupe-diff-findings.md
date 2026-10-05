@@ -40,6 +40,10 @@ kiosk-admin's tab is a plain, read-only display of the shared local `license` ob
 
 **No gap found — this is the same shared license state, not a parallel one.**
 
+## Order channel tagging (Task 8)
+
+`Order.orderType` already includes `'KIOSK'` as a value (`packages/types/src/enums.ts:1`), and pos-admin's `OrdersModule.tsx:820` already renders `ord.orderType` as its own column — a kiosk-sourced order is already visible there as plain text "KIOSK", no code change needed. `KitchenKotModule.tsx` (the Live KDS view) showed no channel indicator at all before this task; added a small "Kiosk" badge next to the ticket's station label when `kot.orderType === 'KIOSK'` (`KOTRecord.orderType` is the same `OrderType` value, confirmed via `packages/types/src/domain.ts:1257`).
+
 ## Bonus finding while reading this range
 
 kiosk-admin's `SETTINGS` tab begins immediately after `LICENSE`, at `App.tsx:4551`, and the "Customer Kiosk Language & Idle Timeout" section (`KIOSK_LANGUAGE_LABELS`) starts right at line ~4565 — confirms the exact starting line for Task 6's relocation of kiosk language settings.

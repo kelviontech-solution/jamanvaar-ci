@@ -43,6 +43,7 @@ import {
 } from '@jamanvaar/ui';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { useEntitlements, filterNavSections } from './hooks/useEntitlements';
+import { NAV_SECTIONS } from './navSections';
 import {
   CentralReportingService,
   ReportGeneratorService,
@@ -104,6 +105,9 @@ import { PaymentsSplitModule } from './components/payments/PaymentsSplitModule';
 import { ReportsDashboard } from './components/reports/ReportsDashboard';
 import { ShiftCashDrawerModule } from './components/shifts/ShiftCashDrawerModule';
 import { PrintersDevicesModule } from './components/hardware/PrintersDevicesModule';
+import { KitchenPrinterRoutingPanel } from './components/hardware/KitchenPrinterRoutingPanel';
+import { PrintQueuePanel } from './components/hardware/PrintQueuePanel';
+import { FeedbackPanel } from './components/kiosk/FeedbackPanel';
 import { ReportBrandingSettings } from './components/settings/ReportBrandingSettings';
 import { SubscriptionPlansView } from './components/settings/SubscriptionPlansView';
 import { AuditTrailModule } from './components/audit/AuditTrailModule';
@@ -937,62 +941,7 @@ export default function PosAdminApp() {
             className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] transition-transform duration-200 ${navOpen ? 'translate-x-0' : '-translate-x-full'} lg:static lg:z-auto lg:w-64 lg:max-w-none lg:translate-x-0 bg-[#FAF8F5] lg:bg-[#FAF8F5]/95 backdrop-blur-md border-r border-[#EAE3D6] flex flex-col justify-between p-3.5 shrink-0 overflow-y-auto min-h-0 shadow-2xl lg:shadow-2xs select-none`}
           >
             <div className="space-y-4">
-              {filterNavSections([
-                {
-                  section: 'OPERATIONS',
-                  items: [
-                    { id: 'DASHBOARD', label: 'Dashboard', icon: LayoutDashboard },
-                    { id: 'BILLING_SALES', label: 'Billing / Invoices', icon: DollarSign },
-                    { id: 'ORDERS', label: 'Orders', icon: ShoppingBag },
-                    { id: 'LIVE_KDS', label: 'Live Orders / KDS', icon: Flame },
-                    { id: 'TABLES', label: 'Floor / Tables', icon: Grid },
-                    { id: 'RESERVATIONS', label: 'Reservations', icon: CalendarClock },
-                    { id: 'KITCHEN_KOT', label: 'Kitchen / KOT', icon: Activity }
-                  ]
-                },
-                {
-                  section: 'DIGITAL ORDERING',
-                  items: [{ id: 'QR_ORDERING', label: 'QR Table Ordering', icon: QrCode }]
-                },
-                {
-                  section: 'MENU & INVENTORY',
-                  items: [
-                    { id: 'MENU', label: 'Menu & Categories', icon: UtensilsCrossed },
-                    { id: 'MENU_OPTIONS', label: 'Customisations & Tax', icon: Sliders },
-                    { id: 'INVENTORY', label: 'Inventory & Recipes', icon: Package },
-                    { id: 'INVENTORY_CONTROL', label: 'Purchasing & Stock Control', icon: Truck }
-                  ]
-                },
-                {
-                  section: 'PEOPLE & CASH',
-                  items: [
-                    { id: 'CUSTOMERS', label: 'Customers CRM', icon: Heart },
-                    { id: 'STAFF', label: 'Staff & Roles (RBAC)', icon: Users },
-                    { id: 'PAYMENTS', label: 'Payments & Split', icon: CreditCard },
-                    { id: 'COUPONS', label: 'Offers & Coupons', icon: Tag },
-                    { id: 'SHIFTS', label: 'Shift & Cash Drawer', icon: Coins }
-                  ]
-                },
-                {
-                  section: 'KIOSK',
-                  items: [
-                    { id: 'KIOSKS', label: 'Kiosk Terminals', icon: Tablet, requiresApp: 'KIOSK_ADMIN' as const }
-                  ]
-                },
-                {
-                  section: 'ANALYTICS & SYSTEM',
-                  items: [
-                    { id: 'REPORTS', label: 'Reports & Analytics', icon: TrendingUp },
-                    { id: 'HARDWARE', label: 'Printers & Devices', icon: Printer },
-                    { id: 'SYNC', label: 'Sync & Devices', icon: RefreshCw },
-                    { id: 'SETTINGS', label: 'Restaurant Settings', icon: Settings },
-                    { id: 'LICENSE', label: 'Subscription Plans', icon: Award },
-                    { id: 'AUDIT', label: 'Audit Trail Logs', icon: ShieldCheck },
-                    { id: 'BACKUP', label: 'Backup & Restore', icon: Database },
-                    { id: 'SUPPORT', label: 'Help & Support', icon: LifeBuoy }
-                  ]
-                }
-              ], hasApp).map((grp) => {
+              {filterNavSections(NAV_SECTIONS, hasApp).map((grp) => {
                 const hasActiveTab = grp.items.some((it) => it.id === activeTab);
                 // A section holding the currently-open tab always shows,
                 // regardless of its remembered collapse state — you should
@@ -1356,6 +1305,8 @@ export default function PosAdminApp() {
                     </div>
                   ))}
                 </div>
+
+                <FeedbackPanel orders={orders} />
               </div>
             )}
 
@@ -1431,15 +1382,19 @@ export default function PosAdminApp() {
 
             {/* TAB 14: HARDWARE & PRINTERS */}
             {activeTab === 'HARDWARE' && (
-              <PrintersDevicesModule
-                configuredPrinters={configuredPrinters}
-                onOpenPrinterModal={(prn) => {
-                  setPrinterToEdit(prn || null);
-                  setIsPrinterModalOpen(true);
-                }}
-                showToast={showToast}
-                onRequestConfirm={setConfirmDialog}
-              />
+              <div className="space-y-6">
+                <PrintersDevicesModule
+                  configuredPrinters={configuredPrinters}
+                  onOpenPrinterModal={(prn) => {
+                    setPrinterToEdit(prn || null);
+                    setIsPrinterModalOpen(true);
+                  }}
+                  showToast={showToast}
+                  onRequestConfirm={setConfirmDialog}
+                />
+                <KitchenPrinterRoutingPanel showToast={showToast} />
+                <PrintQueuePanel showToast={showToast} />
+              </div>
             )}
 
             {/* TAB 15: SETTINGS & BRANDING */}
