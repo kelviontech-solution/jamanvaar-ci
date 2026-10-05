@@ -623,16 +623,33 @@ export class PaymentsService {
       );
       return;
     }
-    const webhookEvent = existing
-      ? await this.prisma.runAsPlatform((tx) =>
-          tx.webhookEvent.update({
-            where: { id: existing.id },
-            data: { rawPayload: payload, signatureValid: true, processingStatus: 'VERIFIED', errorMessage: null, retryCount: { increment: 1 } }
-          })
-        )
-      : await this.prisma.runAsPlatform((tx) =>
+    let webhookEvent;
+    if (existing) {
+      webhookEvent = await this.prisma.runAsPlatform((tx) =>
+        tx.webhookEvent.update({
+          where: { id: existing.id },
+          data: { rawPayload: payload, signatureValid: true, processingStatus: 'VERIFIED', errorMessage: null, retryCount: { increment: 1 } }
+        })
+      );
+    } else {
+      try {
+        webhookEvent = await this.prisma.runAsPlatform((tx) =>
           tx.webhookEvent.create({ data: { provider: 'RAZORPAY', providerEventKey, eventType, rawPayload: payload, signatureValid: true, processingStatus: 'VERIFIED' } })
         );
+      } catch (err) {
+        // Razorpay can and does deliver the same event in parallel, not just as a later retry — a
+        // concurrent request already won the create (P2002 on provider_providerEventKey) between
+        // this request's own findUnique above and this create. Treat it exactly like the `existing`
+        // branch above rather than surfacing a 500 that would just earn an unnecessary extra retry.
+        if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+          await this.prisma.runAsPlatform((tx) =>
+            tx.webhookEvent.updateMany({ where: { provider: 'RAZORPAY', providerEventKey }, data: { retryCount: { increment: 1 }, processingStatus: 'IGNORED_DUPLICATE' } })
+          );
+          return;
+        }
+        throw err;
+      }
+    }
 
     const newStatus = RAZORPAY_EVENT_STATUS[eventType];
     if (!newStatus) {
@@ -654,8 +671,11 @@ export class PaymentsService {
     await this.prisma.runAsPlatform((tx) => tx.webhookEvent.update({ where: { id: webhookEvent.id }, data: { restaurantId: payment.restaurantId } }));
 
     if (newStatus === 'SUCCESS') {
-      const amount = paymentEntity?.amount ?? linkEntity?.amount;
-      const currency = paymentEntity?.currency ?? linkEntity?.currency;
+      // qr_code.credited carries its own amount/currency on the qr_code entity — unlike
+      // payment.captured/payment_link.paid, it isn't guaranteed to arrive with a sibling
+      // payment.entity, so this chain must not depend on one to validate a QR payment correctly.
+      const amount = paymentEntity?.amount ?? linkEntity?.amount ?? qrEntity?.amount;
+      const currency = paymentEntity?.currency ?? linkEntity?.currency ?? qrEntity?.currency;
       if (amount !== payment.amount || currency !== payment.currency) {
         await this.markWebhookFailed(webhookEvent.id, `Amount/currency mismatch: expected ${payment.amount} ${payment.currency}, got ${amount} ${currency}`, eventType);
         return;

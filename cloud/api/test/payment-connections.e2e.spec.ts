@@ -312,6 +312,12 @@ describe('Payment connection onboarding', () => {
     expect(res.status).toBe(400);
   });
 
+  it("PATCH .../commission rejects an override below 2% (Razorpay's own 2% fee comes out of it)", async () => {
+    const res = await authed('patch', `/api/v1/restaurants/${restaurantId}/payment-connection/commission`, platformToken).send({ overrideBps: 150, password: adminPassword });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toContain('at least 2%');
+  });
+
   it('setCommissionOverride still rejects out-of-range values even if a future caller skips the Zod pipe (service-level defense in depth)', async () => {
     const service = app.get(PaymentConnectionsService);
     await expect(service.setCommissionOverride(restaurantId, 10001, { id: 'fake-actor' } as never, undefined)).rejects.toThrow();

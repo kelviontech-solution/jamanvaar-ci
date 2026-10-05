@@ -324,5 +324,20 @@ describe('Jamanvaar WhatsApp connector — channels/quote, channels/checkout, pa
       const synced = await prisma.runAsPlatform((tx) => tx.syncedOrder.findFirst({ where: { restaurantId, externalOrderId: orderRow.externalOrderId } }));
       expect(synced).toBeNull();
     });
+
+    it('a CANCELLED payment link also fails the payment and never creates a SyncedOrder', async () => {
+      const checkout = await asService('post', `/api/v1/service/whatsapp-channel/channels/checkout?restaurantId=${restaurantId}`, {
+        branchId, cart, idempotencyKey: `wa-checkout-8-${stamp}`, customer: { name: 'Harini', phone: '9876500009' }, orderType: 'PICKUP', externalOrderId: `wa-order-8-${stamp}`
+      });
+      const orderRow = await prisma.runAsPlatform((tx) => tx.order.findUniqueOrThrow({ where: { id: checkout.body.orderId } }));
+      const payment = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findFirstOrThrow({ where: { orderId: orderRow.id } }));
+
+      await signedWebhook(webhookLinkPayload(payment.providerOrderId, checkout.body.amount, 'CANCELLED'));
+
+      const failedOrder = await prisma.runAsPlatform((tx) => tx.order.findUniqueOrThrow({ where: { id: orderRow.id } }));
+      expect(failedOrder.status).toBe('PAYMENT_FAILED');
+      const synced = await prisma.runAsPlatform((tx) => tx.syncedOrder.findFirst({ where: { restaurantId, externalOrderId: orderRow.externalOrderId } }));
+      expect(synced).toBeNull();
+    });
   });
 });

@@ -138,6 +138,32 @@ describe('Razorpay webhook processing', () => {
     expect(rows[0].processingStatus).toBe('IGNORED_DUPLICATE');
   });
 
+  it('two near-simultaneous deliveries of the same event id never 500 and still dedupe to one row', async () => {
+    // Razorpay's own retry policy can fire overlapping deliveries, not just later sequential ones.
+    // Promise.all here doesn't reliably force the exact unique-constraint race window (verified by
+    // hand: this test still passed with the P2002 handling in payments.service.ts temporarily
+    // reverted, so it is not on its own proof that race is closed) — it's a basic behavioral check
+    // that firing two requests back-to-back is still safe, not a guaranteed reproduction of the race.
+    const concurrentOrder = await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.order.create({ data: { restaurantId, externalOrderId: `webhook-concurrent-${Date.now()}`, items: [], subtotal: 1000, taxAmount: 0, totalAmount: 1000, status: 'PENDING_PAYMENT' } })
+    );
+    const concurrentRef = `pay_concurrent_ref_${Date.now()}`;
+    await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', orderId: concurrentOrder.id, restaurantId, providerOrderId: concurrentRef, amount: 1000, currency: 'INR', status: 'PENDING' } })
+    );
+    const eventId = `evt_concurrent_${Date.now()}`;
+    const payload = { event: 'payment.captured', payload: { payment: { entity: { id: `pay_concurrent_${Date.now()}`, amount: 1000, currency: 'INR', status: 'captured', notes: { payment_ref: concurrentRef } } } } };
+
+    const [a, b] = await Promise.all([signedEventWithId(payload, eventId), signedEventWithId(payload, eventId)]);
+    expect(a.status).toBe(200);
+    expect(b.status).toBe(200);
+
+    const rows = await prisma.runAsPlatform((tx) => tx.webhookEvent.findMany({ where: { provider: 'RAZORPAY', providerEventKey: `event:${eventId}` } }));
+    expect(rows.length).toBe(1);
+    const updated = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findFirstOrThrow({ where: { providerOrderId: concurrentRef } }));
+    expect(updated.status).toBe('SUCCESS');
+  });
+
   it('an unknown payment reference is recorded as a failed WebhookEvent without throwing', async () => {
     const res = await signedEvent(capturedEvent(21000, 'pay_unknown_ref', `pay_unknown_${Date.now()}`));
     expect(res.status).toBe(200);
@@ -169,6 +195,29 @@ describe('Razorpay webhook processing', () => {
     const updated = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: other.id } }));
     expect(updated.status).toBe('FAILED');
     expect(updated.failureReason).toBe('Payment declined');
+  });
+
+  it('qr_code.credited (no sibling payment.entity) still settles the payment, validated against the qr_code entity\'s own amount', async () => {
+    // Razorpay's QR Code webhook isn't guaranteed to carry a sibling payment.entity the way
+    // payment.captured/payment_link.paid do — this is the one event type whose amount/currency
+    // check must fall back to the qr_code entity itself (see payments.service.ts's own comment at
+    // the amount-mismatch check), so this intentionally omits `payment` from the payload entirely.
+    const qrOrder = await prisma.runAsTenant(restaurantId, async (tx) => {
+      const o = await tx.order.create({ data: { restaurantId, externalOrderId: `webhook-qr-${Date.now()}`, items: [], subtotal: 8000, taxAmount: 0, totalAmount: 8000, status: 'PENDING_PAYMENT' } });
+      const p = await tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', orderId: o.id, restaurantId, providerOrderId: `pay_qr_ref_${Date.now()}`, amount: 8000, currency: 'INR', status: 'PENDING' } });
+      return { order: o, payment: p };
+    });
+    const res = await signedEvent({
+      event: 'qr_code.credited',
+      payload: {
+        qr_code: { entity: { id: `qr_${Date.now()}`, amount: 8000, currency: 'INR', notes: { payment_ref: qrOrder.payment.providerOrderId } } }
+      }
+    });
+    expect(res.status).toBe(200);
+    const updated = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: qrOrder.payment.id } }));
+    expect(updated.status).toBe('SUCCESS');
+    const o = await prisma.runAsPlatform((tx) => tx.order.findUniqueOrThrow({ where: { id: qrOrder.order.id } }));
+    expect(o.status).toBe('PAID');
   });
 
   it('a WhatsApp payment link that is paid marks its payment SUCCESS and creates no order before the webhook', async () => {

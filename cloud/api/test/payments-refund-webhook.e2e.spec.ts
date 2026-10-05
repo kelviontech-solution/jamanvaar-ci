@@ -130,4 +130,31 @@ describe('Refund webhook processing', () => {
     const payment = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: failedPayment.id } }));
     expect(payment.status).toBe('SUCCESS');
   });
+
+  it('two partial refunds that together equal the full amount end at REFUNDED, passing through PARTIALLY_REFUNDED first', async () => {
+    const twoPartOrder = await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.order.create({ data: { restaurantId, externalOrderId: `refund-twopart-${Date.now()}`, items: [], subtotal: 6000, taxAmount: 0, totalAmount: 6000, status: 'PAID' } })
+    );
+    const twoPartPayment = await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.paymentTransaction.create({
+        data: { provider: 'RAZORPAY', providerPaymentId: `pay_tp_${Date.now()}`, orderId: twoPartOrder.id, restaurantId, providerOrderId: `pay_tp_ref_${Date.now()}`, amount: 6000, currency: 'INR', status: 'SUCCESS' }
+      })
+    );
+    const firstRefundId = `rfnd_tp1_${Date.now()}`;
+    const secondRefundId = `rfnd_tp2_${Date.now()}`;
+    await prisma.runAsTenant(restaurantId, (tx) => tx.refund.create({ data: { paymentId: twoPartPayment.id, restaurantId, amount: 2500, status: 'PENDING', providerRefundId: firstRefundId } }));
+
+    const first = await signedEvent(refundEvent('refund.processed', 2500, firstRefundId));
+    expect(first.status).toBe(200);
+    const afterFirst = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: twoPartPayment.id } }));
+    expect(afterFirst.status).toBe('PARTIALLY_REFUNDED');
+
+    await prisma.runAsTenant(restaurantId, (tx) => tx.refund.create({ data: { paymentId: twoPartPayment.id, restaurantId, amount: 3500, status: 'PENDING', providerRefundId: secondRefundId } }));
+    const second = await signedEvent(refundEvent('refund.processed', 3500, secondRefundId));
+    expect(second.status).toBe(200);
+    const afterSecond = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: twoPartPayment.id } }));
+    expect(afterSecond.status).toBe('REFUNDED');
+    const order = await prisma.runAsPlatform((tx) => tx.order.findUniqueOrThrow({ where: { id: twoPartOrder.id } }));
+    expect(order.status).toBe('REFUNDED');
+  });
 });
