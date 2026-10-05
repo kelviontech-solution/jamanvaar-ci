@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { MenuItem, Category, DietaryType, SpiceLevel } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
-import { MenuRepository, FOOD_IMAGE_LIBRARY, AuditRepository, db } from '@jamanvaar/database';
+import { Modal, Button, VirtualKeyboard, type VirtualKeyboardLanguage } from '@jamanvaar/ui';
+import { MenuRepository, FOOD_IMAGE_LIBRARY, AuditRepository, db, KioskDisplaySettingsRepository } from '@jamanvaar/database';
 import { Upload, Sparkles, Image as ImageIcon, Sliders } from 'lucide-react';
+
+/** Mirrors kiosk-admin's KIOSK_LANGUAGE_LABELS (apps/kiosk-system/kiosk-admin/src/App.tsx:234-242). */
+const KIOSK_LANGUAGE_LABELS: Record<string, string> = {
+  en: 'English',
+  hi: 'हिन्दी (Hindi)',
+  gu: 'ગુજરાતી (Gujarati)',
+  mr: 'मराठी (Marathi)',
+  ta: 'தமிழ் (Tamil)',
+  te: 'తెలుగు (Telugu)',
+  kn: 'ಕನ್ನಡ (Kannada)'
+};
 
 interface ItemModalProps {
   isOpen: boolean;
@@ -40,6 +51,8 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   const [maxQuantity, setMaxQuantity] = useState('50');
   const [allowInstructions, setAllowInstructions] = useState(true);
   const [formError, setFormError] = useState('');
+  const [translations, setTranslations] = useState<Record<string, { name: string; description: string }>>({});
+  const [activeKeyboardField, setActiveKeyboardField] = useState<{ lang: VirtualKeyboardLanguage; field: 'name' | 'description' } | null>(null);
 
   useEffect(() => {
     if (itemToEdit) {
@@ -62,6 +75,11 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       setMinQuantity(String(itemToEdit.minQuantity ?? 1));
       setMaxQuantity(String(itemToEdit.maxQuantity ?? 50));
       setAllowInstructions(itemToEdit.allowInstructions !== false);
+      setTranslations(
+        Object.fromEntries(
+          Object.entries(itemToEdit.translations ?? {}).map(([code, t]) => [code, { name: t.name, description: t.description ?? '' }])
+        )
+      );
     } else {
       setName('');
       setSku(`SKU-${Math.floor(100 + Math.random() * 900)}`);
@@ -84,6 +102,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       setMinQuantity('1');
       setMaxQuantity('50');
       setAllowInstructions(true);
+      setTranslations({});
     }
   }, [itemToEdit, categories, isOpen]);
 
@@ -176,6 +195,14 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       return;
     }
 
+    // Empty translation fields are never saved -- only a language the admin actually typed a
+    // name for (matches kiosk-admin's handleCreateMenuItem, the reference implementation).
+    const cleanedTranslations: MenuItem['translations'] = {};
+    for (const [code, t] of Object.entries(translations)) {
+      if (t.name.trim()) cleanedTranslations[code] = { name: t.name.trim(), description: t.description.trim() || undefined };
+    }
+    const translationsToSave = Object.keys(cleanedTranslations).length > 0 ? cleanedTranslations : undefined;
+
     if (itemToEdit) {
       MenuRepository.updateMenuItem(itemToEdit.id, {
         name: trimmedName,
@@ -197,7 +224,8 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         maxQuantity: maxQ,
         allowInstructions,
         ...(sortOrder.trim() !== '' && Number.isFinite(Number(sortOrder)) ? { sortOrder: Number(sortOrder) } : {}),
-        modifierGroupIds
+        modifierGroupIds,
+        translations: translationsToSave
       });
       AuditRepository.log({
         action: 'MENU_ITEM_UPDATED',
@@ -225,7 +253,8 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         maxQuantity: maxQ,
         allowInstructions,
         ...(sortOrder.trim() !== '' && Number.isFinite(Number(sortOrder)) ? { sortOrder: Number(sortOrder) } : {}),
-        modifierGroupIds
+        modifierGroupIds,
+        translations: translationsToSave
       });
       AuditRepository.log({
         action: 'MENU_ITEM_CREATED',
@@ -545,6 +574,62 @@ export const ItemModal: React.FC<ItemModalProps> = ({
           </label>
         </div>
 
+        {/* Admin writes these by hand; nothing auto-translates. Before this, there was no way at
+            all to set these, so every admin-added dish showed only in English on the customer
+            kiosk regardless of selected language. The keyboard button opens a phonetic on-screen
+            keyboard for admins without a native-script keyboard. */}
+        <div className="pt-2 border-t border-slate-200 space-y-3">
+          <p className="text-xs font-bold text-slate-600">Translations (optional, shown when a customer selects that language)</p>
+
+          {KioskDisplaySettingsRepository.getSettings().enabledLanguages.filter((code) => code !== 'en').length === 0 && (
+            <p className="text-xs text-[#8C9BAE]">No other languages are enabled on this kiosk yet — turn one on from Restaurant Settings → Customer Kiosk Language to add a translation here.</p>
+          )}
+
+          {KioskDisplaySettingsRepository.getSettings().enabledLanguages.filter((code) => code !== 'en').map((code) => {
+            const lang = code as VirtualKeyboardLanguage;
+            const current = translations[lang] ?? { name: '', description: '' };
+            const setCurrent = (next: Partial<{ name: string; description: string }>) =>
+              setTranslations((prev) => ({ ...prev, [lang]: { ...current, ...next } }));
+            return (
+              <div key={lang} className="space-y-2 p-3 bg-jaman-ivory rounded-xl border border-jaman-border">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-600">{KIOSK_LANGUAGE_LABELS[lang]} Name</label>
+                  <button
+                    type="button"
+                    onClick={() => setActiveKeyboardField({ lang, field: 'name' })}
+                    className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
+                  >
+                    ⌨ Keyboard
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={current.name}
+                  onChange={(e) => setCurrent({ name: e.target.value })}
+                  placeholder={`${KIOSK_LANGUAGE_LABELS[lang]} dish name`}
+                  className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
+                />
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-600">{KIOSK_LANGUAGE_LABELS[lang]} Description</label>
+                  <button
+                    type="button"
+                    onClick={() => setActiveKeyboardField({ lang, field: 'description' })}
+                    className="text-[10px] font-bold text-jaman-saffron px-2 py-0.5 rounded-md border border-jaman-saffron/30 hover:bg-[#FFF4ED]"
+                  >
+                    ⌨ Keyboard
+                  </button>
+                </div>
+                <textarea
+                  rows={2}
+                  value={current.description}
+                  onChange={(e) => setCurrent({ description: e.target.value })}
+                  className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none"
+                />
+              </div>
+            );
+          })}
+        </div>
+
         {formError && (
           <p className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
             {formError}
@@ -564,6 +649,22 @@ export const ItemModal: React.FC<ItemModalProps> = ({
           </button>
         </div>
       </form>
+
+      {/* Phonetic virtual keyboard for the translation fields above — bound to whichever
+          language/field was last opened. */}
+      {activeKeyboardField && (
+        <VirtualKeyboard
+          language={activeKeyboardField.lang}
+          value={(translations[activeKeyboardField.lang] ?? { name: '', description: '' })[activeKeyboardField.field]}
+          onChange={(next) =>
+            setTranslations((prev) => ({
+              ...prev,
+              [activeKeyboardField.lang]: { ...(prev[activeKeyboardField.lang] ?? { name: '', description: '' }), [activeKeyboardField.field]: next }
+            }))
+          }
+          onClose={() => setActiveKeyboardField(null)}
+        />
+      )}
     </Modal>
   );
 };
