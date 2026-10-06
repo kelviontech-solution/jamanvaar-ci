@@ -176,10 +176,10 @@ export function DevicesListPage() {
       type="button"
       onClick={onClick}
       disabled={!onClick}
-      style={{ textAlign: 'left', background: '#fff', border: `1px solid ${colour}33`, borderRadius: 12, padding: '14px 18px', cursor: onClick ? 'pointer' : 'default' }}
+      style={{ textAlign: 'left', background: 'var(--jv-surface-card)', border: `1px solid ${colour}33`, borderRadius: 12, padding: '14px 18px', cursor: onClick ? 'pointer' : 'default' }}
     >
       <span style={{ fontSize: 12, fontWeight: 700, color: colour, textTransform: 'uppercase' }}>{label}</span>
-      <div style={{ fontSize: 24, fontWeight: 900, color: '#0f172a', marginTop: 4 }}>{value ?? '—'}</div>
+      <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--jv-text)', marginTop: 4 }}>{value ?? '—'}</div>
     </button>
   );
   const focus = (h: Health) => () => {
@@ -243,7 +243,7 @@ export function DevicesListPage() {
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
             aria-label="Hardware type"
-            style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13, background: '#fff' }}
+            style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13, background: 'var(--jv-surface-card)' }}
           >
             <option value="ALL">All hardware types</option>
             <option value="POS">Billing POS</option>
@@ -283,14 +283,14 @@ export function DevicesListPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left', color: '#64748b' }}>
+                <tr style={{ borderBottom: '2px solid var(--jv-border-subtle)', textAlign: 'left', color: 'var(--jv-text-muted)' }}>
                   {['Restaurant', 'Terminals', 'Online', 'Degraded', 'Offline', 'Never seen', 'Revoked', 'Needs attention', ''].map((h) => <th key={h} style={{ padding: '12px 14px' }}>{h}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {restaurants.items.map((r) => (
-                  <tr key={r.restaurantId} style={{ borderBottom: '1px solid #f8fafc' }}>
-                    <td style={{ padding: '12px 14px' }}><Link to={`/restaurants/${r.restaurantId}`} style={{ fontWeight: 700, color: '#0f172a', textDecoration: 'none' }}>{r.restaurantName}</Link></td>
+                  <tr key={r.restaurantId} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
+                    <td style={{ padding: '12px 14px' }}><Link to={`/restaurants/${r.restaurantId}`} style={{ fontWeight: 700, color: 'var(--jv-text)', textDecoration: 'none' }}>{r.restaurantName}</Link></td>
                     <td style={{ padding: '12px 14px' }}>{r.total}</td>
                     <td style={{ padding: '12px 14px' }}>{r.online}</td>
                     <td style={{ padding: '12px 14px' }}>{r.degraded}</td>
@@ -310,7 +310,7 @@ export function DevicesListPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left', color: '#64748b' }}>
+                <tr style={{ borderBottom: '2px solid var(--jv-border-subtle)', textAlign: 'left', color: 'var(--jv-text-muted)' }}>
                   <th style={{ padding: '12px 14px' }}>Terminal</th>
                   <th style={{ padding: '12px 14px' }}>Type</th>
                   <th style={{ padding: '12px 14px' }}>Restaurant &amp; branch</th>
@@ -323,7 +323,7 @@ export function DevicesListPage() {
               </thead>
               <tbody>
                 {devices.items.map((d) => (
-                  <tr key={d.id} style={{ borderBottom: '1px solid #f8fafc' }}>
+                  <tr key={d.id} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
                     <td style={{ padding: '14px' }}>
                       {editing?.id === d.id ? (
                         <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
@@ -334,22 +334,22 @@ export function DevicesListPage() {
                             maxLength={80}
                             onChange={(e) => setEditing({ id: d.id, name: e.target.value })}
                             onKeyDown={(e) => { if (e.key === 'Enter') void saveName(); if (e.key === 'Escape') setEditing(null); }}
-                            style={{ height: 30, width: 150, padding: '0 8px', borderRadius: 6, border: '1px solid #cbd5e1' }}
+                            style={{ height: 30, width: 150, padding: '0 8px', borderRadius: 6, border: '1px solid var(--jv-border-hover)' }}
                           />
                           <Button variant="ghost" size="sm" aria-label="Save name" onClick={saveName}><Check className="w-3.5 h-3.5 text-green-600" /></Button>
                           <Button variant="ghost" size="sm" aria-label="Cancel" onClick={() => setEditing(null)}><X className="w-3.5 h-3.5" /></Button>
                         </span>
                       ) : (
                         <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-                          <Link to={`/devices/${d.id}`} style={{ fontWeight: 800, color: '#0f172a', textDecoration: 'none' }}>
+                          <Link to={`/devices/${d.id}`} style={{ fontWeight: 800, color: 'var(--jv-text)', textDecoration: 'none' }}>
                             {d.name || 'Unnamed terminal'}
                           </Link>
-                          <button type="button" aria-label="Rename terminal" title="Rename" onClick={() => setEditing({ id: d.id, name: d.name ?? '' })} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
+                          <button type="button" aria-label="Rename terminal" title="Rename" onClick={() => setEditing({ id: d.id, name: d.name ?? '' })} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-text-light)' }}>
                             <Pencil className="w-3 h-3" />
                           </button>
                         </span>
                       )}
-                      <div style={{ color: '#94a3b8', fontSize: 11, marginTop: 2 }}><code>{d.id.slice(0, 13)}…</code></div>
+                      <div style={{ color: 'var(--jv-text-light)', fontSize: 11, marginTop: 2 }}><code>{d.id.slice(0, 13)}…</code></div>
                     </td>
                     <td style={{ padding: '14px' }}>
                       <Badge tone={d.type === 'POS_ADMIN' || d.type === 'KIOSK_ADMIN' ? 'accent' : 'neutral'}>
@@ -357,8 +357,8 @@ export function DevicesListPage() {
                       </Badge>
                     </td>
                     <td style={{ padding: '14px' }}>
-                      <div style={{ fontWeight: 700, color: '#1e293b' }}>{d.restaurant?.name || 'Unknown'}</div>
-                      <div style={{ color: '#64748b', fontSize: 12 }}>{d.branch?.name ?? 'No branch assigned'}</div>
+                      <div style={{ fontWeight: 700, color: 'var(--jv-text)' }}>{d.restaurant?.name || 'Unknown'}</div>
+                      <div style={{ color: 'var(--jv-text-muted)', fontSize: 12 }}>{d.branch?.name ?? 'No branch assigned'}</div>
                     </td>
                     <td style={{ padding: '14px' }}>
                       <Badge tone={HEALTH_TONE[d.health]}>
@@ -370,11 +370,11 @@ export function DevicesListPage() {
                     <td style={{ padding: '14px' }}>
                       {d.isLocked ? <Badge tone="warning"><Lock className="w-3 h-3 inline mr-1" /> LOCKED</Badge> : <span className="muted">—</span>}
                     </td>
-                    <td style={{ padding: '14px', color: '#64748b' }} title={d.lastSeenAt ?? undefined}>
+                    <td style={{ padding: '14px', color: 'var(--jv-text-muted)' }} title={d.lastSeenAt ?? undefined}>
                       {relativeTime(d.lastSeenAt)}
-                      {d.lastSeenAt && <div style={{ fontSize: 11, color: '#94a3b8' }}>{absoluteTime(d.lastSeenAt)}</div>}
+                      {d.lastSeenAt && <div style={{ fontSize: 11, color: 'var(--jv-text-light)' }}>{absoluteTime(d.lastSeenAt)}</div>}
                     </td>
-                    <td style={{ padding: '14px', color: '#64748b' }}>{d.appVersion ?? '—'}</td>
+                    <td style={{ padding: '14px', color: 'var(--jv-text-muted)' }}>{d.appVersion ?? '—'}</td>
                     <td style={{ padding: '14px', textAlign: 'right' }}>
                       <div style={{ display: 'inline-flex', gap: 6 }}>
                         <Link to={`/devices/${d.id}`}>

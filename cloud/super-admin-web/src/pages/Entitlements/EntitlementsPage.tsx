@@ -82,7 +82,7 @@ export function EntitlementsPage() {
               borderRadius: 10,
               border: '1px solid var(--jv-border)',
               fontSize: 13,
-              background: '#ffffff',
+              background: 'var(--jv-surface-card)',
               fontWeight: 600
             }}
           >
@@ -141,9 +141,9 @@ export function EntitlementsPage() {
             <div className="entitlement-matrix" style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
-                  <tr style={{ background: '#f8fafc', borderBottom: '2px solid var(--jv-border)' }}>
+                  <tr style={{ background: 'var(--jv-surface-subtle)', borderBottom: '2px solid var(--jv-border)' }}>
                     <th style={{ padding: '16px 20px', textAlign: 'left', width: '38%', minWidth: 280 }}>
-                      <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-muted)' }}>
                         Software Module &amp; Capability
                       </div>
                     </th>
@@ -157,12 +157,12 @@ export function EntitlementsPage() {
                         <th key={p.id} style={{ padding: '16px 20px', textAlign: 'center', minWidth: 180, borderLeft: '1px solid var(--jv-border)' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                             <Badge tone={p.tier === 'PRO' || p.tier === 'ENTERPRISE' ? 'gold' : 'neutral'}>{p.tier}</Badge>
-                            <Link to={`/plans/${p.id}`} style={{ fontWeight: 900, fontSize: 15, color: '#0B253A', textDecoration: 'none' }}>
+                            <Link to={`/plans/${p.id}`} style={{ fontWeight: 900, fontSize: 15, color: 'var(--jv-text)', textDecoration: 'none' }}>
                               {p.name}
                             </Link>
-                            <div style={{ fontSize: 18, fontWeight: 900, color: p.tier === 'PRO' || p.tier === 'ENTERPRISE' ? '#ea580c' : '#0B253A', fontFamily: 'monospace' }}>
+                            <div style={{ fontSize: 18, fontWeight: 900, color: p.tier === 'PRO' || p.tier === 'ENTERPRISE' ? 'var(--jv-accent-text)' : 'var(--jv-text)', fontFamily: 'monospace' }}>
                               ₹{(p.priceMonthly / 100).toLocaleString('en-IN')}
-                              <span style={{ fontSize: 11, fontWeight: 600, color: '#64748b' }}>/mo</span>
+                              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--jv-text-muted)' }}>/mo</span>
                             </div>
                             <span style={{ fontSize: 11, fontWeight: 700, color: '#166534', background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '2px 8px', borderRadius: 12 }}>
                               {dynamicFeatCount} Capabilities Active
@@ -189,16 +189,16 @@ export function EntitlementsPage() {
                       const totalCatFeatures = countFeatures(relatedGroups);
 
                       return (
-                        <tbody key={category.id} style={{ borderBottom: '2px solid #e2e8f0' }}>
+                        <tbody key={category.id} style={{ borderBottom: '2px solid var(--jv-border)' }}>
                           {/* Section Header Row */}
-                          <tr style={{ background: category.isProExclusive ? '#fffaf5' : '#f8fafc' }}>
+                          <tr style={{ background: category.isProExclusive ? '#fffaf5' : 'var(--jv-surface-subtle)' }}>
                             <td
                               colSpan={filteredPlans.length + 1}
                               style={{
                                 padding: '12px 20px',
                                 fontWeight: 900,
                                 fontSize: 13,
-                                color: category.isProExclusive ? '#ea580c' : '#0B253A',
+                                color: category.isProExclusive ? 'var(--jv-accent-text)' : 'var(--jv-text)',
                                 borderTop: '1px solid var(--jv-border)',
                                 borderBottom: '1px solid var(--jv-border)'
                               }}
@@ -208,12 +208,12 @@ export function EntitlementsPage() {
                                   <span>{category.isProExclusive ? '⭐' : '📦'}</span>
                                   <span>{category.name}</span>
                                   {category.isProExclusive && (
-                                    <span style={{ fontSize: 10, fontWeight: 800, color: '#ea580c', background: '#fff4ed', border: '1px solid #fed7aa', padding: '1px 6px', borderRadius: 10 }}>
+                                    <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--jv-accent-text)', background: '#fff4ed', border: '1px solid #fed7aa', padding: '1px 6px', borderRadius: 10 }}>
                                       PRO EXCLUSIVE
                                     </span>
                                   )}
                                 </div>
-                                <span style={{ fontSize: 11, fontWeight: 700, color: '#64748b' }}>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)' }}>
                                   {totalCatFeatures} Capabilities
                                 </span>
                               </div>
@@ -225,10 +225,10 @@ export function EntitlementsPage() {
                             const label = ENTITLEMENT_LABELS[key as EntitlementKey] || key;
 
                             return (
-                              <tr key={key} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                <td style={{ padding: '10px 20px', fontWeight: 600, color: '#1e293b' }}>
+                              <tr key={key} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
+                                <td style={{ padding: '10px 20px', fontWeight: 600, color: 'var(--jv-text)' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <span style={{ color: '#64748b', fontSize: 12 }}>•</span>
+                                    <span style={{ color: 'var(--jv-text-muted)', fontSize: 12 }}>•</span>
                                     <span>{label}</span>
                                   </div>
                                 </td>
@@ -267,11 +267,11 @@ export function EntitlementsPage() {
                 )}
 
                 {catalog && (
-                  <tbody style={{ borderBottom: '2px solid #e2e8f0' }}>
-                    <tr style={{ background: '#f8fafc' }}>
+                  <tbody style={{ borderBottom: '2px solid var(--jv-border)' }}>
+                    <tr style={{ background: 'var(--jv-surface-subtle)' }}>
                       <td
                         colSpan={filteredPlans.length + 1}
-                        style={{ padding: '12px 20px', fontWeight: 900, fontSize: 13, color: '#0B253A', borderTop: '1px solid var(--jv-border)', borderBottom: '1px solid var(--jv-border)' }}
+                        style={{ padding: '12px 20px', fontWeight: 900, fontSize: 13, color: 'var(--jv-text)', borderTop: '1px solid var(--jv-border)', borderBottom: '1px solid var(--jv-border)' }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span>🔌</span>
@@ -280,10 +280,10 @@ export function EntitlementsPage() {
                       </td>
                     </tr>
                     {(Object.keys(catalog) as AppCode[]).map((appCode) => (
-                      <tr key={appCode} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '10px 20px', fontWeight: 600, color: '#1e293b' }}>
+                      <tr key={appCode} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
+                        <td style={{ padding: '10px 20px', fontWeight: 600, color: 'var(--jv-text)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ color: '#64748b', fontSize: 12 }}>•</span>
+                            <span style={{ color: 'var(--jv-text-muted)', fontSize: 12 }}>•</span>
                             <span title={catalog[appCode].description}>{APP_CODE_LABELS[appCode] ?? appCode}</span>
                           </div>
                         </td>

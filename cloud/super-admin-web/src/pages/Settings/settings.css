@@ -29,7 +29,7 @@
   align-items: center;
   justify-content: center;
   background: var(--jv-accent-soft);
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
   flex-shrink: 0;
 }
 

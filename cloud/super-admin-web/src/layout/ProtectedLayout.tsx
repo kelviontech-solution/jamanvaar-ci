@@ -22,6 +22,8 @@ import {
   Package,
   Repeat,
   CreditCard,
+  Landmark,
+  Banknote,
   ShieldCheck,
   KeyRound,
   Laptop2,
@@ -137,8 +139,8 @@ const NAV_GROUPS: NavGroup[] = [
       { to: '/ai-assistant', label: 'JAMAN AI Engine', icon: Sparkles },
       { to: '/catalog', label: 'Master Menu Catalog', icon: Utensils },
       { to: '/activation-keys', label: 'Activation Keys', icon: KeyRound },
-      { to: '/payment-connections', label: 'Payment Gateways', icon: CreditCard },
-      { to: '/platform-payments', label: 'Platform Payments', icon: CreditCard },
+      { to: '/payment-connections', label: 'Payment Gateways', icon: Landmark },
+      { to: '/platform-payments', label: 'Platform Payments', icon: Banknote },
       { to: '/payouts', label: 'Restaurant Payouts', icon: Wallet },
       { to: '/applications', label: 'Applications & Releases', icon: Layers }
     ]
@@ -505,7 +507,7 @@ export function ProtectedLayout() {
               >
                 {pageMatches.length > 0 && (
                   <div>
-                    <div style={{ padding: '8px 16px 4px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
+                    <div style={{ padding: '8px 16px 4px', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
                       Pages
                     </div>
                     {pageMatches.map(({ item, group }) => (
@@ -541,7 +543,7 @@ export function ProtectedLayout() {
 
                     {searchResults.restaurants.length > 0 && (
                       <div>
-                        <div style={{ padding: '8px 16px 4px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
+                        <div style={{ padding: '8px 16px 4px', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
                           Restaurants
                         </div>
                         {searchResults.restaurants.map((r) => (
@@ -561,7 +563,7 @@ export function ProtectedLayout() {
 
                     {searchResults.owners.length > 0 && (
                       <div>
-                        <div style={{ padding: '8px 16px 4px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
+                        <div style={{ padding: '8px 16px 4px', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
                           Owners
                         </div>
                         {searchResults.owners.map((o) => (
@@ -581,7 +583,7 @@ export function ProtectedLayout() {
 
                     {searchResults.devices.length > 0 && (
                       <div>
-                        <div style={{ padding: '8px 16px 4px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
+                        <div style={{ padding: '8px 16px 4px', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
                           Devices
                         </div>
                         {searchResults.devices.map((d) => (
@@ -601,7 +603,7 @@ export function ProtectedLayout() {
 
                     {searchResults.activationKeys.length > 0 && (
                       <div>
-                        <div style={{ padding: '8px 16px 4px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
+                        <div style={{ padding: '8px 16px 4px', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-light)' }}>
                           Activation Keys
                         </div>
                         {searchResults.activationKeys.map((k) => (
@@ -692,7 +694,9 @@ export function ProtectedLayout() {
             </div>
           )}
           {canOpenPage ? (
-            <Outlet />
+            <div className="route-fade" key={location.pathname}>
+              <Outlet />
+            </div>
           ) : (
             <div className="no-access-panel" role="alert">
               <h2>You don't have access to this page</h2>

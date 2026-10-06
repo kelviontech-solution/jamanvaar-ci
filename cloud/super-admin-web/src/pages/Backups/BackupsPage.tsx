@@ -486,22 +486,22 @@ export function BackupsPage() {
             {previewLoading ? (
               <div className="page-loading">Reading the backup…</div>
             ) : restorePreviewJob ? (
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12, fontSize: 13 }}>
+              <div style={{ background: 'var(--jv-surface-subtle)', border: '1px solid var(--jv-border)', borderRadius: 8, padding: 12, fontSize: 13 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <span style={{ color: '#64748b' }}>Restaurant:</span>
+                  <span style={{ color: 'var(--jv-text-muted)' }}>Restaurant:</span>
                   <strong>{restoreModalTarget.restaurantName}</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <span style={{ color: '#64748b' }}>Backup taken:</span>
+                  <span style={{ color: 'var(--jv-text-muted)' }}>Backup taken:</span>
                   <span>{new Date(restoreModalTarget.createdAt).toLocaleString()}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ color: '#64748b' }}>Size (compressed):</span>
+                  <span style={{ color: 'var(--jv-text-muted)' }}>Size (compressed):</span>
                   <span>{formatBytes(restoreModalTarget.sizeBytes)}</span>
                 </div>
-                <div style={{ color: '#64748b', marginBottom: 4 }}>Contents</div>
+                <div style={{ color: 'var(--jv-text-muted)', marginBottom: 4 }}>Contents</div>
                 {Object.keys(restorePreviewJob.previewSummary?.counts ?? {}).length === 0 ? (
-                  <div style={{ color: '#94a3b8' }}>No record lists found in this backup.</div>
+                  <div style={{ color: 'var(--jv-text-light)' }}>No record lists found in this backup.</div>
                 ) : (
                   Object.entries(restorePreviewJob.previewSummary.counts as Record<string, number>).map(([name, count]) => (
                     <div key={name} style={{ display: 'flex', justifyContent: 'space-between' }}>

@@ -112,7 +112,7 @@ export function SandboxesPage() {
       <Card>
         <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Active Staging Sandboxes ({sandboxes.length})</h3>
         {sandboxes.length === 0 ? (
-          <div style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>
+          <div style={{ padding: 48, textAlign: 'center', color: 'var(--jv-text-light)' }}>
             <Boxes className="w-8 h-8 mx-auto mb-2 text-slate-400" />
             No staging sandboxes currently deployed. Click "Clone New Sandbox" to spawn an isolated demo or training environment.
           </div>
@@ -120,7 +120,7 @@ export function SandboxesPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left', color: '#64748b' }}>
+                <tr style={{ borderBottom: '2px solid var(--jv-border-subtle)', textAlign: 'left', color: 'var(--jv-text-muted)' }}>
                   <th style={{ padding: '12px 14px' }}>Sandbox Environment</th>
                   <th style={{ padding: '12px 14px' }}>Source Restaurant</th>
                   <th style={{ padding: '12px 14px' }}>Environment Key</th>
@@ -131,20 +131,20 @@ export function SandboxesPage() {
               </thead>
               <tbody>
                 {sandboxes.map((sbx) => (
-                  <tr key={sbx.id} style={{ borderBottom: '1px solid #f8fafc' }}>
+                  <tr key={sbx.id} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
                     <td style={{ padding: '14px' }}>
-                      <strong style={{ color: '#0f172a', fontSize: 14 }}>{sbx.name}</strong>
-                      <div style={{ color: '#64748b', fontSize: 11 }}>Isolated Sandbox</div>
+                      <strong style={{ color: 'var(--jv-text)', fontSize: 14 }}>{sbx.name}</strong>
+                      <div style={{ color: 'var(--jv-text-muted)', fontSize: 11 }}>Isolated Sandbox</div>
                     </td>
                     <td style={{ padding: '14px' }}>
                       {sbx.sourceRestaurant?.name || 'Production Tenant'}
                     </td>
                     <td style={{ padding: '14px' }}>
-                      <code style={{ background: '#f1f5f9', padding: '3px 8px', borderRadius: 4, fontWeight: 700 }}>
+                      <code style={{ background: 'var(--jv-bg-muted)', padding: '3px 8px', borderRadius: 4, fontWeight: 700 }}>
                         {sbx.environmentKey}
                       </code>
                     </td>
-                    <td style={{ padding: '14px', color: '#64748b' }}>
+                    <td style={{ padding: '14px', color: 'var(--jv-text-muted)' }}>
                       {new Date(sbx.expiresAt).toLocaleDateString()}
                     </td>
                     <td style={{ padding: '14px' }}>
@@ -184,7 +184,7 @@ export function SandboxesPage() {
                   const selected = restaurants.find((r) => r.id === e.target.value);
                   if (selected) setSandboxName(`${selected.name} Training Sandbox`);
                 }}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               >
                 {restaurants.map((r) => (
                   <option key={r.id} value={r.id}>{r.name} ({r.city || 'India'})</option>
@@ -200,7 +200,7 @@ export function SandboxesPage() {
                 type="text"
                 value={sandboxName}
                 onChange={(e) => setSandboxName(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               />
             </div>
 
@@ -211,7 +211,7 @@ export function SandboxesPage() {
               <select
                 value={durationDays}
                 onChange={(e) => setDurationDays(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               >
                 <option value="7">7 Days (Short Pilot)</option>
                 <option value="14">14 Days (Standard Staff Training)</option>

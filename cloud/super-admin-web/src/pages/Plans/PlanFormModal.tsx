@@ -279,7 +279,7 @@ export function PlanFormModal({
                   onClick={() => handleTierChange('PRO')}
                 >
                   <div className="tier-title">
-                    <span style={{ color: '#ea580c' }}>JAMANVAAR PRO</span>
+                    <span style={{ color: 'var(--jv-accent-text)' }}>JAMANVAAR PRO</span>
                     <span className="module-badge pro">₹7,000</span>
                   </div>
                   <div className="tier-desc">Flagship edition. Everything in Core + Captain app, QR table ordering, mesh sync &amp; AI.</div>
@@ -456,7 +456,7 @@ export function PlanFormModal({
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                       <span>{ENTITLEMENT_LABELS[key as keyof Entitlements] || key}</span>
                                       {isProExclusive && (
-                                        <span style={{ fontSize: 9, fontWeight: 800, color: '#ea580c', background: '#fff7ed', padding: '1px 5px', borderRadius: 4 }}>
+                                        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--jv-accent-text)', background: '#fff7ed', padding: '1px 5px', borderRadius: 4 }}>
                                           PRO
                                         </span>
                                       )}
@@ -479,7 +479,7 @@ export function PlanFormModal({
                                 </span>
                               ))}
                               {totalGranularCount > 16 && (
-                                <span className="feature-pill" style={{ background: '#fff4ed', color: '#ea580c', fontWeight: 700 }}>
+                                <span className="feature-pill" style={{ background: '#fff4ed', color: 'var(--jv-accent-text)', fontWeight: 700 }}>
                                   +{totalGranularCount - 16} more capabilities
                                 </span>
                               )}
@@ -626,28 +626,28 @@ export function PlanFormModal({
                   <div className="preview-ribbon">RECOMMENDED</div>
                 )}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #f1f5f9', paddingBottom: 16, marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 16, marginBottom: 16 }}>
                   <div>
-                    <span style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', color: form.tier === 'PRO' ? '#ea580c' : '#64748b' }}>
+                    <span style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', color: form.tier === 'PRO' ? 'var(--jv-accent-text)' : 'var(--jv-text-muted)' }}>
                       {form.tier === 'PRO' ? 'FLAGSHIP CONNECTED ECOSYSTEM' : 'FOUNDATION EDITION'}
                     </span>
-                    <h3 style={{ margin: '2px 0 0 0', fontSize: 22, fontWeight: 900, color: '#0B253A' }}>
+                    <h3 style={{ margin: '2px 0 0 0', fontSize: 22, fontWeight: 900, color: 'var(--jv-text)' }}>
                       {form.name || 'Untitled Plan'}
                     </h3>
-                    <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>
+                    <span style={{ fontSize: 11, color: 'var(--jv-text-muted)', fontWeight: 600 }}>
                       {form.tier === 'PRO' ? 'POS + Complete Management + Connected Floor' : 'POS + Complete Restaurant Management'}
                     </span>
                   </div>
 
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 28, fontWeight: 900, color: '#0B253A', fontFamily: 'monospace' }}>
+                    <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--jv-text)', fontFamily: 'monospace' }}>
                       ₹{Number(form.priceMonthly || 0).toLocaleString('en-IN')}
                     </div>
-                    <span style={{ fontSize: 10, color: '#94a3b8' }}>per license</span>
+                    <span style={{ fontSize: 11, color: 'var(--jv-text-light)' }}>per license</span>
                   </div>
                 </div>
 
-                <p style={{ fontSize: 12, color: '#475569', lineHeight: 1.4, background: '#f8fafc', padding: 12, borderRadius: 12, margin: '0 0 16px 0' }}>
+                <p style={{ fontSize: 12, color: 'var(--jv-text-secondary)', lineHeight: 1.4, background: 'var(--jv-surface-subtle)', padding: 12, borderRadius: 12, margin: '0 0 16px 0' }}>
                   {form.description || 'Commercial restaurant operating software licensing by KELVIONTECH.'}
                 </p>
 
@@ -664,7 +664,7 @@ export function PlanFormModal({
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-muted)' }}>
                     INCLUDED MODULES ({metrics.enabledModulesCount} Groups • {metrics.enabledFeaturesCount} Features):
                   </div>
 
@@ -673,11 +673,11 @@ export function PlanFormModal({
                     if (!hasAny) return null;
 
                     return (
-                      <div key={cat.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600, color: '#1e293b' }}>
+                      <div key={cat.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600, color: 'var(--jv-text)' }}>
                         <span style={{ color: '#16a34a', fontWeight: 900 }}>✓</span>
                         <span>{cat.name}</span>
                         {cat.isProExclusive && (
-                          <span style={{ fontSize: 9, fontWeight: 800, color: '#ea580c', background: '#fff7ed', padding: '1px 5px', borderRadius: 4 }}>
+                          <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--jv-accent-text)', background: '#fff7ed', padding: '1px 5px', borderRadius: 4 }}>
                             PRO
                           </span>
                         )}
@@ -696,7 +696,7 @@ export function PlanFormModal({
             <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-secondary)' }}>
               <span>{metrics.activeEntitlementsCount} / {metrics.totalEntitlementsCount} Entitlements Active</span>
               <span style={{ margin: '0 8px' }}>•</span>
-              <span style={{ color: '#ea580c' }}>{metrics.enabledFeaturesCount} Granular Features</span>
+              <span style={{ color: 'var(--jv-accent-text)' }}>{metrics.enabledFeaturesCount} Granular Features</span>
             </div>
 
             <div className="modal-actions">

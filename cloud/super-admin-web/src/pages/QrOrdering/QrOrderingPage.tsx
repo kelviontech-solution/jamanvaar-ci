@@ -49,7 +49,7 @@ function NoUsageCell({ note = NO_USAGE_LABEL }: { note?: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
       <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--jv-text-light)' }}>{EM_DASH}</span>
-      <span style={{ fontSize: 10.5, color: 'var(--jv-text-muted)' }}>{note}</span>
+      <span style={{ fontSize: 11, color: 'var(--jv-text-muted)' }}>{note}</span>
     </div>
   );
 }
@@ -588,7 +588,7 @@ export function QrOrderingPage() {
                           ) : (
                             <div>
                               <NoUsageCell />
-                              <span style={{ fontSize: 10.5, color: 'var(--jv-text-muted)' }}>
+                              <span style={{ fontSize: 11, color: 'var(--jv-text-muted)' }}>
                                 Quota {formatCount(quota)}
                               </span>
                             </div>
@@ -605,7 +605,7 @@ export function QrOrderingPage() {
                               <span className="mono" style={{ fontSize: 11.5, color: 'var(--jv-text-secondary)' }}>
                                 {formatRupees(r.revenueToday)}
                               </span>
-                              <span style={{ fontSize: 10.5, color: 'var(--jv-text-muted)' }}>
+                              <span style={{ fontSize: 11, color: 'var(--jv-text-muted)' }}>
                                 Reported {formatRelative(r.usageReportedAt)}
                               </span>
                             </div>

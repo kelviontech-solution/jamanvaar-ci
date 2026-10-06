@@ -1457,7 +1457,7 @@ export function OnboardRestaurantPage() {
                 </div>
                 <div className="credential-item">
                   <span className="credential-label">Temporary Password</span>
-                  <span className="credential-value" style={{ color: '#e66817' }}>
+                  <span className="credential-value" style={{ color: 'var(--jv-accent-text)' }}>
                     {owner.passwordMode === 'set_now' ? owner.initialPassword : 'Invitation token (generated on submit)'}
                   </span>
                 </div>
@@ -1626,7 +1626,7 @@ export function OnboardRestaurantPage() {
 
                 <div className="credential-item">
                   <span className="credential-label">Initial Password</span>
-                  <div className="credential-value" style={{ color: '#e66817' }}>
+                  <div className="credential-value" style={{ color: 'var(--jv-accent-text)' }}>
                     <span>{owner.passwordMode === 'set_now' ? owner.initialPassword : 'Set by owner (see invitation token below)'}</span>
                     {owner.passwordMode === 'set_now' && (
                       <button
@@ -1649,7 +1649,7 @@ export function OnboardRestaurantPage() {
                         ? `emailed to ${owner.ownerEmail} — also shown here as a backup`
                         : 'could not be emailed (SMTP not configured or delivery failed) — relay it to the owner yourself'}
                     </span>
-                    <div className="credential-value" style={{ color: '#e66817', fontFamily: 'monospace', fontSize: 11, wordBreak: 'break-all' }}>
+                    <div className="credential-value" style={{ color: 'var(--jv-accent-text)', fontFamily: 'monospace', fontSize: 11, wordBreak: 'break-all' }}>
                       <span>{ownerActivationToken ?? 'Unavailable — password activation step failed, see warning above'}</span>
                       {ownerActivationToken && (
                         <button
@@ -1698,7 +1698,7 @@ export function OnboardRestaurantPage() {
                       const allText = provisionedKeys.map((k) => `${k.deviceType}: ${k.code}`).join(' | ');
                       handleCopy(allText, 'All Activation Keys');
                     }}
-                    style={{ fontWeight: 700, color: '#ea580c' }}
+                    style={{ fontWeight: 700, color: 'var(--jv-accent-text)' }}
                   >
                     {isCopied('All Activation Keys') ? <Check className="w-3.5 h-3.5 mr-1.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5 mr-1.5" />}
                     {isCopied('All Activation Keys') ? 'Copied' : 'Copy All Keys'}
@@ -1725,7 +1725,7 @@ export function OnboardRestaurantPage() {
                 <div className="device-keys-grid">
                   {provisionedKeys.map((k) => (
                     <div key={k.id} className="device-key-card" style={{ border: '1.5px solid #fed7aa', boxShadow: '0 2px 8px rgba(234, 88, 12, 0.08)' }}>
-                      <div className="device-key-type-tag" style={{ background: '#ea580c', color: '#fff', fontWeight: 800 }}>
+                      <div className="device-key-type-tag" style={{ background: 'var(--jv-accent)', color: '#fff', fontWeight: 800 }}>
                         {k.deviceType === 'ANY' || k.deviceType === 'POS_ADMIN'
                           ? 'RESTAURANT ADMIN CONSOLE'
                           : k.deviceType === 'KIOSK_ADMIN'
@@ -1742,7 +1742,7 @@ export function OnboardRestaurantPage() {
                       </div>
                       <Button
                         variant="ghost"
-                        style={{ fontSize: 11, padding: '4px 10px', color: '#ea580c', fontWeight: 700 }}
+                        style={{ fontSize: 11, padding: '4px 10px', color: 'var(--jv-accent-text)', fontWeight: 700 }}
                         onClick={() => handleCopy(k.code, `${k.deviceType} Key`)}
                       >
                         {isCopied(`${k.deviceType} Key`) ? <Check className="w-3 h-3 mr-1" style={{ color: '#047857' }} /> : <Copy className="w-3 h-3 mr-1" />}

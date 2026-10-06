@@ -189,10 +189,10 @@ export function OwnersListPage() {
       {/* Page Header */}
       <div className="page-header" style={{ marginBottom: 20 }}>
         <div>
-          <h1 className="page-title" style={{ fontSize: 24, fontWeight: 800, color: '#0B253A', letterSpacing: '-0.02em' }}>
+          <h1 className="page-title" style={{ fontSize: 24, fontWeight: 800, color: 'var(--jv-text)', letterSpacing: '-0.02em' }}>
             Restaurant Owners
           </h1>
-          <p className="page-subtitle" style={{ fontSize: 13.5, color: '#64748B', marginTop: 4 }}>
+          <p className="page-subtitle" style={{ fontSize: 13.5, color: 'var(--jv-text-muted)', marginTop: 4 }}>
             Master tenant users with the OWNER role — strictly isolated from platform Super Admin privileges.
           </p>
         </div>
@@ -283,7 +283,7 @@ export function OwnersListPage() {
           <button
             type="button"
             className="btn btn-ghost btn-sm"
-            style={{ fontSize: 12, color: 'var(--jv-accent)', fontWeight: 600 }}
+            style={{ fontSize: 12, color: 'var(--jv-accent-text)', fontWeight: 600 }}
             onClick={() => { setSearch(''); setStatusFilter('ALL'); }}
           >
             Clear filters

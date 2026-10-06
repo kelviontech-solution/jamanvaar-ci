@@ -1,9 +1,9 @@
 /* Shared page/modal/table primitives reused across every SaaS management page. */
 
 .page-error {
-  background: #fef2f2;
-  color: var(--jv-error);
-  border-radius: 8px;
+  background: var(--jv-error-soft);
+  color: var(--jv-error-text);
+  border-radius: var(--jv-radius-md);
   padding: 12px 14px;
   font-size: 13.5px;
   margin-bottom: 16px;
@@ -34,7 +34,7 @@
 .toolbar select:focus {
   outline: none;
   border-color: var(--jv-accent);
-  box-shadow: 0 0 0 3px rgba(230, 104, 23, 0.15);
+  box-shadow: 0 0 0 3px var(--jv-accent-ring);
 }
 .toolbar .spacer {
   flex: 1;
@@ -53,11 +53,11 @@
 }
 .data-table th {
   text-align: left;
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: var(--jv-text-secondary);
-  font-weight: 700;
+  font-weight: 600;
   padding: 14px 20px;
   background: var(--jv-bg);
   border-bottom: 1px solid var(--jv-border);
@@ -83,7 +83,7 @@
   transition: color 0.15s ease;
 }
 .table-link:hover {
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
   text-decoration: underline;
 }
 .row-actions {
@@ -182,6 +182,12 @@
   white-space: nowrap;
   flex-shrink: 0;
 }
+.tab-btn {
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.tab-btn:hover {
+  color: var(--jv-text);
+}
 .tab-btn.active {
   color: var(--jv-primary);
   border-bottom-color: var(--jv-accent);
@@ -232,6 +238,17 @@
   line-height: 1;
   cursor: pointer;
   color: var(--jv-text-muted);
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--jv-radius-md);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.modal-close:hover {
+  background: var(--jv-bg-muted);
+  color: var(--jv-text);
 }
 .modal-form {
   padding: 20px 24px 24px;
@@ -318,7 +335,7 @@
   color: var(--jv-text-muted);
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 10.5px;
+  font-size: 11px;
   letter-spacing: 0.03em;
 }
 .check-yes {
@@ -376,7 +393,7 @@
 }
 .user-avatar-owner {
   background: #fff4eb;
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
 }
 .user-card-name {
   font-weight: 700;
@@ -419,20 +436,18 @@
   background: var(--jv-surface);
   border: 1px solid var(--jv-border);
   border-radius: var(--jv-radius-lg);
-  box-shadow: var(--jv-shadow-sm);
+  box-shadow: var(--jv-shadow-xs);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 12px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.2s ease;
   position: relative;
   overflow: hidden;
 }
 
 .stat-tile:hover {
   border-color: var(--jv-border-hover);
-  box-shadow: var(--jv-shadow-card-hover);
-  transform: translateY(-1.5px);
 }
 
 .stat-tile-top {
@@ -460,17 +475,16 @@
 
 .stat-value {
   font-size: 26px;
-  font-weight: 800;
-  color: var(--jv-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--jv-text);
   letter-spacing: -0.02em;
   line-height: 1.15;
 }
 
 .stat-label {
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--jv-text-secondary);
   line-height: 1.35;
 }
@@ -495,11 +509,9 @@
 
 .form-field label,
 .modal-form label {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 12.5px;
+  font-weight: 600;
   color: var(--jv-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
   display: block;
 }
 
@@ -546,8 +558,8 @@
 .modal-form textarea:focus {
   outline: none;
   border-color: var(--jv-accent);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(230, 104, 23, 0.15);
+  background: var(--jv-surface-card);
+  box-shadow: 0 0 0 3px var(--jv-accent-ring);
 }
 
 .form-field textarea,
@@ -584,7 +596,7 @@
   padding: 12px 16px;
   border-radius: 10px;
   background: var(--jv-primary);
-  color: #fff;
+  color: var(--jv-on-primary);
   font-size: 13px;
   font-weight: 600;
   line-height: 1.4;
@@ -606,7 +618,7 @@
   gap: 10px;
   padding: 10px 14px;
   margin-bottom: 16px;
-  border-radius: 8px;
+  border-radius: var(--jv-radius-md);
   border: 1px solid var(--jv-border);
   background: var(--jv-surface-subtle);
   color: var(--jv-text);
@@ -617,12 +629,12 @@
 .error-banner {
   background: var(--jv-error-soft);
   border-color: rgba(220, 38, 38, 0.3);
-  color: var(--jv-error);
+  color: var(--jv-error-text);
 }
 .page-success {
   background: var(--jv-success-soft);
   border-color: rgba(22, 163, 74, 0.3);
-  color: var(--jv-success);
+  color: var(--jv-success-text);
 }
 
 /* The shared Modal renders a .modal-body; without padding its content touched the dialog edges. */
@@ -668,8 +680,8 @@
 .label {
   display: block;
   margin-bottom: 4px;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 12.5px;
+  font-weight: 600;
   color: var(--jv-text-secondary);
 }
 .input-select,
@@ -677,7 +689,7 @@
   width: 100%;
   padding: 9px 12px;
   border: 1px solid var(--jv-border);
-  border-radius: 8px;
+  border-radius: var(--jv-radius-md);
   background: var(--jv-surface);
   color: var(--jv-text);
   font: inherit;
@@ -689,7 +701,7 @@
 .input-textarea:focus {
   outline: none;
   border-color: var(--jv-accent);
-  box-shadow: 0 0 0 3px var(--jv-accent-soft);
+  box-shadow: 0 0 0 3px var(--jv-accent-ring);
 }
 .btn-xs {
   padding: 2px 8px;
@@ -737,8 +749,8 @@
   border-radius: 999px;
   background: var(--jv-accent-soft);
   border: 1px solid var(--jv-accent-border);
-  color: var(--jv-accent);
-  font-size: 10.5px;
+  color: var(--jv-accent-text);
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.06em;
 }
@@ -806,4 +818,38 @@
   align-items: center;
   gap: 10px;
   cursor: pointer;
+}
+
+
+/* Segmented view toggle (cards / table). One definition: the Restaurants and Catalog pages each used to define their own
+   `.view-toggle-btn`, so the control looked different depending on which page had been opened first. */
+.view-toggle-group,
+.view-toggle-wrap {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--jv-bg-muted);
+  border: 1px solid var(--jv-border);
+  border-radius: var(--jv-radius-md);
+}
+.view-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: none;
+  border-radius: var(--jv-radius-sm);
+  background: transparent;
+  color: var(--jv-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.view-toggle-btn:hover {
+  color: var(--jv-text);
+}
+.view-toggle-btn.active {
+  background: var(--jv-accent-soft);
+  color: var(--jv-accent-text);
 }

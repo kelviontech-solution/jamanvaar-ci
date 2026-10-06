@@ -128,7 +128,7 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
             style={{
               padding: '16px',
               borderRadius: 8,
-              background: inviteResult.emailSent ? '#ecfdf5' : '#fffbeb',
+              background: inviteResult.emailSent ? '#ecfdf5' : 'var(--jv-warning-soft)',
               border: `1px solid ${inviteResult.emailSent ? '#a7f3d0' : '#fde68a'}`,
               display: 'flex',
               flexDirection: 'column',
@@ -149,7 +149,7 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
 
           {inviteResult.activationUrl && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>Activation Link</label>
+              <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-secondary)' }}>Activation Link</label>
               <div style={{ display: 'flex', gap: 8 }}>
                 <input
                   type="text"
@@ -160,8 +160,8 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
                     padding: '8px 12px',
                     fontSize: 12,
                     fontFamily: 'monospace',
-                    background: '#f8fafc',
-                    border: '1px solid #cbd5e1',
+                    background: 'var(--jv-surface-subtle)',
+                    border: '1px solid var(--jv-border-hover)',
                     borderRadius: 6
                   }}
                 />
@@ -196,7 +196,7 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>Full Name *</label>
+            <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-secondary)' }}>Full Name *</label>
             <Input
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -206,7 +206,7 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>Email Address *</label>
+            <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-secondary)' }}>Email Address *</label>
             <Input
               type="email"
               value={email}
@@ -217,7 +217,7 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>Assign Platform Role *</label>
+            <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-secondary)' }}>Assign Platform Role *</label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {ROLE_OPTIONS.map((opt) => (
                 <label
@@ -228,8 +228,8 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
                     gap: 12,
                     padding: '10px 12px',
                     borderRadius: 8,
-                    border: `1.5px solid ${role === opt.role ? '#0B253A' : '#e2e8f0'}`,
-                    background: role === opt.role ? '#f8fafc' : '#fff',
+                    border: `1.5px solid ${role === opt.role ? '#0B253A' : 'var(--jv-border)'}`,
+                    background: role === opt.role ? 'var(--jv-surface-subtle)' : 'var(--jv-surface-card)',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease'
                   }}
@@ -243,8 +243,8 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
                     style={{ marginTop: 3 }}
                   />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 13, color: '#0f172a' }}>{opt.label}</div>
-                    <div style={{ fontSize: 12, color: '#64748b' }}>{opt.desc}</div>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--jv-text)' }}>{opt.label}</div>
+                    <div style={{ fontSize: 12, color: 'var(--jv-text-muted)' }}>{opt.desc}</div>
                   </div>
                 </label>
               ))}

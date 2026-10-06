@@ -568,7 +568,7 @@ export function BillingPage() {
           <Filter className="w-3.5 h-3.5" />
           <span>Filters</span>
           {statusFilter !== 'ALL' && (
-            <span className="badge badge-accent" style={{ fontSize: 10, padding: '1px 6px' }}>1</span>
+            <span className="badge badge-accent" style={{ fontSize: 11, padding: '1px 6px' }}>1</span>
           )}
         </button>
 
@@ -763,7 +763,7 @@ export function BillingPage() {
                           {new Date(inv.dueDate).toLocaleDateString('en-IN')}
                         </div>
                         {inv.status === 'ISSUED' && new Date(inv.dueDate) < new Date() && (
-                          <div style={{ fontSize: 10, color: '#dc2626', fontWeight: 600 }}>OVERDUE</div>
+                          <div style={{ fontSize: 11, color: '#dc2626', fontWeight: 600 }}>OVERDUE</div>
                         )}
                       </td>
                       <td>

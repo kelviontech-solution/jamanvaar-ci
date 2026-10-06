@@ -7,11 +7,12 @@ import { AlertCircle, CheckCircle2, ShieldCheck } from 'lucide-react';
 // Direct component imports avoid pulling @jamanvaar/ui barrel which pulls local sync singletons
 import { JAMANVAARStartup } from '../../../../../packages/ui/src/JAMANVAARStartup';
 import { JamanvaarAuthLayout } from '../../../../../packages/ui/src/JamanvaarAuthLayout';
+import { getStoredTheme, isEffectivelyDark } from '../../theme';
 import './login.css';
 
 const RESEND_COOLDOWN_SECONDS = 45;
 const inputClass =
-  'w-full bg-[#FAF7F2] border border-[#EBE6DD] focus:border-[#E66817] focus:bg-white rounded-2xl px-4 py-3 text-sm text-[#0B253A] font-semibold focus:outline-hidden transition-colors';
+  'w-full bg-[var(--jv-bg)] border border-[var(--jv-border)] focus:border-[var(--jv-accent)] focus:bg-[var(--jv-surface-card)] rounded-2xl px-4 py-3 text-sm text-[var(--jv-text)] font-semibold focus:outline-hidden transition-colors';
 
 export function LoginPage() {
   const { user, requestLogin, verifyOtp, resendOtp } = useAuth();
@@ -123,6 +124,7 @@ export function LoginPage() {
       subtitle="JAMANVAAR Cloud Platform Control"
     >
       <JamanvaarAuthLayout
+        theme={isEffectivelyDark(getStoredTheme()) ? 'dark' : 'light'}
         appIdentity="SUPER_ADMIN"
         appTitle="JAMANVAAR"
         appSubtitle="Enterprise Platform Control & SaaS Management"
@@ -135,7 +137,7 @@ export function LoginPage() {
         capabilities={[
           { label: 'Tenant Fleet Control', icon: 'zap' },
           { label: 'License Provisioning', icon: 'cloud' },
-          { label: 'Enterprise Analytics', icon: 'printer' },
+          { label: 'Enterprise Analytics', icon: 'chart' },
           { label: 'Role-Based Security', icon: 'table' }
         ]}
         footerNote="Enterprise Grade Security • 99.99% Uptime SLA • Automated Backups"
@@ -144,7 +146,7 @@ export function LoginPage() {
         {step === 'CREDENTIALS' ? (
           <form onSubmit={handleCredentialsSubmit} className="space-y-3.5 pt-2 text-left">
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
+              <label className="text-xs font-bold text-[var(--jv-text-secondary)] block mb-1.5 text-left">
                 Super Admin Email *
               </label>
               <input
@@ -164,11 +166,11 @@ export function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-bold text-slate-700">Password *</label>
+                <label className="text-xs font-bold text-[var(--jv-text-secondary)]">Password *</label>
                 <button
                   type="button"
                   onClick={() => setShowPassword((p) => !p)}
-                  className="text-[11px] text-[#E66817] hover:underline font-bold cursor-pointer"
+                  className="text-[11px] text-[var(--jv-accent-text)] hover:underline font-bold cursor-pointer"
                 >
                   {showPassword ? 'Hide Password' : 'Show Password'}
                 </button>
@@ -190,29 +192,29 @@ export function LoginPage() {
             </div>
 
             {error && (
-              <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2.5 rounded-xl text-center flex items-center justify-center gap-2" role="alert">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <div className="text-xs font-bold text-[var(--jv-error-text)] bg-[var(--jv-error-soft)] border border-[rgba(220,38,38,0.3)] px-3.5 py-2.5 rounded-xl text-center flex items-center justify-center gap-2" role="alert">
+                <AlertCircle className="w-4 h-4 text-[var(--jv-error-text)] shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
-            <div className="flex items-center justify-between text-xs text-slate-500 pt-0.5">
+            <div className="flex items-center justify-between text-xs text-[var(--jv-text-muted)] pt-0.5">
               <label className="flex items-center gap-2 cursor-pointer select-none font-medium">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="rounded accent-[#E66817]"
+                  className="rounded accent-[var(--jv-accent)]"
                 />
                 <span>Remember session</span>
               </label>
-              <span className="text-slate-400 text-[11px] font-mono">Port 4000 • Live Cloud API</span>
+              <span className="text-[var(--jv-text-light)] text-[11px] font-mono">Port 4000 • Live Cloud API</span>
             </div>
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-3.5 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] disabled:opacity-50 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2 flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-2xl bg-[var(--jv-accent)] hover:bg-[var(--jv-accent-hover)] disabled:opacity-50 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2 flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -231,20 +233,20 @@ export function LoginPage() {
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
                 <span>VERIFY IT'S YOU</span>
               </div>
-              <p className="text-xs text-slate-500 max-w-xs mx-auto pt-1">
-                We emailed a 6-digit code to <span className="font-bold text-[#0B253A]">{maskedEmail}</span>. Enter it below to sign in to Platform Control.
+              <p className="text-xs text-[var(--jv-text-muted)] max-w-xs mx-auto pt-1">
+                We emailed a 6-digit code to <span className="font-bold text-[var(--jv-text)]">{maskedEmail}</span>. Enter it below to sign in to Platform Control.
               </p>
             </div>
 
             {justResent && (
-              <div className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3.5 py-2 rounded-xl flex items-start gap-1.5" role="status">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-px" />
+              <div className="text-xs font-semibold text-[var(--jv-success-text)] bg-[var(--jv-success-soft)] border border-emerald-200 px-3.5 py-2 rounded-xl flex items-start gap-1.5" role="status">
+                <CheckCircle2 className="w-4 h-4 text-[var(--jv-success-text)] shrink-0 mt-px" />
                 <span>A new code is on its way.</span>
               </div>
             )}
 
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">6-digit code *</label>
+              <label className="text-xs font-bold text-[var(--jv-text-secondary)] block mb-1.5 text-left">6-digit code *</label>
               <input
                 ref={otpInputRef}
                 type="text"
@@ -262,8 +264,8 @@ export function LoginPage() {
             </div>
 
             {error && (
-              <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2.5 rounded-xl text-center flex items-center justify-center gap-2" role="alert">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <div className="text-xs font-bold text-[var(--jv-error-text)] bg-[var(--jv-error-soft)] border border-[rgba(220,38,38,0.3)] px-3.5 py-2.5 rounded-xl text-center flex items-center justify-center gap-2" role="alert">
+                <AlertCircle className="w-4 h-4 text-[var(--jv-error-text)] shrink-0" />
                 <span>{error}</span>
               </div>
             )}
@@ -271,7 +273,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={submitting || otp.length !== 6}
-              className="w-full py-3.5 rounded-2xl bg-[#E66817] hover:bg-[#EA580C] disabled:opacity-50 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2 flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-2xl bg-[var(--jv-accent)] hover:bg-[var(--jv-accent-hover)] disabled:opacity-50 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2 flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -287,7 +289,7 @@ export function LoginPage() {
               type="button"
               disabled={resendCooldown > 0}
               onClick={handleResend}
-              className="w-full py-2 text-center text-xs font-bold text-[#E66817] hover:underline disabled:opacity-40 disabled:no-underline cursor-pointer disabled:cursor-not-allowed"
+              className="w-full py-2 text-center text-xs font-bold text-[var(--jv-accent-text)] hover:underline disabled:opacity-40 disabled:no-underline cursor-pointer disabled:cursor-not-allowed"
             >
               {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code'}
             </button>
@@ -295,7 +297,7 @@ export function LoginPage() {
             <button
               type="button"
               onClick={backToCredentials}
-              className="w-full py-2.5 text-center text-xs font-bold text-slate-500 hover:text-[#0B253A] transition-colors cursor-pointer"
+              className="w-full py-2.5 text-center text-xs font-bold text-[var(--jv-text-muted)] hover:text-[var(--jv-text)] transition-colors cursor-pointer"
             >
               ← Back to Sign In
             </button>

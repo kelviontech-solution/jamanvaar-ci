@@ -292,7 +292,7 @@ export function ActivationKeysListPage() {
               value={deviceType}
               onChange={(e) => setDeviceType(e.target.value)}
               aria-label="Terminal type"
-              style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: '#fff' }}
+              style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: 'var(--jv-surface-card)' }}
             >
               <option value="ALL">All terminal types</option>
               <option value="POS">POS Terminal</option>
@@ -431,7 +431,7 @@ export function ActivationKeysListPage() {
                     <tr key={k.id}>
                       <td><input type="checkbox" aria-label={`Select key ${codeText(k)}`} checked={selectedIds.has(k.id)} onChange={() => toggleSelected(k.id)} /></td>
                       <td>
-                        <span className="mono" style={{ fontWeight: 800, color: k.code ? '#0B253A' : '#94a3b8', fontSize: 14, letterSpacing: '0.02em' }}>{codeText(k)}</span>
+                        <span className="mono" style={{ fontWeight: 800, color: k.code ? 'var(--jv-text)' : 'var(--jv-text-light)', fontSize: 14, letterSpacing: '0.02em' }}>{codeText(k)}</span>
                         {k.label && <div className="muted" style={{ fontSize: 12 }}>{k.label}</div>}
                       </td>
                       <td>

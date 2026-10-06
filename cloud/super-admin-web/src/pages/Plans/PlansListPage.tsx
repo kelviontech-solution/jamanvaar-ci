@@ -223,13 +223,13 @@ export function PlansListPage() {
                             {p.description || `${p.tier} edition`}
                           </div>
                         </td>
-                        <td style={{ fontWeight: 800, fontFamily: 'monospace', color: '#0B253A' }}>
+                        <td style={{ fontWeight: 800, fontFamily: 'monospace', color: 'var(--jv-text)' }}>
                           ₹{(p.priceMonthly / 100).toLocaleString('en-IN')}
                         </td>
                         <td style={{ fontFamily: 'monospace' }}>
                           {p.priceYearly ? `₹${(p.priceYearly / 100).toLocaleString('en-IN')}` : '—'}
                         </td>
-                        <td style={{ fontSize: 12, color: '#475569' }}>
+                        <td style={{ fontSize: 12, color: 'var(--jv-text-secondary)' }}>
                           <div>{p.maxBranches} Br • {p.maxDevices} Dev</div>
                           <div className="muted">{p.maxUsers} Users</div>
                         </td>
@@ -238,7 +238,7 @@ export function PlansListPage() {
                             style={{
                               fontSize: 11,
                               fontWeight: 700,
-                              color: isPro ? '#ea580c' : '#166534',
+                              color: isPro ? 'var(--jv-accent-text)' : '#166534',
                               background: isPro ? '#fff4ed' : '#f0fdf4',
                               border: `1px solid ${isPro ? '#fed7aa' : '#bbf7d0'}`,
                               padding: '2px 8px',

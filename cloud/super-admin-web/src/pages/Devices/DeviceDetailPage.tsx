@@ -137,7 +137,7 @@ export function DeviceDetailPage() {
       {toast && <div className="floating-toast">{toast}</div>}
 
       <div style={{ marginBottom: 16 }}>
-        <Link to="/devices" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#64748b', fontSize: 13, textDecoration: 'none', fontWeight: 600 }}>
+        <Link to="/devices" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--jv-text-muted)', fontSize: 13, textDecoration: 'none', fontWeight: 600 }}>
           <ArrowLeft className="w-4 h-4" /> Back to Registered Devices
         </Link>
       </div>
@@ -146,7 +146,7 @@ export function DeviceDetailPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: '#0f172a' }}>
+            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: 'var(--jv-text)' }}>
               {device.name || `${device.type} Terminal`}
             </h1>
             <Badge tone={device.status === 'ACTIVE' ? 'success' : 'error'}>{device.status}</Badge>
@@ -155,8 +155,8 @@ export function DeviceDetailPage() {
               {isOnline ? <><Wifi className="w-3 h-3 inline mr-1" /> ONLINE</> : <><WifiOff className="w-3 h-3 inline mr-1" /> OFFLINE</>}
             </Badge>
           </div>
-          <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>
-            Terminal ID: <code style={{ color: '#0f172a', fontWeight: 700 }}>{device.id}</code> • Organization: <strong>{device.restaurant?.name}</strong> • Branch: <strong>{device.branch?.name || 'Main Branch'}</strong>
+          <p style={{ margin: 0, color: 'var(--jv-text-muted)', fontSize: 13 }}>
+            Terminal ID: <code style={{ color: 'var(--jv-text)', fontWeight: 700 }}>{device.id}</code> • Organization: <strong>{device.restaurant?.name}</strong> • Branch: <strong>{device.branch?.name || 'Main Branch'}</strong>
           </p>
         </div>
 
@@ -185,7 +185,7 @@ export function DeviceDetailPage() {
 
       {/* Lock Notice Banner */}
       {device.isLocked && (
-        <div style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 12, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ background: 'var(--jv-warning-soft)', border: '1.5px solid #fde68a', borderRadius: 12, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
           <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
           <div style={{ flex: 1 }}>
             <strong style={{ color: '#92400e', fontSize: 14 }}>Device Locked via Super Admin MDM</strong>
@@ -201,24 +201,24 @@ export function DeviceDetailPage() {
         <Card className="card-pad">
           <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Hardware & Operational Identity</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-              <span style={{ color: '#64748b' }}>Role / Type</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
+              <span style={{ color: 'var(--jv-text-muted)' }}>Role / Type</span>
               <strong>{device.type}</strong>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-              <span style={{ color: '#64748b' }}>App Version</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
+              <span style={{ color: 'var(--jv-text-muted)' }}>App Version</span>
               <strong style={{ color: '#0369a1' }}>{device.appVersion || 'v1.0.0 (Stable)'}</strong>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-              <span style={{ color: '#64748b' }}>IP Address</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
+              <span style={{ color: 'var(--jv-text-muted)' }}>IP Address</span>
               <span>{device.ipAddress || '192.168.1.104 (LAN)'}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-              <span style={{ color: '#64748b' }}>Registered On</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
+              <span style={{ color: 'var(--jv-text-muted)' }}>Registered On</span>
               <span>{new Date(device.createdAt).toLocaleDateString()}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#64748b' }}>Activated At</span>
+              <span style={{ color: 'var(--jv-text-muted)' }}>Activated At</span>
               <span>{device.activatedAt ? new Date(device.activatedAt).toLocaleString() : 'Pending Activation'}</span>
             </div>
           </div>
@@ -227,26 +227,26 @@ export function DeviceDetailPage() {
         <Card className="card-pad">
           <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Connectivity & Sync Telemetry</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-              <span style={{ color: '#64748b' }}>Last Heartbeat</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
+              <span style={{ color: 'var(--jv-text-muted)' }}>Last Heartbeat</span>
               <strong>{device.lastSeenAt ? new Date(device.lastSeenAt).toLocaleTimeString() : 'Never'}</strong>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-              <span style={{ color: '#64748b' }}>Last Successful Sync</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
+              <span style={{ color: 'var(--jv-text-muted)' }}>Last Successful Sync</span>
               <span>{device.lastSyncAt ? new Date(device.lastSyncAt).toLocaleString() : 'Up to date'}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-              <span style={{ color: '#64748b' }}>Pending Sync Queue</span>
-              <span style={{ color: device.pendingSyncCount ? '#ea580c' : '#16a34a', fontWeight: 700 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
+              <span style={{ color: 'var(--jv-text-muted)' }}>Pending Sync Queue</span>
+              <span style={{ color: device.pendingSyncCount ? 'var(--jv-accent-text)' : '#16a34a', fontWeight: 700 }}>
                 {device.pendingSyncCount || 0} items
               </span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-              <span style={{ color: '#64748b' }}>Last Backup Created</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
+              <span style={{ color: 'var(--jv-text-muted)' }}>Last Backup Created</span>
               <span>{device.lastBackupAt ? new Date(device.lastBackupAt).toLocaleDateString() : 'None reported'}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#64748b' }}>Reported Sync Status</span>
+              <span style={{ color: 'var(--jv-text-muted)' }}>Reported Sync Status</span>
               <Badge tone={device.syncStatus?.includes('error') ? 'error' : 'success'}>
                 {device.syncStatus || 'nominal'}
               </Badge>
@@ -259,14 +259,14 @@ export function DeviceDetailPage() {
       <Card className="card-pad">
         <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Remote Command History ({commands.length})</h3>
         {commands.length === 0 ? (
-          <div style={{ padding: 32, textAlign: 'center', color: '#94a3b8' }}>
+          <div style={{ padding: 32, textAlign: 'center', color: 'var(--jv-text-light)' }}>
             No remote commands have been dispatched to this terminal yet.
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left', color: '#64748b' }}>
+                <tr style={{ borderBottom: '2px solid var(--jv-border-subtle)', textAlign: 'left', color: 'var(--jv-text-muted)' }}>
                   <th style={{ padding: '10px 14px' }}>Command</th>
                   <th style={{ padding: '10px 14px' }}>Status</th>
                   <th style={{ padding: '10px 14px' }}>Dispatched At</th>
@@ -276,8 +276,8 @@ export function DeviceDetailPage() {
               </thead>
               <tbody>
                 {commands.map((cmd) => (
-                  <tr key={cmd.id} style={{ borderBottom: '1px solid #f8fafc' }}>
-                    <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0f172a' }}>
+                  <tr key={cmd.id} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
+                    <td style={{ padding: '12px 14px', fontWeight: 700, color: 'var(--jv-text)' }}>
                       <code>{cmd.commandType}</code>
                     </td>
                     <td style={{ padding: '12px 14px' }}>
@@ -295,13 +295,13 @@ export function DeviceDetailPage() {
                         {cmd.status}
                       </Badge>
                     </td>
-                    <td style={{ padding: '12px 14px', color: '#64748b' }}>
+                    <td style={{ padding: '12px 14px', color: 'var(--jv-text-muted)' }}>
                       {new Date(cmd.issuedAt).toLocaleString()}
                     </td>
-                    <td style={{ padding: '12px 14px', color: '#64748b' }}>
+                    <td style={{ padding: '12px 14px', color: 'var(--jv-text-muted)' }}>
                       {cmd.executedAt ? new Date(cmd.executedAt).toLocaleTimeString() : '—'}
                     </td>
-                    <td style={{ padding: '12px 14px', color: '#64748b' }}>
+                    <td style={{ padding: '12px 14px', color: 'var(--jv-text-muted)' }}>
                       {cmd.errorMessage ? (
                         <span style={{ color: '#dc2626' }}>{cmd.errorMessage}</span>
                       ) : cmd.payload?.reason ? (
@@ -323,13 +323,13 @@ export function DeviceDetailPage() {
         <Modal title="Dispatch Remote Command" onClose={() => setCommandModalOpen(false)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: '#0f172a' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: 'var(--jv-text)' }}>
                 Command Action
               </label>
               <select
                 value={selectedCommand}
                 onChange={(e) => setSelectedCommand(e.target.value as DeviceCommandType)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               >
                 <option value="REQUEST_SYNC">Request Full Sync</option>
                 <option value="LOCK">Lock Terminal (MDM Lock)</option>
@@ -342,7 +342,7 @@ export function DeviceDetailPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: '#0f172a' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: 'var(--jv-text)' }}>
                 Operational Reason / Note
               </label>
               <input
@@ -350,7 +350,7 @@ export function DeviceDetailPage() {
                 placeholder="e.g. Scheduled cache flush, or suspicious session detected"
                 value={commandReason}
                 onChange={(e) => setCommandReason(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               />
             </div>
 
@@ -381,7 +381,7 @@ export function DeviceDetailPage() {
                 value={wipeConfirmation}
                 onChange={(e) => setWipeConfirmation(e.target.value)}
                 placeholder="WIPE DEVICE DATA"
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               />
             </div>
 

@@ -133,14 +133,8 @@ export function DashboardPage() {
                 <div className="mrr-hero-header">
                   <div className="mrr-tag-group">
                     <span className="mrr-pill-badge">MONTHLY RECURRING REVENUE</span>
-                    <Badge tone="success" pulse>
-                      ACTIVE BILLING
-                    </Badge>
+                    <Badge tone="success">ACTIVE BILLING</Badge>
                   </div>
-                  <Link to="/billing" className="mrr-link-action" title="Open Billing Management">
-                    <span>Billing Hub</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </Link>
                 </div>
 
                 <div className="mrr-hero-body">
@@ -220,7 +214,7 @@ export function DashboardPage() {
             {/* Invoices & Receivables Banner */}
             <div className="invoices-receivables-bar">
               <div className="invoices-rec-left">
-                <div style={{ width: 40, height: 40, borderRadius: 8, background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="invoices-rec-icon">
                   <IndianRupee className="w-5 h-5" />
                 </div>
                 <div className="invoices-rec-info">
@@ -262,7 +256,7 @@ export function DashboardPage() {
                 <div className="telemetry-tile-body">
                   <div className="telemetry-tile-metric">
                     {summary.operations?.platformHealth?.apiStatus === 'UP' ? '100%' : '—'}
-                    <span style={{ fontSize: 12, color: summary.operations?.platformHealth?.apiStatus === 'UP' ? '#047857' : '#B91C1C', fontWeight: 600 }}>
+                    <span className={`telemetry-unit ${summary.operations?.platformHealth?.apiStatus === 'UP' ? 'telemetry-unit-ok' : 'telemetry-unit-bad'}`}>
                       {summary.operations?.platformHealth?.apiStatus === 'UP' ? 'Healthy' : 'Degraded'}
                     </span>
                   </div>
@@ -283,7 +277,7 @@ export function DashboardPage() {
                 <div className="telemetry-tile-body">
                   <div className="telemetry-tile-metric">
                     {summary.operations?.platformHealth?.databaseLatencyMs ?? 1}ms
-                    <span style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>Latency</span>
+                    <span className="telemetry-unit">Latency</span>
                   </div>
                   <span className="telemetry-tile-sub">
                     {summary.operations?.platformHealth?.activeConnections ?? 1} active pool connection(s)
@@ -302,7 +296,7 @@ export function DashboardPage() {
                 <div className="telemetry-tile-body">
                   <div className="telemetry-tile-metric">
                     {summary.operations?.syncHealth?.events24h ?? 0}
-                    <span style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>Events (24h)</span>
+                    <span className="telemetry-unit">Events (24h)</span>
                   </div>
                   <span className="telemetry-tile-sub">
                     {summary.operations?.syncHealth?.pendingConflicts ?? 0} unresolved conflict(s)
@@ -323,7 +317,7 @@ export function DashboardPage() {
                 <div className="telemetry-tile-body">
                   <div className="telemetry-tile-metric">
                     {summary.operations?.backupHealth?.completedBackups ?? 0}
-                    <span style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>Completed</span>
+                    <span className="telemetry-unit">Completed</span>
                   </div>
                   <span className="telemetry-tile-sub">
                     {summary.operations?.backupHealth?.failedBackups ?? 0} failed • SHA-256 Verified
@@ -353,7 +347,7 @@ export function DashboardPage() {
                     </span>
                     <span className="chart-card-subtitle">New restaurant accounts onboarded per month</span>
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 800, color: '#0B253A' }}>
+                  <span className="chart-card-stat">
                     +{summary.newRestaurantsThisMonth} this month
                   </span>
                 </div>
@@ -394,9 +388,6 @@ export function DashboardPage() {
                     </span>
                     <span className="chart-card-subtitle">Monthly recurring billings from active tiers</span>
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: 900, color: '#047857' }}>
-                    ₹{summary.mrr.toLocaleString('en-IN')}
-                  </span>
                 </div>
 
                 <div className="mini-bar-chart">

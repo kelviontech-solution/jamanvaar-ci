@@ -167,7 +167,7 @@ export function PlatformPaymentsDashboardPage() {
     <Card>
       <div style={{ padding: 16 }}>
         <div className="muted" style={{ fontSize: 12 }}>{label}</div>
-        <div style={{ fontSize: 24, fontWeight: 700, color: tone === 'good' ? '#16a34a' : tone === 'warn' ? '#ea580c' : undefined }}>{value}</div>
+        <div style={{ fontSize: 24, fontWeight: 700, color: tone === 'good' ? '#16a34a' : tone === 'warn' ? 'var(--jv-accent-text)' : undefined }}>{value}</div>
       </div>
     </Card>
   );
@@ -264,7 +264,7 @@ export function PlatformPaymentsDashboardPage() {
           )}
 
           {refundTarget && (
-            <div style={{ marginTop: 16, padding: 12, border: '1px solid #e2e8f0', borderRadius: 8 }}>
+            <div style={{ marginTop: 16, padding: 12, border: '1px solid var(--jv-border)', borderRadius: 8 }}>
               <div style={{ fontWeight: 600, marginBottom: 8 }}>Refund {refundTarget.restaurant.name} — order {refundTarget.externalOrderId.slice(-10)} (up to {formatRupees(refundTarget.amount)})</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                 <input type="number" min={0.01} step={0.01} value={refundAmount} onChange={(e) => setRefundAmount(e.target.value)} style={{ width: 110 }} aria-label="Refund amount in rupees" />

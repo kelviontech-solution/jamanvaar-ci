@@ -149,7 +149,7 @@ export function OfflinePolicyPage() {
 
       {/* Approaching Expiry Warning Section */}
       {approachingExpiry.length > 0 && (
-        <div style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 12, padding: '16px 20px', marginBottom: 24 }}>
+        <div style={{ background: 'var(--jv-warning-soft)', border: '1.5px solid #fde68a', borderRadius: 12, padding: '16px 20px', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
             <AlertTriangle className="w-5 h-5 text-amber-600" />
             <strong style={{ color: '#92400e', fontSize: 14 }}>
@@ -164,7 +164,7 @@ export function OfflinePolicyPage() {
               <div
                 key={d.id}
                 style={{
-                  background: '#fff',
+                  background: 'var(--jv-surface-card)',
                   border: '1px solid #fed7aa',
                   borderRadius: 8,
                   padding: '8px 12px',
@@ -175,7 +175,7 @@ export function OfflinePolicyPage() {
                 }}
               >
                 <span><strong>{d.restaurant?.name}</strong> ({d.type})</span>
-                <span style={{ color: '#ea580c' }}>Last seen {d.lastSeenAt ? new Date(d.lastSeenAt).toLocaleDateString() : 'Never'}</span>
+                <span style={{ color: 'var(--jv-accent-text)' }}>Last seen {d.lastSeenAt ? new Date(d.lastSeenAt).toLocaleDateString() : 'Never'}</span>
               </div>
             ))}
           </div>
@@ -196,7 +196,7 @@ export function OfflinePolicyPage() {
           Emergency Extensions ({extensions.filter((e) => e.status === 'ACTIVE').length} active, {extensions.length} total)
         </h3>
         {extensions.length === 0 ? (
-          <div style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>
+          <div style={{ padding: 48, textAlign: 'center', color: 'var(--jv-text-light)' }}>
             <FileCheck2 className="w-8 h-8 mx-auto mb-2 text-slate-400" />
             No emergency offline extensions are currently active.
           </div>
@@ -204,7 +204,7 @@ export function OfflinePolicyPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left', color: '#64748b' }}>
+                <tr style={{ borderBottom: '2px solid var(--jv-border-subtle)', textAlign: 'left', color: 'var(--jv-text-muted)' }}>
                   <th style={{ padding: '12px 14px' }}>Restaurant / Terminal</th>
                   <th style={{ padding: '12px 14px' }}>Duration</th>
                   <th style={{ padding: '12px 14px' }}>Approved Reason</th>
@@ -216,32 +216,32 @@ export function OfflinePolicyPage() {
               </thead>
               <tbody>
                 {extensions.map((ext) => (
-                  <tr key={ext.id} style={{ borderBottom: '1px solid #f8fafc' }}>
+                  <tr key={ext.id} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
                     <td style={{ padding: '14px' }}>
-                      <strong style={{ color: '#0f172a' }}>{ext.restaurant?.name}</strong>
-                      <div style={{ color: '#64748b', fontSize: 11 }}>
+                      <strong style={{ color: 'var(--jv-text)' }}>{ext.restaurant?.name}</strong>
+                      <div style={{ color: 'var(--jv-text-muted)', fontSize: 11 }}>
                         {ext.device
                           ? `${ext.device.type} Terminal`
                           : ext.branchId
                             ? `Branch: ${branches.find((b) => b.id === ext.branchId)?.name ?? 'one branch'}`
                             : 'Fleet Wide'}
                       </div>
-                      <div style={{ color: '#94a3b8', fontSize: 11 }}>
+                      <div style={{ color: 'var(--jv-text-light)', fontSize: 11 }}>
                         Asked by {ext.requestedBy}{ext.ticketRef ? ` · ${ext.ticketRef}` : ''}
                       </div>
                     </td>
                     <td style={{ padding: '14px', fontWeight: 800, color: '#0369a1' }}>
                       +{ext.extensionDays} Days
                     </td>
-                    <td style={{ padding: '14px', color: '#475569', maxWidth: 280 }}>
+                    <td style={{ padding: '14px', color: 'var(--jv-text-secondary)', maxWidth: 280 }}>
                       {ext.reason}
                     </td>
                     <td style={{ padding: '14px' }}>
-                      <code style={{ fontSize: 11, background: '#f1f5f9', padding: '2px 6px', borderRadius: 4 }}>
+                      <code style={{ fontSize: 11, background: 'var(--jv-bg-muted)', padding: '2px 6px', borderRadius: 4 }}>
                         ECDSA: {ext.certificateSignature.slice(0, 14)}…
                       </code>
                     </td>
-                    <td style={{ padding: '14px', color: '#64748b', fontSize: 12 }}>
+                    <td style={{ padding: '14px', color: 'var(--jv-text-muted)', fontSize: 12 }}>
                       Valid until {new Date(ext.validUntil).toLocaleDateString()}
                     </td>
                     <td style={{ padding: '14px' }}>
@@ -282,7 +282,7 @@ export function OfflinePolicyPage() {
                   setTargetRestaurantId(e.target.value);
                   setTargetBranchId('');
                 }}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               >
                 {restaurants.map((r) => (
                   <option key={r.id} value={r.id}>{r.name} ({r.city || 'India'})</option>
@@ -295,7 +295,7 @@ export function OfflinePolicyPage() {
               <select
                 value={targetBranchId}
                 onChange={(e) => setTargetBranchId(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               >
                 <option value="">Every branch of this restaurant</option>
                 {branches.filter((b) => b.restaurantId === targetRestaurantId).map((b) => (
@@ -305,7 +305,7 @@ export function OfflinePolicyPage() {
             </div>
 
             {extensions.some((e) => e.restaurantId === targetRestaurantId && e.status === 'ACTIVE') && (
-              <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: 10, fontSize: 12, color: '#92400e' }}>
+              <div style={{ background: 'var(--jv-warning-soft)', border: '1px solid #fde68a', borderRadius: 8, padding: 10, fontSize: 12, color: '#92400e' }}>
                 This restaurant already has an active extension. Issuing another does not replace it: revoke the earlier one if it should no longer apply.
               </div>
             )}
@@ -319,7 +319,7 @@ export function OfflinePolicyPage() {
                 placeholder="e.g. Asha Rao (owner), by phone"
                 value={requestedBy}
                 onChange={(e) => setRequestedBy(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               />
             </div>
 
@@ -332,7 +332,7 @@ export function OfflinePolicyPage() {
                 placeholder="e.g. TCK-1042 (optional)"
                 value={ticketRef}
                 onChange={(e) => setTicketRef(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               />
             </div>
 
@@ -343,7 +343,7 @@ export function OfflinePolicyPage() {
               <select
                 value={targetDays}
                 onChange={(e) => setTargetDays(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               >
                 <option value="7">7 Days (Emergency Short)</option>
                 <option value="14">14 Days (Standard Grace)</option>
@@ -361,7 +361,7 @@ export function OfflinePolicyPage() {
                 placeholder="e.g. Major fiber cut at shopping mall; verified via regional manager"
                 value={grantReason}
                 onChange={(e) => setGrantReason(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               />
             </div>
 

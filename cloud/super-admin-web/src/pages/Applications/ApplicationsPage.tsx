@@ -264,7 +264,7 @@ export function ApplicationsPage() {
                     </span>
                   ))}
                   {app.defaultPort && (
-                    <span className="platform-pill" style={{ color: 'var(--jv-accent)' }}>
+                    <span className="platform-pill" style={{ color: 'var(--jv-accent-text)' }}>
                       PORT {app.defaultPort}
                     </span>
                   )}

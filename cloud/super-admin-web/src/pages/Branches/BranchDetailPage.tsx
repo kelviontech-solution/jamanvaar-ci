@@ -187,7 +187,7 @@ export function BranchDetailPage() {
                     <Store className="w-3.5 h-3.5" />
                     <Link
                       to={`/restaurants/${branch.restaurantId}`}
-                      style={{ fontWeight: 600, color: 'var(--jv-accent)', textDecoration: 'none' }}
+                      style={{ fontWeight: 600, color: 'var(--jv-accent-text)', textDecoration: 'none' }}
                     >
                       {branch.restaurant.name}
                     </Link>
@@ -326,7 +326,7 @@ export function BranchDetailPage() {
                 </h3>
                 <Link
                   to={`/restaurants/${branch.restaurantId}`}
-                  style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--jv-accent)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}
+                  style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--jv-accent-text)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}
                 >
                   Open Restaurant <ChevronRight className="w-3.5 h-3.5" />
                 </Link>

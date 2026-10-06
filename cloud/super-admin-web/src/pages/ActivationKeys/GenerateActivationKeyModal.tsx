@@ -165,11 +165,11 @@ export function GenerateActivationKeyModal({
               </div>
             </div>
             {deviceType !== 'ANY' && restaurantId && (
-              <div style={{ fontSize: 12, color: '#64748b', margin: '-4px 0 4px' }}>
+              <div style={{ fontSize: 12, color: 'var(--jv-text-muted)', margin: '-4px 0 4px' }}>
                 {quotaLoading ? (
                   'Checking device quota…'
                 ) : quotaPreview ? (
-                  <span style={{ color: quotaPreview.current + 1 > quotaPreview.quota ? '#dc2626' : '#64748b', fontWeight: quotaPreview.current + 1 > quotaPreview.quota ? 700 : 400 }}>
+                  <span style={{ color: quotaPreview.current + 1 > quotaPreview.quota ? '#dc2626' : 'var(--jv-text-muted)', fontWeight: quotaPreview.current + 1 > quotaPreview.quota ? 700 : 400 }}>
                     {quotaPreview.current} / {quotaPreview.quota} devices in use → {quotaPreview.current + 1} / {quotaPreview.quota} after this key is redeemed
                     {quotaPreview.current + 1 > quotaPreview.quota ? ' — over quota, redemption will be refused' : ''}
                   </span>

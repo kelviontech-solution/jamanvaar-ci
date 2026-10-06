@@ -66,10 +66,10 @@ export function ChangePlanModal({
       <form onSubmit={handleSubmit} className="modal-form">
         {error && <div className="page-error">{error}</div>}
 
-        <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: 8, border: '1px solid var(--jv-border)' }}>
+        <div style={{ background: 'var(--jv-surface-subtle)', padding: '12px 16px', borderRadius: 8, border: '1px solid var(--jv-border)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
             <span className="muted" style={{ fontSize: 12 }}>Current Allotted Tier</span>
-            <strong style={{ fontSize: 13, color: '#0B253A' }}>
+            <strong style={{ fontSize: 13, color: 'var(--jv-text)' }}>
               {currentPlan.name} ({currentPlan.tier})
             </strong>
           </div>
@@ -99,7 +99,7 @@ export function ChangePlanModal({
 
         {chosenPlan && chosenPlan.id !== currentPlan.id && (
           <div style={{ background: '#fffaf5', border: '1px solid #fed7aa', padding: '12px 16px', borderRadius: 8 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#ea580c', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-accent-text)', textTransform: 'uppercase' }}>
               Plan Transition Summary
             </div>
             <p style={{ margin: '4px 0 0 0', fontSize: 13, color: '#7c2d12' }}>

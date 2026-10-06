@@ -128,7 +128,7 @@ export function AuditLogsPage() {
             setPage(1);
             setCategory(e.target.value);
           }}
-          style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: '#fff' }}
+          style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: 'var(--jv-surface-card)' }}
         >
           <option value="">All Categories</option>
           {categories.map((c) => (
@@ -144,7 +144,7 @@ export function AuditLogsPage() {
             setPage(1);
             setActorType(e.target.value);
           }}
-          style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: '#fff' }}
+          style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: 'var(--jv-surface-card)' }}
         >
           <option value="">All Actors</option>
           <option value="PLATFORM">Platform Admin</option>
@@ -230,7 +230,7 @@ export function AuditLogsPage() {
                                 >
                                   {event.title}
                                 </button>
-                                <span className="mono" style={{ fontSize: 10, color: 'var(--jv-text-secondary)', background: 'var(--jv-bg-muted)', padding: '1px 6px', borderRadius: 4, border: '1px solid var(--jv-border)' }}>
+                                <span className="mono" style={{ fontSize: 11, color: 'var(--jv-text-secondary)', background: 'var(--jv-bg-muted)', padding: '1px 6px', borderRadius: 4, border: '1px solid var(--jv-border)' }}>
                                   {row.action}
                                 </span>
                               </div>
@@ -317,7 +317,7 @@ export function AuditLogsPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <dl className="detail-list">
               <dt>Action</dt>
-              <dd className="mono" style={{ fontWeight: 700, color: '#0B253A' }}>{selectedLog.action}</dd>
+              <dd className="mono" style={{ fontWeight: 700, color: 'var(--jv-text)' }}>{selectedLog.action}</dd>
               <dt>Category</dt>
               <dd><Badge tone="neutral">{selectedLog.category}</Badge></dd>
               <dt>Actor Type</dt>
@@ -335,7 +335,7 @@ export function AuditLogsPage() {
                 <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-secondary)', marginBottom: 6 }}>
                   Event Payload Metadata:
                 </div>
-                <pre style={{ background: '#f8fafc', padding: 12, borderRadius: 8, fontSize: 12, fontFamily: 'monospace', overflowX: 'auto', border: '1px solid var(--jv-border)' }}>
+                <pre style={{ background: 'var(--jv-surface-subtle)', padding: 12, borderRadius: 8, fontSize: 12, fontFamily: 'monospace', overflowX: 'auto', border: '1px solid var(--jv-border)' }}>
                   {JSON.stringify(selectedLog.metadata, null, 2)}
                 </pre>
               </div>

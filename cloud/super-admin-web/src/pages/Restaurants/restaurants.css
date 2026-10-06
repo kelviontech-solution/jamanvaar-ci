@@ -1,240 +1,15 @@
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13.5px;
-}
-.data-table th {
-  text-align: left;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--jv-text-secondary);
-  font-weight: 700;
-  padding: 14px 20px;
-  background: var(--jv-bg);
-  border-bottom: 1px solid var(--jv-border);
-  white-space: nowrap;
-}
-.data-table td {
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--jv-border);
-  vertical-align: middle;
-  color: var(--jv-text);
-  transition: background 0.12s ease;
-}
-.data-table tbody tr:hover td {
-  background: var(--jv-surface-subtle);
-}
-.data-table tr:last-child td {
-  border-bottom: none;
-}
-.table-link {
-  font-weight: 600;
-  text-decoration: none;
-  color: var(--jv-primary);
-  transition: color 0.15s ease;
-}
-.table-link:hover {
-  color: var(--jv-accent);
-  text-decoration: underline;
-}
-
-.back-link {
-  display: inline-block;
-  font-size: 13px;
-  color: var(--jv-text-secondary);
-  text-decoration: none;
-  margin-bottom: 12px;
-}
-.back-link:hover {
-  color: var(--jv-primary);
-}
-
-.detail-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-}
-.detail-card {
-  padding: 20px 22px;
-}
-.detail-card-title {
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 14px;
-}
-.detail-list {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 6px 16px;
-  margin: 0;
-  font-size: 13.5px;
-}
-.detail-list dt {
-  color: var(--jv-text-muted);
-}
-.detail-list dd {
-  margin: 0;
-}
-.simple-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 13.5px;
-}
-.muted {
-  color: var(--jv-text-muted);
-  font-size: 13px;
-}
-
 /* Modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(11, 37, 58, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 50;
-}
-.modal {
-  background: #fff;
-  border-radius: 14px;
-  width: 100%;
-  max-width: 560px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.4);
-}
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--jv-border);
-}
-.modal-header h2 {
-  margin: 0;
-  font-size: 16px;
-}
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  color: var(--jv-text-muted);
-}
-.modal-form {
-  padding: 20px 24px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.form-section-label {
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--jv-text-muted);
-  margin-top: 4px;
-}
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
 @media (max-width: 640px) {
   .form-grid {
     grid-template-columns: 1fr;
   }
 }
-.form-note {
-  font-size: 12px;
-  color: var(--jv-text-muted);
-  margin: 0;
-}
-.form-error {
-  background: #fef2f2;
-  color: var(--jv-error);
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 13px;
-}
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 4px;
-}
-
 /* ==========================================================================
    Restaurant Square-Grid Card System
    (The grid container / square tiles live in card-grid.css)
    ========================================================================== */
 
 /* Legacy table-view card uses a dropdown menu — preserve those styles */
-.more-actions-menu-container {
-  position: relative;
-}
-
-.actions-dropdown-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 6px);
-  background: var(--jv-surface);
-  border: 1px solid var(--jv-border);
-  border-radius: 10px;
-  box-shadow: 0 12px 30px -6px rgba(0, 0, 0, 0.35), 0 4px 10px rgba(0, 0, 0, 0.2);
-  padding: 6px;
-  min-width: 210px;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.actions-dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--jv-text);
-  background: none;
-  border: none;
-  border-radius: 6px;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.12s ease;
-  text-decoration: none;
-}
-
-.actions-dropdown-item:hover {
-  background: var(--jv-surface-hover);
-  color: var(--jv-text);
-}
-
-.actions-dropdown-item.is-danger {
-  color: #ef4444;
-}
-
-.actions-dropdown-item.is-danger:hover {
-  background: rgba(239, 68, 68, 0.12);
-}
-
-.actions-dropdown-divider {
-  height: 1px;
-  background: var(--jv-border);
-  margin: 4px 0;
-}
-
 /* Table-view "Open Workspace" button (used in table rows) */
 .btn-open-workspace {
   background: #0b253a;
@@ -290,7 +65,7 @@
   border: 1px solid var(--jv-border);
   padding: 1px 6px;
   border-radius: 4px;
-  font-size: 10.5px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -376,37 +151,6 @@
 .filter-select-input:focus {
   outline: none;
   border-color: var(--jv-accent);
-}
-
-.view-toggle-group {
-  display: flex;
-  border: 1px solid var(--jv-border);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.view-toggle-btn {
-  padding: 6px 10px;
-  border: none;
-  background: var(--jv-bg);
-  color: var(--jv-text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  transition: all 0.15s ease;
-}
-
-.view-toggle-btn.active {
-  background: #0b253a;
-  color: #ffffff;
-}
-
-[data-theme='dark'] .view-toggle-btn.active {
-  background: #1a2f48;
-  color: #f8fafc;
 }
 
 /* Skeleton Loading Cards */

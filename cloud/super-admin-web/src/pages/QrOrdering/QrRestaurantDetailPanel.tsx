@@ -112,7 +112,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <span
         style={{
-          fontSize: 10.5,
+          fontSize: 11,
           fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: '0.04em',
@@ -212,7 +212,7 @@ function UsageMetric({
     >
       <div
         style={{
-          fontSize: 10.5,
+          fontSize: 11,
           fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: '0.04em',

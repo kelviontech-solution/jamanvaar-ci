@@ -64,14 +64,14 @@ export function RenewSubscriptionModal({
       <form onSubmit={handleSubmit} className="modal-form">
         {error && <div className="page-error">{error}</div>}
 
-        <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: 8, border: '1px solid var(--jv-border)' }}>
+        <div style={{ background: 'var(--jv-surface-subtle)', padding: '12px 16px', borderRadius: 8, border: '1px solid var(--jv-border)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
             <span className="muted" style={{ fontSize: 12 }}>Restaurant Tenant</span>
-            <strong style={{ fontSize: 13, color: '#0B253A' }}>{subscription.restaurant.name}</strong>
+            <strong style={{ fontSize: 13, color: 'var(--jv-text)' }}>{subscription.restaurant.name}</strong>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
             <span className="muted" style={{ fontSize: 12 }}>Current SaaS Plan</span>
-            <strong style={{ fontSize: 13, color: 'var(--jv-accent)' }}>{subscription.plan.name} ({subscription.plan.tier})</strong>
+            <strong style={{ fontSize: 13, color: 'var(--jv-accent-text)' }}>{subscription.plan.name} ({subscription.plan.tier})</strong>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span className="muted" style={{ fontSize: 12 }}>Current Expiration Date</span>

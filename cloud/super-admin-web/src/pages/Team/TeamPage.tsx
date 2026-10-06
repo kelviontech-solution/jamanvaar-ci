@@ -354,7 +354,7 @@ export function TeamPage() {
                           </div>
                           <div>
                             <div style={{ fontWeight: 700, color: 'var(--jv-text)' }}>
-                              {u.fullName} {isSelf && <span style={{ fontSize: 11, color: 'var(--jv-accent)', marginLeft: 4 }}>(You)</span>}
+                              {u.fullName} {isSelf && <span style={{ fontSize: 11, color: 'var(--jv-accent-text)', marginLeft: 4 }}>(You)</span>}
                             </div>
                             <div style={{ fontSize: 12, color: 'var(--jv-text-muted)' }}>{u.email}</div>
                           </div>
@@ -488,8 +488,8 @@ export function TeamPage() {
                       gap: 10,
                       padding: '10px 12px',
                       borderRadius: 6,
-                      border: `1px solid ${newSelectedRole === rKey ? '#0B253A' : '#e2e8f0'}`,
-                      background: newSelectedRole === rKey ? '#f8fafc' : '#fff',
+                      border: `1px solid ${newSelectedRole === rKey ? '#0B253A' : 'var(--jv-border)'}`,
+                      background: newSelectedRole === rKey ? 'var(--jv-surface-subtle)' : 'var(--jv-surface-card)',
                       cursor: 'pointer'
                     }}
                   >
@@ -503,7 +503,7 @@ export function TeamPage() {
                     />
                     <div>
                       <div style={{ fontWeight: 700, fontSize: 13 }}>{rVal.label}</div>
-                      <div style={{ fontSize: 11, color: '#64748b' }}>{rVal.desc}</div>
+                      <div style={{ fontSize: 11, color: 'var(--jv-text-muted)' }}>{rVal.desc}</div>
                     </div>
                   </label>
                 );

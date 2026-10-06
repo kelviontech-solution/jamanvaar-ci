@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #ffffff;
+  background: var(--jv-surface-card);
   border: 1px solid var(--jv-border);
   padding: 6px 12px;
   border-radius: var(--jv-radius-md);
@@ -133,7 +133,7 @@
 
 .plan-price-tag {
   font-weight: 600;
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
 }
 
 .revenue-collection-card {
@@ -178,7 +178,7 @@
 }
 
 .reports-table-card {
-  background: #ffffff;
+  background: var(--jv-surface-card);
   border: 1px solid var(--jv-border);
   border-radius: var(--jv-radius-lg);
   overflow: hidden;
@@ -193,7 +193,7 @@
 }
 
 .city-distribution-card {
-  background: #ffffff;
+  background: var(--jv-surface-card);
   border: 1px solid var(--jv-border);
   border-radius: var(--jv-radius-lg);
   margin-bottom: 24px;

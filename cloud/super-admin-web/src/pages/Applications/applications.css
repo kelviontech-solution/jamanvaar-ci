@@ -33,7 +33,7 @@
   height: 44px;
   border-radius: 10px;
   background: rgba(220, 38, 38, 0.1);
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
   display: flex;
   align-items: center;
   justify-content: center;

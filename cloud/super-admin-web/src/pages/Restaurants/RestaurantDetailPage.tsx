@@ -764,7 +764,7 @@ export function RestaurantDetailPage() {
             {restaurant.restaurantCode ? (
               <>
                 <span className="muted" style={{ fontSize: 12, fontWeight: 600 }}>Restaurant ID:</span>
-                <code className="mono" style={{ fontSize: 13, fontWeight: 800, color: '#0B253A' }}>{restaurant.restaurantCode}</code>
+                <code className="mono" style={{ fontSize: 13, fontWeight: 800, color: 'var(--jv-text)' }}>{restaurant.restaurantCode}</code>
                 <CopyButton text={restaurant.restaurantCode} label="Copy" title="Copy the Restaurant ID" />
               </>
             ) : (
@@ -849,7 +849,7 @@ export function RestaurantDetailPage() {
                 <dd>{new Date(restaurant.createdAt).toLocaleDateString('en-IN')}</dd>
               </dl>
               <details style={{ marginTop: 12 }}>
-                <summary style={{ cursor: 'pointer', fontSize: 12, fontWeight: 700, color: '#64748b' }}>
+                <summary style={{ cursor: 'pointer', fontSize: 12, fontWeight: 700, color: 'var(--jv-text-muted)' }}>
                   Advanced / Internal IDs
                 </summary>
                 <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -890,18 +890,18 @@ export function RestaurantDetailPage() {
                   <div style={{ width: 28, height: 28, borderRadius: 8, background: '#ea580c', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <KeyRound className="w-4 h-4" />
                   </div>
-                  <h3 style={{ margin: 0, fontSize: 17, fontWeight: 900, color: '#0B253A' }}>
+                  <h3 style={{ margin: 0, fontSize: 17, fontWeight: 900, color: 'var(--jv-text)' }}>
                     Hardware &amp; Terminal Activation Keys ({restaurant.activationKeys.length})
                   </h3>
                   <Badge tone={restaurant.activationKeys.some((k) => k.status === 'ACTIVE') ? 'success' : 'neutral'}>
                     {restaurant.activationKeys.filter((k) => k.status === 'ACTIVE').length} Available to Redeem
                   </Badge>
                 </div>
-                <div style={{ margin: '8px 0 0 0', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 13, color: '#0B253A' }}>
+                <div style={{ margin: '8px 0 0 0', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 13, color: 'var(--jv-text)' }}>
                   <strong>Restaurant ID</strong>
                   <code
                     className="mono"
-                    style={{ fontSize: 12, background: '#fff', border: '1px solid #FDBA74', borderRadius: 8, padding: '3px 8px', wordBreak: 'break-all', userSelect: 'all' }}
+                    style={{ fontSize: 12, background: 'var(--jv-surface-card)', border: '1px solid #FDBA74', borderRadius: 8, padding: '3px 8px', wordBreak: 'break-all', userSelect: 'all' }}
                   >
                     {restaurant.restaurantCode ?? 'Not yet assigned'}
                   </code>
@@ -909,7 +909,7 @@ export function RestaurantDetailPage() {
                     <CopyButton text={restaurant.restaurantCode} label="Copy ID" title="Copy the Restaurant ID" />
                   )}
                 </div>
-                <p style={{ margin: '6px 0 0 0', fontSize: 13, color: '#64748b' }}>
+                <p style={{ margin: '6px 0 0 0', fontSize: 13, color: 'var(--jv-text-muted)' }}>
                   <strong>Kiosk Admin</strong> asks for this Restaurant ID together with the restaurant owner's login before it takes a key. <strong>Captain</strong>, POS and Kitchen Display need only their key.
                   {' '}Relay these keys to the restaurant owner. On first login at <strong>Restaurant Admin ({RESTAURANT_ADMIN_URL})</strong>, <strong>POS</strong>, or <strong>Captain</strong>, entering this key registers and binds the device.
                   {restaurant.activationKeys.some((k) => k.allowedDeviceType === 'KIOSK_ADMIN') && (
@@ -945,8 +945,8 @@ export function RestaurantDetailPage() {
                       style={{
                         padding: '14px 16px',
                         borderRadius: 12,
-                        border: isAvailable ? '1.5px solid #FDBA74' : '1px solid #E2E8F0',
-                        background: isAvailable ? '#FFFDF9' : '#F8FAFC',
+                        border: isAvailable ? '1.5px solid #FDBA74' : '1px solid var(--jv-border)',
+                        background: isAvailable ? '#FFFDF9' : 'var(--jv-surface-subtle)',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 10,
@@ -954,14 +954,14 @@ export function RestaurantDetailPage() {
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: isAvailable ? '#E66817' : '#64748B' }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: isAvailable ? '#E66817' : 'var(--jv-text-muted)' }}>
                           ● {formatDeviceTypeLabel(k.allowedDeviceType)}
                         </span>
                         <Badge tone={statusTone(k.status)}>{k.status}</Badge>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', border: '1px solid #E2E8F0', borderRadius: 8, padding: '8px 12px' }}>
-                        <span className="mono" style={{ fontSize: 15, fontWeight: 800, color: '#0B253A', letterSpacing: '0.04em' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--jv-surface-card)', border: '1px solid var(--jv-border)', borderRadius: 8, padding: '8px 12px' }}>
+                        <span className="mono" style={{ fontSize: 15, fontWeight: 800, color: 'var(--jv-text)', letterSpacing: '0.04em' }}>
                           {k.code ?? `•••• ${k.codeLast4 ?? ''}`}
                         </span>
                         {k.code && (
@@ -972,7 +972,7 @@ export function RestaurantDetailPage() {
                         )}
                       </div>
 
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#64748B' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--jv-text-muted)' }}>
                         <span>Expires: {new Date(k.expiresAt).toLocaleDateString('en-IN')}</span>
                         {k.redeemedAt && (
                           <span style={{ color: '#16A34A', fontWeight: 600 }}>
@@ -998,7 +998,7 @@ export function RestaurantDetailPage() {
             <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
               <div>
                 <span>Master Restaurant Owner</span>
-                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                   Primary tenant administrator holding full billing and management authority.
                 </p>
               </div>
@@ -1053,7 +1053,7 @@ export function RestaurantDetailPage() {
             <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
               <div>
                 <span>All Restaurant Users &amp; Terminal Logins ({restaurant.users.length})</span>
-                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                   Store managers, cashiers, and kitchen accounts associated with this restaurant.
                 </p>
               </div>
@@ -1108,7 +1108,7 @@ export function RestaurantDetailPage() {
           <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
             <div>
               <span>Restaurant Outlets &amp; Branches ({restaurant.branches.length})</span>
-              <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                 Manage physical store locations, billing counters, and local sync hubs.
               </p>
             </div>
@@ -1151,10 +1151,10 @@ export function RestaurantDetailPage() {
           <Card style={{ padding: 22 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: '#0B253A' }}>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: 'var(--jv-text)' }}>
                   Current SaaS Subscription Plan
                 </h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--jv-text-muted)' }}>
                   Governs feature flags, maximum allowed POS terminals, and cloud sync policies.
                   {allActiveSubs.length > 1 && ` This restaurant holds ${allActiveSubs.length} active subscriptions — see the Applications tab for their combined entitlements.`}
                 </p>
@@ -1182,7 +1182,7 @@ export function RestaurantDetailPage() {
                 </div>
                 <div>
                   <span className="muted" style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Price (Monthly)</span>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: '#E66817', marginTop: 4 }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--jv-accent-text)', marginTop: 4 }}>
                     ₹{(activeSub.plan.priceMonthly / 100).toLocaleString('en-IN')}
                   </div>
                 </div>
@@ -1205,7 +1205,7 @@ export function RestaurantDetailPage() {
               {allActiveSubs.filter((s) => s.id !== activeSub?.id).map((s) => (
                 <Card key={s.id} style={{ padding: 18 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                    <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: 'var(--jv-text-muted)' }}>
                       {familyLabel((s.plan as { productFamily?: string }).productFamily)}
                     </span>
                     <Badge tone={statusTone(s.status)} pulse={s.status === 'ACTIVE'}>{s.status}</Badge>
@@ -1233,7 +1233,7 @@ export function RestaurantDetailPage() {
           <div className="detail-card-title">
             <div>
               <span>Applications Provisioned</span>
-              <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                 What this restaurant can actually activate a device for — enabling an app here is what lets a
                 new activation key be generated or redeemed for it.
               </p>
@@ -1270,8 +1270,8 @@ export function RestaurantDetailPage() {
                     style={{
                       padding: '14px 16px',
                       borderRadius: 12,
-                      border: enabled ? '1px solid #86efac' : '1px solid #e2e8f0',
-                      background: enabled ? '#f0fdf4' : '#f8fafc',
+                      border: enabled ? '1px solid #86efac' : '1px solid var(--jv-border)',
+                      background: enabled ? '#f0fdf4' : 'var(--jv-surface-subtle)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 8
@@ -1280,19 +1280,19 @@ export function RestaurantDetailPage() {
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: enabled ? '#166534' : '#0B253A' }}>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: enabled ? '#166534' : 'var(--jv-text)' }}>
                             {APP_CODE_LABELS[code]}
                           </span>
                           {featureCatalog?.[code] && (
-                            <span style={{ fontSize: 10, fontWeight: 700, color: '#64748b', border: '1px solid #e2e8f0', borderRadius: 6, padding: '1px 6px' }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', border: '1px solid var(--jv-border)', borderRadius: 6, padding: '1px 6px' }}>
                               {featureCatalog[code].category}
                             </span>
                           )}
                         </div>
                         {featureCatalog?.[code] && (
-                          <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 2 }}>{featureCatalog[code].description}</div>
+                          <div style={{ fontSize: 11.5, color: 'var(--jv-text-muted)', marginTop: 2 }}>{featureCatalog[code].description}</div>
                         )}
-                        <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                        <div style={{ fontSize: 12, color: 'var(--jv-text-muted)', marginTop: 2 }}>
                           {deviceCount} device{deviceCount === 1 ? '' : 's'} active
                           {row?.deviceQuota ? ` · quota ${row.deviceQuota}` : ''}
                         </div>
@@ -1325,17 +1325,17 @@ export function RestaurantDetailPage() {
           <div className="detail-card-title">
             <div>
               <span>Platform Quotas &amp; Usage Limits</span>
-              <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                 Real-time consumption meters against subscription quotas.
               </p>
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, marginTop: 10 }}>
-            <div style={{ padding: 18, background: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+            <div style={{ padding: 18, background: 'var(--jv-surface-subtle)', borderRadius: 12, border: '1px solid var(--jv-border)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>Branches Allowed</span>
-                <span style={{ fontWeight: 800, color: '#0B253A' }}>
+                <span style={{ fontWeight: 800, color: 'var(--jv-text)' }}>
                   {restaurant.branches.length} / {activeSub?.plan.maxBranches || 1}
                 </span>
               </div>
@@ -1350,10 +1350,10 @@ export function RestaurantDetailPage() {
               </div>
             </div>
 
-            <div style={{ padding: 18, background: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+            <div style={{ padding: 18, background: 'var(--jv-surface-subtle)', borderRadius: 12, border: '1px solid var(--jv-border)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>Devices &amp; Terminals</span>
-                <span style={{ fontWeight: 800, color: '#E66817' }}>
+                <span style={{ fontWeight: 800, color: 'var(--jv-accent-text)' }}>
                   {restaurant.devices.length} / {activeSub?.plan.maxDevices || 3}
                 </span>
               </div>
@@ -1368,7 +1368,7 @@ export function RestaurantDetailPage() {
               </div>
             </div>
 
-            <div style={{ padding: 18, background: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+            <div style={{ padding: 18, background: 'var(--jv-surface-subtle)', borderRadius: 12, border: '1px solid var(--jv-border)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>Staff &amp; Terminal Users</span>
                 <span style={{ fontWeight: 800, color: '#16a34a' }}>
@@ -1386,12 +1386,12 @@ export function RestaurantDetailPage() {
               </div>
             </div>
 
-            <div style={{ padding: 18, background: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+            <div style={{ padding: 18, background: 'var(--jv-surface-subtle)', borderRadius: 12, border: '1px solid var(--jv-border)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>Offline Validity Tolerance</span>
                 <Badge tone="success">30 Days</Badge>
               </div>
-              <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>
+              <p style={{ margin: 0, fontSize: 12, color: 'var(--jv-text-muted)' }}>
                 ECDSA P-256 cryptographically signed token valid for offline mesh operations.
               </p>
             </div>
@@ -1406,7 +1406,7 @@ export function RestaurantDetailPage() {
             <div className="detail-card-title">
               <div>
                 <span>Feature Flag Entitlements Matrix</span>
-                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                   Comparing ₹5,000 CORE vs ₹7,000 PRO vs this restaurant's assigned plan tier.
                 </p>
               </div>
@@ -1425,14 +1425,14 @@ export function RestaurantDetailPage() {
                     style={{
                       padding: '12px 14px',
                       borderRadius: 10,
-                      border: isEnabled ? '1px solid #86efac' : '1px solid #e2e8f0',
-                      background: isEnabled ? '#f0fdf4' : '#f8fafc',
+                      border: isEnabled ? '1px solid #86efac' : '1px solid var(--jv-border)',
+                      background: isEnabled ? '#f0fdf4' : 'var(--jv-surface-subtle)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between'
                     }}
                   >
-                    <span style={{ fontSize: 13, fontWeight: 600, color: isEnabled ? '#166534' : '#64748b' }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: isEnabled ? '#166534' : 'var(--jv-text-muted)' }}>
                       {label}
                     </span>
                     <Badge tone={isEnabled ? 'success' : 'neutral'}>
@@ -1457,7 +1457,7 @@ export function RestaurantDetailPage() {
                   <KeyRound className="w-4 h-4 text-orange-600" />
                   <span>Hardware Activation Keys ({restaurant.activationKeys.length})</span>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 500, color: '#64748b', marginTop: 4 }}>
+                <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--jv-text-muted)', marginTop: 4 }}>
                   Use these keys to onboard and bind terminals (Restaurant Admin, POS Counter, Captain Tablet, KDS).
                 </div>
               </div>
@@ -1482,7 +1482,7 @@ export function RestaurantDetailPage() {
                 <tbody>
                   {restaurant.activationKeys.map((k) => (
                     <tr key={k.id}>
-                      <td className="mono" style={{ fontWeight: 800, color: '#0B253A' }}>
+                      <td className="mono" style={{ fontWeight: 800, color: 'var(--jv-text)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span>{k.code ?? `•••• ${k.codeLast4 ?? ''}`}</span>
                           {k.code && (
@@ -1517,7 +1517,7 @@ export function RestaurantDetailPage() {
             <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
               <div>
                 <span>Registered Terminal Fleet ({restaurant.devices.length})</span>
-                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                   Live operational state and remote MDM controls.
                 </p>
               </div>
@@ -1595,7 +1595,7 @@ export function RestaurantDetailPage() {
           <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
             <div>
               <span>Tax Invoices &amp; Billing Ledger ({invoices?.length || 0})</span>
-              <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                 GST compliant invoices issued for subscription licenses and renewals.
               </p>
             </div>
@@ -1663,19 +1663,19 @@ export function RestaurantDetailPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {payments && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
-              <div style={{ padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Transactions (this page)</div>
-                <div style={{ fontSize: 22, fontWeight: 900, color: '#0B253A', marginTop: 4 }}>{payments.total}</div>
+              <div style={{ padding: 16, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Transactions (this page)</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--jv-text)', marginTop: 4 }}>{payments.total}</div>
               </div>
-              <div style={{ padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Successful Amount</div>
+              <div style={{ padding: 16, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Successful Amount</div>
                 <div style={{ fontSize: 22, fontWeight: 900, color: '#16a34a', marginTop: 4 }}>
                   ₹{(payments.rows.filter((p) => p.status === 'SUCCESS').reduce((sum, p) => sum + p.amount, 0) / 100).toLocaleString('en-IN')}
                 </div>
               </div>
-              <div style={{ padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Refunded Amount</div>
-                <div style={{ fontSize: 22, fontWeight: 900, color: '#ea580c', marginTop: 4 }}>
+              <div style={{ padding: 16, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Refunded Amount</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--jv-accent-text)', marginTop: 4 }}>
                   ₹{(payments.rows.flatMap((p) => p.refunds).filter((r) => r.status === 'SUCCESS').reduce((sum, r) => sum + r.amount, 0) / 100).toLocaleString('en-IN')}
                 </div>
               </div>
@@ -1686,7 +1686,7 @@ export function RestaurantDetailPage() {
             <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
               <div>
                 <span>Payments &amp; Refunds ({payments?.total ?? 0})</span>
-                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                   Real Razorpay-backed payment transactions and refunds for this restaurant.
                 </p>
               </div>
@@ -1750,7 +1750,7 @@ export function RestaurantDetailPage() {
                           </tr>
                           {expanded && (
                             <tr>
-                              <td colSpan={6} style={{ background: '#f8fafc', padding: '14px 22px', fontSize: 12.5 }}>
+                              <td colSpan={6} style={{ background: 'var(--jv-surface-subtle)', padding: '14px 22px', fontSize: 12.5 }}>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
                                   <div><strong>Razorpay Order ID:</strong> {p.providerOrderId}</div>
                                   <div><strong>Razorpay Payment ID:</strong> {p.providerPaymentId ?? '—'}</div>
@@ -1796,10 +1796,10 @@ export function RestaurantDetailPage() {
           <Card style={{ padding: 22 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#0B253A' }}>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: 'var(--jv-text)' }}>
                   Platform billing &amp; fleet
                 </h3>
-                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                   What JAMANVAAR bills this restaurant (invoice totals include 18% GST; a plan's listed price does not), and the health of its terminals.
                 </p>
               </div>
@@ -1822,9 +1822,9 @@ export function RestaurantDetailPage() {
 
             {reportsData ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
-                <div style={{ padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Total Billed</div>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: '#0B253A', marginTop: 4 }}>
+                <div style={{ padding: 16, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Total Billed</div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--jv-text)', marginTop: 4 }}>
                     ₹{reportsData.metrics.totalBilled.toLocaleString('en-IN')}
                   </div>
                   <div style={{ fontSize: 11.5, color: '#16a34a', marginTop: 2, fontWeight: 600 }}>
@@ -1832,32 +1832,32 @@ export function RestaurantDetailPage() {
                   </div>
                 </div>
 
-                <div style={{ padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Outstanding Receivables</div>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: '#ea580c', marginTop: 4 }}>
+                <div style={{ padding: 16, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Outstanding Receivables</div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--jv-accent-text)', marginTop: 4 }}>
                     ₹{reportsData.metrics.outstandingReceivables.toLocaleString('en-IN')}
                   </div>
-                  <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 2 }}>
+                  <div style={{ fontSize: 11.5, color: 'var(--jv-text-muted)', marginTop: 2 }}>
                     From {reportsData.metrics.totalInvoices} invoice(s)
                   </div>
                 </div>
 
-                <div style={{ padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Terminal Fleet Health</div>
+                <div style={{ padding: 16, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Terminal Fleet Health</div>
                   <div style={{ fontSize: 22, fontWeight: 900, color: '#16a34a', marginTop: 4 }}>
                     {reportsData.metrics.activeDevices} / {reportsData.metrics.devicesCount} Online
                   </div>
-                  <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 2 }}>
+                  <div style={{ fontSize: 11.5, color: 'var(--jv-text-muted)', marginTop: 2 }}>
                     {reportsData.metrics.offlineDevices} offline / standby
                   </div>
                 </div>
 
-                <div style={{ padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Data Resilience</div>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: '#0B253A', marginTop: 4 }}>
+                <div style={{ padding: 16, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Data Resilience</div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--jv-text)', marginTop: 4 }}>
                     {reportsData.metrics.backupsCount} Backups
                   </div>
-                  <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 2 }}>
+                  <div style={{ fontSize: 11.5, color: 'var(--jv-text-muted)', marginTop: 2 }}>
                     {reportsData.metrics.syncEventsCount} sync events logged
                   </div>
                 </div>
@@ -1875,7 +1875,7 @@ export function RestaurantDetailPage() {
           <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
             <div>
               <span>Enterprise Operational Audit Trail ({activity?.total || 0})</span>
-              <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                 Human-readable chronological activity log for this restaurant tenant.
               </p>
             </div>
@@ -1969,10 +1969,10 @@ export function RestaurantDetailPage() {
           <Card style={{ padding: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#0B253A' }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--jv-text)' }}>
                   Live Diagnostic Telemetry
                 </h3>
-                <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>
+                <p style={{ margin: 0, fontSize: 12, color: 'var(--jv-text-muted)' }}>
                   Real-time terminal connectivity and tenant operational state.
                 </p>
               </div>
@@ -1985,19 +1985,19 @@ export function RestaurantDetailPage() {
 
             {diagnostics ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-                <div style={{ padding: 14, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Tenant Status</div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: '#0B253A', marginTop: 4 }}>{diagnostics.restaurant.status}</div>
+                <div style={{ padding: 14, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Tenant Status</div>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--jv-text)', marginTop: 4 }}>{diagnostics.restaurant.status}</div>
                 </div>
-                <div style={{ padding: 14, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Online Terminals</div>
+                <div style={{ padding: 14, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Online Terminals</div>
                   <div style={{ fontSize: 18, fontWeight: 900, color: '#16a34a', marginTop: 4 }}>
                     {diagnostics.onlineDevicesCount} / {diagnostics.devices.length} Online
                   </div>
                 </div>
-                <div style={{ padding: 14, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Active Plan Tier</div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: '#ea580c', marginTop: 4 }}>
+                <div style={{ padding: 14, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Active Plan Tier</div>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--jv-accent-text)', marginTop: 4 }}>
                     {diagnostics.activeSubscription?.plan?.name || 'No Active Plan'}
                   </div>
                 </div>
@@ -2016,7 +2016,7 @@ export function RestaurantDetailPage() {
             <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
               <div>
                 <span>Multi-Tenant Cloud Backup Snapshots {backupsError ? '' : `(${backups?.length ?? 0})`}</span>
-                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                   Isolated point-in-time database snapshots with cryptographic SHA-256 verification.
                 </p>
               </div>
@@ -2207,7 +2207,7 @@ export function RestaurantDetailPage() {
             <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
               <div>
                 <span>Menu ({menu ? menu.items.length : 0} dishes, {menu ? menu.categories.length : 0} categories)</span>
-                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                   Upload this restaurant's menu directly, on the owner's behalf. It reaches POS, Captain, KDS and Kiosk
                   the same way a Restaurant Admin upload does.
                 </p>
@@ -2234,15 +2234,15 @@ export function RestaurantDetailPage() {
                   justifyContent: 'space-between',
                   gap: 12,
                   padding: '14px 16px',
-                  background: '#f8fafc',
+                  background: 'var(--jv-surface-subtle)',
                   borderRadius: 10,
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid var(--jv-border)',
                   marginBottom: 16
                 }}
               >
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: 13, color: '#0B253A' }}>Restaurant Admin self-upload</div>
-                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                  <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--jv-text)' }}>Restaurant Admin self-upload</div>
+                  <div style={{ fontSize: 12, color: 'var(--jv-text-muted)', marginTop: 2 }}>
                     {menu?.selfUploadEnabled === false
                       ? "This restaurant's own admin currently cannot upload their own menu CSV. Only Super Admin can."
                       : 'The restaurant admin may upload their own menu CSV from Restaurant Admin → Menu & Catalog.'}
@@ -2263,15 +2263,15 @@ export function RestaurantDetailPage() {
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10 }}>
                   {menu.items.slice(0, 60).map((it) => (
-                    <div key={it.externalId} style={{ padding: 12, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 10 }}>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: '#0B253A' }}>{String(it.payload.name ?? it.externalId)}</div>
-                      <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
+                    <div key={it.externalId} style={{ padding: 12, background: 'var(--jv-surface-card)', border: '1px solid var(--jv-border)', borderRadius: 10 }}>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--jv-text)' }}>{String(it.payload.name ?? it.externalId)}</div>
+                      <div style={{ fontSize: 11, color: 'var(--jv-text-muted)', marginTop: 2 }}>
                         {it.payload.price != null ? '₹' + it.payload.price : ''} {it.payload.dietaryType ? '· ' + it.payload.dietaryType : ''}
                       </div>
                     </div>
                   ))}
                   {menu.items.length > 60 && (
-                    <div style={{ padding: 12, color: '#64748b', fontSize: 12, alignSelf: 'center' }}>
+                    <div style={{ padding: 12, color: 'var(--jv-text-muted)', fontSize: 12, alignSelf: 'center' }}>
                       +{menu.items.length - 60} more dish(es)
                     </div>
                   )}
@@ -2290,19 +2290,19 @@ export function RestaurantDetailPage() {
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 800, fontSize: 16, color: '#0B253A' }}>
+              <span style={{ fontWeight: 800, fontSize: 16, color: 'var(--jv-text)' }}>
                 {formatAuditEvent(selectedLog.action, selectedLog.category).title}
               </span>
-              <span className="mono" style={{ fontSize: 11, background: '#f1f5f9', padding: '2px 8px', borderRadius: 4 }}>
+              <span className="mono" style={{ fontSize: 11, background: 'var(--jv-bg-muted)', padding: '2px 8px', borderRadius: 4 }}>
                 {selectedLog.action}
               </span>
             </div>
 
-            <p style={{ margin: 0, fontSize: 13, color: '#475569' }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--jv-text-secondary)' }}>
               {formatAuditEvent(selectedLog.action, selectedLog.category).description}
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, background: '#f8fafc', padding: 12, borderRadius: 8, fontSize: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, background: 'var(--jv-surface-subtle)', padding: 12, borderRadius: 8, fontSize: 12 }}>
               <div><strong>Category:</strong> {selectedLog.category}</div>
               <div><strong>Actor Type:</strong> {selectedLog.actorType}</div>
               <div><strong>Actor ID:</strong> <span className="mono">{selectedLog.actorId || '—'}</span></div>
@@ -2311,7 +2311,7 @@ export function RestaurantDetailPage() {
 
             {selectedLog.metadata && (
               <div>
-                <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#64748b' }}>
+                <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--jv-text-muted)' }}>
                   Event Payload &amp; Details
                 </span>
                 <pre style={{ background: '#0B253A', color: '#e2e8f0', padding: 12, borderRadius: 8, fontSize: 11, overflowX: 'auto', marginTop: 4 }}>
@@ -2336,7 +2336,7 @@ export function RestaurantDetailPage() {
           onClose={() => setRestorePreview(null)}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <p style={{ margin: 0, fontSize: 13, color: '#475569' }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--jv-text-secondary)' }}>
               Safe staging preview dry-run: this inspection validates the backup archive structure without overwriting production records.
             </p>
             <pre style={{ background: '#0B253A', color: '#e2e8f0', padding: 12, borderRadius: 8, fontSize: 11, overflowX: 'auto' }}>

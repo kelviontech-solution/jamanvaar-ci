@@ -93,21 +93,21 @@ export function SyncMonitorPage() {
 
       {/* Sync Operational Metric KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 20 }}>
-        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>24h Sync Events</span>
-          <div style={{ fontSize: 24, fontWeight: 900, color: '#0f172a', marginTop: 4 }}>
+        <div style={{ background: 'var(--jv-surface-card)', border: '1px solid var(--jv-border)', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>24h Sync Events</span>
+          <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--jv-text)', marginTop: 4 }}>
             {metrics?.events24h ?? '—'}
           </div>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #bbf7d0', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div style={{ background: 'var(--jv-surface-card)', border: '1px solid #bbf7d0', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: '#16a34a', textTransform: 'uppercase' }}>Replication Success Rate</span>
           <div style={{ fontSize: 24, fontWeight: 900, color: '#15803d', marginTop: 4 }}>
             {metrics?.successRatePercent !== undefined ? `${metrics.successRatePercent}%` : '—'}
           </div>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div style={{ background: 'var(--jv-surface-card)', border: '1px solid var(--jv-border)', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
           {/* B2-026: "Active Reporting Terminals" read like a live online count (Device Fleet's own
               "ONLINE" tile, a 2-minute window) but this one counts anything that reported in the
               last 24h (see sync-observability.service.ts's own comment) — a real, different, and
@@ -115,13 +115,13 @@ export function SyncMonitorPage() {
               comparing the two pages saw "1 vs 9" with nothing explaining why. Named and grouped
               like the sibling "24h Sync Events" tile right next to it, which already says its own
               window in its own label. */}
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Terminals Reporting (24h)</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Terminals Reporting (24h)</span>
           <div style={{ fontSize: 24, fontWeight: 900, color: '#0369a1', marginTop: 4 }}>
             {metrics?.activeSyncingDevices ?? '—'}
           </div>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #fecaca', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div style={{ background: 'var(--jv-surface-card)', border: '1px solid #fecaca', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: '#dc2626', textTransform: 'uppercase' }}>Pending Conflicts</span>
           <div style={{ fontSize: 24, fontWeight: 900, color: '#b91c1c', marginTop: 4 }}>
             {metrics?.pendingConflicts ?? 0}
@@ -130,7 +130,7 @@ export function SyncMonitorPage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 10, borderBottom: '1px solid #e2e8f0', paddingBottom: 12, marginBottom: 20 }}>
+      <div style={{ display: 'flex', gap: 10, borderBottom: '1px solid var(--jv-border)', paddingBottom: 12, marginBottom: 20 }}>
         <Button
           variant={activeTab === 'LOGS' ? 'primary' : 'ghost'}
           onClick={() => setActiveTab('LOGS')}
@@ -150,14 +150,14 @@ export function SyncMonitorPage() {
         <Card>
           <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Live Synchronization Stream</h3>
           {logs.length === 0 ? (
-            <div style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>
+            <div style={{ padding: 48, textAlign: 'center', color: 'var(--jv-text-light)' }}>
               No sync events reported in this period.
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
-                  <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left', color: '#64748b' }}>
+                  <tr style={{ borderBottom: '2px solid var(--jv-border-subtle)', textAlign: 'left', color: 'var(--jv-text-muted)' }}>
                     <th style={{ padding: '12px 14px' }}>Entity & Action</th>
                     <th style={{ padding: '12px 14px' }}>Restaurant / Outlet</th>
                     <th style={{ padding: '12px 14px' }}>Device</th>
@@ -169,17 +169,17 @@ export function SyncMonitorPage() {
                 </thead>
                 <tbody>
                   {logs.map((log) => (
-                    <tr key={log.id} style={{ borderBottom: '1px solid #f8fafc' }}>
+                    <tr key={log.id} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
                       <td style={{ padding: '14px' }}>
-                        <strong style={{ color: '#0f172a' }}>{log.entityType}</strong>
-                        <span style={{ color: '#64748b', fontSize: 11, marginLeft: 6 }}>
+                        <strong style={{ color: 'var(--jv-text)' }}>{log.entityType}</strong>
+                        <span style={{ color: 'var(--jv-text-muted)', fontSize: 11, marginLeft: 6 }}>
                           <code>{log.action}</code>
                         </span>
                       </td>
                       <td style={{ padding: '14px' }}>
                         {log.restaurant?.name || 'Central Platform'}
                       </td>
-                      <td style={{ padding: '14px', color: '#64748b' }}>
+                      <td style={{ padding: '14px', color: 'var(--jv-text-muted)' }}>
                         {log.device ? `${log.device.type} Terminal` : 'Cloud Bridge'}
                       </td>
                       <td style={{ padding: '14px' }}>
@@ -187,13 +187,13 @@ export function SyncMonitorPage() {
                           {log.status}
                         </Badge>
                       </td>
-                      <td style={{ padding: '14px', color: log.latencyMs > 200 ? '#ea580c' : '#16a34a' }}>
+                      <td style={{ padding: '14px', color: log.latencyMs > 200 ? 'var(--jv-accent-text)' : '#16a34a' }}>
                         {log.latencyMs} ms
                       </td>
-                      <td style={{ padding: '14px', color: '#64748b' }}>
+                      <td style={{ padding: '14px', color: 'var(--jv-text-muted)' }}>
                         {(log.payloadSize / 1024).toFixed(1)} KB
                       </td>
-                      <td style={{ padding: '14px', color: '#64748b' }}>
+                      <td style={{ padding: '14px', color: 'var(--jv-text-muted)' }}>
                         {new Date(log.timestamp).toLocaleTimeString()}
                       </td>
                     </tr>
@@ -210,7 +210,7 @@ export function SyncMonitorPage() {
         <Card>
           <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Multi-Version Synchronization Conflicts</h3>
           {conflicts.length === 0 ? (
-            <div style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>
+            <div style={{ padding: 48, textAlign: 'center', color: 'var(--jv-text-light)' }}>
               <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-emerald-500" />
               All data versions across Cloud and Edge terminals are currently in full sync.
             </div>
@@ -218,7 +218,7 @@ export function SyncMonitorPage() {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
-                  <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left', color: '#64748b' }}>
+                  <tr style={{ borderBottom: '2px solid var(--jv-border-subtle)', textAlign: 'left', color: 'var(--jv-text-muted)' }}>
                     <th style={{ padding: '12px 14px' }}>Entity</th>
                     <th style={{ padding: '12px 14px' }}>Restaurant</th>
                     <th style={{ padding: '12px 14px' }}>Reason</th>
@@ -229,13 +229,13 @@ export function SyncMonitorPage() {
                 </thead>
                 <tbody>
                   {conflicts.map((c) => (
-                    <tr key={c.id} style={{ borderBottom: '1px solid #f8fafc' }}>
+                    <tr key={c.id} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
                       <td style={{ padding: '14px' }}>
-                        <strong style={{ color: '#0f172a' }}>{c.entityType}</strong>
-                        <div style={{ color: '#94a3b8', fontSize: 11 }}>ID: {c.entityId}</div>
+                        <strong style={{ color: 'var(--jv-text)' }}>{c.entityType}</strong>
+                        <div style={{ color: 'var(--jv-text-light)', fontSize: 11 }}>ID: {c.entityId}</div>
                       </td>
                       <td style={{ padding: '14px' }}>{c.restaurant?.name}</td>
-                      <td style={{ padding: '14px', color: '#475569', maxWidth: 320 }}>
+                      <td style={{ padding: '14px', color: 'var(--jv-text-secondary)', maxWidth: 320 }}>
                         {c.reason}
                       </td>
                       <td style={{ padding: '14px' }}>
@@ -243,7 +243,7 @@ export function SyncMonitorPage() {
                           {c.resolution}
                         </Badge>
                       </td>
-                      <td style={{ padding: '14px', color: '#64748b' }}>
+                      <td style={{ padding: '14px', color: 'var(--jv-text-muted)' }}>
                         {new Date(c.createdAt).toLocaleString()}
                       </td>
                       <td style={{ padding: '14px', textAlign: 'right' }}>
@@ -264,26 +264,26 @@ export function SyncMonitorPage() {
       {selectedConflict && (
         <Modal title={`Resolve Sync Conflict: ${selectedConflict.entityType}`} onClose={() => setSelectedConflict(null)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: 12, fontSize: 13, color: '#92400e' }}>
+            <div style={{ background: 'var(--jv-warning-soft)', border: '1px solid #fde68a', borderRadius: 8, padding: 12, fontSize: 13, color: '#92400e' }}>
               <strong>Conflict Cause:</strong> {selectedConflict.reason}
             </div>
 
             {/* Side by side JSON Diff Preview */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12 }}>
+              <div style={{ background: 'var(--jv-surface-subtle)', border: '1px solid var(--jv-border)', borderRadius: 8, padding: 12 }}>
                 <strong style={{ display: 'block', fontSize: 13, color: '#0369a1', marginBottom: 6 }}>
                   📱 Local Edge Terminal Version
                 </strong>
-                <pre style={{ fontSize: 12, background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1', overflowX: 'auto' }}>
+                <pre style={{ fontSize: 12, background: 'var(--jv-surface-card)', padding: 10, borderRadius: 6, border: '1px solid var(--jv-border-hover)', overflowX: 'auto' }}>
                   {JSON.stringify(selectedConflict.localVersion, null, 2)}
                 </pre>
               </div>
 
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12 }}>
+              <div style={{ background: 'var(--jv-surface-subtle)', border: '1px solid var(--jv-border)', borderRadius: 8, padding: 12 }}>
                 <strong style={{ display: 'block', fontSize: 13, color: '#15803d', marginBottom: 6 }}>
                   ☁️ Authoritative Cloud Version
                 </strong>
-                <pre style={{ fontSize: 12, background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1', overflowX: 'auto' }}>
+                <pre style={{ fontSize: 12, background: 'var(--jv-surface-card)', padding: 10, borderRadius: 6, border: '1px solid var(--jv-border-hover)', overflowX: 'auto' }}>
                   {JSON.stringify(selectedConflict.cloudVersion, null, 2)}
                 </pre>
               </div>

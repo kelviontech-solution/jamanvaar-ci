@@ -334,7 +334,7 @@ export function OwnerDetailPage() {
           {/* Summary stats */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14 }}>
             {[
-              { label: 'Associated Restaurant', value: owner.restaurant ? 1 : 0, icon: Store, color: '#e66817' },
+              { label: 'Associated Restaurant', value: owner.restaurant ? 1 : 0, icon: Store, color: 'var(--jv-accent-text)' },
               { label: 'Total Branches', value: branchCount, icon: Building2, color: '#0ea5e9' },
               { label: 'Total Devices', value: restaurant?.devices?.length ?? 0, icon: Laptop2, color: '#8b5cf6' },
             ].map((item) => (

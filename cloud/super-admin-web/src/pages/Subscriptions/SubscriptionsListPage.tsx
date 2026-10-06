@@ -200,7 +200,7 @@ export function SubscriptionsListPage() {
         <select
           value={tierFilter}
           onChange={(e) => setTierFilter(e.target.value as 'ALL' | 'CORE' | 'PRO' | 'ENTERPRISE')}
-          style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: '#fff' }}
+          style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: 'var(--jv-surface-card)' }}
         >
           <option value="ALL">All Tiers</option>
           <option value="CORE">CORE (₹5,000)</option>

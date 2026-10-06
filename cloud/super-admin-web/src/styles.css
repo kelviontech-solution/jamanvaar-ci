@@ -9,11 +9,16 @@
   --jv-primary: #0b253a;
   --jv-primary-hover: #133e5e;
   --jv-primary-soft: rgba(11, 37, 58, 0.05);
+  --jv-on-primary: #ffffff;
 
-  --jv-accent: #e66817;
-  --jv-accent-hover: #d45a0e;
+  --jv-accent: #bf540f;
+  --jv-accent-hover: #a9480c;
   --jv-accent-soft: #fff4ed;
-  --jv-accent-border: rgba(230, 104, 23, 0.25);
+  --jv-accent-border: rgba(191, 84, 15, 0.3);
+  /* Accent as TEXT (on white / accent-soft): 5.9:1 / 5.5:1. The plain accent is the fill colour (white text on it: 4.7:1). */
+  --jv-accent-text: #a8460b;
+  --jv-accent-ring: rgba(191, 84, 15, 0.2);
+  --jv-focus-ring: #bf540f;
 
   --jv-gold: #c5a059;
   --jv-gold-soft: #faf4e8;
@@ -36,15 +41,19 @@
 
   --jv-text: #0b253a;
   --jv-text-secondary: #4a5568;
-  --jv-text-muted: #7a8b9e;
-  --jv-text-light: #94a3b8;
+  --jv-text-muted: #556579;
+  --jv-text-light: #5d6d82;
 
   --jv-success: #16a34a;
   --jv-success-soft: #ecfdf5;
+  --jv-success-text: #065f46; /* status text on white: 7.9:1 */
   --jv-warning: #d97706;
   --jv-warning-soft: #fffbeb;
+  --jv-warning-text: #92400e; /* status text on white: 7.1:1 */
   --jv-error: #dc2626;
   --jv-error-soft: #fef2f2;
+  --jv-error-text: #991b1b; /* error text on its soft background: 8:1 */
+  --jv-gold-text: #854d0e;
   --jv-online: #22c55e;
 
   /* Elevation and shadows */
@@ -54,8 +63,8 @@
   --jv-shadow-card-hover: 0 8px 24px -4px rgba(11, 37, 58, 0.08), 0 2px 6px 0 rgba(11, 37, 58, 0.04);
   --jv-shadow-hero: 0 4px 20px -4px rgba(11, 37, 58, 0.06), 0 1px 4px 0 rgba(11, 37, 58, 0.03);
   --jv-shadow-hero-hover: 0 10px 28px -6px rgba(11, 37, 58, 0.1), 0 2px 8px 0 rgba(11, 37, 58, 0.04);
-  --jv-shadow-saffron: 0 4px 14px 0 rgba(230, 104, 23, 0.28);
-  --jv-shadow-saffron-hover: 0 6px 20px 0 rgba(230, 104, 23, 0.42);
+  --jv-shadow-saffron: 0 4px 14px 0 rgba(191, 84, 15, 0.25);
+  --jv-shadow-saffron-hover: 0 6px 20px 0 rgba(191, 84, 15, 0.35);
 
   --jv-radius-sm: 6px;
   --jv-radius-md: 10px;
@@ -73,11 +82,15 @@
     --jv-primary: #f1f5f9;
     --jv-primary-hover: #ffffff;
     --jv-primary-soft: rgba(241, 245, 249, 0.08);
+    --jv-on-primary: #0b1118;
 
-    --jv-accent: #f97316;
-    --jv-accent-hover: #fb923c;
+    --jv-accent: #c2410c;
+    --jv-accent-hover: #9a3412;
     --jv-accent-soft: rgba(249, 115, 22, 0.14);
-    --jv-accent-border: rgba(249, 115, 22, 0.35);
+    --jv-accent-border: rgba(251, 146, 60, 0.35);
+    --jv-accent-text: #fb923c;
+    --jv-accent-ring: rgba(251, 146, 60, 0.3);
+    --jv-focus-ring: #fb923c;
 
     --jv-gold: #e2ba6d;
     --jv-gold-soft: rgba(226, 186, 109, 0.12);
@@ -93,21 +106,25 @@
     --jv-surface-card: #162436;
     --jv-surface-hover: #1c2e44;
 
-    --jv-border: #1f3349;
-    --jv-border-hover: #2e4a6a;
+    --jv-border: #263b52;
+    --jv-border-hover: #3a5878;
     --jv-border-subtle: rgba(255, 255, 255, 0.08);
 
-    --jv-text: #f8fafc;
-    --jv-text-secondary: #94a3b8;
-    --jv-text-muted: #64748b;
-    --jv-text-light: #475569;
+    --jv-text: #e8eef6;
+    --jv-text-secondary: #b4c0d0;
+    --jv-text-muted: #97a9bf;
+    --jv-text-light: #8396ae;
 
     --jv-success: #34d399;
     --jv-success-soft: rgba(52, 211, 153, 0.14);
+    --jv-success-text: #34d399;
     --jv-warning: #fbbf24;
     --jv-warning-soft: rgba(251, 191, 36, 0.14);
+    --jv-warning-text: #fbbf24;
     --jv-error: #f87171;
     --jv-error-soft: rgba(248, 113, 113, 0.14);
+    --jv-error-text: #f87171;
+    --jv-gold-text: #e2ba6d;
     --jv-online: #10b981;
 
     --jv-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
@@ -127,11 +144,15 @@
   --jv-primary: #f1f5f9;
   --jv-primary-hover: #ffffff;
   --jv-primary-soft: rgba(241, 245, 249, 0.08);
+    --jv-on-primary: #0b1118;
 
-  --jv-accent: #f97316;
-  --jv-accent-hover: #fb923c;
+  --jv-accent: #c2410c;
+  --jv-accent-hover: #9a3412;
   --jv-accent-soft: rgba(249, 115, 22, 0.14);
-  --jv-accent-border: rgba(249, 115, 22, 0.35);
+  --jv-accent-border: rgba(251, 146, 60, 0.35);
+    --jv-accent-text: #fb923c;
+    --jv-accent-ring: rgba(251, 146, 60, 0.3);
+    --jv-focus-ring: #fb923c;
 
   --jv-gold: #e2ba6d;
   --jv-gold-soft: rgba(226, 186, 109, 0.12);
@@ -147,21 +168,25 @@
   --jv-surface-card: #162436;
   --jv-surface-hover: #1c2e44;
 
-  --jv-border: #1f3349;
-  --jv-border-hover: #2e4a6a;
+  --jv-border: #263b52;
+  --jv-border-hover: #3a5878;
   --jv-border-subtle: rgba(255, 255, 255, 0.08);
 
-  --jv-text: #f8fafc;
-  --jv-text-secondary: #94a3b8;
-  --jv-text-muted: #64748b;
-  --jv-text-light: #475569;
+  --jv-text: #e8eef6;
+  --jv-text-secondary: #b4c0d0;
+  --jv-text-muted: #97a9bf;
+  --jv-text-light: #8396ae;
 
   --jv-success: #34d399;
   --jv-success-soft: rgba(52, 211, 153, 0.14);
+    --jv-success-text: #34d399;
   --jv-warning: #fbbf24;
   --jv-warning-soft: rgba(251, 191, 36, 0.14);
+    --jv-warning-text: #fbbf24;
   --jv-error: #f87171;
   --jv-error-soft: rgba(248, 113, 113, 0.14);
+    --jv-error-text: #f87171;
+    --jv-gold-text: #e2ba6d;
   --jv-online: #10b981;
 
   --jv-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
@@ -244,4 +269,155 @@ textarea {
 
 .animate-pulse-subtle {
   animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Keyboard focus — one visible, brand-coloured ring for every control.  */
+/* Text fields keep their own border + soft ring (see --jv-accent-ring). */
+/* ------------------------------------------------------------------ */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+select:focus-visible,
+[role='button']:focus-visible,
+[role='tab']:focus-visible,
+[role='menuitem']:focus-visible,
+[role='switch']:focus-visible,
+input[type='checkbox']:focus-visible,
+input[type='radio']:focus-visible,
+input[type='range']:focus-visible,
+[tabindex]:not([tabindex='-1']):focus-visible {
+  outline: 2px solid var(--jv-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reduced motion — decorative loops and lifts stop; real loading       */
+/* indicators (the `spin` loader) and one-shot toasts keep working.     */
+/* ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot,
+  .status-indicator-dot,
+  .animate-pulse-subtle,
+  [class*='skeleton'] {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+  .btn:hover:not(:disabled),
+  [class*='card']:hover {
+    transform: none !important;
+  }
+}
+
+
+::selection {
+  background: var(--jv-accent-ring);
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion — short, quiet, CSS-only. Everything below only runs for      */
+/* people who have NOT asked the OS for reduced motion.                 */
+/* ------------------------------------------------------------------ */
+@keyframes sa-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes sa-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes sa-pop {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes sa-grow-y {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+@keyframes sa-grow-x {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* switching page */
+  .route-fade {
+    animation: sa-rise 0.26s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  /* groups of cards arrive one after another (capped so long grids don't feel slow) */
+  .dashboard-section,
+  .mgmt-card-grid > *,
+  .dish-cards-grid > *,
+  .hero-metrics-grid > *,
+  .health-grid > *,
+  .telemetry-grid-4 > *,
+  .charts-split-grid > *,
+  .stat-grid > *,
+  .kpi-strip > * {
+    animation: sa-rise 0.32s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+  .dashboard-section:nth-child(2),
+  .mgmt-card-grid > *:nth-child(2), .dish-cards-grid > *:nth-child(2), .hero-metrics-grid > *:nth-child(2),
+  .health-grid > *:nth-child(2), .telemetry-grid-4 > *:nth-child(2), .charts-split-grid > *:nth-child(2),
+  .stat-grid > *:nth-child(2), .kpi-strip > *:nth-child(2) { animation-delay: 40ms; }
+  .dashboard-section:nth-child(3),
+  .mgmt-card-grid > *:nth-child(3), .dish-cards-grid > *:nth-child(3), .hero-metrics-grid > *:nth-child(3),
+  .health-grid > *:nth-child(3), .telemetry-grid-4 > *:nth-child(3),
+  .stat-grid > *:nth-child(3), .kpi-strip > *:nth-child(3) { animation-delay: 80ms; }
+  .dashboard-section:nth-child(4),
+  .mgmt-card-grid > *:nth-child(4), .dish-cards-grid > *:nth-child(4),
+  .health-grid > *:nth-child(4), .telemetry-grid-4 > *:nth-child(4),
+  .stat-grid > *:nth-child(4), .kpi-strip > *:nth-child(4) { animation-delay: 120ms; }
+  .mgmt-card-grid > *:nth-child(n+5), .dish-cards-grid > *:nth-child(n+5),
+  .stat-grid > *:nth-child(n+5), .kpi-strip > *:nth-child(n+5) { animation-delay: 160ms; }
+
+  /* dialogs and menus */
+  .modal-backdrop {
+    animation: sa-fade 0.18s ease-out backwards;
+  }
+  .modal {
+    animation: sa-pop 0.22s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+  .actions-dropdown-menu {
+    animation: sa-pop 0.16s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    transform-origin: top right;
+  }
+  .banner, .error-banner, .banner-error, .page-success, .page-error, .readonly-banner {
+    animation: sa-fade 0.2s ease-out backwards;
+  }
+
+  /* charts and meters draw in */
+  .chart-bar-pillar {
+    transform-origin: bottom;
+    animation: sa-grow-y 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+  .chart-bar-wrap:nth-child(2) .chart-bar-pillar { animation-delay: 40ms; }
+  .chart-bar-wrap:nth-child(3) .chart-bar-pillar { animation-delay: 80ms; }
+  .chart-bar-wrap:nth-child(4) .chart-bar-pillar { animation-delay: 120ms; }
+  .chart-bar-wrap:nth-child(5) .chart-bar-pillar { animation-delay: 160ms; }
+  .chart-bar-wrap:nth-child(n+6) .chart-bar-pillar { animation-delay: 200ms; }
+  .connectivity-fill {
+    transform-origin: left;
+    animation: sa-grow-x 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  /* a small press response on buttons */
+  .btn:active:not(:disabled) {
+    transform: scale(0.985);
+  }
+
+  /* changing theme eases the colours instead of flashing (class is added by applyTheme for a moment) */
+  html.theme-switching,
+  html.theme-switching *,
+  html.theme-switching *::before,
+  html.theme-switching *::after {
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, fill 0.25s ease !important;
+  }
 }

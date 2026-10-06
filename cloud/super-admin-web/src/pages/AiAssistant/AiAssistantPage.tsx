@@ -319,7 +319,7 @@ export function AiAssistantPage() {
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <h1 className="page-title" style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#0f172a' }}>
+            <h1 className="page-title" style={{ margin: 0, fontSize: 24, fontWeight: 800, color: 'var(--jv-text)' }}>
               JAMAN AI Engine
             </h1>
             <span className="badge badge-accent" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -327,7 +327,7 @@ export function AiAssistantPage() {
               <span>PRO Control Center</span>
             </span>
           </div>
-          <p className="page-subtitle" style={{ margin: '4px 0 0', color: '#64748b', fontSize: 14 }}>
+          <p className="page-subtitle" style={{ margin: '4px 0 0', color: 'var(--jv-text-muted)', fontSize: 14 }}>
             Platform-wide operations intelligence, tier entitlement gating ({priceOf('PRO')} PRO vs {priceOf('CORE')} CORE), question templates, and edge query telemetry.
           </p>
         </div>
@@ -357,7 +357,7 @@ export function AiAssistantPage() {
             </div>
             <div>
               <div className="ai-metric-value">
-                {telemetry.activeProTenants} <span style={{ fontSize: '1rem', color: '#64748b', fontWeight: 600 }}>/ {telemetry.totalActiveTenants}</span>
+                {telemetry.activeProTenants} <span style={{ fontSize: '1rem', color: 'var(--jv-text-muted)', fontWeight: 600 }}>/ {telemetry.totalActiveTenants}</span>
               </div>
               <div className="ai-metric-subtext" style={{ color: '#059669' }}>
                 <Check className="w-3.5 h-3.5" />
@@ -386,7 +386,7 @@ export function AiAssistantPage() {
           <div className="ai-metric-card">
             <div className="ai-metric-header">
               <span className="ai-metric-title">Top Inquired Intent</span>
-              <div className="ai-metric-icon" style={{ background: '#fffbeb', color: '#d97706' }}>
+              <div className="ai-metric-icon" style={{ background: 'var(--jv-warning-soft)', color: '#d97706' }}>
                 <TrendingUp className="w-5 h-5" />
               </div>
             </div>
@@ -394,7 +394,7 @@ export function AiAssistantPage() {
               <div className="ai-metric-value" style={{ fontSize: '1.25rem', fontFamily: 'monospace' }}>
                 {telemetry.topIntent ?? '—'}
               </div>
-              <div className="ai-metric-subtext" style={{ color: '#64748b' }}>
+              <div className="ai-metric-subtext" style={{ color: 'var(--jv-text-muted)' }}>
                 <span>Leading operational metric requested</span>
               </div>
             </div>
@@ -423,10 +423,10 @@ export function AiAssistantPage() {
       {/* Plan Entitlement & Tier Gating Comparison */}
       <Card>
         <div style={{ marginBottom: 16 }}>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#0f172a' }}>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--jv-text)' }}>
             Plan Entitlement & Tier Access Control
           </h2>
-          <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--jv-text-muted)' }}>
             JAMAN AI Assistant is strictly restricted as a flagship PRO feature to drive SaaS plan upgrades.
           </p>
         </div>
@@ -438,9 +438,9 @@ export function AiAssistantPage() {
               <div className="ai-tier-header">
                 <div>
                   <div className="ai-tier-title">JAMANVAAR CORE</div>
-                  <div style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>{priceOf('CORE')} / month (Foundation)</div>
+                  <div style={{ fontSize: 13, color: 'var(--jv-text-muted)', fontWeight: 600 }}>{priceOf('CORE')} / month (Foundation)</div>
                 </div>
-                <span className="ai-tier-badge" style={{ background: '#f1f5f9', color: '#475569' }}>
+                <span className="ai-tier-badge" style={{ background: 'var(--jv-bg-muted)', color: 'var(--jv-text-secondary)' }}>
                   <Lock className="w-3 h-3 inline mr-1" />
                   GATED / LOCKED
                 </span>
@@ -460,7 +460,7 @@ export function AiAssistantPage() {
                 </li>
               </ul>
             </div>
-            <div style={{ background: '#f8fafc', padding: 10, borderRadius: 8, fontSize: 12, color: '#64748b' }}>
+            <div style={{ background: 'var(--jv-surface-subtle)', padding: 10, borderRadius: 8, fontSize: 12, color: 'var(--jv-text-muted)' }}>
               Staff tap the AI button ➔ see a locked panel with a few example questions. Nothing is answered. Switch it on for one restaurant below.
             </div>
           </div>
@@ -473,31 +473,31 @@ export function AiAssistantPage() {
                   <div className="ai-tier-title" style={{ color: '#b45309' }}>JAMANVAAR PRO</div>
                   <div style={{ fontSize: 13, color: '#b45309', fontWeight: 700 }}>{priceOf('PRO')} / month (Growth Edition)</div>
                 </div>
-                <span className="ai-tier-badge" style={{ background: '#fef3c7', color: '#b45309' }}>
+                <span className="ai-tier-badge" style={{ background: 'var(--jv-warning-soft)', color: '#b45309' }}>
                   <Unlock className="w-3 h-3 inline mr-1" />
                   100% UNLOCKED
                 </span>
               </div>
               <ul className="ai-tier-feature-list">
-                <li className="ai-tier-feature-item" style={{ color: '#0f172a', fontWeight: 600 }}>
+                <li className="ai-tier-feature-item" style={{ color: 'var(--jv-text)', fontWeight: 600 }}>
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <span>Full access to all 11 Intelligence Modules</span>
                 </li>
-                <li className="ai-tier-feature-item" style={{ color: '#0f172a', fontWeight: 600 }}>
+                <li className="ai-tier-feature-item" style={{ color: 'var(--jv-text)', fontWeight: 600 }}>
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <span>Real-time Financial Pulse & Tax breakdowns</span>
                 </li>
-                <li className="ai-tier-feature-item" style={{ color: '#0f172a', fontWeight: 600 }}>
+                <li className="ai-tier-feature-item" style={{ color: 'var(--jv-text)', fontWeight: 600 }}>
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <span>Proactive Delayed KOT & Low Stock alerts</span>
                 </li>
-                <li className="ai-tier-feature-item" style={{ color: '#0f172a', fontWeight: 600 }}>
+                <li className="ai-tier-feature-item" style={{ color: 'var(--jv-text)', fontWeight: 600 }}>
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <span>Natural Language Search & Executive EOD Briefing</span>
                 </li>
               </ul>
             </div>
-            <div style={{ background: '#fef3c7', padding: 10, borderRadius: 8, fontSize: 12, color: '#b45309', fontWeight: 600 }}>
+            <div style={{ background: 'var(--jv-warning-soft)', padding: 10, borderRadius: 8, fontSize: 12, color: '#b45309', fontWeight: 600 }}>
               Included alongside Captain App & Table QR Standee Ordering.
             </div>
           </div>
@@ -507,10 +507,10 @@ export function AiAssistantPage() {
       {/* Global Intelligence & Anomaly Alert Tuning */}
       <Card>
         <div style={{ marginBottom: 16 }}>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#0f172a' }}>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--jv-text)' }}>
             Anomaly Thresholds & AI Alert Engine Tuning
           </h2>
-          <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--jv-text-muted)' }}>
             Tuned values are pushed down to restaurant instances to trigger proactive assistant banners and urgent cards.
           </p>
         </div>
@@ -558,7 +558,7 @@ export function AiAssistantPage() {
 
           </div>
 
-          <div style={{ display: 'flex', gap: 24, marginTop: 16, paddingTop: 16, borderTop: '1px solid #e2e8f0', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 24, marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--jv-border)', flexWrap: 'wrap' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
               <input
                 type="checkbox"
@@ -594,10 +594,10 @@ export function AiAssistantPage() {
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#0f172a' }}>
+            <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--jv-text)' }}>
               Query Template & Category Registry ({filteredQuestions.length} Questions)
             </h2>
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--jv-text-muted)' }}>
               Enable, disable, reprioritize, or configure minimum tier requirements for assistant questions.
             </p>
           </div>
@@ -653,9 +653,9 @@ export function AiAssistantPage() {
                 {filteredQuestions.map((q) => (
                   <tr key={q.id}>
                     <td>
-                      <div style={{ fontWeight: 700, color: '#0f172a' }}>{q.label}</div>
+                      <div style={{ fontWeight: 700, color: 'var(--jv-text)' }}>{q.label}</div>
                       {q.isCustom && (
-                        <span className="badge badge-accent" style={{ fontSize: 10, padding: '1px 5px' }}>
+                        <span className="badge badge-accent" style={{ fontSize: 11, padding: '1px 5px' }}>
                           CUSTOM QUERY
                         </span>
                       )}
@@ -666,7 +666,7 @@ export function AiAssistantPage() {
                       </span>
                     </td>
                     <td>
-                      <code style={{ fontSize: 12, color: '#334155' }}>{q.intent}</code>
+                      <code style={{ fontSize: 12, color: 'var(--jv-text-secondary)' }}>{q.intent}</code>
                     </td>
                     <td>
                       <Badge tone={q.minPlanTier === 'PRO' ? 'accent' : 'neutral'}>
@@ -738,7 +738,7 @@ export function AiAssistantPage() {
                 <select
                   value={editTier}
                   onChange={(e) => setEditTier(e.target.value as any)}
-                  style={{ height: 40, borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px', width: '100%' }}
+                  style={{ height: 40, borderRadius: 6, border: '1px solid var(--jv-border-hover)', padding: '0 10px', width: '100%' }}
                 >
                   <option value="PRO">PRO Plan (₹7,000/mo)</option>
                   <option value="CORE">CORE Plan (₹5,000/mo)</option>
@@ -780,7 +780,7 @@ export function AiAssistantPage() {
           <form onSubmit={handleAddQuestion} className="modal-form">
             {/* Step 1: Target Real-Data Source */}
             <div className="form-field">
-              <label style={{ fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>
+              <label style={{ fontWeight: 800, color: 'var(--jv-text)', marginBottom: 6 }}>
                 1. Target Real Data Source (Local SQLite Table) *
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
@@ -799,9 +799,9 @@ export function AiAssistantPage() {
                     style={{
                       padding: '10px 8px',
                       borderRadius: 8,
-                      border: targetDomain === d.id ? '2px solid #e66817' : '1px solid #cbd5e1',
-                      background: targetDomain === d.id ? '#fff7ed' : '#ffffff',
-                      color: targetDomain === d.id ? '#c2410c' : '#334155',
+                      border: targetDomain === d.id ? '2px solid #e66817' : '1px solid var(--jv-border-hover)',
+                      background: targetDomain === d.id ? '#fff7ed' : 'var(--jv-surface-card)',
+                      color: targetDomain === d.id ? '#c2410c' : 'var(--jv-text-secondary)',
                       fontWeight: 700,
                       fontSize: 12,
                       cursor: 'pointer',
@@ -820,11 +820,11 @@ export function AiAssistantPage() {
             {/* Step 2: Calculation & Metric Type */}
             <div className="form-row" style={{ marginTop: 8 }}>
               <div className="form-field">
-                <label style={{ fontWeight: 800, color: '#0f172a' }}>2. Calculation Type *</label>
+                <label style={{ fontWeight: 800, color: 'var(--jv-text)' }}>2. Calculation Type *</label>
                 <select
                   value={calculationType}
                   onChange={(e) => setCalculationType(e.target.value as any)}
-                  style={{ height: 40, borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px', width: '100%' }}
+                  style={{ height: 40, borderRadius: 6, border: '1px solid var(--jv-border-hover)', padding: '0 10px', width: '100%' }}
                 >
                   <option value="SUM">SUM: Total Net Revenue / Amount (₹)</option>
                   <option value="COUNT">COUNT: Total Volume / Tickets (#)</option>
@@ -834,11 +834,11 @@ export function AiAssistantPage() {
               </div>
 
               <div className="form-field">
-                <label style={{ fontWeight: 800, color: '#0f172a' }}>Display Format *</label>
+                <label style={{ fontWeight: 800, color: 'var(--jv-text)' }}>Display Format *</label>
                 <select
                   value={displayUnit}
                   onChange={(e) => setDisplayUnit(e.target.value as any)}
-                  style={{ height: 40, borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px', width: '100%' }}
+                  style={{ height: 40, borderRadius: 6, border: '1px solid var(--jv-border-hover)', padding: '0 10px', width: '100%' }}
                 >
                   <option value="CURRENCY">Currency (₹ Indian Rupee)</option>
                   <option value="NUMBER">Number (# of Orders / Items)</option>
@@ -851,7 +851,7 @@ export function AiAssistantPage() {
             {/* Step 3: Local SQLite Filter Criteria */}
             <div className="form-row" style={{ marginTop: 8 }}>
               <div className="form-field">
-                <label style={{ fontWeight: 800, color: '#0f172a' }}>3. Filter Field</label>
+                <label style={{ fontWeight: 800, color: 'var(--jv-text)' }}>3. Filter Field</label>
                 <Input
                   value={filterField}
                   onChange={(e) => setFilterField(e.target.value)}
@@ -861,7 +861,7 @@ export function AiAssistantPage() {
               </div>
 
               <div className="form-field">
-                <label style={{ fontWeight: 800, color: '#0f172a' }}>Filter Value</label>
+                <label style={{ fontWeight: 800, color: 'var(--jv-text)' }}>Filter Value</label>
                 <Input
                   value={filterValue}
                   onChange={(e) => setFilterValue(e.target.value)}
@@ -873,7 +873,7 @@ export function AiAssistantPage() {
 
             {/* Step 4: Display Question Details */}
             <div className="form-field" style={{ marginTop: 8 }}>
-              <label style={{ fontWeight: 800, color: '#0f172a' }}>4. Question Label (Displayed in Restaurant Assistant) *</label>
+              <label style={{ fontWeight: 800, color: 'var(--jv-text)' }}>4. Question Label (Displayed in Restaurant Assistant) *</label>
               <Input
                 value={newLabel}
                 onChange={(e) => setNewLabel(e.target.value)}
@@ -888,7 +888,7 @@ export function AiAssistantPage() {
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  style={{ height: 40, borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px', width: '100%' }}
+                  style={{ height: 40, borderRadius: 6, border: '1px solid var(--jv-border-hover)', padding: '0 10px', width: '100%' }}
                   required
                 >
                   {categories.map((c) => (
@@ -904,7 +904,7 @@ export function AiAssistantPage() {
                 <select
                   value={newTier}
                   onChange={(e) => setNewTier(e.target.value as any)}
-                  style={{ height: 40, borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px', width: '100%' }}
+                  style={{ height: 40, borderRadius: 6, border: '1px solid var(--jv-border-hover)', padding: '0 10px', width: '100%' }}
                 >
                   <option value="PRO">PRO Plan (₹7,000 / month)</option>
                   <option value="CORE">CORE Plan (₹5,000 / month)</option>
@@ -937,10 +937,10 @@ export function AiAssistantPage() {
             {/* Step 5: Live Real-Data Result Mockup Preview */}
             <div style={{ background: '#0b253a', borderRadius: 12, padding: 14, color: '#fff', marginTop: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#e66817', background: 'rgba(230,104,23,0.15)', padding: '2px 8px', borderRadius: 10 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--jv-accent-text)', background: 'rgba(230,104,23,0.15)', padding: '2px 8px', borderRadius: 10 }}>
                   {targetDomain} • REAL LOCAL SQLITE DATA
                 </span>
-                <span style={{ fontSize: 10, color: '#94a3b8', fontFamily: 'monospace' }}>&lt; 3ms Zero Cloud Lag</span>
+                <span style={{ fontSize: 11, color: 'var(--jv-text-light)', fontFamily: 'monospace' }}>&lt; 3ms Zero Cloud Lag</span>
               </div>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>
                 {newLabel || 'Question Display Label'}
@@ -948,7 +948,7 @@ export function AiAssistantPage() {
               <div style={{ fontSize: 22, fontWeight: 900, fontFamily: 'monospace', color: '#f8fafc', marginTop: 4 }}>
                 {calculationType === 'COUNT' ? '24 Orders' : calculationType === 'RATIO' ? '68% Share' : '₹14,850'}
               </div>
-              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ fontSize: 11, color: 'var(--jv-text-light)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Computed live against restaurant's local SQLite ledger (filter: {filterField} = {filterValue || 'ALL'}).</span>
               </div>

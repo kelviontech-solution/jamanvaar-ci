@@ -1,3 +1,4 @@
+import '../../components/shared.css';
 import { RESTAURANT_ADMIN_URL } from '../../lib/appUrls';
 // Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
 import { copyText } from '../../../../../packages/utils/src/clipboard';
@@ -186,11 +187,11 @@ export function CreateRestaurantModal({
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <KeyRound className="w-3.5 h-3.5 text-amber-600" />
-                      <span style={{ fontSize: 11, color: '#E66817', fontWeight: 800, textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: 11, color: 'var(--jv-accent-text)', fontWeight: 800, textTransform: 'uppercase' }}>
                         Restaurant Admin Activation Key
                       </span>
                     </div>
-                    <div className="mono" style={{ fontSize: 15, fontWeight: 800, color: '#E66817', letterSpacing: '0.05em', marginTop: 2 }}>
+                    <div className="mono" style={{ fontSize: 15, fontWeight: 800, color: 'var(--jv-accent-text)', letterSpacing: '0.05em', marginTop: 2 }}>
                       {createdResult.activationKey}
                     </div>
                   </div>
@@ -281,7 +282,7 @@ export function CreateRestaurantModal({
                 <label style={{ margin: 0 }}>Initial Password *</label>
                 <button
                   type="button"
-                  style={{ background: 'none', border: 'none', color: 'var(--jv-accent)', fontSize: 11.5, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+                  style={{ background: 'none', border: 'none', color: 'var(--jv-accent-text)', fontSize: 11.5, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
                   onClick={() => update('ownerPassword', generateRandomPassword())}
                 >
                   <RefreshCw className="w-3 h-3" />
@@ -300,7 +301,7 @@ export function CreateRestaurantModal({
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748B', cursor: 'pointer' }}
+                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--jv-text-muted)', cursor: 'pointer' }}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>

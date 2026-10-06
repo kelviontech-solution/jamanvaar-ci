@@ -160,7 +160,7 @@ export function PayoutsListPage() {
     <Card>
       <div style={{ padding: 16 }}>
         <div className="muted" style={{ fontSize: 12 }}>{label}</div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: tone === 'good' ? '#16a34a' : tone === 'warn' ? '#ea580c' : undefined }}>{value}</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: tone === 'good' ? '#16a34a' : tone === 'warn' ? 'var(--jv-accent-text)' : undefined }}>{value}</div>
       </div>
     </Card>
   );
@@ -293,7 +293,7 @@ export function PayoutsListPage() {
 
       {modal && (
         <div className="modal-backdrop" role="dialog" aria-modal="true" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 20, width: 360 }}>
+          <div style={{ background: 'var(--jv-surface-card)', borderRadius: 12, padding: 20, width: 360 }}>
             <div style={{ fontWeight: 700, marginBottom: 8 }}>
               {modal.kind === 'mark-paid' ? 'Mark payout PAID' : modal.kind === 'hold' ? 'Put payout on hold' : 'Release payout'}
             </div>

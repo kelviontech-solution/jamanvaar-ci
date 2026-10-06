@@ -434,7 +434,7 @@ export function MasterCatalogPage() {
         <select
           value={dietaryFilter}
           onChange={(e) => setDietaryFilter(e.target.value)}
-          style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: '#fff' }}
+          style={{ height: 38, padding: '0 12px', borderRadius: 8, border: '1px solid var(--jv-border)', fontSize: 13, background: 'var(--jv-surface-card)' }}
         >
           <option value="ALL">All Dietary Classifications</option>
           <option value="VEG">Vegetarian (VEG)</option>
@@ -484,12 +484,12 @@ export function MasterCatalogPage() {
 
       {/* ── Content View ── */}
       {loading && items.length === 0 ? (
-        <div style={{ padding: 48, textAlign: 'center', color: '#64748b' }}>Loading master menu catalog…</div>
+        <div style={{ padding: 48, textAlign: 'center', color: 'var(--jv-text-muted)' }}>Loading master menu catalog…</div>
       ) : filteredItems.length === 0 ? (
         <Card style={{ padding: 48, textAlign: 'center' }}>
           <Utensils className="w-10 h-10 mx-auto text-slate-400 mb-3" />
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0B253A', marginBottom: 6 }}>No master dishes match your search</h3>
-          <p style={{ fontSize: 13, color: '#64748B', maxWidth: 450, margin: '0 auto 16px' }}>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--jv-text)', marginBottom: 6 }}>No master dishes match your search</h3>
+          <p style={{ fontSize: 13, color: 'var(--jv-text-muted)', maxWidth: 450, margin: '0 auto 16px' }}>
             Try clearing search keywords, or click "Import Starter Library" to automatically load 30+ authentic Indian culinary recipes.
           </p>
           <Button variant="accent" onClick={handleImportStarterLibrary} disabled={importingLibrary}>
@@ -593,7 +593,7 @@ export function MasterCatalogPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left', color: '#64748b' }}>
+                <tr style={{ borderBottom: '2px solid var(--jv-border-subtle)', textAlign: 'left', color: 'var(--jv-text-muted)' }}>
                   <th style={{ padding: '12px 14px' }}>Master Dish</th>
                   <th style={{ padding: '12px 14px' }}>Category</th>
                   <th style={{ padding: '12px 14px' }}>Dietary</th>
@@ -607,7 +607,7 @@ export function MasterCatalogPage() {
                 {filteredItems.map((dish) => {
                   const diet = getDietStyle(dish.dietaryType);
                   return (
-                    <tr key={dish.id} style={{ borderBottom: '1px solid #f8fafc' }}>
+                    <tr key={dish.id} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
                       <td style={{ padding: '14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                           {dish.imageUrl ? (
@@ -622,14 +622,14 @@ export function MasterCatalogPage() {
                             </div>
                           )}
                           <div>
-                            <div style={{ fontWeight: 800, color: '#0B253A', fontSize: 14 }}>{dish.name}</div>
-                            <div style={{ color: '#64748b', fontSize: 12, marginTop: 2, maxWidth: 360 }}>
+                            <div style={{ fontWeight: 800, color: 'var(--jv-text)', fontSize: 14 }}>{dish.name}</div>
+                            <div style={{ color: 'var(--jv-text-muted)', fontSize: 12, marginTop: 2, maxWidth: 360 }}>
                               {dish.description || 'Standard chef formulation'}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td style={{ padding: '14px', color: '#475569', fontWeight: 600 }}>
+                      <td style={{ padding: '14px', color: 'var(--jv-text-secondary)', fontWeight: 600 }}>
                         {dish.category?.name || 'General'}
                       </td>
                       <td style={{ padding: '14px' }}>
@@ -639,9 +639,9 @@ export function MasterCatalogPage() {
                         <span style={{ fontWeight: 900, color: '#047857', fontSize: 14 }}>
                           ₹{(dish.basePrice / 100).toFixed(0)}
                         </span>
-                        <span style={{ color: '#94a3b8', fontSize: 11, marginLeft: 4 }}>+ 5% GST</span>
+                        <span style={{ color: 'var(--jv-text-light)', fontSize: 11, marginLeft: 4 }}>+ 5% GST</span>
                       </td>
-                      <td style={{ padding: '14px', color: '#64748b' }}>
+                      <td style={{ padding: '14px', color: 'var(--jv-text-muted)' }}>
                         <Clock className="w-3.5 h-3.5 inline mr-1 text-slate-400" />
                         {dish.preparationTimeMinutes} min
                       </td>
@@ -677,7 +677,7 @@ export function MasterCatalogPage() {
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxHeight: '75vh', overflowY: 'auto', paddingRight: 4 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: '#0B253A' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: 'var(--jv-text)' }}>
                 Dish Name *
               </label>
               <input
@@ -685,19 +685,19 @@ export function MasterCatalogPage() {
                 placeholder="e.g. Amritsari Kulcha Platter"
                 value={dishName}
                 onChange={(e) => setDishName(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: '#0B253A' }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: 'var(--jv-text)' }}>
                   Category *
                 </label>
                 <select
                   value={dishCategory}
                   onChange={(e) => setDishCategory(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
                 >
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
@@ -706,13 +706,13 @@ export function MasterCatalogPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: '#0B253A' }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: 'var(--jv-text)' }}>
                   Dietary Classification
                 </label>
                 <select
                   value={dishDiet}
                   onChange={(e) => setDishDiet(e.target.value as any)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
                 >
                   <option value="VEG">Vegetarian (VEG)</option>
                   <option value="JAIN">Jain (No Root Vegetables)</option>
@@ -725,31 +725,31 @@ export function MasterCatalogPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: '#0B253A' }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: 'var(--jv-text)' }}>
                   Suggested Base Price (₹) *
                 </label>
                 <input
                   type="number"
                   value={dishPrice}
                   onChange={(e) => setDishPrice(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: '#0B253A' }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: 'var(--jv-text)' }}>
                   Kitchen Prep Time (Min)
                 </label>
                 <input
                   type="number"
                   value={dishPrepTime}
                   onChange={(e) => setDishPrepTime(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: '#0B253A' }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: 'var(--jv-text)' }}>
                   HSN Tax Code
                 </label>
                 <input
@@ -757,13 +757,13 @@ export function MasterCatalogPage() {
                   value={dishHsn}
                   onChange={(e) => setDishHsn(e.target.value)}
                   placeholder="996331"
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
                 />
               </div>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: '#0B253A' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: 'var(--jv-text)' }}>
                 Description
               </label>
               <textarea
@@ -771,12 +771,12 @@ export function MasterCatalogPage() {
                 placeholder="Culinary background, flavor notes, and presentation style…"
                 value={dishDesc}
                 onChange={(e) => setDishDesc(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: '#0B253A' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: 'var(--jv-text)' }}>
                 Ingredients & Formulation (1 per line)
               </label>
               <textarea
@@ -784,12 +784,12 @@ export function MasterCatalogPage() {
                 placeholder="Paneer malai (200g)&#10;Hung curd (50g)&#10;Kashmiri degi mirch (15g)"
                 value={dishIngredients}
                 onChange={(e) => setDishIngredients(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: '#0B253A' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4, color: 'var(--jv-text)' }}>
                 Preparation Method & Kitchen Notes
               </label>
               <textarea
@@ -797,13 +797,13 @@ export function MasterCatalogPage() {
                 placeholder="Step-by-step chef method and tandoor/pan execution guide…"
                 value={dishRecipeMethod}
                 onChange={(e) => setDishRecipeMethod(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13 }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               />
             </div>
 
             {/* Dish Image Upload */}
             <div>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: '#0B253A' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: 'var(--jv-text)' }}>
                 Dish Photography & Visual Asset
               </label>
               {dishImageUrl ? (
@@ -831,10 +831,10 @@ export function MasterCatalogPage() {
                     onChange={handleFileChange}
                   />
                   <ImageIcon className="w-8 h-8 mx-auto text-slate-400 mb-2" />
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#0B253A' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--jv-text)' }}>
                     {uploadingImage ? 'Uploading dish photo…' : 'Click to upload dish photo'}
                   </div>
-                  <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: 'var(--jv-text-muted)', marginTop: 2 }}>
                     {/* security-audit LOW-03: SVG dropped — the API no longer accepts it (can carry a <script> tag) */}
                     PNG, JPG, WEBP or GIF (Max 5MB)
                   </div>
@@ -857,8 +857,8 @@ export function MasterCatalogPage() {
         <Modal title="Master Menu Category Management" onClose={() => setCategoryModalOpen(false)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Create / Edit Form */}
-            <div style={{ background: '#F8FAFC', padding: 14, borderRadius: 8, border: '1px solid #E2E8F0' }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: '#0B253A', marginBottom: 8 }}>
+            <div style={{ background: 'var(--jv-surface-subtle)', padding: 14, borderRadius: 8, border: '1px solid var(--jv-border)' }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--jv-text)', marginBottom: 8 }}>
                 {editingCat ? `Edit Category: ${editingCat.name}` : 'Create New Category'}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
@@ -867,14 +867,14 @@ export function MasterCatalogPage() {
                   placeholder="Category Name (e.g. Chaat & Street Food)"
                   value={newCatName}
                   onChange={(e) => setNewCatName(e.target.value)}
-                  style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #cbd5e1', fontSize: 13 }}
+                  style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
                 />
                 <input
                   type="text"
                   placeholder="Slug (optional e.g. chaat-street-food)"
                   value={newCatSlug}
                   onChange={(e) => setNewCatSlug(e.target.value)}
-                  style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #cbd5e1', fontSize: 13 }}
+                  style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
                 />
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
@@ -899,15 +899,15 @@ export function MasterCatalogPage() {
 
             {/* List */}
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>
                 Existing Categories ({categories.length})
               </div>
               <div className="category-manager-list">
                 {categories.map((cat) => (
                   <div key={cat.id} className="category-manager-item">
                     <div>
-                      <strong style={{ color: '#0B253A', fontSize: 13 }}>{cat.name}</strong>
-                      <span style={{ color: '#64748B', fontSize: 12, marginLeft: 8 }}>
+                      <strong style={{ color: 'var(--jv-text)', fontSize: 13 }}>{cat.name}</strong>
+                      <span style={{ color: 'var(--jv-text-muted)', fontSize: 12, marginLeft: 8 }}>
                         ({cat._count?.items ?? 0} dishes)
                       </span>
                     </div>
@@ -970,7 +970,7 @@ export function MasterCatalogPage() {
 
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <label style={{ fontSize: 13, fontWeight: 700, color: '#0B253A' }}>
+                <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--jv-text)' }}>
                   Select Target Outlets ({selectedRestIds.size} of {restaurants.length} selected):
                 </label>
                 <button
@@ -985,7 +985,7 @@ export function MasterCatalogPage() {
                 </button>
               </div>
 
-              <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 8, padding: 8 }}>
+              <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid var(--jv-border)', borderRadius: 8, padding: 8 }}>
                 {restaurants.map((r) => {
                   const checked = selectedRestIds.has(r.id);
                   return (
@@ -997,7 +997,7 @@ export function MasterCatalogPage() {
                         gap: 10,
                         padding: '8px 10px',
                         borderRadius: 6,
-                        background: checked ? '#f8fafc' : 'transparent',
+                        background: checked ? 'var(--jv-surface-subtle)' : 'transparent',
                         cursor: 'pointer'
                       }}
                     >
@@ -1008,7 +1008,7 @@ export function MasterCatalogPage() {
                       />
                       <div>
                         <strong>{r.name}</strong>
-                        <span style={{ color: '#64748b', fontSize: 12, marginLeft: 8 }}>{r.city || 'India'}</span>
+                        <span style={{ color: 'var(--jv-text-muted)', fontSize: 12, marginLeft: 8 }}>{r.city || 'India'}</span>
                       </div>
                     </label>
                   );

@@ -28,7 +28,7 @@
 
 .support-search-input:focus {
   border-color: var(--jv-accent);
-  box-shadow: 0 0 0 3px rgba(230, 104, 23, 0.18);
+  box-shadow: 0 0 0 3px var(--jv-accent-ring);
 }
 
 .search-results-grid {

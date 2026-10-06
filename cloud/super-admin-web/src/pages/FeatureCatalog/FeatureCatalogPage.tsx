@@ -83,10 +83,10 @@ export function FeatureCatalogPage() {
             const catFeatures = features.filter((f) => f.categoryId === cat.id);
             return (
               <Card key={cat.id} style={{ padding: 0, overflow: 'hidden' }}>
-                <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', borderBottom: '1px solid var(--jv-border)' }}>
+                <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--jv-surface-subtle)', borderBottom: '1px solid var(--jv-border)' }}>
                   <div>
-                    <div style={{ fontWeight: 900, fontSize: 14, color: '#0B253A' }}>{cat.name}</div>
-                    <div style={{ fontSize: 12, color: '#64748b' }}>{cat.description}</div>
+                    <div style={{ fontWeight: 900, fontSize: 14, color: 'var(--jv-text)' }}>{cat.name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--jv-text-muted)' }}>{cat.description}</div>
                   </div>
                   <Button variant="ghost" size="sm" onClick={() => setCategoryModal({ category: cat })}>Edit Category</Button>
                 </div>
@@ -96,10 +96,10 @@ export function FeatureCatalogPage() {
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                     <tbody>
                       {catFeatures.map((f) => (
-                        <tr key={f.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <tr key={f.id} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
                           <td style={{ padding: '10px 20px' }}>
-                            <div style={{ fontWeight: 700, color: '#1e293b' }}>{f.name}</div>
-                            <div style={{ fontSize: 12, color: '#64748b' }}>{f.description}</div>
+                            <div style={{ fontWeight: 700, color: 'var(--jv-text)' }}>{f.name}</div>
+                            <div style={{ fontSize: 12, color: 'var(--jv-text-muted)' }}>{f.description}</div>
                           </td>
                           <td style={{ padding: '10px 20px' }}>{f.appCode && <Badge tone="accent">{f.appCode}</Badge>}</td>
                           <td style={{ padding: '10px 20px' }}>

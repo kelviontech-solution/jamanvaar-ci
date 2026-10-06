@@ -42,10 +42,10 @@ export function RestaurantSalesPanel({ restaurantId }: { restaurantId: string })
   useEffect(load, [load]);
 
   const tile = (label: string, value: string, sub?: string) => (
-    <div style={{ padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 800, color: '#0B253A', marginTop: 6 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>{sub}</div>}
+    <div style={{ padding: 16, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>{label}</div>
+      <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--jv-text)', marginTop: 6 }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, color: 'var(--jv-text-muted)', marginTop: 2 }}>{sub}</div>}
     </div>
   );
 
@@ -53,13 +53,13 @@ export function RestaurantSalesPanel({ restaurantId }: { restaurantId: string })
     <Card style={{ padding: 22 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
         <div>
-          <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#0B253A' }}>Restaurant sales</h3>
-          <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+          <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: 'var(--jv-text)' }}>Restaurant sales</h3>
+          <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
             The restaurant&apos;s own takings, from orders its terminals synced. Not the platform&apos;s invoices (see below).
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <select value={days} onChange={(e) => setDays(Number(e.target.value))} aria-label="Period" style={{ height: 32, borderRadius: 8, border: '1px solid #cbd5e1', padding: '0 8px', fontSize: 13 }}>
+          <select value={days} onChange={(e) => setDays(Number(e.target.value))} aria-label="Period" style={{ height: 32, borderRadius: 8, border: '1px solid var(--jv-border-hover)', padding: '0 8px', fontSize: 13 }}>
             {RANGES.map((r) => <option key={r.days} value={r.days}>{r.label}</option>)}
           </select>
           <Button variant="ghost" size="sm" onClick={load} disabled={loading}>
@@ -100,17 +100,17 @@ export function RestaurantSalesPanel({ restaurantId }: { restaurantId: string })
 function Breakdown({ title, rows, countLabel = 'Orders' }: { title: string; rows: Array<[string, number, number]>; countLabel?: string }) {
   return (
     <div>
-      <div style={{ fontSize: 12, fontWeight: 800, color: '#0B253A', marginBottom: 6 }}>{title}</div>
+      <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--jv-text)', marginBottom: 6 }}>{title}</div>
       {rows.length === 0 ? (
-        <div style={{ fontSize: 12, color: '#94a3b8' }}>Nothing in this period.</div>
+        <div style={{ fontSize: 12, color: 'var(--jv-text-light)' }}>Nothing in this period.</div>
       ) : (
         <table style={{ width: '100%', fontSize: 12.5, borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ color: '#64748b', textAlign: 'left' }}><th style={{ padding: '4px 0' }} /><th style={{ textAlign: 'right' }}>{countLabel}</th><th style={{ textAlign: 'right' }}>Sales</th></tr>
+            <tr style={{ color: 'var(--jv-text-muted)', textAlign: 'left' }}><th style={{ padding: '4px 0' }} /><th style={{ textAlign: 'right' }}>{countLabel}</th><th style={{ textAlign: 'right' }}>Sales</th></tr>
           </thead>
           <tbody>
             {rows.map(([name, count, amount]) => (
-              <tr key={name} style={{ borderTop: '1px solid #f1f5f9' }}>
+              <tr key={name} style={{ borderTop: '1px solid var(--jv-border-subtle)' }}>
                 <td style={{ padding: '5px 0' }}>{name}</td>
                 <td style={{ textAlign: 'right' }}>{count}</td>
                 <td style={{ textAlign: 'right', fontWeight: 700 }}>{inr(amount)}</td>

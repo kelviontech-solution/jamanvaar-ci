@@ -8,7 +8,7 @@
 .dashboard-error {
   background: var(--jv-error-soft);
   color: var(--jv-error);
-  border: 1px solid #fecaca;
+  border: 1px solid rgba(220, 38, 38, 0.3);
   border-radius: var(--jv-radius-md);
   padding: 14px 18px;
   font-size: 13.5px;
@@ -37,23 +37,18 @@
 .section-heading {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 .section-title {
-  font-size: 14px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--jv-primary);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--jv-text);
 }
 .section-badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--jv-text-light);
-  background: var(--jv-bg-muted);
-  padding: 2px 8px;
-  border-radius: var(--jv-radius-sm);
-  border: 1px solid var(--jv-border);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--jv-text-muted);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -68,17 +63,17 @@
 /* MRR Hero Card */
 .mrr-hero-card {
   padding: 22px 24px;
-  background: linear-gradient(135deg, #ffffff 0%, #fdfbf7 100%);
-  border: 1px solid var(--jv-gold-border);
+  background: var(--jv-surface-card);
+  border: 1px solid var(--jv-border);
   border-radius: var(--jv-radius-lg);
-  box-shadow: var(--jv-shadow-hero);
+  box-shadow: var(--jv-shadow-sm);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 16px;
   position: relative;
   overflow: hidden;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.2s ease;
 }
 .mrr-hero-card::before {
   content: '';
@@ -86,16 +81,15 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 3.5px;
-  background: linear-gradient(90deg, var(--jv-accent) 0%, var(--jv-gold) 100%);
+  height: 3px;
+  background: var(--jv-accent);
 }
 .mrr-hero-card:hover {
-  border-color: #d1c7af;
-  box-shadow: var(--jv-shadow-hero-hover);
-  transform: translateY(-1px);
+  border-color: var(--jv-border-hover);
 }
 
 .mrr-hero-header {
+  flex-wrap: wrap;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -108,8 +102,8 @@
   flex-wrap: wrap;
 }
 .mrr-pill-badge {
-  font-size: 10.5px;
-  font-weight: 800;
+  font-size: 11px;
+  font-weight: 700;
   letter-spacing: 0.05em;
   color: var(--jv-text-secondary);
   background: var(--jv-bg);
@@ -123,7 +117,7 @@
   gap: 4px;
   font-size: 12px;
   font-weight: 700;
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
   text-decoration: none;
   transition: color 0.15s ease;
 }
@@ -144,15 +138,15 @@
 }
 .mrr-currency-symbol {
   font-size: 22px;
-  font-weight: 700;
-  color: var(--jv-gold);
+  font-weight: 600;
+  color: var(--jv-text-muted);
 }
 .mrr-amount {
-  font-size: 34px;
-  font-weight: 800;
-  font-family: 'IBM Plex Mono', monospace;
-  color: var(--jv-primary);
-  letter-spacing: -0.03em;
+  font-size: 36px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--jv-text);
+  letter-spacing: -0.02em;
   line-height: 1.1;
 }
 
@@ -162,15 +156,15 @@
   gap: 12px;
   flex-wrap: wrap;
   padding-top: 4px;
-  border-top: 1px dashed var(--jv-border);
+  border-top: 1px solid var(--jv-border-subtle);
 }
 .mrr-arr-tag {
   font-size: 12px;
   color: var(--jv-text-secondary);
 }
 .mrr-arr-tag strong {
-  color: var(--jv-primary);
-  font-family: 'IBM Plex Mono', monospace;
+  color: var(--jv-text);
+  font-variant-numeric: tabular-nums;
   font-weight: 700;
 }
 .mrr-sub-note {
@@ -181,20 +175,18 @@
 /* Standard Overview Metric Card */
 .overview-metric-card {
   padding: 20px 22px;
-  background: #ffffff;
+  background: var(--jv-surface-card);
   border: 1px solid var(--jv-border);
   border-radius: var(--jv-radius-lg);
-  box-shadow: var(--jv-shadow-card);
+  box-shadow: var(--jv-shadow-xs);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 14px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.2s ease;
 }
 .overview-metric-card:hover {
   border-color: var(--jv-border-hover);
-  box-shadow: var(--jv-shadow-card-hover);
-  transform: translateY(-1px);
 }
 
 .metric-card-top {
@@ -203,8 +195,8 @@
   justify-content: space-between;
 }
 .metric-label {
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--jv-text-secondary);
 }
 .metric-icon-box {
@@ -222,7 +214,7 @@
 }
 .metric-icon-saffron {
   background: var(--jv-accent-soft);
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
 }
 
 .metric-card-middle {
@@ -232,9 +224,9 @@
 }
 .metric-big-number {
   font-size: 32px;
-  font-weight: 800;
-  font-family: 'IBM Plex Mono', monospace;
-  color: var(--jv-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--jv-text);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -257,9 +249,7 @@
   border-radius: 50%;
   display: inline-block;
 }
-.text-emerald { color: #065f46; }
 .bg-emerald { background: var(--jv-online); }
-.text-amber { color: #92400e; }
 .bg-amber { background: var(--jv-warning); }
 
 .metric-sub-text {
@@ -280,7 +270,7 @@
   transition: color 0.15s ease;
 }
 .card-explore-link:hover {
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -289,12 +279,12 @@
 .health-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  gap: 16px;
 }
 
 .health-tile {
   padding: 16px 18px;
-  background: #ffffff;
+  background: var(--jv-surface-card);
   border: 1px solid var(--jv-border);
   border-radius: var(--jv-radius-md);
   box-shadow: var(--jv-shadow-xs);
@@ -318,15 +308,15 @@
   flex-shrink: 0;
 }
 .bg-saffron-soft { background: var(--jv-accent-soft); }
-.text-saffron { color: var(--jv-accent); }
-.bg-rose-soft { background: #fef2f2; }
+.text-saffron { color: var(--jv-accent-text); }
+.bg-rose-soft { background: var(--jv-error-soft); }
 .text-rose { color: var(--jv-error); }
-.bg-amber-soft { background: #fffbeb; }
-.text-amber { color: var(--jv-warning); }
-.bg-emerald-soft { background: #ecfdf5; }
-.text-emerald { color: #065f46; }
-.bg-slate-soft { background: #f1f5f9; }
-.text-slate { color: #64748b; }
+.bg-amber-soft { background: var(--jv-warning-soft); }
+.text-amber { color: var(--jv-warning-text); }
+.bg-emerald-soft { background: var(--jv-success-soft); }
+.text-emerald { color: var(--jv-success-text); }
+.bg-slate-soft { background: var(--jv-bg-muted); }
+.text-slate { color: var(--jv-text-muted); }
 
 .health-info {
   display: flex;
@@ -334,14 +324,14 @@
 }
 .health-number {
   font-size: 20px;
-  font-weight: 800;
-  font-family: 'IBM Plex Mono', monospace;
-  color: var(--jv-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--jv-text);
   line-height: 1.1;
 }
 .health-label {
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--jv-text-secondary);
   margin-top: 2px;
 }
@@ -354,7 +344,7 @@
 /* Plan Distribution Card */
 .plan-distribution-card {
   padding: 14px 20px;
-  background: #ffffff;
+  background: var(--jv-surface-card);
   border: 1px solid var(--jv-border);
   border-radius: var(--jv-radius-md);
   display: flex;
@@ -380,7 +370,7 @@
   text-decoration: none;
 }
 .plan-dist-link:hover {
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
 }
 .plan-dist-badges {
   display: flex;
@@ -403,13 +393,13 @@
   color: var(--jv-primary);
 }
 .plan-count-badge {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--jv-accent);
-  background: #ffffff;
+  color: var(--jv-accent-text);
+  background: var(--jv-surface-card);
   padding: 1px 6px;
-  border-radius: 4px;
-  border: 1px solid rgba(230, 104, 23, 0.2);
+  border-radius: var(--jv-radius-sm);
+  border: 1px solid var(--jv-accent-border);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -418,7 +408,7 @@
 .operations-split-grid {
   display: grid;
   grid-template-columns: 1fr 1.3fr;
-  gap: 18px;
+  gap: 16px;
   align-items: start;
 }
 
@@ -431,16 +421,18 @@
 /* Infrastructure Card */
 .infrastructure-card {
   padding: 20px 22px;
-  background: #ffffff;
+  background: var(--jv-surface-card);
   border: 1px solid var(--jv-border);
   border-radius: var(--jv-radius-lg);
-  box-shadow: var(--jv-shadow-card);
+  box-shadow: var(--jv-shadow-xs);
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
 .card-header-bar {
+  flex-wrap: wrap;
+  gap: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -462,7 +454,7 @@
   text-decoration: none;
 }
 .card-link-sm:hover {
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
 }
 
 .infra-stats-row {
@@ -478,9 +470,9 @@
 }
 .infra-number {
   font-size: 24px;
-  font-weight: 800;
-  font-family: 'IBM Plex Mono', monospace;
-  color: var(--jv-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--jv-text);
   line-height: 1.1;
 }
 .infra-number-sub {
@@ -513,8 +505,8 @@
 }
 .connectivity-pct {
   font-weight: 700;
-  color: var(--jv-primary);
-  font-family: 'IBM Plex Mono', monospace;
+  color: var(--jv-text);
+  font-variant-numeric: tabular-nums;
 }
 .connectivity-bar {
   height: 7px;
@@ -524,7 +516,7 @@
 }
 .connectivity-fill {
   height: 100%;
-  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  background: var(--jv-success);
   border-radius: var(--jv-radius-full);
   transition: width 0.4s ease;
 }
@@ -557,8 +549,9 @@
 
 /* Quick Health Card */
 .quick-health-card {
+  flex-wrap: wrap;
   padding: 16px 20px;
-  background: #ffffff;
+  background: var(--jv-surface-card);
   border: 1px solid var(--jv-border);
   border-radius: var(--jv-radius-lg);
   box-shadow: var(--jv-shadow-xs);
@@ -585,10 +578,10 @@
 /* ── Activity Panel & Timeline ── */
 .activity-panel-card {
   padding: 20px 22px;
-  background: #ffffff;
+  background: var(--jv-surface-card);
   border: 1px solid var(--jv-border);
   border-radius: var(--jv-radius-lg);
-  box-shadow: var(--jv-shadow-card);
+  box-shadow: var(--jv-shadow-xs);
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -608,7 +601,7 @@
 }
 .activity-panel-title {
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--jv-primary);
   letter-spacing: -0.01em;
 }
@@ -620,7 +613,7 @@
   transition: color 0.15s ease;
 }
 .activity-panel-link:hover {
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
 }
 
 /* Activity Stream Timeline */
@@ -656,13 +649,13 @@
   border-radius: 50%;
   flex-shrink: 0;
   z-index: 2;
-  box-shadow: 0 0 0 2px #ffffff;
+  box-shadow: 0 0 0 2px var(--jv-surface-card);
 }
 .activity-stream-dot.badge-success { background: var(--jv-success); }
 .activity-stream-dot.badge-accent { background: var(--jv-accent); }
 .activity-stream-dot.badge-warning { background: var(--jv-warning); }
 .activity-stream-dot.badge-error { background: var(--jv-error); }
-.activity-stream-dot.badge-neutral { background: #94a3b8; }
+.activity-stream-dot.badge-neutral { background: var(--jv-text-light); }
 
 .activity-stream-line {
   width: 2px;
@@ -693,7 +686,7 @@
   line-height: 1.3;
 }
 .activity-action-tag {
-  font-size: 10px;
+  font-size: 11px;
   padding: 1.5px 7px;
 }
 
@@ -723,22 +716,27 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
+.telemetry-unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--jv-text-muted);
+}
+.telemetry-unit-ok { color: var(--jv-success-text); }
+.telemetry-unit-bad { color: var(--jv-error); }
 
 .telemetry-tile {
   padding: 18px;
-  background: #FFFFFF;
-  border: 1px solid var(--jv-border, #E2E8F0);
-  border-radius: var(--jv-radius-md, 10px);
+  background: var(--jv-surface-card);
+  border: 1px solid var(--jv-border);
+  border-radius: var(--jv-radius-md);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: all 0.18s ease;
+  transition: border-color 0.18s ease;
 }
 
 .telemetry-tile:hover {
-  border-color: rgba(230, 104, 23, 0.4);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(11, 37, 58, 0.05);
+  border-color: var(--jv-border-hover);
 }
 
 .telemetry-tile-top {
@@ -748,11 +746,9 @@
 }
 
 .telemetry-tile-title {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--jv-text-secondary, #475569);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--jv-text-secondary);
 }
 
 .telemetry-tile-body {
@@ -762,17 +758,18 @@
 }
 
 .telemetry-tile-metric {
-  font-size: 20px;
-  font-weight: 800;
-  color: #0B253A;
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--jv-text);
   display: flex;
   align-items: baseline;
   gap: 6px;
 }
 
 .telemetry-tile-sub {
-  font-size: 11.5px;
-  color: #64748B;
+  font-size: 12px;
+  color: var(--jv-text-muted);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -781,14 +778,15 @@
 .charts-split-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 16px;
 }
 
 .chart-card {
   padding: 22px;
-  background: #FFFFFF;
-  border: 1px solid var(--jv-border, #E2E8F0);
-  border-radius: var(--jv-radius-lg, 12px);
+  background: var(--jv-surface-card);
+  border: 1px solid var(--jv-border);
+  box-shadow: var(--jv-shadow-xs);
+  border-radius: var(--jv-radius-lg);
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -808,8 +806,8 @@
 
 .chart-card-title {
   font-size: 14px;
-  font-weight: 800;
-  color: #0B253A;
+  font-weight: 700;
+  color: var(--jv-text);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -817,7 +815,14 @@
 
 .chart-card-subtitle {
   font-size: 12px;
-  color: #64748B;
+  color: var(--jv-text-muted);
+}
+
+.chart-card-stat {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--jv-text);
+  font-variant-numeric: tabular-nums;
 }
 
 .mini-bar-chart {
@@ -826,7 +831,7 @@
   justify-content: space-around;
   height: 140px;
   padding-top: 20px;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid var(--jv-border-subtle);
   gap: 12px;
 }
 
@@ -843,34 +848,34 @@
 .chart-bar-val {
   font-size: 11px;
   font-weight: 700;
-  color: #0B253A;
+  color: var(--jv-text);
+  font-variant-numeric: tabular-nums;
 }
 
 .chart-bar-pillar {
   width: 100%;
   max-width: 38px;
   border-radius: 6px 6px 0 0;
-  transition: all 0.3s ease;
+  transition: opacity 0.2s ease;
   min-height: 8px;
 }
 
 .chart-bar-pillar-orange {
-  background: linear-gradient(180deg, #E66817 0%, #F59E0B 100%);
+  background: var(--jv-accent);
 }
 
 .chart-bar-pillar-navy {
-  background: linear-gradient(180deg, #0B253A 0%, #2563EB 100%);
+  background: var(--jv-primary);
 }
 
 .chart-bar-wrap:hover .chart-bar-pillar {
-  filter: brightness(1.15);
-  transform: scaleY(1.03);
+  opacity: 0.85;
 }
 
 .chart-bar-label {
   font-size: 11.5px;
   font-weight: 600;
-  color: #64748B;
+  color: var(--jv-text-muted);
 }
 
 /* Invoices Receivables Card */
@@ -879,10 +884,22 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 18px;
-  background: #FFFDF9;
-  border: 1px solid var(--jv-gold-border, #E8DEC8);
-  border-radius: 10px;
+  background: var(--jv-surface-card);
+  border: 1px solid var(--jv-border);
+  border-radius: var(--jv-radius-md);
   gap: 14px;
+  flex-wrap: wrap;
+}
+.invoices-rec-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--jv-radius-md);
+  background: var(--jv-warning-soft);
+  color: var(--jv-warning-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .invoices-rec-left {
@@ -899,13 +916,13 @@
 
 .invoices-rec-title {
   font-size: 13px;
-  font-weight: 800;
-  color: #0B253A;
+  font-weight: 700;
+  color: var(--jv-text);
 }
 
 .invoices-rec-sub {
-  font-size: 11.5px;
-  color: #64748B;
+  font-size: 12px;
+  color: var(--jv-text-muted);
 }
 
 /* Responsive updates */
@@ -928,6 +945,9 @@
 }
 
 @media (max-width: 640px) {
+  .mrr-amount {
+    font-size: 30px;
+  }
   .health-grid {
     grid-template-columns: 1fr;
   }

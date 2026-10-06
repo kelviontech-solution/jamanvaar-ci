@@ -66,8 +66,8 @@ export function EditRestaurantModal({ restaurant, onClose, onUpdated, onSaved }:
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 580 }}>
         <div className="modal-header">
           <div>
-            <h2 style={{ fontSize: 17, fontWeight: 700, color: '#0B253A' }}>Edit Restaurant Profile</h2>
-            <p style={{ margin: 0, fontSize: 12, color: '#64748B' }}>
+            <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--jv-text)' }}>Edit Restaurant Profile</h2>
+            <p style={{ margin: 0, fontSize: 12, color: 'var(--jv-text-muted)' }}>
               Update commercial identity and address for {restaurant.name}
             </p>
           </div>

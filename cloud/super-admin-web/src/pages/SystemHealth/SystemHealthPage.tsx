@@ -89,10 +89,10 @@ export function SystemHealthPage() {
             <AlertTriangle className="w-6 h-6 text-rose-600" />
           )}
           <div>
-            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: '#0B253A' }}>
+            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'var(--jv-text)' }}>
               {health?.database === 'UP' ? 'All Platform Core Services Operational' : 'Infrastructure Degraded'}
             </h3>
-            <p style={{ margin: '2px 0 0 0', fontSize: 13, color: '#475569' }}>
+            <p style={{ margin: '2px 0 0 0', fontSize: 13, color: 'var(--jv-text-secondary)' }}>
               {health?.database === 'UP'
                 ? 'Cloud API NestJS runtime and PostgreSQL connection pool are operating within nominal latency thresholds.'
                 : 'The database ping failed on the last check — the API process itself is still responding, but requests that touch the database will fail.'}
@@ -152,7 +152,7 @@ export function SystemHealthPage() {
                 {health.database === 'UP' ? 'ACTIVE & HEALTHY' : 'UNREACHABLE'}
               </dd>
               <dt>Ping Latency</dt>
-              <dd style={{ fontFamily: 'monospace', fontWeight: 800, color: '#0B253A', fontSize: 15 }}>
+              <dd style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--jv-text)', fontSize: 15 }}>
                 {health.databaseLatencyMs !== null ? `${health.databaseLatencyMs} ms` : '—'}
               </dd>
               <dt>Database Schema</dt>

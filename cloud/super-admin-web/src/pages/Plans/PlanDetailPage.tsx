@@ -73,7 +73,7 @@ export function PlanDetailPage() {
           <div className="detail-card-title">Commercial Terms &amp; Quotas</div>
           <dl className="detail-list">
             <dt>Monthly Fee</dt>
-            <dd style={{ fontWeight: 800, color: '#0B253A', fontSize: 16, fontFamily: 'monospace' }}>
+            <dd style={{ fontWeight: 800, color: 'var(--jv-text)', fontSize: 16, fontFamily: 'monospace' }}>
               ₹{(plan.priceMonthly / 100).toLocaleString('en-IN')}
             </dd>
             <dt>Yearly Fee</dt>
@@ -85,7 +85,7 @@ export function PlanDetailPage() {
             <dt>Max Staff Users</dt>
             <dd>{plan.maxUsers} user accounts</dd>
             <dt>Granular Features</dt>
-            <dd style={{ color: '#ea580c', fontWeight: 800 }}>{featureMetrics.totalFeatures} Capabilities</dd>
+            <dd style={{ color: 'var(--jv-accent-text)', fontWeight: 800 }}>{featureMetrics.totalFeatures} Capabilities</dd>
           </dl>
         </Card>
 
@@ -115,11 +115,11 @@ export function PlanDetailPage() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: 13, color: '#0B253A' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: 13, color: 'var(--jv-text)' }}>
                       <span style={{ color: '#16a34a' }}>✓</span>
                       <span>{cat.name}</span>
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#64748b' }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)' }}>
                       {catFeatsCount} Features
                     </span>
                   </div>
@@ -134,9 +134,9 @@ export function PlanDetailPage() {
                             fontSize: 11,
                             padding: '2px 8px',
                             borderRadius: 6,
-                            background: on ? '#f0fdf4' : '#f1f5f9',
-                            color: on ? '#166534' : '#94a3b8',
-                            border: `1px solid ${on ? '#86efac' : '#e2e8f0'}`,
+                            background: on ? '#f0fdf4' : 'var(--jv-bg-muted)',
+                            color: on ? '#166534' : 'var(--jv-text-light)',
+                            border: `1px solid ${on ? '#86efac' : 'var(--jv-border)'}`,
                             fontWeight: 600
                           }}
                         >

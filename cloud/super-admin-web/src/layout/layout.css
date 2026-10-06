@@ -80,7 +80,7 @@
   flex-wrap: wrap;
 }
 .platform-tag {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.06em;
   color: var(--jv-text-secondary);
@@ -90,10 +90,10 @@
   border: 1px solid var(--jv-border);
 }
 .super-admin-badge {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.06em;
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
   background: var(--jv-accent-soft);
   border: 1px solid rgba(253, 186, 116, 0.6);
   padding: 2px 7px;
@@ -115,7 +115,7 @@
   gap: 3px;
 }
 .sidebar-group-label {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -191,11 +191,11 @@
 }
 .sidebar-link.active {
   background: var(--jv-accent-soft);
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
   font-weight: 600;
 }
 .sidebar-link.active .sidebar-icon-wrap {
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
 }
 .sidebar-link.active::before {
   content: '';
@@ -246,10 +246,10 @@
   align-items: center;
 }
 .health-link:hover {
-  color: var(--jv-accent);
+  color: var(--jv-accent-text);
 }
 .platform-version {
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--jv-text-light);
   padding-left: 2px;
 }
@@ -349,7 +349,7 @@
   outline: none;
   background: var(--jv-surface);
   border-color: var(--jv-accent);
-  box-shadow: 0 0 0 3px rgba(230, 104, 23, 0.12);
+  box-shadow: 0 0 0 3px var(--jv-accent-ring);
 }
 .header-search-input::placeholder {
   color: var(--jv-text-light);
@@ -357,7 +357,7 @@
 .search-kbd {
   position: absolute;
   right: 10px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   font-family: inherit;
   color: var(--jv-text-muted);
@@ -385,7 +385,7 @@
   border-radius: var(--jv-radius-full);
   background: rgba(16, 185, 129, 0.12);
   border: 1px solid rgba(16, 185, 129, 0.3);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: #10b981;
@@ -481,7 +481,7 @@
   line-height: 1.2;
 }
 .profile-role-tag {
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--jv-text-muted);
   font-weight: 500;
 }

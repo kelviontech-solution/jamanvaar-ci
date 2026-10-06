@@ -8,17 +8,17 @@
 }
 
 .jamanvaar-superadmin-login input:focus {
-  background-color: #ffffff !important;
-  border-color: #e66817 !important;
-  box-shadow: 0 0 0 3px rgba(230, 104, 23, 0.12);
+  background-color: var(--jv-surface-card) !important;
+  border-color: var(--jv-accent) !important;
+  box-shadow: 0 0 0 3px var(--jv-accent-ring);
 }
 
 .jamanvaar-superadmin-login button[type="submit"] {
-  background: linear-gradient(135deg, #e66817 0%, #ea580c 100%);
-  box-shadow: 0 4px 14px 0 rgba(230, 104, 23, 0.3);
+  background: var(--jv-accent);
+  box-shadow: 0 4px 14px 0 rgba(191, 84, 15, 0.25);
 }
 
 .jamanvaar-superadmin-login button[type="submit"]:hover:not(:disabled) {
-  background: linear-gradient(135deg, #f97316 0%, #e66817 100%);
-  box-shadow: 0 6px 20px 0 rgba(230, 104, 23, 0.42);
+  background: var(--jv-accent-hover);
+  box-shadow: 0 6px 20px 0 rgba(191, 84, 15, 0.35);
 }
