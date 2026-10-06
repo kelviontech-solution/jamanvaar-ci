@@ -23,7 +23,7 @@ import {
   type ServiceMessage
 } from '@jamanvaar/database';
 import type { User } from '@jamanvaar/types';
-import { lanMeshSync, StaffSession, SyncOutboxEngine, syncDiningTables, pushServiceMessages } from '@jamanvaar/sync';
+import { lanMeshSync, StaffSession, SyncOutboxEngine, syncDiningTables, pushServiceMessages, verifyPinWithSync } from '@jamanvaar/sync';
 
 /** Sends what this tablet just changed to the cloud now, not at the next 4 s timer tick, so the kitchen and counter see it within a second. */
 function pushNow(): void {
@@ -387,7 +387,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
   login: async (pin: string) => {
     // Centralised, hashed PIN verification (BUG-005/006/009/011) — same path as POS/KDS/Kiosk.
-    const candidate = (await StaffRepository.verifyPin(pin))?.user;
+    const candidate = (await verifyPinWithSync(pin))?.user;
     // A PIN for a role that does not work the floor is refused (BUG-118).
     const matchedUser = candidate && StaffRepository.canUseTerminal(candidate.roleId, 'CAPTAIN') ? candidate : undefined;
     // A correct PIN on the wrong screen is not a typo: say so, the way POS does (BUG-147).
@@ -992,7 +992,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     let approver = state.currentCaptain?.name;
     if (!signedInIsManager) {
       if (!managerPin) return { ok: false, error: 'A manager must approve cancelling a dish that was already sent.' };
-      const verified = await StaffRepository.verifyPin(managerPin);
+      const verified = await verifyPinWithSync(managerPin);
       if (!verified?.isManager) return { ok: false, error: 'That is not a manager PIN.' };
       approver = verified.user.fullName;
       await StaffSession.approve(managerPin, captainDeviceFetch); // best effort: gives the server proof of who approved

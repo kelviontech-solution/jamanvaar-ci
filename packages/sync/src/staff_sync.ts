@@ -1,4 +1,5 @@
 import { db, KeyValueStore, StaffRepository } from '@jamanvaar/database';
+import type { User } from '@jamanvaar/types';
 import { EntitySyncEngine } from './entity_sync';
 
 const ACK_KEY = 'jamanvaar_staff_sync_ack_v2';
@@ -42,4 +43,20 @@ export function syncStaffUsers(opts: { push: boolean }): Promise<void> {
     } while (again);
   })().finally(() => { inFlight = null; });
   return inFlight;
+}
+
+/**
+ * Every terminal login screen's PIN check: a plain `StaffRepository.verifyPin` only sees
+ * whatever this device has already pulled, and that pull runs on its own ~15s tick (plus
+ * whatever Restaurant Admin takes to push) — so a PIN issued seconds ago, tried on a
+ * different device, looks exactly like a wrong PIN. This probes the already-local data
+ * first (free, instant, the common case) without spending one of the 5 lockout strikes;
+ * only on a miss does it pull once and check again, so the one real strike is charged
+ * against the final, synced answer.
+ */
+export async function verifyPinWithSync(pin: string, restaurantId?: string): Promise<{ user: User; isManager: boolean } | null> {
+  const first = await StaffRepository.verifyPin(pin, restaurantId, { countFailure: false });
+  if (first) return first;
+  await syncStaffUsers({ push: false }).catch(() => undefined);
+  return StaffRepository.verifyPin(pin, restaurantId);
 }

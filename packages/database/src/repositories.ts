@@ -3757,8 +3757,14 @@ export class StaffRepository {
    * active user's hash concurrently (PBKDF2 is deliberately slow per B2-014 — sequential
    * `await`s here would multiply that cost by staff count) and returns whichever one matches.
    * The lockout below is MED-07 (see the constants' own comment above this class).
+   *
+   * `opts.countFailure: false` lets a caller probe once without spending one of the 5 lockout
+   * strikes — used by `verifyPinWithSync` (packages/sync/src/staff_sync.ts) for its silent
+   * pre-sync attempt, so a PIN that merely hasn't synced to this device yet doesn't cost the
+   * cashier a real attempt (see BUG-019/034/035's follow-up: the record syncs fine, but only on
+   * this device's own ~15s poll tick — a PIN tried in that window looked like a wrong PIN).
    */
-  public static async verifyPin(pin: string, restaurantId?: string): Promise<{ user: User; isManager: boolean } | null> {
+  public static async verifyPin(pin: string, restaurantId?: string, opts?: { countFailure?: boolean }): Promise<{ user: User; isManager: boolean } | null> {
     if (Date.now() < pinLockedUntil) return null;
     pinLockedUntil = 0;
 
@@ -3787,10 +3793,12 @@ export class StaffRepository {
     }
 
     if (!user) {
-      pinFailureCount += 1;
-      if (pinFailureCount >= PIN_LOCKOUT_AFTER_FAILURES) {
-        pinLockedUntil = Date.now() + PIN_LOCKOUT_MS;
-        pinFailureCount = 0;
+      if (opts?.countFailure !== false) {
+        pinFailureCount += 1;
+        if (pinFailureCount >= PIN_LOCKOUT_AFTER_FAILURES) {
+          pinLockedUntil = Date.now() + PIN_LOCKOUT_MS;
+          pinFailureCount = 0;
+        }
       }
       return null;
     }

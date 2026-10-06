@@ -36,7 +36,7 @@ import {
 import { PosPrinterService } from '../services/printerService';
 import { Platform } from '@jamanvaar/api';
 import { PosRecoveryService } from '../services/recoveryService';
-import { lanMeshSync, SyncOutboxEngine, StaffSession, type RefundApprovalScope } from '@jamanvaar/sync';
+import { lanMeshSync, SyncOutboxEngine, StaffSession, verifyPinWithSync, type RefundApprovalScope } from '@jamanvaar/sync';
 import { deviceFetch as posDeviceFetch } from '../cloud/cloudClient';
 import { SessionPersistence, AuthStatus, calculateCart } from '@jamanvaar/business';
 import { generateUUID } from '@jamanvaar/utils';
@@ -500,7 +500,7 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     loginWithPin: async (pin: string) => {
-      const result = await StaffRepository.verifyPin(pin);
+      const result = await verifyPinWithSync(pin);
       const user = result?.user;
 
       if (user && !StaffRepository.canUseTerminal(user.roleId, 'POS')) {
@@ -572,7 +572,7 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     unlockTerminal: async (pin: string) => {
-      const result = await StaffRepository.verifyPin(pin);
+      const result = await verifyPinWithSync(pin);
       if (result) {
         SessionPersistence.update('pos', { locked: false });
         set({ isLocked: false });

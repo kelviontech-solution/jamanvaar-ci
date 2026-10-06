@@ -1,4 +1,4 @@
-import { syncStaffUsers, startLocalChangeSync } from '@jamanvaar/sync';
+import { syncStaffUsers, startLocalChangeSync, verifyPinWithSync } from '@jamanvaar/sync';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository, KeyValueStore } from '@jamanvaar/database';
 import { getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages, syncMenuCatalog, EndpointResolver, onAppResume } from '@jamanvaar/sync';
@@ -363,7 +363,7 @@ export const App: React.FC = () => {
       const next = kdsPin + digit;
       setKdsPin(next);
       if (next.length === 4) {
-        const candidate = (await StaffRepository.verifyPin(next))?.user;
+        const candidate = (await verifyPinWithSync(next))?.user;
         // A PIN for a role that does not work the kitchen screen is refused (BUG-118).
         const matchedUser = candidate && StaffRepository.canUseTerminal(candidate.roleId, 'KDS') ? candidate : undefined;
 
